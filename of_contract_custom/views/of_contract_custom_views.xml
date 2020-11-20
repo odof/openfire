@@ -115,7 +115,7 @@
                         </group>
                         <group col="2" colspan="2" string="Validité" name="validity">
                             <field name="current_period_id"/>
-
+                            <field name="period_ids" invisible="1" readonly="1"/>
                             <label for="date_start" string="Dates"/>
                             <div name="dates">
                                 <i class="oe_grey oe_inline">Début : </i>
@@ -177,7 +177,7 @@
                                         <button name="annuler_la_ligne" type="object" icon="fa-times"
                                                 help="Annuler la ligne"
                                                 attrs="{'invisible': ['|',('state', '!=', 'validated'),('date_end','!=',False)]}"/>
-                                        <button name="supprimer_la_ligne" type="object" icon="fa-tash-o"
+                                        <button name="supprimer_la_ligne" type="object" icon="fa-trash-o"
                                                 help="Supprimer"
                                                 attrs="{'invisible': [('state', '!=', 'draft')]}"
                                                 confirm="Voulez-vous supprimer la ligne ?"/>
@@ -316,6 +316,197 @@
             </xpath>
         </field>
     </record>
+
+    <record id="view_of_contract_service_form" model="ir.ui.view">
+        <field name="name">of.contract.service.form</field>
+        <field name="model">of.service</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="button_valider" string="Valider" states="draft" type="object"/>
+                    <button name="button_annuler" string="Annuler" type="object"
+                            attrs="{'invisible': [('base_state', '!=', 'calculated')]}"/>
+                    <button name="button_brouillon" string="Remettre en brouillon" states="cancel" type="object"/>
+                </header>
+                <sheet>
+                    <field name="alert_dates" invisible="1"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" name="action_view_intervention" type="object" icon="fa-calendar">
+                            <field string="RDVs Tech" name="intervention_count" widget="statinfo"/>
+                        </button>
+                        <button name="toggle_active" type="object"
+                                class="oe_stat_button" icon="fa-archive"
+                                confirm="Êtes-vous sûr de vouloir archiver/activer ce service ?">
+                            <field name="active" widget="boolean_button"
+                                options='{"terminology": "archive"}'/>
+                        </button>
+                            <button name="action_view_contract" type="object"
+                                    class="oe_stat_button" icon="fa-pencil-square-o"
+                                    attrs="{'invisible': [('contract_id','=',False)]}" string="Contrat">
+                                <field name="contract_id" invisible="1"/>
+                            </button>
+
+                    </div>
+                    <div class="of_title">
+                        <h1 attrs="{'invisible': [('recurrence', '=', False)]}"><b>
+                            <span>Intervention récurrente</span>
+                            <i> (<field name="state" nolabel="1" attrs="{'invisible': [('recurrence', '!=', True)]}"
+                                       class="oe_inline"/>)</i>
+                        </b></h1>
+                        <h1 attrs="{'invisible': [('recurrence', '=', True)]}"><b>
+                            <span>Intervention ponctuelle</span>
+                            <i> (<field name="state_ponc" nolabel="1" attrs="{'invisible': [('recurrence', '=', True)]}"
+                                       class="oe_inline"/>)</i>
+                        </b></h1>
+                    </div>
+                    <group>
+                        <group name="gauche_1">
+                            <group colspan="2" name="refs" string="Références">
+                                <field name="base_state" invisible="1"/>
+                                <field name="partner_id" invisible="context.get('hide_service_partner_id')"/>
+                                <label for="address_id" invisible="context.get('hide_service_address_id')"/>
+                                <div class="o_address_format" invisible="context.get('hide_service_address_id')">
+                                    <div><field name="address_id"/></div>
+                                    <field name="address_address"/>
+                                </div>
+                                <field name="secteur_tech_id"/>
+                                <field name="tag_ids" widget="many2many_tags"/>
+                                <field name="company_id"/>
+                            </group>
+                            <group colspan="2" name="origine" string="Origine">
+                                <field name="order_id"
+                                   groups="sales_team.group_sale_salesman,
+                                           account.group_account_invoice,
+                                           stock.group_stock_user"/>
+                                <field name="sav_id"
+                                       attrs="{'invisible': [('recurrence', '=', True)]}"
+                                       groups="project.group_project_user, base.group_portal"/>
+                                <field name="origin" readonly="1" attrs="{'invisible': [('recurrence', '=', True)]}"/>
+                            </group>
+                            <group string="Produit installé" groups="project.group_project_user" colspan="2">
+                                <field name="parc_installe_id"/>
+                                <field name="parc_installe_product_id"/>
+                                <field name="parc_installe_site_adresse_id"/>
+                                <field name="parc_installe_note"/>
+                            </group>
+                        </group>
+                        <group name="droite_1">
+                            <group colspan="2" name="planif" string="Planification">
+                                <div colspan="2" attrs="{'invisible': [('base_state', '!=', 'draft')]}">
+                                    <b><i class="of_red">
+                                        <i class="fa fa-lg fa-warning"/>
+                                        Vous ne pourrez planifier cette intervention que lorsqu’elle sera validée.
+                                    </i></b>
+                                </div>
+                                <div colspan="2" attrs="{'invisible': [('base_state', '!=', 'cancel')]}">
+                                    <b><i class="of_red">
+                                        <i class="fa fa-lg fa-warning"/> Une intervention annulée n'est pas planifiable.
+                                    </i></b>
+                                </div>
+                                <group colspan="2">
+                                    <field name="date_last" invisible="1"/>
+                                    <field name="tache_id" context="{'show_rec_icon_first': recurrence}"/>
+                                    <label for="duree" string="Durées"/>
+                                    <div>
+                                        <field name="duree" widget="float_time" nolabel="1" class="oe_inline"
+                                               attrs="{'invisible': [('state', '=', 'done')]}"/>
+                                        <i class="oe_grey oe_inline"
+                                            attrs="{'invisible': [('state', '=', 'done')]}"> (estimée), </i>
+                                        <field name="duree_planif" widget="float_time" nolabel="1" class="oe_inline"
+                                            attrs="{'invisible': [('state', '=', 'done')]}"/>
+                                        <i class="oe_grey oe_inline"
+                                            attrs="{'invisible': [('state', '=', 'done')]}"> (planifiée), </i>
+                                        <field name="duree_restante" widget="float_time" nolabel="1" class="oe_inline"
+                                            attrs="{'invisible': [('state', '=', 'done')]}"/>
+                                        <i class="oe_grey oe_inline"
+                                            attrs="{'invisible': [('state', '=', 'done')]}"> (restante).</i>
+                                        <i class="oe_grey oe_inline" attrs="{'invisible': [('state', '!=', 'done')]}">
+                                            Cette intervention est terminée
+                                        </i>
+                                    </div>
+
+                                    <label for="date_next" string="Dates"/>
+                                    <div name="dates">
+                                        <i class="oe_grey oe_inline">Entre le </i>
+                                        <field name="date_next" nolabel="1" class="oe_inline"/>
+                                        <i class="oe_grey oe_inline"> et le </i>
+                                        <field name="date_fin" nolabel="1" class="oe_inline"/>
+                                        <span attrs="{'invisible': [('recurrence', '=', False)]}">
+                                            <i class="oe_grey oe_inline">. Expire le </i>
+                                            <field name="date_fin_contrat" nolabel="1" class="oe_inline"/>
+                                            <i class="oe_grey oe_inline"> .</i>
+                                        </span>
+                                        <div attrs="{'invisible': [('alert_dates', '=', False)]}" class="of_red">
+                                            <i class="fa fa-warning of_ws"/>Incohérence dans les dates
+                                        </div>
+                                    </div>
+                                    <div colspan="2"
+                                         attrs="{'invisible': ['|',
+                                                                ('date_next', '&lt;=', '_field_date_fin_contrat'),
+                                                                ('date_fin_contrat', '=', False)]}">
+                                        <b><i class="oe_grey">
+                                            La date de prochaine planification est postérieure à la date de fin
+                                            du contrat.<br/>
+                                            Cela signifie que cette intervention est terminée et ne sera plus jamais
+                                            sélectionnée par les outils de planification.<br/>
+                                            Veuillez changer les dates si ce n'est pas ce que vous vouliez faire
+                                        </i></b>
+                                    </div>
+                                    <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                    <field name="recurrence"/>
+                                    <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('recurrence', '=', False)]}"/>
+                                    <label for="recurring_interval" attrs="{'invisible': [('recurrence', '=', False)]}"/>
+                                    <div attrs="{'invisible': [('recurrence', '=', False)]}" col="2">
+                                        <field name="recurring_interval" nolabel="1" class="oe_inline of_ws"/>
+                                        <field name="recurring_rule_type" nolabel="1" class="oe_inline"/>
+                                    </div>
+                                    <field name="recurrence_tache" invisible="1"/>
+                                    <div colspan="2" attrs="{'invisible': [
+                                        '|',
+                                            ('recurrence', '=', '_field_recurrence_tache'),
+                                            ('recurrence', '=', False)]}">
+                                        <b><i class="oe_grey">
+                                            La tâche de cette intervention est ponctuelle alors que cette intervention est récurrente.
+                                        </i></b>
+                                    </div>
+                                    <div colspan="2" attrs="{'invisible': [
+                                        '|',
+                                            ('recurrence', '=', '_field_recurrence_tache'),
+                                            ('recurrence', '=', True)]}">
+                                        <b><i class="oe_grey">
+                                            La tâche de cette intervention est récurrente alors que cette intervention est ponctuelle.
+                                        </i></b>
+                                    </div>
+                                </group>
+                            </group>
+                            <group colspan="2" name="notes" string="Description">
+                                <field name="note" colspan="2" nolabel="1"/>
+                            </group>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_of_contract_service_form_planning" model="ir.actions.act_window">
+        <field name="name">Interventions ponctuelles</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.service</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,map,form,pivot</field>
+        <field name="search_view_id" ref="of_service.view_of_service_filter"/>
+        <field name="context">{
+            'search_default_filter_ponc': 1,
+            'default_recurrence': False,
+            'form_view_ref': 'of_contract_custom.view_of_contract_service_form',
+        }</field>
+    </record>
+
+
+
+
+
 
 <!-- ******************************************************************************************* -->
 <!-- ***************************************** ARTICLES **************************************** -->

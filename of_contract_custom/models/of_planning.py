@@ -54,6 +54,14 @@ class OfService(models.Model):
             action_context.update({'default_contract_line_id': self.contract_line_id.id})
         return super(OfService, self).get_action_view_interventions_context(action_context)
 
+
+    @api.multi
+    def action_view_contract(self):
+        self.ensure_one()
+        action = self.env.ref('of_contract_custom.action_contract').read()[0]
+        action['domain'] = [('id', '=', self.contract_id.id)]
+        return action
+
     @api.multi
     def button_open_of_planning_intervention(self):
         self.ensure_one()
