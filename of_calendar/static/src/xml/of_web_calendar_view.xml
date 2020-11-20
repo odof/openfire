@@ -37,35 +37,48 @@
     </div>
 
     <t t-extend="CalendarView.sidebar.contacts">
-        <t t-jquery="span[t-attf-class='color_filter o_underline_color_#{filters_value.color}']" t-operation="replace">
-            <!-- if custom colors -->
-            <t t-if="filters_value.custom_colors">
-                <span t-attf-style="
-                    color: #{filters_value.color_ft}; 
-                    background: #{filters_value.color_bg}; 
-                    padding: 2px 8px 4px;
-                    border-radius: 4px;
-                    border: 1px solid #0D0D0D;"
-                    t-attf-class="of_calendar_attendee_#{filters_value.value} of_calendar_filter"
-                    t-attf-id="of_calendar_attendee_#{filters_value.value}">
-                    <t t-esc="filters_value.label"/>
-                </span>
-            </t>
-            <t t-if="!filters_value.custom_colors"><!-- copy of parent XML -->
-                <span t-attf-class="color_filter o_underline_color_#{filters_value.color}">
-                    <t t-esc="filters_value.label"/>
-                </span>
-            </t>
-        </t>
-        <!-- if radio filters -->
-        <t t-jquery="input[name='selection']" t-operation="replace">
-            <t t-if="filters_radio">
-                <input type="radio" name="selection" t-att-value="filters_value.value"
-                       t-att-checked="(filters_value.is_checked ? true : undefined)"/><span/>
-            </t>
-            <t t-if="!filters_radio">
-                <input type="checkbox" name="selection" t-att-value="filters_value.value"
-                       t-att-checked="(filters_value.is_checked ? true : undefined)"/><span/>
+        <t t-jquery="t[t-if='filters_value.value']" t-operation="replace">
+            <t t-if="filters_value.value &amp;&amp; filters_value.is_visible"><!-- don't display if no value given (or undefined) -->
+                <div class="o_checkbox">
+                    <t t-if="filters_radio">
+                        <input type="radio" name="selection" t-att-value="filters_value.value"
+                               t-att-checked="(filters_value.is_checked ? true : undefined)"/>
+                        <span/>
+                    </t>
+                    <t t-if="!filters_radio">
+                        <input type="checkbox" name="selection" t-att-value="filters_value.value"
+                               t-att-checked="(filters_value.is_checked ? true : undefined)"/>
+                        <span/>
+                    </t>
+                    <span/>
+                </div>
+                <t t-if="filters_value.value == -1">
+                    <span>
+                        <i class="fa fa-users fa-fw o_cal_avatar"/>
+                    </span>
+                </t>
+                <t t-if="(filters_value.value != -1) &amp;&amp; filters_value.avatar_model">
+                    <img t-attf-src="/web/image/#{filters_value.avatar_model}/#{filters_value.value}/image_small"
+                         class="o_cal_avatar"/>
+                </t>
+                <!-- if custom colors -->
+                <t t-if="filters_value.custom_colors">
+                    <span t-attf-style="
+                        color: #{filters_value.color_ft};
+                        background: #{filters_value.color_bg};
+                        padding: 2px 8px 4px;
+                        border-radius: 4px;
+                        border: 1px solid #0D0D0D;"
+                          t-attf-class="of_calendar_attendee_#{filters_value.value} of_calendar_filter"
+                          t-attf-id="of_calendar_attendee_#{filters_value.value}">
+                        <t t-esc="filters_value.label"/>
+                    </span>
+                </t>
+                <t t-if="!filters_value.custom_colors"><!-- copy of parent XML -->
+                    <span t-attf-class="color_filter o_underline_color_#{filters_value.color}">
+                        <t t-esc="filters_value.label"/>
+                    </span>
+                </t>
             </t>
         </t>
     </t>
