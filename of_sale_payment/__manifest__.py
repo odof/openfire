@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 {
-    "name" : "OpenFire / Paiements ventes",
-    "version" : "10.0.1.0.0",
-    "author" : "OpenFire",
-    "description" : """
+    "name": u"OpenFire / Paiements ventes",
+    "version": "10.0.1.0.0",
+    "author": "OpenFire",
+    "description": u"""
 Paiements depuis les bons de commande client
 ============================================
 
@@ -13,10 +13,10 @@ Paiements depuis les bons de commande client
 - Ajout d'un smart button paiements sur les commandes
 - Modification de l'impression de devis/commande
 """,
-    "website" : "www.openfire.fr",
-    "depends" : ["of_sale", "of_account_payment_mode"],
-    "category" : "OpenFire",
-    "data" : [
+    "website": "www.openfire.fr",
+    "depends": ["of_sale", "of_account_payment_mode"],
+    "category": "OpenFire",
+    "data": [
         'views/of_sale_payment_view.xml',
         'report/of_sale_payment_report_template.xml',
     ],

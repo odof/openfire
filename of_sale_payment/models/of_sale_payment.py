@@ -4,10 +4,13 @@ from odoo import models, fields, api
 
 from odoo.addons.mail.models.mail_template import format_date
 
+
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    payment_ids = fields.Many2many('account.payment', 'sale_order_account_payment_rel', 'order_id', 'payment_id', string="Paiements", copy=False, readonly=True)
+    payment_ids = fields.Many2many(
+        'account.payment', 'sale_order_account_payment_rel', 'order_id', 'payment_id',
+        string="Paiements", copy=False, readonly=True)
     of_payment_amount = fields.Float(compute='_compute_of_payment_amount')
 
     @api.depends('payment_ids')
@@ -31,15 +34,19 @@ class SaleOrder(models.Model):
         if not result:
             for payment in self.payment_ids:
                 # Les paiements sont classés dans l'ordre chronologique
-                move_line = payment.move_line_ids.filtered(lambda l: l.account_id == self.partner_id.property_account_receivable_id)
+                move_line = payment.move_line_ids.filtered(
+                    lambda l: l.account_id == self.partner_id.property_account_receivable_id)
                 name = invoice_obj._of_get_payment_display(move_line)
                 result.append((name, payment.amount))
         return result
 
+
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
-    order_ids = fields.Many2many('sale.order', 'sale_order_account_payment_rel', 'payment_id', 'order_id', string="Commandes client", copy=False, readonly=True)
+    order_ids = fields.Many2many(
+        'sale.order', 'sale_order_account_payment_rel', 'payment_id', 'order_id',
+        string="Commandes client", copy=False, readonly=True)
     of_order_count = fields.Integer(compute='_compute_of_order_count')
 
     @api.depends('order_ids')
@@ -123,6 +130,7 @@ class AccountPayment(models.Model):
             rec['amount'] = amount
         return rec
 
+
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
@@ -137,6 +145,7 @@ class AccountInvoice(models.Model):
 
             credit_aml.payment_id.write({'order_ids': [(4, order_id, None) for order_id in order_ids]})
         return res
+
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
