@@ -105,6 +105,8 @@ class ProjectIssue(models.Model):
         for i in self.liste_docs_partner():  # On récupère la liste des documents liés au partenaire (factures, ...)
             docs.append((0, 0, i))
         self.doc_ids = docs
+        if self.partner_id:
+            self.company_id = self.partner_id.company_id
 
     @api.onchange('project_id')
     def _onchange_project_id(self):
