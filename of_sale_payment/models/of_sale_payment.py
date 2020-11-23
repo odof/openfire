@@ -128,6 +128,16 @@ class AccountPayment(models.Model):
             rec['amount'] = amount
         return rec
 
+    @api.model
+    def create(self, vals):
+        payment = super(AccountPayment, self).create(vals)
+        if self._context.get('default_order_ids') and not self._context.get('default_invoice_ids'):
+            payment.message_post_with_view(
+                'mail.message_origin_link',
+                values={'self': payment, 'origin': payment.order_ids},
+                subtype_id=self.env.ref('mail.mt_note').id)
+        return payment
+
 
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'

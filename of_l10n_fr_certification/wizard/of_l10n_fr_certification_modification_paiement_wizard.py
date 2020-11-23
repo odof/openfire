@@ -56,6 +56,13 @@ class OFAccountPaymentWizard(models.TransientModel):
         if getattr(payment, 'of_intervention_id', False):
             context['default_of_intervention_id'] = payment.of_intervention_id.id
 
+        # Si les paiements héritent de mail.thread (module of_account), on ajoute des informations dans le contexte
+        if 'message_ids' in payment._fields:
+            context.update({
+                'of_orig_payment_operation': type_paiement,
+                'of_orig_payment_id': payment.id,
+            })
+
         # On vérifie si le module of_account_payment_mode est installé (existence du champ of_payment_mode_id).
         # Si oui, on ajoute les valeurs des champs supplémentaires qu'il a ajouté.
         if getattr(payment, 'of_payment_mode_id', False):
