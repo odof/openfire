@@ -146,7 +146,7 @@
                                 </div>
                                 <field name="line_ids" mode="tree" nolabel="1"
                                        options="{'reload_on_button': True}"
-                                       context="{'form_view_ref': 'of_contract_custom_v2.of_contract_line_view_form',
+                                       context="{'form_view_ref': 'of_contract_custom.of_contract_line_view_form',
                                                  'default_partner_id': partner_id,
                                                  'default_company_id': company_id,
                                                  'default_recurring_invoicing_payment': recurring_invoicing_payment,
@@ -231,7 +231,7 @@
     </record>
 
 
-    <menuitem name="Contrats" id="contract_sale.menu_contract_sale" parent="sales_team.menu_sales" sequence="150" action="of_contract_custom_v2.action_contract"/>
+    <menuitem name="Contrats" id="contract_sale.menu_contract_sale" parent="sales_team.menu_sales" sequence="150" action="of_contract_custom.action_contract"/>
 
 <!-- ******************************************************************************************* -->
 <!-- ************************************ MODÈLE DE CONTRAT ************************************ -->
@@ -499,7 +499,7 @@
         <field name="context">{
             'search_default_filter_ponc': 1,
             'default_recurrence': False,
-            'form_view_ref': 'of_contract_custom_v2.view_of_contract_service_form',
+            'form_view_ref': 'of_contract_custom.view_of_contract_service_form',
         }</field>
     </record>
 
@@ -704,7 +704,7 @@
                                 </group>
                                 <separator string="Articles" colspan="4"/>
                                 <field colspan="4" name="contract_product_ids" nolabel="1"
-                                context="{'form_view_ref': 'of_contract_custom_v2.of_contract_custom_contract_product_view_form'}">
+                                context="{'form_view_ref': 'of_contract_custom.of_contract_custom_contract_product_view_form'}">
                                     <tree>
                                         <field name="product_id"/>
                                         <field name="price_unit"/>
@@ -770,7 +770,7 @@
         <field name="model">of.contract.line</field>
         <field name="mode">primary</field>
         <field name="type">form</field>
-        <field name="inherit_id" ref="of_contract_custom_v2.of_contract_line_view_form"/>
+        <field name="inherit_id" ref="of_contract_custom.of_contract_line_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="contract_id" readonly="1"/>
@@ -876,7 +876,7 @@
     </record>
 
     <menuitem name="Contrats" id="menu_config_contrat" parent="sale.prod_config_main" sequence="40"/>
-    <menuitem name="Indices" id="menu_config_index" parent="of_contract_custom_v2.menu_config_contrat" sequence="10" action="action_index"/>
+    <menuitem name="Indices" id="menu_config_index" parent="of_contract_custom.menu_config_contrat" sequence="10" action="action_index"/>
 
 
 </odoo>
