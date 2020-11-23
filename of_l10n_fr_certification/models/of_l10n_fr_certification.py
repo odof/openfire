@@ -122,7 +122,7 @@ class AccountPayment(models.Model):
     _name = "account.payment"
     _inherit = 'account.payment'
 
-    active = fields.Boolean(string="Active", default=True)
+    active = fields.Boolean(string="Active", default=True, track_visibility='onchange')
 
     of_payment_type_readonly = fields.Boolean(string=u"Type de paiement en lecture seule")
 
@@ -192,10 +192,6 @@ class AccountPayment(models.Model):
                              paiement.state or '', paiement.name or '', paiement.communication or '',
                              paiement.company_id.id, paiement.company_id.name or ''))
         return res
-
-    @api.multi
-    def unlink(self):
-        raise UserError(_(u"Vous ne pouvez pas supprimer un paiement.\nVous pouvez seulement le laisser en brouillon."))
 
     # Il y a un onchange dans payment.type qui change de manière non voulue la valeur du type de partenaire
     # dans le formulaire du nouveau paiement.
