@@ -58,14 +58,14 @@ class OfService(models.Model):
     @api.multi
     def action_view_contract(self):
         self.ensure_one()
-        action = self.env.ref('of_contract_custom.action_contract').read()[0]
+        action = self.env.ref('of_contract_custom_v2.action_contract').read()[0]
         action['domain'] = [('id', '=', self.contract_id.id)]
         return action
 
     @api.multi
     def button_open_of_planning_intervention(self):
         self.ensure_one()
-        action = self.env.ref('of_contract_custom.of_contract_custom_open_interventions').read()[0]
+        action = self.env.ref('of_contract_custom_v2.of_contract_custom_open_interventions').read()[0]
         interventions = self.intervention_ids
         if len(interventions) > 1:
             action['context'] = {'search_default_service_id': self.id}

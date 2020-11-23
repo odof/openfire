@@ -16,9 +16,7 @@ class OfContract(models.Model):
     invoice_count = fields.Integer(string='Nombre de facture', compute='_get_invoice_count', readonly=True)
     name = fields.Char(string="Nom", required=False, compute="_compute_name")
     reference = fields.Char(string=u"Référence", required=True)
-    # template_id = fields.Many2one('of.contract.template', string=u'Modèle')
     partner_id = fields.Many2one("res.partner", string="Client payeur", required=True)
-    # partner_ref = fields.Char(string=u"Référence", related='partner_id.ref', readonly=True)
     category_ids = fields.Many2many(
         'res.partner.category', related="partner_id.category_id", string=u"Étiquettes client")
     pricelist_id = fields.Many2one('product.pricelist', string='Liste de prix')
@@ -32,17 +30,11 @@ class OfContract(models.Model):
         ], default='month', string=u"Fréquence de facturation", help="Interval de temps entre chaque facturation",
         required=True
     )
-    # recurring_invoicing_type = fields.Selection(
-    #     [('contract', u'Récurrence du contrat'),
-    #      ('services', u'Récurrence des services'),
-    #      ], default='contract', string='Type de facturation',
-    #     help=u"Défini si la facturation est faite en fonction de l'interval du contrat ou de l'interval des éléments de facturation")
     recurring_invoicing_payment = fields.Selection(
         [('pre-paid', u'À Échoir'),
          ('post-paid', u'Échu'),
          ], default='pre-paid', string='Type de facturation', required=True,
     )
-    # recurring_interval = fields.Integer(string=u'Répéter chaque', default=1, required=True)
     journal_id = fields.Many2one(
         'account.journal', string='Journal', default=lambda s: s._default_journal(),
         domain="[('type', '=', 'sale'),('company_id', '=', company_id)]")
@@ -274,7 +266,7 @@ class OfContract(models.Model):
     @api.multi
     def action_view_intervention(self):
         interventions = self.env['of.planning.intervention']
-        action = self.env.ref('of_contract_custom.of_contract_custom_open_interventions').read()[0]
+        action = self.env.ref('of_contract_custom_v2.of_contract_custom_open_interventions').read()[0]
         for contract_line in self.line_ids:
             interventions |= contract_line.intervention_ids
         action['domain'] = [('id', 'in', interventions._ids)]
@@ -283,7 +275,7 @@ class OfContract(models.Model):
     @api.multi
     def action_view_services(self):
         self.ensure_one()
-        action = self.env.ref('of_contract_custom.action_of_contract_service_form_planning').read()[0]
+        action = self.env.ref('of_contract_custom_v2.action_of_contract_service_form_planning').read()[0]
         action['context'] = {
             'search_default_filter_ponc'  : 1,
             'search_default_contract_id'  : self.id,
@@ -298,7 +290,7 @@ class OfContract(models.Model):
         self.ensure_one()
         if not self.period_ids.filtered(lambda p: p.has_invoices):
             return self.env['of.popup.wizard'].popup_return(message=u"Aucune période ne pouvant être revue.")
-        view_id = self.env.ref('of_contract_custom.of_contract_revision_view_form').id
+        view_id = self.env.ref('of_contract_custom_v2.of_contract_revision_view_form').id
         wizard = self.env['of.contract.revision.wizard'].create({'contract_id': self.id, 'period_id': self.period_ids[0].id})
         return {
             'name'     : 'Avenant',
@@ -559,7 +551,7 @@ class OfContractLine(models.Model):
         ], default='pre-paid', string='Type de facturation', required=True)
 
     next_date = fields.Date(string="Prochaine facturation", compute="_compute_dates", store=True, copy=False)
-    previous_date = fields.Date(string=u"Dernière facturation", compute="_compute_dates")
+    # previous_date = fields.Date(string=u"Dernière facturation", compute="_compute_dates")
     is_invoiceable = fields.Boolean(compute="_compute_is_invoiceable", store=True, copy=False)
     date_avenant = fields.Date(u'Date de début (avenant)', copy=False)
     date_start = fields.Date(
@@ -636,7 +628,7 @@ class OfContractLine(models.Model):
     use_index = fields.Boolean(string="Indexer", default=True)
     date_indexed = fields.Date(string=u"Dernière indexation", compute="_compute_date_indexed", store=True)
     last_invoicing_date = fields.Date(
-            string=u"Date de dernière facturation", copy=False, compute="_compute_last_invoicing_date", store=True)
+            string=u"Dernière facturation", copy=False, compute="_compute_dates", store=True)
     afficher_facturation = fields.Boolean(string=u"Détails facturation")
     revision_avenant = fields.Boolean(string=u"")
     warning_planif = fields.Boolean(string="Warning planification", compute="_compute_warning_planif")
@@ -695,6 +687,7 @@ class OfContractLine(models.Model):
                  'invoice_line_ids.invoice_id',
                  'invoice_line_ids.invoice_id.state',
                  'date_avenant',
+                 'last_invoicing_date',
                  'date_end',
                  'contract_id.date_start',
                  'contract_id.date_end',
@@ -720,9 +713,17 @@ class OfContractLine(models.Model):
             # date_end
             if line.date_end:
                 date_end = fields.Date.from_string(line.date_end)
-                line.date_contract_end = fields.Date.to_string(date_end - relativedelta(days=1))
+                line.date_contract_end = fields.Date.to_string(date_end)
             elif line.contract_id.date_end:
                 line.date_contract_end = line.contract_id.date_end
+            last_invoice_date = False
+            if line.invoice_line_ids:
+                invoices = line.invoice_line_ids.mapped('invoice_id').sorted('date_invoice')
+                last_invoice_date = invoices[-1].date_invoice
+                line.last_invoicing_date = last_invoice_date
+            elif line.line_origine_id.invoice_line_ids:
+                invoices = line.line_origine_id.invoice_line_ids.mapped('invoice_id').sorted('date_invoice')
+                last_invoice_date = invoices[-1].date_invoice
             if line.state != 'validated':
                 continue
             if line.frequency_type == 'date':
@@ -738,11 +739,21 @@ class OfContractLine(models.Model):
             else:
                 invoice_lines = line.invoice_line_ids.filtered(lambda l: l.invoice_id.state != 'cancel')
                 if not invoice_lines and line.frequency_type != 'date':
-                    base_date = fields.Date.from_string(line.date_contract_start)
+                    base_date = fields.Date.from_string(last_invoice_date or line.date_contract_start)
                     if line.recurring_invoicing_payment == 'pre-paid':
-                        if base_date.day != 1:
-                            base_date = base_date + relativedelta(months=1)
-                        line.next_date = base_date + relativedelta(day=1)
+                        if last_invoice_date:
+                            if frequency_type == 'month':
+                                line.next_date = base_date + relativedelta(months=1, day=1)
+                            if frequency_type == 'trimester':
+                                line.next_date = base_date + relativedelta(months=3, day=1)
+                            if frequency_type == 'semester':
+                                line.next_date = base_date + relativedelta(months=6, day=1)
+                            if frequency_type == 'year':
+                                line.next_date = base_date + relativedelta(years=1, month=1, day=1)
+                        else:
+                            if base_date.day != 1:
+                                base_date = base_date + relativedelta(months=1)
+                            line.next_date = base_date + relativedelta(day=1)
                     else:
                         if frequency_type == 'month':
                             line.next_date = base_date + relativedelta(months=1, day=1, days=-1)
@@ -752,14 +763,12 @@ class OfContractLine(models.Model):
                             line.next_date = base_date + relativedelta(months=6, day=1, days=-1)
                         if frequency_type == 'year':
                             line.next_date = base_date + relativedelta(years=1, month=1, day=1, days=-1)
-                        else:
-                            continue
                     continue
-                last_invoice_line = invoice_lines.sorted('date_invoice', reverse=True)[0]
-                line.previous_date = last_invoice_line.date_invoice
+                # last_invoice_line = invoice_lines.sorted('date_invoice', reverse=True)[0]
+                # line.previous_date = last_invoice_date
                 end = line.date_contract_end
                 if line.frequency_type == 'month':
-                    next = fields.Date.from_string(last_invoice_line.date_invoice) + relativedelta(months=1)
+                    next = fields.Date.from_string(last_invoice_date) + relativedelta(months=1)
                     if line.recurring_invoicing_payment == 'pre-paid':
                         next = next + relativedelta(day=1)
                     else:
@@ -768,7 +777,7 @@ class OfContractLine(models.Model):
                     if not end or end > next:
                         line.next_date = next
                 elif line.frequency_type == 'trimester':
-                    next = fields.Date.from_string(last_invoice_line.date_invoice) + relativedelta(months=3)
+                    next = fields.Date.from_string(last_invoice_date) + relativedelta(months=3)
                     if line.recurring_invoicing_payment == 'pre-paid':
                         next = next + relativedelta(day=1)
                     else:
@@ -777,7 +786,7 @@ class OfContractLine(models.Model):
                     if not end or end > next:
                         line.next_date = next
                 elif line.frequency_type == 'semester':
-                    next = fields.Date.from_string(last_invoice_line.date_invoice) + relativedelta(months=6)
+                    next = fields.Date.from_string(last_invoice_date) + relativedelta(months=6)
                     if line.recurring_invoicing_payment == 'pre-paid':
                         next = next + relativedelta(day=1)
                     else:
@@ -786,7 +795,7 @@ class OfContractLine(models.Model):
                     if not end or end > next:
                         line.next_date = next
                 elif line.frequency_type == 'year':
-                    next = fields.Date.from_string(last_invoice_line.date_invoice) + relativedelta(years=1)
+                    next = fields.Date.from_string(last_invoice_date) + relativedelta(years=1)
                     if line.recurring_invoicing_payment == 'pre-paid':
                         next = next + relativedelta(day=1)
                     else:
@@ -841,14 +850,6 @@ class OfContractLine(models.Model):
         contract_line_obj = self.env['of.contract.line']
         for line in self:
             line.line_origine_id = contract_line_obj.search([('line_avenant_id', '=', line.id)], limit=1)
-
-    @api.depends('invoice_line_ids', 'invoice_line_ids.invoice_id', 'invoice_line_ids.invoice_id.date_invoice')
-    def _compute_last_invoicing_date(self):
-        """ Calcul de la dernière date de facturation pour la ligne de contrat """
-        for line in self:
-            if line.invoice_line_ids:
-                invoices = line.invoice_line_ids.mapped('invoice_id')
-                line.last_invoicing_date = invoices[-1].date_invoice
 
     @api.depends('contract_product_ids', 'contract_product_ids.date_indexed')
     def _compute_date_indexed(self):
@@ -928,7 +929,7 @@ class OfContractLine(models.Model):
     @api.multi
     def _affect_number(self):
         """ Affectation du code de ligne """
-        sequence = self.env.ref('of_contract_custom.of_contract_custom_sequence')
+        sequence = self.env.ref('of_contract_custom_v2.of_contract_custom_sequence')
         for contract_line in self:
             if contract_line.state == 'validated' and not contract_line.code_de_ligne:
                 contract_line.write({'code_de_ligne': sequence.next_by_id()})
@@ -946,10 +947,19 @@ class OfContractLine(models.Model):
             return self.env['of.popup.wizard'].popup_return(message=u"Vous ne pouvez valider une ligne sans article.")
 
     @api.multi
+    def bouton_brouillon(self):
+        """ Valide la ligne de contrat """
+        if self.state == 'validated':
+            self.write({'state': 'draft'})
+        else:
+            return self.env['of.popup.wizard'].popup_return(message=u"Vous pas remettre en brouillon une ligne annulée.")
+
+
+    @api.multi
     def faire_avenant(self):
         """ Renvoi un wizard pour créer un avenant sur la ligne de contrat sélectionnée """
         self.ensure_one()
-        view_id = self.env.ref('of_contract_custom.of_contract_avenant_view_form').id
+        view_id = self.env.ref('of_contract_custom_v2.of_contract_avenant_view_form').id
         wizard = self.env['of.contract.avenant.wizard'].create({'contract_line_id': self.id})
         return {
             'name'     : 'Avenant',
@@ -967,7 +977,7 @@ class OfContractLine(models.Model):
     def annuler_la_ligne(self):
         """ Renvoi un wizard permettant de donner une date de fin à la ligne de contrat"""
         self.ensure_one()
-        view_id = self.env.ref('of_contract_custom.of_contract_line_cancel_view_form').id
+        view_id = self.env.ref('of_contract_custom_v2.of_contract_line_cancel_view_form').id
         wizard = self.env['of.contract.line.cancel.wizard'].create({'contract_line_id': self.id})
         return {
             'name'     : 'Avenant',
@@ -996,7 +1006,7 @@ class OfContractLine(models.Model):
     @api.multi
     def action_view_services(self):
         self.ensure_one()
-        action = self.env.ref('of_contract_custom.action_of_contract_service_form_planning').read()[0]
+        action = self.env.ref('of_contract_custom_v2.action_of_contract_service_form_planning').read()[0]
         action['context'] = {
             'search_default_filter_ponc': 1,
             'search_default_contract_line_id': self.id,
@@ -1020,7 +1030,7 @@ class OfContractLine(models.Model):
 
     @api.multi
     def action_view_intervention(self):
-        action = self.env.ref('of_contract_custom.of_contract_custom_open_interventions').read()[0]
+        action = self.env.ref('of_contract_custom_v2.of_contract_custom_open_interventions').read()[0]
         action['context'] = {'search_default_contract_line_id': self.id}
         return action
 
