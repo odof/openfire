@@ -266,7 +266,7 @@ class OfContract(models.Model):
     @api.multi
     def action_view_intervention(self):
         interventions = self.env['of.planning.intervention']
-        action = self.env.ref('of_contract_custom_v2.of_contract_custom_open_interventions').read()[0]
+        action = self.env.ref('of_contract_custom.of_contract_custom_open_interventions').read()[0]
         for contract_line in self.line_ids:
             interventions |= contract_line.intervention_ids
         action['domain'] = [('id', 'in', interventions._ids)]
@@ -275,7 +275,7 @@ class OfContract(models.Model):
     @api.multi
     def action_view_services(self):
         self.ensure_one()
-        action = self.env.ref('of_contract_custom_v2.action_of_contract_service_form_planning').read()[0]
+        action = self.env.ref('of_contract_custom.action_of_contract_service_form_planning').read()[0]
         action['context'] = {
             'search_default_filter_ponc'  : 1,
             'search_default_contract_id'  : self.id,
@@ -290,7 +290,7 @@ class OfContract(models.Model):
         self.ensure_one()
         if not self.period_ids.filtered(lambda p: p.has_invoices):
             return self.env['of.popup.wizard'].popup_return(message=u"Aucune période ne pouvant être revue.")
-        view_id = self.env.ref('of_contract_custom_v2.of_contract_revision_view_form').id
+        view_id = self.env.ref('of_contract_custom.of_contract_revision_view_form').id
         wizard = self.env['of.contract.revision.wizard'].create({'contract_id': self.id, 'period_id': self.period_ids[0].id})
         return {
             'name'     : 'Avenant',
@@ -929,7 +929,7 @@ class OfContractLine(models.Model):
     @api.multi
     def _affect_number(self):
         """ Affectation du code de ligne """
-        sequence = self.env.ref('of_contract_custom_v2.of_contract_custom_sequence')
+        sequence = self.env.ref('of_contract_custom.of_contract_custom_sequence')
         for contract_line in self:
             if contract_line.state == 'validated' and not contract_line.code_de_ligne:
                 contract_line.write({'code_de_ligne': sequence.next_by_id()})
@@ -959,7 +959,7 @@ class OfContractLine(models.Model):
     def faire_avenant(self):
         """ Renvoi un wizard pour créer un avenant sur la ligne de contrat sélectionnée """
         self.ensure_one()
-        view_id = self.env.ref('of_contract_custom_v2.of_contract_avenant_view_form').id
+        view_id = self.env.ref('of_contract_custom.of_contract_avenant_view_form').id
         wizard = self.env['of.contract.avenant.wizard'].create({'contract_line_id': self.id})
         return {
             'name'     : 'Avenant',
@@ -977,7 +977,7 @@ class OfContractLine(models.Model):
     def annuler_la_ligne(self):
         """ Renvoi un wizard permettant de donner une date de fin à la ligne de contrat"""
         self.ensure_one()
-        view_id = self.env.ref('of_contract_custom_v2.of_contract_line_cancel_view_form').id
+        view_id = self.env.ref('of_contract_custom.of_contract_line_cancel_view_form').id
         wizard = self.env['of.contract.line.cancel.wizard'].create({'contract_line_id': self.id})
         return {
             'name'     : 'Avenant',
@@ -1006,7 +1006,7 @@ class OfContractLine(models.Model):
     @api.multi
     def action_view_services(self):
         self.ensure_one()
-        action = self.env.ref('of_contract_custom_v2.action_of_contract_service_form_planning').read()[0]
+        action = self.env.ref('of_contract_custom.action_of_contract_service_form_planning').read()[0]
         action['context'] = {
             'search_default_filter_ponc': 1,
             'search_default_contract_line_id': self.id,
@@ -1030,7 +1030,7 @@ class OfContractLine(models.Model):
 
     @api.multi
     def action_view_intervention(self):
-        action = self.env.ref('of_contract_custom_v2.of_contract_custom_open_interventions').read()[0]
+        action = self.env.ref('of_contract_custom.of_contract_custom_open_interventions').read()[0]
         action['context'] = {'search_default_contract_line_id': self.id}
         return action
 
