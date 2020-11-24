@@ -942,18 +942,26 @@ PlanningView.Row = Widget.extend({
                             self.columns[i].sort(compareFunction);  // ordonner les enregistrements de la colonne
                         }
                         if (self.view.mode_calendar) {
-                            var current_max = self.view.min_time;
+                            var current_max = self.view.min_time, heure_debut;
                             for (var ic=0; ic<self.columns[i].length; ic++) {
                                 event = self.columns[i][ic];
-                                if (event.heure_debut > current_max) {
-                                    record = {heure_debut: current_max, heure_fin: event.heure_debut}
+
+                                if (!isNullOrUndef(event['hours_cols']) && event['hours_cols'][i]) {
+                                    heure_debut = event['hours_cols'][i].heure_debut
+                                }else{
+                                    heure_debut = event.heure_debut;
+                                }
+                                if (heure_debut > current_max) {
+                                    record = {heure_debut: current_max, heure_fin: heure_debut}
                                     le_creneau = new PlanningCreneauIndispo(self, self.view, record, options);
                                     self.columns[i].splice(ic, 0, le_creneau);
                                     ic++;
-                                }else{
-
                                 }
-                                current_max = event.heure_fin;
+                                if (!isNullOrUndef(event['hours_cols']) && event['hours_cols'][i]) {
+                                    current_max = event['hours_cols'][i].heure_fin;
+                                }else{
+                                    current_max = event.heure_fin;
+                                }
                             }
                             if (current_max < max_time) {
                                 record = {heure_debut: current_max, heure_fin: max_time}
@@ -1144,6 +1152,11 @@ PlanningView.Row = Widget.extend({
                     planning_record["hours_cols"][i].heure_fin_str = formats.format_value(planning_record["hours_cols"][i].heure_fin,descript_ft);
                     var duree_col = planning_record["hours_cols"][i].heure_fin - planning_record["hours_cols"][i].heure_debut
                     planning_record["hours_cols"][i].duree = duree_col
+                    if (self.view.mode_calendar) {
+                        planning_record["hours_cols"][i].hauteur = (duree_col * self.view.duree_to_px).toString() + "px";
+                    }else{
+                        planning_record["hours_cols"][i].hauteur = 'auto';
+                    }
                     var heures = Math.trunc(duree_col);
                     var minutes = (duree_col - heures) * 60;
                     var duree_col_str;
@@ -1555,9 +1568,6 @@ var PlanningRecord = Widget.extend({
             this.attendee_other_ids = []
         }
         this.on_global_click = _.debounce(this.on_global_click, 300, true);
-        if (this.id == 2568) {
-            console.log(this);
-        }
     },
     /**
      *  Génère le rendu de l'enregistrement. associe les events js.
@@ -1655,7 +1665,38 @@ var PlanningRecord = Widget.extend({
      */
     on_mouseover: function (ev) {
         ev.preventDefault();
-        if (this.isOverflown()) {
+        if (this.view.mode_calendar && this.day_span > 1) {
+            // à cause de l'asynchronicité de find() on ne peut pas utiliser de boucle for
+            var a = new Array(7);
+            a[0] = this.$of_el[0] && this.$of_el[0].find('.of_planning_record_global_click')[0] || false;
+            a[1] = this.$of_el[1] && this.$of_el[1].find('.of_planning_record_global_click')[0] || false;
+            a[2] = this.$of_el[2] && this.$of_el[2].find('.of_planning_record_global_click')[0] || false;
+            a[3] = this.$of_el[3] && this.$of_el[3].find('.of_planning_record_global_click')[0] || false;
+            a[4] = this.$of_el[4] && this.$of_el[4].find('.of_planning_record_global_click')[0] || false;
+            a[5] = this.$of_el[5] && this.$of_el[5].find('.of_planning_record_global_click')[0] || false;
+            a[6] = this.$of_el[6] && this.$of_el[6].find('.of_planning_record_global_click')[0] || false;
+            if (!!a[0] && (a[0].scrollHeight > a[0].clientHeight || a[0].scrollWidth > a[0].clientWidth)) {
+                this.$of_el[0].find('.of_planning_record_global_click').height('auto');
+            }
+            if (!!a[1] && (a[1].scrollHeight > a[1].clientHeight || a[1].scrollWidth > a[1].clientWidth)) {
+                this.$of_el[1].find('.of_planning_record_global_click').height('auto');
+            }
+            if (!!a[2] && (a[2].scrollHeight > a[2].clientHeight || a[2].scrollWidth > a[2].clientWidth)) {
+                this.$of_el[2].find('.of_planning_record_global_click').height('auto');
+            }
+            if (!!a[3] && (a[3].scrollHeight > a[3].clientHeight || a[3].scrollWidth > a[3].clientWidth)) {
+                this.$of_el[3].find('.of_planning_record_global_click').height('auto');
+            }
+            if (!!a[4] && (a[4].scrollHeight > a[4].clientHeight || a[4].scrollWidth > a[4].clientWidth)) {
+                this.$of_el[4].find('.of_planning_record_global_click').height('auto');
+            }
+            if (!!a[5] && (a[5].scrollHeight > a[5].clientHeight || a[5].scrollWidth > a[5].clientWidth)) {
+                this.$of_el[5].find('.of_planning_record_global_click').height('auto');
+            }
+            if (!!a[6] && (a[6].scrollHeight > a[6].clientHeight || a[6].scrollWidth > a[6].clientWidth)) {
+                this.$of_el[6].find('.of_planning_record_global_click').height('auto');
+            }
+        }else if (this.isOverflown()) {
             this.$el.find('.of_planning_record_global_click').height('auto');
         }
     },
@@ -1664,7 +1705,40 @@ var PlanningRecord = Widget.extend({
      */
     on_mouseout: function (ev) {
         ev.preventDefault();
-        this.$el.find('.of_planning_record_global_click').outerHeight(this.hauteur);
+        if (this.view.mode_calendar && this.day_span > 1) {
+            // à cause de l'asynchronicité de find() on ne peut pas utiliser de boucle for
+            var a = new Array(7);
+            a[0] = this.$of_el[0] && this.$of_el[0].find('.of_planning_record_global_click')[0] || false;
+            a[1] = this.$of_el[1] && this.$of_el[1].find('.of_planning_record_global_click')[0] || false;
+            a[2] = this.$of_el[2] && this.$of_el[2].find('.of_planning_record_global_click')[0] || false;
+            a[3] = this.$of_el[3] && this.$of_el[3].find('.of_planning_record_global_click')[0] || false;
+            a[4] = this.$of_el[4] && this.$of_el[4].find('.of_planning_record_global_click')[0] || false;
+            a[5] = this.$of_el[5] && this.$of_el[5].find('.of_planning_record_global_click')[0] || false;
+            a[6] = this.$of_el[6] && this.$of_el[6].find('.of_planning_record_global_click')[0] || false;
+            if (!!a[0]) {
+                this.$of_el[0].find('.of_planning_record_global_click').outerHeight(this.hours_cols[0].hauteur);
+            }
+            if (!!a[1]) {
+                this.$of_el[1].find('.of_planning_record_global_click').outerHeight(this.hours_cols[1].hauteur);
+            }
+            if (!!a[2]) {
+                this.$of_el[2].find('.of_planning_record_global_click').outerHeight(this.hours_cols[2].hauteur);
+            }
+            if (!!a[3]) {
+                this.$of_el[3].find('.of_planning_record_global_click').outerHeight(this.hours_cols[3].hauteur);
+            }
+            if (!!a[4]) {
+                this.$of_el[4].find('.of_planning_record_global_click').outerHeight(this.hours_cols[4].hauteur);
+            }
+            if (!!a[5]) {
+                this.$of_el[5].find('.of_planning_record_global_click').outerHeight(this.hours_cols[5].hauteur);
+            }
+            if (!!a[6]) {
+                this.$of_el[6].find('.of_planning_record_global_click').outerHeight(this.hours_cols[6].hauteur);
+            }
+        }else{
+            this.$el.find('.of_planning_record_global_click').outerHeight(this.hauteur);
+        }
     },
     /**
      *  méthode reprise de KanbanView

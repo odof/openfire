@@ -119,7 +119,9 @@
     <!-- Évènement (RDV d'intervention) -->
     <div t-name="PlanningView.record"
          t-attf-class="of_planning_record_global_click #{record.annule_reporte and 'of_planning_info_annule_reporte' or ''}"
-         t-attf-style="height: #{record.hauteur}; overflow: hidden;">
+         t-attf-style="
+            height: #{record.day_span > 1 &amp;&amp; record['hours_cols'][col_index].hauteur || record.hauteur};
+            overflow: hidden;">
         <!-- variables données par le javascript: record et col_index -->
         <div t-att-class="record.class"
              t-attf-style="color: #{record.color_ft}; background-color: #{record.color_bg}; border-top: 1px solid #{record.color_ft};
@@ -161,16 +163,16 @@
                 </t>
             </div>
 
-            <div t-if="record.tache_name" class="of_planning_info of_planning_info_tache_name">
-                <i class="fa fa-cogs"/>
-                <span class="of_ws"/>
-                <t t-raw="record.tache_name"/>
-            </div>
-
             <div t-if="record.partner_name" class="of_planning_info of_planning_info_partner_name">
                 <i class="fa fa-user"/>
                 <span class="of_ws"/>
                 <t t-raw="record.partner_name"/>
+            </div>
+
+            <div t-if="record.tache_name" class="of_planning_info of_planning_info_tache_name">
+                <i class="fa fa-cogs"/>
+                <span class="of_ws"/>
+                <t t-raw="record.tache_name"/>
             </div>
 
             <div class="of_planning_info of_planning_info_lieu">
@@ -245,20 +247,19 @@
                 </t>
             </div>
 
-            <div t-if="record.tache_name">
-                <i class="fa fa-cogs"/>
-                <span class="of_ws"/>
-                <t t-raw="record.tache_name"/>
-            </div>
-
             <div t-if="record.partner_name">
                 <i class="fa fa-user"/>
                 <span class="of_ws"/>
                 <t t-raw="record.partner_name"/>
             </div>
 
-            <div>
+            <div t-if="record.tache_name">
+                <i class="fa fa-cogs"/>
+                <span class="of_ws"/>
+                <t t-raw="record.tache_name"/>
+            </div>
 
+            <div>
                 <i t-if="record.address_zip || record.address_city || record.secteur_name" class="fa fa-map-marker"/>
                 <span t-if="record.address_zip || record.address_city" class="of_ws"/>
 
@@ -276,6 +277,13 @@
                     <t t-raw="record.secteur_name"/>
                 </span>
             </div>
+
+            <div t-if="record.name">
+                <i class="fa fa-tag"/>
+                <span class="of_ws"/>
+                <t t-esc="record.name"/>
+            </div>
+
         </div>
     </div>
 
@@ -356,7 +364,8 @@
     <!-- filtres de ressources (Attendees) -->
     <t t-name="PlanningView.sidebar.contacts">
         <div t-foreach="filters" class="of_planning_contact">
-            <t t-if="filters_value.value"><!-- foolproofing: don't display if no value given (or undefined) -->
+            <!-- foolproofing: don't display if no value given (or undefined) -->
+            <t t-if="filters_value.value &amp;&amp; filters_value.is_visible">
                 <div class="o_checkbox">
                     <input type="checkbox" name="selection"
                         t-att-value="filters_value.value" t-att-id="filters_value.input_id"
@@ -367,16 +376,15 @@
                     <img t-attf-src="/web/image/#{filters_value.avatar_model}/#{filters_value.value}/image_small" class="o_cal_avatar"/>
                 </t>
                 <span t-attf-style="
-                    color: #{filters_value.color_ft}; 
-                    background: #{filters_value.color_bg}; 
-                    padding: 2px 8px 4px; 
+                    color: #{filters_value.color_ft};
+                    background: #{filters_value.color_bg};
+                    padding: 2px 8px 4px;
                     border-radius: 4px;
                     margin: 1px 0;
                     border: 1px solid #0D0D0D;">
                     <t t-esc="filters_value.label"/>
                 </span>
             </t>
-            <t t-else="">Une erreur s'est produite au niveau de l'affichage des filtres</t>
         </div>
     </t>
 
@@ -452,7 +460,7 @@
                         t-att-checked="(filters_value.is_checked ? true : undefined)"/><span/>
                 </div>
                 <span t-attf-style="
-                    padding: 2px 8px 4px; 
+                    padding: 2px 8px 4px;
                     margin: 1px 0;">
                     <t t-esc="filters_value.label"/>
                 </span>
@@ -470,7 +478,7 @@
                                 t-att-checked="(les_children_value.is_checked ? true : undefined)"/><span/>
                         </div>
                         <span t-attf-style="
-                            padding: 2px 8px 4px; 
+                            padding: 2px 8px 4px;
                             margin: 1px 0;">
                             <t t-esc="les_children_value.label"/>
                         </span>

@@ -19,16 +19,16 @@
                     </span>
                 </div>
 
-                <div t-if="record.tache_name">
-                    <i class="fa fa-cogs"/>
-                    <span class="of_ws"/>
-                    <t t-raw="record.tache_name"/>
-                </div>
-
                 <div t-if="record.partner_name">
                     <i class="fa fa-user"/>
                     <span class="of_ws"/>
                     <t t-raw="record.partner_name"/>
+                </div>
+
+                <div t-if="record.tache_name">
+                    <i class="fa fa-cogs"/>
+                    <span class="of_ws"/>
+                    <t t-raw="record.tache_name"/>
                 </div>
 
                 <div>
@@ -50,6 +50,13 @@
                         <t t-raw="record.secteur_name"/>
                     </span>
                 </div>
+
+                <div t-if="record.name">
+                    <i class="fa fa-tag"/>
+                    <span class="of_ws"/>
+                    <t t-esc="record.name"/>
+                </div>
+
             </div>
         </t>
     </t>
