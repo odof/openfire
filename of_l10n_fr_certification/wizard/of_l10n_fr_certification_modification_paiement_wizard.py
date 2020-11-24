@@ -64,7 +64,7 @@ class OFAccountPaymentWizard(models.TransientModel):
             })
 
         # On vérifie si le module of_account_payment_mode est installé (existence du champ of_payment_mode_id).
-        # Si oui, on ajoute les valeurs des champs supplémentaires qu'il a ajouté.
+        # Si oui, on ajoute les valeurs des champs supplémentaires qu'il a ajoutés.
         if getattr(payment, 'of_payment_mode_id', False):
             # Les catégories de paiement (étiquettes)
             if payment.of_tag_ids:
@@ -144,9 +144,9 @@ class OFAccountPaymentWizard(models.TransientModel):
                 if self.type_modification_payment == 'cancel':
                     # Pour annuler le paiement, on crée une contrepartie comptable.
                     for move in payment.move_line_ids.mapped('move_id'):
-                        rev_move = move.create_reversals(reconcile=True)
+                        rev_move = move.create_reversals(date=fields.Date.today(), reconcile=True)
                         rev_move.ref = form.description or move.name
-                    payment.active = False
+                    payment.state = 'cancel'
                     # L'annulation a été faite.
                     # On va à la liste des paiements clients ou fournisseurs (appel de l'action).
                     if payment.partner_type == 'supplier':
@@ -159,5 +159,5 @@ class OFAccountPaymentWizard(models.TransientModel):
                     for move in payment.move_line_ids.mapped('move_id'):
                         rev_move = move.create_reversals(reconcile=True)
                         rev_move.ref = form.description or move.name
-                    payment.active = False
+                    payment.state = 'cancel'
                     return self.get_action_payment_form(payment, 'modify')

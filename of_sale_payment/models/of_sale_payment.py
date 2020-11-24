@@ -14,7 +14,9 @@ class SaleOrder(models.Model):
     @api.depends('payment_ids')
     def _compute_of_payment_amount(self):
         for sale_order in self:
-            sale_order.of_payment_amount = sum(sale_order.payment_ids.mapped('of_amount_total'))
+            # Filtre des paiements non annulés pour le cas où le module of_l10n_fr_certification est installé
+            payments = sale_order.payment_ids.filtered(lambda p: p.state != 'cancel')
+            sale_order.of_payment_amount = sum(payments.mapped('of_amount_total'))
 
     @api.multi
     def action_view_payments(self):
@@ -164,7 +166,9 @@ class ResPartner(models.Model):
     @api.depends('of_payment_ids')
     def _compute_payment_total(self):
         for partner in self:
-            partner.of_payment_total = sum(partner.of_payment_ids.mapped('of_amount_total'))
+            # Filtre des paiements non annulés pour le cas où le module of_l10n_fr_certification est installé
+            payments = partner.of_payment_ids.filtered(lambda p: p.state != 'cancel')
+            partner.of_payment_total = sum(payments.mapped('of_amount_total'))
 
     @api.multi
     def action_view_payments(self):

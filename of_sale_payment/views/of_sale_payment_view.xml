@@ -23,7 +23,8 @@
 
             <!-- Smart button -->
             <xpath expr="/form/sheet/div[@name='button_box']" position="inside">
-                <button class="oe_stat_button" name="action_view_payments" type="object" icon="fa-usd" attrs="{'invisible': [('of_payment_amount', '=', 0)]}">
+                <field name="payment_ids" invisible="1"/>
+                <button class="oe_stat_button" name="action_view_payments" type="object" icon="fa-usd" attrs="{'invisible': [('payment_ids', '=', [])]}">
                     <div class="o_form_field o_stat_info">
                         <span class="o_stat_value"><field name="of_payment_amount" widget='monetary' options="{'currency_field': 'currency_id'}"/></span>
                         <span class="o_stat_text">Paiements</span>
