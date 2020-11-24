@@ -123,6 +123,7 @@ class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
     active = fields.Boolean(string="Active", default=True, track_visibility='onchange')
+    state = fields.Selection(selection_add=[('cancel', u"Annulé")])
 
     of_payment_type_readonly = fields.Boolean(string=u"Type de paiement en lecture seule")
 
