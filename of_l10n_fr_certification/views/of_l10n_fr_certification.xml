@@ -2,6 +2,28 @@
 <odoo>
     <data>
 
+        <record id="of_l10n_fr_certification_view_account_payment_tree" model="ir.ui.view">
+            <field name="name">of.l10n.fr.certification.account.payment.tree</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="/tree" position="attributes">
+                    <attribute name="decoration-muted">state in ('reconciled','cancel')</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_l10n_fr_certification_view_account_payment_search" model="ir.ui.view">
+            <field name="name">of.l10n.fr.certification.account.payment.search</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_search"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='reconciled']" position="after">
+                    <filter string="Annulé" domain="[('state','=','cancel')]" name="cancel"/>
+                </xpath>
+            </field>
+        </record>
+
         <!-- Vue formulaire facture clients form message de confirmation validation facture -->
         <record id="of_l10n_fr_certification_invoice_partner_form" model="ir.ui.view">
             <field name="name">of.l10n.fr.certification.invoice.partner.form</field>

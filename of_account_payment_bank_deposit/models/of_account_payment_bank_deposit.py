@@ -14,7 +14,9 @@ class OfAccountPaymentBankDeposit(models.Model):
         if self._context.get('active_model', '') == 'account.payment':
             # Allow only payments that have not been already deposited
             payments = self.env['account.payment'].search(
-                [('id', 'in', self._context['active_ids']), ('of_deposit_id', '=', False)])
+                [('id', 'in', self._context['active_ids']),
+                 ('of_deposit_id', '=', False),
+                 ('state', 'in', ('posted', 'sent', 'reconciled'))])
             res = [(4, payment.id) for payment in payments]
         return res
 
@@ -22,6 +24,7 @@ class OfAccountPaymentBankDeposit(models.Model):
     date = fields.Date('Date', required=True, default=fields.Date.context_today)
     payment_ids = fields.One2many(
         'account.payment', 'of_deposit_id', 'Payments', copy=False,
+        domain="[('state', 'in', ('posted', 'sent', 'reconciled'))]",
         default=lambda s: s._default_payment_ids())
     move_id = fields.Many2one('account.move', 'Account move', readonly=True, ondelete='restrict')
     state = fields.Selection(

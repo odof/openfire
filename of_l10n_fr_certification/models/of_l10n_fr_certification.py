@@ -123,6 +123,7 @@ class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
     active = fields.Boolean(string="Active", default=True, track_visibility='onchange')
+    state = fields.Selection(selection_add=[('cancel', u"Annulé")])
 
     @api.multi
     def write(self, vals):
