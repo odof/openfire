@@ -3,26 +3,32 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
+
 class OfAccountPaymentBankDeposit(models.Model):
     _name = 'of.account.payment.bank.deposit'
     _description = 'Payment bank deposit'
 
     @api.multi
-    def _get_default_payments(self):
+    def _default_payment_ids(self):
         res = []
         if self._context.get('active_model', '') == 'account.payment':
             # Allow only payments that have not been already deposited
-            payments = self.env['account.payment'].search([('id', 'in', self._context['active_ids']), ('of_deposit_id', '=', False)])
+            payments = self.env['account.payment'].search(
+                [('id', 'in', self._context['active_ids']), ('of_deposit_id', '=', False)])
             res = [(4, payment.id) for payment in payments]
         return res
 
     name = fields.Char('Deposit code', required=True, help='Deposit code')
     date = fields.Date('Date', required=True, default=fields.Date.context_today)
-    payment_ids = fields.One2many('account.payment', 'of_deposit_id', 'Payments', copy=False, default=_get_default_payments)
+    payment_ids = fields.One2many(
+        'account.payment', 'of_deposit_id', 'Payments', copy=False,
+        default=lambda s: s._default_payment_ids())
     move_id = fields.Many2one('account.move', 'Account move', readonly=True, ondelete='restrict')
-    state = fields.Selection([('draft', 'Unposted'), ('posted', 'Posted')], string='Status',
-                             required=True, readonly=True, copy=False, default='draft')
-    journal_id = fields.Many2one('account.journal', 'Journal', required=True, domain="[('type', 'in', ('cash', 'bank'))]")
+    state = fields.Selection(
+        [('draft', 'Unposted'), ('posted', 'Posted')],
+        string='Status', required=True, readonly=True, copy=False, default='draft')
+    journal_id = fields.Many2one(
+        'account.journal', 'Journal', required=True, domain="[('type', 'in', ('cash', 'bank'))]")
 
     _order = 'date DESC'
 
