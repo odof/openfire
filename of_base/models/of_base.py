@@ -286,6 +286,13 @@ class BaseConfigSettings(models.TransientModel):
     of_affichage_ville = fields.Boolean(
         string="(OF) Afficher ville",
         help=u"Affiche la ville entre parenthèses après le nom du partenaire lors de la recherche de partenaire")
+    company_share_partner = fields.Boolean(
+        string=u"Partager les clients entre toutes les sociétés",
+        help=u"Partagez vos clients avec toutes les sociétés définies dans votre base.\n"
+             u"* Coché : Les clients sont visibles par toutes les sociétés, "
+             u"même si une société est définie pour le client.\n"
+             u"* Non coché : Chaque société ne peut voir que ses clients (clients pour lesquels la société est "
+             u"définie). Les clients non reliés à une société sont visibles par toutes les sociétés.")
 
     @api.multi
     def set_of_affichage_ville_defaults(self):

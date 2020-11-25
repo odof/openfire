@@ -36,3 +36,23 @@ msgid "Laissez le type de compte IBAN pour laisser le logiciel vérifier la vali
 "Utiliser le type Banque pour tout autre type de compte, aucune vérification ne sera effectuée."
 msgstr "Laissez le type de compte IBAN pour laisser le logiciel vérifier la validité du code saisi.\n"
 "Utiliser le type Banque pour tout autre type de compte, aucune vérification ne sera effectuée."
+
+#. module: of_base
+#: model:ir.model.fields,field_description:base_setup.field_base_config_settings_company_share_partner
+msgid "Partager les clients entre toutes les sociétés"
+msgstr "Partager les clients entre toutes les sociétés"
+
+#. module: of_base
+#: model:ir.model.fields,help:base_setup.field_base_config_settings_company_share_partner
+msgid ""
+"Partagez vos clients avec toutes les sociétés définies dans votre base.\n"
+"* Coché : Les clients sont visibles par toutes les sociétés, "
+"même si une société est définie pour le client.\n"
+"* Non coché : Chaque société ne peut voir que ses clients (clients pour lesquels la société est "
+"définie). Les clients non reliés à une société sont visibles par toutes les sociétés."
+msgstr ""
+"Partagez vos clients avec toutes les sociétés définies dans votre base.\n"
+"* Coché : Les clients sont visibles par toutes les sociétés, "
+"même si une société est définie pour le client.\n"
+"* Non coché : Chaque société ne peut voir que ses clients (clients pour lesquels la société est "
+"définie). Les clients non reliés à une société sont visibles par toutes les sociétés."
