@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- OF Parc Installe Views -->
+
+    <record id="of_access_control_of_parc_installe_form_view" model="ir.ui.view">
+        <field name="name">of.access.control.of.parc.installe.form.view</field>
+        <field name="model">of.parc.installe</field>
+        <field name="inherit_id" ref="of_parc_installe.of_parc_installe_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tel_site_id']" position="after">
+                <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

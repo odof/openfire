@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="stock.menu_warehouse_report" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('of_group_stock_responsible')])]"/>
+    </record>
+
+    <record id="stock.menu_stock_procurement_action" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('of_group_stock_responsible')])]"/>
+    </record>
+
+    <record id="stock_account.menu_action_wizard_valuation_history" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('stock.group_stock_manager')])]"/>
+    </record>
+
+</odoo>

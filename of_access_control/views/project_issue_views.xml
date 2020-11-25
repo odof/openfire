@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Project Issue Views -->
+
+    <record id="of_access_control_of_project_issue_form_view" model="ir.ui.view">
+        <field name="name">of.access.control.of.project.issue.form.view</field>
+        <field name="model">project.issue</field>
+        <field name="inherit_id" ref="of_project_issue.of_project_issue_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_canal_id']" position="before">
+                <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
