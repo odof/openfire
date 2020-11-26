@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_document_website_dms_file_form_view" model="ir.ui.view">
+        <field name="name">of.document.website.dms.file.form.view</field>
+        <field name="model">muk_dms.file</field>
+        <field name="inherit_id" ref="of_document.of_document_dms_file_form_view"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" name="website_publish_button" type="object" icon="fa-globe">
+                    <field name="of_website_published" widget="website_button"/>
+                </button>
+            </div>
+            <field name="content" position="after">
+                <field name="of_website_url" attrs="{'invisible': [('of_website_published', '=', False)]}"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>
