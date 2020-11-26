@@ -278,8 +278,10 @@ CalendarView.include({
         var self = this;
         // asynchronicity event colors. we need filteres to be rendered to know what color to put on events
         self.dfd_filters_rendered = $.Deferred();
-        if (! self.all_filters) {
+        if (!self.all_filters && self.useContacts) {
             self.all_filters = {};
+        }else if (!self.all_filters) {
+            self.all_filters = []
         }
 
         if (! _.isUndefined(this.event_source)) {
@@ -401,9 +403,7 @@ CalendarView.include({
                         // this part is modified /*
 
                         if (!self.show_all_attendees) {
-                            var all_filters_temp = [];
                             var new_filter_added = false;
-                            self.res_ids_indexes = {};
                             _.each(events, function (e) {
                                 var key,val = null;
 
@@ -419,8 +419,8 @@ CalendarView.include({
                                                                ? self.avatar_filter : false ),
                                                 is_checked: true
                                             };
-                                            all_filters_temp.push(filter_item);
-                                            self.res_ids_indexes[key] = all_filters_temp.length - 1;
+                                            self.all_filters.push(filter_item);
+                                            self.res_ids_indexes[key] = self.all_filters.length - 1;
                                             new_filter_added = true
                                         }
                                         if (! _.contains(self.now_filter_ids, key)) {
@@ -444,8 +444,8 @@ CalendarView.include({
                                                            ? self.avatar_filter : false ),
                                             is_checked: true
                                         };
-                                        all_filters_temp.push(filter_item);
-                                        self.res_ids_indexes[key] = all_filters_temp.length - 1;
+                                        self.all_filters.push(filter_item);
+                                        self.res_ids_indexes[key] = self.all_filters.length - 1;
                                         new_filter_added = true
                                     }
                                     if (! _.contains(self.now_filter_ids, key)) {
@@ -456,22 +456,25 @@ CalendarView.include({
 
                             // uncheck all but one filter if a new filter has been added
                             if (self.filters_radio && new_filter_added) {
-                                var la_key;
-                                if (!isNullOrUndef(self.first_evt)) {
-                                    la_key = self.first_evt[self.color_field][0];
-                                }else{
-                                    la_key = _.min(_.keys(self.res_ids_indexes));
+                                var la_key = self.sidebar.filter.current_radio_key;
+                                // initialiser self.sidebar.filter.current_radio_key si nécessaire
+                                if (isNullOrUndef(la_key)) {
+                                    if (!isNullOrUndef(self.first_evt)) {
+                                        la_key = self.first_evt[self.color_field][0];
+                                    }else{
+                                        la_key = _.min(_.keys(self.res_ids_indexes));
+                                    }
+                                    self.sidebar.filter.current_radio_key = la_key;
                                 }
-                                self.current_radio_key = la_key;
+
                                 for(var key in self.res_ids_indexes){
                                     if (key == la_key) {
-                                        all_filters_temp[self.res_ids_indexes[key]].is_checked = true;
+                                        self.all_filters[self.res_ids_indexes[key]].is_checked = true;
                                     }else{
-                                        all_filters_temp[self.res_ids_indexes[key]].is_checked = false;
+                                        self.all_filters[self.res_ids_indexes[key]].is_checked = false;
                                     }
                                 };
                             }
-                            self.all_filters = all_filters_temp;
                         }else{
                             for (var ii=0; ii<self.all_filters.length; ii++) {
                                 if (self.all_filters[ii].is_checked) {
