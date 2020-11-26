@@ -109,6 +109,7 @@
                             </div>
                             <field name="journal_id" attrs="{'readonly': [('invoice_count','>',0)]}"/>
                             <field name="fiscal_position_id"/>
+                            <field name="grouped"/>
                             <field name="recurring_next_date"/>
                             <field name="revision"/>
                             <field name="pricelist_id" invisible="1"/>
@@ -157,15 +158,16 @@
                                                  'recurring_next_date': recurring_next_date,
                                                  'default_use_index': use_index,
                                                  'default_revision': revision,
+                                                 'default_grouped': grouped,
                                                  'form_readonly': '[(&quot;state&quot;,&quot;in&quot;,[&quot;validated&quot;,&quot;cancel&quot;])]'}">
                                     <tree colors="grey:state=='cancel';blue:is_invoiceable==True" delete="true">
                                         <field name="state" invisible="1"/>
                                         <field name="code_de_ligne"/>
                                         <field name="address_id"/>
+                                        <field name="tache_id"/>
                                         <field name="frequency_type"/>
                                         <field name="next_date"/>
                                         <field name="last_invoicing_date"/>
-                                        <field name="partner_id"/>
                                         <field name="is_invoiceable" invisible="1"/>
                                         <field name="line_avenant_id" invisible="1"/>
                                         <field name="date_end" invisible="1"/>

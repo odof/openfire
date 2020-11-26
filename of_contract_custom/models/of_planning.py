@@ -33,8 +33,7 @@ class OfService(models.Model):
     _inherit = 'of.service'
 
     contract_id = fields.Many2one(comodel_name='of.contract', string="Contrat")
-    contract_line_id = fields.Many2one(
-        comodel_name='of.contract.line', string="Contrat")
+    contract_line_id = fields.Many2one(comodel_name='of.contract.line', string="Contrat")
     spec_date = fields.Char(string="Date", compute="_compute_spec_date")
 
     @api.depends()
@@ -49,11 +48,10 @@ class OfService(models.Model):
                 service.spec_date = u"Prévue entre %s et %s" % (format_date(service.date_next, lang), format_date(service.date_fin, lang))
 
     @api.multi
-    def get_action_view_interventions_context(self, action_context={}):
+    def get_action_view_intervention_context(self, action_context={}):
         if self.contract_line_id:
             action_context.update({'default_contract_line_id': self.contract_line_id.id})
-        return super(OfService, self).get_action_view_interventions_context(action_context)
-
+        return super(OfService, self).get_action_view_intervention_context(action_context)
 
     @api.multi
     def action_view_contract(self):
