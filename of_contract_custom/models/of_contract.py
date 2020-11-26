@@ -84,6 +84,7 @@ class OfContract(models.Model):
         ], string=u"Période de révision", default='last_day')
     service_ids = fields.One2many(
         comodel_name='of.service', compute="_compute_service_ids", string="Interventions à programmer")
+    grouped = fields.Boolean(string="Regrouper la facturation")
 
     @api.model
     def _default_journal(self):
@@ -978,7 +979,10 @@ class OfContractLine(models.Model):
         """ Renvoi un wizard permettant de donner une date de fin à la ligne de contrat"""
         self.ensure_one()
         view_id = self.env.ref('of_contract_custom.of_contract_line_cancel_view_form').id
-        wizard = self.env['of.contract.line.cancel.wizard'].create({'contract_line_id': self.id})
+        ref_date = fields.Date.today()
+        if self.last_invoicing_date and self.last_invoicing_date > ref_date:
+            ref_date = self.last_invoicing_date
+        wizard = self.env['of.contract.line.cancel.wizard'].create({'contract_line_id': self.id, 'date_end': ref_date})
         return {
             'name'     : 'Avenant',
             'type'     : 'ir.actions.act_window',
