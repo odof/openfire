@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Portail -->
+
+    <template id="website_project_issue.portal_layout" inherit_id="website_portal.portal_layout"/>
+    <template id="website_project_issue.portal_my_home" inherit_id="website_portal.portal_my_home"/>
+
+    <template id="of_website_portal_portal_my_home_menu" name="OF Website Portal Home Menu" inherit_id="website_portal.portal_layout" priority="25">
+        <xpath expr="//ul[contains(@class,'o_portal_submenu')]" position="inside">
+            <li>
+                <a href="/my/of_contracts">Contrats</a>
+            </li>
+        </xpath>
+        <xpath expr="//div[@class='o_my_details']" position="after">
+            <div name="upload_file" class="oe_website_sale">
+                <h3 class="page-header">Déposer un fichier</h3>
+                <form action="/my/upload_file" method="post" enctype="multipart/form-data" style="text-align: right;">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <input type="hidden" name="partner_id" t-att-value="user.partner_id.id"/>
+                    <input type="file" name="attachment" class="file" id="file"/>
+                    <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading" style="margin-top: 10px;">Envoyer</button>
+                </form>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="of_website_portal_portal_my_home" name="OF Website Portal Home" inherit_id="website_portal.portal_my_home" priority="25">
+        <xpath expr="//div[contains(@class,'o_my_home_content')]" position="inside">
+            <h3 class="page-header">
+                <a href="/my/of_contracts">Vos contrats
+                    <small class="ml8">
+                        <t t-if="recurrent_count">
+                            <span class='badge'><t t-esc="recurrent_count"/></span>
+                        </t>
+                        <t t-if="not recurrent_count">
+                            Il n'y a actuellement pas de contrats pour votre compte.
+                        </t>
+                    </small>
+                </a>
+            </h3>
+        </xpath>
+    </template>
+
+    <!-- Portail - Contrats -->
+
+    <template id="of_website_portal_portal_my_of_contracts" name="OF My Contracts">
+        <t t-call="website_portal.portal_layout">
+            <h3 class="page-header">Vos contrats</h3>
+            <t t-if="not contracts">
+                <p>Il n'y a actuellement pas de contrats pour votre compte.</p>
+            </t>
+            <t t-if="contracts">
+                <table class="table table-hover o_my_status_table">
+                    <thead>
+                        <tr class="active">
+                            <th>Contrat</th>
+                            <th>Adresse</th>
+                        </tr>
+                    </thead>
+                    <t t-foreach="contracts" t-as="contract">
+                        <tr>
+                            <td>
+                                <a t-attf-href="/of_contract/#{slug(contract)}"><t t-esc="contract.display_name" /></a>
+                            </td>
+                            <td>
+                                <span t-field="contract.address_id" t-options='{"widget": "contact", "fields": ["address"], "no_marker": True}'/>
+                            </td>
+                        </tr>
+                    </t>
+                </table>
+                <div t-if="pager" class="o_portal_pager text-center">
+                    <t t-call="website.pager" />
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <template id="of_website_portal_website_of_contract" name="OF Website Contract">
+        <t t-call="website.layout">
+            <body data-spy="scroll" data-target=".navspy" data-offset="50">
+                <div class="container o_website_quote">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <ol class="breadcrumb mt8">
+                                <li><a href="/my/home"><i class="fa fa-home" /></a></li>
+                                <li><a t-attf-href="/my/of_contracts">Mes contrats</a></li>
+                                <li>
+                                    <t t-esc="contract.name" />
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="row mt16">
+                        <!-- Page content -->
+                        <div id="of_contract_page_content" class="col-md-12">
+                            <!-- Intro -->
+                            <div id="of_contract_introduction" class="page-header mt16">
+                                <h1>
+                                    <em t-esc="contract.name" />
+                                </h1>
+                            </div>
+                            <!-- Informations générales -->
+                            <div class="row mt32">
+                                <div class="col-md-4 col-xs-4">
+                                    <div class="row">
+                                        <label class="col-sm-4 col-xs-4 text-right">Client :</label>
+                                        <div class="col-sm-8 col-xs-8">
+                                            <div t-field="contract.partner_id" t-options='{
+                                                "widget": "contact",
+                                                "fields": ["address", "name", "phone", "mobile"]
+                                                }'/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-xs-4">
+                                    <div class="row">
+                                        <label class="col-sm-4 col-xs-4 text-right">Adresse :</label>
+                                        <div class="col-sm-8 col-xs-8">
+                                            <div t-field="contract.address_id" t-options='{
+                                                "widget": "contact",
+                                                "fields": ["address", "name", "phone", "mobile"]
+                                                }'/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-xs-4">
+                                    <div class="row">
+                                        <div>
+                                            <label class="col-sm-5 col-xs-5 text-right">Date de fin :</label>
+                                            <div class="col-sm-7 col-xs-7">
+                                                <span t-if="contract.date_fin_contrat" t-field="contract.date_fin_contrat"/>
+                                                <span t-else="">-</span>
+                                            </div>
+                                        </div>
+                                        <div class="clearfix" />
+                                        <div>
+                                            <label class="col-sm-5 col-xs-5 text-right">Répéter chaque :</label>
+                                            <div class="col-sm-7 col-xs-7">
+                                                <span t-field="contract.recurring_interval" />
+                                                <span t-field="contract.recurring_rule_type" />
+                                            </div>
+                                        </div>
+                                        <div class="clearfix" />
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Informations parc installé -->
+                            <div class="row mt32" t-if="contract.parc_installe_id">
+                                <div class="col-md-12 col-xs-12">
+                                    <h3>Produit installé</h3>
+                                    <div class="col-md-6 col-xs-6">
+                                        <div class="row">
+                                            <label class="col-sm-4 col-xs-4 text-right">Désignation :</label>
+                                            <div class="col-sm-8 col-xs-8">
+                                                <span t-esc="contract.parc_installe_product_id.sudo().name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-xs-6">
+                                        <div class="row">
+                                            <label class="col-sm-4 col-xs-4 text-right">Numéro de série :</label>
+                                            <div class="col-sm-8 col-xs-8">
+                                                <span t-field="contract.parc_installe_id.name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Informations RDV -->
+                            <div class="row mt32">
+                                <div class="col-md-12 col-xs-12">
+                                    <h3>Historique des rendez-vous</h3>
+                                    <t t-if="not contract.intervention_count">
+                                        <p>Il n'y a pas encore eu de rendez-vous pour ce contrat.</p>
+                                    </t>
+                                    <t t-else="">
+                                        <table class="table">
+                                            <thead>
+                                                <tr class="active">
+                                                    <th>Date</th>
+                                                    <th>Durée</th>
+                                                    <th>État</th>
+                                                </tr>
+                                            </thead>
+                                            <t t-foreach="contract.intervention_ids.filtered(lambda rdv: rdv.state in ['confirm', 'done']).sorted(key='date', reverse=True)" t-as="rdv">
+                                                <tr>
+                                                    <td>
+                                                        <span t-field="rdv.with_context(tz='Europe/Paris').date"/>
+                                                    </td>
+                                                    <td>
+                                                        <span t-esc="'%02dh%02d' % (int(rdv.duree), rdv.duree % 1 * 60)"/>
+                                                    </td>
+                                                    <td>
+                                                        <span t-field="rdv.state"/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </table>
+                                    </t>
+                                </div>
+                            </div>
+                            <div class="oe_structure" />
+                        </div>
+                    </div>
+                </div>
+            </body>
+        </t>
+    </template>
+
+</odoo>
