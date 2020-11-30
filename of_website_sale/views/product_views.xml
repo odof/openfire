@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Product Template -->
+
+    <record id="of_website_sale_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.website.sale.product.template.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='description_sale']" position="after">
+                <separator string="Description pour le site internet" colspan="4"/>
+                <field name="website_description" colspan="4" nolabel="1"
+                       placeholder="Cette note sera affichée sur la fiche produit du site internet."/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_website_sale_product_template_website_form_view" model="ir.ui.view">
+        <field name="name">of.website.sale.product.template.website.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="website_sale.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='public_categ_ids']" position="before">
+                <field name="website_name"/>
+            </xpath>
+            <xpath expr="//field[@name='alternative_product_ids']" position="attributes">
+                <attribute name="string">Suggestions fiche article</attribute>
+            </xpath>
+            <xpath expr="//field[@name='accessory_product_ids']" position="attributes">
+                <attribute name="string">Suggestions panier</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_website_sale_product_template_website_sale_options_form_view" model="ir.ui.view">
+        <field name="name">of.website.sale.product.template.website.sale.options.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="website_sale_options.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='optional_product_ids']" position="attributes">
+                <attribute name="string">Suggestions pop-up</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
