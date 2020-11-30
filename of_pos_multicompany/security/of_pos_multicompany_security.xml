@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Désactivation des règles standards -->
+        <!-- Rappel: Une fonction en noupdate n'est lancée qu'à l'installation du module (elle n'a pas d'existence dans ir_model_data) -->
+        <function id="inactive_old_rules" model="ir.rule" name="write"
+                  eval="([ref(xml_id) for xml_id in (
+    'account.account_bank_statement_comp_rule',
+    'account.account_bank_statement_line_comp_rule',
+    )], {'active':False})"/>
+
+        <!-- Ajout des règles Multi-société OpenFire -->
+
+        <!-- Account Bank Statement -->
+        <record id="of_pos_multicompany_account_bank_statement_rule" model="ir.rule">
+            <field name="name">OF Bank Statement multi-company</field>
+            <field name="model_id" ref="account.model_account_bank_statement"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|','|',('company_id','=',False),('company_id','child_of',[user.company_id.id]),('company_id','parent_of',[user.company_id.id])]</field>
+        </record>
+        <record id="of_pos_multicompany_account_bank_statement_line_rule" model="ir.rule">
+            <field name="name">OF Bank Statement Line multi-company</field>
+            <field name="model_id" ref="account.model_account_bank_statement_line"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|','|',('company_id','=',False),('company_id','child_of',[user.company_id.id]),('company_id','parent_of',[user.company_id.id])]</field>
+        </record>
+
+    </data>
+</odoo>
