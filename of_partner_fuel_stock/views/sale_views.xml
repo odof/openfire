@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Sale Orders -->
+
+    <record id="of_partner_fuel_stock_sale_order_form_view" model="ir.ui.view">
+        <field name="name">of.partner.fuel.stock.sale.order.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_article_principal']" position="after">
+                <field name="of_storage"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

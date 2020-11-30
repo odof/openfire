@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <template id="of_partner_fuel_stock_external_layout_header" inherit_id="report.external_layout_header">
+        <xpath expr="//t[@t-elif=&quot;o._name == 'stock.picking'&quot;]" position="replace">
+            <t t-elif="o._name == 'stock.picking'">
+                <t t-if="o.of_storage">
+                    <span name="bon_enlevement" style="font-size: medium;">Bon d'enlèvement</span>
+                </t>
+                <t t-else="">
+                    <span name="bon_livraison" style="font-size: medium;">Bon de livraison</span>
+                </t>
+            </t>
+        </xpath>
+    </template>
+
+</odoo>
