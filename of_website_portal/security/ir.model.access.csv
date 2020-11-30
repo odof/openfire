@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_service_public,access.of.service.public,of_service.model_of_service,base.group_portal,1,0,0,0
+access_of_planning_intervention_public,access.of.planning.intervention.public,of_planning.model_of_planning_intervention,base.group_portal,1,0,0,0
+access_of_parc_installe_public,access.of.parc.installe.public,of_parc_installe.model_of_parc_installe,base.group_portal,1,0,0,0
+access_of_res_partner_phone_public,access.of.res.partner.phone.public,of_base.model_of_res_partner_phone,base.group_portal,1,0,0,0
+access_of_invoice_kit_public,access.of.invoice.kit.public,of_kit.model_of_invoice_kit,base.group_portal,1,0,0,0
+access_of_invoice_kit_line_public,access.of.invoice.kit.line.public,of_kit.model_of_invoice_kit_line,base.group_portal,1,0,0,0
