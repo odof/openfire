@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_point_of_sale_account_journal_form_view" model="ir.ui.view">
+        <field name="name">of.point.of.sale.account.journal.form.view</field>
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="point_of_sale.view_account_journal_pos_user_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='amount_authorized_diff']" position="after">
+                <field name="of_pos_payment_mode_ids" attrs="{'required': [('journal_user', '=', True)]}" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_point_of_sale_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.point.of.sale.product.template.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="point_of_sale.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='pos_categ_id']" position="after">
+                <field name="of_pos_favorite" attrs="{'invisible': [('available_in_pos', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
