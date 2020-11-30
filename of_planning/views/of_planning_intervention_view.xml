@@ -108,7 +108,7 @@
         <field name="model">of.planning.intervention</field>
         <field name="arch" type="xml">
             <search string="Recherche">
-                <group>
+                <group name="filter">
                     <filter string="Brouillon" name="state_draft" icon="terp-folder-violet" domain="[('state','=','draft')]"/>
                     <filter string="Confirmé" name="state_confirm" icon="gtk-no" domain="[('state','=','confirm')]"/>
                     <filter string="Réalisé" name="state_done" icon="terp-folder-blue" domain="[('state','=','done')]"/>
@@ -139,7 +139,7 @@
                                      (u'date', u'&lt;', (context_today() + datetime.timedelta(days=2)).strftime('%Y-%m-%d'))]"/>
                 </group>
                 <newline/>
-                <group>
+                <group name="field">
                     <field name="name" filter_domain="['|', ('name','ilike',self), ('number','ilike',self)]"/>
                     <field name="date_date"/>
                     <field name="date_date" string="Semaine intervention"
@@ -158,7 +158,7 @@
                     <field name="company_id" widget="selection"/>
                 </group>
                 <newline/>
-                <group expand="0" string="Regrouper par...">
+                <group expand="0" string="Regrouper par..." name="group_by">
                    <filter string="Utilisateur" icon="terp-personal" domain="[]" context="{'group_by' : 'user_id'}"/>
                    <filter string="Tâche" icon="terp-folder-blue" domain="[]" context="{'group_by' : 'tache_id'}"/>
                    <filter string="Équipe" icon="terp-partner" domain="[]" context="{'group_by' : 'equipe_id'}"/>
@@ -274,6 +274,7 @@
                                            account.group_account_invoice,
                                            stock.group_stock_user"/>
                         </group>
+                        <group name="autre" string="Divers" invisible="1"/>
                     </group>
                     <notebook>
                         <!-- Description -->
