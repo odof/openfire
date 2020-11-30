@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Portail -->
+
+    <template id="of_website_portal_fuel_stock_portal_my_home_menu" name="OF Website Portal Fuel Stock Home Menu" inherit_id="website_portal.portal_layout" priority="25">
+        <xpath expr="//ul[contains(@class,'o_portal_submenu')]" position="inside">
+            <li>
+                <a href="/my/of_fuel_stocks">Stocks de combustible</a>
+            </li>
+        </xpath>
+    </template>
+
+    <template id="of_website_portal_fuel_stock_portal_my_home" name="OF Website Portal Fuel Stock Home" inherit_id="website_portal.portal_my_home" priority="25">
+        <xpath expr="//div[contains(@class,'o_my_home_content')]" position="inside">
+            <h3 class="page-header">
+                <a href="/my/of_fuel_stocks">Vos stocks de combustible
+                    <small class="ml8">
+                        <t t-if="fuel_stock_count">
+                            <span class='badge'><t t-esc="fuel_stock_count"/></span>
+                        </t>
+                        <t t-if="not fuel_stock_count">
+                            Il n'y a actuellement pas de stock de combustible pour votre compte.
+                        </t>
+                    </small>
+                </a>
+            </h3>
+        </xpath>
+    </template>
+
+    <!-- Portail - Stocks de combustible -->
+
+    <template id="of_website_portal_fuel_stock_portal_my_of_fuel_stocks" name="OF My Fuel Stocks">
+        <t t-call="website_portal.portal_layout">
+            <h3 class="page-header">Vos stocks de combustible</h3>
+            <t t-if="not fuel_stocks">
+                <p>Il n'y a actuellement pas de stock de combustible pour votre compte.</p>
+            </t>
+            <t t-if="fuel_stocks">
+                <table class="table table-hover o_my_status_table">
+                    <thead>
+                        <tr class="active">
+                            <th>Article</th>
+                            <th>Solde</th>
+                        </tr>
+                    </thead>
+                    <t t-foreach="fuel_stocks" t-as="fuel_stock">
+                        <tr>
+                            <td>
+                                <a t-attf-href="/of_fuel_stock/#{slug(fuel_stock)}"><t t-esc="fuel_stock.sudo().name" /></a>
+                            </td>
+                            <td>
+                                <span t-esc="partner.get_fuel_balance(fuel_stock)"/>
+                            </td>
+                        </tr>
+                    </t>
+                </table>
+                <div t-if="pager" class="o_portal_pager text-center">
+                    <t t-call="website.pager" />
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <template id="of_website_portal_fuel_stock_website_of_fuel_stock" name="OF Website Fuel Stock">
+        <t t-call="website.layout">
+            <body data-spy="scroll" data-target=".navspy" data-offset="50">
+                <div class="container o_website_quote">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <ol class="breadcrumb mt8">
+                                <li><a href="/my/home"><i class="fa fa-home" /></a></li>
+                                <li><a t-attf-href="/my/of_fuel_stocks">Mes stocks de combustible</a></li>
+                                <li>
+                                    <t t-esc="fuel_stock.sudo().name" />
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="row mt16">
+                        <!-- Page content -->
+                        <div id="of_fuel_stock_page_content" class="col-md-12">
+                            <!-- Intro -->
+                            <div id="of_fuel_stock_introduction" class="page-header mt16">
+                                <h1>
+                                    <em t-esc="fuel_stock.sudo().name" />
+                                </h1>
+                            </div>
+                            <!-- Informations générales -->
+                            <div class="row mt32">
+                                <div class="col-md-4 col-xs-4">
+                                    <div class="row">
+                                        <label class="col-sm-8 col-xs-8 text-right">Quantité achetée :</label>
+                                        <div class="col-sm-4 col-xs-4">
+                                            <span t-esc="partner.get_fuel_purchase_qty(fuel_stock)"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-xs-4">
+                                    <div class="row">
+                                        <label class="col-sm-8 col-xs-8 text-right">Quantitée retirée :</label>
+                                        <div class="col-sm-4 col-xs-4">
+                                            <span t-esc="partner.get_fuel_checkout_qty(fuel_stock)"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-xs-4">
+                                    <div class="row">
+                                        <label class="col-sm-8 col-xs-8 text-right">Solde :</label>
+                                        <div class="col-sm-4 col-xs-4">
+                                            <span t-esc="partner.get_fuel_balance(fuel_stock)"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Informations historique d'enlèvement -->
+                            <div class="row mt32">
+                                <div class="col-md-12 col-xs-12">
+                                    <h3>Historique des enlèvements</h3>
+                                    <t t-if="not partner.get_checkouts(fuel_stock)">
+                                        <p>Il n'y a pas encore eu d'enlèvement pour ce stock de combustible.</p>
+                                    </t>
+                                    <t t-else="">
+                                        <table class="table">
+                                            <thead>
+                                                <tr class="active">
+                                                    <th>Date</th>
+                                                    <th>Quantité retirée</th>
+                                                    <th/>
+                                                </tr>
+                                            </thead>
+                                            <t t-foreach="partner.get_checkouts(fuel_stock).sorted(key='date_done', reverse=True)" t-as="checkout">
+                                                <tr>
+                                                    <td style="vertical-align: middle;">
+                                                        <span t-field="checkout.date_done"/>
+                                                    </td>
+                                                    <td style="vertical-align: middle;">
+                                                        <span t-esc="checkout.pack_operation_product_ids.filtered(lambda l: l.product_id.id == fuel_stock.id).qty_done"/>
+                                                    </td>
+                                                    <td>
+                                                        <a t-att-href="'/of_fuel_stock/pdf/'+str(checkout.id)"><button class="btn btn-default btn-primary pull-right">Bon d'enlèvement</button></a>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </table>
+                                    </t>
+                                </div>
+                            </div>
+                            <div class="oe_structure" />
+                        </div>
+                    </div>
+                </div>
+            </body>
+        </t>
+    </template>
+
+</odoo>
