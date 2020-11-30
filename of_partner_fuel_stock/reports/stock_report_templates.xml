@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Bon d'enlèvement -->
+    <template id="of_partner_fuel_stock_report_delivery_document" inherit_id="stock.report_delivery_document">
+        <xpath expr="//p[@t-if='o.backorder_id']" position="replace">
+            <p t-if="not o.of_storage and o.backorder_id">
+                Cet envoi est un reliquat de <t t-esc="o.backorder_id.name"/>.
+            </p>
+        </xpath>
+        <xpath expr="//t[@t-if=&quot;o.search([('backorder_id', '=', o.id), ('state', 'not in', ['cancel', 'done'])])&quot;]" position="replace">
+            <t t-if="not o.of_storage and o.search([('backorder_id', '=', o.id), ('state', 'not in', ['cancel', 'done'])])">
+                Tous les éléments n'ont pas pu être expédiés, le reliquat sera expédié dès qu'il sera disponible.
+            </t>
+        </xpath>
+    </template>
+
+</odoo>
