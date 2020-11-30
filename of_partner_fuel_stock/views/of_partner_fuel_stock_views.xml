@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- OF Res Partner Fuel Stock -->
+
+    <record id="of_partner_fuel_stock_of_res_partner_fuel_stock_form_view" model="ir.ui.view">
+        <field name="name">of.partner.fuel.stock.of.res.partner.fuel.stock.form.view</field>
+        <field name="model">of.res.partner.fuel.stock</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_orders" type="object" class="oe_stat_button" icon="fa-usd">
+                            <field name="order_count" widget="statinfo" string="Commande(s)"/>
+                        </button>
+                        <button name="action_view_pickings" type="object" class="oe_stat_button" icon="fa-truck">
+                            <field name="picking_count" widget="statinfo" string="Enlèvement(s)"/>
+                        </button>
+                    </div>
+                    <group col="4">
+                        <group colspan="2">
+                            <field name="partner_id"/>
+                            <field name="product_id"/>
+                        </group>
+                        <group colspan="2">
+                            <field name="ordered_qty"/>
+                            <field name="checkout_qty"/>
+                            <field name="balance"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_partner_fuel_stock_of_res_partner_fuel_stock_tree_view" model="ir.ui.view">
+        <field name="name">of.partner.fuel.stock.of.res.partner.fuel.stock.tree.view</field>
+        <field name="model">of.res.partner.fuel.stock</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="ordered_qty" sum="Total commandé"/>
+                <field name="checkout_qty" sum="Total retiré"/>
+                <field name="balance" sum="Balance totale"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_partner_fuel_stock_of_res_partner_fuel_stock_search_view" model="ir.ui.view">
+        <field name="name">of.partner.fuel.stock.of.res.partner.fuel.stock.search.view</field>
+        <field name="model">of.res.partner.fuel.stock</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <separator/>
+                <filter string="Solde positif" name="positive_balance" domain="[('balance', '>', 0)]"/>
+                <group expand="0" string="Group By" colspan="16">
+                    <filter string="Client" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Article" context="{'group_by': 'product_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_partner_fuel_stock_of_res_partner_fuel_stock_action" model="ir.actions.act_window">
+        <field name="name">État de stock combustible des clients</field>
+        <field name="res_model">of.res.partner.fuel.stock</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form,tree</field>
+        <field name="view_id" ref="of_partner_fuel_stock_of_res_partner_fuel_stock_tree_view"/>
+    </record>
+
+    <menuitem id="of_partner_fuel_stock_of_res_partner_fuel_stock_menu" name="État de stock combustible des clients"
+              action="of_partner_fuel_stock_of_res_partner_fuel_stock_action"
+              parent="sales_team.menu_sales" sequence="110"/>
+
+</odoo>

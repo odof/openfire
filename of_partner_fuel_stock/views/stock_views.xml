@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Stock Pickings -->
+
+    <record id="of_partner_fuel_stock_stock_picking_form_view" model="ir.ui.view">
+        <field name="name">of.partner.fuel.stock.stock.picking.form.view</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='origin']" position="after">
+                <field name="of_storage" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
