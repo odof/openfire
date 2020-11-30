@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="assets_frontend" inherit_id="website.assets_frontend" name="OF Website Fuel Choice Assets">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/of_website_fuel_choice/static/src/js/fuel_choice.js"></script>
+        </xpath>
+    </template>
+
+    <template id="of_website_fuel_choice_website_sale_cart_lines" inherit_id="website_sale.cart_lines">
+        <xpath expr="//span[@t-field='line.product_id.image_small']" position="replace">
+            <span t-if="line.product_id.sudo().image_small" t-esc="line.product_id.sudo().image_small" t-options="{'widget': 'image', 'class': 'img-rounded'}" />
+            <span t-else="" t-field="line.product_id.sudo().image_small" t-options="{'widget': 'image', 'class': 'img-rounded'}" />
+        </xpath>
+        <xpath expr="//strong[@t-esc='line.product_id.with_context(display_default_code=False).display_name']/parent::a" position="replace">
+            <a t-attf-href="/shop/product/#{ slug(line.product_id.product_tmpl_id) }" t-if="not line.of_fuel_choice">
+                <strong t-esc="line.product_id.with_context(display_default_code=False).display_name" />
+            </a>
+            <div t-else="">
+                <strong t-field="line.name"/>
+            </div>
+        </xpath>
+        <xpath expr="//td[@id='td-qty']/div" position="attributes">
+            <attribute name="t-if">not line.of_fuel_choice</attribute>
+        </xpath>
+        <xpath expr="//td[@id='td-qty']/div" position="after">
+            <div t-else="">
+                <input type="hidden" class="js_quantity form-control quantity" t-att-data-line-id="line.id" t-att-data-product-id="line.product_id.id" t-att-value="int(line.product_uom_qty) == line.product_uom_qty and int(line.product_uom_qty) or line.product_uom_qty" />
+                <span>1</span>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="of_website_fuel_choice_website_sale_payment" inherit_id="website_sale.payment">
+        <xpath expr="//span[@t-field='line.product_id.image_small']" position="replace">
+            <span t-if="line.product_id.sudo().image_small" t-esc="line.product_id.sudo().image_small" t-options="{'widget': 'image', 'class': 'img-rounded'}" />
+            <span t-else="" t-field="line.product_id.sudo().image_small" t-options="{'widget': 'image', 'class': 'img-rounded'}" />
+        </xpath>
+        <xpath expr="//strong[@t-field='line.product_id.with_context(display_default_code=False).display_name']" position="replace">
+            <strong t-field="line.name" t-if="line.of_fuel_choice"/>
+            <strong t-field="line.product_id.with_context(display_default_code=False).display_name" t-else=""/>
+        </xpath>
+    </template>
+
+    <!-- Formulaire choix du combustible -->
+    <template id="fuel_choice" name="Choix de combustible">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_website_sale oe_website_fuel">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <h3 class="page-header mt16" style="text-align: center;">Choix de combustible</h3>
+                                <t t-if="error" t-foreach="error.get('error_message', [])" t-as="err">
+                                    <h4 class="text-danger" t-esc="err" />
+                                </t>
+                                <t t-if="send_message">
+                                    <h4 class="text-success" t-esc="send_message" />
+                                </t>
+                                <form name="/fuel_choice" method="post" class="fuel_choice_autoformat">
+                                    <div t-attf-class="form-group #{error.get('fuel_id') and 'has-error' or ''} col-md-6" id="div_fuel_id">
+                                        <label class="control-label" for="fuel_id">Type de bois</label>
+                                        <select id="fuel_id" name="fuel_id" class="form-control">
+                                            <option value="">Type de bois...</option>
+                                            <t t-foreach="fuel_types" t-as="f">
+                                                <option t-att-value="f.id" t-att-selected="f.id == (fuel and fuel.id or -1)">
+                                                    <t t-esc="f.name" />
+                                                </option>
+                                            </t>
+                                        </select>
+                                    </div>
+                                    <div t-attf-class="form-group #{error.get('length') and 'has-error' or ''} col-md-4" id="div_length" t-att-style="(not fuel or len(filter(None, list(set(fuel.line_ids.mapped('length'))))) &lt;= 1) and 'display: none'">
+                                        <label class="control-label" for="length">Longueur</label>
+                                        <select name="length" class="form-control" data-init="1">
+                                            <option value="">Longueur...</option>
+                                            <t t-foreach="fuel and filter(None, list(set(fuel.line_ids.mapped('length')))) or []" t-as="l">
+                                                <option t-att-value="l" t-att-selected="l == ('length' in values and values['length'])">
+                                                    <t t-esc="l"/>
+                                                </option>
+                                            </t>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-2" id="div_split" t-att-style="(not fuel or len(list(set(fuel.line_ids.mapped('split')))) &lt;= 1) and 'display: none'">
+                                        <label class="control-label" for="split">Fendu ?</label>
+                                        <input type="checkbox" name="split" class="form-control" style="width: auto; margin: auto;"
+                                               t-att-checked="'checked' if 'split' in values else None"/>
+                                    </div>
+                                    <div class="clearfix"/>
+                                    <div t-attf-class="form-group #{error.get('qty') and 'has-error' or ''} col-md-4" id="div_qty">
+                                        <label class="control-label" for="qty">Quantité</label>
+                                        <div t-attf-class="input-group oe_website_spinner col-md-4" style="margin: auto;">
+                                            <a t-attf-href="#" class="mb8 input-group-addon js_add_cart_json">
+                                                <i class="fa fa-minus"></i>
+                                            </a>
+                                            <input type="text" class="js_quantity form-control quantity" data-min="1" name="qty" t-att-value="'qty' in values and values['qty'] or 1"/>
+                                            <a t-attf-href="#" class="mb8 input-group-addon float_left js_add_cart_json">
+                                                <i class="fa fa-plus"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"/>
+                                    <div t-attf-class="form-group #{error.get('checkout_id') and 'has-error' or ''} col-md-6" id="div_checkout_id">
+                                        <label class="control-label" for="checkout_id">Mode de retrait</label>
+                                        <select id="checkout_id" name="checkout_id" class="form-control">
+                                            <option value="">Mode de retrait...</option>
+                                            <t t-foreach="checkout_modes" t-as="m">
+                                                <option t-att-value="m.id" t-att-selected="m.id == (checkout and checkout.id or -1)">
+                                                    <t t-esc="m.name" />
+                                                </option>
+                                            </t>
+                                        </select>
+                                    </div>
+                                    <div name="address" class="form-group col-md-6" t-att-style="(not checkout or checkout.type != 'delivery') and 'display: none'">
+                                        <div t-attf-class="form-group #{error.get('street') and 'has-error' or ''} col-md-12" id="div_street">
+                                            <label class="control-label" for="street">Rue</label>
+                                            <input type="text" name="street" class="form-control" t-att-value="'street' in values and values['street']" />
+                                        </div>
+                                        <div class="clearfix" />
+                                        <div t-attf-class="form-group #{error.get('zip') and 'has-error' or ''} col-sm-4" id="div_zip">
+                                            <label class="control-label" for="zip">Code postal</label>
+                                            <input type="text" name="zip" class="form-control" t-att-value="'zip' in values and values['zip']" />
+                                        </div>
+                                        <div t-attf-class="form-group #{error.get('city') and 'has-error' or ''} col-sm-8" id="div_city">
+                                            <label class="control-label" for="city">Ville</label>
+                                            <input type="text" name="city" class="form-control" t-att-value="'city' in values and values['city']" />
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"/>
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <input type="hidden" name="submitted" value="1"/>
+                                    <div>
+                                        <button type="submit" class="btn btn-default btn-primary pull-right mb32 a-submit a-submit-disable a-submit-loading"
+                                                name="action" value="order">
+                                            Passer commande
+                                        </button>
+                                        <button type="submit" class="btn btn-default btn-primary pull-right mb32 a-submit a-submit-disable a-submit-loading"
+                                                name="action" value="email" style="margin-right: 10px;">
+                                            Demandez un devis par courriel
+                                        </button>
+                                    </div>
+                                    <div class="clearfix"/>
+                                    <div t-att-style="not email and 'display: none'">
+                                        <input type="hidden" name="email_display" t-att-value="1 if email else 0"/>
+                                        <div t-attf-class="form-group #{error.get('email') and 'has-error' or ''} col-md-6" id="div_email">
+                                            <label class="control-label" for="email">Courriel</label>
+                                            <input type="email" name="email" class="form-control" t-att-value="'email' in values and values['email']"/>
+                                        </div>
+                                        <div class="clearfix"/>
+                                        <div>
+                                            <button type="submit" class="btn btn-default btn-primary pull-right mb32 a-submit a-submit-disable a-submit-loading"
+                                                    name="action" value="send">
+                                                Valider
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

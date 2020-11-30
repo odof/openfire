@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_website_product_fuel_public,access.of.website.product.fuel.public,model_of_website_product_fuel,,1,0,0,0
+access_of_website_product_fuel_employee,access.of.website.product.fuel.employee,model_of_website_product_fuel,base.group_user,1,0,0,0
+access_of_website_product_fuel_sale_manager,access.of.website.product.fuel.sale.manager,model_of_website_product_fuel,sales_team.group_sale_manager,1,1,1,1
+access_of_website_product_fuel_line_public,access.of.website.product.fuel.line.public,model_of_website_product_fuel_line,,1,0,0,0
+access_of_website_product_fuel_line_employee,access.of.website.product.fuel.line.employee,model_of_website_product_fuel_line,base.group_user,1,0,0,0
+access_of_website_product_fuel_line_sale_manager,access.of.website.product.fuel.line.sale.manager,model_of_website_product_fuel_line,sales_team.group_sale_manager,1,1,1,1
+access_of_website_product_fuel_checkout_mode_public,access.of.website.product.fuel.checkout.mode.public,model_of_website_product_fuel_checkout_mode,,1,0,0,0
+access_of_website_product_fuel_checkout_mode_employee,access.of.website.product.fuel.checkout.mode.employee,model_of_website_product_fuel_checkout_mode,base.group_user,1,0,0,0
+access_of_website_product_fuel_checkout_mode_sale_manager,access.of.website.product.fuel.checkout.mode.sale.manager,model_of_website_product_fuel_checkout_mode,sales_team.group_sale_manager,1,1,1,1
+access_of_website_product_fuel_checkout_mode_line_public,access.of.website.product.fuel.checkout.mode.line.public,model_of_website_product_fuel_checkout_mode_line,,1,0,0,0
+access_of_website_product_fuel_checkout_mode_line_employee,access.of.website.product.fuel.checkout.mode.line.employee,model_of_website_product_fuel_checkout_mode_line,base.group_user,1,0,0,0
+access_of_website_product_fuel_checkout_mode_line_sale_manager,access.of.website.product.fuel.checkout.mode.line.sale.manager,model_of_website_product_fuel_checkout_mode_line,sales_team.group_sale_manager,1,1,1,1

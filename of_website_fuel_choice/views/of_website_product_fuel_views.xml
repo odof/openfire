@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- OF Website Product Fuel -->
+
+    <record id="of_website_fuel_choice_of_website_product_fuel_form_view" model="ir.ui.view">
+        <field name="name">of.website.fuel.choice.of.website.product.fuel.form.view</field>
+        <field name="model">of.website.product.fuel</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group colspan="2">
+                        <field name="name" placeholder="Palette de bois, sac de granulés..."/>
+                    </group>
+                    <group colspan="4">
+                        <field name="line_ids" nolabel="1">
+                            <tree editable="bottom">
+                                <field name="product_id"/>
+                                <field name="length" placeholder="25 cm, 33 cm..."/>
+                                <field name="split"/>
+                            </tree>
+                        </field>
+                    </group>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_website_fuel_choice_of_website_product_fuel_tree_view" model="ir.ui.view">
+        <field name="name">of.website.fuel.choice.of.website.product.fuel.tree.view</field>
+        <field name="model">of.website.product.fuel</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_website_fuel_choice_of_website_product_fuel_action" model="ir.actions.act_window">
+        <field name="name">Types de combustible</field>
+        <field name="res_model">of.website.product.fuel</field>
+        <field name="view_type">form</field>
+        <field name="view_id" ref="of_website_fuel_choice_of_website_product_fuel_tree_view"/>
+    </record>
+
+    <!-- OF Website Product Fuel Checkout Mode -->
+
+    <record id="of_website_fuel_choice_of_website_product_fuel_checkout_mode_form_view" model="ir.ui.view">
+        <field name="name">of.website.fuel.choice.of.website.product.fuel.checkout.mode.form.view</field>
+        <field name="model">of.website.product.fuel.checkout.mode</field>
+        <field name="arch" type="xml">
+            <form>
+                <group col="4">
+                    <group colspan="2">
+                        <field name="name" placeholder="Livraison à domicile, retrait borne..."/>
+                        <field name="product_id" attrs="{'invisible': [('type', '=', 'delivery')]}"/>
+                    </group>
+                    <group colspan="2">
+                        <field name="type"/>
+                        <field name="pellets_drive" attrs="{'invisible': [('type', '!=', 'storage')]}"/>
+                    </group>
+                    <group colspan="4">
+                        <field name="line_ids" nolabel="1" attrs="{'invisible': [('type', '!=', 'delivery')]}">
+                            <tree editable="bottom">
+                                <field name="min_distance"/>
+                                <field name="max_distance"/>
+                                <field name="product_id"/>
+                            </tree>
+                        </field>
+                    </group>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_website_fuel_choice_of_website_product_fuel_checkout_mode_tree_view" model="ir.ui.view">
+        <field name="name">of.website.fuel.choice.of.website.product.fuel.checkout.mode.tree.view</field>
+        <field name="model">of.website.product.fuel.checkout.mode</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_website_fuel_choice_of_website_product_fuel_checkout_mode_action" model="ir.actions.act_window">
+        <field name="name">Modes de retrait</field>
+        <field name="res_model">of.website.product.fuel.checkout.mode</field>
+        <field name="view_type">form</field>
+        <field name="view_id" ref="of_website_fuel_choice_of_website_product_fuel_checkout_mode_tree_view"/>
+    </record>
+
+    <!-- Menus -->
+
+    <menuitem id="of_website_fuel_choice_website_fuel_config_menu" name="Combustible" parent="sales_team.menu_sale_config"
+              sequence="2" groups="sales_team.group_sale_manager"/>
+
+    <menuitem id="of_website_fuel_choice_of_website_product_fuel_menu" name="Types de combustible"
+              action="of_website_fuel_choice_of_website_product_fuel_action"
+              parent="of_website_fuel_choice_website_fuel_config_menu" sequence="10"/>
+
+    <menuitem id="of_website_fuel_choice_of_website_product_fuel_checkout_mode_menu" name="Modes de retrait"
+              action="of_website_fuel_choice_of_website_product_fuel_checkout_mode_action"
+              parent="of_website_fuel_choice_website_fuel_config_menu" sequence="20"/>
+
+</odoo>
