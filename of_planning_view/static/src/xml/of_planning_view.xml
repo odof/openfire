@@ -165,7 +165,9 @@
     <!-- Évènement (RDV d'intervention) -->
     <div t-name="PlanningView.record"
          t-attf-class="of_planning_record_global_click #{record.annule_reporte and 'of_planning_info_annule_reporte' or ''}"
-         t-attf-style="height: #{record.hauteur}; overflow: hidden;">
+         t-attf-style="
+            height: #{record.day_span > 1 &amp;&amp; record['hours_cols'][col_index].hauteur || record.hauteur};
+            overflow: hidden;">
         <!-- variables données par le javascript: record et col_index -->
         <div t-att-class="record.class"
              t-attf-style="color: #{record.color_ft}; background-color: #{record.color_bg}; border-top: 1px solid #{record.color_ft};
@@ -207,16 +209,16 @@
                 </t>
             </div>
 
-            <div t-if="record.tache_name" class="of_planning_info of_planning_info_tache_name">
-                <i class="fa fa-cogs"/>
-                <span class="of_ws"/>
-                <t t-raw="record.tache_name"/>
-            </div>
-
             <div t-if="record.partner_name" class="of_planning_info of_planning_info_partner_name">
                 <i class="fa fa-user"/>
                 <span class="of_ws"/>
                 <t t-raw="record.partner_name"/>
+            </div>
+
+            <div t-if="record.tache_name" class="of_planning_info of_planning_info_tache_name">
+                <i class="fa fa-cogs"/>
+                <span class="of_ws"/>
+                <t t-raw="record.tache_name"/>
             </div>
 
             <div class="of_planning_info of_planning_info_lieu">
@@ -291,10 +293,10 @@
                 </t>
             </div>
 
-            <div t-if="record.name">
-                <i class="fa fa-tag"/>
+            <div t-if="record.partner_name">
+                <i class="fa fa-user"/>
                 <span class="of_ws"/>
-                <t t-esc="record.name"/>
+                <t t-raw="record.partner_name"/>
             </div>
 
             <div t-if="record.tache_name">
@@ -303,14 +305,7 @@
                 <t t-raw="record.tache_name"/>
             </div>
 
-            <div t-if="record.partner_name">
-                <i class="fa fa-user"/>
-                <span class="of_ws"/>
-                <t t-raw="record.partner_name"/>
-            </div>
-
             <div>
-
                 <i t-if="record.address_zip || record.address_city || record.secteur_name" class="fa fa-map-marker"/>
                 <span t-if="record.address_zip || record.address_city" class="of_ws"/>
 
@@ -328,6 +323,13 @@
                     <t t-raw="record.secteur_name"/>
                 </span>
             </div>
+
+            <div t-if="record.name">
+                <i class="fa fa-tag"/>
+                <span class="of_ws"/>
+                <t t-esc="record.name"/>
+            </div>
+
         </div>
     </div>
 
