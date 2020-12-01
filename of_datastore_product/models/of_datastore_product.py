@@ -767,6 +767,7 @@ class OfDatastoreCentralized(models.AbstractModel):
             ('of_seller_product_category_name', lambda: vals['categ_id'][1]),
             ('of_tmpl_datastore_res_id'       , lambda: vals['product_tmpl_id'][0]),
             ('description_norme'              , lambda: product.description_norme or vals['description_norme']),
+            ('of_template_image'              , lambda: vals.get('of_template_image') or product.image),
             # Attention, l'ordre des deux lignes suivantes est important
             ('of_seller_product_code'         , lambda: vals['default_code']),
             ('default_code'                   , lambda: default_code_func[brand](vals['default_code'])),
