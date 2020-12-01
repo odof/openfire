@@ -329,6 +329,8 @@
                     <button name="button_annuler" string="Annuler" type="object"
                             attrs="{'invisible': [('base_state', '!=', 'calculated')]}"/>
                     <button name="button_brouillon" string="Remettre en brouillon" states="cancel" type="object"/>
+                    <button name="of_planning_tournee.action_view_rdv_intervention_wizard_service" string="Planifier Intervention"
+                            type="action" attrs="{'invisible': [('base_state', '!=', 'calculated')]}"/>
                 </header>
                 <sheet>
                     <field name="alert_dates" invisible="1"/>
@@ -358,13 +360,13 @@
                         <field name="state" invisible="1"/>
                         <field name="base_state" invisible="1"/>
                         <group col="2" colspan="2">
-                            <field name="type" wiget="radio"/>
+                            <field name="type" widget="radio" options="{'horizontal': true}"/>
                         </group>
                         <group col="2" colspan="2">
                             <field name="user_id"/>
                         </group>
                         <group name="who" col="2" colspan="2" string="Qui" class="of_grey_background">
-                            <group>
+                            <group colspan="2">
                                 <field name="partner_id"/>
                                 <field name="tag_ids" widget="many2many_tags"/>
                                 <field name="company_id"/>
