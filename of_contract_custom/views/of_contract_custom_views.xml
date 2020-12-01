@@ -350,142 +350,81 @@
 
                     </div>
                     <div class="of_title">
-                        <h1 attrs="{'invisible': [('recurrence', '=', False)]}"><b>
-                            <span>Intervention récurrente</span>
-                            <i> (<field name="state" nolabel="1" attrs="{'invisible': [('recurrence', '!=', True)]}"
-                                       class="oe_inline"/>)</i>
-                        </b></h1>
-                        <h1 attrs="{'invisible': [('recurrence', '=', True)]}"><b>
-                            <span>Intervention ponctuelle</span>
-                            <i> (<field name="state_ponc" nolabel="1" attrs="{'invisible': [('recurrence', '=', True)]}"
-                                       class="oe_inline"/>)</i>
+                        <h1><b>
+                            <span>Demande d'intervention</span>
                         </b></h1>
                     </div>
-                    <group>
-                        <group name="gauche_1">
-                            <group colspan="2" name="refs" string="Références">
-                                <field name="base_state" invisible="1"/>
-                                <field name="partner_id" invisible="context.get('hide_service_partner_id')"/>
-                                <label for="address_id" invisible="context.get('hide_service_address_id')"/>
-                                <div class="o_address_format" invisible="context.get('hide_service_address_id')">
+                    <group col="4">
+                        <field name="state" invisible="1"/>
+                        <field name="base_state" invisible="1"/>
+                        <group col="2" colspan="2">
+                            <field name="type" wiget="radio"/>
+                        </group>
+                        <group col="2" colspan="2">
+                            <field name="user_id"/>
+                        </group>
+                        <group name="who" col="2" colspan="2" string="Qui" class="of_grey_background">
+                            <group>
+                                <field name="partner_id"/>
+                                <field name="tag_ids" widget="many2many_tags"/>
+                                <field name="company_id"/>
+                            </group>
+                        </group>
+                        <group name="where" col="2" colspan="2" string="Où" class="of_grey_background">
+                            <group colspan="2">
+                                <label for="address_id" string="Adresse d'intervention"/>
+                                <div class="o_address_format">
                                     <div><field name="address_id"/></div>
                                     <field name="address_address"/>
                                 </div>
                                 <field name="secteur_tech_id"/>
-                                <field name="tag_ids" widget="many2many_tags"/>
-                                <field name="company_id"/>
                             </group>
-                            <group colspan="2" name="origine" string="Origine">
-                                <field name="order_id"
-                                   groups="sales_team.group_sale_salesman,
-                                           account.group_account_invoice,
-                                           stock.group_stock_user"/>
-                                <field name="sav_id"
-                                       attrs="{'invisible': [('recurrence', '=', True)]}"
-                                       groups="project.group_project_user, base.group_portal"/>
-                                <field name="origin" readonly="1" attrs="{'invisible': [('recurrence', '=', True)]}"/>
+                        </group>
+                        <group name="what" col="2" colspan="2" string="Quoi" class="of_grey_background">
+                            <group colspan="2">
+                                <field name="tache_id"/>
+                                <label for="duree" string="Durées"/>
+                                <div>
+                                    <field name="duree" widget="float_time" nolabel="1" class="oe_inline" attrs="{'invisible': [('state', '=', 'done')]}"/>
+                                    <i class="oe_grey oe_inline" attrs="{'invisible': [('state', '=', 'done')]}"> estimée, dont </i>
+                                    <field name="duree_planif" widget="float_time" nolabel="1" class="oe_inline" attrs="{'invisible': [('state', '=', 'done')]}"/>
+                                    <i class="oe_grey oe_inline" attrs="{'invisible': [('state', '=', 'done')]}"> planifiée et </i>
+                                    <field name="duree_restante" widget="float_time" nolabel="1" class="oe_inline" attrs="{'invisible': [('state', '=', 'done')]}"/>
+                                    <i class="oe_grey oe_inline" attrs="{'invisible': [('state', '=', 'done')]}"> restante</i>
+                                    <i class="oe_grey oe_inline" attrs="{'invisible': [('state', '!=', 'done')]}">
+                                        Cette intervention est terminée
+                                    </i>
+                                </div>
                             </group>
+<!--                            <field name=""/>-->
+                        </group>
+                        <group name="when" col="2" colspan="2" string="Quand" class="of_grey_background">
+                            <group colspan="2">
+                                <field name="date_next" string="Entre le"/>
+                                <field name="date_fin" string="et le"/>
+                                <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
+<!--                            <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}" />-->
+                            </group>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="description" string="Description">
+                            <group>
+                                <field name="note" nolabel="1"/>
+                            </group>
+                        </page>
+                        <page name="parc" string="Produit installé">
                             <group string="Produit installé" groups="project.group_project_user" colspan="2">
                                 <field name="parc_installe_id"/>
                                 <field name="parc_installe_product_id"/>
                                 <field name="parc_installe_site_adresse_id"/>
                                 <field name="parc_installe_note"/>
                             </group>
-                        </group>
-                        <group name="droite_1">
-                            <group colspan="2" name="planif" string="Planification">
-                                <div colspan="2" attrs="{'invisible': [('base_state', '!=', 'draft')]}">
-                                    <b><i class="of_red">
-                                        <i class="fa fa-lg fa-warning"/>
-                                        Vous ne pourrez planifier cette intervention que lorsqu’elle sera validée.
-                                    </i></b>
-                                </div>
-                                <div colspan="2" attrs="{'invisible': [('base_state', '!=', 'cancel')]}">
-                                    <b><i class="of_red">
-                                        <i class="fa fa-lg fa-warning"/> Une intervention annulée n'est pas planifiable.
-                                    </i></b>
-                                </div>
-                                <group colspan="2">
-                                    <field name="date_last" invisible="1"/>
-                                    <field name="tache_id" context="{'show_rec_icon_first': recurrence}"/>
-                                    <label for="duree" string="Durées"/>
-                                    <div>
-                                        <field name="duree" widget="float_time" nolabel="1" class="oe_inline"
-                                               attrs="{'invisible': [('state', '=', 'done')]}"/>
-                                        <i class="oe_grey oe_inline"
-                                            attrs="{'invisible': [('state', '=', 'done')]}"> (estimée), </i>
-                                        <field name="duree_planif" widget="float_time" nolabel="1" class="oe_inline"
-                                            attrs="{'invisible': [('state', '=', 'done')]}"/>
-                                        <i class="oe_grey oe_inline"
-                                            attrs="{'invisible': [('state', '=', 'done')]}"> (planifiée), </i>
-                                        <field name="duree_restante" widget="float_time" nolabel="1" class="oe_inline"
-                                            attrs="{'invisible': [('state', '=', 'done')]}"/>
-                                        <i class="oe_grey oe_inline"
-                                            attrs="{'invisible': [('state', '=', 'done')]}"> (restante).</i>
-                                        <i class="oe_grey oe_inline" attrs="{'invisible': [('state', '!=', 'done')]}">
-                                            Cette intervention est terminée
-                                        </i>
-                                    </div>
+                        </page>
+                        <page name="docs" string="Documents">
 
-                                    <label for="date_next" string="Dates"/>
-                                    <div name="dates">
-                                        <i class="oe_grey oe_inline">Entre le </i>
-                                        <field name="date_next" nolabel="1" class="oe_inline"/>
-                                        <i class="oe_grey oe_inline"> et le </i>
-                                        <field name="date_fin" nolabel="1" class="oe_inline"/>
-                                        <span attrs="{'invisible': [('recurrence', '=', False)]}">
-                                            <i class="oe_grey oe_inline">. Expire le </i>
-                                            <field name="date_fin_contrat" nolabel="1" class="oe_inline"/>
-                                            <i class="oe_grey oe_inline"> .</i>
-                                        </span>
-                                        <div attrs="{'invisible': [('alert_dates', '=', False)]}" class="of_red">
-                                            <i class="fa fa-warning of_ws"/>Incohérence dans les dates
-                                        </div>
-                                    </div>
-                                    <div colspan="2"
-                                         attrs="{'invisible': ['|',
-                                                                ('date_next', '&lt;=', '_field_date_fin_contrat'),
-                                                                ('date_fin_contrat', '=', False)]}">
-                                        <b><i class="oe_grey">
-                                            La date de prochaine planification est postérieure à la date de fin
-                                            du contrat.<br/>
-                                            Cela signifie que cette intervention est terminée et ne sera plus jamais
-                                            sélectionnée par les outils de planification.<br/>
-                                            Veuillez changer les dates si ce n'est pas ce que vous vouliez faire
-                                        </i></b>
-                                    </div>
-                                    <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
-                                    <field name="recurrence"/>
-                                    <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('recurrence', '=', False)]}"/>
-                                    <label for="recurring_interval" attrs="{'invisible': [('recurrence', '=', False)]}"/>
-                                    <div attrs="{'invisible': [('recurrence', '=', False)]}" col="2">
-                                        <field name="recurring_interval" nolabel="1" class="oe_inline of_ws"/>
-                                        <field name="recurring_rule_type" nolabel="1" class="oe_inline"/>
-                                    </div>
-                                    <field name="recurrence_tache" invisible="1"/>
-                                    <div colspan="2" attrs="{'invisible': [
-                                        '|',
-                                            ('recurrence', '=', '_field_recurrence_tache'),
-                                            ('recurrence', '=', False)]}">
-                                        <b><i class="oe_grey">
-                                            La tâche de cette intervention est ponctuelle alors que cette intervention est récurrente.
-                                        </i></b>
-                                    </div>
-                                    <div colspan="2" attrs="{'invisible': [
-                                        '|',
-                                            ('recurrence', '=', '_field_recurrence_tache'),
-                                            ('recurrence', '=', True)]}">
-                                        <b><i class="oe_grey">
-                                            La tâche de cette intervention est récurrente alors que cette intervention est ponctuelle.
-                                        </i></b>
-                                    </div>
-                                </group>
-                            </group>
-                            <group colspan="2" name="notes" string="Description">
-                                <field name="note" colspan="2" nolabel="1"/>
-                            </group>
-                        </group>
-                    </group>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
