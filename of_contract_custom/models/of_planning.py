@@ -32,9 +32,16 @@ class OfPlanningPlannification(models.AbstractModel):
 class OfService(models.Model):
     _inherit = 'of.service'
 
+    type = fields.Selection(selection=[
+        ('maintenance', 'Entretien - Maintenance'),
+        ('sav', 'SAV'),
+        ('technical', 'Visite technique'),
+        ('installation', 'Installation'),
+        ])
     contract_id = fields.Many2one(comodel_name='of.contract', string="Contrat")
-    contract_line_id = fields.Many2one(comodel_name='of.contract.line', string="Contrat")
+    contract_line_id = fields.Many2one(comodel_name='of.contract.line', string="Ligne de contrat")
     spec_date = fields.Char(string="Date", compute="_compute_spec_date")
+    user_id = fields.Many2one(comodel_name='res.users', string="Utilisateur", default=lambda r:r.env.user)
 
     @api.depends()
     def _compute_spec_date(self):
