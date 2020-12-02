@@ -338,8 +338,7 @@ class OfService(models.Model):
         query = ("SELECT s.id\n"
                  "FROM of_service AS s\n"
                  "LEFT JOIN of_planning_intervention AS p\n"
-                 "  ON p.address_id = s.address_id\n"
-                 "  AND p.tache_id = s.tache_id\n")
+                 "  ON p.service_id = s.id\n")
 
         if operand:
             if len(operand) == 10:
