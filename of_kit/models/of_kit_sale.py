@@ -219,6 +219,44 @@ class SaleOrderLine(models.Model):
         super(SaleOrderLine, self).product_uom_change()
         self._refresh_price_unit()
 
+    @api.depends('qty_invoiced', 'product_uom_qty', 'order_id.state', 'order_id.of_invoice_policy',
+                 'order_id.partner_id.of_invoice_policy', 'procurement_ids', 'procurement_ids.move_ids',
+                 'procurement_ids.move_ids.of_ordered_qty', 'procurement_ids.move_ids.picking_id',
+                 'procurement_ids.move_ids.picking_id.state')
+    def _get_to_invoice_qty(self):
+        for line in self.filtered(lambda l: l.of_invoice_policy == 'ordered_delivery' and l.of_is_kit):
+            if line.order_id.state in ['sale', 'done']:
+                line.qty_to_invoice = line.qty_delivered - line.qty_invoiced
+            else:
+                line.qty_to_invoice = 0
+        super(SaleOrderLine, self.filtered(lambda l: l.of_invoice_policy != 'ordered_delivery' or not l.of_is_kit)).\
+            _get_to_invoice_qty()
+
+    @api.depends('of_invoice_policy',
+                 'order_id', 'order_id.of_fixed_invoice_date',
+                 'procurement_ids', 'procurement_ids.move_ids', 'procurement_ids.move_ids.picking_id',
+                 'procurement_ids.move_ids.picking_id.min_date', 'procurement_ids.move_ids.picking_id.state',
+                 'kit_id', 'kit_id.kit_line_ids', 'kit_id.kit_line_ids.procurement_ids',
+                 'kit_id.kit_line_ids.procurement_ids.move_ids',
+                 'kit_id.kit_line_ids.procurement_ids.move_ids.picking_id',
+                 'kit_id.kit_line_ids.procurement_ids.move_ids.picking_id.min_date',
+                 'kit_id.kit_line_ids.procurement_ids.move_ids.picking_id.state')
+    def _compute_of_invoice_date_prev(self):
+        super(SaleOrderLine, self)._compute_of_invoice_date_prev()
+        for line in self:
+            if line.of_invoice_policy == 'ordered_delivery' and line.of_is_kit:
+                moves = line.kit_id.kit_line_ids.mapped('procurement_ids').mapped('move_ids')
+                moves = moves.filtered(lambda m: m.picking_id.state != 'cancel').sorted('date_expected')
+
+                if moves:
+                    to_process_moves = moves.filtered(lambda m: m.picking_id.state != 'done')
+                    if to_process_moves:
+                        line.of_invoice_date_prev = fields.Date.to_string(
+                            fields.Date.from_string(to_process_moves[0].date_expected))
+                    else:
+                        line.of_invoice_date_prev = fields.Date.to_string(
+                            fields.Date.from_string(moves[-1].date_expected))
+
     @api.onchange('of_pricing')
     def _onchange_of_pricing(self):
         self.ensure_one()
