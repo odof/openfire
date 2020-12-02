@@ -14,7 +14,7 @@ class StockPicking(models.Model):
         for picking in self:
             if picking.of_storage:
                 for line in picking.pack_operation_product_ids:
-                    fuel_stock = self.env['of.res.partner.fuel.stock'].search(
+                    fuel_stock = self.sudo().env['of.res.partner.fuel.stock'].search(
                         [('partner_id', '=', picking.partner_id.id), ('product_id', '=', line.product_id.id)],
                         limit=1)
                     if fuel_stock:
