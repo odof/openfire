@@ -57,7 +57,10 @@ class OfFusionCommandeFournisseur(models.TransientModel):
                 sale_orders += order.sale_order_id + order.of_sale_order_ids
 
         procurement_orders.write({'purchase_id': fuse_on.id})
-        fuse_on.write({'of_sale_order_ids': sale_orders, 'of_fused': True, 'customer_id': customer and customer.id})
+        fuse_on.write(
+            {'of_sale_order_ids': [(6, False, sale_orders.ids)],
+             'of_fused': True,
+             'customer_id': customer and customer.id})
         # màj origin dans les BRs
         for picking in fuse_on.picking_ids:
             picking.origin = fuse_on.name
@@ -66,8 +69,6 @@ class OfFusionCommandeFournisseur(models.TransientModel):
         for order in delete_orders:
             order.button_cancel()
         delete_orders.unlink()
-
-        sale_orders.write({'of_purchase_id': fuse_on.id})
 
         return self.env['of.popup.wizard'].popup_return(
             u'Toutes les commandes ont été fusionnées sur la commande ' + fuse_on.name + '.', 'Information')

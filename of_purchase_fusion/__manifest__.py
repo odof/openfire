@@ -32,7 +32,7 @@ Fonctionnalités
 - Ajout du client sur les lignes des commandes fournisseurs (livraison attendue également mais uniquement en DB)
 - Modifications de l'impression 'Commande fournisseur' (ajout contremarque sur les lignes)
 """,
-    'depends': ['of_purchase', 'of_sale'],
+    'depends': ['of_purchase', 'of_sale', 'of_sale_stock'],
     'data': [
         'wizards/of_fusion_commande_fournisseur_view.xml',
         'views/of_purchase_fusion_view.xml',
