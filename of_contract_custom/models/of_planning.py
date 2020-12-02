@@ -32,12 +32,21 @@ class OfPlanningPlannification(models.AbstractModel):
 class OfService(models.Model):
     _inherit = 'of.service'
 
-    type_id = fields.Many2one(comodel_name='of.service.type', string="Type", required=True)
+    type_id = fields.Many2one(
+        comodel_name='of.service.type', string="Type", required=True,)
+        # default=lambda s : s.env.ref('of_contract_custom.of_contract_custom_type_sav'))
     contract_id = fields.Many2one(comodel_name='of.contract', string="Contrat")
     contract_line_id = fields.Many2one(comodel_name='of.contract.line', string="Ligne de contrat")
     spec_date = fields.Char(string="Date", compute="_compute_spec_date")
     user_id = fields.Many2one(comodel_name='res.users', string="Utilisateur", default=lambda r:r.env.user)
-    kanban_step_id = fields.Many2one(comodel_name='of.service.kanban', string=u"Étapes kanban")
+    kanban_step_id = fields.Many2one(
+        comodel_name='of.service.stage', string=u"Étapes kanban", group_expand='_read_group_stage_ids',
+        domain="[('type_ids','=',type_id)]")
+
+    @api.onchange('type_id')
+    def onchange_type_id(self):
+        if self.type_id and self.type_id.kanban_ids:
+            self.kanban_step_id = self.type_id.kanban_ids[0]
 
     @api.depends()
     def _compute_spec_date(self):
@@ -49,6 +58,13 @@ class OfService(models.Model):
                 service.spec_date = u"Prévue le %s" % format_date(service.intervention_ids[-1].date_date, lang)
             else:
                 service.spec_date = u"Prévue entre %s et %s" % (format_date(service.date_next, lang), format_date(service.date_fin, lang))
+
+    @api.model
+    def _read_group_stage_ids(self, stages, domain, order):
+        """
+        Surcharge de la fonction pour afficher toutes les étapes existantes sur vue kanban
+        """
+        return stages.search([], order=order)
 
     @api.multi
     def write(self, vals):
@@ -93,11 +109,11 @@ class OfServiceType(models.Model):
     _name = 'of.service.type'
 
     name = fields.Char(string="Type de service")
-    kanban_ids = fields.Many2many(comodel_name='of.service.kanban', string=u"Étapes autorisées")
+    kanban_ids = fields.Many2many(comodel_name='of.service.stage', string=u"Étapes autorisées")
 
 
 class OfServiceKanban(models.Model):
-    _name = 'of.service.kanban'
+    _name = 'of.service.stage'
     _order = 'sequence'
 
     name = fields.Char(string=u"Nom de l'étape")
