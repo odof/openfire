@@ -32,16 +32,12 @@ class OfPlanningPlannification(models.AbstractModel):
 class OfService(models.Model):
     _inherit = 'of.service'
 
-    type = fields.Selection(selection=[
-        ('maintenance', 'Entretien - Maintenance'),
-        ('sav', 'SAV'),
-        ('technical', 'Visite technique'),
-        ('installation', 'Installation'),
-        ])
+    type_id = fields.Many2one(comodel_name='of.service.type', string="Type", required=True)
     contract_id = fields.Many2one(comodel_name='of.contract', string="Contrat")
     contract_line_id = fields.Many2one(comodel_name='of.contract.line', string="Ligne de contrat")
     spec_date = fields.Char(string="Date", compute="_compute_spec_date")
     user_id = fields.Many2one(comodel_name='res.users', string="Utilisateur", default=lambda r:r.env.user)
+    kanban_step_id = fields.Many2one(comodel_name='of.service.kanban', string=u"Étapes kanban")
 
     @api.depends()
     def _compute_spec_date(self):
@@ -53,6 +49,10 @@ class OfService(models.Model):
                 service.spec_date = u"Prévue le %s" % format_date(service.intervention_ids[-1].date_date, lang)
             else:
                 service.spec_date = u"Prévue entre %s et %s" % (format_date(service.date_next, lang), format_date(service.date_fin, lang))
+
+    @api.multi
+    def write(self, vals):
+        return super(OfService, self).write(vals)
 
     @api.multi
     def get_action_view_intervention_context(self, action_context={}):
@@ -89,12 +89,28 @@ class OfService(models.Model):
             return self.env['of.popup.wizard'].popup_return(message=u"Aucune intervention liée.")
 
 
+class OfServiceType(models.Model):
+    _name = 'of.service.type'
+
+    name = fields.Char(string="Type de service")
+    kanban_ids = fields.Many2many(comodel_name='of.service.kanban', string=u"Étapes autorisées")
+
+
+class OfServiceKanban(models.Model):
+    _name = 'of.service.kanban'
+    _order = 'sequence'
+
+    name = fields.Char(string=u"Nom de l'étape")
+    sequence = fields.Integer(string=u"Séquence")
+    type_ids = fields.Many2many(comodel_name='of.service.type', string=u"Types autorisés")
+
+
 class OfPlanningIntervention(models.Model):
     _inherit = 'of.planning.intervention'
 
     contract_line_id = fields.Many2one(
         comodel_name='of.contract.line', string="Ligne de contrat",
-        domain="service_id and [('service_ids', '=', service_id)] or "
-               "address_id and [('address_id', '=', address_id)] or "
+        domain="service_id and [('service_ids','=',service_id)] or "
+               "address_id and [('address_id','=',address_id)] or "
                "[]")
 

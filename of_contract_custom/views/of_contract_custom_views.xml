@@ -360,7 +360,18 @@
                         <field name="state" invisible="1"/>
                         <field name="base_state" invisible="1"/>
                         <group col="2" colspan="2">
-                            <field name="type" widget="radio" options="{'horizontal': true}"/>
+                            <field name="type_id" widget="radio" options="{'horizontal': true}"/>
+                            <field name="kanban_step_id" readonly="1" invisible="1"/>
+<!--                            <div>-->
+<!--                                <label for="order_id" attrs="{'invisible': [('kanban_step_id.id','!=',ref(of_contract_custom.of_contract_custom_type_installation))]}"/>-->
+<!--                                <label for="contract_id" attrs="{'invisible': [('kanban_step_id.id','!=',ref(of_contract_custom.of_contract_custom_type_maintenance))]}"/>-->
+<!--                                <label for="contract_line_id" attrs="{'invisible': [('kanban_step_id.id','!=',ref(of_contract_custom.of_contract_custom_type_maintenance))]}"/>-->
+<!--                            </div>-->
+<!--                            <div>-->
+                            <field name="order_id" attrs="{'invisible': [('type_id','!=',%(of_contract_custom.of_contract_custom_type_installation)d)]}"/>
+                            <field name="contract_id" attrs="{'invisible': [('type_id','!=',%(of_contract_custom.of_contract_custom_type_maintenance)d)]}"/>
+                            <field name="contract_line_id" attrs="{'invisible': [('type_id','!=',%(of_contract_custom.of_contract_custom_type_maintenance)d)]}"/>
+<!--                            </div>-->
                         </group>
                         <group col="2" colspan="2">
                             <field name="user_id"/>
@@ -432,12 +443,54 @@
         </field>
     </record>
 
+    <record id="of_contract_service_kanban_view" model="ir.ui.view">
+        <field name="name">of.contract.service.kandan.view</field>
+        <field name="model">of.service</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column" default_group_by="kanban_step_id">
+                <field name="type_id"/>
+                <field name="kanban_step_id"/>
+                <field name="date_next"/>
+                <field name="date_fin"/>
+                <field name="partner_id"/>
+                <field name="address_id"/>
+                <field name="address_address"/>
+                <field name="spec_date"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+<!--                                <div class="o_kanban_tags_section oe_kanban_partner_categories"/>-->
+                            <div class="oe_kanban_content">
+                                <div>
+                                    <field name="tag_ids"/>
+                                </div>
+                                <strong class="oe_partner_heading"><field name="address_id"/> - <field name="type_id"/></strong>
+                                <ul>
+                                    <li t-if="record.address_address.raw_value"><field name="address_address"/></li>
+                                    <br/>
+                                    <li t-if="record.spec_date.raw_value"><field name="spec_date"/></li>
+                                </ul>
+<!--                                    <div class="oe_kanban_partner_links"/>-->
+                            </div>
+                        </div>
+
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+
+
+
+
+
     <record id="action_of_contract_service_form_planning" model="ir.actions.act_window">
         <field name="name">Interventions ponctuelles</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">of.service</field>
         <field name="view_type">form</field>
-        <field name="view_mode">tree,map,form,pivot</field>
+        <field name="view_mode">tree,kanban,map,form,pivot</field>
         <field name="search_view_id" ref="of_service.view_of_service_filter"/>
         <field name="context">{
             'search_default_filter_ponc': 1,

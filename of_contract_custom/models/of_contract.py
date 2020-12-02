@@ -1094,6 +1094,7 @@ class OfContractLine(models.Model):
                 if line.date_contract_end and date_service > line.date_contract_end:
                     break
                 service_vals = {
+                    'type'            : 'maintenance',
                     'partner_id'      : line.partner_id.id,
                     'address_id'      : line.address_id.id,
                     'tache_id'        : line.tache_id.id,
