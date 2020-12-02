@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="of_financing_report_saleorder_document" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//div[@t-if='doc.pdf_afficher_multi_echeances()']/parent::div" position="after">
+            <div class="row">
+                <div class="col-xs-12" t-if="doc.of_financing_printing" name="financing">
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Votre financement</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    Financement
+                                    <t t-if="doc.of_financing_organism"><span t-field="doc.of_financing_organism.name"/></t>
+                                    <t t-if="doc.of_financing_file_number"> - N° de dossier <span t-field="doc.of_financing_file_number"/></t>
+                                    <t t-if="doc.of_financing_state and doc.of_financing_decision_date"> (<span t-field="doc.of_financing_state"/> le <span t-field="doc.of_financing_decision_date"/>)</t>
+                                    <t t-elif="doc.of_financing_state"> (<span t-field="doc.of_financing_state"/>)</t>
+                                    <t t-elif="doc.of_financing_decision_date"> (<span t-field="doc.of_financing_decision_date"/>)</t>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <t t-if="doc.of_financing_amount"><strong><span>Montant : </span></strong><span t-field="doc.of_financing_amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></t>
+                                    <t t-if="doc.of_financing_monthly_payment_number"> / <strong><span>Nombre de mensualités : </span></strong><span t-field="doc.of_financing_monthly_payment_number"/></t>
+                                    <t t-if="doc.of_financing_rate"> / <strong><span>Taux : </span></strong><span t-field="doc.of_financing_rate"/> %</t>
+                                </td>
+                            </tr>
+                            <tr t-if="doc.of_financing_notes">
+                                <td>
+                                    <span t-field="doc.of_financing_notes"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>
