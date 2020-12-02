@@ -2,10 +2,12 @@
 
 from odoo import models, fields, api
 
+
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    of_purchase_id = fields.Many2one('purchase.order', string=u"Commande fournisseur fusionnée", copy=False, readonly=True)
+    of_purchase_id = fields.Many2one(
+        'purchase.order', string=u"Commande fournisseur fusionnée", copy=False, readonly=True)
 
     @api.depends('purchase_ids', 'of_purchase_id')
     def _compute_purchase_count(self):
@@ -17,6 +19,7 @@ class SaleOrder(models.Model):
         action = self.env.ref('of_purchase.of_purchase_open_achats').read()[0]
         action['domain'] = ['|', ('sale_order_id', 'in', self._ids), ('of_sale_order_ids', 'in', self._ids)]
         return action
+
 
 class PurchaseOrderLine(models.Model):
     _inherit = "purchase.order.line"
@@ -34,6 +37,7 @@ class PurchaseOrderLine(models.Model):
             if vals.get('delivery_expected'):
                 vals['of_delivery_expected'] = order.delivery_expected
         return super(PurchaseOrderLine, self).create(vals)
+
 
 class PurchaseOrder(models.Model):
     _inherit = "purchase.order"
@@ -56,6 +60,7 @@ class PurchaseOrder(models.Model):
         action = self.env.ref('of_purchase_fusion.of_purchase_open_ventes').read()[0]
         action['domain'] = ['|', ('of_purchase_id', 'in', self._ids), ('purchase_ids', 'in', self._ids)]
         return action
+
 
 class StockMove(models.Model):
     _inherit = 'stock.move'
@@ -81,7 +86,8 @@ class ResPartner(models.Model):
         action = self.env.ref('of_purchase.of_purchase_open_picking').read()[0]
         pickings = self.env['stock.picking']
         for partner in self:
-            pickings |= picking_obj.search([('of_customer_id', '=', partner.id), ('of_location_usage', '=', 'supplier')])
+            pickings |= picking_obj.search(
+                [('of_customer_id', '=', partner.id), ('of_location_usage', '=', 'supplier')])
             pickings |= move_obj.search([('of_customer_id', '=', partner.id)]).mapped('picking_id')
         action['domain'] = [('id', 'in', pickings._ids)]
         return action

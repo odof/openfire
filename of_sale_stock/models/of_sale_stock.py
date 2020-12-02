@@ -17,6 +17,7 @@ class StockInventory(models.Model):
                 vals['product_value_unit'] = product.standard_price
         return res
 
+
 class StockInventoryLine(models.Model):
     _inherit = "stock.inventory.line"
 
@@ -35,7 +36,8 @@ class StockInventoryLine(models.Model):
 
     currency_id = fields.Many2one('res.currency', string='Currency', readonly=True, related="company_id.currency_id")
     product_value_unit = fields.Monetary(string='Valeur unitaire', digits=dp.get_precision('Product Price'))
-    product_value = fields.Monetary(string='Value', digits=dp.get_precision('Product Price'), compute="_compute_product_value")
+    product_value = fields.Monetary(
+        string='Value', digits=dp.get_precision('Product Price'), compute="_compute_product_value")
 
     @api.depends('product_value_unit', 'product_qty')
     def _compute_product_value(self):
@@ -53,8 +55,10 @@ class StockInventoryLine(models.Model):
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    of_picking_min_date = fields.Datetime(compute=lambda x: False, search='_search_of_picking_min_date', string="Date bon de livraison")
-    of_picking_date_done = fields.Datetime(compute=lambda x: False, search='_search_of_picking_date_done', string="Date transfert bon de livraison")
+    of_picking_min_date = fields.Datetime(
+        compute=lambda x: False, search='_search_of_picking_min_date', string="Date bon de livraison")
+    of_picking_date_done = fields.Datetime(
+        compute=lambda x: False, search='_search_of_picking_date_done', string="Date transfert bon de livraison")
     of_route_id = fields.Many2one('stock.location.route', string="Route")
 
     @api.onchange('of_route_id')
@@ -69,7 +73,8 @@ class SaleOrder(models.Model):
         pickings = self.env['stock.picking'].search([('min_date', operator, value)])
         order_ids = []
         if pickings:
-            self._cr.execute("SELECT o.id "
+            self._cr.execute(
+                "SELECT o.id "
                 "FROM sale_order AS o "
                 "INNER JOIN stock_picking AS p ON p.group_id = o.procurement_group_id "
                 "WHERE p.id IN %s", (tuple(pickings._ids), ))
@@ -81,7 +86,8 @@ class SaleOrder(models.Model):
         pickings = self.env['stock.picking'].search([('date_done', operator, value)])
         order_ids = []
         if pickings:
-            self._cr.execute("SELECT o.id "
+            self._cr.execute(
+                "SELECT o.id "
                 "FROM sale_order AS o "
                 "INNER JOIN stock_picking AS p ON p.group_id = o.procurement_group_id "
                 "WHERE p.id IN %s", (tuple(pickings._ids), ))
@@ -115,24 +121,28 @@ class SaleOrderLine(models.Model):
 class SaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'
 
-    of_stock_warning_setting = fields.Boolean(string="(OF) Avertissements de stock", required=True, default=False,
-            help="Afficher les messages d'avertissement de stock ?")
+    of_stock_warning_setting = fields.Boolean(
+        string="(OF) Avertissements de stock", required=True, default=False,
+        help="Afficher les messages d'avertissement de stock ?")
 
     @api.multi
     def set_stock_warning_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_stock_warning_setting', self.of_stock_warning_setting)
 
+
 # Ajout configuration "Description articles"
 class StockConfiguration(models.TransientModel):
     _inherit = 'stock.config.settings'
 
-    group_description_BL_variant = fields.Selection([
+    group_description_BL_variant = fields.Selection(
+        [
             (0, "Afficher uniquement l'article dans le bon de livraison"),
             (1, "Afficher l'article et sa description dans le bon de livraison")
         ], "(OF) Description articles",
-        help = "Choisissez si la description de l'article s'affichée dans le bon de livraison.\nCela affecte également les documents imprimables.",
-        implied_group = 'of_sale_stock.group_description_BL_variant')
+        help=u"Choisissez si la description de l'article s'affichée dans le bon de livraison.\n"
+             u"Cela affecte également les documents imprimables.",
+        implied_group='of_sale_stock.group_description_BL_variant')
 
     @api.multi
     def set_group_description_BL_variant_defaults(self):
@@ -147,7 +157,8 @@ class StockPicking(models.Model):
     client_order_ref = fields.Char(related="sale_id.client_order_ref")
     of_note_operations = fields.Text('Notes Operations')
 
-    of_purchase_ids = fields.Many2many('purchase.order', compute='_compute_of_purchase_ids', string=u'Achats associés à cette livraison')
+    of_purchase_ids = fields.Many2many(
+        'purchase.order', compute='_compute_of_purchase_ids', string=u'Achats associés à cette livraison')
     of_purchase_count = fields.Integer('Achats', compute='_compute_of_purchase_ids')
 
     @api.multi
@@ -164,11 +175,11 @@ class StockPicking(models.Model):
 
     @api.multi
     def action_of_view_purchase(self):
-        '''
+        """
         This function returns an action that display existing purchase orders
         of given delivery ids. It can either be a in a list or in a form
         view, if there is only one purchase order to show.
-        '''
+        """
         action = self.env.ref('purchase.purchase_form_action').read()[0]
 
         purchases = self.mapped('of_purchase_ids')
@@ -179,11 +190,13 @@ class StockPicking(models.Model):
             action['res_id'] = purchases.id
         return action
 
+
 class PackOperation(models.Model):
     _inherit = "stock.pack.operation"
 
     move_id = fields.Many2one('stock.move', related='linked_move_operation_ids.move_id', string='Move_id')
     move_name = fields.Char(related='move_id.name', string='Description')
+
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
@@ -197,4 +210,3 @@ class ProductTemplate(models.Model):
             products = product_template.mapped('product_variant_ids')
             quants = quant_obj.search([('product_id', 'in', products.ids)]).filtered(lambda q: not q.reservation_id)
             product_template.of_qty_unreserved = sum(quants.mapped('qty'))
-

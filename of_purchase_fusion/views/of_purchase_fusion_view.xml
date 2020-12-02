@@ -11,7 +11,8 @@
             </xpath>
             <xpath expr="//field[@name='sale_order_id']" position="after">
                 <field name="of_fused" invisible="1"/>
-                <field name="of_sale_order_ids" widget="many2many_tags" attrs="{'invisible': [('of_fused', '=', False)]}" readonly="1"/>
+                <field name="of_sale_order_ids" widget="many2many_tags"
+                       attrs="{'invisible': [('of_fused', '=', False)]}" readonly="1"/>
             </xpath>
         </field>
     </record>
@@ -22,7 +23,8 @@
         <field name="inherit_id" ref="purchase.purchase_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button class="oe_stat_button" name="action_view_ventes" type="object" icon="fa-shopping-cart" attrs="{'invisible': [('of_sale_count', '=', 0)]}">
+                <button class="oe_stat_button" name="action_view_ventes" type="object" icon="fa-shopping-cart"
+                        attrs="{'invisible': [('of_sale_count', '=', 0)]}">
                     <field string="Ventes" name="of_sale_count" widget="statinfo"/>
                 </button>
             </xpath>

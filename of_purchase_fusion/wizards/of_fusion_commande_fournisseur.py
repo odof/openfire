@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api
 
+
 class OfFusionCommandeFournisseur(models.TransientModel):
     _name = "of.fusion.commande.fournisseur"
     _description = u"Wizard de fusion pour les commandes d'un même fournisseur"
@@ -20,14 +21,17 @@ class OfFusionCommandeFournisseur(models.TransientModel):
                 self.affichage = True
                 return
 
-            filtered_orders = purchase_orders.with_context(partner_id=purchase_orders[0].partner_id.id).filtered(lambda order: order.partner_id.id == order._context['partner_id'])
+            filtered_orders = purchase_orders\
+                .with_context(partner_id=purchase_orders[0].partner_id.id)\
+                .filtered(lambda order: order.partner_id.id == order._context['partner_id'])
             if purchase_orders != filtered_orders:
                 self.texte = u"Les commandes ont des fournisseurs différents."
                 self.affichage = True
                 return
 
             names = [order.name for order in purchase_orders]
-            self.texte = "Vous allez fusionner les commandes " + (', ').join(names) + u".\n Êtes vous certains de vouloir continuer ?"
+            self.texte = "Vous allez fusionner les commandes " + ', '.join(names)\
+                         + u".\n Êtes vous certains de vouloir continuer ?"
 
     @api.multi
     def button_merge_orders(self):
@@ -37,7 +41,8 @@ class OfFusionCommandeFournisseur(models.TransientModel):
         purchase_orders = purchase_order_obj.browse(self._context['active_ids'])
         procurement_orders = procurement_order_obj.search([('purchase_id', 'in', purchase_orders._ids)])
 
-        fuse_on = purchase_orders[0]  # Fusion sur la première commande de la liste qui est généralement aussi la dernière créée
+        # Fusion sur la première commande de la liste qui est généralement aussi la dernière créée
+        fuse_on = purchase_orders[0]
         customer = fuse_on.customer_id
 
         sale_orders = self.env['sale.order'].browse()
@@ -45,7 +50,8 @@ class OfFusionCommandeFournisseur(models.TransientModel):
             if order.customer_id != customer:
                 customer = False
             if order.order_line:
-                order.order_line.filtered(lambda l: not l.of_customer_id).write({'of_customer_id': order.customer_id.id})
+                order.order_line.filtered(lambda l: not l.of_customer_id).write(
+                    {'of_customer_id': order.customer_id.id})
                 order.order_line.write({'order_id': fuse_on.id, 'of_delivery_expected': order.delivery_expected})
             if order.sale_order_id:
                 sale_orders += order.sale_order_id + order.of_sale_order_ids
@@ -63,4 +69,5 @@ class OfFusionCommandeFournisseur(models.TransientModel):
 
         sale_orders.write({'of_purchase_id': fuse_on.id})
 
-        return self.env['of.popup.wizard'].popup_return(u'Toutes les commandes ont été fusionnées sur la commande ' + fuse_on.name + '.', 'Information')
+        return self.env['of.popup.wizard'].popup_return(
+            u'Toutes les commandes ont été fusionnées sur la commande ' + fuse_on.name + '.', 'Information')
