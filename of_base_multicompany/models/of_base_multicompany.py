@@ -111,6 +111,7 @@ class AccountInvoice(models.Model):
         return "type in ('out_invoice', 'out_refund') and [('of_is_shop','=',True)] or []"
 
 
+
 class AccountAccount(models.Model):
     _inherit = 'account.account'
 
