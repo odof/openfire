@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_of_purchase_order_form" model="ir.ui.view">
+        <field name="name">view.of.purchase.order.form</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='is_shipped']" position="after">
+                <label for="of_carrier_id"/>
+                  <div name='carrier_selection'>
+                      <div>
+                        <field name="of_carrier_id" context="{'purchase_id': id}" class="oe_inline" options="{'no_create': True, 'no_open': True}" attrs="{'readonly':[('state','not in',('draft','sent'))]}"/>
+                      </div>
+                      <div>
+                        <field name='of_franco' class="oe_inline" nolabel="1" attrs="{'invisible': [('of_carrier_id','=', False)]}"/>
+                        <button name="delivery_set" string="Mettre un prix" type="object" class="oe_inline fa fa-arrow-right oe_link" attrs="{'invisible':['|',('of_carrier_id','=',False),('state','not in',('draft','sent'))]}"/>
+                      </div>
+                  </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
