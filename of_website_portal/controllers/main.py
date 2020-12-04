@@ -2,6 +2,7 @@
 
 from odoo import http
 from odoo.http import request
+from odoo.exceptions import AccessError
 from odoo.addons.website_portal.controllers.main import website_account
 
 
@@ -47,3 +48,19 @@ class WebsiteAccount(website_account):
                 'datas': attachment.encode('base64'),
             })
         return request.redirect('/my/home')
+
+    @http.route(['/my/orders/<int:order_id>'], type='http', auth="user", website=True)
+    def of_portal_get_order(self, order_id=None, **kw):
+        order = request.env['sale.order'].browse([order_id])
+        try:
+            order.check_access_rights('read')
+            order.check_access_rule('read')
+        except AccessError:
+            return request.render("website.403")
+
+        pdf = request.env['report'].sudo().get_pdf([order_id], 'sale.report_saleorder')
+        pdfhttpheaders = [
+            ('Content-Type', 'application/pdf'), ('Content-Length', len(pdf)),
+            ('Content-Disposition', 'attachment; filename=Commande.pdf;')
+        ]
+        return request.make_response(pdf, headers=pdfhttpheaders)
