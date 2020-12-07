@@ -234,6 +234,7 @@
 
 
     <menuitem name="Contrats" id="contract_sale.menu_contract_sale" parent="sales_team.menu_sales" sequence="150" action="of_contract_custom.action_contract"/>
+    <menuitem name="Contrats" id="menu_config_contrat" parent="sale.prod_config_main" sequence="40"/>
 
 <!-- ******************************************************************************************* -->
 <!-- ************************************ MODÈLE DE CONTRAT ************************************ -->
@@ -303,268 +304,6 @@
 <!--    <menuitem name="Modèles de contrats" id="menu_contract_template" parent="of_planning.menu_of_planning_configuration" sequence="75" action="action_contract_template"/>-->
 
 
-<!-- ******************************************************************************************* -->
-<!-- ***************************************** SERVICE ***************************************** -->
-<!-- ******************************************************************************************* -->
-
-    <record id="of_contract_view_of_service_rec_filter" model="ir.ui.view">
-        <field name="name">of.contract.view.of.service.rec.filter</field>
-        <field name="model">of.service</field>
-        <field name="inherit_id" ref="of_service.view_of_service_filter"/>
-        <field name="arch" type="xml">
-            <xpath expr="//search" position="inside">
-                <field name="contract_line_id"/>
-                <field name="contract_id"/>
-            </xpath>
-        </field>
-    </record>
-
-    <record id="view_of_contract_service_form" model="ir.ui.view">
-        <field name="name">of.contract.service.form</field>
-        <field name="model">of.service</field>
-        <field name="arch" type="xml">
-            <form>
-                <header>
-                    <field name="state" invisible="1"/>
-                    <field name="base_state" invisible="1"/>
-                    <button name="button_valider" string="Valider" states="draft" type="object"/>
-                    <button name="button_annuler" string="Annuler" type="object"
-                            attrs="{'invisible': [('base_state', '!=', 'calculated')]}"/>
-                    <button name="button_brouillon" string="Remettre en brouillon" states="cancel" type="object"/>
-                    <button name="of_planning_tournee.action_view_rdv_intervention_wizard_service" string="Planifier Intervention"
-                            type="action" attrs="{'invisible': [('base_state', '!=', 'calculated')]}"/>
-                    <field name="kanban_step_id" widget="statusbar" clickable="True" options="{'fold_field': 'fold'}"/>
-                </header>
-                <sheet>
-                    <field name="alert_dates" invisible="1"/>
-                    <div class="oe_button_box" name="button_box">
-                        <button class="oe_stat_button" name="action_view_intervention" type="object" icon="fa-calendar">
-                            <field string="RDVs Tech" name="intervention_count" widget="statinfo"/>
-                        </button>
-                        <button name="toggle_active" type="object"
-                                class="oe_stat_button" icon="fa-archive"
-                                confirm="Êtes-vous sûr de vouloir archiver/activer ce service ?">
-                            <field name="active" widget="boolean_button"
-                                options='{"terminology": "archive"}'/>
-                        </button>
-                    </div>
-                    <div class="of_title">
-                        <h1><b>
-                            <span>Demande d'intervention</span>
-                        </b></h1>
-                    </div>
-                    <group col="4">
-
-                        <group col="2" colspan="2">
-                            <field name="type_id" />
-                            <field name="order_id" attrs="{'invisible': [('type_id','not in', [%(of_contract_custom.of_contract_custom_type_installation)d, %(of_contract_custom.of_contract_custom_type_sav)d])]}"/>
-                            <field name="contract_id" attrs="{'invisible': [('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d, %(of_contract_custom.of_contract_custom_type_sav)d])]}"/>
-                            <field name="contract_line_id" attrs="{'invisible': [('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d, %(of_contract_custom.of_contract_custom_type_sav)d])]}"/>
-                        </group>
-                        <group col="2" colspan="2">
-                            <field name="user_id"/>
-                        </group>
-                        <group name="who" col="2" colspan="2" string="Qui" class="of_grey_background">
-                            <group colspan="2">
-                                <field name="partner_id"/>
-                                <field name="tag_ids" widget="many2many_tags"/>
-                                <field name="company_id"/>
-                            </group>
-                        </group>
-                        <group name="where" col="2" colspan="2" string="Où" class="of_grey_background">
-                            <group colspan="2">
-                                <label for="address_id" string="Adresse d'intervention"/>
-                                <div class="o_address_format">
-                                    <div><field name="address_id"/></div>
-                                    <field name="address_address"/>
-                                </div>
-                                <field name="secteur_tech_id"/>
-                            </group>
-                        </group>
-                        <group name="what" col="2" colspan="2" string="Quoi" class="of_grey_background">
-                            <group colspan="2">
-                                <field name="tache_id"/>
-                                <label for="duree" string="Durées"/>
-                                <div>
-                                    <field name="duree" widget="float_time" nolabel="1" class="oe_inline" attrs="{'invisible': [('state', '=', 'done')]}"/>
-                                    <i class="oe_grey oe_inline" attrs="{'invisible': [('state', '=', 'done')]}"> estimée, dont </i>
-                                    <field name="duree_planif" widget="float_time" nolabel="1" class="oe_inline" attrs="{'invisible': [('state', '=', 'done')]}"/>
-                                    <i class="oe_grey oe_inline" attrs="{'invisible': [('state', '=', 'done')]}"> planifiée et </i>
-                                    <field name="duree_restante" widget="float_time" nolabel="1" class="oe_inline" attrs="{'invisible': [('state', '=', 'done')]}"/>
-                                    <i class="oe_grey oe_inline" attrs="{'invisible': [('state', '=', 'done')]}"> restante</i>
-                                    <i class="oe_grey oe_inline" attrs="{'invisible': [('state', '!=', 'done')]}">
-                                        Cette intervention est terminée
-                                    </i>
-                                </div>
-                            </group>
-<!--                            <field name=""/>-->
-                        </group>
-                        <group name="when" col="2" colspan="2" string="Quand" class="of_grey_background">
-                            <group colspan="2">
-                                <field name="date_next" string="Entre le"/>
-                                <field name="date_fin" string="et le"/>
-                                <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
-<!--                            <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}" />-->
-                            </group>
-                        </group>
-                    </group>
-                    <notebook>
-                        <page name="description" string="Description">
-                            <group>
-                                <field name="note" nolabel="1"/>
-                            </group>
-                        </page>
-                        <page name="parc" string="Produit installé">
-                            <group string="Produit installé" groups="project.group_project_user" colspan="2">
-                                <field name="parc_installe_id"/>
-                                <field name="parc_installe_product_id"/>
-                                <field name="parc_installe_site_adresse_id"/>
-                                <field name="parc_installe_note"/>
-                            </group>
-                        </page>
-                        <page name="docs" string="Documents">
-
-                        </page>
-                    </notebook>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-    <record id="of_contract_service_kanban_view" model="ir.ui.view">
-        <field name="name">of.contract.service.kandan.view</field>
-        <field name="model">of.service</field>
-        <field name="arch" type="xml">
-            <kanban class="o_kanban_small_column" default_group_by="kanban_step_id">
-                <field name="type_id"/>
-                <field name="kanban_step_id"/>
-                <field name="date_next"/>
-                <field name="date_fin"/>
-                <field name="partner_id"/>
-                <field name="address_id"/>
-                <field name="address_address"/>
-                <field name="spec_date"/>
-                <templates>
-                    <t t-name="kanban-box">
-                        <div class="oe_kanban_card oe_kanban_global_click">
-<!--                                <div class="o_kanban_tags_section oe_kanban_partner_categories"/>-->
-                            <div class="oe_kanban_content">
-                                <div>
-                                    <field name="tag_ids"/>
-                                </div>
-                                <strong class="oe_partner_heading"><field name="address_id"/> - <field name="type_id"/></strong>
-                                <ul>
-                                    <li t-if="record.address_address.raw_value"><field name="address_address"/></li>
-                                    <br/>
-                                    <li t-if="record.spec_date.raw_value"><field name="spec_date"/></li>
-                                </ul>
-<!--                                    <div class="oe_kanban_partner_links"/>-->
-                            </div>
-                        </div>
-
-                    </t>
-                </templates>
-            </kanban>
-        </field>
-    </record>
-
-
-
-
-
-
-    <record id="action_of_contract_service_form_planning" model="ir.actions.act_window">
-        <field name="name">Interventions ponctuelles</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">of.service</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">tree,kanban,map,form,pivot</field>
-        <field name="search_view_id" ref="of_service.view_of_service_filter"/>
-        <field name="context">{
-            'search_default_filter_ponc': 1,
-            'form_view_ref': 'of_contract_custom.view_of_contract_service_form',
-        }</field>
-    </record>
-
-
-    <menuitem id="of_service.menu_of_planning_service_prog" name="Demandes d'intervention" parent="of_planning.menu_of_planning_intervention" sequence="5" action="of_contract_custom.action_of_contract_service_form_planning"/>
-    <record id="of_service.menu_of_planning_service_rec" model="ir.ui.menu">
-        <field name="groups_id" eval="[(6,0,[ref('of_base.of_group_root_only')])]"/>
-    </record>
-    <record id="of_service.menu_of_planning_service_ponc" model="ir.ui.menu">
-        <field name="groups_id" eval="[(6,0,[ref('of_base.of_group_root_only')])]"/>
-    </record>
-    <!--    <menuitem id="of_service.menu_of_planning_service_rec" invisible="1"/>-->
-<!--    <menuitem id="of_service.menu_of_planning_service_ponc"/>-->
-
-
-
-
-<!-- ******************************************************************************************* -->
-<!-- ***************************************** ARTICLES **************************************** -->
-<!-- ******************************************************************************************* -->
-
-    <record id="of_contract_custom_contract_product_view_form" model="ir.ui.view">
-        <field name="name">of.contract.custom.contract.product.view.form</field>
-        <field name="model">of.contract.product</field>
-        <field name="arch" type="xml">
-            <form>
-                <group>
-                    <group>
-                        <field name="product_id"/>
-                        <field name="price_unit"/>
-                        <label for="product_uom_qty" string="Quantité"/>
-                        <div>
-                            <field name="quantity" class="oe_inline"/>
-                            <field name="uom_id" groups="product.group_uom" class="oe_inline oe_no_button"/>
-                        </div>
-                        <field name="discount" groups="sale.group_discount_per_so_line"/>
-                   </group>
-                    <group>
-                        <field name="tax_ids" widget="many2many_tags"/>
-                    </group>
-                    <separator string="Description"/>
-                    <field name="name" nolabel="1" colspan="4"/>
-                </group>
-            </form>
-        </field>
-    </record>
-
-<!-- ******************************************************************************************* -->
-<!-- **************************************** PARTENAIRE *************************************** -->
-<!-- ******************************************************************************************* -->
-
-    <record id="of_contract_view_res_partner" model="ir.ui.view">
-        <field name="name">of_contract_view_res_partner</field>
-        <field name="model">res.partner</field>
-        <field name="inherit_id" ref="base.view_partner_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//div[@name='button_box']" position="inside">
-                <button class="oe_stat_button" type="object" name="action_view_contrat" icon="fa-book">
-                    <field name="of_contrat_count" widget="statinfo" string="Contrats"/>
-                </button>
-            </xpath>
-
-        </field>
-    </record>
-
-<!-- ******************************************************************************************* -->
-<!-- ***************************************** ACTION ****************************************** -->
-<!-- ******************************************************************************************* -->
-
-    <record id="of_contract_custom_open_interventions" model="ir.actions.act_window">
-        <field name="name">Intervention</field>
-        <field name="res_model">of.planning.intervention</field>
-        <field name="domain">[]</field> <!-- Force empty -->
-        <field name="view_type">form</field>
-    </record>
-
-    <record id="of_contract_custom_open_contrat" model="ir.actions.act_window">
-        <field name="name">Contrats</field>
-        <field name="res_model">of.contract</field>
-        <field name="domain">[]</field> <!-- Force empty -->
-        <field name="view_type">form</field>
-    </record>
 
 <!-- ******************************************************************************************* -->
 <!-- ********************************** LIGNES DE CONTRATS ************************************* -->
@@ -782,29 +521,32 @@
     <menuitem name="Lignes de contrats" id="menu_contract_lines" parent="sales_team.menu_sales" sequence="151" action="action_contract_lines"/>
 
 <!-- ******************************************************************************************* -->
-<!-- *********************************** RDVS INTERVENTIONS ************************************ -->
+<!-- ***************************************** ARTICLES **************************************** -->
 <!-- ******************************************************************************************* -->
 
-    <record id="of_contract_planning_intervention_view_form" model="ir.ui.view" >
-        <field name="name">of.contract.planning.intervention.form</field>
-        <field name="model">of.planning.intervention</field>
-        <field name="type">form</field>
-        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
+    <record id="of_contract_custom_contract_product_view_form" model="ir.ui.view">
+        <field name="name">of.contract.custom.contract.product.view.form</field>
+        <field name="model">of.contract.product</field>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='order_id']" position="after">
-                <field name="contract_line_id"/>
-            </xpath>
-        </field>
-    </record>
-
-    <record id="of_contract_planning_intervention_view_search" model="ir.ui.view" >
-        <field name="name">of.contract.planning.intervention.search</field>
-        <field name="model">of.planning.intervention</field>
-        <field name="inherit_id" ref="of_planning.of_planning_intervention_filter"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='order_id']" position="after">
-                <field name="contract_line_id" />
-            </xpath>
+            <form>
+                <group>
+                    <group>
+                        <field name="product_id"/>
+                        <field name="price_unit"/>
+                        <label for="product_uom_qty" string="Quantité"/>
+                        <div>
+                            <field name="quantity" class="oe_inline"/>
+                            <field name="uom_id" groups="product.group_uom" class="oe_inline oe_no_button"/>
+                        </div>
+                        <field name="discount" groups="sale.group_discount_per_so_line"/>
+                   </group>
+                    <group>
+                        <field name="tax_ids" widget="many2many_tags"/>
+                    </group>
+                    <separator string="Description"/>
+                    <field name="name" nolabel="1" colspan="4"/>
+                </group>
+            </form>
         </field>
     </record>
 
@@ -867,8 +609,25 @@
         <field name="view_id" ref="of_contract_index_tree_view"/>
     </record>
 
-    <menuitem name="Contrats" id="menu_config_contrat" parent="sale.prod_config_main" sequence="40"/>
     <menuitem name="Indices" id="menu_config_index" parent="of_contract_custom.menu_config_contrat" sequence="10" action="action_index"/>
+
+<!-- ******************************************************************************************* -->
+<!-- ***************************************** ACTION ****************************************** -->
+<!-- ******************************************************************************************* -->
+
+    <record id="of_contract_custom_open_interventions" model="ir.actions.act_window">
+        <field name="name">Intervention</field>
+        <field name="res_model">of.planning.intervention</field>
+        <field name="domain">[]</field> <!-- Force empty -->
+        <field name="view_type">form</field>
+    </record>
+
+    <record id="of_contract_custom_open_contrat" model="ir.actions.act_window">
+        <field name="name">Contrats</field>
+        <field name="res_model">of.contract</field>
+        <field name="domain">[]</field> <!-- Force empty -->
+        <field name="view_type">form</field>
+    </record>
 
 
 </odoo>
