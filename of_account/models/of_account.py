@@ -111,6 +111,10 @@ class AccountAccount(models.Model):
     _inherit = 'account.account'
 
     of_account_counterpart_id = fields.Many2one('account.account', string="Compte de contrepartie")
+    of_editable = fields.Boolean(
+        string=u"Éditable", default=True,
+        help=u"Un compte non éditable ne pourra être modifié que par l'admin."
+    )
 
     @api.model
     def create(self, vals):
