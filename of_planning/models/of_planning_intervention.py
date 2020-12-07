@@ -740,10 +740,13 @@ class OfPlanningIntervention(models.Model):
             intervention.price_tax = sum(intervention.line_ids.mapped('price_tax'))
             intervention.price_total = sum(intervention.line_ids.mapped('price_total'))
 
-    @api.depends('line_ids', 'line_ids.invoice_line_ids')
+    @api.depends('line_ids', 'line_ids.invoice_line_ids', 'order_id', 'order_id.invoice_ids')
     def _compute_invoice_ids(self):
         for rdv in self:
             invoices = rdv.line_ids.mapped('invoice_line_ids').mapped('invoice_id')
+            if rdv.order_id:
+                for invoice in rdv.order_id.invoice_ids:
+                    invoices |= invoice
             rdv.invoice_count = len(invoices)
             rdv.invoice_ids = invoices
 
