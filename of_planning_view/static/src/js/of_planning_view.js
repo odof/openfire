@@ -1504,7 +1504,9 @@ var PlanningCreneauDispo = Widget.extend({
      */
     on_mouseout: function (ev) {
         ev.preventDefault();
-        this.$el.find('.of_planning_creneau_dispo').outerHeight(this.hauteur);
+        if (!this.$el.is(":hover")) {
+            this.$el.find('.of_planning_creneau_dispo').outerHeight(this.hauteur);
+        }
     },
     /**
      *  Ouvre le pop-up de sélection de secteur
