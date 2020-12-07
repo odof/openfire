@@ -134,6 +134,7 @@ class SaleOrder(models.Model):
             'layout_category_id': line.layout_category_id,
             'product_uom': line.product_uom_id.id,
             'of_article_principal': line.of_article_principal,
+            'of_product_forbidden_discount': line.product_id.of_forbidden_discount,
         }
         return data
 
