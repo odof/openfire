@@ -1234,6 +1234,10 @@ PlanningView.Row = Widget.extend({
                 a_push = true;
 
                 if (i>=0 && i<self.column_nb) {
+                    if (isNullOrUndef(self.segments_horaires[self.col_offset_to_segment[i]])) {
+                        // l'employé n'a pas d'horaire défini ce jour-ci
+                        continue;
+                    }
                     planning_record.$of_el[i] = planning_record.$el.clone(true);
                     horaires_dict = self.segments_horaires[self.col_offset_to_segment[i]][2];  // récupérer le bon horaires_dict
 
