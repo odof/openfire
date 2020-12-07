@@ -161,6 +161,10 @@ class AccountAccount(models.Model):
 
     of_account_counterpart_id = fields.Many2one('account.account', string="Compte de contrepartie")
     of_accept_entries = fields.Boolean(string=u"Accepter les écritures", default=True)
+    of_editable = fields.Boolean(
+        string=u"Éditable", default=True,
+        help=u"Un compte non éditable ne pourra être modifié que par l'admin."
+    )
 
     @api.model
     def create(self, vals):
