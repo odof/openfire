@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import json
+
 from odoo import api, fields, models, SUPERUSER_ID, _
 from odoo.exceptions import UserError, ValidationError, RedirectWarning
 from odoo.models import regex_order
 from odoo.addons.account.models.account_invoice import AccountInvoice
-from odoo.tools.float_utils import float_compare
+from odoo.tools import float_compare, float_is_zero
 
 NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
 
@@ -102,9 +104,56 @@ def get_taxes_values(self):
     return tax_grouped
 
 
+@api.one
+def _get_outstanding_info_JSON(self):
+    self.outstanding_credits_debits_widget = json.dumps(False)
+    if self.state == 'open':
+        domain = [
+            ('account_id', '=', self.account_id.id),
+            ('partner_id', '=', self.env['res.partner']._find_accounting_partner(self.partner_id).id),
+            ('reconciled', '=', False),
+            '|',
+                '&', ('amount_residual_currency', '!=', 0.0), ('currency_id', '!=', None),
+                '&', ('amount_residual_currency', '=', 0.0),
+                    '&', ('currency_id', '=', None), ('amount_residual', '!=', 0.0)]
+        if self.type in ('out_invoice', 'in_refund'):
+            domain.extend([('credit', '>', 0), ('debit', '=', 0)])
+            type_payment = _('Outstanding credits')
+        else:
+            domain.extend([('credit', '=', 0), ('debit', '>', 0)])
+            type_payment = _('Outstanding debits')
+        info = {'title': '', 'outstanding': True, 'content': [], 'invoice_id': self.id}
+        lines = self.env['account.move.line'].search(domain)
+        currency_id = self.currency_id
+        if len(lines) != 0:
+            for line in lines:
+                # get the outstanding residual value in invoice currency
+                if line.currency_id and line.currency_id == self.currency_id:
+                    amount_to_show = abs(line.amount_residual_currency)
+                else:
+                    amount_to_show = line.company_id.currency_id.with_context(date=line.date)\
+                                         .compute(abs(line.amount_residual), self.currency_id)
+                if float_is_zero(amount_to_show, precision_rounding=self.currency_id.rounding):
+                    continue
+                info['content'].append({
+                    # Modification OF
+                    'journal_name': line.journal_id.name + " - " + line.move_id.name,
+                    # Fin de modification
+                    'amount': amount_to_show,
+                    'currency': currency_id.symbol,
+                    'id': line.id,
+                    'position': currency_id.position,
+                    'digits': [69, self.currency_id.decimal_places],
+                })
+            info['title'] = type_payment
+            self.outstanding_credits_debits_widget = json.dumps(info)
+            self.has_outstanding = True
+
+
 AccountInvoice._onchange_partner_id = _onchange_partner_id
 AccountInvoice._onchange_partner_id_warning = _onchange_partner_id_warning
 AccountInvoice.get_taxes_values = get_taxes_values
+AccountInvoice._get_outstanding_info_JSON = _get_outstanding_info_JSON
 
 
 class AccountAccount(models.Model):

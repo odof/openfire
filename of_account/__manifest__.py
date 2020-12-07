@@ -32,9 +32,13 @@ Module de comptabilité OpenFire.
     'data': [
         'data/of_account_data.xml',
         'security/of_account_security.xml',
+        'views/of_account.xml',
         'views/of_account_views.xml',
         'views/partner_views.xml',
         'wizards/wizard_edit_export_view.xml'
+    ],
+    'qweb': [
+        "static/src/xml/account_payment.xml",
     ],
     'installable': True,
 }
