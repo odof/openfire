@@ -177,6 +177,9 @@
             <xpath expr="//field[@name='tax_ids']" position="after">
                 <field name="of_account_counterpart_id"/>
             </xpath>
+            <xpath expr="//field[@name='deprecated']" position="after">
+                <field name="of_editable" groups="of_base.of_group_root_only"/>
+            </xpath>
         </field>
     </record>
 
