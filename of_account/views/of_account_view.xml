@@ -128,6 +128,9 @@
             <xpath expr="//field[@name='internal_type']" position="after">
                 <field name="of_accept_entries"/>
             </xpath>
+            <xpath expr="//field[@name='centralized']" position="after">
+                <field name="of_editable" groups="of_base.of_group_root_only"/>
+            </xpath>
         </field>
     </record>
 
