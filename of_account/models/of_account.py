@@ -164,6 +164,10 @@ class AccountAccount(models.Model):
         string="Compte de saisie", default=True,
         help=u"Seuls les comptes de saisies peuvent recevoir des écritures comptables."
     )
+    of_editable = fields.Boolean(
+        string=u"Éditable", default=True,
+        help=u"Un compte non éditable ne pourra être modifié que par l'admin."
+    )
 
     @api.model
     def create(self, vals):
