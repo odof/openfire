@@ -1427,7 +1427,7 @@ class OfContractPeriod(models.Model):
     _order = 'number'
 
     name = fields.Char(string=u"Nom de la période", compute="_compute_name")
-    contract_id = fields.Many2one(comodel_name='of.contract', string="Contrat", required=True)
+    contract_id = fields.Many2one(comodel_name='of.contract', string="Contrat", required=True, ondelete='cascade')
     number = fields.Integer(string=u"Période n°", required=True)
     date_start = fields.Date(string=u"Date de début", required=True)
     date_end = fields.Date(string=u"Date de fin", required=True)
