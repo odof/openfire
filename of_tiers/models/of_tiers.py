@@ -20,7 +20,8 @@ class ResCompany(models.Model):
             seq_client.active = False
         seq_fournisseur = sequence_obj.browse(xml_obj.search([('name', 'like', 'sequence_supplier_account')]).res_id)
         if seq_fournisseur and seq_fournisseur.active:
-            code = "'%s%%0%si%s' %% partner.id" % (seq_fournisseur.prefix or '', seq_fournisseur.padding, seq_fournisseur.suffix or '')
+            code = "'%s%%0%si%s' %% partner.id" % (
+                seq_fournisseur.prefix or '', seq_fournisseur.padding, seq_fournisseur.suffix or '')
             vals['of_code_fournisseur'] = "(%s, %s)" % (code, 'partner.name')
             seq_fournisseur.active = False
         if vals:
@@ -28,9 +29,10 @@ class ResCompany(models.Model):
             companies.write(vals)
         return res
 
-    of_client_id_ref = fields.Boolean(u'Réf. client automatique',
-                                      help=u"Lors de la création d'un nouveau partenaire, si cette case est cochée, "
-                                           u"la référence client prendra par défaut le n° de compte comptable du partenaire.")
+    of_client_id_ref = fields.Boolean(
+        string=u'Réf. client automatique',
+        help=u"Lors de la création d'un nouveau partenaire, si cette case est cochée, "
+             u"la référence client prendra par défaut le n° de compte comptable du partenaire.")
     of_code_client = fields.Char('Code client', default="('411%05i' % partner.id, partner.name)")
     of_code_fournisseur = fields.Char('Code fournisseur', default="('401%05i' % partner.id, partner.name)")
 
@@ -86,8 +88,9 @@ class ResPartner(models.Model):
                             'code': code,
                             'name': name,
                             'reconcile': True,
-                            # Avec le module of_base_multicompany, il est utile de forcer la société à la même que celle du compte par défaut
-                            # et non celle de l'utilisateur (compte au niveau de la société, pas du magasin)
+                            # Avec le module of_base_multicompany, il est utile de forcer la société à la même
+                            # que celle du compte par défaut et non celle de l'utilisateur
+                            # (compte au niveau de la société, pas du magasin)
                             'company_id': default_account_receivable.company_id.id
                         }
                         data['property_account_receivable_id'] = ac_obj.create(account_data)
@@ -109,8 +112,9 @@ class ResPartner(models.Model):
                             'code': code,
                             'name': name,
                             'reconcile': True,
-                            # Avec le module of_base_multicompany, il est utile de forcer la société à la même que celle du compte par défaut
-                            # et non celle de l'utilisateur (compte au niveau de la société, pas du magasin)
+                            # Avec le module of_base_multicompany, il est utile de forcer la société à la même
+                            # que celle du compte par défaut et non celle de l'utilisateur
+                            # (compte au niveau de la société, pas du magasin)
                             'company_id': default_account_payable.company_id.id
                         }
                         data['property_account_payable_id'] = ac_obj.create(account)
@@ -147,7 +151,9 @@ class ResPartner(models.Model):
 
         # On ne supprime pas les comptes ayant des écritures
         if account_ids:
-            cr.execute("SELECT DISTINCT account_id FROM account_move_line WHERE account_id IN %s", (tuple(account_ids),))
+            cr.execute(
+                "SELECT DISTINCT account_id FROM account_move_line WHERE account_id IN %s",
+                (tuple(account_ids),))
             used_account_ids = cr.fetchall()
             if used_account_ids:
                 account_ids -= set(zip(*used_account_ids)[0])
@@ -170,7 +176,8 @@ class AccountConfigSettings(models.TransientModel):
     of_code_fournisseur = fields.Char(related='company_id.of_code_fournisseur', string='Code fournisseur')
     of_client_id_ref = fields.Boolean(
         related='company_id.of_client_id_ref', string=u"Utiliser les comptes de tiers comme références clients *",
-        help=u"Affectation automatique de la partie variable du compte de tiers dans la référence du partenaire nouvellement créé")
+        help=u"Affectation automatique de la partie variable du compte de tiers "
+             u"dans la référence du partenaire nouvellement créé")
 
 
 class AccountInvoice(models.Model):
