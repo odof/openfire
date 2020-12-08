@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import re
+
 from odoo import models, fields, api
 from odoo.tools.safe_eval import safe_eval
 
@@ -49,6 +51,36 @@ class ResPartner(models.Model):
         """
         Création / Mise à jour du compte de tiers des clients.
         """
+        def get_code(prefix, digits, required=True, first_num=1, suffix=''):
+            u"""
+            Fonction de génération de code de compte avec incrément
+            :param prefix: Préfixe du code du compte
+            :param digits: Nombre de chiffres à utiliser
+            :param required: Si True, même le premier compte a également un numéro en suffixe
+            :param first_num: Premier numéro à utiliser
+            :param suffix: Suffixe du code du compte.
+            :return:
+            """
+            code_pattern = '^' + re.escape(prefix) + '\\d*' + re.escape(suffix) + '$'
+            self.env.cr.execute(
+                "SELECT code "
+                "FROM account_account "
+                "WHERE code ~ %s "
+                "ORDER BY char_length(code) DESC, code DESC "
+                "LIMIT 1",
+                (code_pattern, )
+            )
+            prev_codes = self.env.cr.fetchone()
+            prev_code = prev_codes and prev_codes[0]
+            if not prev_code:
+                if not required:
+                    return prefix + suffix
+                prev_code = prefix + suffix
+            num = first_num
+            if prev_code != prefix + suffix:
+                num = int(prev_code[len(prefix):-len(suffix) or len(prev_code)]) + 1
+            return prefix + "%%0%ii" % digits % num + suffix
+
         # Pas de création de compte de tiers pour les contacts, mais uniquement pour les vrais partenaires
         partners = self.mapped('commercial_partner_id')
         if not partners:
@@ -56,6 +88,8 @@ class ResPartner(models.Model):
 
         # On se place en sudo pour pouvoir générer les comptes, mais il faut forcer la société de l'utilisateur
         company = self.env.user.company_id
+        while not company.chart_template_id and company.parent_id:
+            company = company.parent_id
         self = self.sudo().with_context(force_company=company.id)
         partners = partners.with_context(force_company=company.id)
 
@@ -74,8 +108,14 @@ class ResPartner(models.Model):
             # Si est un client
             if partner.customer and company.of_code_client:
                 # Création du compte de tiers
-                code, name = safe_eval(company.of_code_client, {'partner': partner, 'company': company})
                 if (partner.property_account_receivable_id or default_account_receivable) == default_account_receivable:
+                    code, name = safe_eval(
+                        company.of_code_client,
+                        {
+                            'partner': partner,
+                            'company': company,
+                            'get_code': get_code,
+                        })
                     account = ac_obj.search([('code', '=', code), ('company_id', '=', company.id)], limit=1)
                     if account:
                         data['property_account_receivable_id'] = account.id
@@ -98,8 +138,14 @@ class ResPartner(models.Model):
             # Si est un fournisseur
             if partner.supplier and company.of_code_fournisseur:
                 # Création du compte de tiers
-                code, name = safe_eval(company.of_code_fournisseur, {'partner': partner, 'company': company})
                 if (partner.property_account_payable_id or default_account_payable) == default_account_payable:
+                    code, name = safe_eval(
+                        company.of_code_fournisseur,
+                        {
+                            'partner': partner,
+                            'company': company,
+                            'get_code': get_code,
+                        })
                     account = ac_obj.search([('code', '=', code), ('company_id', '=', company.id)], limit=1)
                     if account:
                         data['property_account_payable_id'] = account.id
