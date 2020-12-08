@@ -422,7 +422,7 @@ class OfService(models.Model):
 
         if len(self._ids) == 1:
             context = safe_eval(action['context'])
-            action['context'] = str(self.get_action_view_intervention_context(context))
+            action['context'] = self.get_action_view_intervention_context(context)
 
         return action
 

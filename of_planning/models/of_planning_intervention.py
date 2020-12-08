@@ -1109,7 +1109,7 @@ class ResPartner(models.Model):
         action['domain'] = ['|', ('partner_id', 'child_of', self.ids), ('partner_id', 'child_of', self.ids)]
         if len(self._ids) == 1:
             context = safe_eval(action['context'])
-            action['context'] = str(self._get_action_view_intervention_context(context))
+            action['context'] = self._get_action_view_intervention_context(context)
 
         return action
 
