@@ -3,6 +3,7 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 
+
 class AccountTax(models.Model):
     _inherit = 'account.tax'
 
@@ -16,6 +17,7 @@ class AccountTax(models.Model):
                 return pos.account_dest_id
         return account
 
+
 # Copié depuis la classe account.fiscal.position.account
 class OfAccountTaxAccount(models.Model):
     _name = 'of.account.tax.account'
@@ -23,10 +25,10 @@ class OfAccountTaxAccount(models.Model):
     _rec_name = 'tax_id'
 
     tax_id = fields.Many2one('account.tax', string='Taxe', required=True, ondelete='cascade')
-    account_src_id = fields.Many2one('account.account', string="Compte de l'article",
-                                     domain=[('deprecated', '=', False)], required=True)
-    account_dest_id = fields.Many2one('account.account', string=u"Compte à utiliser à la place",
-                                      domain=[('deprecated', '=', False)], required=True)
+    account_src_id = fields.Many2one(
+        'account.account', string="Compte de l'article", domain=[('deprecated', '=', False)], required=True)
+    account_dest_id = fields.Many2one(
+        'account.account', string=u"Compte à utiliser à la place", domain=[('deprecated', '=', False)], required=True)
 
     _sql_constraints = [
         ('of_account_src_dest_uniq',
@@ -34,11 +36,13 @@ class OfAccountTaxAccount(models.Model):
          'Vous ne pouvez créer deux correspondances de comptes identiques sur une même taxe.')
     ]
 
+
 class AccountFiscalPosition(models.Model):
     _inherit = 'account.fiscal.position'
 
-    default_tax_ids = fields.Many2many('account.tax', string=u"Taxes par défaut",
-                                       help=u"Taxes utilisées quand aucun compte de taxes n'est défini dans l'article")
+    default_tax_ids = fields.Many2many(
+        'account.tax', string=u"Taxes par défaut",
+        help=u"Taxes utilisées quand aucun compte de taxes n'est défini dans l'article")
 
     @api.multi
     def map_tax(self, taxes, product=None, partner=None):
@@ -53,7 +57,8 @@ class AccountFiscalPosition(models.Model):
     def _get_fpos_by_region(self, country_id=False, state_id=False, zipcode=False, vat_required=False):
         # Dans le cas où un client n'a pas de pays, on veut quand-même récupérer une position fiscale par défaut
         if country_id:
-            return super(AccountFiscalPosition, self)._get_fpos_by_region(country_id=country_id, state_id=state_id, zipcode=zipcode, vat_required=vat_required)
+            return super(AccountFiscalPosition, self)._get_fpos_by_region(
+                country_id=country_id, state_id=state_id, zipcode=zipcode, vat_required=vat_required)
 
         base_domain = [('auto_apply', '=', True), ('vat_required', '=', vat_required)]
         if self.env.context.get('force_company'):
@@ -62,6 +67,7 @@ class AccountFiscalPosition(models.Model):
 
         fpos = self.search(base_domain + null_country_dom, limit=1)
         return fpos or False
+
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
@@ -81,11 +87,13 @@ class AccountInvoiceLine(models.Model):
         # Recalcul du compte comptable en fonction des taxes sélectionnées
         account = self.account_id
         if self.product_id:
-            account = self.get_invoice_line_account(self.invoice_id.type, self.product_id, self.invoice_id.fiscal_position_id, self.invoice_id.company_id)
+            account = self.get_invoice_line_account(
+                self.invoice_id.type, self.product_id, self.invoice_id.fiscal_position_id, self.invoice_id.company_id)
         for tax in self.invoice_line_tax_ids:
             account = tax.map_account(account)
         if self.account_id != account:
             self.account_id = account
+
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
@@ -100,6 +108,7 @@ class SaleOrderLine(models.Model):
         res['account_id'] = account.id
         return res
 
+
 class AccountInvoice(models.Model):
     _inherit = "account.invoice"
 
@@ -108,7 +117,8 @@ class AccountInvoice(models.Model):
         tax_obj = self.env['account.tax']
         data = super(AccountInvoice, self)._prepare_invoice_line_from_po_line(line)
 
-        account = invoice_line_obj.get_invoice_line_account(self.type, line.product_id, line.order_id.fiscal_position_id, self.company_id)
+        account = invoice_line_obj.get_invoice_line_account(
+            self.type, line.product_id, line.order_id.fiscal_position_id, self.company_id)
         if data['invoice_line_tax_ids']:
             tax_ids = tax_obj.browse(data['invoice_line_tax_ids'])
             for tax in tax_ids:
