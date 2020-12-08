@@ -114,12 +114,12 @@
             <field name="inherit_id" ref="account.view_account_payment_search"/>
             <field name="arch" type="xml">
                 <xpath expr="//search/separator[2]" position="after">
-                    <separator/>
                     <filter string="Deposited" domain="[('of_deposit_id','!=',False)]" name="deposited"/>
                     <filter string="Not deposited" domain="[('of_deposit_id','=',False)]" name="not_deposited"/>
+                    <separator/>
                 </xpath>
-                <xpath expr="//search/filter[9]" position="before">
-                    <filter string="Bank Deposit" domain="[]" context="{'group_by': 'of_deposit_id'}"/>
+                <xpath expr="//filter[@name='journal']" position="after">
+                    <filter string="Bank Deposit" domain="[]" context="{'group_by': 'of_deposit_id'}" name="deposit"/>
                 </xpath>
             </field>
         </record>

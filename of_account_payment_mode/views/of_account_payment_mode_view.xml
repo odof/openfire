@@ -207,8 +207,8 @@
                 <field name="journal_id" position="before">
                     <field name="of_payment_mode_id"/>
                 </field>
-                <xpath expr="//search/filter[9]" position="before">
-                    <filter string="Payment mode" domain="[]" context="{'group_by': 'of_payment_mode_id'}"/>
+                <xpath expr="//filter[@name='journal']" position="before">
+                    <filter string="Payment mode" domain="[]" context="{'group_by': 'of_payment_mode_id'}" name="paymentmode"/>
                 </xpath>
             </field>
         </record>
