@@ -1,62 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
 
-        <!-- Taxe -->
+    <!-- Taxe -->
 
-        <record id="of_view_tax_form" model="ir.ui.view">
-            <field name="name">of.account.tax.form</field>
-            <field name="model">account.tax</field>
-            <field name="inherit_id" ref="account.view_tax_form"/>
-            <field name="arch" type="xml">
-                <notebook position="inside">
-                    <page string="Affectation des comptes">
-                        <group>
-                            <field name="account_ids" widget="one2many_list" nolabel="1">
-                                <tree string="Affectation des comptes" editable="bottom">
-                                    <field name="account_src_id"/>
-                                    <field name="account_dest_id"/>
-                                </tree>
-                                <form string="Affectation des comptes">
-                                    <field name="account_src_id"/>
-                                    <field name="account_dest_id"/>
-                                </form>
-                            </field>
-                        </group>
-                    </page>
-                </notebook>
+    <record id="of_view_tax_form" model="ir.ui.view">
+        <field name="name">of.account.tax.form</field>
+        <field name="model">account.tax</field>
+        <field name="inherit_id" ref="account.view_tax_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Affectation des comptes">
+                    <group>
+                        <field name="account_ids" widget="one2many_list" nolabel="1">
+                            <tree string="Affectation des comptes" editable="bottom">
+                                <field name="account_src_id"/>
+                                <field name="account_dest_id"/>
+                            </tree>
+                            <form string="Affectation des comptes">
+                                <field name="account_src_id"/>
+                                <field name="account_dest_id"/>
+                            </form>
+                        </field>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+    <!-- Position fiscale -->
+
+    <record id="of_view_account_position_form" model="ir.ui.view">
+        <field name="name">of.account.fiscal.position.form</field>
+        <field name="model">account.fiscal.position</field>
+        <field name="inherit_id" ref="account.view_account_position_form"/>
+        <field name="arch" type="xml">
+            <field name="tax_ids" position="attributes">
+                <attribute name="colspan">2</attribute>
             </field>
-        </record>
-
-        <!-- Position fiscale -->
-
-        <record id="of_view_account_position_form" model="ir.ui.view">
-            <field name="name">of.account.fiscal.position.form</field>
-            <field name="model">account.fiscal.position</field>
-            <field name="inherit_id" ref="account.view_account_position_form"/>
-            <field name="arch" type="xml">
-                <field name="tax_ids" position="attributes">
-                    <attribute name="colspan">2</attribute>
-                </field>
-                <field name="tax_ids" position="before">
-                    <field name="default_tax_ids" widget="many2many_tags"/>
-                </field>
+            <field name="tax_ids" position="before">
+                <field name="default_tax_ids" widget="many2many_tags"/>
             </field>
-        </record>
+        </field>
+    </record>
 
-        <!-- Bon de commande -->
+    <!-- Bon de commande -->
 
-        <record id="of_account_tax_view_order_form" model="ir.ui.view">
-            <field name="name">of_account_tax.sale.order.form</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="sale.view_order_form"/>
-            <field name="arch" type="xml">
-                <field name="fiscal_position_id" position="replace"/>
-                <field name="confirmation_date" position="after">
-                    <field name="fiscal_position_id" options="{'no_create': True}"/>
-                </field>
+    <record id="of_account_tax_view_order_form" model="ir.ui.view">
+        <field name="name">of_account_tax.sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <field name="fiscal_position_id" position="replace"/>
+            <field name="confirmation_date" position="after">
+                <field name="fiscal_position_id" options="{'no_create': True}"/>
             </field>
-        </record>
+        </field>
+    </record>
 
-    </data>
 </odoo>

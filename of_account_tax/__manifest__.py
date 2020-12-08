@@ -6,7 +6,7 @@
     'version': '10.0.1.0.0',
     'category': 'Accounting',
     'summary': 'OpenFire Taxes',
-    'description': """
+    'description': u"""
 Gestion des taxes OpenFire
 ==========================
 
