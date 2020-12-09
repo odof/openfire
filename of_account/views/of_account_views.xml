@@ -214,6 +214,23 @@
         </field>
     </record>
 
+    <record id="of_account_view_account_move_filter" model="ir.ui.view">
+        <field name="name">of.account.move.select</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_move_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date']" position="after">
+                <filter string="Mois en cours" name="this_month"
+                        domain="[('date', u'&gt;=', context_today().strftime('%Y-%m-01')),
+                                 ('date', u'&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Mois précédent" name="previous_month"
+                        domain="[('date', u'&gt;=', (context_today() - relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
+                                 ('date', u'&lt;', context_today().strftime('%Y-%m-01'))]"/>
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Rechercher écritures comptables sur le débit et crédit en même temps -->
     <record id="of_account_view_account_move_line_filter" model="ir.ui.view">
         <field name="name">of.account.view.account.move.line.filter</field>
