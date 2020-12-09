@@ -14,6 +14,9 @@
                 <button class="oe_stat_button" type="object" name="action_view_contrat" icon="fa-book">
                     <field name="of_contrat_count" widget="statinfo" string="Contrats"/>
                 </button>
+                <button class="oe_stat_button" type="object" name="action_view_contrat" icon="fa-book" attrs="{'invisible': [('supplier','!=',True)]}">
+                    <field name="of_contrat_line_count" widget="statinfo" string="Lignes de contrat"/>
+                </button>
             </xpath>
         </field>
     </record>

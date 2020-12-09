@@ -6,18 +6,28 @@ from odoo import models, fields, api
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    of_contrat_count = fields.Integer(compute="_compute_of_contrat_count")
-    of_contrat_ids = fields.One2many('of.contract', 'partner_id', string="Contrats")
+    of_contrat_count = fields.Integer(compute="_compute_of_contrat_count", string="Nombre de contrat")
+    of_contrat_ids = fields.One2many(comodel_name='of.contract', inverse_name='partner_id', string="Contrats")
+    of_contrat_line_count = fields.Integer(compute="_compute_of_contrat_count", string="Nombre de ligne de contrat")
+    of_contract_line_count_ids = fields.One2many(
+        comodel_name='of.contract.line', inverse_name='supplier_id', string="Lignes de contrat")
 
-    @api.depends('of_contrat_ids')
+    @api.depends('of_contrat_ids', 'of_contract_line_count_ids')
     def _compute_of_contrat_count(self):
         for partner in self:
             partner.of_contrat_count = len(partner.of_contrat_ids)
+            partner.of_contrat_line_count = len(partner.of_contract_line_count_ids)
 
     @api.multi
     def action_view_contrat(self):
         action = self.env.ref('of_contract_custom.of_contract_custom_open_contrat').read()[0]
         action['domain'] = [('partner_id', 'in', self._ids)]
+        return action
+
+    @api.multi
+    def action_view_contrat(self):
+        action = self.env.ref('of_contract_custom.of_contract_custom_open_contrat_line').read()[0]
+        action['domain'] = [('supplier_id', 'in', self._ids)]
         return action
 
     @api.multi

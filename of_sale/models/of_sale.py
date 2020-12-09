@@ -36,7 +36,15 @@ def product_uom_change(self):
             and (not self.price_unit or float_compare(self.price_unit, self.product_id.list_price, 2) != 0):
         self.price_unit = self.of_get_price_unit()
 
+
 SOL.product_uom_change = product_uom_change
+
+
+class OfSaleOrderKanban(models.Model):
+    _name = 'of.sale.order.kanban'
+    _description = u"Étapes kanban des sale.order"
+
+    name = fields.Char(string=u"Nom de l'étape", required=True)
 
 
 class OfDocumentsJoints(models.AbstractModel):
@@ -195,7 +203,7 @@ class SaleOrder(models.Model):
     )
     of_kanban_step_id = fields.Many2one(
         comodel_name='of.sale.order.kanban', string=u"Étape kanban",
-        default=lambda s: s.env.ref('of_sale.of_sale_order_kanban_new')
+        default=lambda s: s.env.ref('of_sale.of_sale_order_kanban_new', raise_if_not_found=False)
     )
 
     @api.depends('of_echeance_line_ids', 'amount_total')
@@ -1591,10 +1599,3 @@ class ProductPricelist(models.Model):
                     continue
                 return True
         return False
-
-
-class OfSaleOrderKanban(models.Model):
-    _name = 'of.sale.order.kanban'
-    _description = u"Étapes kanban des sale.order"
-
-    name = fields.Char(string=u"Nom de l'étape", required=True)
