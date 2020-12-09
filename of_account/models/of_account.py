@@ -37,6 +37,10 @@ class AccountInvoice(models.Model):
 
     of_etiquette_partenaire_ids = fields.Many2many('res.partner.category', related='partner_id.category_id', string=u"Étiquettes client")
 
+    of_partner_phone = fields.Char(related='partner_id.phone', string=u"Téléphone du partenaire", readonly=True)
+    of_partner_mobile = fields.Char(related='partner_id.mobile', string=u"Mobile du partenaire", readonly=True)
+    of_partner_email = fields.Char(related='partner_id.email', string=u"Courriel du partenaire", readonly=True)
+
     # Date d'échéance des factures
     # Surcharge de la méthode pour permettre la comparaison avec le paramètrage du mode de calcul de la date d'échéance (manuel/auto).
     @api.onchange('payment_term_id', 'date_invoice')

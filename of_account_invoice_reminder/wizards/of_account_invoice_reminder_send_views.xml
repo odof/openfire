@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Invoice Reminder Send Views -->
+
+    <record id="of_account_invoice_reminder_send_form_view" model="ir.ui.view">
+        <field name="name">of.account.invoice.reminder.stage.form.view</field>
+        <field name="model">of.account.invoice.reminder.send</field>
+        <field name="arch" type="xml">
+            <form string="Envoyer les relances facture">
+                    <field name="ok" invisible="1"/>
+                    <field name="error" invisible="1"/>
+                    <field name="info_txt" nolabel="1" readonly="1"/>
+                <footer>
+                    <button string="Envoyer les relances" name="button_send_reminder" type="object" class="btn-primary"
+                            attrs="{'invisible': [('ok', '=', False)]}"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window id="of_account_invoice_reminder_send_action"
+                key2="client_action_multi"
+                name="Relances"
+                res_model="of.account.invoice.reminder.send"
+                src_model="account.invoice"
+                view_mode="form"
+                view_type="form"
+                multi="True"
+                view_id="of_account_invoice_reminder_send_form_view"
+                target="new" />
+
+</odoo>

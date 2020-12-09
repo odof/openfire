@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Invoice Reminder Stage Views -->
+
+    <record id="of_account_invoice_reminder_stage_form_view" model="ir.ui.view">
+        <field name="name">of.account.invoice.reminder.stage.form.view</field>
+        <field name="model">of.account.invoice.reminder.stage</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="sequence"/>
+                            <field name="email_template_id"/>
+                        </group>
+                        <group>
+                            <field name="trigger_date"/>
+                            <field name="trigger_delay"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_account_invoice_reminder_stage_tree_view" model="ir.ui.view">
+        <field name="name">of.account.invoice.reminder.stage.tree.view</field>
+        <field name="model">of.account.invoice.reminder.stage</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="email_template_id"/>
+                <field name="trigger_date"/>
+                <field name="trigger_delay"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_account_invoice_reminder_stage_action" model="ir.actions.act_window">
+        <field name="name">Étapes de relance facture</field>
+        <field name="res_model">of.account.invoice.reminder.stage</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="Étapes de relance facture" id="of_account_invoice_reminder_stage_menu"
+              parent="account.account_management_menu" sequence="30" action="of_account_invoice_reminder_stage_action"/>
+
+    <!-- Account Invoice Views -->
+
+    <record id="of_account_invoice_reminder_account_invoice_form_view" model="ir.ui.view">
+        <field name="name">of.account.invoice.reminder.account.invoice.form.view</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="priority" eval="50"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="before">
+                <button name="action_send_reminder" type="object" string="Relancer"/>
+            </xpath>
+            <xpath expr="//field[@name='date_due']" position="after">
+                <label for="of_reminder_stage_id"/>
+                <div>
+                    <field name="of_reminder_stage_id" class="oe_inline" widget="selection"/>
+                    <field name="of_reminder_state" nolabel="1" class="oe_inline" style="margin-left:5px;"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_account_invoice_reminder_account_invoice_search_view" model="ir.ui.view">
+        <field name="name">of.account.invoice.reminder.account.invoice.search.view</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='late']" position="after">
+                <separator/>
+                <filter name="À relancer" domain="[('state','=', 'open'), ('of_reminder_state', '=', 'to_do')]"/>
+                <field name="of_reminder_stage_id"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

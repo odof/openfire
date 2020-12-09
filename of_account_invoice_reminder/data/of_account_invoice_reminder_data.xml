@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Modèles de mail -->
+
+    <record id="of_account_invoice_reminder_1_email_template" model="mail.template">
+        <field name="name">Facture - Première relance</field>
+        <field name="email_from">${object.user_id.email and '%s &lt;%s&gt;' % (object.user_id.name, object.user_id.email) or '')|safe}</field>
+        <field name="subject">Facture ${object.number or ''} - Première relance</field>
+        <field name="partner_to">${object.partner_id.id}</field>
+        <field name="model_id" ref="account.model_account_invoice"/>
+        <field name="auto_delete" eval="False"/>
+        <field name="lang">${object.partner_id.lang}</field>
+        <field name="body_html"><![CDATA[
+<p>Bonjour ${object.partner_id.title and object.partner_id.title.shortcut or ''} ${object.partner_id.name},</p>
+<p>
+Première relance pour la facture ${object.number}.
+</p>
+<p>
+Vous en souhaitant bonne réception.<br/>
+</p>
+<p>
+% if user and user.signature:
+${user.signature | safe}
+% endif
+</p>
+]]></field>
+    </record>
+
+    <record id="of_account_invoice_reminder_2_email_template" model="mail.template">
+        <field name="name">Facture - Seconde relance</field>
+        <field name="email_from">${object.user_id.email and '%s &lt;%s&gt;' % (object.user_id.name, object.user_id.email) or '')|safe}</field>
+        <field name="subject">Facture ${object.number or ''} - Seconde relance</field>
+        <field name="partner_to">${object.partner_id.id}</field>
+        <field name="model_id" ref="account.model_account_invoice"/>
+        <field name="auto_delete" eval="False"/>
+        <field name="lang">${object.partner_id.lang}</field>
+        <field name="body_html"><![CDATA[
+<p>Bonjour ${object.partner_id.title and object.partner_id.title.shortcut or ''} ${object.partner_id.name},</p>
+<p>
+Seconde relance pour la facture ${object.number}.
+</p>
+<p>
+Vous en souhaitant bonne réception.<br/>
+</p>
+<p>
+% if user and user.signature:
+${user.signature | safe}
+% endif
+</p>
+]]></field>
+    </record>
+
+    <record id="of_account_invoice_reminder_3_email_template" model="mail.template">
+        <field name="name">Facture - Troisième relance</field>
+        <field name="email_from">${object.user_id.email and '%s &lt;%s&gt;' % (object.user_id.name, object.user_id.email) or '')|safe}</field>
+        <field name="subject">Facture ${object.number or ''} - Seconde relance</field>
+        <field name="partner_to">${object.partner_id.id}</field>
+        <field name="model_id" ref="account.model_account_invoice"/>
+        <field name="auto_delete" eval="False"/>
+        <field name="lang">${object.partner_id.lang}</field>
+        <field name="body_html"><![CDATA[
+<p>Bonjour ${object.partner_id.title and object.partner_id.title.shortcut or ''} ${object.partner_id.name},</p>
+<p>
+Troisième relance pour la facture ${object.number}.
+</p>
+<p>
+Vous en souhaitant bonne réception.<br/>
+</p>
+<p>
+% if user and user.signature:
+${user.signature | safe}
+% endif
+</p>
+]]></field>
+    </record>
+
+    <!-- Étapes de relance -->
+
+    <record id="of_account_invoice_reminder_stage_1" model="of.account.invoice.reminder.stage">
+        <field name="name">Relance 1</field>
+        <field name="sequence">1</field>
+        <field name="trigger_date">deadline</field>
+        <field name="trigger_delay">0</field>
+        <field name="email_template_id" ref="of_account_invoice_reminder.of_account_invoice_reminder_1_email_template"/>
+    </record>
+
+    <record id="of_account_invoice_reminder_stage_2" model="of.account.invoice.reminder.stage">
+        <field name="name">Relance 2</field>
+        <field name="sequence">2</field>
+        <field name="trigger_date">previous_reminder</field>
+        <field name="trigger_delay">30</field>
+        <field name="email_template_id" ref="of_account_invoice_reminder.of_account_invoice_reminder_2_email_template"/>
+    </record>
+
+    <record id="of_account_invoice_reminder_stage_3" model="of.account.invoice.reminder.stage">
+        <field name="name">Relance 3</field>
+        <field name="sequence">3</field>
+        <field name="trigger_date">previous_reminder</field>
+        <field name="trigger_delay">30</field>
+        <field name="email_template_id" ref="of_account_invoice_reminder.of_account_invoice_reminder_3_email_template"/>
+    </record>
+
+</odoo>
