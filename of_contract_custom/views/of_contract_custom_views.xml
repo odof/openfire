@@ -630,5 +630,12 @@
         <field name="view_type">form</field>
     </record>
 
+    <record id="of_contract_custom_open_contrat_line" model="ir.actions.act_window">
+        <field name="name">Lignes de contrat</field>
+        <field name="res_model">of.contract.line</field>
+        <field name="domain">[]</field> <!-- Force empty -->
+        <field name="view_type">form</field>
+    </record>
+
 
 </odoo>
