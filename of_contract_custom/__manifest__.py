@@ -15,6 +15,9 @@ Création de nouveaux modèles:
  - Indice
  - Ligne d'indice
  
+Modifications de modèles existant:
+ - Interventions à programmer -> Demandes d'intervention
+ 
 Contrats :
 ----------
 
@@ -30,6 +33,7 @@ Ligne de contrat :
  - Nombres d'interventions par période ainsi que mois de références
  - Articles à facturer et fréquence de facturation
  
+ 
 Indices :
 ---------
 
@@ -41,6 +45,13 @@ Ligne d'indice :
  - Date de début et date de fin d'application
  - Veleur d'indexation
 
+
+Demandes d'intervention :
+-------------------------
+
+Renommer les références aux interventions à programmer/ponctuelles/récurrentes par demandes d'intervention
+
+Bloquer l'utilisation de la récurrence sur le modèle `of.service` car les contrats font la récurrence.
 
 
 
@@ -65,6 +76,7 @@ Ligne d'indice :
         'views/of_service_views.xml',
         'views/project_issue_views.xml',
         'views/res_partner_views.xml',
+        'views/sale_views.xml',
         'security/ir.model.access.csv',
         'security/of_contract_custom_security.xml',
         'wizards/of_contract_avenant_wizard_views.xml',
@@ -72,6 +84,7 @@ Ligne d'indice :
         'wizards/of_contract_indice_wizard_views.xml',
         'wizards/of_contract_line_cancel_wizard_views.xml',
         'wizards/of_contract_revision_wizard_views.xml',
+        'wizards/of_rdv_wizard_views.xml',
         ],
     'installable': True,
     'application': False,

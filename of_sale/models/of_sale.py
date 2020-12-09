@@ -193,6 +193,10 @@ class SaleOrder(models.Model):
     of_invoice_policy = fields.Selection(
         [('order', u'Quantités commandées'), ('delivery', u'Quantités livrées')], string="Politique de facturation"
     )
+    of_kanban_step_id = fields.Many2one(
+        comodel_name='of.sale.order.kanban', string=u"Étape kanban",
+        default=lambda s: s.env.ref('of_sale.of_sale_order_kanban_new')
+    )
 
     @api.depends('of_echeance_line_ids', 'amount_total')
     def _compute_of_echeances_modified(self):
@@ -1587,3 +1591,10 @@ class ProductPricelist(models.Model):
                     continue
                 return True
         return False
+
+
+class OfSaleOrderKanban(models.Model):
+    _name = 'of.sale.order.kanban'
+    _description = u"Étapes kanban des sale.order"
+
+    name = fields.Char(string=u"Nom de l'étape", required=True)

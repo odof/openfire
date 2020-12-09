@@ -15,7 +15,18 @@
                     <field name="of_contrat_count" widget="statinfo" string="Contrats"/>
                 </button>
             </xpath>
+        </field>
+    </record>
 
+    <record id="of_contract_custom_service_view_partner_form" model="ir.ui.view">
+        <field name="name">of.contract.custom.service.view.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="of_service.of_service_view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_prevoir_intervention']" position="attributes">
+                <attribute name="string">Demande d'intervention</attribute>
+            </xpath>
         </field>
     </record>
 
