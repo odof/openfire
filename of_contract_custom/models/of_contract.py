@@ -1077,6 +1077,7 @@ class OfContractLine(models.Model):
     def _generate_services(self):
         """ Génération des interventions à programmer """
         service_obj = self.with_context(bloquer_recurrence=True).env['of.service']
+        type = self.env.ref('of_contract_custom.of_contract_custom_type_maintenance')
         for line in self:
             months = line.mois_reference_ids
             nbr_intervs = line.nbr_interv
@@ -1094,7 +1095,7 @@ class OfContractLine(models.Model):
                 if line.date_contract_end and date_service > line.date_contract_end:
                     break
                 service_vals = {
-                    'type'            : 'maintenance',
+                    'type_id'         : type.id,
                     'partner_id'      : line.partner_id.id,
                     'address_id'      : line.address_id.id,
                     'tache_id'        : line.tache_id.id,

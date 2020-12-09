@@ -10,6 +10,9 @@
         <field name="model">of.parc.installe</field>
         <field name="inherit_id" ref="of_service_parc_installe.view_of_service_parc_installe_form_extended"/>
         <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_prevoir_intervention']" position="attributes">
+                <attribute name="string">Demande d'intervention</attribute>
+            </xpath>
             <xpath expr="//button[@name='action_view_a_programmer']" position="replace"/>
             <xpath expr="//button[@name='action_view_service']" position="replace">
                 <button class="oe_stat_button" name="action_view_service" type="object" icon="fa-calendar-o">
