@@ -12,7 +12,7 @@ try:
 except (ImportError, IOError) as err:
     _logger.debug(err)
 
-# import socket # Ne pas supprimer cette ligne, voir fonction connect()
+import socket  # Ne pas supprimer cette ligne, voir fonction connect()
 
 
 class OfDatastoreConnector(models.AbstractModel):
@@ -79,6 +79,12 @@ class OfDatastoreConnector(models.AbstractModel):
             def run(self):
                 try:
                     server_address = supplier.server_address
+                    # ======= Code à recommenter après la résolution du bug OVH =======
+                    # Retrait du prefixe http://
+                    ip_address = socket.gethostbyname(server_address.split('://')[1])
+                    # Sur s-alpha le port 8010 est utilisé pour la connexion xmlrpc v10
+                    server_address = "http://%s:8010" % (ip_address,)
+                    # =================================================================
 
                     i = server_address.find('://')
                     if i == -1:
