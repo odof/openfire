@@ -36,17 +36,14 @@ class OfService(models.Model):
         comodel_name='of.service.type', string="Type", required=True,)
         # default=lambda s : s.env.ref('of_contract_custom.of_contract_custom_type_sav'))
     contract_id = fields.Many2one(comodel_name='of.contract', string="Contrat")
-    contract_line_id = fields.Many2one(comodel_name='of.contract.line', string="Ligne de contrat")
+    contract_line_id = fields.Many2one(comodel_name='of.contract.line', string="Ligne de contrat", domain="[('contract_id','=',contract_id)]")
     spec_date = fields.Char(string="Date", compute="_compute_spec_date")
     user_id = fields.Many2one(comodel_name='res.users', string="Utilisateur", default=lambda r:r.env.user)
     kanban_step_id = fields.Many2one(
         comodel_name='of.service.stage', string=u"Étapes kanban", group_expand='_read_group_stage_ids',
-        domain="[('type_ids','=',type_id)]")
-
-    @api.onchange('type_id')
-    def onchange_type_id(self):
-        if self.type_id and self.type_id.kanban_ids:
-            self.kanban_step_id = self.type_id.kanban_ids[0]
+        domain="[('type_ids','=',type_id)]"
+    )
+    contract_message = fields.Char(string="Infos SAV du contrat", compute="_compute_contract_message")
 
     @api.depends()
     def _compute_spec_date(self):
@@ -58,6 +55,22 @@ class OfService(models.Model):
                 service.spec_date = u"Prévue le %s" % format_date(service.intervention_ids[-1].date_date, lang)
             else:
                 service.spec_date = u"Prévue entre %s et %s" % (format_date(service.date_next, lang), format_date(service.date_fin, lang))
+
+    @api.depends('contract_line_id', 'contract_line_id.use_sav', 'type_id')
+    def _compute_contract_message(self):
+        sav_type = self.env.ref('of_contract_custom.of_contract_custom_type_sav', raise_if_not_found=False)
+        if sav_type:
+            for service in self:
+                if service.type_id.id == sav_type.id and service.contract_line_id.use_sav:
+                    count = service.contract_line_id.remaining_sav
+                    service.contract_message = "%s SAV restant(s) pour cette ligne de contrat" % count
+                elif service.type_id.id == sav_type.id and service.contract_line_id:
+                    service.contract_message = "Cette ligne de contrat n'utilise pas l'option SAV"
+
+    @api.onchange('type_id')
+    def onchange_type_id(self):
+        if self.type_id and self.type_id.kanban_ids:
+            self.kanban_step_id = self.type_id.kanban_ids[0]
 
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):

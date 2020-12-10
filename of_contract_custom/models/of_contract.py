@@ -634,6 +634,10 @@ class OfContractLine(models.Model):
     revision_avenant = fields.Boolean(string=u"")
     warning_planif = fields.Boolean(string="Warning planification", compute="_compute_warning_planif")
 
+    use_sav = fields.Boolean(string="Utilise les SAV")
+    sav_count = fields.Integer(string="Nombre de visites SAV")
+    remaining_sav = fields.Integer(string="Nbr. visites SAV restantes", compute="_compute_remaining_sav")
+
     @api.depends('code_de_ligne',
                  'line_avenant_id', 'line_avenant_id.code_de_ligne',
                  'state',
@@ -873,6 +877,18 @@ class OfContractLine(models.Model):
                 rdvs = line.intervention_ids.filtered(lambda i: period.date_start <= i.date_date <= period.date_end)
                 if len(rdvs) < line.nbr_interv:
                     line.warning_planif = True
+
+    @api.depends('sav_count', 'service_ids')
+    def _compute_remaining_sav(self):
+        sav_type = self.env.ref('of_contract_custom.of_contract_custom_type_sav', raise_if_not_found=False)
+        if sav_type:
+            for line in self:
+                period = line.current_period_id
+                period_start = period.date_start
+                period_end = period.date_end
+                sav = line.service_ids.filtered(lambda s: s.type_id.id == sav_type.id and (period_start <= s.date_next <= period_end or period_start <= s.date_fin <= period_end))
+                remaining_sav = line.sav_count - len(sav)
+                line.remaining_sav = remaining_sav if remaining_sav > 0 else 0
 
     @api.onchange('address_id')
     def _onchange_address_id(self):

@@ -462,11 +462,15 @@
                             <group col="4">
                                 <group colspan="2" name="planif" string="Planification">
                                     <field name="warning_planif" invisible="1"/>
-
                                     <field name="tache_id" attrs="{'required': [('nbr_interv', '>', 0)]}"/>
                                     <field name="nbr_interv"/>
                                     <field name="mois_reference_ids" widget="many2many_tags"
                                            attrs="{'form_readonly_exception': True, 'required': [('nbr_interv', '>', 0)]}"/>
+                                </group>
+                                <group colspan="2" name="sav" string="Sav">
+                                    <field name="use_sav"/>
+                                    <field name="sav_count" attrs="{'invisible': [('use_sav','!=',True)]}"/>
+                                    <field name="remaining_sav" attrs="{'invisible': [('use_sav','!=',True)]}"/>
                                 </group>
                             </group>
                             <group name="services" string="Tableau de suivi">

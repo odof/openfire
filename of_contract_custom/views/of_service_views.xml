@@ -59,6 +59,8 @@
                             <field name="order_id" attrs="{'invisible': [('type_id','not in', [%(of_contract_custom.of_contract_custom_type_installation)d, %(of_contract_custom.of_contract_custom_type_sav)d])]}"/>
                             <field name="contract_id" attrs="{'invisible': [('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d, %(of_contract_custom.of_contract_custom_type_sav)d])]}"/>
                             <field name="contract_line_id" attrs="{'invisible': [('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d, %(of_contract_custom.of_contract_custom_type_sav)d])]}"/>
+                            <field name="contract_message" nolabel="1" colspan="2"/>
+<!--                            <field name="contract_message" nolabel="1" class="oe_inline oe_grey"/>-->
                         </group>
                         <group col="2" colspan="2">
                             <field name="user_id"/>
