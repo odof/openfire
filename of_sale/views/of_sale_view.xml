@@ -163,6 +163,19 @@
             </field>
         </record>
 
+        <!-- Ajout l'étape kanban sur les devis/commandes -->
+        <record id="of_sale_view_kanban_step" model="ir.ui.view">
+            <field name="name">of.sale.view.kanban.step</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="priority">100</field>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_shipping_id']" position="after">
+                    <field name="of_kanban_step_id" widget="selection"/>
+                </xpath>
+            </field>
+        </record>
+
         <!-- Ajout des droits sur les marges/prix d'achats -->
         <record id="of_sale_margin_sale_order_line" model="ir.ui.view">
             <field name="name">of.sale.margin.sale.order.line</field>
