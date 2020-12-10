@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="of_multicompany_view_company_form" model="ir.ui.view">
+            <field name="name">of.multicompany.company.form</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='parent_id']" position="after">
+                    <field name="of_is_shop"/>
+                    <field name="of_default_shop_id" attrs="{'invisible':[('of_is_shop','=',True)]}"/>
+                </xpath>
+            </field>
+        </record>
+
+</odoo>

@@ -40,6 +40,7 @@ class ProjectIssue(models.Model):
         res['date'] = time.strftime('%Y-%m-%d %H:%M:00')
         return res
 
+    company_id = fields.Many2one(default=lambda s: s.env['res.company']._company_default_get('project.issue'))
     of_code = fields.Char("Code", required=True, readonly=True, default='Nouveau')
     partner_note = fields.Text("Note client", related='partner_id.comment', readonly=False)
     of_categorie_id = fields.Many2one('of.project.issue.categorie', string=u"Catégorie", ondelete='restrict')

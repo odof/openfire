@@ -13,7 +13,6 @@
                     <button name="action_confirm_estimation" string="Confirmer l'estimation" type="object" states="draft" class="btn-primary"/>
                 </xpath>
                 <xpath expr="//sheet/group/group[1]" position="inside">
-                    <newline/>
                     <field name="of_sent_quotation"/>
                 </xpath>
                 <xpath expr="//form//sheet//notebook//group[@name='technical']/../.." position="attributes">
