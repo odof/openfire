@@ -27,6 +27,28 @@
         </field>
     </record>
 
+    <record id="view_of_stock_picking_form" model="ir.ui.view">
+        <field name="name">of.stock.picking.form</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='min_date']" position="after">
+                <field name="date_done" string="Date réelle"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_of_move_picking_tree" model="ir.ui.view">
+        <field name="name">of.stock.move.tree</field>
+        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="stock.view_move_picking_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="of_product_stockable"/>
+            </xpath>
+        </field>
+    </record>
+
     <record id="of_stock_view_stock_config_settings_form" model="ir.ui.view">
         <field name="name">of.sale.stock.config.settings.form</field>
         <field name="model">stock.config.settings</field>
@@ -40,6 +62,13 @@
                         <span>Permettre de forcer la date de l'inventaire</span>
                     </div>
                 </group>
+            </xpath>
+            <xpath expr="//field[@name='group_warning_stock']" position="after">
+                <label for="of_forcer_date_move"/>
+                <div name="of_forcer_date_move">
+                    <field name="of_forcer_date_move" class="oe_inline"/>
+                    <span>Permettre de réserver et valider des mouvements de stock dans le passé</span>
+                </div>
             </xpath>
         </field>
     </record>
