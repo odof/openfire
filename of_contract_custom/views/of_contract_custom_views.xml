@@ -235,7 +235,7 @@
 
 
     <menuitem name="Contrats" id="menu_contract_custom_sale" parent="sales_team.menu_sales" sequence="150" action="of_contract_custom.action_contract"/>
-    <menuitem name="Contrats" id="menu_contract_custom_interventions" parent="of_planning.menu_of_planning" sequence="150" action="of_contract_custom.action_contract"/>
+    <menuitem name="Contrats" id="menu_contract_custom_interventions" parent="of_planning.menu_of_planning_intervention" sequence="150" action="of_contract_custom.action_contract"/>
     <menuitem name="Contrats" id="menu_config_contrat" parent="sale.prod_config_main" sequence="40"/>
 
 <!-- ******************************************************************************************* -->
@@ -526,7 +526,7 @@
     </record>
 
     <menuitem name="Lignes de contrats" id="menu_contract_lines_sale" parent="sales_team.menu_sales" sequence="151" action="action_contract_lines"/>
-    <menuitem name="Lignes de contrats" id="menu_contract_lines_interventions" parent="of_planning.menu_of_planning" sequence="151" action="action_contract_lines"/>
+    <menuitem name="Lignes de contrats" id="menu_contract_lines_interventions" parent="of_planning.menu_of_planning_intervention" sequence="151" action="action_contract_lines"/>
 
 <!-- ******************************************************************************************* -->
 <!-- ***************************************** ARTICLES **************************************** -->

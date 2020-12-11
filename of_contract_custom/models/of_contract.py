@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 from odoo.addons import decimal_precision as dp
 from odoo.exceptions import UserError
 from odoo.exceptions import ValidationError
+from odoo.addons.of_utils.models.of_utils import format_date
 
 
 class OfContract(models.Model):
@@ -30,10 +31,10 @@ class OfContract(models.Model):
         ], default='month', string=u"Fréquence de facturation", help="Interval de temps entre chaque facturation",
         required=True
     )
-    recurring_invoicing_payment = fields.Selection(
-        [('pre-paid', u'À Échoir'),
-         ('post-paid', u'Échu'),
-         ], default='pre-paid', string='Type de facturation', required=True,
+    recurring_invoicing_payment = fields.Selection([
+        ('pre-paid', u'À Échoir'),
+        ('post-paid', u'Échu'),
+        ], default='pre-paid', string='Type de facturation', required=True,
     )
     journal_id = fields.Many2one(
         'account.journal', string='Journal', default=lambda s: s._default_journal(),
@@ -915,7 +916,7 @@ class OfContractLine(models.Model):
             result = []
             for record in self:
                 result.append((
-                    record.id, record.name + " - %s, %s %s" % (record.address_id.street, record.address_id.zip, record.address_id.city)))
+                    record.id, record.name + " - %s" % record.address_id.name))
             return result
         else:
             return super(OfContractLine, self).name_get()
@@ -1397,8 +1398,10 @@ class OfContractProduct(models.Model):
         invoice_line_vals = invoice_line_new._convert_to_write(invoice_line_new._cache)
         # Get other invoice line values from product onchange
         name = self.name
-        if self.line_id.grouped:
-            name += "\n%s : %s" % (self.line_id.contract_id.name, self.line_id.name)
+        name += "\n%s" % self.line_id.contract_id.name
+        name += "\n%s, %s" % (self.product_id.name, self.line_id.name)
+        name += "\n%s, %s" % (self.line_id.address_id.name, self.line_id.partner_code_magasin)
+        name += "\n%s" % self.line_id.current_period_id.name
         invoice_line_vals.update({
             'quantity'     : self.qty_to_invoice,
             'uom_id'       : self.product_id.uom_id.id,
@@ -1465,10 +1468,11 @@ class OfContractPeriod(models.Model):
 
     @api.depends('date_start', 'date_end')
     def _compute_name(self):
+        lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
         for period in self:
             if not period.date_start or not period.date_end:
                 continue
-            period.name = u"Période %s / %s" % (period.date_start, period.date_end)
+            period.name = u"Période %s - %s" % (format_date(period.date_start, lang), format_date(period.date_end, lang))
 
     @api.depends('contract_id', 'contract_id.invoice_ids', 'date_start', 'date_end')
     def _compute_has_invoices(self):
