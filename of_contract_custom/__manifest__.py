@@ -58,10 +58,8 @@ Bloquer l'utilisation de la récurrence sur le modèle `of.service` car les cont
 """,
     "website": "www.openfire.fr",
     "depends": [
-        "of_contract",
         "of_service_parc_installe",
         "of_account",
-        "of_service_contrat",
         "of_planning_tournee",
         "of_project_issue",
         # "date_range",

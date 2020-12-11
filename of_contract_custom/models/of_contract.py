@@ -58,6 +58,7 @@ class OfContract(models.Model):
     last_invoicing_date = fields.Date(
         string=u"Date de dernière facturation", copy=False, compute="_compute_last_invoicing_date", store=True)
     intervention_count = fields.Integer(compute="_compute_intervention_count")
+    intervention_ids = fields.One2many(comodel_name='of.planning.intervention', inverse_name='contract_id', string="RDV(s) d'intervention")
 
     is_invoiceable = fields.Boolean(compute="compute_is_invoiceable", store=True)
     current_period_id = fields.Many2one(
@@ -523,6 +524,7 @@ class OfContractLine(models.Model):
     # company_id = fields.Many2one('res.company', string=u'Société', default=lambda self: self.env.user.company_id)
 
     partner_id = fields.Many2one('res.partner', related="contract_id.partner_id", string="Client payeur", readonly=True)
+    partner_code_magasin = fields.Char(string="Code magasin", related="partner_id.of_code_magasin", readonly=True)
     address_id = fields.Many2one('res.partner', string="Adresse d'intervention", required=True)
     address_street = fields.Char(string="Rue", related="address_id.street", readonly=True)
     address_street2 = fields.Char(string="Rue", related="address_id.street2", readonly=True)
@@ -906,6 +908,17 @@ class OfContractLine(models.Model):
                 parc_installe = parc_obj.search([('client_id', '=', self.partner_id.id)], limit=1)
             if parc_installe:
                 self.parc_installe_id = parc_installe
+
+    @api.multi
+    def name_get(self):
+        if self._context.get('display_address', False):
+            result = []
+            for record in self:
+                result.append((
+                    record.id, record.name + " - %s, %s %s" % (record.address_id.street, record.address_id.zip, record.address_id.city)))
+            return result
+        else:
+            return super(OfContractLine, self).name_get()
 
     @api.model
     def create(self, vals):

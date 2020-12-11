@@ -58,7 +58,8 @@
                             <field name="type_id" />
                             <field name="order_id" attrs="{'invisible': [('type_id','not in', [%(of_contract_custom.of_contract_custom_type_installation)d, %(of_contract_custom.of_contract_custom_type_sav)d])]}"/>
                             <field name="contract_id" attrs="{'invisible': [('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d, %(of_contract_custom.of_contract_custom_type_sav)d])]}"/>
-                            <field name="contract_line_id" attrs="{'invisible': [('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d, %(of_contract_custom.of_contract_custom_type_sav)d])]}"/>
+                            <field name="contract_line_id" context="{'display_address': True}"
+                                   attrs="{'invisible': [('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d, %(of_contract_custom.of_contract_custom_type_sav)d])]}"/>
                             <field name="contract_message" nolabel="1" colspan="2"/>
 <!--                            <field name="contract_message" nolabel="1" class="oe_inline oe_grey"/>-->
                         </group>
@@ -68,6 +69,7 @@
                         <group name="who" col="2" colspan="2" string="Qui" class="of_grey_background">
                             <group colspan="2">
                                 <field name="partner_id"/>
+                                <field name="partner_code_magasin"/>
                                 <field name="tag_ids" widget="many2many_tags"/>
                                 <field name="company_id"/>
                             </group>
@@ -79,6 +81,7 @@
                                     <div><field name="address_id"/></div>
                                     <field name="address_address"/>
                                 </div>
+                                <field name="partner_code_magasin"/>
                                 <field name="secteur_tech_id"/>
                             </group>
                         </group>

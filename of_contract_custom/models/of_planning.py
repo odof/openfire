@@ -35,8 +35,9 @@ class OfService(models.Model):
     type_id = fields.Many2one(
         comodel_name='of.service.type', string="Type", required=True,)
         # default=lambda s : s.env.ref('of_contract_custom.of_contract_custom_type_sav'))
+    partner_code_magasin = fields.Char(string="Code magasin", related="partner_id.of_code_magasin", readonly=True)
     contract_id = fields.Many2one(comodel_name='of.contract', string="Contrat")
-    contract_line_id = fields.Many2one(comodel_name='of.contract.line', string="Ligne de contrat", domain="[('contract_id','=',contract_id)]")
+    contract_line_id = fields.Many2one(comodel_name='of.contract.line', string="Ligne de contrat", domain="['|','|',('contract_id','=',contract_id),('partner_id','=',partner_id),('address_id','=',address_id)]")
     spec_date = fields.Char(string="Date", compute="_compute_spec_date")
     user_id = fields.Many2one(comodel_name='res.users', string="Utilisateur", default=lambda r:r.env.user)
     kanban_step_id = fields.Many2one(
@@ -66,6 +67,17 @@ class OfService(models.Model):
                     service.contract_message = "%s SAV restant(s) pour cette ligne de contrat" % count
                 elif service.type_id.id == sav_type.id and service.contract_line_id:
                     service.contract_message = "Cette ligne de contrat n'utilise pas l'option SAV"
+
+    @api.onchange('contract_id')
+    def onchange_contract_id(self):
+        if self.contract_id and self.contract_id.partner_id:
+            self.partner_id = self.contract_id.partner_id
+
+    @api.onchange('contract_line_id')
+    def onchange_contract_line_id(self):
+        if self.contract_line_id and self.contract_line_id.address_id:
+            self.address_id = self.contract_line_id.address_id
+            self.parc_installe_id = self.contract_line_id.parc_installe_id
 
     @api.onchange('type_id')
     def onchange_type_id(self):
@@ -142,4 +154,29 @@ class OfPlanningIntervention(models.Model):
         domain="service_id and [('service_ids','=',service_id)] or "
                "address_id and [('address_id','=',address_id)] or "
                "[]")
+    contract_id = fields.Many2one(
+            comodel_name='of.contract', string="Contrat",
+            domain="service_id and [('service_ids','=',service_id)] or "
+                   "partner_id and [('partner_id','=',partner_id)] or "
+                   "address_id and [('partner_id','=',address_id)] or "
+                   "[]")
+    partner_code_magasin = fields.Char(string="Code magasin", related="partner_id.of_code_magasin", readonly=True)
 
+    @api.onchange('contract_line_id')
+    def _onchange_contract_line_id(self):
+        pass
+
+    @api.onchange('contract_id')
+    def _onchange_contract_id(self):
+        if self.contract_line_id:
+            self.contract_id = self.contract_line_id.contract_id
+            self.address_id = self.contract_line_id.address_id or self.contract_line_id.partner_id
+
+    @api.onchange('service_id')
+    def _onchange_service_id(self):
+        super(OfPlanningIntervention, self)._onchange_service_id()
+        if self.service_id:
+            self.contract_line_id = self.service_id.contract_line_id
+            self.contract_id = self.service_id.contract_id
+            if self.service_id.order_id:
+                self.order_id = self.service_id.order_id
