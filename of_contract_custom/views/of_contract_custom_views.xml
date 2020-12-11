@@ -234,7 +234,8 @@
     </record>
 
 
-    <menuitem name="Contrats" id="contract_sale.menu_contract_sale" parent="sales_team.menu_sales" sequence="150" action="of_contract_custom.action_contract"/>
+    <menuitem name="Contrats" id="menu_contract_custom_sale" parent="sales_team.menu_sales" sequence="150" action="of_contract_custom.action_contract"/>
+    <menuitem name="Contrats" id="menu_contract_custom_interventions" parent="of_planning.menu_of_planning" sequence="150" action="of_contract_custom.action_contract"/>
     <menuitem name="Contrats" id="menu_config_contrat" parent="sale.prod_config_main" sequence="40"/>
 
 <!-- ******************************************************************************************* -->
@@ -397,6 +398,7 @@
                                 <field name="address_zip" class="o_address_city" />
                                 <field name="address_city" class="o_address_zip" />
                             </div>
+                            <field name="partner_code_magasin"/>
                             <field name="partner_id"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
@@ -523,7 +525,8 @@
         <field name="context">{'form_readonly': '[("state","in",["validated","cancel"])]', 'create': False}</field>
     </record>
 
-    <menuitem name="Lignes de contrats" id="menu_contract_lines" parent="sales_team.menu_sales" sequence="151" action="action_contract_lines"/>
+    <menuitem name="Lignes de contrats" id="menu_contract_lines_sale" parent="sales_team.menu_sales" sequence="151" action="action_contract_lines"/>
+    <menuitem name="Lignes de contrats" id="menu_contract_lines_interventions" parent="of_planning.menu_of_planning" sequence="151" action="action_contract_lines"/>
 
 <!-- ******************************************************************************************* -->
 <!-- ***************************************** ARTICLES **************************************** -->
