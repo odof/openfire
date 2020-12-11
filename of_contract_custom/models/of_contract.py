@@ -15,7 +15,7 @@ class OfContract(models.Model):
     active = fields.Boolean(default=True)
     invoice_ids = fields.One2many(comodel_name='account.invoice', inverse_name='of_contract_id', string="Factures")
     invoice_count = fields.Integer(string='Nombre de facture', compute='_get_invoice_count', readonly=True)
-    name = fields.Char(string="Nom", required=False, compute="_compute_name")
+    name = fields.Char(string="Nom", required=False, compute="_compute_name", store=True)
     reference = fields.Char(string=u"Référence", required=True)
     partner_id = fields.Many2one("res.partner", string="Client payeur", required=True)
     category_ids = fields.Many2many(
