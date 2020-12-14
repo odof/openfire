@@ -19,3 +19,28 @@ msgstr ""
 #: model:ir.ui.view,arch_db:account.partner_view_buttons
 msgid "<span class=\"o_stat_text\">Invoiced</span>"
 msgstr "<span class=\"o_stat_text\">Facturé HT</span>"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_of_wizard_invoice_edit_open_inv_account_id
+msgid "Account"
+msgstr "Compte"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_of_wizard_invoice_edit_open_inv_date_due
+msgid "Due Date"
+msgstr "Date d'échéance"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_of_wizard_invoice_edit_open_inv_name
+msgid "Reference/Description"
+msgstr "Référence/description"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_of_wizard_invoice_edit_open_inv_partner_shipping_id
+msgid "Delivery Address"
+msgstr "Adresse de livraison"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_of_wizard_invoice_edit_open_inv_user_id
+msgid "Salesperson"
+msgstr "Vendeur"
