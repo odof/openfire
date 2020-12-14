@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_of_wizard_invoice_edit_open" model="ir.ui.view">
+        <field name="name">of.wizard.invoice.edit.open.form</field>
+        <field name="model">of.wizard.invoice.edit.open</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="invoice_id" invisible="1"/>
+                    <field name="inv_account_id" readonly="0"/>
+                    <field name="inv_date_due" readonly="0"/>
+                    <field name="inv_name" readonly="0"/>
+                    <field name="inv_partner_shipping_id" readonly="0"/>
+                    <field name="inv_user_id" readonly="0"/>
+                </group>
+                <field name="line_ids">
+                    <tree string="Lignes de facture" create="false" delete="false" editable="bottom">
+                        <field name="invoice_line_id" invisible="1"/>
+                        <field name="name"/>
+                        <field name="account_id"/>
+                        <field name="price_unit"/>
+                        <field name="quantity"/>
+                        <field name="price_subtotal" sum="Total"/>
+                    </tree>
+                </field>
+            </form>
+            <footer>
+                <button name="action_dummy" string="Appliquer" type="object" class="oe_highlight"/>
+                <button string="Annuler" special="cancel" class="btn-default"/>
+            </footer>
+         </field>
+    </record>
+
+    <act_window id="action_of_wizard_invoice_edit_open"
+        name="Modifier la facture"
+        res_model="of.wizard.invoice.edit.open"
+        src_model="account.invoice"
+        groups="account.group_account_user"
+        view_mode="form"
+        view_type="form"
+        view_id="view_of_wizard_invoice_edit_open"
+        target="new"/>
+
+</odoo>
