@@ -27,7 +27,7 @@ class ResPartner(models.Model):
         return action
 
     @api.multi
-    def action_view_contrat(self):
+    def action_view_contrat_line(self):
         action = self.env.ref('of_contract_custom.of_contract_custom_open_contrat_line').read()[0]
         action['domain'] = [('supplier_id', 'in', self._ids)]
         return action

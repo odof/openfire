@@ -24,7 +24,6 @@
         </field>
     </record>
 
-
     <delete model="ir.ui.view" id="of_project_issue.of_project_issue_partner_form_view"/>
     <delete model="ir.ui.view" id="project_issue.res_partner_issues_button_view"/>
 
