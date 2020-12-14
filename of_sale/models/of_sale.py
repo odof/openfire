@@ -40,13 +40,6 @@ def product_uom_change(self):
 SOL.product_uom_change = product_uom_change
 
 
-class OfSaleOrderKanban(models.Model):
-    _name = 'of.sale.order.kanban'
-    _description = u"Étapes kanban des sale.order"
-
-    name = fields.Char(string=u"Nom de l'étape", required=True)
-
-
 class OfDocumentsJoints(models.AbstractModel):
     """ Classe abstraite qui permet d'ajouter les documents joints.
     Elle doit être surchargée pour ajouter d'autres rapports dans la fonction _allowed_reports
@@ -200,10 +193,6 @@ class SaleOrder(models.Model):
     )
     of_invoice_policy = fields.Selection(
         [('order', u'Quantités commandées'), ('delivery', u'Quantités livrées')], string="Politique de facturation"
-    )
-    of_kanban_step_id = fields.Many2one(
-        comodel_name='of.sale.order.kanban', string=u"Étape kanban",
-        default=lambda s: s.env.ref('of_sale.of_sale_order_kanban_new', raise_if_not_found=False)
     )
 
     @api.depends('of_echeance_line_ids', 'amount_total')

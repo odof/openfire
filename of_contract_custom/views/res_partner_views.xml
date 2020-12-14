@@ -14,7 +14,7 @@
                 <button class="oe_stat_button" type="object" name="action_view_contrat" icon="fa-book">
                     <field name="of_contrat_count" widget="statinfo" string="Contrats"/>
                 </button>
-                <button class="oe_stat_button" type="object" name="action_view_contrat" icon="fa-book" attrs="{'invisible': [('supplier','!=',True)]}">
+                <button class="oe_stat_button" type="object" name="action_view_contrat_line" icon="fa-book" attrs="{'invisible': [('supplier','!=',True)]}">
                     <field name="of_contrat_line_count" widget="statinfo" string="Lignes de contrat"/>
                 </button>
             </xpath>
@@ -31,25 +31,6 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='of_secteur_tech_id']" position="after">
                 <field name="of_prestataire_id" widget="selection"/>
-            </xpath>
-        </field>
-    </record>
-
-    <record id="of_contract_view_res_partner" model="ir.ui.view">
-        <field name="name">of_contract_view_res_partner</field>
-        <field name="model">res.partner</field>
-        <field name="inherit_id" ref="base.view_partner_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//div[@name='button_box']" position="inside">
-                <button class="oe_stat_button" type="object" name="action_view_contrat" icon="fa-book">
-                    <field name="of_contrat_count" widget="statinfo" string="Contrats"/>
-                </button>
-                <button class="oe_stat_button" type="object" name="action_view_contrat" icon="fa-book" attrs="{'invisible': [('supplier','!=',True)]}">
-                    <field name="of_contrat_line_count" widget="statinfo" string="Lignes de contrat"/>
-                </button>
-            </xpath>
-            <xpath expr="//field[@name='ref']" position="after">
-                <field name="of_code_magasin"/>
             </xpath>
         </field>
     </record>
