@@ -91,7 +91,7 @@ class OfWizardInvoiceEditOpen(models.TransientModel):
         invoice.move_id.write({'line_ids': line})
 
         # On revalide la pièce, ce qui peut aussi lancer d'autres recalculs, comme les lignes analytiques
-        invoice.move_id.post()
+        invoice.with_context(mail_notrack=True).move_id.post()
 
     @api.model
     def create(self, vals):

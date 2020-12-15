@@ -78,6 +78,12 @@ class AccountPayment(models.Model):
                 'name': ((self.partner_id.name or self.partner_id.parent_id.name or '')[:30]
                          + " " + (self.communication or '')).strip()
             })
+
+        # Ajout du paiement dans le RSE de la pièce comptable générée
+        message = u"Pièce créée depuis : <a href=# data-oe-model=account.payment data-oe-id=%d>%s</a>"\
+                  % (self.id, self.name)
+        self.move_line_ids.mapped('move_id').message_post(body=message)
+
         return res
 
     def _get_move_vals(self, journal=None):
