@@ -90,6 +90,9 @@
                     <field string="Commandes" name="of_order_count" widget="statinfo"/>
                 </button>
             </xpath>
+            <xpath expr="//field[@name='communication']" position="after">
+                <field name="order_ids" domain="[('partner_invoice_id', '=', partner_id)]" widget="many2many_tags"/>
+            </xpath>
         </field>
     </record>
 

@@ -44,7 +44,7 @@ class AccountPayment(models.Model):
 
     order_ids = fields.Many2many(
         'sale.order', 'sale_order_account_payment_rel', 'payment_id', 'order_id',
-        string="Commandes client", copy=False, readonly=True)
+        string="Commandes client", copy=False)
     of_order_count = fields.Integer(compute='_compute_of_order_count')
 
     @api.depends('order_ids')
