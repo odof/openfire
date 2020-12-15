@@ -69,6 +69,11 @@ class AccountPayment(models.Model):
                 + (self.communication or '')).strip()})  # Permet d'avoir toutes les lignes avec le même libellé
         else:
             self.move_line_ids.write({"name": client_line.name})
+
+        # Ajout du paiement dans le RSE de la pièce comptable générée
+        message = u"Pièce créée depuis : <a href=# data-oe-model=account.payment data-oe-id=%d>%s</a>"\
+                  % (self.id, self.name)
+        self.move_line_ids.mapped('move_id').message_post(body=message)
         return res
 
     @api.model
