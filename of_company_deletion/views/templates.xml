@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="assets_backend" name="OF Company Deletion Assets" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/of_company_deletion/static/src/js/form_view.js"></script>
+            <script type="text/javascript" src="/of_company_deletion/static/src/js/list_view.js"></script>
+        </xpath>
+   </template>
+</odoo>
