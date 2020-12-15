@@ -344,6 +344,11 @@ class AccountInvoice(models.Model):
                 ref = (ref + ' ' + (invoice.reference or '')).rstrip()
             invoice.move_id.line_ids.write({'name': ref})
             invoice.move_id.write({'ref': ref})
+
+            # Ajout de la facture dans le RSE de la pièce comptable générée
+            message = u"Pièce créée depuis : <a href=# data-oe-model=account.invoice data-oe-id=%d>%s</a>" \
+                      % (invoice.id, invoice.number)
+            invoice.move_id.message_post(body=message)
         return res
 
     @api.multi
@@ -494,9 +499,14 @@ class AccountInvoiceLine(models.Model):
 
 
 class AccountMove(models.Model):
-    _inherit = 'account.move'
+    _name = 'account.move'
+    _inherit = ['account.move', 'mail.thread']
 
     of_export = fields.Boolean(string=u"Exporté")
+    # Champs RSE
+    amount = fields.Monetary(track_visibility='always')
+    date = fields.Date(track_visibility='always')
+    journal_id = fields.Many2one(track_visibility='always')
 
     # Lors d'une saisie d'une pièce comptable, pour préremplir avec la date de la dernière écriture du journal.
     @api.onchange('journal_id')
@@ -507,6 +517,13 @@ class AccountMove(models.Model):
                 order='date DESC', limit=1)
             if move:
                 self.date = move.date
+
+    @api.multi
+    def post(self):
+        result = super(AccountMove, self).post()
+        if not self._context.get('mail_notrack'):
+            self.message_post(u"Pièce comptabilisée")
+        return result
 
 
 class AccountMoveLine(models.Model):
