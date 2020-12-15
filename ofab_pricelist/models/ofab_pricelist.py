@@ -262,13 +262,18 @@ class SaleOrderLine(models.Model):
             if self.of_is_kit:
                 self.price_unit = (self.kit_id and self.kit_id.cost_comps or 0) * self.of_coef * factor
             else:
-                purchase_factor = self.product_id and self.product_id.uom_po_id and self.product_id.uom_po_id.factor or 1
-                self.price_unit = (self.product_id and self.product_id.of_seller_price or 0) * self.of_coef * factor * purchase_factor
+                purchase_factor = self.product_id and self.product_id.uom_po_id and self.product_id.uom_po_id.factor \
+                                  or 1
+                if self.env['ir.values'].get_default('sale.config.settings', 'of_coef_method') == 'cost':
+                    self.price_unit = self.purchase_price * self.of_coef * factor * purchase_factor
+                else:
+                    self.price_unit = (self.product_id and self.product_id.of_seller_price or 0) * self.of_coef * \
+                                      factor * purchase_factor
 
-    @api.onchange('of_coef', 'product_id.of_seller_price')
+    @api.onchange('of_coef', 'product_id.of_seller_price', 'purchase_price')
     def onchange_of_coef(self):
         """ Permet de recalculer le prix si le coefficient est utilisé 
-        et que le coefficient ou le prix d'achat est modifié
+        et que le coefficient, le prix d'achat ou le coût est modifié
         """
         if self.of_coef_usage:
             self.product_uom_change()
@@ -289,3 +294,17 @@ class SaleOrderLine(models.Model):
                 uom=self.product_uom.id
             )
             self.price_unit = self.env['account.tax']._fix_tax_included_price_company(self._get_display_price(product), product.taxes_id, self.tax_id, self.company_id)
+
+
+class SaleConfigSettings(models.TransientModel):
+    _inherit = 'sale.config.settings'
+
+    of_coef_method = fields.Selection(
+        selection=[('purchase', u"Applique le coefficient sur le prix d'achat de l'article"),
+                   ('cost', u"Applique le coefficient sur le coût de l'article")],
+        string=u"(OF) Utilisation du coefficient", required=True, default='purchase')
+
+    @api.multi
+    def set_of_coef_method_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_coef_method', self.of_coef_method)
