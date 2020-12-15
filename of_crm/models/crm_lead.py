@@ -489,7 +489,7 @@ class OFCRMActivity(models.Model):
 
     active = fields.Boolean(string='Actif', default=True)
     title = fields.Char(string=u"Résumé", required=True)
-    opportunity_id = fields.Many2one(comodel_name='crm.lead', string=u"Opportunité", required=True)
+    opportunity_id = fields.Many2one(comodel_name='crm.lead', string=u"Opportunité", required=True, ondelete='cascade')
     type_id = fields.Many2one(comodel_name='crm.activity', string=u"Activité", required=True)
     date = fields.Datetime(string=u"Date", required=True)
     state = fields.Selection(

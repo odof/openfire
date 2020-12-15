@@ -229,7 +229,7 @@ class OfPlanningTournee(models.Model):
     # Conservé quelques jours pour la transtion des données.
     # À supprimer par la suite.
     equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe')
-    employee_id = fields.Many2one('hr.employee', string=u'Intervenant', required=True)
+    employee_id = fields.Many2one('hr.employee', string=u'Intervenant', required=True, ondelete='cascade')
     employee_other_ids = fields.Many2many(
         'hr.employee', 'tournee_employee_other_rel', 'tournee_id', 'employee_id', string=u'Équipiers', required=True,
         domain="[('of_est_intervenant', '=', True)]")

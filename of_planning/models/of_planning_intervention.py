@@ -1238,7 +1238,8 @@ class OfPlanningIntervention(models.Model):
 class OfPlanningInterventionLine(models.Model):
     _name = "of.planning.intervention.line"
 
-    intervention_id = fields.Many2one('of.planning.intervention', string='Intervention', required=True)
+    intervention_id = fields.Many2one(
+        'of.planning.intervention', string='Intervention', required=True, ondelete='cascade')
     partner_id = fields.Many2one('res.partner', related='intervention_id.partner_id')
     company_id = fields.Many2one('res.company', related='intervention_id.company_id', string=u'Société')
     currency_id = fields.Many2one('res.currency', string='Currency', readonly=True, related="company_id.currency_id")
