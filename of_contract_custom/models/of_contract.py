@@ -1338,8 +1338,8 @@ class OfContractProduct(models.Model):
         """ Calcul de la qté à facturer """
         for product_line in self:
             line = product_line.line_id
-            qty_per_year = product_line.quantity * line.nbr_interv
-            qty_per_period = product_line.quantity * line.nbr_interv
+            qty_per_year = product_line.quantity
+            qty_per_period = product_line.quantity
             product_line.qty_per_year = qty_per_year
             product_line.qty_per_period = qty_per_period
             last_day = product_line.line_id.current_period_id.date_end
