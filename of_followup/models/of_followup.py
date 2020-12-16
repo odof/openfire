@@ -359,7 +359,7 @@ class OFFollowupProject(models.Model):
     @api.multi
     def action_view_interventions(self):
         self.ensure_one()
-        return self.order_id.action_view_interventions()
+        return self.order_id.action_view_intervention()
 
     @api.multi
     def action_view_to_schedule(self):
