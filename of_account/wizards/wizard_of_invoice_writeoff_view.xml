@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_of_wizard_invoice_writeoff" model="ir.ui.view">
+        <field name="name">of.wizard.invoice.writeoff.form</field>
+        <field name="model">of.wizard.invoice.writeoff</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="invoice_ids" invisible="1"/>
+                    <field name="journal_id"/>
+                    <field name="name"/>
+                    <field name="date"/>
+                    <field name="credit"/>
+                    <field name="debit"/>
+                    <field name="residual"/>
+                    <field name="account_debit_id" attrs="{'invisible':[('residual','>=',0)]}"/>
+                    <field name="account_credit_id" attrs="{'invisible':[('residual','&lt;=',0)]}"/>
+                </group>
+            </form>
+            <footer>
+                <button name="action_process" string="Appliquer" type="object" class="oe_highlight"/>
+                <button string="Annuler" special="cancel" class="btn-default"/>
+            </footer>
+         </field>
+    </record>
+
+    <act_window id="action_of_wizard_invoice_writeoff"
+        key2="client_action_multi"
+        name="Solder les factures"
+        res_model="of.wizard.invoice.writeoff"
+        src_model="account.invoice"
+        groups="account.group_account_manager"
+        view_mode="form"
+        view_type="form"
+        view_id="view_of_wizard_invoice_writeoff"
+        target="new"/>
+
+</odoo>
