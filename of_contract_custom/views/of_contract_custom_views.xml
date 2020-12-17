@@ -113,6 +113,7 @@
                             </div>
                             <field name="journal_id" attrs="{'readonly': [('invoice_count','>',0)]}"/>
                             <field name="fiscal_position_id"/>
+                            <field name="payment_term_id"/>
                             <field name="grouped"/>
                             <field name="recurring_next_date"/>
                             <field name="revision"/>

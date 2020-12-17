@@ -75,6 +75,7 @@ Bloquer l'utilisation de la récurrence sur le modèle `of.service` car les cont
         'views/project_issue_views.xml',
         'views/res_partner_views.xml',
         'views/sale_views.xml',
+        'reports/of_contract_invoice_report_templates.xml',
         'security/ir.model.access.csv',
         'security/of_contract_custom_security.xml',
         'wizards/of_contract_avenant_wizard_views.xml',

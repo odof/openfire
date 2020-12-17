@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<odoo>
+
+<template id="of_contract_report_invoice_document" inherit_id="account.report_invoice_document">
+    <xpath expr="//div[@name='vos_references']/div/div[@id='informations']" position="inside">
+        <div name="contrat_period" t-if="o.of_contract_id" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+            <strong>Période :</strong>
+            <p t-field="o.of_contract_period"/>
+        </div>
+        <div t-if="o.of_contract_id" style="display: table-cell; width: 4px;"/>
+    </xpath>
+</template>
+
+
+</odoo>
