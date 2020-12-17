@@ -87,6 +87,7 @@ class OfContract(models.Model):
     service_ids = fields.One2many(
         comodel_name='of.service', compute="_compute_service_ids", string="Interventions à programmer")
     grouped = fields.Boolean(string="Regrouper la facturation")
+    payment_term_id = fields.Many2one('account.payment.term', string=u'Conditions de règlement')
 
     @api.model
     def _default_journal(self):
@@ -326,7 +327,7 @@ class OfContract(models.Model):
         return self.line_ids.filtered(lambda s: s.state == 'draft').bouton_valider()
 
     @api.multi
-    def _prepare_invoice(self, do_raise=True):
+    def _prepare_invoice(self, do_raise=True, intervention_id=False):
         """ Permet de récupérer un dictionnaire de valeur pour créer une facture """
         self.ensure_one()
         if not self.partner_id:
@@ -362,15 +363,18 @@ class OfContract(models.Model):
             'currency_id': currency.id,
             'journal_id': journal.id,
             'date_invoice': self.recurring_next_date,
-            'origin': self.name,
+            'origin': 'Contrat %s' % self.name,
             'company_id': self.company_id.id,
             'of_contract_id': self.id,
             'user_id': self.partner_id.user_id.id,
             'fiscal_position_id': self.fiscal_position_id.id,
+            'payment_term_id': self.payment_term_id.id,
+            'of_intervention_id': intervention_id,
         })
         # Get other invoice values from partner onchange
         invoice._onchange_partner_id()
         invoice.fiscal_position_id = self.fiscal_position_id.id
+        invoice.payment_term_id = self.payment_term_id.id
         return invoice._convert_to_write(invoice._cache)
 
     @api.multi
@@ -403,7 +407,18 @@ class OfContract(models.Model):
                 invoices |= invoice
         if single_lines:
             for line in single_lines:
-                invoice_vals = self._prepare_invoice(do_raise=do_raise)
+                intervention_id = False
+                if line.frequency_type == 'date':
+                    last_invoicing = line.last_invoicing_date
+                    if not last_invoicing:
+                        date_start = fields.Date.from_string(line.date_contract_start)
+                        last_invoicing = fields.Date.to_string(date_start - relativedelta(days=1))
+                    interventions = line.intervention_ids.filtered(
+                        lambda i: i.state == 'done' and i.date_date > last_invoicing)
+                    if interventions:
+                        interventions = interventions.sorted('date_date')
+                        intervention_id = interventions[0].id
+                invoice_vals = self._prepare_invoice(do_raise=do_raise, intervention_id=intervention_id)
                 if not invoice_vals:
                     continue
                 lines = line._add_invoice_lines()
