@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api
+from odoo import models, fields, api, SUPERUSER_ID
 from odoo.exceptions import UserError
 
 
@@ -69,6 +69,19 @@ class ProductTemplate(models.Model):
         for product in self:
             product.sales_count = sum(
                 p.sales_count for p in product.with_context(active_test=False).product_variant_ids)
+
+    @api.multi
+    def write(self, vals):
+        if self._uid != SUPERUSER_ID:
+            # Seul l'admin a le droit de configurer les articles d'acompte
+            acompte_categ_id = self.env['ir.values'].get_default(
+                'sale.config.settings', 'of_deposit_product_categ_id_setting')
+            if vals.get('categ_id') == acompte_categ_id:
+                raise UserError(
+                    u"Seul l'administrateur a le droit de placer des articles dans la catégorie des acomptes.")
+            if self.search([('id', 'in', self.ids), ('categ_id', '=', acompte_categ_id)], limit=1):
+                raise UserError(u"Seul l'administrateur a le droit de modifier les articles d'acompte.")
+        return super(ProductTemplate, self).write(vals)
 
     @api.multi
     def action_view_sales(self):
