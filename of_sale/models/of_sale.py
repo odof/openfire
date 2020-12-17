@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
+from odoo import models, fields, api, _, SUPERUSER_ID
 import odoo.addons.decimal_precision as dp
 from odoo.addons.sale.models.sale import SaleOrderLine as SOL
 from odoo.tools import float_compare, float_is_zero
@@ -1566,6 +1566,23 @@ class ResPartner(models.Model):
     of_invoice_policy = fields.Selection(
         [('order', u'Quantités commandées'), ('delivery', u'Quantités livrées')],
         string="Politique de facturation")
+
+
+class ProductTemplate(models.Model):
+    _inherit = 'product.template'
+
+    @api.multi
+    def write(self, vals):
+        if self._uid != SUPERUSER_ID:
+            # Seul l'admin a le droit de configurer les articles d'acompte
+            acompte_categ_id = self.env['ir.values'].get_default(
+                'sale.config.settings', 'of_deposit_product_categ_id_setting')
+            if vals.get('categ_id') == acompte_categ_id:
+                raise UserError(
+                    u"Seul l'administrateur a le droit de placer des articles dans la catégorie des acomptes.")
+            if self.search([('id', 'in', self.ids), ('categ_id', '=', acompte_categ_id)], limit=1):
+                raise UserError(u"Seul l'administrateur a le droit de modifier les articles d'acompte.")
+        return super(ProductTemplate, self).write(vals)
 
 
 class ProductPricelist(models.Model):
