@@ -140,7 +140,8 @@ class SaleOrderLine(models.Model):
         price = frm_cur.with_context(ctx).compute(purchase_price, to_cur, round=False)
         return price
 
-    @api.depends('kit_id.kit_line_ids')
+    @api.depends('kit_id.kit_line_ids', 'kit_id', 'kit_id.kit_line_ids.cost_unit',
+                 'kit_id.kit_line_ids.price_unit', 'kit_id.kit_line_ids.qty_per_kit')
     def _compute_price_comps(self):
         for line in self:
             if line.kit_id:
@@ -436,6 +437,12 @@ class SaleOrderLine(models.Model):
                 line.of_difference = float_compare(line.kit_id.price_comps, line.price_unit, 2)
             else:
                 line.of_difference = False
+
+    @api.multi
+    def refresh_cost_comps(self):
+        for line in self:
+            if line.kit_id:
+                line.purchase_price = line.cost_comps
 
 
 class OfSaleOrderKit(models.Model):

@@ -325,3 +325,19 @@ class StockMove(models.Model):
             if qty_delivered != 0:
                 line.qty_delivered = qty_delivered
         return result
+
+
+class PurchaseOrder(models.Model):
+    _inherit = 'purchase.order'
+
+    @api.multi
+    def button_confirm(self):
+        procurement_obj = self.env['procurement.order']
+        super(PurchaseOrder, self).button_confirm()
+        if self.env['ir.values'].get_default('sale.config.settings', 'of_recalcul_pa'):
+            for line in self.order_line:
+                procurements = procurement_obj.search([('purchase_line_id', '=', line.id)])
+                moves = procurements.mapped('move_dest_id')
+                kit_sale_lines = moves.mapped('procurement_id').mapped('of_sale_comp_id')
+                kit_sale_lines.write({'cost_unit': line.price_unit * line.product_id.property_of_purchase_coeff})
+                kit_sale_lines.mapped('kit_id').mapped('order_line_id').refresh_cost_comps()

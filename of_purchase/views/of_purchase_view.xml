@@ -159,4 +159,19 @@
         </field>
     </record>
 
+    <record id="of_purchase_view_sale_config_settings" model="ir.ui.view">
+        <field name="name">of sale settings</field>
+        <field name="model">sale.config.settings</field>
+        <field name="inherit_id" ref="sale.view_sales_config"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='quotations_sales']" position="inside">
+                <label for="of_recalcul_pa"/>
+                <div name="of_recalcul_pa">
+                  <field name="of_recalcul_pa" class="oe_inline"/>
+                  <span>Recalculer le prix d'achat des lignes de commandes en fonction de la commande fournisseur liée</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
