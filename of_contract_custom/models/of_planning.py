@@ -15,8 +15,8 @@ class OfPlanningPlannification(models.AbstractModel):
     _name = 'of.planning.plannification'
 
     nbr_interv = fields.Integer(string="Nombre de visites", help=u"Nombre de RDV d'interventions dans l'année", required=True)
-    mois_reference_ids = fields.Many2many(comodel_name='of.mois', string=u"Mois de visite")
-    tache_id = fields.Many2one(comodel_name='of.planning.tache', string=u"Tâche")
+    mois_reference_ids = fields.Many2many(comodel_name='of.mois', string=u"Mois de visite", required=True)
+    tache_id = fields.Many2one(comodel_name='of.planning.tache', string=u"Tâche", required=True)
 
     @api.multi
     def _generate_services(self):
@@ -32,10 +32,15 @@ class OfPlanningPlannification(models.AbstractModel):
 class OfService(models.Model):
     _inherit = 'of.service'
 
+    @api.model
+    def _domain_employee_ids(self):
+        return [('of_est_intervenant', '=', True)]
+
     type_id = fields.Many2one(
         comodel_name='of.service.type', string="Type", required=True,)
         # default=lambda s : s.env.ref('of_contract_custom.of_contract_custom_type_sav'))
     partner_code_magasin = fields.Char(string="Code magasin", related="partner_id.of_code_magasin", readonly=True)
+    supplier_id = fields.Many2one(comodel_name='res.partner', string="Prestataire", domain="[('supplier','=',True)]")
     contract_id = fields.Many2one(comodel_name='of.contract', string="Contrat")
     contract_line_id = fields.Many2one(comodel_name='of.contract.line', string="Ligne de contrat", domain="['|','|',('contract_id','=',contract_id),('partner_id','=',partner_id),('address_id','=',address_id)]")
     spec_date = fields.Char(string="Date", compute="_compute_spec_date")
@@ -45,6 +50,9 @@ class OfService(models.Model):
         domain="[('type_ids','=',type_id)]"
     )
     contract_message = fields.Char(string="Infos SAV du contrat", compute="_compute_contract_message")
+    employee_ids = fields.Many2many(
+        comodel_name='hr.employee', string="Intervenants", domain=lambda self: self._domain_employee_ids()
+    )
 
     @api.depends()
     def _compute_spec_date(self):
@@ -67,6 +75,13 @@ class OfService(models.Model):
                     service.contract_message = "%s SAV restant(s) pour cette ligne de contrat" % count
                 elif service.type_id.id == sav_type.id and service.contract_line_id:
                     service.contract_message = "Cette ligne de contrat n'utilise pas l'option SAV"
+
+    @api.onchange('address_id', 'tache_id')
+    def _onchange_address_id(self):
+        super(OfService, self)._onchange_address_id()
+        if self.address_id:
+            if self.address_id.of_prestataire_id:
+                self.supplier_id = self.address_id.of_prestataire_id
 
     @api.onchange('contract_id')
     def onchange_contract_id(self):
@@ -99,7 +114,8 @@ class OfService(models.Model):
     def get_action_view_intervention_context(self, action_context={}):
         if self.contract_line_id:
             action_context.update({'default_contract_line_id': self.contract_line_id.id})
-        return super(OfService, self).get_action_view_intervention_context(action_context)
+            action_context.update({'default_employee_ids': [(6, 0, [emp.id for emp in self.employee_ids])]})
+            return super(OfService, self).get_action_view_intervention_context(action_context)
 
     @api.multi
     def action_view_contract(self):

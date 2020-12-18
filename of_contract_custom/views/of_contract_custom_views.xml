@@ -361,7 +361,6 @@
                             states="draft"/>
                     <button name="bouton_brouillon" type="object" class="btn-primary" string="Brouillon"
                             attrs="{'invisible': ['|','|',('invoice_count','&gt;',0),('intervention_count','&gt;',0),('state','!=','validated')]}"/>
-                    <button name="generate_services" type="object" class="btn-primary" string="Générer interventions" states="validated"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,validated,cancel"/>
                 </header>
                 <sheet>
@@ -469,10 +468,10 @@
                             <group col="4">
                                 <group colspan="2" name="planif" string="Planification">
                                     <field name="warning_planif" invisible="1"/>
-                                    <field name="tache_id" attrs="{'required': [('nbr_interv', '>', 0)]}"/>
+                                    <field name="tache_id"/>
                                     <field name="nbr_interv"/>
                                     <field name="mois_reference_ids" widget="many2many_tags"
-                                           attrs="{'form_readonly_exception': True, 'required': [('nbr_interv', '>', 0)]}"/>
+                                           attrs="{'form_readonly_exception': True}"/>
                                 </group>
                                 <group colspan="2" name="sav" string="Sav">
                                     <field name="use_sav"/>
