@@ -480,7 +480,7 @@
                                     <field name="remaining_sav" attrs="{'invisible': [('use_sav','!=',True)]}"/>
                                 </group>
                                 <separator string="Notes" colspan="4"/>
-                                <field name="note" nolabel="1" colspan="4"/>
+                                <field name="notes" nolabel="1" colspan="4"/>
                             </group>
                             <group name="services" string="Tableau de suivi">
                                 <field name="service_ids" nolabel="1" readonly="1">

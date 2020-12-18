@@ -11,7 +11,7 @@ class ResPartner(models.Model):
     of_contrat_line_count = fields.Integer(compute="_compute_of_contrat_count", string="Nombre de ligne de contrat")
     of_contract_line_count_ids = fields.One2many(
         comodel_name='of.contract.line', inverse_name='supplier_id', string="Lignes de contrat")
-    of_prestataire_id = fields.Many2one(comodel_name='res.partner', string="Prestataire")
+    of_prestataire_id = fields.Many2one(comodel_name='res.partner', string="Prestataire", domain="[('supplier','=',True)]")
     of_code_magasin = fields.Char(string="Code magasin")
 
     @api.depends('of_contrat_ids', 'of_contract_line_count_ids')

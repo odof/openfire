@@ -655,7 +655,7 @@ class OfContractLine(models.Model):
     use_sav = fields.Boolean(string="Utilise les SAV")
     sav_count = fields.Integer(string="Nombre de visites SAV")
     remaining_sav = fields.Integer(string="Nbr. visites SAV restantes", compute="_compute_remaining_sav")
-    note = fields.Text(string="Notes")
+    notes = fields.Text(string="Notes")
 
     @api.depends('code_de_ligne',
                  'line_avenant_id', 'line_avenant_id.code_de_ligne',
@@ -948,11 +948,12 @@ class OfContractLine(models.Model):
     def write(self, vals):
         """ Affectation du numéro si passage à l'état 'validated' """
         fields_allowed = ['state', 'supplier_id', 'afficher_facturation', 'grouped', 'mois_reference_ids', 'note']
-        for line in self:
-            if line.state == 'validated' and any([key not in fields_allowed for key in vals.keys()]):
-                fields_string = '\n'.join([self._fields[field].string for field in fields_allowed])
-                raise UserError(u'Pour les lignes de contrats validées, '
-                                u'vous ne pouvez modifier que les champs suivants :\n%s' % fields_string)
+        if not self._context.get('no_verification'):
+            for line in self:
+                if line.state == 'validated' and any([key not in fields_allowed for key in vals.keys()]):
+                    fields_string = '\n'.join([self._fields[field].string for field in fields_allowed])
+                    raise UserError(u'Pour les lignes de contrats validées, '
+                                    u'vous ne pouvez modifier que les champs suivants :\n%s' % fields_string)
         res = super(OfContractLine, self).write(vals)
         self._affect_number()
         for line in self:
@@ -991,7 +992,7 @@ class OfContractLine(models.Model):
         sequence = self.env.ref('of_contract_custom.of_contract_custom_sequence')
         for contract_line in self:
             if contract_line.state == 'validated' and not contract_line.code_de_ligne:
-                contract_line.write({'code_de_ligne': sequence.next_by_id()})
+                contract_line.with_context(no_verification=True).write({'code_de_ligne': sequence.next_by_id()})
 
     @api.multi
     def bouton_valider(self):
@@ -1160,7 +1161,7 @@ class OfContractLine(models.Model):
                     'recurrence'      : False,
                     'contract_id'     : line.contract_id.id,
                     'contract_line_id': line.id,
-                    'note'            : line.note,
+                    'notes'            : line.note,
                     }
                 new_service = service_obj.new(service_vals)
                 new_service._onchange_tache_id()
@@ -1427,8 +1428,8 @@ class OfContractProduct(models.Model):
         invoice_line_vals = invoice_line_new._convert_to_write(invoice_line_new._cache)
         # Get other invoice line values from product onchange
         name = ""
-        name += "%s, %s" % (self.name, self.line_id.name)
-        name += "\n%s, %s" % (self.line_id.address_id.name, self.line_id.partner_code_magasin)
+        name += "%s, %s" % (self.name or '', self.line_id.name)
+        name += "\n%s, %s" % (self.line_id.address_id.name or '', self.line_id.partner_code_magasin or '')
         invoice_line_vals.update({
             'quantity'     : self.qty_to_invoice,
             'uom_id'       : self.product_id.uom_id.id,

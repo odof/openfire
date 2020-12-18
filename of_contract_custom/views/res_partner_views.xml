@@ -30,7 +30,7 @@
         <field name="inherit_id" ref="of_base_location.of_base_location_partner_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='of_secteur_tech_id']" position="after">
-                <field name="of_prestataire_id" widget="selection"/>
+                <field name="of_prestataire_id" options='{"no_open": True, "no_create": True}'/>
             </xpath>
         </field>
     </record>
