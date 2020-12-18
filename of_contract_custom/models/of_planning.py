@@ -145,6 +145,22 @@ class OfService(models.Model):
         else:
             return self.env['of.popup.wizard'].popup_return(message=u"Aucune intervention liée.")
 
+    @api.model
+    def of_get_report_name(self, docs):
+        return "Demande d'intervention"
+
+    @api.model
+    def of_get_report_number(self, docs):
+        return ""
+
+    @api.model
+    def of_get_report_date(self, docs):
+        if len(docs) == 1:
+            lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
+            return "%s " % format_date(docs.date_next, lang)
+            # return "%s - %s" % (format_date(docs.date_next, lang), format_date(docs.date_fin, lang))
+        return ""
+
 
 class OfServiceType(models.Model):
     _name = 'of.service.type'

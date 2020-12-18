@@ -1171,13 +1171,16 @@ class OfContractLine(models.Model):
                         'recurrence'      : False,
                         'contract_id'     : line.contract_id.id,
                         'contract_line_id': line.id,
-                        'notes'           : line.note,
+                        'note'            : line.notes,
                         'supplier_id'     : line.supplier_id.id or False,
+                        'company_id'      : line.company_id.id,
                         }
                     new_service = service_obj.new(service_vals)
                     new_service._onchange_tache_id()
                     new_service.update({'date_next': date_service})
                     new_service._onchange_date_next()
+                    if line.parc_installe_id:
+                        new_service.update({'parc_installe_id': line.parc_installe_id.id})
                     new_service_vals = new_service._convert_to_write(new_service._cache)
                     service_obj.create(new_service_vals)
 

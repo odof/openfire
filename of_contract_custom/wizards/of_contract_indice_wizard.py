@@ -40,6 +40,6 @@ class OFContractIndiceWizard(models.TransientModel):
                     if not additionnal_prices:
                         continue
                     new_price = previous_price + sum(additionnal_prices)
-                    product_line.write({'price_unit': new_price, 'price_unit_prec': previous_price, 'date_indexed': fields.Date.today()})
+                    product_line.with_context(no_verification=True).write({'price_unit': new_price, 'price_unit_prec': previous_price, 'date_indexed': fields.Date.today()})
                     products_done += 1
         return self.env['of.popup.wizard'].popup_return(message=u"%s articles ont été indéxés." % products_done, titre="Indexation")
