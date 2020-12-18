@@ -23,5 +23,5 @@ class SaleOrder(models.Model):
     def function_set_kanban_step_id(self):
         step = self.env.ref('of_sale.of_sale_order_kanban_new', raise_if_not_found=False)
         if step:
-            self._cr.execute('UPDATE %s SET of_kanban_step_id = %s', (self._table, step.id))
+            self._cr.execute('UPDATE sale_order SET of_kanban_step_id = %s', (step.id,))
 
