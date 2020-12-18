@@ -19,6 +19,7 @@ class OfAccountInvoice(models.Model):
     of_contract_id = fields.Many2one('of.contract', string="(OF) Contrat")
     of_contract_period = fields.Char(string=u"Période du contrat", compute='_compute_of_contract_period')
     of_intervention_id = fields.Many2one('of.planning.intervention', string="RDV d'intervention")
+    of_address_id = fields.Many2one('res.partner', string="Adresse d'intervention", compute='_compute_of_address_id')
 
     @api.depends('of_contract_id', 'date_invoice', 'of_intervention_id')
     def _compute_of_contract_period(self):
@@ -46,7 +47,13 @@ class OfAccountInvoice(models.Model):
                         invoice.of_contract_period = "%s - %s" % (format_date(fields.Date.to_string(period_start), lang),
                                                                   format_date(invoice.date_invoice, lang))
 
-
+    @api.depends('invoice_line_ids', 'invoice_line_ids.of_contract_line_id', 'invoice_line_ids.of_contract_line_id.address_id')
+    def _compute_of_address_id(self):
+        for invoice in self:
+            if invoice.invoice_line_ids:
+                addresses = invoice.invoice_line_ids.mapped('of_contract_line_id').mapped('address_id')
+                if len(addresses) == 1:
+                    invoice.of_address_id = addresses
 
 
 class OfAccountInvoiceLine(models.Model):

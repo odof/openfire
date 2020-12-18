@@ -68,6 +68,8 @@ Bloquer l'utilisation de la récurrence sur le modèle `of.service` car les cont
     "category": "OpenFire",
     "data": [
         'data/of_contract_custom_data.xml',
+        'views/account_views.xml',
+        'views/of_better_zip_views.xml',
         'views/of_contract_custom_views.xml',
         'views/of_parc_installe_views.xml',
         'views/of_planning_views.xml',
