@@ -31,6 +31,6 @@ class OFContractLineCancelWizard(models.TransientModel):
         if self.contract_line_id.last_invoicing_date and self.date_end < self.contract_line_id.last_invoicing_date:
             raise UserError(u"Vous ne pouvez sélectionner une date de fin antérieure à la date de dernière facturation. "
                             u"(%s)" % format_date(self.contract_line_id.last_invoicing_date, lang))
-        self.contract_line_id.write({
+        self.contract_line_id.with_context(no_verification=True).write({
             'date_end'       : self.date_end,
             })
