@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models, _
-from odoo.tools.float_utils import float_compare
+from odoo import api, _
 from odoo.addons.stock.models.stock_picking import Picking
+from odoo.exceptions import UserError
 
 
 @api.multi
@@ -66,10 +66,10 @@ def do_new_transfer(self):
             pack_operations_delete.unlink()
 
         # OF début modification openfire
-        view = self.env.ref('of_stock.view_of_stock_date_confirmation')
-        wiz = self.env['of.stock.date.confirmation'].create({'pick_id': pick.id})
         forcer_date_move = self.env['ir.values'].get_default('stock.config.settings', 'of_forcer_date_move')
         if forcer_date_move:
+            view = self.env.ref('of_stock.view_of_stock_date_confirmation')
+            wiz = self.env['of.stock.date.confirmation'].create({'pick_id': pick.id})
             return {
                 'name': _('Confirmer la date'),
                 'type': 'ir.actions.act_window',

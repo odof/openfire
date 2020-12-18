@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
-
 from odoo import api, fields, models, _
 from odoo.tools import float_utils
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
@@ -88,7 +86,7 @@ def action_start(self):
             vals['date'] = fields.Datetime.now()
         if (inventory.filter != 'partial') and not inventory.line_ids:
             vals.update(
-                    {'line_ids': [(0, 0, line_values) for line_values in inventory._get_inventory_lines_values()]})
+                {'line_ids': [(0, 0, line_values) for line_values in inventory._get_inventory_lines_values()]})
         inventory.write(vals)
     return True
 
@@ -100,8 +98,8 @@ Inventory.prepare_inventory = action_start
 @api.model
 def _quant_create_from_move(self, qty, move, lot_id=False, owner_id=False, src_package_id=False, dest_package_id=False,
                             force_location_from=False, force_location_to=False):
-    '''Create a quant in the destination location and create a negative
-    quant in the source location if it's an internal location. '''
+    """Create a quant in the destination location and create a negative
+    quant in the source location if it's an internal location. """
     inventory_date = self._context.get('inventory_date', False)
     force_date = self._context.get('force_date_done', False)
     if inventory_date:
@@ -109,7 +107,7 @@ def _quant_create_from_move(self, qty, move, lot_id=False, owner_id=False, src_p
     elif force_date:
         in_date = force_date
     else:
-        in_date = datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+        in_date = fields.Datetime.now()
     price_unit = move.get_price_unit()
     location = force_location_to or move.location_dest_id
     rounding = move.product_id.uom_id.rounding
@@ -348,9 +346,11 @@ class Inventory(models.Model):
 
     @api.multi
     def action_done(self):
-        return super(Inventory, self.with_context(
-                inventory_date=self.env['ir.values'].get_default(
-                        'stock.config.settings', 'of_forcer_date_inventaire'))).action_done()
+        return super(
+            Inventory,
+            self.with_context(
+                inventory_date=self.env['ir.values'].get_default('stock.config.settings', 'of_forcer_date_inventaire'))
+        ).action_done()
 
 
 class InventoryLine(models.Model):
@@ -486,12 +486,15 @@ class StockConfigSettings(models.TransientModel):
 class StockMove(models.Model):
     _inherit = 'stock.move'
 
-    of_product_stockable = fields.Boolean(string="Stockable", compute="_compute_of_product_stockable")
+    of_has_reordering_rule = fields.Boolean(
+        string=u"Règle de stock", compute="_compute_of_of_has_reordering_rule",
+        help=u"L'article dispose de règles de réapprovisionnement."
+    )
 
     @api.depends('product_id', 'product_id.type')
-    def _compute_of_product_stockable(self):
+    def _compute_of_of_has_reordering_rule(self):
         for move in self:
-            move.of_product_stockable = move.product_id and move.product_id.type == 'product'
+            move.of_has_reordering_rule = move.product_id.nbr_reordering_rules > 0
 
     @api.multi
     def write(self, vals):
@@ -503,13 +506,11 @@ class StockMove(models.Model):
 class StockQuant(models.Model):
     _inherit = 'stock.quant'
 
-
     def _quants_get_reservation_domain(self, move, pack_operation_id=False, lot_id=False, company_id=False,
-                                   initial_domain=None):
+                                       initial_domain=None):
         force_date = self._context.get('force_date_done', False)
         if force_date:
-            force_date_dom = ('in_date', '<=', force_date)
-            initial_domain = initial_domain and initial_domain.append(force_date_dom) or [force_date_dom,
-                                                                                          ('qty', '>', 0.0)]
-        return super(StockQuant, self)._quants_get_reservation_domain(move, pack_operation_id, lot_id, company_id,
-                                                                        initial_domain)
+            initial_domain = (initial_domain or [('qty', '>', 0.0)]) + [('in_date', '<=', force_date)]
+
+        return super(StockQuant, self)._quants_get_reservation_domain(
+            move, pack_operation_id, lot_id, company_id, initial_domain)
