@@ -165,7 +165,7 @@
                                                  'default_revision': revision,
                                                  'default_grouped': grouped,
                                                  'form_readonly': '[(&quot;state&quot;,&quot;in&quot;,[&quot;validated&quot;,&quot;cancel&quot;])]'}">
-                                    <tree colors="grey:state=='cancel';blue:is_invoiceable==True" delete="true">
+                                    <tree colors="grey:state=='cancel';blue:is_invoiceable==True" delete="false">
                                         <field name="state" invisible="1"/>
                                         <field name="code_de_ligne"/>
                                         <field name="address_id"/>
@@ -360,7 +360,7 @@
                     <button name="bouton_valider" type="object" class="btn-primary" string="Activer la ligne"
                             states="draft"/>
                     <button name="bouton_brouillon" type="object" class="btn-primary" string="Brouillon"
-                            states="validated"/>
+                            attrs="{'invisible': ['|','|',('invoice_count','&gt;',0),('intervention_count','&gt;',0),('state','!=','validated')]}"/>
                     <button name="generate_services" type="object" class="btn-primary" string="Générer interventions" states="validated"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,validated,cancel"/>
                 </header>
@@ -414,7 +414,7 @@
                             <field name="date_contract_end" readonly="1"/>
                             <field name="line_origine_id"/>
                             <field name="date_end" invisible="1"/>
-                            <field name="supplier_id"/>
+                            <field name="supplier_id" attrs="{'form_readonly_exception': True}"/>
                             <field name="supplier_tag_ids" widget="many2many_tags"/>
                         </group>
                         <group col="2" colspan="2" name="validity" string="Validité" invisible="1">
@@ -479,6 +479,8 @@
                                     <field name="sav_count" attrs="{'invisible': [('use_sav','!=',True)]}"/>
                                     <field name="remaining_sav" attrs="{'invisible': [('use_sav','!=',True)]}"/>
                                 </group>
+                                <separator string="Notes" colspan="4"/>
+                                <field name="note" nolabel="1" colspan="4"/>
                             </group>
                             <group name="services" string="Tableau de suivi">
                                 <field name="service_ids" nolabel="1" readonly="1">

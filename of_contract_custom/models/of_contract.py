@@ -655,6 +655,7 @@ class OfContractLine(models.Model):
     use_sav = fields.Boolean(string="Utilise les SAV")
     sav_count = fields.Integer(string="Nombre de visites SAV")
     remaining_sav = fields.Integer(string="Nbr. visites SAV restantes", compute="_compute_remaining_sav")
+    note = fields.Text(string="Notes")
 
     @api.depends('code_de_ligne',
                  'line_avenant_id', 'line_avenant_id.code_de_ligne',
@@ -946,8 +947,20 @@ class OfContractLine(models.Model):
     @api.multi
     def write(self, vals):
         """ Affectation du numéro si passage à l'état 'validated' """
+        fields_allowed = ['state', 'supplier_id', 'afficher_facturation', 'grouped', 'mois_reference_ids', 'note']
+        for line in self:
+            if line.state == 'validated' and any([key not in fields_allowed for key in vals.keys()]):
+                fields_string = '\n'.join([self._fields[field].string for field in fields_allowed])
+                raise UserError(u'Pour les lignes de contrats validées, '
+                                u'vous ne pouvez modifier que les champs suivants :\n%s' % fields_string)
         res = super(OfContractLine, self).write(vals)
         self._affect_number()
+        for line in self:
+            if ('supplier_id' in vals and line.state == 'validated') or vals.get('state', '') == 'validated':
+                supplier_id = vals.get('supplier_id', line.supplier_id.id)
+                if line.address_id.of_prestataire_id and line.address_id.of_prestataire_id.id != supplier_id \
+                   or not line.address_id.of_prestataire_id:
+                    line.address_id.write({'of_prestataire_id': supplier_id})
         return res
 
     @api.multi
@@ -1147,6 +1160,7 @@ class OfContractLine(models.Model):
                     'recurrence'      : False,
                     'contract_id'     : line.contract_id.id,
                     'contract_line_id': line.id,
+                    'note'            : line.note,
                     }
                 new_service = service_obj.new(service_vals)
                 new_service._onchange_tache_id()
@@ -1412,11 +1426,9 @@ class OfContractProduct(models.Model):
         invoice_line_new._onchange_product_id()
         invoice_line_vals = invoice_line_new._convert_to_write(invoice_line_new._cache)
         # Get other invoice line values from product onchange
-        name = self.name
-        name += "\n%s" % self.line_id.contract_id.name
-        name += "\n%s, %s" % (self.product_id.name, self.line_id.name)
+        name = ""
+        name += "%s, %s" % (self.name, self.line_id.name)
         name += "\n%s, %s" % (self.line_id.address_id.name, self.line_id.partner_code_magasin)
-        name += "\n%s" % self.line_id.current_period_id.name
         invoice_line_vals.update({
             'quantity'     : self.qty_to_invoice,
             'uom_id'       : self.product_id.uom_id.id,

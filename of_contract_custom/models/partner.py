@@ -20,6 +20,15 @@ class ResPartner(models.Model):
             partner.of_contrat_count = len(partner.of_contrat_ids)
             partner.of_contrat_line_count = len(partner.of_contract_line_count_ids)
 
+    @api.onchange('of_secteur_tech_id')
+    def _onchange_of_secteur_tech_id(self):
+        self.ensure_one()
+        if self.of_secteur_tech_id:
+            if self.of_secteur_tech_id.partner_id:
+                self.of_prestataire_id = self.of_secteur_tech_id.partner_id
+            if self.of_secteur_tech_id.type == 'tech_com':
+                self.of_secteur_com_id = self.of_secteur_tech_id.id
+
     @api.multi
     def action_view_contrat(self):
         action = self.env.ref('of_contract_custom.of_contract_custom_open_contrat').read()[0]
