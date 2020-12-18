@@ -25,7 +25,7 @@ class ResPartner(models.Model):
         self.ensure_one()
         if self.of_secteur_tech_id:
             if self.of_secteur_tech_id.partner_id:
-                self.of_prestataire_id = self.of_secteur_tech_id.partner_id
+                self.of_prestataire_id = self.of_secteur_tech_id.partner_id.id
             if self.of_secteur_tech_id.type == 'tech_com':
                 self.of_secteur_com_id = self.of_secteur_tech_id.id
 
