@@ -68,14 +68,17 @@
                         </group>
                         <group name="who" col="2" colspan="2" string="Qui" class="of_grey_background">
                             <group colspan="2">
-                                <field name="partner_id"/>
-                                <field name="partner_code_magasin"/>
-                                <field name="tag_ids" widget="many2many_tags"/>
+                                <field name="employee_ids" widget="many2many_tags"/>
+                                <field name="supplier_id"/>
+
                                 <field name="company_id"/>
                             </group>
                         </group>
                         <group name="where" col="2" colspan="2" string="Où" class="of_grey_background">
                             <group colspan="2">
+                                <field name="partner_id"/>
+                                <field name="partner_code_magasin"/>
+                                <field name="tag_ids" widget="many2many_tags"/>
                                 <label for="address_id" string="Adresse d'intervention"/>
                                 <div class="o_address_format">
                                     <div><field name="address_id"/></div>

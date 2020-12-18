@@ -25,7 +25,7 @@ class OFContractAvenantWizard(models.TransientModel):
             line_data.append((0, 0, line.copy_data(default={'previous_product_id': line.id})[0]))
         data['contract_product_ids'] = line_data
         avenant = contract_line_obj.create(data)
-        origine.write({
+        origine.with_context(no_verification=True).write({
             'line_avenant_id': avenant.id,
             'date_end'       : fields.Date.to_string(fields.Date.from_string(self.date_start) - relativedelta(days=1)),
             })

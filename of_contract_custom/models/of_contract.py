@@ -914,6 +914,8 @@ class OfContractLine(models.Model):
         """ Récupération du parc installé si l'utilisateur à les droits """
         self.ensure_one()
         if self.address_id:
+            if self.address_id.of_prestataire_id:
+                self.supplier_id = self.address_id.of_prestataire_id
             parc_obj = self.env['of.parc.installe']
             # ne pas tenter le onchange si l'utilisateur n'a pas les droits
             if not parc_obj.check_access_rights('read', raise_exception=False):
@@ -972,6 +974,7 @@ class OfContractLine(models.Model):
                 contract_line._revision_avenant()
                 vals['revision_avenant'] = False
         res = super(OfContractLine, self)._write(vals)
+        self._generate_services()
         return res
 
     @api.multi
@@ -1062,11 +1065,6 @@ class OfContractLine(models.Model):
             self.unlink()
 
     @api.multi
-    def generate_services(self):
-        """ Bouton pour générer les services"""
-        self._generate_services()
-
-    @api.multi
     def action_view_services(self):
         self.ensure_one()
         action = self.env.ref('of_contract_custom.action_of_contract_service_form_planning').read()[0]
@@ -1138,6 +1136,8 @@ class OfContractLine(models.Model):
         service_obj = self.with_context(bloquer_recurrence=True).env['of.service']
         type = self.env.ref('of_contract_custom.of_contract_custom_type_maintenance')
         for line in self:
+            if not line.current_period_id or not line.state == 'validated':
+                continue
             months = line.mois_reference_ids
             nbr_intervs = line.nbr_interv
             nbr_months = len(months)
@@ -1147,28 +1147,39 @@ class OfContractLine(models.Model):
             for i in xrange(0, nbr_intervs):
                 month = months[int(i/ratio)]
                 num_mois = month.numero
-                date_service = fields.Date.to_string(date_start + relativedelta(years=int(date_start.month > num_mois), month=num_mois, day=1))
+                dt_service = date_start + relativedelta(years=int(date_start.month > num_mois), month=num_mois, day=1)
+                date_service = fields.Date.to_string(dt_service)
+                month_service_end = fields.Date.to_string(dt_service + relativedelta(months=1))
 
                 if date_service < line.date_contract_start:
                     continue
                 if line.date_contract_end and date_service > line.date_contract_end:
                     break
-                service_vals = {
-                    'type_id'         : type.id,
-                    'partner_id'      : line.partner_id.id,
-                    'address_id'      : line.address_id.id,
-                    'tache_id'        : line.tache_id.id,
-                    'recurrence'      : False,
-                    'contract_id'     : line.contract_id.id,
-                    'contract_line_id': line.id,
-                    'notes'            : line.note,
-                    }
-                new_service = service_obj.new(service_vals)
-                new_service._onchange_tache_id()
-                new_service.update({'date_next': date_service})
-                new_service._onchange_date_next()
-                new_service_vals = new_service._convert_to_write(new_service._cache)
-                service_obj.create(new_service_vals)
+                if line.service_ids.filtered(lambda s: date_service <= s.date_next < month_service_end):
+                    continue
+                origine = line.line_origine_id
+                while origine:
+                    if origine.service_ids.filtered(lambda s: date_service <= s.date_next < month_service_end):
+                        break
+                    origine = origine.line_origine_id
+                else:
+                    service_vals = {
+                        'type_id'         : type.id,
+                        'partner_id'      : line.partner_id.id,
+                        'address_id'      : line.address_id.id,
+                        'tache_id'        : line.tache_id.id,
+                        'recurrence'      : False,
+                        'contract_id'     : line.contract_id.id,
+                        'contract_line_id': line.id,
+                        'notes'           : line.note,
+                        'supplier_id'     : line.supplier_id.id or False,
+                        }
+                    new_service = service_obj.new(service_vals)
+                    new_service._onchange_tache_id()
+                    new_service.update({'date_next': date_service})
+                    new_service._onchange_date_next()
+                    new_service_vals = new_service._convert_to_write(new_service._cache)
+                    service_obj.create(new_service_vals)
 
     @api.multi
     def generate_revision_line(self, invoicing_date):
@@ -1270,8 +1281,7 @@ class OfContractLine(models.Model):
         for line in self:
             if not line.date_contract_end:
                 continue
-            services = line.service_ids.filtered(lambda s: s.date_next > line.date_contract_end and
-                                                           not s.intervention_ids)
+            services = line.service_ids.filtered(lambda s: not s.intervention_ids)
             if services:
                 services.unlink()
 
