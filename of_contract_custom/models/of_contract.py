@@ -401,6 +401,9 @@ class OfContract(models.Model):
             for line in lines_grouped:
                 lines += line._add_invoice_lines()
             if lines:
+                addresses = lines_grouped.mapped('address_id')
+                if len(addresses) == 1:
+                    invoice_vals['partner_shipping_id'] = addresses.id
                 invoice_vals['invoice_line_ids'] = lines
                 invoice = self.env['account.invoice'].create(invoice_vals)
                 invoice.compute_taxes()
@@ -424,6 +427,8 @@ class OfContract(models.Model):
                 lines = line._add_invoice_lines()
                 if not lines:
                     continue
+                if line.address_id:
+                    invoice_vals['partner_shipping_id'] = line.address_id.id
                 invoice_vals['invoice_line_ids'] = lines
                 invoice = self.env['account.invoice'].create(invoice_vals)
                 invoice.compute_taxes()
@@ -1440,8 +1445,7 @@ class OfContractProduct(models.Model):
         invoice_line_new._onchange_product_id()
         invoice_line_vals = invoice_line_new._convert_to_write(invoice_line_new._cache)
         # Get other invoice line values from product onchange
-        name = ""
-        name += "%s, %s" % (self.name or '', self.line_id.name)
+        name = "%s" % (self.name or '')
         name += "\n%s, %s" % (self.line_id.address_id.name or '', self.line_id.partner_code_magasin or '')
         invoice_line_vals.update({
             'quantity'     : self.qty_to_invoice,
