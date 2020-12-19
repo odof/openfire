@@ -70,7 +70,7 @@
                     <button name="valider_lignes_contrat" type="object" class="btn-primary" string="Activer les lignes"
                     confirm="Activer les lignes du contrat va passer toutes les lignes actuellement en brouillon en état validée. Voulez-vous continuer ?
 (les lignes annulées par un avenant ou déjà validée ne seront pas modifiées)"/>
-                    <button name="faire_revision" type="object" class="btn-primary" string="Révision à date"/>
+                    <button name="faire_revision" type="object" class="btn-primary" string="Faire la révision"/>
                     <field name="state" widget="statusbar" statusbar_visible="in_progress"/>
                 </header>
                 <sheet>
@@ -211,6 +211,7 @@
                                         <field name="spec_date"/>
                                         <field name="state"/>
                                         <field name="contract_line_id"/>
+                                        <field name="last_attachment_id" invisible="1"/>
                                         <button name="button_open_of_planning_intervention" class="oe_link" type="object" string="Voir RDVs"/>
                                         <button name="print_intervention_report" class="oe_link" type="object" string="Rapport(s)"/>
                                     </tree>
@@ -486,6 +487,7 @@
                                     <tree>
                                         <field name="spec_date"/>
                                         <field name="state"/>
+                                        <field name="last_attachment_id" invisible="1"/>
                                         <button name="button_open_of_planning_intervention" class="oe_link" type="object" string="Voir RDVs"/>
                                         <button name="print_intervention_report" class="oe_link" type="object" string="Rapport(s)"/>
                                     </tree>
@@ -599,6 +601,7 @@
                     <group col="4">
                         <group col="2" colspan="2">
                             <field name="category_ids" widget="many2many_tags"/>
+                            <field name="product_ids" widget="many2many_tags"/>
                             <field name="index_formula"/>
                         </group>
                         <separator string="Historique" colspan="4"/>

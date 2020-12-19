@@ -53,6 +53,9 @@ class OfService(models.Model):
     employee_ids = fields.Many2many(
         comodel_name='hr.employee', string="Intervenants", domain=lambda self: self._domain_employee_ids()
     )
+    last_attachment_id = fields.Many2one(
+        comodel_name='ir.attachment', string=u"Dernier rapport", compute="_compute_last_attachment_id"
+    )
 
     @api.depends()
     def _compute_spec_date(self):
@@ -75,6 +78,21 @@ class OfService(models.Model):
                     service.contract_message = "%s SAV restant(s) pour cette ligne de contrat" % count
                 elif service.type_id.id == sav_type.id and service.contract_line_id:
                     service.contract_message = "Cette ligne de contrat n'utilise pas l'option SAV"
+
+    @api.depends()
+    def _compute_last_attachment_id(self):
+        """ Récupère le rapport 'Fiche d'intervention' du dernier RDV ayant la fiche d'intervention dans ses PJ"""
+        attachment_obj = self.env['ir.attachment']
+        for service in self:
+            if service.intervention_ids:
+                for i in xrange(1, len(service.intervention_ids) + 1):
+                    current_interv = service.intervention_ids[-i]
+                    attachment = attachment_obj.search([('res_model', '=', 'of.planning.intervention'),
+                                                        ('res_id', '=', current_interv.id),
+                                                        ('of_intervention_report', '=', True)])
+                    if attachment:
+                        service.last_attachment_id = attachment[-1]
+                        break
 
     @api.onchange('address_id', 'tache_id')
     def _onchange_address_id(self):
@@ -196,13 +214,16 @@ class OfPlanningIntervention(models.Model):
 
     @api.onchange('contract_line_id')
     def _onchange_contract_line_id(self):
-        pass
-
-    @api.onchange('contract_id')
-    def _onchange_contract_id(self):
         if self.contract_line_id:
             self.contract_id = self.contract_line_id.contract_id
             self.address_id = self.contract_line_id.address_id or self.contract_line_id.partner_id
+
+    @api.onchange('contract_id')
+    def _onchange_contract_id(self):
+        pass
+        # if self.contract_id:
+        #     self.contract_id = self.contract_line_id.contract_id
+        #     self.address_id = self.contract_line_id.address_id or self.contract_line_id.partner_id
 
     @api.onchange('service_id')
     def _onchange_service_id(self):
@@ -212,3 +233,34 @@ class OfPlanningIntervention(models.Model):
             self.contract_id = self.service_id.contract_id
             if self.service_id.order_id:
                 self.order_id = self.service_id.order_id
+
+
+class Report(models.Model):
+    _inherit = "report"
+
+    @api.model
+    def get_pdf(self, docids, report_name, html=None, data=None):
+        if report_name == 'of_planning.of_planning_fiche_intervention_report_template':
+            self = self.with_context(copy_to_di=True, fiche_intervention=True)
+        result = super(Report, self).get_pdf(docids, report_name, html=html, data=data)
+        return result
+
+
+class IrAttachment(models.Model):
+    _inherit = 'ir.attachment'
+
+    of_intervention_report = fields.Boolean(string="Fiche d'intervention")
+
+    def create(self, vals):
+        if self._context.get('fiche_intervention'):
+            vals['of_intervention_report'] = True
+        attachment = super(IrAttachment, self).create(vals)
+        if self._context.get('copy_to_di') and vals.get('res_model', '') == 'of.planning.intervention' \
+           and vals.get('res_id') and isinstance(vals['res_id'], int):
+            interv = self.env['of.planning.intervention'].browse(vals['res_id'])
+            if interv.service_id:
+                new_vals = vals.copy()
+                new_vals['res_model'] = 'of.service'
+                new_vals['res_id'] = interv.service_id.id
+                self.env['ir.attachment'].create(new_vals)
+        return attachment
