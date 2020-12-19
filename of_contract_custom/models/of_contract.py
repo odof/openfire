@@ -949,7 +949,7 @@ class OfContractLine(models.Model):
     @api.multi
     def write(self, vals):
         """ Affectation du numéro si passage à l'état 'validated' """
-        fields_allowed = ['state', 'supplier_id', 'afficher_facturation', 'grouped', 'mois_reference_ids', 'note']
+        fields_allowed = ['state', 'supplier_id', 'afficher_facturation', 'grouped', 'mois_reference_ids', 'notes']
         if not self._context.get('no_verification'):
             for line in self:
                 if line.state == 'validated' and any([key not in fields_allowed for key in vals.keys()]):
