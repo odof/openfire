@@ -45,7 +45,7 @@ class OFContractIndiceWizard(models.TransientModel):
                         else:
                             previous_price = product_line.price_unit
                             # product = product_line.product_id
-                            index_ids = product_line.product_id.categ_id.of_index_ids.ids
+                            index_ids = product_line.product_id.of_index_ids.ids
                             temp_indices = [indice for indice in indices if indice.id in index_ids]
                             additionnal_prices = []
                             for indice in temp_indices:
@@ -87,7 +87,7 @@ class OFContractIndiceWizard(models.TransientModel):
                     else:
                         previous_price = product_line.price_unit
                         # product = product_line.product_id
-                        index_ids = product_line.product_id.categ_id.of_index_ids.ids
+                        index_ids = product_line.product_id.of_index_ids.ids
                         temp_indices = [indice for indice in indices if indice.id in index_ids]
                         additionnal_prices = []
                         for indice in temp_indices:

@@ -9,6 +9,7 @@ class OfIndex(models.Model):
     name = fields.Char(string="Nom de l'indice")
     category_ids = fields.Many2many(
         comodel_name='product.category', string=u"Catégories d'articles", required=True)
+    product_ids = fields.Many2many(comodel_name='product.template', string=u"Articles")
     index_formula = fields.Char(string="Formule d'indexation")
     index_line_ids = fields.One2many(
         comodel_name='of.index.line', inverse_name='index_id', string="Historique", required=True)

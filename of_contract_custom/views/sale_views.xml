@@ -7,7 +7,7 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="of_service.sale_order_form_quote"/>
         <field name="arch" type="xml">
-            <xpath expr="//button[@name='action_prevoir_intervention']" position="attributes">
+            <xpath expr="//field[@name='of_service_count']" position="attributes">
                 <attribute name="string">Demande d'intervention</attribute>
             </xpath>
         </field>
