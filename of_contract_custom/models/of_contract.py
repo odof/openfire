@@ -626,6 +626,12 @@ class OfContractLine(models.Model):
     amount_total = fields.Monetary(
         string="Prochain Total", compute='_compute_prices', currency_field='company_currency_id', store=True,
         copy=False)
+    year_subtotal = fields.Float(
+        string="Sous-total", compute='_compute_prices', digits=dp.get_precision('Account'), store=True)
+    year_taxes = fields.Monetary(
+        string="Taxes ", compute='_compute_prices', currency_field='company_currency_id', store=True)
+    year_total = fields.Monetary(
+        string="Prochain Total", compute='_compute_prices', currency_field='company_currency_id', store=True)
 
     service_ids = fields.One2many(
             comodel_name='of.service', inverse_name='contract_line_id', string=u"Interventions à programmer")
@@ -839,12 +845,15 @@ class OfContractLine(models.Model):
                  'contract_product_ids.product_id',
                  'contract_product_ids.price_unit',
                  'contract_product_ids.amount_subtotal',
+                 'contract_product_ids.year_subtotal',
                  'contract_product_ids.amount_taxes',
+                 'contract_product_ids.year_taxes',
                  'frequency_type',
                  'fiscal_position_id')
     def _compute_prices(self):
         """ Calcule les différents montants facturés générés par la ligne de contrat """
         for contract_line in self:
+            # For a single month
             product_lines = contract_line.contract_product_ids
             c_subtotal = 0
             c_total_tax = 0
@@ -854,6 +863,16 @@ class OfContractLine(models.Model):
             contract_line.amount_taxes = c_total_tax
             contract_line.amount_subtotal = c_subtotal
             contract_line.amount_total = c_total_tax + c_subtotal
+            # For a year
+            product_lines = contract_line.contract_product_ids
+            c_subtotal = 0
+            c_total_tax = 0
+            for line in product_lines:
+                c_subtotal += line.year_subtotal
+                c_total_tax += line.year_taxes
+            contract_line.year_taxes = c_total_tax
+            contract_line.year_subtotal = c_subtotal
+            contract_line.year_total = c_total_tax + c_subtotal
 
     @api.depends('service_ids')
     def _compute_service_count(self):
@@ -1146,6 +1165,8 @@ class OfContractLine(models.Model):
             months = line.mois_reference_ids
             nbr_intervs = line.nbr_interv
             nbr_months = len(months)
+            if not nbr_intervs or not nbr_months:
+                continue
             ratio = float(nbr_intervs) / float(nbr_months)
 
             date_start = fields.Date.from_string(line.current_period_id.date_start)
@@ -1310,7 +1331,7 @@ class OfContractProduct(models.Model):
     company_currency_id = fields.Many2one(
         'res.currency', related='line_id.company_currency_id', string="Company Currency", readonly=True)
     amount_subtotal = fields.Float(
-        string="Sous-total", compute='_compute_amount', digits=dp.get_precision('Account'))
+        string="Sous-total", compute='_compute_amount', digits=dp.get_precision('Account'), store=True)
     amount_taxes = fields.Monetary(
         string="Taxes ", compute='_compute_amount', currency_field='company_currency_id', store=True)
     amount_total = fields.Monetary(
@@ -1329,18 +1350,32 @@ class OfContractProduct(models.Model):
     next_product_id = fields.Many2one(
         comodel_name='of.contract.product', string="Produit sur ligne d'avenant", compute="_compute_next_product_id")
     date_indexed = fields.Date(string=u"Dernière indexation")
+    year_subtotal = fields.Float(
+        string="Sous-total", compute='_compute_amount', digits=dp.get_precision('Account'), store=True)
+    year_taxes = fields.Monetary(
+        string="Taxes ", compute='_compute_amount', currency_field='company_currency_id', store=True)
+    year_total = fields.Monetary(
+        string="Prochain Total", compute='_compute_amount', currency_field='company_currency_id', store=True)
 
     @api.depends('quantity', 'discount', 'price_unit', 'tax_ids', 'qty_to_invoice',
                  'line_id', 'line_id.is_invoiceable')
     def _compute_amount(self):
         """ Calcul des montants pour la ligne d'article """
         for line in self:
+            # For a single month
             price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
             taxes = line.tax_ids.compute_all(price, line.company_currency_id, line.qty_to_invoice,
                                              product=line.product_id, partner=line.line_id.address_id)
             line.amount_taxes = taxes['total_included'] - taxes['total_excluded']
             line.amount_total = taxes['total_included']
             line.amount_subtotal = taxes['total_excluded']
+            # For a year
+            price = (line.price_unit * line.quantity) * (1 - (line.discount or 0.0) / 100.0)
+            taxes = line.tax_ids.compute_all(price, line.company_currency_id, line.quantity,
+                                             product=line.product_id, partner=line.line_id.address_id)
+            line.year_taxes = taxes['total_included'] - taxes['total_excluded']
+            line.year_total = taxes['total_included']
+            line.year_subtotal = taxes['total_excluded']
 
     @api.multi
     def _compute_tax_id(self):
@@ -1446,7 +1481,9 @@ class OfContractProduct(models.Model):
         invoice_line_vals = invoice_line_new._convert_to_write(invoice_line_new._cache)
         # Get other invoice line values from product onchange
         name = u"%s" % (self.name or '')
-        name += u"\n%s, Magasin n°%s" % (self.line_id.address_id.name or u'', self.line_id.partner_code_magasin or u'')
+        name += u"\n%s%s" % (self.line_id.address_id.name or u'',
+                             self.line_id.partner_code_magasin and
+                             (u", Magasin n°%s" % self.line_id.partner_code_magasin) or u'')
         invoice_line_vals.update({
             'quantity'     : self.qty_to_invoice,
             'uom_id'       : self.product_id.uom_id.id,
