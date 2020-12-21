@@ -12,6 +12,15 @@ class OfContract(models.Model):
     _name = "of.contract"
     _inherit = ['mail.thread', 'of.form.readonly']
 
+    # @api.constrains('recurring_rule_type', 'recurring_invoicing_payment')
+    # def contrainte_type_et_frequence(self):
+    #     if self.recurring_rule_type == 'date' and self.recurring_invoicing_payment == 'pre-paid':
+    #         raise ValidationError(u"Impossible de créer un contrat avec une fréquence à la prestation"
+    #                               u" et un type à échoir")
+    #     if self.recurring_rule_type != 'date' and self.recurring_invoicing_payment == 'date':
+    #         raise ValidationError(u"Impossible de créer un contrat avec une fréquence différente de à la prestation"
+    #                               u" et un type date du jour")
+
     active = fields.Boolean(default=True)
     invoice_ids = fields.One2many(comodel_name='account.invoice', inverse_name='of_contract_id', string="Factures")
     invoice_count = fields.Integer(string='Nombre de facture', compute='_get_invoice_count', readonly=True)
@@ -32,6 +41,7 @@ class OfContract(models.Model):
         required=True
     )
     recurring_invoicing_payment = fields.Selection([
+        # ('date', 'Date du jour'),
         ('pre-paid', u'À Échoir'),
         ('post-paid', u'Échu'),
         ], default='pre-paid', string='Type de facturation', required=True,
@@ -207,6 +217,10 @@ class OfContract(models.Model):
         """ Calcul du nombre de factures liées au contrat """
         for contract in self:
             contract.invoice_count = len(contract.invoice_ids)
+
+    # @api.constrains('recurring_rule_type', 'recurring_invoicing_payment')
+    # def _onchange_invoicing_frequency(self):
+    #     self.contrainte_type_et_frequence()
 
     @api.onchange('renewal')
     def _onchange_renewal(self):
@@ -541,6 +555,15 @@ class OfContractLine(models.Model):
     _inherit = ["of.form.readonly", "of.planning.plannification"]
     _order = 'line_avenant_id ASC, code_de_ligne DESC'
 
+    # @api.constrains('frequency_type', 'recurring_invoicing_payment')
+    # def contrainte_type_et_frequence(self):
+    #     if self.frequency_type == 'date' and self.recurring_invoicing_payment == 'pre-paid':
+    #         raise ValidationError(u"Impossible de créer un contrat avec une fréquence à la prestation"
+    #                               u" et un type à échoir")
+    #     if self.frequency_type != 'date' and self.recurring_invoicing_payment == 'date':
+    #         raise ValidationError(u"Impossible de créer un contrat avec une fréquence différente de à la prestation"
+    #                               u" et un type date du jour")
+
     name = fields.Char(string="Nom", compute="_compute_name", store=True)
     # company_id = fields.Many2one('res.company', string=u'Société', default=lambda self: self.env.user.company_id)
 
@@ -570,6 +593,7 @@ class OfContractLine(models.Model):
         ('year', u'Annuelle'),
         ], default='month', string=u"Fréquence de facturation", required=True)
     recurring_invoicing_payment = fields.Selection([
+        # ('date', 'Date du jour'),
         ('pre-paid', u'À Échoir'),
         ('post-paid', u'Échu'),
         ], default='pre-paid', string='Type de facturation', required=True)
@@ -932,6 +956,10 @@ class OfContractLine(models.Model):
                 sav = line.service_ids.filtered(lambda s: s.type_id.id == sav_type.id and (period_start <= s.date_next <= period_end or period_start <= s.date_fin <= period_end))
                 remaining_sav = line.sav_count - len(sav)
                 line.remaining_sav = remaining_sav if remaining_sav > 0 else 0
+
+    # @api.constrains('frequency_type', 'recurring_invoicing_payment')
+    # def _onchange_invoicing_frequency(self):
+    #     self.contrainte_type_et_frequence()
 
     @api.onchange('address_id')
     def _onchange_address_id(self):
