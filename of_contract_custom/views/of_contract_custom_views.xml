@@ -604,7 +604,8 @@
                     <group col="4">
                         <group col="2" colspan="2">
                             <field name="category_ids" widget="many2many_tags"/>
-                            <field name="product_ids" widget="many2many_tags"/>
+                            <field name="product_ids" widget="many2many_tags"
+                                   domain="[('categ_id', category_ids and 'child_of' or 'ilike', category_ids and category_ids[0][2] or '')]"/>
                             <field name="index_formula"/>
                         </group>
                         <separator string="Historique" colspan="4"/>
