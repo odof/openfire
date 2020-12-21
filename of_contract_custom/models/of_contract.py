@@ -545,8 +545,8 @@ class OfContractLine(models.Model):
     # company_id = fields.Many2one('res.company', string=u'Société', default=lambda self: self.env.user.company_id)
 
     partner_id = fields.Many2one('res.partner', related="contract_id.partner_id", string="Client payeur", readonly=True)
-    partner_code_magasin = fields.Char(string="Code magasin", related="partner_id.of_code_magasin", readonly=True)
     address_id = fields.Many2one('res.partner', string="Adresse d'intervention", required=True)
+    partner_code_magasin = fields.Char(string="Code magasin", related="address_id.of_code_magasin", readonly=True)
     address_street = fields.Char(string="Rue", related="address_id.street", readonly=True)
     address_street2 = fields.Char(string="Rue", related="address_id.street2", readonly=True)
     address_zip = fields.Char(string="Zip", related="address_id.zip", readonly=True)
@@ -1445,8 +1445,8 @@ class OfContractProduct(models.Model):
         invoice_line_new._onchange_product_id()
         invoice_line_vals = invoice_line_new._convert_to_write(invoice_line_new._cache)
         # Get other invoice line values from product onchange
-        name = "%s" % (self.name or '')
-        name += "\n%s, %s" % (self.line_id.address_id.name or '', self.line_id.partner_code_magasin or '')
+        name = u"%s" % (self.name or '')
+        name += u"\n%s, Magasin n°%s" % (self.line_id.address_id.name or u'', self.line_id.partner_code_magasin or u'')
         invoice_line_vals.update({
             'quantity'     : self.qty_to_invoice,
             'uom_id'       : self.product_id.uom_id.id,

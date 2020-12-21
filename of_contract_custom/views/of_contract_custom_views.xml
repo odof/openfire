@@ -31,10 +31,10 @@
                 <filter string="À facturer" name="to_invoice" domain="[('is_invoiceable', '=', True), ('recurring_next_date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
                 <filter string="À facturer ce mois" name="to_invoice" domain="[('is_invoiceable', '=', True), ('recurring_next_date', '&gt;=', context_today().strftime('%Y-%m-01')), ('recurring_next_date', '&lt;=', (context_today() + relativedelta(months=1, day=1, days=-1)).strftime('%Y-%m-%d'))]"/>
                 <separator/>
+                <field name="partner_id"/>
                 <field name="name"/>
                 <field name="category_ids"/>
                 <field name="reference"/>
-                <field name="partner_id"/>
                 <field name="recurring_invoicing_payment"/>
                 <field name="recurring_rule_type"/>
                 <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
@@ -324,9 +324,12 @@
                 <filter string="À facturer" name="to_invoice" domain="[('is_invoiceable', '=', True), ('next_date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
                 <filter string="À facturer ce mois" name="to_invoice" domain="[('is_invoiceable', '=', True), ('next_date', '&gt;=', context_today().strftime('%Y-%m-01')), ('next_date', '&lt;=', (context_today() + relativedelta(months=1, day=1, days=-1)).strftime('%Y-%m-%d'))]"/>
                 <separator/>
+                <field name="code_de_ligne" filter_domain="['|', '|', '|', ('code_de_ligne', '=', self), ('partner_id', 'ilike', self), ('address_id', 'ilike', self), ('supplier_id', 'ilike', self)]"/>
+                <field name="partner_id"/>
+                <field name="address_id"/>
+                <field name="supplier_id"/>
                 <field name="recurring_invoicing_payment"/>
                 <field name="supplier_tag_ids"/>
-<!--                <field name="code_de_ligne" filter_domain="['|', '|', '|', ('code_de_ligne', '=', self), ('partner_id', 'ilike', self), ('address_id', 'ilike', self), ('supplier_id', 'ilike', self)]"/>-->
                 <field name="contract_product_ids"/>
                 <field name="tache_id"/>
                 <field name="nbr_interv"/>
