@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.addons.of_utils.models.of_utils import format_date
 
 
 class OFContractIndiceWizard(models.TransientModel):
@@ -16,7 +17,11 @@ class OFContractIndiceWizard(models.TransientModel):
     indice_ids = fields.Many2many(comodel_name='of.index', string="Indices")
     contract_ids = fields.Many2many(
         comodel_name='of.contract', string="Contrats", default=lambda self: self._default_contracts())
-    date_execution = fields.Date(string=u"Date de référence", default=fields.Date.today())
+    date_execution = fields.Date(
+        string=u"Date de la période d'indexation", default=fields.Date.today(),
+        help=u"Cette date vous permet de sélectionner la valeur de l'indexation que vous souhaitez appliquer, "
+             u"elle doit être comprise dans la période définie de l'une des valeurs d'indexation définies "
+             u"dans votre indice")
 
     line_ids = fields.One2many(comodel_name='of.contract.indice.line.wizard', inverse_name='wizard_id', string="Lignes affectées", compute="_compute_line_ids")
 
@@ -30,7 +35,9 @@ class OFContractIndiceWizard(models.TransientModel):
             date_execution = wizard.date_execution
             for contract in contracts:
                 contract_lines = contract.line_ids.filtered(
-                    lambda l: l.use_index and l.next_date and l.state == 'validated')
+                        lambda l: l.use_index and
+                                  (not l.date_contract_end or l.date_contract_end > fields.Date.today())
+                                  and l.state == 'validated')
                 for contract_line in contract_lines:
                     product_lines = contract_line.contract_product_ids
                     for product_line in product_lines:
@@ -73,17 +80,24 @@ class OFContractIndiceWizard(models.TransientModel):
         contracts = self.contract_ids.filtered('use_index')
         indices = self.indice_ids
         date_execution = self.date_execution
-        products_done = 0
+        products_done = self.env['of.contract.product']
+
         for contract in contracts:
-            contract_lines = contract.line_ids.filtered(lambda l: l.use_index and l.next_date and l.state == 'validated')
+            contract_lines = contract.line_ids.filtered(
+                    lambda l: l.use_index and
+                              (not l.date_contract_end or l.date_contract_end > fields.Date.today())
+                              and l.state == 'validated')
             for contract_line in contract_lines:
                 product_lines = contract_line.contract_product_ids
                 for product_line in product_lines:
                     if self.rollback:
-                        previous_price = product_line.price_unit
                         new_price = product_line.price_unit_prec
-                        product_line.with_context(no_verification=True).write({'price_unit': new_price, 'price_unit_prec': previous_price, 'date_indexed': fields.Date.today()})
-                        products_done += 1
+                        product_line.with_context(no_verification=True).write({
+                            'price_unit'        : new_price,
+                            'date_indexed'      : product_line.date_indexed_prec,
+                            'date_indexed_prec' : False,
+                            })
+                        products_done |= product_line
                     else:
                         previous_price = product_line.price_unit
                         # product = product_line.product_id
@@ -97,9 +111,26 @@ class OFContractIndiceWizard(models.TransientModel):
                         if not additionnal_prices:
                             continue
                         new_price = previous_price + sum(additionnal_prices)
-                        product_line.with_context(no_verification=True).write({'price_unit': new_price, 'price_unit_prec': previous_price, 'date_indexed': fields.Date.today()})
-                        products_done += 1
-        message = u"%s articles %s été %s." % (products_done, products_done == 1 and u'à' or u'ont',
+                        product_line.with_context(no_verification=True).write(
+                            {
+                                'price_unit'        : new_price,
+                                'price_unit_prec'   : previous_price,
+                                'date_indexed'      : fields.Date.today(),
+                                'date_indexed_prec' : product_line.date_indexed,
+                            })
+                        products_done |= product_line
+        products_done_count = len(products_done)
+        lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
+        for contract in products_done.mapped('line_id').mapped('contract_id'):
+            products = products_done.filtered(lambda p: p.line_id.contract_id.id == contract.id)
+            today = format_date(fields.Date.today(), lang)
+            if self.rollback:
+                contract.message_post(u"Retour au PU précédent réalisée le %s pour les articles :<br/>%s" %
+                                      (today, '<br/>'.join([product.product_id.name for product in products])))
+            else:
+                contract.message_post(u"Indexation réalisée le %s pour les articles :<br/>%s" %
+                                      (today, '<br/>'.join([product.product_id.name for product in products])))
+        message = u"%s article(s) %s été %s." % (products_done_count, products_done_count == 1 and u'à' or u'ont',
                                                self.rollback and u"retournés au prix précédent" or u"indéxés")
         return self.env['of.popup.wizard'].popup_return(message=message, titre="Indexation")
 

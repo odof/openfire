@@ -98,6 +98,7 @@ class OfContract(models.Model):
         comodel_name='of.service', compute="_compute_service_ids", string="Interventions à programmer")
     grouped = fields.Boolean(string="Regrouper la facturation")
     payment_term_id = fields.Many2one('account.payment.term', string=u'Conditions de règlement')
+    date_indexed = fields.Date(string=u"Dernière indexation", compute="_compute_date_indexed", store=True)
 
     @api.model
     def _default_journal(self):
@@ -217,6 +218,14 @@ class OfContract(models.Model):
         """ Calcul du nombre de factures liées au contrat """
         for contract in self:
             contract.invoice_count = len(contract.invoice_ids)
+
+    @api.depends('line_ids', 'line_ids.date_indexed')
+    def _compute_date_indexed(self):
+        for contract in self:
+            lines = contract.line_ids.filtered('date_indexed').sorted('date_indexed')
+            if lines:
+                contract.date_indexed = lines[-1].date_indexed
+            pass
 
     # @api.constrains('recurring_rule_type', 'recurring_invoicing_payment')
     # def _onchange_invoicing_frequency(self):
@@ -1378,6 +1387,7 @@ class OfContractProduct(models.Model):
     next_product_id = fields.Many2one(
         comodel_name='of.contract.product', string="Produit sur ligne d'avenant", compute="_compute_next_product_id")
     date_indexed = fields.Date(string=u"Dernière indexation")
+    date_indexed_prec = fields.Date(string=u"Précédent indexation")
     year_subtotal = fields.Float(
         string="Sous-total", compute='_compute_amount', digits=dp.get_precision('Account'), store=True)
     year_taxes = fields.Monetary(
