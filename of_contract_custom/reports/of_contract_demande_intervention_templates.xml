@@ -312,6 +312,16 @@
                                         </t>
                                     </div>
                                 </div>
+                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                <div class="h5" style="padding: 0px 16px;">
+                                    <div>
+                                        <span>Mois référent&amp;nbsp;:</span>
+                                        <t t-if="o.mois_ids">
+                                            <span t-esc="o.mois_ids[0].name"/>
+<!--                                            <span t-field="o.duree" t-field-options='{"widget": "duration", "unit": "hour", "round": "minute"}'></span>-->
+                                        </t>
+                                    </div>
+                                </div>
 <!--                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>-->
 <!--                                <div class="h5" style="padding: 0px 16px;">-->
 <!--                                    <div>-->
