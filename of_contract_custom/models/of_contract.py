@@ -37,14 +37,14 @@ class OfContract(models.Model):
         ('trimester', u'Trimestrielle'),  # Tout les 3 mois
         ('semester', u'Semestrielle'),  # 2 fois par ans
         ('year', u'Annuelle'),
-        ], default='month', string=u"Fréquence de facturation", help="Interval de temps entre chaque facturation",
+        ], string=u"Fréquence de facturation", help="Interval de temps entre chaque facturation",
         required=True
     )
     recurring_invoicing_payment = fields.Selection([
         # ('date', 'Date du jour'),
         ('pre-paid', u'À Échoir'),
         ('post-paid', u'Échu'),
-        ], default='pre-paid', string='Type de facturation', required=True,
+        ], string='Type de facturation', required=True,
     )
     journal_id = fields.Many2one(
         'account.journal', string='Journal', default=lambda s: s._default_journal(),
@@ -87,7 +87,7 @@ class OfContract(models.Model):
     ], string=u"État", compute="_compute_state")
     renewal = fields.Boolean(string="Renouveler", default=True)
     commentaires = fields.Text(string="Commentaires")
-    use_index = fields.Boolean(string="Indexer", default=True)
+    use_index = fields.Boolean(string="Indexer")
     period_ids = fields.One2many(
         comodel_name='of.contract.period', inverse_name='contract_id', string=u"Périodes")
     revision = fields.Selection([
@@ -652,6 +652,7 @@ class OfContractLine(models.Model):
     contract_product_ids = fields.One2many(
         comodel_name="of.contract.product", inverse_name='line_id', string="Articles", copy=False)
     fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale")
+    purchase_price = fields.Float(string=u"Coût", compute='_compute_prices')
     amount_subtotal = fields.Float(
         string="Sous-total", compute='_compute_prices', digits=dp.get_precision('Account'), store=True, copy=False)
     amount_taxes = fields.Monetary(
@@ -660,11 +661,11 @@ class OfContractLine(models.Model):
         string="Prochain Total", compute='_compute_prices', currency_field='company_currency_id', store=True,
         copy=False)
     year_subtotal = fields.Float(
-        string="Sous-total", compute='_compute_prices', digits=dp.get_precision('Account'), store=True)
+        string="Sous-total annuel", compute='_compute_prices', digits=dp.get_precision('Account'), store=True)
     year_taxes = fields.Monetary(
-        string="Taxes ", compute='_compute_prices', currency_field='company_currency_id', store=True)
+        string="Taxes annuelles", compute='_compute_prices', currency_field='company_currency_id', store=True)
     year_total = fields.Monetary(
-        string="Prochain Total", compute='_compute_prices', currency_field='company_currency_id', store=True)
+        string="Total annuel", compute='_compute_prices', currency_field='company_currency_id', store=True)
 
     service_ids = fields.One2many(
             comodel_name='of.service', inverse_name='contract_line_id', string=u"Interventions à programmer")
@@ -881,6 +882,7 @@ class OfContractLine(models.Model):
                  'contract_product_ids.year_subtotal',
                  'contract_product_ids.amount_taxes',
                  'contract_product_ids.year_taxes',
+                 'contract_product_ids.purchase_price',
                  'frequency_type',
                  'fiscal_position_id')
     def _compute_prices(self):
@@ -888,21 +890,16 @@ class OfContractLine(models.Model):
         for contract_line in self:
             # For a single month
             product_lines = contract_line.contract_product_ids
-            c_subtotal = 0
-            c_total_tax = 0
-            for line in product_lines:
-                c_subtotal += line.amount_subtotal
-                c_total_tax += line.amount_taxes
+            c_subtotal = sum(product_lines.mapped('amount_subtotal'))
+            c_total_tax = sum(product_lines.mapped('amount_taxes'))
             contract_line.amount_taxes = c_total_tax
             contract_line.amount_subtotal = c_subtotal
             contract_line.amount_total = c_total_tax + c_subtotal
+            contract_line.purchase_price = sum(product_lines.mapped('purchase_price'))
             # For a year
             product_lines = contract_line.contract_product_ids
-            c_subtotal = 0
-            c_total_tax = 0
-            for line in product_lines:
-                c_subtotal += line.year_subtotal
-                c_total_tax += line.year_taxes
+            c_subtotal = sum(product_lines.mapped('year_subtotal'))
+            c_total_tax = sum(product_lines.mapped('year_taxes'))
             contract_line.year_taxes = c_total_tax
             contract_line.year_subtotal = c_subtotal
             contract_line.year_total = c_total_tax + c_subtotal
@@ -1362,6 +1359,7 @@ class OfContractProduct(models.Model):
     product_id = fields.Many2one('product.product', string="Article", required=True)
     price_unit = fields.Float(string="Prix unitaire")
     price_unit_prec = fields.Float(string=u"Prix unitaire précédent")
+    purchase_price = fields.Float(string=u"Coût", compute='_compute_purchase_price')
     name = fields.Text(string='Description', required=True)
     quantity = fields.Float(string=u"Qté", default=1.0)
     uom_id = fields.Many2one('product.uom', string=u'Unité de mesure')
@@ -1389,11 +1387,16 @@ class OfContractProduct(models.Model):
     date_indexed = fields.Date(string=u"Dernière indexation")
     date_indexed_prec = fields.Date(string=u"Précédent indexation")
     year_subtotal = fields.Float(
-        string="Sous-total", compute='_compute_amount', digits=dp.get_precision('Account'), store=True)
+        string="Sous-total annuel", compute='_compute_amount', digits=dp.get_precision('Account'), store=True)
     year_taxes = fields.Monetary(
-        string="Taxes ", compute='_compute_amount', currency_field='company_currency_id', store=True)
+        string="Taxes annuelles", compute='_compute_amount', currency_field='company_currency_id', store=True)
     year_total = fields.Monetary(
-        string="Prochain Total", compute='_compute_amount', currency_field='company_currency_id', store=True)
+        string="Total annuel", compute='_compute_amount', currency_field='company_currency_id', store=True)
+
+    @api.depends('quantity', 'product_id', 'product_id.standard_price')
+    def _compute_purchase_price(self):
+        for line in self:
+            line.purchase_price = line.product_id.standard_price * line.quantity
 
     @api.depends('quantity', 'discount', 'price_unit', 'tax_ids', 'qty_to_invoice',
                  'line_id', 'line_id.is_invoiceable')
