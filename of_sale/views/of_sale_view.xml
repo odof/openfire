@@ -600,7 +600,9 @@ Tous les articles seront considérés comme disponibles et marqués comme livré
         <field name="view_type">form</field>
         <field name="view_mode">tree,pivot</field>
         <field name="view_id" ref="of_sale_order_line_tree" />
-        <field name="domain">[('order_id.state', '=', 'sale'), ('invoice_status', '!=', 'invoiced')]</field>
+        <field name="domain">[('order_id.state', '=', 'sale'),
+                              ('order_id.of_force_invoice_status', '=', False),
+                              ('invoice_status', '!=', 'invoiced')]</field>
     </record>
 
     <menuitem id="menu_sale_order_line_test" parent="sale.menu_sale_invoicing" action="action_sale_order_line_tree_all"
