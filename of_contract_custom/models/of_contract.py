@@ -652,7 +652,8 @@ class OfContractLine(models.Model):
     contract_product_ids = fields.One2many(
         comodel_name="of.contract.product", inverse_name='line_id', string="Articles", copy=False)
     fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale")
-    purchase_price = fields.Float(string=u"Coût", compute='_compute_prices')
+    next_purchase_price = fields.Float(string=u"Prochain coût", compute='_compute_prices')
+    year_purchase_price = fields.Float(string=u"Coût annuel", compute='_compute_prices')
     amount_subtotal = fields.Float(
         string="Sous-total", compute='_compute_prices', digits=dp.get_precision('Account'), store=True, copy=False)
     amount_taxes = fields.Monetary(
@@ -882,7 +883,8 @@ class OfContractLine(models.Model):
                  'contract_product_ids.year_subtotal',
                  'contract_product_ids.amount_taxes',
                  'contract_product_ids.year_taxes',
-                 'contract_product_ids.purchase_price',
+                 'contract_product_ids.next_purchase_price',
+                 'contract_product_ids.year_purchase_price',
                  'frequency_type',
                  'fiscal_position_id')
     def _compute_prices(self):
@@ -895,7 +897,7 @@ class OfContractLine(models.Model):
             contract_line.amount_taxes = c_total_tax
             contract_line.amount_subtotal = c_subtotal
             contract_line.amount_total = c_total_tax + c_subtotal
-            contract_line.purchase_price = sum(product_lines.mapped('purchase_price'))
+            contract_line.next_purchase_price = sum(product_lines.mapped('next_purchase_price'))
             # For a year
             product_lines = contract_line.contract_product_ids
             c_subtotal = sum(product_lines.mapped('year_subtotal'))
@@ -903,6 +905,7 @@ class OfContractLine(models.Model):
             contract_line.year_taxes = c_total_tax
             contract_line.year_subtotal = c_subtotal
             contract_line.year_total = c_total_tax + c_subtotal
+            contract_line.year_purchase_price = sum(product_lines.mapped('year_purchase_price'))
 
     @api.depends('service_ids')
     def _compute_service_count(self):
@@ -1359,7 +1362,9 @@ class OfContractProduct(models.Model):
     product_id = fields.Many2one('product.product', string="Article", required=True)
     price_unit = fields.Float(string="Prix unitaire")
     price_unit_prec = fields.Float(string=u"Prix unitaire précédent")
-    purchase_price = fields.Float(string=u"Coût", compute='_compute_purchase_price')
+    purchase_price = fields.Float(string=u"Coût")
+    next_purchase_price = fields.Float(string=u"Prochain coût", compute='_compute_amount')
+    year_purchase_price = fields.Float(string=u"Coût annuel", compute='_compute_amount')
     name = fields.Text(string='Description', required=True)
     quantity = fields.Float(string=u"Qté", default=1.0)
     uom_id = fields.Many2one('product.uom', string=u'Unité de mesure')
@@ -1393,30 +1398,26 @@ class OfContractProduct(models.Model):
     year_total = fields.Monetary(
         string="Total annuel", compute='_compute_amount', currency_field='company_currency_id', store=True)
 
-    @api.depends('quantity', 'product_id', 'product_id.standard_price')
-    def _compute_purchase_price(self):
-        for line in self:
-            line.purchase_price = line.product_id.standard_price * line.quantity
-
     @api.depends('quantity', 'discount', 'price_unit', 'tax_ids', 'qty_to_invoice',
-                 'line_id', 'line_id.is_invoiceable')
+                 'line_id', 'line_id.is_invoiceable', 'purchase_price')
     def _compute_amount(self):
         """ Calcul des montants pour la ligne d'article """
         for line in self:
-            # For a single month
             price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
+            # For a single month
             taxes = line.tax_ids.compute_all(price, line.company_currency_id, line.qty_to_invoice,
                                              product=line.product_id, partner=line.line_id.address_id)
             line.amount_taxes = taxes['total_included'] - taxes['total_excluded']
             line.amount_total = taxes['total_included']
             line.amount_subtotal = taxes['total_excluded']
+            line.next_purchase_price = line.purchase_price * line.qty_to_invoice
             # For a year
-            price = (line.price_unit * line.quantity) * (1 - (line.discount or 0.0) / 100.0)
             taxes = line.tax_ids.compute_all(price, line.company_currency_id, line.quantity,
                                              product=line.product_id, partner=line.line_id.address_id)
             line.year_taxes = taxes['total_included'] - taxes['total_excluded']
             line.year_total = taxes['total_included']
             line.year_subtotal = taxes['total_excluded']
+            line.year_purchase_price = line.purchase_price * line.quantity
 
     @api.multi
     def _compute_tax_id(self):
@@ -1502,6 +1503,7 @@ class OfContractProduct(models.Model):
                 name += '\n' + product.description_sale
             self.name = name
             self.price_unit = product.list_price
+            self.purchase_price = product.standard_price
             self.uom_id = product.uom_id
             self._compute_tax_id()
 
