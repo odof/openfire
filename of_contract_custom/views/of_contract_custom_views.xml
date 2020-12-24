@@ -172,8 +172,10 @@
                                         <field name="tache_id"/>
                                         <field name="frequency_type"/>
                                         <field name="next_date"/>
-                                        <field name="purchase_price" sum="Coût annuel"/>
-                                        <field name="amount_total" sum="Total"/>
+                                        <field name="year_purchase_price" sum="Coût annuel"/>
+                                        <field name="year_total" sum="Total annuel"/>
+                                        <field name="next_purchase_price" sum="Prochain coût"/>
+                                        <field name="amount_total" sum="Prochain total"/>
                                         <field name="last_invoicing_date"/>
                                         <field name="is_invoiceable" invisible="1"/>
                                         <field name="line_avenant_id" invisible="1"/>
@@ -351,8 +353,10 @@
                 <field name="name"/>
                 <field name="address_id"/>
                 <field name="next_date"/>
-                <field name="purchase_price" sum="Coût annuel"/>
+                <field name="year_purchase_price" sum="Coût annuel"/>
                 <field name="year_total" sum="Total annuel"/>
+                <field name="next_purchase_price" sum="Prochain coût"/>
+                <field name="amount_total" sum="Prochain total"/>
                 <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                 <field name="state"/>
             </tree>
@@ -454,6 +458,7 @@
                                     <tree>
                                         <field name="product_id"/>
                                         <field name="price_unit"/>
+                                        <field name="purchase_price"/>
                                         <field name="quantity"/>
                                         <field name="uom_id" groups="product.group_uom" class="oe_inline oe_no_button"/>
                                         <field name="discount" groups="sale.group_discount_per_so_line"/>
@@ -556,6 +561,7 @@
                     <group>
                         <field name="product_id"/>
                         <field name="price_unit"/>
+                        <field name="purchase_price"/>
                         <label for="product_uom_qty" string="Quantité"/>
                         <div>
                             <field name="quantity" class="oe_inline"/>
