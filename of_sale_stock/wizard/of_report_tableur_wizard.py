@@ -47,13 +47,7 @@ class OFRapportGestionStockWizard(models.TransientModel):
 
         # En-tête
         worksheet.write(0, 0, u"Société(s) :", format_default)
-        company_names = ""
-        for location in self.location_ids:
-            if location.company_id.display_name not in company_names:
-                if company_names:
-                    company_names = company_names + ";"
-                company_names = company_names + location.company_id.display_name
-        worksheet.write(0, 1, company_names, format_default)
+        worksheet.write(0, 1, ';'.join(self.location_ids.mapped('company_id').mapped('display_name')), format_default)
 
         date_file_create = fields.Date.context_today(self)
         worksheet.write(1, 0, u"Date de création\ndu fichier :", format_default)
