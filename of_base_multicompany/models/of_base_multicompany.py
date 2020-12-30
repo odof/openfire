@@ -35,6 +35,9 @@ class Company(models.Model):
     @api.model
     def _company_default_get(self, object=False, field=False):
         res = super(Company, self)._company_default_get(object, field)
+        if not object:
+            # Sans objet on ne sait pas quelles modifications apporter au résultat.
+            return res
         # Dans le cadre de la recherche d'un compte comptable, la société voulue est la société comptable.
         if object == 'account.account' and not field:
             res = res.accounting_company_id
