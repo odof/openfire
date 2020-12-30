@@ -12,9 +12,10 @@ class ReportDynamicLabel(models.AbstractModel):
     @api.multi
     def get_data(self, row, columns, ids, model, number_of_copy):
         active_model_obj = self.env[model]
-        label_print_obj = self.env['of_label.print']
+        label_print_obj = self.env['label.print']
         label_print_data = label_print_obj.\
             browse(self.env.context.get('label_print'))
+        mode = label_print_data.mode
         result = []
         value_vals = []
         diff = 0
@@ -23,60 +24,69 @@ class ReportDynamicLabel(models.AbstractModel):
                 vals = []
                 bot = False
                 bot_dict = {}
-                for field in label_print_data.field_ids:
-                    string = ''
-                    pos = ''
-                    if field.python_expression and field.python_field:
-                        string = field.python_field.split('.')[-1]
-                        value = eval(field.python_field, {'obj': datas})
-
-                    elif field.field_id.name:
-                        string = field.field_id.field_description
-                        value = getattr(datas, field.field_id.name)
-
-                    if not value:
-                        continue
-
-                    if isinstance(value, browse_record):
-                        model_obj = self.pool.get(value._name)
-                        value = eval("obj." + model_obj._rec_name,
-                                     {'obj': value})
-
-                    if not value:
-                        value = ''
-
-                    if field.nolabel:
+                if mode == 'fields':
+                    for field in label_print_data.field_ids:
                         string = ''
-                    else:
-                        string += ' :- '
+                        pos = ''
+                        if field.python_expression and field.python_field:
+                            string = field.python_field.split('.')[-1]
+                            value = eval(field.python_field, {'obj': datas})
 
-                    if field.type == 'image' or field.type == 'barcode':
-                        string = ''
-                        if field.position != 'bottom':
-                            pos = 'float:' + str(field.position) + ';'
-                            bot = False
+                        elif field.field_id.name:
+                            string = field.field_id.field_description
+                            value = getattr(datas, field.field_id.name)
+
+                        if not value:
+                            continue
+
+                        if isinstance(value, browse_record):
+                            model_obj = self.pool.get(value._name)
+                            value = eval("obj." + model_obj._rec_name,
+                                         {'obj': value})
+
+                        if not value:
+                            value = ''
+
+                        if field.nolabel:
+                            string = ''
                         else:
-                            bot = True
-                            bot_dict = {'string': string, 'value': value,
-                                        'type': field.type,
-                                        'newline': field.newline,
-                                        'style': "font-size:" +
-                                        str(field.fontsize) + "px;" + pos}
-                    else:
-                        bot = False
-                    if not bot:
-                        vals_dict = {'string': string, 'value': value,
-                                     'type': field.type,
-                                     'newline': field.newline,
-                                     'style': "font-size:" +
-                                     str(field.fontsize) + "px;" + pos}
-                        vals.append(vals_dict)
-                if bot_dict != {}:
-                    vals.append(bot_dict)
-                if vals and vals[0]['value'] not in value_vals:
-                    value_vals.append(vals[0]['value'])
-                result.append(vals)
-                temp = vals
+                            string += ' :- '
+
+                        if field.type == 'image' or field.type == 'barcode':
+                            string = ''
+                            if field.position != 'bottom':
+                                pos = 'float:' + str(field.position) + ';'
+                                bot = False
+                            else:
+                                bot = True
+                                bot_dict = {'string': string, 'value': value,
+                                            'type': field.type,
+                                            'newline': field.newline,
+                                            'css_string': not field.nolabel and field.css_string or '',
+                                            'style': "font-size:" +
+                                            str(field.fontsize) + "px;" + pos}
+                        else:
+                            bot = False
+                        if not bot:
+                            vals_dict = {'string': string, 'value': value,
+                                         'type': field.type,
+                                         'newline': field.newline,
+                                         'css_string': not field.nolabel and field.css_string or '',
+                                         'css_value': field.css_value,
+                                         'style': "font-size:" +
+                                         str(field.fontsize) + "px;" + pos}
+                            vals.append(vals_dict)
+                    if bot_dict != {}:
+                        vals.append(bot_dict)
+                    if vals and vals[0]['value'] not in value_vals:
+                        value_vals.append(vals[0]['value'])
+                    result.append(vals)
+                    temp = vals
+                elif label_print_data.mode == 'template':
+                    #vals = {'model': model, 'id': datas.id}
+                    vals = datas
+                    result.append(vals)
+                    temp = vals
 
         newlist_len = 0
         new_list = []
@@ -86,9 +96,10 @@ class ReportDynamicLabel(models.AbstractModel):
             val = result[row * columns: row * columns + columns]
             if val:
                 new_list.append(val)
-            for value_list in val:
-                for value_print in value_list:
-                    list_newdata.append(value_print['value'])
+            if mode == 'fields':
+                for value_list in val:
+                    for value_print in value_list:
+                        list_newdata.append(value_print['value'])
 
         for data in new_list:
             for list_data in data:
@@ -118,7 +129,7 @@ class ReportDynamicLabel(models.AbstractModel):
             for new_result in range(0, diff):
                 result1.append(temp)
 
-        # Duplicates the data and raise the issue with the of_label format.
+        # Duplicates the data and raise the issue with the label format.
 #         if len(ids) > 1:
 #             for remain_data_value in remain_data:
 #                 temp[0]['value'] = remain_data_value
@@ -133,7 +144,8 @@ class ReportDynamicLabel(models.AbstractModel):
     @api.model
     def render_html(self, docids, data):
         report = self.env['report']
-        lab_report = report._get_report_from_name('of_label.report_label')
+        report_name = 'of_label.report_label' + (data.get('landscape') and '_landscape' or '')
+        lab_report = report._get_report_from_name(report_name)
         if data is None:
             data = {}
         if not docids:
@@ -144,4 +156,10 @@ class ReportDynamicLabel(models.AbstractModel):
             'data': data,
             'get_data': self.get_data,
         }
-        return report.render('of_label.report_label', docargs)
+        return report.render(report_name, docargs)
+
+
+class ReportDynamicLabelLandscape(models.AbstractModel):
+    _name = 'report.of_label.report_label_landscape'
+    _inherit = 'report.of_label.report_label'
+    u"""Héritage vide pour permettre l'impression au format paysage"""

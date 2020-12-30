@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>
+<odoo><!-- ajouter noupdate="1" après les tests -->
 
         <!-- QWEB Report use paperformat -->
         <report id="dynamic_label"
                 string="Label"
                 model="label.config"
-                name="label.report_label"
+                name="of_label.report_label"
                 report_type="qweb-pdf"
-                paperformat="label.paperformat_euro"/>
+                paperformat="of_label.paperformat_euro_portrait"/>
+
+        <!-- QWEB Report use paperformat -->
+        <report id="dynamic_label_landscape"
+                string="Label"
+                model="label.config"
+                name="of_label.report_label_landscape"
+                report_type="qweb-pdf"
+                paperformat="of_label.paperformat_euro_landscape"/>
 
 </odoo>

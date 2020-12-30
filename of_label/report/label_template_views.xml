@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_of_label_style">
+        <style type="text/css">
+            .of_label_stock {
+            display:table;
+            width:674px;
+            height:476px; // sans l'attribute height, les valeurs height en % ne sont pas appliqués
+            overflow: hidden;
+            }
+            .of_label_table {
+            display:table;
+            }
+            .of_label_row {
+            display:table-row;
+            }
+            .of_label_cell {
+            display: table-cell;
+            padding: 16px;
+            }
+        </style>
+    </template>
+
+    <template id="report_of_label_stock_1">
+        <div class="of_label_stock">
+            <div class="of_label_table" style="height: 10%; width: 100%">
+                <div class="of_label_row">
+                    <div class="of_label_cell" t-field="o.product_id.brand_id.name"/>
+                    <div class="of_label_cell" style="text-align: center;">
+                        Reçu le
+                        <span t-field="o.date" t-field-options='{"format": "dd MMMM yyyy"}'/>
+                    </div>
+                    <div class="of_label_cell" style="text-align: right;" t-field="o.picking_id.name"/>
+                </div>
+            </div>
+            <div class="of_label_table" style="width: 100%; height: 69%;">
+                <div class="of_label_row" style="font-size: 32px; height: 15%">
+                    <div class="of_label_cell">Client:</div>
+                    <div class="of_label_cell" t-field="o.picking_id.partner_id.name" style="colspan: 3;"/>
+                </div>
+                <div class="of_label_row" style="font-size: 24px; height: 12%">
+                    <div class="of_label_cell">Projet:</div>
+                    <div class="of_label_cell" style="colspan: 3;"
+                         t-field="o.picking_id.sale_id.related_project_id.name"/>
+                </div>
+                <div class="of_label_row" style="height: 12%">
+                    <div class="of_label_cell">Désignation:</div>
+                    <div class="of_label_cell" style="colspan: 3;" t-field="o.name"/>
+                </div>
+            </div>
+            <div class="of_label_table" style="width:100%; height:20%;">
+                <div class="of_label_row" style="height: 10%">
+                    <div class="of_label_cell" style="width: 25%; text-align:center;">Code barre</div>
+                    <div class="of_label_cell" style="width: 25%; text-align:center;">Ref</div>
+                    <div class="of_label_cell" style="width: 25%; text-align:center;">Quantité</div>
+                    <div class="of_label_cell" style="width: 25%; text-align:center;">Emplacement</div>
+                </div>
+                <div class="of_label_row" style="height: 10%">
+                    <div class="of_label_cell" style="max-width: 25% !important; text-align:center;">
+                        <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s'
+                            % ('Code128', o.product_id.barcode, 150, 25)" style="max-width: parent;"/>
+                    </div>
+                    <div class="of_label_cell" style="width: 25%; text-align:center;"
+                         t-field="o.product_id.default_code"/>
+                    <div class="of_label_cell" style="width: 25%; text-align:center;" t-field="o.product_uom_qty"/>
+                    <div class="of_label_cell" style="width: 25%; text-align:center;"
+                         t-field="o.location_dest_id.name"/>
+                </div>
+            </div>
+        </div>
+    </template>
+
+</odoo>

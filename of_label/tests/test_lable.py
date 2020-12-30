@@ -39,7 +39,7 @@ class LabelTestCase(common.TransactionCase):
                                 ustr('function')]]],
                         limit=1)
 
-        self.label_print = self.env['of_label.print']
+        self.label_print = self.env['label.print']
         self.label_print_id = self.label_print.sudo().\
             create({'name': 'Lable Print Test',
                     'model_id': self.model.id,

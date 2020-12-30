@@ -1,46 +1,81 @@
 <odoo>
 
-        <!-- Qweb Report design -->
-        <template id="report_label">
-            <t t-call="report.html_container">
-                <div class="page" style="margin-top:0px;">
-                    <div class="ex2">
-                        <table t-att-style="'border-spacing:'+data['form']['cell_spacing']+';border-collapse: separate'">
-                            <t t-foreach="get_data(data['form'].get('rows'),data['form'].get('columns'),data['form'].get('ids'),data ['form'].get('model'),data['form'].get('number_of_copy'))"
-                               t-as="row">
-                                <tr t-att-height="data['form']['height']">
-                                    <t t-foreach="row" t-as="col">
-                                        <td t-att-width="data['form']['width']"
-                                            t-att-style="'padding-left:'+data['form']['left_margin']+';padding-right:'+data['form']['right_margin']+';padding-top:'+data['form']['top_margin']+';border:1px solid black;'">
+    <!-- redéfinition totale du template -->
+    <template id="report_label_internal">
+        <t t-call="report.html_container">
+            <div class="page" style="margin:0px;">
+                <t t-if="data['form']['template_css']">
+                    <t t-call="#{data['form']['template_css']}"/>
+                </t>
+
+                <div class="ex2" style="margin:0px;">
+                    <t t-set="mode" t-value="data['form'].get('mode')"/>
+                    <t t-foreach="get_data(data['form'].get('rows'),data['form'].get('columns'),data['form'].get('ids'),data ['form'].get('model'),data['form'].get('number_of_copy'))"
+                       t-as="row">
+                        <table t-att-style="'border-spacing:'+data['form']['cell_spacing']+';border-collapse: separate;page-break-inside: avoid; padding: 0px; margin: 0px;'">
+                            <tr t-att-height="data['form']['height']" style="margin: 0px">
+                                <t t-foreach="row" t-as="col" t-if="mode == 'fields'">
+                                    <td t-att-width="data['form']['width']"
+                                        t-att-style="'padding-left:'+data['form']['left_margin']+';padding-right:'+data['form']['right_margin']+';padding-top:'+data['form']['top_margin']+';border:1px solid black;box-sizing: border-box;margin:0px;'">
+                                        <div style="min-width: 100%; min-height: 100%; overflow: hidden; margin:0px;">
                                             <t t-foreach="col" t-as="val">
                                                 <t t-if="val['newline']">
                                                     <br/>
                                                 </t>
-                                                <span style="val['style']">
+                                                <span t-attf-style="#{val['style']}">
                                                     <t t-if="(val.get('type') == 'normal')">
-                                                        <t t-esc="val['string']"/>
-                                                        <t t-esc="val['value']"/>
+                                                        <span t-attf-style="#{val['css_string']}">
+                                                            <t t-esc="val['string']"/>
+                                                        </span>
+                                                        <span t-attf-style="#{val['css_value']}">
+                                                            <t t-esc="val['value']"/>
+                                                        </span>
                                                     </t>
                                                     <t t-if="(val.get('type') == 'image')">
-                                                        <t t-esc="val.get('string')"/>
+                                                        <span t-attf-style="#{val['css_string']}">
+                                                            <t t-esc="val.get('string')"/>
+                                                        </span>
                                                         <img t-att-src="'data:image/png;base64,%s' % (val.get('value'))"
                                                              t-att-style="'height:'+data['form']['image_height']+';width:'+data['form']['image_width']"/>
                                                     </t>
                                                     <t t-if="(val.get('type') == 'barcode')">
-                                                        <t t-esc="val.get('string')"/>
+                                                        <span t-attf-style="#{val['css_string']}">
+                                                            <t t-esc="val.get('string')"/>
+                                                        </span>
                                                         <img
                                                                 t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128',val.get('value') , data['form']['barcode_width'], data['form']['barcode_height'])"/>
                                                     </t>
                                                 </span>
                                             </t>
+                                        </div>
+                                    </td>
+                                </t>
+                                <t t-if="mode == 'template'">
+                                    <t t-foreach="row" t-as="col">
+                                        <t t-set="o" t-value="col"/>
+                                        <t t-set="label_width" t-value="data['form']['width_internal']"/>
+                                        <t t-set="label_height" t-value="data['form']['height_internal']"/>
+                                        <t t-set="template_name" t-value="data['form']['template_name']"/>
+                                        <td t-att-width="data['form']['width']"
+                                            t-att-style="'padding-left:'+data['form']['left_margin']+';padding-right:'+data['form']['right_margin']+';padding-top:'+data['form']['top_margin']+';border:1px solid black;box-sizing: border-box;margin:0px;'">
+                                            <t t-call="#{template_name}"/>
                                         </td>
                                     </t>
-                                </tr>
-                            </t>
+                                </t>
+                            </tr>
                         </table>
-                    </div>
+                    </t>
                 </div>
-            </t>
-        </template>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_label">
+        <t t-call="of_label.report_label_internal"/>
+    </template>
+
+    <template id="report_label_landscape">
+        <t t-call="of_label.report_label_internal"/>
+    </template>
 
 </odoo>

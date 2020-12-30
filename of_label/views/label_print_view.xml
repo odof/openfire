@@ -1,49 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-        <!-- This view use for display of_label data fields -->
-        <record id="view_label_print_form" model="ir.ui.view">
-            <field name="name">label.print.form</field>
-            <field name="model">label.print</field>
-            <field name="arch" type="xml">
-                <form string="Label">
-                    <sheet>
-                    <group colspan="4" col="4">
-                        <field name="name"/>
-                        <field name="model_id"/>
-                        <field name="model_list" invisible="1"/>
+    <!-- This view use for display of_label data fields -->
+    <record id="view_label_print_form" model="ir.ui.view">
+        <field name="name">label.print.form</field>
+        <field name="model">label.print</field>
+        <field name="arch" type="xml">
+            <form string="Label">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object"
+                                class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"
+                                   options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <group name="main">
+                        <group name="main_left">
+                            <field name="name"/>
+                            <field name="label_brand_id"/>
+                            <field name="label_config_id" domain="[('label_main_id', '=', label_brand_id)]"/>
+                            <field name="mode"/>
+                        </group>
+                        <group name="main_right">
+                            <field name="model_id"/>
+                            <field name="line_model_id" attrs="{'invisible': [('line_field_domain', '=', [])]}"/>
+                            <field name="line_field_id" attrs="{'invisible': [('line_field_domain', '=', [])]}"/>
+                            <field name="line_field_domain" invisible="1"/>
+                            <field name="model_list" invisible="1"/>
+                        </group>
                     </group>
                     <notebook colspan="4">
-                        <page string="Fields">
+                        <page name="template" string="Template" attrs="{'invisible': [('mode', '=', 'fields')]}">
+                            <field name="template_id"/>
+                            <field name="template_id_arch"/>
+                        </page>
+                        <page string="Fields" attrs="{'invisible': [('mode', '!=', 'fields')]}">
                             <field name="field_ids" colspan="4" nolabel="1">
                                 <form string="Fields">
-                                    <group colspan="4" col="4">
-                                        <field name="sequence"/>
-                                        <field name="type"/>
-                                        <field name="fontsize"/>
-                                        <field name="position" attrs="{'invisible':[('type','=','normal')]}"/>
-                                        <field name="newline"/>
-                                        <field name="nolabel"/>
-                                        <field name="python_expression"/>
-                                        <field name="field_id"
-                                               attrs="{'invisible': [('python_expression','=',True)], 'required': [('python_expression','=',False)]}"
-                                               domain="[('ttype', 'not in', ['one2many', 'refenrence', 'function'])]"
-                                               context="{'model_list':parent.model_list}"/>
-                                        <field name="python_field"
-                                               attrs="{'invisible': [('python_expression','=',False)], 'required': [('python_expression','=',True)]}"/>
-                                        <newline/>
-                                        <label string="Python experession field must be start with obj. e.g:- obj.M2O_field.field_name"
-                                               colspan="4"/>
+                                    <group name="main">
+                                        <group name="left_1" string="Infos Champ" col="2">
+                                            <field name="sequence"/>
+                                            <field name="field_id"
+                                                   attrs="{'invisible': [('python_expression','=',True)], 'required': [('python_expression','=',False)]}"
+                                                   domain="[('ttype', 'not in', ['one2many', 'refenrence', 'function'])]"
+                                                   context="{'model_list':parent.model_list}"/>
+                                            <field name="python_expression"/>
+                                            <field name="python_field"
+                                                   attrs="{'invisible': [('python_expression','=',False)], 'required': [('python_expression','=',True)]}"/>
+                                            <div colspan="2" attrs="{'invisible': [('python_expression','=',False)]}">
+                                                <i class="oe_grey">
+                                                    l'expression Python doit commencer par obj.
+                                                    exples: obj.M2O_field.field_name, obj.partner_id.name
+                                                </i>
+                                            </div>
+                                            <field name="name"/>
+                                        </group>
+                                        <group name="right_1" string="Cosmétique">
+                                            <field name="type"/>
+                                            <field name="width"
+                                                   attrs="{'invisible': [('type', 'not in', ('image', 'barcode'))]}"/>
+                                            <field name="height"
+                                                   attrs="{'invisible': [('type', 'not in', ('image', 'barcode'))]}"/>
+                                            <field name="position" attrs="{'invisible':[('type','=','normal')]}"/>
+                                            <field name="fontsize"/>
+                                            <field name="css_string" attrs="{'invisible':[('nolabel', '=', True)]}"/>
+                                            <field name="css_value"/>
+                                            <field name="newline"/>
+                                            <field name="nolabel"/>
+                                        </group>
                                     </group>
                                 </form>
                                 <tree string="Fields">
                                     <field name="sequence"/>
+                                    <field name="name"/>
                                     <field name="field_id"
                                            domain="[('ttype', 'not in', ['one2many', 'refenrence', 'function'])]"/>
                                     <field name="python_field"/>
                                     <field name="type"/>
+                                    <field name="width"
+                                           attrs="{'invisible': [('type', 'not in', ('image', 'barcode'))]}"/>
+                                    <field name="height"
+                                           attrs="{'invisible': [('type', 'not in', ('image', 'barcode'))]}"/>
                                 </tree>
                             </field>
+                        </page>
+                        <page name="css" string="CSS">
+                            <field name="template_css_id"/>
+                            <field name="template_css_id_arch"/>
                         </page>
                         <page string="Advance">
                             <group colspan="2" col="2">
@@ -60,33 +104,33 @@
                             </group>
                         </page>
                     </notebook>
-                    </sheet>
-                </form>
-            </field>
-        </record>
+                </sheet>
+            </form>
+        </field>
+    </record>
 
-        <!-- Label print data tree view -->
-        <record id="view_label_print_tree" model="ir.ui.view">
-            <field name="name">label.print.tree</field>
-            <field name="model">label.print</field>
-            <field name="arch" type="xml">
-                <tree string="Report">
-                    <field name="name"/>
-                    <field name="model_id"/>
-                </tree>
-            </field>
-        </record>
+    <!-- Label print data tree view -->
+    <record id="view_label_print_tree" model="ir.ui.view">
+        <field name="name">label.print.tree</field>
+        <field name="model">label.print</field>
+        <field name="arch" type="xml">
+            <tree string="Report">
+                <field name="name"/>
+                <field name="model_id"/>
+            </tree>
+        </field>
+    </record>
 
-        <!-- Label Print Action -->
-        <record id="action_label_print_form" model="ir.actions.act_window">
-            <field name="name">Label Print</field>
-            <field name="res_model">label.print</field>
-            <field name="context">{'default_field_id':1}</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-        </record>
+    <!-- Label Print Action -->
+    <record id="action_label_print_form" model="ir.actions.act_window">
+        <field name="name">Label Print</field>
+        <field name="res_model">label.print</field>
+        <field name="context">{'default_field_id':1}</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
 
-        <!-- Menu of Label Print -->
-        <menuitem id="menu_label_print_view" action="action_label_print_form" parent="label.menu_config"/>
+    <!-- Menu of Label Print -->
+    <menuitem id="menu_label_print_view" action="action_label_print_form" parent="of_label.menu_config"/>
 
 </odoo>

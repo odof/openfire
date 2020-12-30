@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
+    <data >
+
+        <record id="b0" model="label.brand">
+            <field name="brand_name">Openfire</field>
+        </record>
+
+        <record id="s01" model="label.config">
+            <field name="label_main_id" ref="b0"/>
+            <field name="name">2 x 2 paysage</field>
+            <field name="height">105.0</field>
+            <field name="width">148.5</field>
+            <field name="cell_spacing">0.0</field>
+            <field name="landscape">True</field>
+        </record>
 
         <record id="b1" model="label.brand">
             <field name="brand_name">Others</field>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="of_label_stock_1" model="label.print">
+            <field name="name">Étiquette de stock 2x2</field>
+            <field name="label_brand_id" ref="of_label.b0"/>
+            <field name="label_config_id" ref="of_label.s01"/>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="line_field_id" ref="stock.field_stock_picking_move_lines"/>
+            <field name="mode">template</field>
+            <field name="template_id" ref="of_label.report_of_label_stock_1"/>
+            <field name="template_css_id" ref="of_label.report_of_label_style"/>
+        </record>
+
+    </data>
+</odoo>
