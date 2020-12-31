@@ -65,7 +65,7 @@
                          t-field="o.product_id.default_code"/>
                     <div class="of_label_cell" style="width: 25%; text-align:center;" t-field="o.product_uom_qty"/>
                     <div class="of_label_cell" style="width: 25%; text-align:center;"
-                         t-field="o.location_dest_id.name"/>
+                         t-field="o.location_dest_id.display_name"/>
                 </div>
             </div>
         </div>
