@@ -20,6 +20,9 @@ Extension OpenFire du module stock
     ],
     "data": [
         'views/of_stock_views.xml',
+        'wizards/of_stock_date_confirmation_views.xml',
+        'wizards/stock_backorder_confirmation_views.xml',
+        'wizards/stock_immediate_transfer_views.xml',
     ],
     'installable': True,
     'application': False,

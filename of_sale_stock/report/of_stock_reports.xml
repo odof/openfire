@@ -1,72 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- Modifcation stock picking (bon de préparation) -->
-    <template id="of_stock_report_picking" inherit_id="stock.report_picking">
-
-        <!-- Ajout pastille vendeur -->
-        <xpath expr="//div[@class='row']" position="after">
-            <div class="row mt32 mb32">
-                <div class="col-xs-12">
-                    <div><strong>Vos références&amp;nbsp;: </strong></div>
-                    <div name="refs" class="mt8" id="informations" style="display: table">
-                        <div t-if="o.move_lines.mapped('procurement_id').mapped('sale_line_id').mapped('order_id').mapped('user_id').name"
-                            style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
-                            <strong>Vendeur&amp;nbsp;:</strong><br/>
-                            <t t-set="vendeur" t-value="o.move_lines.mapped('procurement_id').mapped('sale_line_id').mapped('order_id').mapped('user_id').name"/>
-                            <span t-esc="vendeur"/>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </xpath>
-
-        <!-- Cacher le titre h1 -->
-        <xpath expr="//h1" position="attributes">
-            <attribute name="style">display: none</attribute>
-        </xpath>
-
-        <!-- Ajoute description d'article (si l'option de configuration est marqué) -->
-        <xpath expr="//table[2]/thead/tr/th" position="replace">
-            <th groups="!of_sale_stock.group_description_BL_variant"><strong>Article</strong></th>
-            <th groups="of_sale_stock.group_description_BL_variant"><strong>Article et description</strong></th>
-        </xpath>
-        <xpath expr="//table[2]/tbody/tr/td" position="replace">
-            <td groups="!of_sale_stock.group_description_BL_variant">
-                <span t-field="pack_operation.product_id"/>
-                <br/>
-                <span t-field="pack_operation.product_id.description_picking"/>
-                <t t-if="not pack_operation.product_id and pack_operation.package_id">
-                    <span t-field="pack_operation.package_id"/>
-                </t>
-            </td>
-            <td groups="of_sale_stock.group_description_BL_variant">
-                <t t-set="description_BL" t-value="pack_operation.move_name"/>
-                <span t-esc="description_BL"/>
-            </td>
-        </xpath>
-
-        <!-- Ajout colonne stock réel -->
-        <xpath expr="//table[2]/thead/tr//th[@class='text-right']" position="after">
-            <th class="text-right">Qté. stock</th>
-        </xpath>
-        <xpath expr="//table[2]/tbody/tr//td[@class='text-right']" position="after">
-            <td class="text-right">
-                <t t-set="stock_qty" t-value="pack_operation.remaining_qty"/>
-                <span t-esc="stock_qty"/>
-                <span t-field="pack_operation.product_uom_id" groups="product.group_uom"/>
-            </td>
-        </xpath>
-
-        <!-- Ajout colonne commandé et reçu -->
-        <xpath expr="//table[2]/thead/tr/t[2]" position="after">
-            <th><strong>Commandé</strong></th>
-            <th><strong>Reçu</strong></th>
-        </xpath>
-        <xpath expr="//table[2]/tbody//td[@t-if='has_serial_number']" position="after">
-            <td class="text-center"><input type="checkbox"/></td>
-            <td class="text-center"><input type="checkbox"/></td>
-        </xpath>
+    <template id="report_of_picking_preparation">
+        <t t-call="report.html_container">
+            <t t-set="docs" t-value="docs.with_context(of_report_name='Bon de préparation')"/>
+            <t t-foreach="docs" t-as="o">
+                <t t-call="stock.report_picking" t-lang="o.partner_id.lang"/>
+            </t>
+        </t>
     </template>
 
+    <report
+        string="Picking Operations"
+        id="stock.action_report_picking"
+        model="stock.picking"
+        report_type="qweb-pdf"
+        name="of_sale_stock.report_of_picking_preparation"
+        file="of_sale_stock.report_of_picking_preparation"
+    />
 </odoo>

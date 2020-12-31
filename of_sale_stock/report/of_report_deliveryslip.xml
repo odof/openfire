@@ -2,6 +2,16 @@
 <odoo>
         <!-- Inherit report_delivery_document (depuis module stock) -->
         <template id="of_report_deliveryslip" inherit_id="stock.report_delivery_document">
+            <xpath expr="//tr[@t-foreach='o.move_lines']" position="attributes">
+                <attribute name="t-if">move.state != 'cancel'</attribute>
+            </xpath>
+            <xpath expr="//tr[@t-foreach='o.move_lines']" position="after">
+                <tr t-if="o.move_lines and len(o.move_lines.filtered(lambda m: m.state != 'cancel')) == 0">
+                    <td colspan="2">
+                        Toutes les lignes de ce bon de livraison sont annulées.
+                    </td>
+                </tr>
+            </xpath>
             <xpath expr="//table[3]" position="after">
                 <t t-if="o.of_note_operations">
                     <div style="border-bottom: 1px solid black; padding-bottom: 6px; margin-top: 8px;">

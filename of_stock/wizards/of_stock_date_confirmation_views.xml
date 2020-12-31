@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_of_stock_date_confirmation" model="ir.ui.view">
+        <field name="name">of.stock.date.confirmation.view.form</field>
+        <field name="model">of.stock.date.confirmation</field>
+        <field name="arch" type="xml">
+            <form string="Immediate transfer?">
+                <group name="gr_1">
+                    <field name="date_done"/>
+                </group>
+                <footer>
+                    <button name="process" string="Valider" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
