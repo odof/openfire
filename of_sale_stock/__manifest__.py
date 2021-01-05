@@ -6,7 +6,7 @@
     "author": "OpenFire",
     'license': 'AGPL-3',
     'category': 'OpenFire modules',
-    "description": """
+    "description": u"""
 Extension OpenFire du module sale_stock
 =======================================
 
