@@ -41,8 +41,16 @@
                 </div>
                 <div class="of_label_row" style="font-size: 24px; height: 12%">
                     <div class="of_label_cell">Projet:</div>
-                    <div class="of_label_cell" style="colspan: 3;"
-                         t-field="o.picking_id.sale_id.related_project_id.name"/>
+                    <div class="of_label_cell" style="colspan: 3;">
+                        <!-- BR -->
+                        <t t-if="o.picking_id.picking_type_code == 'incoming'">
+                            <span t-field="o.procurement_id.purchase_line_id.account_analytic_id.name"/>
+                        </t>
+                        <!-- BL -->
+                        <t t-if="o.picking_id.picking_type_code == 'outgoing'">
+                            <span t-field="o.picking_id.sale_id.related_project_id.name"/>
+                        </t>
+                    </div>
                 </div>
                 <div class="of_label_row" style="height: 12%">
                     <div class="of_label_cell">Désignation:</div>
