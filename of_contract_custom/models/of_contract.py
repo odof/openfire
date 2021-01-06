@@ -12,6 +12,27 @@ class OfContract(models.Model):
     _name = "of.contract"
     _inherit = ['mail.thread', 'of.form.readonly']
 
+    @api.model_cr_context
+    def _auto_init(self):
+        """ A SUPPRIMER """
+        cr = self._cr
+        cr.execute(
+            "SELECT 1 FROM information_schema.columns "
+            "WHERE table_name = 'of_contract' AND column_name = 'recurring_invoicing_payment'")
+        champ_ancien = bool(cr.fetchall())
+        cr.execute(
+            "SELECT 1 FROM information_schema.columns "
+            "WHERE table_name = 'of_contract' AND column_name = 'recurring_invoicing_payment_id'")
+        champ_nouveau = bool(cr.fetchall())
+        res = super(OfContract, self)._auto_init()
+        if champ_ancien and not champ_nouveau:
+            cr.execute(
+                "UPDATE of_contract as oc "
+                "SET recurring_invoicing_payment_id = rip.id "
+                "FROM of_contract_recurring_invoicing_payment AS rip "
+                "WHERE rip.code = oc.recurring_invoicing_payment")
+        return res
+
     # @api.constrains('recurring_rule_type', 'recurring_invoicing_payment')
     # def contrainte_type_et_frequence(self):
     #     if self.recurring_rule_type == 'date' and self.recurring_invoicing_payment == 'pre-paid':
@@ -23,7 +44,7 @@ class OfContract(models.Model):
 
     active = fields.Boolean(default=True)
     invoice_ids = fields.One2many(comodel_name='account.invoice', inverse_name='of_contract_id', string="Factures")
-    invoice_count = fields.Integer(string='Nombre de facture', compute='_get_invoice_count', readonly=True)
+    invoice_count = fields.Integer(string='Nombre de factures', compute='_get_invoice_count', readonly=True)
     name = fields.Char(string="Nom", required=False, compute="_compute_name", store=True)
     reference = fields.Char(string=u"Référence", required=True)
     partner_id = fields.Many2one("res.partner", string="Client payeur", required=True)
@@ -37,15 +58,11 @@ class OfContract(models.Model):
         ('trimester', u'Trimestrielle'),  # Tout les 3 mois
         ('semester', u'Semestrielle'),  # 2 fois par ans
         ('year', u'Annuelle'),
-        ], string=u"Fréquence de facturation", help="Interval de temps entre chaque facturation",
+        ], string=u"Fréquence de facturation", help="Intervalle de temps entre chaque facturation",
         required=True
     )
-    recurring_invoicing_payment = fields.Selection([
-        # ('date', 'Date du jour'),
-        ('pre-paid', u'À Échoir'),
-        ('post-paid', u'Échu'),
-        ], string='Type de facturation', required=True,
-    )
+    recurring_invoicing_payment_id = fields.Many2one(
+        'of.contract.recurring.invoicing.payment', string="Type de facturation", required=True)
     journal_id = fields.Many2one(
         'account.journal', string='Journal', default=lambda s: s._default_journal(),
         domain="[('type', '=', 'sale'),('company_id', '=', company_id)]")
@@ -161,7 +178,7 @@ class OfContract(models.Model):
 
     @api.depends('line_ids', 'line_ids.next_date')
     def _compute_next_date(self):
-        """ Calcul de la date de prochaine facturation en fonction du type d'interval choisit (facture ou éléments)
+        """ Calcul de la date de prochaine facturation en fonction du type d'intervalle choisi (facture ou éléments)
         """
         for contract in self:
             if not contract.line_ids:
@@ -244,6 +261,16 @@ class OfContract(models.Model):
     def onchange_partner(self):
         """ Prend la position fiscale renseignée sur le client """
         self.fiscal_position_id = self.partner_id.property_account_position_id
+
+    @api.onchange('recurring_rule_type')
+    def _onchange_recurring_rule_type(self):
+        self.ensure_one()
+        if self.recurring_rule_type == 'date':
+            if self.recurring_invoicing_payment_id.code not in ('date', 'post-paid'):
+                self.recurring_invoicing_payment_id = False
+        elif self.recurring_rule_type:
+            if self.recurring_invoicing_payment_id.code not in ('pre-paid', 'post-paid'):
+                self.recurring_invoicing_payment_id = False
 
     @api.model
     def create(self, vals):
@@ -564,6 +591,27 @@ class OfContractLine(models.Model):
     _inherit = ["of.form.readonly", "of.planning.plannification"]
     _order = 'line_avenant_id ASC, code_de_ligne DESC'
 
+    @api.model_cr_context
+    def _auto_init(self):
+        """ A SUPPRIMER """
+        cr = self._cr
+        cr.execute(
+            "SELECT 1 FROM information_schema.columns "
+            "WHERE table_name = 'of_contract_line' AND column_name = 'recurring_invoicing_payment'")
+        champ_ancien = bool(cr.fetchall())
+        cr.execute(
+            "SELECT 1 FROM information_schema.columns "
+            "WHERE table_name = 'of_contract_line' AND column_name = 'recurring_invoicing_payment_id'")
+        champ_nouveau = bool(cr.fetchall())
+        res = super(OfContractLine, self)._auto_init()
+        if champ_ancien and not champ_nouveau:
+            cr.execute(
+                "UPDATE of_contract_line as ocl "
+                "SET recurring_invoicing_payment_id = rip.id "
+                "FROM of_contract_recurring_invoicing_payment AS rip "
+                "WHERE rip.code = ocl.recurring_invoicing_payment")
+        return res
+
     # @api.constrains('frequency_type', 'recurring_invoicing_payment')
     # def contrainte_type_et_frequence(self):
     #     if self.frequency_type == 'date' and self.recurring_invoicing_payment == 'pre-paid':
@@ -601,11 +649,10 @@ class OfContractLine(models.Model):
         ('semester', u'Semestrielle'),  # 2 fois par ans
         ('year', u'Annuelle'),
         ], default='month', string=u"Fréquence de facturation", required=True)
-    recurring_invoicing_payment = fields.Selection([
-        # ('date', 'Date du jour'),
-        ('pre-paid', u'À Échoir'),
-        ('post-paid', u'Échu'),
-        ], default='pre-paid', string='Type de facturation', required=True)
+    recurring_invoicing_payment_id = fields.Many2one(
+        'of.contract.recurring.invoicing.payment', string="Type de facturation", required=True,
+        default=lambda s: s.env.ref(
+            'of_contract_custom.of_contract_recurring_invoicing_payment_pre-paid', raise_if_not_found=False))
 
     next_date = fields.Date(string="Prochaine facturation", compute="_compute_dates", store=True, copy=False)
     # previous_date = fields.Date(string=u"Dernière facturation", compute="_compute_dates")
@@ -797,6 +844,7 @@ class OfContractLine(models.Model):
             if line.state != 'validated':
                 continue
             if line.frequency_type == 'date':
+                # line.recurring_invoicing_payment_id.code est 'date' ou 'post-paid'
                 last_invoicing = line.last_invoicing_date
                 if not last_invoicing:
                     date_start = fields.Date.from_string(line.date_contract_start)
@@ -805,12 +853,17 @@ class OfContractLine(models.Model):
                 if interventions:
                     interventions = interventions.sorted('date_date')
                     intervention = interventions[0]
-                    line.next_date = intervention.date_date
+                    next_date = intervention.date_date
+                    if line.recurring_invoicing_payment_id.code == 'post-paid':
+                        # On se place au dernier jour du mois
+                        base_date = fields.Date.from_string(next_date)
+                        next_date = base_date + relativedelta(months=1, day=1, days=-1)
+                    line.next_date = next_date
             else:
                 invoice_lines = line.invoice_line_ids.filtered(lambda l: l.invoice_id.state != 'cancel')
                 if not invoice_lines and line.frequency_type != 'date':
                     base_date = fields.Date.from_string(last_invoice_date or line.date_contract_start)
-                    if line.recurring_invoicing_payment == 'pre-paid':
+                    if line.recurring_invoicing_payment_id.code == 'pre-paid':
                         if last_invoice_date:
                             if frequency_type == 'month':
                                 line.next_date = base_date + relativedelta(months=1, day=1)
@@ -839,7 +892,7 @@ class OfContractLine(models.Model):
                 end = line.date_contract_end
                 if line.frequency_type == 'month':
                     next = fields.Date.from_string(last_invoice_date) + relativedelta(months=1)
-                    if line.recurring_invoicing_payment == 'pre-paid':
+                    if line.recurring_invoicing_payment_id.code == 'pre-paid':
                         next = next + relativedelta(day=1)
                     else:
                         next = next + relativedelta(months=1, day=1, days=-1)
@@ -848,7 +901,7 @@ class OfContractLine(models.Model):
                         line.next_date = next
                 elif line.frequency_type == 'trimester':
                     next = fields.Date.from_string(last_invoice_date) + relativedelta(months=3)
-                    if line.recurring_invoicing_payment == 'pre-paid':
+                    if line.recurring_invoicing_payment_id.code == 'pre-paid':
                         next = next + relativedelta(day=1)
                     else:
                         next = next + relativedelta(months=1, day=1, days=-1)
@@ -857,7 +910,7 @@ class OfContractLine(models.Model):
                         line.next_date = next
                 elif line.frequency_type == 'semester':
                     next = fields.Date.from_string(last_invoice_date) + relativedelta(months=6)
-                    if line.recurring_invoicing_payment == 'pre-paid':
+                    if line.recurring_invoicing_payment_id.code == 'pre-paid':
                         next = next + relativedelta(day=1)
                     else:
                         next = next + relativedelta(months=1, day=1, days=-1)
@@ -866,7 +919,7 @@ class OfContractLine(models.Model):
                         line.next_date = next
                 elif line.frequency_type == 'year':
                     next = fields.Date.from_string(last_invoice_date) + relativedelta(years=1)
-                    if line.recurring_invoicing_payment == 'pre-paid':
+                    if line.recurring_invoicing_payment_id.code == 'pre-paid':
                         next = next + relativedelta(day=1)
                     else:
                         next = next + relativedelta(months=1, day=1, days=-1)
@@ -988,6 +1041,16 @@ class OfContractLine(models.Model):
                 parc_installe = parc_obj.search([('client_id', '=', self.partner_id.id)], limit=1)
             if parc_installe:
                 self.parc_installe_id = parc_installe
+
+    @api.onchange('frequency_type')
+    def _onchange_frequency_type(self):
+        self.ensure_one()
+        if self.frequency_type == 'date':
+            if self.recurring_invoicing_payment_id.code not in ('date', 'post-paid'):
+                self.recurring_invoicing_payment_id = False
+        elif self.frequency_type:
+            if self.recurring_invoicing_payment_id.code not in ('pre-paid', 'post-paid'):
+                self.recurring_invoicing_payment_id = False
 
     @api.multi
     def name_get(self):
@@ -1470,7 +1533,7 @@ class OfContractProduct(models.Model):
             last_day = product_line.line_id.current_period_id.date_end
             frequency_type = line.frequency_type
             qty_to_invoice = 0
-            if last_day and line.recurring_invoicing_payment == 'post-paid' and \
+            if last_day and line.recurring_invoicing_payment_id.code == 'post-paid' and \
                last_day == line.next_date and line.revision == 'last_day':
                 qty_to_invoice = round(product_line.qty_per_year - product_line.qty_invoiced, 3)
             else:
@@ -1608,3 +1671,10 @@ class OfContractPeriod(models.Model):
                                         .filtered(lambda i: period.date_start <= i.date_invoice <= period.date_end)
             if invoice:
                 period.has_invoices = True
+
+
+class OfContractRecurringInvoicingPayment(models.Model):
+    _name = 'of.contract.recurring.invoicing.payment'
+
+    code = fields.Char(string="Code")
+    name = fields.Char(string=u"Libellé")

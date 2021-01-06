@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <data>
+        <record id="of_contract_recurring_invoicing_payment_date" model="of.contract.recurring.invoicing.payment">
+            <field name="code">date</field>
+            <field name="name">Date du jour</field>
+        </record>
+        <record id="of_contract_recurring_invoicing_payment_pre-paid" model="of.contract.recurring.invoicing.payment">
+            <field name="code">pre-paid</field>
+            <field name="name">À Échoir</field>
+        </record>
+        <record id="of_contract_recurring_invoicing_payment_post-paid" model="of.contract.recurring.invoicing.payment">
+            <field name="code">post-paid</field>
+            <field name="name">Échu</field>
+        </record>
+    </data>
+
     <data noupdate="1">
 
         <!-- nextcall est écrit en heure serveur donc ajouter 2 heures en été et 1 en hiver -->

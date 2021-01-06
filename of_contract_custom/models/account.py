@@ -27,10 +27,10 @@ class OfAccountInvoice(models.Model):
         lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
         for invoice in self:
             if invoice.of_contract_id and invoice.date_invoice:
-                recurring_invoicing_payment = invoice.of_contract_id.recurring_invoicing_payment
+                recurring_invoicing_payment = invoice.of_contract_id.recurring_invoicing_payment_id
                 recurring_rule_type = invoice.of_contract_id.recurring_rule_type
                 months = month_correspondance[recurring_rule_type]
-                if recurring_invoicing_payment == 'pre-paid':
+                if recurring_invoicing_payment.code == 'pre-paid':
                     if not months and invoice.of_intervention_id:
                         invoice.of_contract_period = u"Facturation à date %s" % format_date(invoice.of_intervention_id.date_date, lang)
                     else:

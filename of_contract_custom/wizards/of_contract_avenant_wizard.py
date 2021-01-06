@@ -18,7 +18,7 @@ class OFContractAvenantWizard(models.TransientModel):
             'state': 'draft',
             'date_avenant': self.date_start,
             'type': 'avenant',
-            'revision_avenant' : self.contract_line_id.recurring_invoicing_payment == 'pre-paid',
+            'revision_avenant': self.contract_line_id.recurring_invoicing_payment_id.code == 'pre-paid',
         })[0]
         line_data = []
         for line in origine.contract_product_ids:

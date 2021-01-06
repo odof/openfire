@@ -192,8 +192,9 @@ class OfPlanningIntervention(models.Model):
                 self.tache_id.name,
                 self.service_id.note
             )
-            res = [info for info in infos if (info and info not in self.description)]
-            self.description += " ".join(res)
+            description = self.description or ""
+            res = [info for info in infos if (info and info not in description)]
+            self.description = description + " ".join(res)
 
 
 class OfPlanningEquipe(models.Model):  #@todo: vérifier si nécessaire

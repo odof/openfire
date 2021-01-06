@@ -35,7 +35,7 @@
                 <field name="name"/>
                 <field name="category_ids"/>
                 <field name="reference"/>
-                <field name="recurring_invoicing_payment"/>
+                <field name="recurring_invoicing_payment_id"/>
                 <field name="recurring_rule_type"/>
                 <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                 <separator/>
@@ -51,7 +51,7 @@
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="recurring_rule_type"/>
-                <field name="recurring_invoicing_payment"/>
+                <field name="recurring_invoicing_payment_id"/>
                 <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
             </tree>
         </field>
@@ -106,10 +106,12 @@
                             <field name="date_souscription" attrs="{'readonly': [('invoice_count','>',0)]}"/>
                         </group>
                         <group col="2" colspan="2" string="Facturation" name="facturation">
-                            <label for="recurring_invoicing_payment"/>
+                            <label for="recurring_invoicing_payment_id"/>
                             <div name="dates">
                                 <field name="recurring_rule_type" nolabel="1" class="oe_inline"/>
-                                <field name="recurring_invoicing_payment" nolabel="1" class="oe_inline"/>
+                                <field name="recurring_invoicing_payment_id" nolabel="1" class="oe_inline"
+                                       options="{'no_create': True, 'no_open': True}"
+                                       domain="[('code', 'in', recurring_rule_type == 'date' and ('date', 'post-paid') or ('pre-paid', 'post-paid'))]"/>
                             </div>
                             <field name="journal_id" attrs="{'readonly': [('invoice_count','>',0)]}"/>
                             <field name="fiscal_position_id"/>
@@ -155,7 +157,7 @@
                                        context="{'form_view_ref': 'of_contract_custom.of_contract_line_view_form',
                                                  'default_partner_id': partner_id,
                                                  'default_company_id': company_id,
-                                                 'default_recurring_invoicing_payment': recurring_invoicing_payment,
+                                                 'default_recurring_invoicing_payment_id': recurring_invoicing_payment_id,
                                                  'default_frequency_type': recurring_rule_type,
                                                  'default_recurrence': True,
                                                  'default_fiscal_position_id': fiscal_position_id,
@@ -332,7 +334,7 @@
                 <field name="partner_id"/>
                 <field name="address_id"/>
                 <field name="supplier_id"/>
-                <field name="recurring_invoicing_payment"/>
+                <field name="recurring_invoicing_payment_id"/>
                 <field name="supplier_tag_ids"/>
                 <field name="contract_product_ids"/>
                 <field name="tache_id"/>
@@ -448,7 +450,9 @@
                                 </group>
                                 <group col="2" colspan="2" attrs="{'invisible': [('afficher_facturation', '=', False)]}">
                                     <field name="frequency_type" class="oe_inline"/>
-                                    <field name="recurring_invoicing_payment"/>
+                                    <field name="recurring_invoicing_payment_id"
+                                           options="{'no_create': True, 'no_open': True}"
+                                           domain="[('code', 'in', frequency_type == 'date' and ('date', 'post-paid') or ('pre-paid', 'post-paid'))]"/>
                                     <field name="fiscal_position_id"/>
                                     <field name="revision"/>
                                 </group>
