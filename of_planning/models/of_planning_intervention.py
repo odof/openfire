@@ -1590,6 +1590,16 @@ class SaleOrderLine(models.Model):
             else:
                 line.of_intervention_state = 'todo'
 
+    @api.model
+    def create(self, vals):
+        if vals.get('order_id', False):
+            order = self.env['sale.order'].browse(vals['order_id'])
+            if order and order.state == 'sale':
+                # Ajout d'un contexte afin de ne pas recalculer la date du BL
+                # si ce dernier est lié à des RDVs d'intervention
+                self = self.with_context(of_add_order_line=True)
+        return super(SaleOrderLine, self).create(vals)
+
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
@@ -1628,3 +1638,17 @@ class StockPicking(models.Model):
                 context['search_default_picking_id'] = self.id
             action['context'] = str(context)
         return action
+
+
+class StockMove(models.Model):
+    _inherit = 'stock.move'
+
+    @api.multi
+    def write(self, vals):
+        # Lors de l'ajout d'une ligne sur un bon de commande validé, on inhibe le recalcul de la date du BL
+        # si ce dernier est lié à des RDVs d'intervention
+        if self._context.get('of_add_order_line', False) and vals.get('picking_id', False):
+            picking = self.env['stock.picking'].browse(vals['picking_id'])
+            if picking and picking.of_intervention_ids:
+                vals['date_expected'] = picking.min_date
+        return super(StockMove, self).write(vals)
