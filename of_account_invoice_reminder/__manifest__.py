@@ -20,6 +20,7 @@ Mise en place d'un workflow de relance pour les factures.
         'data/of_account_invoice_reminder_data.xml',
         'views/of_account_invoice_reminder_views.xml',
         'wizards/of_account_invoice_reminder_send_views.xml',
+        'security/ir.model.access.csv',
     ],
     'installable': True,
     'application': False,
