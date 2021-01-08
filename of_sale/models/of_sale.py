@@ -721,6 +721,7 @@ class SaleOrderLine(models.Model):
     )
     of_product_default_code = fields.Char(related='product_id.default_code', string=u"Référence article", readonly=True)
     of_order_line_option_id = fields.Many2one(comodel_name='of.order.line.option', string=u"Option")
+    of_reset_option = fields.Boolean(string=u"Réinitialiser l'option ?")
 
     of_confirmation_date = fields.Datetime(string="Date de confirmation", related="order_id.confirmation_date", store=True)
     of_invoice_policy = fields.Selection([('order', u'Quantités commandées'), ('delivery', u'Quantités livrées')],
@@ -855,7 +856,29 @@ class SaleOrderLine(models.Model):
                                             (option.purchase_price_update_value / 100))) *\
                                           self.product_id.property_of_purchase_coeff
                 self.purchase_price = self.order_id.currency_id.round(self.purchase_price)
-            self.name = self.name + "\n%s" % option.description_update
+            if option.description_update:
+                self.name = self.name + "\n%s" % option.description_update
+
+    @api.onchange('of_reset_option')
+    def _onchange_of_reset_option(self):
+        if self.of_reset_option:
+            product = self.product_id.with_context(
+                lang=self.order_id.partner_id.lang,
+                partner=self.order_id.partner_id.id,
+                quantity=self.product_uom_qty,
+                date=self.order_id.date_order,
+                pricelist=self.order_id.pricelist_id.id,
+                uom=self.product_uom.id
+            )
+
+            if self.order_id.pricelist_id and self.order_id.partner_id:
+                self.price_unit = self.env['account.tax']._fix_tax_included_price_company(
+                    self._get_display_price(product), product.taxes_id, self.tax_id, self.company_id)
+            self.purchase_price = product.standard_price
+            if self.of_order_line_option_id.description_update:
+                self.name = self.name.replace(self.of_order_line_option_id.description_update, '')
+            self.of_order_line_option_id = False
+            self.of_reset_option = False
 
     def of_get_line_name(self):
         self.ensure_one()

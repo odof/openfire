@@ -198,7 +198,8 @@
                     <attribute name="attrs">{'invisible': [('of_client_view', '=', True)]}</attribute>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="after">
-                    <field name="of_order_line_option_id"/>
+                    <field name="of_order_line_option_id" options="{'no_create': True, 'no_open': True}"/>
+                    <field name="of_reset_option"/>
                     <field name="of_client_view" invisible="1"/>
                 </xpath>
             </field>
