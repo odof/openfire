@@ -3,6 +3,7 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
+
 class OfAccountPaymentBankDeposit(models.Model):
     _name = 'of.account.payment.bank.deposit'
     _description = 'Payment bank deposit'
@@ -12,17 +13,20 @@ class OfAccountPaymentBankDeposit(models.Model):
         res = []
         if self._context.get('active_model', '') == 'account.payment':
             # Allow only payments that have not been already deposited
-            payments = self.env['account.payment'].search([('id', 'in', self._context['active_ids']), ('of_deposit_id', '=', False)])
+            payments = self.env['account.payment'].search(
+                [('id', 'in', self._context['active_ids']), ('of_deposit_id', '=', False)])
             res = [(4, payment.id) for payment in payments]
         return res
 
     name = fields.Char('Deposit code', required=True, help='Deposit code')
     date = fields.Date('Date', required=True, default=fields.Date.context_today)
-    payment_ids = fields.One2many('account.payment', 'of_deposit_id', 'Payments', copy=False, default=_get_default_payments)
+    payment_ids = fields.One2many(
+        'account.payment', 'of_deposit_id', 'Payments', copy=False, default=_get_default_payments)
     move_id = fields.Many2one('account.move', 'Account move', readonly=True, ondelete='restrict')
     state = fields.Selection([('draft', 'Unposted'), ('posted', 'Posted')], string='Status',
                              required=True, readonly=True, copy=False, default='draft')
-    journal_id = fields.Many2one('account.journal', 'Journal', required=True, domain="[('type', 'in', ('cash', 'bank'))]")
+    journal_id = fields.Many2one(
+        'account.journal', 'Journal', required=True, domain="[('type', 'in', ('cash', 'bank'))]")
 
     _order = 'date DESC'
 
@@ -32,6 +36,9 @@ class OfAccountPaymentBankDeposit(models.Model):
         move_line_obj = self.env['account.move.line'].with_context(check_move_validity=False)
 
         for rec in self:
+            # On contrôle qu'il n'y ait pas différents modes de paiement dans la remise
+            if len(rec.payment_ids.mapped('of_payment_mode_id')) > 1:
+                raise UserError(_("You cannot validate a deposit including different payment method!"))
             name = rec.name
             journal = rec.journal_id
             debit_account = journal.default_debit_account_id
@@ -60,31 +67,53 @@ class OfAccountPaymentBankDeposit(models.Model):
 
             move_data = {
                 'journal_id': journal.id,
-                'date'      : rec.date,
+                'date': rec.date,
                 'company_id': journal.company_id.id,
+                'ref': _('Deposit %s') % (name,),
             }
             move = move_obj.create(move_data)
 
             move_line_obj.create({
-                'move_id'   : move.id,
-                'name'      : _('Deposit %s') % (name,),
+                'move_id': move.id,
+                'name': _('Deposit %s') % (name,),
                 'account_id': debit_account.id,
-                'debit'     : amount_total > 0 and amount_total,
-                'credit'    : amount_total < 0 and -amount_total,
+                'debit': amount_total > 0 and amount_total,
+                'credit': amount_total < 0 and -amount_total,
             })
 
             for account, move_lines in move_lines_dict.iteritems():
-                amount = sum(move_line.debit - move_line.credit for move_line in move_lines)
-                if amount:
-                    move_line = move_line_obj.create({
-                        'move_id'   : move.id,
-                        'name'      : _('Deposit %s') % (name,),
-                        'account_id': account.id,
-                        'credit'    : amount > 0 and amount,
-                        'debit'     : amount < 0 and -amount,
-                    })
+                if journal.of_bank_deposit_group_move:
+                    amount = sum(move_line.debit - move_line.credit for move_line in move_lines)
+                    if amount:
+                        move_line = move_line_obj.create({
+                            'move_id': move.id,
+                            'name': _('Deposit %s') % (name,),
+                            'account_id': account.id,
+                            'credit': amount > 0 and amount,
+                            'debit': amount < 0 and -amount,
+                        })
 
-                    move_line_ids = [ml.id for ml in move_lines] + [move_line.id]
+                        move_line_ids = [ml.id for ml in move_lines] + [move_line.id]
+                        move_lines = move_line_obj.browse(move_line_ids)
+                else:
+                    move_line_ids = []
+                    for move_line in move_lines:
+                        amount = move_line.debit - move_line.credit
+                        if amount:
+                            new_move_line = move_line_obj.create({
+                                'move_id': move.id,
+                                'name': _('%s / %s - Deposit %s') %
+                                (move_line.partner_id.name,
+                                 move_line.partner_id.with_context(force_company=move_line.payment_id.company_id.id).
+                                 property_account_receivable_id.code,
+                                 name),
+                                'account_id': account.id,
+                                'credit': amount > 0 and amount,
+                                'debit': amount < 0 and -amount,
+                                'partner_id': move_line.partner_id.id,
+                            })
+
+                            move_line_ids += [move_line.id, new_move_line.id]
                     move_lines = move_line_obj.browse(move_line_ids)
                 move_lines.reconcile()
                 move_lines.compute_full_after_batch_reconcile()
@@ -134,7 +163,6 @@ class OfAccountPaymentBankDeposit(models.Model):
         self._check_payment_ids(vals.get('payment_ids', False))
         return super(OfAccountPaymentBankDeposit, self).create(vals)
 
-
 #    Uncomment this method to have an error message at the opening of the wizard when a payment is already deposited
 #    The main drawback is that the user loses his selection of payments, so we prefer an error at the deposit creation
 
@@ -147,7 +175,15 @@ class OfAccountPaymentBankDeposit(models.Model):
 #                 raise UserError(_('Payment %s has already been deposited') % payment.name)
 #         return super(OfAccountPaymentBankDeposit, self).default_get(fields_list)
 
+
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
     of_deposit_id = fields.Many2one('of.account.payment.bank.deposit', 'Bank deposit', readonly=True, copy=False)
+
+
+class AccountJournal(models.Model):
+    _inherit = 'account.journal'
+
+    of_bank_deposit_group_move = fields.Boolean(
+        string=u"Grouper les écritures par compte lors d'une remise en banque", default=True)
