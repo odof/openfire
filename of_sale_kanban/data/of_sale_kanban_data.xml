@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Types de demande d'intervention -->
+        <record id="of_sale_order_kanban_new" model="of.sale.order.kanban">
+            <field name="name">Nouveau</field>
+        </record>
+<!--    <function model="of.service" name="function_set_date_next" />-->
+
+        <function model="sale.order" name="function_set_kanban_step_id"/>
+
+    </data>
+
+</odoo>
