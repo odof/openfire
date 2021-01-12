@@ -3,6 +3,12 @@
 from odoo import models, api, tools, fields, SUPERUSER_ID, _
 from odoo.exceptions import AccessError
 from odoo.tools import OrderedSet
+from odoo.tools.safe_eval import safe_eval
+from lxml import etree
+try:
+    import simplejson as json
+except ImportError:
+    import json
 from odoo.models import BaseModel
 
 
@@ -367,3 +373,55 @@ class BaseConfigSettings(models.TransientModel):
         partner_rule = self.env.ref('of_base.of_base_res_partner_rule')
         for config in self:
             partner_rule.write({'active': not config.company_share_partner})
+
+
+class OFFormReadonly(models.AbstractModel):
+    _name = 'of.form.readonly'
+
+    @api.model
+    def fields_view_get(self, view_id=None, view_type=False, toolbar=False, submenu=False):
+        context = self._context
+        res = super(OFFormReadonly, self).fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar,
+                                                     submenu=submenu)
+
+        read_only_domain = context.get('form_readonly', False)
+        if res and read_only_domain:  # Check for context value
+            doc = etree.XML(res['arch'])
+            if view_type == 'form':  # Applies only for form view
+                for node in doc.xpath("//field"):  # All the view fields to readonly
+                    modifiers = node.get('modifiers', {})
+                    if modifiers and isinstance(modifiers, str) or isinstance(modifiers, unicode):
+                        modifiers = json.loads(modifiers)
+                    if modifiers and isinstance(modifiers, dict) and 'readonly' in modifiers and isinstance(
+                            modifiers.get('readonly', None), bool):
+                        continue
+                    elif modifiers and isinstance(modifiers, dict) and 'readonly' in modifiers and not isinstance(modifiers.get('readonly', None), bool):
+                        modifiers['readonly'] = ['|'] + modifiers['readonly'] + safe_eval(read_only_domain)
+                    elif isinstance(modifiers, dict):
+                        modifiers['readonly'] = safe_eval(read_only_domain)
+
+                    attrs = node.get('attrs', {})
+                    if attrs and isinstance(attrs, str) or isinstance(attrs, unicode):
+                        attrs = safe_eval(attrs)
+                    if attrs and isinstance(attrs, dict) and attrs.get('form_readonly_exception', False):
+                        continue
+                    if attrs and isinstance(attrs, dict) and 'readonly' in attrs and isinstance(
+                            attrs.get('readonly', None), bool):
+                        continue
+                    elif attrs and isinstance(attrs, dict) and 'readonly' in attrs and not isinstance(
+                            attrs.get('readonly', None), bool):
+                        attrs['readonly'] = ['|'] + attrs['readonly'] + safe_eval(read_only_domain)
+                    elif isinstance(modifiers, dict):
+                        attrs['readonly'] = safe_eval(read_only_domain)
+
+                    # attrs = node.get('attrs', {})
+                    # if attrs and isinstance(attrs, str) or isinstance(attrs, unicode):
+                    #     attrs = safe_eval(attrs)
+                    # if attrs and isinstance(attrs, dict) and attrs.get('form_readonly_exception', False):
+                    #     continue
+                    # if isinstance(attrs, dict):
+                    #     attrs['readonly'] = safe_eval(read_only_domain)
+                    node.set('attrs', json.dumps(attrs))
+                    node.set('modifiers', json.dumps(modifiers))
+                res['arch'] = etree.tostring(doc)
+        return res
