@@ -339,18 +339,33 @@ INSERT INTO ir_property (
     property_of_purchase_coeff = fields.Float(string="Coefficient d'achat", company_dependent=True)
 
     @api.multi
-    def write(self, vals):
-        if 'standard_price' in vals:
-            res = False
-            for product in self:
-                standard_price = vals['standard_price']
-                vals['property_of_purchase_coeff'] = standard_price and product.of_seller_price \
-                                                     and standard_price / product.of_seller_price \
-                                                     or 1
-                res = super(ProductProduct, product).write(vals)
-            return res
-        else:
-            return super(ProductProduct, self).write(vals)
+    def of_propage_cout(self, cout):
+        super(ProductProduct, self).of_propage_cout(cout)
+        self.of_purchase_coeff_cost_propagation(cout)
+
+    @api.multi
+    def of_purchase_coeff_cost_propagation(self, cost):
+        # Le coefficient d'achat (property_of_purchase_coeff) est défini sur l'ensemble des sociétés.
+        # Si le module of_base_multicompany est installé, il est inutile de le diffuser sur les sociétés "magasins"
+        companies = self.env['res.company'].search(['|', ('chart_template_id', '!=', False), ('parent_id', '=', False)])
+        property_obj = self.env['ir.property'].sudo()
+        coeff_values = {product.id: cost and product.of_seller_price and cost / product.of_seller_price or 1
+                        for product in self}
+        for company in companies:
+            property_obj.with_context(force_company=company.id).set_multi(
+                'property_of_purchase_coeff', 'product.product', coeff_values)
+
+    @api.multi
+    def of_purchase_coeff_seller_price_propagation(self, seller_price):
+        # Le coefficient d'achat (property_of_purchase_coeff) est défini sur l'ensemble des sociétés.
+        # Si le module of_base_multicompany est installé, il est inutile de le diffuser sur les sociétés "magasins"
+        companies = self.env['res.company'].search(['|', ('chart_template_id', '!=', False), ('parent_id', '=', False)])
+        property_obj = self.env['ir.property'].sudo()
+        coeff_values = {product.id: product.standard_price and seller_price and product.standard_price / seller_price
+                        or 1 for product in self}
+        for company in companies:
+            property_obj.with_context(force_company=company.id).set_multi(
+                'property_of_purchase_coeff', 'product.product', coeff_values)
 
 
 class ProductSupplierinfo(models.Model):
@@ -367,16 +382,11 @@ class ProductSupplierinfo(models.Model):
             if product_tmpl_id:
                 product_tmpl = self.env['product.template'].browse(product_tmpl_id)
                 if product_tmpl.seller_ids and product_tmpl.seller_ids[0].id == self.id:
-                    for product in product_tmpl.product_variant_ids:
-                        product.property_of_purchase_coeff = product.standard_price and price \
-                                                    and product.standard_price / price \
-                                                    or 1
-                        products_done |= product
+                    product_tmpl.product_variant_ids.of_purchase_coeff_seller_price_propagation(price)
+                    products_done |= product_tmpl.product_variant_ids
 
             if product_id and (not products_done or product_id not in products_done.ids):
                 product = self.env['product.product'].browse(product_id)
                 if product.seller_ids and product.seller_ids[0].id == self.id:
-                    product.property_of_purchase_coeff = product.standard_price and price \
-                                                and product.standard_price / price \
-                                                or 1
+                    product.of_purchase_coeff_seller_price_propagation(price)
         return super(ProductSupplierinfo, self).write(vals)
