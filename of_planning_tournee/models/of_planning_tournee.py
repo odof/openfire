@@ -187,17 +187,14 @@ class OfPlanningIntervention(models.Model):
     def _calc_new_description(self):
         """Ajoute la tache et les notes du service à la description"""
         self.ensure_one()
-
-        tache = self.tache_id
-        for service in self.address_id.service_address_ids:
-            if service.tache_id == tache:
-                infos = (
-                    self.description,
-                    tache.name,
-                    service.note
-                )
-                res = [info for info in infos if info]
-                self.description = "\n".join(res)
+        if self.service_id:
+            infos = (
+                self.tache_id.name,
+                self.service_id.note
+            )
+            description = self.description or ""
+            res = [info for info in infos if (info and info not in description)]
+            self.description = description + " ".join(res)
 
 
 class OfPlanningEquipe(models.Model):  #@todo: vérifier si nécessaire
