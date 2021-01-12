@@ -383,7 +383,7 @@ class OfService(models.Model):
         #       avant que l'utilisateur ait confirmé son choix.
         #     Cette fonction doit donc être autorisée à écraser le mois déjà saisi
         #     Pour éviter les ennuis, elle est donc restreinte à un usage en mode création de nouveau service uniquement
-        if self.date_next and not self._origin:  # <- signifie mode creation
+        if self.date_next and (not hasattr(self, '_origin') or not self._origin):  # <- signifie mode creation
             mois = self.env['of.mois'].search([('numero', '=', int(self.date_next[5:7]))])
             mois_id = mois[0] and mois[0].id or False
             if mois_id:
