@@ -1,0 +1,675 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- ******************************************************************************************* -->
+<!-- ***************************************** CONTRAT ***************************************** -->
+<!-- ******************************************************************************************* -->
+
+    <record id="act_recurring_invoices" model="ir.actions.act_window">
+        <field name="name">Invoices</field>
+        <field name="res_model">account.invoice</field>
+        <field name="view_ids"
+               eval="[(5, 0, 0),
+                      (0, 0, {'view_mode': 'tree', 'view_id': ref('account.invoice_tree')}),
+                      (0, 0, {'view_mode': 'form', 'view_id': ref('account.invoice_form')})]"/>
+        <field name="context">{
+            'search_default_of_contract_id': [active_id],
+            'default_of_contract_id': active_id}
+        </field>
+    </record>
+
+    <record id="of_contract_search_view" model="ir.ui.view">
+        <field name="name">of_contract_search_view</field>
+        <field name="model">of.contract</field>
+        <field name="arch" type="xml">
+            <search>
+                <filter string="Archivé" name="inactive" domain="[('active', '=', False)]"/>
+                <filter string="À venir" name="upcoming" domain="[('date_start', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="En cours" name="in_progress" domain="[('date_start', '&lt;=', context_today().strftime('%Y-%m-%d')), ('date_end','&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Inactif" name="inactive" domain="[('date_end', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter string="À facturer" name="to_invoice" domain="[('is_invoiceable', '=', True), ('recurring_next_date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="À facturer ce mois" name="to_invoice" domain="[('is_invoiceable', '=', True), ('recurring_next_date', '&gt;=', context_today().strftime('%Y-%m-01')), ('recurring_next_date', '&lt;=', (context_today() + relativedelta(months=1, day=1, days=-1)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <field name="partner_id"/>
+                <field name="name"/>
+                <field name="category_ids"/>
+                <field name="reference"/>
+                <field name="recurring_invoicing_payment_id"/>
+                <field name="recurring_rule_type"/>
+                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                <separator/>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_contract_tree_view" model="ir.ui.view">
+        <field name="name">of_contract_tree_view</field>
+        <field name="model">of.contract</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="recurring_rule_type"/>
+                <field name="recurring_invoicing_payment_id"/>
+                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_contract_form_view" model="ir.ui.view">
+        <field name="name">of_contract_form_view</field>
+        <field name="model">of.contract</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="is_invoiceable" invisible="1"/>
+
+                    <button name="recurring_create_invoice" type="object" class="btn-primary" string="Créer les factures"
+                            attrs="{'invisible': [('is_invoiceable', '=', False)]}"/>
+                    <button name="valider_lignes_contrat" type="object" class="btn-primary" string="Activer les lignes"
+                    confirm="Activer les lignes du contrat va passer toutes les lignes actuellement en brouillon en état validée. Voulez-vous continuer ?
+(les lignes annulées par un avenant ou déjà validée ne seront pas modifiées)"/>
+                    <button name="faire_revision" type="object" class="btn-primary" string="Faire la révision"/>
+                    <field name="state" widget="statusbar" statusbar_visible="in_progress"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <field name="invoice_ids" invisible="1"/>
+                        <button class="oe_stat_button" type="object" name="action_view_services" icon="fa-calendar" string="Planification"/>
+                        <button class="oe_stat_button" type="object" name="action_view_invoice" icon="fa-pencil-square-o">
+                            <field name="invoice_count" widget="statinfo" string="Factures"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_view_intervention" icon="fa-calendar">
+                            <field name="intervention_count" widget="statinfo" string="RDVs"/>
+                        </button>
+                        <button name="toggle_active" type="object"
+                                        class="oe_stat_button" icon="fa-archive"
+                                        confirm="Êtes-vous sûr de vouloir archiver/activer ce contrat ?">
+                                    <field name="active" widget="boolean_button"
+                                        options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" class="oe_inline"/>
+                        </h1>
+                        <field name="type" widget="radio" attrs="{'readonly': [('invoice_count','>',0)]}" options="{'horizontal': true}"/>
+                    </div>
+                    <group col="4">
+                        <group col="2" colspan="2" string="Informations clients" name="refs">
+                            <field name="reference" class="oe_inline" placeholder="e.g. Project XYZ"/>
+                            <field name="partner_id"/>
+                            <field name="category_ids" widget="many2many_tags"/>
+                            <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                            <field name="date_souscription" attrs="{'readonly': [('invoice_count','>',0)]}"/>
+                        </group>
+                        <group col="2" colspan="2" string="Facturation" name="facturation">
+                            <label for="recurring_invoicing_payment_id"/>
+                            <div name="dates">
+                                <field name="recurring_rule_type" nolabel="1" class="oe_inline"/>
+                                <field name="recurring_invoicing_payment_id" nolabel="1" class="oe_inline"
+                                       options="{'no_create': True, 'no_open': True}"
+                                       domain="[('code', 'in', recurring_rule_type == 'date' and ('date', 'post-paid') or ('pre-paid', 'post-paid'))]"/>
+                            </div>
+                            <field name="journal_id" attrs="{'readonly': [('invoice_count','>',0)]}"/>
+                            <field name="fiscal_position_id"/>
+                            <field name="payment_term_id"/>
+                            <field name="grouped"/>
+                            <field name="recurring_next_date"/>
+                            <field name="revision"/>
+                            <field name="pricelist_id" invisible="1"/>
+                        </group>
+                        <group col="2" colspan="2" string="Validité" name="validity">
+                            <field name="current_period_id"/>
+                            <field name="period_ids" invisible="1" readonly="1"/>
+                            <label for="date_start" string="Dates"/>
+                            <div name="dates">
+                                <i class="oe_grey oe_inline">Début : </i>
+                                <field name="date_start" nolabel="1" class="oe_inline"
+                                       attrs="{'readonly': [('invoice_count','>',0)]}"/>
+                                <i class="oe_grey oe_inline"> Fin : </i>
+                                <field name="date_end" nolabel="1" class="oe_inline"/>
+                            </div>
+
+                            <label for="period"/>
+                            <div>
+                                <field name="period"/> mois
+                            </div>
+                        </group>
+                        <group col="2" colspan="2" string="Renouvellement" name="renewal">
+                            <field name="renewal"/>
+                            <field name="use_index" invisible="0"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="lignes" string="Lignes">
+                            <group string="Lignes de contrat">
+                                <div colspan="2" attrs="{'invisible': [('is_invoiceable', '=', True)]}">
+
+                                    <b><i class="oe_grey">
+                                        Aucune ligne facturable
+                                    </i></b>
+                                </div>
+                                <field name="line_ids" mode="tree" nolabel="1"
+                                       options="{'reload_on_button': True}"
+                                       context="{'form_view_ref': 'of_contract_custom.of_contract_line_view_form',
+                                                 'default_partner_id': partner_id,
+                                                 'default_company_id': company_id,
+                                                 'default_recurring_invoicing_payment_id': recurring_invoicing_payment_id,
+                                                 'default_frequency_type': recurring_rule_type,
+                                                 'default_recurrence': True,
+                                                 'default_fiscal_position_id': fiscal_position_id,
+                                                 'default_date_start': invoice_ids and recurring_next_date or False,
+                                                 'recurring_next_date': recurring_next_date,
+                                                 'default_use_index': use_index,
+                                                 'default_revision': revision,
+                                                 'default_grouped': grouped,
+                                                 'form_readonly': '[(&quot;state&quot;,&quot;in&quot;,[&quot;validated&quot;,&quot;cancel&quot;])]'}">
+                                    <tree colors="grey:state=='cancel';blue:is_invoiceable==True" delete="false">
+                                        <field name="state" invisible="1"/>
+                                        <field name="code_de_ligne"/>
+                                        <field name="address_id"/>
+                                        <field name="tache_id"/>
+                                        <field name="frequency_type"/>
+                                        <field name="next_date"/>
+                                        <field name="year_purchase_price" sum="Coût annuel"/>
+                                        <field name="year_total" sum="Total annuel"/>
+                                        <field name="next_purchase_price" sum="Prochain coût"/>
+                                        <field name="amount_total" sum="Prochain total"/>
+                                        <field name="last_invoicing_date"/>
+                                        <field name="is_invoiceable" invisible="1"/>
+                                        <field name="line_avenant_id" invisible="1"/>
+                                        <field name="date_end" invisible="1"/>
+                                        <field name="date_indexed"/>
+                                        <field name="date_contract_end" invisible="0"/>
+                                        <button name="faire_avenant" type="object" icon="fa-cogs"
+                                                help="Faire un avenant"
+                                                attrs="{'invisible': ['|',('state', '!=', 'validated'),('date_end','!=',False)]}"/>
+                                        <button name="annuler_la_ligne" type="object" icon="fa-times"
+                                                help="Annuler la ligne"
+                                                attrs="{'invisible': ['|',('state', '!=', 'validated'),('date_end','!=',False)]}"/>
+                                        <button name="supprimer_la_ligne" type="object" icon="fa-trash-o"
+                                                help="Supprimer"
+                                                attrs="{'invisible': [('state', '!=', 'draft')]}"
+                                                confirm="Voulez-vous supprimer la ligne ?"/>
+
+                                    </tree>
+                                </field>
+                            </group>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="company_currency_id" invisible="1"/>
+                                <field name="next_subtotal"/>
+                                <field name="next_taxes"/>
+                                <field name="next_total" class="oe_subtotal_footer_separator"/>
+                            </group>
+                        </page>
+                        <page name="commentaires" string="Commentaires">
+                            <group name="comments" string="Commentaires">
+                                <field name="commentaires" nolabel="1"/>
+                            </group>
+                        </page>
+                        <page name="tableau" string="Suivi">
+                            <group name="services" string="Tableau de suivi">
+                                <field name="service_ids" nolabel="1">
+                                    <tree>
+                                        <field name="spec_date"/>
+                                        <field name="state"/>
+                                        <field name="contract_line_id"/>
+                                        <field name="last_attachment_id" invisible="1"/>
+                                        <button name="button_open_of_planning_intervention" class="oe_link" type="object" string="Voir RDVs"/>
+                                        <button name="print_intervention_report" class="oe_link" type="object" string="Rapport(s)"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_contract" model="ir.actions.act_window">
+        <field name="name">Contrats</field>
+        <field name="res_model">of.contract</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_contract_tree_view"/>
+        <field name="search_view_id" ref="of_contract_search_view"/>
+        <field name="context">{'form_readonly': '[(&quot;active&quot;,&quot;=&quot;,False)]'}</field>
+    </record>
+
+
+    <menuitem name="Contrats" id="menu_contract_custom_sale" parent="sales_team.menu_sales" sequence="150" action="of_contract_custom.action_contract"/>
+    <menuitem name="Contrats" id="menu_contract_custom_interventions" parent="of_planning.menu_of_planning_intervention" sequence="150" action="of_contract_custom.action_contract"/>
+    <menuitem name="Contrats" id="menu_config_contrat" parent="sale.prod_config_main" sequence="40"/>
+
+<!-- ******************************************************************************************* -->
+<!-- ************************************ MODÈLE DE CONTRAT ************************************ -->
+<!-- ******************************************************************************************* -->
+
+<!--    <record id="of_contract_template_tree_view" model="ir.ui.view">-->
+<!--        <field name="name">of_contract_tree_view</field>-->
+<!--        <field name="model">of.contract.template</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <tree>-->
+<!--                <field name="name"/>-->
+<!--                <field name="recurring_rule_type"/>-->
+<!--                <field name="recurring_invoicing_payment"/>-->
+<!--            </tree>-->
+<!--        </field>-->
+<!--    </record>-->
+
+<!--    <record id="of_contract_template_form_view" model="ir.ui.view">-->
+<!--        <field name="name">of_contract_form_view</field>-->
+<!--        <field name="model">of.contract.template</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <form>-->
+<!--                <div class="oe_title">-->
+<!--                    <label for="name" class="oe_edit_only"/>-->
+<!--                    <h1>-->
+<!--                        <field name="name" class="oe_inline" placeholder="e.g. Project XYZ"/>-->
+<!--                    </h1>-->
+<!--                </div>-->
+<!--                <separator string="Factures récurrentes"/>-->
+<!--                <group col="4">-->
+<!--                    <group col="2" colspan="2">-->
+<!--                        <field name="recurring_rule_type" class="oe_inline"/>-->
+<!--                        <field name="recurring_invoicing_payment"/>-->
+<!--                    </group>-->
+<!--                    <group col="2" colspan="2">-->
+<!--                        <field name="journal_id"/>-->
+<!--                        <field name="pricelist_id" invisible="1"/>-->
+<!--                        <field name="fiscal_position_id"/>-->
+<!--                    </group>-->
+<!--                </group>-->
+<!--                <separator string="Lignes"/>-->
+<!--                <group>-->
+<!--                    <field name="line_ids" mode="tree" nolabel="1"-->
+<!--                           context="{'form_view_ref': 'of_contract_custom.of_contract_line_view_form',-->
+<!--                                     'default_frequency_type': recurring_rule_type}">-->
+<!--                        <tree>-->
+<!--&lt;!&ndash;                            <field name="sequence" widget="handle"/>&ndash;&gt;-->
+<!--                            <field name="amount_subtotal"/>-->
+<!--                            <field name="frequency_type"/>-->
+<!--                            <field name="next_date"/>-->
+<!--                            <field name="parc_installe_id"/>-->
+<!--                        </tree>-->
+<!--                    </field>-->
+<!--                </group>-->
+<!--            </form>-->
+<!--        </field>-->
+<!--    </record>-->
+
+<!--    <record id="action_contract_template" model="ir.actions.act_window">-->
+<!--        <field name="name">Contrats</field>-->
+<!--        <field name="res_model">of.contract.template</field>-->
+<!--        <field name="view_type">form</field>-->
+<!--        <field name="view_mode">tree,form</field>-->
+<!--        <field name="view_id" ref="of_contract_template_tree_view"/>-->
+<!--    </record>-->
+
+<!--    <menuitem name="Modèles de contrats" id="menu_contract_template" parent="of_planning.menu_of_planning_configuration" sequence="75" action="action_contract_template"/>-->
+
+
+
+<!-- ******************************************************************************************* -->
+<!-- ********************************** LIGNES DE CONTRATS ************************************* -->
+<!-- ******************************************************************************************* -->
+
+    <record id="of_contract_line_search_view" model="ir.ui.view">
+        <field name="name">of_contract_line_search_view</field>
+        <field name="model">of.contract.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <filter string="À facturer" name="to_invoice" domain="[('is_invoiceable', '=', True), ('next_date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="À facturer ce mois" name="to_invoice" domain="[('is_invoiceable', '=', True), ('next_date', '&gt;=', context_today().strftime('%Y-%m-01')), ('next_date', '&lt;=', (context_today() + relativedelta(months=1, day=1, days=-1)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <field name="code_de_ligne" filter_domain="['|', '|', '|', ('code_de_ligne', '=', self), ('partner_id', 'ilike', self), ('address_id', 'ilike', self), ('supplier_id', 'ilike', self)]"/>
+                <field name="partner_id"/>
+                <field name="address_id"/>
+                <field name="supplier_id"/>
+                <field name="recurring_invoicing_payment_id"/>
+                <field name="supplier_tag_ids"/>
+                <field name="contract_product_ids"/>
+                <field name="tache_id"/>
+                <field name="nbr_interv"/>
+                <field name="mois_reference_ids"/>
+                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                <separator/>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_contract_line_tree_view" model="ir.ui.view">
+        <field name="name">of_contract_line_tree_view</field>
+        <field name="model">of.contract.line</field>
+        <field name="arch" type="xml">
+            <tree colors="grey:state=='cancel'">
+                <field name="contract_id"/>
+                <field name="name"/>
+                <field name="address_id"/>
+                <field name="next_date"/>
+                <field name="year_purchase_price" sum="Coût annuel"/>
+                <field name="year_total" sum="Total annuel"/>
+                <field name="next_purchase_price" sum="Prochain coût"/>
+                <field name="amount_total" sum="Prochain total"/>
+                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_contract_line_view_form" model="ir.ui.view">
+        <field name="name">Ligne de contrat</field>
+        <field name="model">of.contract.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="bouton_valider" type="object" class="btn-primary" string="Activer la ligne"
+                            states="draft"/>
+                    <button name="bouton_brouillon" type="object" class="btn-primary" string="Brouillon"
+                            attrs="{'invisible': ['|','|',('invoice_count','&gt;',0),('intervention_count','&gt;',0),('state','!=','validated')]}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,validated,cancel"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_view_invoices" icon="fa-pencil-square-o">
+                            <field name="invoice_count" widget="statinfo" string="Factures"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_view_services" icon="fa-calendar">
+                            <field name="service_count" widget="statinfo" string="Planification"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_view_intervention" icon="fa-calendar">
+                            <field name="intervention_count" widget="statinfo" string="RDVs"/>
+                        </button>
+                    </div>
+                    <div class="of_title">
+                        <h1><b>
+                            <span>Ligne </span>
+                            <i> <field name="code_de_ligne" nolabel="1" class="oe_inline" readonly="1"/></i>
+                        </b></h1>
+                        <div attrs="{'invisible': [('warning_planif', '=', False)]}">
+                            <b>
+                                <i class="of_red">
+                                    <i class="fa fa-lg fa-warning"/>
+                                    Attention :
+                                    <br/>
+                                    Vous avez planifié moins d'interventions dans la période que le nombre prévu.
+                                    Pensez à vérifier si il y a besoin de modifier votre planification.
+                                </i>
+                            </b>
+                        </div>
+                    </div>
+                    <group col="4">
+                        <group col="2" colspan="2" name="refs" string="Informations client">
+                            <label for="address_id" />
+                            <div class="o_address_format">
+                                <field name="address_id"  class="o_address_street"/>
+                                <field name="address_street" class="o_address_street" />
+                                <field name="address_street2" class="o_address_street" />
+                                <field name="address_zip" class="o_address_city" />
+                                <field name="address_city" class="o_address_zip" />
+                            </div>
+                            <field name="partner_code_magasin"/>
+                            <field name="partner_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group col="2" colspan="2" name="description" string="Description">
+                            <field name="type"/>
+                            <field name="date_start" invisible="1"/>
+                            <field name="date_contract_start"/>
+                            <field name="date_contract_end" readonly="1"/>
+                            <field name="line_origine_id"/>
+                            <field name="date_end" invisible="1"/>
+                            <field name="supplier_id" attrs="{'form_readonly_exception': True}"/>
+                            <field name="supplier_tag_ids" widget="many2many_tags"/>
+                        </group>
+                        <group col="2" colspan="2" name="validity" string="Validité" invisible="1">
+                            <field name="contract_current_period_id"/>
+                            <field name="contract_date_start"/>
+                            <field name="contract_date_end"/>
+                            <field name="contract_type" widget="radio"/>
+                            <field name="contract_renewal"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="invoicing" string="Facturation">
+                            <group col="4" name="invoice">
+                                <group name="invoicing_frequency" col="2" colspan="2">
+                                    <field name="afficher_facturation"  attrs="{'form_readonly_exception': True}"/>
+                                    <field name="grouped" attrs="{'form_readonly_exception': True}"/>
+                                    <field name="next_date"/>
+                                    <field name="use_index" invisible="0"/>
+                                    <field name="is_invoiceable" invisible="1"/>
+                                </group>
+                                <group col="2" colspan="2" attrs="{'invisible': [('afficher_facturation', '=', False)]}">
+                                    <field name="frequency_type" class="oe_inline"/>
+                                    <field name="recurring_invoicing_payment_id"
+                                           options="{'no_create': True, 'no_open': True}"
+                                           domain="[('code', 'in', frequency_type == 'date' and ('date', 'post-paid') or ('pre-paid', 'post-paid'))]"/>
+                                    <field name="fiscal_position_id"/>
+                                    <field name="revision"/>
+                                </group>
+                                <separator string="Articles" colspan="4"/>
+                                <field colspan="4" name="contract_product_ids" nolabel="1"
+                                context="{'form_view_ref': 'of_contract_custom.of_contract_custom_contract_product_view_form'}">
+                                    <tree>
+                                        <field name="product_id"/>
+                                        <field name="price_unit"/>
+                                        <field name="purchase_price"/>
+                                        <field name="quantity"/>
+                                        <field name="uom_id" groups="product.group_uom" class="oe_inline oe_no_button"/>
+                                        <field name="discount" groups="sale.group_discount_per_so_line"/>
+                                        <field name="tax_ids" widget="many2many_tags" invisible="1"/>
+                                        <field name="amount_total"/>
+                                        <field name="qty_invoiced"/>
+                                        <field name="price_unit_prec"/>
+                                        <field name="date_indexed"/>
+                                    </tree>
+                                </field>
+                            </group>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="company_currency_id" invisible="1"/>
+                                <field name="amount_subtotal"/>
+                                <field name="amount_taxes"/>
+                                <field name="amount_total" class="oe_subtotal_footer_separator"/>
+                            </group>
+                        </page>
+                        <page name="planification" string="Planification">
+                            <group col="4">
+                                <group colspan="2" name="planif" string="Planification">
+                                    <field name="warning_planif" invisible="1"/>
+                                    <field name="tache_id"/>
+                                    <field name="nbr_interv"/>
+                                    <field name="mois_reference_ids" widget="many2many_tags"
+                                           attrs="{'form_readonly_exception': True}"/>
+                                </group>
+                                <group colspan="2" name="sav" string="Sav">
+                                    <field name="use_sav"/>
+                                    <field name="sav_count" attrs="{'invisible': [('use_sav','!=',True)]}"/>
+                                    <field name="remaining_sav" attrs="{'invisible': [('use_sav','!=',True)]}"/>
+                                </group>
+                                <separator string="Notes" colspan="4"/>
+                                <field name="notes" nolabel="1" colspan="4" attrs="{'form_readonly_exception': True}"/>
+                            </group>
+                            <group name="services" string="Tableau de suivi">
+                                <field name="service_ids" nolabel="1" readonly="1">
+                                    <tree>
+                                        <field name="spec_date"/>
+                                        <field name="state"/>
+                                        <field name="last_attachment_id" invisible="1"/>
+                                        <button name="button_open_of_planning_intervention" class="oe_link" type="object" string="Voir RDVs"/>
+                                        <button name="print_intervention_report" class="oe_link" type="object" string="Rapport(s)"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                        <page name="parc_installe" string="Équipement">
+                            <group name="parc" string="Produit installé" groups="project.group_project_user" colspan="2">
+                                <field name="parc_installe_id"/>
+                                <field name="parc_installe_product_id"/>
+                                <field name="parc_installe_site_adresse_id"/>
+                                <field name="parc_installe_note"/>
+                            </group>
+                            <group name="notes" string="Description" colspan="2">
+                                <field name="note" colspan="2" nolabel="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_contract_line_view_form_extended" model="ir.ui.view" >
+        <field name="name">Ligne de contrat</field>
+        <field name="model">of.contract.line</field>
+        <field name="mode">primary</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="of_contract_custom.of_contract_line_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="contract_id" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_contract_lines" model="ir.actions.act_window">
+        <field name="name">Lignes de contrats</field>
+        <field name="res_model">of.contract.line</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_contract_line_tree_view"/>
+        <field name="context">{'form_readonly': '[("state","in",["validated","cancel"])]', 'create': False}</field>
+    </record>
+
+    <menuitem name="Lignes de contrats" id="menu_contract_lines_sale" parent="sales_team.menu_sales" sequence="151" action="action_contract_lines"/>
+    <menuitem name="Lignes de contrats" id="menu_contract_lines_interventions" parent="of_planning.menu_of_planning_intervention" sequence="151" action="action_contract_lines"/>
+
+<!-- ******************************************************************************************* -->
+<!-- ***************************************** ARTICLES **************************************** -->
+<!-- ******************************************************************************************* -->
+
+    <record id="of_contract_custom_contract_product_view_form" model="ir.ui.view">
+        <field name="name">of.contract.custom.contract.product.view.form</field>
+        <field name="model">of.contract.product</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="product_id"/>
+                        <field name="price_unit"/>
+                        <field name="purchase_price"/>
+                        <label for="product_uom_qty" string="Quantité"/>
+                        <div>
+                            <field name="quantity" class="oe_inline"/>
+                            <field name="uom_id" groups="product.group_uom" class="oe_inline oe_no_button"/>
+                        </div>
+                        <field name="discount" groups="sale.group_discount_per_so_line"/>
+                   </group>
+                    <group>
+                        <field name="tax_ids" widget="many2many_tags"/>
+                    </group>
+                    <separator string="Description"/>
+                    <field name="name" nolabel="1" colspan="4"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+<!-- ******************************************************************************************* -->
+<!-- ***************************************** INDICES ***************************************** -->
+<!-- ******************************************************************************************* -->
+
+    <record id="of_contract_index_tree_view" model="ir.ui.view">
+        <field name="name">of_contract_index_tree_view</field>
+        <field name="model">of.index</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="index_formula"/>
+                <field name="category_ids" widget="many2many_tags"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_contract_index_view_form" model="ir.ui.view">
+        <field name="name">Indice</field>
+        <field name="model">of.index</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                    </div>
+                    <div class="of_title">
+                        <h1><b>
+                            <span>Indice </span>
+                            <i> <field name="name" nolabel="1" class="oe_inline"/></i>
+                        </b></h1>
+                    </div>
+                    <group col="4">
+                        <group col="2" colspan="2">
+                            <field name="category_ids" widget="many2many_tags"/>
+                            <field name="product_ids" widget="many2many_tags"
+                                   domain="[('categ_id', category_ids and 'child_of' or 'ilike', category_ids and category_ids[0][2] or '')]"/>
+                            <field name="index_formula"/>
+                        </group>
+                        <separator string="Historique" colspan="4"/>
+                        <field name="index_line_ids" nolabel="1" required="1" colspan="4">
+                            <tree editable="bottom">
+                                <field name="value"/>
+                                <field name="date_start"/>
+                                <field name="date_end"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_index" model="ir.actions.act_window">
+        <field name="name">Indices</field>
+        <field name="res_model">of.index</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_contract_index_tree_view"/>
+    </record>
+
+    <menuitem name="Indices" id="menu_config_index" parent="of_contract_custom.menu_config_contrat" sequence="10" action="action_index"/>
+
+<!-- ******************************************************************************************* -->
+<!-- ***************************************** ACTION ****************************************** -->
+<!-- ******************************************************************************************* -->
+
+    <record id="of_contract_custom_open_interventions" model="ir.actions.act_window">
+        <field name="name">Intervention</field>
+        <field name="res_model">of.planning.intervention</field>
+        <field name="domain">[]</field> <!-- Force empty -->
+        <field name="view_type">form</field>
+    </record>
+
+    <record id="of_contract_custom_open_contrat" model="ir.actions.act_window">
+        <field name="name">Contrats</field>
+        <field name="res_model">of.contract</field>
+        <field name="domain">[]</field> <!-- Force empty -->
+        <field name="view_type">form</field>
+    </record>
+
+    <record id="of_contract_custom_open_contrat_line" model="ir.actions.act_window">
+        <field name="name">Lignes de contrat</field>
+        <field name="res_model">of.contract.line</field>
+        <field name="domain">[]</field> <!-- Force empty -->
+        <field name="view_type">form</field>
+    </record>
+
+
+</odoo>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_contract_custom_sms_planning_intervention_view_form" model="ir.ui.view" >
+        <field name="name">of.contract.custom.sms.planning.intervention.form</field>
+        <field name="inherit_id" ref="of_contract_custom.of_contract_custom_planning_intervention_view_form"/>
+        <field name="model">of.planning.intervention</field>
+        <field name="arch" type="xml" >
+            <xpath expr="//field[@name='tag_ids']" position="before">
+                <field name="of_envoye_par_sms_client"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

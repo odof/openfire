@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="of_contract_recurring_invoicing_payment_date" model="of.contract.recurring.invoicing.payment">
+            <field name="code">date</field>
+            <field name="name">Date du jour</field>
+        </record>
+        <record id="of_contract_recurring_invoicing_payment_pre-paid" model="of.contract.recurring.invoicing.payment">
+            <field name="code">pre-paid</field>
+            <field name="name">À Échoir</field>
+        </record>
+        <record id="of_contract_recurring_invoicing_payment_post-paid" model="of.contract.recurring.invoicing.payment">
+            <field name="code">post-paid</field>
+            <field name="name">Échu</field>
+        </record>
+    </data>
+
+    <data noupdate="1">
+
+        <!-- nextcall est écrit en heure serveur donc ajouter 2 heures en été et 1 en hiver -->
+        <record id="of_contract_custom_generate_invoices" model="ir.cron">
+            <field name="name">Création automatique des factures</field>
+            <field name="model">of.contract</field>
+            <field name="function">generate_invoices</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="nextcall">2020-10-14 07:00:00</field>
+            <field name="active">false</field>
+            <field name="args">()</field>
+        </record>
+
+        <record id="of_contract_custom_date_range_type" model="date.range.type">
+            <field name="name">Année contractuelle</field>
+            <!-- On ne veut pas de société, si  -->
+            <field name="company_id"></field>
+        </record>
+
+        <record id="of_contract_custom_sequence" model="ir.sequence">
+            <field name="name">Séquence de ligne de contrat</field>
+            <field name="padding">6</field>
+        </record>
+
+        <!-- Types de demande d'intervention -->
+        <record id="of_contract_custom_type_sav" model="of.service.type">
+            <field name="name">SAV</field>
+        </record>
+
+        <record id="of_contract_custom_type_maintenance" model="of.service.type">
+            <field name="name">Entretien - Maintenance</field>
+        </record>
+
+        <record id="of_contract_custom_type_installation" model="of.service.type">
+            <field name="name">Installation</field>
+        </record>
+
+        <record id="of_contract_custom_type_technical" model="of.service.type">
+            <field name="name">Visite technique</field>
+        </record>
+
+        <!-- Étapes kanban des demandes d'interventions -->
+        <record id="of_contract_custom_kanban_new" model="of.service.stage">
+            <field name="name">Nouveau</field>
+            <field name="sequence">10</field>
+            <field name="type_ids"
+                   eval="[(4, ref('of_contract_custom.of_contract_custom_type_sav')),
+                          (4, ref('of_contract_custom.of_contract_custom_type_installation'))]"/>
+        </record>
+
+        <record id="of_contract_custom_kanban_quote" model="of.service.stage">
+            <field name="name">Devis</field>
+            <field name="sequence">20</field>
+            <field name="type_ids" eval="[(4, ref('of_contract_custom.of_contract_custom_type_sav'))]"/>
+        </record>
+
+        <record id="of_contract_custom_kanban_sale" model="of.service.stage">
+            <field name="name">Commandes</field>
+            <field name="sequence">30</field>
+            <field name="type_ids"
+                   eval="[(4, ref('of_contract_custom.of_contract_custom_type_sav')),
+                          (4, ref('of_contract_custom.of_contract_custom_type_installation'))]"/>
+        </record>
+
+        <record id="of_contract_custom_kanban_toplan" model="of.service.stage">
+            <field name="name">À planifier</field>
+            <field name="sequence">40</field>
+            <field name="type_ids"
+                   eval="[(4, ref('of_contract_custom.of_contract_custom_type_sav')),
+                          (4, ref('of_contract_custom.of_contract_custom_type_maintenance')),
+                          (4, ref('of_contract_custom.of_contract_custom_type_installation')),
+                          (4, ref('of_contract_custom.of_contract_custom_type_technical'))]"/>
+        </record>
+
+        <record id="of_contract_custom_kanban_planned" model="of.service.stage">
+            <field name="name">Planifié</field>
+            <field name="sequence">50</field>
+            <field name="type_ids"
+                   eval="[(4, ref('of_contract_custom.of_contract_custom_type_sav')),
+                          (4, ref('of_contract_custom.of_contract_custom_type_maintenance')),
+                          (4, ref('of_contract_custom.of_contract_custom_type_installation')),
+                          (4, ref('of_contract_custom.of_contract_custom_type_technical'))]"/>
+        </record>
+
+        <record id="of_contract_custom_kanban_toinvoice" model="of.service.stage">
+            <field name="name">À facturer</field>
+            <field name="sequence">60</field>
+            <field name="type_ids"
+                   eval="[(4, ref('of_contract_custom.of_contract_custom_type_sav')),
+                          (4, ref('of_contract_custom.of_contract_custom_type_installation')),
+                          (4, ref('of_contract_custom.of_contract_custom_type_technical'))]"/>
+        </record>
+
+        <record id="of_contract_custom_kanban_closed" model="of.service.stage">
+            <field name="name">Clôturé</field>
+            <field name="sequence">70</field>
+            <field name="type_ids"
+                   eval="[(4, ref('of_contract_custom.of_contract_custom_type_sav')),
+                          (4, ref('of_contract_custom.of_contract_custom_type_maintenance')),
+                          (4, ref('of_contract_custom.of_contract_custom_type_installation')),
+                          (4, ref('of_contract_custom.of_contract_custom_type_technical'))]"/>
+        </record>
+
+    </data>
+
+</odoo>

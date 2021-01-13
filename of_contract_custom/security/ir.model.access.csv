@@ -1,0 +1,10 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_of_contract_user","of.contract","model_of_contract","base.group_system",1,1,1,1
+"access_of_contract_line_user","of.contract.line","model_of_contract_line","base.group_system",1,1,1,1
+"access_of_contract_period_user","of.contract.period","model_of_contract_period","base.group_system",1,1,1,1
+"access_of_contract_product_user","of.contract.product","model_of_contract_product","base.group_system",1,1,1,1
+"access_of_contract_recurring_invoicing_payment_user","of.contract.recurring.invoicing.payment","model_of_contract_recurring_invoicing_payment","base.group_system",1,0,0,0
+"access_of_index_user","of.index","model_of_index","base.group_system",1,1,1,1
+"access_of_index_line_user","of.index.line","model_of_index_line","base.group_system",1,1,1,1
+"access_of_service_type_user","of.service.type","model_of_service_type","base.group_system",1,0,0,0
+"access_of_service_stage_user","of.service.stage","model_of_service_stage","base.group_system",1,0,0,0

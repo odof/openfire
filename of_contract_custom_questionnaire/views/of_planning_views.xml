@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_contract_custom_questionnaire_planning_intervention_view_form" model="ir.ui.view" >
+        <field name="name">of.contract.custom.questionnaire.planning.intervention.form</field>
+        <field name="inherit_id" ref="of_contract_custom.of_contract_custom_planning_intervention_view_form"/>
+        <field name="model">of.planning.intervention</field>
+        <field name="arch" type="xml" >
+            <xpath expr="//notebook" position="inside">
+                <page name="questionnaire" string="Questionnaire">
+                    <group col="2">
+                        <field name="questionnaire_id" domain="[('type', '=', 'intervention')])" options="{'no_create': True}" colspan="2"/>
+                        <field name="question_ids" mode="tree" nolabel="1" context="{'address_id': address_id, 'default_type': 'intervention'}" colspan="2">
+                            <tree>
+                                <field name="sequence" widget="handle"/>
+                                <field name="category_id" invisible="1"/>
+                                <field name="type" invisible="1"/>
+                                <field name="name"/>
+                                <field name="answer_type" invisible="1"/>
+                                <field name="answer_ids" invisible="1"/>
+                                <field name="answer"/>
+                                <field name="definitive_answer" readonly="1"/>
+                                <field name="parc_installe_id" invisible="1"/>
+                            </tree>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
