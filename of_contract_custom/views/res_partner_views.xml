@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- ******************************************************************************************* -->
+<!-- **************************************** PARTENAIRE *************************************** -->
+<!-- ******************************************************************************************* -->
+
+    <record id="of_contract_view_res_partner" model="ir.ui.view">
+        <field name="name">of_contract_view_res_partner</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" type="object" name="action_view_contrat" icon="fa-book">
+                    <field name="of_contrat_count" widget="statinfo" string="Contrats"/>
+                </button>
+                <button class="oe_stat_button" type="object" name="action_view_contrat_line" icon="fa-book" attrs="{'invisible': [('supplier','!=',True)]}">
+                    <field name="of_contrat_line_count" widget="statinfo" string="Lignes de contrat"/>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='ref']" position="after">
+                <field name="of_code_magasin"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_contract_service_view_partner_form" model="ir.ui.view">
+        <field name="name">of_contract_service_view_partner_form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="of_service.of_service_view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='a_programmer_count']" position="attributes">
+                <attribute name="string">Demande d'intervention</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_view_recurrent']" position="replace"/>
+        </field>
+    </record>
+
+    <record id="of_contract_custom_base_location_partner_form" model="ir.ui.view">
+        <field name="name">of.contract.custom.base.location.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="of_base_location.of_base_location_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_secteur_tech_id']" position="after">
+                <field name="of_prestataire_id" options='{"no_open": True, "no_create": True}'/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_contract_custom_service_view_partner_form" model="ir.ui.view">
+        <field name="name">of.contract.custom.service.view.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="of_service.of_service_view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_prevoir_intervention']" position="attributes">
+                <attribute name="string">Demande d'intervention</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

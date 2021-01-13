@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_contract_line_cancel_view_form" model="ir.ui.view">
+        <field name="name">Annuler la ligne</field>
+        <field name="model">of.contract.line.cancel.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Avenant">
+                <group>
+                    <field name="contract_line_id" readonly="1"/>
+                    <field name="date_end"/>
+                </group>
+                <footer>
+                    <button string="Annuler la ligne" name="button_end" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+<!--    <act_window id="action_invoice_contract"-->
+<!--            key2="client_action_multi"-->
+<!--            name="Facturer"-->
+<!--            res_model="of.contract.planning.wizard"-->
+<!--            src_model="of.contract"-->
+<!--            view_mode="form"-->
+<!--            view_type="form"-->
+<!--            view_id="of_contract_planning_view_form"-->
+<!--            target="new"/>-->
+
+</odoo>
