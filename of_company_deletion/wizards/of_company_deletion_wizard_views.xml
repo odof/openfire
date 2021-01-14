@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- OF Company Deletion Wizard Form View -->
+    <record id="of_company_deletion_wizard_form_view" model="ir.ui.view">
+        <field name="name">of.company.deletion.wizard.form.view</field>
+        <field name="model">of.company.deletion.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <div>
+                    <h1>ATTENTION, cette opération est irréversible !</h1>
+                    <p>La ou les sociétés sélectionnées, ainsi que l'ensemble des objets liés ci-dessous seront supprimés définitivement :<br/>
+                       - Opportunités<br/>
+                       - Commandes de vente<br/>
+                       - Factures client<br/>
+                       - Paiements client<br/>
+                       - Remises en banque<br/>
+                       - Bons de livraison<br/>
+                       - Partenaires<br/>
+                       - Commandes fournisseur<br/>
+                       - Bons de réception<br/>
+                       - Factures fournisseur<br/>
+                       - Paiements fournisseur<br/>
+                       - Autres paiements<br/>
+                       - Pièces comptables<br/>
+                       - Journaux<br/>
+                       - Taxes<br/>
+                       - Positions fiscales<br/>
+                       - Plan comptables<br/>
+                       - Comptes analytiques<br/>
+                       - Contrats analytiques<br/>
+                       - RDVs d'intervention<br/>
+                       - Interventions à programmer<br/>
+                       - Contrats d'entretien<br/>
+                       - SAVs<br/>
+                       - Parcs installés<br/>
+                       - Entrepôts<br/>
+                       - Emplacements de stock<br/>
+                       - Mouvements de stock<br/>
+                       - Séquences<br/>
+                       - Utilisateurs<br/>
+                       - Employés<br/>
+                    </p>
+                </div>
+                <footer>
+                    <button string="Supprimer" name="action_unlink" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

@@ -31,7 +31,8 @@ class OFFollowupProject(models.Model):
          ('cancel', u'Annulé')],
         string=u"Etat du dossier", compute='_compute_state', store=True)
     is_done = fields.Boolean(string=u"Est terminé")
-    order_id = fields.Many2one(comodel_name='sale.order', string=u"Commande", required=True, copy=False)
+    order_id = fields.Many2one(
+        comodel_name='sale.order', string=u"Commande", required=True, copy=False, ondelete='cascade')
     partner_id = fields.Many2one(related='order_id.partner_id', string=u"Client", readonly=True)
     intervention_address_id = fields.Many2one(
         related='order_id.partner_shipping_id', string=u"Adresse d'intervention", readonly=True)
