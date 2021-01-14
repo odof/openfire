@@ -7,7 +7,7 @@ var _t = core._t;
 var FormView = require('web.FormView');
 
 FormView.include({
-    // Redéfintion de la fonction standard
+    // Redéfinition de la fonction standard
     on_button_delete: function() {
         var self = this;
         if (self.model === 'res.company'){

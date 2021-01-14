@@ -187,7 +187,12 @@ class OFCompanyDeletionWizard(models.TransientModel):
                                 SET     credit              = 0.0
                                 WHERE   id                  IN %s;
                              """, (tuple(lines_to_update.ids),))
-        account_moves.unlink()
+        for move in account_moves:
+            # Le module account surcharge la fonction unlink et provoque des temps de calcul qui explosent en
+            # fonction du nombre de pièces comptables à supprimer.
+            # L'appel de prefetch() permet de supprimer les pièces une par une et ainsi de garder un temps d'exécution
+            # linéaire.
+            move.with_prefetch().unlink()
         _logger.info(u"Company Deletion - Companies %s - Account Moves - END" % company_ids)
 
         self.env.cr.commit()
@@ -232,29 +237,14 @@ class OFCompanyDeletionWizard(models.TransientModel):
 
         self.env.cr.commit()
 
-        # Plan comptables
+        # Plans comptables
         _logger.info(u"Company Deletion - Companies %s - Accounts - START" % company_ids)
         accounts = self.env['account.account'].with_context(active_test=False).search(
             [('company_id', 'in', self.company_ids.ids)])
         # Dans le cas où des propriétés des partenaires sur les comptes comptables à supprimer existent toujours
-        # (i.e. des propriétés d'une société portant sur un compte d'une autre société), on réaffecte le bon compte
-        # correspondant à la société de la propriété
+        # (i.e. des propriétés d'une société portant sur un compte d'une autre société), on supprime les affectations
         values = ['account.account,%s' % (account_id,) for account_id in accounts.ids]
-        partner_acc_properties = self.env['ir.property'].search([('value_reference', 'in', values)])
-        for partner_acc_property in partner_acc_properties:
-            account_id = int(partner_acc_property.value_reference.partition(',')[-1])
-            account = self.env['account.account'].search([('id', '=', account_id)])
-            partner_id = int(partner_acc_property.res_id.partition(',')[-1])
-            partner = self.env['res.partner'].search([('id', '=', partner_id)])
-            if account and partner:
-                correct_account = self.env['account.account'].search(
-                    [('company_id', '=', partner_acc_property.company_id.id), ('code', '=', account.code)])
-                if correct_account and correct_account.internal_type == 'receivable':
-                    partner.with_context(force_company=partner_acc_property.company_id.id).\
-                        property_account_receivable_id = correct_account
-                elif correct_account and correct_account.internal_type == 'payable':
-                    partner.with_context(force_company=partner_acc_property.company_id.id).\
-                        property_account_payable_id = correct_account
+        self.env['ir.property'].search([('value_reference', 'in', values)]).unlink()
         accounts.unlink()
         _logger.info(u"Company Deletion - Companies %s - Accounts - END" % company_ids)
 
@@ -379,7 +369,7 @@ class OFCompanyDeletionWizard(models.TransientModel):
 
         # Entrepôts
         _logger.info(u"Company Deletion - Companies %s - Stock Warehouses - START" % company_ids)
-        # S'ils restent des transferts (BL ou BR) associés à des entrepôts à supprimer, on les supprime
+        # S'il reste des transferts (BL, BR ou BT) associés à des entrepôts à supprimer, on les supprime
         warehouse_pickings = self.env['stock.picking'].with_context(active_test=False).search(
             ['|',
              ('location_id.company_id', 'in', self.company_ids.ids),
@@ -394,12 +384,21 @@ class OFCompanyDeletionWizard(models.TransientModel):
         # Suppression des règles d'approvisionnement associées aux entrepôts à supprimer
         self.env['procurement.rule'].with_context(active_test=False).search(
             [('warehouse_id.company_id', 'in', self.company_ids.ids)]).unlink()
-        # Suppression des commandes de vente associées aux entrepôts à supprimer
-        self.env['sale.order'].with_context(active_test=False).search(
-            [('warehouse_id.company_id', 'in', self.company_ids.ids),
-             ('state', 'not in', ['draft', 'cancel'])]).write({'state': 'cancel'})
-        self.env['sale.order'].with_context(active_test=False).search(
-            [('warehouse_id.company_id', 'in', self.company_ids.ids)]).unlink()
+        # Si un bon de commande est accocié à un entrepôt à supprimer, on le remplace par le bon de commande
+        # par défaut pour sa société
+        for vals in self.env['sale.order'].with_context(active_test=False).read_group(
+                [('warehouse_id.company_id', 'in', self.company_ids.ids)], 'company_id', 'company_id'):
+            if vals['company_id']:
+                # Code récupéré de sale.order._default_warehouse_id() (module sale_stock)
+                default_warehouse_id = self.env['stock.warehouse'].search(
+                    [('company_id', '=', vals['company_id'][0])], limit=1).id
+                self.env['sale.order'].with_context(active_test=False).search(vals['__domain']).write(
+                    {'warehouse_id': default_warehouse_id})
+            else:
+                # Suppression des commandes sans société mais avec un entrepôt erroné
+                orders = self.env['sale.order'].with_context(active_test=False).search(vals['__domain'])
+                orders.filtered(lambda o: o.state not in ('draft', 'cancel')).write({'state': 'cancel'})
+                orders.unlink()
         self.env['stock.warehouse'].with_context(active_test=False).search(
             [('company_id', 'in', self.company_ids.ids)]).unlink()
         _logger.info(u"Company Deletion - Companies %s - Stock Warehouses - END" % company_ids)
@@ -468,30 +467,30 @@ class OFCompanyDeletionWizard(models.TransientModel):
         _logger.info(u"Company Deletion - Companies %s - Partners - START" % company_ids)
         company_partners = self.env['res.partner'].with_context(active_test=False).search(
             [('company_id', 'in', self.company_ids.ids)])
-        # On ne supprime aucun fournisseurs, on vide simplement leur société
+        # On ne supprime aucun fournisseur, on vide simplement leur société
         suppliers = company_partners.filtered(lambda p: p.supplier)
         if suppliers:
             company_partners -= suppliers
             suppliers.write({'company_id': False})
-        # On ne supprime les partenaires correspondants à des sociétés, on vide simplement leur société
+        # On ne supprime pas les partenaires correspondant à des sociétés, on vide simplement leur société
         for company in self.company_ids:
             company_partner = company.partner_id
             if company_partner.id in company_partners.ids:
                 company_partners -= company_partner
                 company_partner.write({'company_id': False})
-        # On ne supprime les partenaires correspondants à des marques, on vide simplement leur société
+        # On ne supprime pas les partenaires correspondant à des marques, on vide simplement leur société
         brand_partners = self.env['of.product.brand'].with_context(active_test=False).search(
             [('partner_id', 'in', company_partners.ids)]).mapped('partner_id')
         if brand_partners:
             company_partners -= brand_partners
             brand_partners.write({'company_id': False})
-        # On ne supprime les partenaires qui ont encore des factures, on vide simplement leur société
+        # On ne supprime pas les partenaires qui ont encore des factures, on vide simplement leur société
         invoice_partners = self.env['account.invoice'].with_context(active_test=False).search(
             [('partner_id', 'in', company_partners.ids)]).mapped('partner_id')
         if invoice_partners:
             company_partners -= invoice_partners
             invoice_partners.write({'company_id': False})
-        # On ne supprime les partenaires qui ont encore des commandes de vente, on vide simplement leur société
+        # On ne supprime pas les partenaires qui ont encore des commandes de vente, on vide simplement leur société
         so_partners = self.env['sale.order'].with_context(active_test=False).search(
             [('partner_id', 'in', company_partners.ids)]).mapped('partner_id')
         so_partners |= self.env['sale.order'].with_context(active_test=False).search(
@@ -501,25 +500,31 @@ class OFCompanyDeletionWizard(models.TransientModel):
         if so_partners:
             company_partners -= so_partners
             so_partners.write({'company_id': False})
-        # On ne supprime les partenaires qui ont encore des commandes d'achat, on vide simplement leur société
+        # On ne supprime pas les partenaires qui ont encore des commandes d'achat, on vide simplement leur société
         po_partners = self.env['purchase.order'].with_context(active_test=False).search(
             [('partner_id', 'in', company_partners.ids)]).mapped('partner_id')
         if po_partners:
             company_partners -= po_partners
             po_partners.write({'company_id': False})
-        # On ne supprime les partenaires correspondants à des utilisateurs, on vide simplement leur société
+        # On ne supprime pas les partenaires correspondant à des utilisateurs, on vide simplement leur société
         user_partners = self.env['res.users'].with_context(active_test=False).search(
             [('partner_id', 'in', company_partners.ids)]).mapped('partner_id')
         if user_partners:
             company_partners -= user_partners
             user_partners.write({'company_id': False})
-        # On ne supprime les partenaires qui ont encore des parcs installés, on vide simplement leur société
+        # On ne supprime pas les partenaires qui ont encore des savs, on vide simplement leur société
+        project_issue_partners = self.env['project.issue'].with_context(active_test=False).search(
+            [('partner_id', 'in', company_partners.ids)]).mapped('partner_id')
+        if project_issue_partners:
+            company_partners -= project_issue_partners
+            project_issue_partners.write({'company_id': False})
+        # On ne supprime pas les partenaires qui ont encore des parcs installés, on vide simplement leur société
         parc_installe_partners = self.env['of.parc.installe'].with_context(active_test=False).search(
             [('client_id', 'in', company_partners.ids)]).mapped('client_id')
         if parc_installe_partners:
             company_partners -= parc_installe_partners
             parc_installe_partners.write({'company_id': False})
-        # On ne supprime les partenaires qui ont encore des interventions, on vide simplement leur société
+        # On ne supprime pas les partenaires qui ont encore des interventions, on vide simplement leur société
         service_partners = self.env['of.service'].with_context(active_test=False).search(
             [('partner_id', 'in', company_partners.ids)]).mapped('partner_id')
         service_partners |= self.env['of.service'].with_context(active_test=False).search(
@@ -527,7 +532,7 @@ class OFCompanyDeletionWizard(models.TransientModel):
         if service_partners:
             company_partners -= service_partners
             service_partners.write({'company_id': False})
-        # On ne supprime les partenaires qui ont encore des écritures comptables, on vide simplement leur société
+        # On ne supprime pas les partenaires qui ont encore des écritures comptables, on vide simplement leur société
         account_move_partners = self.env['account.move.line'].with_context(active_test=False).search(
             [('partner_id', 'in', company_partners.ids)]).mapped('partner_id')
         if account_move_partners:

@@ -7,7 +7,7 @@ var _t = core._t;
 var ListView = require('web.ListView');
 
 ListView.include({
-    // Redéfintion de la fonction standard
+    // Redéfinition de la fonction standard
     do_delete: function (ids) {
         var self = this;
         if (self.model === 'res.company'){
