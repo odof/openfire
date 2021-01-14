@@ -427,11 +427,11 @@ class HREmployee(models.Model):
                 pre_res.append(segment_fuz)
                 segments_emp_1.pop(0)
                 segments_emp_2.pop(0)
-        # OK! on a une liste de segments avec 2 horaires_dict dans chaque. maintenant on fusionne les horaires_dict pour garder leur intersection
+        # On a à présent une liste de segments avec 2 horaires_dict dans chaque.
+        # On fusionne les horaires_dict pour garder leur intersection
         for segment in pre_res:
-            segment_fuz = (segment[0], segment[1], self.get_intersection_heures_dict(segment[2], segment[3]))
+            segment_fuz = [segment[0], segment[1], self.get_intersection_heures_dict(segment[2], segment[3])]
             res.append(segment_fuz)
-        # YOUPI!
         return res
 
     @api.model
