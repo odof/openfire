@@ -22,6 +22,7 @@ class OFContractIndiceWizard(models.TransientModel):
         help=u"Cette date vous permet de sélectionner la valeur de l'indexation que vous souhaitez appliquer, "
              u"elle doit être comprise dans la période définie de l'une des valeurs d'indexation définies "
              u"dans votre indice")
+    purchase = fields.Boolean(string=u"Affecte le coÛt", default=True)
 
     line_ids = fields.One2many(comodel_name='of.contract.indice.line.wizard', inverse_name='wizard_id', string="Lignes affectées", compute="_compute_line_ids")
 
@@ -42,37 +43,60 @@ class OFContractIndiceWizard(models.TransientModel):
                     product_lines = contract_line.contract_product_ids
                     for product_line in product_lines:
                         if wizard.rollback:
-                            previous_price = product_line.price_unit
-                            new_price = product_line.price_unit_prec
-                            new_lines += wizard_lines_obj.new({
-                                'product_line_id': product_line.id,
-                                'current_price'  : previous_price,
-                                'new_price'      : new_price,
-                            })
+                            current_price = product_line.price_unit
+                            previous_price = product_line.price_unit_prec
+                            current_purchase_price = product_line.purchase_price
+                            new_values = {
+                                'product_line_id'       : product_line.id,
+                                'current_price'         : current_price,
+                                'new_price'             : previous_price,
+                                'current_purchase_price': current_purchase_price,
+                                'new_purchase_price'    : current_purchase_price,
+                            }
+                            if self.purchase:
+                                previous_purchase_price = product_line.purchase_price_prec
+                                new_values.update({
+                                    'new_purchase_price': previous_purchase_price,
+                                })
+                            new_lines += wizard_lines_obj.new(new_values)
                         else:
                             previous_price = product_line.price_unit
+                            previous_purchase_price = product_line.purchase_price
                             # product = product_line.product_id
                             index_ids = product_line.product_id.of_index_ids.ids
                             temp_indices = [indice for indice in indices if indice.id in index_ids]
                             additionnal_prices = []
+                            additionnal_purchase_prices = []
                             for indice in temp_indices:
                                 index_line = indice.index_line_ids.filtered(
                                     lambda il: il.date_start <= date_execution <= il.date_end)
                                 if index_line:
                                     additionnal_prices.append((previous_price * index_line.value) - previous_price)
+                                    additionnal_purchase_prices.append(
+                                            (previous_purchase_price * index_line.value) - previous_purchase_price)
                             if not additionnal_prices:
                                 new_lines += wizard_lines_obj.new({
-                                    'product_line_id': product_line.id,
-                                    'current_price'  : previous_price,
-                                    'new_price'      : previous_price,
-                                    })
+                                    'product_line_id'       : product_line.id,
+                                    'current_price'         : previous_price,
+                                    'new_price'             : previous_price,
+                                    'current_purchase_price': previous_purchase_price,
+                                    'new_purchase_price'    : previous_purchase_price,
+                                })
                             else:
                                 new_price = previous_price + sum(additionnal_prices)
-                                new_lines += wizard_lines_obj.new({
-                                    'product_line_id': product_line.id,
-                                    'current_price'  : previous_price,
-                                    'new_price'      : new_price,
-                                    })
+                                new_values = {
+                                    'product_line_id'       : product_line.id,
+                                    'current_price'         : previous_price,
+                                    'new_price'             : new_price,
+                                    'current_purchase_price': previous_purchase_price,
+                                    'new_purchase_price'    : previous_purchase_price,
+                                }
+                                if self.purchase:
+                                    new_purchase_price = previous_purchase_price + sum(additionnal_purchase_prices)
+                                    new_values.update({
+                                        'new_purchase_price'    : new_purchase_price,
+                                })
+                                new_lines += wizard_lines_obj.new(new_values)
             wizard.line_ids = new_lines
 
     @api.multi
@@ -92,32 +116,48 @@ class OFContractIndiceWizard(models.TransientModel):
                 for product_line in product_lines:
                     if self.rollback:
                         new_price = product_line.price_unit_prec
-                        product_line.with_context(no_verification=True).write({
+                        new_values = {
                             'price_unit'        : new_price,
                             'date_indexed'      : product_line.date_indexed_prec,
                             'date_indexed_prec' : False,
+                        }
+                        if self.purchase:
+                            new_purchase_price = product_line.purchase_price_prec
+                            new_values.update({
+                                'purchase_price'    : new_purchase_price,
                             })
+                        product_line.with_context(no_verification=True).write(new_values)
                         products_done |= product_line
                     else:
                         previous_price = product_line.price_unit
+                        previous_purchase_price = product_line.purchase_price
                         # product = product_line.product_id
                         index_ids = product_line.product_id.of_index_ids.ids
                         temp_indices = [indice for indice in indices if indice.id in index_ids]
                         additionnal_prices = []
+                        additionnal_purchase_prices = []
                         for indice in temp_indices:
                             index_line = indice.index_line_ids.filtered(lambda il: il.date_start <= date_execution <= il.date_end)
                             if index_line:
                                 additionnal_prices.append((previous_price * index_line.value) - previous_price)
+                                additionnal_purchase_prices.append(
+                                    (previous_purchase_price * index_line.value) - previous_purchase_price)
                         if not additionnal_prices:
                             continue
                         new_price = previous_price + sum(additionnal_prices)
-                        product_line.with_context(no_verification=True).write(
-                            {
-                                'price_unit'        : new_price,
-                                'price_unit_prec'   : previous_price,
-                                'date_indexed'      : fields.Date.today(),
-                                'date_indexed_prec' : product_line.date_indexed,
+                        new_values = {
+                            'product_line_id'    : product_line.id,
+                            'price_unit_prec'    : previous_price,
+                            'price_unit'         : new_price,
+                            'purchase_price'     : previous_purchase_price,
+                            'purchase_price_prec': previous_purchase_price,
+                        }
+                        if self.purchase:
+                            new_purchase_price = previous_purchase_price + sum(additionnal_purchase_prices)
+                            new_values.update({
+                                'purchase_price': new_purchase_price,
                             })
+                        product_line.with_context(no_verification=True).write(new_values)
                         products_done |= product_line
         products_done_count = len(products_done)
         lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
@@ -144,3 +184,5 @@ class OFContractIndiceLineWizard(models.TransientModel):
     product_id = fields.Many2one(comodel_name='product.product', string="Article", related="product_line_id.product_id")
     current_price = fields.Float(string="PU Actuel")
     new_price = fields.Float(string=u"PU calculé")
+    current_purchase_price = fields.Float(string=u"Coût actuel")
+    new_purchase_price = fields.Float(string=u"Coût calculé")

@@ -11,6 +11,7 @@
                     <field name="contract_ids" widget="many2many_tags"/>
                     <field name="indice_ids" widget="many2many_tags" attrs="{'invisible': [('rollback','=',True)]}"/>
                     <field name="date_execution" attrs="{'invisible': [('rollback','=',True)]}"/>
+                    <field name="purchase"/>
                     <field name="rollback"/>
                 </group>
                 <group>
@@ -24,6 +25,8 @@
                             <field name="product_id"/>
                             <field name="current_price"/>
                             <field name="new_price"/>
+                            <field name="current_purchase_price" invisible="1"/>
+                            <field name="new_purchase_price" invisible="1"/>
 <!--                            <field name=""/>-->
                         </tree>
                     </field>

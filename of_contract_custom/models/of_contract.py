@@ -171,7 +171,7 @@ class OfContract(models.Model):
         for contract in self:
             if contract.date_start > today:
                 contract.state = 'upcoming'
-            elif contract.date_end < today:
+            elif contract.date_end and contract.date_end < today:
                 contract.state = 'inactive'
             else:
                 contract.state = 'in_progress'
@@ -1411,6 +1411,7 @@ class OfContractProduct(models.Model):
     price_unit = fields.Float(string="Prix unitaire")
     price_unit_prec = fields.Float(string=u"Prix unitaire précédent")
     purchase_price = fields.Float(string=u"Coût")
+    purchase_price_prec = fields.Float(string=u"Coût précédent")
     next_purchase_price = fields.Float(string=u"Prochain coût", compute='_compute_amount')
     year_purchase_price = fields.Float(string=u"Coût annuel", compute='_compute_amount')
     name = fields.Text(string='Description', required=True)
