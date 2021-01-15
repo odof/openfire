@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime, timedelta
+import math
 
 from odoo import api, fields, models
 from odoo.tools import float_is_zero, float_compare, DEFAULT_SERVER_DATETIME_FORMAT
@@ -295,15 +296,16 @@ class SaleOrderLine(models.Model):
         if not self.of_is_kit:
             qty = super(SaleOrderLine, self)._get_delivered_qty()
             return qty
-        if not self._all_comps_delivered():
-            return 0.0
-        else:
-            return self.product_uom_qty
+        delivered_qty = 0.0
+        for component in self.kit_id.kit_line_ids:
+            delivered_qty = max(math.ceil(round(component.qty_delivered / component.qty_per_kit, 3)), delivered_qty)
+        return delivered_qty
 
     @api.multi
     def _all_comps_delivered(self):
         """
-        check if all components were delivered entirely.
+        Check if all components were delivered entirely.
+        (This method is no longer used but we keep it in case we need it again.)
         """
         self.ensure_one()
         components = self.kit_id.kit_line_ids or []
