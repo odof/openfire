@@ -22,7 +22,7 @@ ListView.include({
             });
         }
         else{
-            self._super();
+            self._super.apply(this, arguments);
         }
     },
 });
