@@ -30,6 +30,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
         domain="[('categ_id', '=', product_categ_id), ('type', '=', 'service')]",
         default=lambda self: self._default_product_id())
     of_nb_products = fields.Integer(compute="_compute_of_nb_products")
+    of_include_null_qty_lines = fields.Boolean(string=u"Inclure les lignes en quantité 0 ?")
 
     @api.depends('product_categ_id')
     def _compute_of_nb_products(self):
@@ -68,5 +69,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
             if len(sale_orders) > 1 and self._context.get('open_invoices', False):
                 result = sale_orders.action_view_invoice()
         else:
+            if self.advance_payment_method in ['delivered', 'all'] and self.of_include_null_qty_lines:
+                self = self.with_context(of_include_null_qty_lines=True)
             result = super(SaleAdvancePaymentInv, self).create_invoices()
         return result

@@ -619,6 +619,26 @@ class SaleOrder(models.Model):
         res._onchange_payment_term_id()
         return res
 
+    @api.multi
+    def action_invoice_create(self, grouped=False, final=False):
+        invoice_ids = super(SaleOrder, self).action_invoice_create(grouped=grouped, final=final)
+        invoices = self.env['account.invoice'].browse(invoice_ids)
+
+        if self._context.get('of_include_null_qty_lines', False) and invoices:
+            for order in self:
+                # On récupère la facture générée correspondant à cette commande
+                invoice = invoices.filtered(lambda inv: inv.origin == order.name)
+                if invoice:
+                    # On ajoute dans la facture les lignes correspondantes aux lignes de commande en quantité 0
+                    # et qui n'ont pas de lignes de facture associées
+                    for order_line in order.order_line.filtered(
+                            lambda l: l.product_uom_qty == 0.0 and not l.invoice_lines):
+                        vals = order_line._prepare_invoice_line(qty=0.0)
+                        vals.update({'invoice_id': invoice.id, 'sale_line_ids': [(6, 0, [order_line.id])]})
+                        self.env['account.invoice.line'].create(vals)
+
+        return invoice_ids
+
 
 class Report(models.Model):
     _inherit = "report"
