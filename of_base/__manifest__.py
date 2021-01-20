@@ -24,6 +24,15 @@ Personnalisation des fonctions de base Odoo :
 - Permet à l'auteur d'un mail de le recevoir en copie (par défaut odoo retire l'expéditeur de la liste des destinataires)
 - Nouvelle gestion des numéros de téléphone des partenaires avec formatage automatique des numéros
     -> Librairie Python phonenumbers nécessaire, pour installer : pip install phonenumbers
+
+Ajout d'un modèle servant de log interne :
+------------------------------------------
+ - Titre : Généralement lié au nom du module.
+ - Type d'erreur : Si erreur de validation par un connecteur alors catégorie de l'erreur (si présente) autrement définie par le développeur.
+ - Modèle : Modèle dans lequel l'erreur s'est produite.
+ - Fonction : Fonction dans laquelle l'erreur s'est produite.
+ - Message : Si erreur de validation par un connecteur alors message retourné par l'erreur (si présent) autrement défini par le développeur.
+ - Niveau de log : Peut être Info, Avertissement ou Erreur.
 """,
     'website': "www.openfire.fr",
     'depends': [
@@ -36,10 +45,12 @@ Personnalisation des fonctions de base Odoo :
     'category': "OpenFire",
     'data': [
         'data/report_paperformat.xml',
+        'data/of_base_data.xml',
         'security/of_base_security.xml',
         'security/of_group_intranet_security.xml',
         'security/ir.model.access.csv',
         'views/of_base_view.xml',
+        'views/of_log_message_views.xml',
         'views/templates.xml',
         'wizard/wizard_change_active_product.xml',
         'wizard/of_popup_wizard_view.xml',
