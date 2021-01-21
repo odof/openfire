@@ -1104,7 +1104,6 @@ class AccountInvoiceLine(models.Model):
     def write(self, vals):
         fields_to_sync = {
             'price_unit': 'price_unit',
-            'quantity': 'product_uom_qty',
             'uom_id': 'product_uom',
             'discount': 'discount',
             'of_discount_formula': 'of_discount_formula',
