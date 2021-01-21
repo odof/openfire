@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Create CEE Invoices Views -->
+
+    <record id="of_cee_of_create_cee_invoices_form_view" model="ir.ui.view">
+        <field name="name">of.cee.of.create.cee.invoices.form.view</field>
+        <field name="model">of.create.cee.invoices</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="ok" invisible="1"/>
+                <field name="error" invisible="1"/>
+                <field name="info_txt" nolabel="1" readonly="1"/>
+                <footer>
+                    <button string="Créer les factures CEE" name="create_cee_invoices" type="object" class="btn-primary"
+                            attrs="{'invisible': [('ok', '=', False)]}"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window id="of_cee_of_create_cee_invoices_action"
+                key2="client_action_multi"
+                name="Facturer CEE"
+                res_model="of.create.cee.invoices"
+                src_model="sale.order"
+                view_mode="form"
+                view_type="form"
+                view_id="of_cee_of_create_cee_invoices_form_view"
+                target="new" />
+
+</odoo>

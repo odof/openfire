@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Modèle de facture CEE test -->
+
+    <template id="of_cee_invoice_test_document" inherit_id="sale.report_invoice_layouted" primary="True">
+
+        <xpath expr="//t[@groups='sale.group_sale_layout']/table/thead" position="attributes">
+            <attribute name="style">background-color: #F29400;</attribute>
+        </xpath>
+
+    </template>
+
+    <template id="of_cee_invoice_test">
+        <t t-call="report.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="of_cee.of_cee_invoice_test_document" t-lang="o.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+</odoo>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Sale Order Views -->
+
+    <record id="of_cee_sale_order_form_view" model="ir.ui.view">
+        <field name="name">of.cee.sale.order.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='client_order_ref']" position="after">
+                <field name="of_cee_number"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_cee_sale_order_search_view" model="ir.ui.view">
+        <field name="name">of.cee.sale.order.search.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='message_needaction']" position="before">
+                <filter string="CEE à facturer" name="cee_to_invoice" domain="[('of_cee_invoice_status', '=', 'to_invoice')]"/>
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Sale Config Settings Views -->
+
+    <record id="of_cee_sale_config_settings_form_view" model="ir.ui.view">
+        <field name="name">of.cee.sale.config.settings.form.view</field>
+        <field name="model">sale.config.settings</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_sale_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='deposit_product_id_setting']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='of_deposit_product_categ_id_setting']" position="after">
+                <field name="of_cee_product_categ_id" class="oe_inline"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
