@@ -62,11 +62,50 @@ class OfAccountInvoice(models.Model):
                             format_date(fields.Date.to_string(period_start), lang),
                             format_date(base_date, lang))
 
+    def _get_refund_common_fields(self):
+        common_fields = ['of_contract_id']
+        return (super(OfAccountInvoice, self)._get_refund_common_fields() or []) + common_fields
+
+    def _get_refund_copy_fields(self):
+        copy_fields = ['of_contract_id']
+        return (super(OfAccountInvoice, self)._get_refund_copy_fields() or []) + copy_fields
+
+    @api.model
+    def _refund_cleanup_lines(self, lines):
+        """ Surcharge pour que tout avoir soit pris en compte dans les contrats
+        """
+        result = super(OfAccountInvoice, self)._refund_cleanup_lines(lines)
+        # le context mode n'est envoyé que pour la création de la nouvelle facture et non pour l'avoir
+        if self.env.context.get('mode') == 'modify':
+            for i in xrange(0, len(lines)):
+                for name, field in lines[i]._fields.iteritems():
+                    if name in ('of_contract_product_id', 'of_contract_line_id'):
+                        # Par sécurité mais supposément non nécessaire
+                        result[i][2][name] = lines[i][name] and lines[i][name].id or False
+                        lines[i][name] = False
+        elif self.env.context.get('of_mode') in ('refund', 'modify'):
+            for i in xrange(0, len(lines)):
+                for name, field in lines[i]._fields.iteritems():
+                    if name in ('of_contract_product_id', 'of_contract_line_id'):
+                        # La fonction d'origine copie tous les champs many2one y compris ceux en copy=False
+                        # On ne veut pas que ce soit copié dans ce cas
+                        result[i][2][name] = False
+        elif self.env.context.get('of_mode') == 'cancel':
+            for i in xrange(0, len(lines)):
+                for name, field in lines[i]._fields.iteritems():
+                    if name in ('of_contract_product_id', 'of_contract_line_id'):
+                        lines[i][name] = False
+                        # La fonction d'origine copie tous les champs many2one y compris ceux en copy=False
+                        # On ne veut pas que ce soit copié dans ce cas
+                        result[i][2][name] = False
+
+        return result
+
 
 class OfAccountInvoiceLine(models.Model):
     _inherit = "account.invoice.line"
 
     of_contract_id = fields.Many2one('of.contract', string="Contrat")
-    of_contract_product_id = fields.Many2one('of.contract.product', string="Article contrat")
-    of_contract_line_id = fields.Many2one('of.contract.line', string="Ligne de contrat")
+    of_contract_product_id = fields.Many2one('of.contract.product', string="Article contrat", copy=False)
+    of_contract_line_id = fields.Many2one('of.contract.line', string="Ligne de contrat", copy=False)
     of_contract_supposed_date = fields.Date(string=u'Date prévue', readonly=True)

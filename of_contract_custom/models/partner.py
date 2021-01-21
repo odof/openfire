@@ -11,18 +11,23 @@ class ResPartner(models.Model):
     of_contract_ids = fields.One2many(
         comodel_name='of.contract', inverse_name='partner_id', string="Contrats", oldname='of_contrat_ids')
     of_contract_line_count = fields.Integer(
-        compute="_compute_of_contract_count", string="Nombre de ligne de contrat", oldname='of_contrat_line_count')
+        compute="_compute_of_contract_count", string="Nombre de ligne de contrat (prestataire)", oldname='of_contrat_line_count')
     of_contract_line_ids = fields.One2many(
-        comodel_name='of.contract.line', inverse_name='supplier_id', string="Lignes de contrat", oldname='of_contract_line_count_ids')
+        comodel_name='of.contract.line', inverse_name='supplier_id', string="Lignes de contrat (prestataire)", oldname='of_contract_line_count_ids')
+    of_contract_line_address_count = fields.Integer(
+            compute="_compute_of_contract_count", string="Nombre de ligne de contrat (addresse)")
+    of_contract_line_address_ids = fields.One2many(
+            comodel_name='of.contract.line', inverse_name='address_id', string="Lignes de contrat (addresse)")
     of_prestataire_id = fields.Many2one(
         comodel_name='res.partner', string="Prestataire", domain="[('supplier','=',True)]", track_visibility='onchange')
     of_code_magasin = fields.Char(string="Code magasin")
 
-    @api.depends('of_contract_ids', 'of_contract_line_ids')
+    @api.depends('of_contract_ids', 'of_contract_line_ids', 'of_contract_line_address_ids')
     def _compute_of_contract_count(self):
         for partner in self:
             partner.of_contract_count = len(partner.of_contract_ids)
             partner.of_contract_line_count = len(partner.of_contract_line_ids)
+            partner.of_contract_line_address_count = len(partner.of_contract_line_address_ids)
 
     @api.onchange('of_secteur_tech_id')
     def _onchange_of_secteur_tech_id(self):
@@ -43,6 +48,12 @@ class ResPartner(models.Model):
     def action_view_contract_line(self):
         action = self.env.ref('of_contract_custom.of_contract_custom_open_contrat_line').read()[0]
         action['domain'] = [('supplier_id', 'in', self._ids)]
+        return action
+
+    @api.multi
+    def action_view_contrat_line_address(self):
+        action = self.env.ref('of_contract_custom.of_contract_custom_open_contrat_line').read()[0]
+        action['domain'] = [('address_id', 'in', self._ids)]
         return action
 
     @api.multi

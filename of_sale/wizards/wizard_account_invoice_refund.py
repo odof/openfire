@@ -9,6 +9,4 @@ class AccountInvoiceRefund(models.TransientModel):
 
     @api.multi
     def compute_refund(self, mode='refund'):
-        if mode == 'cancel':
-            return super(AccountInvoiceRefund, self.with_context(of_mode='cancel')).compute_refund(mode)
-        return super(AccountInvoiceRefund, self).compute_refund(mode)
+        return super(AccountInvoiceRefund, self.with_context(of_mode=mode)).compute_refund(mode)

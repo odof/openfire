@@ -212,11 +212,17 @@ class OfContract(models.Model):
             contract.next_subtotal = round(c_subtotal, 2)
             contract.next_total = c_total_tax + c_subtotal
 
-    @api.depends('invoice_ids', 'invoice_ids.state')
+    @api.depends('line_ids',
+                 'line_ids.invoice_line_ids',
+                 'line_ids.invoice_line_ids.invoice_id',
+                 'line_ids.invoice_line_ids.invoice_id.state')
     def _compute_last_invoicing_date(self):
         """ Récupération de la dernière date de facturation """
         for contract in self:
-            invoices = contract.invoice_ids.filtered(lambda i: i.state in ['confirm', 'paid'])
+            # en cas d'avoir, la facture est déliée des lignes de contrat mais pas du contrat.
+            # on passe donc par les lignes de contrat pour connaitre la facture actuelle
+            invoices = contract.line_ids.mapped('invoice_line_ids').mapped('invoice_id')\
+                                        .filtered(lambda i: i.state in ['confirm', 'paid'])
             if invoices:
                 contract.last_invoicing_date = invoices[0].date_invoice
 
@@ -549,7 +555,7 @@ class OfContract(models.Model):
     def generate_invoices(self):
         """ Génére les facture pour les contrats à facturer aujourd'hui """
         today = fields.Date.today()
-        contracts = self.search([('recurring_next_date', '=', today)])
+        contracts = self.search([('recurring_next_date', '<=', today)])
         contracts.recurring_create_invoice(do_raise=False)
 
     @api.multi
@@ -1262,6 +1268,7 @@ class OfContractLine(models.Model):
         """ Génération des interventions à programmer """
         service_obj = self.with_context(bloquer_recurrence=True).env['of.service']
         type = self.env.ref('of_contract_custom.of_contract_custom_type_maintenance')
+        services = self.env['of.service']
         services_kept = self.env['of.service']
         for line in self:
             if not line.current_period_id or not line.state == 'validated':
@@ -1282,8 +1289,8 @@ class OfContractLine(models.Model):
                 date_service = fields.Date.to_string(service_da)
                 month_service_end = fields.Date.to_string(service_da + relativedelta(months=1))
 
-                if date_service < line.date_contract_start:
-                    continue
+                # if date_service < line.date_contract_start:
+                #     continue
                 if line.date_contract_end and date_service > line.date_contract_end:
                     break
                 if line.service_ids.filtered(lambda s: date_service <= s.date_next < month_service_end):
@@ -1314,7 +1321,11 @@ class OfContractLine(models.Model):
                     if line.parc_installe_id:
                         new_service.update({'parc_installe_id': line.parc_installe_id.id})
                     new_service_vals = new_service._convert_to_write(new_service._cache)
-                    services_kept |= service_obj.create(new_service_vals)
+                    new_service = service_obj.create(new_service_vals)
+                    services_kept |= new_service
+                    services |= new_service
+        if services:
+            services.button_valider()
         all_services = self.mapped('service_ids')
         services_to_remove = all_services - services_kept
         services_to_remove = services_to_remove.filtered(lambda s: not s.intervention_ids)
@@ -1521,13 +1532,19 @@ class OfContractProduct(models.Model):
             lines = product_line.invoice_line_ids\
                                 .filtered(lambda l: l.of_contract_supposed_date and
                                           date_range.date_start <= l.of_contract_supposed_date <= date_range.date_end)
-            qty_invoiced = sum(lines.mapped('quantity'))
+            qty_out_invoice = sum(lines.filtered(lambda il: il.invoice_id.type == 'out_invoice').mapped('quantity'))
+            qty_out_refund = sum(lines.filtered(lambda il: il.invoice_id.type == 'out_refund').mapped('quantity'))
+            qty_invoiced = qty_out_invoice - qty_out_refund
             avenant_de = product_line.previous_product_id
             if avenant_de and avenant_de.line_id.current_period_id.id == date_range.id:
                 old_lines = avenant_de.invoice_line_ids\
                                       .filtered(lambda l: l.of_contract_supposed_date and
                                                 date_range.date_start <= l.of_contract_supposed_date <= date_range.date_end)
-                qty_invoiced += sum(old_lines.mapped('quantity'))
+                old_qty_out_invoice = sum(old_lines.filtered(
+                        lambda il: il.invoice_id.type == 'out_invoice').mapped('quantity'))
+                old_qty_out_refund = sum(old_lines.filtered(
+                        lambda il: il.invoice_id.type == 'out_refund').mapped('quantity'))
+                qty_invoiced += old_qty_out_invoice - old_qty_out_refund
             product_line.qty_invoiced = qty_invoiced
 
     @api.depends('quantity', 'line_id', 'line_id.nbr_interv', 'line_id.next_date', 'line_id.state', 'qty_invoiced',
@@ -1592,6 +1609,11 @@ class OfContractProduct(models.Model):
             'product_id'   : self.product_id.id,
             'name': self.name,
             })
+        type = 'out_invoice'
+        product = self.product_id
+        fpos = self.line_id.fiscal_position_id
+        company = self.line_id.contract_id.company_id
+        account = self.env['account.invoice.line'].get_invoice_line_account(type, product, fpos, company)
         invoice_line_new._onchange_product_id()
         invoice_line_vals = invoice_line_new._convert_to_write(invoice_line_new._cache)
         # Get other invoice line values from product onchange
@@ -1607,7 +1629,8 @@ class OfContractProduct(models.Model):
             'invoice_line_tax_ids' : [(6, 0, [tax.id for tax in self.tax_ids])],
             'name'          : name,
             'price_unit'    : self.price_unit,
-            'of_contract_supposed_date': self.line_id.next_date
+            'of_contract_supposed_date': self.line_id.next_date,
+            'account_id'    : account.id,
         })
 
         return invoice_line_vals
