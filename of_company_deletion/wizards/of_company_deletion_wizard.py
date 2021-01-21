@@ -57,6 +57,13 @@ class OFCompanyDeletionWizard(models.TransientModel):
         account_invoices = self.env['account.invoice'].with_context(active_test=False).search(
             [('type', 'in', ['out_invoice', 'out_refund']),
              ('company_id', 'in', self.company_ids.ids)])
+        # Suppression des paiements edi
+        if 'of.paiement.edi.line' in self.env:
+            edi_payment_lines = self.env['of.paiement.edi.line'].with_context(active_test=False).search(
+                [('invoice_id', 'in', account_invoices.ids)])
+            edi_payments = edi_payment_lines.mapped('edi_id')
+            edi_payment_lines.unlink()
+            edi_payments.unlink()
         # Seules les factures brouillon ou annulées qui n'ont pas de numéro attribué peuvent être supprimées
         account_invoices.write({'state': 'cancel', 'move_name': False})
         account_invoices.unlink()
@@ -67,13 +74,14 @@ class OFCompanyDeletionWizard(models.TransientModel):
         # Paiements client
         _logger.info(u"Company Deletion - Companies %s - Customer Payments - START" % company_ids)
         # Suppression des historiques de paiement
-        self._cr.execute("""DELETE FROM of_log_paiement
-                            WHERE       paiement_id     IN (    SELECT  id
-                                                                FROM    account_payment
-                                                                WHERE   company_id      IN %s
-                                                                AND     payment_type    = 'inbound'
-                                                            );
-                         """, (tuple(self.company_ids.ids), ))
+        if 'of.log.paiement' in self.env:
+            self._cr.execute("""DELETE FROM of_log_paiement
+                                WHERE       paiement_id     IN (    SELECT  id
+                                                                    FROM    account_payment
+                                                                    WHERE   company_id      IN %s
+                                                                    AND     payment_type    = 'inbound'
+                                                                );
+                             """, (tuple(self.company_ids.ids), ))
         self._cr.execute("""DELETE FROM account_payment
                             WHERE       company_id      IN %s
                             AND         payment_type    = 'inbound';
@@ -82,19 +90,21 @@ class OFCompanyDeletionWizard(models.TransientModel):
 
         self.env.cr.commit()
 
-        # Remises en banque
-        _logger.info(u"Company Deletion - Companies %s - Bank Deposits - START" % company_ids)
         # On autorise l'annulation d'écritures sur tous les journaux des sociétés à supprimer
         self.env['account.journal'].with_context(active_test=False).search(
             [('company_id', 'in', self.company_ids.ids)]).write({'update_posted': True})
-        # Seules les remises en banque brouillon ou annulées peuvent être supprimées
-        self.env['of.account.payment.bank.deposit'].with_context(active_test=False).search(
-            [('journal_id.company_id', 'in', self.company_ids.ids), ('state', '!=', 'draft')]).cancel()
-        self.env['of.account.payment.bank.deposit'].with_context(active_test=False).search(
-            [('journal_id.company_id', 'in', self.company_ids.ids)]).unlink()
-        _logger.info(u"Company Deletion - Companies %s - Bank Deposits - END" % company_ids)
 
-        self.env.cr.commit()
+        # Remises en banque
+        if 'of.account.payment.bank.deposit' in self.env:
+            _logger.info(u"Company Deletion - Companies %s - Bank Deposits - START" % company_ids)
+            # Seules les remises en banque brouillon ou annulées peuvent être supprimées
+            self.env['of.account.payment.bank.deposit'].with_context(active_test=False).search(
+                [('journal_id.company_id', 'in', self.company_ids.ids), ('state', '!=', 'draft')]).cancel()
+            self.env['of.account.payment.bank.deposit'].with_context(active_test=False).search(
+                [('journal_id.company_id', 'in', self.company_ids.ids)]).unlink()
+            _logger.info(u"Company Deletion - Companies %s - Bank Deposits - END" % company_ids)
+
+            self.env.cr.commit()
 
         # Commandes fournisseur
         _logger.info(u"Company Deletion - Companies %s - Purchase Orders - START" % company_ids)
@@ -133,13 +143,14 @@ class OFCompanyDeletionWizard(models.TransientModel):
         # Paiements fournisseur
         _logger.info(u"Company Deletion - Companies %s - Supplier Payments - START" % company_ids)
         # Suppression des historiques de paiement
-        self._cr.execute("""DELETE FROM of_log_paiement
-                            WHERE       paiement_id     IN (    SELECT  id
-                                                                FROM    account_payment
-                                                                WHERE   company_id      IN %s
-                                                                AND     payment_type    = 'outbound'
-                                                            );
-                         """, (tuple(self.company_ids.ids), ))
+        if 'of.log.paiement' in self.env:
+            self._cr.execute("""DELETE FROM of_log_paiement
+                                WHERE       paiement_id     IN (    SELECT  id
+                                                                    FROM    account_payment
+                                                                    WHERE   company_id      IN %s
+                                                                    AND     payment_type    = 'outbound'
+                                                                );
+                             """, (tuple(self.company_ids.ids), ))
         self._cr.execute("""DELETE FROM account_payment
                             WHERE       company_id      IN %s
                             AND         payment_type    = 'outbound';
@@ -151,12 +162,13 @@ class OFCompanyDeletionWizard(models.TransientModel):
         # Autres paiements
         _logger.info(u"Company Deletion - Companies %s - Other Payments - START" % company_ids)
         # Suppression des historiques de paiement
-        self._cr.execute("""DELETE FROM of_log_paiement
-                            WHERE       paiement_id     IN (    SELECT  id
-                                                                FROM    account_payment
-                                                                WHERE   company_id      IN %s
-                                                            );
-                         """, (tuple(self.company_ids.ids),))
+        if 'of.log.paiement' in self.env:
+            self._cr.execute("""DELETE FROM of_log_paiement
+                                WHERE       paiement_id     IN (    SELECT  id
+                                                                    FROM    account_payment
+                                                                    WHERE   company_id      IN %s
+                                                                );
+                             """, (tuple(self.company_ids.ids),))
         self._cr.execute("""DELETE FROM account_payment
                             WHERE       company_id      IN %s;
                          """, (tuple(self.company_ids.ids),))
@@ -206,12 +218,13 @@ class OFCompanyDeletionWizard(models.TransientModel):
         self.env.cr.commit()
 
         # Modes de paiement
-        _logger.info(u"Company Deletion - Companies %s - Payment Modes - START" % company_ids)
-        self.env['of.account.payment.mode'].with_context(active_test=False).search(
-            [('company_id', 'in', self.company_ids.ids)]).unlink()
-        _logger.info(u"Company Deletion - Companies %s - Payment Modes - END" % company_ids)
+        if 'of.account.payment.mode' in self.env:
+            _logger.info(u"Company Deletion - Companies %s - Payment Modes - START" % company_ids)
+            self.env['of.account.payment.mode'].with_context(active_test=False).search(
+                [('company_id', 'in', self.company_ids.ids)]).unlink()
+            _logger.info(u"Company Deletion - Companies %s - Payment Modes - END" % company_ids)
 
-        self.env.cr.commit()
+            self.env.cr.commit()
 
         # Journaux
         _logger.info(u"Company Deletion - Companies %s - Account Journals - START" % company_ids)
@@ -267,30 +280,33 @@ class OFCompanyDeletionWizard(models.TransientModel):
         self.env.cr.commit()
 
         # RDVs d'intervention
-        _logger.info(u"Company Deletion - Companies %s - Planning Interventions - START" % company_ids)
-        self.env['of.planning.intervention'].with_context(active_test=False).search(
-            [('company_id', 'in', self.company_ids.ids)]).unlink()
-        _logger.info(u"Company Deletion - Companies %s - Planning Interventions - END" % company_ids)
+        if 'of.planning.intervention' in self.env:
+            _logger.info(u"Company Deletion - Companies %s - Planning Interventions - START" % company_ids)
+            self.env['of.planning.intervention'].with_context(active_test=False).search(
+                [('company_id', 'in', self.company_ids.ids)]).unlink()
+            _logger.info(u"Company Deletion - Companies %s - Planning Interventions - END" % company_ids)
 
-        self.env.cr.commit()
+            self.env.cr.commit()
 
         # Interventions à programmer
-        _logger.info(u"Company Deletion - Companies %s - Ponctual Services - START" % company_ids)
-        self.env['of.service'].with_context(active_test=False).search(
-            [('recurrence', '=', False),
-             ('company_id', 'in', self.company_ids.ids)]).unlink()
-        _logger.info(u"Company Deletion - Companies %s - Ponctual Services - END" % company_ids)
+        if 'of.service' in self.env:
+            _logger.info(u"Company Deletion - Companies %s - Ponctual Services - START" % company_ids)
+            self.env['of.service'].with_context(active_test=False).search(
+                [('recurrence', '=', False),
+                 ('company_id', 'in', self.company_ids.ids)]).unlink()
+            _logger.info(u"Company Deletion - Companies %s - Ponctual Services - END" % company_ids)
 
-        self.env.cr.commit()
+            self.env.cr.commit()
 
         # Contrats d'entretien
-        _logger.info(u"Company Deletion - Companies %s - Recurrent Services - START" % company_ids)
-        self.env['of.service'].with_context(active_test=False).search(
-            [('recurrence', '=', True),
-             ('company_id', 'in', self.company_ids.ids)]).unlink()
-        _logger.info(u"Company Deletion - Companies %s - Recurrent Services - END" % company_ids)
+        if 'of.service' in self.env:
+            _logger.info(u"Company Deletion - Companies %s - Recurrent Services - START" % company_ids)
+            self.env['of.service'].with_context(active_test=False).search(
+                [('recurrence', '=', True),
+                 ('company_id', 'in', self.company_ids.ids)]).unlink()
+            _logger.info(u"Company Deletion - Companies %s - Recurrent Services - END" % company_ids)
 
-        self.env.cr.commit()
+            self.env.cr.commit()
 
         # SAVs
         _logger.info(u"Company Deletion - Companies %s - Project Issues - START" % company_ids)
@@ -301,18 +317,19 @@ class OFCompanyDeletionWizard(models.TransientModel):
         self.env.cr.commit()
 
         # Parcs installés
-        _logger.info(u"Company Deletion - Companies %s - Parcs Installés - START" % company_ids)
-        parc_installe_ids = self.env['of.parc.installe'].with_context(active_test=False).search(
-            [('company_id', 'in', self.company_ids.ids)])
-        parc_installe_ids |= self.env['of.parc.installe'].with_context(active_test=False).search(
-            [('company_id', '=', False), ('client_id.company_id', 'in', self.company_ids.ids)])
-        # Si des parcs installés à supprimer sont rattachés à des SAVs, on supprime ce lien
-        self.env['project.issue'].with_context(active_test=False).search(
-            [('of_produit_installe_id', 'in', parc_installe_ids.ids)]).write({'of_produit_installe_id': False})
-        parc_installe_ids.unlink()
-        _logger.info(u"Company Deletion - Companies %s - Parcs Installés - END" % company_ids)
+        if 'of.parc.installe' in self.env:
+            _logger.info(u"Company Deletion - Companies %s - Parcs Installés - START" % company_ids)
+            parc_installe_ids = self.env['of.parc.installe'].with_context(active_test=False).search(
+                [('company_id', 'in', self.company_ids.ids)])
+            parc_installe_ids |= self.env['of.parc.installe'].with_context(active_test=False).search(
+                [('company_id', '=', False), ('client_id.company_id', 'in', self.company_ids.ids)])
+            # Si des parcs installés à supprimer sont rattachés à des SAVs, on supprime ce lien
+            self.env['project.issue'].with_context(active_test=False).search(
+                [('of_produit_installe_id', 'in', parc_installe_ids.ids)]).write({'of_produit_installe_id': False})
+            parc_installe_ids.unlink()
+            _logger.info(u"Company Deletion - Companies %s - Parcs Installés - END" % company_ids)
 
-        self.env.cr.commit()
+            self.env.cr.commit()
 
         # Mouvements de stock
         _logger.info(u"Company Deletion - Companies %s - Stock Moves - START" % company_ids)
@@ -456,8 +473,9 @@ class OFCompanyDeletionWizard(models.TransientModel):
                 if user.company_id.id in self.company_ids.ids:
                     user.company_id = user.company_ids.filtered(lambda comp: comp.id not in self.company_ids.ids)[0]
         # Suppression des activités CRM associées à des utilisateurs à supprimer
-        self.env['of.crm.activity'].with_context(active_test=False).search(
-            ['|', ('user_id', 'in', company_users.ids), ('vendor_id', 'in', company_users.ids)]).unlink()
+        if 'of.crm.activity' in self.env:
+            self.env['of.crm.activity'].with_context(active_test=False).search(
+                ['|', ('user_id', 'in', company_users.ids), ('vendor_id', 'in', company_users.ids)]).unlink()
         company_users.unlink()
         _logger.info(u"Company Deletion - Companies %s - Users - END" % company_ids)
 
@@ -479,11 +497,12 @@ class OFCompanyDeletionWizard(models.TransientModel):
                 company_partners -= company_partner
                 company_partner.write({'company_id': False})
         # On ne supprime pas les partenaires correspondant à des marques, on vide simplement leur société
-        brand_partners = self.env['of.product.brand'].with_context(active_test=False).search(
-            [('partner_id', 'in', company_partners.ids)]).mapped('partner_id')
-        if brand_partners:
-            company_partners -= brand_partners
-            brand_partners.write({'company_id': False})
+        if 'of.product.brand' in self.env:
+            brand_partners = self.env['of.product.brand'].with_context(active_test=False).search(
+                [('partner_id', 'in', company_partners.ids)]).mapped('partner_id')
+            if brand_partners:
+                company_partners -= brand_partners
+                brand_partners.write({'company_id': False})
         # On ne supprime pas les partenaires qui ont encore des factures, on vide simplement leur société
         invoice_partners = self.env['account.invoice'].with_context(active_test=False).search(
             [('partner_id', 'in', company_partners.ids)]).mapped('partner_id')
@@ -519,19 +538,21 @@ class OFCompanyDeletionWizard(models.TransientModel):
             company_partners -= project_issue_partners
             project_issue_partners.write({'company_id': False})
         # On ne supprime pas les partenaires qui ont encore des parcs installés, on vide simplement leur société
-        parc_installe_partners = self.env['of.parc.installe'].with_context(active_test=False).search(
-            [('client_id', 'in', company_partners.ids)]).mapped('client_id')
-        if parc_installe_partners:
-            company_partners -= parc_installe_partners
-            parc_installe_partners.write({'company_id': False})
+        if 'of.parc.installe' in self.env:
+            parc_installe_partners = self.env['of.parc.installe'].with_context(active_test=False).search(
+                [('client_id', 'in', company_partners.ids)]).mapped('client_id')
+            if parc_installe_partners:
+                company_partners -= parc_installe_partners
+                parc_installe_partners.write({'company_id': False})
         # On ne supprime pas les partenaires qui ont encore des interventions, on vide simplement leur société
-        service_partners = self.env['of.service'].with_context(active_test=False).search(
-            [('partner_id', 'in', company_partners.ids)]).mapped('partner_id')
-        service_partners |= self.env['of.service'].with_context(active_test=False).search(
-            [('address_id', 'in', company_partners.ids)]).mapped('address_id')
-        if service_partners:
-            company_partners -= service_partners
-            service_partners.write({'company_id': False})
+        if 'of.service' in self.env:
+            service_partners = self.env['of.service'].with_context(active_test=False).search(
+                [('partner_id', 'in', company_partners.ids)]).mapped('partner_id')
+            service_partners |= self.env['of.service'].with_context(active_test=False).search(
+                [('address_id', 'in', company_partners.ids)]).mapped('address_id')
+            if service_partners:
+                company_partners -= service_partners
+                service_partners.write({'company_id': False})
         # On ne supprime pas les partenaires qui ont encore des écritures comptables, on vide simplement leur société
         account_move_partners = self.env['account.move.line'].with_context(active_test=False).search(
             [('partner_id', 'in', company_partners.ids)]).mapped('partner_id')
@@ -549,13 +570,13 @@ class OFCompanyDeletionWizard(models.TransientModel):
         # Employés
         _logger.info(u"Company Deletion - Companies %s - Employees - START" % company_ids)
         # Suppression des objectifs de vente associés à des sociétés à supprimer, si le modèle existe
-        if self.env['ir.model'].search([('model', '=', 'of.sale.objective')]):
+        if 'of.sale.objective' in self.env:
             self.env['of.sale.objective'].with_context(active_test=False).search(
                 [('company_id', 'in', self.company_ids.ids)]).unlink()
         employees = self.env['hr.employee'].with_context(active_test=False).search(
             [('company_id', 'in', self.company_ids.ids)])
         # Suppression des lignes d'objectif de vente associées à des employés à supprimer, si le modèle existe
-        if self.env['ir.model'].search([('model', '=', 'of.sale.objective.line')]):
+        if 'of.sale.objective.line' in self.env:
             self.env['of.sale.objective.line'].with_context(active_test=False).search(
                 [('employee_id', 'in', employees.ids)]).unlink()
         employees.unlink()
