@@ -297,7 +297,7 @@ class SaleOrderLine(models.Model):
             qty = super(SaleOrderLine, self)._get_delivered_qty()
             return qty
         delivered_qty = 0.0
-        for component in self.kit_id.kit_line_ids:
+        for component in self.kit_id.kit_line_ids.filtered(lambda l: l.qty_per_kit):
             delivered_qty = max(math.ceil(round(component.qty_delivered / component.qty_per_kit, 3)), delivered_qty)
         return delivered_qty
 
