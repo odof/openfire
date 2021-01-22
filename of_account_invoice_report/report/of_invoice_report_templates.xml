@@ -103,20 +103,20 @@
             <table name="invoice_line" class="table table-condensed">
                 <thead>
                     <tr>
-                        <th style="width: 60%">Description</th>
-                        <th class="hidden">Source Doc</th>
-                        <th class="text-right">Qty</th>
+                        <th name="descr" style="width: 60%">Description</th>
+                        <th name="source" class="hidden">Source Doc</th>
+                        <th name="quant" class="text-right">Qty</th>
                         <th name="price_unit" class="text-right">Prix/U&amp;nbsp;HT</th>
-                        <th t-if="display_discount" class="text-right">Disc.(%)</th>
-                        <th class="text-right">Taxes</th>
-                        <th class="text-right">Tax Excluded Price</th>
+                        <th name="disc" t-if="display_discount" class="text-right">Disc.(%)</th>
+                        <th name="taxe" class="text-right">Taxes</th>
+                        <th name="price_ht" class="text-right">Tax Excluded Price</th>
                     </tr>
                 </thead>
                 <tbody class="invoice_tbody">
                     <tr t-foreach="invoice_data['lines']" t-as="l">
-                        <td><span t-field="l.name"/></td>
-                        <td class="hidden"><span t-field="l.origin"/></td>
-                        <td class="text-right">
+                        <td name="descr"><span t-field="l.name"/></td>
+                        <td name="source" class="hidden"><span t-field="l.origin"/></td>
+                        <td name="quant" class="text-right">
                             <span t-esc="(str(l.quantity)).rstrip('0').rstrip('.').replace('.', ',')"/>
                             <span t-field="l.uom_id"  groups="product.group_uom"/>
                         </td>
@@ -124,13 +124,13 @@
                             <span t-field="l.of_price_unit_ht" t-options="{'precision':2,
                                         'widget': 'monetary', 'display_currency': o.currency_id}"/>
                         </td>
-                        <td t-if="display_discount" class="text-right">
+                        <td name="disc" t-if="display_discount" class="text-right">
                             <span t-field="l.discount"/>
                         </td>
-                        <td class="text-right">
+                        <td name="taxe" class="text-right">
                             <span t-esc="', '.join(map(lambda x: (x.description or x.name), l.invoice_line_tax_ids))"/>
                         </td>
-                        <td class="text-right">
+                        <td name="price_ht" class="text-right">
                             <span t-field="l.price_subtotal"
                                 t-tag='{"widget": "monetary", "display_currency": o.currency_id}'/>
                         </td>
