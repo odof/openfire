@@ -5,6 +5,8 @@ import re
 from odoo import models, fields, api
 from odoo.tools.safe_eval import safe_eval
 
+from odoo.addons.of_utils.models.of_utils import sanitize_text
+
 
 class ResCompany(models.Model):
     _inherit = "res.company"
@@ -61,7 +63,9 @@ class ResPartner(models.Model):
             :param suffix: Suffixe du code du compte.
             :return:
             """
-            code_pattern = '^' + re.escape(prefix) + '\\d*' + re.escape(suffix) + '$'
+            def postgres_regexp_escape(text):
+                return re.sub(r'([!$()*+.:<=>?[\]^{|}-])', r'\\\1', text)
+            code_pattern = '^' + postgres_regexp_escape(prefix) + '\\d*' + postgres_regexp_escape(suffix) + '$'
             self.env.cr.execute(
                 "SELECT code "
                 "FROM account_account "
@@ -115,6 +119,7 @@ class ResPartner(models.Model):
                             'partner': partner,
                             'company': company,
                             'get_code': get_code,
+                            'sanitize': sanitize_text,
                         })
                     account = ac_obj.search([('code', '=', code), ('company_id', '=', company.id)], limit=1)
                     if account:
