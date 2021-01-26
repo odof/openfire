@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
+from math import asin, sin, cos, sqrt, radians
+import re
+import unicodedata
+
 from odoo import models, fields
 from odoo.tools.safe_eval import safe_eval
-from math import asin, sin, cos, sqrt, radians
 
 
 def arrondi_sup(val, mult):
@@ -66,6 +69,22 @@ def compare_date(date1, date2, compare="==", isdatetime=False):
     return safe_eval("date1 " + compare + " date2",
                      {'date1': date1.strftime("%d/%m/%Y %H:%M:%S") if isdatetime else date1.strftime("%d/%m/%Y"),
                       'date2': date2.strftime("%d/%m/%Y %H:%M:%S") if isdatetime else date2.strftime("%d/%m/%Y")})
+
+
+def sanitize_text(text, allowed=''):
+    """
+    Cette fonction nettoie un texte en remplaçant les caractères non-ascii.
+    Les caractères seront remplacés par un équivalent si possible (e.g. lettres accentuées) ou supprimés sinon.
+    Seuls les chiffres, lettres, et caractères de allowed seront conservés, les autres supprimés.
+    :param text: Texte à nettoyer.
+    :param allowed: Caractères spéciaux ASCII autorisés (ponctuation, espaces blancs, etc.).
+    :return: texte nettoyé.
+    """
+    # Retrait de tous les caractères spéciaux.
+    # Les caractères accentués sont remplacés par leur version sans accent.
+    text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore')
+    allowed = re.escape(allowed)
+    return re.sub('[^0-9A-Za-z%s]' % allowed, '', text)
 
 
 class BigInteger(fields.Integer):
