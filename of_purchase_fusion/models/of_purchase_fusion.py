@@ -57,6 +57,8 @@ class PurchaseOrderLine(models.Model):
                 vals['of_customer_id'] = order.customer_id.id
             if vals.get('delivery_expected'):
                 vals['of_delivery_expected'] = order.delivery_expected
+            if order.of_project_id:
+                vals['account_analytic_id'] = order.of_project_id.id
         return super(PurchaseOrderLine, self).create(vals)
 
 

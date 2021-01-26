@@ -44,11 +44,14 @@ class OfFusionCommandeFournisseur(models.TransientModel):
         # Fusion sur la première commande de la liste qui est généralement aussi la dernière créée
         fuse_on = purchase_orders[0]
         customer = fuse_on.customer_id
+        project = fuse_on.of_project_id
 
         sale_orders = self.env['sale.order'].browse()
         for order in purchase_orders:
             if order.customer_id != customer:
                 customer = False
+            if order.of_project_id != project:
+                project = False
             if order.order_line:
                 order.order_line.filtered(lambda l: not l.of_customer_id).write(
                     {'of_customer_id': order.customer_id.id})
@@ -60,7 +63,8 @@ class OfFusionCommandeFournisseur(models.TransientModel):
         fuse_on.write(
             {'of_sale_order_ids': [(6, False, sale_orders.ids)],
              'of_fused': True,
-             'customer_id': customer and customer.id})
+             'customer_id': customer and customer.id,
+             'of_project_id': project and project.id})
         # màj origin dans les BRs
         for picking in fuse_on.picking_ids:
             picking.origin = fuse_on.name
