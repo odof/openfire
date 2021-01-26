@@ -1214,6 +1214,10 @@ class OFSaleConfiguration(models.TransientModel):
 
     of_position_fiscale = fields.Boolean(string="(OF) Position fiscale")
 
+    group_of_order_line_option = fields.Boolean(
+        string=u"(OF) Options de ligne de commande", implied_group='of_sale.group_of_order_line_option',
+        group='base.group_portal,base.group_user,base.group_public')
+
     @api.multi
     def set_pdf_adresse_nom_parent_defaults(self):
         return self.env['ir.values'].sudo().set_default(
