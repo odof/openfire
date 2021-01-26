@@ -30,6 +30,7 @@ class PurchaseOrder(models.Model):
     sale_order_id = fields.Many2one('sale.order', string="Commande d'origine")
     delivery_expected = fields.Char(string='Livraison attendue', states={'done': [('readonly', True)]})
     of_sent = fields.Boolean(string=u"CF envoyée")
+    of_project_id = fields.Many2one(comodel_name='account.analytic.account', string=u"Compte analytique")
 
     @api.model
     def _prepare_picking(self):
@@ -59,6 +60,7 @@ class ProcurementOrder(models.Model):
         res['customer_id'] = self._context.get('purchase_customer_id', False) or sale_order.partner_id.id
         res['sale_order_id'] = sale_order.id
         res['delivery_expected'] = sale_order.delivery_expected
+        res['of_project_id'] = sale_order.project_id.id
 
         return res
 
