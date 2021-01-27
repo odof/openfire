@@ -198,6 +198,9 @@
                     <attribute name="attrs">{'invisible': [('of_client_view', '=', True)]}</attribute>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="after">
+                    <field name="of_order_line_option_id" options="{'no_create': True, 'no_open': True}"
+                           groups="of_sale.group_of_order_line_option"/>
+                    <field name="of_reset_option" groups="of_sale.group_of_order_line_option"/>
                     <field name="of_client_view" invisible="1"/>
                 </xpath>
             </field>
@@ -275,6 +278,11 @@
                     <div name="of_position_fiscale">
                         <field name="of_position_fiscale" class="oe_inline"/>
                         <span>Forcer l'utilisation des positions fiscales dans les devis/commandes</span>
+                    </div>
+                    <label for="group_of_order_line_option"/>
+                    <div name="group_of_order_line_option">
+                        <field name="group_of_order_line_option" class="oe_inline"/>
+                        <span>Activer les options de ligne de commande</span>
                     </div>
                 </xpath>
                 <xpath expr="//div[@id='main']" position="inside">
@@ -619,6 +627,89 @@ Tous les articles seront considérés comme disponibles et marqués comme livré
         <field name="arch" type="xml">
             <xpath expr="//group[@name='first']" position="inside">
                 <field name="of_article_principal"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- OF Order Line Option Views -->
+
+    <record id="of_sale_of_order_line_option_form_view" model="ir.ui.view">
+        <field name="name">of.sale.of.order.line.option.form.view</field>
+        <field name="model">of.order.line.option</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="description_update"/>
+                        </group>
+                        <group>
+                            <field name="purchase_price_update"/>
+                            <field name="purchase_price_update_type" string="Type" widget="radio"
+                                   attrs="{'invisible': [('purchase_price_update', '=', False)],
+                                           'required': [('purchase_price_update', '=', True)]}"/>
+                            <label for="purchase_price_update_value" string="Valeur"
+                                   attrs="{'invisible': [('purchase_price_update', '=', False)]}"/>
+                            <div attrs="{'invisible': [('purchase_price_update', '=', False)]}">
+                                <field name="purchase_price_update_value" class="oe_inline"/>
+                                <label string="€" class="oe_inline"
+                                       attrs="{'invisible': [('purchase_price_update_type', '!=', 'fixed')]}"/>
+                                <label string="%" class="oe_inline"
+                                       attrs="{'invisible': [('purchase_price_update_type', '!=', 'percent')]}"/>
+                            </div>
+                            <field name="sale_price_update"/>
+                            <field name="sale_price_update_type" string="Type" widget="radio"
+                                   attrs="{'invisible': [('sale_price_update', '=', False)],
+                                           'required': [('sale_price_update', '=', True)]}"/>
+                            <label for="sale_price_update_value" string="Valeur"
+                                   attrs="{'invisible': [('sale_price_update', '=', False)]}"/>
+                            <div attrs="{'invisible': [('sale_price_update', '=', False)]}">
+                                <field name="sale_price_update_value" class="oe_inline"/>
+                                <label string="€" class="oe_inline"
+                                       attrs="{'invisible': [('sale_price_update_type', '!=', 'fixed')]}"/>
+                                <label string="%" class="oe_inline"
+                                       attrs="{'invisible': [('sale_price_update_type', '!=', 'percent')]}"/>
+                            </div>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sale_of_order_line_option_tree_view" model="ir.ui.view">
+        <field name="name">of.sale.of.order.line.option.tree.view</field>
+        <field name="model">of.order.line.option</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_sale_of_order_line_option_action" model="ir.actions.act_window">
+        <field name="name">Options de ligne de commande</field>
+        <field name="res_model">of.order.line.option</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="of_sale_of_order_line_option_menu" name="Options de ligne de commande"
+              parent="sale.menu_sales_config" sequence="20" action="of_sale_of_order_line_option_action"
+              groups="of_sale.group_of_order_line_option"/>
+
+    <!-- Purchase Order Views -->
+
+    <record id="of_sale_purchase_order_form_view" model="ir.ui.view">
+        <field name="name">of.sale.purchase.order.form.view</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/tree/field[@name='name']" position="after">
+                <field name="of_order_line_option_id" groups="of_sale.group_of_order_line_option"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="after">
+                <field name="of_order_line_option_id" groups="of_sale.group_of_order_line_option"/>
             </xpath>
         </field>
     </record>

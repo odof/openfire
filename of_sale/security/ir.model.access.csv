@@ -1,2 +1,4 @@
 "id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
 "access_of_sale_echeance","of.sale.echeance","model_of_sale_echeance","base.group_user",1,1,1,1
+access_of_order_line_option_user,access.of.order.line.option.user,model_of_order_line_option,base.group_user,1,0,0,0
+access_of_order_line_option_manager,access.of.order.line.option.manager,model_of_order_line_option,sales_team.group_sale_manager,1,1,1,1
