@@ -99,6 +99,7 @@ class ResPartner(models.Model):
         string=u"Numéros de téléphone mal formatés", compute="_compute_of_phone_error", search="_search_of_phone_error")
     of_parent_category_id = fields.Many2many('res.partner.category', string=u"Étiquettes parent",
                                              compute="_compute_parent_category")
+    of_default_address = fields.Boolean(string=u"Adresse par défaut")
 
     @api.multi
     def _compute_old_phone_fields(self):

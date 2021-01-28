@@ -103,6 +103,9 @@
                 </field>
                 <field name="mobile" position="replace"/>
                 <field name="fax" position="replace"/>
+                <xpath expr="//field[@name='child_ids']/form/sheet//div[@name='div_address']/parent::node()" position="after">
+                    <field name="of_default_address" attrs="{'invisible': [('type', 'not in', ('invoice', 'delivery'))]}"/>
+                </xpath>
             </field>
         </record>
 
