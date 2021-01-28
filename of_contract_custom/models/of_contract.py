@@ -255,7 +255,20 @@ class OfContract(models.Model):
         if self.renewal:
             self.date_end = False
         if not self.renewal:
-            self.date_end = self.current_period_id.date_end
+            if self.current_period_id:
+                self.date_end = self.current_period_id.date_end
+            elif self.date_start:
+                date = fields.Date.from_string(self.date_start)
+                end_date = date + relativedelta(years=1, day=1, month=1) - relativedelta(days=1)
+                self.date_end = fields.Date.to_string(end_date)
+
+    @api.onchange('date_start')
+    def _onchange_date_start(self):
+        if self.date_start:
+            if not self.renewal:
+                date = fields.Date.from_string(self.date_start)
+                end_date = date + relativedelta(years=1, day=1, month=1) - relativedelta(days=1)
+                self.date_end = fields.Date.to_string(end_date)
 
     @api.onchange('partner_id')
     def onchange_partner(self):

@@ -100,7 +100,7 @@
                     <group col="4">
                         <group col="2" colspan="2" string="Informations clients" name="refs">
                             <field name="reference" class="oe_inline" placeholder="e.g. Project XYZ"/>
-                            <field name="partner_id"/>
+                            <field name="partner_id" attrs="{'readonly': [('invoice_count', '>', 0)]}"/>
                             <field name="category_ids" widget="many2many_tags"/>
                             <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                             <field name="date_souscription" attrs="{'readonly': [('invoice_count','>',0)]}"/>
@@ -130,7 +130,8 @@
                                 <field name="date_start" nolabel="1" class="oe_inline"
                                        attrs="{'readonly': [('invoice_count','>',0)]}"/>
                                 <i class="oe_grey oe_inline"> Fin : </i>
-                                <field name="date_end" nolabel="1" class="oe_inline"/>
+                                <field name="date_end" nolabel="1" class="oe_inline"
+                                       attrs="{'required':[('renewal','=', False)], 'readonly':[('renewal','=', True)]}"/>
                             </div>
 
                             <label for="period"/>
