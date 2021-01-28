@@ -71,4 +71,39 @@
         </field>
     </record>
 
+    <!-- Sale Order Form View -->
+    <record id="ofab_escompte_sale_order_form_view" model="ir.ui.view">
+        <field name="name">ofab.escompte.sale.order.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <label for="of_reduction"/>
+                <div name='of_reduction'>
+                    <div>
+                        <field name="of_reduction" class="oe_inline"/>
+                    </div>
+                    <div>
+                        <field name='of_reduction_perc' class="oe_inline" style="width: 30% !important" nolabel="1" attrs="{'invisible': [('of_reduction', '=', False)]}"/>
+                        <span class="oe_inline" attrs="{'invisible': [('of_reduction', '=', False)]}"> %</span>
+                        <button name="set_reduction" string="Mettre à jour" type="object" class="oe_inline fa fa-arrow-right oe_link" attrs="{'invisible': [('of_reduction', '=', False)]}"/>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Sale Config Settings Form View -->
+    <record id="ofab_escompte_sale_config_settings_form_view" model="ir.ui.view">
+        <field name="name">ofab.escompte.sale.config.settings.form.view</field>
+        <field name="model">sale.config.settings</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_sale_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_deposit_product_categ_id_setting']" position="after">
+                <field name="of_reduction_product_id" class="oe_inline"/>
+                <field name="of_default_reduction_perc" class="oe_inline"/>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
