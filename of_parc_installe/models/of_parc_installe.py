@@ -9,7 +9,7 @@ class OFParcInstalle(models.Model):
     """Parc installé"""
 
     _name = 'of.parc.installe'
-    _description = "Parc installé"
+    _description = u"Parc installé"
 
     name = fields.Char(u"No de série", size=64, required=False, copy=False)
     date_service = fields.Date("Date vente", required=False)
