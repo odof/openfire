@@ -40,9 +40,13 @@ class OfAccountInvoice(models.Model):
                     if not months and invoice.of_intervention_id:
                         invoice.of_contract_period = u"Facturation à date %s" % format_date(invoice.of_intervention_id.date_date, lang)
                     else:
-                        months = -months
+                        months = -(months-1)
                         date = fields.Date.from_string(invoice.date_invoice)
-                        period_start = date + relativedelta(months=months, days=1)
+                        if recurring_rule_type == 'date':
+                            period_start = date + relativedelta(day=1)
+                        else:
+                            period_start = date + relativedelta(months=months, day=1)
+
                         invoice.of_contract_period = "%s - %s" % (format_date(fields.Date.to_string(period_start), lang),
                                                                   format_date(invoice.date_invoice, lang))
 
