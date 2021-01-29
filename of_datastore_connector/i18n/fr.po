@@ -1,0 +1,84 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_datastore_connector
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-02-02 11:00+0000\n"
+"PO-Revision-Date: 2021-02-02 11:00+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_datastore_connector
+#: code:addons/of_datastore_connector/models/of_datastore_connector.py:63
+#, python-format
+msgid "Connection successful"
+msgstr "Connexion réussie"
+
+#. module: of_datastore_connector
+#: code:addons/of_datastore_connector/models/of_datastore_connector.py:129
+#, python-format
+msgid "Connection timeout"
+msgstr "Délai de connexion expiré"
+
+#. module: of_datastore_connector
+#: model:ir.model.fields,field_description:of_datastore_connector.field_of_datastore_connector_db_name
+msgid "Database"
+msgstr "Base de données"
+
+#. module: of_datastore_connector
+#: model:ir.model.fields,field_description:of_datastore_connector.field_of_datastore_connector_display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_datastore_connector
+#: model:ir.model.fields,field_description:of_datastore_connector.field_of_datastore_connector_error_msg
+msgid "Error"
+msgstr "Erreur"
+
+#. module: of_datastore_connector
+#: model:ir.model.fields,field_description:of_datastore_connector.field_of_datastore_connector_id
+msgid "ID"
+msgstr "ID"
+
+#. module: of_datastore_connector
+#: model:ir.model.fields,field_description:of_datastore_connector.field_of_datastore_connector___last_update
+msgid "Last Modified on"
+msgstr "Dernière Modification le"
+
+#. module: of_datastore_connector
+#: model:ir.model.fields,field_description:of_datastore_connector.field_of_datastore_connector_login
+msgid "Login"
+msgstr "Identifiant"
+
+#. module: of_datastore_connector
+#: model:ir.model.fields,field_description:of_datastore_connector.field_of_datastore_connector_password
+msgid "Password"
+msgstr "Mot de passe"
+
+#. module: of_datastore_connector
+#: model:ir.model.fields,field_description:of_datastore_connector.field_of_datastore_connector_server_address
+msgid "Server address"
+msgstr "Adresse du serveur"
+
+#. module: of_datastore_connector
+#: model:ir.model.fields,field_description:of_datastore_connector.field_of_datastore_connector_new_password
+msgid "Set Password"
+msgstr "Définir le mot de passe"
+
+#. module: of_datastore_connector
+#: model:ir.model.fields,help:of_datastore_connector.field_of_datastore_connector_new_password
+msgid "Specify a value only when changing the password, otherwise leave empty"
+msgstr "Renseigner une valeur pour modifier le mot de passe, sinon laisser vide"
+
+#. module: of_datastore_connector
+#: code:addons/of_datastore_connector/models/of_datastore_connector.py:57
+#, python-format
+msgid "You must fill the field \"%s\""
+msgstr "Vous devez remplir le champ \"%s\""
