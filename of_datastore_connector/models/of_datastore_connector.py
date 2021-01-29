@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import logging
 import threading
+import xmlrpclib
+import socket  # Ne pas supprimer cette ligne, voir fonction connect()
 
 from odoo import models, fields, api, _
-import xmlrpclib
 
 _logger = logging.getLogger(__name__)
 
@@ -11,8 +12,6 @@ try:
     import openerplib  # sudo easy_install openerp-client-lib
 except (ImportError, IOError) as err:
     _logger.debug(err)
-
-import socket  # Ne pas supprimer cette ligne, voir fonction connect()
 
 
 class OfDatastoreConnector(models.AbstractModel):
@@ -55,7 +54,8 @@ class OfDatastoreConnector(models.AbstractModel):
                     # Le nouveau mot de passe n'est obligatoire que s'il n'en existe pas déjà un
                     continue
                 if not connector[field_name]:
-                    error_msg = _("You must fill the field \"%s\"") % self.env['ir.model.fields'].search([('model', '=', self._name), ('name', '=', field_name)]).name_get()[0][1]
+                    error_msg = _("You must fill the field \"%s\"") % self.env['ir.model.fields'].search(
+                        [('model', '=', self._name), ('name', '=', field_name)]).name_get()[0][1]
                     break
             else:
                 error_msg = connector.of_datastore_connect()
@@ -170,7 +170,8 @@ class OfDatastoreConnector(models.AbstractModel):
         return ds_model.read(ids, **kwargs)
 
     @api.model
-    def of_datastore_read_group(self, ds_model, domain, fields, groupby, offset=None, limit=None, orderby=None, lazy=None):
+    def of_datastore_read_group(
+            self, ds_model, domain, fields, groupby, offset=None, limit=None, orderby=None, lazy=None):
         kwargs = {
             key: val
             for key, val in [('offset', offset),
