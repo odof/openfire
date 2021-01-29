@@ -315,6 +315,23 @@ class SaleOrder(models.Model):
         super(SaleOrder, self).onchange_partner_id()
         self.of_invoice_policy = self.partner_id and self.partner_id.of_invoice_policy or False
 
+        # Adresses par défaut
+        if self.partner_id:
+            if not self.partner_invoice_id.of_default_address:
+                default_invoice_address = self.partner_id.child_ids.filtered(
+                    lambda child: child.type == 'invoice' and child.of_default_address)
+                if default_invoice_address:
+                    if len(default_invoice_address) > 1:
+                        default_invoice_address = default_invoice_address[0]
+                    self.partner_invoice_id = default_invoice_address
+            if not self.partner_shipping_id.of_default_address:
+                default_shipping_address = self.partner_id.child_ids.filtered(
+                    lambda child: child.type == 'delivery' and child.of_default_address)
+                if default_shipping_address:
+                    if len(default_shipping_address) > 1:
+                        default_shipping_address = default_shipping_address[0]
+                    self.partner_shipping_id = default_shipping_address
+
     @api.onchange('payment_term_id')
     def _onchange_payment_term_id(self):
         if self.payment_term_id:
