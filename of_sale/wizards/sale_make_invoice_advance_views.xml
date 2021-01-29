@@ -31,6 +31,9 @@
             <xpath expr="//field[@name='deposit_taxes_id']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
+            <xpath expr="//field[@name='advance_payment_method']" position="after">
+                <field name="of_include_null_qty_lines" attrs="{'invisible': [('advance_payment_method', 'not in', ('delivered', 'all'))]}"/>
+            </xpath>
         </field>
     </record>
 
