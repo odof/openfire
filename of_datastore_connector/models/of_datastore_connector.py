@@ -79,12 +79,19 @@ class OfDatastoreConnector(models.AbstractModel):
             def run(self):
                 try:
                     server_address = supplier.server_address
-                    # ======= Code à recommenter après la résolution du bug OVH =======
-                    # Retrait du prefixe http://
-                    ip_address = socket.gethostbyname(server_address.split('://')[1])
-                    # Sur s-alpha le port 8010 est utilisé pour la connexion xmlrpc v10
-                    server_address = "http://%s:8010" % (ip_address,)
-                    # =================================================================
+                    # ========== Code à recommenter après la résolution du bug OVH ==========
+                    # Retrait du prefixe http:// et extraction du port (optionnel)
+                    address_split = server_address.split('://')[-1].split(':')  # [adresse, port]
+                    ip_address = socket.gethostbyname(address_split[0])
+                    if len(address_split) == 2:
+                        port = ':' + address_split[1]
+                    elif ip_address == socket.gethostbyname('s-alpha.openfire.fr'):
+                        # Sur s-alpha le port 8010 est utilisé pour la connexion xmlrpc v10
+                        port = ':8010'
+                    else:
+                        port = ''
+                    server_address = "http://%s%s" % (ip_address, port)
+                    # =======================================================================
 
                     i = server_address.find('://')
                     if i == -1:
