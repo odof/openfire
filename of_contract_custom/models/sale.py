@@ -25,11 +25,11 @@ class SaleOrder(models.Model):
             'default_partner_id': self.partner_id.id,
             'default_address_id': self.partner_shipping_id and self.partner_shipping_id.id or self.partner_id.id,
             'default_recurrence': False,
-            'default_date_next ': today_str,
-            'default_date_fin  ': deux_semaines_str,
-            'default_origin    ': u"[Commande] " + self.name,
-            'default_order_id  ': self.id,
+            'default_date_next' : today_str,
+            'default_date_fin'  : deux_semaines_str,
+            'default_origin'    : u"[Commande] " + self.name,
+            'default_order_id ' : self.id,
             'hide_bouton_planif': True,
-            'default_type_id': self.env.ref('of_contract_custom.of_contract_custom_type_installation').id,
+            'default_type_id'   : self.env.ref('of_contract_custom.of_contract_custom_type_installation').id,
             }
         return action

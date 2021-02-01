@@ -16,7 +16,7 @@ class OfIndex(models.Model):
 
     @api.multi
     def _get_indexed_price(self, price, date=fields.Date.today()):
-        """ Renvoi le prix indexer en fonction de la date """
+        """ Renvoi le prix indexé en fonction de la date """
         if not price:
             return 0.0
         today = date

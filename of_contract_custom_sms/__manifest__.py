@@ -8,7 +8,7 @@
     'summary': u"Module de lien entre contrats et sms",
     "description": u"""
 OpenFire / Contrat custom - sms
-==========================================
+===============================
 Module de lien entre les modules of_contract_custom et of_sms
 
 """,

@@ -61,7 +61,6 @@
                             <field name="contract_line_id" context="{'display_address': True}"
                                    attrs="{'invisible': [('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d, %(of_contract_custom.of_contract_custom_type_sav)d])]}"/>
                             <field name="contract_message" nolabel="1" colspan="2"/>
-<!--                            <field name="contract_message" nolabel="1" class="oe_inline oe_grey"/>-->
                         </group>
                         <group col="2" colspan="2">
                             <field name="user_id"/>
@@ -104,14 +103,12 @@
                                     </i>
                                 </div>
                             </group>
-<!--                            <field name=""/>-->
                         </group>
                         <group name="when" col="2" colspan="2" string="Quand" class="of_grey_background">
                             <group colspan="2">
                                 <field name="date_next" string="Entre le"/>
                                 <field name="date_fin" string="et le"/>
                                 <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
-<!--                            <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}" />-->
                             </group>
                         </group>
                     </group>
@@ -189,15 +186,5 @@
     <menuitem id="of_service.menu_of_planning_service_prog" name="Demandes d'intervention" parent="of_planning.menu_of_planning_intervention" sequence="5" action="of_contract_custom.action_of_contract_service_form_planning"/>
     <delete model="ir.ui.menu" id="of_service.menu_of_planning_service_rec"/>
     <delete model="ir.ui.menu" id="of_service.menu_of_planning_service_ponc"/>
-<!--    <record id="of_service.menu_of_planning_service_rec" model="ir.ui.menu">-->
-<!--        <field name="groups_id" eval="[(6,0,[ref('of_base.of_group_root_only')])]"/>-->
-<!--        <field name="invisible">True</field>-->
-<!--    </record>-->
-<!--    <record id="of_service.menu_of_planning_service_ponc" model="ir.ui.menu">-->
-<!--        <field name="groups_id" eval="[(6,0,[ref('of_base.of_group_root_only')])]"/>-->
-<!--        <field name="invisible">True</field>-->
-<!--    </record>-->
-    <!--    <menuitem id="of_service.menu_of_planning_service_rec" invisible="1"/>-->
-<!--    <menuitem id="of_service.menu_of_planning_service_ponc"/>-->
 
 </odoo>

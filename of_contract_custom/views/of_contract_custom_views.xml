@@ -37,7 +37,7 @@
                 <field name="reference"/>
                 <field name="recurring_invoicing_payment_id"/>
                 <field name="recurring_rule_type"/>
-                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                <field name="company_id" groups="base.group_multi_company"/>
                 <separator/>
             </search>
         </field>
@@ -107,7 +107,7 @@
                         </group>
                         <group col="2" colspan="2" string="Facturation" name="facturation">
                             <label for="recurring_invoicing_payment_id"/>
-                            <div name="dates">
+                            <div name="invoicing">
                                 <field name="recurring_rule_type" nolabel="1" class="oe_inline"/>
                                 <field name="recurring_invoicing_payment_id" nolabel="1" class="oe_inline"
                                        options="{'no_create': True, 'no_open': True}"
@@ -251,75 +251,6 @@
     <menuitem name="Contrats" id="menu_config_contrat" parent="sale.prod_config_main" sequence="40"/>
 
 <!-- ******************************************************************************************* -->
-<!-- ************************************ MODÈLE DE CONTRAT ************************************ -->
-<!-- ******************************************************************************************* -->
-
-<!--    <record id="of_contract_template_tree_view" model="ir.ui.view">-->
-<!--        <field name="name">of_contract_tree_view</field>-->
-<!--        <field name="model">of.contract.template</field>-->
-<!--        <field name="arch" type="xml">-->
-<!--            <tree>-->
-<!--                <field name="name"/>-->
-<!--                <field name="recurring_rule_type"/>-->
-<!--                <field name="recurring_invoicing_payment"/>-->
-<!--            </tree>-->
-<!--        </field>-->
-<!--    </record>-->
-
-<!--    <record id="of_contract_template_form_view" model="ir.ui.view">-->
-<!--        <field name="name">of_contract_form_view</field>-->
-<!--        <field name="model">of.contract.template</field>-->
-<!--        <field name="arch" type="xml">-->
-<!--            <form>-->
-<!--                <div class="oe_title">-->
-<!--                    <label for="name" class="oe_edit_only"/>-->
-<!--                    <h1>-->
-<!--                        <field name="name" class="oe_inline" placeholder="e.g. Project XYZ"/>-->
-<!--                    </h1>-->
-<!--                </div>-->
-<!--                <separator string="Factures récurrentes"/>-->
-<!--                <group col="4">-->
-<!--                    <group col="2" colspan="2">-->
-<!--                        <field name="recurring_rule_type" class="oe_inline"/>-->
-<!--                        <field name="recurring_invoicing_payment"/>-->
-<!--                    </group>-->
-<!--                    <group col="2" colspan="2">-->
-<!--                        <field name="journal_id"/>-->
-<!--                        <field name="pricelist_id" invisible="1"/>-->
-<!--                        <field name="fiscal_position_id"/>-->
-<!--                    </group>-->
-<!--                </group>-->
-<!--                <separator string="Lignes"/>-->
-<!--                <group>-->
-<!--                    <field name="line_ids" mode="tree" nolabel="1"-->
-<!--                           context="{'form_view_ref': 'of_contract_custom.of_contract_line_view_form',-->
-<!--                                     'default_frequency_type': recurring_rule_type}">-->
-<!--                        <tree>-->
-<!--&lt;!&ndash;                            <field name="sequence" widget="handle"/>&ndash;&gt;-->
-<!--                            <field name="amount_subtotal"/>-->
-<!--                            <field name="frequency_type"/>-->
-<!--                            <field name="next_date"/>-->
-<!--                            <field name="parc_installe_id"/>-->
-<!--                        </tree>-->
-<!--                    </field>-->
-<!--                </group>-->
-<!--            </form>-->
-<!--        </field>-->
-<!--    </record>-->
-
-<!--    <record id="action_contract_template" model="ir.actions.act_window">-->
-<!--        <field name="name">Contrats</field>-->
-<!--        <field name="res_model">of.contract.template</field>-->
-<!--        <field name="view_type">form</field>-->
-<!--        <field name="view_mode">tree,form</field>-->
-<!--        <field name="view_id" ref="of_contract_template_tree_view"/>-->
-<!--    </record>-->
-
-<!--    <menuitem name="Modèles de contrats" id="menu_contract_template" parent="of_planning.menu_of_planning_configuration" sequence="75" action="action_contract_template"/>-->
-
-
-
-<!-- ******************************************************************************************* -->
 <!-- ********************************** LIGNES DE CONTRATS ************************************* -->
 <!-- ******************************************************************************************* -->
 
@@ -341,7 +272,7 @@
                 <field name="tache_id"/>
                 <field name="nbr_interv"/>
                 <field name="mois_reference_ids"/>
-                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                <field name="company_id" groups="base.group_multi_company"/>
                 <separator/>
             </search>
         </field>
@@ -360,7 +291,7 @@
                 <field name="year_total" sum="Total annuel"/>
                 <field name="next_purchase_price" sum="Prochain coût"/>
                 <field name="amount_total" sum="Prochain total"/>
-                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                <field name="company_id" groups="base.group_multi_company"/>
                 <field name="state"/>
             </tree>
         </field>
@@ -418,7 +349,7 @@
                                 <field name="address_city" class="o_address_zip" />
                             </div>
                             <field name="partner_code_magasin"/>
-                            <field name="partner_id"/>
+                            <field name="partner_id" readonly="False"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                         <group col="2" colspan="2" name="description" string="Description">
@@ -459,7 +390,7 @@
                                 </group>
                                 <separator string="Articles" colspan="4"/>
                                 <field colspan="4" name="contract_product_ids" nolabel="1"
-                                context="{'form_view_ref': 'of_contract_custom.of_contract_custom_contract_product_view_form'}">
+                                       context="{'form_view_ref': 'of_contract_custom.of_contract_custom_contract_product_view_form'}">
                                     <tree>
                                         <field name="product_id"/>
                                         <field name="price_unit"/>
@@ -511,8 +442,8 @@
                                 </field>
                             </group>
                         </page>
-                        <page name="parc_installe" string="Équipement">
-                            <group name="parc" string="Produit installé" groups="project.group_project_user" colspan="2">
+                        <page name="parc_installe" string="Équipement" groups="project.group_project_user" >
+                            <group name="parc" string="Produit installé" colspan="2">
                                 <field name="parc_installe_id"/>
                                 <field name="parc_installe_product_id"/>
                                 <field name="parc_installe_site_adresse_id"/>

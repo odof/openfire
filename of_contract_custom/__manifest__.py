@@ -43,7 +43,7 @@ Indice :
  
 Ligne d'indice :
  - Date de début et date de fin d'application
- - Veleur d'indexation
+ - Valeur d'indexation
 
 
 Demandes d'intervention :
@@ -68,7 +68,6 @@ Bloquer l'utilisation de la récurrence sur le modèle `of.service` car les cont
     "category": "OpenFire",
     "data": [
         'data/of_contract_custom_data.xml',
-        'views/account_views.xml',
         'views/of_better_zip_views.xml',
         'views/of_contract_custom_views.xml',
         'views/of_parc_installe_views.xml',

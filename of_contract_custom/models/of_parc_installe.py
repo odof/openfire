@@ -11,7 +11,7 @@ class OfParcInstalle(models.Model):
     def _compute_service_count(self):
         """
         Dû aux changement des services on n'utilise plus le système de récurrence inclus dans le service.
-        Les deux champs ont donnent donc le même résultat.
+        Les deux champs donnent donc le même résultat.
         """
         service_obj = self.env['of.service']
         for parc in self:
@@ -27,7 +27,7 @@ class OfParcInstalle(models.Model):
         action['context'] = {
             'default_partner_id': self.client_id.id,
             'default_address_id': self.site_adresse_id.id,
-            'default_recurrence': True,
+            'default_recurrence': False,
             'default_date_next': fields.Date.today(),
             'default_parc_installe_id': self.id,
             'default_origin': u"[parc installé] " + (self.name or ''),

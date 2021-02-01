@@ -18,14 +18,4 @@
         </field>
     </record>
 
-<!--    <act_window id="action_invoice_contract"-->
-<!--            key2="client_action_multi"-->
-<!--            name="Facturer"-->
-<!--            res_model="of.contract.planning.wizard"-->
-<!--            src_model="of.contract"-->
-<!--            view_mode="form"-->
-<!--            view_type="form"-->
-<!--            view_id="of_contract_planning_view_form"-->
-<!--            target="new"/>-->
-
 </odoo>
