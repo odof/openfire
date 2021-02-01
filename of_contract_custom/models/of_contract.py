@@ -73,7 +73,7 @@ class OfContract(models.Model):
     period = fields.Integer(string=u"Période d'activité", required=True, default=12, readonly=True)
     date_end = fields.Date(string='Date de fin')
     recurring_next_date = fields.Date(string='Date de la prochaine facture', compute="_compute_next_date", store=True)
-    fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale")
+    fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale", domain="[('company_id', '=', company_id)]")
     next_subtotal = fields.Monetary(
         string="Prochain montant HT", compute='_compute_next_total', currency_field='company_currency_id')
     next_taxes = fields.Monetary(
@@ -112,7 +112,7 @@ class OfContract(models.Model):
         ('last_day', 'Dernier jour du contrat'),
         ], string=u"Période de révision", default='last_day')
     service_ids = fields.One2many(
-        comodel_name='of.service', compute="_compute_service_ids", string="Interventions à programmer")
+        comodel_name='of.service', compute="_compute_service_ids", string="Demandes d'intervention")
     grouped = fields.Boolean(string="Regrouper la facturation")
     payment_term_id = fields.Many2one('account.payment.term', string=u'Conditions de règlement')
     date_indexed = fields.Date(string=u"Dernière indexation", compute="_compute_date_indexed", store=True)

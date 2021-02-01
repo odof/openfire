@@ -6,7 +6,6 @@
         <field name="model">of.contract.indice.wizard</field>
         <field name="arch" type="xml">
             <form string="Appliquer des indices">
-<!--                <group>-->
                 <group>
                     <field name="contract_ids" widget="many2many_tags"/>
                     <field name="indice_ids" widget="many2many_tags" attrs="{'invisible': [('rollback','=',True)]}"/>
@@ -27,7 +26,6 @@
                             <field name="new_price"/>
                             <field name="current_purchase_price" invisible="1"/>
                             <field name="new_purchase_price" invisible="1"/>
-<!--                            <field name=""/>-->
                         </tree>
                     </field>
                 </group>
@@ -38,7 +36,6 @@
                         Si le contrat/ligne de contrat n'utilise pas les indices, le prix unitaire des articles ne sera également pas mis à jour.
                      </div>
                 </group>
-<!--                </group>-->
                 <footer>
                     <button string="Appliquer les indices" name="button_apply" type="object" class="btn-primary"/>
                     <button string="Annuler" special="cancel" class="btn-default"/>

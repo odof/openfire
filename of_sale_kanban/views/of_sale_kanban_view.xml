@@ -49,5 +49,4 @@
 
     <menuitem name="Étapes kanban" id="menu_sale_order_kanban" parent="sale.menu_sales_config" sequence="3" action="action_sale_order_kanban"/>
 
-
 </odoo>

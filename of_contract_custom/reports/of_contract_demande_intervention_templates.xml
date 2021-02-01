@@ -19,14 +19,11 @@
     </template>
 
     <template id="of_demande_intervention_report_template">
-        <!-- L'impression de ce rapport peut être déclenché des devis/commandes ou du planning.
-        L'affichage diffère selon l'origine. -->
         <t t-call="report.external_layout">
             <div class="page">
                 <t t-set="o" t-value="doc"/>
                 <t t-set="order" t-value="doc.order_id"/>
                 <t t-set="cacher_montant" t-value="order.fiche_intervention_cacher_montant()"/>
-                <!-- Commande (affichage conditionnel selon que vient du planning ou des devis/commandes) -->
                 <t t-if="order">
                     <t t-if="cacher_montant">
                         <div name="order_info_sans_montant">

@@ -30,7 +30,8 @@ class OfAccountInvoice(models.Model):
                 months = month_correspondance[recurring_rule_type]
                 if recurring_invoicing_payment.code == 'pre-paid':
                     if not months and invoice.of_intervention_id:
-                        invoice.of_contract_period = u"Facturation à date %s" % format_date(invoice.of_intervention_id.date_date, lang)
+                        invoice.of_contract_period = u"Facturation à date %s" % format_date(
+                                invoice.of_intervention_id.date_date, lang)
                     else:
                         date = fields.Date.from_string(invoice.date_invoice)
                         period_end = date + relativedelta(months=months, days=-1)
@@ -38,7 +39,8 @@ class OfAccountInvoice(models.Model):
                                                                   format_date(fields.Date.to_string(period_end), lang))
                 else:
                     if not months and invoice.of_intervention_id:
-                        invoice.of_contract_period = u"Facturation à date %s" % format_date(invoice.of_intervention_id.date_date, lang)
+                        invoice.of_contract_period = u"Facturation à date %s" % format_date(
+                                invoice.of_intervention_id.date_date, lang)
                     else:
                         months = -(months-1)
                         date = fields.Date.from_string(invoice.date_invoice)
@@ -47,12 +49,12 @@ class OfAccountInvoice(models.Model):
                         else:
                             period_start = date + relativedelta(months=months, day=1)
 
-                        invoice.of_contract_period = "%s - %s" % (format_date(fields.Date.to_string(period_start), lang),
-                                                                  format_date(invoice.date_invoice, lang))
+                        invoice.of_contract_period = "%s - %s" % (
+                            format_date(fields.Date.to_string(period_start), lang),
+                            format_date(invoice.date_invoice, lang))
 
 
 class OfAccountInvoiceLine(models.Model):
-
     _inherit = "account.invoice.line"
 
     of_contract_id = fields.Many2one('of.contract', string="(OF) Contrat")

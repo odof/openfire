@@ -6,7 +6,6 @@
         <record id="of_sale_order_kanban_new" model="of.sale.order.kanban">
             <field name="name">Nouveau</field>
         </record>
-<!--    <function model="of.service" name="function_set_date_next" />-->
 
         <function model="sale.order" name="function_set_kanban_step_id"/>
 

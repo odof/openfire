@@ -11,11 +11,11 @@
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button class="oe_stat_button" type="object" name="action_view_contrat" icon="fa-book">
-                    <field name="of_contrat_count" widget="statinfo" string="Contrats"/>
+                <button class="oe_stat_button" type="object" name="action_view_contract" icon="fa-book">
+                    <field name="of_contract_count" widget="statinfo" string="Contrats"/>
                 </button>
-                <button class="oe_stat_button" type="object" name="action_view_contrat_line" icon="fa-book" attrs="{'invisible': [('supplier','!=',True)]}">
-                    <field name="of_contrat_line_count" widget="statinfo" string="Lignes de contrat"/>
+                <button class="oe_stat_button" type="object" name="action_view_contract_line" icon="fa-book" attrs="{'invisible': [('supplier','!=',True)]}">
+                    <field name="of_contract_line_count" widget="statinfo" string="Lignes de contrat"/>
                 </button>
             </xpath>
             <xpath expr="//field[@name='ref']" position="after">

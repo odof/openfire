@@ -24,7 +24,10 @@ class OFContractIndiceWizard(models.TransientModel):
              u"dans votre indice")
     purchase = fields.Boolean(string=u"Affecte le coÛt", default=True)
 
-    line_ids = fields.One2many(comodel_name='of.contract.indice.line.wizard', inverse_name='wizard_id', string="Lignes affectées", compute="_compute_line_ids")
+    line_ids = fields.One2many(
+        comodel_name='of.contract.indice.line.wizard', inverse_name='wizard_id', string="Lignes affectées",
+        compute="_compute_line_ids"
+    )
 
     @api.onchange('contract_ids', 'rollback', 'indice_ids', 'date_execution')
     def _compute_line_ids(self):
@@ -62,7 +65,6 @@ class OFContractIndiceWizard(models.TransientModel):
                         else:
                             previous_price = product_line.price_unit
                             previous_purchase_price = product_line.purchase_price
-                            # product = product_line.product_id
                             index_ids = product_line.product_id.of_index_ids.ids
                             temp_indices = [indice for indice in indices if indice.id in index_ids]
                             additionnal_prices = []
@@ -131,13 +133,13 @@ class OFContractIndiceWizard(models.TransientModel):
                     else:
                         previous_price = product_line.price_unit
                         previous_purchase_price = product_line.purchase_price
-                        # product = product_line.product_id
                         index_ids = product_line.product_id.of_index_ids.ids
                         temp_indices = [indice for indice in indices if indice.id in index_ids]
                         additionnal_prices = []
                         additionnal_purchase_prices = []
                         for indice in temp_indices:
-                            index_line = indice.index_line_ids.filtered(lambda il: il.date_start <= date_execution <= il.date_end)
+                            index_line = indice.index_line_ids.filtered(
+                                    lambda il: il.date_start <= date_execution <= il.date_end)
                             if index_line:
                                 additionnal_prices.append((previous_price * index_line.value) - previous_price)
                                 additionnal_purchase_prices.append(
@@ -165,7 +167,7 @@ class OFContractIndiceWizard(models.TransientModel):
             products = products_done.filtered(lambda p: p.line_id.contract_id.id == contract.id)
             today = format_date(fields.Date.today(), lang)
             if self.rollback:
-                contract.message_post(u"Retour au PU précédent réalisée le %s pour les articles :<br/>%s" %
+                contract.message_post(u"Retour au PU précédent réalisé le %s pour les articles :<br/>%s" %
                                       (today, '<br/>'.join([product.product_id.name for product in products])))
             else:
                 contract.message_post(u"Indexation réalisée le %s pour les articles :<br/>%s" %
@@ -180,7 +182,8 @@ class OFContractIndiceLineWizard(models.TransientModel):
 
     wizard_id = fields.Many2one(comodel_name='of.contract.indice.wizard', string="Wizard")
     product_line_id = fields.Many2one(comodel_name='of.contract.product', string="Produit du contrat")
-    contract_line_id = fields.Many2one(comodel_name='of.contract.line', string="Ligne de contrat", related="product_line_id.line_id")
+    contract_line_id = fields.Many2one(
+        comodel_name='of.contract.line', string="Ligne de contrat", related="product_line_id.line_id")
     product_id = fields.Many2one(comodel_name='product.product', string="Article", related="product_line_id.product_id")
     current_price = fields.Float(string="PU Actuel")
     new_price = fields.Float(string=u"PU calculé")

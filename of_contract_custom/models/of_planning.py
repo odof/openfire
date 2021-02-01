@@ -57,9 +57,10 @@ class OfService(models.Model):
     def _compute_spec_date(self):
         lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
         for service in self:
-            if service.state == 'done' and service.intervention_ids:
+            interventions = service.intervention_ids.filtered(lambda i: i.state not in ('cancel', 'postponed'))
+            if service.state == 'done' and interventions:
                 service.spec_date = u"Réalisée le %s" % format_date(service.intervention_ids[-1].date_date, lang)
-            if service.intervention_ids:
+            elif interventions:
                 service.spec_date = u"Prévue le %s" % format_date(service.intervention_ids[-1].date_date, lang)
             else:
                 service.spec_date = u"Prévue entre %s et %s" % (format_date(service.date_next, lang), format_date(service.date_fin, lang))
@@ -80,7 +81,8 @@ class OfService(models.Model):
         """ Récupère le rapport 'Fiche d'intervention' du dernier RDV ayant la fiche d'intervention dans ses PJ"""
         attachment_obj = self.env['ir.attachment']
         for service in self:
-            if service.intervention_ids:
+            interventions = service.intervention_ids.filtered(lambda i: i.state not in ('cancel', 'postponed'))
+            if interventions:
                 for i in xrange(1, len(service.intervention_ids) + 1):
                     current_interv = service.intervention_ids[-i]
                     attachment = attachment_obj.search([('res_model', '=', 'of.planning.intervention'),
@@ -121,15 +123,11 @@ class OfService(models.Model):
         return stages.search([], order=order)
 
     @api.multi
-    def write(self, vals):
-        return super(OfService, self).write(vals)
-
-    @api.multi
     def get_action_view_intervention_context(self, action_context={}):
         if self.contract_line_id:
             action_context.update({'default_contract_line_id': self.contract_line_id.id})
             action_context.update({'default_employee_ids': [(6, 0, [emp.id for emp in self.employee_ids])]})
-            return super(OfService, self).get_action_view_intervention_context(action_context)
+        return super(OfService, self).get_action_view_intervention_context(action_context)
 
     @api.multi
     def action_view_contract(self):
@@ -149,7 +147,7 @@ class OfService(models.Model):
             action['views'] = [(self.env.ref('of_planning.of_planning_intervention_view_form').id, 'form')]
             action['res_id'] = interventions.ids[0]
         else:
-            action = self.env['of.popup.wizard'].popup_return(message=u"Aucune intervention liée.")
+            action = self.env['of.popup.wizard'].popup_return(message=u"Aucun RDV d'intervention lié.")
         return action
 
     @api.multi
@@ -157,7 +155,7 @@ class OfService(models.Model):
         if self.intervention_ids:
             return self.env['report'].get_action(self.intervention_ids, 'of_planning.of_planning_fiche_intervention_report_template')
         else:
-            return self.env['of.popup.wizard'].popup_return(message=u"Aucune intervention liée.")
+            return self.env['of.popup.wizard'].popup_return(message=u"Aucun RDV d'intervention lié.")
 
     @api.model
     def of_get_report_name(self, docs):
@@ -230,8 +228,7 @@ class Report(models.Model):
     def get_pdf(self, docids, report_name, html=None, data=None):
         if report_name == 'of_planning.of_planning_fiche_intervention_report_template':
             self = self.with_context(copy_to_di=True, fiche_intervention=True)
-        result = super(Report, self).get_pdf(docids, report_name, html=html, data=data)
-        return result
+        return super(Report, self).get_pdf(docids, report_name, html=html, data=data)
 
 
 class IrAttachment(models.Model):

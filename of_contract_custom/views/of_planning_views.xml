@@ -17,13 +17,13 @@
     </record>
 
 
-<!--###################################################______Vue form______###################################################-->
+<!--##############################################______Vue form______###############################################-->
 
     <record id="of_contract_custom_planning_intervention_view_form" model="ir.ui.view" >
         <field name="name">of.contract.custom.planning.intervention.form</field>
         <field name="model">of.planning.intervention</field>
         <field name="arch" type="xml" >
-            <form string="Nouvelle Intervention">
+            <form string="Nouveau RDV d'intervention">
                 <header>
                     Passer à
                     <button name="button_confirm" string="Confirmé" states="draft" type="object"/>
@@ -32,9 +32,9 @@
                     <button name="button_postponed" string="Reporté" states="confirm" type="object"/>
                     <button name="button_cancel" string="Annulé" states="draft,confirm" type="object"/>
                     <button name="button_draft" string="Brouillon" states="confirm,done,unfinished,cancel,postponed" type="object"/>
-                    <field name="state" widget="statusbar" nolabel="1" statusbar_visible="draft,confirm,done" statusbar_colors='{"proforma":"blue","proforma2":"blue"}'/>
+                    <field name="state" widget="statusbar" nolabel="1" statusbar_visible="draft,confirm,done"/>
                     <div align="right" style="align:right;padding: 0px 18px 0px 0px;width:100%">
-                        <field name="raison_id" widget="selection" context="{'tz': 'Europe/Paris'}" attrs="{'invisible':[('state', '!=', 'postponed')]}"/>
+                        <field name="raison_id" widget="selection" attrs="{'invisible':[('state', '!=', 'postponed')]}"/>
                     </div>
                 </header>
                 <sheet>
@@ -176,5 +176,8 @@
         </field>
     </record>
 
+    <record id="of_planning.action_of_planning_intervention_form" model="ir.actions.act_window">
+        <field name="view_id" ref="of_contract_custom.of_contract_custom_planning_intervention_view_form"/>
+    </record>
 
 </odoo>
