@@ -188,3 +188,13 @@ class OfDatastoreConnector(models.AbstractModel):
                              ('context', self._get_context())]
             if val is not None}
         return ds_model.read_group(domain, fields, groupby, **kwargs)
+
+    @api.model
+    def of_datastore_search_read(self, ds_model, domain=None, fields=None, offset=0, limit=None, order=None):
+        # La fonction search_read de openerplib ne fonctionne pas bien et fonctionne par un appel search() puis read().
+        # On reprend le même système, mais avec nos méthodes.
+        record_ids = self.of_datastore_search(ds_model, domain, offset, limit, order, count=False)
+        if not record_ids:
+            return []
+        records = self.of_datastore_read(ds_model, record_ids, fields)
+        return records
