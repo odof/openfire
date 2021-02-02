@@ -8,7 +8,7 @@ class OfProductBrand(models.Model):
 
     note_maj = fields.Text(
         string=u"Notes de mise à jour",
-        help=u"Ce champ est à destination des distributeurs et permet de transmettre des information "
+        help=u"Ce champ est à destination des distributeurs et permet de transmettre des informations "
              u"sur l'état des tarifs")
 
 
