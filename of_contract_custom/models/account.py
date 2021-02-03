@@ -16,7 +16,7 @@ month_correspondance = {
 class OfAccountInvoice(models.Model):
     _inherit = "account.invoice"
 
-    of_contract_id = fields.Many2one('of.contract', string="(OF) Contrat")
+    of_contract_id = fields.Many2one('of.contract', string="Contrat")
     of_contract_period = fields.Char(string=u"Période du contrat", compute='_compute_of_contract_period')
     of_intervention_id = fields.Many2one('of.planning.intervention', string="RDV d'intervention")
 
@@ -26,7 +26,12 @@ class OfAccountInvoice(models.Model):
         for invoice in self:
             if invoice.of_contract_id and invoice.date_invoice:
                 contractual_lines = invoice.invoice_line_ids.filtered('of_contract_line_id')
-                if len(contractual_lines) > 1 and not all([date == contractual_lines[0].of_contract_supposed_date for date in contractual_lines.mapped('of_contract_supposed_date')]):
+                # toutes les lignes doivent avoir la même date prévue ou la même fréquence de facturation
+                if len(contractual_lines) > 1 and \
+                    (not all([date == contractual_lines[0].of_contract_supposed_date
+                              for date in contractual_lines.mapped('of_contract_supposed_date')]) or \
+                     not all([code == contractual_lines[0].recurring_rule_type
+                              for code in contractual_lines.mapped('recurring_rule_type')])):
                     continue
                 base_date = contractual_lines[0].of_contract_supposed_date
                 recurring_invoicing_payment = invoice.of_contract_id.recurring_invoicing_payment_id
@@ -61,7 +66,7 @@ class OfAccountInvoice(models.Model):
 class OfAccountInvoiceLine(models.Model):
     _inherit = "account.invoice.line"
 
-    of_contract_id = fields.Many2one('of.contract', string="(OF) Contrat")
-    of_contract_product_id = fields.Many2one('of.contract.product', string="(OF) Article contrat")
-    of_contract_line_id = fields.Many2one('of.contract.line', string="(OF) Ligne de contrat")
+    of_contract_id = fields.Many2one('of.contract', string="Contrat")
+    of_contract_product_id = fields.Many2one('of.contract.product', string="Article contrat")
+    of_contract_line_id = fields.Many2one('of.contract.line', string="Ligne de contrat")
     of_contract_supposed_date = fields.Date(string=u'Date prévue', readonly=True)

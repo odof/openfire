@@ -113,8 +113,8 @@
                                        options="{'no_create': True, 'no_open': True}"
                                        domain="[('code', 'in', recurring_rule_type == 'date' and ('date', 'post-paid') or ('pre-paid', 'post-paid'))]"/>
                             </div>
-                            <field name="journal_id" attrs="{'readonly': [('invoice_count','>',0)]}"/>
-                            <field name="fiscal_position_id"/>
+                            <field name="journal_id" attrs="{'readonly': [('invoice_count','>',0)]}" options="{'no_create': True}"/>
+                            <field name="fiscal_position_id" options="{'no_create': True}"/>
                             <field name="payment_term_id"/>
                             <field name="grouped"/>
                             <field name="recurring_next_date"/>
@@ -124,11 +124,12 @@
                         <group col="2" colspan="2" string="Validité" name="validity">
                             <field name="current_period_id"/>
                             <field name="period_ids" invisible="1" readonly="1"/>
+                            <field name="validated" invisible="1" readonly="1"/>
                             <label for="date_start" string="Dates"/>
                             <div name="dates">
                                 <i class="oe_grey oe_inline">Début : </i>
                                 <field name="date_start" nolabel="1" class="oe_inline"
-                                       attrs="{'readonly': [('invoice_count','>',0)]}"/>
+                                       attrs="{'readonly': ['|',('invoice_count','>',0),('validated','=',True)]}"/>
                                 <i class="oe_grey oe_inline"> Fin : </i>
                                 <field name="date_end" nolabel="1" class="oe_inline"
                                        attrs="{'required':[('renewal','=', False)], 'readonly':[('renewal','=', True)]}"/>
