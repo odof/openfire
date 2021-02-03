@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Connecteur Achat -->
+
+    <record id="of_datastore_purchase_form_view" model="ir.ui.view">
+        <field name="name">of.datastore.purchase.form.view</field>
+        <field name="model">of.datastore.purchase</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="datastore_id"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="db_name"/>
+                            <field name="server_address"/>
+                            <field name="login"/>
+                            <field name="new_password" password="True" placeholder="***"/>
+                            <field name="password" invisible="1"/>
+                            <button name="button_dummy" string="Test connexion" type="object"/>
+                        </group>
+                        <field name="error_msg" colspan="4"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_datastore_purchase_tree_view" model="ir.ui.view">
+        <field name="name">of.datastore.purchase.tree.view</field>
+        <field name="model">of.datastore.purchase</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree colors="gray:active == False">
+                <field name="active" invisible="1"/>
+                <field name="partner_id"/>
+                <field name="db_name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_datastore_purchase_action" model="ir.actions.act_window">
+        <field name="name">Connecteurs achat</field>
+        <field name="res_model">of.datastore.purchase</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_datastore_purchase_tree_view"/>
+        <field name="context">{'active_test':False}</field>
+    </record>
+
+    <menuitem name="Connecteurs achat" id="of_datastore_purchase_menu" parent="base.menu_administration" sequence="1" action="of_datastore_purchase_action"/>
+
+</odoo>
