@@ -349,7 +349,7 @@
                                 <field name="address_city" class="o_address_zip" />
                             </div>
                             <field name="partner_code_magasin"/>
-                            <field name="partner_id" readonly="False"/>
+                            <field name="partner_id"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                         <group col="2" colspan="2" name="description" string="Description">

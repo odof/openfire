@@ -382,7 +382,7 @@ class OFFormReadonly(models.AbstractModel):
     def fields_view_get(self, view_id=None, view_type=False, toolbar=False, submenu=False):
         context = self._context
         res = super(OFFormReadonly, self).fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar,
-                                                     submenu=submenu)
+                                                          submenu=submenu)
 
         read_only_domain = context.get('form_readonly', False)
         if res and read_only_domain:  # Check for context value
