@@ -198,3 +198,15 @@ class OfDatastoreConnector(models.AbstractModel):
             return []
         records = self.of_datastore_read(ds_model, record_ids, fields)
         return records
+
+    @api.model
+    def of_datastore_create(self, ds_model, values):
+        kwargs = {'context': self._get_context()}
+        return ds_model.create(values, **kwargs)
+
+    @api.model
+    def of_datastore_func(self, ds_model, func, params, optional_params):
+        kwargs = {key: val for key, val in optional_params if val is not None}
+        kwargs['context'] = self._get_context()
+        args = tuple(params)
+        return getattr(ds_model, func)(*args, **kwargs)
