@@ -60,4 +60,4 @@ class OfAccountInvoiceLine(models.Model):
     of_contract_id = fields.Many2one('of.contract', string="(OF) Contrat")
     of_contract_product_id = fields.Many2one('of.contract.product', string="(OF) Article contrat")
     of_contract_line_id = fields.Many2one('of.contract.line', string="(OF) Ligne de contrat")
-
+    of_contract_supposed_date = fields.Date(string=u'Date prévue', readonly=True)

@@ -813,6 +813,7 @@ class OfContractLine(models.Model):
 
     @api.depends('frequency_type', 'invoice_line_ids',
                  'invoice_line_ids.date_invoice',
+                 'invoice_line_ids.of_contract_supposed_date',
                  'invoice_line_ids.invoice_id',
                  'invoice_line_ids.invoice_id.state',
                  'date_avenant',
@@ -846,13 +847,13 @@ class OfContractLine(models.Model):
             elif line.contract_id.date_end:
                 line.date_contract_end = line.contract_id.date_end
             last_invoice_date = False
-            if line.invoice_line_ids:
+            if line.invoice_line_ids:  #of_contract_supposed_date
                 invoices = line.invoice_line_ids.mapped('invoice_id').sorted('date_invoice')
-                last_invoice_date = invoices[-1].date_invoice
-                line.last_invoicing_date = last_invoice_date
+                last_invoice_date = line.invoice_line_ids.sorted('date_invoice')[-1].of_contract_supposed_date
+                line.last_invoicing_date = invoices[-1].date_invoice
             elif line.line_origine_id.invoice_line_ids:
                 invoices = line.line_origine_id.invoice_line_ids.mapped('invoice_id').sorted('date_invoice')
-                last_invoice_date = invoices[-1].date_invoice
+                last_invoice_date = line.line_origine_id.invoice_line_ids.sorted('date_invoice')[-1].of_contract_supposed_date
             if line.state != 'validated':
                 continue
             if line.frequency_type == 'date':
@@ -1597,6 +1598,7 @@ class OfContractProduct(models.Model):
             'invoice_line_tax_ids' : [(6, 0, [tax.id for tax in self.tax_ids])],
             'name'          : name,
             'price_unit'    : self.price_unit,
+            'of_contract_supposed_date': self.line_id.next_date
         })
 
         return invoice_line_vals
@@ -1610,14 +1612,14 @@ class OfContractProduct(models.Model):
         date_end = period.date_end
         qty = sum(base_line.invoice_line_ids
                            .filtered(lambda l: l.invoice_id.state != 'cancel'
-                                               and date_start <= l.invoice_id.date_invoice <= date_end)
+                                               and date_start <= l.of_contract_supposed_date <= date_end)
                            .mapped('quantity'))
         search = bool(qty)
         while search:
             base_line = base_line.previous_product_id
             new_qty = sum(base_line.invoice_line_ids
                                    .filtered(lambda l: l.invoice_id.state != 'cancel'
-                                                       and date_start <= l.invoice_id.date_invoice <= date_end)
+                                                       and date_start <= l.of_contract_supposed_date <= date_end)
                                    .mapped('quantity'))
             search = bool(new_qty)
             qty += new_qty
