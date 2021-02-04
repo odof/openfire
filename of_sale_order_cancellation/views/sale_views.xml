@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_order_cancellation_sale_order_form_view" model="ir.ui.view">
+        <field name="name">of.sale.order.cancellation.sale.order.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+        <field name="arch" type="xml">
+            <field name="state" position="before">
+                <field name="of_commercially_cancelled" invisible="1"/>
+                <button name="button_commercial_cancellation" string="Annulation commerciale" type="object"
+                        confirm="Êtes-vous sûr de vouloir annuler cette commande ?"
+                        attrs="{'invisible': ['|', '|', ('state', '!=', 'sale'), ('of_commercially_cancelled', '=', True), ('of_cancelled_order_id', '!=', False)]}"/>
+            </field>
+            <xpath expr="//h1" position="after">
+                <h3 style="display: inline; color: white; border: 1px solid black; border-radius: 5px; background: red; padding-left: 5px; padding-right: 5px;"
+                    attrs="{'invisible': [('of_cancelled_order_id', '=', False)]}">
+                    Commande d'annulation
+                </h3>
+            </xpath>
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="of_cancelled_order_id" readonly="1" attrs="{'invisible': [('of_cancelled_order_id', '=', False)]}"/>
+                <field name="of_cancellation_order_id" readonly="1" attrs="{'invisible': [('of_cancellation_order_id', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
