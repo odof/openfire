@@ -217,6 +217,7 @@ class OFFollowupProject(models.Model):
          ('cancel', u'Annulé')],
         string=u"Etat du dossier", compute='_compute_state', store=True)
     is_done = fields.Boolean(string=u"Est terminé")
+    is_canceled = fields.Boolean(string=u"Est annulé")
     order_id = fields.Many2one(
         comodel_name='sale.order', string=u"Commande", required=True, copy=False, ondelete='cascade')
     partner_id = fields.Many2one(related='order_id.partner_id', string=u"Client", readonly=True)
@@ -286,7 +287,7 @@ class OFFollowupProject(models.Model):
     @api.depends('reference_laying_date', 'state')
     def _compute_stage_id(self):
         for rec in self:
-            if rec.state == 'done':
+            if rec.state in ('done', 'cancel'):
                 rec.stage_id = self.env['of.followup.project.stage'].search([('code', '=', 'done')], limit=1)
             else:
                 laying_date = rec.reference_laying_date
@@ -305,8 +306,8 @@ class OFFollowupProject(models.Model):
                     rec.stage_id = self.env['of.followup.project.stage'].search([('code', '=', 'new')], limit=1)
 
     @api.multi
-    @api.depends('order_id', 'order_id.state', 'is_done', 'task_ids', 'task_ids.is_not_processed', 'task_ids.is_done',
-                 'task_ids.is_late')
+    @api.depends('order_id', 'order_id.state', 'is_done', 'is_canceled', 'task_ids', 'task_ids.is_not_processed',
+                 'task_ids.is_done', 'task_ids.is_late')
     def _compute_state(self):
         for rec in self:
             # Si commande annulée, le suivi est à l'état annulé également
@@ -315,9 +316,12 @@ class OFFollowupProject(models.Model):
             else:
                 # Par défaut le projet est en cours
                 state = 'in_progress'
-                # Le projet a été marqué comme terminé
                 if rec.is_done:
+                    # Le projet a été marqué comme terminé
                     state = 'done'
+                elif rec.is_canceled:
+                    # Le projet a été marqué comme annulé
+                    state = 'cancel'
                 else:
                     # Correction d'un bug sur l'ordre de calcul des champs compute : Pour savoir si des tâches
                     # sont réellement en retard, il faut recalculer l'étape du suivi au préalable
@@ -490,6 +494,11 @@ class OFFollowupProject(models.Model):
     def set_to_done(self):
         self.ensure_one()
         self.is_done = True
+
+    @api.multi
+    def set_to_canceled(self):
+        self.ensure_one()
+        self.is_canceled = True
 
     @api.multi
     def set_to_in_progress(self):
@@ -1232,9 +1241,10 @@ class SaleOrder(models.Model):
     @api.multi
     def action_confirm(self):
         super(SaleOrder, self).action_confirm()
-        for order in self:
-            order.with_context(auto_followup=True, followup_creator_id=self.env.user.id).sudo(). \
-                action_followup_project()
+        if not self._context.get('order_cancellation', False):
+            for order in self:
+                order.with_context(auto_followup=True, followup_creator_id=self.env.user.id).sudo().\
+                    action_followup_project()
         return True
 
     @api.multi
