@@ -1,3 +1,0 @@
-"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
-"access_of_partner_categ_user","of.partner.categ","model_of_partner_categ","base.group_user",1,0,0,0
-"access_of_partner_categ_manager","of.partner.categ","model_of_partner_categ","base.group_system",1,1,1,1
