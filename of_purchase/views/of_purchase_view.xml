@@ -14,6 +14,9 @@
                 <xpath expr="//label[@for='date_planned']" position="before">
                     <field name="delivery_expected"/>
                 </xpath>
+                <xpath expr="//field[@name='partner_ref']" position="after">
+                    <field name="of_user_id"/>
+                </xpath>
             </field>
         </record>
 
@@ -75,6 +78,9 @@
             <xpath expr="//group[@name='sale_shipping']" position="inside">
                 <field name="delivery_expected"/>
             </xpath>
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="of_user_id"/>
+            </xpath>
         </field>
     </record>
 
@@ -107,6 +113,7 @@
         <field name="inherit_id" ref="stock.view_picking_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='origin']" position="after">
+                <field name="of_user_id"/>
                 <field name="of_location_usage" invisible="1"/>
                 <field name="of_customer_id" attrs="{'invisible': [('of_location_usage', '!=', 'supplier')]}"/>
             </xpath>
