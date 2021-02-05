@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_stock_picking_merge_form_view" model="ir.ui.view">
+        <field name="name">of.stock.picking.merge.form.view</field>
+        <field name="model">of.stock.picking.merge</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="ok" invisible="1"/>
+                <field name="error" invisible="1"/>
+                <field name="info_txt" nolabel="1" readonly="1"/>
+                <footer>
+                    <button string="Fusionner" name="action_merge_pickings" type="object" class="btn-primary"
+                            attrs="{'invisible': [('ok', '=', False)]}"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+         </field>
+    </record>
+
+    <act_window id="of_stock_picking_merge_action"
+                key2="client_action_multi"
+                name="Fusion des opérations"
+                res_model="of.stock.picking.merge"
+                src_model="stock.picking"
+                view_mode="form"
+                view_type="form"
+                multi="True"
+                view_id="of_stock_picking_merge_form_view"
+                target="new"/>
+
+</odoo>
