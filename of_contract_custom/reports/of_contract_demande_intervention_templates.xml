@@ -47,15 +47,13 @@
                                             </div>
                                             <div style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
                                         </t>
-                                        <t t-if="order">
-                                            <div class="h5" style="padding: 0px 16px;">
-                                                <div>
-                                                    <span>Commande associée&amp;nbsp;:</span>
-                                                    <span t-field="order.name"/>
-                                                </div>
+                                        <div class="h5" style="padding: 0px 16px;">
+                                            <div>
+                                                <span>Commande associée&amp;nbsp;:</span>
+                                                <span t-field="order.name"/>
                                             </div>
-                                            <div style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
-                                        </t>
+                                        </div>
+                                        <div style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
                                         <t t-if="order.confirmation_date">
                                             <div class="h5" style="padding: 0px 16px;">
                                                 <t t-set="pre_d" t-value="order.confirmation_date"/>
@@ -122,15 +120,13 @@
                                             </div>
                                             <div style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
                                         </t>
-                                        <t t-if="order">
-                                            <div class="h5" style="padding: 0px 16px;">
-                                                <div>
-                                                    <span>Commande associée&amp;nbsp;:</span>
-                                                    <span t-field="order.name"/>
-                                                </div>
+                                        <div class="h5" style="padding: 0px 16px;">
+                                            <div>
+                                                <span>Commande associée&amp;nbsp;:</span>
+                                                <span t-field="order.name"/>
                                             </div>
-                                            <div style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
-                                        </t>
+                                        </div>
+                                        <div style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
                                         <t t-if="order.confirmation_date">
                                             <div class="h5" style="padding: 0px 16px;">
                                                 <t t-set="pre_d" t-value="order.confirmation_date"/>
