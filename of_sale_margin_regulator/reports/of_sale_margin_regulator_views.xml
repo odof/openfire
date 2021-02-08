@@ -10,6 +10,7 @@
                     <field name="ordered_cost" type="measure"/>
                     <field name="ordered_total" type="measure"/>
                     <field name="ordered_margin" type="measure"/>
+                    <field name="ordered_margin_wo_discount" type="measure"/>
                     <field name="delivered_cost" type="measure"/>
                     <field name="delivered_margin" type="measure"/>
                     <field name="invoiced_cost" type="measure"/>

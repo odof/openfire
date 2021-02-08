@@ -13,6 +13,7 @@ class SaleReport(models.Model):
     of_confirmation_date = fields.Datetime('Date de confirmation', readonly=True)
     of_date_livraison = fields.Datetime('Date de livraison', readonly=True)
     of_montant_livre = fields.Float(string=u"Montant livré", readonly=True)
+    of_total_discount_amount = fields.Float(string=u"Montant total de remise", readonly=True)
 
     @api.depends()
     def _compute_dummy(self):
@@ -29,7 +30,8 @@ class SaleReport(models.Model):
         res += (", t.brand_id as of_brand_id"
                 ", s.confirmation_date as of_confirmation_date"
                 ", CASE WHEN sm.qty = sum(l.product_uom_qty / u.factor * u2.factor) THEN sm.date ELSE NULL END AS of_date_livraison"
-                ", CASE WHEN sum(l.product_uom_qty / u.factor * u2.factor) != 0 THEN sum(l.price_subtotal / COALESCE(cr.rate, 1.0)) * sm.qty / sum(l.product_uom_qty / u.factor * u2.factor) ELSE 0 END AS of_montant_livre")
+                ", CASE WHEN sum(l.product_uom_qty / u.factor * u2.factor) != 0 THEN sum(l.price_subtotal / COALESCE(cr.rate, 1.0)) * sm.qty / sum(l.product_uom_qty / u.factor * u2.factor) ELSE 0 END AS of_montant_livre"
+                ", SUM(l.product_uom_qty * l.of_unit_discount_amount / COALESCE(cr.rate, 1.0)) AS of_total_discount_amount")
         return res
 
     def _from(self):

@@ -25,8 +25,12 @@ class OFSaleMarginRegulator(models.Model):
         ], string=u"État de facturation", readonly=True)
     ordered_cost = fields.Float(string=u"Coût commandé", readonly=True)
     ordered_total = fields.Float(string=u"Total HT commandé", readonly=True)
+    ordered_total_wo_discount = fields.Float(string=u"Total HT théorique commandé", readonly=True)
     ordered_margin = fields.Float(
         string=u"Marge sur commandé", compute='_compute_ordered_margin', compute_sudo=True, readonly=True)
+    ordered_margin_wo_discount = fields.Float(
+        string=u"Marge théorique sur commandé", compute='_compute_ordered_margin_wo_discount', compute_sudo=True,
+        readonly=True)
     delivered_cost = fields.Float(string=u"Coût livré", readonly=True)
     delivered_margin = fields.Float(
         string=u"Marge sur livré", compute='_compute_delivered_margin', compute_sudo=True, readonly=True)
@@ -76,6 +80,13 @@ class OFSaleMarginRegulator(models.Model):
                                 )                                                           AS invoice_date
                     ,           SO.invoice_status
                     ,           SO.amount_untaxed                                           AS ordered_total
+                    ,           SO.amount_untaxed +
+                                COALESCE(
+                                    (   SELECT  SUM(SOL.of_unit_discount_amount * SOL.product_uom_qty)
+                                        FROM    sale_order_line                             SOL
+                                        WHERE   SOL.order_id                                = SO.id
+                                    )
+                                    , 0)                                                    AS ordered_total_wo_discount
                     ,           (   SELECT  SUM(SOL.purchase_price * SOL.product_uom_qty)
                                     FROM    sale_order_line                                 SOL
                                     WHERE   SOL.order_id                                    = SO.id
@@ -127,6 +138,11 @@ class OFSaleMarginRegulator(models.Model):
     def _compute_ordered_margin(self):
         for rec in self:
             rec.ordered_margin = rec.ordered_total - rec.ordered_cost
+
+    @api.multi
+    def _compute_ordered_margin_wo_discount(self):
+        for rec in self:
+            rec.ordered_margin_wo_discount = rec.ordered_total_wo_discount - rec.ordered_cost
 
     @api.multi
     def _compute_delivered_cost(self):
@@ -204,6 +220,8 @@ class OFSaleMarginRegulator(models.Model):
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
         if 'ordered_total' not in fields:
             fields.append('ordered_total')
+        if 'ordered_total_wo_discount' not in fields:
+            fields.append('ordered_total_wo_discount')
         if 'ordered_cost' not in fields:
             fields.append('ordered_cost')
         if 'ordered_margin' not in fields:
@@ -231,6 +249,10 @@ class OFSaleMarginRegulator(models.Model):
                 if 'ordered_total' in line and line['ordered_total'] is not None and \
                    'ordered_cost' in line and line['ordered_cost'] is not None:
                     line['ordered_margin'] = line['ordered_total'] - line['ordered_cost']
+            if 'ordered_margin_wo_discount' in fields:
+                if 'ordered_total_wo_discount' in line and line['ordered_total_wo_discount'] is not None and \
+                   'ordered_cost' in line and line['ordered_cost'] is not None:
+                    line['ordered_margin_wo_discount'] = line['ordered_total_wo_discount'] - line['ordered_cost']
             if 'delivered_margin' in fields:
                 if 'ordered_total' in line and line['ordered_total'] is not None and \
                    'delivered_cost' in line and line['delivered_cost'] is not None:
