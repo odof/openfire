@@ -19,6 +19,7 @@ Module de gestion des contrôles d'accès
         'of_followup',
         'of_service',
         'of_parc_installe',
+        'of_sale',
     ],
     'data': [
         'security/of_access_control_security.xml',
@@ -27,6 +28,7 @@ Module de gestion des contrôles d'accès
         'views/of_parc_installe_views.xml',
         'views/project_issue_views.xml',
         'views/stock_views.xml',
+        'views/sale_views.xml',
         'views/menus.xml',
     ],
     'qweb': [

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="of_access_control_sale_order_form_view" model="ir.ui.view">
+        <field name="name">of.access.control.sale.order.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_margin_sale_order_line"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/form//field[@name='of_product_seller_price']" position="attributes">
+                <attribute name="groups">of_sale.of_group_sale_marge_manager+of_access_control.of_group_sale_responsible</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_access_control_sale_order2_form_view" model="ir.ui.view">
+        <field name="name">of.access.control.sale.order2.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_margin_sale_order_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/tree//field[@name='of_product_seller_price']" position="attributes">
+                <attribute name="groups">of_sale.of_group_sale_marge_manager+of_access_control.of_group_sale_responsible</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

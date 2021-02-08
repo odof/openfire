@@ -803,6 +803,7 @@ class SaleOrderLine(models.Model):
     of_invoice_date_prev = fields.Date(string=u"Date de facturation prévisionnelle",
                                        compute="_compute_of_invoice_date_prev",
                                        store=True)
+    of_product_seller_price = fields.Float(string=u"Prix d'achat", related='product_id.of_seller_price', readonly=True)
 
     @api.depends('price_unit', 'order_id.currency_id', 'order_id.partner_shipping_id', 'product_id',
                  'price_subtotal', 'product_uom_qty')
