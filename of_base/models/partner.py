@@ -122,11 +122,8 @@ class ResPartner(models.Model):
     @api.depends('parent_id', 'parent_id.category_id')
     def _compute_parent_category(self):
         for partner in self:
-            parent = partner
-            while parent.parent_id:
-                parent = parent.parent_id
-            if not isinstance(parent.id, models.NewId):
-                partners = self.search([('id', 'child_of', parent.id)])
+            if not isinstance(partner.id, models.NewId):
+                partners = self.search([('id', 'parent_of', partner.id)])
                 partners -= partner
                 partner.of_parent_category_id = partners.mapped('category_id')
 

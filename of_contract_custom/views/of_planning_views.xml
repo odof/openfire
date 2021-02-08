@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- ******************************************************************************************* -->
+<!-- *********************************** RDVS INTERVENTIONS ************************************ -->
+<!-- ******************************************************************************************* -->
+
+    <record id="of_contract_planning_intervention_view_search" model="ir.ui.view" >
+        <field name="name">of.contract.planning.intervention.search</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_id']" position="after">
+                <field name="contract_line_id" />
+            </xpath>
+        </field>
+    </record>
+
+
+<!--##############################################______Vue form______###############################################-->
+
+    <record id="of_contract_custom_planning_intervention_view_form" model="ir.ui.view" >
+        <field name="name">of.contract.custom.planning.intervention.form</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="arch" type="xml" >
+            <form string="Nouveau RDV d'intervention">
+                <header>
+                    Passer à
+                    <button name="button_confirm" string="Confirmé" states="draft" type="object"/>
+                    <button name="button_done" string="Réalisé" states="confirm" type="object"/>
+                    <button name="button_unfinished" string="Inachevé" states="confirm" type="object"/>
+                    <button name="button_postponed" string="Reporté" states="confirm" type="object"/>
+                    <button name="button_cancel" string="Annulé" states="draft,confirm" type="object"/>
+                    <button name="button_draft" string="Brouillon" states="confirm,done,unfinished,cancel,postponed" type="object"/>
+                    <field name="state" widget="statusbar" nolabel="1" statusbar_visible="draft,confirm,done"/>
+                    <div align="right" style="align:right;padding: 0px 18px 0px 0px;width:100%">
+                        <field name="raison_id" widget="selection" attrs="{'invisible':[('state', '!=', 'postponed')]}"/>
+                    </div>
+                </header>
+                <sheet>
+                    <div class="oe_title" name="num">
+                        <h1><b>
+                            <span class="of_title of_ws">Rendez-vous d'intervention</span>
+                            <field name="number" placeholder="N° d'intervention" readonly="1" nolabel="1" class="oe_inline"/>
+                        </b></h1>
+                    </div>
+                    <field name="alert_hors_creneau" invisible="1"/>
+                    <field name="alert_incapable" invisible="1"/>
+                    <field name="alert_coherence_date" invisible="1"/>
+                    <group col="4">
+                        <group col="2" colspan="2">
+                            <field name="template_id" attrs="{'readonly': [('number', '!=', False), ('state', 'not in', ('draft', 'cancel'))]}"/>
+                        </group>
+                        <group col="2" colspan="2">
+                            <field name="user_id"/>
+                        </group>
+                        <group name="who" col="2" colspan="2" string="Qui" class="of_grey_background">
+                            <group colspan="2">
+                                <field name="equipe_id" autofocus="autofocus"/>
+                                <label for="employee_ids" string="Intervenants"/>
+                                <div>
+                                    <field name="employee_ids" string="Intervenants" widget="many2many_tags"
+                                       options='{"no_open": True, "no_create": True}'
+                                       context="{'tache_prio_id': tache_id}"/>
+                                    <div attrs="{'invisible': [('alert_incapable', '=', False)]}" class="of_red">
+                                        <i class="fa fa-warning of_ws"/>Aucun intervenant ne peut réaliser cette tâche
+                                    </div>
+                                </div>
+                                <field name="company_id" options="{'no_create': True, 'no_edit': True}"/>
+                            </group>
+                        </group>
+                        <group name="where" col="2" colspan="2" string="Où" class="of_grey_background">
+                            <group colspan="2">
+                                <field name="partner_id" invisible="1"/>
+                                <field name="address_id" domain="[('customer','=',True)]" colspan="2"/>
+                                <field name="partner_code_magasin"/>
+                                <field name="secteur_id"/>
+                                <field name="name"/>
+                            </group>
+                        </group>
+                        <group name="what" col="2" colspan="2" string="Quoi" class="of_grey_background">
+                            <group colspan="2">
+                                <field name="tache_id" context="{'intervenant_prio_ids': employee_ids}"/>
+                                <field name="duree" string="Durée" widget="float_time"/>
+                                <field name="service_id" string="Demande d'intervention" context="{'display_address': True}"/>
+                            </group>
+                        </group>
+                        <group name="when" col="2" colspan="2" string="Quand" class="of_grey_background">
+                            <group colspan="2">
+                                <label for="date"/>
+                                <div>
+                                    <field name="jour" class="oe_inline of_ws"/>
+                                    <field name="date" class="oe_inline"/>
+                                </div>
+                                <label for="date_deadline" attrs="{'invisible': [('forcer_dates', '=', True)]}"/>
+                                <div attrs="{'invisible': [('forcer_dates', '=', True)]}">
+                                    <field name="jour_fin" class="oe_inline of_ws"
+                                           attrs="{'invisible': [('alert_hors_creneau', '=', True)]}"/>
+                                    <field name="date_deadline" class="oe_inline"
+                                           attrs="{'invisible': [('alert_hors_creneau', '=', True)]}"/>
+                                    <div attrs="{'invisible': [('alert_hors_creneau', '=', False)]}" class="of_red">
+                                        <i class="fa fa-warning of_ws"/>L'horaire de début des travaux est en dehors des heures de travail.
+                                    </div>
+                                </div>
+                                <field name="horaire_du_jour" attrs="{'invisible': [('alert_hors_creneau', '=', False)]}"/>
+                                <label for="date_deadline_forcee" attrs="{'invisible': [('forcer_dates', '=', False)]}"/>
+                                <div attrs="{'invisible': [('forcer_dates', '=', False)]}">
+                                    <field name="jour_fin_force" class="oe_inline of_ws"/>
+                                    <field name="date_deadline_forcee" class="oe_inline"
+                                           attrs="{'required': [('forcer_dates', '=', True)]}"/>
+                                    <div attrs="{'invisible': [('alert_coherence_date', '=', False)]}" class="of_red">
+                                        <i class="fa fa-warning of_ws"/>la date de fin doit être au moins égale à la date de début + la durée
+                                    </div>
+                                </div>
+                                <field name="forcer_dates"/>
+                                <field name="verif_dispo"/>
+                            </group>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="infos" string="Informations">
+                            <group col="4">
+                                <group col="2" colspan="2">
+                                    <field name="order_id" groups="sales_team.group_sale_salesman,
+                                                                   account.group_account_invoice,
+                                                                   stock.group_stock_user"/>
+                                    <field name="contract_id"/>
+                                    <field name="contract_line_id"/>
+                                    <field name="opportunity_id"/>
+                                    <field name="parc_installe_id"/>
+                                </group>
+                                <group col="2" colspan="2">
+                                    <field name="tag_ids" widget="many2many_tags"/>
+                                </group>
+                                <field name="description" nolabel="1" witget="html"
+                                       help="Ce champ sera imprimé dans la fiche d'intervention."/>
+                                <div class="oe_edit_only" style="margin-top: -20px; padding-top: 0px">
+                                    * Les données saisies dans ce champ seront imprimées dans la fiche d'intervention.
+                                </div>
+                                <!-- Notes client -->
+                                <group attrs="{'invisible':[('of_notes_client','=',False)]}" col="2">
+                                    <separator string="Notes client" colspan="2"/>
+                                    <field name="of_notes_client" colspan="2" nolabel="1" readonly="1"
+                                        help="Ces notes proviennent de la fiche client sous la rubrique 'Notes internes'. Ils sont uniquement modifiables dans la fiche client."/>
+                                </group>
+                                <!-- Notes intervention -->
+                                <group attrs="{'invisible':[('of_notes_intervention','=',False)]}" col="2">
+                                    <separator string="Notes intervention" colspan="2"/>
+                                    <field name="of_notes_intervention" nolabel="1"
+                                        help="Ces notes proviennent du devis / commande sous la rubrique 'Notes intervention'. Ils sont uniquement modifiables dans le  devis / commande (voir la commande associée)."/>
+                                </group>
+                            </group>
+                        </page>
+                        <page name="recap" string="Compte rendu" invisible="1">
+                            <group>
+
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_planning.action_of_planning_intervention_calendar" model="ir.actions.act_window">
+        <field name="context">
+            {'search_default_state_confirm':1,
+            'search_default_state_done':1,
+            'search_default_state_draft':1,
+            'search_default_state_unfinished':1,
+            'form_view_ref': 'of_contract_custom.of_contract_custom_planning_intervention_view_form'}
+        </field>
+    </record>
+
+    <record id="of_planning.action_of_planning_intervention_form" model="ir.actions.act_window">
+        <field name="view_id" ref="of_contract_custom.of_contract_custom_planning_intervention_view_form"/>
+    </record>
+
+</odoo>

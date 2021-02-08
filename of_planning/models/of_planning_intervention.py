@@ -466,7 +466,7 @@ class OfPlanningIntervention(models.Model):
                     partner = partner.parent_id
             interv.partner_id = partner and partner.id
 
-    @api.depends('date', 'date_deadline_forcee')
+    @api.depends('date', 'date_deadline_forcee', 'date_deadline')
     def _compute_jour(self):
         for interv in self:
             t = ''

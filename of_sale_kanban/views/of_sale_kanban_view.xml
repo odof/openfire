@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!--##############################################################################-->
+<!--############################ ______ Kanban ______ ############################-->
+<!--##############################################################################-->
+
+    <record id="of_sale_view_sale_order_kanban" model="ir.ui.view">
+        <field name="name">of.sale.view.sale.order.kanban</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sale_order_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="default_group_by">of_kanban_step_id</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Ajout l'étape kanban sur les devis/commandes -->
+    <record id="of_sale_view_kanban_step" model="ir.ui.view">
+        <field name="name">of.sale.view.kanban.step</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_shipping_id']" position="after">
+                <field name="of_kanban_step_id" widget="selection"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_order_kanban_tree_view" model="ir.ui.view">
+        <field name="name">of.sale.order.kanban.tree.view</field>
+        <field name="model">of.sale.order.kanban</field>
+        <field name="arch" type="xml">
+            <tree string="Étapes kanban" editable="top">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_sale_order_kanban" model="ir.actions.act_window">
+        <field name="name">Étapes kanban</field>
+        <field name="res_model">of.sale.order.kanban</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="of_sale_order_kanban_tree_view"/>
+    </record>
+
+    <menuitem name="Étapes kanban" id="menu_sale_order_kanban" parent="sale.menu_sales_config" sequence="3" action="action_sale_order_kanban"/>
+
+</odoo>
