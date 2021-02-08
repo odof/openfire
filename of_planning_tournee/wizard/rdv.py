@@ -276,6 +276,7 @@ class OfTourneeRdv(models.TransientModel):
         values = self.get_values_intervention_create()
 
         res = intervention_obj.create(values)
+        contract_custom = self.env['ir.module.module'].search([('name', '=', 'of_contract_custom')])
 
         # Creation/mise à jour du service si creer_recurrence
         if self.date_next:
@@ -284,7 +285,7 @@ class OfTourneeRdv(models.TransientModel):
                     'date_next': self.date_next,
                     'date_fin': self.date_fin_planif
                 })
-            elif self.creer_recurrence:
+            elif self.creer_recurrence and (not contract_custom or contract_custom.state != 'installed'):
                 res.service_id = service_obj.create(self._get_service_data(date_propos_dt.month))
 
         return {
