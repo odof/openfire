@@ -265,19 +265,28 @@ class OFCompanyDeletionWizard(models.TransientModel):
 
         # Comptes analytiques
         _logger.info(u"Company Deletion - Companies %s - Analytic Accounts - START" % company_ids)
-        self.env['account.analytic.account'].with_context(active_test=False).search(
-            [('company_id', 'in', self.company_ids.ids)]).unlink()
+        analytic_accounts = self.env['account.analytic.account'].with_context(active_test=False).search(
+            [('company_id', 'in', self.company_ids.ids)])
+        if 'project.project' in self.env:
+            # Suppression des projets et tâches associés aux comptes analytiques à supprimer
+            projects = self.env['project.project'].with_context(active_test=False).search(
+                [('analytic_account_id', 'in', analytic_accounts.ids)])
+            self.env['project.task'].with_context(active_test=False).search(
+                [('project_id', 'in', projects.ids)]).unlink()
+            projects.unlink()
+        analytic_accounts.unlink()
         _logger.info(u"Company Deletion - Companies %s - Analytic Accounts - END" % company_ids)
 
         self.env.cr.commit()
 
         # Contrats analytiques
-        _logger.info(u"Company Deletion - Companies %s - Analytic Contracts - START" % company_ids)
-        self.env['account.analytic.contract'].with_context(active_test=False).search(
-            [('company_id', 'in', self.company_ids.ids)]).unlink()
-        _logger.info(u"Company Deletion - Companies %s - Analytic Contracts - END" % company_ids)
+        if 'account.analytic.contract' in self.env:
+            _logger.info(u"Company Deletion - Companies %s - Analytic Contracts - START" % company_ids)
+            self.env['account.analytic.contract'].with_context(active_test=False).search(
+                [('company_id', 'in', self.company_ids.ids)]).unlink()
+            _logger.info(u"Company Deletion - Companies %s - Analytic Contracts - END" % company_ids)
 
-        self.env.cr.commit()
+            self.env.cr.commit()
 
         # RDVs d'intervention
         if 'of.planning.intervention' in self.env:
@@ -319,14 +328,18 @@ class OFCompanyDeletionWizard(models.TransientModel):
         # Parcs installés
         if 'of.parc.installe' in self.env:
             _logger.info(u"Company Deletion - Companies %s - Parcs Installés - START" % company_ids)
-            parc_installe_ids = self.env['of.parc.installe'].with_context(active_test=False).search(
-                [('company_id', 'in', self.company_ids.ids)])
-            parc_installe_ids |= self.env['of.parc.installe'].with_context(active_test=False).search(
-                [('company_id', '=', False), ('client_id.company_id', 'in', self.company_ids.ids)])
+            if 'company_id' in self.env['of.parc.installe']:
+                parc_installes = self.env['of.parc.installe'].with_context(active_test=False).search(
+                    [('company_id', 'in', self.company_ids.ids)])
+                parc_installes |= self.env['of.parc.installe'].with_context(active_test=False).search(
+                    [('company_id', '=', False), ('client_id.company_id', 'in', self.company_ids.ids)])
+            else:
+                parc_installes = self.env['of.parc.installe'].with_context(active_test=False).search(
+                    [('client_id.company_id', 'in', self.company_ids.ids)])
             # Si des parcs installés à supprimer sont rattachés à des SAVs, on supprime ce lien
             self.env['project.issue'].with_context(active_test=False).search(
-                [('of_produit_installe_id', 'in', parc_installe_ids.ids)]).write({'of_produit_installe_id': False})
-            parc_installe_ids.unlink()
+                [('of_produit_installe_id', 'in', parc_installes.ids)]).write({'of_produit_installe_id': False})
+            parc_installes.unlink()
             _logger.info(u"Company Deletion - Companies %s - Parcs Installés - END" % company_ids)
 
             self.env.cr.commit()
@@ -600,6 +613,10 @@ class OFCompanyDeletionWizard(models.TransientModel):
         self.env['account.fiscal.position.tax.template'].with_context(active_test=False).search(
             [('tax_src_id', 'in', tax_templates.ids)]).unlink()
         tax_templates.unlink()
+        # S'il existe des intermédiaires de paiement associés à des sociétés à supprimer, on leur affecte une autre
+        # société arbitrairement
+        self.env['payment.acquirer'].with_context(active_test=False).search(
+            [('company_id', 'in', self.company_ids.ids)]).write({'company_id': other_company.id})
         self.company_ids.unlink()
 
         _logger.info(u"Company Deletion - Companies %s - END" % company_ids)

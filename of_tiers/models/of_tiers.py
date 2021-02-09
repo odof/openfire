@@ -194,7 +194,7 @@ class ResPartner(models.Model):
         account_ids = [account.id
                        for partner in self
                        for account in (partner.property_account_receivable_id, partner.property_account_payable_id)
-                       if account not in (default_account_receivable, default_account_payable)]
+                       if account and account not in (default_account_receivable, default_account_payable)]
 
         super(ResPartner, self).unlink()
 
