@@ -38,6 +38,17 @@ Ces différentes valeurs peuvent être configurées par marque et par catégorie
 
 La configuration d'une formule pour la remise n'est pas obligatoire. Si elle n'est pas renseignée, le fichier d'import devra
 contenir une colonne renseignant soit le prix d'achat ('of_seller_price'), soit la remise accordée par le fournisseur ('of_seller_remise')
+
+
+Import de pièces jointes/images
+-------------------------------
+L'import de pièces jointes ou images (sur champ dédié d'un objet) nécessite que les fichiers aient été préalablement téléchargés sur le serveur.
+Le fichier d'import est constitué de 5 champs :
+ - name : Le nom de la pièce jointe.
+ - store_fname : Le chemin complet du fichier sur le serveur (e.g. "/home/odoo/fichiers_import_55/image_27.png").
+ - res_model : Le nom technique de l'objet concerné (par exemple pour les articles : "product.template").
+ - res_id : Le nom permettant d'identifier l'élément auquel associer la PJ (par exemple pour un article il s'agit de la référence).
+ - res_field : Pour une PJ, laisser vide. Pour une image, mettre le nom du champ concerné (pour l'image d'un article, le champ est "image").
 """,
     "depends": [
         'of_product_brand',
