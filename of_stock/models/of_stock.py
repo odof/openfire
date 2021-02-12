@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models, _
+from odoo import api, fields, models, _, SUPERUSER_ID
 from odoo.tools import float_utils
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.tools.float_utils import float_compare, float_round
@@ -346,11 +346,18 @@ class Inventory(models.Model):
 
     @api.multi
     def action_done(self):
-        return super(
-            Inventory,
-            self.with_context(
-                inventory_date=self.env['ir.values'].get_default('stock.config.settings', 'of_forcer_date_inventaire'))
-        ).action_done()
+        self = self.with_context(
+            inventory_date=self.env['ir.values'].get_default('stock.config.settings', 'of_forcer_date_inventaire'))
+        if self._uid != SUPERUSER_ID:
+            negative = next((line for line in self.mapped('line_ids') if
+                             line.product_qty < 0 and line.product_qty != line.theoretical_qty), False)
+            if negative:
+                raise UserError(_('You cannot set a negative product quantity in an inventory line:\n\t%s - qty: %s') %
+                                (negative.product_id.name, negative.product_qty))
+        self.action_check()
+        self.write({'state': 'done'})
+        self.post_inventory()
+        return True
 
 
 class InventoryLine(models.Model):
@@ -481,6 +488,19 @@ class StockConfigSettings(models.TransientModel):
     def set_of_forcer_date_move_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'stock.config.settings', 'of_forcer_date_move', self.of_forcer_date_move)
+
+
+class StockPicking(models.Model):
+    _inherit = 'stock.picking'
+
+    @api.multi
+    def action_fill_operation_qty_done(self):
+        self.ensure_one()
+
+        for operation in self.pack_operation_product_ids.filtered(lambda op: not op.lots_visible):
+            operation.qty_done = operation.product_qty
+
+        return True
 
 
 class StockMove(models.Model):
