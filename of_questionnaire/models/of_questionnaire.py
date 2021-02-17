@@ -197,6 +197,7 @@ class OfPlanningInterventionQuestion(models.Model):
     parc_installe_id = fields.Many2one('of.parc.installe.question', string=u"Équipement")
     attachment_answer = fields.Binary(string=u"Fichier réponse", attachment=True)
     attachment_answer_name = fields.Char(string=u"Nom du fichier réponse")
+    condition_unmet = fields.Boolean(string=u"Condition non respectée")
 
     _sql_constraints = [
         ('of_id_code_intervention_uniq', 'unique(id_code, intervention_id)',

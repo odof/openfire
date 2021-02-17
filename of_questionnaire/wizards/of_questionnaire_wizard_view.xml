@@ -21,8 +21,7 @@
                     <field name="answer_ids" attrs="{'invisible': [('answer_type', '!=', 'list')]}" domain="[('planning_question_ids', 'in', [question_id])]" widget="many2many_tags" options="{'no_create': True}"/>
                     <field name="attachment_answer_name" invisible="1"/>
                     <field name="attachment_answer" filename="attachment_answer_name"
-                           attrs="{'invisible': [('answer_type', 'not in', ('photo', 'drawing')), ('additional_attachment_answer', '=', False)],
-                                   'required': ['|', ('answer_type', 'in', ('photo', 'drawing')), ('attachment_required', '=', True)]}"/>
+                           attrs="{'invisible': [('answer_type', 'not in', ('photo', 'drawing')), ('additional_attachment_answer', '=', False)], 'required': ['|', ('answer_type', 'in', ('photo', 'drawing')), ('attachment_required', '=', True)]}"/>
                 </group>
                 <footer>
                     <button string="Annuler" special="cancel" class="btn-default"/>
@@ -41,8 +40,7 @@
             view_mode="form"
             view_type="form"
             view_id="of_repondre_questionnaire_view_form"
-            target="new"
-            context="{'question_ids': question_ids}"/>
+            target="new"/>
 
     <record id="of_repondre_questionnaire_planning_intervention_view_form" model="ir.ui.view">
         <field name="name">of.repondre.questionnaire.planning.intervention.view.form</field>

@@ -416,10 +416,11 @@
                     <separator string="Questionnaire"/>
                     <field name="questionnaire_id" domain="[('type', '=', 'intervention')])" options="{'no_create': True}"/>
                     <field name="question_ids" mode="tree" nolabel="1" context="{'address_id': address_id, 'default_type': 'intervention'}">
-                        <tree>
+                        <tree colors="grey:condition_unmet">
                             <field name="sequence" widget="handle"/>
                             <field name="category_id" invisible="1"/>
                             <field name="type" invisible="1"/>
+                            <field name="condition_unmet" invisible="1"/>
                             <field name="name"/>
                             <field name="answer_type" invisible="1"/>
                             <field name="answer_ids" invisible="1"/>

@@ -65,7 +65,7 @@ class RepondreQuestionnaireWizard(models.TransientModel):
                     reponses |= reponse
             result['answer_ids'] = [(6, 0, reponses._ids)]
 
-        if question.answer_type in ('list', 'drawing') or question.photo:
+        if question.answer_type in ('photo', 'drawing') or question.photo:
             result['attachment_answer_name'] = question.attachment_answer_name
             result['attachment_answer'] = question.attachment_answer
 
@@ -81,6 +81,10 @@ class RepondreQuestionnaireWizard(models.TransientModel):
             question = self.env['of.planning.intervention.question'].browse(question_ids[0][1])
             if question.definitive_answer:
                 rec.update(self._convert_question_answer(question))
+        elif 'question_id' in rec:
+            question = self.env['of.planning.intervention.question'].browse(rec['question_id'])
+            if question.definitive_answer:
+                rec.update(self._convert_question_answer(question))
         return rec
 
     def validate_answer(self):
@@ -92,11 +96,16 @@ class RepondreQuestionnaireWizard(models.TransientModel):
             self.question_id.write({'definitive_answer': self.answer_id.name})
         elif self.question_id.answer_type == 'list':
             self.question_id.write({'definitive_answer': ', '.join([answer.name for answer in self.answer_ids])})
+        elif self.question_id.answer_type in ('photo', 'drawing'):
+            self.question_id.write({'definitive_answer': self.attachment_answer_name})
 
-        if self.question_id.answer_type in ('list', 'drawing') or (self.additional_attachment_answer and
-                                                                   self.attachment_answer):
+        if self.question_id.answer_type in ('photo', 'drawing') or (self.additional_attachment_answer and
+                                                                    self.attachment_answer):
             self.question_id.write({'attachment_answer_name': self.attachment_answer_name,
                                     'attachment_answer': self.attachment_answer})
+
+        if self.question_id.condition_unmet:
+            self.question_id.write({'condition_unmet': False})
 
         return self.next_question()
 
@@ -118,7 +127,8 @@ class RepondreQuestionnaireWizard(models.TransientModel):
             if not condition_res:
                 # Si la condition n'est pas respectée, on vide la réponse potentielle de la question
                 # et on passe à la question suivante
-                self.question_id.write({'definitive_answer': False,
+                self.question_id.write({'condition_unmet': True,
+                                        'definitive_answer': False,
                                         'attachment_answer_name': False,
                                         'attachment_answer': False})
                 return self.next_question()
