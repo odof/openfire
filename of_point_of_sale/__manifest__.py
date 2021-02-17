@@ -9,7 +9,10 @@
 Module Point de Vente OpenFire
 ==============================
 
-Ce module apporte une personnalisation des points de ventes
+Ce module apporte une personnalisation des points de ventes.
+
+ATTENTION, pour pouvoir installer ce module, il faut au préalable définir des valeurs par défaut pour 
+les champs marque ('brand_id') et catégorie interne ('categ_id') des articles (modèle 'product.template').
 """,
     'depends': [
         'point_of_sale',
