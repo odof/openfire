@@ -14,8 +14,11 @@
                 <button class="oe_stat_button" type="object" name="action_view_contract" icon="fa-book">
                     <field name="of_contract_count" widget="statinfo" string="Contrats"/>
                 </button>
+                <button class="oe_stat_button" type="object" name="action_view_contrat_line_address" icon="fa-book" attrs="{'invisible': [('customer','!=',True)]}">
+                    <field name="of_contract_line_address_count" widget="statinfo" string="Lignes contrat"/>
+                </button>
                 <button class="oe_stat_button" type="object" name="action_view_contract_line" icon="fa-book" attrs="{'invisible': [('supplier','!=',True)]}">
-                    <field name="of_contract_line_count" widget="statinfo" string="Lignes de contrat"/>
+                    <field name="of_contract_line_count" widget="statinfo" string="Lignes (Prestataire)"/>
                 </button>
             </xpath>
             <xpath expr="//field[@name='ref']" position="after">
