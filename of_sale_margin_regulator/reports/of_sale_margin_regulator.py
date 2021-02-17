@@ -15,6 +15,7 @@ class OFSaleMarginRegulator(models.Model):
     company_id = fields.Many2one(comodel_name='res.company', string=u"Société", readonly=True)
     user_id = fields.Many2one(comodel_name='res.users', string=u"Vendeur", readonly=True)
     partner_id = fields.Many2one(comodel_name='res.partner', string=u"Partenaire", readonly=True)
+    order_date = fields.Date(string=u"Date de commande", readonly=True)
     confirmation_date = fields.Date(string=u"Date de confirmation", readonly=True)
     invoice_date = fields.Date(string=u"Date de dernière facture", readonly=True)
     invoice_status = fields.Selection([
@@ -23,281 +24,351 @@ class OFSaleMarginRegulator(models.Model):
         ('to invoice', u"À facturer"),
         ('no', u"Rien à facturer")
         ], string=u"État de facturation", readonly=True)
-    ordered_cost = fields.Float(string=u"Coût commandé", readonly=True)
-    ordered_total = fields.Float(string=u"Total HT commandé", readonly=True)
-    ordered_total_wo_discount = fields.Float(string=u"Total HT théorique commandé", readonly=True)
-    ordered_margin = fields.Float(
-        string=u"Marge sur commandé", compute='_compute_ordered_margin', compute_sudo=True, readonly=True)
-    ordered_margin_wo_discount = fields.Float(
-        string=u"Marge théorique sur commandé", compute='_compute_ordered_margin_wo_discount', compute_sudo=True,
-        readonly=True)
+    product_id = fields.Many2one(comodel_name='product.product', string=u"Article")
+
+    sale_cost = fields.Float(string=u"Prix de revient sur vente", readonly=True)
+    sale_price = fields.Float(string=u"Prix de vente sur vente", readonly=True)
+    sale_discount = fields.Float(string=u"Remise sur vente", readonly=True)
+    sale_margin = fields.Float(string=u"Marge sur vente (€)", readonly=True)
+    sale_margin_perc = fields.Char(
+        string=u"Marge sur vente (%)", compute='_compute_sale_margin_perc', compute_sudo=True, readonly=True)
+
+    validation_cost = fields.Float(string=u"Prix de revient sur validation", readonly=True)
+    validation_price = fields.Float(string=u"Prix de vente sur validation", readonly=True)
+    validation_discount = fields.Float(string=u"Remise sur validation", readonly=True)
+    validation_margin = fields.Float(string=u"Marge sur validation (€)", readonly=True)
+    validation_margin_perc = fields.Char(
+        string=u"Marge sur validation (%)", compute='_compute_validation_margin_perc', compute_sudo=True, readonly=True)
+
     delivered_cost = fields.Float(string=u"Coût livré", readonly=True)
-    delivered_margin = fields.Float(
-        string=u"Marge sur livré", compute='_compute_delivered_margin', compute_sudo=True, readonly=True)
-    invoiced_cost = fields.Float(string=u"Coût facturé", readonly=True)
     invoiced_total = fields.Float(string=u"Total HT facturé", readonly=True)
-    invoiced_margin = fields.Float(
-        string=u"Marge sur facturé", compute='_compute_invoiced_margin', compute_sudo=True, readonly=True)
-    delivered_ordered_margin_gap = fields.Float(
-        string=u"Écart de marge livré / commandé", compute='_compute_delivered_ordered_margin_gap', compute_sudo=True,
+
+    ordered_real_margin = fields.Float(
+        string=u"Marge réelle sur commandé (€)", compute='_compute_ordered_real_margin', compute_sudo=True,
         readonly=True)
-    delivered_ordered_margin_gap_perc = fields.Char(
-        string=u"Écart de marge livré / commandé (%)", compute='_compute_delivered_ordered_margin_gap_perc',
-        compute_sudo=True, readonly=True)
-    invoiced_ordered_margin_gap = fields.Float(
-        string=u"Écart de marge facturé / commandé", compute='_compute_invoiced_ordered_margin_gap', compute_sudo=True,
+    ordered_real_margin_perc = fields.Char(
+        string=u"Marge réelle sur commandé (%)", compute='_compute_ordered_real_margin_perc', compute_sudo=True,
         readonly=True)
-    invoiced_ordered_margin_gap_perc = fields.Char(
-        string=u"Écart de marge facturé / commandé (%)", compute='_compute_invoiced_ordered_margin_gap_perc',
-        compute_sudo=True, readonly=True)
-    ordered_delivered_margin_regulator = fields.Float(
-        string=u"Régule de marge commandé / livré", compute='_compute_ordered_delivered_margin_regulator',
-        compute_sudo=True, readonly=True)
-    ordered_delivered_margin_regulator_perc = fields.Char(
-        string=u"Régule de marge commandé / livré (%)", compute='_compute_ordered_delivered_margin_regulator_perc',
-        compute_sudo=True, readonly=True)
+    invoiced_real_margin = fields.Float(
+        string=u"Marge réelle sur facturé (€)", compute='_compute_invoiced_real_margin', compute_sudo=True,
+        readonly=True)
+    invoiced_real_margin_perc = fields.Char(
+        string=u"Marge réelle sur facturé (%)", compute='_compute_invoiced_real_margin_perc', compute_sudo=True,
+        readonly=True)
+
+    validation_ordered_real_margin_gap = fields.Float(
+        string=u"Écart marge à la validation / réelle commandée (€)",
+        compute='_compute_validation_ordered_real_margin_gap', compute_sudo=True, readonly=True)
+    validation_ordered_real_margin_gap_perc = fields.Char(
+        string=u"Écart marge à la validation / réelle commandée (%)",
+        compute='_compute_validation_ordered_real_margin_gap_perc', compute_sudo=True, readonly=True)
+    validation_invoiced_real_margin_gap = fields.Float(
+        string=u"Écart marge à la validation / réelle facturée (€)",
+        compute='_compute_validation_invoiced_real_margin_gap', compute_sudo=True, readonly=True)
+    validation_invoiced_real_margin_gap_perc = fields.Char(
+        string=u"Écart marge à la validation / réelle facturée (%)",
+        compute='_compute_validation_invoiced_real_margin_gap_perc', compute_sudo=True, readonly=True)
 
     def init(self):
         tools.drop_view_if_exists(self._cr, 'of_sale_margin_regulator')
         self._cr.execute("""
             CREATE VIEW of_sale_margin_regulator AS (
-                    SELECT      SO.id
+                    SELECT      SOL.id                                                      AS id
                     ,           SO.id                                                       AS order_id
                     ,           SO.company_id
                     ,           SO.user_id
                     ,           SO.partner_id
+                    ,           SO.date_order::timestamp::date                              AS order_date
                     ,           SO.confirmation_date::timestamp::date                       AS confirmation_date
-                    ,           (   SELECT  MAX(AI.date_invoice)
-                                    FROM    sale_order_line                                 SOL
-                                    ,       sale_order_line_invoice_rel                     SOLIR
-                                    ,       account_invoice_line                            AIL
-                                    ,       account_invoice                                 AI
-                                    WHERE   SOL.order_id                                    = SO.id
-                                    AND     SOLIR.order_line_id                             = SOL.id
-                                    AND     AIL.id                                          = SOLIR.invoice_line_id
-                                    AND     AI.id                                           = AIL.invoice_id
-                                    AND     AI.state                                        IN ('open', 'paid')
-                                )                                                           AS invoice_date
                     ,           SO.invoice_status
-                    ,           SO.amount_untaxed                                           AS ordered_total
-                    ,           SO.amount_untaxed +
-                                COALESCE(
-                                    (   SELECT  SUM(SOL.of_unit_discount_amount * SOL.product_uom_qty)
-                                        FROM    sale_order_line                             SOL
-                                        WHERE   SOL.order_id                                = SO.id
-                                    )
-                                    , 0)                                                    AS ordered_total_wo_discount
-                    ,           (   SELECT  SUM(SOL.purchase_price * SOL.product_uom_qty)
-                                    FROM    sale_order_line                                 SOL
-                                    WHERE   SOL.order_id                                    = SO.id
-                                )                                                           AS ordered_cost
-                    ,           (   SELECT  SUM(SM.of_unit_cost)
-                                    FROM    stock_picking                                   SP
-                                    ,       stock_move                                      SM
-                                    WHERE   SP.group_id                                     = SO.procurement_group_id
-                                    AND     SM.picking_id                                   = SP.id
-                                    AND     SM.state                                        = 'done'
-                                )                                                           AS delivered_cost
-                    ,           (   SELECT  SUM(AIL2.price_subtotal)
-                                    FROM    (   SELECT DISTINCT
-                                                        AI.id
-                                                FROM    sale_order_line                     SOL
-                                                ,       sale_order_line_invoice_rel         SOLIR
-                                                ,       account_invoice_line                AIL
-                                                ,       account_invoice                     AI
-                                                WHERE   SOL.order_id                        = SO.id
-                                                AND     SOLIR.order_line_id                 = SOL.id
-                                                AND     AIL.id                              = SOLIR.invoice_line_id
-                                                AND     AI.id                               = AIL.invoice_id
-                                                AND     AI.state                            IN ('open', 'paid')
-                                            )                                               TMP
-                                    ,       account_invoice_line                            AIL2
-                                    WHERE   AIL2.invoice_id                                 = TMP.id
-                                )                                                           AS invoiced_total
-                    ,           (   SELECT  SUM(AIL2.of_unit_cost * AIL2.quantity)
-                                    FROM    (   SELECT DISTINCT
-                                                        AI.id
-                                                FROM    sale_order_line                     SOL
-                                                ,       sale_order_line_invoice_rel         SOLIR
-                                                ,       account_invoice_line                AIL
-                                                ,       account_invoice                     AI
-                                                WHERE   SOL.order_id                        = SO.id
-                                                AND     SOLIR.order_line_id                 = SOL.id
-                                                AND     AIL.id                              = SOLIR.invoice_line_id
-                                                AND     AI.id                               = AIL.invoice_id
-                                                AND     AI.state                            IN ('open', 'paid')
-                                            )                                               TMP
-                                    ,       account_invoice_line                            AIL2
-                                    WHERE   AIL2.invoice_id                                 = TMP.id
-                                )                                                           AS invoiced_cost
+                    ,           (   SELECT  MAX(AI2.date_invoice)
+                                    FROM    sale_order_line             SOL2
+                                    ,       sale_order_line_invoice_rel SOLIR2
+                                    ,       account_invoice_line        AIL2
+                                    ,       account_invoice             AI2
+                                    WHERE   SOL2.order_id               = SO.id
+                                    AND     SOLIR2.order_line_id        = SOL2.id
+                                    AND     AIL2.id                     = SOLIR2.invoice_line_id
+                                    AND     AI2.id                      = AIL2.invoice_id
+                                    AND     AI2.state                   IN ('open', 'paid')
+                                )                                                           AS invoice_date
+                    ,           SOL.product_id
+                    ,           SOL.of_sale_cost                                            AS sale_cost
+                    ,           SOL.of_sale_price                                           AS sale_price
+                    ,           SOL.of_sale_discount                                        AS sale_discount
+                    ,           SOL.of_sale_margin                                          AS sale_margin
+                    ,           SOL.of_validation_cost                                      AS validation_cost
+                    ,           SOL.of_validation_price                                     AS validation_price
+                    ,           SOL.of_validation_discount                                  AS validation_discount
+                    ,           SOL.of_validation_margin                                    AS validation_margin
+                    ,           SM.of_unit_cost                                             AS delivered_cost
+                    ,           AIL.price_subtotal                                          AS invoiced_total
                     FROM        sale_order                                                  SO
-                    WHERE       SO.state                                                    = 'sale'
+                    ,           sale_order_line                                             SOL
+                    LEFT JOIN   procurement_order                                           PO
+                        ON      PO.sale_line_id                                             = SOL.id
+                    LEFT JOIN   stock_move                                                  SM
+                        ON      SM.procurement_id                                           = PO.id
+                    LEFT JOIN   sale_order_line_invoice_rel                                 SOLIR
+                        ON      SOLIR.order_line_id                                         = SOL.id
+                    LEFT JOIN   account_invoice_line                                        AIL
+                        ON      AIL.id                                                      = SOLIR.invoice_line_id
+                    WHERE       SO.state                                                    IN ('sale', 'done', 'closed')
+                    AND         SOL.order_id                                                = SO.id
+
+                    UNION
+
+                    SELECT      100000000 + SM2.id                                          AS id
+                    ,           SO2.id                                                      AS order_id
+                    ,           SO2.company_id
+                    ,           SO2.user_id
+                    ,           SO2.partner_id
+                    ,           SO2.date_order::timestamp::date                             AS order_date
+                    ,           SO2.confirmation_date::timestamp::date                      AS confirmation_date
+                    ,           SO2.invoice_status
+                    ,           (   SELECT  MAX(AI3.date_invoice)
+                                    FROM    sale_order_line             SOL3
+                                    ,       sale_order_line_invoice_rel SOLIR3
+                                    ,       account_invoice_line        AIL3
+                                    ,       account_invoice             AI3
+                                    WHERE   SOL3.order_id               = SO2.id
+                                    AND     SOLIR3.order_line_id        = SOL3.id
+                                    AND     AIL3.id                     = SOLIR3.invoice_line_id
+                                    AND     AI3.id                      = AIL3.invoice_id
+                                    AND     AI3.state                   IN ('open', 'paid')
+                                )                                                           AS invoice_date
+                    ,           SM2.product_id
+                    ,           NULL                                                        AS sale_cost
+                    ,           NULL                                                        AS sale_price
+                    ,           NULL                                                        AS sale_discount
+                    ,           NULL                                                        AS sale_margin
+                    ,           NULL                                                        AS validation_cost
+                    ,           NULL                                                        AS validation_price
+                    ,           NULL                                                        AS validation_discount
+                    ,           NULL                                                        AS validation_margin
+                    ,           SM2.of_unit_cost                                            AS delivered_cost
+                    ,           NULL                                                        AS invoiced_total
+                    FROM        sale_order                                                  SO2
+                    ,           stock_picking                                               SP
+                    ,           stock_move                                                  SM2
+                    WHERE       SO2.state                                                   IN ('sale', 'done', 'closed')
+                    AND         SP.origin                                                   = SO2.name
+                    AND         SM2.picking_id                                              = SP.id
+                    AND         SM2.procurement_id                                          IS NULL
+
+                    UNION
+
+                    SELECT      200000000 + AIL4.id                                         AS id
+                    ,           SO3.id                                                      AS order_id
+                    ,           SO3.company_id
+                    ,           SO3.user_id
+                    ,           SO3.partner_id
+                    ,           SO3.date_order::timestamp::date                             AS order_date
+                    ,           SO3.confirmation_date::timestamp::date                      AS confirmation_date
+                    ,           SO3.invoice_status
+                    ,           (   SELECT  MAX(AI5.date_invoice)
+                                    FROM    sale_order_line             SOL5
+                                    ,       sale_order_line_invoice_rel SOLIR5
+                                    ,       account_invoice_line        AIL5
+                                    ,       account_invoice             AI5
+                                    WHERE   SOL5.order_id               = SO3.id
+                                    AND     SOLIR5.order_line_id        = SOL5.id
+                                    AND     AIL5.id                     = SOLIR5.invoice_line_id
+                                    AND     AI5.id                      = AIL5.invoice_id
+                                    AND     AI5.state                   IN ('open', 'paid')
+                                )                                                           AS invoice_date
+                    ,           AIL4.product_id
+                    ,           NULL                                                        AS sale_cost
+                    ,           NULL                                                        AS sale_price
+                    ,           NULL                                                        AS sale_discount
+                    ,           NULL                                                        AS sale_margin
+                    ,           NULL                                                        AS validation_cost
+                    ,           NULL                                                        AS validation_price
+                    ,           NULL                                                        AS validation_discount
+                    ,           NULL                                                        AS validation_margin
+                    ,           NULL                                                        AS delivered_cost
+                    ,           AIL4.price_subtotal                                         AS invoiced_total
+                    FROM        sale_order                                                  SO3
+                    ,           account_invoice                                             AI4
+                    ,           account_invoice_line                                        AIL4
+                    WHERE       SO3.state                                                   IN ('sale', 'done', 'closed')
+                    AND         AI4.origin                                                  = SO3.name
+                    AND         AIL4.invoice_id                                             = AI4.id
+                    AND         NOT EXISTS                                                  (   SELECT  *
+                                                                                                FROM    sale_order_line_invoice_rel SOLIR4
+                                                                                                WHERE   SOLIR4.invoice_line_id      = AIL4.id
+                                                                                            )
             )""")
 
     @api.multi
-    def _compute_ordered_margin(self):
+    def _compute_sale_margin_perc(self):
         for rec in self:
-            rec.ordered_margin = rec.ordered_total - rec.ordered_cost
-
-    @api.multi
-    def _compute_ordered_margin_wo_discount(self):
-        for rec in self:
-            rec.ordered_margin_wo_discount = rec.ordered_total_wo_discount - rec.ordered_cost
-
-    @api.multi
-    def _compute_delivered_cost(self):
-        for rec in self:
-            delivered_cost = 0.0
-            for move in rec.order_id.picking_ids.mapped('move_lines').filtered(lambda m: m.state == 'done'):
-                purchase_procurement_orders = self.env['procurement.order'].search([('move_dest_id', '=', move.id)])
-                validated_purchase_lines = purchase_procurement_orders.mapped('purchase_line_id').filtered(
-                    lambda l: l.order_id.state == 'purchase')
-                if validated_purchase_lines:
-                    purchase_prices = validated_purchase_lines.mapped('price_unit')
-                    unit_cost = sum(purchase_prices)/len(purchase_prices)
-                    unit_cost = round(unit_cost * move.product_id.property_of_purchase_coeff)
-                elif move.procurement_id.sale_line_id:
-                    unit_cost = move.procurement_id.sale_line_id.purchase_price
-                else:
-                    unit_cost = move.product_id.standard_price
-                delivered_cost += unit_cost * move.product_uom_qty
-            rec.delivered_cost = delivered_cost
-
-    @api.multi
-    def _compute_delivered_margin(self):
-        for rec in self:
-            rec.delivered_margin = rec.ordered_total - rec.delivered_cost
-
-    @api.multi
-    def _compute_invoiced_margin(self):
-        for rec in self:
-            rec.invoiced_margin = rec.invoiced_total - rec.invoiced_cost
-
-    @api.multi
-    def _compute_delivered_ordered_margin_gap(self):
-        for rec in self:
-            rec.delivered_ordered_margin_gap = rec.delivered_margin - rec.ordered_margin
-
-    @api.multi
-    def _compute_delivered_ordered_margin_gap_perc(self):
-        for rec in self:
-            if rec.ordered_margin != 0:
-                rec.delivered_ordered_margin_gap_perc = \
-                    '%.2f' % (100.0 * rec.delivered_ordered_margin_gap / rec.ordered_margin)
+            if rec.sale_price != 0:
+                rec.sale_margin_perc = \
+                    '%.2f' % (100.0 * (1.0 - rec.sale_cost / rec.sale_price))
             else:
-                rec.delivered_ordered_margin_gap_perc = "N/E"
+                rec.sale_margin_perc = "N/E"
 
     @api.multi
-    def _compute_invoiced_ordered_margin_gap(self):
+    def _compute_validation_margin_perc(self):
         for rec in self:
-            rec.invoiced_ordered_margin_gap = rec.invoiced_margin - rec.ordered_margin
-
-    @api.multi
-    def _compute_invoiced_ordered_margin_gap_perc(self):
-        for rec in self:
-            if rec.ordered_margin != 0:
-                rec.invoiced_ordered_margin_gap_perc = \
-                    '%.2f' % (100.0 * rec.invoiced_ordered_margin_gap / rec.ordered_margin)
+            if rec.validation_price != 0:
+                rec.validation_margin_perc = \
+                    '%.2f' % (100.0 * (1.0 - rec.validation_cost / rec.validation_price))
             else:
-                rec.invoiced_ordered_margin_gap_perc = "N/E"
+                rec.validation_margin_perc = "N/E"
 
     @api.multi
-    def _compute_ordered_delivered_margin_regulator(self):
-        # Coût commandé - coût livré
+    def _compute_ordered_real_margin(self):
         for rec in self:
-            rec.ordered_delivered_margin_regulator = rec.ordered_cost - rec.delivered_cost
+            rec.ordered_real_margin = rec.validation_price - rec.delivered_cost
 
     @api.multi
-    def _compute_ordered_delivered_margin_regulator_perc(self):
+    def _compute_ordered_real_margin_perc(self):
         for rec in self:
-            if rec.ordered_total != 0:
-                rec.ordered_delivered_margin_regulator_perc = \
-                    '%.2f' % (100.0 * rec.ordered_delivered_margin_regulator / rec.ordered_total)
+            if rec.validation_price != 0:
+                rec.ordered_real_margin_perc = \
+                    '%.2f' % (100.0 * (1.0 - rec.delivered_cost / rec.validation_price))
             else:
-                rec.ordered_delivered_margin_regulator_perc = "N/E"
+                rec.ordered_real_margin_perc = "N/E"
+
+    @api.multi
+    def _compute_invoiced_real_margin(self):
+        for rec in self:
+            rec.invoiced_real_margin = rec.invoiced_total - rec.delivered_cost
+
+    @api.multi
+    def _compute_invoiced_real_margin_perc(self):
+        for rec in self:
+            rec.invoiced_real_margin_perc = 100.0 * (1.0 - rec.delivered_cost / rec.invoiced_total)
+
+    @api.multi
+    def _compute_validation_ordered_real_margin_gap(self):
+        for rec in self:
+            rec.validation_ordered_real_margin_gap = rec.validation_margin - rec.ordered_real_margin
+
+    @api.multi
+    def _compute_validation_ordered_real_margin_gap_perc(self):
+        for rec in self:
+            if rec.ordered_real_margin != 0:
+                rec.validation_ordered_real_margin_gap_perc = \
+                    '%.2f' % (100.0 * rec.validation_ordered_real_margin_gap / rec.ordered_real_margin)
+            else:
+                rec.validation_ordered_real_margin_gap_perc = "N/E"
+
+    @api.multi
+    def _compute_validation_invoiced_real_margin_gap(self):
+        for rec in self:
+            rec.validation_invoiced_real_margin_gap = rec.validation_margin - rec.invoiced_real_margin
+
+    @api.multi
+    def _compute_validation_invoiced_real_margin_gap_perc(self):
+        for rec in self:
+            if rec.invoiced_real_margin != 0:
+                rec.validation_invoiced_real_margin_gap_perc = \
+                    '%.2f' % (100.0 * rec.validation_invoiced_real_margin_gap / rec.invoiced_real_margin)
+            else:
+                rec.validation_invoiced_real_margin_gap_perc = "N/E"
 
     @api.model
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
-        if 'ordered_total' not in fields:
-            fields.append('ordered_total')
-        if 'ordered_total_wo_discount' not in fields:
-            fields.append('ordered_total_wo_discount')
-        if 'ordered_cost' not in fields:
-            fields.append('ordered_cost')
-        if 'ordered_margin' not in fields:
-            fields.append('ordered_margin')
+        if 'sale_cost' not in fields:
+            fields.append('sale_cost')
+        if 'sale_price' not in fields:
+            fields.append('sale_price')
+        if 'validation_cost' not in fields:
+            fields.append('validation_cost')
+        if 'validation_price' not in fields:
+            fields.append('validation_price')
         if 'delivered_cost' not in fields:
             fields.append('delivered_cost')
-        if 'delivered_margin' not in fields:
-            fields.append('delivered_margin')
         if 'invoiced_total' not in fields:
             fields.append('invoiced_total')
-        if 'invoiced_cost' not in fields:
-            fields.append('invoiced_cost')
-        if 'invoiced_margin' not in fields:
-            fields.append('invoiced_margin')
-        if 'delivered_ordered_margin_gap' not in fields:
-            fields.append('delivered_ordered_margin_gap')
-        if 'invoiced_ordered_margin_gap' not in fields:
-            fields.append('invoiced_ordered_margin_gap')
-        if 'ordered_delivered_margin_regulator' not in fields:
-            fields.append('ordered_delivered_margin_regulator')
+        if 'validation_margin' not in fields:
+            fields.append('validation_margin')
+        if 'ordered_real_margin' not in fields:
+            fields.append('ordered_real_margin')
+        if 'validation_ordered_real_margin_gap' not in fields:
+            fields.append('validation_ordered_real_margin_gap')
+        if 'invoiced_real_margin' not in fields:
+            fields.append('invoiced_real_margin')
+        if 'validation_invoiced_real_margin_gap' not in fields:
+            fields.append('validation_invoiced_real_margin_gap')
         res = super(OFSaleMarginRegulator, self).read_group(
             domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
         for line in res:
-            if 'ordered_margin' in fields:
-                if 'ordered_total' in line and line['ordered_total'] is not None and \
-                   'ordered_cost' in line and line['ordered_cost'] is not None:
-                    line['ordered_margin'] = line['ordered_total'] - line['ordered_cost']
-            if 'ordered_margin_wo_discount' in fields:
-                if 'ordered_total_wo_discount' in line and line['ordered_total_wo_discount'] is not None and \
-                   'ordered_cost' in line and line['ordered_cost'] is not None:
-                    line['ordered_margin_wo_discount'] = line['ordered_total_wo_discount'] - line['ordered_cost']
-            if 'delivered_margin' in fields:
-                if 'ordered_total' in line and line['ordered_total'] is not None and \
-                   'delivered_cost' in line and line['delivered_cost'] is not None:
-                    line['delivered_margin'] = line['ordered_total'] - line['delivered_cost']
-            if 'invoiced_margin' in fields:
+            if 'sale_margin_perc' in fields:
+                if 'sale_cost' in line and line['sale_cost'] is not None and \
+                        'sale_price' in line and line['sale_price'] is not None and line['sale_price']:
+                    line['sale_margin_perc'] = \
+                        ('%.2f' % (round(100.0 * (1.0 - line['sale_cost'] / line['sale_price']), 2))).\
+                        replace('.', ',')
+                else:
+                    line['sale_margin_perc'] = "N/E"
+            if 'validation_margin_perc' in fields:
+                if 'validation_cost' in line and line['validation_cost'] is not None and \
+                        'validation_price' in line and line['validation_price'] is not None and \
+                        line['validation_price']:
+                    line['validation_margin_perc'] = \
+                        ('%.2f' % (round(100.0 * (1.0 - line['validation_cost'] / line['validation_price']), 2))).\
+                        replace('.', ',')
+                else:
+                    line['validation_margin_perc'] = "N/E"
+            if 'ordered_real_margin' in fields:
+                if 'validation_price' in line and line['validation_price'] is not None and \
+                        'delivered_cost' in line and line['delivered_cost'] is not None:
+                    line['ordered_real_margin'] = line['validation_price'] - line['delivered_cost']
+            if 'ordered_real_margin_perc' in fields:
+                if 'delivered_cost' in line and line['delivered_cost'] is not None and \
+                        'validation_price' in line and line['validation_price'] is not None and \
+                        line['validation_price']:
+                    line['ordered_real_margin_perc'] = \
+                        ('%.2f' % (round(100.0 * (1.0 - line['delivered_cost'] / line['validation_price']), 2))).\
+                        replace('.', ',')
+                else:
+                    line['ordered_real_margin_perc'] = "N/E"
+            if 'invoiced_real_margin' in fields:
                 if 'invoiced_total' in line and line['invoiced_total'] is not None and \
-                   'invoiced_cost' in line and line['invoiced_cost'] is not None:
-                    line['invoiced_margin'] = line['invoiced_total'] - line['invoiced_cost']
-            if 'delivered_ordered_margin_gap' in fields:
-                if 'delivered_margin' in line and line['delivered_margin'] is not None and \
-                   'ordered_margin' in line and line['ordered_margin'] is not None:
-                    line['delivered_ordered_margin_gap'] = line['delivered_margin'] - line['ordered_margin']
-            if 'delivered_ordered_margin_gap_perc' in fields:
-                if 'delivered_ordered_margin_gap' in line and line['delivered_ordered_margin_gap'] is not None and \
-                   'ordered_margin' in line and line['ordered_margin'] is not None and line['ordered_margin']:
-                    line['delivered_ordered_margin_gap_perc'] = \
-                        ('%.2f' % (round(100.0 * line['delivered_ordered_margin_gap'] / line['ordered_margin'], 2))).\
+                        'delivered_cost' in line and line['delivered_cost'] is not None:
+                    line['invoiced_real_margin'] = line['invoiced_total'] - line['delivered_cost']
+            if 'invoiced_real_margin_perc' in fields:
+                if 'delivered_cost' in line and line['delivered_cost'] is not None and \
+                        'invoiced_total' in line and line['invoiced_total'] is not None and line['invoiced_total']:
+                    line['invoiced_real_margin_perc'] = \
+                        ('%.2f' % (round(100.0 * (1.0 - line['delivered_cost'] / line['invoiced_total']), 2))).\
                         replace('.', ',')
                 else:
-                    line['delivered_ordered_margin_gap_perc'] = "N/E"
-            if 'invoiced_ordered_margin_gap' in fields:
-                if 'invoiced_margin' in line and line['invoiced_margin'] is not None and \
-                   'ordered_margin' in line and line['ordered_margin'] is not None:
-                    line['invoiced_ordered_margin_gap'] = line['invoiced_margin'] - line['ordered_margin']
-            if 'invoiced_ordered_margin_gap_perc' in fields:
-                if 'invoiced_ordered_margin_gap' in line and line['invoiced_ordered_margin_gap'] is not None and \
-                   'ordered_margin' in line and line['ordered_margin'] is not None and line['ordered_margin']:
-                    line['invoiced_ordered_margin_gap_perc'] = \
-                        ('%.2f' % (round(100.0 * line['invoiced_ordered_margin_gap'] / line['ordered_margin'], 2))).\
-                        replace('.', ',')
-                else:
-                    line['invoiced_ordered_margin_gap_perc'] = "N/E"
-            if 'ordered_delivered_margin_regulator' in fields:
-                if 'ordered_cost' in line and line['ordered_cost'] is not None and \
-                   'delivered_cost' in line and line['delivered_cost'] is not None:
-                    line['ordered_delivered_margin_regulator'] = line['ordered_cost'] - line['delivered_cost']
-            if 'ordered_delivered_margin_regulator_perc' in fields:
-                if 'ordered_delivered_margin_regulator' in line and \
-                        line['ordered_delivered_margin_regulator'] is not None and \
-                   'ordered_total' in line and line['ordered_total'] is not None and line['ordered_total']:
-                    line['ordered_delivered_margin_regulator_perc'] = \
+                    line['invoiced_real_margin_perc'] = "N/E"
+            if 'validation_ordered_real_margin_gap' in fields:
+                if 'validation_margin' in line and line['validation_margin'] is not None and \
+                        'ordered_real_margin' in line and line['ordered_real_margin'] is not None:
+                    line['validation_ordered_real_margin_gap'] = line['validation_margin'] - line['ordered_real_margin']
+            if 'validation_ordered_real_margin_gap_perc' in fields:
+                if 'validation_ordered_real_margin_gap' in line and \
+                        line['validation_ordered_real_margin_gap'] is not None and \
+                        'ordered_real_margin' in line and line['ordered_real_margin'] is not None and \
+                        line['ordered_real_margin']:
+                    line['validation_ordered_real_margin_gap_perc'] = \
                         ('%.2f' %
-                         (round(100.0 * line['ordered_delivered_margin_regulator'] / line['ordered_total'], 2))).\
+                         (round(100.0 * line['validation_ordered_real_margin_gap'] / line['ordered_real_margin'], 2))).\
                         replace('.', ',')
                 else:
-                    line['ordered_delivered_margin_regulator_perc'] = "N/E"
+                    line['validation_ordered_real_margin_gap_perc'] = "N/E"
+            if 'validation_invoiced_real_margin_gap' in fields:
+                if 'validation_margin' in line and line['validation_margin'] is not None and \
+                        'invoiced_real_margin' in line and line['invoiced_real_margin'] is not None:
+                    line['validation_invoiced_real_margin_gap'] = line['validation_margin'] - \
+                                                                  line['invoiced_real_margin']
+            if 'validation_invoiced_real_margin_gap_perc' in fields:
+                if 'validation_invoiced_real_margin_gap' in line and \
+                        line['validation_invoiced_real_margin_gap'] is not None and \
+                        'invoiced_real_margin' in line and line['invoiced_real_margin'] is not None and \
+                        line['invoiced_real_margin']:
+                    line['validation_invoiced_real_margin_gap_perc'] = \
+                        ('%.2f' %
+                         (round(100.0 * line['validation_invoiced_real_margin_gap'] / line['invoiced_real_margin'],
+                                2))).replace('.', ',')
+                else:
+                    line['validation_invoiced_real_margin_gap_perc'] = "N/E"
 
         return res

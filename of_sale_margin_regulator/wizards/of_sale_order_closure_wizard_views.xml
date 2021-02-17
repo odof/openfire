@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- OF Sale Order Closure Wizard Form View -->
+    <record id="of_sale_order_closure_wizard_form_view" model="ir.ui.view">
+        <field name="name">of.sale.order.closure.wizard.form.view</field>
+        <field name="model">of.sale.order.closure.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="info_txt" nolabel="1" readonly="1" colspan="4"/>
+                </group>
+                <footer>
+                    <button string="Clôturer" name="action_close" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sale_order_closure_wizard_action" model="ir.actions.act_window">
+        <field name="name">Clôturer la commande</field>
+        <field name="res_model">of.sale.order.closure.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>
