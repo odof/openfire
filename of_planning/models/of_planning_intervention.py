@@ -878,6 +878,8 @@ class OfPlanningIntervention(models.Model):
         if self.tache_id:
             if self.tache_id.duree:
                 self.duree = self.tache_id.duree
+            if self.tache_id.fiscal_position_id and not self.fiscal_position_id:
+                self.fiscal_position_id = self.tache_id.fiscal_position_id
             if self.tache_id.product_id:
                 self.line_ids.new({
                     'intervention_id': self.id,
@@ -887,8 +889,6 @@ class OfPlanningIntervention(models.Model):
                     'name'           : self.tache_id.product_id.name,
                     })
                 self.line_ids.compute_taxes()
-            if self.tache_id.fiscal_position_id and not self.fiscal_position_id:
-                self.fiscal_position_id = self.tache_id.fiscal_position_id
 
     @api.onchange('forcer_dates')
     def _onchange_forcer_dates(self):
@@ -1302,7 +1302,7 @@ class OfPlanningInterventionLine(models.Model):
                 taxes = taxes.filtered(lambda r: r.company_id == partner.company_id)
             if fiscal_position:
                 taxes = fiscal_position.map_tax(taxes, product, partner)
-                line.taxe_ids = taxes
+            line.taxe_ids = taxes
 
     @api.multi
     def _prepare_invoice_line(self):
