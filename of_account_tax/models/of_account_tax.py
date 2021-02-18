@@ -43,6 +43,8 @@ class AccountFiscalPosition(models.Model):
     @api.multi
     def map_tax(self, taxes, product=None, partner=None):
         if not self:
+            if self._context.get('website_id'):
+                return taxes
             raise UserError(u"Veuillez renseigner une position fiscale")
         self.ensure_one()
         if not taxes:
