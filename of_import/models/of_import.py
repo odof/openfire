@@ -7,6 +7,7 @@ import itertools
 import logging
 import time
 import base64
+from os import path
 
 from odoo import api, fields, models
 from odoo.tools.translate import _
@@ -190,7 +191,7 @@ class OFProductBrand(models.Model):
     _name = 'of.product.brand'
     _inherit = ('of.product.brand', 'of.import.product.config.template')
 
-    categ_ids = fields.One2many('of.import.product.categ.config', 'brand_id', string="Catégories")
+    categ_ids = fields.One2many('of.import.product.categ.config', 'brand_id', string=u"Catégories")
     product_config_ids = fields.One2many(
         'product.template', string="Articles", compute="_compute_product_config_ids",
         inverse="_inverse_product_config_ids", domain="[('brand_id', '=', id)]")
@@ -380,10 +381,10 @@ class ProductTemplate(models.Model):
     _inherit = ('product.template', 'of.import.product.config.template')
 
     of_is_net_price = fields.Boolean(
-        string="Basé sur prix net",
-        help="Si cette case est cochée, les prix de l'article sont calculés à partir d'un "
-             "prix d'achat donné par le fournisseur.\n"
-             "Sinon, ils sont pasés sur le prix public hors taxe."
+        string=u"Basé sur prix net",
+        help=u"Si cette case est cochée, les prix de l'article sont calculés à partir d'un "
+             u"prix d'achat donné par le fournisseur.\n"
+             u"Sinon, ils sont pasés sur le prix public hors taxe."
     )
 
     @api.multi
@@ -488,9 +489,10 @@ class OfImport(models.Model):
         selection = [
             ('product.template', u'Articles'),
             ('of.product.kit.line', u'Composants de kits'),
+            ('res.partner.bank', u'Comptes en banque des partenaires'),
+            ('ir.attachment', u"Images/pièces jointes"),
             ('res.partner', u'Partenaires'),
             ('crm.lead', u'Pistes/opportunités'),
-            ('res.partner.bank', u'Comptes en banques partenaire'),
             ('of.service', u'Services OpenFire'),
         ]
         selection = [s for s in selection if s[0] in self.env]
@@ -685,6 +687,8 @@ class OfImport(models.Model):
 
         if not model:
             return {}
+        if model == 'ir.attachment':
+            return self.get_champs_odoo_attachment()
 
         champs_odoo = {}
 
@@ -751,6 +755,46 @@ class OfImport(models.Model):
                 # L'unité de mesure est par défaut celle du composant.
                 champs_odoo['product_uom_id']['requis'] = False
         return champs_odoo
+
+    @api.model
+    def get_champs_odoo_attachment(self):
+        return {
+            'name': {
+                'description': u"Libellé",
+                'requis': True,
+                'type': 'char',
+                'langue': False,
+                'traduit': False,
+            },
+            'store_fname': {
+                'description': u"Chemin complet du fichier",
+                'requis': True,
+                'type': 'char',
+                'langue': False,
+                'traduit': False,
+            },
+            'res_model': {
+                'description': u"Modèle",
+                'requis': True,
+                'type': 'char',
+                'langue': False,
+                'traduit': False,
+            },
+            'res_id': {
+                'description': u"Référence article",
+                'requis': True,
+                'type': 'char',
+                'langue': False,
+                'traduit': False,
+            },
+            'res_field': {
+                'description': u"Champ (ou vide si pièce jointe)",
+                'requis': False,
+                'type': 'char',
+                'langue': False,
+                'traduit': False,
+            },
+        }
 
     @api.multi
     def bouton_remettre_brouillon(self):
@@ -1305,6 +1349,7 @@ class OfImport(models.Model):
                     message = [(0, 0, {'type': 'info',
                                        'message': u"MAJ %s %s (ligne %s)" % (model_data['nom_objet'], libelle_ref, i)})]
                 except Exception, exp:
+                    code = CODE_IMPORT_ERREUR
                     message = [(0, 0, {'type': 'error',
                                        'message': u"Ligne %s : échec mise à jour %s %s - Erreur : %s" %
                                                   (i, model_data['nom_objet'], libelle_ref,
@@ -1323,6 +1368,7 @@ class OfImport(models.Model):
                                        'message': u"Création %s %s (ligne %s)" %
                                                   (model_data['nom_objet'], libelle_ref, i)})]
                 except Exception, exp:
+                    code = CODE_IMPORT_ERREUR
                     message = [(0, 0, {'type': 'error',
                                        'message': u"Ligne %s : échec création %s %s - Erreur : %s" %
                                                   (i, model_data['nom_objet'], libelle_ref,
@@ -1348,6 +1394,135 @@ class OfImport(models.Model):
         return code, message
 
     @api.multi
+    def _importer_ligne_attachment(self, ligne, champs_fichier, champs_odoo, i, model_data, doublons, simuler):
+        attachment_obj = self.env['ir.attachment']
+        import_error = []
+        code = CODE_IMPORT_CREATION
+
+        def erreur(msg):
+            """
+            Gestion des erreurs
+            En mode simulation, toutes les anomalies sont listées pour chaque ligne d'import.
+            En mode import, chaque ligne est abandonnée à la première anomalie rencontrée.
+            """
+            if msg:
+                import_error.append((0, 0, {'type': 'error', 'message': msg}))
+            if not simuler:
+                raise OfImportError(import_error)
+
+        # clé d'unicité
+        key = (ligne['res_id'], ligne['res_field'], not ligne['res_field'] and ligne['name'])
+        if key in doublons:
+            doublons[key][0] += 1
+            doublons[key][1] += ", " + str(i)
+            return CODE_IMPORT_AVERT, ""
+        else:
+            doublons[key] = [1, str(i)]
+
+        file_path = ligne['store_fname']
+        value = ''
+        try:
+            value = open(file_path, 'rb').read().encode('base64')
+            if not value:
+                erreur(u"Ligne %s : le fichier est vide : %s" % (i, file_path))
+        except (IOError, OSError):
+            if path.exists(file_path):
+                erreur(u"Ligne %s : impossible d'ouvrir le fichier : %s" % (i, file_path))
+            else:
+                erreur(u"Ligne %s : fichier non existant : %s" % (i, file_path))
+
+        res_model = ligne.get('res_model', False)
+        res_obj = res_name = False
+        if res_model not in self.env:
+            erreur(u"Ligne %s : modèle non reconnu : %s" % (i, ligne['res_model']))
+        else:
+            res_name = ligne.get('res_id', '')
+            res_obj = self.env[res_model].name_search(res_name, operator='=', limit=2)
+            if not res_obj:
+                erreur(u"Ligne %s : aucun résultat trouvé pour : %s" % (i, res_name))
+            elif len(res_obj) > 1:
+                erreur(u"Ligne %s : plusieurs résultats trouvés pour : %s" % (i, res_name))
+            else:
+                res_obj = self.env[res_model].browse(res_obj[0][0])
+
+        res_field = ligne.get('res_field') or False
+        if res_field and res_obj is not False and res_field not in res_obj._fields:
+            erreur(u"Ligne %s : champ non trouvé : %s.%s" % (i, res_model, res_field))
+
+        libelle_ref = u"réf. " + ligne['res_model'] + u" : " + ligne['res_id'] + u" - " + ligne['name']
+
+        attachment = False
+        if len(res_obj) == 1 and not res_field:
+            attachment = attachment_obj.search(
+                [('name', '=', ligne['name']),
+                 ('res_model', '=', res_model),
+                 ('res_field', '=', False),
+                 ('res_id', '=', res_obj.id),
+                 ('type', '=', 'binary')], limit=2)
+            if len(attachment) > 1:
+                erreur(u"Ligne %s : Plusieurs pièces jointes existent : %s - %s : %s" %
+                       (i, res_model, res_name, ligne['name']))
+
+        message = import_error
+        if message:
+            code = CODE_IMPORT_ERREUR
+        if code == CODE_IMPORT_CREATION and not simuler:
+            if res_field:
+                # Champ binaire d'un objet
+                if res_obj[res_field]:
+                    code = CODE_IMPORT_MODIFICATION
+                try:
+                    res_obj[res_field] = value
+                    message = [(0, 0, {'type': 'info',
+                                       'message': u"MAJ du champ %s %s (ligne %s)" %
+                                                  (res_field, libelle_ref, i)})]
+                except Exception, e:
+                    code = CODE_IMPORT_ERREUR
+                    erreur(u"Ligne %s : échec mise à jour %s %s - Erreur : %s" %
+                           (i, model_data['nom_objet'], libelle_ref, str(e).decode('utf8', 'ignore')))
+            elif attachment is not False:
+                # Pièce jointe
+                attachment_data = {
+                    'name': ligne['name'],
+                    'datas_fname': ligne['name'],
+                    'res_model': res_model,
+                    'res_field': res_field,
+                    'res_id': res_obj.id,
+                    'type': 'binary',
+                    'datas': value,
+                }
+                try:
+                    if attachment:
+                        attachment.write(attachment_data)
+                        code = CODE_IMPORT_MODIFICATION
+                        message = [(0, 0, {'type': 'info',
+                                           'message': u"MAJ pièce jointe %s (ligne %s)" %
+                                                      (libelle_ref, i)})]
+                    else:
+                        attachment_obj.create(attachment_data)
+                        code = CODE_IMPORT_CREATION
+                        message = [(0, 0, {'type': 'info',
+                                           'message': u"Création pièce jointe %s (ligne %s)" %
+                                                      (libelle_ref, i)})]
+                except Exception, e:
+                    code = CODE_IMPORT_ERREUR
+                    erreur(u"Ligne %s : échec %s %s %s - Erreur : %s" %
+                           (i, attachment and u"mise à jour" or u"création",
+                            model_data['nom_objet'], libelle_ref,
+                            str(e).decode('utf8', 'ignore')))
+
+        if not simuler:
+            if code == CODE_IMPORT_ERREUR:
+                # Si l'erreur est de type SQL, le cursor est en 'ABORT STATE' et commit() et rollback()
+                #   ont le même effet.
+                # En revanche, si l'erreur est une erreur python, le cursor est correct et un commit()
+                #   risque de valider un import incomplet.
+                self._cr.rollback()
+            else:
+                self._cr.commit()
+        return code, message
+
+    @api.multi
     def importer(self, simuler=True):
 
         # VARIABLES DE CONFIGURATION
@@ -1359,13 +1534,22 @@ class OfImport(models.Model):
         model_data = {
             'product.template': {
                 # Libellé pour affichage dans message information/erreur
-                'nom_objet': u'article',
+                'nom_objet': u'Article',
                 # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour)
                 # ou inexistant (création)
                 'champ_primaire': 'default_code',
                 # Champ qui contient la référence ( ex : référence du produit, d'un client, ...)
                 # pour ajout du préfixe devant
                 'champ_reference': 'default_code',
+            },
+            'ir.attachment': {
+                # Libellé pour affichage dans message information/erreur
+                'nom_objet': u"Image/pièce jointe",
+                # Champ inutile pour les pièces jointes : les doublons se gèrent avec une clef sur plusieurs champs.
+                'champ_primaire': 'name',
+                # Champ qui contient la référence ( ex : référence du produit, d'un client, ...)
+                # pour ajout du préfixe devant
+                'champ_reference': '',
             },
             'of.product.kit.line': {
                 'nom_objet': u'Composants de kits',
@@ -1592,6 +1776,9 @@ class OfImport(models.Model):
     # IMPORT ENREGISTREMENT PAR ENREGISTREMENT
     #
 
+        fct_importer_ligne = self._importer_ligne
+        if model == 'ir.attachment':
+            fct_importer_ligne = self._importer_ligne_attachment
         # On parcourt le fichier enregistrement par enregistrement
         while True:
             try:
@@ -1626,7 +1813,7 @@ class OfImport(models.Model):
             nb_total += 1
 
             try:
-                code, message = self._importer_ligne(
+                code, message = fct_importer_ligne(
                     ligne, champs_fichier, champs_odoo, i, model_data, doublons, simuler)
 
                 if message:
@@ -1699,44 +1886,7 @@ class OFImportMessage(models.Model):
     _description = "Message du journal d'OpenImport"
 
     import_id = fields.Many2one(comodel_name='of.import', string=u"Import")
-    type = fields.Selection(selection=[('error', u"Erreur"), ('warning', u"vertissement"), ('info', u"Info")],
-                            string=u"Type de message")
+    type = fields.Selection(
+        selection=[('error', u"Erreur"), ('warning', u"Avertissement"), ('info', u"Info")],
+        string=u"Type de message")
     message = fields.Text(string=u"Message")
-
-    @api.model_cr_context
-    def _auto_init(self):
-        """
-        Recover old import messages
-        """
-        cr = self._cr
-        cr.execute("SELECT * FROM information_schema.tables WHERE table_name = '%s'" % (self._table,))
-        exists = bool(cr.fetchall())
-        res = super(OFImportMessage, self)._auto_init()
-        if not exists:
-            import_ids = self.env['of.import'].search([])
-            for import_id in import_ids:
-                import_success = []
-                import_warning = []
-                import_error = []
-                cr.execute("SELECT sortie_succes FROM of_import WHERE id = '%s'" % (import_id.id,))
-                sortie_succes = cr.fetchone()[0]
-                if sortie_succes:
-                    for line in sortie_succes.splitlines():
-                        if line:
-                            import_success += [(0, 0, {'type': 'info', 'message': line})]
-                cr.execute("SELECT sortie_avertissement FROM of_import WHERE id = '%s'" % (import_id.id,))
-                sortie_avertissement = cr.fetchone()[0]
-                if sortie_avertissement:
-                    for line in sortie_avertissement.splitlines():
-                        if line:
-                            import_warning += [(0, 0, {'type': 'warning', 'message': line})]
-                cr.execute("SELECT sortie_erreur FROM of_import WHERE id = '%s'" % (import_id.id,))
-                sortie_erreur = cr.fetchone()[0]
-                if sortie_erreur:
-                    for line in sortie_erreur.splitlines():
-                        if line:
-                            import_error += [(0, 0, {'type': 'error', 'message': line})]
-                import_id.write({'import_success_ids': import_success,
-                                 'import_warning_ids': import_warning,
-                                 'import_error_ids': import_error})
-        return res

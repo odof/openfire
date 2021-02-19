@@ -29,11 +29,12 @@ class OfDatastoreUpdateProduct(models.TransientModel):
             nb_local_products = len(active_ids)
         return nb_local_products
 
-    noup_name = fields.Boolean(string='Don\'t update product name')
+    noup_name = fields.Boolean(string="Don't update product name")
     is_update = fields.Boolean('Show update options', default=lambda self: self._default_is_update())
     # Ajout du field type pour permettre l'import de tous les articles depuis la marque
     type = fields.Selection([('update', 'Update'), ('import', 'Import')], string="Type", default="update")
-    nb_local_products = fields.Integer(string="Nombre de références", default=lambda self: self._default_nb_local_products())
+    nb_local_products = fields.Integer(
+        string=u"Nombre de références", default=lambda self: self._default_nb_local_products())
 
     def _update_links(self, supplier, client, product_ids, id_match):
         """

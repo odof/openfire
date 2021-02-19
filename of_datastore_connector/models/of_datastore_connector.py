@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import logging
 import threading
+import xmlrpclib
+import socket  # Ne pas supprimer cette ligne, voir fonction connect()
 
 from odoo import models, fields, api, _
-import xmlrpclib
 
 _logger = logging.getLogger(__name__)
 
@@ -11,8 +12,6 @@ try:
     import openerplib  # sudo easy_install openerp-client-lib
 except (ImportError, IOError) as err:
     _logger.debug(err)
-
-import socket  # Ne pas supprimer cette ligne, voir fonction connect()
 
 
 class OfDatastoreConnector(models.AbstractModel):
@@ -55,7 +54,8 @@ class OfDatastoreConnector(models.AbstractModel):
                     # Le nouveau mot de passe n'est obligatoire que s'il n'en existe pas déjà un
                     continue
                 if not connector[field_name]:
-                    error_msg = _("You must fill the field \"%s\"") % self.env['ir.model.fields'].search([('model', '=', self._name), ('name', '=', field_name)]).name_get()[0][1]
+                    error_msg = _("You must fill the field \"%s\"") % self.env['ir.model.fields'].search(
+                        [('model', '=', self._name), ('name', '=', field_name)]).name_get()[0][1]
                     break
             else:
                 error_msg = connector.of_datastore_connect()
@@ -79,12 +79,19 @@ class OfDatastoreConnector(models.AbstractModel):
             def run(self):
                 try:
                     server_address = supplier.server_address
-                    # ======= Code à recommenter après la résolution du bug OVH =======
-                    # Retrait du prefixe http://
-                    ip_address = socket.gethostbyname(server_address.split('://')[1])
-                    # Sur s-alpha le port 8010 est utilisé pour la connexion xmlrpc v10
-                    server_address = "http://%s:8010" % (ip_address,)
-                    # =================================================================
+                    # ========== Code à recommenter après la résolution du bug OVH ==========
+                    # Retrait du prefixe http:// et extraction du port (optionnel)
+                    address_split = server_address.split('://')[-1].split(':')  # [adresse, port]
+                    ip_address = socket.gethostbyname(address_split[0])
+                    if len(address_split) == 2:
+                        port = ':' + address_split[1]
+                    elif ip_address == socket.gethostbyname('s-alpha.openfire.fr'):
+                        # Sur s-alpha le port 8010 est utilisé pour la connexion xmlrpc v10
+                        port = ':8010'
+                    else:
+                        port = ''
+                    server_address = "http://%s%s" % (ip_address, port)
+                    # =======================================================================
 
                     i = server_address.find('://')
                     if i == -1:
@@ -170,7 +177,8 @@ class OfDatastoreConnector(models.AbstractModel):
         return ds_model.read(ids, **kwargs)
 
     @api.model
-    def of_datastore_read_group(self, ds_model, domain, fields, groupby, offset=None, limit=None, orderby=None, lazy=None):
+    def of_datastore_read_group(
+            self, ds_model, domain, fields, groupby, offset=None, limit=None, orderby=None, lazy=None):
         kwargs = {
             key: val
             for key, val in [('offset', offset),
@@ -180,3 +188,13 @@ class OfDatastoreConnector(models.AbstractModel):
                              ('context', self._get_context())]
             if val is not None}
         return ds_model.read_group(domain, fields, groupby, **kwargs)
+
+    @api.model
+    def of_datastore_search_read(self, ds_model, domain=None, fields=None, offset=0, limit=None, order=None):
+        # La fonction search_read de openerplib ne fonctionne pas bien et fonctionne par un appel search() puis read().
+        # On reprend le même système, mais avec nos méthodes.
+        record_ids = self.of_datastore_search(ds_model, domain, offset, limit, order, count=False)
+        if not record_ids:
+            return []
+        records = self.of_datastore_read(ds_model, record_ids, fields)
+        return records

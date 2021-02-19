@@ -32,6 +32,7 @@ Une action permet de supprimer tous les produits inutilisés d'une marque.
 Ce module nécessite l'installation de openerplib sur le serveur : sudo easy_install openerp-client-lib
 """,
     "depends": [
+        'of_datastore_connector',
         # Les marques sont utilisées pour filtrer les produits accédés dans la base centralisée
         'of_product_brand',
         # Surcharge des lignes de facture
@@ -53,6 +54,9 @@ Ce module nécessite l'installation de openerplib sur le serveur : sudo easy_ins
         'wizard/of_datastore_update_product.xml',
         'wizard/of_remove_unused_products.xml',
         'views/of_datastore_product_view.xml',
+    ],
+    "qweb": [
+        'static/src/xml/of_datastore_product.xml',
     ],
     "installable": True,
 }
