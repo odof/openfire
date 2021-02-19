@@ -39,6 +39,24 @@ class ResPartner(models.Model):
         if self.of_referred_id and not self.of_referred_date:
             self.of_referred_date = fields.Date.today()
 
+    @api.multi
+    def name_get(self):
+        u""" Permet de renvoyer le nom + magasin + adresse mail + mobile du client quand valeur du """
+        u""" contexte 'of_referred' présent """
+        name = self._rec_name
+        if self._context.get('of_referred') and name in self._fields:
+            result = []
+            convert = self._fields[name].convert_to_display_name
+            for record in self:
+                result.append((record.id, ' - '.join([st.strip() for st in
+                                                      (convert(record[name], record),
+                                                       record.sudo().company_id.name or '', record.email or '',
+                                                       record.mobile or '') if st and st.strip()])))
+        else:
+            result = super(ResPartner, self).name_get()
+        return result
+
+
 class CrmLead(models.Model):
     _inherit = 'crm.lead'
 
