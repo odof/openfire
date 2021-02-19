@@ -11,8 +11,8 @@
             </xpath>
             <xpath expr="//page[@name='marketing']/group" position="inside">
                 <group name="referred" string="Parrainage">
-                    <field name="of_referred_id" />
-                    <field name="of_referred_date"/>
+                    <field name="of_referred_id" attrs="{'required': [('of_referred_date', '!=', False)]}" context="{'of_referred': True}"/>
+                    <field name="of_referred_date" attrs="{'required': [('of_referred_id', '!=', False)]}"/>
                     <field name="of_referred_reward_id" widget="selection"/>
                     <field name="of_referred_note"/>
                     <field name="of_referred_reward_state"/>
@@ -27,7 +27,12 @@
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="of_crm.of_crm_view_create_opportunity_simplified"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_referred_id']" position="attributes">
+                <attribute name="attrs">{'required': [('of_referred_date', '!=', False)]}</attribute>
+                <attribute name="context">{'of_referred': True}</attribute>
+            </xpath>
             <xpath expr="//group[@name='parrainage']" position="inside">
+                <field name="of_referred_date" attrs="{'required': [('of_referred_id', '!=', False)]}"/>
                 <field name="of_referred_reward_id" widget="selection"/>
                 <field name="of_referred_note"/>
                 <field name="of_referred_reward_state"/>
@@ -41,7 +46,12 @@
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="of_crm.of_crm_case_form_view_oppor"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_referred_id']" position="attributes">
+                <attribute name="attrs">{'required': [('of_referred_date', '!=', False)]}</attribute>
+                <attribute name="context">{'of_referred': True}</attribute>
+            </xpath>
             <xpath expr="//page[@name='lead']/group/group[@name='parrainage']" position="inside">
+                <field name="of_referred_date" attrs="{'required': [('of_referred_id', '!=', False)]}"/>
                 <field name="of_referred_reward_id" widget="selection"/>
                 <field name="of_referred_note"/>
                 <field name="of_referred_reward_state"/>
