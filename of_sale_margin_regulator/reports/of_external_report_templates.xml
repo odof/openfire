@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Rapport Impression spécifique -->
+
+    <template id="of_sale_margin_regulator_external_layout_header" inherit_id="report.external_layout_header">
+        <xpath expr='//t[@t-elif="o._name == &apos;sale.order&apos;"]' position="replace">
+            <t t-elif="o._name == 'sale.order'">
+                <!-- On prend en compte le statut "Validé" -->
+                <span t-if="o.state == 'draft' and not o.of_validated">Estimation</span>
+                <span t-if="o.state == 'sent' and not o.of_validated">Devis</span>
+                <span t-if="o.state not in ['draft','sent'] or o.of_validated">Bon de commande</span>
+                <br/>
+            </t>
+        </xpath>
+    </template>
+
+</odoo>

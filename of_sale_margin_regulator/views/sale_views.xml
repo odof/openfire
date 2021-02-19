@@ -25,21 +25,23 @@
                         groups="of_access_control.of_group_sale_responsible"
                         attrs="{'invisible': [('state', '!=', 'closed')]}"/>
             </xpath>
-            <xpath expr="//h1" position="after">
-                <h3 style="display: inline; color: white; border: 1px solid black; border-radius: 5px; background: green; padding-left: 5px; padding-right: 5px;"
+            <xpath expr="//field[@name='name']" position="after">
+                <span class="badge" style="background: green; margin-left: 15px;"
                     attrs="{'invisible': [('of_validated', '=', False)]}">
-                    Validé
-                </h3>
+                    VALIDÉ
+                </span>
             </xpath>
             <xpath expr="//notebook" position="inside">
-                <page string="Suivi de la marge">
+                <page string="Suivi de la marge" groups="of_sale.of_group_sale_marge_manager">
                     <group>
                         <field name="of_margin_followup_ids" nolabel="1" readonly="1">
-                            <tree>
+                            <tree colors="grey:cancelled">
+                                <field name="cancelled" invisible="1"/>
                                 <field name="type"/>
+                                <field name="date"/>
                                 <field name="cost"/>
                                 <field name="price"/>
-                                <field name="discount"/>
+                                <field name="price_variation"/>
                                 <field name="margin"/>
                                 <field name="margin_perc"/>
                             </tree>

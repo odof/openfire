@@ -755,6 +755,10 @@ class OfSaleOrderKitLine(models.Model):
     invoiced = fields.Boolean("Invoiced", compute="_compute_invoiced")  # for readonly in XML
     route_id = fields.Many2one('stock.location.route', string="Route", compute="_compute_route")
 
+    of_price_management_variation = fields.Float(
+        string=u"Montant unitaire de la variation de prix liée à la gestion de prix")
+    of_unit_price_variation = fields.Float(string=u"Montant unitaire de la variation de prix")
+
     @api.depends('kit_id', 'kit_id.order_line_id', 'kit_id.order_line_id.route_id')
     def _compute_route(self):
         """ Reprend la route de la ligne de commande """

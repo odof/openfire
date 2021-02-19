@@ -319,6 +319,10 @@ class OFFollowupProject(models.Model):
                 if rec.is_done:
                     state = 'done'
                 else:
+                    # Correction d'un bug sur l'ordre de calcul des champs compute : Pour savoir si des tâches
+                    # sont réellement en retard, il faut recalculer l'étape du suivi au préalable
+                    rec.state = state
+                    rec._compute_stage_id()
                     # Toutes les tâches sont terminées (excepté les non traitées)
                     if rec.task_ids and not rec.task_ids.filtered(lambda t: not t.is_not_processed and not t.is_done):
                         state = 'ready'

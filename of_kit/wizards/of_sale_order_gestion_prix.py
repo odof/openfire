@@ -69,7 +69,14 @@ class GestionPrixLine(models.TransientModel):
                 if rounding or kit_line != kit_lines[-1]:
                     line_price_unit = currency.round(line_price_unit)
 
-                values[kit_line] = {'price_unit': line_price_unit}
+                price_management_variation = line_price_unit - kit_line.price_unit + \
+                    kit_line.of_price_management_variation
+                new_price_variation = price_management_variation - \
+                    (line_price_unit * (order_line.discount or 0.0) / 100.0)
+
+                values[kit_line] = {'price_unit': line_price_unit,
+                                    'of_price_management_variation': price_management_variation,
+                                    'of_unit_price_variation': new_price_variation}
 
                 to_distribute -= line_price_unit * kit_line.qty_per_kit
                 total -= price_unit * kit_line.qty_per_kit
@@ -95,7 +102,10 @@ class GestionPrixLine(models.TransientModel):
 
             for kit_line in order_line.kit_id.kit_line_ids:
                 price_unit = kit_line.product_id.list_price
-                values[kit_line] = {'price_unit': price_unit}
+                new_price_variation = -price_unit * (order_line.discount or 0.0) / 100.0
+                values[kit_line] = {'price_unit': price_unit,
+                                    'of_price_management_variation': 0.0,
+                                    'of_unit_price_variation': new_price_variation}
                 kit_price_unit += price_unit * kit_line.qty_per_kit
 
             if line_rounding:

@@ -28,17 +28,18 @@ class OFSaleMarginRegulator(models.Model):
 
     sale_cost = fields.Float(string=u"Prix de revient sur vente", readonly=True)
     sale_price = fields.Float(string=u"Prix de vente sur vente", readonly=True)
-    sale_discount = fields.Float(string=u"Remise sur vente", readonly=True)
+    sale_price_variation = fields.Float(string=u"Variation de prix sur vente", readonly=True)
     sale_margin = fields.Float(string=u"Marge sur vente (€)", readonly=True)
     sale_margin_perc = fields.Char(
         string=u"Marge sur vente (%)", compute='_compute_sale_margin_perc', compute_sudo=True, readonly=True)
 
-    validation_cost = fields.Float(string=u"Prix de revient sur validation", readonly=True)
-    validation_price = fields.Float(string=u"Prix de vente sur validation", readonly=True)
-    validation_discount = fields.Float(string=u"Remise sur validation", readonly=True)
-    validation_margin = fields.Float(string=u"Marge sur validation (€)", readonly=True)
-    validation_margin_perc = fields.Char(
-        string=u"Marge sur validation (%)", compute='_compute_validation_margin_perc', compute_sudo=True, readonly=True)
+    confirmation_cost = fields.Float(string=u"Prix de revient sur confirmation", readonly=True)
+    confirmation_price = fields.Float(string=u"Prix de vente sur confirmation", readonly=True)
+    confirmation_price_variation = fields.Float(string=u"Variation de prix sur confirmation", readonly=True)
+    confirmation_margin = fields.Float(string=u"Marge sur confirmation (€)", readonly=True)
+    confirmation_margin_perc = fields.Char(
+        string=u"Marge sur confirmation (%)", compute='_compute_confirmation_margin_perc', compute_sudo=True,
+        readonly=True)
 
     delivered_cost = fields.Float(string=u"Coût livré", readonly=True)
     invoiced_total = fields.Float(string=u"Total HT facturé", readonly=True)
@@ -56,18 +57,18 @@ class OFSaleMarginRegulator(models.Model):
         string=u"Marge réelle sur facturé (%)", compute='_compute_invoiced_real_margin_perc', compute_sudo=True,
         readonly=True)
 
-    validation_ordered_real_margin_gap = fields.Float(
-        string=u"Écart marge à la validation / réelle commandée (€)",
-        compute='_compute_validation_ordered_real_margin_gap', compute_sudo=True, readonly=True)
-    validation_ordered_real_margin_gap_perc = fields.Char(
-        string=u"Écart marge à la validation / réelle commandée (%)",
-        compute='_compute_validation_ordered_real_margin_gap_perc', compute_sudo=True, readonly=True)
-    validation_invoiced_real_margin_gap = fields.Float(
-        string=u"Écart marge à la validation / réelle facturée (€)",
-        compute='_compute_validation_invoiced_real_margin_gap', compute_sudo=True, readonly=True)
-    validation_invoiced_real_margin_gap_perc = fields.Char(
-        string=u"Écart marge à la validation / réelle facturée (%)",
-        compute='_compute_validation_invoiced_real_margin_gap_perc', compute_sudo=True, readonly=True)
+    ordered_real_confirmation_margin_gap = fields.Float(
+        string=u"Écart Marge réelle commandée / Marge à la confirmation (€)",
+        compute='_compute_ordered_real_confirmation_margin_gap', compute_sudo=True, readonly=True)
+    ordered_real_confirmation_margin_gap_perc = fields.Char(
+        string=u"Écart Marge réelle commandée / Marge à la confirmation (%)",
+        compute='_compute_ordered_real_confirmation_margin_gap_perc', compute_sudo=True, readonly=True)
+    invoiced_real_confirmation_margin_gap = fields.Float(
+        string=u"Écart Marge réelle facturée / Marge à la confirmation (€)",
+        compute='_compute_invoiced_real_confirmation_margin_gap', compute_sudo=True, readonly=True)
+    invoiced_real_confirmation_margin_gap_perc = fields.Char(
+        string=u"Écart Marge réelle facturée / Marge à la confirmation (%)",
+        compute='_compute_invoiced_real_confirmation_margin_gap_perc', compute_sudo=True, readonly=True)
 
     def init(self):
         tools.drop_view_if_exists(self._cr, 'of_sale_margin_regulator')
@@ -95,13 +96,13 @@ class OFSaleMarginRegulator(models.Model):
                     ,           SOL.product_id
                     ,           SOL.of_sale_cost                                            AS sale_cost
                     ,           SOL.of_sale_price                                           AS sale_price
-                    ,           SOL.of_sale_discount                                        AS sale_discount
+                    ,           SOL.of_sale_price_variation                                 AS sale_price_variation
                     ,           SOL.of_sale_margin                                          AS sale_margin
-                    ,           SOL.of_validation_cost                                      AS validation_cost
-                    ,           SOL.of_validation_price                                     AS validation_price
-                    ,           SOL.of_validation_discount                                  AS validation_discount
-                    ,           SOL.of_validation_margin                                    AS validation_margin
-                    ,           SM.of_unit_cost                                             AS delivered_cost
+                    ,           SOL.of_confirmation_cost                                    AS confirmation_cost
+                    ,           SOL.of_confirmation_price                                   AS confirmation_price
+                    ,           SOL.of_confirmation_price_variation                         AS confirmation_price_variation
+                    ,           SOL.of_confirmation_margin                                  AS confirmation_margin
+                    ,           SM.of_unit_cost * SM.product_uom_qty                        AS delivered_cost
                     ,           AIL.price_subtotal                                          AS invoiced_total
                     FROM        sale_order                                                  SO
                     ,           sale_order_line                                             SOL
@@ -140,13 +141,13 @@ class OFSaleMarginRegulator(models.Model):
                     ,           SM2.product_id
                     ,           NULL                                                        AS sale_cost
                     ,           NULL                                                        AS sale_price
-                    ,           NULL                                                        AS sale_discount
+                    ,           NULL                                                        AS sale_price_variation
                     ,           NULL                                                        AS sale_margin
-                    ,           NULL                                                        AS validation_cost
-                    ,           NULL                                                        AS validation_price
-                    ,           NULL                                                        AS validation_discount
-                    ,           NULL                                                        AS validation_margin
-                    ,           SM2.of_unit_cost                                            AS delivered_cost
+                    ,           NULL                                                        AS confirmation_cost
+                    ,           NULL                                                        AS confirmation_price
+                    ,           NULL                                                        AS confirmation_price_variation
+                    ,           NULL                                                        AS confirmation_margin
+                    ,           SM2.of_unit_cost * SM2.product_uom_qty                      AS delivered_cost
                     ,           NULL                                                        AS invoiced_total
                     FROM        sale_order                                                  SO2
                     ,           stock_picking                                               SP
@@ -154,7 +155,13 @@ class OFSaleMarginRegulator(models.Model):
                     WHERE       SO2.state                                                   IN ('sale', 'done', 'closed')
                     AND         SP.origin                                                   = SO2.name
                     AND         SM2.picking_id                                              = SP.id
-                    AND         SM2.procurement_id                                          IS NULL
+                    AND         (   SM2.procurement_id                                      IS NULL
+                                OR  EXISTS                                                  (   SELECT  *
+                                                                                                FROM    procurement_order   PO2
+                                                                                                WHERE   PO2.id              = SM2.procurement_id
+                                                                                                AND     PO2.of_sale_comp_id IS NOT NULL
+                                                                                            )
+                                )
 
                     UNION
 
@@ -180,12 +187,12 @@ class OFSaleMarginRegulator(models.Model):
                     ,           AIL4.product_id
                     ,           NULL                                                        AS sale_cost
                     ,           NULL                                                        AS sale_price
-                    ,           NULL                                                        AS sale_discount
+                    ,           NULL                                                        AS sale_price_variation
                     ,           NULL                                                        AS sale_margin
-                    ,           NULL                                                        AS validation_cost
-                    ,           NULL                                                        AS validation_price
-                    ,           NULL                                                        AS validation_discount
-                    ,           NULL                                                        AS validation_margin
+                    ,           NULL                                                        AS confirmation_cost
+                    ,           NULL                                                        AS confirmation_price
+                    ,           NULL                                                        AS confirmation_price_variation
+                    ,           NULL                                                        AS confirmation_margin
                     ,           NULL                                                        AS delivered_cost
                     ,           AIL4.price_subtotal                                         AS invoiced_total
                     FROM        sale_order                                                  SO3
@@ -210,25 +217,25 @@ class OFSaleMarginRegulator(models.Model):
                 rec.sale_margin_perc = "N/E"
 
     @api.multi
-    def _compute_validation_margin_perc(self):
+    def _compute_confirmation_margin_perc(self):
         for rec in self:
-            if rec.validation_price != 0:
-                rec.validation_margin_perc = \
-                    '%.2f' % (100.0 * (1.0 - rec.validation_cost / rec.validation_price))
+            if rec.confirmation_price != 0:
+                rec.confirmation_margin_perc = \
+                    '%.2f' % (100.0 * (1.0 - rec.confirmation_cost / rec.confirmation_price))
             else:
-                rec.validation_margin_perc = "N/E"
+                rec.confirmation_margin_perc = "N/E"
 
     @api.multi
     def _compute_ordered_real_margin(self):
         for rec in self:
-            rec.ordered_real_margin = rec.validation_price - rec.delivered_cost
+            rec.ordered_real_margin = rec.confirmation_price - rec.delivered_cost
 
     @api.multi
     def _compute_ordered_real_margin_perc(self):
         for rec in self:
-            if rec.validation_price != 0:
+            if rec.confirmation_price != 0:
                 rec.ordered_real_margin_perc = \
-                    '%.2f' % (100.0 * (1.0 - rec.delivered_cost / rec.validation_price))
+                    '%.2f' % (100.0 * (1.0 - rec.delivered_cost / rec.confirmation_price))
             else:
                 rec.ordered_real_margin_perc = "N/E"
 
@@ -243,32 +250,32 @@ class OFSaleMarginRegulator(models.Model):
             rec.invoiced_real_margin_perc = 100.0 * (1.0 - rec.delivered_cost / rec.invoiced_total)
 
     @api.multi
-    def _compute_validation_ordered_real_margin_gap(self):
+    def _compute_ordered_real_confirmation_margin_gap(self):
         for rec in self:
-            rec.validation_ordered_real_margin_gap = rec.validation_margin - rec.ordered_real_margin
+            rec.ordered_real_confirmation_margin_gap = rec.ordered_real_margin - rec.confirmation_margin
 
     @api.multi
-    def _compute_validation_ordered_real_margin_gap_perc(self):
+    def _compute_ordered_real_confirmation_margin_gap_perc(self):
         for rec in self:
             if rec.ordered_real_margin != 0:
-                rec.validation_ordered_real_margin_gap_perc = \
-                    '%.2f' % (100.0 * rec.validation_ordered_real_margin_gap / rec.ordered_real_margin)
+                rec.ordered_real_confirmation_margin_gap_perc = \
+                    '%.2f' % (100.0 * rec.ordered_real_confirmation_margin_gap / rec.confirmation_margin)
             else:
-                rec.validation_ordered_real_margin_gap_perc = "N/E"
+                rec.ordered_real_confirmation_margin_gap_perc = "N/E"
 
     @api.multi
-    def _compute_validation_invoiced_real_margin_gap(self):
+    def _compute_invoiced_real_confirmation_margin_gap(self):
         for rec in self:
-            rec.validation_invoiced_real_margin_gap = rec.validation_margin - rec.invoiced_real_margin
+            rec.invoiced_real_confirmation_margin_gap = rec.invoiced_real_margin - rec.confirmation_margin
 
     @api.multi
-    def _compute_validation_invoiced_real_margin_gap_perc(self):
+    def _compute_invoiced_real_confirmation_margin_gap_perc(self):
         for rec in self:
             if rec.invoiced_real_margin != 0:
-                rec.validation_invoiced_real_margin_gap_perc = \
-                    '%.2f' % (100.0 * rec.validation_invoiced_real_margin_gap / rec.invoiced_real_margin)
+                rec.invoiced_real_confirmation_margin_gap_perc = \
+                    '%.2f' % (100.0 * rec.invoiced_real_confirmation_margin_gap / rec.confirmation_margin)
             else:
-                rec.validation_invoiced_real_margin_gap_perc = "N/E"
+                rec.invoiced_real_confirmation_margin_gap_perc = "N/E"
 
     @api.model
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
@@ -276,54 +283,52 @@ class OFSaleMarginRegulator(models.Model):
             fields.append('sale_cost')
         if 'sale_price' not in fields:
             fields.append('sale_price')
-        if 'validation_cost' not in fields:
-            fields.append('validation_cost')
-        if 'validation_price' not in fields:
-            fields.append('validation_price')
+        if 'confirmation_cost' not in fields:
+            fields.append('confirmation_cost')
+        if 'confirmation_price' not in fields:
+            fields.append('confirmation_price')
         if 'delivered_cost' not in fields:
             fields.append('delivered_cost')
         if 'invoiced_total' not in fields:
             fields.append('invoiced_total')
-        if 'validation_margin' not in fields:
-            fields.append('validation_margin')
+        if 'confirmation_margin' not in fields:
+            fields.append('confirmation_margin')
         if 'ordered_real_margin' not in fields:
             fields.append('ordered_real_margin')
-        if 'validation_ordered_real_margin_gap' not in fields:
-            fields.append('validation_ordered_real_margin_gap')
+        if 'ordered_real_confirmation_margin_gap' not in fields:
+            fields.append('ordered_real_confirmation_margin_gap')
         if 'invoiced_real_margin' not in fields:
             fields.append('invoiced_real_margin')
-        if 'validation_invoiced_real_margin_gap' not in fields:
-            fields.append('validation_invoiced_real_margin_gap')
+        if 'invoiced_real_confirmation_margin_gap' not in fields:
+            fields.append('invoiced_real_confirmation_margin_gap')
         res = super(OFSaleMarginRegulator, self).read_group(
             domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
         for line in res:
             if 'sale_margin_perc' in fields:
                 if 'sale_cost' in line and line['sale_cost'] is not None and \
-                        'sale_price' in line and line['sale_price'] is not None and line['sale_price']:
+                        line.get('sale_price', False):
                     line['sale_margin_perc'] = \
                         ('%.2f' % (round(100.0 * (1.0 - line['sale_cost'] / line['sale_price']), 2))).\
                         replace('.', ',')
                 else:
                     line['sale_margin_perc'] = "N/E"
-            if 'validation_margin_perc' in fields:
-                if 'validation_cost' in line and line['validation_cost'] is not None and \
-                        'validation_price' in line and line['validation_price'] is not None and \
-                        line['validation_price']:
-                    line['validation_margin_perc'] = \
-                        ('%.2f' % (round(100.0 * (1.0 - line['validation_cost'] / line['validation_price']), 2))).\
+            if 'confirmation_margin_perc' in fields:
+                if 'confirmation_cost' in line and line['confirmation_cost'] is not None and \
+                        line.get('confirmation_price', False):
+                    line['confirmation_margin_perc'] = \
+                        ('%.2f' % (round(100.0 * (1.0 - line['confirmation_cost'] / line['confirmation_price']), 2))).\
                         replace('.', ',')
                 else:
-                    line['validation_margin_perc'] = "N/E"
+                    line['confirmation_margin_perc'] = "N/E"
             if 'ordered_real_margin' in fields:
-                if 'validation_price' in line and line['validation_price'] is not None and \
+                if 'confirmation_price' in line and line['confirmation_price'] is not None and \
                         'delivered_cost' in line and line['delivered_cost'] is not None:
-                    line['ordered_real_margin'] = line['validation_price'] - line['delivered_cost']
+                    line['ordered_real_margin'] = line['confirmation_price'] - line['delivered_cost']
             if 'ordered_real_margin_perc' in fields:
                 if 'delivered_cost' in line and line['delivered_cost'] is not None and \
-                        'validation_price' in line and line['validation_price'] is not None and \
-                        line['validation_price']:
+                        line.get('confirmation_price', False):
                     line['ordered_real_margin_perc'] = \
-                        ('%.2f' % (round(100.0 * (1.0 - line['delivered_cost'] / line['validation_price']), 2))).\
+                        ('%.2f' % (round(100.0 * (1.0 - line['delivered_cost'] / line['confirmation_price']), 2))).\
                         replace('.', ',')
                 else:
                     line['ordered_real_margin_perc'] = "N/E"
@@ -333,42 +338,41 @@ class OFSaleMarginRegulator(models.Model):
                     line['invoiced_real_margin'] = line['invoiced_total'] - line['delivered_cost']
             if 'invoiced_real_margin_perc' in fields:
                 if 'delivered_cost' in line and line['delivered_cost'] is not None and \
-                        'invoiced_total' in line and line['invoiced_total'] is not None and line['invoiced_total']:
+                        line.get('invoiced_total', False):
                     line['invoiced_real_margin_perc'] = \
                         ('%.2f' % (round(100.0 * (1.0 - line['delivered_cost'] / line['invoiced_total']), 2))).\
                         replace('.', ',')
                 else:
                     line['invoiced_real_margin_perc'] = "N/E"
-            if 'validation_ordered_real_margin_gap' in fields:
-                if 'validation_margin' in line and line['validation_margin'] is not None and \
+            if 'ordered_real_confirmation_margin_gap' in fields:
+                if 'confirmation_margin' in line and line['confirmation_margin'] is not None and \
                         'ordered_real_margin' in line and line['ordered_real_margin'] is not None:
-                    line['validation_ordered_real_margin_gap'] = line['validation_margin'] - line['ordered_real_margin']
-            if 'validation_ordered_real_margin_gap_perc' in fields:
-                if 'validation_ordered_real_margin_gap' in line and \
-                        line['validation_ordered_real_margin_gap'] is not None and \
-                        'ordered_real_margin' in line and line['ordered_real_margin'] is not None and \
-                        line['ordered_real_margin']:
-                    line['validation_ordered_real_margin_gap_perc'] = \
+                    line['ordered_real_confirmation_margin_gap'] = line['ordered_real_margin'] - \
+                                                                   line['confirmation_margin']
+            if 'ordered_real_confirmation_margin_gap_perc' in fields:
+                if 'ordered_real_confirmation_margin_gap' in line and \
+                        line['ordered_real_confirmation_margin_gap'] is not None and \
+                        line.get('confirmation_margin', False):
+                    line['ordered_real_confirmation_margin_gap_perc'] = \
                         ('%.2f' %
-                         (round(100.0 * line['validation_ordered_real_margin_gap'] / line['ordered_real_margin'], 2))).\
-                        replace('.', ',')
-                else:
-                    line['validation_ordered_real_margin_gap_perc'] = "N/E"
-            if 'validation_invoiced_real_margin_gap' in fields:
-                if 'validation_margin' in line and line['validation_margin'] is not None and \
-                        'invoiced_real_margin' in line and line['invoiced_real_margin'] is not None:
-                    line['validation_invoiced_real_margin_gap'] = line['validation_margin'] - \
-                                                                  line['invoiced_real_margin']
-            if 'validation_invoiced_real_margin_gap_perc' in fields:
-                if 'validation_invoiced_real_margin_gap' in line and \
-                        line['validation_invoiced_real_margin_gap'] is not None and \
-                        'invoiced_real_margin' in line and line['invoiced_real_margin'] is not None and \
-                        line['invoiced_real_margin']:
-                    line['validation_invoiced_real_margin_gap_perc'] = \
-                        ('%.2f' %
-                         (round(100.0 * line['validation_invoiced_real_margin_gap'] / line['invoiced_real_margin'],
+                         (round(100.0 * line['ordered_real_confirmation_margin_gap'] / line['confirmation_margin'],
                                 2))).replace('.', ',')
                 else:
-                    line['validation_invoiced_real_margin_gap_perc'] = "N/E"
+                    line['ordered_real_confirmation_margin_gap_perc'] = "N/E"
+            if 'invoiced_real_confirmation_margin_gap' in fields:
+                if 'confirmation_margin' in line and line['confirmation_margin'] is not None and \
+                        'invoiced_real_margin' in line and line['invoiced_real_margin'] is not None:
+                    line['invoiced_real_confirmation_margin_gap'] = line['invoiced_real_margin'] - \
+                                                                    line['confirmation_margin']
+            if 'invoiced_real_confirmation_margin_gap_perc' in fields:
+                if 'invoiced_real_confirmation_margin_gap' in line and \
+                        line['invoiced_real_confirmation_margin_gap'] is not None and \
+                        line.get('confirmation_margin', False):
+                    line['invoiced_real_confirmation_margin_gap_perc'] = \
+                        ('%.2f' %
+                         (round(100.0 * line['invoiced_real_confirmation_margin_gap'] / line['confirmation_margin'],
+                                2))).replace('.', ',')
+                else:
+                    line['invoiced_real_confirmation_margin_gap_perc'] = "N/E"
 
         return res

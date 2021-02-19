@@ -24,7 +24,8 @@ class OFSaleOrderClosureWizard(models.TransientModel):
 
             invoices = order.invoice_ids.filtered(lambda inv: inv.state not in ('paid', 'cancel'))
             if invoices:
-                info_txt += u"- La commande a des factures en attente : " + ', '.join(invoices.mapped('number')) + "\n"
+                info_txt += u"- La commande a des factures en attente : " +\
+                            ', '.join(invoices.mapped(lambda rec: rec.number or u"Facture brouillon")) + "\n"
 
             pickings = order.picking_ids.filtered(lambda p: p.state not in ('done', 'cancel'))
             if pickings:
@@ -50,5 +51,8 @@ class OFSaleOrderClosureWizard(models.TransientModel):
     @api.multi
     def action_close(self):
         self.ensure_one()
+        # On clôture le suivi
+        if self.order_id.of_followup_project_id:
+            self.order_id.of_followup_project_id.set_to_done()
         self.order_id.state = 'closed'
         return True
