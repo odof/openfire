@@ -9,39 +9,24 @@
                     <field name="confirmation_date" interval="month" type="row"/>
                     <field name="sale_cost" type="measure"/>
                     <field name="sale_price" type="measure"/>
-                    <field name="sale_discount" type="measure"/>
+                    <field name="sale_price_variation" type="measure"/>
                     <field name="sale_margin" type="measure"/>
                     <field name="sale_margin_perc" type="measure"/>
-                    <field name="validation_cost" type="measure"/>
-                    <field name="validation_price" type="measure"/>
-                    <field name="validation_discount" type="measure"/>
-                    <field name="validation_margin" type="measure"/>
-                    <field name="validation_margin_perc" type="measure"/>
+                    <field name="confirmation_cost" type="measure"/>
+                    <field name="confirmation_price" type="measure"/>
+                    <field name="confirmation_price_variation" type="measure"/>
+                    <field name="confirmation_margin" type="measure"/>
+                    <field name="confirmation_margin_perc" type="measure"/>
                     <field name="delivered_cost" type="measure"/>
                     <field name="invoiced_total" type="measure"/>
                     <field name="ordered_real_margin" type="measure"/>
                     <field name="ordered_real_margin_perc" type="measure"/>
                     <field name="invoiced_real_margin" type="measure"/>
                     <field name="invoiced_real_margin_perc" type="measure"/>
-                    <field name="validation_ordered_real_margin_gap" type="measure"/>
-                    <field name="validation_ordered_real_margin_gap_perc" type="measure"/>
-                    <field name="validation_invoiced_real_margin_gap" type="measure"/>
-                    <field name="validation_invoiced_real_margin_gap_perc" type="measure"/>
-<!--                    <field name="ordered_cost" type="measure"/>-->
-<!--                    <field name="ordered_total" type="measure"/>-->
-<!--                    <field name="ordered_margin" type="measure"/>-->
-<!--                    <field name="ordered_margin_wo_discount" type="measure"/>-->
-<!--                    <field name="delivered_cost" type="measure"/>-->
-<!--                    <field name="delivered_margin" type="measure"/>-->
-<!--                    <field name="invoiced_cost" type="measure"/>-->
-<!--                    <field name="invoiced_total" type="measure"/>-->
-<!--                    <field name="invoiced_margin" type="measure"/>-->
-<!--                    <field name="delivered_ordered_margin_gap" type="measure"/>-->
-<!--                    <field name="delivered_ordered_margin_gap_perc" type="measure"/>-->
-<!--                    <field name="invoiced_ordered_margin_gap" type="measure"/>-->
-<!--                    <field name="invoiced_ordered_margin_gap_perc" type="measure"/>-->
-<!--                    <field name="ordered_delivered_margin_regulator" type="measure"/>-->
-<!--                    <field name="ordered_delivered_margin_regulator_perc" type="measure"/>-->
+                    <field name="ordered_real_confirmation_margin_gap" type="measure"/>
+                    <field name="ordered_real_confirmation_margin_gap_perc" type="measure"/>
+                    <field name="invoiced_real_confirmation_margin_gap" type="measure"/>
+                    <field name="invoiced_real_confirmation_margin_gap_perc" type="measure"/>
                 </pivot>
             </field>
         </record>

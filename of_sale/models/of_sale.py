@@ -778,8 +778,9 @@ class SaleOrderLine(models.Model):
                 """)
         return res
 
-    of_price_management_discount = fields.Float(string=u"Montant unitaire de remise liée à la gestion de prix")
-    of_unit_discount_amount = fields.Float(string=u"Montant unitaire de remise")
+    of_price_management_variation = fields.Float(
+        string=u"Montant unitaire de la variation de prix liée à la gestion de prix")
+    of_unit_price_variation = fields.Float(string=u"Montant unitaire de la variation de prix")
 
     @api.depends('price_unit', 'order_id.currency_id', 'order_id.partner_shipping_id', 'product_id',
                  'price_subtotal', 'product_uom_qty')
@@ -978,8 +979,8 @@ class SaleOrderLine(models.Model):
             self = self.sudo()
 
         if 'price_reduce' in vals and len(self) == 1:
-            vals['of_unit_discount_amount'] = \
-                self.of_price_management_discount + self.price_unit - vals.get('price_reduce', 0)
+            vals['of_unit_price_variation'] = \
+                self.of_price_management_variation + vals.get('price_reduce', 0) - self.price_unit
 
         return super(SaleOrderLine, self)._write(vals)
 

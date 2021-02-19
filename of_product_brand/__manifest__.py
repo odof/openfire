@@ -14,7 +14,7 @@ OpenFire module to manage products brand
 """,
     "depends": [
         'of_product',
-        'of_sale',
+        'sale',
     ],
     "init_xml": [],
     "demo_xml": [],
