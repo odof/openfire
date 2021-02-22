@@ -9,6 +9,7 @@ class SaleOrder(models.Model):
     delivery_expected = fields.Char(string='Livraison attendue', states={'done': [('readonly', True)]})
     purchase_ids = fields.One2many("purchase.order", "sale_order_id", string="Achats")
     purchase_count = fields.Integer(compute='_compute_purchase_count')
+    of_user_id = fields.Many2one(comodel_name='res.users', string="Responsable technique")
 
     @api.depends('purchase_ids')
     @api.multi
@@ -31,6 +32,7 @@ class PurchaseOrder(models.Model):
     delivery_expected = fields.Char(string='Livraison attendue', states={'done': [('readonly', True)]})
     of_sent = fields.Boolean(string=u"CF envoyée")
     of_project_id = fields.Many2one(comodel_name='account.analytic.account', string=u"Compte analytique")
+    of_user_id = fields.Many2one(comodel_name='res.users', string="Responsable technique")
 
     @api.model
     def _prepare_picking(self):
@@ -61,6 +63,8 @@ class ProcurementOrder(models.Model):
         res['sale_order_id'] = sale_order.id
         res['delivery_expected'] = sale_order.delivery_expected
         res['of_project_id'] = sale_order.project_id.id
+        if sale_order.of_user_id:
+            res['of_user_id'] = sale_order.of_user_id.id
 
         return res
 
@@ -242,6 +246,19 @@ class StockPicking(models.Model):
     of_customer_id = fields.Many2one('res.partner', string="Client")
     # Permet de cacher le champ of_customer_id si pas sur BR
     of_location_usage = fields.Selection(related="location_id.usage")
+    of_user_id = fields.Many2one(comodel_name='res.users', string="Responsable technique")
+
+
+class StockMove(models.Model):
+    _inherit = 'stock.move'
+
+    def _get_new_picking_values(self):
+        res = super(StockMove, self)._get_new_picking_values()
+        if isinstance(res, dict):
+            responsable = self.procurement_id.sale_line_id.order_id.of_user_id
+            if responsable:
+                res['of_user_id'] = responsable.id
+        return res
 
 
 class ResPartner(models.Model):
