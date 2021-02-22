@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Sale Order Views -->
+
+    <record id="of_financing_sale_order_form_view" model="ir.ui.view">
+        <field name="name">of.financing.sale.order.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="financing" string="Financement">
+                    <group>
+                        <group>
+                            <field name="of_financing_organism" string="Organisme"/>
+                            <field name="of_financing_file_number" string="Numéro de dossier"/>
+                            <field name="of_financing_state" string="État"/>
+                            <field name="of_financing_decision_date" string="Date de décision"/>
+                        </group>
+                        <group>
+                            <field name="of_financing_amount" string="Montant"/>
+                            <field name="of_financing_monthly_payment_number" string="Nombre de mensualités"/>
+                            <field name="of_financing_rate" string="Taux (%)"/>
+                            <field name="of_financing_printing" string="Impression"/>
+                        </group>
+                        <field name="of_financing_notes" string="Mentions"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
