@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Res Partner Views -->
+
+    <record id="of_cee_res_partner_form_view" model="ir.ui.view">
+        <field name="name">of.cee.res.partner.form.view</field>
+        <field name="model">res.partner</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="account.view_partner_property_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='property_payment_term_id']/parent::node()" position="inside">
+                <field name="of_cee_invoice_template"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
