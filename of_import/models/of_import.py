@@ -1437,13 +1437,14 @@ class OfImport(models.Model):
             erreur(u"Ligne %s : modèle non reconnu : %s" % (i, ligne['res_model']))
         else:
             res_name = ligne.get('res_id', '')
-            res_obj = self.env[res_model].name_search(res_name, operator='=', limit=2)
-            if not res_obj:
+            res_obj = self.env[res_model]
+            res_obj_name_search = res_obj.with_context(active_test=False).name_search(res_name, operator='=', limit=2)
+            if not res_obj_name_search:
                 erreur(u"Ligne %s : aucun résultat trouvé pour : %s" % (i, res_name))
-            elif len(res_obj) > 1:
+            elif len(res_obj_name_search) > 1:
                 erreur(u"Ligne %s : plusieurs résultats trouvés pour : %s" % (i, res_name))
             else:
-                res_obj = self.env[res_model].browse(res_obj[0][0])
+                res_obj = res_obj.browse(res_obj_name_search[0][0])
 
         res_field = ligne.get('res_field') or False
         if res_field and res_obj is not False and res_field not in res_obj._fields:
