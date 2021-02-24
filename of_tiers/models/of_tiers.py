@@ -49,9 +49,12 @@ class ResPartner(models.Model):
     _inherit = 'res.partner'
 
     @api.multi
-    def update_account(self):
+    def update_account(self, company=False):
         """
         Création / Mise à jour du compte de tiers des clients.
+        :param company: Société pour laquelle on doit mettre à jour le compte.
+            Si non renseigné, la création de compte de tiers se fait en fonction de la société de l'utilisateur.
+            Si la société n'a pas de plan comptable, on remonte ses parents jusqu'à en trouver un.
         """
         def get_code(prefix, digits, required=True, first_num=1, suffix=''):
             u"""
@@ -70,9 +73,10 @@ class ResPartner(models.Model):
                 "SELECT code "
                 "FROM account_account "
                 "WHERE code ~ %s "
+                "  AND company_id = %s "
                 "ORDER BY char_length(code) DESC, code DESC "
                 "LIMIT 1",
-                (code_pattern, )
+                (code_pattern, company.id)
             )
             prev_codes = self.env.cr.fetchone()
             prev_code = prev_codes and prev_codes[0]
@@ -91,11 +95,11 @@ class ResPartner(models.Model):
             return
 
         # On se place en sudo pour pouvoir générer les comptes, mais il faut forcer la société de l'utilisateur
-        company = self.env.user.company_id
+        company = company or self.env.user.company_id
         while not company.chart_template_id and company.parent_id:
             company = company.parent_id
         self = self.sudo().with_context(force_company=company.id)
-        partners = partners.with_context(force_company=company.id)
+        partners = partners.sudo().with_context(force_company=company.id)
 
         data_obj = self.env['ir.model.data']
         ac_obj = self.env['account.account']
