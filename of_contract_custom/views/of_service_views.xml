@@ -182,6 +182,17 @@
         }</field>
     </record>
 
+    <record id="of_service.action_of_service_prog_form_planning" model="ir.actions.act_window">
+        <field name="name">Demandes d'interventions</field>
+        <field name="view_mode">tree,kanban,map,form,pivot</field>
+    </record>
+
+    <record id="of_service.action_service_prog_form_view_planning" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_contract_custom.view_of_contract_service_form"/>
+        <field name="act_window_id" ref="of_service.action_of_service_prog_form_planning"/>
+    </record>
 
     <menuitem id="of_service.menu_of_planning_service_prog" name="Demandes d'intervention" parent="of_planning.menu_of_planning_intervention" sequence="5" action="of_contract_custom.action_of_contract_service_form_planning"/>
     <delete model="ir.ui.menu" id="of_service.menu_of_planning_service_rec"/>
