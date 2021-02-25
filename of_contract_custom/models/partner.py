@@ -7,17 +7,23 @@ class ResPartner(models.Model):
     _inherit = "res.partner"
 
     of_contract_count = fields.Integer(
-        compute="_compute_of_contract_count", string="Nombre de contrat", oldname='of_contrat_count')
+        compute="_compute_of_contract_count", string="Nombre de contrats", oldname='of_contrat_count')
     of_contract_ids = fields.One2many(
         comodel_name='of.contract', inverse_name='partner_id', string="Contrats", oldname='of_contrat_ids')
     of_contract_line_count = fields.Integer(
-        compute="_compute_of_contract_count", string="Nombre de ligne de contrat (prestataire)", oldname='of_contrat_line_count')
+        compute="_compute_of_contract_count", string="Nombre de lignes de contrat (prestataire)",
+        oldname='of_contrat_line_count')
     of_contract_line_ids = fields.One2many(
-        comodel_name='of.contract.line', inverse_name='supplier_id', string="Lignes de contrat (prestataire)", oldname='of_contract_line_count_ids')
+        comodel_name='of.contract.line', inverse_name='supplier_id', string="Lignes de contrat (prestataire)",
+        oldname='of_contract_line_count_ids')
     of_contract_line_address_count = fields.Integer(
-            compute="_compute_of_contract_count", string="Nombre de ligne de contrat (addresse)")
+            compute="_compute_of_contract_count", string="Nombre de lignes de contrat (addresse)")
     of_contract_line_address_ids = fields.One2many(
             comodel_name='of.contract.line', inverse_name='address_id', string="Lignes de contrat (addresse)")
+    of_client_payeur_id = fields.Many2one('res.partner', string="Client payeur")
+    of_client_receveur_ids = fields.One2many('res.partner', 'of_client_payeur_id', string="Clients receveurs")
+    of_client_receveur_count = fields.Integer(
+        compute="_compute_of_client_receveur_count", string="Nombre de clients receveurs")
     of_prestataire_id = fields.Many2one(
         comodel_name='res.partner', string="Prestataire", domain="[('supplier','=',True)]", track_visibility='onchange')
     of_code_magasin = fields.Char(string="Code magasin")
@@ -28,6 +34,11 @@ class ResPartner(models.Model):
             partner.of_contract_count = len(partner.of_contract_ids)
             partner.of_contract_line_count = len(partner.of_contract_line_ids)
             partner.of_contract_line_address_count = len(partner.of_contract_line_address_ids)
+
+    @api.depends('of_client_receveur_ids')
+    def _compute_of_client_receveur_count(self):
+        for partner in self:
+            partner.of_client_receveur_count = len(partner.of_client_receveur_ids)
 
     @api.onchange('of_secteur_tech_id')
     def _onchange_of_secteur_tech_id(self):
@@ -57,13 +68,25 @@ class ResPartner(models.Model):
         return action
 
     @api.multi
+    def action_view_clients_receveurs(self):
+        partners = self.mapped('of_client_receveur_ids')
+        action = self.env.ref('contacts.action_contacts').read()[0]
+        if len(partners) == 1:
+            action['views'] = [(self.env.ref('base.view_partner_form').id, 'form')]
+            action['res_id'] = partners.id
+        else:
+            action['domain'] = [('of_client_payeur_id', 'in', self._ids)]
+        return action
+
+    @api.multi
     def action_prevoir_intervention(self):
         self.ensure_one()
         action = self.env.ref('of_contract_custom.action_of_contract_service_form_planning').read()[0]
         action['name'] = u"Prévoir une intervention"
         action['view_mode'] = "form"
         action['view_ids'] = False
-        action['view_id'] = self.env['ir.model.data'].xmlid_to_res_id("of_contract_custom.view_of_contract_service_form")
+        action['view_id'] = self.env['ir.model.data'].xmlid_to_res_id(
+            "of_contract_custom.view_of_contract_service_form")
         action['views'] = False
         action['target'] = "new"
         action['context'] = {
