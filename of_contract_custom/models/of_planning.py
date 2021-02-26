@@ -180,7 +180,7 @@ class OfServiceType(models.Model):
     kanban_ids = fields.Many2many(comodel_name='of.service.stage', string=u"Étapes autorisées")
 
 
-class OfServiceKanban(models.Model):
+class OfServiceStage(models.Model):
     _name = 'of.service.stage'
     _order = 'sequence'
 
