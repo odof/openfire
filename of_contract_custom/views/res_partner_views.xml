@@ -5,18 +5,22 @@
 <!-- **************************************** PARTENAIRE *************************************** -->
 <!-- ******************************************************************************************* -->
 
-    <record id="of_contract_view_res_partner" model="ir.ui.view">
-        <field name="name">of_contract_view_res_partner</field>
+    <record id="of_contract_view_res_partner_buttons" model="ir.ui.view">
+        <field name="name">of.contract.view.res.partner.buttons</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="group_ids" eval="[(6, False, [ref('base.group_system')])]"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
+                <!-- contrats du partenaire -->
                 <button class="oe_stat_button" type="object" name="action_view_contract" icon="fa-book">
                     <field name="of_contract_count" widget="statinfo" string="Contrats"/>
                 </button>
+                <!-- lignes de contrats dont le partenaire est l'adress d'intervention -->
                 <button class="oe_stat_button" type="object" name="action_view_contrat_line_address" icon="fa-book" attrs="{'invisible': [('customer','!=',True)]}">
                     <field name="of_contract_line_address_count" widget="statinfo" string="Lignes contrat"/>
                 </button>
+                <!-- lignes de contrats dont le partenaire est le prestataire -->
                 <button class="oe_stat_button" type="object" name="action_view_contract_line" icon="fa-book" attrs="{'invisible': [('supplier','!=',True)]}">
                     <field name="of_contract_line_count" widget="statinfo" string="Lignes (Prestataire)"/>
                 </button>
@@ -27,15 +31,33 @@
         </field>
     </record>
 
+    <record id="of_contract_view_res_partner" model="ir.ui.view">
+        <field name="name">of.contract.view.res.partner</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!-- ajout du code de magasin -->
+            <xpath expr="//field[@name='ref']" position="after">
+                <field name="of_code_magasin"/>
+            </xpath>
+        </field>
+    </record>
+
     <record id="of_contract_service_view_partner_form" model="ir.ui.view">
-        <field name="name">of_contract_service_view_partner_form</field>
+        <field name="name">of.contract.custom.service.view.partner.form</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="of_service.of_service_view_partner_form"/>
         <field name="arch" type="xml">
+            <!-- renommer les interventions à programmer -->
             <xpath expr="//field[@name='a_programmer_count']" position="attributes">
                 <attribute name="string">Demande d'intervention</attribute>
             </xpath>
+            <!-- supprimer l'accès aux interventions récurrentes -->
             <xpath expr="//button[@name='action_view_recurrent']" position="replace"/>
+            <!-- renommer l'action "prévoir intervention" -->
+            <xpath expr="//button[@name='action_prevoir_intervention']" position="attributes">
+                <attribute name="string">Demande d'intervention</attribute>
+            </xpath>
         </field>
     </record>
 
@@ -46,18 +68,6 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='of_secteur_tech_id']" position="after">
                 <field name="of_prestataire_id" options='{"no_open": True, "no_create": True}'/>
-            </xpath>
-        </field>
-    </record>
-
-    <record id="of_contract_custom_service_view_partner_form" model="ir.ui.view">
-        <field name="name">of.contract.custom.service.view.partner.form</field>
-        <field name="model">res.partner</field>
-        <field name="type">form</field>
-        <field name="inherit_id" ref="of_service.of_service_view_partner_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//button[@name='action_prevoir_intervention']" position="attributes">
-                <attribute name="string">Demande d'intervention</attribute>
             </xpath>
         </field>
     </record>
