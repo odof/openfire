@@ -28,10 +28,10 @@ class OfAccountInvoice(models.Model):
                 contractual_lines = invoice.invoice_line_ids.filtered('of_contract_line_id')
                 # toutes les lignes doivent avoir la même date prévue ou la même fréquence de facturation
                 if len(contractual_lines) > 1 and \
-                    (not all([date == contractual_lines[0].of_contract_supposed_date
-                              for date in contractual_lines.mapped('of_contract_supposed_date')]) or \
-                     not all([code == contractual_lines[0].recurring_rule_type
-                              for code in contractual_lines.mapped('recurring_rule_type')])):
+                    (not all(date == contractual_lines[0].of_contract_supposed_date
+                             for date in contractual_lines.mapped('of_contract_supposed_date')) or
+                     not all(code == contractual_lines[0].of_contract_line_id.frequency_type
+                             for code in contractual_lines.mapped('of_contract_line_id').mapped('frequency_type'))):
                     continue
                 base_date = contractual_lines[0].of_contract_supposed_date
                 recurring_invoicing_payment = invoice.of_contract_id.recurring_invoicing_payment_id
