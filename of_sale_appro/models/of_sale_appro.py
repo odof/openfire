@@ -57,9 +57,9 @@ class StockMove(models.Model):
     @api.multi
     def action_reset(self):
         for move in self:
-            if move.state not in ['waiting', 'assigned']:
+            if move.state not in ['waiting', 'assigned', 'cancel']:
                 raise UserError(
-                    u"Seul un mouvement en attente d'un autre mouvement ou disponible peut être réinitialisé.")
+                    u"Seul un mouvement en attente d'un autre mouvement, disponible ou annulé peut être réinitialisé.")
             move.linked_move_operation_ids.mapped('operation_id').unlink()
             move.quants_unreserve()
             move.write({'state': 'confirmed'})

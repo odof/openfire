@@ -51,6 +51,23 @@ class PurchaseOrder(models.Model):
                 sale_lines.write({'purchase_price': line.price_unit * line.product_id.property_of_purchase_coeff})
 
 
+class PurchaseOrderLine(models.Model):
+    _inherit = 'purchase.order.line'
+
+    @api.multi
+    def write(self, vals):
+        res = super(PurchaseOrderLine, self).write(vals)
+        if 'price_unit' in vals:
+            # On répercute le changement de prix pour la valorisation de l'inventaire s'il y a lieu
+            moves = self.mapped('move_ids')
+            if moves:
+                moves.write({'price_unit': vals['price_unit']})
+                quants = moves.mapped('quant_ids')
+                if quants:
+                    quants.sudo().write({'cost': vals['price_unit']})
+        return res
+
+
 class ProcurementOrder(models.Model):
     _inherit = 'procurement.order'
 
