@@ -26,6 +26,7 @@ Module de gestion des contrôles d'accès
         'security/ir.model.access.csv',
         'views/res_users_views.xml',
         'views/of_parc_installe_views.xml',
+        'views/of_res_config_views.xml',
         'views/project_issue_views.xml',
         'views/stock_views.xml',
         'views/sale_views.xml',

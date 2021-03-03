@@ -8,6 +8,14 @@ class OfInterventionSettings(models.TransientModel):
     _name = 'of.intervention.settings'
     _inherit = 'res.config.settings'
 
+    @api.model_cr_context
+    def _auto_init(self):
+        res = super(OfInterventionSettings, self)._auto_init()
+        if not self.env['ir.values'].get_default('of.intervention.settings', 'company_choice'):
+            self.env['ir.values'].sudo().set_default(
+                    'of.intervention.settings', 'company_choice', 'contact')
+        return res
+
     company_id = fields.Many2one(
         'res.company', string=u'(OF) Société', required=True, default=lambda self: self.env.user.company_id)
     calendar_min_time = fields.Integer(string='(OF) Heure min', help=u"Heure minimale affichée")
@@ -29,6 +37,13 @@ class OfInterventionSettings(models.TransientModel):
         help=u"Choisissez un couleur de texte pour les créneaux dispos")
 
     fiche_intervention_cacher_montant = fields.Boolean(string=u"(OF) Cacher montant restant")
+    company_choice = fields.Selection(
+        [
+            ('contact', u"la société du contact"),
+            ('user', u"la société de l'utilisateur"),
+        ], string=u"(OF) Création dans", required=True,
+        help=u"Pour la création des RDVs, interventions à programmer, SAV et parcs installés."
+    )
 
     @api.multi
     def set_calendar_min_time_defaults(self):
@@ -73,3 +88,8 @@ class OfInterventionSettings(models.TransientModel):
     def set_fiche_intervention_cacher_montant_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'of.intervention.settings', 'fiche_intervention_cacher_montant', self.fiche_intervention_cacher_montant)
+
+    @api.multi
+    def set_company_choice_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings', 'company_choice', self.company_choice)

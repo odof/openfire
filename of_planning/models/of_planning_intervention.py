@@ -309,6 +309,15 @@ class OfPlanningIntervention(models.Model):
     def _domain_employee_ids(self):
         return [('of_est_intervenant', '=', True)]
 
+    # Default #
+
+    @api.model
+    def _default_company(self):
+        # Pour les objets du planning, le choix de société se fait par un paramètre de config
+        if self.env['ir.values'].get_default('of.intervention.settings', 'company_choice') == 'user':
+            return self.env['res.company']._company_default_get('of.planning.intervention')
+        return False
+
     # Champs #
 
     # Header
@@ -338,9 +347,7 @@ class OfPlanningIntervention(models.Model):
     address_zip = fields.Char(related='address_id.zip')
     secteur_id = fields.Many2one(related='address_id.of_secteur_tech_id', readonly=True)
     user_id = fields.Many2one('res.users', string="Utilisateur", default=lambda self: self.env.uid)
-    company_id = fields.Many2one(
-        'res.company', string='Magasin', required=True,
-        default=lambda self: self.env['res.company']._company_default_get('of.planning.intervention'))
+    company_id = fields.Many2one('res.company', string='Magasin', required=True, default=lambda s: s._default_company())
     name = fields.Char(string=u"Libellé", required=True)
     tag_ids = fields.Many2many('of.planning.tag', column1='intervention_id', column2='tag_id', string=u"Étiquettes")
 
@@ -428,25 +435,6 @@ class OfPlanningIntervention(models.Model):
         comodel_name='stock.picking', string=u"BL associé",
         domain="[('id', 'in', picking_domain and picking_domain[0] and picking_domain[0][2] or False)]")
     picking_domain = fields.Many2many(comodel_name='stock.picking', compute='_compute_picking_domain')
-
-    @api.depends('order_id')
-    def _compute_picking_domain(self):
-        for intervention in self:
-            picking_list = []
-            if intervention.order_id:
-                picking_list = intervention.order_id.picking_ids.ids
-            intervention.picking_domain = picking_list
-
-    @api.onchange('order_id')
-    def onchange_order_id(self):
-        picking_list = []
-        if self.order_id:
-            picking_list = self.order_id.picking_ids.ids
-        self.picking_domain = picking_list
-        if self.picking_id and self.picking_id.id not in picking_list:
-            self.picking_id = False
-        res = {'domain': {'picking_id': [('id', 'in', picking_list)]}}
-        return res
 
     # Compute
 
@@ -771,6 +759,14 @@ class OfPlanningIntervention(models.Model):
             elif interv.state and interv.state in ('cancel', 'postponed'):
                 interv.state_int = 3
 
+    @api.depends('order_id')
+    def _compute_picking_domain(self):
+        for intervention in self:
+            picking_list = []
+            if intervention.order_id:
+                picking_list = intervention.order_id.picking_ids.ids
+            intervention.picking_domain = picking_list
+
     # Search #
 
     def _search_employee_main_id(self, operator, operand):
@@ -856,6 +852,11 @@ class OfPlanningIntervention(models.Model):
                 if val:
                     name.append(val)
             self.fiscal_position_id = self.address_id.commercial_partner_id.property_account_position_id
+            # Pour les objets du planning, le choix de la société se fait par un paramètre de config
+            company_choice = self.env['ir.values'].get_default(
+                'of.intervention.settings', 'company_choice') or 'contact'
+            if company_choice == 'contact' and self.address_id.company_id:
+                self.company_id = self.address_id.company_id.id
         self.name = name and " ".join(name) or "Intervention"
 
     @api.onchange('template_id')
@@ -900,6 +901,17 @@ class OfPlanningIntervention(models.Model):
             heures, minutes = float_2_heures_minutes(self.duree)
             self.date_deadline_forcee = fields.Datetime.to_string(
                 fields.Datetime.from_string(self.date) + relativedelta(hours=heures, minutes=minutes))
+
+    @api.onchange('order_id')
+    def onchange_order_id(self):
+        picking_list = []
+        if self.order_id:
+            picking_list = self.order_id.picking_ids.ids
+        self.picking_domain = picking_list
+        if self.picking_id and self.picking_id.id not in picking_list:
+            self.picking_id = False
+        res = {'domain': {'picking_id': [('id', 'in', picking_list)]}}
+        return res
 
     # Héritages
 

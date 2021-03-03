@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Intervention config wizard -->
+    <record id="view_of_intervention_settings_access_control" model="ir.ui.view">
+        <field name="name">view.of.intervention.settings.inherit.of.access.control</field>
+        <field name="model">of.intervention.settings</field>
+        <field name="inherit_id" ref="of_planning.view_of_intervention_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='company_choice']" position="after">
+                <label for="activate_rules" attrs="{'invisible': [('company_choice', '=', 'contact')]}"/>
+                <div name="activate_rules" attrs="{'invisible': [('company_choice', '=', 'contact')]}">
+                    <field name="activate_rules" class="oe_inline"/>
+                    <i class="oe_grey">Cocher pour activer les règles de cloisonnement pour les objets du planning.</i>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

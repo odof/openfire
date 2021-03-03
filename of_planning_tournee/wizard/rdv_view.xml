@@ -43,6 +43,7 @@
                             <i>Votre géocodeur par défaut n'a pas réussi à géolocaliser cette adresse. pour continuer la recherche vous pouvez ignorer les données géographiques</i>
                         </div>
                         <field name="ignorer_geo" attrs="{'invisible': ['|',('geo_lat', '!=', 0.0),('geo_lng', '!=', 0.0)]}"/>
+                        <field name="company_id" options="{'no_create': True, 'no_open': True}"/>
                     </group>
                     <group col="2" colspan="2">
                         <div class="o_address_format" colspan="2">

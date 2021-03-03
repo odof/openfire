@@ -214,6 +214,13 @@ class OfService(models.Model):
 
     # Default
 
+    @api.model
+    def _default_company(self):
+        # Pour les objets du planning, le choix de société se fait par un paramètre de config
+        if self.env['ir.values'].get_default('of.intervention.settings', 'company_choice') == 'user':
+            return self.env['res.company']._company_default_get('of.service')
+        return False
+
     def _default_jours(self):
         # Lundi à vendredi comme valeurs par défaut
         jours = self.env['of.jours'].search([('numero', 'in', (1, 2, 3, 4, 5))], order="numero")
@@ -364,8 +371,20 @@ class OfService(models.Model):
     def _onchange_partner_id(self):
         self.ensure_one()
         if self.partner_id:
-            self.address_id = self.partner_id
-            self.company_id = self.partner_id.company_id
+            addresses = self.partner_id.address_get(['delivery', 'invoice', 'contact'])
+            self.address_id = addresses['delivery'] or addresses['invoice'] or addresses['contact']
+
+    @api.onchange('address_id')
+    def _onchange_address_id(self):
+        self.ensure_one()
+        if self.address_id:
+            # Pour les objets du planning, le choix de la société se fait par un paramètre de config
+            company_choice = self.env['ir.values'].get_default(
+                'of.intervention.settings', 'company_choice') or 'contact'
+            if company_choice == 'contact' and self.address_id.company_id:
+                self.company_id = self.address_id.company_id.id
+            elif company_choice == 'contact' and self.partner_id.company_id:
+                self.company_id = self.partner_id.company_id.id
 
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
