@@ -174,6 +174,11 @@ class ProductPricelistItem(models.Model):
     of_brand_id = fields.Many2one('of.product.brand', string="Marque")
     applied_on = fields.Selection(selection_add=[('2.5_brand', 'Marque')])
     compute_price = fields.Selection(selection_add=[('coef', 'Coefficient')])
+    of_purchase_price_calculation_basis = fields.Selection(
+        selection=[('standard_purchase_price', u"Prix d'achat de l'article (standard)"),
+                   ('order_cost', u"Prix de revient de la commande"),
+                   ('order_sale_price', u"Prix de vente de la commande")], string=u"Base de calcul du prix d'achat")
+    of_purchase_price_percent = fields.Float(string=u"Pourcentage pour le calcul du prix d'achat")
 
     @api.onchange('applied_on')
     def _onchange_applied_on(self):
@@ -245,7 +250,7 @@ class SaleOrderLine(models.Model):
             if self.product_id:
                 items = self.order_id.pricelist_id.item_ids.filtered(lambda i: i.applied_on == '0_product_variant' and i.product_id.id == self.product_id.id and i.compute_price == 'coef')
                 if not items:
-                    items = self.order_id.pricelist_id.item_ids.filtered(lambda i: i.applied_on == '1_product' and i.product_tpl_id.id == self.product_id.product_tpl_id.id and i.compute_price == 'coef')
+                    items = self.order_id.pricelist_id.item_ids.filtered(lambda i: i.applied_on == '1_product' and i.product_tmpl_id.id == self.product_id.product_tmpl_id.id and i.compute_price == 'coef')
                 if not items:
                     items = self.order_id.pricelist_id.item_ids.filtered(lambda i: i.applied_on == '2_product_category' and i.categ_id.id == self.product_id.categ_id.id and i.compute_price == 'coef')
                 if not items:
@@ -308,3 +313,41 @@ class SaleConfigSettings(models.TransientModel):
     def set_of_coef_method_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_coef_method', self.of_coef_method)
+
+
+class ProcurementOrder(models.Model):
+    _inherit = 'procurement.order'
+
+    @api.multi
+    def _prepare_purchase_order_line(self, po, supplier):
+        res = super(ProcurementOrder, self)._prepare_purchase_order_line(po, supplier)
+
+        # Prise en compte du calcul du prix d'achat de la liste de prix
+        sale_line_id = self.move_dest_id.procurement_id.sale_line_id
+        if not sale_line_id:
+            # Cas particulier des services sous-traités
+            sale_line_id = self.sale_line_id
+        pricelist = sale_line_id.order_id.pricelist_id
+        if pricelist and res.get('product_id'):
+            product = self.env['product.product'].browse(res['product_id'])
+            items = pricelist.item_ids.filtered(
+                lambda i: i.applied_on == '0_product_variant' and i.product_id.id == product.id)
+            if not items:
+                items = pricelist.item_ids.filtered(
+                    lambda i: i.applied_on == '1_product' and i.product_tmpl_id.id == product.product_tmpl_id.id)
+            if not items:
+                items = pricelist.item_ids.filtered(
+                    lambda i: i.applied_on == '2_product_category' and i.categ_id.id == product.categ_id.id)
+            if not items:
+                items = pricelist.item_ids.filtered(
+                    lambda i: i.applied_on == '2.5_brand' and i.of_brand_id.id == product.brand_id.id)
+            if not items:
+                items = pricelist.item_ids.filtered(lambda i: i.applied_on == '3_global')
+
+            if items and items[0].of_purchase_price_calculation_basis in ('order_cost', 'order_sale_price'):
+                if items[0].of_purchase_price_calculation_basis == 'order_cost':
+                    res['price_unit'] = sale_line_id.purchase_price * items[0].of_purchase_price_percent / 100.0
+                elif items[0].of_purchase_price_calculation_basis == 'order_sale_price':
+                    res['price_unit'] = sale_line_id.price_unit * items[0].of_purchase_price_percent / 100.0
+
+        return res
