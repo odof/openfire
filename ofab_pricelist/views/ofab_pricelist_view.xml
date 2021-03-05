@@ -28,6 +28,23 @@
                 <div attrs="{'invisible':[('compute_price', '!=', 'coef')]}">
                     <field name="of_coef" nolabel= "1" options="{'currency_field': 'currency_id'}"/></div>
             </xpath>
+            <xpath expr="//separator" position="attributes">
+                <attribute name="string">Calcul du prix de vente</attribute>
+            </xpath>
+            <xpath expr="//group[3]" position="after">
+                <separator string="Calcul du prix d'achat"/>
+                <group>
+                    <group>
+                        <label for="of_purchase_price_calculation_basis" string="Base de calcul"/>
+                        <div>
+                            <field name="of_purchase_price_calculation_basis" widget="radio"/>
+                            <div attrs="{'invisible':[('of_purchase_price_calculation_basis', 'not in', ('order_cost', 'order_sale_price'))]}">
+                                <field name="of_purchase_price_percent" nolabel="1" class="oe_inline"/>%%
+                            </div>
+                        </div>
+                    </group>
+                </group>
+            </xpath>
         </field>
     </record>
 
