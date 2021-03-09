@@ -5,6 +5,17 @@
 <!-- **************************************** PARTENAIRE *************************************** -->
 <!-- ******************************************************************************************* -->
 
+    <record id="of_contract_view_res_partner_filter" model="ir.ui.view">
+        <field name="name">of.contract.res.partner.select</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="of_client_payeur_id"/>
+            </xpath>
+        </field>
+    </record>
+
     <record id="of_contract_view_res_partner_buttons" model="ir.ui.view">
         <field name="name">of.contract.view.res.partner.buttons</field>
         <field name="model">res.partner</field>
@@ -24,6 +35,9 @@
                 <button class="oe_stat_button" type="object" name="action_view_contract_line" icon="fa-book" attrs="{'invisible': [('supplier','!=',True)]}">
                     <field name="of_contract_line_count" widget="statinfo" string="Lignes (Prestataire)"/>
                 </button>
+                <button class="oe_stat_button" type="object" name="action_view_clients_receveurs" icon="fa-users" attrs="{'invisible': [('of_client_receveur_count','=',0)]}">
+                    <field name="of_client_receveur_count" widget="statinfo" string="Clients receveurs"/>
+                </button>
             </xpath>
             <xpath expr="//field[@name='ref']" position="after">
                 <field name="of_code_magasin"/>
@@ -39,6 +53,10 @@
             <!-- ajout du code de magasin -->
             <xpath expr="//field[@name='ref']" position="after">
                 <field name="of_code_magasin"/>
+            </xpath>
+            <!-- ajout du client payeur -->
+            <xpath expr="//field[@name='website']" position="before">
+                <field name="of_client_payeur_id"/>
             </xpath>
         </field>
     </record>
