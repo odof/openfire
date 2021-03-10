@@ -12,7 +12,7 @@
                     <button string="Annuler" type="object" name="cancel" class="oe_link" special="cancel"/>
                 </header>
                 <div id="main">
-                    <group string="Société" groups="base.group_multi_company">
+                    <group string="Société" groups="base.group_multi_company" invisible="1">
                         <label for="id" string="Société"/>
                         <div>
                             <field name="company_id" options="{'no_create': True}" class="oe_inline"/>
