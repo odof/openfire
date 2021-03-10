@@ -191,6 +191,7 @@
                     <button name="button_postponed" string="Reporté" states="confirm" type="object"/>
                     <button name="button_cancel" string="Annulé" states="draft,confirm" type="object"/>
                     <button name="button_draft" string="Brouillon" states="confirm,done,unfinished,cancel,postponed" type="object"/>
+                    <button name="action_intervention_send" string="Envoyer par email" type="object"/>
                     <field name="state" widget="statusbar" nolabel="1" statusbar_visible="draft,confirm,done" statusbar_colors='{"proforma":"blue","proforma2":"blue"}'/>
                     <div align="right" style="align:right;padding: 0px 18px 0px 0px;width:100%">
                         <field name="raison_id" widget="selection" context="{'tz': 'Europe/Paris'}" attrs="{'invisible':[('state', '!=', 'postponed')]}"/>

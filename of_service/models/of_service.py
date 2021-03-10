@@ -14,7 +14,7 @@ import math
 
 class OfService(models.Model):
     _name = "of.service"
-    _inherit = "of.map.view.mixin"
+    _inherit = ["of.map.view.mixin", "mail.thread"]
     _description = "Intervention à programmer"
 
     # Init
@@ -444,6 +444,31 @@ class OfService(models.Model):
             action['context'] = self.get_action_view_intervention_context(context)
 
         return action
+
+    @api.multi
+    def action_service_send(self):
+        self.ensure_one()
+        ir_model_data = self.env['ir.model.data']
+        try:
+            compose_form_id = ir_model_data.get_object_reference('mail', 'email_compose_message_wizard_form')[1]
+        except ValueError:
+            compose_form_id = False
+        ctx = dict()
+        ctx.update({
+            'default_model': 'of.service',
+            'default_res_id': self.ids[0],
+            'default_composition_mode': 'comment'
+        })
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'mail.compose.message',
+            'views': [(compose_form_id, 'form')],
+            'view_id': compose_form_id,
+            'target': 'new',
+            'context': ctx,
+        }
 
     @api.multi
     def button_valider(self):

@@ -87,3 +87,41 @@ def do_new_transfer(self):
 
 
 Picking.do_new_transfer = do_new_transfer
+
+
+class StockPicking(models.Model):
+    _inherit = 'stock.picking'
+
+    @api.multi
+    def action_fill_operation_qty_done(self):
+        self.ensure_one()
+
+        for operation in self.pack_operation_product_ids.filtered(lambda op: not op.lots_visible):
+            operation.qty_done = operation.product_qty
+
+        return True
+
+    @api.multi
+    def action_picking_send(self):
+        self.ensure_one()
+        ir_model_data = self.env['ir.model.data']
+        try:
+            compose_form_id = ir_model_data.get_object_reference('mail', 'email_compose_message_wizard_form')[1]
+        except ValueError:
+            compose_form_id = False
+        ctx = dict()
+        ctx.update({
+            'default_model': 'stock.picking',
+            'default_res_id': self.ids[0],
+            'default_composition_mode': 'comment'
+        })
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'mail.compose.message',
+            'views': [(compose_form_id, 'form')],
+            'view_id': compose_form_id,
+            'target': 'new',
+            'context': ctx,
+        }
