@@ -54,6 +54,9 @@
         <field name="model">stock.picking</field>
         <field name="inherit_id" ref="stock.view_picking_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_picking_send" string="Envoyer par email" type="object"/>
+            </xpath>
             <xpath expr="//field[@name='state']" position="before">
                 <button name="action_fill_operation_qty_done" string="Remplir opérations" type="object"
                         attrs="{'invisible': ['|', ('pack_operation_product_ids', '=', False), ('state', 'in', ['cancel', 'done'])]}"/>

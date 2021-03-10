@@ -521,19 +521,6 @@ class StockConfigSettings(models.TransientModel):
             'stock.config.settings', 'of_forcer_date_move', self.of_forcer_date_move)
 
 
-class StockPicking(models.Model):
-    _inherit = 'stock.picking'
-
-    @api.multi
-    def action_fill_operation_qty_done(self):
-        self.ensure_one()
-
-        for operation in self.pack_operation_product_ids.filtered(lambda op: not op.lots_visible):
-            operation.qty_done = operation.product_qty
-
-        return True
-
-
 class StockMove(models.Model):
     _inherit = 'stock.move'
 
