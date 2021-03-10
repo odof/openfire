@@ -803,7 +803,27 @@ class SaleOrderLine(models.Model):
     of_invoice_date_prev = fields.Date(string=u"Date de facturation prévisionnelle",
                                        compute="_compute_of_invoice_date_prev",
                                        store=True)
-    of_product_seller_price = fields.Float(string=u"Prix d'achat", related='product_id.of_seller_price', readonly=True)
+    of_seller_price = fields.Float(string=u"Prix d'achat")
+
+    @api.model_cr_context
+    def _auto_init(self):
+        """
+        Modification du nom du champ 'of_product_seller_price' en 'of_seller_price' dans les vues xml.
+        TODO: A SUPPRIMER APRES INSTALLATION !
+        """
+        cr = self._cr
+        cr.execute(
+            "SELECT 1 FROM information_schema.columns WHERE table_name = %s AND column_name = 'of_seller_price'",
+            (self._table,))
+        exists = bool(cr.fetchall())
+        res = super(SaleOrderLine, self)._auto_init()
+        if not exists:
+            cr.execute(
+                """ UPDATE  ir_ui_view
+                    SET     arch_db     = REPLACE(arch_db, 'of_product_seller_price', 'of_seller_price')
+                    WHERE   arch_db     LIKE '%of_product_seller_price%'
+                """)
+        return res
 
     @api.depends('price_unit', 'order_id.currency_id', 'order_id.partner_shipping_id', 'product_id',
                  'price_subtotal', 'product_uom_qty')
@@ -908,6 +928,22 @@ class SaleOrderLine(models.Model):
                 self.layout_category_id = self.product_id.categ_id.of_layout_id
 
         return res
+
+    @api.onchange('product_id', 'product_uom')
+    def product_id_change_margin(self):
+        super(SaleOrderLine, self).product_id_change_margin()
+
+        if not self.order_id.pricelist_id or not self.product_id or not self.product_uom:
+            return
+
+        frm_cur = self.env.user.company_id.currency_id
+        to_cur = self.order_id.pricelist_id.currency_id
+        seller_price = self.product_id.of_seller_price
+        if self.product_uom != self.product_id.uom_id:
+            seller_price = self.product_id.uom_id._compute_price(seller_price, self.product_uom)
+        ctx = self.env.context.copy()
+        ctx['date'] = self.order_id.date_order
+        self.of_seller_price = frm_cur.with_context(ctx).compute(seller_price, to_cur, round=False)
 
     @api.onchange('of_order_line_option_id')
     def _onchange_of_order_line_option_id(self):

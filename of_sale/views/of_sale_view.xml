@@ -200,7 +200,7 @@
                     <attribute name="attrs">{'invisible': [('of_client_view', '=', True)]}</attribute>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="after">
-                    <field name="of_product_seller_price" groups="of_sale.of_group_sale_marge_manager+sales_team.group_sale_manager"
+                    <field name="of_seller_price" groups="of_sale.of_group_sale_marge_manager+sales_team.group_sale_manager"
                            invisible="context.get('hide_sale')" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
                     <field name="of_order_line_option_id" options="{'no_create': True, 'no_open': True}"
                            groups="of_sale.group_of_order_line_option"/>
@@ -221,7 +221,7 @@
                     <attribute name="attrs">{'invisible': [('of_client_view', '=', True)]}</attribute>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/tree//field[@name='purchase_price']" position="after">
-                    <field name="of_product_seller_price" groups="of_sale.of_group_sale_marge_manager+sales_team.group_sale_manager"
+                    <field name="of_seller_price" groups="of_sale.of_group_sale_marge_manager+sales_team.group_sale_manager"
                            invisible="context.get('hide_sale')" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/tree" position="inside">

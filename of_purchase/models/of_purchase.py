@@ -48,7 +48,8 @@ class PurchaseOrder(models.Model):
                 procurements = procurement_obj.search([('purchase_line_id', '=', line.id)])
                 moves = procurements.mapped('move_dest_id')
                 sale_lines = moves.mapped('procurement_id').mapped('sale_line_id')
-                sale_lines.write({'purchase_price': line.price_unit * line.product_id.property_of_purchase_coeff})
+                sale_lines.write({'of_seller_price': line.price_unit,
+                                  'purchase_price': line.price_unit * line.product_id.property_of_purchase_coeff})
 
 
 class PurchaseOrderLine(models.Model):
