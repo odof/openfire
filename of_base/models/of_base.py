@@ -324,6 +324,14 @@ class MailTemplate(models.Model):
 
     of_copie_expediteur = fields.Boolean(string=u"Copie du mail à l'expéditeur")
 
+    @api.multi
+    def create_action(self):
+        return super(MailTemplate, self.sudo()).create_action()
+
+    @api.multi
+    def unlink_action(self):
+        return super(MailTemplate, self.sudo()).unlink_action()
+
 
 class ResCompany(models.Model):
     _inherit = "res.company"

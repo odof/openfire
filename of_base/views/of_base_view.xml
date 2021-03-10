@@ -286,6 +286,13 @@
         <field name="model">mail.template</field>
         <field name="inherit_id" ref="mail.email_template_form"/>
         <field name="arch" type="xml">
+            <!-- Autoriser l'ajout/retrait d'action contextuelle aux utilisateurs qui ont accès aux modèles de mails -->
+            <xpath expr="//button[@name='create_action']" position="attributes">
+                <attribute name="groups"/>
+            </xpath>
+            <xpath expr="//button[@name='unlink_action']" position="attributes">
+                <attribute name="groups"/>
+            </xpath>
             <xpath expr="//field[@name='email_from']" position="after">
                 <field name="of_copie_expediteur"/>
             </xpath>
