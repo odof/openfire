@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, _
+from odoo import models, api, _
 from odoo.addons.stock.models.stock_picking import Picking
 from odoo.exceptions import UserError
 
