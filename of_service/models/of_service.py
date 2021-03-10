@@ -141,6 +141,11 @@ class OfService(models.Model):
     tag_ids = fields.Many2many('of.service.tag', string=u"Étiquettes")
     company_id = fields.Many2one('res.company', string=u"Société")
 
+    commitment_type = fields.Selection(
+        selection=[('renewal', u"Renouvellement"), ('sale', u"Vente")], string=u"Type d'engagement")
+    technician_id = fields.Many2one(
+        comodel_name='hr.employee', string=u"Technicien", domain=[('of_est_intervenant', '=', True)])
+
     # Rubrique Origine
     origin = fields.Char(string="Origine")
     order_id = fields.Many2one('sale.order', string="Commande client")
