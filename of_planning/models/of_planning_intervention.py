@@ -648,11 +648,15 @@ class OfPlanningIntervention(models.Model):
             cleantext = re.sub(cleanr, '', interv.order_id.of_notes_intervention or '')
             interv.cleantext_intervention = cleantext
 
-    @api.depends('employee_main_id', 'employee_main_id.of_changed_intervention_id')
+    @api.depends('employee_main_id')
     def _compute_interventions_before_after(self):
+        return  # Temporary 'fix'
+        # Cette fonction n'a jamais eu le fonctionnement voulu à cause d'une erreur sur le comparateur
+        # Nous devons modifier soit le compute pour avoir un calcul plus précis ne prenant que les rdv impactés
+        # Soit modifier l'appel du calcul pour ne plus être un compute.
         interv_obj = self.env['of.planning.intervention']
         for interv in self:
-            if compare_date(interv.date, fields.Datetime.now(), compare=">") or \
+            if compare_date(interv.date, fields.Datetime.now(), compare="<") or \
                     not compare_date(interv.date, interv.employee_main_id.of_changed_intervention_id.date):
                 continue
             if interv.interv_before_id and interv.interv_before_id == interv.employee_main_id.of_changed_intervention_id:
