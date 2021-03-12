@@ -102,7 +102,7 @@ class OfContract(models.Model):
         ('in_progress', 'En cours'),
         ('inactive', 'Inactif'),
     ], string=u"État", compute="_compute_state")
-    renewal = fields.Boolean(string="Renouveler", default=True)
+    renewal = fields.Boolean(string="Renouvellement automatique", default=True)
     commentaires = fields.Text(string="Commentaires")
     use_index = fields.Boolean(string="Indexer")
     period_ids = fields.One2many(
@@ -157,10 +157,10 @@ class OfContract(models.Model):
         for contract in self:
             if not contract.period_ids:
                 continue
-            if contract.date_end:
-                ref_date = contract.date_end
-            elif contract.recurring_next_date:
+            if contract.recurring_next_date:
                 ref_date = contract.recurring_next_date
+            elif contract.last_invoicing_date and contract.date_end:
+                ref_date = contract.date_end
             else:
                 ref_date = contract.date_start
             contract.current_period_id = contract.period_ids.filtered(lambda p: p.date_start <= ref_date <= p.date_end)
@@ -613,6 +613,22 @@ class OfContract(models.Model):
                 invoices |= invoice
         return invoices
 
+    @api.multi
+    def button_renew(self):
+        automatic_renewal = self.env['of.contract']
+        for contract in self:
+            if contract.renewal:
+                automatic_renewal |= contract
+                continue
+            current_end = fields.Date.from_string(contract.date_end)
+            new_end = current_end + relativedelta(years=1)
+            contract.date_end = fields.Date.to_string(new_end)
+        if automatic_renewal:
+            message = u"Les contrats suivants sont en renouvellement automatique, " + \
+                      u"et n'ont donc pas été renouvelés :\n%s" % '\n'.join(c.name for c in automatic_renewal)
+            return self.env['of.popup.wizard'].popup_return(message=message)
+        return {'type': 'ir.actions.do_nothing'}
+
 
 class OfContractLine(models.Model):
     _name = 'of.contract.line'
@@ -751,7 +767,7 @@ class OfContractLine(models.Model):
         (0, 'Nouveau contrat'),
         (1, 'Renouvellement'),
         ], string="Type de contrat", related="contract_id.type", readonly=True)
-    contract_renewal = fields.Boolean(string="Renouveler", related="contract_id.renewal", readonly=True)
+    contract_renewal = fields.Boolean(string="Renouvellement automatique", related="contract_id.renewal", readonly=True)
     use_index = fields.Boolean(string="Indexer", default=True)
     date_indexed = fields.Date(string=u"Dernière indexation", compute="_compute_date_indexed", store=True)
     last_invoicing_date = fields.Date(
@@ -1269,7 +1285,6 @@ class OfContractLine(models.Model):
         service_obj = self.with_context(bloquer_recurrence=True).env['of.service']
         type = self.env.ref('of_contract_custom.of_contract_custom_type_maintenance')
         services = self.env['of.service']
-        services_kept = self.env['of.service']
         for line in self:
             if not line.current_period_id or not line.state == 'validated':
                 continue
@@ -1294,7 +1309,6 @@ class OfContractLine(models.Model):
                 if line.date_contract_end and date_service > line.date_contract_end:
                     break
                 if line.service_ids.filtered(lambda s: date_service <= s.date_next < month_service_end):
-                    services_kept |= line.service_ids.filtered(lambda s: date_service <= s.date_next < month_service_end)
                     continue
                 origine = line.line_origine_id
                 while origine:
@@ -1322,14 +1336,9 @@ class OfContractLine(models.Model):
                         new_service.update({'parc_installe_id': line.parc_installe_id.id})
                     new_service_vals = new_service._convert_to_write(new_service._cache)
                     new_service = service_obj.create(new_service_vals)
-                    services_kept |= new_service
                     services |= new_service
         if services:
             services.button_valider()
-        all_services = self.mapped('service_ids')
-        services_to_remove = all_services - services_kept
-        services_to_remove = services_to_remove.filtered(lambda s: not s.intervention_ids)
-        services_to_remove.unlink()
 
     @api.multi
     def generate_revision_line(self, invoicing_date):

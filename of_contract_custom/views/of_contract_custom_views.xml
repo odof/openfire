@@ -67,6 +67,8 @@
 
                     <button name="recurring_create_invoice" type="object" class="btn-primary" string="Créer les factures"
                             attrs="{'invisible': [('is_invoiceable', '=', False)]}"/>
+                    <button name="button_renew" type="object" class="btn-primary" string="Renouveler"
+                            attrs="{'invisible': ['|', ('is_invoiceable', '!=', False), ('renewal', '=', True)]}"/>
                     <button name="valider_lignes_contrat" type="object" class="btn-primary" string="Activer les lignes"
                     confirm="Activer les lignes du contrat va passer toutes les lignes actuellement en brouillon en état validée. Voulez-vous continuer ?
 (les lignes annulées par un avenant ou déjà validée ne seront pas modifiées)"/>
@@ -246,6 +248,23 @@
         <field name="context">{'form_readonly': '[(&quot;active&quot;,&quot;=&quot;,False)]'}</field>
     </record>
 
+    <record id="of_action_contract_renouveler" model="ir.actions.server">
+        <field name="name">Renouveler</field>
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="model_id" ref="of_contract_custom.model_of_contract"/>
+        <field name="code">action = records.button_renew()</field>
+    </record>
+
+    <record id="of_action_contract_renouveler_value" model="ir.values">
+        <field name="name">Renouveler</field>
+        <field name="key">action</field>
+        <field name="key2">client_action_multi</field>
+        <field name="model">of.contract</field>
+        <field name="value"
+               eval="'ir.actions.server,%d'
+                     % ref('of_contract_custom.of_action_contract_renouveler')" />
+    </record>
 
     <menuitem name="Contrats" id="menu_contract_custom_sale" parent="sales_team.menu_sales" sequence="150" action="of_contract_custom.action_contract"/>
     <menuitem name="Contrats" id="menu_contract_custom_interventions" parent="of_planning.menu_of_planning_intervention" sequence="150" action="of_contract_custom.action_contract"/>
