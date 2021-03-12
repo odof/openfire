@@ -20,7 +20,7 @@
         <field name="name">of.contract.view.res.partner.buttons</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
-        <field name="groups_id" eval="[(6, False, [ref('base.group_system')])]"/>
+        <field name="groups_id" eval="[(6, False, [ref('of_contract_custom.group_of_contract_custom_lecture')])]"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
                 <!-- contrats du partenaire -->
