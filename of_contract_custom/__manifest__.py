@@ -68,6 +68,8 @@ Bloquer l'utilisation de la récurrence sur le modèle `of.service` car les cont
     "category": "OpenFire",
     "data": [
         'data/of_contract_custom_data.xml',
+        'security/of_contract_custom_security.xml',
+        'security/ir.model.access.csv',
         'views/of_better_zip_views.xml',
         'views/of_contract_custom_views.xml',
         'views/of_parc_installe_views.xml',
@@ -79,8 +81,6 @@ Bloquer l'utilisation de la récurrence sur le modèle `of.service` car les cont
         'reports/of_contract_demande_intervention_templates.xml',
         'reports/of_contract_invoice_report_templates.xml',
         'reports/of_contract_planning_intervention_templates.xml',
-        'security/ir.model.access.csv',
-        'security/of_contract_custom_security.xml',
         'wizards/of_contract_avenant_wizard_views.xml',
         'wizards/of_contract_custom_wizard_view.xml',
         'wizards/of_contract_indice_wizard_views.xml',

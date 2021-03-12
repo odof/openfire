@@ -1,6 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- ################# Création des catégories de droits contrats ################# -->
+
+    <!-- Groupe droits d'accès aux contrats -->
+    <record model="ir.module.category" id="of_contract_custom_module_category">
+        <field name="name">OF Contrats</field>
+        <field name="description">Définit les droits d'accès aux contrats OpenFire.</field>
+        <field name="sequence">93</field>
+    </record>
+
+    <!-- ################# Création des groupes de droits contrats ################# -->
+
+    <!-- Lecture seule -->
+    <record id="group_of_contract_custom_lecture" model="res.groups">
+        <field name="name">Consultation</field>
+        <field name="category_id" ref="of_contract_custom_module_category"/>
+    </record>
+
+    <!-- Modification -->
+    <record id="group_of_contract_custom_modification" model="res.groups">
+        <field name="name">Modification</field>
+        <field name="category_id" ref="of_contract_custom_module_category"/>
+        <field name="implied_ids" eval="[(4, ref('group_of_contract_custom_lecture'))]"/>
+    </record>
+
+    <!-- Administration -->
+    <record id="group_of_contract_custom_creation" model="res.groups">
+        <field name="name">Administration</field>
+        <field name="category_id" ref="of_contract_custom_module_category"/>
+        <field name="implied_ids" eval="[(4, ref('group_of_contract_custom_modification'))]"/>
+        <field name="users" eval="[(4, ref('base.user_root'))]"/>
+    </record>
+
 <data noupdate="1">
 
     <record id="of_contract_planning_multicompany_rule_read" model="ir.rule">
