@@ -23,6 +23,10 @@ class ResPartner(models.Model):
                        "WHERE cl.partner_id = rp.id")
 
     of_referred_id = fields.Many2one('res.partner', string=u"Apporté par", help="Nom de l'apporteur d'affaire")
+    of_referee_partner_ids = fields.One2many(
+        comodel_name='res.partner', inverse_name='of_referred_id', string=u"Contacts apportés")
+    of_referee_lead_ids = fields.One2many(
+        comodel_name='crm.lead', inverse_name='of_referred_id', string=u"Opportunités apportées")
     of_referred_reward_id = fields.Many2one('of.referred.reward', string=u"Récompense")
     of_referred_note = fields.Text(string="Notes")
     of_referred_reward_state = fields.Boolean(string="Clos")
