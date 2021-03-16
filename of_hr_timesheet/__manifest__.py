@@ -29,6 +29,7 @@ Ce module personnalise le module Odoo des feuilles de temps.
     'depends' : [
         'hr_timesheet',
         'hr_timesheet_sheet',
+        'of_project',
     ],
     'data' : [
         'views/of_hr_timesheet_views.xml',

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- OF Project Task Planning Type -->
+
+        <record id="of_project_task_planning_type_dev" model="of.project.task.planning.type">
+            <field name="name">Développement</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="of_project_task_planning_type_val" model="of.project.task.planning.type">
+            <field name="name">Validation</field>
+            <field name="sequence">20</field>
+        </record>
+
+    </data>
+
+    <!-- Task planning initialisation -->
+    <function model="of.project.task.planning" name="_init_planning"/>
+
+</odoo>

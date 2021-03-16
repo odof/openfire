@@ -36,6 +36,7 @@ class AccountAnalyticLine(models.Model):
 
     of_categ_id = fields.Many2one('of.hr.timesheet.categ', u'Catégorie', ondelete='restrict')
     of_partner_id = fields.Many2one(comodel_name='res.partner', string=u"Client")
+    of_type_id = fields.Many2one(comodel_name='of.project.task.planning.type', string=u"Type")
 
     @api.onchange('project_id')
     def onchange_project_id(self):

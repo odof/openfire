@@ -7,3 +7,7 @@ access_of_periode_planifiee_category_group_project_manager,project.of.periode.pl
 access_of_periode_planifiee_category_group_project_user,project.of.periode.planifiee.category.user,model_of_periode_planifiee_category,project.group_project_user,1,0,0,0
 access_of_affectation_tache_group_project_manager,project.of.affectation.tache.manager,model_of_affectation_tache,project.group_project_manager,1,1,1,1
 access_of_affectation_tache_group_project_user,project.of.affectation.tache.user,model_of_affectation_tache,project.group_project_user,1,0,0,0
+access_of_project_task_planning_manager,access.of.project.task.planning.manager,model_of_project_task_planning,project.group_project_manager,1,1,1,1
+access_of_project_task_planning_user,access.of.project.task.planning.user,model_of_project_task_planning,project.group_project_user,1,0,0,0
+access_of_project_task_planning_type_manager,access.of.project.task.planning.type.manager,model_of_project_task_planning_type,project.group_project_manager,1,1,1,1
+access_of_project_task_planning_type_user,access.of.project.task.planning.type.user,model_of_project_task_planning_type,project.group_project_user,1,0,0,0

@@ -44,6 +44,7 @@ Fonctionnalités
         'website_support',
         ],
     'data': [
+        'data/of_project_data.xml',
         'views/of_project_views.xml',
         'security/ir.model.access.csv',
     ],

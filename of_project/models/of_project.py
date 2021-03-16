@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import json
+
 from odoo import models, fields, api
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -30,15 +32,31 @@ class OfPeriodePlanifiee(models.Model):
     name = fields.Char(string="Nom", compute="_compute_name", search="_search_name")
     active = fields.Boolean(string="Actif", default=True)
     technicien_ids = fields.One2many('of.periode.planifiee.technicien', 'periode_id', copy=True)
-    temps_total = fields.Float(string="Temps Total", compute="_compute_temps")
-    temps_prevu = fields.Float(string=u"Temps prévu", compute="_compute_temps")
-    temps_restant_task = fields.Float(string=u"Temps restant à affecter (tâches)", compute="_compute_temps")
-    temps_restant_categ = fields.Float(string=u"Temps restant à affecter (catégories)", compute="_compute_temps")
-    temps_effectue = fields.Float(string=u"Temps effectué", compute="_compute_temps")
+    tech_total_time = fields.Float(string=u"Temp total technique", compute='_compute_time')
+    tech_planned_time = fields.Float(string=u"Temps planifié technique", compute='_compute_time')
+    tech_planned_time_perc = fields.Float(string=u"Temps planifié technique (%)", compute='_compute_time')
+    tech_remaining_task_time = fields.Float(string=u"Reste à planifier technique (tâches)", compute='_compute_time')
+    tech_remaining_categ_time = fields.Float(
+        string=u"Reste à planifier technique (catégories)", compute='_compute_time')
+    tech_done_time = fields.Float(string=u"Temps produit technique", compute='_compute_time')
+    tech_done_time_perc = fields.Float(string=u"Temps produit technique (%)", compute='_compute_time')
+    cust_total_time = fields.Float(string=u"Temp total client", compute='_compute_time')
+    cust_planned_time = fields.Float(string=u"Temps planifié client", compute='_compute_time')
+    cust_planned_time_perc = fields.Float(string=u"Temps planifié client (%)", compute='_compute_time')
+    cust_remaining_task_time = fields.Float(string=u"Reste à planifier client (tâches)", compute='_compute_time')
+    cust_remaining_categ_time = fields.Float(
+        string=u"Reste à planifier client (catégories)", compute='_compute_time')
+    cust_done_time = fields.Float(string=u"Temps produit client", compute='_compute_time')
+    cust_done_time_perc = fields.Float(string=u"Temps produit client (%)", compute='_compute_time')
+
+
     gb_user_id = fields.Many2one('res.users', compute='lambda *a, **k:{}', search='_search_gb_user_id',
                                  string="Utilisateur", of_custom_groupby=True)
     gb_category_id = fields.Many2one('project.category', compute='lambda *a, **k:{}', search='_search_gb_category_id',
                                      string=u"Catégorie", of_custom_groupby=True)
+
+    planification_alert = fields.Boolean(string=u"Alerte de planification", compute='_compute_planification')
+    planification_ok = fields.Boolean(string=u"Planification OK", compute='_compute_planification')
 
     @api.model
     def _read_group_process_groupby(self, gb, query):
@@ -122,16 +140,53 @@ class OfPeriodePlanifiee(models.Model):
                     periode.name = date.strftime('%B - %Y')
 
     @api.depends('technicien_ids')
-    def _compute_temps(self):
-        """ Permet de calculer les différentes informations
-        relative au temps renseigné sur les techniciens
+    def _compute_time(self):
+        """
+        Permet de calculer les différentes informations relative au temps renseigné sur les ressources
         """
         for periode in self:
-            periode.temps_total = sum(periode.technicien_ids.mapped('temps_de_travail'))
-            periode.temps_prevu = sum(periode.technicien_ids.mapped('category_ids').mapped('temps_prevu'))
-            periode.temps_restant_task = sum(periode.technicien_ids.mapped('category_ids').mapped('temps_restant'))
-            periode.temps_restant_categ = sum(periode.technicien_ids.mapped('temps_restant_categ'))
-            periode.temps_effectue = sum(periode.technicien_ids.mapped('temps_effectue'))
+            # Technique
+            periode.tech_total_time = sum(
+                periode.technicien_ids.filtered(lambda t: t.type == 'tech').mapped('temps_de_travail'))
+            periode.tech_remaining_task_time = sum(
+                periode.technicien_ids.filtered(lambda t: t.type == 'tech').mapped('temps_restant_task'))
+            periode.tech_remaining_categ_time = sum(
+                periode.technicien_ids.filtered(lambda t: t.type == 'tech').mapped('temps_restant_categ'))
+            periode.tech_planned_time = periode.tech_total_time - periode.tech_remaining_task_time
+            periode.tech_done_time = sum(
+                periode.technicien_ids.filtered(lambda t: t.type == 'tech').mapped('temps_effectue'))
+            if periode.tech_total_time:
+                periode.tech_planned_time_perc = periode.tech_planned_time / periode.tech_total_time * 100.0
+                periode.tech_done_time_perc = periode.tech_done_time / periode.tech_total_time * 100.0
+            else:
+                periode.tech_planned_time_perc = 0.0
+                periode.tech_done_time_perc = 0.0
+            # Client
+            periode.cust_total_time = sum(
+                periode.technicien_ids.filtered(lambda t: t.type == 'cust').mapped('temps_de_travail'))
+            periode.cust_remaining_task_time = sum(
+                periode.technicien_ids.filtered(lambda t: t.type == 'cust').mapped('temps_restant_task'))
+            periode.cust_remaining_categ_time = sum(
+                periode.technicien_ids.filtered(lambda t: t.type == 'cust').mapped('temps_restant_categ'))
+            periode.cust_planned_time = periode.cust_total_time - periode.cust_remaining_task_time
+            periode.cust_done_time = sum(
+                periode.technicien_ids.filtered(lambda t: t.type == 'cust').mapped('temps_effectue'))
+            if periode.cust_total_time:
+                periode.cust_planned_time_perc = periode.cust_planned_time / periode.cust_total_time * 100.0
+                periode.cust_done_time_perc = periode.cust_done_time / periode.cust_total_time * 100.0
+            else:
+                periode.cust_planned_time_perc = 0.0
+                periode.cust_done_time_perc = 0.0
+
+    @api.depends('technicien_ids', 'technicien_ids.temps_restant_task')
+    def _compute_planification(self):
+        """
+        Permet de calculer le niveau de planification (alerte ou OK)
+        """
+        for period in self:
+            period.planification_alert = period.technicien_ids.filtered(lambda tech: tech.temps_restant_task < 0.0)
+            period.planification_ok = not period.technicien_ids.filtered(lambda tech: tech.temps_restant_task != 0.0)
+
 
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
@@ -154,13 +209,18 @@ class OfPeriodePlanifieeTechnicien(models.Model):
     _name = "of.periode.planifiee.technicien"
 
     periode_id = fields.Many2one('of.periode.planifiee')
-    user_id = fields.Many2one('res.users', string="Technicien", required=True)
+    user_id = fields.Many2one('res.users', string=u"Ressource", required=True)
+    type = fields.Selection(
+        selection=[('tech', u"Technique"), ('cust', u"Client")], string=u"Type")
     temps_de_travail = fields.Float(string="Temps de travail", required=True)
     temps_restant_task = fields.Float(string=u'Temps restant à affecter (tâches)', compute="_get_temps_restant")
     temps_restant_categ = fields.Float(string=u"Temps restant à affecter (catégories)", compute="_get_temps_restant")
     temps_effectue = fields.Float(string=u"Temps effectué", compute="_get_temps_restant")
     category_ids = fields.One2many('of.periode.planifiee.category', 'technicien_id', copy=True)
     name = fields.Char(string='Nom', related='user_id.name', readonly=True)
+    task_planning_ids = fields.Many2many(
+        comodel_name='of.project.task.planning', compute='_compute_task_planning_ids',
+        inverse='_inverse_task_planning_ids', string=u"Planification des tâches")
 
     @api.model
     def create(self, vals):
@@ -186,7 +246,9 @@ class OfPeriodePlanifieeTechnicien(models.Model):
         for tech in self:
             if tech.temps_de_travail:
                 tech.temps_restant_categ = tech.temps_de_travail - sum(tech.category_ids.mapped('temps_prevu'))
-                tech.temps_restant_task = sum(tech.category_ids.mapped('temps_restant'))
+                task_plannings = self.env['of.project.task.planning'].search(
+                    [('period_id', '=', tech.periode_id.id), ('user_id', '=', tech.user_id.id)])
+                tech.temps_restant_task = tech.temps_de_travail - sum(task_plannings.mapped('duration'))
             if not isinstance(tech.periode_id.id, models.NewId) and tech.user_id:
                 activities = activity_obj.search(
                     [('date', '>=', tech.periode_id.premier_jour),
@@ -194,11 +256,40 @@ class OfPeriodePlanifieeTechnicien(models.Model):
                      ('user_id', '=', tech.user_id.id)])
                 tech.temps_effectue = sum(activities.mapped('unit_amount'))
 
+    @api.depends('user_id', 'periode_id')
+    def _compute_task_planning_ids(self):
+        for period_ressource in self:
+            period_ressource.task_planning_ids = self.env['of.project.task.planning'].search(
+                [('user_id', '=', period_ressource.user_id.id), ('period_id', '=', period_ressource.periode_id.id)])
+
+    def _inverse_task_planning_ids(self):
+        for period_ressource in self:
+            if not period_ressource.task_planning_ids:
+                task_plannings = self.env['of.project.task.planning'].search(
+                    [('user_id', '=', period_ressource.user_id.id), ('period_id', '=', period_ressource.periode_id.id)])
+                if task_plannings:
+                    tasks = task_plannings.mapped('task_id')
+                    task_plannings.unlink()
+                    for task in tasks:
+                        task.onchange_of_planning_ids()
+            for task_planning in period_ressource.task_planning_ids:
+                if isinstance(task_planning.id, models.NewId):
+                    new_task_planning = self.env['of.project.task.planning'].create(
+                        {'period_id': self.periode_id.id,
+                         'user_id': self.user_id.id,
+                         'task_id': task_planning.task_id.id,
+                         'type_id': task_planning.type_id.id,
+                         'duration': task_planning.duration,
+                         'notes': task_planning.notes})
+                    new_task_planning.task_id.onchange_of_planning_ids()
+                elif not isinstance(task_planning.id, basestring):
+                    task_planning.task_id.onchange_of_planning_ids()
+
 
 class OfPeriodePlanifieeCategory(models.Model):
     _name = "of.periode.planifiee.category"
 
-    technicien_id = fields.Many2one('of.periode.planifiee.technicien', string="Technicien")
+    technicien_id = fields.Many2one('of.periode.planifiee.technicien', string="Ressource")
     categorie_id = fields.Many2one('project.category', string=u"Catégorie", required=True)
     periode_id = fields.Many2one(
         'of.periode.planifiee', string=u"Période", related="technicien_id.periode_id", readonly=True)
@@ -208,22 +299,18 @@ class OfPeriodePlanifieeCategory(models.Model):
 
     @api.depends('technicien_id', 'temps_prevu')
     def _compute_temps_restant(self):
-        """ Calcul le temps restant à affecter en fonction des tâches
-        et de la période
         """
-        task_obj = self.env['project.task']
+        Calcul le temps restant à affecter en fonction des tâches et de la période
+        """
         for period_categ in self:
             rest = 0
             if not isinstance(period_categ.periode_id.id, models.NewId):
                 if period_categ.technicien_id and period_categ.categorie_id and period_categ.periode_id:
-                    tasks = task_obj.search([('categ_id', '=', period_categ.categorie_id.id),
-                                             ('of_periode_ids', 'in', [period_categ.periode_id.id]),
-                                             '|',
-                                             ('user_id', '=', period_categ.technicien_id.user_id.id),
-                                             ('of_user_id', '=', period_categ.technicien_id.user_id.id)])
-                    rest = sum(tasks.mapped('of_periode_time_ids').filtered(
-                        lambda t: t.periode_id.id == period_categ.periode_id.id and
-                        t.user_id == period_categ.technicien_id.user_id).mapped('temps_affecte'))
+                    task_planning_ids = self.env['of.project.task.planning'].search(
+                        [('period_id', '=', period_categ.periode_id.id),
+                         ('user_id', '=', period_categ.technicien_id.user_id.id),
+                         ('task_id.categ_id', '=', period_categ.categorie_id.id)])
+                    rest = sum(task_planning_ids.mapped('duration'))
             period_categ.temps_restant = period_categ.temps_prevu - rest
         return
 
@@ -236,7 +323,7 @@ class OfAffectationTache(models.Model):
     temps_affecte = fields.Float(string=u"Temps affecté")
     name = fields.Date(string="Nom", related="periode_id.premier_jour")
     temps_effectue = fields.Float(string=u"Temps effectué", compute="_compute_temps")
-    user_id = fields.Many2one(comodel_name='res.users', string=u"Technicien")
+    user_id = fields.Many2one(comodel_name='res.users', string=u"Ressource")
 
     @api.depends('tache_id', 'tache_id.timesheet_ids')
     def _compute_temps(self):
@@ -249,14 +336,79 @@ class OfAffectationTache(models.Model):
         return
 
 
+class Project(models.Model):
+    _inherit = 'project.project'
+    _order = 'of_start_week'
+
+    of_state = fields.Selection(
+        selection=[('01_incoming', u"À venir"),
+                   ('02_in_progress', u"En cours"),
+                   ('03_on_hold', u"En attente"),
+                   ('04_closed', u"Fermé")], compute='_compute_of_state', string=u"État", store=True)
+    of_start_date = fields.Date(compute='_compute_of_dates', string=u"Date de début", store=True)
+    of_end_date = fields.Date(compute='_compute_of_dates', string=u"Date de fin", store=True)
+    of_start_week = fields.Char(compute='_compute_of_dates', string=u"Semaine de début", store=True)
+    of_tag_ids = fields.Many2many(comodel_name='project.tags', string=u"Étiquettes")
+    of_total_planned_hours = fields.Float(string=u"Durée prévue", compute='_compute_time')
+    of_total_done_hours = fields.Float(string=u"Durée réalisée", compute='_compute_time')
+    of_ressources = fields.Text(string=u"Ressources", compute='_compute_of_ressources')
+
+    @api.depends('task_ids', 'task_ids.stage_id', 'task_ids.stage_id.state')
+    def _compute_of_state(self):
+        """
+        Calcul de l'état d'un projet en fonction de l'avancement de ses tâches
+        """
+        for project in self:
+            if project.task_ids.filtered(lambda t: t.stage_id.state == 'open'):
+                project.of_state = '02_in_progress'
+            elif project.task_ids.filtered(lambda t: t.stage_id.state == 'draft'):
+                project.of_state = '01_incoming'
+            elif project.task_ids.filtered(lambda t: t.stage_id.state == 'pending'):
+                project.of_state = '03_on_hold'
+            else:
+                project.of_state = '04_closed'
+
+    @api.depends('task_ids', 'task_ids.date_start', 'task_ids.date_end')
+    def _compute_of_dates(self):
+        """
+        Calcul des dates d'un projet en fonction des dates de ses tâches
+        """
+        for project in self:
+            if project.task_ids.filtered(lambda t: t.date_start).mapped('date_start'):
+                project.of_start_date = min(project.task_ids.filtered(lambda t: t.date_start).mapped('date_start'))
+
+                date = datetime.strptime(project.of_start_date, "%Y-%m-%d")
+                week_nb = date.isocalendar()[1]
+                project.of_start_week = "%s S%02d" % (date.strftime('%Y'), week_nb)
+
+            if project.task_ids.filtered(lambda t: t.date_end).mapped('date_end'):
+                project.of_end_date = max(project.task_ids.filtered(lambda t: t.date_end).mapped('date_end'))
+
+    @api.depends('task_ids', 'task_ids.planned_hours', 'task_ids.effective_hours')
+    def _compute_time(self):
+        """
+        Calcul les temps consolidés d'un projet en fonction des temps de ses tâches
+        """
+        for project in self:
+            project.of_total_planned_hours = sum(project.task_ids.mapped('planned_hours'))
+            project.of_total_done_hours = sum(project.task_ids.mapped('effective_hours'))
+
+    @api.depends('task_ids', 'task_ids.of_planning_ids', 'task_ids.of_planning_ids.user_id')
+    def _compute_of_ressources(self):
+        for project in self:
+            ressources = []
+            all_ressources = set(
+                project.task_ids.mapped('of_planning_ids').filtered(lambda p: p.user_id).mapped('user_id'))
+            for user in all_ressources:
+                ressources.append({'id': user.id, 'name': user.name})
+            project.of_ressources = json.dumps(ressources) if ressources else False
+
+
 class ProjectTask(models.Model):
     _name = 'project.task'
     _inherit = ['project.task', 'of.readgroup']
 
-    of_periode_ids = fields.Many2many('of.periode.planifiee', string=u"Période(s)")
-    of_periode_time_ids = fields.One2many('of.affectation.tache', 'tache_id', string=u"Temps par période")
-    of_time_left = fields.Float(string=u"Temps à affecter", compute="_compute_temps_restant")
-    planned_hours = fields.Float(compute='_compute_planned_hours', inverse='_inverse_planned_hours', store=True)
+    planned_hours = fields.Float(compute='_compute_planned_hours', store=True)
     of_planned_dev_hours = fields.Float(string=u"Heures de développement")
     of_planned_review_hours = fields.Float(string=u"Heures de revue")
     project_id = fields.Many2one(required=True)
@@ -268,33 +420,42 @@ class ProjectTask(models.Model):
     of_gb_period_id = fields.Many2one(
         comodel_name='of.periode.planifiee', compute='lambda *a, **k:{}', search='_search_of_gb_period_id',
         string=u"Période", of_custom_groupby=True)
+    of_user_id = fields.Many2one(comodel_name='res.users', string='Relecteur')
+    of_planning_ids = fields.One2many(
+        comodel_name='of.project.task.planning', inverse_name='task_id', string=u"Planification")
+    of_ressources = fields.Text(string=u"Ressources", compute='_compute_of_ressources')
 
     def _search_of_gb_period_id(self, operator, value):
-        return [('of_periode_ids', operator, value)]
+        return [('of_planning_ids.period_id', operator, value)]
 
-    @api.depends('of_periode_time_ids', 'planned_hours')
-    def _compute_temps_restant(self):
-        """ Permet le calcul du temps restant à affecter aux périodes
-        """
-        for task in self:
-            task.of_time_left = task.planned_hours - sum(task.of_periode_time_ids.mapped('temps_affecte'))
-
-    @api.depends('of_planned_dev_hours', 'of_planned_review_hours')
+    @api.depends('of_planning_ids', 'of_planning_ids.duration')
     def _compute_planned_hours(self):
         for task in self:
-            task.planned_hours = task.of_planned_dev_hours + task.of_planned_review_hours
+            task.planned_hours = sum(task.of_planning_ids.mapped('duration'))
 
-    @api.multi
-    def _inverse_planned_hours(self):
+    @api.depends('of_planning_ids', 'of_planning_ids.user_id')
+    def _compute_of_ressources(self):
         for task in self:
-            task.of_planned_dev_hours = task.planned_hours
-            task.of_planned_review_hours = 0
+            ressources = []
+            all_ressources = set(task.of_planning_ids.filtered(lambda p: p.user_id).mapped('user_id'))
+            for user in all_ressources:
+                ressources.append({'id': user.id, 'name': user.name})
+            task.of_ressources = json.dumps(ressources) if ressources else False
 
     @api.multi
     def _compute_of_tickets(self):
         for task in self:
             task.of_ticket_ids = self.env['website.support.ticket'].search([('of_task_id', '=', task.id)])
             task.of_ticket_count = len(task.of_ticket_ids)
+
+    @api.onchange('of_planning_ids', 'of_planning_ids.period_id')
+    def onchange_of_planning_ids(self):
+        """
+        Recalcul les dates de début et fin de tâches en fonction de la planification
+        """
+        if self.of_planning_ids:
+            self.date_start = min(self.of_planning_ids.mapped('period_id').mapped('premier_jour'))
+            self.date_end = max(self.of_planning_ids.mapped('period_id').mapped('dernier_jour'))
 
     @api.multi
     def name_get(self):
@@ -319,11 +480,11 @@ class ProjectTask(models.Model):
             return super(ProjectTask, self)._read_group_process_groupby(gb, query)
 
         alias, _ = query.add_join(
-            (self._table, 'of_periode_planifiee_project_task_rel', 'id', 'project_task_id', 'of_periode_planifiee_id'),
+            (self._table, 'of_project_task_planning', 'id', 'task_id', 'period_id'),
             implicit=False, outer=True,
         )
 
-        field_name = 'of_periode_planifiee_id'
+        field_name = 'period_id'
 
         return {
             'field': gb,
@@ -334,91 +495,6 @@ class ProjectTask(models.Model):
             'tz_convert': False,
             'qualified_field': '"%s".%s' % (alias, field_name)
         }
-
-    def _get_infos_on_periode(self, periode, user):
-        """ Récupère les informations des périodes en fonction de l'utilisateur
-        affecté a la tâche et de la catégorie de la tâche
-        """
-        vals = {'periode_id': periode.id, 'user_id': user.id}
-        user_periode = periode.technicien_ids.filtered(lambda t: t.user_id.id == user.id)
-        categ_user = user_periode.category_ids.filtered(lambda c: c.categorie_id.id == self.categ_id.id)
-        vals["temps_affecte"] = self.of_time_left if self.of_time_left <= categ_user.temps_restant \
-            else categ_user.temps_restant
-        return vals
-
-    @api.onchange('planned_hours', 'of_periode_ids')
-    def onchange_time(self):
-        """ Change le temps affecté aux périodes si on ajoute une période
-        ou modification des heures prévues (mettre le plus d'heures possible
-        sur la première période, etc...)
-        """
-        records = self.of_periode_time_ids
-        dev_time = self.of_planned_dev_hours
-        review_time = self.of_planned_review_hours
-        while records:
-            first_date = min(records.mapped('name'))
-            temp = records.filtered(lambda r: r.name == first_date)
-            # Développeur
-            if self.user_id:
-                dev_temp = temp.filtered(lambda t: t.user_id.id == self.user_id.id)
-                dev_user_periode = dev_temp.periode_id.technicien_ids.filtered(lambda t: t.user_id.id == self.user_id.id)
-                dev_categ_user = dev_user_periode.category_ids.filtered(lambda c: c.categorie_id.id == self.categ_id.id)
-                dev_temp.temps_affecte = 0
-                tmp_dev_time = dev_time if dev_time <= dev_categ_user.temps_restant else dev_categ_user.temps_restant
-                dev_temp.temps_affecte = tmp_dev_time
-                dev_time -= tmp_dev_time
-                records -= dev_temp
-            # Relecteur
-            if self.of_user_id:
-                review_temp = temp.filtered(lambda t: t.user_id.id == self.of_user_id.id)
-                review_user_periode = review_temp.periode_id.technicien_ids.filtered(
-                    lambda t: t.user_id.id == self.of_user_id.id)
-                review_categ_user = review_user_periode.category_ids.filtered(
-                    lambda c: c.categorie_id.id == self.categ_id.id)
-                review_temp.temps_affecte = 0
-                tmp_review_time = review_time if review_time <= review_categ_user.temps_restant else \
-                    review_categ_user.temps_restant
-                review_temp.temps_affecte = tmp_review_time
-                review_time -= tmp_review_time
-                records -= review_temp
-        return
-
-    @api.onchange('of_periode_ids', 'user_id', 'of_user_id')
-    def onchange_periode_ids(self):
-        """ Ajoute ou enlève la possibilité de définir du temps par période
-        """
-        affectation_obj = self.env['of.affectation.tache']
-        # Période du développeur
-        dev_period_time = affectation_obj
-        if self.user_id:
-            to_add = affectation_obj
-            if self.of_periode_ids:
-                self.date_start = min(self.of_periode_ids.mapped('premier_jour'))
-                self.date_end = max(self.of_periode_ids.mapped('dernier_jour'))
-                already_used = self.of_periode_time_ids.filtered(
-                    lambda t: t.user_id == self.user_id).mapped('periode_id').mapped('id')
-                for periode in self.of_periode_ids:
-                    if periode.id in already_used:
-                        continue
-                    to_add += affectation_obj.new(self._get_infos_on_periode(periode, self.user_id))
-            dev_period_time = self.of_periode_time_ids.filtered(
-                lambda t: t.periode_id in self.of_periode_ids and t.user_id == self.user_id) + to_add
-        # Période du relecteur
-        review_period_time = affectation_obj
-        if self.of_user_id:
-            to_add = affectation_obj
-            if self.of_periode_ids:
-                self.date_start = min(self.of_periode_ids.mapped('premier_jour'))
-                self.date_end = max(self.of_periode_ids.mapped('dernier_jour'))
-                already_used = self.of_periode_time_ids.filtered(
-                    lambda t: t.user_id == self.of_user_id).mapped('periode_id').mapped('id')
-                for periode in self.of_periode_ids:
-                    if periode.id in already_used:
-                        continue
-                    to_add += affectation_obj.new(self._get_infos_on_periode(periode, self.of_user_id))
-            review_period_time = self.of_periode_time_ids.filtered(
-                lambda t: t.periode_id in self.of_periode_ids and t.user_id == self.of_user_id) + to_add
-        self.of_periode_time_ids = dev_period_time + review_period_time
 
     @api.multi
     def action_view_tickets(self):
@@ -432,6 +508,44 @@ class ProjectTask(models.Model):
         action['view_mode'] = 'tree,form'
         action['views'] = [(False, u'tree'), (False, u'form')]
         return action
+
+
+class OFProjectTaskPlanning(models.Model):
+    _name = 'of.project.task.planning'
+
+    task_id = fields.Many2one(comodel_name='project.task', string=u"Tâche", required=True, ondelete='cascade')
+    type_id = fields.Many2one(comodel_name='of.project.task.planning.type', string=u"Type", required=True)
+    user_id = fields.Many2one(comodel_name='res.users', string=u"Ressource")
+    period_id = fields.Many2one(comodel_name='of.periode.planifiee', string=u"Période")
+    duration = fields.Float(string=u"Durée")
+    notes = fields.Char(string=u"Notes")
+
+    @api.model
+    def _init_planning(self):
+        dev_planning_type = self.env.ref('of_project.of_project_task_planning_type_dev')
+        val_planning_type = self.env.ref('of_project.of_project_task_planning_type_val')
+        for task in self.env['project.task'].search(
+                ['|', ('of_planned_dev_hours', '>', 0.0), ('of_planned_review_hours', '>', 0.0)]):
+            if not task.of_planning_ids:
+                if task.of_planned_dev_hours > 0.0:
+                    self.create({'task_id': task.id,
+                                 'type_id': dev_planning_type.id,
+                                 'user_id': task.user_id.id,
+                                 'duration': task.of_planned_dev_hours})
+                if task.of_planned_review_hours > 0.0:
+                    self.create({'task_id': task.id,
+                                 'type_id': val_planning_type.id,
+                                 'user_id': task.of_user_id.id,
+                                 'duration': task.of_planned_review_hours})
+
+
+class OFProjectTaskPlanningType(models.Model):
+    _name = 'of.project.task.planning.type'
+    _order = 'sequence, name'
+
+    sequence = fields.Integer(string=u"Séquence")
+    name = fields.Char(string=u"Nom", required=True)
+    active = fields.Boolean(string=u"Actif", default=True)
 
 
 class WebsiteSupportTicket(models.Model):

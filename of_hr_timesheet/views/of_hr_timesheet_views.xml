@@ -34,9 +34,11 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='date']" position="after">
                 <field name="task_id"/>
+                <field name="of_type_id"/>
             </xpath>
             <xpath expr="//field[@name='timesheet_ids']/form/group/field[@name='date']" position="after">
                 <field name="task_id"/>
+                <field name="of_type_id"/>
             </xpath>
             <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='project_id']" position="after">
                 <field name="of_partner_id"/>
