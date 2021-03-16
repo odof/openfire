@@ -110,6 +110,7 @@
                         <group>
                             <field name="id_code"/>
                             <field name="condition"/>
+                            <field name="visibility" attrs="{'invisible': [('condition', '=', False)], 'required': [('condition', '=', True)]}"/>
                             <field name="condition_code" attrs="{'invisible': [('condition', '=', False)]}"/>
                             <div colspan="2" attrs="{'invisible': [('condition', '=', False)]}">
                                 <h4>Aide pour le code de condition</h4>
@@ -299,6 +300,7 @@
                         <group>
                             <field name="id_code"/>
                             <field name="condition"/>
+                            <field name="visibility" attrs="{'invisible': [('condition', '=', False)], 'required': [('condition', '=', True)]}"/>
                             <field name="condition_code" attrs="{'invisible': [('condition', '=', False)]}"/>
                             <div colspan="2" attrs="{'invisible': [('condition', '=', False)]}">
                                 <h4>Aide pour le code de condition</h4>
@@ -416,7 +418,7 @@
                     <separator string="Questionnaire"/>
                     <field name="questionnaire_id" domain="[('type', '=', 'intervention')])" options="{'no_create': True}"/>
                     <field name="question_ids" mode="tree" nolabel="1" context="{'address_id': address_id, 'default_type': 'intervention'}">
-                        <tree colors="grey:condition_unmet">
+                        <tree decoration-muted="condition_unmet">
                             <field name="sequence" widget="handle"/>
                             <field name="category_id" invisible="1"/>
                             <field name="type" invisible="1"/>
@@ -472,6 +474,7 @@
                         <group>
                             <field name="id_code"/>
                             <field name="condition"/>
+                            <field name="visibility" attrs="{'invisible': [('condition', '=', False)], 'required': [('condition', '=', True)]}"/>
                             <field name="condition_code" attrs="{'invisible': [('condition', '=', False)]}"/>
                             <div colspan="2" attrs="{'invisible': [('condition', '=', False)]}">
                                 <h4>Aide pour le code de condition</h4>

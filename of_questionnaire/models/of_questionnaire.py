@@ -43,6 +43,8 @@ class OfQuestionnaireLine(models.Model):
     photo = fields.Boolean(string=u"Photo", help=u"Indique si une photo peut être jointe à la réponse")
     photo_required = fields.Boolean(
         string=u"Photo requise", help=u"Indique si une photo doit obligatoirement être jointe à la réponse")
+    visibility = fields.Selection(
+        selection=[('always', u"Toujours"), ('condition_met', u"Si condition vérifiée")], string=u"Visibilité")
 
     @api.depends('answer_ids', 'answer_type')
     def _compute_answer(self):
