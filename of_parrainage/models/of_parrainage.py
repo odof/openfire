@@ -32,6 +32,15 @@ class ResPartner(models.Model):
     of_referred_reward_state = fields.Boolean(string="Clos")
     of_referred_reward_date = fields.Date(string=u"Date de récompense")
     of_referred_date = fields.Date(string="Date de parrainage")
+    of_referee_date = fields.Date(string=u"Date de dernier parrainage", compute='_compute_of_referee_date', store=True)
+
+    @api.depends('of_referee_partner_ids', 'of_referee_partner_ids.of_referred_date')
+    def _compute_of_referee_date(self):
+        for partner in self:
+            if not partner.of_referee_partner_ids.filtered('of_referred_date'):
+                continue
+            partner.of_referee_date = partner.of_referee_partner_ids.filtered('of_referred_date').\
+                sorted('of_referred_date')[-1].of_referred_date
 
     @api.onchange('of_referred_reward_id')
     def onchange_referred_reward(self):
