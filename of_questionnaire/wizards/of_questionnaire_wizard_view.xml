@@ -12,11 +12,16 @@
                 <field name="question_ids" invisible="1"/>
                 <field name="question_id" invisible="1"/>
                 <field name="answer_type" invisible="1"/>
+                <field name="additional_attachment_answer" invisible="1"/>
+                <field name="attachment_required" invisible="1"/>
                 <group name="answers">
                     <field name="answer_bool" attrs="{'invisible': [('answer_type', '!=', 'bool')]}"/>
                     <field name="answer_text" attrs="{'invisible': [('answer_type', '!=', 'text')]}"/>
                     <field name="answer_id" attrs="{'invisible': [('answer_type', '!=', 'one')]}" domain="[('planning_question_ids', 'in', [question_id])]" options="{'no_create': True}"/>
                     <field name="answer_ids" attrs="{'invisible': [('answer_type', '!=', 'list')]}" domain="[('planning_question_ids', 'in', [question_id])]" widget="many2many_tags" options="{'no_create': True}"/>
+                    <field name="attachment_answer_name" invisible="1"/>
+                    <field name="attachment_answer" filename="attachment_answer_name"
+                           attrs="{'invisible': [('answer_type', 'not in', ('photo', 'drawing')), ('additional_attachment_answer', '=', False)], 'required': ['|', ('answer_type', 'in', ('photo', 'drawing')), ('attachment_required', '=', True)]}"/>
                 </group>
                 <footer>
                     <button string="Annuler" special="cancel" class="btn-default"/>
@@ -52,7 +57,7 @@
             </xpath>
             <xpath expr="//notebook/page[@name='recap']//field[@name='question_ids']/tree//field[@name='definitive_answer']" position="after">
                 <field name="id" invisible="1"/>
-                <button name="of_questionnaire.action_of_repondre_questionnaire" type="action" icon="fa-pencil" context="{'default_question_id': id}"/>
+                <button name="of_questionnaire.action_of_repondre_questionnaire" type="action" icon="fa-pencil" context="{'question_ids': [], 'default_question_id': id}"/>
             </xpath>
         </field>
     </record>
