@@ -959,9 +959,10 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def _write(self, vals):
+        res = super(OfPlanningIntervention, self)._write(vals)
         if vals.get('employee_ids') or vals.get('date') or vals.get('date_deadline') or vals.get('verif_dispo'):
             self.do_verif_dispo()
-        return super(OfPlanningIntervention, self)._write(vals)
+        return res
 
     @api.model
     def _read_group_process_groupby(self, gb, query):
