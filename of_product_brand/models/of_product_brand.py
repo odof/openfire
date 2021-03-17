@@ -232,7 +232,7 @@ class ProductProduct(models.Model):
 class Partner(models.Model):
     _inherit = 'res.partner'
 
-    brand_ids = fields.One2many('of.product.brand', 'partner_id', string="Brands")
+    brand_ids = fields.One2many('of.product.brand', 'partner_id', string="Brands", readonly=True)
     supplier_brand_count = fields.Integer(compute='_compute_supplier_brand_count', string='# Brands')
 
     @api.multi
