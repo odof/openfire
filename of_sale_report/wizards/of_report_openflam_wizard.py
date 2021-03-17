@@ -272,7 +272,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
         worksheet.set_column(4, 4, 16)      # Largeur colonne 'Vendeur'
         worksheet.set_column(5, 5, 16)      # Largeur colonne 'Total HT'
         worksheet.set_column(6, 6, 16)      # Largeur colonne 'Total TTC'
-        worksheet.set_column(7, 7, 25)      # Largeur colonne 'Accompte(s) versé(s) (total)'
+        worksheet.set_column(7, 7, 25)      # Largeur colonne 'Acompte(s) versé(s) (total)'
         worksheet.set_column(8, 8, 20)      # Largeur colonne 'Solde'
 
         # --- Entête ---
@@ -292,7 +292,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
         worksheet.write(line_number, 4, 'Vendeur', styles['text_title_border'])
         worksheet.write(line_number, 5, 'Total HT', styles['text_title_border'])
         worksheet.write(line_number, 6, 'Total TTC', styles['text_title_border'])
-        worksheet.write(line_number, 7, u'Accompte(s) versé(s) (total)', styles['text_title_border'])
+        worksheet.write(line_number, 7, u'Acompte(s) versé(s) (total)', styles['text_title_border'])
         worksheet.write(line_number, 8, 'solde', styles['text_title_border'])
         line_number += 1
         solde = 0
@@ -304,7 +304,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
         line_keep = line_number
         date = 0
         for order in orders:
-            # --- Vérification du montant des accomptes ---
+            # --- Vérification du montant des acomptes ---
             payments = self.env['account.payment'].search([('communication', '=', order.name)])
             for invoice in order.invoice_ids:
                 payments = payments | invoice.payment_ids
@@ -352,7 +352,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
 
         # --- Ligne de récap total ---
         if solde and total:
-            worksheet.merge_range(line_number, 0, line_number, 4, 'Total de toute les semaines', styles['text_title_border'])
+            worksheet.merge_range(line_number, 0, line_number, 4, 'Total de toutes les semaines', styles['text_title_border'])
             for col in range(5, 9):
                 val = '=%s' % ('+'.join([xl_rowcol_to_cell(x, col) for x in total]))
                 worksheet.write(line_number, col, val, styles['number_title_border'])
@@ -408,7 +408,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
         worksheet.write(line_number, 5, u'Conditions de règlement', styles['text_title_border'])
         worksheet.write(line_number, 6, 'Total HT', styles['text_title_border'])
         worksheet.write(line_number, 7, 'Total TTC', styles['text_title_border'])
-        worksheet.write(line_number, 8, u'Accompte(s) versé(s) (total)', styles['text_title_border'])
+        worksheet.write(line_number, 8, u'Acompte(s) versé(s) (total)', styles['text_title_border'])
         worksheet.write(line_number, 9, 'solde', styles['text_title_border'])
         line_number += 1
         solde = 0
