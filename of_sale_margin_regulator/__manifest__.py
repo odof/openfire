@@ -17,6 +17,7 @@ Ce module ajoute le rapport Régule de marge pour les ventes
         'of_followup',
         'of_access_control',
         'of_external',
+        'sale',
     ],
     'data': [
         'reports/of_sale_margin_regulator_views.xml',
