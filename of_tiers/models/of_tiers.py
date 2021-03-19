@@ -49,11 +49,10 @@ class ResPartner(models.Model):
     _inherit = 'res.partner'
 
     @api.multi
-    def update_account(self, company=False):
+    def _update_account(self, company):
         """
-        Création / Mise à jour du compte de tiers des clients.
+        Création / Mise à jour du compte de tiers des clients et fournisseurs.
         :param company: Société pour laquelle on doit mettre à jour le compte.
-            Si non renseigné, la création de compte de tiers se fait en fonction de la société de l'utilisateur.
             Si la société n'a pas de plan comptable, on remonte ses parents jusqu'à en trouver un.
         """
         def get_code(prefix, digits, required=True, first_num=1, suffix=''):
@@ -95,7 +94,6 @@ class ResPartner(models.Model):
             return
 
         # On se place en sudo pour pouvoir générer les comptes, mais il faut forcer la société de l'utilisateur
-        company = company or self.env.user.company_id
         while not company.chart_template_id and company.parent_id:
             company = company.parent_id
         self = self.sudo().with_context(force_company=company.id)
@@ -176,6 +174,23 @@ class ResPartner(models.Model):
             if data:
                 partner.write(data)
 
+    @api.multi
+    def update_account(self, company=False):
+        """
+        Création / Mise à jour du compte de tiers des clients et fournisseurs.
+        :param company: Société pour laquelle on doit mettre à jour le compte.
+            Si non renseigné, la création de compte de tiers se fait en fonction de la société de l'utilisateur.
+            Si la base est configurée pour créer des comptes sur toutes les sociétés, ce champ n'est pas pris en compte.
+        """
+        company = company or self.env.user.company_id
+        mode = self.env['ir.values'].get_default('account.config.settings', 'of_tiers_mode')
+        if mode == 'all':
+            companies = self.env['res.company'].sudo().search([('chart_template_id', '!=', False)])
+        else:
+            companies = company or self.env.user.company_id
+        for comp in companies:
+            self._update_account(comp)
+
     @api.model
     def create(self, vals):
         partner = super(ResPartner, self).create(vals)
@@ -233,6 +248,19 @@ class AccountConfigSettings(models.TransientModel):
         related='company_id.of_client_id_ref', string=u"Utiliser les comptes de tiers comme références clients *",
         help=u"Affectation automatique de la partie variable du compte de tiers "
              u"dans la référence du partenaire nouvellement créé")
+    of_tiers_mode = fields.Selection(
+        [
+            ('current', u"Sur la société qui en a besoin uniquement"),
+            ('all', u"Sur toutes les sociétés comptables, dès qu'une société en a besoin")
+        ], string=u"(OF) Création des comptes de tiers", default='current',
+        help=u"Les comptes de tiers sont générés lorsque le besoin se présente.\n"
+             u"Cette option permet d'uniformiser la création des comptes sur les différentes sociétés comptables.\n"
+             u"Cela peut servir pour avoir une numérotation identique sur les divers plans comptables."
+    )
+
+    @api.multi
+    def set_of_tiers_mode_defaults(self):
+        return self.env['ir.values'].sudo().set_default('account.config.settings', 'of_tiers_mode', self.of_tiers_mode)
 
 
 class AccountInvoice(models.Model):
