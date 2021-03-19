@@ -20,7 +20,14 @@
                     </group>
                     <group name="intervention" string="Interventions">
                         <!--label for="id" string="Configuration des interventions" style="width: 250px"/-->
-                        <div name="general_config">
+                        <div name="general_config" colspan="2">
+                        </div>
+                        <label for="company_choice"/>
+                        <div name="company_choice">
+                            <field name="company_choice" class="oe_inline"/>
+                            <span>pour la création des RDVs, interventions à programmer, SAV et parcs installés.</span>
+                            <br/>
+                            <i class="oe_grey">/!\ ce paramètre est partagé entre toutes les sociétés</i>
                         </div>
                     </group>
                     <group name="fiche_intervention" string="Fiche d'intervention">

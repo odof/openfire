@@ -67,7 +67,25 @@ class OfTourneeRdv(models.TransientModel):
         res['partner_id'] = partner and partner.id or False
         res['partner_address_id'] = address and address.id or False
         res['service_id'] = service and service.id or False
+
+        # Allocation de société par défaut
+        # Pour les objets du planning, le choix de société se fait par un paramètre de config
+        # if not res.get('company_id'):
+        #     company_choice = self.env['ir.values'].get_default('of.intervention.settings', 'company_choice')
+        #     if company_choice == 'user':
+        #         res['company_id'] = self.env.user.company_id.id
+        #     elif res.get('partner_address_id') and address.company_id:
+        #         res['company_id'] = address.company_id.id
+        #     elif res.get('partner_id') and partner.company_id:
+        #         res['company_id'] = partner.company_id.id
+
         return res
+
+    @api.model
+    def _default_company(self):
+        if self.env['ir.values'].get_default('of.intervention.settings', 'company_choice') == 'user':
+            return self.env['res.company']._company_default_get('of.tournee.rdv')
+        return False
 
     # Champs de recherche
 
@@ -87,6 +105,7 @@ class OfTourneeRdv(models.TransientModel):
     partner_address_state_id = fields.Many2one(related="partner_address_id.state_id", readonly=True)
     partner_address_zip = fields.Char(related="partner_address_id.zip", readonly=True)
     partner_address_country_id = fields.Many2one(related="partner_address_id.country_id", readonly=True)
+    company_id = fields.Many2one('res.company', string='Magasin', required=True, default=lambda s: s._default_company())
     service_id = fields.Many2one('of.service', string=u"À programmer", domain="[('partner_id', '=', partner_id)]")
     tache_id = fields.Many2one('of.planning.tache', string=u"Tâche", required=True)
     creer_recurrence = fields.Boolean(
@@ -147,6 +166,15 @@ class OfTourneeRdv(models.TransientModel):
                 wizard.geocode_retry = True
 
     # @api.onchange
+
+    @api.onchange('partner_address_id')
+    def _onchange_partner_address_id(self):
+        if self.partner_address_id:
+            # Pour les objets du planning, le choix de la société se fait par un paramètre de config
+            company_choice = self.env['ir.values'].get_default(
+                'of.intervention.settings', 'company_choice') or 'contact'
+            if company_choice == 'contact' and self.partner_address_id.company_id:
+                self.company_id = self.partner_address_id.company_id.id
 
     @api.onchange('service_id')
     def _onchange_service(self):
@@ -324,7 +352,7 @@ class OfTourneeRdv(models.TransientModel):
 
         employee_obj = self.env['hr.employee']
         wizard_line_obj = self.env['of.tournee.rdv.line']
-        intervention_obj = self.env['of.planning.intervention']
+        intervention_obj = self.with_context(force_read=True).env['of.planning.intervention']
 
         service = self.service_id
 
@@ -613,6 +641,7 @@ class OfTourneeRdv(models.TransientModel):
         return {
             'partner_id': self.partner_id.id,
             'address_id': self.partner_address_id.id,
+            'company_id': self.company_id.id,
             'tache_id': self.tache_id.id,
             'mois_ids': [(4, mois)],
             'date_next': self.date_next,
@@ -629,6 +658,7 @@ class OfTourneeRdv(models.TransientModel):
         :return: dictionnaires de valeurs pour la création du RDV Tech
         """
         self.ensure_one()
+
         return {
             'partner_id': self.partner_id.id,
             'address_id': self.partner_address_id.id,
@@ -638,7 +668,7 @@ class OfTourneeRdv(models.TransientModel):
             'date': self.date_propos,
             'duree': self.duree,
             'user_id': self._uid,
-            'company_id': self.partner_address_id.company_id and self.partner_address_id.company_id.id,
+            'company_id': self.company_id.id,
             'name': self.name,
             'description': self.description or '',
             'state': 'confirm',
