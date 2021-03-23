@@ -38,24 +38,6 @@ class OfPlanningIntervention(models.Model):
         super(OfPlanningIntervention, self)._onchange_tache_id()
         if self.partner_id and self.tache_id:
             self._calc_new_description()
-        # auto-détection du service
-        if not self.address_id:
-            # ne pas charger un service si il n'y a pas d'adresse
-            return
-        service_obj = self.env['of.service']
-        vals = {'service_id': False}
-        if self.tache_id:
-            if self.service_id and self.service_id.tache_id.id == self.tache_id.id:
-                del vals['service_id']
-            else:
-                service = service_obj.search(['|',
-                                                ('address_id', '=', self.address_id.id),
-                                                ('partner_id', '=', self.partner_id.id),
-                                              ('tache_id', '=', self.tache_id.id)], limit=1)
-                if service:
-                    vals['service_id'] = service
-
-        self.update(vals)
 
     # Héritages
 

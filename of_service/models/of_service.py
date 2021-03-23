@@ -829,16 +829,6 @@ class OFPlanningIntervention(models.Model):
 
     # @api.onchange
 
-    @api.onchange('address_id', 'tache_id')
-    def _onchange_address_id(self):
-        super(OFPlanningIntervention, self)._onchange_address_id()
-        if self.address_id and self.address_id.service_address_ids and not self.service_id:
-            if self.tache_id:
-                service = self.address_id.service_address_ids.filtered(lambda x: x.tache_id.id == self.tache_id.id)
-                self.service_id = service and service[0] or False
-            else:
-                self.service_id = self.address_id.service_address_ids[0]
-
     @api.onchange('service_id')
     def _onchange_service_id(self):
         if self.service_id:

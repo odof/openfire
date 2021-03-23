@@ -69,6 +69,7 @@ class OfService(models.Model):
     def get_action_view_intervention_context(self, context={}):
         context = super(OfService, self).get_action_view_intervention_context(context)
         context['default_parc_installe_id'] = self.parc_installe_id and self.parc_installe_id.id or False
+        context['default_sav_id'] = self.sav_id and self.sav_id.id or False
         return context
 
 

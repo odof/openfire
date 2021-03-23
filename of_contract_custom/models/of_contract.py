@@ -351,6 +351,8 @@ class OfContract(models.Model):
         action = self.env.ref('of_contract_custom.of_contract_custom_open_interventions').read()[0]
         interventions = self.line_ids.mapped('intervention_ids')
         action['domain'] = [('id', 'in', interventions._ids)]
+        if len(self) == 1:
+            action['context'] = {'default_contract_id': self.id}
         return action
 
     @api.multi
