@@ -8,6 +8,8 @@
         <t t-set="pdf_fax" t-value="doc.pdf_afficher_fax()"/>
         <t t-set="pdf_email" t-value="doc.pdf_afficher_email()"/>
         <t t-set="pdf_vt_pastille" t-value="doc.pdf_vt_pastille()"/>
+        <t t-set="pdf_masquer_commercial" t-value="doc.pdf_masquer_commercial()"/>
+        <t t-set="pdf_masquer_payment_term" t-value="doc.pdf_masquer_payment_term()"/>
         <t t-set="client_info_pastille" t-value="(pdf_telephone &gt; 1 and doc.partner_id.phone) or (pdf_mobile &gt; 1 and doc.partner_id.mobile) or (pdf_fax &gt; 1 and doc.partner_id.fax) or (pdf_email &gt; 1 and doc.partner_id.email)"/>
         <t t-set="pdf_hide_global_address_label" t-value="doc.pdf_hide_global_address_label()"/>
         <!--####################
@@ -69,7 +71,7 @@
                         </div>
                         <div t-if="doc.client_order_ref" style="display: table-cell; width: 4px"/>
 
-                        <div name="commercial" t-if="doc.user_id" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                        <div name="commercial" t-if="doc.user_id and not pdf_masquer_commercial" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                             <strong>Commercial(e)&amp;nbsp;:</strong>
                             <p>
                                 <t t-if="doc.user_id.name"><span t-field="doc.user_id.name"/><br/></t>
@@ -92,7 +94,7 @@
                         <div t-if="client_info_pastille" style="display: table-cell; width: 4px;"/>
 
                         <!-- div name="payment_term" important pour sale_stock.report_saleorder_document_inherit_sale_stock -->
-                        <div name="payment_term" t-if="doc.payment_term_id" style="flex: 1; padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                        <div name="payment_term" t-if="doc.payment_term_id and not pdf_masquer_payment_term" style="flex: 1; padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                             <strong>Conditions de règlement&amp;nbsp;:</strong>
                             <p t-field="doc.payment_term_id"/>
                         </div>
