@@ -740,7 +740,7 @@ class OfContractLine(models.Model):
         string="Prochain Total", compute='_compute_prices', currency_field='company_currency_id', store=True,
         copy=False)
     year_subtotal = fields.Float(
-        string="Sous-total annuel", compute='_compute_prices', digits=dp.get_precision('Account'), store=True)
+        string="Total HT annuel", compute='_compute_prices', digits=dp.get_precision('Account'), store=True)
     year_taxes = fields.Monetary(
         string="Taxes annuelles", compute='_compute_prices', currency_field='company_currency_id', store=True)
     year_total = fields.Monetary(

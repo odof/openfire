@@ -179,7 +179,7 @@
                                         <field name="frequency_type"/>
                                         <field name="next_date"/>
                                         <field name="year_purchase_price" sum="Coût annuel"/>
-                                        <field name="year_total" sum="Total annuel"/>
+                                        <field name="year_subtotal" sum="Total HT annuel"/>
                                         <field name="next_purchase_price" sum="Prochain coût"/>
                                         <field name="amount_total" sum="Prochain total"/>
                                         <field name="last_invoicing_date"/>
