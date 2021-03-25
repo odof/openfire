@@ -1025,6 +1025,18 @@ class SaleOrderLine(models.Model):
         ctx['date'] = self.order_id.date_order
         self.of_seller_price = frm_cur.with_context(ctx).compute(seller_price, to_cur, round=False)
 
+    @api.model
+    def _get_of_seller_price(self, pricelist, product, product_uom, date):
+        frm_cur = self.env.user.company_id.currency_id
+        to_cur = pricelist.currency_id
+        seller_price = product.of_seller_price
+        if product_uom != product.uom_id:
+            seller_price = product.uom_id._compute_price(seller_price, product_uom)
+        ctx = self.env.context.copy()
+        ctx['date'] = date
+        price = frm_cur.with_context(ctx).compute(seller_price, to_cur, round=False)
+        return {'of_seller_price': price}
+
     @api.onchange('of_order_line_option_id')
     def _onchange_of_order_line_option_id(self):
         if self.of_order_line_option_id and self.product_id:
