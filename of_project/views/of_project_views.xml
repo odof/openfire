@@ -47,18 +47,24 @@
                                         <page string="Planification">
                                             <field name="task_planning_ids" widget="one2many">
                                                 <tree editable="bottom">
+                                                    <field name="project_id"/>
                                                     <field name="task_id"/>
+                                                    <field name="task_stage_id"/>
                                                     <field name="type_id"/>
                                                     <field name="duration"/>
                                                     <field name="notes"/>
+                                                    <field name="state"/>
                                                 </tree>
                                                 <form>
                                                     <group>
                                                         <group>
+                                                            <field name="project_id"/>
                                                             <field name="task_id"/>
+                                                            <field name="task_stage_id"/>
                                                             <field name="type_id"/>
                                                         </group>
                                                         <group>
+                                                            <field name="state"/>
                                                             <field name="duration"/>
                                                             <field name="notes"/>
                                                         </group>
@@ -229,9 +235,9 @@
             <xpath expr="//field[@name='user_id']" position="before">
                 <separator/>
                 <filter string="Projets Client" name="customer_projects"
-                        domain="[('partner_id', '!=', False)]"/>
+                        domain="['&amp;', ('partner_id', '!=', False), '|', ('use_tasks', '=', True), ('use_issues', '=', True)]"/>
                 <filter string="Projets Produit" name="product_projects"
-                        domain="[('partner_id', '=', False)]"/>
+                        domain="['&amp;', ('partner_id', '=', False), '|', ('use_tasks', '=', True), ('use_issues', '=', True)]"/>
                 <separator/>
                 <filter string="Ouverts" name="opened"
                         domain="[('of_state', '!=', '04_closed')]"/>
@@ -245,7 +251,7 @@
     </record>
 
     <record id="project.open_view_project_all" model="ir.actions.act_window">
-        <field name="view_mode">kanban,timeline,form</field>
+        <field name="view_mode">kanban,timeline,tree,form</field>
         <field name="context">{'search_default_opened': 1}</field>
     </record>
 
@@ -349,6 +355,86 @@
             </xpath>
         </field>
     </record>
+
+    <!--*****************************************************************************************-->
+    <!--******************************* OF Project Task Planning ********************************-->
+    <!--*****************************************************************************************-->
+
+    <record id="of_project_task_planning_form_view" model="ir.ui.view">
+        <field name="name">of.project.task.planning.form.view</field>
+        <field name="model">of.project.task.planning</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="project_id"/>
+                            <field name="task_id"/>
+                            <field name="task_stage_id"/>
+                            <field name="type_id"/>
+                        </group>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="period_id"/>
+                            <field name="duration"/>
+                            <field name="state"/>
+                        </group>
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_project_task_planning_tree_view" model="ir.ui.view">
+        <field name="name">of.project.task.planning.tree.view</field>
+        <field name="model">of.project.task.planning</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="project_id"/>
+                <field name="task_id"/>
+                <field name="task_stage_id"/>
+                <field name="type_id"/>
+                <field name="user_id"/>
+                <field name="period_id"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_project_task_planning_search_view" model="ir.ui.view">
+        <field name="name">of.project.task.planning.search.view</field>
+        <field name="model">of.project.task.planning</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="project_id"/>
+                <field name="task_id"/>
+                <field name="type_id"/>
+                <field name="user_id"/>
+                <field name="period_id"/>
+                <filter string="À valider" name="to_validate" domain="[('state', '=', 'to_validate')]"/>
+                <filter string="Validé" name="validated" domain="[('state', '=', 'validated')]"/>
+                <separator/>
+                <filter string="Mes activités" name="my_activities" domain="[('user_id', '=', uid)]"/>
+                <separator/>
+                <filter string="À venir" name="incoming"
+                        domain="[('period_id.dernier_jour', '>=', context_today().strftime('%Y-%m-%d'))]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_project_task_planning_action" model="ir.actions.act_window">
+        <field name="name">Activités planifiées</field>
+        <field name="res_model">of.project.task.planning</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="of_project_task_planning_search_view"/>
+        <field name="context">{'search_default_my_activities': 1,
+                               'search_default_incoming': 1,
+                               'search_default_to_validate': 1}</field>
+    </record>
+
+    <menuitem id="of_project_task_planning_menu" action="of_project_task_planning_action"
+              string="Activités planifiées" parent="project.menu_project_management" sequence="10"/>
 
     <!--*****************************************************************************************-->
     <!--***************************** OF Project Task Planning Type *****************************-->

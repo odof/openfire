@@ -338,7 +338,7 @@ class OfAffectationTache(models.Model):
 
 class Project(models.Model):
     _inherit = 'project.project'
-    _order = 'of_start_week'
+    _order = 'of_task_total_priority desc, of_end_date'
 
     of_state = fields.Selection(
         selection=[('01_incoming', u"À venir"),
@@ -352,6 +352,8 @@ class Project(models.Model):
     of_total_planned_hours = fields.Float(string=u"Durée prévue", compute='_compute_time')
     of_total_done_hours = fields.Float(string=u"Durée réalisée", compute='_compute_time')
     of_ressources = fields.Text(string=u"Ressources", compute='_compute_of_ressources')
+    of_task_total_priority = fields.Integer(
+        string=u"Priorité totale des tâches", compute='_compute_of_task_total_priority', store=True)
 
     @api.depends('task_ids', 'task_ids.stage_id', 'task_ids.stage_id.state')
     def _compute_of_state(self):
@@ -402,6 +404,14 @@ class Project(models.Model):
             for user in all_ressources:
                 ressources.append({'id': user.id, 'name': user.name})
             project.of_ressources = json.dumps(ressources) if ressources else False
+
+    @api.depends('task_ids', 'task_ids.priority')
+    def _compute_of_task_total_priority(self):
+        """
+        Calcul de la priorité d'un projet en fonction des priorités de ses tâches
+        """
+        for project in self:
+            project.of_task_total_priority = sum(project.task_ids.mapped(lambda t: int(t.priority)))
 
 
 class ProjectTask(models.Model):
@@ -513,30 +523,26 @@ class ProjectTask(models.Model):
 class OFProjectTaskPlanning(models.Model):
     _name = 'of.project.task.planning'
 
+    state = fields.Selection(
+        selection=[('to_validate', u"À valider"), ('validated', u"Validé")], string=u"État", default='validated')
     task_id = fields.Many2one(comodel_name='project.task', string=u"Tâche", required=True, ondelete='cascade')
+    project_id = fields.Many2one(
+        comodel_name='project.project', related='task_id.project_id', string=u"Projet", readonly=True)
+    task_stage_id = fields.Many2one(
+        comodel_name='project.task.type', related='task_id.stage_id', string=u"Étape de la tâche", readonly=True)
     type_id = fields.Many2one(comodel_name='of.project.task.planning.type', string=u"Type", required=True)
     user_id = fields.Many2one(comodel_name='res.users', string=u"Ressource")
     period_id = fields.Many2one(comodel_name='of.periode.planifiee', string=u"Période")
     duration = fields.Float(string=u"Durée")
     notes = fields.Char(string=u"Notes")
 
-    @api.model
-    def _init_planning(self):
-        dev_planning_type = self.env.ref('of_project.of_project_task_planning_type_dev')
-        val_planning_type = self.env.ref('of_project.of_project_task_planning_type_val')
-        for task in self.env['project.task'].search(
-                ['|', ('of_planned_dev_hours', '>', 0.0), ('of_planned_review_hours', '>', 0.0)]):
-            if not task.of_planning_ids:
-                if task.of_planned_dev_hours > 0.0:
-                    self.create({'task_id': task.id,
-                                 'type_id': dev_planning_type.id,
-                                 'user_id': task.user_id.id,
-                                 'duration': task.of_planned_dev_hours})
-                if task.of_planned_review_hours > 0.0:
-                    self.create({'task_id': task.id,
-                                 'type_id': val_planning_type.id,
-                                 'user_id': task.of_user_id.id,
-                                 'duration': task.of_planned_review_hours})
+    @api.multi
+    def name_get(self):
+        res = []
+        for task_planning in self:
+            res.append(
+                (task_planning.id, '%s / %s' % (task_planning.task_id.name_get()[0][1], task_planning.type_id.name)))
+        return res
 
 
 class OFProjectTaskPlanningType(models.Model):

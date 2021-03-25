@@ -16,7 +16,4 @@
 
     </data>
 
-    <!-- Task planning initialisation -->
-    <function model="of.project.task.planning" name="_init_planning"/>
-
 </odoo>
