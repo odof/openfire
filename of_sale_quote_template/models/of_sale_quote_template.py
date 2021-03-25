@@ -173,7 +173,10 @@ class SaleOrder(models.Model):
 
                 data = self._get_data_from_template(line, price, discount)
                 if self.pricelist_id:
-                    data.update(self.env['sale.order.line']._get_purchase_price(self.pricelist_id, line.product_id, line.product_uom_id, fields.Date.context_today(self)))
+                    data.update(self.env['sale.order.line']._get_purchase_price(
+                        self.pricelist_id, line.product_id, line.product_uom_id, fields.Date.context_today(self)))
+                    data.update(self.env['sale.order.line']._get_of_seller_price(
+                        self.pricelist_id, line.product_id, line.product_uom_id, fields.Date.context_today(self)))
                 new_line = order_line_obj._new_line_for_template(data)
                 if self.env.user.has_group('sale.group_sale_layout'):
                     if not new_line.layout_category_id and new_line.product_id.categ_id.of_layout_id:
