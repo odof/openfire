@@ -907,6 +907,8 @@ class SaleOrder(models.Model):
                     if self.pricelist_id:
                         data.update(OrderLine._get_purchase_price(
                             self.pricelist_id, line.product_id, line.product_uom_id, fields.Date.context_today(self)))
+                        data.update(OrderLine._get_of_seller_price(
+                            self.pricelist_id, line.product_id, line.product_uom_id, fields.Date.context_today(self)))
                     new_line = OrderLine._new_line_for_template(data)
                     if self.env.user.has_group('sale.group_sale_layout'):
                         if not new_line.layout_category_id and new_line.product_id.categ_id.of_layout_id:
