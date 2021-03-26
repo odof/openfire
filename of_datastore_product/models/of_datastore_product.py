@@ -381,10 +381,9 @@ class OfProductBrand(models.Model):
             if not model_ids:
                 return False
             model = ds_supplier_obj.of_datastore_read(ds_model_obj, model_ids, ['module', 'name'])[0]
-            res_id = model_obj.search([('module', '=', model['module']), ('name', '=', model['name'])]).id
+            res_id = model_obj.search([('module', '=', model['module']), ('name', '=', model['name'])]).res_id
             # Dans certains cas, un objet a pu être supprimé en DB mais pas sa référence dans ir_model_data
-            res_id = res_id and self.env[obj_name].search([('id', '=', res_id)]).id
-            return res_id
+            return self.env[obj_name].search([('id', '=', res_id)])
         # --- Gestion des cas particuliers ---
         if obj == self._name:
             return self
@@ -448,6 +447,9 @@ class OfProductBrand(models.Model):
                 if len(uoms) > 1:
                     # Ajout d'un filtre sur le nom pour préciser la recherche
                     uoms = obj_obj.search([('id', 'in', uoms.ids), ('name', '=ilike', res_name)]) or uoms
+                if len(uoms) > 1:
+                    # Tentative de matching par xml_id
+                    uoms = uoms & datastore_matching_model(obj, res_id) or uoms
                 if len(uoms) > 1:
                     # Ajout d'un filtre sur le nom pour préciser la recherche : même préfixe sur 4 lettres
                     uoms = obj_obj.search([('id', 'in', uoms.ids), ('name', '=ilike', res_name[:4]+'%')]) or uoms
