@@ -31,4 +31,5 @@
         name="of_sale_stock.report_of_picking_preparation"
         file="of_sale_stock.report_of_picking_preparation"
     />
+
 </odoo>

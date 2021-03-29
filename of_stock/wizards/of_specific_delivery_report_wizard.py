@@ -5,7 +5,7 @@ from odoo import api, fields, models
 
 class OFSpecificDeliveryReportWizard(models.TransientModel):
     _name = 'of.specific.delivery.report.wizard'
-    _description = u"Assistant de rapport BL spécifique"
+    _description = u"Assistant de rapport Transfert spécifique"
 
     @api.model
     def default_get(self, fields=None):
@@ -19,6 +19,7 @@ class OFSpecificDeliveryReportWizard(models.TransientModel):
         return result
 
     picking_id = fields.Many2one(comodel_name='stock.picking', string=u"Bon de livraison")
+    picking_type_code = fields.Selection(related='picking_id.picking_type_code', readonly=True)
     line_ids = fields.One2many(
         comodel_name='of.specific.delivery.report.wizard.line', inverse_name='wizard_id', string=u"Lignes à imprimer")
 
