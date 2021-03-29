@@ -216,6 +216,12 @@
                 <t t-raw="record.partner_name"/>
             </div>
 
+            <div t-if="record.name" class="of_planning_info of_planning_info_name">
+                <i class="fa fa-folder-open-o"/>
+                <span class="of_ws"/>
+                <t t-raw="record.name"/>
+            </div>
+
             <div t-if="record.tache_name" class="of_planning_info of_planning_info_tache_name">
                 <i class="fa fa-cogs"/>
                 <span class="of_ws"/>
@@ -292,6 +298,12 @@
                         ]
                     </span>
                 </t>
+            </div>
+
+            <div t-if="record.name">
+                <i class="fa fa-folder-open-o"/>
+                <span class="of_ws"/>
+                <t t-raw="record.name"/>
             </div>
 
             <div t-if="record.partner_name">
