@@ -4,7 +4,7 @@
 
     <report
         id="of_specific_delivery_report_action"
-        string="Bon de livraison spécifique"
+        string="Bon de Transfert spécifique"
         model="of.specific.delivery.report.wizard"
         report_type="qweb-pdf"
         name="of_stock.of_specific_delivery_report"
@@ -40,6 +40,20 @@
                                     <span t-field="o.picking_id.sale_id.client_order_ref"/>
                                 </div>
                                 <div t-if="o.picking_id.sale_id.client_order_ref" style="display: table-cell; width: 4px;"/>
+                                <div t-if="o.picking_type_code == 'internal'"
+                                     style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                                    <strong>Emplacement d'origine&amp;nbsp;:</strong>
+                                    <br/>
+                                    <span t-field="o.picking_id.location_id.name"/>
+                                </div>
+                                <div t-if="o.picking_type_code == 'internal'" style="display: table-cell; width: 4px;"/>
+                                <div t-if="o.picking_type_code == 'internal'"
+                                     style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                                    <strong>Emplacement de destination&amp;nbsp;:</strong>
+                                    <br/>
+                                    <span t-field="o.picking_id.location_dest_id.name"/>
+                                </div>
+                                <div t-if="o.picking_type_code == 'internal'" style="display: table-cell; width: 4px;"/>
                             </div>
                         </div>
                     </div>
