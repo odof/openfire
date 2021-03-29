@@ -19,6 +19,15 @@
         </field>
     </record>
 
+    <record id="view_of_service_rec_tree_inh_contract" model="ir.ui.view">
+        <field name="name">of.service.tree.contract.custom</field>
+        <field name="inherit_id" ref="of_service.view_of_service_rec_tree"/>
+        <field name="model">of.service</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='recurrence']" position="replace"/>
+        </field>
+    </record>
+
     <record id="view_of_contract_service_form" model="ir.ui.view">
         <field name="name">of.contract.service.form</field>
         <field name="model">of.service</field>
