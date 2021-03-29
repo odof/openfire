@@ -26,7 +26,7 @@
     </record>
 
     <act_window id="of_specific_delivery_report_wizard_action"
-                name="Bon de livraison spécifique"
+                name="Bon de Transfert spécifique"
                 res_model="of.specific.delivery.report.wizard"
                 src_model="stock.picking"
                 view_mode="form"

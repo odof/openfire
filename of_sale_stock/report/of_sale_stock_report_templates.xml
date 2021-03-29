@@ -29,6 +29,20 @@
                             <span t-field="o.sale_id.client_order_ref"/>
                         </div>
                         <div t-if="o.sale_id.client_order_ref" style="display: table-cell; width: 4px;"/>
+                        <div t-if="o.picking_type_code == 'internal'"
+                             style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                            <strong>Emplacement d'origine&amp;nbsp;:</strong>
+                            <br/>
+                            <span t-field="o.location_id.name"/>
+                        </div>
+                        <div t-if="o.picking_type_code == 'internal'" style="display: table-cell; width: 4px;"/>
+                        <div t-if="o.picking_type_code == 'internal'"
+                             style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                            <strong>Emplacement de destination&amp;nbsp;:</strong>
+                            <br/>
+                            <span t-field="o.location_dest_id.name"/>
+                        </div>
+                        <div t-if="o.picking_type_code == 'internal'" style="display: table-cell; width: 4px;"/>
                     </div>
                 </div>
             </div>
@@ -36,18 +50,18 @@
 
         <!-- not o.pack_operation_ids -->
         <xpath expr="//table[2]/thead//th" position="after">
-            <th groups="of_sale_stock.group_description_BL_variant" >Description</th>
+            <th name="th_descr_BL_nopack" groups="of_sale_stock.group_description_BL_variant" >Description</th>
         </xpath>
         <xpath expr="//table[2]//tbody//td" position="after">
-            <td groups="of_sale_stock.group_description_BL_variant" ><span t-field="move.name"/></td>
+            <td name="td_descr_BL_nopack" groups="of_sale_stock.group_description_BL_variant" ><span t-field="move.name"/></td>
         </xpath>
 
         <!-- with o.pack_operation_ids -->
         <xpath expr="//table[3]/thead//th" position="after">
-            <th groups="of_sale_stock.group_description_BL_variant">Description</th>
+            <th name="th_descr_BL_pack" groups="of_sale_stock.group_description_BL_variant">Description</th>
         </xpath>
         <xpath expr="//table[3]//tbody//td" position="after">
-            <td groups="of_sale_stock.group_description_BL_variant"><span t-field="pack_operation.move_name"/></td>
+            <td name="td_descr_BL_pack" groups="of_sale_stock.group_description_BL_variant"><span t-field="pack_operation.move_name"/></td>
         </xpath>
 
     </template>
