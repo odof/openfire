@@ -26,6 +26,8 @@ class OfAccountInvoice(models.Model):
         for invoice in self:
             if invoice.of_contract_id and invoice.date_invoice:
                 contractual_lines = invoice.invoice_line_ids.filtered('of_contract_line_id')
+                if not contractual_lines:
+                    continue
                 # toutes les lignes doivent avoir la même date prévue ou la même fréquence de facturation
                 if len(contractual_lines) > 1 and \
                     (not all(date == contractual_lines[0].of_contract_supposed_date
