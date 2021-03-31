@@ -38,10 +38,18 @@ class Company(models.Model):
         if not object:
             # Sans objet on ne sait pas quelles modifications apporter au résultat.
             return res
-        # Dans le cadre de la recherche d'un compte comptable, la société voulue est la société comptable.
-        if object == 'account.account' and not field:
+        if field:
+            # Le seul cas où field est renseigné est dans le cadre des champs company-dependent.
+            # Dans ce cas, on veut se placer sur la société comptable.
+            # Raison :
+            # Voir fonctions dans odoo/fields.py : _compute_company_dependent _inverse_company_dependent
+            # Le résultat de _company_default_get est mis comme société dans context['force_company']
+            #   et l'utilisateur est remplacé par SUPERUSER_ID
             res = res.accounting_company_id
-        if object == 'account.invoice' or not object.startswith('account.'):
+        # Dans le cadre de la recherche d'un compte comptable, la société voulue est la société comptable.
+        elif object == 'account.account':
+            res = res.accounting_company_id
+        elif object == 'account.invoice' or not object.startswith('account.'):
             # A l'exception de la comptabilité, on ne souhaite pas proposer des sociétés qui ne sont pas des magasins.
             if res and not res.of_is_shop:
                 res = res.of_default_shop_id
@@ -154,6 +162,10 @@ class Property(models.Model):
     _inherit = 'ir.property'
 
     def _get_domain(self, prop_name, model):
+        # Dans le cas où self.env.context contient 'force_company', la société retournée peut ne pas être
+        # une société comptable. Il faut donc le modifier.
+        # (e.g. : société forcée à celle de la facture pour calculer le compte de tiers
+        #   dans account.invoice._onchange_partner_id)
         res = super(Property, self)._get_domain(prop_name, model)
         if res:
             # Part du principe que _get_domain renvoie un domaine de la forme :
@@ -164,7 +176,7 @@ class Property(models.Model):
 
     @api.model
     def set_multi(self, name, model, values, default_value=None):
-        # retrieve the properties corresponding to the given record ids
+        # Si self.env.context contient 'force_company', il faut le modifier par la société comptable.
         self._cr.execute("SELECT id FROM ir_model_fields WHERE name=%s AND model=%s", (name, model))
         field_id = self._cr.fetchone()[0]
         company_id = self.env.context.get('force_company')\
