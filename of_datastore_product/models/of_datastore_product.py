@@ -379,7 +379,7 @@ class OfProductBrand(models.Model):
             model_ids = ds_supplier_obj.of_datastore_search(ds_model_obj, [('model', '=', obj_name),
                                                                            ('res_id', '=', obj_id)])
             if not model_ids:
-                return False
+                return self.env[obj_name]
             model = ds_supplier_obj.of_datastore_read(ds_model_obj, model_ids, ['module', 'name'])[0]
             res_id = model_obj.search([('module', '=', model['module']), ('name', '=', model['name'])]).res_id
             # Dans certains cas, un objet a pu être supprimé en DB mais pas sa référence dans ir_model_data
