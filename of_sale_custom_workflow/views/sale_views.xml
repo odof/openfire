@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Sale Order Views -->
+
+    <record id="of_sale_custom_workflow_sale_order_form_view" model="ir.ui.view">
+        <field name="name">of.sale.custom.workflow.sale.order.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="priority" eval="10"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_confirm'][1]" position="attributes">
+                <attribute name="string">Enregistrer la commande</attribute>
+                <attribute name="states"/>
+                <attribute name="attrs">{'invisible': [('state', '!=', 'presale')]}</attribute>
+                <attribute name="groups">of_access_control.of_group_sale_responsible</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_confirm'][2]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_confirm']" position="after">
+                <button name="action_preconfirm" states="draft" string="Confirmer la vente" type="object"/>
+                <button name="action_preconfirm" states="sent" string="Confirmer la vente" class="btn-primary" type="object"/>
+            </xpath>
+            <xpath expr="//button[@name='%(sale.action_view_sale_advance_payment_inv)d'][2]" position="attributes">
+                <attribute name="attrs">{'invisible': ['|',('invoice_status', '!=', 'no'), ('state', 'not in', ['presale', 'sale'])]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='state']" position="before">
+                <button name="%(of_sale_order_closure_wizard_action)d" type="action" string="Clôturer"
+                        groups="of_access_control.of_group_sale_responsible"
+                        attrs="{'invisible': [('state', 'not in', ('sale', 'done'))]}"/>
+                <button name="action_reopen" type="object" string="Ré-ouvrir"
+                        groups="of_access_control.of_group_sale_responsible"
+                        attrs="{'invisible': [('state', '!=', 'closed')]}"/>
+            </xpath>
+            <xpath expr="//field[@name='state']" position="replace">
+                <field name="state" widget="statusbar" statusbar_visible="draft,sent,presale,sale"/>
+            </xpath>
+            <xpath expr="//field[@name='confirmation_date']" position="before">
+                <field name="of_custom_confirmation_date" attrs="{'invisible': [('state', 'in', ['draft', 'sent', 'cancel'])]}" widget="date"/>
+            </xpath>
+            <xpath expr="//field[@name='confirmation_date']" position="attributes">
+                <attribute name="attrs">{'invisible': [('state', 'in', ['draft', 'sent', 'presale', 'cancel'])]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_custom_workflow_sale_order_confirmation_date_form_view" model="ir.ui.view">
+        <field name="name">of.sale.custom.workflow.sale.order.confirmation.date.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_confirmation_date_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_confirm'][1]" position="attributes">
+                <attribute name="string">Enregistrer la commande</attribute>
+                <attribute name="attrs">{'invisible': ['|', ('confirmation_date', '!=', False), ('state', '!=', 'presale')]}</attribute>
+                <attribute name="groups">of_access_control.of_group_sale_responsible</attribute>
+            </xpath>
+            <xpath expr="//button[@name='of_sale.action_of_sale_confirmation_devis'][1]" position="replace"/>
+            <xpath expr="//button[@name='of_sale.action_of_sale_confirmation_devis'][1]" position="attributes">
+                <attribute name="string">Enregistrer la commande</attribute>
+                <attribute name="attrs">{'invisible': ['|', ('confirmation_date', '=', False), ('state', '!=', 'presale')]}</attribute>
+                <attribute name="groups">of_access_control.of_group_sale_responsible</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_custom_workflow_sale_order_payment_form_view" model="ir.ui.view">
+        <field name="name">of.sale.custom.workflow.sale.order.payment.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale_payment.of_sale_view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='%(of_sale_payment.action_sale_order_payment)d']" position="attributes">
+                <attribute name="states">presale,sale</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_crm.of_crm_sale_order_quotation_form_view" model="ir.ui.view">
+        <field name="inherit_id" ref="of_sale_custom_workflow.of_sale_custom_workflow_sale_order_form_view"/>
+        <field name="arch" type="xml">
+            <field name="state" position="replace">
+                <field name="state" widget="statusbar" statusbar_visible="sent,presale,sale"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="of_sale_custom_workflow_sale_order_search_view" model="ir.ui.view">
+        <field name="name">of.sale.custom.workflow.sale.order.search.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_order_view_search_inherit_sale"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='sales']" position="replace">
+                <filter string="Commandes validées" name="presales" domain="[('state', '=', 'presale')]"/>
+                <filter string="Commandes enregistrées" name="sales" domain="[('state', 'in', ('sale', 'done'))]"/>
+            </xpath>
+            <xpath expr="//separator[3]" position="after">
+                <filter name='in_progress' string="En cours" domain="[('state', '!=', 'closed'')]"/>
+                <filter name='closed' string="Clôturé" domain="[('state', '=', 'closed'')]"/>
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_custom_workflow_sale_quotation_search_view" model="ir.ui.view">
+        <field name="name">of.sale.custom.workflow.sale.quotation.search.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.sale_order_view_search_inherit_quotation"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='sales']" position="replace">
+                <filter string="Commandes validées" name="presales" domain="[('state', '=', 'presale')]"/>
+                <filter string="Commandes enregistrées" name="sales" domain="[('state', 'in', ('sale', 'done'))]"/>
+            </xpath>
+            <xpath expr="//separator[2]" position="after">
+                <filter name='in_progress' string="En cours" domain="[('state', '!=', 'closed'')]"/>
+                <filter name='closed' string="Clôturé" domain="[('state', '=', 'closed'')]"/>
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sale.action_orders" model="ir.actions.act_window">
+        <field name="context">{'search_default_in_progress': 1}</field>
+    </record>
+
+    <record id="sale.action_quotations" model="ir.actions.act_window">
+        <field name="context">{'hide_sale': True, 'search_default_in_progress': 1}</field>
+    </record>
+
+</odoo>

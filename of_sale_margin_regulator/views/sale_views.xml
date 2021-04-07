@@ -8,34 +8,11 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//button[@name='action_confirm'][1]" position="attributes">
-                <attribute name="groups">of_access_control.of_group_sale_responsible</attribute>
-            </xpath>
-            <xpath expr="//button[@name='action_confirm'][2]" position="attributes">
-                <attribute name="groups">of_access_control.of_group_sale_responsible</attribute>
-            </xpath>
-            <xpath expr="//field[@name='state']" position="before">
-                <field name="of_validated" invisible="1"/>
-                <button name="action_validate" type="object" string="Validation commerciale" class="btn-primary"
-                        attrs="{'invisible': ['|', ('state', 'not in', ('draft', 'sent')), ('of_validated', '=', True)]}"/>
-                <button name="%(of_sale_order_closure_wizard_action)d" type="action" string="Clôturer"
-                        groups="of_access_control.of_group_sale_responsible"
-                        attrs="{'invisible': [('state', 'not in', ('sale', 'done'))]}"/>
-                <button name="action_reopen" type="object" string="Ré-ouvrir"
-                        groups="of_access_control.of_group_sale_responsible"
-                        attrs="{'invisible': [('state', '!=', 'closed')]}"/>
-            </xpath>
-            <xpath expr="//field[@name='name']" position="after">
-                <span class="badge" style="background: green; margin-left: 15px;"
-                    attrs="{'invisible': [('of_validated', '=', False)]}">
-                    VALIDÉ
-                </span>
-            </xpath>
             <xpath expr="//notebook" position="inside">
                 <page string="Suivi de la marge" groups="of_sale.of_group_sale_marge_manager">
                     <group>
                         <field name="of_margin_followup_ids" nolabel="1" readonly="1">
-                            <tree colors="grey:cancelled">
+                            <tree decoration-muted="cancelled">
                                 <field name="cancelled" invisible="1"/>
                                 <field name="type"/>
                                 <field name="date"/>
@@ -50,40 +27,6 @@
                 </page>
             </xpath>
         </field>
-    </record>
-
-    <record id="of_sale_margin_regulator_sale_order_search_view" model="ir.ui.view">
-        <field name="name">of.sale.margin.regulator.sale.order.search.view</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="of_sale.of_sale_order_view_search_inherit_sale"/>
-        <field name="arch" type="xml">
-            <xpath expr="//separator[3]" position="after">
-                <filter name='in_progress' string="En cours" domain="[('state', '!=', 'closed'')]"/>
-                <filter name='closed' string="Clôturé" domain="[('state', '=', 'closed'')]"/>
-                <separator/>
-            </xpath>
-        </field>
-    </record>
-
-    <record id="of_sale_margin_regulator_sale_quotation_search_view" model="ir.ui.view">
-        <field name="name">of.sale.margin.regulator.sale.quotation.search.view</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.sale_order_view_search_inherit_quotation"/>
-        <field name="arch" type="xml">
-            <xpath expr="//separator[2]" position="after">
-                <filter name='in_progress' string="En cours" domain="[('state', '!=', 'closed'')]"/>
-                <filter name='closed' string="Clôturé" domain="[('state', '=', 'closed'')]"/>
-                <separator/>
-            </xpath>
-        </field>
-    </record>
-
-    <record id="sale.action_orders" model="ir.actions.act_window">
-        <field name="context">{'search_default_in_progress': 1}</field>
-    </record>
-
-    <record id="sale.action_quotations" model="ir.actions.act_window">
-        <field name="context">{'hide_sale': True, 'search_default_in_progress': 1}</field>
     </record>
 
 </odoo>
