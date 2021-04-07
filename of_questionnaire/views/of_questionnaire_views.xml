@@ -414,7 +414,7 @@
         <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
-                <page name="recap" string="Compte rendu de l'intervention">
+                <page name="questionnaire" string="Questionnaire">
                     <separator string="Questionnaire"/>
                     <field name="questionnaire_id" domain="[('type', '=', 'intervention')])" options="{'no_create': True}"/>
                     <field name="question_ids" mode="tree" nolabel="1" context="{'address_id': address_id, 'default_type': 'intervention'}">
