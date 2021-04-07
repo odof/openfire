@@ -989,11 +989,12 @@
                     <div class="oe_title">
                         <h1><field name="name" placeholder="Nom du modèle"/></h1>
                     </div>
-                    <group>
-                        <group>
+                    <group name="general">
+                        <group name="general_one">
                             <field name="code"/>
                             <field name="tache_id"/>
                         </group>
+                        <group name="general_two"/>
                     </group>
                     <notebook>
                         <page string="Configuration">
