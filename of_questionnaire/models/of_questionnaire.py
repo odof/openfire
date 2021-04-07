@@ -117,6 +117,14 @@ class OfQuestionnaireLineCategory(models.Model):
 class OfPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
+    @api.model_cr_context
+    def _auto_init(self):
+        view = self.env.ref('of_questionnaire.of_repondre_questionnaire_planning_intervention_view_form', raise_if_not_found=False)
+        if view:
+            view.unlink()
+        res = super(OfPlanningIntervention, self)._auto_init()
+        return res
+
     question_ids = fields.One2many('of.planning.intervention.question', 'intervention_id', string="Questions")
     questionnaire_id = fields.Many2one('of.questionnaire', string="Questionnaire")
 
