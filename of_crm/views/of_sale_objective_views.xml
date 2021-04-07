@@ -26,7 +26,9 @@
                         <field name="objective_line_ids" nolabel="1" attrs="{'invisible': [('id', '=', False)]}" colspan="4">
                             <tree editable="bottom">
                                 <field name="employee_id" options="{'no_open': True, 'no_create': True}"/>
-                                <field name="ordered_turnover"/>
+                                <field name="turnover_budget" sum="Total"/>
+                                <field name="ordered_turnover" sum="Total"/>
+                                <field name="invoiced_turnover" sum="Total"/>
                             </tree>
                         </field>
                     </group>

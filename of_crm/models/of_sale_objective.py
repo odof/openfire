@@ -73,7 +73,9 @@ class OFSaleObjectiveLine(models.Model):
     objective_id = fields.Many2one(
         comodel_name='of.sale.objective', string=u"Objectif mensuel associé", required=True, ondelete='cascade')
     employee_id = fields.Many2one(comodel_name='hr.employee', string=u"Vendeur", required=True)
+    turnover_budget = fields.Float(string=u"Budget CA")
     ordered_turnover = fields.Float(string=u"CA commandé")
+    invoiced_turnover = fields.Float(string=u"CA facturé")
 
     _sql_constraints = [
         ('of_sale_objective_line_employee_uniq',
