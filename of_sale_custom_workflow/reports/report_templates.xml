@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Rapport Fiche d'intervention -->
+    <template id="of_sale_custom_workflow_fiche_intervention_report_template" inherit_id="of_planning.of_fiche_intervention_report_template">
+        <xpath expr="//div[@name='order_info_sans_montant']//t[@t-if='order.confirmation_date']" position="replace">
+            <t t-if="order.confirmation_date">
+                <div class="h5" style="padding: 0px 16px;">
+                    <div>
+                        <span>Date d'enregistrement&amp;nbsp;:</span>
+                        <span t-field="order.confirmation_date" t-field-options='{"widget": "date"}'/>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+        <xpath expr="//div[@name='order_info']//t[@t-if='order.confirmation_date']" position="replace">
+            <t t-if="order.confirmation_date">
+                <div class="h5" style="padding: 0px 16px;">
+                    <div>
+                        <span>Date d'enregistrement&amp;nbsp;:</span>
+                        <span t-field="order.confirmation_date" t-field-options='{"widget": "date"}'/>
+                    </div>
+                </div>
+                <div style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+            </t>
+        </xpath>
+    </template>
+
+</odoo>
