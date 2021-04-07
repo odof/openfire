@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Res Company Views -->
+
+    <record id="of_retail_analysis_res_company_form_view" model="ir.ui.view">
+        <field name="name">of.retail.analysis.res.company.form.view</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="of_base.of_base_view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[1]/group[1]" position="inside">
+                <group string="Périmètre d'analyse">
+                    <field name="of_company_type_id"/>
+                    <field name="of_company_sector_id"/>
+                    <field name="of_company_sales_group_id"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- OF Res Company Type Views -->
+
+    <record id="of_retail_analysis_of_res_company_type_form_view" model="ir.ui.view">
+        <field name="name">of.retail.analysis.of.res.company.type.form.view</field>
+        <field name="model">of.res.company.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="sequence"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_retail_analysis_of_res_company_type_tree_view" model="ir.ui.view">
+        <field name="name">of.retail.analysis.of.res.company.type.tree.view</field>
+        <field name="model">of.res.company.type</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_retail_analysis_of_res_company_type_action" model="ir.actions.act_window">
+        <field name="name">Types de société</field>
+        <field name="res_model">of.res.company.type</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="of_retail_analysis_of_res_company_type_menu" name="Types de société" parent="base.menu_users"
+              action="of_retail_analysis_of_res_company_type_action" sequence="15" groups="base.group_system"/>
+
+    <!-- OF Res Company Sector Views -->
+
+    <record id="of_retail_analysis_of_res_company_sector_form_view" model="ir.ui.view">
+        <field name="name">of.retail.analysis.of.res.company.sector.form.view</field>
+        <field name="model">of.res.company.sector</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="sequence"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_retail_analysis_of_res_company_sector_tree_view" model="ir.ui.view">
+        <field name="name">of.retail.analysis.of.res.company.sector.tree.view</field>
+        <field name="model">of.res.company.sector</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_retail_analysis_of_res_company_sector_action" model="ir.actions.act_window">
+        <field name="name">Secteurs de société</field>
+        <field name="res_model">of.res.company.sector</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="of_retail_analysis_of_res_company_sector_menu" name="Secteurs de société" parent="base.menu_users"
+              action="of_retail_analysis_of_res_company_sector_action" sequence="20" groups="base.group_system"/>
+
+    <!-- OF Res Company Sales Group Views -->
+
+    <record id="of_retail_analysis_of_res_company_sales_group_form_view" model="ir.ui.view">
+        <field name="name">of.retail.analysis.of.res.company.sales.group.form.view</field>
+        <field name="model">of.res.company.sales.group</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="sequence"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_retail_analysis_of_res_company_sales_group_tree_view" model="ir.ui.view">
+        <field name="name">of.retail.analysis.of.res.company.sales.group.tree.view</field>
+        <field name="model">of.res.company.sales.group</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_retail_analysis_of_res_company_sales_group_action" model="ir.actions.act_window">
+        <field name="name">Groupes Ventes de société</field>
+        <field name="res_model">of.res.company.sales.group</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="of_retail_analysis_of_res_company_sales_group_menu" name="Groupes Ventes de société" parent="base.menu_users"
+              action="of_retail_analysis_of_res_company_sales_group_action" sequence="25" groups="base.group_system"/>
+
+</odoo>

@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_res_company_type_user,access.of.res.company.type.user,model_of_res_company_type,base.group_user,1,0,0,0
+access_of_res_company_type_manager,access.of.res.company.type.manager,model_of_res_company_type,base.group_system,1,1,1,1
+access_of_res_company_sector_user,access.of.res.company.sector.user,model_of_res_company_sector,base.group_user,1,0,0,0
+access_of_res_company_sector_manager,access.of.res.company.sector.manager,model_of_res_company_sector,base.group_system,1,1,1,1
+access_of_res_company_sales_group_user,access.of.res.company.sales.group.user,model_of_res_company_sales_group,base.group_user,1,0,0,0
+access_of_res_company_sales_group_manager,access.of.res.company.sales.group.manager,model_of_res_company_sales_group,base.group_system,1,1,1,1
