@@ -7,26 +7,26 @@
             <field name="arch" type="xml">
                 <pivot string="Régule de marge" disable_linking="True">
                     <field name="confirmation_date" interval="month" type="row"/>
+                    <field name="presale_cost" type="measure"/>
+                    <field name="presale_price" type="measure"/>
+                    <field name="presale_price_variation" type="measure"/>
+                    <field name="presale_margin" type="measure"/>
+                    <field name="presale_margin_perc" type="measure"/>
                     <field name="sale_cost" type="measure"/>
                     <field name="sale_price" type="measure"/>
                     <field name="sale_price_variation" type="measure"/>
                     <field name="sale_margin" type="measure"/>
                     <field name="sale_margin_perc" type="measure"/>
-                    <field name="confirmation_cost" type="measure"/>
-                    <field name="confirmation_price" type="measure"/>
-                    <field name="confirmation_price_variation" type="measure"/>
-                    <field name="confirmation_margin" type="measure"/>
-                    <field name="confirmation_margin_perc" type="measure"/>
                     <field name="delivered_cost" type="measure"/>
                     <field name="invoiced_total" type="measure"/>
                     <field name="ordered_real_margin" type="measure"/>
                     <field name="ordered_real_margin_perc" type="measure"/>
                     <field name="invoiced_real_margin" type="measure"/>
                     <field name="invoiced_real_margin_perc" type="measure"/>
-                    <field name="ordered_real_confirmation_margin_gap" type="measure"/>
-                    <field name="ordered_real_confirmation_margin_gap_perc" type="measure"/>
-                    <field name="invoiced_real_confirmation_margin_gap" type="measure"/>
-                    <field name="invoiced_real_confirmation_margin_gap_perc" type="measure"/>
+                    <field name="ordered_real_sale_margin_gap" type="measure"/>
+                    <field name="ordered_real_sale_margin_gap_perc" type="measure"/>
+                    <field name="invoiced_real_sale_margin_gap" type="measure"/>
+                    <field name="invoiced_real_sale_margin_gap_perc" type="measure"/>
                 </pivot>
             </field>
         </record>
