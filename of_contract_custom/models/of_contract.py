@@ -19,27 +19,6 @@ class OfContract(models.Model):
     _name = "of.contract"
     _inherit = ['mail.thread', 'of.form.readonly']
 
-    @api.model_cr_context
-    def _auto_init(self):
-        """ A SUPPRIMER QUAND LES BASES SERONT MIGRES SUR SERVEUR DE PROD """
-        cr = self._cr
-        cr.execute(
-            "SELECT 1 FROM information_schema.columns "
-            "WHERE table_name = 'of_contract' AND column_name = 'recurring_invoicing_payment'")
-        champ_ancien = bool(cr.fetchall())
-        cr.execute(
-            "SELECT 1 FROM information_schema.columns "
-            "WHERE table_name = 'of_contract' AND column_name = 'recurring_invoicing_payment_id'")
-        champ_nouveau = bool(cr.fetchall())
-        res = super(OfContract, self)._auto_init()
-        if champ_ancien and not champ_nouveau:
-            cr.execute(
-                "UPDATE of_contract as oc "
-                "SET recurring_invoicing_payment_id = rip.id "
-                "FROM of_contract_recurring_invoicing_payment AS rip "
-                "WHERE rip.code = oc.recurring_invoicing_payment")
-        return res
-
     active = fields.Boolean(default=True)
     invoice_ids = fields.One2many(comodel_name='account.invoice', inverse_name='of_contract_id', string="Factures")
     invoice_count = fields.Integer(string='Nombre de factures', compute='_get_invoice_count', readonly=True)
@@ -635,27 +614,6 @@ class OfContractLine(models.Model):
     _inherit = ["of.form.readonly", "of.planning.plannification"]
     _order = 'line_avenant_id ASC, code_de_ligne DESC'
 
-    @api.model_cr_context
-    def _auto_init(self):
-        """ A SUPPRIMER QUAND LES BASES SERONT MIGRES SUR SERVEUR DE PROD """
-        cr = self._cr
-        cr.execute(
-            "SELECT 1 FROM information_schema.columns "
-            "WHERE table_name = 'of_contract_line' AND column_name = 'recurring_invoicing_payment'")
-        champ_ancien = bool(cr.fetchall())
-        cr.execute(
-            "SELECT 1 FROM information_schema.columns "
-            "WHERE table_name = 'of_contract_line' AND column_name = 'recurring_invoicing_payment_id'")
-        champ_nouveau = bool(cr.fetchall())
-        res = super(OfContractLine, self)._auto_init()
-        if champ_ancien and not champ_nouveau:
-            cr.execute(
-                "UPDATE of_contract_line as ocl "
-                "SET recurring_invoicing_payment_id = rip.id "
-                "FROM of_contract_recurring_invoicing_payment AS rip "
-                "WHERE rip.code = ocl.recurring_invoicing_payment")
-        return res
-
     name = fields.Char(string="Nom", compute="_compute_name", store=True)
     partner_id = fields.Many2one('res.partner', related="contract_id.partner_id", string="Client payeur", readonly=True)
     address_id = fields.Many2one('res.partner', string="Adresse d'intervention", required=True)
@@ -1086,6 +1044,12 @@ class OfContractLine(models.Model):
         elif self.frequency_type:
             if self.recurring_invoicing_payment_id.code not in ('pre-paid', 'post-paid'):
                 self.recurring_invoicing_payment_id = False
+
+    @api.model
+    def cancel_contract_lines(self):
+        today = fields.Date.today()
+        lines_to_cancel = self.search([('date_contract_end', '<=', today), ('state', '=', 'validated')])
+        lines_to_cancel.write({'state': 'cancel'})
 
     @api.multi
     def name_get(self):
