@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_parc_installe_public,access.of.parc.installe.public,of_parc_installe.model_of_parc_installe,base.group_portal,1,0,0,0
+access_product_category_public,access.product.category.public,product.model_product_category,base.group_portal,1,0,0,0
+access_of_product_brand_public,access.of.product.brand.public,of_product_brand.model_of_product_brand,base.group_portal,1,0,0,0
+access_of_planning_tache_public,access.of.planning.tache.public,of_planning.model_of_planning_tache,base.group_portal,1,0,0,0

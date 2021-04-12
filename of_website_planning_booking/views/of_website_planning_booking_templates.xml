@@ -1,0 +1,777 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="assets_frontend" inherit_id="website.assets_frontend" name="RDV">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" href="/of_website_planning_booking/static/src/css/of_website_planning_booking.css"/>
+            <script type="text/javascript" src="/of_website_planning_booking/static/src/js/of_website_planning_booking.js"/>
+        </xpath>
+    </template>
+
+    <!-- Portal -->
+
+    <template id="of_website_planning_booking_portal_my_home_menu" name="OF Website Planning Booking Portal Home Menu"
+              inherit_id="website_portal.portal_layout" priority="30">
+        <xpath expr="//ul[contains(@class,'o_portal_submenu')]" position="inside">
+            <li>
+                <a href="/my/of_installed_parks">Parcs installés</a>
+            </li>
+        </xpath>
+    </template>
+
+    <template id="of_website_planning_booking_portal_my_home" name="OF Website Planning Booking Portal Home"
+              inherit_id="website_portal.portal_my_home" priority="30">
+        <xpath expr="//div[contains(@class,'o_my_home_content')]" position="inside">
+            <h3 class="page-header">
+                <a href="/my/of_installed_parks">Vos parcs installés
+                    <small class="ml8">
+                        <t t-if="installed_park_count">
+                            <span class='badge'><t t-esc="installed_park_count"/></span>
+                        </t>
+                        <t t-if="not installed_park_count">
+                            Il n'y a actuellement pas de parcs installés associés à votre compte.
+                        </t>
+                    </small>
+                </a>
+            </h3>
+        </xpath>
+    </template>
+
+    <!-- Portal - OF My Installed Parks -->
+
+    <template id="of_website_planning_booking_portal_my_home_of_installed_parks" name="OF My Installed Parks">
+        <t t-call="website_portal.portal_layout">
+            <h3 class="page-header">Vos parcs installés</h3>
+            <t t-if="not installed_parks">
+                <p>Il n'y a actuellement pas de parcs installés associé à votre compte.</p>
+            </t>
+            <t t-if="installed_parks">
+                <table class="table table-hover o_my_status_table">
+                    <thead>
+                        <tr class="active">
+                            <th>Marque - Modèle</th>
+                            <th>N° de série</th>
+                        </tr>
+                    </thead>
+                    <t t-foreach="installed_parks" t-as="installed_park">
+                        <tr>
+                            <td>
+                                <span t-esc="installed_park.brand_id.name"/> - <span t-esc="installed_park.modele"/>
+                            </td>
+                            <td>
+                                <span t-esc="installed_park.name or '-'"/>
+                            </td>
+                        </tr>
+                    </t>
+                </table>
+                <div t-if="pager" class="o_portal_pager text-center">
+                    <t t-call="website.pager" />
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- OF Website Planning Booking -->
+
+    <!-- OF Website Planning Booking - Breadcrumb Trail -->
+    <template id="new_booking_breadcrumb_trail" name="Prise de RDV en ligne - Fil d'Ariane">
+        <ul class="wizard pull-right">
+            <li t-att-class="step_number==10 and 'text-primary' or 'text-muted'" id="step_parc">
+                <t t-if="step_number&gt;10">
+                    <a href="/new_booking/installed_park_select" class="text-primary">
+                        Appareil
+                        <span class="chevron"/>
+                    </a>
+                </t>
+                <t t-if="not step_number&gt;10">
+                    Appareil
+                    <span class="chevron"/>
+                </t>
+            </li>
+            <li t-att-class="(20 &lt;= step_number &lt; 30 and 'text-primary') or 'text-muted'" id="step_address">
+                <t t-if="step_number&gt;20">
+                    <a href="/new_booking/address_select" class="text-primary">
+                        Adresse
+                        <span class="chevron"/>
+                    </a>
+                </t>
+                <t t-if="not step_number&gt;20">
+                    Adresse
+                    <span class="chevron"/>
+                </t>
+            </li>
+            <li t-att-class="(step_number==30 and 'text-primary') or 'text-muted'" id="step_geoloc">
+                <t t-if="step_number&gt;30">
+                    <a href="/new_booking/localize" class="text-primary">
+                        Localisation
+                        <span class="chevron"/>
+                    </a>
+                </t>
+                <t t-if="not step_number&gt;30">
+                    Localisation
+                    <span class="chevron"/>
+                </t>
+            </li>
+            <li t-att-class="(step_number==40 and 'text-primary') or 'text-muted'" id="step_prestation">
+                <t t-if="step_number&gt;40">
+                    <a href="/new_booking/localize" class="text-primary">
+                        Prestation
+                        <span class="chevron"/>
+                    </a>
+                </t>
+                <t t-if="not step_number&gt;40">
+                    Prestation
+                    <span class="chevron"/>
+                </t>
+            </li>
+            <li t-att-class="(step_number==50 and 'text-primary') or 'text-muted'" id="step_creneau">
+                <t t-if="step_number&gt;50">
+                    <a href="/new_booking/slot" class="text-primary">
+                        Créneau
+                        <span class="chevron"/>
+                    </a>
+                </t>
+                <t t-if="not step_number&gt;50">
+                    Créneau
+                    <span class="chevron"/>
+                </t>
+            </li>
+            <li t-att-class="(step_number==60 and 'text-primary') or 'text-muted'" id="step_confirmation">
+                Confirmation
+                <span class="chevron"/>
+            </li>
+        </ul>
+    </template>
+
+    <!-- OF Website Planning Booking - Installed Park Select -->
+    <template id="new_booking_installed_park_select" name="Prise de RDV en ligne - Sélection Appareil">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_website_sale">
+                    <div class="row">
+                        <t t-call="of_website_planning_booking.new_booking_breadcrumb_trail"/>
+                        <h1 class="col-md-10 page-header text-primary">Sélectionner mon installation</h1>
+                        <b><span class="col-md-10">Vous avez au moins un appareil installé chez vous, sélectionnez celui pour lequel vous souhaitez prévoir une intervention ou ajoutez en un nouveau.</span></b>
+                        <div class="clearfix"/>
+                        <br/>
+                        <form action="/new_booking/installed_park_select" method="post">
+                            <div t-attf-class="form-group form-field o_website_form_required_custom col-md-6 #{error_dict.get('parc_installe_id') and 'has-error' or ''}">
+                                <select id="parc_installe_id" name="parc_installe_id" class="form-control">
+                                    <option value="">La référence de votre appareil...</option>
+                                    <t t-foreach="parc_installe_list" t-as="pi">
+                                        <option t-att-value="pi.id"
+                                                t-att-selected="pi.id == parc_installe_id">
+                                            <t t-esc="pi.modele + (pi.name and ' - ' + pi.name or '')"/>
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <input type="hidden" name="submitted" value="1"/>
+                            <input type="hidden" name="current_step" t-att-value="current_step"/>
+                            <div class="clearfix" />
+                            <div class="mt32 mb64 pull-right" name="buttons">
+                                <a href="/new_booking/installed_park_create"
+                                   class="btn btn-default a-submit a-submit-disable a-submit-loading">
+                                    Ajouter un appareil
+                                </a>
+                                &amp;nbsp;&amp;nbsp;&amp;nbsp;ou&amp;nbsp;&amp;nbsp;&amp;nbsp;
+                                <button type="submit" class="btn btn-primary a-submit a-submit-disable a-submit-loading"
+                                        name="next_step" value="address_select">
+                                    Suivant
+                                    <span class="fa fa-long-arrow-right"/>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- OF Website Planning Booking - Installed Park Create -->
+    <template id="new_booking_installed_park_create" name="Prise de RDV en ligne - Création Appareil">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_website_sale">
+                    <t t-call="of_website_planning_booking.new_booking_breadcrumb_trail"/>
+                    <h1 class="col-md-10 page-header text-primary">Mon appareil</h1>
+                    <b><span class="col-md-10">Quelques questions avant de commencer :</span></b>
+                    <div class="clearfix" />
+                    <br/>
+                    <t t-if="error_dict" t-foreach="error_dict.get('error_message', [])" t-as="err">
+                        <h4 class="text-danger" t-esc="err"/>
+                    </t>
+                    <form name="/new_booking/installed_park_create" method="post">
+                        <div t-attf-class="form-group #{error_dict.get('product_category_id') and 'has-error' or ''} col-md-10">
+                            <label class="control-label label-optional" for="product_category_id">Catégorie d'appareil *</label>
+                            <select id="product_category_id" name="product_category_id" class="form-control o_website_form_input">
+                                <option value="">La catégorie de votre appareil...</option>
+                                <t t-foreach="product_categ_list" t-as="pc">
+                                    <option t-att-value="pc.id"
+                                            t-att-selected="pc.id == (product_category and product_category.id or -1)">
+                                        <t t-esc="pc.name"/>
+                                    </option>
+                                </t>
+                            </select>
+                        </div>
+                        <div class="clearfix"/>
+                        <div t-attf-class="form-group #{error_dict.get('brand_id') and 'has-error' or ''} col-md-10">
+                            <label class="control-label label-optional" for="brand_id">Marque *</label>
+                            <select id="brand_id" name="brand_id" class="form-control o_website_form_input">
+                                <option value="">La marque de votre appareil...</option>
+                                <t t-foreach="brand_list" t-as="b">
+                                    <option t-att-value="b.id"
+                                            t-att-selected="b.id == (brand and brand.id or -1)">
+                                        <t t-esc="b.name"/>
+                                    </option>
+                                </t>
+                            </select>
+                            <i>
+                                Si vous ne trouvez pas la marque de votre appareil,
+                                c'est que nous ne sommes pas en mesure d'intervenir dessus.
+                            </i>
+                        </div>
+                        <div class="clearfix"/>
+                        <div t-attf-class="form-group #{error_dict.get('modele') and 'has-error' or ''} col-md-5">
+                            <label class="control-label label-optional" for="modele">Modèle *</label>
+                            <input type="text" class="form-control o_website_form_input" name="modele"
+                                   t-att-value="request.params.get('modele')"/>
+                        </div>
+                        <div t-attf-class="form-group col-md-5">
+                            <label class="control-label label-optional" for="name">Nº de série</label>
+                            <input type="text" class="form-control o_website_form_input" name="name"
+                                   t-att-value="request.params.get('name')"/>
+                        </div>
+                        <div class="clearfix"/>
+                        <div class="form-group col-md-10">
+                            <label class="control-label label-optional" for="type_conduit">Type de conduit</label>
+                            <input type="text" class="form-control o_website_form_input" name="type_conduit"
+                                   t-att-value="request.params.get('type_conduit')"/>
+                        </div>
+                        <div class="clearfix"/>
+                        <div class="form-group col-md-5">
+                            <label class="control-label label-optional" for="date_installation">Date d'installation</label>
+                            <input type="date" class="form-control o_website_form_input" name="date_installation"
+                                   t-att-value="request.params.get('date_installation')"/>
+                        </div>
+                        <div class="form-group col-md-5">
+                            <label class="control-label label-optional" for="annee_batiment">Année de construction du bâtiment</label>
+                            <input type="number" class="form-control o_website_form_input" name="annee_batiment"
+                                   t-att-value="request.params.get('annee_batiment')"/>
+                        </div>
+                        <div class="clearfix"/>
+                        <div class="form-group col-md-5">
+                            <label class="control-label label-optional" for="installateur_name">Nom de l'installateur</label>
+                            <input type="text" class="form-control o_website_form_input" name="installateur_name"
+                                   t-att-value="request.params.get('installateur_name')"/>
+                        </div>
+                        <div class="form-group col-md-5">
+                            <label class="control-label label-optional" for="installateur_email">E-mail de l'installateur</label>
+                            <input type="email" class="form-control o_website_form_input" name="installateur_email"
+                                   t-att-value="request.params.get('installateur_email')"/>
+                        </div>
+                        <div class="clearfix"/>
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <input type="hidden" name="submitted" value="1"/>
+                        <input type="hidden" name="current_step" t-att-value="current_step"/>
+                        <div class="mt32 mb64" name="buttons">
+                            <a href="/new_booking" class="btn btn-default">
+                                <span class="fa fa-long-arrow-left"/>
+                                Retour
+                            </a>
+                            <button type="submit"
+                                    class="btn btn-primary pull-right a-submit a-submit-disable a-submit-loading"
+                                    name="next_step" value="address_select">
+                                Valider
+                                <span class="fa fa-long-arrow-right"/>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- OF Website Planning Booking - Address Select -->
+    <template id="new_booking_address_select" name="Prise de RDV en ligne - Choix de l'adresse">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_website_sale">
+                    <t t-call="of_website_planning_booking.new_booking_breadcrumb_trail"/>
+                    <h1 class="col-md-10 page-header text-primary">Choisir mon adresse d'intervention</h1>
+                    <div class="clearfix" />
+                    <br/>
+                    <div class="row">
+                        <div class="oe_cart">
+                            <div class="all_shipping">
+                                <div class="col-md-10">
+                                    <t t-foreach="adresse_list" t-as="adresse_unit">
+                                        <div class="col-md-4 one_kanban">
+                                            <t t-call="of_website_planning_booking.new_booking_address_kanban">
+                                                <t t-set="actual_partner" t-value="request.env.user.partner_id"/>
+                                                <t t-set='contact' t-value="adresse_unit"/>
+                                                <t t-set="readonly" t-value="0"/>
+                                                <t t-set='selected'
+                                                   t-value="site_adresse_id==adresse_unit.id or len(adresse_list)==1"/>
+                                            </t>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                            <div class="clearfix"/>
+                            <div class="mt32 mb64" name="buttons">
+                                <a href="/new_booking/installed_park_select" class="btn btn-default">
+                                    <span class="fa fa-long-arrow-left"/>
+                                    Retour
+                                </a>
+                                <span name="buttons_right" class="pull-right">
+                                    <t t-if="not parc_installe.site_adresse_id">
+                                        <form action="/new_booking/address_create_edit" method="post" class='' style="display:inline-block">
+                                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                            <input type="hidden" name="mode" value="new"/>
+                                            <a class='btn btn-default a-submit' title="Ajouter une adresse">
+                                                Ajouter une adresse
+                                            </a>
+                                        </form>
+                                        &amp;nbsp;&amp;nbsp;&amp;nbsp;ou&amp;nbsp;&amp;nbsp;&amp;nbsp;
+                                    </t>
+                                    <a class="btn btn-primary" href="/new_booking/localize">
+                                        Suivant
+                                        <span class="fa fa-long-arrow-right"/>
+                                    </a>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- OF Website Planning Booking - Address Create / Edit -->
+    <template id="new_booking_address_create_edit" name="Prise de RDV en ligne - Renseigner l'adresse">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_website_sale">
+                    <t t-call="of_website_planning_booking.new_booking_breadcrumb_trail"/>
+                    <h1 class="col-md-10 page-header text-primary">Mon adresse</h1>
+                    <div class="clearfix" />
+                    <br/>
+                    <form action="/new_booking/address_create_edit" method="post" class="checkout_autoformat">
+                        <div t-attf-class="form-group #{error_dict.get('name') and 'has-error' or ''} col-md-5 div_name">
+                            <label class="control-label label-optional" for="name">
+                                NOM Prénom
+                                <span t-if="not adresse_principale"> (si différent)</span>
+                                <span t-if="adresse_principale"> *</span>
+                            </label>
+                            <input type="text" name="name" class="form-control" t-att-value="name"/>
+                        </div>
+                        <div class="clearfix"/>
+                        <div t-attf-class="form-group #{error_dict.get('email') and 'has-error' or ''} col-md-5"
+                             id="div_email">
+                            <label class="control-label label-optional" for="email">
+                                E-mail
+                                <span t-if="not adresse_principale"> (si différent)</span>
+                                <span t-if="adresse_principale"> *</span>
+                            </label>
+                            <input type="email" name="email" class="form-control" t-att-value="email"/>
+                        </div>
+                        <div t-attf-class="form-group #{error_dict.get('phone') and 'has-error' or ''} col-md-5"
+                             id="div_phone">
+                            <label class="control-label label-optional" for="phone">
+                                Téléphone
+                                <span t-if="not adresse_principale"> (si différent)</span>
+                                <span t-if="adresse_principale"> *</span>
+                            </label>
+                            <input type="tel" name="phone" class="form-control" t-att-value="phone"/>
+                        </div>
+                        <div class="clearfix"/>
+                        <div t-attf-class="form-group #{error_dict.get('street') and 'has-error' or ''} col-md-10 div_street">
+                            <label class="control-label label-optional" for="street">Rue
+                                <span class="hidden-xs">(et numéro)</span> *
+                            </label>
+                            <input type="text" name="street" class="form-control" t-att-value="street"/>
+                        </div>
+                        <div class="clearfix"/>
+                        <div t-attf-class="form-group #{error_dict.get('street2') and 'has-error' or ''} col-md-10 div_street">
+                            <label class="control-label label-optional" for="street2">Complément</label>
+                            <input type="text" name="street2" class="form-control" t-att-value="street2"/>
+                        </div>
+                        <div class="clearfix"/>
+                        <t t-set='zip_city'
+                           t-value='country and [x for x in country.get_address_fields() if x in ["zip", "city"]] or ["city", "zip"]'/>
+                        <t t-if="'zip' in zip_city and zip_city.index('zip') &lt; zip_city.index('city')">
+                            <div t-attf-class="form-group #{error_dict.get('zip') and 'has-error' or ''} col-sm-3 div_zip">
+                                <label class="control-label label-optional" for="zip">CP *</label>
+                                <input type="text" name="zip" class="form-control" t-att-value="zip_code"/>
+                            </div>
+                        </t>
+                        <div t-attf-class="form-group #{error_dict.get('city') and 'has-error' or ''} col-sm-7 div_city">
+                            <label class="control-label label-optional" for="city">Ville *</label>
+                            <input type="text" name="city" class="form-control" t-att-value="city"/>
+                        </div>
+                        <t t-if="'zip' in zip_city and zip_city.index('zip') &gt; zip_city.index('city')">
+                            <div t-attf-class="form-group #{error_dict.get('zip') and 'has-error' or ''} col-sm-3 div_zip">
+                                <label class="control-label label-optional" for="zip">CP *</label>
+                                <input type="text" name="zip" class="form-control" t-att-value="zip_code"/>
+                            </div>
+                        </t>
+                        <div class="clearfix"/>
+                        <div t-attf-class="form-group #{error_dict.get('country_id') and 'has-error' or ''} col-md-5 div_country">
+                            <label class="control-label label-optional" for="country_id">Pays *</label>
+                            <select id="country_id" name="country_id" class="form-control">
+                                <option value="">Pays...</option>
+                                <t t-foreach="country_list" t-as="c">
+                                    <option t-att-value="c.id"
+                                            t-att-selected="c.id == (country and country.id or -1)">
+                                        <t t-esc="c.name"/>
+                                    </option>
+                                </t>
+                            </select>
+                        </div>
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <input type="hidden" name="submitted" value="1"/>
+                        <!-- renvoyer '0' pour signaler la création d'un nouveau res.partner -->
+                        <input type="hidden" name="site_adresse_id"
+                               t-att-value="partner and partner.id or '0'"/>
+                        <input type="hidden" name="mode" t-att-value="mode"/>
+                        <input type="hidden" name="adresse_principale" t-att-value="adresse_principale"/>
+                        <input type="hidden" name="current_step" t-att-value="current_step"/>
+                        <input type="hidden" name="callback" t-att-value="callback"/>
+                        <div class="clearfix"/>
+                        <div class="mt32 mb64" name="buttons">
+                            <a href="/new_booking/address_select"
+                               class="btn btn-default mb32">
+                                <span class="fa fa-long-arrow-left"/>
+                                Retour
+                            </a>
+                            <button type="submit"
+                                    class="btn btn-primary pull-right a-submit a-submit-disable a-submit-loading"
+                                    name="next_step" value="address_select">
+                                Valider
+                                <span class="fa fa-long-arrow-right"/>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- OF Website Planning Booking - Localize -->
+    <template id="new_booking_localize" name="Prise de RDV en ligne - Localisation">
+        <t t-call="website.layout">
+            <script t-att-src="'https://maps.googleapis.com/maps/api/js?key=' + googleAPIKey" type="text/javascript"/>
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_website_sale">
+                    <t t-call="of_website_planning_booking.new_booking_breadcrumb_trail"/>
+                    <h1 class="col-md-10 page-header text-primary">Ma localisation</h1>
+                    <b><span class="col-md-10">Laissez nous un commentaire si la localisation n'est pas bonne.
+                        Nous verrons ça ensemble au moment de vous rappeler pour valider le RDV.</span></b>
+                    <div class="clearfix" />
+                    <br/>
+                    <div class="col-md-10 div_map">
+                        <script>
+                            var map_data = <t t-raw="map_lat_lng"/>;
+                        </script>
+                        <div id="map" style="margin-top:2%;width:100%;height:600px;vertical-align: top;display: inline-block;"/>
+                    </div>
+                    <div class="clearfix"/>
+                    <br/>
+                    <form action="/new_booking/localize" method="post">
+                        <div class="form-group col-md-10">
+                            <label class="control-label label-optional" for="Commentaire">Commentaire</label>
+                            <input type="text" name="comment" class="form-control"
+                                   t-att-value="request.params.get('comment', of_geo_comment)"/>
+                        </div>
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <input type="hidden" name="current_step" t-att-value="current_step"/>
+                        <input type="hidden" name="submitted" value="1"/>
+                        <input type="hidden" name="next_step" value="slot"/>
+                        <div class="clearfix"/>
+                        <div class="mt32 mb64" name="buttons">
+                            <a href="/new_booking/address_select" class="btn btn-default mb32">
+                                <span class="fa fa-long-arrow-left"/>
+                                Retour
+                            </a>
+                            <a class="btn btn-primary a-submit a-submit-disable a-submit-loading pull-right">
+                                Suivant
+                                <span class="fa fa-long-arrow-right"/>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- OF Website Planning Booking - Service -->
+    <template id="new_booking_service" name="Prise de RDV en ligne - Rendez-vous">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_website_sale">
+                    <t t-call="of_website_planning_booking.new_booking_breadcrumb_trail"/>
+                    <h1 class="col-md-10 page-header text-primary">Prendre un rendez-vous</h1>
+                    <div class="clearfix" />
+                    <br/>
+                    <t t-if="error_dict" t-foreach="error_dict.get('error_message', [])" t-as="err">
+                        <h4 class="text-danger" t-esc="err"/>
+                    </t>
+                    <form action="/new_booking/service" method="post" class="checkout_autoformat">
+                        <div t-attf-class="form-group #{error_dict.get('tache_id') and 'has-error' or ''} col-md-10">
+                            <label class="control-label label-optional" for="tache_id">Prestation *</label>
+                            <select id="tache_id" name="tache_id" class="form-control">
+                                <option value="">Prestation...</option>
+                                <t t-foreach="tache_list" t-as="t">
+                                    <option t-att-value="t.id"
+                                            t-att-selected="t.id == (tache and tache.id or -1)">
+                                        <t t-esc="t.name"/>
+                                    </option>
+                                </t>
+                            </select>
+                        </div>
+                        <div class="clearfix"/>
+                        <div t-attf-class="form-group #{error_dict.get('date_recherche_debut') and 'has-error' or ''} col-md-5">
+                            <label class="control-label label-optional" for="date_recherche_debut">
+                                À partir de quand voulez-vous que nous intervenions ? *
+                            </label>
+                            <input type="date" name="date_recherche_debut" class="form-control"
+                                   t-att-value="date_recherche_debut"/>
+                        </div>
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <input type="hidden" name="submitted" value="1"/>
+                        <input type="hidden" name="current_step" t-att-value="current_step"/>
+                        <input type="hidden" name="callback" t-att-value="callback"/>
+                        <div class="clearfix"/>
+                        <div class="mt32 mb64" name="buttons">
+                            <a href="/new_booking/localize"
+                               class="btn btn-default mb32">
+                                <span class="fa fa-long-arrow-left"/>
+                                Retour
+                            </a>
+                            <button type="submit"
+                                    class="btn btn-primary pull-right a-submit a-submit-disable a-submit-loading"
+                                    name="next_step" value="slot">
+                                Suivant
+                                <span class="fa fa-long-arrow-right"/>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- OF Website Planning Booking - Slot -->
+    <template id="new_booking_slot" name="Prise de RDV en ligne - Créneau">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_website_sale">
+                    <t t-call="of_website_planning_booking.new_booking_breadcrumb_trail"/>
+                    <h1 class="col-md-10 page-header text-primary">Choisir mon créneau</h1>
+                    <div class="clearfix" />
+                    <br/>
+                    <div class="of_rdv_nouveau_tous_creneaux" t-if="creneau_selected">
+                        <div class="col-md-10">
+                            <t t-foreach="creneaux" t-as="creneau">
+                                <div class="col-md-4 one_kanban">
+                                    <t t-call="of_website_planning_booking.new_booking_slot_kanban">
+                                        <t t-set="title" t-value="creneau.name"/>
+                                        <t t-set="extra_info" t-value="creneau.description"/>
+                                        <t t-set="selected" t-value="creneau.selected"/>
+                                    </t>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                    <div name="zero_result" t-if="not creneau_selected">
+                        <h2>
+                            Il semblerait qu'il n'y ait pas de créneau disponible correspondant à votre recherche...
+                        </h2>
+                        Vous pouvez contacter notre service commercial pour plus d'informations.
+                    </div>
+
+                    <div class="clearfix"/>
+                    <div class="mt32 mb64" name="buttons">
+                        <a href="/new_booking/service" class="btn btn-default">
+                            <span class="fa fa-long-arrow-left"/>
+                            Retour
+                        </a>
+                        <span name="buttons_right" class="pull-right" t-if="creneau_selected">
+                            <t t-if="len(creneaux) &lt; 20">
+                                <form action="/new_booking/slot" method="post" style="display:inline-block">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <input type="hidden" name="submitted" value="1"/>
+                                    <input type="hidden" name="load_more" value="1"/>
+                                    <a class='btn btn-default a-submit'>Chercher plus...</a>
+                                </form>
+                                &amp;nbsp;&amp;nbsp;&amp;nbsp;ou&amp;nbsp;&amp;nbsp;&amp;nbsp;
+                            </t>
+                            <a class="btn btn-primary"
+                               href="/new_booking/confirmation">
+                                Suivant
+                                <span class="fa fa-long-arrow-right"/>
+                            </a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- OF Website Planning Booking - Confirmation -->
+    <template id="new_booking_confirmation" name="Prise de RDV en ligne - Confirmation">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_website_sale">
+                    <t t-call="of_website_planning_booking.new_booking_breadcrumb_trail"/>
+                    <h1 class="col-md-10 page-header text-primary">Récapitulatif de rendez-vous</h1>
+                    <div class="clearfix" />
+                    <br/>
+                    <h2 class="col-md-10">Mon adresse d'intervention</h2>
+                    <div class="col-md-4 one_kanban">
+                        <t t-call="of_website_planning_booking.new_booking_address_kanban">
+                            <t t-set="actual_partner" t-value="parc_installe.client_id"/>
+                            <t t-set='contact' t-value="adresse"/>
+                            <t t-set='selected' t-value="1"/>
+                            <t t-set='readonly' t-value="1"/>
+                            <t t-set='loc_comment' t-value="adresse.of_geo_comment"/>
+                        </t>
+                    </div>
+                    <div class="clearfix"/>
+                    <h2 class="col-md-10">Mon appareil</h2>
+                    <div class="col-md-4 one_kanban">
+                        <t t-call="of_website_planning_booking.new_booking_device_kanban"/>
+                    </div>
+                    <div class="clearfix"/>
+                    <h2 class="col-md-10">Mon rendez-vous</h2>
+                    <div class="col-md-4 one_kanban">
+                        <div class="panel of_border_primary">
+                            <div class="panel-body">
+                                <b>
+                                    <span t-esc="tache.name"/> - <span t-esc="tache.product_id.sudo().lst_price * 1.2" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/> TTC
+                                </b>
+                                <br/>
+                                <span t-esc="creneau.name"/>
+                                <br/>
+                                <span t-esc="creneau.description"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix"/>
+                    <div class="mt32 mb64" name="buttons">
+                        <a href="/new_booking/slot" class="btn btn-default">
+                            <span class="fa fa-long-arrow-left"/>
+                            Retour
+                        </a>
+                        <span name="buttons_right" class="pull-right">
+                            <form action="/new_booking/confirmation" method="post" class=''>
+                                <input type="hidden" name="csrf_token"
+                                       t-att-value="request.csrf_token()"/>
+                                <input type="hidden" name="submitted" value="1"/>
+                                <a class='btn btn-primary a-submit'>
+                                    Valider
+                                    <span class="fa fa-long-arrow-right"/>
+                                </a>
+                            </form>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- OF Website Planning Booking - Thank-you -->
+    <template id="new_booking_thank_you" name="Prise de RDV en ligne - Merci">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_website_sale">
+                    <h1 class="col-md-10 page-header text-primary">Merci</h1>
+                    <div class="clearfix" />
+                    <br/>
+                    <b class="col-md-10">
+                        Votre demande de rendez-vous a bien été enregistrée et une confirmation vous a été envoyée par e-mail.
+                        <br/>
+                        Nous vous recontacterons prochainement pour la dernière étape de la prise de ce rendez-vous.
+                    </b>
+                    <div class="clearfix"/>
+                    <div class="mt32 mb64 pull-right" name="buttons">
+                        <a href="/" class="btn btn-primary">
+                            Accueil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- OF Website Planning Booking - Kanban Address -->
+    <template id="new_booking_address_kanban" name="Prise de RDV en ligne - Adresse Kanban">
+        <form action="/new_booking/address_select" method="POST" class='hide'>
+            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+            <input type="hidden" name="site_adresse_id" t-att-value="contact.id"/>
+            <input type='submit'/>
+        </form>
+        <a t-if="not readonly" class='btn btn-link pull-right fa fa-edit of_js_edit_address no-decoration'
+           title="Modifier cette adresse" style="font-size: 25px"/>
+        <div t-att-class="'panel panel-default %s' % (selected and 'of_border_primary' or 'of_js_change_shipping')">
+            <div class='panel-body' t-att-style="(not readonly and 'height: 180px; ' or '') + 'overflow: clip;'">
+                <t t-esc="contact" t-options="dict(widget='contact', fields=['name', 'address', 'email', 'phone'], no_marker=True)"/>
+                <br t-if="loc_comment"/>
+                <i t-if="loc_comment" t-esc="loc_comment"/>
+            </div>
+        </div>
+    </template>
+
+    <!-- OF Website Planning Booking - Kanban Slot -->
+    <template id="new_booking_slot_kanban" name="Prise de RDV en ligne - Créneau Kanban">
+        <form action="/new_booking/slot" method="POST" class='hide'>
+            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+            <input type="hidden" name="creneau_id" t-att-value="creneau.id"/>
+            <input type='submit'/>
+        </form>
+        <div t-att-class="'panel panel-default %s' % (selected and 'of_border_primary' or 'of_js_change_creneau')">
+            <div class='panel-body' style="min-height: 60px; text-align: center;">
+                <b>
+                    <span t-esc="title"/>
+                </b>
+                <br/>
+                <i t-if="extra_info" t-esc="extra_info"/>
+            </div>
+        </div>
+    </template>
+
+    <!-- OF Website Planning Booking - Kanban Device -->
+    <template id="new_booking_device_kanban" name="Prise de RDV en ligne - Appareil Kanban">
+        <div class="panel panel-default of_border_primary">
+            <div class='panel-body'>
+                <div>
+                    <b t-esc="parc_installe.product_category_id.name"/>
+                </div>
+                <div>
+                    <span t-esc="parc_installe.brand_id.name"/> - <span t-esc="parc_installe.modele"/>
+                </div>
+                <div t-if="parc_installe.name">
+                    Nº série : <span t-esc="parc_installe.name"/>
+                </div>
+                <div t-if="parc_installe.date_installation">
+                    Installé le <span t-esc="parc_installe.date_installation" t-options="{'widget': 'date'}"/>
+                </div>
+                <div t-if="parc_installe.installateur_id">
+                    Installé par <span t-esc="parc_installe.installateur_id.sudo().name"/>
+                </div>
+            </div>
+        </div>
+    </template>
+
+</odoo>

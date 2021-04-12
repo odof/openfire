@@ -943,18 +943,19 @@ class OfPlanningIntervention(models.Model):
     @api.onchange('address_id')
     def _onchange_address_id(self):
         name = False
-        if self.address_id:
-            name = [self.address_id.name_get()[0][1]]
+        address = self._context.get('from_portal') and self.address_id.sudo() or self.address_id
+        if address:
+            name = [address.name_get()[0][1]]
             for field in ('zip', 'city'):
                 val = getattr(self.address_id, field)
                 if val:
                     name.append(val)
-            self.fiscal_position_id = self.address_id.commercial_partner_id.property_account_position_id
+            self.fiscal_position_id = address.commercial_partner_id.property_account_position_id
             # Pour les objets du planning, le choix de la société se fait par un paramètre de config
             company_choice = self.env['ir.values'].get_default(
                 'of.intervention.settings', 'company_choice') or 'contact'
             if company_choice == 'contact' and self.address_id.company_id:
-                self.company_id = self.address_id.company_id.id
+                self.company_id = address.company_id.id
         self.name = name and " ".join(name) or "Intervention"
 
     @api.onchange('template_id')
@@ -1318,8 +1319,9 @@ class OfPlanningIntervention(models.Model):
                     ('state', 'not in', ('cancel', 'postponed')),
                 ], limit=1)
                 if rdv:
-                    raise ValidationError(u"L'employé %s a déjà au moins un rendez-vous sur ce créneau." %
-                                          (rdv.employee_ids & interv.employee_ids)[0].name)
+                    raise ValidationError(u"L'employé %s a déjà au moins un rendez-vous sur ce créneau."
+                                          u"\n id du rdv: %d" % (
+                                            (rdv.employee_ids & rdv.employee_ids)[0].name), rdv.id)
 
     @api.multi
     def _affect_number(self):

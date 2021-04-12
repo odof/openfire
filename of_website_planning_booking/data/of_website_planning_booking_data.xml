@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Article lambda pour la prise de rdv en ligne -->
+        <record id="of_website_planning_booking_product_default" model="product.product">
+            <field name="name">Article lambda</field>
+            <field name="categ_id" ref="product.product_category_all"/>
+            <field name="type">service</field>
+            <field name="uom_id" ref="product.product_uom_unit"/>
+            <field name="uom_po_id" ref="product.product_uom_unit"/>
+            <field name="description">Article lambda utilisé pour la création des parcs installés en ligne</field>
+            <field name="default_code">PARC_DEFAULT</field>
+        </record>
+
+        <!-- Website menu -->
+        <record id="of_website_planning_booking_menu" model="website.menu">
+            <field name="name">Prendre rendez-vous</field>
+            <field name="url">/new_booking</field>
+            <field name="parent_id" ref="website.main_menu"/>
+            <field name="sequence" type="int">60</field>
+            <field name="website_id" ref="website.default_website"/>
+        </record>
+
+        <!-- Modèle de mail -->
+        <record id="of_website_planning_booking_confirmation_mail_template" model="mail.template">
+            <field name="name">Prise de RDV en ligne - Confirmation</field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
+            <field name="subject">Confirmation de votre prise de rendez-vous</field>
+            <field name="partner_to">${object.address_id.commercial_partner_id.id}</field>
+            <field name="model_id" ref="of_planning.model_of_planning_intervention"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="lang">${object.address_id.commercial_partner_id.lang}</field>
+            <field name="body_html"><![CDATA[
+<p>Bonjour ${object.address_id.commercial_partner_id.title and object.address_id.commercial_partner_id.title.shortcut or ''} ${object.address_id.commercial_partner_id.name},</p>
+<p>
+Votre demande de rendez-vous pour le ${object.get_display_date()} a bien été enregistrée.
+</p>
+<p>
+Vous en souhaitant bonne réception.<br/>
+</p>
+]]>
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -11,9 +11,12 @@ from odoo.addons.of_utils.models.of_utils import distance_points, hours_to_strs
 
 import urllib
 import requests
+import logging
 
 from odoo.tools import config
 from odoo.tools.float_utils import float_compare
+
+_logger = logging.getLogger(__name__)
 
 SEARCH_MODES = [
     ('distance', u'Distance (km)'),
@@ -341,10 +344,11 @@ class OfTourneeRdv(models.TransientModel):
         return employee_ids
 
     @api.multi
-    def compute(self):
+    def compute(self, sudo=False, mode='new'):
         u"""
         Remplit le champ planning_ids avec les créneaux non travaillés et les RDV tech.
         Lance le calcul des distances et sélectionne un résultat si il y en a
+        sudo=True quand recherche de créneau depuis le site web.
         """
         self.ensure_one()
         compare_precision = 5
@@ -353,26 +357,40 @@ class OfTourneeRdv(models.TransientModel):
             self = self.with_context(tz='Europe/Paris')
         tz = pytz.timezone(self._context['tz'])
 
-        employee_obj = self.env['hr.employee']
+        employee_obj = sudo and self.env['hr.employee'].sudo() or self.env['hr.employee']
         wizard_line_obj = self.env['of.tournee.rdv.line']
-        intervention_obj = self.with_context(force_read=True).env['of.planning.intervention']
+        intervention_obj = sudo and self.with_context(force_read=True).env['of.planning.intervention'].sudo() or \
+            self.with_context(force_read=True).env['of.planning.intervention']
 
         service = self.service_id
 
         # Suppression des anciens créneaux
-        self.planning_ids.unlink()
+        if mode == 'new':
+            self.planning_ids.unlink()
 
         # Récupération des équipes
-        if not self.tache_id.employee_ids:
-            raise UserError(u"Aucun intervenant ne peut réaliser cette prestation.")
-        employees = self.tache_id.employee_ids
-        if self.pre_employee_ids:
-            employees &= self.pre_employee_ids
+        tache_id = sudo and self.tache_id.sudo() or self.tache_id
+        if not tache_id.employee_ids:
+            if sudo:
+                _logger.warning(u"Tentative ratée de recherche de créneau pour la tâche '%s': "
+                                u"aucun intervenant ne peut la réaliser." % tache_id.name)
+                return
+            else:
+                raise UserError(u"Aucun intervenant ne peut réaliser cette prestation.")
+        employees = sudo and tache_id.employee_ids.sudo() or tache_id.employee_ids
+        pre_employee_ids = sudo and self.pre_employee_ids.sudo() or self.pre_employee_ids
+        if pre_employee_ids:
+            employees &= pre_employee_ids
             if not employees:
-                raise UserError(u"Aucun des intervenants sélectionnés n'a la compétence pour réaliser cette prestation.")
+                if sudo:
+                    _logger.warning(u"Tentative ratée de recherche de créneau pour la tâche '%s': "
+                                    u"aucun intervenant pré-sélectionné ne peut la réaliser." % tache_id.name)
+                    return
+                else:
+                    raise UserError(u"Aucun des intervenants sélectionnés n'a la compétence pour réaliser cette prestation.")
 
         # Jours du service, jours travaillés des équipes et horaires de travail
-        jours_service = [jour.numero for jour in service.jour_ids] if service else range(1, 8)
+        jours_service = sudo and range(1, 8) or [jour.numero for jour in service.jour_ids] if service else range(1, 8)
 
         un_jour = timedelta(days=1)
         # --- Création des créneaux de début et fin de recherche ---
@@ -582,14 +600,18 @@ class OfTourneeRdv(models.TransientModel):
                     self.orthodromique = False
             except Exception as e:
                 self.orthodromique = True
-            self.calc_distances_dates_employees(date_debut_da, date_fin_da, employees)
+            self.calc_distances_dates_employees(date_debut_da, date_fin_da, employees, sudo=sudo)
 
         nb, nb_dispo, first_res = wizard_line_obj.get_nb_dispo(self)
 
         # Sélection du résultat
         if nb > 0:
-            address = self.partner_address_id
-            name = address.name or (address.parent_id and address.parent_id.name) or ''
+            if sudo:
+                address = self.partner_address_id.sudo()
+                name = address.name or (address.parent_id and address.parent_id.sudo().name) or ''
+            else:
+                address = sudo and self.partner_address_id.sudo() or self.partner_address_id
+                name = address.name or (address.parent_id and address.parent_id.name) or ''
             name += address.zip and (" " + address.zip) or ""
             name += address.city and (" " + address.city) or ""
 
@@ -681,7 +703,7 @@ class OfTourneeRdv(models.TransientModel):
         }
 
     @api.multi
-    def calc_distances_dates_employees(self, date_debut, date_fin, employees):
+    def calc_distances_dates_employees(self, date_debut, date_fin, employees, sudo=False):
         u"""
             Appelle le serveur OSRM openfire pour calculer les distances des créneaux libres avec les RDV existants.
             Une requête http par jour et par employé.
@@ -689,29 +711,39 @@ class OfTourneeRdv(models.TransientModel):
         """
         self.ensure_one()
         wizard_line_obj = self.env['of.tournee.rdv.line']
-        tournee_obj = self.env['of.planning.tournee']
+        tournee_obj = sudo and self.env['of.planning.tournee'].sudo() or self.env['of.planning.tournee']
         lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
         un_jour = timedelta(days=1)
         date_courante = date_debut
+        employees = sudo and employees.sudo() or employees
         while date_courante <= date_fin:
             mode_recherche = self.orthodromique and "distance" or self.mode_recherche
             maxi = self.max_recherche
             for employee in employees:
+                employee = sudo and employee.sudo() or employee
                 creneaux = wizard_line_obj.search([('wizard_id', '=', self.id),
                                                    ('date', '=', date_courante),
                                                    ('employee_id', '=', employee.id)], order="debut_dt")
                 if len(creneaux) == 0:
                     continue
-                tournee = tournee_obj.search([('date', '=', date_courante),
-                                              ('employee_id', '=', employee.id)], limit=1)
+                if not sudo:
+                    tournee = tournee_obj.search([('date', '=', date_courante),
+                                                  ('employee_id', '=', employee.sudo().id)], limit=1)
                 # S'il y a une tournée, on favorise son point de départ plutôt que celui de l'employé.
                 # Note : une tournée est unique par employé et par date (contrainte SQL) donc len(tournee) <= 1
-                origine = (tournee and tournee.address_depart_id or
-                           employee.of_address_depart_id or
-                           False)
-                arrivee = (tournee and tournee.address_retour_id or
-                           employee.of_address_retour_id or
-                           False)
+                if sudo:
+                    # @todo: en l'état j'ai dû retirer la tournee pour contourner une erreur de droit, il faut corriger ça
+                    origine = (employee.of_address_depart_id.sudo() or
+                               False)
+                    arrivee = (employee.of_address_retour_id.sudo() or
+                               False)
+                else:
+                    origine = (tournee and tournee.address_depart_id or
+                               employee.of_address_depart_id or
+                               False)
+                    arrivee = (tournee and tournee.address_retour_id or
+                               employee.of_address_retour_id or
+                               False)
                 # Pas d'origine ni pour la tournée ni pour l'employé
                 if not origine:
                     raise UserError(u"L'intervenant \"%s\" n'a pas d'adresse de départ." % employee.name)
@@ -922,17 +954,21 @@ class OfTourneeRdvLine(models.TransientModel):
         return self.wizard_id.button_confirm()
 
     @api.multi
-    def button_select(self):
+    def button_select(self, sudo=False):
         """Sélectionne ce créneau en tant que résultat. Appelé depuis la vue form du créneau"""
         self.ensure_one()
         rdv_line_obj = self.env["of.tournee.rdv.line"]
         selected_line = rdv_line_obj.search([('wizard_id', '=', self.wizard_id.id), ('selected', '=', True)])
-        selected_line.selected = False
+        selected_line.write({'selected': False})
         self.selected = True
         self.selected_hour = self.date_flo
 
-        address = self.wizard_id.partner_address_id
-        name = address.name or (address.parent_id and address.parent_id.name) or ''
+        if sudo:
+            address = self.wizard_id.partner_address_id.sudo()
+            name = address.name or (address.parent_id and address.parent_id.sudo().name) or ''
+        else:
+            address = self.wizard_id.partner_address_id
+            name = address.name or (address.parent_id and address.parent_id.name) or ''
         name += address.zip and (" " + address.zip) or ""
         name += address.city and (" " + address.city) or ""
         wizard_vals = {
