@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="menu_prendre_rdv" model="website.menu">
+            <field name="name">Prendre rendez-vous</field>
+            <field name="url">/page/rdv</field>
+            <field name="parent_id" ref="website.main_menu"/>
+            <field name="sequence" type="int">60</field>
+            <field name="website_id" ref="default_website"/>
+        </record>
+
+    </data>
+</odoo>

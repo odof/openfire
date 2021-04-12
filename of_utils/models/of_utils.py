@@ -45,9 +45,18 @@ def se_chevauchent(min_1, max_1, min_2, max_2, strict=True):
     return min_1 <= max_2 and min_2 <= max_1
 
 
-def hours_to_strs(*hours):
+def hours_to_strs(*args):
     """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
     """
+    # Si le premier argument est un string, c'est le mode
+    if args and isinstance(args[0], basestring):
+        mode = args[0]
+        hours = args[1:]
+    else:
+        mode = 'default'
+        hours = args
+    if mode == 'time':
+        return tuple("%02d:%02d" % (hour, round((hour % 1) * 60)) for hour in hours)
     return tuple("%dh%02d" % (hour, round((hour % 1) * 60)) if hour % 1 else "%dh" % hour for hour in hours)
 
 

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Partner form view (tab 'Localisation') -->
+    <record id="view_res_partner_planning_website_form" model="ir.ui.view">
+        <field name="name">res.partner.planning.website.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="of_geolocalize.of_partner_geo_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='geo_location_tab']//field[@name='geo_lng']" position="after">
+                <field name="of_geo_comment"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

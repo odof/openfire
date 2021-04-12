@@ -15,6 +15,7 @@ class OFParcInstalle(models.Model):
     date_service = fields.Date("Date vente", required=False)
     date_installation = fields.Date("Date d'installation", required=False)
     date_fin_garantie = fields.Date(string="Fin de garantie")
+    annee_batiment = fields.Integer(string=u"Année de construction du batiment")
     product_id = fields.Many2one('product.product', 'Produit', required=True, ondelete='restrict')
     product_category_id = fields.Many2one('product.category', string=u'Catégorie')
     client_id = fields.Many2one(

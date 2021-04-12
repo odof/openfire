@@ -1,0 +1,803 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="assets_frontend" inherit_id="website.assets_frontend" name="RDV">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/of_planning_website/static/src/js/of_planning_website.js"/>
+        </xpath>
+    </template>
+
+    <!--template id="auth_signup.login" inherit_id="web.login"/>
+
+    <!- -template id="of_zz_flammeandco_theme_impacto_custom_login_form" inherit_id="theme_impacto.custom_login_form">
+        <xpath expr="//button[@type='submit']" position="before">
+            <div class="clearfix"/>
+            <a t-if="signup_enabled" t-attf-href="/web/signup?{{ keep_query() }}" class="btn btn-link pull-right">
+                S'enregistrer
+            </a>
+            <a t-if="reset_password_enabled" t-attf-href="/web/reset_password?{{ keep_query() }}"
+               class="btn btn-link pull-left">Réinitialiser le mot de passe
+            </a>
+        </xpath>
+    </template-->
+
+    <!-- fil d'ariane -->
+    <template id="rdv_nouveau_ariane" name="Wizard RDV nouveau">
+        <ul class="wizard pull-right">
+            <li t-att-class="step_number==10 and 'text-primary' or 'text-muted'" id="step_parc">
+                <t t-if="step_number&gt;10">
+                    <a href="/rdv/nouveau/appareil/selection" class="text-success">
+                        Appareil
+                        <span class="chevron"/>
+                    </a>
+                </t>
+                <t t-if="not step_number&gt;10">
+                    Appareil
+                    <span class="chevron"/>
+                </t>
+            </li>
+            <li t-att-class="(20 &lt;= step_number &lt; 30 and 'text-primary') or 'text-muted'" id="step_address">
+                <t t-if="step_number&gt;20">
+                    <a href="/rdv/nouveau/adresse/selection" class="text-success">
+                        Adresse
+                        <span class="chevron"/>
+                    </a>
+                </t>
+                <t t-if="not step_number&gt;20">
+                    Adresse
+                    <span class="chevron"/>
+                </t>
+            </li>
+            <li t-att-class="(step_number==30 and 'text-primary') or 'text-muted'" id="step_geoloc">
+                <t t-if="step_number&gt;30">
+                    <a href="/rdv/nouveau/localisation" class="text-success">
+                        Localisation
+                        <span class="chevron"/>
+                    </a>
+                </t>
+                <t t-if="not step_number&gt;30">
+                    Localisation
+                    <span class="chevron"/>
+                </t>
+            </li>
+            <li t-att-class="(step_number==40 and 'text-primary') or 'text-muted'" id="step_prestation">
+                <t t-if="step_number&gt;40">
+                    <a href="/rdv/nouveau/localisation" class="text-success">
+                        Prestation
+                        <span class="chevron"/>
+                    </a>
+                </t>
+                <t t-if="not step_number&gt;40">
+                    Prestation
+                    <span class="chevron"/>
+                </t>
+            </li>
+            <li t-att-class="(step_number==50 and 'text-primary') or 'text-muted'" id="step_creneau">
+                <t t-if="step_number&gt;50">
+                    <a href="/rdv/nouveau/creneau" class="text-success">
+                        Créneau
+                        <span class="chevron"/>
+                    </a>
+                </t>
+                <t t-if="not step_number&gt;50">
+                    Créneau
+                    <span class="chevron"/>
+                </t>
+            </li>
+            <li t-att-class="(step_number==60 and 'text-primary') or 'text-muted'" id="step_confirmation">
+                Confirmation
+                <span class="chevron"/>
+            </li>
+        </ul>
+    </template>
+
+    <template id="rdv_nouveau_appareil_select" name="Étape 1 : Appareil">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_website_sale">
+                    <t t-call="of_planning_website.rdv_nouveau_ariane"/>
+                    <h1>ÉTAPE 1 : APPAREIL</h1>
+                    <t t-if="current_step and current_step == 'appareil_select'">
+                        <form action="/rdv/nouveau/appareil/selection" method="post">
+                            <div class="form-group form-field o_website_form_required_custom">
+                                <label class="control-label" for="parc_installe_id">Votre appareil</label>
+                                <select id="parc_installe_id" name="parc_installe_id" class="form-control">
+                                    <option value="">La référence de votre appareil</option>
+                                    <t t-foreach="parc_installe_list" t-as="pi">
+                                        <option t-att-value="pi.id"
+                                                t-att-selected="pi.id == (parc_installe and parc_installe.id or -1)">
+                                            <t t-esc="pi.name"/>
+                                        </option>
+                                    </t>
+                                </select>
+                                <i class="o_red" t-if="error_dict.get('parc_installe_id')">
+                                    <t t-esc="error_dict['parc_installe_id']"/>
+                                </i>
+                            </div>
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <input type="hidden" name="submitted" value="1"/>
+                            <input type="hidden" name="current_step" t-att-value="current_step"/>
+                            <div class="pull-right mb32" name="buttons">
+                                <button type="submit" class="btn btn-primary a-submit a-submit-disable a-submit-loading"
+                                        name="next_step" value="adresse_select">
+                                    Suivant
+                                </button>
+                                &amp;nbsp;&amp;nbsp;&amp;nbsp;ou&amp;nbsp;&amp;nbsp;&amp;nbsp;
+                                <a href="/rdv/nouveau/appareil/creation"
+                                   class="btn btn-default a-submit a-submit-disable a-submit-loading">
+                                    Ajouter un appareil
+                                </a>
+                            </div>
+                        </form>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="rdv_nouveau_appareil_create" name="Étape 1 : Appareil">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_website_sale">
+                    <t t-call="of_planning_website.rdv_nouveau_ariane"/>
+                    <h1>ÉTAPE 1 : APPAREIL</h1>
+                    <t t-if="current_step and current_step == 'appareil_create'">
+                        <t t-if="error_dict" t-foreach="error_dict.get('error_message', [])" t-as="err">
+                            <h4 class="text-danger" t-esc="err"/>
+                        </t>
+                        <form name="/rdv/nouveau/appareil/creation" method="post">
+                            <div t-attf-class="form-group #{error_dict.get('product_category_id') and 'has-error' or ''} col-md-12">
+                                <label class="col-md-3 col-sm-4 control-label" for="product_category_id">
+                                    Catégorie d'article *
+                                </label>
+                                <div class="col-md-7 col-sm-8">
+                                    <select id="product_category_id" name="product_category_id"
+                                            class="form-control o_website_form_input">
+                                        <t t-foreach="product_categ_list" t-as="pc">
+                                            <option t-att-value="pc.id"
+                                                    t-att-selected="pc.id == (product_category and product_category.id or -1)">
+                                                <t t-esc="pc.name"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="clearfix"/>
+                            <div t-attf-class="form-group #{error_dict.get('brand_id') and 'has-error' or ''} col-md-12">
+                                <label class="col-md-3 col-sm-4 control-label" for="brand_id">
+                                    Marque *
+                                </label>
+                                <div class="col-md-7 col-sm-8">
+                                    <select id="brand_id" name="brand_id" class="form-control o_website_form_input">
+                                        <t t-foreach="brand_list" t-as="b">
+                                            <option t-att-value="b.id"
+                                                    t-att-selected="b.id == (brand and brand.id or -1)">
+                                                <t t-esc="b.name"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                    <i>
+                                        Si vous ne trouvez pas la marque de votre appareil,
+                                        c'est que nous ne sommes pas en mesure d'intervenir dessus.
+                                    </i>
+                                </div>
+                            </div>
+                            <div class="clearfix"/>
+                            <div t-attf-class="form-group #{error_dict.get('modele') and 'has-error' or ''} col-md-12">
+                                <label class="col-md-3 col-sm-4 control-label" for="modele">Modèle *</label>
+                                <div class="col-md-7 col-sm-8">
+                                    <input type="text" class="form-control o_website_form_input" name="modele"
+                                           t-att-value="request.params.get('modele')" required=""/>
+                                </div>
+                            </div>
+                            <div class="clearfix"/>
+                            <div t-attf-class="form-group #{error_dict.get('name') and 'has-error' or ''} col-md-12">
+                                <label class="col-md-3 col-sm-4 control-label" for="name">Nº de série *</label>
+                                <div class="col-md-7 col-sm-8">
+                                    <input type="text" class="form-control o_website_form_input" name="name"
+                                           t-att-value="request.params.get('name')" required=""/>
+                                </div>
+                            </div>
+                            <div class="clearfix"/>
+                            <div t-attf-class="form-group #{error_dict.get('type_conduit') and 'has-error' or ''} col-md-12">
+                                <label class="col-md-3 col-sm-4 control-label" for="type_conduit">
+                                    Type de conduit
+                                </label>
+                                <div class="col-md-7 col-sm-8">
+                                    <input type="text" class="form-control o_website_form_input" name="type_conduit"
+                                           t-att-value="request.params.get('type_conduit')" required=""/>
+                                </div>
+                            </div>
+                            <div class="clearfix"/>
+                            <div t-attf-class="form-group #{error_dict.get('date_installation') and 'has-error' or ''} col-md-12">
+                                <label class="col-md-3 col-sm-4 control-label" for="date_installation">
+                                    Date d'installation
+                                </label>
+                                <div class="col-md-7 col-sm-8">
+                                    <input type="date" class="form-control o_website_form_input"
+                                           t-att-value="request.params.get('date_installation')"
+                                           name="date_installation" required=""/>
+                                </div>
+                            </div>
+                            <div class="clearfix"/>
+                            <div t-attf-class="form-group #{error_dict.get('annee_batiment') and 'has-error' or ''} col-md-12">
+                                <label class="col-md-3 col-sm-4 control-label" for="annee_batiment">
+                                    Année de construction du batiment
+                                </label>
+                                <div class="col-md-7 col-sm-8">
+                                    <input type="number" class="form-control o_website_form_input" name="annee_batiment"
+                                           t-att-value="request.params.get('annee_batiment')" required=""/>
+                                </div>
+                            </div>
+                            <div class="clearfix"/>
+                            <div t-attf-class="form-group #{error_dict.get('installateur_email') and 'has-error' or ''} col-md-12">
+                                <label class="col-md-3 col-sm-4 control-label" for="installateur_email">
+                                    Email installateur
+                                </label>
+                                <div class="col-md-7 col-sm-8">
+                                    <input type="email" class="form-control o_website_form_input"
+                                           t-att-value="request.params.get('installateur_email')"
+                                           name="installateur_email" required=""/>
+                                </div>
+                            </div>
+                            <div class="clearfix"/>
+                            <div t-attf-class="form-group #{error_dict.get('installateur_name') and 'has-error' or ''} col-md-12">
+                                <label class="col-md-3 col-sm-4 control-label" for="installateur_name">
+                                    Nom installateur
+                                </label>
+                                <div class="col-md-7 col-sm-8">
+                                    <input type="text" class="form-control o_website_form_input"
+                                           t-att-value="request.params.get('installateur_name')"
+                                           name="installateur_name" required=""/>
+                                </div>
+                            </div>
+                            <div class="clearfix"/>
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <input type="hidden" name="submitted" value="1"/>
+                            <input type="hidden" name="current_step" t-att-value="current_step"/>
+                            <div class="mb32 mt32" name="buttons">
+                                <a href="/rdv/nouveau" class="btn btn-default">
+                                    <span class="fa fa-long-arrow-left"/>
+                                    Retour
+                                </a>
+                                <button type="submit"
+                                        class="btn btn-primary pull-right a-submit a-submit-disable a-submit-loading"
+                                        name="next_step" value="adresse_select">
+                                    Valider
+                                    <span class="fa fa-long-arrow-right"/>
+                                </button>
+                            </div>
+                        </form>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="rdv_nouveau_adresse_select" name="Étape 2 : Adresse">
+        <t t-call="website.layout">
+            <t t-set="additional_title">RDV - Adresse</t>
+            <div id="wrap">
+                <div class="container oe_website_sale">
+                    <t t-call="of_planning_website.rdv_nouveau_ariane"/>
+                    <h1>ÉTAPE 2 : ADRESSE</h1>
+                    <!-- Choix de l'adresse -->
+                    <t t-if="current_step == 'adresse_select'">
+                        <div class="row">
+                            <div class="oe_cart">
+                                <div class="row all_shipping">
+                                    <div class="col-md-12">
+                                        <div class="row mt8">
+                                            <t t-foreach="adresse_list" t-as="adresse_unit">
+                                                <div class="col-sm-12 col-md-4 one_kanban">
+                                                    <t t-call="of_planning_website.rdv_kanban_adresse">
+                                                        <t t-set="actual_partner" t-value="parc_installe.client_id"/>
+                                                        <t t-set='contact' t-value="adresse_unit"/>
+                                                        <t t-set="readonly" t-value="0"/>
+                                                        <t t-set='selected'
+                                                           t-value="site_adresse_id==adresse_unit.id or len(adresse_list)==1"/>
+                                                    </t>
+                                                </div>
+                                            </t>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="clearfix"/>
+                                <div name="buttons" class="mt32 mb32">
+                                    <a href="/rdv/nouveau/appareil/selection" class="btn btn-default">
+                                        <span class="fa fa-long-arrow-left"/>
+                                        Retour
+                                    </a>
+                                    <span name="buttons_right" class="pull-right">
+                                        <a class="btn btn-primary"
+                                           href="/rdv/nouveau/localisation">
+                                            Suivant
+                                            <span class="fa fa-long-arrow-right"/>
+                                        </a>
+                                        <t t-if="not parc_installe.site_adresse_id">
+                                            &amp;nbsp;&amp;nbsp;&amp;nbsp;ou&amp;nbsp;&amp;nbsp;&amp;nbsp;
+                                            <form action="/rdv/nouveau/adresse/edition" method="post" class=''
+                                                  style="display:inline-block">
+                                                <input type="hidden" name="csrf_token"
+                                                       t-att-value="request.csrf_token()"/>
+                                                <input type="hidden" name="mode" value="new"/>
+                                                <a class='btn btn-default a-submit'>
+                                                   title="Ajouter une adresse">
+                                                    Ajouter une adresse
+                                                </a>
+                                            </form>
+                                        </t>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="rdv_nouveau_adresse_edit" name="Étape 2 : Adresse">
+        <t t-call="website.layout">
+            <t t-set="additional_title">RDV - Adresse</t>
+            <div id="wrap">
+                <div class="container oe_website_sale">
+                    <t t-call="of_planning_website.rdv_nouveau_ariane"/>
+                    <h1>ÉTAPE 2 : ADRESSE</h1>
+                    <!-- Édition d'une adresse -->
+                    <t t-if="current_step == 'adresse_edit'">
+                        <div class="row">
+                            <div class="col-md-9 oe_cart">
+                                <div class="row">
+                                    <t t-if="mode == 'first'">
+                                        <h3 class="page-header mt16">Votre adresse</h3>
+                                    </t>
+                                    <t t-if="mode == 'new'">
+                                        <h3 class="page-header mt16">Nouvelle adresse</h3>
+                                    </t>
+                                    <t t-if="mode == 'edit'">
+                                        <h3 class="page-header mt16">Modifier l'adresse</h3>
+                                    </t>
+
+                                    <t t-if="error_dict" t-foreach="error_dict.get('error_message', [])" t-as="err">
+                                        <h4 class="text-danger" t-esc="err"/>
+                                    </t>
+                                    <form action="/rdv/nouveau/adresse/edition" method="post" class="checkout_autoformat">
+                                        <div t-attf-class="form-group #{error_dict.get('name') and 'has-error' or ''} col-md-12 div_name">
+                                            <label class="control-label" for="name">
+                                                NOM Prénom
+                                                <span t-if="not adresse_principale"> (si différent)</span>
+                                                <span t-if="adresse_principale"> *</span>
+                                            </label>
+                                            <input type="text" name="name" class="form-control"
+                                                   t-att-value="partner and partner.name"/>
+                                        </div>
+                                        <div class="clearfix"/>
+                                        <div t-attf-class="form-group #{error_dict.get('email') and 'has-error' or ''} col-md-6"
+                                             id="div_email">
+                                            <label class="control-label" for="email">
+                                                Email
+                                                <span t-if="not adresse_principale"> (si différent)</span>
+                                                <span t-if="adresse_principale"> *</span>
+                                            </label>
+                                            <input type="email" name="email" class="form-control"
+                                                   t-att-value="partner and partner.email"/>
+                                        </div>
+                                        <div t-attf-class="form-group #{error_dict.get('phone') and 'has-error' or ''} col-md-6"
+                                             id="div_phone">
+                                            <label class="control-label" for="phone">
+                                                Téléphone
+                                                <span t-if="not adresse_principale"> (si différent)</span>
+                                                <span t-if="adresse_principale"> *</span>
+                                            </label>
+                                            <input type="tel" name="phone" class="form-control"
+                                                   t-att-value="partner and partner.phone"/>
+                                        </div>
+                                        <div class="clearfix"/>
+                                        <div t-attf-class="form-group #{error_dict.get('street') and 'has-error' or ''} col-md-12 div_street">
+                                            <label class="control-label" for="street">Rue
+                                                <span class="hidden-xs">(et numéro)</span> *
+                                            </label>
+                                            <input type="text" name="street" class="form-control"
+                                                   t-att-value="partner and partner.street"/>
+                                        </div>
+                                        <div class="clearfix"/>
+                                        <div t-attf-class="form-group #{error_dict.get('street2') and 'has-error' or ''} col-md-12 div_street">
+                                            <label class="control-label" for="street2">Complément</label>
+                                            <input type="text" name="street2" class="form-control"
+                                                   t-att-value="partner and partner.street2"/>
+                                        </div>
+                                        <div class="clearfix"/>
+                                        <t t-set='zip_city'
+                                           t-value='country and [x for x in country.get_address_fields() if x in ["zip", "city"]] or ["city", "zip"]'/>
+                                        <t t-if="'zip' in zip_city and zip_city.index('zip') &lt; zip_city.index('city')">
+                                            <div t-attf-class="form-group #{error_dict.get('zip') and 'has-error' or ''} col-sm-4 div_zip">
+                                                <label class="control-label" for="zip">CP *</label>
+                                                <input type="text" name="zip" class="form-control"
+                                                       t-att-value="partner and partner.zip"/>
+                                            </div>
+                                        </t>
+                                        <div t-attf-class="form-group #{error_dict.get('city') and 'has-error' or ''} col-sm-8 div_city">
+                                            <label class="control-label" for="city">Ville *</label>
+                                            <input type="text" name="city" class="form-control"
+                                                   t-att-value="partner and partner.city"/>
+                                        </div>
+                                        <t t-if="'zip' in zip_city and zip_city.index('zip') &gt; zip_city.index('city')">
+                                            <div t-attf-class="form-group #{error_dict.get('zip') and 'has-error' or ''} col-sm-4 div_zip">
+                                                <label class="control-label" for="zip">CP *</label>
+                                                <input type="text" name="zip" class="form-control"
+                                                       t-att-value="partner and partner.zip"/>
+                                            </div>
+                                        </t>
+                                        <div class="clearfix"/>
+                                        <div t-attf-class="form-group #{error_dict.get('country_id') and 'has-error' or ''} col-md-6 div_country">
+                                            <label class="control-label" for="country_id">Pays *</label>
+                                            <select id="country_id" name="country_id" class="form-control">
+                                                <option value="">Pays...</option>
+                                                <t t-foreach="country_list" t-as="c">
+                                                    <option t-att-value="c.id"
+                                                            t-att-selected="c.id == (country and country.id or -1)">
+                                                        <t t-esc="c.name"/>
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <input type="hidden" name="submitted" value="1"/>
+                                        <!-- renvoyer '0' pour signaler la création d'un nouveau res.partner -->
+                                        <input type="hidden" name="site_adresse_id"
+                                               t-att-value="partner and partner.id or '0'"/>
+                                        <input type="hidden" name="mode" t-att-value="mode"/>
+                                        <input type="hidden" name="adresse_principale" t-att-value="adresse_principale"/>
+                                        <input type="hidden" name="parc_installe_id" t-att-value="parc_installe.id"/>
+                                        <input type="hidden" name="current_step" t-att-value="current_step"/>
+                                        <input type="hidden" name="callback" t-att-value="callback"/>
+
+                                        <div class="clearfix"/>
+                                        <div>
+                                            <a href="/rdv/nouveau/adresse/selection"
+                                               class="btn btn-default mb32">
+                                                <span class="fa fa-long-arrow-left"/>
+                                                Retour
+                                            </a>
+                                            <button type="submit"
+                                                    class="btn btn-primary pull-right a-submit a-submit-disable a-submit-loading"
+                                                    name="next_step" value="adresse_select">
+                                                Valider
+                                                <span class="fa fa-long-arrow-right"/>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="rdv_nouveau_localisation" name="Étape 3 : Localisation">
+        <t t-call="website.layout">
+            <script t-att-src="'https://maps.googleapis.com/maps/api/js?key=' + googleAPIKey" type="text/javascript"/>
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_website_sale">
+                    <t t-call="of_planning_website.rdv_nouveau_ariane"/>
+                    <h1>ÉTAPE 3 : LOCALISATION</h1>
+                    <div class="container div_map">
+                        <script>
+                            var map_data = <t t-raw="map_lat_lng"/>;
+                        </script>
+                        <div class="row">
+                            <div id="map"
+                                 style="margin-top:2%;width:100%;height:600px;vertical-align: top;display: inline-block;"/>
+                        </div>
+                    </div>
+                    <div class="clearfix"/>
+                    <div class="mt32">
+                        <form action="/rdv/nouveau/localisation" method="post">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <input type="hidden" name="current_step" t-att-value="current_step"/>
+                            <input type="hidden" name="submitted" value="1"/>
+                            <input type="hidden" name="next_step" value="creneau"/>
+                            <div class="form-group col-sm-8">
+                                <label class="control-label" for="Commentaire">Commentaire</label>
+                                <input type="text" name="comment" class="form-control"
+                                       t-att-value="request.params.get('comment', of_geo_comment)"/>
+                                <i class="oe_grey">
+                                    Laissez nous un commentaire si la localisation n'est pas bonne.
+                                    Nous verrons ça ensemble au moment de vous rappeler pour valider le RDV.
+                                </i>
+                            </div>
+                            <div class="clearfix"/>
+                            <a href="/rdv/nouveau/adresse/selection" class="btn btn-default mb32">
+                                <span class="fa fa-long-arrow-left"/>
+                                Retour
+                            </a>
+                            <a class="btn btn-primary a-submit a-submit-disable a-submit-loading pull-right">
+                                Suivant
+                                <span class="fa fa-long-arrow-right"/>
+                            </a>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="rdv_nouveau_prestation" name="Étape 4 : Prestation">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_website_sale">
+                    <t t-call="of_planning_website.rdv_nouveau_ariane"/>
+                    <h1>ÉTAPE 4 : PRESTATION</h1>
+                    <t t-if="error_dict" t-foreach="error_dict.get('error_message', [])" t-as="err">
+                        <h4 class="text-danger" t-esc="err"/>
+                    </t>
+                    <form action="/rdv/nouveau/prestation" method="post" class="checkout_autoformat">
+                        <div t-attf-class="form-group #{error_dict.get('tache_id') and 'has-error' or ''} col-md-6">
+                            <label class="control-label" for="tache_id">Prestation</label>
+                            <select id="tache_id" name="tache_id" class="form-control">
+                                <option value="">Prestation...</option>
+                                <t t-foreach="tache_list" t-as="t">
+                                    <option t-att-value="t.id"
+                                            t-att-selected="t.id == (tache and tache.id or -1)">
+                                        <t t-esc="t.name"/>
+                                    </option>
+                                </t>
+                            </select>
+                        </div>
+                        <div class="clearfix"/>
+                        <div t-attf-class="form-group #{error_dict.get('date_recherche_debut') and 'has-error' or ''} col-md-6">
+                            <label class="control-label" for="date_recherche_debut">
+                                Date de début de recherche de créneau
+                            </label>
+                            <input type="date" name="date_recherche_debut" class="form-control"
+                                   t-att-value="date_recherche_debut"/>
+                        </div>
+
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <input type="hidden" name="submitted" value="1"/>
+                        <input type="hidden" name="current_step" t-att-value="current_step"/>
+                        <input type="hidden" name="callback" t-att-value="callback"/>
+
+                        <div class="clearfix"/>
+                        <div>
+                            <a href="/rdv/nouveau/adresse/selection"
+                               class="btn btn-default mb32">
+                                <span class="fa fa-long-arrow-left"/>
+                                Retour
+                            </a>
+                            <button type="submit"
+                                    class="btn btn-primary pull-right a-submit a-submit-disable a-submit-loading"
+                                    name="next_step" value="creneau">
+                                Suivant
+                                <span class="fa fa-long-arrow-right"/>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="rdv_nouveau_creneau" name="Étape 5 : Créneau">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_website_sale">
+                    <t t-call="of_planning_website.rdv_nouveau_ariane"/>
+                    <h1>ÉTAPE 5 : CRÉNEAU</h1>
+                    <!-- classe utilisée par le js -->
+                    <div class="of_rdv_nouveau_tous_creneaux" t-if="creneau_selected">
+                        <t t-if="mode == 'journee'">
+                            <t t-foreach="creneaux_grouped" t-as="week_number">
+                                <div class="row">
+                                    <h3>Semaine
+                                        <span t-esc="week_number"/>
+                                        :
+                                    </h3>
+                                    <t t-foreach="creneaux_grouped[week_number]" t-as="creneau">
+                                        <div class="col-sm-6 col-md-2 one_kanban">
+                                            <t t-call="of_planning_website.rdv_kanban_creneau">
+                                                <t t-set="title" t-value="creneau.name"/>
+                                                <t t-set="extra_info" t-value="creneau.description"/>
+                                                <t t-set="selected" t-value="creneau.selected"/>
+                                            </t>
+                                        </div>
+                                    </t>
+                                </div>
+                            </t>
+                        </t>
+                        <t t-if="mode == 'demi-journee'">
+                            <t t-foreach="creneaux_grouped" t-as="week_number">
+                                <div class="row">
+                                    <h3>Semaine <span t-esc="week_number"/> : </h3>
+                                    <t t-foreach="creneaux_grouped[week_number]" t-as="day">
+                                        <div class="col-sm-6 col-md-2">
+                                            <h4 style="text-align: center;">
+                                                <t t-esc="day" t-options="{'widget': 'date'}"/>
+                                            </h4>
+                                            <t t-foreach="creneaux_grouped[week_number][day]" t-as="creneau">
+                                                <div class="one_kanban">
+                                                    <t t-call="of_planning_website.rdv_kanban_creneau">
+                                                        <t t-set="title" t-value="creneau.name"/>
+                                                        <t t-set="extra_info" t-value="creneau.description"/>
+                                                        <t t-set="selected" t-value="creneau.selected"/>
+                                                    </t>
+                                                </div>
+                                            </t>
+                                        </div>
+                                    </t>
+                                </div>
+                            </t>
+                        </t>
+                    </div>
+                    <div name="zero_result" t-if="not creneau_selected">
+                        <h2>
+                            Mince Alors! On dirait qu'il n'y a aucun créneau de libre... Revenez dans quelques jours!
+                        </h2>
+                        Vous pouvez aussi contacter notre service commercial pour plus d'information.
+                    </div>
+
+                    <div class="clearfix"/>
+                    <div name="buttons" class="mt32 mb32">
+                        <a href="/rdv/nouveau/prestation" class="btn btn-default">
+                            <span class="fa fa-long-arrow-left"/>
+                            Retour
+                        </a>
+                        <span name="buttons_right" class="pull-right" t-if="creneau_selected">
+                            <a class="btn btn-primary"
+                               href="/rdv/nouveau/confirmation">
+                                Suivant
+                                <span class="fa fa-long-arrow-right"/>
+                            </a>
+                            &amp;nbsp;&amp;nbsp;&amp;nbsp;ou&amp;nbsp;&amp;nbsp;&amp;nbsp;
+                            <form action="/rdv/nouveau/creneau" method="post" class=''
+                                  style="display:inline-block">
+                                <input type="hidden" name="csrf_token"
+                                       t-att-value="request.csrf_token()"/>
+                                <input type="hidden" name="submitted" value="1"/>
+                                <input type="hidden" name="load_more" value="1"/>
+                                <a class='btn btn-default a-submit'>
+                                    Chercher plus...
+                                </a>
+                            </form>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="rdv_nouveau_confirmation" name="Étape 6 : Confirmation">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_website_sale">
+                    <t t-call="of_planning_website.rdv_nouveau_ariane"/>
+                    <h1>ÉTAPE 6 : CONFIRMATION</h1>
+                    <div class="clearfix"/>
+                    <h2>Votre adresse d'intervention</h2>
+                    <div class="col-sm-12 col-md-4 one_kanban">
+                        <t t-call="of_planning_website.rdv_kanban_adresse">
+                            <t t-set="actual_partner" t-value="parc_installe.client_id"/>
+                            <t t-set='contact' t-value="adresse"/>
+                            <t t-set='selected' t-value="1"/>
+                            <t t-set='readonly' t-value="1"/>
+                        </t>
+                    </div>
+                    <div class="clearfix"/>
+                    <h2>Votre appareil</h2>
+                    <div class="col-sm-12 col-md-4 one_kanban">
+                        <t t-call="of_planning_website.rdv_kanban_appareil"/>
+                    </div>
+                    <div class="clearfix"/>
+                    <h2>Votre rendez-vous</h2>
+                    <div class="col-sm-12 col-md-4 one_kanban">
+                        <t t-call="of_planning_website.rdv_kanban_creneau">
+                            <t t-set="title" t-value="creneau.display_name"/>
+                            <t t-set="extra_info" t-value="tache.name"/>
+                            <t t-set="selected" t-value="1"/>
+                        </t>
+                    </div>
+                    <div class="clearfix"/>
+                    <div name="buttons" class="mt32 mb32">
+                        <a href="/rdv/nouveau/creneau" class="btn btn-default">
+                            <span class="fa fa-long-arrow-left"/>
+                            Retour
+                        </a>
+                        <span name="buttons_right" class="pull-right">
+                            <form action="/rdv/nouveau/confirmation" method="post" class=''>
+                                <input type="hidden" name="csrf_token"
+                                       t-att-value="request.csrf_token()"/>
+                                <input type="hidden" name="submitted" value="1"/>
+                                <a class='btn btn-primary a-submit'>
+                                    Valider ma demande de RDV
+                                </a>
+                            </form>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="rdv_nouveau_ok" name="Étape 6 : Confirmation">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_website_sale">
+                    <h1>FÉLICITATIONS!</h1>
+                    <h2>Votre demande de RDV a bien été enregistrée. Nous vous recontacterons prochainement
+                        pour la dernière étape de ce processus.
+                    </h2>
+                    <div name="buttons" class="mt32 mb32">
+                        <a href="/" class="btn btn-primary">
+                            Accueil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="rdv_kanban_appareil" name="Kanban appareil">
+        <div class="panel panel-default border_primary">
+            <div class='panel-body' style='min-height: 130px;'>
+                <div t-if="parc_installe.modele">
+                    Modèle : <b t-esc="parc_installe.modele"/>
+                </div>
+                <div t-if="parc_installe.name">
+                    Nº série : <span t-esc="parc_installe.name"/>
+                </div>
+                <div t-if="parc_installe.installateur_id">
+                    Par <span t-esc="parc_installe.installateur_id.name"/>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="rdv_kanban_adresse" name="Kanban address">
+        <form action="/rdv/nouveau/adresse/selection" method="POST" class='hide'>
+            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+            <input type="hidden" name="site_adresse_id" t-att-value="contact.id"/>
+            <input type='submit'/>
+        </form>
+        <a t-if="not readonly and (not actual_partner or (adresse.id in actual_partner.ids + actual_partner.child_ids.ids))"
+           class='btn btn-link pull-right fa fa-edit of_js_edit_address no-decoration' title="Modifier cette adresse"
+           style="font-size: 30px"/>
+        <div t-att-class="'panel panel-default %s' % (selected and 'border_primary' or 'of_js_change_shipping')">
+            <div class='panel-body' style='min-height: 130px;'>
+                <t t-esc="contact"
+                   t-options="dict(widget='contact', fields=['name', 'address', 'phone'], no_marker=True)"/>
+            </div>
+        </div>
+    </template>
+
+    <template id="rdv_kanban_creneau" name="Kanban créneau">
+        <form action="/rdv/nouveau/creneau" method="POST" class='hide'>
+            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+            <input type="hidden" name="creneau_id" t-att-value="creneau.id"/>
+            <input type='submit'/>
+        </form>
+        <div t-att-class="'panel panel-default %s' % (selected and 'border_primary' or 'of_js_change_creneau')">
+            <div class='panel-body' style='min-height: 130px;'>
+                <b>
+                    <span t-esc="title"/>
+                </b>
+                <br/>
+                <i t-if="extra_info" t-esc="extra_info"/>
+            </div>
+        </div>
+    </template>
+
+</odoo>
