@@ -66,13 +66,17 @@
                     <field name="is_invoiceable" invisible="1"/>
 
                     <button name="recurring_create_invoice" type="object" class="btn-primary" string="Créer les factures"
-                            attrs="{'invisible': [('is_invoiceable', '=', False)]}"/>
+                            attrs="{'invisible': [('is_invoiceable', '=', False)]}"
+                            groups="of_contract_custom.group_of_contract_custom_modification"/>
                     <button name="button_renew" type="object" class="btn-primary" string="Renouveler"
-                            attrs="{'invisible': ['|', ('is_invoiceable', '!=', False), ('renewal', '=', True)]}"/>
+                            attrs="{'invisible': ['|', ('is_invoiceable', '!=', False), ('renewal', '=', True)]}"
+                            groups="of_contract_custom.group_of_contract_custom_modification"/>
                     <button name="valider_lignes_contrat" type="object" class="btn-primary" string="Activer les lignes"
                     confirm="Activer les lignes du contrat va passer toutes les lignes actuellement en brouillon en état validée. Voulez-vous continuer ?
-(les lignes annulées par un avenant ou déjà validée ne seront pas modifiées)"/>
-                    <button name="faire_revision" type="object" class="btn-primary" string="Faire la révision"/>
+(les lignes annulées par un avenant ou déjà validée ne seront pas modifiées)"
+                            groups="of_contract_custom.group_of_contract_custom_creation"/>
+                    <button name="faire_revision" type="object" class="btn-primary" string="Faire la révision"
+                            groups="of_contract_custom.group_of_contract_custom_modification"/>
                     <field name="state" widget="statusbar" statusbar_visible="in_progress"/>
                 </header>
                 <sheet>
@@ -190,14 +194,17 @@
                                         <field name="date_contract_end" invisible="0"/>
                                         <button name="faire_avenant" type="object" icon="fa-cogs"
                                                 help="Faire un avenant"
-                                                attrs="{'invisible': ['|',('state', '!=', 'validated'),('date_end','!=',False)]}"/>
+                                                attrs="{'invisible': ['|',('state', '!=', 'validated'),('date_end','!=',False)]}"
+                                                groups="of_contract_custom.group_of_contract_custom_creation"/>
                                         <button name="annuler_la_ligne" type="object" icon="fa-times"
                                                 help="Annuler la ligne"
-                                                attrs="{'invisible': ['|',('state', '!=', 'validated'),('date_end','!=',False)]}"/>
+                                                attrs="{'invisible': ['|',('state', '!=', 'validated'),('date_end','!=',False)]}"
+                                                groups="of_contract_custom.group_of_contract_custom_modification"/>
                                         <button name="supprimer_la_ligne" type="object" icon="fa-trash-o"
                                                 help="Supprimer"
                                                 attrs="{'invisible': [('state', '!=', 'draft')]}"
-                                                confirm="Voulez-vous supprimer la ligne ?"/>
+                                                confirm="Voulez-vous supprimer la ligne ?"
+                                                groups="of_base.of_group_root_only"/>
 
                                     </tree>
                                 </field>
@@ -324,9 +331,11 @@
             <form>
                 <header>
                     <button name="bouton_valider" type="object" class="btn-primary" string="Activer la ligne"
-                            states="draft"/>
+                            states="draft"
+                            groups="of_contract_custom.group_of_contract_custom_creation"/>
                     <button name="bouton_brouillon" type="object" class="btn-primary" string="Brouillon"
-                            attrs="{'invisible': ['|','|',('invoice_count','&gt;',0),('intervention_count','&gt;',0),('state','!=','validated')]}"/>
+                            attrs="{'invisible': ['|','|',('invoice_count','&gt;',0),('intervention_count','&gt;',0),('state','!=','validated')]}"
+                            groups="of_contract_custom.group_of_contract_custom_creation"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,validated,cancel"/>
                 </header>
                 <sheet>
