@@ -126,4 +126,24 @@
         <field name="context">{'hide_sale': True, 'search_default_in_progress': 1}</field>
     </record>
 
+    <!-- Sale config wizard -->
+    <record id="of_sale_custom_workflow_sale_config_settings_form_view" model="ir.ui.view">
+        <field name="name">of.sale.custom.workflow.sale.config.settings.form.view</field>
+        <field name="model">sale.config.settings</field>
+        <field name="inherit_id" ref="of_crm.of_cr_sale_config_settings_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_display_funnel_conversion2']/.." position="after">
+                <label for="of_display_funnel_conversion4"/>
+                <div>
+                    <field name="of_display_funnel_conversion4" class="oe_inline"/>
+                    <p class="text-muted">Tunnel basé sur l'analyse brute des données commerciales.<br/>
+                        La valeur de référence est la date de chaque évènement.
+                        Toutes les données sont analysées.<br/>
+                        Le workflow des commandes est enrichi.</p>
+                    <field name="group_funnel_conversion4" class="oe_inline" invisible="1"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
