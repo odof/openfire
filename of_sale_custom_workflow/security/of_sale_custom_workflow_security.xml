@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="group_funnel_conversion4" model="res.groups">
+        <field name="name">Affichage du tunnel de conversion brut</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+    <function name="_init_crm_funnel_conversion_group4" model="sale.config.settings"/>
+
+</odoo>

@@ -471,6 +471,19 @@ class SaleConfiguration(models.TransientModel):
             self.env.ref('base.group_portal').write({'implied_ids': [(4, group_quotation_sale_order_state.id)]})
             self.env.ref('base.group_user').write({'implied_ids': [(4, group_quotation_sale_order_state.id)]})
 
+    @api.model
+    def _init_crm_funnel_conversion_group(self):
+        group_funnel_conversion1 = self.env.ref('of_crm.group_funnel_conversion1')
+        if not self.env['ir.values'].search(
+                [('name', '=', 'of_display_funnel_conversion1'), ('model', '=', 'sale.config.settings')]):
+            self.env['ir.values'].sudo().set_default('sale.config.settings', 'of_display_funnel_conversion1', True)
+            self.env.ref('sales_team.group_sale_salesman').write({'implied_ids': [(4, group_funnel_conversion1.id)]})
+        group_funnel_conversion2 = self.env.ref('of_crm.group_funnel_conversion2')
+        if not self.env['ir.values'].search(
+                [('name', '=', 'of_display_funnel_conversion2'), ('model', '=', 'sale.config.settings')]):
+            self.env['ir.values'].sudo().set_default('sale.config.settings', 'of_display_funnel_conversion2', True)
+            self.env.ref('sales_team.group_sale_salesman').write({'implied_ids': [(4, group_funnel_conversion2.id)]})
+
     group_estimation_sale_order_state = fields.Boolean(
         string=u"Commandes créés à l'étape Estimation",
         implied_group='of_crm.group_estimation_sale_order_state',
@@ -485,6 +498,21 @@ class SaleConfiguration(models.TransientModel):
         string=u"(OF) État de départ des commandes",
         default='quotation',
         required=True)
+    of_lost_opportunity_stage_id = fields.Many2one(
+        comodel_name='crm.stage', string=u"(OF) Étape perdue des opportunités",
+        help=u"Permet d'indiquer quelle est l'étape associée à la perte d'opportunité pour des besoins d'analyse")
+    group_funnel_conversion1 = fields.Boolean(
+        string=u"Affichage du tunnel de conversion qualitatif",
+        implied_group='of_crm.group_funnel_conversion1',
+        group='sales_team.group_sale_salesman')
+    of_display_funnel_conversion1 = fields.Boolean(
+        string=u"(OF) Affichage du tunnel de conversion qualitatif", default=True)
+    group_funnel_conversion2 = fields.Boolean(
+        string=u"Affichage du tunnel de conversion quantitatif",
+        implied_group='of_crm.group_funnel_conversion2',
+        group='sales_team.group_sale_salesman')
+    of_display_funnel_conversion2 = fields.Boolean(
+        string=u"(OF) Affichage du tunnel de conversion quantitatif", default=True)
 
     @api.multi
     def set_of_sale_order_start_state_defaults(self):
@@ -503,6 +531,35 @@ class SaleConfiguration(models.TransientModel):
                 'group_estimation_sale_order_state': False,
                 'group_quotation_sale_order_state': True,
             })
+
+    @api.multi
+    def set_of_lost_opportunity_stage_id_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_lost_opportunity_stage_id', self.of_lost_opportunity_stage_id.id)
+
+    @api.multi
+    def set_of_display_funnel_conversion1(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_display_funnel_conversion1', self.of_display_funnel_conversion1)
+
+    @api.onchange('of_display_funnel_conversion1')
+    def _onchange_of_display_funnel_conversion1(self):
+        if self.of_display_funnel_conversion1:
+            self.update({'group_funnel_conversion1': True})
+        else:
+            self.update({'group_funnel_conversion1': False})
+
+    @api.multi
+    def set_of_display_funnel_conversion2(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_display_funnel_conversion2', self.of_display_funnel_conversion2)
+
+    @api.onchange('of_display_funnel_conversion2')
+    def _onchange_of_display_funnel_conversion2(self):
+        if self.of_display_funnel_conversion2:
+            self.update({'group_funnel_conversion2': True})
+        else:
+            self.update({'group_funnel_conversion2': False})
 
 
 class MailComposeMessage(models.TransientModel):

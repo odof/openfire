@@ -213,6 +213,27 @@
                         <field name="group_quotation_sale_order_state" class="oe_inline" invisible="1"/>
                     </div>
                 </xpath>
+                <xpath expr="//group[@name='config_alias']" position="inside">
+                    <field name="of_lost_opportunity_stage_id" class="oe_inline"/>
+                    <label for="of_display_funnel_conversion1"/>
+                    <div>
+                        <field name="of_display_funnel_conversion1" class="oe_inline"/>
+                        <p class="text-muted">Tunnel basé sur l'analyse qualitative des données commerciales.<br/>
+                            La valeur de référence est l'opportunité source.
+                            Seules les données rattachées à une opportunité sont analysées.<br/>
+                            Certains indicateurs sont interprétés (Nombre de devis, montant de devis, etc).</p>
+                        <field name="group_funnel_conversion1" class="oe_inline" invisible="1"/>
+                    </div>
+                    <label for="of_display_funnel_conversion2"/>
+                    <div>
+                        <field name="of_display_funnel_conversion2" class="oe_inline"/>
+                        <p class="text-muted">Tunnel basé sur l'analyse quantitative des données commerciales.<br/>
+                            La valeur de référence est la date de chaque évènement.
+                            Seules les données rattachées à une opportunité sont analysées.<br/>
+                            Certains indicateurs sont interprétés (Nombre de devis, montant de devis, etc).</p>
+                        <field name="group_funnel_conversion2" class="oe_inline" invisible="1"/>
+                    </div>
+                </xpath>
             </field>
         </record>
 
