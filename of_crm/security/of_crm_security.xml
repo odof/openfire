@@ -13,7 +13,19 @@
         <field name="comment">L'étape de départ du workflow des commandes de vente est "Devis"</field>
     </record>
 
+    <record id="group_funnel_conversion1" model="res.groups">
+        <field name="name">Affichage du tunnel de conversion qualitatif</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+    <record id="group_funnel_conversion2" model="res.groups">
+        <field name="name">Affichage du tunnel de conversion quantitatif</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
     <function name="_init_sale_order_state_group" model="sale.config.settings"/>
+
+    <function name="_init_crm_funnel_conversion_group" model="sale.config.settings"/>
 
     <data noupdate="1">
 
