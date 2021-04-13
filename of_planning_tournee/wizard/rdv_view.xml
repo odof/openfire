@@ -88,8 +88,8 @@
                                 filters_radio="1" dispo_field="disponible" jump_to="selected" display_states="1"
                                 force_color_field="force_color" selected_field="selected" quick_add="0" draggable="0">
                                 <field name="name"/>
-                                <field name="distance" suffix=" km"/>
-                                <field name="duree" suffix=" min"/>
+                                <field name="distance_utile" suffix=" km"/>
+                                <field name="duree_utile" suffix=" min"/>
                                 <field name="state_int" invisible="1"/>
                                 <field name="disponible" invisible="1"/>
                                 <field name="force_color" invisible="1"/>
@@ -111,8 +111,8 @@
                                 <field name="date"/>
                                 <field name="employee_id"/>
                                 <field name="description" string="Créneau"/>
-                                <field name="distance" string="Distance"/>
-                                <field name="duree" string="Durée"/>
+                                <field name="distance_utile" string="Distance"/>
+                                <field name="duree_utile" string="Durée"/>
                             </tree>
                         </field>
                     </page>
