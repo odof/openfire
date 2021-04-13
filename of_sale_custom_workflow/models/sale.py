@@ -48,4 +48,30 @@ class SaleOrderLine(models.Model):
 class SaleConfigSettings(models.TransientModel):
     _inherit = 'sale.config.settings'
 
+    @api.model
+    def _init_crm_funnel_conversion_group4(self):
+        group_funnel_conversion4 = self.env.ref('of_sale_custom_workflow.group_funnel_conversion4')
+        if not self.env['ir.values'].search(
+                [('name', '=', 'of_display_funnel_conversion4'), ('model', '=', 'sale.config.settings')]):
+            self.env['ir.values'].sudo().set_default('sale.config.settings', 'of_display_funnel_conversion4', True)
+            self.env.ref('sales_team.group_sale_salesman').write({'implied_ids': [(4, group_funnel_conversion4.id)]})
+
     of_recalcul_date_confirmation = fields.Selection(string=u"(OF) Recalcul de la date d'enregistrement")
+    group_funnel_conversion4 = fields.Boolean(
+        string=u"Affichage du tunnel de conversion brut",
+        implied_group='of_sale_custom_workflow.group_funnel_conversion4',
+        group='sales_team.group_sale_salesman')
+    of_display_funnel_conversion4 = fields.Boolean(
+        string=u"(OF) Affichage du tunnel de conversion brut", default=True)
+
+    @api.multi
+    def set_of_display_funnel_conversion4(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_display_funnel_conversion4', self.of_display_funnel_conversion4)
+
+    @api.onchange('of_display_funnel_conversion4')
+    def _onchange_of_display_funnel_conversion4(self):
+        if self.of_display_funnel_conversion4:
+            self.update({'group_funnel_conversion4': True})
+        else:
+            self.update({'group_funnel_conversion4': False})

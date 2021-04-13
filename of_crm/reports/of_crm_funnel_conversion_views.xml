@@ -89,10 +89,12 @@
         <menuitem
             id="of_crm_funnel_conversion_menu"
             name="Tunnel quali"
-            groups="sales_team.group_sale_salesman"
             parent="sales_team.menu_sale_report"
             action="of_crm_funnel_conversion_action"
             sequence="7"/>
+        <record model="ir.ui.menu" id="of_crm.of_crm_funnel_conversion_menu">
+            <field name="groups_id" eval="[(6,0, [ref('group_funnel_conversion1')])]"/>
+        </record>
 
         <record id="of_crm_funnel_conversion_rule" model="ir.rule">
             <field name="name">Opportunitées du vendeur</field>
@@ -185,10 +187,12 @@
         <menuitem
             id="of_crm_funnel_conversion2_menu"
             name="Tunnel quanti"
-            groups="sales_team.group_sale_salesman"
             parent="sales_team.menu_sale_report"
             action="of_crm_funnel_conversion2_action"
             sequence="8"/>
+        <record model="ir.ui.menu" id="of_crm.of_crm_funnel_conversion2_menu">
+            <field name="groups_id" eval="[(6,0, [ref('group_funnel_conversion2')])]"/>
+        </record>
 
         <record id="of_crm_funnel_conversion2_rule" model="ir.rule">
             <field name="name">Opportunitées du vendeur</field>

@@ -25,16 +25,4 @@
         <field name="groups_id" eval="[(5,0), (4, ref('of_access_control.of_group_sale_responsible'))]"/>
     </record>
 
-    <!-- Sale config wizard -->
-    <record id="of_sale_order_confirmation_view_sale_config_settings" model="ir.ui.view">
-        <field name="name">of sale settings</field>
-        <field name="model">sale.config.settings</field>
-        <field name="inherit_id" ref="of_sale.of_sale_view_sale_config_settings"/>
-        <field name="arch" type="xml">
-            <xpath expr="//label[@for='of_position_fiscale']" position="before">
-                <field name="of_recalcul_date_confirmation" class="oe_inline" widget="radio"/>
-            </xpath>
-        </field>
-    </record>
-
 </odoo>
