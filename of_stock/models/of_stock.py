@@ -364,7 +364,20 @@ class InventoryLine(models.Model):
     _inherit = "stock.inventory.line"
     _order = "product_id, inventory_id, location_id, prod_lot_id"
 
+    @api.model_cr_context
+    def _auto_init(self):
+        cr = self._cr
+        cr.execute(
+            "SELECT 1 FROM information_schema.columns "
+            "WHERE table_name = 'stock_inventory_line' AND column_name = 'of_theoretical_qty'")
+        exists = bool(cr.fetchall())
+        res = super(InventoryLine, self)._auto_init()
+        if not exists:
+            cr.execute("UPDATE stock_inventory_line SET of_theoretical_qty = theoretical_qty")
+        return res
+
     of_note = fields.Text(string="Notes")
+    of_theoretical_qty = fields.Float(string=u"Quantité théorique")
 
     @api.multi
     def _write(self, vals):
@@ -376,6 +389,8 @@ class InventoryLine(models.Model):
                 break
         else:
             self = self.sudo()
+        if 'theoretical_qty' in vals:
+            vals['of_theoretical_qty'] = vals['theoretical_qty']
         return super(InventoryLine, self)._write(vals)
 
     @api.model
@@ -460,17 +475,33 @@ class InventoryLine(models.Model):
                             quant._quant_reconcile_negative(move)
         return moves
 
-    def _get_quants(self):
-        if self.env['ir.values'].get_default('stock.config.settings', 'of_forcer_date_inventaire'):
-            return self.env['stock.quant'].search([
-                ('company_id', '=', self.company_id.id),
-                ('location_id', '=', self.location_id.id),
-                ('lot_id', '=', self.prod_lot_id.id),
-                ('product_id', '=', self.product_id.id),
-                ('owner_id', '=', self.partner_id.id),
-                ('package_id', '=', self.package_id.id),
-                ('in_date', '<=', self.inventory_id.date)])
-        return super(InventoryLine, self)._get_quants()
+    @api.one
+    @api.depends('location_id', 'product_id', 'package_id', 'product_uom_id', 'company_id', 'prod_lot_id', 'partner_id',
+                 'inventory_id.date')
+    def _compute_theoretical_qty(self):
+        if not self.env['ir.values'].get_default('stock.config.settings', 'of_forcer_date_inventaire'):
+            return super(InventoryLine, self)._compute_theoretical_qty()
+        theoretical_qty = sum([x.quantity for x in self.of_get_stock_history()])
+        if theoretical_qty and self.product_uom_id and self.product_id.uom_id != self.product_uom_id:
+            theoretical_qty = self.product_id.uom_id._compute_quantity(theoretical_qty, self.product_uom_id)
+        self.theoretical_qty = theoretical_qty
+
+    @api.onchange(
+        'location_id', 'product_id', 'package_id', 'product_uom_id', 'company_id', 'prod_lot_id', 'partner_id',
+        'inventory_id.date')
+    def _onchange_product_info(self):
+        for line in self:
+            # Dans un onchange, l'appel d'un champ compute force son recalcul même s'il est stored.
+            self.of_theoretical_qty = line.theoretical_qty
+
+    def of_get_stock_history(self):
+        # :TODO: Ajouter des filtres pour les champs lot_id, partner_id, package_id ?
+        #        Remplacer l'appel à cette fonction requête SQL plus rapide n'utilisant pas stock_history
+        return self.env['stock.history'].search(
+            [('company_id', '=', self.inventory_id.company_id.id),
+             ('location_id', '=', self.location_id.id),
+             ('product_id', '=', self.product_id.id),
+             ('date', '<=', self.inventory_id.date)])
 
 
 class StockConfigSettings(models.TransientModel):
