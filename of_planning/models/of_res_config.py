@@ -29,6 +29,10 @@ class OfInterventionSettings(models.TransientModel):
         help=u"Choisissez un couleur de texte pour les créneaux dispos")
 
     fiche_intervention_cacher_montant = fields.Boolean(string=u"(OF) Cacher montant restant")
+    do_deliveries = fields.Selection(selection=[
+        (0, 'Ne pas utiliser les bons de livraisons depuis les RDV'),
+        (1, 'Utiliser les bons de livraisons depuis les RDV'),
+        ], string="(OF) BL d'intervention")
 
     @api.multi
     def set_calendar_min_time_defaults(self):
@@ -73,3 +77,8 @@ class OfInterventionSettings(models.TransientModel):
     def set_fiche_intervention_cacher_montant_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'of.intervention.settings', 'fiche_intervention_cacher_montant', self.fiche_intervention_cacher_montant)
+
+    @api.multi
+    def set_do_deliveries_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+                'of.intervention.settings', 'do_deliveries', self.do_deliveries)
