@@ -1468,6 +1468,14 @@ var PlanningCreneauDispo = Widget.extend({
      */
     on_mouseout: function (ev) {
         ev.preventDefault();
+        if (ev.relatedTarget && ev.relatedTarget.parentNode.classList.contains('of_planning_fillerbar')) {
+            var rect1 = ev.relatedTarget.getBoundingClientRect();
+            var rect2 = this.$el.find('.of_planning_creneau_dispo')[0].getBoundingClientRect();
+            var overlap = !(rect1.right < rect2.left || rect1.left > rect2.right || rect1.bottom - 1 < rect2.top || rect1.top > rect2.bottom - 1)
+            if (overlap) {
+                return;
+            }
+        }
         if (!this.$el.is(":hover")) {
             this.$el.find('.of_planning_creneau_dispo').outerHeight(this.hauteur);
         }
@@ -1841,27 +1849,91 @@ var PlanningRecord = Widget.extend({
             a[5] = this.$of_el[5] && this.$of_el[5].find('.of_planning_record_global_click')[0] || false;
             a[6] = this.$of_el[6] && this.$of_el[6].find('.of_planning_record_global_click')[0] || false;
             if (!!a[0]) {
+                if (ev.relatedTarget && ev.relatedTarget.parentNode.classList.contains('of_planning_fillerbar')) {
+                    var rect1 = ev.relatedTarget.getBoundingClientRect();
+                    var rect2 = this.$of_el[0].find('.of_planning_record_global_click')[0].getBoundingClientRect();
+                    var overlap = !(rect1.right < rect2.left || rect1.left > rect2.right || rect1.bottom - 1 < rect2.top || rect1.top > rect2.bottom - 1)
+                    if (overlap) {
+                        return;
+                    }
+                }
                 this.$of_el[0].find('.of_planning_record_global_click').outerHeight(this.hours_cols[0].hauteur);
             }
             if (!!a[1]) {
+                if (ev.relatedTarget && ev.relatedTarget.parentNode.classList.contains('of_planning_fillerbar')) {
+                    var rect1 = ev.relatedTarget.getBoundingClientRect();
+                    var rect2 = this.$of_el[1].find('.of_planning_record_global_click')[0].getBoundingClientRect();
+                    var overlap = !(rect1.right < rect2.left || rect1.left > rect2.right || rect1.bottom - 1 < rect2.top || rect1.top > rect2.bottom - 1)
+                    if (overlap) {
+                        return;
+                    }
+                }
                 this.$of_el[1].find('.of_planning_record_global_click').outerHeight(this.hours_cols[1].hauteur);
             }
             if (!!a[2]) {
+                if (ev.relatedTarget && ev.relatedTarget.parentNode.classList.contains('of_planning_fillerbar')) {
+                    var rect1 = ev.relatedTarget.getBoundingClientRect();
+                    var rect2 = this.$of_el[2].find('.of_planning_record_global_click')[0].getBoundingClientRect();
+                    var overlap = !(rect1.right < rect2.left || rect1.left > rect2.right || rect1.bottom - 1 < rect2.top || rect1.top > rect2.bottom - 1)
+                    if (overlap) {
+                        return;
+                    }
+                }
                 this.$of_el[2].find('.of_planning_record_global_click').outerHeight(this.hours_cols[2].hauteur);
             }
             if (!!a[3]) {
+                if (ev.relatedTarget && ev.relatedTarget.parentNode.classList.contains('of_planning_fillerbar')) {
+                    var rect1 = ev.relatedTarget.getBoundingClientRect();
+                    var rect2 = this.$of_el[3].find('.of_planning_record_global_click')[0].getBoundingClientRect();
+                    var overlap = !(rect1.right < rect2.left || rect1.left > rect2.right || rect1.bottom - 1 < rect2.top || rect1.top > rect2.bottom - 1)
+                    if (overlap) {
+                        return;
+                    }
+                }
                 this.$of_el[3].find('.of_planning_record_global_click').outerHeight(this.hours_cols[3].hauteur);
             }
             if (!!a[4]) {
+                if (ev.relatedTarget && ev.relatedTarget.parentNode.classList.contains('of_planning_fillerbar')) {
+                    var rect1 = ev.relatedTarget.getBoundingClientRect();
+                    var rect2 = this.$of_el[4].find('.of_planning_record_global_click')[0].getBoundingClientRect();
+                    var overlap = !(rect1.right < rect2.left || rect1.left > rect2.right || rect1.bottom - 1 < rect2.top || rect1.top > rect2.bottom - 1)
+                    if (overlap) {
+                        return;
+                    }
+                }
                 this.$of_el[4].find('.of_planning_record_global_click').outerHeight(this.hours_cols[4].hauteur);
             }
             if (!!a[5]) {
+                if (ev.relatedTarget && ev.relatedTarget.parentNode.classList.contains('of_planning_fillerbar')) {
+                    var rect1 = ev.relatedTarget.getBoundingClientRect();
+                    var rect2 = this.$of_el[5].find('.of_planning_record_global_click')[0].getBoundingClientRect();
+                    var overlap = !(rect1.right < rect2.left || rect1.left > rect2.right || rect1.bottom - 1 < rect2.top || rect1.top > rect2.bottom - 1)
+                    if (overlap) {
+                        return;
+                    }
+                }
                 this.$of_el[5].find('.of_planning_record_global_click').outerHeight(this.hours_cols[5].hauteur);
             }
             if (!!a[6]) {
+                if (ev.relatedTarget && ev.relatedTarget.parentNode.classList.contains('of_planning_fillerbar')) {
+                    var rect1 = ev.relatedTarget.getBoundingClientRect();
+                    var rect2 = this.$of_el[6].find('.of_planning_record_global_click')[0].getBoundingClientRect();
+                    var overlap = !(rect1.right < rect2.left || rect1.left > rect2.right || rect1.bottom - 1 < rect2.top || rect1.top > rect2.bottom - 1)
+                    if (overlap) {
+                        return;
+                    }
+                }
                 this.$of_el[6].find('.of_planning_record_global_click').outerHeight(this.hours_cols[6].hauteur);
             }
         }else{
+            if (ev.relatedTarget && ev.relatedTarget.parentNode.classList.contains('of_planning_fillerbar')) {
+                var rect1 = ev.relatedTarget.getBoundingClientRect();
+                var rect2 = this.$el.find('.of_planning_record_global_click')[0].getBoundingClientRect();
+                var overlap = !(rect1.right < rect2.left || rect1.left > rect2.right || rect1.bottom - 1 < rect2.top || rect1.top > rect2.bottom - 1)
+                if (overlap) {
+                    return;
+                }
+            }
             this.$el.find('.of_planning_record_global_click').outerHeight(this.hauteur);
         }
     },
