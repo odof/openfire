@@ -30,6 +30,9 @@
                             <i class="oe_grey">/!\ ce paramètre est partagé entre toutes les sociétés</i>
                         </div>
                     </group>
+                    <group name="deliveries" string="Bons de livraisons">
+                        <field name="do_deliveries" widget="radio"/>
+                    </group>
                     <group name="fiche_intervention" string="Fiche d'intervention">
                         <field name="fiche_intervention_cacher_montant"/>
                     </group>
