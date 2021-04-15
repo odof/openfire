@@ -44,6 +44,10 @@ class OfInterventionSettings(models.TransientModel):
         ], string=u"(OF) Création dans", required=True,
         help=u"Pour la création des RDVs, interventions à programmer, SAV et parcs installés."
     )
+    do_deliveries = fields.Selection(selection=[
+        (0, 'Ne pas utiliser les bons de livraisons depuis les RDV'),
+        (1, 'Utiliser les bons de livraisons depuis les RDV'),
+        ], string="(OF) BL d'intervention")
 
     @api.multi
     def set_calendar_min_time_defaults(self):
@@ -93,3 +97,8 @@ class OfInterventionSettings(models.TransientModel):
     def set_company_choice_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'of.intervention.settings', 'company_choice', self.company_choice)
+
+    @api.multi
+    def set_do_deliveries_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+                'of.intervention.settings', 'do_deliveries', self.do_deliveries)
