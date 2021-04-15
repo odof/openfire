@@ -9,7 +9,7 @@ import urllib
 
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError, ValidationError
-from odoo.tools import config, DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools import config, DEFAULT_SERVER_DATETIME_FORMAT, float_is_zero
 from odoo.tools.float_utils import float_compare
 from odoo.tools.safe_eval import safe_eval
 
@@ -358,6 +358,12 @@ class OfPlanningIntervention(models.Model):
             self = self.with_context(default_date_deadline=self._context['default_date_deadline_prompt'])
         return super(OfPlanningIntervention, self).default_get(fields_list)
 
+    @api.model
+    def _default_warehouse_id(self):
+        company_id = self.env.user.company_id.id
+        warehouse_id = self.env['stock.warehouse'].search([('company_id', '=', company_id)], limit=1)
+        return warehouse_id
+
     # Champs #
 
     # Header
@@ -494,7 +500,24 @@ class OfPlanningIntervention(models.Model):
         comodel_name='stock.picking', string=u"Bon de livraison",
         domain="[('id', 'in', picking_domain and picking_domain[0] and picking_domain[0][2] or False)]")
     picking_domain = fields.Many2many(comodel_name='stock.picking', compute='_compute_picking_domain')
-
+    invoice_policy = fields.Selection(selection=[
+            ('delivery', u'Quantités livrées'),
+            ('intervention', u'Quantités planifiées')
+        ], string="Politique de facturation", default='intervention', required=True
+    )
+    invoice_status = fields.Selection(selection=[
+            ('no', u'Rien à facturer'),
+            ('to invoice', u'À facturer'),
+            ('invoiced', u'Totalement facturée'),
+        ], string=u"État de facturation", compute='_compute_invoice_status', store=True
+    )
+    warehouse_id = fields.Many2one(
+        'stock.warehouse', string=u'Entrepôt',
+        required=True, readonly=True, states={'draft': [('readonly', False)]},
+        default=lambda s: s._default_warehouse_id)
+    procurement_group_id = fields.Many2one('procurement.group', 'Procurement Group', copy=False)
+    picking_ids = fields.One2many(comodel_name='stock.picking', compute="_compute_pickings", string=u"BL associés")
+    delivery_count = fields.Integer(string="Nbr Bl", compute="_compute_pickings")
     # Compute
 
     @api.multi
@@ -884,6 +907,39 @@ class OfPlanningIntervention(models.Model):
             else:
                 intervention.color_map = 'black'
 
+    @api.depends('state', 'line_ids.invoice_status')
+    def _compute_invoice_status(self):
+        """
+        Copie de sale.order._compute_invoice_status(), adaptée pour of.planning.intervention
+        Compute the invoice status of a OPI. Possible statuses:
+        - no: if the OPF is not in status 'confirm' or 'done', we consider that there is nothing to
+          invoice. This is also hte default value if the conditions of no other status is met.
+        - to invoice: if any OPI line is 'to invoice', the whole OPI is 'to invoice'
+        - invoiced: if all OPI lines are invoiced, the OPI is invoiced..
+        """
+        for rdv in self:
+            # Ignore the status of the deposit product
+            deposit_product_id = self.env['sale.advance.payment.inv']._default_product_id()
+            line_invoice_status = [line.invoice_status for line in rdv.line_ids.filtered(lambda l: not l.order_line_id)
+                                   if line.product_id != deposit_product_id]
+
+            if rdv.state not in ('confirm', 'done'):
+                rdv.invoice_status = 'no'
+            elif any(invoice_status == 'to invoice' for invoice_status in line_invoice_status):
+                rdv.invoice_status = 'to invoice'
+            elif all(invoice_status == 'invoiced' for invoice_status in line_invoice_status):
+                rdv.invoice_status = 'invoiced'
+            else:
+                rdv.invoice_status = 'no'
+
+    @api.depends('line_ids', 'line_ids.procurement_ids')
+    def _compute_pickings(self):
+        for rdv in self:
+            if rdv.line_ids and rdv.line_ids.mapped('procurement_ids'):
+                pickings = rdv.line_ids.mapped('procurement_ids').mapped('move_ids').mapped('picking_id')
+                rdv.picking_ids = pickings
+                rdv.delivery_count = len(pickings)
+
     # Search #
 
     def _search_employee_main_id(self, operator, operand):
@@ -1043,6 +1099,13 @@ class OfPlanningIntervention(models.Model):
         res = {'domain': {'picking_id': [('id', 'in', picking_list)]}}
         return res
 
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        if self.company_id:
+            company_id = self.company_id.id
+            warehouse_id = self.env['stock.warehouse'].search([('company_id', '=', company_id)], limit=1)
+            self.warehouse_id = warehouse_id
+
     # Héritages
 
     @api.multi
@@ -1130,6 +1193,13 @@ class OfPlanningIntervention(models.Model):
         res = super(OfPlanningIntervention, self)._write(vals)
         if vals.get('employee_ids') or vals.get('date') or vals.get('date_deadline') or vals.get('verif_dispo'):
             self.do_verif_dispo()
+        return res
+
+    @api.multi
+    def unlink(self):
+        pickings = self.mapped('picking_ids')
+        res = super(OfPlanningIntervention, self).unlink()
+        pickings.filtered(lambda p: p.state != 'done').unlink()
         return res
 
     @api.model
@@ -1225,11 +1295,16 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def button_confirm(self):
-        return self.write({'state': 'confirm'})
+        res = self.write({'state': 'confirm'})
+        self.line_ids._action_procurement_create()
+        return res
 
     @api.multi
     def button_done(self):
-        return self.write({'state': 'done'})
+        res = self.write({'state': 'done'})
+        for picking in self.picking_ids.filtered(lambda p: p.state in ('partially_available', 'assigned')):
+            self.env['stock.immediate.transfer'].create({'pick_id': picking.id}).process()
+        return res
 
     @api.multi
     def button_unfinished(self):
@@ -1241,7 +1316,13 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def button_cancel(self):
-        return self.write({'state': 'cancel'})
+        res = self.write({'state': 'cancel'})
+        if self.picking_ids.filtered(lambda p : p.state not in ('done', 'cancel')):
+            self.picking_ids.filtered(lambda p : p.state not in ('done', 'cancel')).action_cancel()
+        self.mapped('line_ids').mapped('procurement_ids').cancel()  # la fonctionne n'annule pas les appro déjà terminés
+        self.mapped('line_ids').mapped('procurement_ids').filtered(lambda p: p.state == 'cancel')\
+            .write({'of_intervention_line_id': False})
+        return res
 
     @api.multi
     def button_draft(self):
@@ -1274,6 +1355,18 @@ class OfPlanningIntervention(models.Model):
     def button_update_lines(self):
         self.ensure_one()
         self.line_ids.update_vals()
+
+    @api.multi
+    def action_view_delivery(self):
+        action = self.env.ref('stock.action_picking_tree_all').read()[0]
+
+        pickings = self.mapped('picking_ids')
+        if len(pickings) > 1:
+            action['domain'] = [('id', 'in', pickings.ids)]
+        elif pickings:
+            action['views'] = [(self.env.ref('stock.view_picking_form').id, 'form')]
+            action['res_id'] = pickings.id
+        return action
 
     # Autres
 
@@ -1376,7 +1469,7 @@ class OfPlanningIntervention(models.Model):
         self.ensure_one()
         lines_data = []
         error = ''
-        for line in self.line_ids:
+        for line in self.line_ids.filtered(lambda l: l.invoice_status == 'to invoice'):
             line_data, line_error = line._prepare_invoice_line()
             lines_data.append((0, 0, line_data))
             error += line_error
@@ -1470,6 +1563,8 @@ class OfPlanningIntervention(models.Model):
         v3 = {'label': u"Autre", 'value': 'black'}
         return {"title": title, "values": (v0, v1, v2, v3)}
 
+    def _prepare_procurement_group(self):
+        return {'name': self.name, 'partner_id': self.address_id.id}
 
 class OfPlanningInterventionLine(models.Model):
     _name = "of.planning.intervention.line"
@@ -1489,6 +1584,9 @@ class OfPlanningInterventionLine(models.Model):
     name = fields.Text(string='Description')
     taxe_ids = fields.Many2many('account.tax', string="TVA")
     discount = fields.Float(string='Remise (%)', digits=dp.get_precision('Discount'), default=0.0)
+    qty_delivered = fields.Float(string=u"Qté livrée",)
+    qty_invoiced = fields.Float(string=u"Qté facturée", compute='_compute_qty_invoiced', store=True)
+    qty_invoiceable = fields.Float(string=u"Qté a facturer", compute='_compute_qty_invoiceable', store=True)
 
     price_subtotal = fields.Monetary(compute='_compute_amount', string='Sous-total HT', readonly=True, store=True)
     price_tax = fields.Monetary(compute='_compute_amount', string='Taxes', readonly=True, store=True)
@@ -1496,6 +1594,15 @@ class OfPlanningInterventionLine(models.Model):
 
     intervention_state = fields.Selection(related="intervention_id.state", store=True)
     invoice_line_ids = fields.One2many('account.invoice.line', 'of_intervention_line_id', string=u"Ligne de facturation")
+    procurement_ids = fields.One2many('procurement.order', 'of_intervention_line_id', string='Procurements')
+    invoice_policy = fields.Selection(related="intervention_id.invoice_policy", string="Politique de facturation")
+    invoice_status = fields.Selection(selection=[
+        ('no', u'Rien à facturer'),
+        ('to invoice', u'À facturer'),
+        ('invoiced', u'Totalement facturée'),
+        ], string=u"État de facturation", compute='_compute_invoice_status', store=True
+    )
+    from_order = fields.Boolean(string=u"CC liée", compute="_compute_from_order")
 
     @api.depends('qty', 'price_unit', 'taxe_ids')
     def _compute_amount(self):
@@ -1540,6 +1647,55 @@ class OfPlanningInterventionLine(models.Model):
                 taxes = fiscal_position.map_tax(taxes, product, partner)
             line.taxe_ids = taxes
 
+    @api.depends('invoice_line_ids', 'invoice_line_ids.quantity')
+    def _compute_qty_invoiced(self):
+        for line in self:
+            if line.invoice_line_ids:
+                line.qty_invoiced = sum(line.invoice_line_ids.mapped('quantity'))
+
+    @api.depends('intervention_id.invoice_policy', 'intervention_id.state',
+                 'qty', 'qty_delivered', 'qty_invoiced', 'order_line_id')
+    def _compute_qty_invoiceable(self):
+        for line in self:
+            if line.intervention_id.state not in ('confirm', 'done') or line.order_line_id:
+                line.qty_invoiceable = 0.0
+            elif line.invoice_policy == 'intervention':
+                line.qty_invoiceable = line.qty - line.qty_invoiced
+            elif self.invoice_policy == 'delivered':
+                line.qty_invoiceable = line.qty_delivered - line.qty_invoiced
+
+    @api.depends('intervention_id.state', 'qty', 'qty_delivered', 'qty_invoiced', 'order_line_id', 'qty_invoiceable')
+    def _compute_invoice_status(self):
+        precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+        for line in self:
+            if line.intervention_id.state not in ('confirm', 'done') or line.order_line_id:
+                line.invoice_status = 'no'
+            elif not float_is_zero(line.qty_invoiceable, precision_digits=precision):
+                line.invoice_status = 'to invoice'
+            elif float_compare(line.qty_invoiced, line.qty, precision_digits=precision) >= 0:
+                line.invoice_status = 'invoiced'
+            else:
+                line.invoice_status = 'no'
+
+    @api.depends('order_line_id')
+    def _compute_from_order(self):
+        for line in self:
+            line.from_order = bool(line.order_line_id)
+
+    @api.model
+    def create(self, vals):
+        res = super(OfPlanningInterventionLine, self).create(vals)
+        if res.intervention_id.state == 'confirm':
+            res._action_procurement_create()
+        return res
+
+    @api.multi
+    def write(self, vals):
+        res = super(OfPlanningInterventionLine, self).write(vals)
+        if 'qty' in vals:
+            self._action_procurement_create()
+        return res
+
     @api.multi
     def _prepare_invoice_line(self):
         self.ensure_one()
@@ -1566,7 +1722,7 @@ class OfPlanningInterventionLine(models.Model):
             'name'                   : product.name_get()[0][1],
             'account_id'             : line_account.id,
             'price_unit'             : self.price_unit,
-            'quantity'               : self.qty,
+            'quantity'               : self.qty_invoiceable,
             'discount'               : 0.0,
             'uom_id'                 : product.uom_id.id,
             'product_id'             : product.id,
@@ -1593,6 +1749,73 @@ class OfPlanningInterventionLine(models.Model):
                 'name'           : order_line.name,
                 'taxe_ids'       : [(5, )] + [(4, tax.id) for tax in order_line.tax_id]
                 })
+
+    @api.multi
+    def _prepare_intervention_line_procurement(self, group_id=False):
+        self.ensure_one()
+        return {
+            'name': self.name,
+            'origin': self.intervention_id.name,
+            'date_planned': datetime.strptime(self.intervention_id.date, DEFAULT_SERVER_DATETIME_FORMAT),
+            'product_id': self.product_id.id,
+            'product_qty': self.qty,
+            'product_uom': self.product_id.uom_id.id,
+            'company_id': self.intervention_id.company_id.id,
+            'group_id': group_id,
+            'of_intervention_line_id': self.id,
+            'location_id': self.intervention_id.address_id.property_stock_customer.id,
+            'warehouse_id': self.intervention_id.warehouse_id and self.intervention_id.warehouse_id.id or False,
+            'partner_dest_id': self.intervention_id.address_id.id,
+        }
+
+    @api.multi
+    def _action_procurement_create(self):
+        """
+        Copie de sale.order.line._action_procurement_create(), adaptée pour of.planning.intervention.line
+        Create procurements based on quantity ordered. If the quantity is increased, new
+        procurements are created. If the quantity is decreased, no automated action is taken.
+        """
+        precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+        new_procs = self.env['procurement.order']  # Empty recordset
+        do_deliveries = self.env['ir.values'].get_default('of.intervention.settings', 'do_deliveries')
+        for line in self:
+            if line.intervention_id.state not in ('confirm', 'done') or not line.product_id._need_procurement() \
+                    or line.order_line_id or not do_deliveries:
+                continue
+            qty = 0.0
+            for proc in line.procurement_ids.filtered(lambda r: r.state != 'cancel'):
+                qty += proc.product_qty
+            if float_compare(qty, line.qty, precision_digits=precision) >= 0:
+                continue
+
+            if not line.intervention_id.procurement_group_id:
+                vals = line.intervention_id._prepare_procurement_group()
+                line.intervention_id.procurement_group_id = self.env["procurement.group"].create(vals)
+
+            vals = line._prepare_intervention_line_procurement(group_id=line.intervention_id.procurement_group_id.id)
+            vals['product_qty'] = line.qty - qty
+            new_proc = self.env["procurement.order"].with_context(procurement_autorun_defer=True).create(vals)
+            new_proc.message_post_with_view('mail.message_origin_link',
+                                            values={'self': new_proc, 'origin': line.intervention_id},
+                                            subtype_id=self.env.ref('mail.mt_note').id)
+            new_procs += new_proc
+        new_procs.run()
+        return new_procs
+
+    @api.multi
+    def _get_delivered_qty(self):
+        """Computes the delivered quantity on sale order lines, based on done stock moves related to its procurements
+        """
+        self.ensure_one()
+        qty = 0.0
+        for move in self.procurement_ids.mapped('move_ids').filtered(lambda r: r.state == 'done' and not r.scrapped):
+            if move.location_dest_id.usage == "customer":
+                # FORWARD-PORT NOTICE: "to_refund_so" to rename to "to_refund" in v11
+                if not move.origin_returned_move_id or (move.origin_returned_move_id and move.to_refund_so):
+                    qty += move.product_uom._compute_quantity(move.product_uom_qty, self.product_id.uom_id)
+            elif move.location_dest_id.usage != "customer" and move.to_refund_so:
+                qty -= move.product_uom._compute_quantity(move.product_uom_qty, self.product_id.uom_id)
+        return qty
 
 
 class ResPartner(models.Model):
@@ -1888,3 +2111,27 @@ class StockMove(models.Model):
             if picking and picking.of_intervention_ids:
                 vals['date_expected'] = picking.min_date
         return super(StockMove, self).write(vals)
+
+    @api.multi
+    def action_done(self):
+        result = super(StockMove, self).action_done()
+
+        # Update delivered quantities on intervention lines
+        planning_intervention_lines = self.filtered(lambda move: move.procurement_id.of_intervention_line_id
+                                                                 and move.product_id.expense_policy == 'no')\
+            .mapped('procurement_id.of_intervention_line_id')
+        for line in planning_intervention_lines:
+            line.qty_delivered = line._get_delivered_qty()
+        return result
+
+    def _get_new_picking_values(self):
+        res = super(StockMove, self)._get_new_picking_values()
+        if isinstance(res, dict) and self.procurement_id.of_intervention_line_id:
+            res['min_date'] = self.procurement_id.of_intervention_line_id.intervention_id.date
+        return res
+
+
+class ProcurementOrder(models.Model):
+    _inherit = "procurement.order"
+
+    of_intervention_line_id = fields.Many2one('of.planning.intervention.line')

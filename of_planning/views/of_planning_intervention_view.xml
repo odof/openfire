@@ -141,6 +141,10 @@
                     <filter string="Demain" name="tomorrow"
                             domain="[(u'date', u'&gt;=', (context_today() + datetime.timedelta(days=1)).strftime('%Y-%m-%d')),
                                      (u'date', u'&lt;', (context_today() + datetime.timedelta(days=2)).strftime('%Y-%m-%d'))]"/>
+                    <separator/>
+                    <filter string="Rien à facturer" name="no" domain="[('invoice_status', '=', 'no')]"/>
+                    <filter string="À facturer" name="invoiceable" domain="[('invoice_status', '=', 'to invoice')]"/>
+                    <filter string="Entièrement facturée" name="invoiced" domain="[('invoice_status', '=', 'invoiced')]"/>
                 </group>
                 <newline/>
                 <group name="field">
@@ -209,6 +213,13 @@
                                 icon="fa-pencil-square-o"
                                 attrs="{'invisible': [('invoice_count', '=', 0)]}">
                             <field name="invoice_count" widget="statinfo" string="Factures"/>
+                        </button>
+                        <button type="object"
+                                name="action_view_delivery"
+                                class="oe_stat_button"
+                                icon="fa-truck"
+                                attrs="{'invisible': [('delivery_count', '=', 0)]}" groups="base.group_user">
+                            <field name="delivery_count" widget="statinfo" string="Livraison"/>
                         </button>
                     </div>
                     <div class="oe_title" name="num">
@@ -339,7 +350,9 @@
                             <field name="currency_id" invisible="1"/>
                             <group>
                                 <group>
-                                    <field name="fiscal_position_id" attrs="{'readonly': [('order_id', '!=', False)]}"/>
+                                    <field name="warehouse_id"  options="{'no_create': True, 'no_open': True}"/>
+                                        <field name="invoice_policy"/>
+                                        <field name="fiscal_position_id" attrs="{'readonly': [('order_id', '!=', False)]}"  options="{'no_create': True, 'no_open': True}"/>
                                 </group>
                                 <div class="oe_button_box">
                                     <button name="button_import_order_line" string="Importer"
@@ -353,16 +366,20 @@
                                 </div>
                             </group>
                             <field name="line_ids">
-                                <tree editable="bottom" colors="blue:order_line_id!=False;">
-                                    <field name="order_line_id" invisible="1"/>
+                                <tree editable="bottom" colors="blue:invoice_status=='to invoice';">
+                                        <field name="order_line_id" invisible="1"/>
+                                    <field name="invoice_status" invisible="1"/>
                                     <field name="product_id" attrs="{'readonly': [('order_line_id', '!=', False)]}"/>
                                     <field name="name" attrs="{'readonly': [('order_line_id', '!=', False)]}"/>
                                     <field name="qty"/>
-                                    <field name="price_unit" attrs="{'readonly': [('order_line_id', '!=', False)]}"/>
+                                    <field name="qty_delivered" readonly="1"/>
+                                        <field name="qty_invoiced" readonly="1"/>
+                                        <field name="price_unit" attrs="{'readonly': [('order_line_id', '!=', False)]}"/>
                                     <field name="taxe_ids" attrs="{'readonly': [('order_line_id', '!=', False)]}"
                                            widget="many2many_tags"/>
                                     <field name="price_subtotal" readonly="1"/>
                                     <field name="price_total" readonly="1"/>
+                                        <field name="from_order"/>
                                 </tree>
                             </field>
                             <group class="oe_subtotal_footer oe_right" colspan="2" name="intervention_total">
