@@ -102,6 +102,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         # --- Mise à jour des articles ---
         products_write_data = {}
         fields_to_update = product_obj.of_datastore_get_import_fields()
+        fields_to_not_empty = product_obj.of_datastore_get_fields_to_not_empty()
         if self.noup_name:
             fields_to_update.remove('name')
         ds_product_ids = [-(ds_product_id + supplier_value) for ds_product_id in ds_product_ids]
@@ -136,6 +137,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
                 if ((product._fields[field].type != 'many2one' or (val != product[field].id))
                     if product._fields[field].comodel_name
                     else val != product[field])
+                if val or field not in fields_to_not_empty
             }
             if 'uom_id' in ds_product_data:
                 # Ligne copiée depuis le module stock dans product.template.write()

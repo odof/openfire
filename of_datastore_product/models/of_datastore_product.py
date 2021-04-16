@@ -1353,6 +1353,22 @@ class ProductProduct(models.Model):
         ]
         return fields
 
+    @api.model
+    def of_datastore_get_fields_to_not_empty(self):
+        # On ne veut aucun des champs ajoutés par le module of_product_chem
+        cr = self._cr
+        cr.execute(
+            """SELECT f.name
+               FROM ir_model_data AS d
+               INNER JOIN ir_model_fields AS f
+                 ON d.res_id=f.id
+               WHERE d.model = 'ir.model.fields'
+                 AND f.model = %s
+                 AND d.module IN ('of_product_chem')
+            """,
+            (self._name, ))
+        return [row[0] for row in cr.fetchall()]
+
     @api.multi
     def of_datastore_import(self):
         # self_obj permet de faire des appels de fonctions avec le décorateur api.model sans envoyer tous les ids.
