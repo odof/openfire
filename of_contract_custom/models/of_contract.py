@@ -826,10 +826,10 @@ class OfContractLine(models.Model):
                 line.date_contract_end = line.contract_id.date_end
             last_invoice_date = False
             if line.invoice_line_ids.filtered(lambda il: il.invoice_id.state != 'cancel'):
-                invoices = line.invoice_line_ids.mapped('invoice_id')\
-                           .filtered(lambda i: i.state != 'cancel').sorted('date_invoice')
-                last_invoice_date = line.invoice_line_ids.sorted('date_invoice')[-1].of_contract_supposed_date
-                line.last_invoicing_date = invoices[-1].date_invoice
+                invoice_lines = line.invoice_line_ids.filtered(lambda i: i.invoice_id.state != 'cancel')\
+                                                .sorted('of_contract_supposed_date')
+                last_invoice_date = invoice_lines[-1].of_contract_supposed_date
+                line.last_invoicing_date = invoice_lines[-1].invoice_id.date_invoice
             # On entre dans ce cas quand la ligne est un avenant et n'a pas encore été facturée donc on vérifie
             # la ligne qui a généré cet avenant
             elif line.line_origine_id.invoice_line_ids:
@@ -840,8 +840,11 @@ class OfContractLine(models.Model):
                 continue
             if line.frequency_type == 'date':
                 # line.recurring_invoicing_payment_id.code est 'date' ou 'post-paid'
-                last_invoicing = line.last_invoicing_date
-                if not last_invoicing:
+                invoice_lines = line.invoice_line_ids.filtered(lambda i: i.invoice_id.state != 'cancel') \
+                                                     .sorted('of_contract_supposed_date')
+                if invoice_lines:
+                    last_invoicing = invoice_lines[-1].of_contract_supposed_date
+                else:
                     date_start = fields.Date.from_string(line.date_contract_start)
                     last_invoicing = fields.Date.to_string(date_start - relativedelta(days=1))
                 interventions = line.intervention_ids\
