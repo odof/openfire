@@ -23,6 +23,7 @@ class OFCRMFunnelConversion4(models.Model):
         comodel_name='of.res.company.sales.group', string=u"Groupe Ventes de société", readonly=True)
     vendor_id = fields.Many2one(comodel_name='res.users', string=u"Vendeur", readonly=True)
     project_id = fields.Many2one(comodel_name='account.analytic.account', string=u"Compte analytique", readonly=True)
+    partner_id = fields.Many2one(comodel_name='res.partner', string=u"Partenaire", readonly=True)
 
     opportunity_nb = fields.Integer(string=u"Nb opportunités", readonly=True)
     quotation_nb = fields.Integer(string=u"Nb devis", readonly=True)
@@ -144,6 +145,7 @@ class OFCRMFunnelConversion4(models.Model):
             ,           RC.of_company_sales_group_id                    AS company_sales_group_id
             ,           T.vendor_id
             ,           T.project_id
+            ,           T.partner_id
             ,           COALESCE(SUM(T.opportunity_nb), 0)              AS opportunity_nb
             ,           COALESCE(SUM(T.quotation_nb), 0)                AS quotation_nb
             ,           COALESCE(SUM(T.order_nb), 0)                    AS order_nb
@@ -169,6 +171,7 @@ class OFCRMFunnelConversion4(models.Model):
             ,       CL.company_id           AS company_id
             ,       CL.user_id              AS vendor_id
             ,       NULL                    AS project_id
+            ,       CL.partner_id           AS partner_id
             ,       1                       AS opportunity_nb
             ,       0                       AS quotation_nb
             ,       0                       AS order_nb
@@ -202,6 +205,7 @@ class OFCRMFunnelConversion4(models.Model):
             ,       SO.company_id       AS company_id
             ,       SO.user_id          AS vendor_id
             ,       SO.project_id       AS project_id
+            ,       SO.partner_id       AS partner_id
             ,       0                   AS opportunity_nb
             ,       1                   AS quotation_nb
             ,       0                   AS order_nb
@@ -235,6 +239,7 @@ class OFCRMFunnelConversion4(models.Model):
             ,       SO2.company_id                  AS company_id
             ,       SO2.user_id                     AS vendor_id
             ,       SO2.project_id                  AS project_id
+            ,       SO2.partner_id                  AS partner_id
             ,       0                               AS opportunity_nb
             ,       0                               AS quotation_nb
             ,       1                               AS order_nb
@@ -270,6 +275,7 @@ class OFCRMFunnelConversion4(models.Model):
             ,       SO3.company_id                  AS company_id
             ,       SO3.user_id                     AS vendor_id
             ,       SO3.project_id                  AS project_id
+            ,       SO3.partner_id                  AS partner_id
             ,       0                               AS opportunity_nb
             ,       0                               AS quotation_nb
             ,       0                               AS order_nb
@@ -305,6 +311,7 @@ class OFCRMFunnelConversion4(models.Model):
             ,       SO4.company_id          AS company_id
             ,       SO4.user_id             AS vendor_id
             ,       SO4.project_id          AS project_id
+            ,       SO4.partner_id          AS partner_id
             ,       0                       AS opportunity_nb
             ,       0                       AS quotation_nb
             ,       0                       AS order_nb
@@ -340,6 +347,7 @@ class OFCRMFunnelConversion4(models.Model):
             ,       SO5.company_id      AS company_id
             ,       SO5.user_id         AS vendor_id
             ,       SO5.project_id      AS project_id
+            ,       SO5.partner_id      AS partner_id
             ,       0                   AS opportunity_nb
             ,       0                   AS quotation_nb
             ,       0                   AS order_nb
@@ -380,6 +388,7 @@ class OFCRMFunnelConversion4(models.Model):
             ,       OSO.company_id                              AS company_id
             ,       RR.user_id                                  AS vendor_id
             ,       NULL                                        AS project_id
+            ,       NULL                                        AS partner_id
             ,       0                                           AS opportunity_nb
             ,       0                                           AS quotation_nb
             ,       0                                           AS order_nb
@@ -440,6 +449,7 @@ class OFCRMFunnelConversion4(models.Model):
             ,           RC.of_company_sales_group_id
             ,           T.vendor_id
             ,           T.project_id
+            ,           T.partner_id
         """
         return group_by_str
 
