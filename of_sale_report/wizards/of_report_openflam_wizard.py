@@ -919,7 +919,9 @@ class OFRapportOpenflamWizard(models.TransientModel):
                 affectations = []
                 aml = aml_obj.search([('payment_id', '=', payment.id)])
                 partner_invoice_line_ids = []
+                credit = 0.0
                 for line in aml.filtered(lambda l: l.account_id.user_type_id.type == 'receivable'):
+                    credit += line.credit
                     partner_invoice_line_ids.extend(filter(None, [rp.credit_move_id.id for rp in line.matched_credit_ids]))
                     partner_invoice_line_ids.extend(filter(None, [rp.debit_move_id.id for rp in line.matched_debit_ids]))
                 invoice_move_lines = move_line_obj.browse(list(set(partner_invoice_line_ids)))
@@ -930,7 +932,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
                     total += reconcile.amount
 
                 # Vérification que le montant total lettré est égal au montant du paiement
-                if float_compare(total, payment.amount, 2) == 0:
+                if float_compare(total, credit, 2) == 0:
                     # Calcul du montant affecté aux différents comptes de taxes
                     for invoice_move, amount in affectations:
                         invoice_partner_lines = invoice_move.line_ids.filtered(
