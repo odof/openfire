@@ -200,25 +200,30 @@ class OFCRMFunnelConversion4(models.Model):
 
     def _sub_select_quotation(self):
         sub_select_quotation_str = """
-            SELECT  10000000 + SO.id    AS id
-            ,       SO.create_date      AS date
-            ,       SO.company_id       AS company_id
-            ,       SO.user_id          AS vendor_id
-            ,       SO.project_id       AS project_id
-            ,       SO.partner_id       AS partner_id
-            ,       0                   AS opportunity_nb
-            ,       1                   AS quotation_nb
-            ,       0                   AS order_nb
-            ,       0                   AS lost_quotation_nb
-            ,       SO.amount_untaxed   AS quotation_amount
-            ,       0                   AS ordered_turnover
-            ,       0                   AS recorded_turnover
-            ,       0                   AS lost_turnover
-            ,       0                   AS ordered_margin
-            ,       0                   AS recorded_margin
-            ,       0                   AS budget_turnover_objective
-            ,       0                   AS ordered_turnover_objective
-            ,       0                   AS previous_recorded_turnover
+            SELECT  10000000 + SO.id                                AS id
+            ,       SO.create_date                                  AS date
+            ,       SO.company_id                                   AS company_id
+            ,       SO.user_id                                      AS vendor_id
+            ,       SO.project_id                                   AS project_id
+            ,       SO.partner_id                                   AS partner_id
+            ,       0                                               AS opportunity_nb
+            ,       CASE
+                        WHEN SO.of_cancelled_order_id IS NULL THEN
+                            1
+                        ELSE
+                            -1
+                    END                                             AS quotation_nb
+            ,       0                                               AS order_nb
+            ,       0                                               AS lost_quotation_nb
+            ,       SO.amount_untaxed                               AS quotation_amount
+            ,       0                                               AS ordered_turnover
+            ,       0                                               AS recorded_turnover
+            ,       0                                               AS lost_turnover
+            ,       0                                               AS ordered_margin
+            ,       0                                               AS recorded_margin
+            ,       0                                               AS budget_turnover_objective
+            ,       0                                               AS ordered_turnover_objective
+            ,       0                                               AS previous_recorded_turnover
         """
         return sub_select_quotation_str
 
@@ -234,25 +239,30 @@ class OFCRMFunnelConversion4(models.Model):
 
     def _sub_select_order(self):
         sub_select_order_str = """
-            SELECT  20000000 + SO2.id               AS id
-            ,       SO2.of_custom_confirmation_date AS date
-            ,       SO2.company_id                  AS company_id
-            ,       SO2.user_id                     AS vendor_id
-            ,       SO2.project_id                  AS project_id
-            ,       SO2.partner_id                  AS partner_id
-            ,       0                               AS opportunity_nb
-            ,       0                               AS quotation_nb
-            ,       1                               AS order_nb
-            ,       0                               AS lost_quotation_nb
-            ,       0                               AS quotation_amount
-            ,       0                               AS ordered_turnover
-            ,       0                               AS recorded_turnover
-            ,       0                               AS lost_turnover
-            ,       0                               AS ordered_margin
-            ,       0                               AS recorded_margin
-            ,       0                               AS budget_turnover_objective
-            ,       0                               AS ordered_turnover_objective
-            ,       0                               AS previous_recorded_turnover
+            SELECT  20000000 + SO2.id                               AS id
+            ,       SO2.of_custom_confirmation_date                 AS date
+            ,       SO2.company_id                                  AS company_id
+            ,       SO2.user_id                                     AS vendor_id
+            ,       SO2.project_id                                  AS project_id
+            ,       SO2.partner_id                                  AS partner_id
+            ,       0                                               AS opportunity_nb
+            ,       0                                               AS quotation_nb
+            ,       CASE
+                        WHEN SO2.of_cancelled_order_id IS NULL THEN
+                            1
+                        ELSE
+                            -1
+                    END                                             AS order_nb
+            ,       0                                               AS lost_quotation_nb
+            ,       0                                               AS quotation_amount
+            ,       0                                               AS ordered_turnover
+            ,       0                                               AS recorded_turnover
+            ,       0                                               AS lost_turnover
+            ,       0                                               AS ordered_margin
+            ,       0                                               AS recorded_margin
+            ,       0                                               AS budget_turnover_objective
+            ,       0                                               AS ordered_turnover_objective
+            ,       0                                               AS previous_recorded_turnover
         """
         return sub_select_order_str
 
@@ -456,7 +466,7 @@ class OFCRMFunnelConversion4(models.Model):
     @api.multi
     def _compute_quotation_rate(self):
         for rec in self:
-            if rec.opportunity_nb > 0:
+            if rec.opportunity_nb != 0:
                 rec.quotation_rate = '%.2f' % (100.0 * rec.quotation_nb / rec.opportunity_nb)
             else:
                 rec.quotation_rate = "N/E"
@@ -464,7 +474,7 @@ class OFCRMFunnelConversion4(models.Model):
     @api.multi
     def _compute_order_rate(self):
         for rec in self:
-            if rec.quotation_nb > 0:
+            if rec.quotation_nb != 0:
                 rec.order_rate = '%.2f' % (100.0 * rec.order_nb / rec.quotation_nb)
             else:
                 rec.order_rate = "N/E"
@@ -472,7 +482,7 @@ class OFCRMFunnelConversion4(models.Model):
     @api.multi
     def _compute_turnover_rate(self):
         for rec in self:
-            if rec.quotation_amount > 0:
+            if rec.quotation_amount != 0:
                 rec.turnover_rate = '%.2f' % \
                     (100.0 * rec.total_turnover / rec.quotation_amount)
             else:
@@ -481,7 +491,7 @@ class OFCRMFunnelConversion4(models.Model):
     @api.multi
     def _compute_quotation_cart(self):
         for rec in self:
-            if rec.quotation_nb > 0:
+            if rec.quotation_nb != 0:
                 rec.quotation_cart = '%.2f' % (rec.total_turnover / rec.quotation_nb)
             else:
                 rec.quotation_cart = "N/E"
@@ -489,7 +499,7 @@ class OFCRMFunnelConversion4(models.Model):
     @api.multi
     def _compute_sale_cart(self):
         for rec in self:
-            if rec.order_nb > 0:
+            if rec.order_nb != 0:
                 rec.sale_cart = '%.2f' % (rec.total_turnover / rec.order_nb)
             else:
                 rec.sale_cart = "N/E"
@@ -497,7 +507,7 @@ class OFCRMFunnelConversion4(models.Model):
     @api.multi
     def _compute_lost_cart(self):
         for rec in self:
-            if rec.lost_quotation_nb > 0:
+            if rec.lost_quotation_nb != 0:
                 rec.lost_cart = '%.2f' % (rec.lost_turnover / rec.lost_quotation_nb)
             else:
                 rec.lost_cart = "N/E"
@@ -505,7 +515,7 @@ class OFCRMFunnelConversion4(models.Model):
     @api.multi
     def _compute_ordered_margin_percent(self):
         for rec in self:
-            if rec.ordered_turnover > 0:
+            if rec.ordered_turnover != 0:
                 rec.ordered_margin_percent = '%.2f' % \
                     (100 * (1 - (rec.ordered_turnover - rec.ordered_margin) / rec.ordered_turnover))
             else:
@@ -514,7 +524,7 @@ class OFCRMFunnelConversion4(models.Model):
     @api.multi
     def _compute_recorded_margin_percent(self):
         for rec in self:
-            if rec.recorded_turnover > 0:
+            if rec.recorded_turnover != 0:
                 rec.recorded_margin_percent = '%.2f' % \
                     (100 * (1 - (rec.recorded_turnover - rec.recorded_margin) / rec.recorded_turnover))
             else:
@@ -523,7 +533,7 @@ class OFCRMFunnelConversion4(models.Model):
     @api.multi
     def _compute_total_margin_percent(self):
         for rec in self:
-            if rec.total_turnover > 0:
+            if rec.total_turnover != 0:
                 rec.total_margin_percent = '%.2f' % \
                     (100 * (1 - (rec.total_turnover - rec.total_margin) / rec.total_turnover))
             else:
@@ -532,7 +542,7 @@ class OFCRMFunnelConversion4(models.Model):
     @api.multi
     def _compute_rest_to_do(self):
         for rec in self:
-            if rec.ordered_turnover_objective > 0:
+            if rec.ordered_turnover_objective != 0:
                 rec.rest_to_do = '%.2f' % (100.0 * rec.total_turnover / rec.ordered_turnover_objective)
             else:
                 rec.rest_to_do = "N/E"
@@ -540,7 +550,7 @@ class OFCRMFunnelConversion4(models.Model):
     @api.multi
     def _compute_total_turnover_comparison(self):
         for rec in self:
-            if rec.previous_recorded_turnover > 0:
+            if rec.previous_recorded_turnover != 0:
                 rec.total_turnover_comparison = '%.2f' % (100.0 * rec.total_turnover / rec.previous_recorded_turnover)
             else:
                 rec.total_turnover_comparison = "N/E"
@@ -578,44 +588,44 @@ class OFCRMFunnelConversion4(models.Model):
             orderby=orderby, lazy=lazy)
         for line in res:
             if 'quotation_rate' in fields:
-                if line['opportunity_nb'] > 0:
+                if line['opportunity_nb'] != 0:
                     line['quotation_rate'] = \
                         ('%.2f' % (round(100.0 * line['quotation_nb'] / line['opportunity_nb'], 2))).replace('.', ',')
                 else:
                     line['quotation_rate'] = "N/E"
             if 'order_rate' in fields:
-                if line['quotation_nb'] > 0:
+                if line['quotation_nb'] != 0:
                     line['order_rate'] = ('%.2f' % (round(100.0 * line['order_nb'] / line['quotation_nb'], 2))).\
                         replace('.', ',')
                 else:
                     line['order_rate'] = "N/E"
             if 'turnover_rate' in fields:
-                if line['quotation_nb'] > 0:
+                if line['quotation_nb'] != 0:
                     line['turnover_rate'] = \
                         ('%.2f' % (round(100.0 * line['total_turnover'] / line['quotation_amount'], 2))).\
                         replace('.', ',')
                 else:
                     line['turnover_rate'] = "N/E"
             if 'quotation_cart' in fields:
-                if line['quotation_nb'] > 0:
+                if line['quotation_nb'] != 0:
                     line['quotation_cart'] = ('%.2f' % (round(line['total_turnover'] / line['quotation_nb'], 2))).\
                         replace('.', ',')
                 else:
                     line['quotation_cart'] = "N/E"
             if 'sale_cart' in fields:
-                if line['order_nb'] > 0:
+                if line['order_nb'] != 0:
                     line['sale_cart'] = ('%.2f' % (round(line['total_turnover'] / line['order_nb'], 2))).\
                         replace('.', ',')
                 else:
                     line['sale_cart'] = "N/E"
             if 'lost_cart' in fields:
-                if line['lost_quotation_nb'] > 0:
+                if line['lost_quotation_nb'] != 0:
                     line['lost_cart'] = ('%.2f' % (round(line['lost_turnover'] / line['lost_quotation_nb'], 2))).\
                         replace('.', ',')
                 else:
                     line['lost_cart'] = "N/E"
             if 'ordered_margin_percent' in fields:
-                if line['ordered_turnover'] > 0:
+                if line['ordered_turnover'] != 0:
                     line['ordered_margin_percent'] = \
                         ('%.2f' %
                          (round(100 *
@@ -624,7 +634,7 @@ class OFCRMFunnelConversion4(models.Model):
                 else:
                     line['ordered_margin_percent'] = "N/E"
             if 'recorded_margin_percent' in fields:
-                if line['recorded_turnover'] > 0:
+                if line['recorded_turnover'] != 0:
                     line['recorded_margin_percent'] = \
                         ('%.2f' %
                          (round(100 *
@@ -633,7 +643,7 @@ class OFCRMFunnelConversion4(models.Model):
                 else:
                     line['recorded_margin_percent'] = "N/E"
             if 'total_margin_percent' in fields:
-                if line['total_turnover'] > 0:
+                if line['total_turnover'] != 0:
                     line['total_margin_percent'] = \
                         ('%.2f' %
                          (round(100 *
@@ -642,14 +652,14 @@ class OFCRMFunnelConversion4(models.Model):
                 else:
                     line['total_margin_percent'] = "N/E"
             if 'rest_to_do' in fields:
-                if line['ordered_turnover_objective'] > 0:
+                if line['ordered_turnover_objective'] != 0:
                     line['rest_to_do'] = \
                         ('%.2f' % (round(100.0 * line['total_turnover'] / line['ordered_turnover_objective'], 2))).\
                         replace('.', ',')
                 else:
                     line['rest_to_do'] = "N/E"
             if 'total_turnover_comparison' in fields:
-                if line['previous_recorded_turnover'] > 0:
+                if line['previous_recorded_turnover'] != 0:
                     line['total_turnover_comparison'] = \
                         ('%.2f' % (round(100.0 * line['total_turnover'] / line['previous_recorded_turnover'], 2))).\
                         replace('.', ',')

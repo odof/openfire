@@ -34,6 +34,7 @@ Module ajoutant une étape intermédiaire dans le workflow des commandes de vent
         'of_access_control',
         'of_planning',
         'of_retail_analysis',
+        'of_sale_order_cancellation',
     ],
     'data': [
         'security/ir.model.access.csv',

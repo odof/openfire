@@ -23,8 +23,9 @@ class SaleOrder(models.Model):
         for order in self:
             order.state = 'presale'
             order.of_custom_confirmation_date = fields.Datetime.now()
-            order.with_context(auto_followup=True, followup_creator_id=self.env.user.id).sudo().\
-                action_followup_project()
+            if not self._context.get('order_cancellation', False):
+                order.with_context(auto_followup=True, followup_creator_id=self.env.user.id).sudo().\
+                    action_followup_project()
         return True
 
     @api.multi
