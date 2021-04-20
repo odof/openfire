@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 
 class SaleOrder(models.Model):
@@ -113,6 +114,53 @@ class SaleOrder(models.Model):
         self.mapped('of_margin_followup_ids').filtered(lambda rec: rec.type == 'sale').\
             write({'cancelled': True})
         return super(SaleOrder, self).action_cancel()
+
+    @api.multi
+    def button_commercial_cancellation(self):
+        self.ensure_one()
+
+        if self.state != 'sale':
+            raise UserError(u"Seules les commandes validées peuvent être annulées commercialement !")
+
+        # Création d'une commande inverse
+        cancel_order = self.copy(default={'of_cancelled_order_id': self.id,
+                                          'origin': self.name,
+                                          'client_order_ref': self.client_order_ref,
+                                          'opportunity_id': self.opportunity_id.id,
+                                          'project_id': self.project_id.id,
+                                          'campaign_id': self.campaign_id.id,
+                                          'medium_id': self.medium_id.id,
+                                          'source_id': self.source_id.id,
+                                          'of_referred_id': self.of_referred_id.id})
+        cancel_order.order_line.mapped(lambda line: line.write({'product_uom_qty': -line.product_uom_qty}))
+        cancel_order.with_context(order_cancellation=True).action_preconfirm()
+        cancel_order.with_context(order_cancellation=True).action_confirm()
+
+        # Annulation des objets liés à la commande d'origine
+
+        # Annulation BLs
+        self.picking_ids.filtered(lambda p: not any(move.state == 'done' for move in p.move_lines)).action_cancel()
+
+        # Annulation factures brouillons
+        self.invoice_ids.filtered(lambda i: i.state == 'draft').action_invoice_cancel()
+
+        # Annulation demandes de prix
+        self.env['purchase.order'].search([('sale_order_id', '=', self.id), ('state', '=', 'draft')]).button_cancel()
+
+        # Annulation suivi
+        if self.of_followup_project_id:
+            self.of_followup_project_id.set_to_canceled()
+
+        self.of_commercially_cancelled = True
+        self.of_cancellation_order_id = cancel_order.id
+        # On bloque la commande annulée
+        self.action_done()
+
+        action = self.env.ref('sale.action_orders').read()[0]
+        action['views'] = [(self.env.ref('sale.view_order_form').id, 'form')]
+        action['res_id'] = cancel_order.id
+
+        return action
 
 
 class SaleOrderLine(models.Model):
