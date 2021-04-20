@@ -8,13 +8,15 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     of_commercially_cancelled = fields.Boolean(string=u"Commande annulée commerciallement", copy=False)
-    of_cancellation_order = fields.Boolean(string=u"Commande d'annulation", copy=False)
+    of_cancellation_order_id = fields.Many2one(comodel_name='sale.order', string=u"Commande d'annulation", copy=False)
+    of_cancelled_order_id = fields.Many2one(comodel_name='sale.order', string=u"Commande annulée", copy=False)
 
-    @api.depends('state', 'order_line.invoice_status', 'of_force_invoice_status', 'of_cancellation_order')
+    @api.depends('state', 'order_line.invoice_status', 'of_force_invoice_status', 'of_cancelled_order_id',
+                 'of_cancellation_order_id')
     def _get_invoiced(self):
         super(SaleOrder, self)._get_invoiced()
         for order in self:
-            if order.of_cancellation_order:
+            if order.of_cancelled_order_id or order.of_cancellation_order_id:
                 order.invoice_status = 'no'
 
     @api.multi
@@ -25,7 +27,7 @@ class SaleOrder(models.Model):
             raise UserError(u"Seules les commandes validées peuvent être annulées commercialement !")
 
         # Création d'une commande inverse
-        cancel_order = self.copy(default={'of_cancellation_order': True,
+        cancel_order = self.copy(default={'of_cancelled_order_id': self.id,
                                           'origin': self.name,
                                           'client_order_ref': self.client_order_ref,
                                           'opportunity_id': self.opportunity_id.id,
@@ -53,6 +55,7 @@ class SaleOrder(models.Model):
             self.of_followup_project_id.set_to_canceled()
 
         self.of_commercially_cancelled = True
+        self.of_cancellation_order_id = cancel_order.id
         # On bloque la commande annulée
         self.action_done()
 
@@ -68,9 +71,9 @@ class SaleOrderLine(models.Model):
 
     @api.depends('state', 'product_uom_qty', 'qty_delivered', 'qty_to_invoice', 'qty_invoiced',
                  'order_id.of_invoice_policy', 'order_id.partner_id.of_invoice_policy',
-                 'order_id.of_cancellation_order')
+                 'order_id.of_cancelled_order_id', 'order_id.of_cancellation_order_id')
     def _compute_invoice_status(self):
         super(SaleOrderLine, self)._compute_invoice_status()
         for line in self:
-            if line.order_id.of_cancellation_order:
+            if line.order_id.of_cancelled_order_id or line.order_id.of_cancellation_order_id:
                 line.invoice_status = 'no'

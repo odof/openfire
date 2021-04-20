@@ -101,7 +101,7 @@ class OFFollowupProject(models.Model):
     @api.depends('reference_laying_date', 'state')
     def _compute_stage_id(self):
         for rec in self:
-            if rec.state == 'done':
+            if rec.state in ('done', 'cancel'):
                 rec.stage_id = self.env['of.followup.project.stage'].search([('code', '=', 'done')], limit=1)
             else:
                 laying_date = rec.reference_laying_date
