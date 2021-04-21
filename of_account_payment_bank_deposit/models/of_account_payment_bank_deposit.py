@@ -194,8 +194,7 @@ class AccountJournal(models.Model):
     of_allow_bank_deposit = fields.Boolean(string=u"Autoriser les remises en banque")
 
     @api.onchange('type')
-    def _onchange_type(self):
-        super(AccountJournal, self)._onchange_type()
+    def _onchange_type2(self):
         if self.type == 'bank':
             self.of_allow_bank_deposit = True
         else:
