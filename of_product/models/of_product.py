@@ -87,10 +87,12 @@ class ProductProduct(models.Model):
         # Le coût (standard_price) est défini sur l'ensemble des sociétés.
         # Si le module of_base_multicompany est installé, il est inutile de le diffuser sur les sociétés "magasins"
         companies = self.env['res.company'].search(['|', ('chart_template_id', '!=', False), ('parent_id', '=', False)])
-        property_obj = self.env['ir.property'].sudo()
+        self_sudo = self.sudo()
         values = {product.id: cout for product in self}
         for company in companies:
-            property_obj.with_context(force_company=company.id).set_multi('standard_price', 'product.product', values)
+            self_comp = self_sudo.with_context(force_company=company.id)
+            self_comp.env['ir.property'].set_multi('standard_price', 'product.product', values)
+            self_comp._set_standard_price(cout)
 
     @api.model
     def create(self, vals):
