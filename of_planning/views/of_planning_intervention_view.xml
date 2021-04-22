@@ -232,7 +232,19 @@
                                 </div>
                             </div>
                             <field name="partner_id" invisible="1"/>
-                            <field name="address_id" domain="[('customer','=',True)]" colspan="2"/>
+                            <label for="address_id"/>
+                            <div class="o_address_format">
+                                <div><field name="address_id" domain="[('customer','=',True)]"/></div>
+                                <field name="address_street"/>
+                                <span attrs="{'invisible': ['|', ('address_street', '=', False), ('address_street2', '=', False)]}"> - </span>
+                                <field name="address_street2"/><br/>
+                                <field name="address_zip"/>
+                                <span attrs="{'invisible': ['|', ('address_zip', '=', False), ('address_city', '=', False)]}"> - </span>
+                                <field name="address_city"/><br/>
+                                <field name="address_mobile"/>
+                                <span attrs="{'invisible': ['|', ('address_mobile', '=', False), ('address_phone', '=', False)]}"> - </span>
+                                <field name="address_phone"/>
+                            </div>
                             <field name="secteur_id"/>
                             <field name="user_id"/>
                             <field name="company_id" options="{'no_create': True, 'no_edit': True}"

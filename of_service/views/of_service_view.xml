@@ -55,7 +55,15 @@
                                 <label for="address_id" invisible="context.get('hide_service_address_id')"/>
                                 <div class="o_address_format" invisible="context.get('hide_service_address_id')">
                                     <div><field name="address_id"/></div>
-                                    <field name="address_address"/>
+                                    <field name="address_street"/>
+                                    <span attrs="{'invisible': ['|', ('address_street', '=', False), ('address_street2', '=', False)]}"> - </span>
+                                    <field name="address_street2"/><br/>
+                                    <field name="address_zip"/>
+                                    <span attrs="{'invisible': ['|', ('address_zip', '=', False), ('address_city', '=', False)]}"> - </span>
+                                    <field name="address_city"/><br/>
+                                    <field name="address_mobile"/>
+                                    <span attrs="{'invisible': ['|', ('address_mobile', '=', False), ('address_phone', '=', False)]}"> - </span>
+                                    <field name="address_phone"/>
                                 </div>
                                 <field name="secteur_tech_id"/>
                                 <field name="tag_ids" widget="many2many_tags"/>
