@@ -102,18 +102,30 @@ class OFSaleMarginRegulator(models.Model):
                     ,           SOL.of_confirmation_price                                   AS confirmation_price
                     ,           SOL.of_confirmation_price_variation                         AS confirmation_price_variation
                     ,           SOL.of_confirmation_margin                                  AS confirmation_margin
-                    ,           SM.of_unit_cost * SM.product_uom_qty                        AS delivered_cost
-                    ,           AIL.price_subtotal                                          AS invoiced_total
+                    ,           MOV.delivered_cost                                          AS delivered_cost
+                    ,           INV.invoiced_total                                          AS invoiced_total
                     FROM        sale_order                                                  SO
                     ,           sale_order_line                                             SOL
-                    LEFT JOIN   procurement_order                                           PO
-                        ON      PO.sale_line_id                                             = SOL.id
-                    LEFT JOIN   stock_move                                                  SM
-                        ON      SM.procurement_id                                           = PO.id
-                    LEFT JOIN   sale_order_line_invoice_rel                                 SOLIR
-                        ON      SOLIR.order_line_id                                         = SOL.id
-                    LEFT JOIN   account_invoice_line                                        AIL
-                        ON      AIL.id                                                      = SOLIR.invoice_line_id
+                    LEFT JOIN   (   SELECT      PO.sale_line_id
+                                    ,           SUM(SM.of_unit_cost * SM.product_uom_qty)   AS delivered_cost
+                                    FROM        procurement_order                           PO
+                                    ,           stock_move                                  SM
+                                    WHERE       SM.procurement_id                           = PO.id
+                                    AND         SM.state                                    = 'done'
+                                    GROUP BY    PO.sale_line_id
+                                )                                                           MOV
+                        ON      MOV.sale_line_id                                            = SOL.id
+                    LEFT JOIN   (   SELECT      SOLIR.order_line_id
+                                    ,           SUM(AIL.price_subtotal)     AS invoiced_total
+                                    FROM        sale_order_line_invoice_rel SOLIR
+                                    ,           account_invoice_line        AIL
+                                    ,           account_invoice             AI
+                                    WHERE       AIL.id                      = SOLIR.invoice_line_id
+                                    AND         AI.id                       = AIL.invoice_id
+                                    AND         AI.state                    IN ('open', 'paid')
+                                    GROUP BY    SOLIR.order_line_id
+                                )                                                           INV
+                        ON      INV.order_line_id                                           = SOL.id
                     WHERE       SO.state                                                    IN ('sale', 'done', 'closed')
                     AND         SOL.order_id                                                = SO.id
 
