@@ -56,8 +56,9 @@ class SaleOrder(models.Model):
 
         self.of_commercially_cancelled = True
         self.of_cancellation_order_id = cancel_order.id
-        # On bloque la commande annulée
+        # On bloque la commande annulée ainsi que la commande d'annulation
         self.action_done()
+        cancel_order.action_done()
 
         action = self.env.ref('sale.action_orders').read()[0]
         action['views'] = [(self.env.ref('sale.view_order_form').id, 'form')]
