@@ -20,6 +20,7 @@ Personnalisation multi-sociétés :
         'account',
         'account_reversal',
         'sale_stock',
+        'stock_account',
     ],
     'category': "OpenFire",
     'data': [

@@ -24,6 +24,28 @@
             <xpath expr="//notebook//field[@name='line_ids']/tree" position="inside">
                 <field name="of_note"/>
             </xpath>
+            <!-- On retire la quantité théorique de l'affichage des lignes d'inventaire
+                 pour des raisons de performance -->
+            <xpath expr="//notebook//field[@name='line_ids']/tree" position="attributes">
+                <attribute name="decoration-info">product_qty != of_theoretical_qty</attribute>
+                <attribute name="decoration-danger">of_theoretical_qty &lt; 0</attribute>
+            </xpath>
+            <xpath expr="//notebook//field[@name='line_ids']/tree/field[@name='theoretical_qty']" position="replace">
+                <field name = "of_theoretical_qty" readonly="1"/>
+            </xpath>
+            <xpath expr="//notebook//field[@name='line_ids']/kanban/field[@name='theoretical_qty']" position="replace">
+                <field name = "of_theoretical_qty" readonly="1"/>
+            </xpath>
+            <xpath expr="//notebook//field[@name='line_ids']/kanban/templates/t/div" position="attributes">
+                <attribute name="t-attf-class">
+                    oe_kanban_global_click_edit
+                    #{record.product_qty.raw_value!=record.of_theoretical_qty.raw_value ? 'oe_kanban_color_6' : ''}
+                    #{record.of_theoretical_qty.raw_value&lt;0 ? 'oe_kanban_color_2' : ''}">
+                </attribute>
+            </xpath>
+            <xpath expr="//notebook//field[@name='line_ids']/kanban/templates/t/div//t[@t-esc='record.theoretical_qty.string']/.." position="replace">
+                <span><t t-esc='record.of_theoretical_qty.string'/>: <t t-esc='record.of_theoretical_qty.value'/></span>
+            </xpath>
         </field>
     </record>
 
