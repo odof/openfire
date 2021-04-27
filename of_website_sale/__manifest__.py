@@ -18,6 +18,7 @@ Module OpenFire pour e-commerce
     ],
     'data': [
         'views/product_views.xml',
+        'views/payment_views.xml',
         'views/templates.xml',
     ],
     'qweb': [
