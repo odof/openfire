@@ -1,4 +1,4 @@
-odoo.define('of_base.of_form', function(require) {
+odoo.define('of_base.FormView', function(require) {
 "use strict";
 
 var core = require('web.core');
@@ -7,8 +7,6 @@ var session = require('web.session');
 var _t = core._t;
 
 var FormView = require('web.FormView');
-var form_common = require('web.form_common');
-var form_widgets = require('web.form_widgets');
 var Model = require('web.Model');
 
 FormView.include({
@@ -75,6 +73,21 @@ FormView.include({
         });
     },
 });
+
+return FormView;
+
+});
+
+odoo.define('of_base.FormViewDialog', function(require) {
+"use strict";
+
+var core = require('web.core');
+var session = require('web.session');
+
+var _t = core._t;
+
+var form_common = require('web.form_common');
+var Model = require('web.Model');
 
 form_common.FormViewDialog.include({
     // Redéfinition de la fonction standard
@@ -207,6 +220,21 @@ form_common.FormViewDialog.include({
     },
 });
 
+return form_common.FormViewDialog;
+
+});
+
+odoo.define('of_base.WidgetButton', function(require) {
+"use strict";
+
+var core = require('web.core');
+var session = require('web.session');
+
+var _t = core._t;
+
+var form_widgets = require('web.form_widgets');
+var Model = require('web.Model');
+
 form_widgets.WidgetButton.include({
    // Redéfinition de la fonction standard
     on_click: function() {
@@ -267,5 +295,9 @@ form_widgets.WidgetButton.include({
             }
         });
     },
+
 });
-})
+
+return form_widgets.WidgetButton;
+
+});
