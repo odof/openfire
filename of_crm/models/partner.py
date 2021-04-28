@@ -8,7 +8,8 @@ _logger = logging.getLogger(__name__)
 
 
 class ResPartner(models.Model):
-    _inherit = 'res.partner'
+    _name = 'res.partner'
+    _inherit = ['res.partner', 'utm.mixin']
 
     @api.model_cr_context
     def _auto_init(self):
@@ -94,6 +95,10 @@ Ce champ se met à jour automatiquement sur confirmation de commande et sur vali
     of_quotations_count = fields.Integer(compute='_compute_of_quotations_count', string='Nb devis')
     of_sale_order_quot_count = fields.Integer(compute='_compute_of_sale_order_quot_count', string='Nb dev+cmd')
 
+    of_lead_campaign_id = fields.Many2one('utm.campaign', 'Campaign', compute='_compute_of_lead_utm')
+    of_lead_source_id = fields.Many2one('utm.source', 'Source', compute='_compute_of_lead_utm')
+    of_lead_medium_id = fields.Many2one('utm.medium', 'Medium', compute='_compute_of_lead_utm')
+
     def _compute_of_quotations_count(self):
         self.of_compute_sale_orders_count('of_quotations_count', [('state', 'in', ['draft', 'sent'])])
 
@@ -102,6 +107,18 @@ Ce champ se met à jour automatiquement sur confirmation de commande et sur vali
 
     def _compute_sale_order_count(self):
         self.of_compute_sale_orders_count('sale_order_count', [('state', 'in', ['sale', 'done'])])
+
+    @api.depends('opportunity_ids')
+    def _compute_of_lead_utm(self):
+        for partner in self:
+            if partner.opportunity_ids:
+                partner.of_lead_campaign_id = partner.opportunity_ids[0].campaign_id.id
+                partner.of_lead_source_id = partner.opportunity_ids[0].source_id.id
+                partner.of_lead_medium_id = partner.opportunity_ids[0].medium_id.id
+            else:
+                partner.of_lead_campaign_id = False
+                partner.of_lead_source_id = False
+                partner.of_lead_medium_id = False
 
     def of_compute_sale_orders_count(self, field, state_domain=[]):
         # retrieve all children partners and prefetch 'parent_id' on them
