@@ -48,6 +48,7 @@ Workflow CRM
         # 'of_base',  # <- par of_base_location
         'of_base_location',
         'of_planning',
+        'of_utm',
     ],
     'data': [
         'security/ir.model.access.csv',

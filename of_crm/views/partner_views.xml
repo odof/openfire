@@ -20,8 +20,16 @@
                     <field name="of_prospecteur_id"/>
                 </field>
                 <xpath expr="//notebook" position="inside">
-                    <page name="marketing" string="Marketing" invisible="1">
-                        <group/>
+                    <page name="marketing" string="Marketing">
+                        <group name="utm">
+                            <field name="of_lead_campaign_id" attrs="{'invisible': [('opportunity_ids', '=', [])]}"/>
+                            <field name="of_lead_source_id" attrs="{'invisible': [('opportunity_ids', '=', [])]}"/>
+                            <field name="of_lead_medium_id" attrs="{'invisible': [('opportunity_ids', '=', [])]}"/>
+                            <field name="campaign_id" attrs="{'invisible': [('opportunity_ids', '!=', [])]}"/>
+                            <field name="source_id" attrs="{'invisible': [('opportunity_ids', '!=', [])]}"/>
+                            <field name="medium_id" attrs="{'invisible': [('opportunity_ids', '!=', [])]}"/>
+                            <field name="opportunity_ids" invisible="1"/>
+                        </group>
                     </page>
                 </xpath>
             </field>
