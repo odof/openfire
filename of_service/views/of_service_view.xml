@@ -634,7 +634,7 @@
         <field name="type">form</field>
         <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='order_id']" position="after">
+            <xpath expr="//field[@name='duree']" position="after">
                 <field name="service_id" context="{
                 'default_partner_id': partner_id,
                 'default_address_id': address_id,
