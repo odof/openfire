@@ -7,6 +7,7 @@ odoo.define('of_calendar.calendar_view', function (require) {
 var core = require('web.core');
 var CalendarView = require('web_calendar.CalendarView');
 var Dialog = require('web.Dialog');
+var form_common = require('web.form_common');
 var widgets = require('web_calendar.widgets');
 var Model = require('web.DataModel');
 var Widget = require('web.Widget');
@@ -522,6 +523,9 @@ CalendarView.include({
                             self.dfd_filters_rendered.resolve()
                         }
                     }else{
+                        for (var ie=0; ie<events.length; ie++) {
+                            events[ie].view = self;
+                        }
                         self.dfd_filters_rendered.resolve()
                     }
                     // calculer les créneaux dispo
@@ -697,9 +701,12 @@ CalendarView.include({
                 self.$calendar.fullCalendar('gotoDate', date_tmp);
             }
         }
-        for (var i=0; i<self.events.length; i++) {
-            event = self.events[i];
-            self.add_tooltip(event);
+        // pas d'info-bulle pour le calendrier standard odoo à l'heure actuelle
+        if (!self.useContacts) {
+            for (var i=0; i<self.events.length; i++) {
+                event = self.events[i];
+                self.add_tooltip(event);
+            }
         }
     },
     add_tooltip: function(event) {
