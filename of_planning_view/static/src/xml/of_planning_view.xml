@@ -19,7 +19,8 @@
                 <span class="fa fa-chevron-right"/>
             </button>
             <!-- Bouton de filtrage par société -->
-            <div class="btn-group btn-group-sm" name="company_fil_container">
+            <div t-if="Object.keys(widget.company_filters).length > 2" class="btn-group btn-group-sm"
+                 name="company_fil_container">
                 <button class="o_dropdown_toggler_btn btn btn-sm dropdown-toggle" data-toggle="dropdown">
                     <span class="fa fa-filter"/>
                     <span id="now_company_name">
