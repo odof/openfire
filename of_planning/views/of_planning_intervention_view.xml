@@ -1022,20 +1022,13 @@
                                 <group>
                                 </group>
                             </group>
+                            <separator string="Lignes facturables"/>
                             <field name="line_ids">
                                 <tree editable="bottom">
                                     <field name="product_id"/>
                                     <field name="name"/>
                                     <field name="qty"/>
                                     <field name="price_unit"/>
-                                </tree>
-                            </field>
-                        </page>
-                        <page name="products" string="Articles supplémentaires">
-                            <field name="product_ids">
-                                <tree>
-                                    <field name="name"/>
-                                    <field name="list_price"/>
                                 </tree>
                             </field>
                         </page>
