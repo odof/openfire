@@ -190,21 +190,23 @@ class OFCRMFunnelConversion(models.Model):
             domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
         for line in res:
             if 'sales_objective_comparison' in fields:
-                if line['ordered_turnover_objective'] > 0:
+                if 'sales_total' in line and line['sales_total'] is not None and \
+                        line.get('ordered_turnover_objective', False):
                     line['sales_objective_comparison'] = \
                         ('%.2f' % (round(100.0 * line['sales_total'] / line['ordered_turnover_objective'], 2))).\
                         replace('.', ',')
                 else:
                     line['sales_objective_comparison'] = "N/E"
             if 'sales_total_comparison' in fields:
-                if line['previous_sales_total'] > 0:
+                if 'sales_total' in line and line['sales_total'] is not None and \
+                        line.get('previous_sales_total', False):
                     line['sales_total_comparison'] = \
                         ('%.2f' % (round(100.0 * line['sales_total'] / line['previous_sales_total'], 2))).\
                         replace('.', ',')
                 else:
                     line['sales_total_comparison'] = "N/E"
             if 'order_amount_rate' in fields:
-                if line['quotation_amount'] > 0:
+                if 'sales_total' in line and line['sales_total'] is not None and line.get('quotation_amount', False):
                     line['order_amount_rate'] = \
                         ('%.2f' % (round(100.0 * line['sales_total'] / line['quotation_amount'], 2))).replace('.', ',')
                 else:
@@ -497,43 +499,44 @@ class OFCRMFunnelConversion2(models.Model):
             orderby=orderby, lazy=lazy)
         for line in res:
             if 'quotation_rate' in fields:
-                if line['opportunity_nb'] > 0:
+                if 'quotation_nb' in line and line['quotation_nb'] is not None and line.get('opportunity_nb', False):
                     line['quotation_rate'] = \
                         ('%.2f' % (round(100.0 * line['quotation_nb'] / line['opportunity_nb'], 2))).replace('.', ',')
                 else:
                     line['quotation_rate'] = "N/E"
             if 'order_rate1' in fields:
-                if line['quotation_nb'] > 0:
+                if 'order_nb' in line and line['order_nb'] is not None and line.get('quotation_nb', False):
                     line['order_rate1'] = ('%.2f' % (round(100.0 * line['order_nb'] / line['quotation_nb'], 2))).\
                         replace('.', ',')
                 else:
                     line['order_rate1'] = "N/E"
             if 'order_rate2' in fields:
-                if line['opportunity_nb'] > 0:
+                if 'order_nb' in line and line['order_nb'] is not None and line.get('opportunity_nb', False):
                     line['order_rate2'] = ('%.2f' % (round(100.0 * line['order_nb'] / line['opportunity_nb'], 2))).\
                         replace('.', ',')
                 else:
                     line['order_rate2'] = "N/E"
             if 'opportunity_cart' in fields:
-                if line['opportunity_nb'] > 0:
+                if 'sales_total' in line and line['sales_total'] is not None and line.get('opportunity_nb', False):
                     line['opportunity_cart'] = ('%.2f' % (round(line['sales_total'] / line['opportunity_nb'], 2))).\
                         replace('.', ',')
                 else:
                     line['opportunity_cart'] = "N/E"
             if 'quotation_cart' in fields:
-                if line['quotation_nb'] > 0:
+                if 'sales_total' in line and line['sales_total'] is not None and line.get('quotation_nb', False):
                     line['quotation_cart'] = ('%.2f' % (round(line['sales_total'] / line['quotation_nb'], 2))).\
                         replace('.', ',')
                 else:
                     line['quotation_cart'] = "N/E"
             if 'order_cart' in fields:
-                if line['order_nb'] > 0:
+                if 'sales_total' in line and line['sales_total'] is not None and line.get('order_nb', False):
                     line['order_cart'] = ('%.2f' % (round(line['sales_total'] / line['order_nb'], 2))).\
                         replace('.', ',')
                 else:
                     line['order_cart'] = "N/E"
             if 'order_margin_percent' in fields:
-                if line['sales_total'] > 0:
+                if 'sales_total' in line and line['sales_total'] is not None and 'order_margin' in line and \
+                        line['order_margin'] is not None and line.get('sales_total', False):
                     line['order_margin_percent'] = \
                         ('%.2f' %
                          (round(100 * (1 - (line['sales_total'] - line['order_margin']) / line['sales_total']),
@@ -541,20 +544,22 @@ class OFCRMFunnelConversion2(models.Model):
                 else:
                     line['order_margin_percent'] = "N/E"
             if 'order_amount_rate' in fields:
-                if line['quotation_amount'] > 0:
+                if 'sales_total' in line and line['sales_total'] is not None and line.get('quotation_amount', False):
                     line['order_amount_rate'] = \
                         ('%.2f' % (round(100.0 * line['sales_total'] / line['quotation_amount'], 2))).replace('.', ',')
                 else:
                     line['order_amount_rate'] = "N/E"
             if 'sales_objective_comparison' in fields:
-                if line['ordered_turnover_objective'] > 0:
+                if 'sales_total' in line and line['sales_total'] is not None and \
+                        line.get('ordered_turnover_objective', False):
                     line['sales_objective_comparison'] = \
                         ('%.2f' % (round(100.0 * line['sales_total'] / line['ordered_turnover_objective'], 2))).\
                         replace('.', ',')
                 else:
                     line['sales_objective_comparison'] = "N/E"
             if 'sales_total_comparison' in fields:
-                if line['previous_sales_total'] > 0:
+                if 'sales_total' in line and line['sales_total'] is not None and \
+                        line.get('previous_sales_total', False):
                     line['sales_total_comparison'] = \
                         ('%.2f' % (round(100.0 * line['sales_total'] / line['previous_sales_total'], 2))).\
                         replace('.', ',')
