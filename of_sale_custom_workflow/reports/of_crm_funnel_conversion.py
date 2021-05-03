@@ -588,44 +588,48 @@ class OFCRMFunnelConversion4(models.Model):
             orderby=orderby, lazy=lazy)
         for line in res:
             if 'quotation_rate' in fields:
-                if line['opportunity_nb'] != 0:
+                if 'quotation_nb' in line and line['quotation_nb'] is not None and line.get('opportunity_nb', False):
                     line['quotation_rate'] = \
                         ('%.2f' % (round(100.0 * line['quotation_nb'] / line['opportunity_nb'], 2))).replace('.', ',')
                 else:
                     line['quotation_rate'] = "N/E"
             if 'order_rate' in fields:
-                if line['quotation_nb'] != 0:
+                if 'order_nb' in line and line['order_nb'] is not None and line.get('quotation_nb', False):
                     line['order_rate'] = ('%.2f' % (round(100.0 * line['order_nb'] / line['quotation_nb'], 2))).\
                         replace('.', ',')
                 else:
                     line['order_rate'] = "N/E"
             if 'turnover_rate' in fields:
-                if line['quotation_nb'] != 0:
+                if 'total_turnover' in line and line['total_turnover'] is not None and \
+                        line.get('quotation_amount', False):
                     line['turnover_rate'] = \
                         ('%.2f' % (round(100.0 * line['total_turnover'] / line['quotation_amount'], 2))).\
                         replace('.', ',')
                 else:
                     line['turnover_rate'] = "N/E"
             if 'quotation_cart' in fields:
-                if line['quotation_nb'] != 0:
+                if 'total_turnover' in line and line['total_turnover'] is not None and line.get('quotation_nb', False):
                     line['quotation_cart'] = ('%.2f' % (round(line['total_turnover'] / line['quotation_nb'], 2))).\
                         replace('.', ',')
                 else:
                     line['quotation_cart'] = "N/E"
             if 'sale_cart' in fields:
-                if line['order_nb'] != 0:
+                if 'total_turnover' in line and line['total_turnover'] is not None and line.get('order_nb', False):
                     line['sale_cart'] = ('%.2f' % (round(line['total_turnover'] / line['order_nb'], 2))).\
                         replace('.', ',')
                 else:
                     line['sale_cart'] = "N/E"
             if 'lost_cart' in fields:
-                if line['lost_quotation_nb'] != 0:
+                if 'lost_turnover' in line and line['lost_turnover'] is not None and \
+                        line.get('lost_quotation_nb', False):
                     line['lost_cart'] = ('%.2f' % (round(line['lost_turnover'] / line['lost_quotation_nb'], 2))).\
                         replace('.', ',')
                 else:
                     line['lost_cart'] = "N/E"
             if 'ordered_margin_percent' in fields:
-                if line['ordered_turnover'] != 0:
+                if 'ordered_turnover' in line and line['ordered_turnover'] is not None and \
+                        'ordered_margin' in line and line['ordered_margin'] is not None and \
+                        line.get('ordered_turnover', False):
                     line['ordered_margin_percent'] = \
                         ('%.2f' %
                          (round(100 *
@@ -634,7 +638,9 @@ class OFCRMFunnelConversion4(models.Model):
                 else:
                     line['ordered_margin_percent'] = "N/E"
             if 'recorded_margin_percent' in fields:
-                if line['recorded_turnover'] != 0:
+                if 'recorded_turnover' in line and line['recorded_turnover'] is not None and \
+                        'recorded_margin' in line and line['recorded_margin'] is not None and \
+                        line.get('recorded_turnover', False):
                     line['recorded_margin_percent'] = \
                         ('%.2f' %
                          (round(100 *
@@ -643,7 +649,8 @@ class OFCRMFunnelConversion4(models.Model):
                 else:
                     line['recorded_margin_percent'] = "N/E"
             if 'total_margin_percent' in fields:
-                if line['total_turnover'] != 0:
+                if 'total_turnover' in line and line['total_turnover'] is not None and 'total_margin' in line and \
+                        line['total_margin'] is not None and line.get('total_turnover', False):
                     line['total_margin_percent'] = \
                         ('%.2f' %
                          (round(100 *
@@ -652,14 +659,16 @@ class OFCRMFunnelConversion4(models.Model):
                 else:
                     line['total_margin_percent'] = "N/E"
             if 'rest_to_do' in fields:
-                if line['ordered_turnover_objective'] != 0:
+                if 'total_turnover' in line and line['total_turnover'] is not None and \
+                        line.get('ordered_turnover_objective', False):
                     line['rest_to_do'] = \
                         ('%.2f' % (round(100.0 * line['total_turnover'] / line['ordered_turnover_objective'], 2))).\
                         replace('.', ',')
                 else:
                     line['rest_to_do'] = "N/E"
             if 'total_turnover_comparison' in fields:
-                if line['previous_recorded_turnover'] != 0:
+                if 'total_turnover' in line and line['total_turnover'] is not None and \
+                        line.get('previous_recorded_turnover', False):
                     line['total_turnover_comparison'] = \
                         ('%.2f' % (round(100.0 * line['total_turnover'] / line['previous_recorded_turnover'], 2))).\
                         replace('.', ',')
