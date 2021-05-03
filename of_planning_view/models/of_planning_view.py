@@ -4,6 +4,7 @@ from odoo.osv import orm
 from odoo.tools.float_utils import float_compare
 from odoo import models, fields, api
 from odoo.addons.of_utils.models.of_utils import se_chevauchent, hours_to_strs
+from odoo.exceptions import ValidationError
 
 import pytz
 from datetime import datetime, timedelta
@@ -22,12 +23,8 @@ class ResCompany(models.Model):
 
     @api.model
     def get_company_filter_ids(self):
+        companies = self.env.user.company_ids
         company_id = self.env.user.company_id.id
-        companies = self.env['res.company'].search([
-            '|',
-            ('id', '=', company_id),
-            ('parent_id', 'child_of', company_id),
-        ])
         filters = []
         for company in companies:
             fil = {'id': company.id, 'name': company.name}

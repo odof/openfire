@@ -797,7 +797,7 @@ class OfPlanifCreneauProp(models.TransientModel):
                 a_planifier.distance_reelle_suiv = orthodromique and a_planifier.distance_oiseau_suiv or -1
                 a_planifier.distance_reelle_tota = orthodromique and distance_oiseau or -1
                 a_planifier.distance_order = orthodromique and distance_oiseau or 99999
-                a_planifier.distance_arrondi_order = orthodromique and round_a_cinq(distance_oiseau) or 99999
+                a_planifier.distance_arrondi_order = orthodromique and arrondi_sup(distance_oiseau, 5) or 99999
                 a_planifier.osrm_response = res
                 a_planifier.fait = True
             compteur += 1
