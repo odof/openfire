@@ -67,6 +67,9 @@ class OfTourneeRdv(models.TransientModel):
         res['partner_id'] = partner and partner.id or False
         res['partner_address_id'] = address and address.id or False
         res['service_id'] = service and service.id or False
+        if service and service.date_next:
+            res['date_recherche_debut'] = service.date_next
+
 
         # Allocation de société par défaut
         # Pour les objets du planning, le choix de société se fait par un paramètre de config
