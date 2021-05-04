@@ -38,6 +38,7 @@ Ajout d'un modèle servant de log interne :
     'depends': [
         'base_iban',
         'base_vat',
+        'crm',
         'product',
         'mail',
         'contacts'
