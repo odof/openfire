@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Maintenance -->
+    <delete model="ir.ui.menu" id="maintenance.menu_maintenance_title"/>
+    <delete model="ir.ui.menu" id="maintenance.menu_m_dashboard"/>
+    <delete model="ir.ui.menu" id="maintenance.menu_m_request"/>
+    <delete model="ir.ui.menu" id="maintenance.menu_m_request_form"/>
+    <delete model="ir.ui.menu" id="maintenance.menu_m_request_calendar"/>
+    <delete model="ir.ui.menu" id="maintenance.menu_m_reports"/>
+    <delete model="ir.ui.menu" id="maintenance.menu_m_reports_oee"/>
+    <delete model="ir.ui.menu" id="maintenance.menu_m_reports_losses"/>
+    <delete model="ir.ui.menu" id="maintenance.menu_maintenance_configuration"/>
+    <delete model="ir.ui.menu" id="maintenance.menu_maintenance_teams"/>
+    <delete model="ir.ui.menu" id="maintenance.menu_maintenance_stage_configuration"/>
+    <menuitem id="menu_of_planning_configuration_maintenance" name="Maintenance" parent="of_planning.menu_of_planning_configuration" sequence="50"/>
+    <menuitem
+            id="maintenance.menu_equipment_form"
+            parent="of_equipment.menu_of_planning_configuration_maintenance"
+            sequence="2"/>
+    <menuitem
+            id="maintenance.menu_maintenance_cat"
+            parent="of_equipment.menu_of_planning_configuration_maintenance"
+            sequence="3"/>
+
+    <record id="of_equipement_view_form_intervention" model="ir.ui.view" >
+        <field name="name">of.equipement.form.intervention</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_id']" position="after">
+                <field name="equipment_id"/>
+                <div colspan="2" attrs="{'invisible': ['|',('verify_equipment','=',False),('verify_equipment','=','')]}">
+                    <b><i class="of_red">
+                        <i class="fa fa-lg fa-warning"/>
+                        <field name="verify_equipment" nolabel="1"/>
+                    </i></b>
+                </div>
+
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_equipement_view_form_service" model="ir.ui.view" >
+        <field name="name">of.equipement.form.service</field>
+        <field name="model">of.service</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="of_service.view_of_service_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='gauche_1']/group[1]" position="inside">
+                <field name="equipment_id"/>
+            </xpath>
+        </field>
+    </record>
+
+
+</odoo>
