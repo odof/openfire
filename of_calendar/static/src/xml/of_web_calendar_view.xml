@@ -38,7 +38,7 @@
 
     <t t-extend="CalendarView.sidebar.contacts">
         <t t-jquery="t[t-if='filters_value.value']" t-operation="replace">
-            <t t-if="filters_value.value &amp;&amp; filters_value.is_visible"><!-- don't display if no value given (or undefined) -->
+            <t t-if="filters_value.value &amp;&amp; (filters_value.is_visible || filters_value.useContacts)"><!-- don't display if no value given (or undefined) -->
                 <div class="o_checkbox">
                     <t t-if="filters_radio">
                         <input type="radio" name="selection" t-att-value="filters_value.value"
