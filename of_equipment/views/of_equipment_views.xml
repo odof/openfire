@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem
+            id="menu_of_planning_configuration_maintenance"
+            name="Maintenance"
+            parent="of_planning.menu_of_planning_configuration"
+            sequence="50"/>
+    <menuitem
+            id="maintenance.menu_equipment_form"
+            parent="of_equipment.menu_of_planning_configuration_maintenance"
+            sequence="2"/>
+    <menuitem
+            id="maintenance.menu_maintenance_cat"
+            parent="of_equipment.menu_of_planning_configuration_maintenance"
+            sequence="3"/>
+
+    <record id="of_equipment_view_form_intervention" model="ir.ui.view" >
+        <field name="name">of.equipment.form.intervention</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_id']" position="before">
+                <field name="verify_color" invisible="1"/>
+                <label for="equipment_ids"/>
+                <div>
+                    <field name="equipment_ids" widget="many2many_tags"/>
+                    <div colspan="2" attrs="{'invisible': ['|',('verify_equipment','=',False),('verify_equipment','=','')]}">
+                        <b attrs="{'invisible': [('verify_color','=','none')]}">
+                            <i>
+                                <i class="fa fa-lg fa-warning of_red" attrs="{'invisible': [('verify_color','!=','red')]}"/>
+                                <i class="fa fa-lg fa-warning oe_grey" attrs="{'invisible': [('verify_color','!=','grey')]}"/>
+                                <field name="verify_equipment" nolabel="1"/>
+                            </i>
+                        </b>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_equipment_view_form_service" model="ir.ui.view">
+        <field name="name">of.equipment.form.service</field>
+        <field name="model">of.service</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="of_service.view_of_service_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='gauche_1']/group[1]" position="inside">
+                <field name="equipment_ids" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_equipment_view_form" model="ir.ui.view">
+        <field name="name">of.equipment.view.form</field>
+        <field name="model">maintenance.equipment</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="of_company_ids" widget="many2many_tags" groups="base.group_multi_company"/>
+            </xpath>
+            <xpath expr="//field[@name='maintenance_team_id']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//field[@name='technician_user_id']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//field[@name='assign_date']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//field[@name='scrap_date']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//field[@name='location']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//page[last()]" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_equipment_category_view_form" model="ir.ui.view">
+        <field name="name">of.equipment.category.view.form</field>
+        <field name="model">maintenance.equipment.category</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_category_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']/button[@name='%(maintenance.hr_equipment_request_action_link)d']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//group[@name='group_alias']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
