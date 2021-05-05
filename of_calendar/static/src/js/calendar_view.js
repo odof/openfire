@@ -793,12 +793,14 @@ CalendarView.include({
                     self.all_filters[self.res_ids_indexes[key]]['color_ft'] = a[self.color_ft_field];
                     self.all_filters[self.res_ids_indexes[key]]['custom_colors'] = true;
                     self.all_filters[self.res_ids_indexes[key]]['label'] = a['name'];
+                    self.all_filters[self.res_ids_indexes[key]]['useContacts'] = self.useContacts;
                 };
                 if (self.useContacts) {
                     self.all_filters[-1]['color_bg'] = '#C0FFE8';
                     self.all_filters[-1]['color_ft'] = '#0D0D0D';
                     self.all_filters[-1]['custom_colors'] = true;
                     self.all_filters[-1]['label'] = 'Tout le monde';
+                    self.all_filters[-1]['useContacts'] = true;
                 };
                 dfd.resolve();
             });

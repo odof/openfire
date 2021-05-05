@@ -223,15 +223,17 @@ CalendarView.include({
      *  Relance une recherche (qui lancera un re-rendu des filtres de droite)
      */
     apply_extra_filters: function() {
-        for (var i in this.all_filters) {
-            this.all_filters[i].is_visible = false;
-            this.now_filter_ids = []
+        if (this.model == 'of.planning.intervention'){
+            for (var i in this.all_filters) {
+                this.all_filters[i].is_visible = false;
+                this.now_filter_ids = []
 
-            if (this.attendee_mode == "tech" && this.all_filters[i].est_intervenant
-              || this.attendee_mode == "com" && this.all_filters[i].est_commercial
-              || this.attendee_mode == "comtech") {
-                this.now_filter_ids.push(this.all_filters[i].value);
-                this.all_filters[i].is_visible = true;
+                if (this.attendee_mode == "tech" && this.all_filters[i].est_intervenant
+                  || this.attendee_mode == "com" && this.all_filters[i].est_commercial
+                  || this.attendee_mode == "comtech") {
+                    this.now_filter_ids.push(this.all_filters[i].value);
+                    this.all_filters[i].is_visible = true;
+                }
             }
         }
         this.$calendar.fullCalendar('refetchEvents');
