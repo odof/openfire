@@ -390,6 +390,30 @@ class OfContract(models.Model):
             'context'  : self.env.context}
 
     @api.multi
+    def avenant_de_masse(self):
+        """ Ouvre un wizard pour faire une révision à date """
+        self.ensure_one()
+        view_id = self.env.ref('of_contract_custom.of_contract_mass_avenant_view_form').id
+        lines = self.mapped('line_ids').filtered(lambda l: l.state == 'validated')
+        wizard = self.env['of.contract.mass.avenant.wizard'].create({
+            'date_start' : fields.Date.today(),
+            'line_ids': [
+                (0, 0, {'contract_line_id': line.id,}) for line in lines
+                ]
+        })
+        return {
+            'name'     : 'Avenant de masse',
+            'type'     : 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'of.contract.mass.avenant.wizard',
+            'views'    : [(view_id, 'form')],
+            'view_id'  : view_id,
+            'target'   : 'new',
+            'res_id'   : wizard.id,
+            'context'  : self.env.context}
+
+    @api.multi
     def action_view_invoice(self):
         invoices = self.env['account.invoice'].search([('of_contract_id', '=', self.id)])
         action = self.env.ref('account.action_invoice_tree1').read()[0]
@@ -1110,8 +1134,7 @@ class OfContractLine(models.Model):
     @api.multi
     def write(self, vals):
         """ Affectation du numéro si passage à l'état 'validated' """
-        fields_allowed = ['state', 'supplier_id', 'afficher_facturation', 'grouped', 'mois_reference_ids', 'notes',
-                          'date_contract_end']
+        fields_allowed = self.get_write_allowed_fields()
         if not self._context.get('no_verification'):
             for line in self:
                 if line.state == 'validated' and any([key not in fields_allowed for key in vals.keys()]):
@@ -1151,6 +1174,11 @@ class OfContractLine(models.Model):
                 })
         return super(OfContractLine, self).unlink()
 
+    @api.model
+    def get_write_allowed_fields(self):
+        return ['state', 'supplier_id', 'afficher_facturation', 'grouped', 'mois_reference_ids', 'notes',
+                'date_contract_end', 'fiscal_position_id', 'use_index', 'revision']
+
     @api.multi
     def _affect_number(self):
         """ Affectation du code de ligne """
@@ -1177,6 +1205,7 @@ class OfContractLine(models.Model):
         """ Remettre la ligne de contrat en brouillon """
         if self.state == 'validated':
             self.write({'state': 'draft'})
+            self.remove_services()
         else:
             return self.env['of.popup.wizard'].popup_return(
                 message=u"Vous ne pouvez pas remettre en brouillon une ligne annulée.")
