@@ -4,13 +4,13 @@ access_of_contract_write,of.contract,model_of_contract,group_of_contract_custom_
 access_of_contract_admin,of.contract,model_of_contract,group_of_contract_custom_creation,1,1,1,0
 access_of_contract_line_read,of.contract.line,model_of_contract_line,group_of_contract_custom_lecture,1,0,0,0
 access_of_contract_line_write,of.contract.line,model_of_contract_line,group_of_contract_custom_modification,1,1,0,0
-access_of_contract_line_admin,of.contract.line,model_of_contract_line,group_of_contract_custom_creation,1,1,1,0
+access_of_contract_line_admin,of.contract.line,model_of_contract_line,group_of_contract_custom_creation,1,1,1,1
 access_of_contract_period_read,of.contract.period,model_of_contract_period,group_of_contract_custom_lecture,1,0,0,0
 access_of_contract_period_write,of.contract.period,model_of_contract_period,group_of_contract_custom_modification,1,1,0,0
 access_of_contract_period_admin,of.contract.period,model_of_contract_period,group_of_contract_custom_creation,1,1,1,0
 access_of_contract_product_read,of.contract.product,model_of_contract_product,group_of_contract_custom_lecture,1,0,0,0
 access_of_contract_product_write,of.contract.product,model_of_contract_product,group_of_contract_custom_modification,1,1,0,0
-access_of_contract_product_admin,of.contract.product,model_of_contract_product,group_of_contract_custom_creation,1,1,1,0
+access_of_contract_product_admin,of.contract.product,model_of_contract_product,group_of_contract_custom_creation,1,1,1,1
 access_of_index_read,of.index,model_of_index,group_of_contract_custom_lecture,1,0,0,0
 access_of_index_write,of.index,model_of_index,group_of_contract_custom_modification,1,1,0,0
 access_of_index_admin,of.index,model_of_index,group_of_contract_custom_creation,1,1,1,0

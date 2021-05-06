@@ -77,6 +77,9 @@
                             groups="of_contract_custom.group_of_contract_custom_creation"/>
                     <button name="faire_revision" type="object" class="btn-primary" string="Faire la révision"
                             groups="of_contract_custom.group_of_contract_custom_modification"/>
+                    <button name="avenant_de_masse" type="object" class="btn-primary" string="Avenant de masse"
+                            groups="of_contract_custom.group_of_contract_custom_modification"
+                            attrs="{'invisible': [('validated', '!=', True)]}"/>
                     <field name="state" widget="statusbar" statusbar_visible="in_progress"/>
                 </header>
                 <sheet>
@@ -204,7 +207,7 @@
                                                 help="Supprimer"
                                                 attrs="{'invisible': [('state', '!=', 'draft')]}"
                                                 confirm="Voulez-vous supprimer la ligne ?"
-                                                groups="of_base.of_group_root_only"/>
+                                                groups="of_contract_custom.group_of_contract_custom_creation"/>
 
                                     </tree>
                                 </field>
@@ -406,7 +409,7 @@
                                     <field name="afficher_facturation"  attrs="{'form_readonly_exception': True}"/>
                                     <field name="grouped" attrs="{'form_readonly_exception': True}"/>
                                     <field name="next_date"/>
-                                    <field name="use_index" invisible="0"/>
+                                    <field name="use_index" attrs="{'form_readonly_exception': True}"/>
                                     <field name="is_invoiceable" invisible="1"/>
                                 </group>
                                 <group col="2" colspan="2" attrs="{'invisible': [('afficher_facturation', '=', False)]}">
@@ -414,8 +417,8 @@
                                     <field name="recurring_invoicing_payment_id"
                                            options="{'no_create': True, 'no_open': True}"
                                            domain="[('code', 'in', frequency_type == 'date' and ('date', 'post-paid') or ('pre-paid', 'post-paid'))]"/>
-                                    <field name="fiscal_position_id"/>
-                                    <field name="revision"/>
+                                    <field name="fiscal_position_id" attrs="{'form_readonly_exception': True}"/>
+                                    <field name="revision" attrs="{'form_readonly_exception': True}"/>
                                 </group>
                                 <separator string="Articles" colspan="4"/>
                                 <field colspan="4" name="contract_product_ids" nolabel="1"
