@@ -1492,7 +1492,7 @@ var PlanningCreneauDispo = Widget.extend({
      */
     on_mouseover: function (ev) {
         ev.preventDefault();
-        if (this.isOverflown()) {
+        if (this.view.mode_calendar && this.isOverflown()) {
             this.$el.find('.of_planning_creneau_dispo').height('auto');
         }
     },
@@ -1501,16 +1501,18 @@ var PlanningCreneauDispo = Widget.extend({
      */
     on_mouseout: function (ev) {
         ev.preventDefault();
-        if (ev.relatedTarget && ev.relatedTarget.parentNode.classList.contains('of_planning_fillerbar')) {
-            var rect1 = ev.relatedTarget.getBoundingClientRect();
-            var rect2 = this.$el.find('.of_planning_creneau_dispo')[0].getBoundingClientRect();
-            var overlap = !(rect1.right < rect2.left || rect1.left > rect2.right || rect1.bottom - 1 < rect2.top || rect1.top > rect2.bottom - 1)
-            if (overlap) {
-                return;
+        if (this.view.mode_calendar) {
+            if (ev.relatedTarget && ev.relatedTarget.parentNode.classList.contains('of_planning_fillerbar')) {
+                var rect1 = ev.relatedTarget.getBoundingClientRect();
+                var rect2 = this.$el.find('.of_planning_creneau_dispo')[0].getBoundingClientRect();
+                var overlap = !(rect1.right < rect2.left || rect1.left > rect2.right || rect1.bottom - 1 < rect2.top || rect1.top > rect2.bottom - 1)
+                if (overlap) {
+                    return;
+                }
             }
-        }
-        if (!this.$el.is(":hover")) {
-            this.$el.find('.of_planning_creneau_dispo').outerHeight(this.hauteur);
+            if (!this.$el.is(":hover")) {
+                this.$el.find('.of_planning_creneau_dispo').outerHeight(this.hauteur);
+            }
         }
     },
     /**
@@ -1863,7 +1865,7 @@ var PlanningRecord = Widget.extend({
             if (!!a[6] && (a[6].scrollHeight > a[6].clientHeight || a[6].scrollWidth > a[6].clientWidth)) {
                 this.$of_el[6].find('.of_planning_record_global_click').height('auto');
             }
-        }else if (this.isOverflown()) {
+        }else if (this.view.mode_calendar && this.isOverflown()) {
             this.$el.find('.of_planning_record_global_click').height('auto');
         }
     },
@@ -1959,7 +1961,7 @@ var PlanningRecord = Widget.extend({
                 }
                 this.$of_el[6].find('.of_planning_record_global_click').outerHeight(this.hours_cols[6].hauteur);
             }
-        }else{
+        }else if (this.view.mode_calendar) {
             if (ev.relatedTarget && ev.relatedTarget.parentNode.classList.contains('of_planning_fillerbar')) {
                 var rect1 = ev.relatedTarget.getBoundingClientRect();
                 var rect2 = this.$el.find('.of_planning_record_global_click')[0].getBoundingClientRect();
