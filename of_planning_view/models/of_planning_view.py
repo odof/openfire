@@ -19,22 +19,6 @@ class HREmployee(models.Model):
     of_est_commercial = fields.Boolean(string=u"Est commercial")
 
 
-class ResCompany(models.Model):
-    _inherit = "res.company"
-
-    @api.model
-    def get_company_filter_ids(self):
-        companies = self.env.user.company_ids
-        company_id = self.env.user.company_id.id
-        filters = []
-        for company in companies:
-            fil = {'id': company.id, 'name': company.name}
-            if company_id == company.id:
-                fil['current'] = True
-            filters.append(fil)
-        return filters
-
-
 class ResPartner(models.Model):
     _inherit = "res.partner"
 

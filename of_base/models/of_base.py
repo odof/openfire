@@ -449,6 +449,23 @@ class ResCompany(models.Model):
                     partner.ref = str(partner.id) + '-' + str(i)
         return super(ResCompany, self).write(vals)
 
+    @api.model
+    def get_company_filter_ids(self):
+        u"""
+        Cette fonction renvois les informations nécessaires à l'utilisation du bouton de filtrage par société.
+        Ce bouton est présent dans les vues calendrier et planning du module of_planning_view.
+        Ainsi que le tableau de bord du module ks_dashboard_ninja.
+        """
+        companies = self.env.user.company_ids
+        company_id = self.env.user.company_id.id
+        filters = []
+        for company in companies:
+            fil = {'id': company.id, 'name': company.name}
+            if company_id == company.id:
+                fil['current'] = True
+            filters.append(fil)
+        return filters
+
 
 class BaseConfigSettings(models.TransientModel):
 
