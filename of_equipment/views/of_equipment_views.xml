@@ -23,14 +23,14 @@
             parent="of_equipment.menu_of_planning_configuration_maintenance"
             sequence="3"/>
 
-    <record id="of_equipement_view_form_intervention" model="ir.ui.view" >
-        <field name="name">of.equipement.form.intervention</field>
+    <record id="of_equipment_view_form_intervention" model="ir.ui.view" >
+        <field name="name">of.equipment.form.intervention</field>
         <field name="model">of.planning.intervention</field>
         <field name="type">form</field>
         <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='order_id']" position="after">
-                <field name="equipment_id"/>
+                <field name="equipment_ids" widget="many2many_tags"/>
                 <div colspan="2" attrs="{'invisible': ['|',('verify_equipment','=',False),('verify_equipment','=','')]}">
                     <b><i class="of_red">
                         <i class="fa fa-lg fa-warning"/>
@@ -42,14 +42,14 @@
         </field>
     </record>
 
-    <record id="of_equipement_view_form_service" model="ir.ui.view" >
-        <field name="name">of.equipement.form.service</field>
+    <record id="of_equipment_view_form_service" model="ir.ui.view" >
+        <field name="name">of.equipment.form.service</field>
         <field name="model">of.service</field>
         <field name="type">form</field>
         <field name="inherit_id" ref="of_service.view_of_service_form"/>
         <field name="arch" type="xml">
             <xpath expr="//group[@name='gauche_1']/group[1]" position="inside">
-                <field name="equipment_id"/>
+                <field name="equipment_ids" widget="many2many_tags"/>
             </xpath>
         </field>
     </record>

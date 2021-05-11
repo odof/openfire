@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name': u'OpenFire / Équipement',
+    'name': u"OpenFire / Équipement",
     'author': 'OpenFire',
     'version': '10.0',
-    'category': 'OpenFire modules',
-    'summary': 'Équipement',
+    'category': "OpenFire modules",
+    'summary': u"Équipement",
     'description': u"""
 Module OpenFire pour les équipements
 ====================================

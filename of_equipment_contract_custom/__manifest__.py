@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name': u'OpenFire / Équipement - contrats',
+    'name': u"OpenFire / Équipement - contrats",
     'author': 'OpenFire',
     'version': '10.0',
-    'category': 'OpenFire modules',
-    'summary': 'Équipement',
+    'category': "OpenFire modules",
+    'summary': u"Équipement",
     'description': u"""
 Module OpenFire pour les équipements - contrats
-====================================
+===============================================
 
     """,
     'website': 'openfire.fr',
@@ -17,7 +17,7 @@ Module OpenFire pour les équipements - contrats
         'of_contract_custom',
         ],
     'data': [
-        'views/of_equipement_contract_custom_views.xml',
+        'views/of_equipment_contract_custom_views.xml',
         ],
     'installable': True,
     'auto_install': True,
