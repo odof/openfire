@@ -361,6 +361,18 @@ class Inventory(models.Model):
         self.post_inventory()
         return True
 
+    @api.multi
+    def action_compile_lines(self):
+        self.ensure_one()
+        for line in self.line_ids:
+            if line.exists() and not line.prod_lot_id and line.product_id.tracking == 'none':
+                other_lines = self.line_ids.filtered(
+                    lambda l: l.id != line.id and l.product_id == line.product_id and not l.prod_lot_id)
+                if other_lines:
+                    line.product_qty = line.product_qty + sum(other_lines.mapped('product_qty'))
+                    other_lines.unlink()
+        return True
+
 
 class InventoryLine(models.Model):
     _inherit = "stock.inventory.line"
@@ -380,6 +392,7 @@ class InventoryLine(models.Model):
 
     of_note = fields.Text(string="Notes")
     of_theoretical_qty = fields.Float(string=u"Quantité théorique")
+    of_product_tracking = fields.Selection(related='product_id.tracking', string=u"Suiiv de l'article", readonly=True)
 
     @api.multi
     def _write(self, vals):
