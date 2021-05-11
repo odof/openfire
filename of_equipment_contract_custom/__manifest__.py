@@ -17,7 +17,7 @@ Module OpenFire pour les équipements - contrats
         'of_contract_custom',
         ],
     'data': [
-        'views/of_equipement_contract_custom_views.xml',
+        'views/of_equipment_contract_custom_views.xml',
         ],
     'installable': True,
     'auto_install': True,
