@@ -310,8 +310,10 @@ def action_done(self):
         self.browse(list(move_dest_ids)).action_assign()
 
     # OF début modification openfire
-    pickings.filtered(lambda picking: picking.state == 'done' and not picking.date_done).write(
-        {'date_done': date_done})
+    # au moment de la création d'un reliquat, le picking associé au move est partiellement disponible ou confirmé
+    pickings.filtered(
+        lambda picking: picking.state in ('done', 'partially_available', 'confirmed') and not picking.date_done
+    ).write({'date_done': date_done})
     # OF fin modification openfire
 
     return True
