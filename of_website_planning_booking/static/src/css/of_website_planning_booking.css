@@ -1,3 +1,30 @@
 .of_border_primary {
   outline: 2px solid #337ab7;
 }
+
+.popup {
+    position: absolute;
+    z-index: 20;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    opacity: 0;
+    visibility: hidden;
+    transition: .3s ease;
+}
+
+.show-popup .popup {
+    opacity: 1;
+    visibility: visible;
+}
+
+.popup > iframe {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -315px;
+    margin-left: -560px;
+}
+

@@ -25,6 +25,8 @@ Module OpenFire pour le portail du site internet
     ],
     'data': [
         'security/ir.model.access.csv',
+        'security/of_website_portal_security.xml',
+        'views/of_website_portal_views.xml',
         'views/templates.xml',
     ],
     'qweb': [

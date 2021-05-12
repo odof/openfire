@@ -17,16 +17,19 @@ Fonctionnalités additionnelles :
 """,
     'website': "www.openfire.fr",
     'depends': [
-        'of_planning_tournee',
+        'of_planning_view',
         'of_website_portal',
         'of_parc_chem',
+        'ofab_pricelist',
         'auth_signup',
     ],
     'data': [
         'data/of_website_planning_booking_data.xml',
+        'security/ir.model.access.csv',
+        'security/of_website_planning_booking_security.xml',
         'views/of_website_planning_booking_views.xml',
         'views/of_website_planning_booking_templates.xml',
-        'security/ir.model.access.csv',
+        'wizards/of_horaire_wizard_views.xml',
     ],
     'qweb': [
         'static/src/xml/*.xml',

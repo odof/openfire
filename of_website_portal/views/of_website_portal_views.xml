@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- OF Service Form View -->
+    <record id="of_website_planning_booking_of_service_form_view" model="ir.ui.view">
+        <field name="name">of.website.planning.booking.of.service.form.view</field>
+        <field name="model">of.service</field>
+        <field name="inherit_id" ref="of_service.view_of_service_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='toggle_active']" position="after">
+                <button class="oe_stat_button" name="website_publish_button" type="object" icon="fa-globe">
+                    <field name="website_published" widget="website_button"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- OF Planning Tache Form View -->
+    <record id="of_website_planning_booking_of_planning_tache_form_view" model="ir.ui.view">
+        <field name="name">of.website.planning.booking.of.planning.tache.form.view</field>
+        <field name="model">of.planning.tache</field>
+        <field name="inherit_id" ref="of_planning.of_planning_tache_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='toggle_active']" position="after">
+                <button class="oe_stat_button" name="website_publish_button" type="object" icon="fa-globe">
+                    <field name="website_published" widget="website_button"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

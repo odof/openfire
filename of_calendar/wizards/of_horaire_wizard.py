@@ -105,7 +105,8 @@ class OFHoraireSegmentWizard(models.TransientModel):
         ('edit', u"Éditer"),
         ('unlink', u"Supprimer"),
     ])
-
+    type = fields.Selection(
+        selection=[('regular', u"Normaux")], string=u"Type d'horaires", required=True, default='regular')
     employee_id = fields.Many2one('hr.employee', string=u"Employé", required=True, ondelete='cascade')
     date_deb = fields.Date(string=u"Date de début", default=lambda self: fields.Date.today())
     date_fin = fields.Date(string="Date de fin", default=lambda self: fields.Date.today())
@@ -309,6 +310,7 @@ class OFHoraireSegmentWizard(models.TransientModel):
             ('date_fin', '>=', self.date_deb),
             ('permanent', '=', False),
             ('id', '!=', self.segment_id and self.segment_id.id or False),
+            ('type', '=', self.type),
         ], order="date_deb")
         if chevauche_seg_ids and not self.permanent:
             self.creneau_ids = [(6, 0, creneau_ids)]
@@ -332,6 +334,7 @@ class OFHoraireSegmentWizard(models.TransientModel):
                 ('date_deb', '=', self.date_deb),
                 ('permanent', '=', True),
                 ('id', '!=', self.segment_id and self.segment_id.id or False),
+                ('type', '=', self.type),
             ])
             if segment_meme_deb:
                 raise UserError(u"Des horaires permanents qui commencent à cette date existent déjà")
@@ -339,11 +342,12 @@ class OFHoraireSegmentWizard(models.TransientModel):
         else:
             vals['date_fin'] = self.date_fin
         if self.mode == 'create':
+            vals['type'] = self.type
             segment_obj.create(vals)
         else:
             self.segment_id.write(vals)
         if self.permanent:
-            segment_obj.recompute_permanent_date_fin(self.employee_id.id)
+            segment_obj.recompute_permanent_date_fin(self.employee_id.id, seg_type=self.type)
         #
 
         return {'type': 'ir.actions.act_window_close'}
@@ -355,7 +359,7 @@ class OFHoraireSegmentWizard(models.TransientModel):
             raise UserError(u"Veuillez Sélectionner une période à supprimer")
         self.segment_id.unlink()
         if self.permanent:
-            self.env['of.horaire.segment'].recompute_permanent_date_fin(self.employee_id.id)
+            self.env['of.horaire.segment'].recompute_permanent_date_fin(self.employee_id.id, seg_type=self.type)
         return {'type': 'ir.actions.act_window_close'}
 
     @api.multi
@@ -391,6 +395,7 @@ class OFHoraireSegmentWizard(models.TransientModel):
                     'permanent': False,
                     'creneau_ids': [(6, 0, premier_seg.creneau_ids.ids)],
                     'motif': premier_seg.motif,
+                    'type': self.type,
                 }
                 segment_obj.create(vals)
         # dernier segment entièrement recouvert.
@@ -408,6 +413,7 @@ class OFHoraireSegmentWizard(models.TransientModel):
         if self.mode == 'create':
             vals['employee_id'] = self.employee_id.id
             vals['permanent'] = False
+            vals['type'] = self.type
             segment_obj.create(vals)
         elif self.segment_id:
             self.segment_id.write(vals)

@@ -10,16 +10,30 @@ class WebsiteAccount(website_account):
 
     def _prepare_portal_layout_values(self):
         values = super(WebsiteAccount, self)._prepare_portal_layout_values()
+        service_ids = request.env['of.service'].search([
+            ('recurrence', '=', True),
+            ('state', 'not in', ('draft', 'done', 'cancel')),
+            '|',
+            ('partner_id', 'child_of', request.env.user.partner_id.id),
+            ('address_id', 'child_of', request.env.user.partner_id.id)
+        ])
         values.update({
-            'recurrent_count': request.env.user.partner_id.recurrent_count,
+            'recurrent_count': len(service_ids),
         })
         return values
 
     @http.route(['/my/of_contracts'], type='http', auth='user', website=True)
     def portal_my_of_contracts(self):
         values = self._prepare_portal_layout_values()
+        service_ids = request.env['of.service'].search([
+            ('recurrence', '=', True),
+            ('state', 'not in', ('draft', 'done', 'cancel')),
+            '|',
+            ('partner_id', 'child_of', request.env.user.partner_id.id),
+            ('address_id', 'child_of', request.env.user.partner_id.id)
+        ])
         values.update({
-            'contracts': request.env.user.partner_id.recurrent_ids,
+            'contracts': service_ids,
         })
         return request.render('of_website_portal.of_website_portal_portal_my_of_contracts', values)
 

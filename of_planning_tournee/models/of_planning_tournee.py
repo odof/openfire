@@ -123,7 +123,6 @@ class OfPlanningIntervention(models.Model):
         tournee_obj = self.env['of.planning.tournee']
         date_intervention = self.date_date
         address = self.address_id
-        ville = address
 
         for employee in self.employee_ids:
             tournee = tournee_obj.search([('date', '=', date_intervention), ('employee_id', '=', employee.id)], limit=1)
@@ -131,12 +130,15 @@ class OfPlanningIntervention(models.Model):
                 tournee_data = {
                     'date'       : date_intervention,
                     'employee_id': employee.id,
-                    'epi_lat'    : ville.geo_lat,
-                    'epi_lon'    : ville.geo_lng,
+                    'secteur_id' : address.of_secteur_tech_id.id,
+                    'epi_lat'    : address.geo_lat,
+                    'epi_lon'    : address.geo_lng,
                     'is_bloque'  : False,
                     'is_confirme': False
                 }
                 res.append(tournee_obj.create(tournee_data))
+            elif tournee.secteur_id != address.of_secteur_tech_id:
+                tournee.secteur_id = address.of_secteur_tech_id
         return res
 
     @api.model

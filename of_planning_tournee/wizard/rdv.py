@@ -344,7 +344,7 @@ class OfTourneeRdv(models.TransientModel):
         return employee_ids
 
     @api.multi
-    def compute(self, sudo=False, mode='new'):
+    def compute(self, sudo=False, mode='new', secteur_id=False, web=False):
         u"""
         Remplit le champ planning_ids avec les créneaux non travaillés et les RDV tech.
         Lance le calcul des distances et sélectionne un résultat si il y en a
@@ -357,10 +357,13 @@ class OfTourneeRdv(models.TransientModel):
             self = self.with_context(tz='Europe/Paris')
         tz = pytz.timezone(self._context['tz'])
 
-        employee_obj = sudo and self.env['hr.employee'].sudo() or self.env['hr.employee']
+        employee_obj = self.env['hr.employee']
         wizard_line_obj = self.env['of.tournee.rdv.line']
-        intervention_obj = sudo and self.with_context(force_read=True).env['of.planning.intervention'].sudo() or \
-            self.with_context(force_read=True).env['of.planning.intervention']
+        intervention_obj = self.with_context(force_read=True).env['of.planning.intervention']
+
+        if sudo:
+            employee_obj = employee_obj.sudo()
+            intervention_obj = intervention_obj.sudo()
 
         service = self.service_id
 
@@ -449,9 +452,29 @@ class OfTourneeRdv(models.TransientModel):
             if date_recherche_da >= apres_recherche_da:
                 continue
             date_recherche_str = fields.Date.to_string(date_recherche_da)
-            horaires_du_jour = employees.get_horaires_date(date_recherche_str)
+            seg_type = web and 'website' or 'regular'
+            horaires_du_jour = employees.get_horaires_date(date_recherche_str, seg_type=seg_type)
 
             employees_dispo = [employee.id for employee in employees]
+
+            # Contrôles liés à la prise de RDV en ligne
+            if web:
+                # Contrôle du mois
+                allowed_month_ids = self.env['ir.values'].sudo().get_default(
+                    'of.intervention.settings', 'website_booking_allowed_month_ids')
+                allowed_months = self.env['of.mois'].sudo().browse(allowed_month_ids)
+                if date_recherche_da.month not in allowed_months.mapped('numero'):
+                    continue
+                # Contrôle du jour
+                allowed_day_ids = self.env['ir.values'].sudo().get_default(
+                    'of.intervention.settings', 'website_booking_allowed_day_ids')
+                allowed_days = self.env['of.jours'].sudo().browse(allowed_day_ids)
+                if date_recherche_da.weekday() + 1 not in allowed_days.mapped('numero'):
+                    continue
+                # Contrôle des techniciens
+                allowed_employee_ids = self.env['ir.values'].sudo().get_default(
+                    'of.intervention.settings', 'website_booking_allowed_employee_ids')
+                employees_dispo = list(set(employees_dispo) & set(allowed_employee_ids))
 
             # Recherche de créneaux pour la date voulue et les équipes sélectionnées
             jour_deb_dt = tz.localize(datetime.strptime(date_recherche_str+" 00:00:00", "%Y-%m-%d %H:%M:%S"))
@@ -487,6 +510,24 @@ class OfTourneeRdv(models.TransientModel):
             # Calcul des créneaux dispos
             for employee in employee_obj.browse(employees_dispo):
                 intervention_dates = employee_intervention_dates[employee.id]
+
+                # Si paramètre secteur, on contrôle les tournées de l'intervenant
+                if secteur_id:
+                    tournee_obj = self.env['of.planning.tournee']
+                    if sudo:
+                        tournee_obj = tournee_obj.sudo()
+                    tournee = tournee_obj.search(
+                        [('date', '=', date_recherche_da),
+                         ('employee_id', '=', employee.id),
+                         ('secteur_id', '=', secteur_id)], limit=1)
+                    if not tournee:
+                        continue
+                    elif web:
+                        # Dans le cadre de la prise de vRDV en ligne, on vérifie le paramètre journées vierges
+                        allow_empty_days = self.env['ir.values'].sudo().get_default(
+                            'of.intervention.settings', 'website_booking_allow_empty_days')
+                        if not allow_empty_days and not tournee.intervention_ids:
+                            continue
 
                 horaires_employee = horaires_du_jour[employee.id]
                 if horaires_employee:
@@ -711,7 +752,9 @@ class OfTourneeRdv(models.TransientModel):
         """
         self.ensure_one()
         wizard_line_obj = self.env['of.tournee.rdv.line']
-        tournee_obj = sudo and self.env['of.planning.tournee'].sudo() or self.env['of.planning.tournee']
+        tournee_obj = self.env['of.planning.tournee']
+        if sudo:
+            tournee_obj = tournee_obj.sudo()
         lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
         un_jour = timedelta(days=1)
         date_courante = date_debut

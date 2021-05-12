@@ -41,7 +41,8 @@ class HREmployee(models.Model):
     of_mode_horaires = fields.Selection([
         ("easy", "Facile"),
         ("advanced", u"Avancé")], string=u"Mode de sélection des horaires", required=True, default="easy")
-    of_segment_ids = fields.One2many('of.horaire.segment', 'employee_id', string="Horaires de travail")
+    of_segment_ids = fields.One2many(
+        'of.horaire.segment', 'employee_id', string="Horaires de travail", domain=[('type', '=', 'regular')])
     of_horaire_recap = fields.Html(compute='_compute_of_horaire_recap', string="Horaires de travail")
     of_tz = fields.Selection(_tz_get, string='Fuseau horaire', required=True, help=u"Le fuseau horaire de l'employé")
     of_tz_offset = fields.Char(compute='_compute_of_tz_offset', string='Timezone offset', invisible=True)
@@ -68,10 +69,12 @@ class HREmployee(models.Model):
             segments_temp = segment_obj.search([
                 ('employee_id', '=', employee.id),
                 ('permanent', '=', False),
-                ('date_fin', '>=', date_str)])
+                ('date_fin', '>=', date_str),
+                ('type', '=', 'regular')])
             segments_perm = segment_obj.search([
                 ('employee_id', '=', employee.id),
-                ('permanent', '=', True), ], order="date_deb")
+                ('permanent', '=', True),
+                ('type', '=', 'regular')], order="date_deb")
 
             recap = u"<p><i class='oe_grey'>Les horaires passés ne sont pas affichés.</i></p>"
             if segments_perm:
@@ -186,10 +189,11 @@ class HREmployee(models.Model):
         }
 
     @api.multi
-    def get_horaires_date(self, date_str, response_text=False):
+    def get_horaires_date(self, date_str, response_text=False, seg_type='regular'):
         """Renvoie les horaires des employés à la date donnée en paramètre.
         :param date_str: date d'évaluation
         :param response_text: True si on veut le résultat sous forme de chaine de caractères
+        :param seg_type: Type d'horaire
         :rtype: { employee_id :  [(h_deb, h_fin), (h_deb, h_fin), ..] ,  .. }"""
         segment_obj = self.env['of.horaire.segment']
         date_da = fields.Date.from_string(date_str)
@@ -205,12 +209,14 @@ class HREmployee(models.Model):
             # Récupération du segment, si possible temporaire, avec la date de début la plus avancée
             segment = segment_obj.search([('employee_id', '=', employee.id),
                                           ('date_deb', '<=', date_str),
-                                          ('date_fin', '>=', date_str)],
+                                          ('date_fin', '>=', date_str),
+                                          ('type', '=', seg_type)],
                                          order='permanent, date_deb desc',
                                          limit=1)
             if not segment:
                 segment = segment_obj.search([('employee_id', '=', employee.id),
-                                              ('date_fin', '=', False)], limit=1)
+                                              ('date_fin', '=', False),
+                                              ('type', '=', seg_type)], limit=1)
             # si même après ça il n'y a aucun segment de défini, res[employee.id] = []
             # conserver ainsi car utilisé dans le js
             creneaux = segment.creneau_ids.filtered(lambda c: c.jour_number == num_jour)
@@ -265,7 +271,7 @@ class HREmployee(models.Model):
                 date_start_str = date_start
                 date_stop_str = date_stop
 
-            segments = segment_obj.search([('employee_id', '=', employee.id),
+            segments = segment_obj.search([('employee_id', '=', employee.id), ('type', '=', 'regular'),
                                            '|', ('date_fin', '=', False), ('date_fin', '>', date_start_str),
                                            '|', ('date_deb', '=', False), ('date_deb', '<=', date_stop_str)])
             date_deb = date_start_str
@@ -479,7 +485,8 @@ class OFHoraireSegment(models.Model):
                         raise UserError(u"Oups! Des créneaux se chevauchent")
 
     name = fields.Char(string=u"Période", compute="_compute_name")
-
+    type = fields.Selection(
+        selection=[('regular', u"Normaux")], string=u"Type d'horaires", required=True, default='regular')
     employee_id = fields.Many2one('hr.employee', string=u"Employé", required=True, ondelete='cascade')
     date_deb = fields.Date(string=u"Date de début", default="1970-01-01")
     date_fin = fields.Date(string="Date de fin")
@@ -591,12 +598,13 @@ class OFHoraireSegment(models.Model):
         return result
 
     @api.model
-    def recompute_permanent_date_fin(self, employee_id):
+    def recompute_permanent_date_fin(self, employee_id, seg_type='regular'):
         """#TODO Cette fonction sera couteuse en temp de calcul au fil des ajout d'horaires permanents
         Une meilleure façon de faire serait de recalculer directement depuis le wizard d'horaires seulement les segments concernés
         mais on est dans l'hyper urgence alors on verra plus tard
         """
-        seg_perm = self.search([('employee_id', '=', employee_id), ('permanent', '=', True)], order="date_deb")
+        seg_perm = self.search(
+            [('employee_id', '=', employee_id), ('permanent', '=', True), ('type', '=', seg_type)], order="date_deb")
         un_jour = timedelta(days=1)
         if not seg_perm:
             return

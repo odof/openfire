@@ -15,7 +15,7 @@ class OfTourneeRdv(models.TransientModel):
     website_creneaux_ids = fields.One2many(
         string=u"Créneaux site web", comodel_name='of.tournee.rdv.line.website', inverse_name='wizard_id')
 
-    def build_website_creneaux(self, mode='journee'):
+    def build_website_creneaux(self, mode='day'):
         u"""Construit les créneaux affichés dans le site web, appelée depuis le controller"""
         def format_date(date):
             return fields.Date.from_string(date).strftime('%A %d %B').capitalize()
@@ -26,9 +26,10 @@ class OfTourneeRdv(models.TransientModel):
         compare_precision = 5
 
         creneau_dict = {}
-        for creneau_b in self.planning_ids.filtered(lambda c: c.disponible):
+        for creneau_b in self.planning_ids.filtered(lambda c: c.disponible).\
+                sorted(key=lambda c: c.employee_id.sudo().sequence):
             distance_prec = creneau_b.dist_prec or creneau_b.dist_ortho_prec
-            if mode == 'journee':
+            if mode == 'day':
                 # création d'un créneau site web
                 if creneau_b.date not in creneau_dict:
                     creneau_dict[creneau_b.date] = {
@@ -45,7 +46,7 @@ class OfTourneeRdv(models.TransientModel):
                 # nouveau min
                 if distance_prec < creneau_dict[creneau_b.date]:
                     creneau_dict[creneau_b.date]['distance_min'] = distance_prec
-            elif mode == 'demi-journee':
+            elif mode == 'half_day':
                 # Des créneaux dispo chevauchent souvent l'heure de midi, il faut les ajouter aux créneaux front
                 # du matin et de l'après midi si possible
                 keys = []
@@ -78,8 +79,8 @@ class OfTourneeRdv(models.TransientModel):
             creneau = creneau_dict[k]
             vals = {}
             vals['key'] = creneau['key']
-            vals['name'] = u"%s" % format_date(k)
-            if mode == 'demi-journee':
+            vals['name'] = format_date(k)
+            if mode == 'half_day':
                 if k.endswith('matin'):
                     vals['description'] = u"Matin"
                 else:

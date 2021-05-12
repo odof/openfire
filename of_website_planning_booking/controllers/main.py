@@ -61,9 +61,15 @@ class OFWebsitePlanningBooking(http.Controller):
         if step_number > 0 and not request.session.get('booking_partner_id'):
             return request.redirect('/new_booking')
         partner = request.env['res.partner'].sudo().browse(request.session.get('booking_partner_id'))
-        # Si le partenaire n'a pas de parc installé, on le redirige directement sur la page de création de parc installé
+        # Si le partenaire n'a pas de parc installé, on le redirige directement sur la page de création de
+        # parc installé si l'option est activé ou vers la page d'inposibilité
         if step == 'installed_park_select' and not partner.of_parc_installe_ids:
-            return request.redirect('/new_booking/installed_park_create')
+            if request.env.user.has_group('of_website_planning_booking.group_website_booking_allow_park_creation'):
+                return request.redirect('/new_booking/installed_park_create')
+            else:
+                values = {'message': u"Nous ne parvenons pas à identifier votre équipement, veuillez contacter votre "
+                                     u"magasin au %s." % request.env.user.partner_id.company_id.phone}
+                return request.render('of_website_planning_booking.new_booking_sorry', values)
         # Si le partenaire n'a pas d'adresse, on le redirige directement vers la création d'adresse
         if step == 'address_select' and not partner.street:
             request.params['mode'] = 'new'
@@ -113,10 +119,10 @@ class OFWebsitePlanningBooking(http.Controller):
         error = dict()
         validated = False
 
-        # Le formulaire de l'étape sélection d'appareil a été soumis -> traitement
+        # Le formulaire de l'étape sélection d'équipement a été soumis -> traitement
         if 'submitted' in values:
             values.pop('submitted')
-            if not values.get('parc_installe_id'):
+            if not values.get('parc_installe_id') and not values.get('create'):
                 error['parc_installe_id'] = True
             else:
                 validated = True
@@ -124,8 +130,15 @@ class OFWebsitePlanningBooking(http.Controller):
         values['error_dict'] = error
 
         if validated:
+            if values.get('create'):
+                # On redirige vers le formulaire de création de parc installé
+                request.session.pop('booking_parc_installe_id')
+                return request.redirect('/new_booking/installed_park_create')
+            request.session['booking_parc_installe_id'] = int(values['parc_installe_id'])
+            if values.get('update'):
+                # On redirige vers le formulaire de MAJ du parc installé
+                return request.redirect('/new_booking/installed_park_create')
             # Passage à l'étape sélection d'adresse
-            request.session['booking_parc_installe_id'] = int(kw['parc_installe_id'])
             # Supprimer la valeur d'adresse stockée en session (en cas de retour et changement de parc installé)
             request.session['site_adresse_id'] = False
             return request.redirect('/new_booking/address_select')
@@ -137,6 +150,10 @@ class OFWebsitePlanningBooking(http.Controller):
         if values.get('parc_installe_list'):
             # Si la session a déjà un parc installé. Exemple clic sur 'retour' à l'étape adresse
             values['parc_installe_id'] = request.session.get('booking_parc_installe_id')
+
+        # Création d'un parc installé extérieur
+        if request.env.user.has_group('of_website_planning_booking.group_website_booking_allow_park_creation'):
+            values['display_add_button'] = True
 
         return request.render('of_website_planning_booking.new_booking_installed_park_select', values)
 
@@ -152,8 +169,11 @@ class OFWebsitePlanningBooking(http.Controller):
         values = kw
         error = dict()
         validated = False
+        create = True
+        if request.session.get('booking_parc_installe_id'):
+            create = False
 
-        # Le formulaire de l'étape sélection d'appareil a été soumis -> traitement
+        # Le formulaire de l'étape sélection d'équipement a été soumis -> traitement
         if 'submitted' in values:
             values.pop('submitted')
             # Champs obligatoires
@@ -161,13 +181,53 @@ class OFWebsitePlanningBooking(http.Controller):
                 error['product_category_id'] = True
             if not values.get('brand_id'):
                 error['brand_id'] = True
+            elif values.get('brand_id') == 'Autre marque' and not values.get('extra_brand'):
+                error['extra_brand'] = True
             if not values.get('modele'):
                 error['modele'] = True
             # Validation de champs
             error_message = []
-            # Ne pas tenter la création si le numéro de série existe déjà dans la base
-            if values.get('name') and request.env['of.parc.installe'].sudo().search(
-                    [('name', '=', values.get('name'))], limit=1):
+            # Vérifier la longueur des champs
+            if values.get('extra_brand') and len(values['extra_brand']) > 100:
+                error['extra_brand'] = True
+                error_message.append(u"Le champ 'Autre' ne doit pas dépasser 100 caractères.")
+            if values.get('modele') and len(values['modele']) > 100:
+                error['modele'] = True
+                error_message.append(u"Le champ 'Modèle' ne doit pas dépasser 100 caractères.")
+            if values.get('name') and len(values['name']) > 100:
+                error['name'] = True
+                error_message.append(u"Le champ 'N° de série' ne doit pas dépasser 100 caractères.")
+            if values.get('type_conduit') and len(values['type_conduit']) > 100:
+                error['type_conduit'] = True
+                error_message.append(u"Le champ 'Type de conduit' ne doit pas dépasser 100 caractères.")
+            if values.get('installateur_name') and len(values['installateur_name']) > 100:
+                error['installateur_name'] = True
+                error_message.append(u"Le champ 'Nom de l'installateur' ne doit pas dépasser 100 caractères.")
+            if values.get('installateur_email') and len(values['installateur_email']) > 100:
+                error['installateur_email'] = True
+                error_message.append(u"Le champ 'E-mail de l'installateur' ne doit pas dépasser 100 caractères.")
+            # Contrôle de la date
+            if values.get('date_installation'):
+                try:
+                    fields.Date.from_string(values['date_installation'])
+                    if not ('1900-01-01' < values['date_installation'] < '3000-01-01'):
+                        error['date_installation'] = True
+                        error_message.append(u"La date d'installation doit être comprise entre le 01/01/1900 "
+                                             u"et le 01/01/3000")
+                except ValueError:
+                    error['date_installation'] = True
+                    error_message.append(u"La date d'installation indiquée ne correspond pas à une date valide.")
+            # Contrôle de l'année de construction
+            if values.get('annee_batiment'):
+                if len(values['annee_batiment']) != 4 or any(not i.isdigit() for i in values['annee_batiment']):
+                    error['annee_batiment'] = True
+                    error_message.append(u"L'année de construction du batîment ne correspond pas à une année valide.")
+            # Contrôle de l'unicité du numéro de série dans la base
+            if create and values.get('name') and request.env['of.parc.installe'].sudo().search(
+                    [('name', '=', values.get('name'))], limit=1) or not create and values.get('name') and \
+                    request.env['of.parc.installe'].sudo().search(
+                        [('name', '=', values.get('name')),
+                         ('id', '!=', int(request.session.get('booking_parc_installe_id')))]):
                 error['name'] = True
                 error_message.append(u"Ce numéro de série existe déjà dans notre logiciel,"
                                      u" veuillez vérifier sa valeur et contacter le service client si besoin.")
@@ -179,25 +239,48 @@ class OFWebsitePlanningBooking(http.Controller):
         values['error_dict'] = error
 
         if validated:
-            parc_installe = self._create_parc_installe()
+            if create:
+                parc_installe = self._create_parc_installe()
+                request.session['booking_parc_installe_id'] = parc_installe.id
+            else:
+                self._update_parc_installe(int(request.session['booking_parc_installe_id']))
             # Passage à l'étape sélection d'adresse
-            request.session['booking_parc_installe_id'] = parc_installe.id
             # Supprimer la valeur d'adresse stockée en session (en cas de retour et changement de parc installé)
             request.session['site_adresse_id'] = False
             return request.redirect('/new_booking/address_select')
 
         # Arrivée sur la page ou erreur intermédiaire
         values['step_number'] = STEP_NAME_NUMBER.get(current_step, 'new')
+        parc_installe_obj = request.env['of.parc.installe']
+        parc_installe = parc_installe_obj
+
+        # En mode MAJ, on charge les infos du parc installé
+        if request.session.get('booking_parc_installe_id'):
+            parc_installe = parc_installe_obj.browse(request.session.get('booking_parc_installe_id'))
+
         values['product_categ_list'] = request.env['product.category'].search([])
         values['brand_list'] = request.env['of.product.brand'].search([])
         values['product_category'] = 'product_category_id' in values and values['product_category_id'] != '' and \
-                                     request.env['product.category'].browse(int(values['product_category_id']))
-        values['brand'] = 'brand_id' in values and values['brand_id'] != '' and \
-                          request.env['of.product.brand'].browse(int(values['brand_id']))
+                                     request.env['product.category'].browse(int(values['product_category_id'])) or \
+                                     parc_installe.product_category_id
+        other_brand_id = request.env['ir.values'].sudo().get_default(
+            'of.intervention.settings', 'website_booking_default_product_brand_id')
+        values['brand'] = 'brand_id' in values and values['brand_id'] != '' and values['brand_id'] != 'Autre marque' \
+                          and request.env['of.product.brand'].browse(int(values['brand_id'])) or parc_installe.brand_id
+        values['brand_id'] = values.get('brand_id') or parc_installe.brand_id.id == other_brand_id and 'Autre marque'
+        values['extra_brand'] = values.get('extra_brand') or parc_installe.brand_id.id == other_brand_id and \
+            parc_installe.website_extra_brand
+        values['modele'] = values.get('modele') or parc_installe.modele
+        values['name'] = values.get('name') or parc_installe.name
+        values['type_conduit'] = values.get('type_conduit') or parc_installe.type_conduit
+        values['date_installation'] = values.get('date_installation') or parc_installe.date_installation
+        values['annee_batiment'] = values.get('annee_batiment') or parc_installe.annee_batiment
+        values['installateur_name'] = values.get('installateur_name') or parc_installe.website_installer_name
+        values['installateur_email'] = values.get('installateur_email') or parc_installe.website_installer_email
 
-        if values.get('parc_installe_list'):
-            # Si la session a déjà un parc installé. Exemple clic sur 'retour' à l'étape adresse
-            values['parc_installe_id'] = request.session.get('booking_parc_installe_id')
+        # Autoriser les marques extérieures
+        if request.env.user.has_group('of_website_planning_booking.group_website_booking_allow_park_brand_creation'):
+            values['display_extra_brand'] = True
 
         return request.render('of_website_planning_booking.new_booking_installed_park_create', values)
 
@@ -211,6 +294,25 @@ class OFWebsitePlanningBooking(http.Controller):
             return redirection
 
         values = kw
+
+        # Le formulaire de l'étape sélection d'adresse a été soumis -> traitement
+        if 'submitted' in values:
+            # On contrôle le secteur
+            address = request.env['res.partner'].browse(request.session.get('rdv_site_adresse_id'))
+            if not address.of_secteur_tech_id:
+                # On tente d'assigner un secteur
+                secteur = request.env['of.secteur'].sudo().get_secteur_from_cp(address.zip).filtered(
+                    lambda sec: sec.type in ('tech', 'tech_com'))
+                if not secteur:
+                    values = {
+                        'return_button': True,
+                        'return_button_href': '/new_booking/address_select',
+                        'message': u"Nous ne sommes pas en mesure d'intervenir à cette adresse, veuillez contacter "
+                                   u"votre magasin au %s." % request.env.user.partner_id.company_id.phone}
+                    return request.render('of_website_planning_booking.new_booking_sorry', values)
+                else:
+                    address.sudo().of_secteur_tech_id = secteur
+            return request.redirect('/new_booking/localize')
 
         # Une adresse différente a été sélectionnée -> pas de nouveau rendu mais màj session
         if values.get('site_adresse_id') and values.get('xhr'):
@@ -344,9 +446,7 @@ class OFWebsitePlanningBooking(http.Controller):
 
         # Le formulaire de l'étape localisation a été rempli -> traitement et passage à l'étape créneau
         if 'submitted' in values:
-            if kw.get('comment'):
-                self._update_geo_comment()
-
+            self._update_geo_info()
             return request.redirect('/new_booking/service')
 
         # Arrivée sur la page ou erreur intermédiaire
@@ -355,18 +455,18 @@ class OFWebsitePlanningBooking(http.Controller):
         try:
             google_maps_api_key = request.env['ir.config_parameter'].sudo().get_param('google_maps_api_key', '')
             map_lat_lng = []
-            partner_obj = request.env['res.partner']
-            partner = partner_obj.browse(request.session.get('rdv_site_adresse_id'))
+            partner = request.env['res.partner'].browse(request.session.get('rdv_site_adresse_id'))
             map_lat_lng.append({'name': partner.name, 'geo_lat': partner.geo_lat, 'geo_lng': partner.geo_lng, })
         except Exception, e:
             _logger.error(
-                u"Erreur lors de l'affichage de la carte de l'adresse d'installations : %s" % tools.ustr(e))
+                u"Erreur lors de l'affichage de la carte de l'adresse d'installation : %s" % tools.ustr(e))
             return request.render("website.403")
 
         values.update({
-            'last_step': 'address_select',
             'googleAPIKey': google_maps_api_key,
             'map_lat_lng': json.dumps(map_lat_lng),
+            'geo_lat': values.get('geo_lat', partner.geo_lat),
+            'geo_lng': values.get('geo_lng', partner.geo_lng),
             'of_geo_comment': partner.of_geo_comment,
         })
 
@@ -402,7 +502,8 @@ class OFWebsitePlanningBooking(http.Controller):
                     error['date_recherche_debut'] = True
                     error_message.append(u"La date de début de recherche doit être future.")
                 # La date de début doit être inférieur au paramètre de configuration
-                max_days = 60
+                max_days = request.env['ir.values'].sudo().get_default(
+                    'of.intervention.settings', 'website_booking_open_days_number')
                 max_search_date = fields.Date.from_string(fields.Date.today()) + timedelta(days=max_days)
                 if search_date > max_search_date:
                     error['date_recherche_debut'] = True
@@ -466,7 +567,7 @@ class OFWebsitePlanningBooking(http.Controller):
         values['step_number'] = STEP_NAME_NUMBER.get(current_step, 'new')
 
         # Recherche de créneaux
-        mode = 'demi-journee'  # 'journee' -> appeler la config backend pour choisir le mode
+        mode = request.env['ir.values'].sudo().get_default('of.intervention.settings', 'website_booking_slot_size')
         compute = ''
 
         # Wizard de recherche
@@ -480,6 +581,7 @@ class OFWebsitePlanningBooking(http.Controller):
                 'tache_id': request.session.get('rdv_tache_id'),
                 'date_recherche_debut': request.session.get('rdv_date_recherche_debut'),
                 'duree': tache.duree,
+                'ignorer_geo': True,
             }
             search_wizard = request.env['of.tournee.rdv'].create(wizard_vals)
             search_wizard._onchange_date_recherche_debut()
@@ -487,6 +589,7 @@ class OFWebsitePlanningBooking(http.Controller):
             request.session['rdv_search_wiz_id'] = search_wizard.id
             request.session['rdv_creneau_id'] = False
             compute = 'new'
+            request.session['search_slot_result_nb'] = 10
         else:
             # Récupération du wizard existant
             search_wizard_id = request.session.get('rdv_search_wiz_id')
@@ -503,21 +606,36 @@ class OFWebsitePlanningBooking(http.Controller):
                 search_wizard.date_recherche_debut = fields.Date.to_string(new_search_start_date)
                 search_wizard.date_recherche_fin = fields.Date.to_string(new_search_end_date)
                 compute = 'more'
+                request.session['search_slot_result_nb'] += 5
+            else:
+                request.session['search_slot_result_nb'] = 10
 
         # Lancement de la recherche
         if compute:
-            search_wizard.compute(sudo=True, mode=compute)
-            cmp_try = 0
-            # Tenter jusqu'à avoir un résultat ou avoir parcouru 5 semaines
-            while not search_wizard.planning_ids.filtered(lambda p: p.disponible) and cmp_try < 5:
+            address = request.env['res.partner'].browse(request.session.get('rdv_site_adresse_id'))
+
+            # Nombre de jours max ouverts à la réservation
+            max_days = request.env['ir.values'].sudo().get_default(
+                'of.intervention.settings', 'website_booking_open_days_number')
+            max_search_date = fields.Date.from_string(request.session.get('rdv_date_recherche_debut')) + \
+                timedelta(days=max_days)
+            max_search_date = fields.Date.to_string(max_search_date)
+            search_wizard.date_recherche_fin = min(search_wizard.date_recherche_fin, max_search_date)
+            search_wizard.compute(sudo=True, mode=compute, secteur_id=address.of_secteur_tech_id.id, web=True)
+
+            # Tenter jusqu'à avoir au moins 10 résultats ou ne plus être dans les jours ouverts à la réservation
+            while len(search_wizard.planning_ids.filtered(lambda p: p.disponible)) < \
+                    request.session['search_slot_result_nb'] and search_wizard.date_recherche_fin < max_search_date:
                 new_search_start_date = fields.Date.from_string(search_wizard.date_recherche_fin) + timedelta(days=1)
                 new_search_end_date = new_search_start_date + timedelta(days=6)
                 search_wizard.date_recherche_debut = fields.Date.to_string(new_search_start_date)
                 search_wizard.date_recherche_fin = fields.Date.to_string(new_search_end_date)
-                search_wizard.compute(sudo=True, mode='more')
-                cmp_try += 1
+                search_wizard.date_recherche_fin = min(search_wizard.date_recherche_fin, max_search_date)
+                search_wizard.compute(sudo=True, mode='more', secteur_id=address.of_secteur_tech_id.id, web=True)
+
             if search_wizard.planning_ids.filtered(lambda p: p.disponible):
                 creneaux_web = search_wizard.build_website_creneaux(mode=mode)
+                creneaux_web = creneaux_web[0:request.session['search_slot_result_nb']]
                 if creneaux_web:
                     creneau_selected = creneaux_web[0]
                     request.session['rdv_creneau_id'] = creneau_selected.id
@@ -526,14 +644,28 @@ class OFWebsitePlanningBooking(http.Controller):
             else:
                 creneaux_web = []
                 creneau_selected = False
+
+            if search_wizard.date_recherche_fin == max_search_date:
+                values['nomore_load'] = True
         else:
             creneaux_web = search_wizard.website_creneaux_ids
+            creneaux_web = creneaux_web[0:request.session['search_slot_result_nb']]
             creneau_selected = request.env['of.tournee.rdv.line.website'].browse(request.session.get('rdv_creneau_id'))
 
         # On s'assure qu'il y ait un seul créneau sélectionné, en cas de raifraichissement de page après bouton
         # "chercher plus" par exemple
         if creneau_selected and creneau_selected.exists():
             creneau_selected.button_select(sudo=True)
+        else:
+            values = {
+                'return_button': True,
+                'return_button_href': '/new_booking/service',
+                'message': u"Aucun créneau libre ne correspond à votre recherche, veuillez contacter "
+                           u"votre magasin au %s." % request.env.user.partner_id.company_id.phone}
+            return request.render('of_website_planning_booking.new_booking_sorry', values)
+
+        if request.session['search_slot_result_nb'] >= 20:
+            values['nomore_load'] = True
 
         values['creneaux'] = creneaux_web
         values['creneau_selected'] = creneau_selected
@@ -550,13 +682,31 @@ class OFWebsitePlanningBooking(http.Controller):
             return redirection
 
         values = kw
+        error = dict()
+        validated = False
+
+        if 'submitted' in values:
+            values.pop('submitted')
+            # Champs obligatoires
+            if not values.get('terms'):
+                error['terms'] = True
+            if not values.get('opt_in'):
+                error['opt_in'] = True
+
+            if not error:
+                validated = True
+
+        values['error_dict'] = error
 
         # Demande de RDV confirmée
-        if values.get('submitted'):
+        if validated:
+            # Mise à jour du paramètree opt_out du partenaire
+            if request.env.user.partner_id.opt_out:
+                request.env.user.partner_id.sudo().opt_out = False
             # Création du RDV
             intervention = self._create_intervention()
             if intervention:
-                # Enregistrer l'adresse de l'appareil si nécessaire
+                # Enregistrer l'adresse de l'équipement si nécessaire
                 parc_installe_id = request.session.get('booking_parc_installe_id')
                 parc_installe = request.env['of.parc.installe'].browse(parc_installe_id)
                 site_adresse_id = request.session.get('rdv_site_adresse_id')
@@ -588,9 +738,24 @@ class OFWebsitePlanningBooking(http.Controller):
         values['parc_installe'] = request.env['of.parc.installe'].browse(
             request.session.get('booking_parc_installe_id'))
         values['adresse'] = request.env['res.partner'].browse(request.session.get('rdv_site_adresse_id'))
-        values['tache'] = request.env['of.planning.tache'].browse(request.session.get('rdv_tache_id'))
+        task = request.env['of.planning.tache'].browse(request.session.get('rdv_tache_id'))
+        values['tache'] = task
         values['creneau'] = request.env['of.tournee.rdv.line.website'].browse(request.session.get('rdv_creneau_id')).\
             exists()
+        # Calcul du prix de la prestation
+        pricelist = request.env.user.partner_id.property_product_pricelist or request.env.ref('product.list0', False)
+        price_unit = task.product_id.sudo().with_context(pricelist=pricelist.id).price
+        taxes = task.product_id.sudo().taxes_id
+        if request.env.user.partner_id.company_id:
+            taxes = taxes.filtered(lambda r: r.company_id == request.env.user.partner_id.company_id)
+        taxes = task.fiscal_position_id.sudo().map_tax(taxes, task.product_id, request.env.user.partner_id) or []
+        amounts = taxes.compute_all(
+            price_unit, pricelist.currency_id, 1.0, product=task.product_id, partner=request.env.user.partner_id)
+        values['price'] = amounts['total_included']
+        values['company'] = request.website.company_id
+        values['terms'] = values.get('terms', False)
+        values['opt_in'] = values.get('opt_in', False)
+
         return request.render('of_website_planning_booking.new_booking_confirmation', values)
 
     @http.route(['/new_booking/thank_you'], type='http', auth='user', website=True)
@@ -601,11 +766,26 @@ class OFWebsitePlanningBooking(http.Controller):
         vals = {}
 
         for key in request.params.keys():
-            if key in ('modele', 'name', 'type_conduit', 'date_installation'):
-                vals[key] = request.params[key]
+            if key in ('modele', 'name', 'type_conduit', 'date_installation', 'annee_batiment'):
+                if key != 'name' or request.params[key]:
+                    vals[key] = request.params[key]
             # Les params sont renvoyés en unicode
-            elif key in ('product_category_id', 'brand_id', 'annee_batiment') and request.params[key]:
+            elif key == 'product_category_id' and request.params[key]:
                 vals[key] = int(request.params[key])
+            elif key == 'brand_id' and request.params[key] != 'Autre marque':
+                vals[key] = int(request.params[key])
+            elif key == 'extra_brand':
+                vals['website_extra_brand'] = request.params[key]
+            elif key == 'installateur_name':
+                vals['website_installer_name'] = request.params[key]
+            elif key == 'installateur_email':
+                vals['website_installer_email'] = request.params[key]
+
+        # Marque extérieur
+        if request.params['brand_id'] == 'Autre marque':
+            vals['brand_id'] = request.env['ir.values'].sudo().get_default(
+                'of.intervention.settings', 'website_booking_default_product_brand_id')
+            vals['note'] = u"Marque : %s" % request.params['extra_brand']
 
         vals['product_id'] = request.env.ref(
             'of_website_planning_booking.of_website_planning_booking_product_default').id
@@ -614,7 +794,11 @@ class OFWebsitePlanningBooking(http.Controller):
 
         # Installateur
         if request.params.get('installateur_name') and not request.params.get('installateur_email'):
-            vals['note'] = u"Installé par %s" % request.params['installateur_name']
+            note = u"Installé par %s" % request.params['installateur_name']
+            if vals.get('note'):
+                vals['note'] += "\n" + note
+            else:
+                vals['note'] = note
         elif request.params.get('installateur_name') and request.params.get('installateur_email'):
             partner_obj = request.env['res.partner'].sudo()
             installer = partner_obj.search([('email', '=', request.params['installateur_email'])], limit=1)
@@ -626,7 +810,102 @@ class OFWebsitePlanningBooking(http.Controller):
                 })
             vals['installateur_id'] = installer.id
 
-        return request.env['of.parc.installe'].sudo().create(vals)
+        new_park = request.env['of.parc.installe'].sudo().create(vals)
+
+        # Pièces Jointes
+        if 'park_attachment' in request.params:
+            attached_files = request.httprequest.files.getlist('park_attachment')
+            for attachment in attached_files:
+                attached_file = attachment.read()
+                request.env['ir.attachment'].sudo().create({
+                    'name': attachment.filename,
+                    'res_model': 'of.parc.installe',
+                    'res_id': new_park.id,
+                    'type': 'binary',
+                    'datas_fname': attachment.filename,
+                    'datas': attached_file.encode('base64'),
+                })
+
+        return new_park
+
+    def _update_parc_installe(self, parc_installe_id):
+        parc_installe_obj = request.env['of.parc.installe'].sudo()
+        parc_installe = parc_installe_obj.browse(parc_installe_id)
+        params = request.params
+        updated = False
+        update_vals = {}
+
+        parc_product_category = parc_installe.product_category_id
+        param_product_categ_id = params.get('product_category_id') and int(params['product_category_id'])
+        if param_product_categ_id and (not parc_product_category or parc_product_category.id != param_product_categ_id):
+            update_vals['product_category_id'] = param_product_categ_id
+        parc_brand = parc_installe.brand_id
+        param_brand_id = params.get('brand_id') and params['brand_id'] != 'Autre marque' and int(params['brand_id'])
+        if params.get('brand_id') == 'Autre marque':
+            param_brand_id = request.env['ir.values'].sudo().get_default(
+                'of.intervention.settings', 'website_booking_default_product_brand_id')
+        if param_brand_id and (not parc_brand or parc_brand.id != param_brand_id):
+            update_vals['brand_id'] = param_brand_id
+        if params.get('extra_brand') and params['extra_brand'] != parc_installe.website_extra_brand:
+            update_vals['website_extra_brand'] = params['extra_brand']
+            if not parc_installe.note or params['extra_brand'] not in parc_installe.note:
+                update_vals['note'] = u"Marque : %s" % params['extra_brand']
+        if params.get('modele') and params['modele'] != parc_installe.modele:
+            update_vals['modele'] = params['modele']
+        if params.get('name') != parc_installe.name:
+            update_vals['name'] = params.get('name')
+        if params.get('type_conduit') != parc_installe.type_conduit:
+            update_vals['type_conduit'] = params.get('type_conduit')
+        if params.get('date_installation') != parc_installe.date_installation:
+            update_vals['date_installation'] = params.get('date_installation')
+        if params.get('annee_batiment') != parc_installe.annee_batiment:
+            update_vals['annee_batiment'] = params.get('annee_batiment')
+
+        # Installateur
+        if params.get('installateur_name') and not params.get('installateur_email'):
+            if not parc_installe.note or params['installateur_name'] not in parc_installe.note:
+                note = u"Installé par %s" % request.params['installateur_name']
+                if update_vals.get('note'):
+                    update_vals['note'] += "\n" + note
+                else:
+                    update_vals['note'] = note
+        elif params.get('installateur_name') and params.get('installateur_email'):
+            partner_obj = request.env['res.partner'].sudo()
+            installer = partner_obj.search([('email', '=', params['installateur_email'])], limit=1)
+            if not installer:
+                installer = partner_obj.create({
+                    'name': params['installateur_name'],
+                    'email': params['installateur_email'],
+                    'of_installateur': True,
+                })
+            if installer != parc_installe.installateur_id:
+                update_vals['installateur_id'] = installer.id
+        if params.get('installateur_name') and params['installateur_name'] != parc_installe.website_installer_name:
+            update_vals['website_installer_name'] = params['installateur_name']
+        if params.get('installateur_email') and params['installateur_email'] != parc_installe.website_installer_email:
+            update_vals['website_installer_email'] = params['installateur_email']
+
+        # Pièces Jointes
+        if 'park_attachment' in params:
+            attached_files = request.httprequest.files.getlist('park_attachment')
+            for attachment in attached_files:
+                attached_file = attachment.read()
+                request.env['ir.attachment'].sudo().create({
+                    'name': attachment.filename,
+                    'res_model': 'of.parc.installe',
+                    'res_id': parc_installe.id,
+                    'type': 'binary',
+                    'datas_fname': attachment.filename,
+                    'datas': attached_file.encode('base64'),
+                })
+            updated = True
+
+        if update_vals:
+            if 'note' in update_vals and parc_installe.note:
+                update_vals['note'] = parc_installe.note + '\n\n' + update_vals['note']
+            parc_installe.write(update_vals)
+            updated = True
+        return updated
 
     def _update_address_if_necessary(self, address_id):
         partner_obj = request.env['res.partner'].sudo()
@@ -646,6 +925,14 @@ class OFWebsitePlanningBooking(http.Controller):
             update_vals['street2'] = params['street2']
         if params.get('zip') and params['zip'] != address.zip:
             update_vals['zip'] = params['zip']
+            # On recalcule le secteur
+            if address.of_secteur_tech_id:
+                secteur = request.env['of.secteur'].sudo().get_secteur_from_cp(update_vals['zip']).filtered(
+                    lambda sec: sec.type in ('tech', 'tech_com'))
+                if secteur:
+                    update_vals['of_secteur_tech_id'] = secteur.id
+                else:
+                    update_vals['of_secteur_tech_id'] = False
         if params.get('city') and params['city'] != address.city:
             update_vals['city'] = params['city']
         address_country = address.country_id
@@ -677,12 +964,22 @@ class OFWebsitePlanningBooking(http.Controller):
         partner.geo_code()
         return partner.id
 
-    def _update_geo_comment(self):
+    def _update_geo_info(self):
         partner_obj = request.env['res.partner'].sudo()
         address = partner_obj.browse(request.session.get('rdv_site_adresse_id'))
-        comment = request.params.get('comment')
-        address.write({'of_geo_comment': comment})
-        return True
+        params = request.params
+        updated = False
+        update_vals = {}
+        if params.get('geo_lat') and params['geo_lat'] != address.geo_lat:
+            update_vals['geo_lat'] = params['geo_lat']
+        if params.get('geo_lng') and params['geo_lng'] != address.geo_lng:
+            update_vals['geo_lng'] = params['geo_lng']
+        if params.get('comment') != address.of_geo_comment:
+            update_vals['of_geo_comment'] = params['comment']
+        if update_vals:
+            address.write(update_vals)
+            updated = True
+        return updated
 
     def _get_intervention_vals(self, creneau, creneau_employee):
         tz = pytz.timezone(request.env.user.tz or 'Europe/Paris')
@@ -694,6 +991,14 @@ class OFWebsitePlanningBooking(http.Controller):
         parc_installe = parc_obj.browse(request.session.get('booking_parc_installe_id'))
         adresse = partner_obj.browse(request.session.get('rdv_site_adresse_id'))
         tache = tache_obj.browse(request.session.get('rdv_tache_id'))
+        description = u""
+        if adresse.of_geo_comment:
+            description = u"Commentaire localisation du client : %s" % adresse.of_geo_comment
+        if request.params.get('comment'):
+            if description:
+                description += u"<br/>"
+            description += u"Commentaires additionnels du client : %s" % request.params.get('comment')
+
         vals = {
             'name': u"Intervention",
             'parc_installe_id': parc_installe.id,
@@ -706,6 +1011,7 @@ class OFWebsitePlanningBooking(http.Controller):
             'verif_dispo': True,
             'origin_interface': u"Portail web",
             'website_create': True,
+            'description': description,
         }
         # Le créneau de l'employé peut commencer avant le début d'aprem,
         # on fait donc un max pour s'assurer que le RDV soit pris l'aprem

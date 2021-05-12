@@ -34,12 +34,21 @@
         <field name="model">of.secteur</field>
         <field name="arch" type="xml">
             <form string="Secteur">
+                <header>
+                    <button string="Actualiser" type="object" name="action_update" class="oe_highlight"
+                            confirm="Cette action va mettre à jour tous les partenaires sans secteur qui correspondent aux codes postaux, êtes-vous sûr de vouloir continuer ?"/>
+                    <button string="Actualiser et Supprimer" type="object" name="action_update_delete" class="oe_highlight"
+                            confirm="Cette action va mettre à jour tous les partenaires sans secteur qui correspondent aux codes postaux et exclure ceux qui n'y correspondent pas, êtes-vous sûr de vouloir continuer ?"/>
+                </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button name="toggle_active" type="object"
                                 class="oe_stat_button" icon="fa-archive">
                             <field name="active" widget="boolean_button"
                                 options='{"terminology": "archive"}'/>
+                        </button>
+                        <button name="action_view_partner" type="object" class="oe_stat_button" icon="fa-users">
+                            <field name="partner_count" widget="statinfo" string="Partenaire(s)"/>
                         </button>
                     </div>
                     <group>

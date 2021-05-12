@@ -56,7 +56,7 @@
                     <t t-foreach="installed_parks" t-as="installed_park">
                         <tr>
                             <td>
-                                <span t-esc="installed_park.brand_id.name"/> - <span t-esc="installed_park.modele"/>
+                                <span t-esc="installed_park.brand_id.sudo().name"/> - <span t-esc="installed_park.modele"/>
                             </td>
                             <td>
                                 <span t-esc="installed_park.name or '-'"/>
@@ -79,12 +79,12 @@
             <li t-att-class="step_number==10 and 'text-primary' or 'text-muted'" id="step_parc">
                 <t t-if="step_number&gt;10">
                     <a href="/new_booking/installed_park_select" class="text-primary">
-                        Appareil
+                        Équipement
                         <span class="chevron"/>
                     </a>
                 </t>
                 <t t-if="not step_number&gt;10">
-                    Appareil
+                    Équipement
                     <span class="chevron"/>
                 </t>
             </li>
@@ -144,25 +144,32 @@
     </template>
 
     <!-- OF Website Planning Booking - Installed Park Select -->
-    <template id="new_booking_installed_park_select" name="Prise de RDV en ligne - Sélection Appareil">
+    <template id="new_booking_installed_park_select" name="Prise de RDV en ligne - Sélection Équipement">
         <t t-call="website.layout">
             <div id="wrap">
                 <div class="oe_structure"/>
                 <div class="container oe_website_sale">
                     <div class="row">
                         <t t-call="of_website_planning_booking.new_booking_breadcrumb_trail"/>
-                        <h1 class="col-md-10 page-header text-primary">Sélectionner mon installation</h1>
-                        <b><span class="col-md-10">Vous avez au moins un appareil installé chez vous, sélectionnez celui pour lequel vous souhaitez prévoir une intervention ou ajoutez en un nouveau.</span></b>
+                        <h1 class="col-md-10 page-header text-primary">Sélectionner mon équipement</h1>
+                        <t t-if="display_add_button">
+                            <b><span class="col-md-10">Vous avez au moins un équipement installé chez vous, sélectionnez celui pour lequel vous souhaitez prévoir une intervention, ou ajoutez en un nouveau.</span></b>
+                        </t>
+                        <t t-else="">
+                            <b><span class="col-md-10">Vous avez au moins un équipement installé chez vous, sélectionnez celui pour lequel vous souhaitez prévoir une intervention.</span></b>
+                        </t>
                         <div class="clearfix"/>
                         <br/>
                         <form action="/new_booking/installed_park_select" method="post">
                             <div t-attf-class="form-group form-field o_website_form_required_custom col-md-6 #{error_dict.get('parc_installe_id') and 'has-error' or ''}">
                                 <select id="parc_installe_id" name="parc_installe_id" class="form-control">
-                                    <option value="">La référence de votre appareil...</option>
+                                    <option value="">La référence de votre équipement...</option>
                                     <t t-foreach="parc_installe_list" t-as="pi">
                                         <option t-att-value="pi.id"
                                                 t-att-selected="pi.id == parc_installe_id">
-                                            <t t-esc="pi.modele + (pi.name and ' - ' + pi.name or '')"/>
+                                            <t t-esc="pi.modele"/>
+                                            <t t-if="pi.modele and pi.name" t-esc="'-'"/>
+                                            <t t-esc="pi.name"/>
                                         </option>
                                     </t>
                                 </select>
@@ -172,11 +179,18 @@
                             <input type="hidden" name="current_step" t-att-value="current_step"/>
                             <div class="clearfix" />
                             <div class="mt32 mb64 pull-right" name="buttons">
-                                <a href="/new_booking/installed_park_create"
-                                   class="btn btn-default a-submit a-submit-disable a-submit-loading">
-                                    Ajouter un appareil
-                                </a>
-                                &amp;nbsp;&amp;nbsp;&amp;nbsp;ou&amp;nbsp;&amp;nbsp;&amp;nbsp;
+                                <t t-if="display_add_button">
+                                    <button type="submit" class="btn btn-default a-submit a-submit-disable a-submit-loading"
+                                            name="create" value="address_create">
+                                        Ajouter un équipement
+                                    </button>
+                                    &amp;nbsp;&amp;nbsp;&amp;nbsp;/&amp;nbsp;&amp;nbsp;&amp;nbsp;
+                                    <button type="submit" class="btn btn-default a-submit a-submit-disable a-submit-loading"
+                                            name="update" value="address_update">
+                                        Modifier un équipement
+                                    </button>
+                                    &amp;nbsp;&amp;nbsp;&amp;nbsp;ou&amp;nbsp;&amp;nbsp;&amp;nbsp;
+                                </t>
                                 <button type="submit" class="btn btn-primary a-submit a-submit-disable a-submit-loading"
                                         name="next_step" value="address_select">
                                     Suivant
@@ -191,24 +205,24 @@
     </template>
 
     <!-- OF Website Planning Booking - Installed Park Create -->
-    <template id="new_booking_installed_park_create" name="Prise de RDV en ligne - Création Appareil">
+    <template id="new_booking_installed_park_create" name="Prise de RDV en ligne - Équipement">
         <t t-call="website.layout">
             <div id="wrap">
                 <div class="oe_structure"/>
                 <div class="container oe_website_sale">
                     <t t-call="of_website_planning_booking.new_booking_breadcrumb_trail"/>
-                    <h1 class="col-md-10 page-header text-primary">Mon appareil</h1>
+                    <h1 class="col-md-10 page-header text-primary">Mon équipement</h1>
                     <b><span class="col-md-10">Quelques questions avant de commencer :</span></b>
                     <div class="clearfix" />
                     <br/>
                     <t t-if="error_dict" t-foreach="error_dict.get('error_message', [])" t-as="err">
                         <h4 class="text-danger" t-esc="err"/>
                     </t>
-                    <form name="/new_booking/installed_park_create" method="post">
+                    <form class="booking_extra_brand" name="/new_booking/installed_park_create" method="post" enctype="multipart/form-data">
                         <div t-attf-class="form-group #{error_dict.get('product_category_id') and 'has-error' or ''} col-md-10">
-                            <label class="control-label label-optional" for="product_category_id">Catégorie d'appareil *</label>
+                            <label class="control-label label-optional" for="product_category_id">Catégorie d'équipement *</label>
                             <select id="product_category_id" name="product_category_id" class="form-control o_website_form_input">
-                                <option value="">La catégorie de votre appareil...</option>
+                                <option value="">La catégorie de votre équipement...</option>
                                 <t t-foreach="product_categ_list" t-as="pc">
                                     <option t-att-value="pc.id"
                                             t-att-selected="pc.id == (product_category and product_category.id or -1)">
@@ -218,60 +232,73 @@
                             </select>
                         </div>
                         <div class="clearfix"/>
-                        <div t-attf-class="form-group #{error_dict.get('brand_id') and 'has-error' or ''} col-md-10">
+                        <div t-attf-class="form-group div_brand #{error_dict.get('brand_id') and 'has-error' or ''} #{brand_id == 'Autre marque' and 'col-md-5' or 'col-md-10'}">
                             <label class="control-label label-optional" for="brand_id">Marque *</label>
                             <select id="brand_id" name="brand_id" class="form-control o_website_form_input">
-                                <option value="">La marque de votre appareil...</option>
+                                <option value="">La marque de votre équipement...</option>
                                 <t t-foreach="brand_list" t-as="b">
                                     <option t-att-value="b.id"
                                             t-att-selected="b.id == (brand and brand.id or -1)">
                                         <t t-esc="b.name"/>
                                     </option>
                                 </t>
+                                <option t-if="display_extra_brand" value="Autre marque"
+                                        t-att-selected="brand_id == 'Autre marque'">Autre marque</option>
                             </select>
-                            <i>
-                                Si vous ne trouvez pas la marque de votre appareil,
+                            <i t-if="not display_extra_brand">
+                                Si vous ne trouvez pas la marque de votre équipement,
                                 c'est que nous ne sommes pas en mesure d'intervenir dessus.
                             </i>
+                        </div>
+                        <div t-attf-class="form-group div_extra_brand #{error_dict.get('extra_brand') and 'has-error' or ''} col-md-5"
+                             t-att-style="brand_id != 'Autre marque' and 'display: none;' or ''">
+                            <label class="control-label label-optional" for="extra_brand">Autre *</label>
+                            <input type="text" class="form-control o_website_form_input" name="extra_brand"
+                                   t-att-value="extra_brand"/>
                         </div>
                         <div class="clearfix"/>
                         <div t-attf-class="form-group #{error_dict.get('modele') and 'has-error' or ''} col-md-5">
                             <label class="control-label label-optional" for="modele">Modèle *</label>
                             <input type="text" class="form-control o_website_form_input" name="modele"
-                                   t-att-value="request.params.get('modele')"/>
+                                   t-att-value="modele"/>
                         </div>
-                        <div t-attf-class="form-group col-md-5">
+                        <div t-attf-class="form-group #{error_dict.get('name') and 'has-error' or ''} col-md-5">
                             <label class="control-label label-optional" for="name">Nº de série</label>
                             <input type="text" class="form-control o_website_form_input" name="name"
-                                   t-att-value="request.params.get('name')"/>
+                                   t-att-value="name"/>
+                        </div>
+                        <div class="clearfix"/>
+                        <div t-attf-class="form-group #{error_dict.get('type_conduit') and 'has-error' or ''} col-md-10">
+                            <label class="control-label label-optional" for="type_conduit">Type de conduit</label>
+                            <input type="text" class="form-control o_website_form_input" name="type_conduit"
+                                   t-att-value="type_conduit"/>
+                        </div>
+                        <div class="clearfix"/>
+                        <div t-attf-class="form-group #{error_dict.get('date_installation') and 'has-error' or ''} col-md-5">
+                            <label class="control-label label-optional" for="date_installation">Date d'installation</label>
+                            <input type="date" class="form-control o_website_form_input" name="date_installation"
+                                   t-att-value="date_installation"/>
+                        </div>
+                        <div t-attf-class="form-group #{error_dict.get('annee_batiment') and 'has-error' or ''} col-md-5">
+                            <label class="control-label label-optional" for="annee_batiment">Année de construction du bâtiment</label>
+                            <input type="text" class="form-control o_website_form_input" name="annee_batiment"
+                                   t-att-value="annee_batiment"/>
+                        </div>
+                        <div class="clearfix"/>
+                        <div t-attf-class="form-group #{error_dict.get('installateur_name') and 'has-error' or ''} col-md-5">
+                            <label class="control-label label-optional" for="installateur_name">Nom de l'installateur</label>
+                            <input type="text" class="form-control o_website_form_input" name="installateur_name"
+                                   t-att-value="installateur_name"/>
+                        </div>
+                        <div t-attf-class="form-group #{error_dict.get('installateur_email') and 'has-error' or ''} col-md-5">
+                            <label class="control-label label-optional" for="installateur_email">E-mail de l'installateur</label>
+                            <input type="text" class="form-control o_website_form_input" name="installateur_email"
+                                   t-att-value="installateur_email"/>
                         </div>
                         <div class="clearfix"/>
                         <div class="form-group col-md-10">
-                            <label class="control-label label-optional" for="type_conduit">Type de conduit</label>
-                            <input type="text" class="form-control o_website_form_input" name="type_conduit"
-                                   t-att-value="request.params.get('type_conduit')"/>
-                        </div>
-                        <div class="clearfix"/>
-                        <div class="form-group col-md-5">
-                            <label class="control-label label-optional" for="date_installation">Date d'installation</label>
-                            <input type="date" class="form-control o_website_form_input" name="date_installation"
-                                   t-att-value="request.params.get('date_installation')"/>
-                        </div>
-                        <div class="form-group col-md-5">
-                            <label class="control-label label-optional" for="annee_batiment">Année de construction du bâtiment</label>
-                            <input type="number" class="form-control o_website_form_input" name="annee_batiment"
-                                   t-att-value="request.params.get('annee_batiment')"/>
-                        </div>
-                        <div class="clearfix"/>
-                        <div class="form-group col-md-5">
-                            <label class="control-label label-optional" for="installateur_name">Nom de l'installateur</label>
-                            <input type="text" class="form-control o_website_form_input" name="installateur_name"
-                                   t-att-value="request.params.get('installateur_name')"/>
-                        </div>
-                        <div class="form-group col-md-5">
-                            <label class="control-label label-optional" for="installateur_email">E-mail de l'installateur</label>
-                            <input type="email" class="form-control o_website_form_input" name="installateur_email"
-                                   t-att-value="request.params.get('installateur_email')"/>
+                            <label class="control-label label-optional" for="park_attachment">Photos de l'installation</label>
+                            <input type="file" multiple="true" class="o_website_form_input" name="park_attachment"/>
                         </div>
                         <div class="clearfix"/>
                         <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
@@ -330,7 +357,7 @@
                                 </a>
                                 <span name="buttons_right" class="pull-right">
                                     <t t-if="not parc_installe.site_adresse_id">
-                                        <form action="/new_booking/address_create_edit" method="post" class='' style="display:inline-block">
+                                        <form action="/new_booking/address_create_edit" method="post" style="display:inline-block">
                                             <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                                             <input type="hidden" name="mode" value="new"/>
                                             <a class='btn btn-default a-submit' title="Ajouter une adresse">
@@ -339,10 +366,13 @@
                                         </form>
                                         &amp;nbsp;&amp;nbsp;&amp;nbsp;ou&amp;nbsp;&amp;nbsp;&amp;nbsp;
                                     </t>
-                                    <a class="btn btn-primary" href="/new_booking/localize">
-                                        Suivant
-                                        <span class="fa fa-long-arrow-right"/>
-                                    </a>
+                                    <form action="/new_booking/address_select" method="post" style="display:inline-block">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <input type="hidden" name="submitted" value="1"/>
+                                        <button type="submit" class="btn btn-primary a-submit a-submit-disable a-submit-loading">
+                                            Suivant <span class="fa fa-long-arrow-right"/>
+                                        </button>
+                                    </form>
                                 </span>
                             </div>
                         </div>
@@ -473,7 +503,7 @@
                     <t t-call="of_website_planning_booking.new_booking_breadcrumb_trail"/>
                     <h1 class="col-md-10 page-header text-primary">Ma localisation</h1>
                     <b><span class="col-md-10">Laissez nous un commentaire si la localisation n'est pas bonne.
-                        Nous verrons ça ensemble au moment de vous rappeler pour valider le RDV.</span></b>
+                        Nous verrons ça ensemble au moment de vous rappeler pour valider le rendez-vous.</span></b>
                     <div class="clearfix" />
                     <br/>
                     <div class="col-md-10 div_map">
@@ -485,6 +515,22 @@
                     <div class="clearfix"/>
                     <br/>
                     <form action="/new_booking/localize" method="post">
+                        <div class="form-group col-md-10">
+                            <label class="control-label label-optional" style="width: 100%">Coordonnées GPS</label>
+                            <div class="form-group col-md-6">
+                                <label class="control-label label-optional col-md-5">Latitude</label>
+                                <input type="number" name="geo_lat" class="form-control"
+                                       t-att-value="request.params.get('geo_lat', geo_lat)"/>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="control-label label-optional col-md-5">Longitude</label>
+                                <input type="number" name="geo_lng" class="form-control"
+                                       t-att-value="request.params.get('geo_lng', geo_lng)"/>
+                            </div>
+                            <i>
+                                Vous trouverez <a href="#video-popup" data-media="https://www.youtube.com/embed/fM1TpwczC5U?enablejsapi=1&amp;autoplay=1">ici</a> un tutoriel vidéo pour vous aider à déterminer vos coordonnées GPS.
+                            </i>
+                        </div>
                         <div class="form-group col-md-10">
                             <label class="control-label label-optional" for="Commentaire">Commentaire</label>
                             <input type="text" name="comment" class="form-control"
@@ -506,6 +552,10 @@
                             </a>
                         </div>
                     </form>
+
+                    <div class="popup" id="video-popup">
+                        <iframe class="yt_player_iframe" width="1120" height="630" src="" frameborder="0" allowfullscreen="1"></iframe>
+                    </div>
                 </div>
             </div>
         </t>
@@ -579,7 +629,7 @@
                     <h1 class="col-md-10 page-header text-primary">Choisir mon créneau</h1>
                     <div class="clearfix" />
                     <br/>
-                    <div class="of_rdv_nouveau_tous_creneaux" t-if="creneau_selected">
+                    <div class="of_rdv_nouveau_tous_creneaux">
                         <div class="col-md-10">
                             <t t-foreach="creneaux" t-as="creneau">
                                 <div class="col-md-4 one_kanban">
@@ -592,13 +642,6 @@
                             </t>
                         </div>
                     </div>
-                    <div name="zero_result" t-if="not creneau_selected">
-                        <h2>
-                            Il semblerait qu'il n'y ait pas de créneau disponible correspondant à votre recherche...
-                        </h2>
-                        Vous pouvez contacter notre service commercial pour plus d'informations.
-                    </div>
-
                     <div class="clearfix"/>
                     <div class="mt32 mb64" name="buttons">
                         <a href="/new_booking/service" class="btn btn-default">
@@ -606,7 +649,7 @@
                             Retour
                         </a>
                         <span name="buttons_right" class="pull-right" t-if="creneau_selected">
-                            <t t-if="len(creneaux) &lt; 20">
+                            <t t-if="not nomore_load">
                                 <form action="/new_booking/slot" method="post" style="display:inline-block">
                                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                                     <input type="hidden" name="submitted" value="1"/>
@@ -648,7 +691,7 @@
                         </t>
                     </div>
                     <div class="clearfix"/>
-                    <h2 class="col-md-10">Mon appareil</h2>
+                    <h2 class="col-md-10">Mon équipement</h2>
                     <div class="col-md-4 one_kanban">
                         <t t-call="of_website_planning_booking.new_booking_device_kanban"/>
                     </div>
@@ -658,9 +701,14 @@
                         <div class="panel of_border_primary">
                             <div class="panel-body">
                                 <b>
-                                    <span t-esc="tache.name"/> - <span t-esc="tache.product_id.sudo().lst_price * 1.2" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/> TTC
+                                    <span t-esc="tache.name"/>
                                 </b>
                                 <br/>
+                                <p style="line-height: 70%; margin-top: 5px; margin-bottom: 5px;">
+                                    <span t-esc="price" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/> TTC
+                                    <br/>
+                                    <i style="font-size: 65%">Ce tarif est indicatif et pourra évoluer en fonction des spécificités de votre installation</i>
+                                </p>
                                 <span t-esc="creneau.name"/>
                                 <br/>
                                 <span t-esc="creneau.description"/>
@@ -668,23 +716,42 @@
                         </div>
                     </div>
                     <div class="clearfix"/>
-                    <div class="mt32 mb64" name="buttons">
-                        <a href="/new_booking/slot" class="btn btn-default">
-                            <span class="fa fa-long-arrow-left"/>
-                            Retour
-                        </a>
-                        <span name="buttons_right" class="pull-right">
-                            <form action="/new_booking/confirmation" method="post" class=''>
-                                <input type="hidden" name="csrf_token"
-                                       t-att-value="request.csrf_token()"/>
-                                <input type="hidden" name="submitted" value="1"/>
-                                <a class='btn btn-primary a-submit'>
-                                    Valider
-                                    <span class="fa fa-long-arrow-right"/>
-                                </a>
-                            </form>
-                        </span>
-                    </div>
+                    <br/>
+                    <form action="/new_booking/confirmation" method="post" class=''>
+                        <div class="form-group col-md-10">
+                            <label class="control-label label-optional" for="comment">Commentaires additionnels</label>
+                            <input type="text" name="comment" class="form-control" t-att-value="comment"/>
+                        </div>
+                        <div class="clearfix"/>
+                        <div t-attf-class="#{error_dict.get('terms') and 'has-error' or ''} col-md-10">
+                            <input type="checkbox" name="terms" t-att-checked="'checked' if terms else None"/>
+                            <label class="control-label label-optional" for="terms">
+                                J'accepte les <a t-attf-href="/web/content?model=website&amp;field=website_booking_terms_file&amp;id={{request.website.id}}&amp;filename={{request.website.website_booking_terms_filename}}&amp;download=true">Conditions Générales de Vente</a> de <t t-esc="company.name"/>
+                            </label>
+                        </div>
+                        <div t-attf-class="#{error_dict.get('opt_in') and 'has-error' or ''} col-md-10">
+                            <input type="checkbox" name="opt_in" t-att-checked="'checked' if opt_in else None"/>
+                            <label class="control-label label-optional" for="opt_in">
+                                J'accepte d'être contacté par <span t-esc="company.name"/>
+                            </label>
+                        </div>
+                        <div class="clearfix"/>
+                        <div class="mt32 mb64" name="buttons">
+                            <a href="/new_booking/slot" class="btn btn-default">
+                                <span class="fa fa-long-arrow-left"/>
+                                Retour
+                            </a>
+                            <span name="buttons_right" class="pull-right">
+                                    <input type="hidden" name="csrf_token"
+                                           t-att-value="request.csrf_token()"/>
+                                    <input type="hidden" name="submitted" value="1"/>
+                                    <a class='btn btn-primary a-submit'>
+                                        Valider
+                                        <span class="fa fa-long-arrow-right"/>
+                                    </a>
+                            </span>
+                        </div>
+                    </form>
                 </div>
             </div>
         </t>
@@ -702,11 +769,36 @@
                     <b class="col-md-10">
                         Votre demande de rendez-vous a bien été enregistrée et une confirmation vous a été envoyée par e-mail.
                         <br/>
-                        Nous vous recontacterons prochainement pour la dernière étape de la prise de ce rendez-vous.
+                        Nous vous recontacterons pour valider avec vous les modalités de ce rendez-vous.
                     </b>
                     <div class="clearfix"/>
                     <div class="mt32 mb64 pull-right" name="buttons">
                         <a href="/" class="btn btn-primary">
+                            Accueil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- OF Website Planning Booking - Sorry -->
+    <template id="new_booking_sorry" name="Prise de RDV en ligne - Désolé">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_website_sale">
+                    <h1 class="col-md-10 page-header text-primary">Désolé</h1>
+                    <div class="clearfix" />
+                    <br/>
+                    <b class="col-md-10" t-esc="message"/>
+                    <div class="clearfix"/>
+                    <div class="mt32 mb64" name="buttons">
+                        <a t-if="return_button" t-att-href="return_button_href" class="btn btn-default">
+                            <span class="fa fa-long-arrow-left"/>
+                            Retour
+                        </a>
+                        <a href="/" class="btn btn-primary pull-right">
                             Accueil
                         </a>
                     </div>
@@ -752,14 +844,14 @@
     </template>
 
     <!-- OF Website Planning Booking - Kanban Device -->
-    <template id="new_booking_device_kanban" name="Prise de RDV en ligne - Appareil Kanban">
+    <template id="new_booking_device_kanban" name="Prise de RDV en ligne - Équipement Kanban">
         <div class="panel panel-default of_border_primary">
             <div class='panel-body'>
                 <div>
                     <b t-esc="parc_installe.product_category_id.name"/>
                 </div>
                 <div>
-                    <span t-esc="parc_installe.brand_id.name"/> - <span t-esc="parc_installe.modele"/>
+                    <span t-esc="parc_installe.brand_id.sudo().name"/> - <span t-esc="parc_installe.modele"/>
                 </div>
                 <div t-if="parc_installe.name">
                     Nº série : <span t-esc="parc_installe.name"/>

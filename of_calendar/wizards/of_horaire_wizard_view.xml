@@ -46,6 +46,7 @@
                     <field name="employee_id" readonly="1" nolabel="1" class="oe_inline of_title"/>
                 </b></h1>
                 <field name="mode" invisible="1"/>
+                <field name="type" invisible="1"/>
                 <group col="3">
                     <group name="periode" string="Période">
                         <field name="permanent" attrs="{'readonly': [('premier_seg', '=', True)]}"/>
@@ -53,6 +54,7 @@
                           domain="[
                             ('employee_id', '=', employee_id),
                             ('permanent', '=', permanent),
+                            ('type', '=', type),
                         ]" context="{'restrict_date': 1,}" options="{'no_create': 1, 'no_open': 1,}"/>
                         <field name="date_deb" attrs="{
                             'required': [

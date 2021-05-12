@@ -16,11 +16,11 @@ odoo.define('of_website_planning_booking.planning_website', function (require) {
         var oe_website_sale = this;
 
         var clickwatch = (function(){
-              var timer = 0;
-              return function(callback, ms){
+            var timer = 0;
+            return function(callback, ms){
                 clearTimeout(timer);
                 timer = setTimeout(callback, ms);
-              };
+            };
         })();
 
 
@@ -55,20 +55,20 @@ odoo.define('of_website_planning_booking.planning_website', function (require) {
         });
 
         $('.oe_cart').on('click', '.of_js_change_shipping', function() {
-          if (!$('body.editor_enable').length) { //allow to edit button text with editor
-            var $old = $('.all_shipping').find('.panel.of_border_primary');
-            $old.find('.btn-ship').toggle();
-            $old.addClass('of_js_change_shipping');
-            $old.removeClass('of_border_primary');
+            if (!$('body.editor_enable').length) { //allow to edit button text with editor
+                var $old = $('.all_shipping').find('.panel.of_border_primary');
+                $old.find('.btn-ship').toggle();
+                $old.addClass('of_js_change_shipping');
+                $old.removeClass('of_border_primary');
 
-            var $new = $(this).parent('div.one_kanban').find('.panel');
-            $new.find('.btn-ship').toggle();
-            $new.removeClass('of_js_change_shipping');
-            $new.addClass('of_border_primary');
+                var $new = $(this).parent('div.one_kanban').find('.panel');
+                $new.find('.btn-ship').toggle();
+                $new.removeClass('of_js_change_shipping');
+                $new.addClass('of_border_primary');
 
-            var $form = $(this).parent('div.one_kanban').find('form.hide');
-            $.post($form.attr('action'), $form.serialize()+'&xhr=1');
-          }
+                var $form = $(this).parent('div.one_kanban').find('form.hide');
+                $.post($form.attr('action'), $form.serialize()+'&xhr=1');
+            }
         });
         $('.oe_cart').on('click', '.of_js_edit_address', function() {
             $(this).parent('div.one_kanban').find('form.hide').attr('action', '/new_booking/address_create_edit').submit();
@@ -140,6 +140,25 @@ odoo.define('of_website_planning_booking.planning_website', function (require) {
             });
         }
         $("select[name='country_id']").change();
+
+        // Manage extra brand visibility
+        if ($(".booking_extra_brand").length) {
+            $(oe_website_sale).on('change', "select[name='brand_id']", function () {
+                clickwatch(function() {
+                    if ($("#brand_id").val() == 'Autre marque') {
+                        $(".div_brand").addClass('col-md-5');
+                        $(".div_brand").removeClass('col-md-10');
+                        $(".div_extra_brand").show();
+                    }
+                    else {
+                        $(".div_brand").addClass('col-md-10');
+                        $(".div_brand").removeClass('col-md-5');
+                        $(".div_extra_brand").hide();
+                        $("input[name='extra_brand']").val('').trigger('change');
+                    }
+                }, 500);
+            });
+        }
     });
 
     $('.of_rdv_nouveau_tous_creneaux').on('click', '.of_js_change_creneau', function() {
@@ -159,10 +178,32 @@ odoo.define('of_website_planning_booking.planning_website', function (require) {
         }
     });
 
-    // Deactivate image zoom for mobile devices, since it might prevent users to scroll
-    if (config.device.size_class > config.device.SIZES.XS) {
-        $('.ecom-zoomable img[data-zoom]').zoomOdoo({ attach: '#o-carousel-product'});
-    }
+    // GPS Video Pop-up
+    $("[data-media]").on("click", function(e) {
+        e.preventDefault();
+        var $this = $(this);
+        var videoUrl = $this.attr("data-media");
+        var popup = $this.attr("href");
+        var $popupIframe = $(popup).find("iframe");
+
+        $popupIframe.attr("src", videoUrl);
+
+        $this.closest(".container").addClass("show-popup");
+    });
+
+    $(".popup").on("click", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        $('.yt_player_iframe').each(function(){
+            this.contentWindow.postMessage('{"event":"command","func":"stopVideo","args":""}', '*')
+        });
+        $(".container").removeClass("show-popup");
+    });
+
+    $(".popup > iframe").on("click", function(e) {
+        e.stopPropagation();
+    });
 });
 
 odoo.define('of_website_planning_booking.map_localisation', function (require) {

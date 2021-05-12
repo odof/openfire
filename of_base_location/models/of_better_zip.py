@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api
 
+
 class BetterZip(models.Model):
     _inherit = 'res.better.zip'
 
@@ -39,6 +40,7 @@ class BetterZip(models.Model):
         else:
             super(BetterZip, self)._get_display_name()
 
+
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
@@ -64,10 +66,17 @@ class OfSecteur(models.Model):
         ], string="type de secteur", required=True, default='tech_com')
     zip_range_ids = fields.One2many('of.secteur.zip.range', 'secteur_id', string=u'Codes postaux')
     active = fields.Boolean(string='Actif', default=True)
+    partner_count = fields.Integer(string=u"Nombre de partenaires", compute='_compute_partner_count')
 
     _sql_constraints = [
         ('name_uniq', 'unique(name)', 'Oups ! On dirait que ce secteur existe déjà...'),
     ]
+
+    @api.multi
+    def _compute_partner_count(self):
+        for rec in self:
+            rec.partner_count = len(self.env['res.partner'].search(
+                ['|', ('of_secteur_com_id', '=', rec.id), ('of_secteur_tech_id', '=', rec.id)]))
 
     @api.multi
     def get_secteurs_interieurs(self, type='tech'):
@@ -105,7 +114,7 @@ class OfSecteur(models.Model):
         partner_obj = self.env['res.partner']
         zip_range_obj = self.env['of.secteur.zip.range']
 
-        domain = ['|'] * (len(self) - 1)
+        domain = ['|'] * (len(self.mapped("zip_range_ids")) - 1)
 
         for zip_range in self.mapped("zip_range_ids"):
             cp_min = zip_range.cp_min
@@ -123,6 +132,47 @@ class OfSecteur(models.Model):
             domain += domain_secteur
 
         return partner_obj.search(domain)
+
+    @api.multi
+    def action_view_partner(self):
+        self.ensure_one()
+        action = self.env.ref('contacts.action_contacts')
+        result = action.read()[0]
+        result.pop('id', None)
+        result['context'] = {}
+        partner_ids = self.env['res.partner'].search(
+            ['|', ('of_secteur_com_id', '=', self.id), ('of_secteur_tech_id', '=', self.id)]).ids or []
+        result['domain'] = "[('id', 'in', [" + ','.join(map(str, partner_ids)) + "])]"
+        return result
+
+    @api.multi
+    def action_update(self):
+        self.ensure_one()
+        all_partners = self.get_partners()
+        if all_partners:
+            if self.type in ('tech', 'tech_com'):
+                all_partners.filtered(lambda p: not p.of_secteur_tech_id).write({'of_secteur_tech_id': self.id})
+            if self.type in ('com', 'tech_com'):
+                all_partners.filtered(lambda p: not p.of_secteur_com_id).write({'of_secteur_com_id': self.id})
+        return True
+
+    @api.multi
+    def action_update_delete(self):
+        self.ensure_one()
+        all_partners = self.get_partners()
+        if all_partners:
+            if self.type in ('tech', 'tech_com'):
+                all_partners.filtered(lambda p: not p.of_secteur_tech_id).write({'of_secteur_tech_id': self.id})
+            if self.type in ('com', 'tech_com'):
+                all_partners.filtered(lambda p: not p.of_secteur_com_id).write({'of_secteur_com_id': self.id})
+        self.env['res.partner'].search(
+            [('id', 'not in', all_partners.ids),
+             ('of_secteur_tech_id', '=', self.id)]).write({'of_secteur_tech_id': False})
+        self.env['res.partner'].search(
+            [('id', 'not in', all_partners.ids),
+             ('of_secteur_com_id', '=', self.id)]).write({'of_secteur_com_id': False})
+        return True
+
 
 class OfSecteurZipRange(models.Model):
     _name = "of.secteur.zip.range"

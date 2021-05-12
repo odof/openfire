@@ -1,3 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from . import of_website_planning_booking
+from . import partner
+from . import planning
+from . import product
+from . import website

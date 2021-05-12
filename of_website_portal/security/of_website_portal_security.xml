@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Ir Rules -->
+
+    <!-- OF Service -->
+    <record id="of_service_published_rule" model="ir.rule">
+        <field name="name">OF Service Published</field>
+        <field name="model_id" ref="of_service.model_of_service"/>
+        <field name="domain_force">[('website_published', '=', True)]</field>
+        <field name="groups" eval="[(4, ref('base.group_public')), (4, ref('base.group_portal'))]"/>
+    </record>
+
+    <!-- OF Planning Tache -->
+    <record id="of_planning_tache_published_rule" model="ir.rule">
+        <field name="name">OF Planning Tache Published</field>
+        <field name="model_id" ref="of_planning.model_of_planning_tache"/>
+        <field name="domain_force">[('website_published', '=', True)]</field>
+        <field name="groups" eval="[(4, ref('base.group_public')), (4, ref('base.group_portal'))]"/>
+    </record>
+
+</odoo>

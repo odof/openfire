@@ -444,11 +444,14 @@ class OfPlanningIntervention(models.Model):
     calendar_name = fields.Char(string="Calendar Name", compute="_compute_calendar_name")  # vue Calendar
     tache_name = fields.Char(related='tache_id.name', readonly=True)  # vue Planning
     partner_name = fields.Char(related='partner_id.name')  # vue Planning, vue Map
+    partner_phone = fields.Char(related='partner_id.phone')  # vue Map
+    partner_mobile = fields.Char(related='partner_id.mobile')  # vue Map
     tz = fields.Selection(_tz_get, compute='_compute_tz', string="Fuseau horaire")  # vue Calendar
     tz_offset = fields.Char(compute='_compute_tz_offset', string="Timezone offset", invisible=True)  # vue Calendar
     geo_lat = fields.Float(related='address_id.geo_lat', readonly=True)  # vue Map
     geo_lng = fields.Float(related='address_id.geo_lng', readonly=True)  # vue Map
     precision = fields.Selection(related='address_id.precision', readonly=True)  # vue Map
+    color_map = fields.Char(compute='_compute_color_map', string=u"Couleur carte") # vue Map
     of_color_ft = fields.Char(related="employee_main_id.of_color_ft", readonly=True, oldname='color_ft')  # vue Calendar
     of_color_bg = fields.Char(related="employee_main_id.of_color_bg", readonly=True, oldname='color_bg')  # vue Calendar
 
@@ -852,6 +855,24 @@ class OfPlanningIntervention(models.Model):
             if intervention.order_id:
                 picking_list = intervention.order_id.picking_ids.ids
             intervention.picking_domain = picking_list
+
+    @api.depends('state')
+    def _compute_color_map(self):
+        u""" COULEURS :
+        Gris  : RDV brouillon
+        Orange: RDV confirmé
+        Rouge : RDV réalisé
+        Noir  : autres RDV
+        """
+        for intervention in self:
+            if intervention.state == 'draft':
+                intervention.color_map = 'gray'
+            elif intervention.state == 'confirm':
+                intervention.color_map = 'orange'
+            elif intervention.state == 'done':
+                intervention.color_map = 'red'
+            else:
+                intervention.color_map = 'black'
 
     # Search #
 
@@ -1419,6 +1440,18 @@ class OfPlanningIntervention(models.Model):
         }
 
         return res
+
+    @api.model
+    def get_color_map(self):
+        u"""
+        Fonction pour la légende de la vue map
+        """
+        title = "Interventions"
+        v0 = {'label': u"Brouillon", 'value': 'gray'}
+        v1 = {'label': u"Confirmé", 'value': 'orange'}
+        v2 = {'label': u"Réalisé", 'value': 'red'}
+        v3 = {'label': u"Autre", 'value': 'black'}
+        return {"title": title, "values": (v0, v1, v2, v3)}
 
 
 class OfPlanningInterventionLine(models.Model):

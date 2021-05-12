@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_res_partner_assign_area_wizard_form_view" model="ir.ui.view">
+        <field name="name">of.res.partner.assign.area.wizard.form.view</field>
+        <field name="model">of.res.partner.assign.area.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="area_id"/>
+                    <field name="area_type"/>
+                </group>
+                <footer>
+                    <button string="Valider" name="action_update" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window
+        id="of_res_partner_assign_area_wizard_action"
+        name="Affecter un secteur"
+        res_model="of.res.partner.assign.area.wizard"
+        src_model="res.partner"
+        view_mode="form"
+        key2="client_action_multi"
+        view_id="of_res_partner_assign_area_wizard_form_view"
+        target="new"
+    />
+
+</odoo>

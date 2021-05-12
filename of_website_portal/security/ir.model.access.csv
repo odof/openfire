@@ -5,3 +5,4 @@ access_of_parc_installe_public,access.of.parc.installe.public,of_parc_installe.m
 access_of_res_partner_phone_public,access.of.res.partner.phone.public,of_base.model_of_res_partner_phone,base.group_portal,1,0,0,0
 access_of_invoice_kit_public,access.of.invoice.kit.public,of_kit.model_of_invoice_kit,base.group_portal,1,0,0,0
 access_of_invoice_kit_line_public,access.of.invoice.kit.line.public,of_kit.model_of_invoice_kit_line,base.group_portal,1,0,0,0
+access_of_planning_tache_public,access.of.planning.tache.public,of_planning.model_of_planning_tache,base.group_portal,1,0,0,0

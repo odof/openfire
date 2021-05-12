@@ -2,15 +2,22 @@
 <odoo>
     <data noupdate="1">
 
-        <!-- Article lambda pour la prise de rdv en ligne -->
+        <!-- Article divers web pour la prise de rdv en ligne -->
         <record id="of_website_planning_booking_product_default" model="product.product">
-            <field name="name">Article lambda</field>
+            <field name="name">Article divers web</field>
             <field name="categ_id" ref="product.product_category_all"/>
             <field name="type">service</field>
             <field name="uom_id" ref="product.product_uom_unit"/>
             <field name="uom_po_id" ref="product.product_uom_unit"/>
-            <field name="description">Article lambda utilisé pour la création des parcs installés en ligne</field>
-            <field name="default_code">PARC_DEFAULT</field>
+            <field name="default_code">WEB_DEFAULT</field>
+        </record>
+
+        <!-- Marque divers web pour la prise de rdv en ligne -->
+        <record id="of_website_planning_booking_brand_default" model="of.product.brand">
+            <field name="name">Marque divers web</field>
+            <field name="code">WEB</field>
+            <field name="partner_id" ref="base.main_partner"/>
+            <field name="of_import_categ_id" ref="product.product_category_all"/>
         </record>
 
         <!-- Website menu -->
