@@ -360,9 +360,9 @@ class OfPlanningIntervention(models.Model):
 
     @api.model
     def _default_warehouse_id(self):
-        company = self.env.user.company_id.id
-        warehouse_ids = self.env['stock.warehouse'].search([('company_id', '=', company)], limit=1)
-        return warehouse_ids
+        company_id = self.env.user.company_id.id
+        warehouse_id = self.env['stock.warehouse'].search([('company_id', '=', company_id)], limit=1)
+        return warehouse_id
 
     # Champs #
 
@@ -515,7 +515,7 @@ class OfPlanningIntervention(models.Model):
     )
     warehouse_id = fields.Many2one(
         'stock.warehouse', string=u'Entrepôt',
-        required=False, readonly=True, states={'draft': [('readonly', False)]},
+        required=True, readonly=True, states={'draft': [('readonly', False)]},
         default=lambda s: s._default_warehouse_id)
     procurement_group_id = fields.Many2one('procurement.group', 'Procurement Group', copy=False)
     picking_ids = fields.One2many(comodel_name='stock.picking', compute="_compute_pickings", string=u"BL associés")
@@ -912,16 +912,12 @@ class OfPlanningIntervention(models.Model):
     @api.depends('state', 'line_ids.invoice_status')
     def _compute_invoice_status(self):
         """
-        Compute the invoice status of a SO. Possible statuses:
-        - no: if the SO is not in status 'sale' or 'done', we consider that there is nothing to
+        Copie de sale.order._compute_invoice_status(), adaptée pour of.planning.intervention
+        Compute the invoice status of a OPI. Possible statuses:
+        - no: if the OPF is not in status 'confirm' or 'done', we consider that there is nothing to
           invoice. This is also hte default value if the conditions of no other status is met.
-        - to invoice: if any SO line is 'to invoice', the whole SO is 'to invoice'
-        - invoiced: if all SO lines are invoiced, the SO is invoiced.
-        - upselling: if all SO lines are invoiced or upselling, the status is upselling.
-
-        The invoice_ids are obtained thanks to the invoice lines of the SO lines, and we also search
-        for possible refunds created directly from existing invoices. This is necessary since such a
-        refund is not directly linked to the SO.
+        - to invoice: if any OPI line is 'to invoice', the whole OPI is 'to invoice'
+        - invoiced: if all OPI lines are invoiced, the OPI is invoiced..
         """
         for rdv in self:
             # Ignore the status of the deposit product
@@ -1106,10 +1102,10 @@ class OfPlanningIntervention(models.Model):
         return res
 
     @api.onchange('company_id')
-    def onchnage_company_id(self):
+    def onchange_company_id(self):
         if self.company_id:
-            company = self.company_id.id
-            warehouse_id = self.env['stock.warehouse'].search([('company_id', '=', company)], limit=1)
+            company_id = self.company_id.id
+            warehouse_id = self.env['stock.warehouse'].search([('company_id', '=', company_id)], limit=1)
             self.warehouse_id = warehouse_id
 
     # Héritages
@@ -1693,6 +1689,13 @@ class OfPlanningInterventionLine(models.Model):
         return res
 
     @api.multi
+    def write(self, vals):
+        res = super(OfPlanningInterventionLine, self).write(vals)
+        if 'qty' in vals:
+            self._action_procurement_create()
+        return res
+
+    @api.multi
     def _prepare_invoice_line(self):
         self.ensure_one()
         product = self.product_id
@@ -1760,7 +1763,6 @@ class OfPlanningInterventionLine(models.Model):
             'group_id': group_id,
             'of_intervention_line_id': self.id,
             'location_id': self.intervention_id.address_id.property_stock_customer.id,
-            # 'route_ids': self.route_id and [(4, self.route_id.id)] or [],
             'warehouse_id': self.intervention_id.warehouse_id and self.intervention_id.warehouse_id.id or False,
             'partner_dest_id': self.intervention_id.address_id.id,
         }
@@ -1768,6 +1770,7 @@ class OfPlanningInterventionLine(models.Model):
     @api.multi
     def _action_procurement_create(self):
         """
+        Copie de sale.order.line._action_procurement_create(), adaptée pour of.planning.intervention.line
         Create procurements based on quantity ordered. If the quantity is increased, new
         procurements are created. If the quantity is decreased, no automated action is taken.
         """
