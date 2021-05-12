@@ -185,7 +185,7 @@
                                         <field name="year_purchase_price" sum="Coût annuel"/>
                                         <field name="year_subtotal" sum="Total HT annuel"/>
                                         <field name="next_purchase_price" sum="Prochain coût"/>
-                                        <field name="amount_total" sum="Prochain total"/>
+                                        <field name="amount_subtotal" sum="Prochain total HT"/>
                                         <field name="last_invoicing_date"/>
                                         <field name="is_invoiceable" invisible="1"/>
                                         <field name="line_avenant_id" invisible="1"/>
