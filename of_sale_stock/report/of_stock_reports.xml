@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
+    <template id="of_report_picking" inherit_id="stock.report_picking">
+        <xpath expr="//table[@t-if='o.pack_operation_ids']/thead/tr" position="inside">
+            <th name="operation_state">
+                <strong>État</strong>
+            </th>
+        </xpath>
+        <xpath expr="//table[@t-if='o.pack_operation_ids']/tbody/tr" position="inside">
+            <td name="operation_state">
+                <span t-field="pack_operation.move_state"/>
+            </td>
+        </xpath>
+    </template>
+
     <template id="report_of_picking_preparation">
         <t t-call="report.html_container">
             <t t-set="docs" t-value="docs.with_context(of_report_name='Bon de préparation')"/>
