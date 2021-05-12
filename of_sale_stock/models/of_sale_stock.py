@@ -292,6 +292,7 @@ class PackOperation(models.Model):
 
     move_id = fields.Many2one('stock.move', related='linked_move_operation_ids.move_id', string='Move_id')
     move_name = fields.Char(related='move_id.name', string='Description')
+    move_state = fields.Selection(related='move_id.state', string=u"État")
 
 
 class ProductTemplate(models.Model):
