@@ -70,6 +70,7 @@ Bloquer l'utilisation de la récurrence sur le modèle `of.service` car les cont
         'data/of_contract_custom_data.xml',
         'security/of_contract_custom_security.xml',
         'security/ir.model.access.csv',
+        'views/account_views.xml',
         'views/of_better_zip_views.xml',
         'views/of_contract_custom_views.xml',
         'views/of_parc_installe_views.xml',

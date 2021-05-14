@@ -17,8 +17,21 @@ class OfAccountInvoice(models.Model):
     _inherit = "account.invoice"
 
     of_contract_id = fields.Many2one('of.contract', string="Contrat")
+    of_compute_contract_id = fields.Many2one(
+        'of.contract', string="Contrat", compute='_compute_contract_id', inverse='_inverse_contract_id',
+        help="Ce champ, s'il est rempli manuellement, n'aura pas d'incidence sur le contrat.")
     of_contract_period = fields.Char(string=u"Période du contrat", compute='_compute_of_contract_period')
     of_intervention_id = fields.Many2one('of.planning.intervention', string="RDV d'intervention")
+
+    @api.depends('of_contract_id')
+    def _compute_contract_id(self):
+        for invoice in self:
+            invoice.of_compute_contract_id = invoice.of_contract_id
+
+    @api.multi
+    def _inverse_contract_id(self):
+        for invoice in self:
+            invoice.of_contract_id = invoice.of_compute_contract_id
 
     @api.depends('of_contract_id', 'date_invoice', 'of_intervention_id')
     def _compute_of_contract_period(self):
