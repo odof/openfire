@@ -1454,13 +1454,15 @@ class OfProductKitLine(models.Model):
             client = supplier.of_datastore_connect()
             ds_kit_obj = supplier.of_datastore_get_model(client, 'of.product.kit.line')
 
-            # Donnees de la base fournisseur
+            # Données de la base fournisseur
             kits_data = supplier.of_datastore_read(ds_kit_obj, datastore_kit_ids[supplier.id], [])
             ds_product_ids = [kit['product_id'][0] for kit in kits_data]
 
             # Détection des composants du kit déjà importés
-            products = product_obj.search([('brand_id', 'in', supplier.brand_ids._ids),
-                                           ('of_datastore_res_id', 'in', ds_product_ids)])
+            # Attention de bien détecter les articles archivés (pourrait sinon provoquer des erreurs lors de l'import)
+            products = product_obj.with_context(active_test=False).search(
+                [('brand_id', 'in', supplier.brand_ids.ids),
+                 ('of_datastore_res_id', 'in', ds_product_ids)])
 
             product_match = {product.of_datastore_res_id: product.id for product in products}
             product_names = dict(products.name_get())
