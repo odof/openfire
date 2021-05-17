@@ -9,6 +9,10 @@
             <button name="reset_real_qty" position="attributes">
                 <attribute name="confirm">Voulez-vous réellement mettre les quantités à zéro ?</attribute>
             </button>
+            <xpath expr="//button[@name='reset_real_qty']" position="after">
+                <button name="create_missing_lines" states="confirm" string="⇒ Créer les lignes manquantes à 0" type="object" class="oe_link oe_right" groups="stock.group_stock_user"
+                        confirm="Voulez-vous réellement créer les lignes pour les articles en stock non présents dans cet inventaire ? Si oui, les lignes seront créées avec des quantités réelles à 0."/>
+            </xpath>
             <xpath expr="//field[@name='state']" position="before">
                 <button name="action_compile_lines" states="confirm" string="Compiler les lignes" type="object"/>
             </xpath>
