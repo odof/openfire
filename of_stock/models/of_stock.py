@@ -373,6 +373,43 @@ class Inventory(models.Model):
                     other_lines.unlink()
         return True
 
+    @api.multi
+    def create_missing_lines(self):
+        self.ensure_one()
+
+        locations = self.env['stock.location'].search([('id', 'child_of', [self.location_id.id])])
+        self.env.cr.execute(
+            """ SELECT      product_id
+                ,           sum(qty)        as product_qty
+                ,           location_id
+                ,           lot_id          as prod_lot_id
+                ,           package_id
+                ,           owner_id        as partner_id
+                FROM        stock_quant
+                WHERE       location_id     in %s
+                AND         company_id      = %s
+                GROUP BY    product_id
+                ,           location_id
+                ,           lot_id
+                ,           package_id
+                ,           partner_id
+            """, (tuple(locations.ids), self.company_id.id,))
+
+        vals = []
+        for product_data in self.env.cr.dictfetchall():
+            if product_data['product_qty'] != 0:
+                product_data['theoretical_qty'] = product_data['product_qty']
+                product_data['product_qty'] = 0.0
+                if product_data['product_id'] and \
+                        product_data['product_id'] not in self.line_ids.mapped('product_id').ids:
+                    product_data['product_uom_id'] = self.env['product.product'].browse(
+                        product_data['product_id']).uom_id.id
+                    vals.append(product_data)
+
+        if vals:
+            self.write({'line_ids': [(0, 0, line_values) for line_values in vals]})
+        return True
+
 
 class InventoryLine(models.Model):
     _inherit = "stock.inventory.line"
