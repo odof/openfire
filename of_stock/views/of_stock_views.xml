@@ -29,9 +29,13 @@
             </xpath>
             <xpath expr="//notebook//field[@name='line_ids']/tree/field[@name='prod_lot_id']" position="before">
                 <field name="of_product_tracking" invisible="1"/>
+                <field name="of_lot_serial_management"/>
             </xpath>
             <xpath expr="//notebook//field[@name='line_ids']/tree/field[@name='prod_lot_id']" position="attributes">
                 <attribute name="attrs">{'required': [('of_product_tracking', '!=', 'none')]}</attribute>
+            </xpath>
+            <xpath expr="//notebook//field[@name='line_ids']/tree/field[@name='product_qty']" position="after">
+                <field name="of_inventory_gap"/>
             </xpath>
             <!-- On retire la quantité théorique de l'affichage des lignes d'inventaire
                  pour des raisons de performance -->

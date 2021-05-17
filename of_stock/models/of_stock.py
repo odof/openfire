@@ -392,7 +392,23 @@ class InventoryLine(models.Model):
 
     of_note = fields.Text(string="Notes")
     of_theoretical_qty = fields.Float(string=u"Quantité théorique")
-    of_product_tracking = fields.Selection(related='product_id.tracking', string=u"Suiiv de l'article", readonly=True)
+    of_product_tracking = fields.Selection(related='product_id.tracking', string=u"Suivi de l'article", readonly=True)
+    of_lot_serial_management = fields.Boolean(
+        string=u"Géré par lot/num. de série", compute='_compute_of_lot_serial_management', store=True)
+    of_inventory_gap = fields.Float(string=u"Écart d'inventaire", compute='_compute_of_inventory_gap', store=True)
+
+    @api.depends('product_id', 'product_id.tracking')
+    def _compute_of_lot_serial_management(self):
+        for line in self:
+            if line.product_id and line.product_id.tracking != 'none':
+                line.of_lot_serial_management = True
+            else:
+                line.of_lot_serial_management = False
+
+    @api.depends('theoretical_qty', 'product_qty')
+    def _compute_of_inventory_gap(self):
+        for line in self:
+            line.of_inventory_gap = line.product_qty - line.theoretical_qty
 
     @api.multi
     def _write(self, vals):
