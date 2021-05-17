@@ -361,6 +361,55 @@ class Inventory(models.Model):
         self.post_inventory()
         return True
 
+    @api.multi
+    def action_compile_lines(self):
+        self.ensure_one()
+        for line in self.line_ids:
+            if line.exists() and not line.prod_lot_id and line.product_id.tracking == 'none':
+                other_lines = self.line_ids.filtered(
+                    lambda l: l.id != line.id and l.product_id == line.product_id and not l.prod_lot_id)
+                if other_lines:
+                    line.product_qty = line.product_qty + sum(other_lines.mapped('product_qty'))
+                    other_lines.unlink()
+        return True
+
+    @api.multi
+    def create_missing_lines(self):
+        self.ensure_one()
+
+        locations = self.env['stock.location'].search([('id', 'child_of', [self.location_id.id])])
+        self.env.cr.execute(
+            """ SELECT      product_id
+                ,           sum(qty)        as product_qty
+                ,           location_id
+                ,           lot_id          as prod_lot_id
+                ,           package_id
+                ,           owner_id        as partner_id
+                FROM        stock_quant
+                WHERE       location_id     in %s
+                AND         company_id      = %s
+                GROUP BY    product_id
+                ,           location_id
+                ,           lot_id
+                ,           package_id
+                ,           partner_id
+            """, (tuple(locations.ids), self.company_id.id,))
+
+        vals = []
+        for product_data in self.env.cr.dictfetchall():
+            if product_data['product_qty'] != 0:
+                product_data['theoretical_qty'] = product_data['product_qty']
+                product_data['product_qty'] = 0.0
+                if product_data['product_id'] and \
+                        product_data['product_id'] not in self.line_ids.mapped('product_id').ids:
+                    product_data['product_uom_id'] = self.env['product.product'].browse(
+                        product_data['product_id']).uom_id.id
+                    vals.append(product_data)
+
+        if vals:
+            self.write({'line_ids': [(0, 0, line_values) for line_values in vals]})
+        return True
+
 
 class InventoryLine(models.Model):
     _inherit = "stock.inventory.line"
@@ -380,6 +429,23 @@ class InventoryLine(models.Model):
 
     of_note = fields.Text(string="Notes")
     of_theoretical_qty = fields.Float(string=u"Quantité théorique")
+    of_product_tracking = fields.Selection(related='product_id.tracking', string=u"Suivi de l'article", readonly=True)
+    of_lot_serial_management = fields.Boolean(
+        string=u"Géré par lot/num. de série", compute='_compute_of_lot_serial_management', store=True)
+    of_inventory_gap = fields.Float(string=u"Écart d'inventaire", compute='_compute_of_inventory_gap', store=True)
+
+    @api.depends('product_id', 'product_id.tracking')
+    def _compute_of_lot_serial_management(self):
+        for line in self:
+            if line.product_id and line.product_id.tracking != 'none':
+                line.of_lot_serial_management = True
+            else:
+                line.of_lot_serial_management = False
+
+    @api.depends('theoretical_qty', 'product_qty')
+    def _compute_of_inventory_gap(self):
+        for line in self:
+            line.of_inventory_gap = line.product_qty - line.theoretical_qty
 
     @api.multi
     def _write(self, vals):

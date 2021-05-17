@@ -28,6 +28,7 @@ Paramètres de ventes
         "sale_stock",
         "of_sale",
         "of_product_brand",
+        'of_stock',
     ],
     "category": "OpenFire",
     "data": [
