@@ -28,7 +28,8 @@
                             <field name="campaign_id" attrs="{'invisible': [('opportunity_ids', '!=', [])]}"/>
                             <field name="source_id" attrs="{'invisible': [('opportunity_ids', '!=', [])]}"/>
                             <field name="medium_id" attrs="{'invisible': [('opportunity_ids', '!=', [])]}"/>
-                            <field name="opportunity_ids" invisible="1"/>
+                            <!-- /!\ Champ en readonly pour éviter des problèmes de on_change /!\ -->
+                            <field name="opportunity_ids" readonly="1" invisible="1"/>
                         </group>
                     </page>
                 </xpath>
