@@ -1729,6 +1729,7 @@ var PlanningRecord = Widget.extend({
         this.name = record.name;
         this.partner_name = record.partner_name;
         this.tache_name = record.tache_name;
+        this.name = record.name;
         this.state_int = record.state_int;
 
         if (record[this.view.resource].length > 1) {  // several attendees
@@ -2161,7 +2162,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
     init_filters: function() {
         var self = this;
 
-        var check_tab_names = ["client","tache","zip","city","secteur","heure_debut","heure_fin","duree","annule_reporte"];
+        var check_tab_names = ["name","client","tache","zip","city","secteur","heure_debut","heure_fin","duree","annule_reporte"];
         var check_tab_vals = new Array(9);
         var check_tab_defs = new Array(9);
         var dfd = $.Deferred();
@@ -2193,17 +2194,27 @@ PlanningView.SidebarInfoFilter = Widget.extend({
         $.when(check_tab_defs[7]).then(function(res){check_tab_vals[7] = isNullOrUndef(res) || res});
         check_tab_defs[8] = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_filter_" + check_tab_names[8], false]);
         $.when(check_tab_defs[8]).then(function(res){check_tab_vals[8] = isNullOrUndef(res) || res});
+        check_tab_defs[9] = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_filter_" + check_tab_names[9], false]);
+        $.when(check_tab_defs[9]).then(function(res){check_tab_vals[9] = isNullOrUndef(res) || res});
 
         $.when.apply($, check_tab_defs)
         .then(function () {
             // créer le dictionnaire utilisé pour le rendu et les events de click
             self.info_filters = {
+                "name": {
+                    "value": "name",
+                    "input_id": "name_input",
+                    "class": "of_planning_info_name",
+                    "label": "Libellé",
+                    "is_checked": check_tab_vals[0],
+                    "field_name_ir": "planningview_filter_name",
+                },
                 "client": {
                     "value": "client",
                     "input_id": "client_input",
                     "class": "of_planning_info_partner_name",
                     "label": "Client",
-                    "is_checked": check_tab_vals[0],
+                    "is_checked": check_tab_vals[1],
                     "field_name_ir": "planningview_filter_client",
                 },
                 "tache": {
@@ -2211,7 +2222,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                     "input_id": "tache_input",
                     "class": "of_planning_info_tache_name",
                     "label": "Tache",
-                    "is_checked": check_tab_vals[1],
+                    "is_checked": check_tab_vals[2],
                     "field_name_ir": "planningview_filter_tache",
                 },
                 "lieu": {
@@ -2219,7 +2230,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                     "input_id": "lieu_input",
                     "class": "of_planning_info_lieu",
                     "label": "Lieu",
-                    "is_checked": check_tab_vals[2] || check_tab_vals[3] || check_tab_vals[4],
+                    "is_checked": check_tab_vals[3] || check_tab_vals[4] || check_tab_vals[5],
                     "child_filters_visible": (local_storage.getItem('planningview_info_filters_visible_lieu') == 'true'),
                     "child_filters": {
                         "zip": {
@@ -2227,7 +2238,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                             "input_id": "lieu-zip_input",
                             "class": "of_planning_subinfo_zip",
                             "label": "Code postal",
-                            "is_checked": check_tab_vals[2],
+                            "is_checked": check_tab_vals[3],
                             "field_name_ir": "planningview_filter_zip",
                         },
                         "city": {
@@ -2235,7 +2246,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                             "input_id": "lieu-city_input",
                             "class": "of_planning_subinfo_city",
                             "label": "Ville",
-                            "is_checked": check_tab_vals[3],
+                            "is_checked": check_tab_vals[4],
                             "field_name_ir": "planningview_filter_city",
                         },
                         "secteur": {
@@ -2243,7 +2254,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                             "input_id": "lieu-secteur_input",
                             "class": "of_planning_subinfo_secteur",
                             "label": "Secteur",
-                            "is_checked": check_tab_vals[4],
+                            "is_checked": check_tab_vals[5],
                             "field_name_ir": "planningview_filter_secteur",
                         },
                     },
@@ -2253,7 +2264,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                     "input_id": "heures_input",
                     "class": "of_planning_info_heures",
                     "label": "Heures / Durées",
-                    "is_checked": check_tab_vals[7] || check_tab_vals[5] || check_tab_vals[6],
+                    "is_checked": check_tab_vals[6] || check_tab_vals[7] || check_tab_vals[8],
                     "child_filters_visible": (local_storage.getItem('planningview_info_filters_visible_heures') == 'true'),
                     "child_filters": {
                         "heure_debut": {
@@ -2261,7 +2272,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                             "input_id": "heures-heure_debut_input",
                             "class": "of_planning_subinfo_heure_debut",
                             "label": "Heure de début",
-                            "is_checked": check_tab_vals[5],
+                            "is_checked": check_tab_vals[6],
                             "field_name_ir": "planningview_filter_heure_debut",
                         },
                         "heure_fin": {
@@ -2269,7 +2280,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                             "input_id": "heures-heure_fin_input",
                             "class": "of_planning_subinfo_heure_fin",
                             "label": "Heure de fin",
-                            "is_checked": check_tab_vals[6],
+                            "is_checked": check_tab_vals[7],
                             "field_name_ir": "planningview_filter_heure_fin",
                         },
                         "duree": {
@@ -2277,7 +2288,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                             "input_id": "heures-duree_input",
                             "class": "of_planning_subinfo_duree",
                             "label": "Durée",
-                            "is_checked": check_tab_vals[7],
+                            "is_checked": check_tab_vals[8],
                             "field_name_ir": "planningview_filter_duree",
                         },
                     },
@@ -2287,7 +2298,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                     "input_id": "annule_reporte_input",
                     "class": "of_planning_info_annule_reporte",
                     "label": "Annulé / Reporté",
-                    "is_checked": check_tab_vals[8],
+                    "is_checked": check_tab_vals[9],
                     "field_name_ir": "planningview_filter_annule_reporte",
                     "separated": true,
                 },
