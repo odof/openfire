@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Configuration modèle de devis : vue formulaire -->
+    <record id="view_sale_quote_template_form_inh_questionnaire" model="ir.ui.view">
+        <field name="name">sale.quote.template.form.inh.questionnaire.quote.template</field>
+        <field name="model">sale.quote.template</field>
+        <field name="inherit_id" ref="of_sale_quote_template.view_sale_quote_template_form"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_payment_term_id']" position="after">
+                <field name="of_intervention_template_id"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Questionnaire" name="questionnaire"
+                      attrs="{'invisible': [('of_questionnaire_id', '=', False)]}">
+                    <group>
+                        <field name="of_questionnaire_id"/>
+                    </group>
+                    <field name="of_question_ids" nolabel="1"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
