@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_report_file_user,access.of.report.file.user,model_of_report_file,base.group_user,1,0,0,0
+access_of_report_file_manager,access.of.report.file.manager,model_of_report_file,base.group_system,1,1,1,1
+access_of_report_file_line_user,access.of.report.file.line.user,model_of_report_file_line,base.group_user,1,0,0,0
+access_of_report_file_line_manager,access.of.report.file.line.manager,model_of_report_file_line,base.group_system,1,1,1,1
