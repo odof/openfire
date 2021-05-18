@@ -10,13 +10,18 @@
                 <attribute name="invisible">0</attribute>
             </xpath>
             <xpath expr="//page[@name='marketing']/group" position="inside">
-                <group name="referred" string="Parrainage">
+                <group name="referree" string="Données Filleul">
                     <field name="of_referred_id" attrs="{'required': [('of_referred_date', '!=', False)]}" context="{'of_referred': True}"/>
                     <field name="of_referred_date" attrs="{'required': [('of_referred_id', '!=', False)]}"/>
                     <field name="of_referred_reward_id" widget="selection"/>
+                    <field name="of_referred_reward_date"/>
                     <field name="of_referred_note"/>
                     <field name="of_referred_reward_state"/>
-                    <field name="of_referred_reward_date"/>
+                </group>
+                <group name="referred" string="Données Parrain">
+                    <field name="of_referee_count"/>
+                    <field name="of_referee_partner_ids" invisible="1"/>
+                    <field name="of_referee_date"/>
                 </group>
             </xpath>
         </field>
