@@ -27,7 +27,9 @@ class UtmSource(models.Model):
 class UtmMixin(models.AbstractModel):
     _inherit = 'utm.mixin'
 
-    source_id = fields.Many2one(domain="[('medium_id', '=', medium_id)]")
+    campaign_id = fields.Many2one(string=u"Campagne")
+    medium_id = fields.Many2one(string=u"Canal")
+    source_id = fields.Many2one(string=u"Source", domain="[('medium_id', '=', medium_id)]")
 
     @api.onchange('medium_id')
     def _onchange_medium_id(self):
