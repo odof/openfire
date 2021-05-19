@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
+from odoo import models, fields, api, _, SUPERUSER_ID
 from odoo.exceptions import UserError
 
 
@@ -145,7 +145,7 @@ class OfAccountPaymentBankDeposit(models.Model):
                 rec.move_id.line_ids.remove_move_reconcile()
                 move_id = rec.move_id
                 rec.move_id = False
-                move_id.button_cancel()
+                move_id.with_context(of_cancel_payment_bank_deposit=True).button_cancel()
                 move_id.unlink()
             rec.state = 'draft'
         return True
@@ -221,6 +221,7 @@ class AccountJournal(models.Model):
     of_bank_deposit_group_move = fields.Boolean(
         string=u"Grouper les écritures par compte lors d'une remise en banque", default=True)
     of_allow_bank_deposit = fields.Boolean(string=u"Autoriser les remises en banque")
+    of_cancel_moves = fields.Boolean(string=u"Autoriser l'annulation d'écritures (banque)")
 
     @api.onchange('type')
     def _onchange_type(self):
@@ -229,3 +230,85 @@ class AccountJournal(models.Model):
             self.of_allow_bank_deposit = True
         else:
             self.of_allow_bank_deposit = False
+        self.update_posted = self.type in ('purchase', 'cash', 'bank', 'general')
+        self.of_cancel_moves = False
+
+    @api.onchange('update_posted')
+    def _onchange_update_posted(self):
+        if not self.update_posted:
+            self.of_cancel_moves = False
+
+    @api.onchange('of_allow_bank_deposit')
+    def _onchange_of_allow_bank_deposit(self):
+        self.update_posted = self.of_allow_bank_deposit
+
+    @api.onchange('of_cancel_moves')
+    def _onchange_of_cancel_moves(self):
+        if self.of_cancel_moves:
+            self.update_posted = True
+
+    @api.multi
+    def of_check_edit_updateable(self, vals):
+        u"""
+        Annule et remplace la fonction définie dans of_account.
+        """
+        if self._uid == SUPERUSER_ID:
+            # L'admin a tous les droits. Pas d'erreur, on laisse les paramètres choisis.
+            return False, {}
+        error_msg = u"Vous ne pouvez pas autoriser la modification des écritures comptables sur un journal de ce type"
+        error = False
+        force_vals = {}
+        if vals.get('of_cancel_moves'):
+            # Ce champ ne peut jamais être forcé à vrai par un utilisateur autre que l'admin.
+            error = True
+        elif vals.get('update_posted'):
+            # Modification manuelle de l'utilisateur.
+            # Normalement, un readonly empêche de faire n'importe quoi.
+            # Les tests suivants permettent d'éviter qu'un utilisateur passe outre ce readonly.
+
+            # Séparation des journaux par type
+            type_journals = {}
+            if 'type' in vals:
+                type_journals[vals['type']] = self
+            elif self:
+                default_journal = self.env['account.journal']
+                for journal in self:
+                    type_journals[journal.type] = type_journals.get(journal.type, default_journal) | journal
+            else:
+                type_journals[self.default_get(['type'])['type']] = self
+
+            if 'sale' in type_journals:
+                # Interdiction d'annuler les écritures pour un journal de ventes
+                error = True
+            elif 'bank' in type_journals or 'cash' in type_journals:
+                # Un journal de banque/liquidités ne peut autoriser l'annulation d'écritures que si il autorise
+                # la remise en banque. Dans ce cas, c'est le champ of_cancel_moves qui prendra le relai pour interdire
+                # l'annulation des écritures de paiements.
+                if 'of_allow_bank_deposit' in vals:
+                    error = not vals['of_allow_bank_deposit']
+                elif self:
+                    error = self.filtered(lambda o: not o.of_allow_bank_deposit)
+                else:
+                    error = not self.default_get(['of_allow_bank_deposit'])['of_allow_bank_deposit']
+        elif 'type' in vals:
+            # Lors du changement de type d'un journal, le champ update_posted peut être à vrai
+            #   et ne pas réussir à passer à faux car le champ est devenu readonly.
+            # On s'assure donc de forcer cette valeur
+            force = False
+            if vals['type'] == 'sale':
+                force = True
+            elif vals['type'] in ('bank', 'cash'):
+                force_vals['of_cancel_moves'] = False
+                if 'of_allow_bank_deposit' in vals:
+                    force = not vals['of_allow_bank_deposit']
+                elif self:
+                    force = self.filtered(lambda o: not o.of_allow_bank_deposit)
+                else:
+                    force = not self.default_get(['of_allow_bank_deposit'])['of_allow_bank_deposit']
+            if force:
+                force_vals['update_posted'] = False
+        elif 'of_allow_bank_deposit' in vals:
+            force_vals['of_cancel_moves'] = False
+            if not vals['of_allow_bank_deposit']:
+                force_vals['update_posted'] = False
+        return error and error_msg or "", force_vals

@@ -249,4 +249,20 @@
         </field>
     </record>
 
+    <!-- Account journal form view -->
+    <record id="of_account_journal_form_view" model="ir.ui.view">
+        <field name="name">account.journal.form</field>
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="account_cancel.view_account_journal_form_inherit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='update_posted']" position="before">
+                <field name="of_is_current_user_admin" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='update_posted']" position="attributes">
+                <attribute name="groups"></attribute>
+                <attribute name="attrs">{'invisible':[('of_is_current_user_admin','=',False),('type','in',('sale','cash','bank'))]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
