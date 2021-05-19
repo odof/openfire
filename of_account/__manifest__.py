@@ -25,6 +25,7 @@ Module de comptabilité OpenFire.
 """,
     'depends': [
         'account',
+        'account_cancel',
         'of_base',
     ],
     'demo_xml': [],

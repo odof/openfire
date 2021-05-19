@@ -59,6 +59,8 @@ class SaleAdvancePaymentInv(models.TransientModel):
         if self.advance_payment_method == 'percentage':
             # Le pourcentage doit s'appliquer sur le TTC et non sur le HT
             amount = self.amount
+            if amount > 100:
+                raise UserError(u"Vous ne pouvez pas faire un acompte d'un montant supérieur à celui de la commande.")
             sale_orders = self.env['sale.order'].browse(self._context.get('active_ids', []))
             for order in sale_orders:
                 self.amount = amount * order.amount_total / order.amount_untaxed

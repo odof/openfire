@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
 
         <!-- Payment deposits -->
 
@@ -135,17 +134,38 @@
             />
 
         <!-- Journal Form View -->
-        <record id="of_account_payment_bank_deposit_journal_form_view" model="ir.ui.view">
-            <field name="name">of.account.payment.bank.deposit.journal.form.view</field>
-            <field name="model">account.journal</field>
-            <field name="inherit_id" ref="account.view_account_journal_form"/>
-            <field name="arch" type="xml">
-                <field name="outbound_payment_method_ids" position="after">
-                    <field name="of_allow_bank_deposit" attrs="{'invisible': [('type', 'not in', ['cash', 'bank'])]}"/>
-                    <field name="of_bank_deposit_group_move" attrs="{'invisible': [('of_allow_bank_deposit', '=', False)]}"/>
-                </field>
-             </field>
-        </record>
+    <!-- Account journal form view -->
+    <record id="of_account_payment_bank_deposit_journal_form_view" model="ir.ui.view">
+        <field name="name">of.account.payment.bank.deposit.journal.form.view</field>
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="of_account.of_account_journal_form_view"/>
+        <field name="arch" type="xml">
+            <field name="outbound_payment_method_ids" position="after">
+                <field name="of_allow_bank_deposit" attrs="{'invisible': [('type', 'not in', ['cash', 'bank'])]}"/>
+                <field name="of_bank_deposit_group_move" attrs="{'invisible': [('of_allow_bank_deposit', '=', False)]}"/>
+            </field>
+            <xpath expr="//field[@name='update_posted']" position="before">
+                <div name="update_posted_label" class="o_td_label">
+                    <label for="update_posted"
+                           attrs="{'invisible':['|',('type','not in',('bank','cash')),('of_allow_bank_deposit','=',False)]}"
+                           string="Autoriser l'annulation des remises en banque"/>
+                    <label for="update_posted"
+                           attrs="{'invisible':['|','&amp;',('type','in',('bank','cash')),('of_allow_bank_deposit','=',True),
+                                                    '&amp;',('type','in',('sale','bank','cash')),('of_is_current_user_admin','=',False)]}"/>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='update_posted']" position="attributes">
+                <attribute name="nolabel">1</attribute>
+                <attribute name="attrs">
+                    {'invisible':[('of_is_current_user_admin','=',False),'|',('type','=','sale'),'&amp;',('type','in',('bank','cash')),('of_allow_bank_deposit','=',False)]}
+                </attribute>
+                <attribute name="style">padding-left:8px;</attribute>
+            </xpath>
+            <xpath expr="//field[@name='update_posted']" position="after">
+                <field name="of_cancel_moves"
+                       attrs="{'invisible':['|',('of_is_current_user_admin','=',False),('of_allow_bank_deposit','!=',True)]}"/>
+            </xpath>
+        </field>
+    </record>
 
-    </data>
 </odoo>

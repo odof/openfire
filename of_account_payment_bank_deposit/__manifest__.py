@@ -17,8 +17,8 @@ Fonctionnalités
 - Permettre l'impression de bordereaux de remise en banque
 
 """,
-    'depends' : [
-        'account',
+    'depends': [
+        'of_account',
     ],
     'data' : [
         'views/of_account_payment_bank_deposit_view.xml',
