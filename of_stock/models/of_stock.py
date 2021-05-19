@@ -442,10 +442,10 @@ class InventoryLine(models.Model):
             else:
                 line.of_lot_serial_management = False
 
-    @api.depends('theoretical_qty', 'product_qty')
+    @api.depends('of_theoretical_qty', 'product_qty')
     def _compute_of_inventory_gap(self):
         for line in self:
-            line.of_inventory_gap = line.product_qty - line.theoretical_qty
+            line.of_inventory_gap = line.product_qty - line.of_theoretical_qty
 
     @api.multi
     def _write(self, vals):
@@ -549,7 +549,7 @@ class InventoryLine(models.Model):
     def _compute_theoretical_qty(self):
         if not self.env['ir.values'].get_default('stock.config.settings', 'of_forcer_date_inventaire'):
             return super(InventoryLine, self)._compute_theoretical_qty()
-        theoretical_qty = sum([x.quantity for x in self.of_get_stock_history()])
+        theoretical_qty = self.of_get_stock_history()[0]
         if theoretical_qty and self.product_uom_id and self.product_id.uom_id != self.product_uom_id:
             theoretical_qty = self.product_id.uom_id._compute_quantity(theoretical_qty, self.product_uom_id)
         self.theoretical_qty = theoretical_qty
@@ -563,13 +563,91 @@ class InventoryLine(models.Model):
             self.of_theoretical_qty = line.theoretical_qty
 
     def of_get_stock_history(self):
-        # :TODO: Ajouter des filtres pour les champs lot_id, partner_id, package_id ?
-        #        Remplacer l'appel à cette fonction requête SQL plus rapide n'utilisant pas stock_history
-        return self.env['stock.history'].search(
-            [('company_id', '=', self.inventory_id.company_id.id),
-             ('location_id', '=', self.location_id.id),
-             ('product_id', '=', self.product_id.id),
-             ('date', '<=', self.inventory_id.date)])
+        if not self.product_id:
+            return [0.0, 0.0]
+        in_move_request = """
+            SELECT  SQ.qty                      AS quantity
+            ,       SQ.cost                     AS cost
+            FROM    stock_quant                 SQ
+            ,       stock_quant_move_rel        SQMR
+            ,       stock_move                  SM
+            ,       stock_location              SL1
+            ,       stock_location              SL2
+            ,       product_product             PP
+            WHERE   SQMR.quant_id               = SQ.id
+            AND     SM.id                       = SQMR.move_id
+            AND     SM.location_dest_id         = SL1.id
+            AND     SM.location_id              = SL2.id
+            AND     PP.id                       = SM.product_id
+            AND     SQ.qty                      > 0
+            AND     SM.state                    = 'done'
+            AND     SL1.usage                   IN ('internal', 'transit')
+            AND     (NOT    (   SL2.company_id  IS NULL
+                            AND SL1.company_id  IS NULL
+                            )
+                    OR      SL2.company_id      != SL1.company_id
+                    OR      SL2.usage           NOT IN ('internal', 'transit')
+                    )
+            AND     SM.date                     <= %s
+            AND     SL1.id                      = %s
+            AND     PP.id                       = %s
+        """
+        out_move_request = """
+            SELECT  -SQ.qty                     AS quantity
+            ,       SQ.cost                     AS cost
+            FROM    stock_quant                 SQ
+            ,       stock_quant_move_rel        SQMR
+            ,       stock_move                  SM
+            ,       stock_location              SL1
+            ,       stock_location              SL2
+            ,       product_product             PP
+            WHERE   SQMR.quant_id               = SQ.id
+            AND     SM.id                       = SQMR.move_id
+            AND     SM.location_dest_id         = SL1.id
+            AND     SM.location_id              = SL2.id
+            AND     PP.id                       = SM.product_id
+            AND     SQ.qty                      > 0
+            AND     SM.state                    = 'done'
+            AND     SL2.usage                   IN ('internal', 'transit')
+            AND     (NOT    (   SL2.company_id  IS NULL
+                            AND SL1.company_id  IS NULL
+                            )
+                    OR      SL2.company_id      != SL1.company_id
+                    OR      SL1.usage           NOT IN ('internal', 'transit')
+                    )
+            AND     SM.date                     <= %s
+            AND     SL2.id                      = %s
+            AND     PP.id                       = %s
+        """
+
+        if self.prod_lot_id:
+            in_move_request += """
+            AND     SQ.lot_id                   = %s
+            """ % self.prod_lot_id.id
+            out_move_request += """
+            AND     SQ.lot_id                   = %s
+            """ % self.prod_lot_id.id
+        else:
+            in_move_request += """
+            AND     SQ.lot_id                   IS NULL
+            """
+            out_move_request += """
+            AND     SQ.lot_id                   IS NULL
+            """
+
+        self.env.cr.execute(
+            """
+                SELECT  SUM(quantity)
+                ,       SUM(quantity * cost)
+                FROM    (
+                        %s
+                        UNION ALL
+                        %s
+                        )                       AS FOO
+            """ % (in_move_request, out_move_request),
+            (self.inventory_id.date, self.location_id.id, self.product_id.id,
+             self.inventory_id.date, self.location_id.id, self.product_id.id,))
+        return self.env.cr.fetchone()
 
 
 class StockConfigSettings(models.TransientModel):

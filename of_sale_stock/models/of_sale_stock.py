@@ -43,13 +43,17 @@ class StockInventoryLine(models.Model):
     @api.depends('product_value_unit', 'product_qty')
     def _compute_product_value(self):
         if self.env.user.has_group('of_sale_stock.group_of_inventory_real_value'):
-            for line in self:
-                line.product_value = sum([x.cost * x.qty for x in line._get_quants()])
+            if not self.env['ir.values'].get_default('stock.config.settings', 'of_forcer_date_inventaire'):
+                for line in self:
+                    line.product_value = sum([x.qty * x.cost for x in line._get_quants()])
+            else:
+                for line in self:
+                    line.product_value = line.of_get_stock_history()[1]
         else:
             for line in self:
                 line.product_value = line.product_value_unit * line.product_qty
 
-    @api.onchange('product_id', 'product_uom_id')
+    @api.onchange('product_id')
     def _onchange_product_id(self):
         if self.product_id:
             self.product_value_unit = self.product_id.standard_price
