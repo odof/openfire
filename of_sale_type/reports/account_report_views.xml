@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_order_type_account_invoice_report_search_view" model="ir.ui.view">
+        <field name="name">of.sale.order.type.account.invoice.report.search.view</field>
+        <field name="model">account.invoice.report</field>
+        <field name="inherit_id" ref="account.view_account_invoice_report_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@expand='1']/separator" position="before">
+                <field string="Sale order type" name="of_sale_type_id" context="{'group_by' : 'of_sale_type_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

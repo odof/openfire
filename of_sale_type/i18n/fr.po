@@ -1,0 +1,56 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_sale_type
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-05-19 14:17+0000\n"
+"PO-Revision-Date: 2021-05-19 14:17+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_sale_type
+#: model:ir.model.fields,field_description:of_sale_type.field_of_sale_type_name
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_sale_type
+#: model:ir.model,name:of_sale_type.model_of_sale_type
+#: model:ir.ui.view,arch_db:of_sale_type.of_sale_type_form_view
+#: model:ir.ui.view,arch_db:of_sale_type.of_sale_type_tree_view
+msgid "Sale Order Type"
+msgstr "Type de devis"
+
+#. module: of_sale_type
+#: model:ir.actions.act_window,name:of_sale_type.of_sale_type_action
+msgid "Sale Order Type Action"
+msgstr "Type de devis"
+
+#. module: of_sale_type
+#: model:ir.model.fields,field_description:of_sale_type.field_account_invoice_of_sale_type_id
+#: model:ir.model.fields,field_description:of_sale_type.field_account_invoice_report_of_sale_type_id
+#: model:ir.model.fields,field_description:of_sale_type.field_sale_order_of_sale_type_id
+#: model:ir.model.fields,field_description:of_sale_type.field_sale_quote_template_of_sale_type_id
+#: model:ir.model.fields,field_description:of_sale_type.field_sale_report_of_sale_type_id
+#: model:ir.ui.menu,name:of_sale_type.menu_of_sale_type
+#: model:ir.ui.view,arch_db:of_sale_type.of_sale_type_account_invoice_report_search_view
+#: model:ir.ui.view,arch_db:of_sale_type.of_sale_type_order_product_search_view
+msgid "Sale order type"
+msgstr "Type de devis"
+
+#. module: of_sale_type
+#: model:ir.ui.view,arch_db:of_sale_type.of_sale_type_search_view
+msgid "Search Sale Order Type"
+msgstr "Rechercher type de devis"
+
+#. module: of_sale_type
+#: model:ir.model.fields,field_description:of_sale_type.field_of_sale_type_sequence
+msgid "Sequence"
+msgstr "Séquence"
+

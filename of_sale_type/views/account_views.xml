@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- ############################### ACCOUNT INVOICE ################################ -->
+
+    <record id="of_sale_type_account_invoice_form_view" model="ir.ui.view">
+        <field name="name">of.sale.type.account.invoice.form.view</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='other_info']//field[@name='origin']" position="after">
+                <field name="of_sale_type_id" />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
