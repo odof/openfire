@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- of.planning.tag -->
+        <!-- RDV a été dupliqué -->
+        <record id="of_planning_tournee_planning_tag_duplique" model="of.planning.tag">
+            <field name="name">Dupliqué</field>
+            <field name="color">0</field>
+        </record>
+        <!-- RDV est une duplication d'un autre RDV -->
+        <record id="of_planning_tournee_planning_tag_cree_par_duplication" model="of.planning.tag">
+            <field name="name">Créé par duplication</field>
+            <field name="color">0</field>
+        </record>
+        <!-- RDV est une duplication d'un autre RDV et est en alerte -->
+        <record id="of_planning_tournee_planning_tag_alerte_duplication" model="of.planning.tag">
+            <field name="name">Alerte duplication</field>
+            <field name="color">0</field>
+        </record>
+
+    </data>
+</odoo>

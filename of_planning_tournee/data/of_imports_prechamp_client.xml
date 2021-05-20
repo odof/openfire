@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <openerp>
     <data noupdate="1">
-    
+
         <record id="of_imports_prechp_client_service" model="of.imports.prechp">
             <field name="type_imp" ref="of_imports.of_imports_struct_type_client"/>
             <field name="name">Service</field>
@@ -10,7 +10,7 @@
             <field name="imp" eval="True"></field>
             <field name="type">sp</field>
         </record>
-        
+
         <record id="of_imports_prechp_client_contrat" model="of.imports.prechp">
             <field name="type_imp" ref="of_imports.of_imports_struct_type_client"/>
             <field name="name">Contrat</field>
@@ -19,7 +19,7 @@
             <field name="imp" eval="True"></field>
             <field name="type">sp</field>
         </record>
-        
+
         <record id="of_imports_prechp_client_mois1" model="of.imports.prechp">
             <field name="type_imp" ref="of_imports.of_imports_struct_type_client"/>
             <field name="name">Mois1</field>
@@ -28,7 +28,7 @@
             <field name="imp" eval="True"></field>
             <field name="type">sp</field>
         </record>
-        
+
         <record id="of_imports_prechp_client_mois2" model="of.imports.prechp">
             <field name="type_imp" ref="of_imports.of_imports_struct_type_client"/>
             <field name="name">Mois2</field>
