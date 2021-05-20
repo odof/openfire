@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- OF Sale Forecast Report Views -->
+
+    <record id="of_sale_forecast_report_pivot_view" model="ir.ui.view">
+        <field name="name">of.sale.forecast.report.pivot.view</field>
+        <field name="model">of.sale.forecast.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Rapport prévisions de vente" disable_linking="True">
+                <field name="company_id" type="col"/>
+                <field name="date" interval="month" type="col"/>
+                <field name="brand_id" type="row"/>
+                <field name="categ_id" type="row"/>
+                <field name="product_id" type="row"/>
+                <field name="quantity" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="of_sale_forecast_report_search_view" model="ir.ui.view">
+        <field name="name">of.sale.forecast.report.search.view</field>
+        <field name="model">of.sale.forecast.report</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="company_id"/>
+                <field name="warehouse_id"/>
+                <field name="brand_id"/>
+                <field name="categ_id"/>
+                <field name="product_id"/>
+                <filter string="Année en cours" name="this_year"
+                        domain="[('date', u'&gt;=', context_today().strftime('%Y-01-01')),
+                                 ('date', u'&lt;=', context_today().strftime('%Y-12-31'))]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_sale_forecast_report_action" model="ir.actions.act_window">
+        <field name="name">Rapport prévisions de vente</field>
+        <field name="res_model">of.sale.forecast.report</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">pivot</field>
+        <field name="context">{'search_default_this_year': 1}</field>
+        <field name="domain">[]</field>
+    </record>
+
+    <menuitem
+        id="of_sale_forecast_report_menu"
+        name="Prévisions de vente"
+        groups="sales_team.group_sale_salesman"
+        parent="sales_team.menu_sale_report"
+        action="of_sale_forecast_report_action"
+        sequence="15"/>
+
+</odoo>
