@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_sale_forecast_manager,access.of.sale.forecast.manager,model_of_sale_forecast,sales_team.group_sale_manager,1,1,1,1
+access_of_sale_forecast_user,access.of.sale.forecast.user,model_of_sale_forecast,base.group_user,1,0,0,0
+access_of_sale_forecast_overview_line_manager,access.of.sale.forecast.overview.line.manager,model_of_sale_forecast_overview_line,sales_team.group_sale_manager,1,1,1,1
+access_of_sale_forecast_overview_line_user,access.of.sale.forecast.overview.line.user,model_of_sale_forecast_overview_line,base.group_user,1,0,0,0
+access_of_sale_forecast_forecast_line_manager,access.of.sale.forecast.forecast.line.manager,model_of_sale_forecast_forecast_line,sales_team.group_sale_manager,1,1,1,1
+access_of_sale_forecast_forecast_line_user,access.of.sale.forecast.forecast.line.user,model_of_sale_forecast_forecast_line,base.group_user,1,0,0,0
+access_of_sale_forecast_report_user,access.of.sale.forecast.report.user,model_of_sale_forecast_report,base.group_user,1,0,0,0

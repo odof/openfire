@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- OF Sale Forecast Wizard Views -->
+
+    <record id="of_sale_forecast_wizard_form_view" model="ir.ui.view">
+        <field name="name">of.sale.forecast.wizard.form.view</field>
+        <field name="model">of.sale.forecast.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="brand_id"/>
+                        <field name="categ_id"/>
+                        <field name="company_id"/>
+                        <field name="warehouse_id"/>
+                    </group>
+                    <group>
+                        <field name="forecast_date"/>
+                        <field name="forecast_method"/>
+                        <field name="forecast_method_value" attrs="{'invisible': [('forecast_method', '!=', 'evol_n_1')]}"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="Générer" name="forecast_generation" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sale_forecast_wizard_action" model="ir.actions.act_window">
+        <field name="name">Générer les prévisions de vente</field>
+        <field name="res_model">of.sale.forecast.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_sale_forecast_wizard_form_view"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="of_sale_forecast_wizard_menu"
+              name="Générer les prévisions de vente"
+              action="of_sale_forecast_wizard_action"
+              parent="of_gesdoc.menu_sales_actions"
+              groups="sales_team.group_sale_manager"
+              sequence="20"/>
+
+</odoo>

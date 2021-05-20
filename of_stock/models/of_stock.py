@@ -681,6 +681,13 @@ class StockMove(models.Model):
             vals.pop('date')
         return super(StockMove, self).write(vals)
 
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        if self._context.get('of_to_date_expected', False):
+            domain += [('date_expected', '<=', self._context.get('of_to_date_expected'))]
+        return super(StockMove, self).read_group(
+            domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
+
 
 class StockQuant(models.Model):
     _inherit = 'stock.quant'
@@ -708,3 +715,19 @@ class ProductTemplate(models.Model):
                 rec.of_lot_serial_management = True
             else:
                 rec.of_lot_serial_management = False
+
+
+class StockWarehouseOrderpoint(models.Model):
+    _inherit = 'stock.warehouse.orderpoint'
+
+    of_forecast_limit = fields.Boolean(
+        string=u"Limite de prévision", help=u"Permet de définir une date limite pour les réapprovisionnements.")
+    of_forecast_period = fields.Integer(
+        string=u"Période de prévision", help=u"Nombre de jours pour définir la date limite.\n"
+                                             u"Ex : 30 jour(s), ne prend en compte que les mouvements de stock jusqu'"
+                                             u"à J+30 pour décider de créer un nouvel approvisionnement.")
+
+    @api.onchange('of_forecast_limit')
+    def onchange_of_forecast_limit(self):
+        if not self.of_forecast_limit:
+            self.of_forecast_period = 0
