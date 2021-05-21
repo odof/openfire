@@ -113,6 +113,9 @@
             <xpath expr="//field[@name='line_ids']" position="attributes">
                 <attribute name="context">{'line_ids': line_ids, 'journal_id': journal_id, 'default_name': ref}</attribute>
             </xpath>
+            <xpath expr="//field[@name='line_ids']/tree/field[@name='credit']" position="after">
+                <field name="balance" sum="Balance totale"/>
+            </xpath>
         </field>
     </record>
 
