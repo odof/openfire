@@ -429,18 +429,9 @@ class InventoryLine(models.Model):
 
     of_note = fields.Text(string="Notes")
     of_theoretical_qty = fields.Float(string=u"Quantité théorique")
-    of_product_tracking = fields.Selection(related='product_id.tracking', string=u"Suivi de l'article", readonly=True)
-    of_lot_serial_management = fields.Boolean(
-        string=u"Géré par lot/num. de série", compute='_compute_of_lot_serial_management', store=True)
+    of_product_lot_serial_management = fields.Boolean(
+        related='product_id.of_lot_serial_management', string=u"Géré par lot/num. de série", readonly=True)
     of_inventory_gap = fields.Float(string=u"Écart d'inventaire", compute='_compute_of_inventory_gap', store=True)
-
-    @api.depends('product_id', 'product_id.tracking')
-    def _compute_of_lot_serial_management(self):
-        for line in self:
-            if line.product_id and line.product_id.tracking != 'none':
-                line.of_lot_serial_management = True
-            else:
-                line.of_lot_serial_management = False
 
     @api.depends('of_theoretical_qty', 'product_qty')
     def _compute_of_inventory_gap(self):
@@ -698,3 +689,18 @@ class StockQuant(models.Model):
 
         return super(StockQuant, self)._quants_get_reservation_domain(
             move, pack_operation_id, lot_id, company_id, initial_domain)
+
+
+class ProductTemplate(models.Model):
+    _inherit = 'product.template'
+
+    of_lot_serial_management = fields.Boolean(
+        string=u"Géré par lot/num. de série", compute='_compute_of_lot_serial_management', store=True)
+
+    @api.depends('tracking')
+    def _compute_of_lot_serial_management(self):
+        for rec in self:
+            if rec.tracking != 'none':
+                rec.of_lot_serial_management = True
+            else:
+                rec.of_lot_serial_management = False
