@@ -365,7 +365,7 @@ class AccountMoveLine(models.Model):
                         (line.account_id.code, line.account_id.name))
                 values[0].write({'account_id': vals['account_id']})
 
-        super(AccountMoveLine, self).write(vals)
+        return super(AccountMoveLine, self).write(vals)
 
 
 class AccountMove(models.Model):
