@@ -10,6 +10,7 @@
         <field name="domain">[('type','in',('out_invoice', 'out_refund')), ('of_boutique', '=', True)]</field>
         <field name="context">{'type':'out_invoice', 'journal_type': 'sale',
                                'default_of_boutique': True, 'of_boutique': True,
+                               'tree_view_ref':'account.invoice_tree',
                                'form_view_ref': 'of_account_boutique.of_account_boutique_invoice_form'}</field>
         <field name="search_view_id" ref="account.view_account_invoice_filter"/>
         <field name="help" type="html">
