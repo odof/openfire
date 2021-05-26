@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- OF Worktop Configurator Material Views -->
+
+    <record id="of_worktop_configurator_material_tree_view" model="ir.ui.view">
+        <field name="name">of.worktop.configurator.material.tree.view</field>
+        <field name="model">of.worktop.configurator.material</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence"/>
+                <field name="name"/>
+                <field name="unit_weight"/>
+                <field name="cut_to_size_coeff"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_worktop_configurator_material_action" model="ir.actions.act_window">
+        <field name="name">Matériaux</field>
+        <field name="res_model">of.worktop.configurator.material</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_worktop_configurator_material_tree_view"/>
+    </record>
+
+    <!-- OF Worktop Configurator Finishing Views -->
+
+    <record id="of_worktop_configurator_finishing_tree_view" model="ir.ui.view">
+        <field name="name">of.worktop.configurator.finishing.tree.view</field>
+        <field name="model">of.worktop.configurator.finishing</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_worktop_configurator_finishing_action" model="ir.actions.act_window">
+        <field name="name">Finitions</field>
+        <field name="res_model">of.worktop.configurator.finishing</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_worktop_configurator_finishing_tree_view"/>
+    </record>
+
+    <!-- OF Worktop Configurator Color Views -->
+
+    <record id="of_worktop_configurator_color_tree_view" model="ir.ui.view">
+        <field name="name">of.worktop.configurator.color.tree.view</field>
+        <field name="model">of.worktop.configurator.color</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence"/>
+                <field name="name"/>
+                <field name="image_filename" invisible="1"/>
+                <field name="image_file" filename="image_filename"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_worktop_configurator_color_action" model="ir.actions.act_window">
+        <field name="name">Couleurs</field>
+        <field name="res_model">of.worktop.configurator.color</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_worktop_configurator_color_tree_view"/>
+    </record>
+
+    <!-- OF Worktop Configurator Group Views -->
+
+    <record id="of_worktop_configurator_group_tree_view" model="ir.ui.view">
+        <field name="name">of.worktop.configurator.group.tree.view</field>
+        <field name="model">of.worktop.configurator.group</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence"/>
+                <field name="name"/>
+                <field name="color_ids" widget="many2many_tags"/>
+                <field name="pricelist_ids" widget="many2many_tags"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_worktop_configurator_group_action" model="ir.actions.act_window">
+        <field name="name">Groupes</field>
+        <field name="res_model">of.worktop.configurator.group</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_worktop_configurator_group_tree_view"/>
+    </record>
+
+    <!-- OF Worktop Configurator Thickness Views -->
+
+    <record id="of_worktop_configurator_thickness_tree_view" model="ir.ui.view">
+        <field name="name">of.worktop.configurator.thickness.tree.view</field>
+        <field name="model">of.worktop.configurator.thickness</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence"/>
+                <field name="name"/>
+                <field name="value"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_worktop_configurator_thickness_action" model="ir.actions.act_window">
+        <field name="name">Épaisseurs</field>
+        <field name="res_model">of.worktop.configurator.thickness</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_worktop_configurator_thickness_tree_view"/>
+    </record>
+
+    <!-- OF Worktop Configurator Edge Type Views -->
+
+    <record id="of_worktop_configurator_edge_type_tree_view" model="ir.ui.view">
+        <field name="name">of.worktop.configurator.edge.type.tree.view</field>
+        <field name="model">of.worktop.configurator.edge.type</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_worktop_configurator_edge_type_action" model="ir.actions.act_window">
+        <field name="name">Type de chants</field>
+        <field name="res_model">of.worktop.configurator.edge.type</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_worktop_configurator_edge_type_tree_view"/>
+    </record>
+
+    <!-- OF Worktop Configurator Distance Views -->
+
+    <record id="of_worktop_configurator_distance_tree_view" model="ir.ui.view">
+        <field name="name">of.worktop.configurator.distance.tree.view</field>
+        <field name="model">of.worktop.configurator.distance</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence"/>
+                <field name="name"/>
+                <field name="price"/>
+                <field name="blocking"/>
+                <field name="blocking_message" attrs="{'required': [('blocking', '=', True)]}"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_worktop_configurator_distance_action" model="ir.actions.act_window">
+        <field name="name">Distances</field>
+        <field name="res_model">of.worktop.configurator.distance</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_worktop_configurator_distance_tree_view"/>
+    </record>
+
+    <!-- OF Worktop Configurator Price Views -->
+
+    <record id="of_worktop_configurator_price_tree_view" model="ir.ui.view">
+        <field name="name">of.worktop.configurator.price.tree.view</field>
+        <field name="model">of.worktop.configurator.price</field>
+        <field name="arch" type="xml">
+            <tree editable="top">
+                <field name="material_id"/>
+                <field name="finishing_id"/>
+                <field name="group_id"/>
+                <field name="thickness_id"/>
+                <field name="price"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_worktop_configurator_price_action" model="ir.actions.act_window">
+        <field name="name">Tarifs</field>
+        <field name="res_model">of.worktop.configurator.price</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_worktop_configurator_price_tree_view"/>
+    </record>
+
+    <!-- OF Worktop Configurator Type Views -->
+
+    <record id="of_worktop_configurator_type_form_view" model="ir.ui.view">
+        <field name="name">of.worktop.configurator.type.form.view</field>
+        <field name="model">of.worktop.configurator.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label class="oe_edit_only" for="name"/>
+                        <h1><field name="name" placeholder="Nom du type de pièce"/></h1>
+                    </div>
+                    <group>
+                        <group string="Infos configuration">
+                            <field name="sequence"/>
+                            <field name="material_ids" widget="many2many_tags"/>
+                            <field name="finishing_ids" widget="many2many_tags"/>
+                            <field name="group_ids" widget="many2many_tags"/>
+                        </group>
+                        <group string="Infos devis">
+                            <field name="product_id"/>
+                            <field name="layout_category_id"/>
+                        </group>
+                    </group>
+                    <group string="Accessoires &amp; Prestations">
+                        <field name="product_line_ids" nolabel="1">
+                            <tree editable="bottom">
+                                <field name="sequence"/>
+                                <field name="product_id"/>
+                                <field name="material_id"/>
+                                <field name="price"/>
+                            </tree>
+                            <form>
+                                <group>
+                                    <group>
+                                        <field name="sequence"/>
+                                        <field name="product_id"/>
+                                    </group>
+                                    <group>
+                                        <field name="material_id"/>
+                                        <field name="price"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_worktop_configurator_type_tree_view" model="ir.ui.view">
+        <field name="name">of.worktop.configurator.type.tree.view</field>
+        <field name="model">of.worktop.configurator.type</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_worktop_configurator_type_action" model="ir.actions.act_window">
+        <field name="name">Type de pièces</field>
+        <field name="res_model">of.worktop.configurator.type</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_worktop_configurator_type_tree_view"/>
+    </record>
+
+    <!-- Menus -->
+
+    <!-- Menus -->
+
+    <record id="sales_team.menu_sale_report" model="ir.ui.menu">
+        <field name="sequence">90</field>
+    </record>
+
+    <menuitem id="of_worktop_configurator_menu" name="Configurateur" parent="sales_team.menu_base_partner" sequence="95"
+              groups="sales_team.group_sale_manager"/>
+
+    <menuitem id="of_worktop_configurator_price_menu" name="Tarifs" action="of_worktop_configurator_price_action"
+              parent="of_worktop_configurator_menu" sequence="10"/>
+    <menuitem id="of_worktop_configurator_type_menu" name="Types de pièces" action="of_worktop_configurator_type_action"
+              parent="of_worktop_configurator_menu" sequence="20"/>
+    <menuitem id="of_worktop_configurator_material_menu" name="Matériaux" action="of_worktop_configurator_material_action"
+              parent="of_worktop_configurator_menu" sequence="30"/>
+    <menuitem id="of_worktop_configurator_finishing_menu" name="Finitions" action="of_worktop_configurator_finishing_action"
+              parent="of_worktop_configurator_menu" sequence="40"/>
+    <menuitem id="of_worktop_configurator_color_menu" name="Couleurs" action="of_worktop_configurator_color_action"
+              parent="of_worktop_configurator_menu" sequence="50"/>
+    <menuitem id="of_worktop_configurator_group_menu" name="Groupes" action="of_worktop_configurator_group_action"
+              parent="of_worktop_configurator_menu" sequence="60"/>
+    <menuitem id="of_worktop_configurator_thickness_menu" name="Épaisseurs" action="of_worktop_configurator_thickness_action"
+              parent="of_worktop_configurator_menu" sequence="70"/>
+    <menuitem id="of_worktop_configurator_edge_type_menu" name="Types de chant" action="of_worktop_configurator_edge_type_action"
+              parent="of_worktop_configurator_menu" sequence="80"/>
+    <menuitem id="of_worktop_configurator_distance_menu" name="Distances" action="of_worktop_configurator_distance_action"
+              parent="of_worktop_configurator_menu" sequence="90"/>
+
+</odoo>

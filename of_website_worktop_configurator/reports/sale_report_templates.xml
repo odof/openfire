@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <template id="of_website_worktop_configurator_report_saleorder_document" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//div[@name='vos_references']/div/div[2]" position="inside">
+            <div t-if="doc.of_worktop_configurator_order" name="internal_code" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                <strong>Code interne&amp;nbsp;:</strong>
+                <p>
+                    <span t-field="doc.of_worktop_configurator_internal_code"/>
+                </p>
+            </div>
+            <div t-if="doc.of_worktop_configurator_order" style="display: table-cell; width: 4px"/>
+            <div t-if="doc.of_worktop_configurator_order and doc.of_worktop_configurator_internal_vendor" name="internal_vendor"
+                 style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px; vertical-align: middle;">
+                <p>
+                    <strong>Réalisé par HM Déco</strong>
+                </p>
+            </div>
+            <div t-if="doc.of_worktop_configurator_order and doc.of_worktop_configurator_internal_vendor" style="display: table-cell; width: 4px"/>
+        </xpath>
+    </template>
+
+</odoo>

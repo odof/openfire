@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Sale Order Form View -->
+    <record id="of_sale_order_form_view" model="ir.ui.view">
+        <field name="name">of.sale.order.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group/group[1]" position="inside">
+                <field name="of_worktop_configurator_order" readonly="True"/>
+                <field name="of_submitted_worktop_configurator_order" string="Devis soumis" readonly="True"
+                       attrs="{'invisible': [('of_worktop_configurator_order', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//group[@name='docs']" position="after">
+                <group string="Calculateur" name="website_worktop_configurator">
+                    <field name="of_worktop_configurator_internal_vendor"/>
+                    <field name="of_worktop_configurator_internal_code"/>
+                    <field name="of_delivery_floor"/>
+                    <field name="of_site_distance_id"/>
+                    <field name="of_manufacturer_metrics"/>
+                    <field name="of_junction"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Sale Config Settings Form View -->
+    <record id="of_sale_config_settings_form_view" model="ir.ui.view">
+        <field name="name">of.sale.config.settings.form.view</field>
+        <field name="model">sale.config.settings</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_sale_config_settings"/>
+        <field name="arch" type="xml">
+            <div id="main" position="inside">
+                <group string="Calculateur" name="website_worktop_configurator">
+                    <label for="of_website_worktop_configurator_fiscal_position_ids"/>
+                    <div name="of_website_worktop_configurator_fiscal_position_ids">
+                        <field name="of_website_worktop_configurator_fiscal_position_ids" class="oe_inline" widget="many2many_tags"/>
+                    </div>
+                    <label for="of_website_worktop_configurator_payment_term_id"/>
+                    <div name="of_website_worktop_configurator_payment_term_id">
+                        <field name="of_website_worktop_configurator_payment_term_id" class="oe_inline"/>
+                    </div>
+                    <label for="of_website_worktop_configurator_extra_floor_product_id"/>
+                    <div name="of_website_worktop_configurator_extra_floor_product_id">
+                        <field name="of_website_worktop_configurator_extra_floor_product_id" class="oe_inline"/>
+                    </div>
+                    <label for="of_website_worktop_configurator_extra_distance_product_id"/>
+                    <div name="of_website_worktop_configurator_extra_distance_product_id">
+                        <field name="of_website_worktop_configurator_extra_distance_product_id" class="oe_inline"/>
+                    </div>
+                    <label for="of_website_worktop_configurator_extra_metrics_product_id"/>
+                    <div name="of_website_worktop_configurator_extra_metrics_product_id">
+                        <field name="of_website_worktop_configurator_extra_metrics_product_id" class="oe_inline"/>
+                    </div>
+                    <label for="of_website_worktop_configurator_extra_junction_product_id"/>
+                    <div name="of_website_worktop_configurator_extra_junction_product_id">
+                        <field name="of_website_worktop_configurator_extra_junction_product_id" class="oe_inline"/>
+                    </div>
+                    <label for="of_website_worktop_configurator_extra_weight_product_id"/>
+                    <div name="of_website_worktop_configurator_extra_weight_product_id">
+                        <field name="of_website_worktop_configurator_extra_weight_product_id" class="oe_inline"/>
+                    </div>
+                    <label for="of_website_worktop_configurator_acc_layout_category_id"/>
+                    <div name="of_website_worktop_configurator_acc_layout_category_id">
+                        <field name="of_website_worktop_configurator_acc_layout_category_id" class="oe_inline"/>
+                    </div>
+                    <label for="of_website_worktop_configurator_extra_layout_category_id"/>
+                    <div name="of_website_worktop_configurator_extra_layout_category_id">
+                        <field name="of_website_worktop_configurator_extra_layout_category_id" class="oe_inline"/>
+                    </div>
+                </group>
+            </div>
+        </field>
+    </record>
+
+</odoo>

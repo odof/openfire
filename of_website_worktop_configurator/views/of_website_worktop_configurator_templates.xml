@@ -1,0 +1,1014 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="assets_frontend" name="OF Website Worktop Configurator Assets Frontend" inherit_id="website.assets_frontend">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" href="/of_website_worktop_configurator/static/src/css/of_website_worktop_configurator.css"/>
+            <script type="text/javascript" src="/of_website_worktop_configurator/static/src/js/of_website_worktop_configurator.js"/>
+        </xpath>
+    </template>
+
+    <!-- OF Website Worktop Configurator -->
+
+    <!-- OF Website Worktop Configurator - Breadcrumb Trail -->
+    <template id="worktop_configurator_breadcrumb_trail" name="Configurateur en ligne - Fil d'Ariane">
+        <ul class="wizard pull-right">
+            <li t-att-class="step_number in (10, 20) and 'text-primary' or 'text-muted'">
+                <t t-if="step_number&gt;20">
+                    <a href="/worktop_configurator/vendor_select" class="text-primary">
+                        Coordonnées
+                        <span class="chevron"/>
+                    </a>
+                </t>
+                <t t-else="">
+                    Coordonnées
+                    <span class="chevron"/>
+                </t>
+            </li>
+            <li t-att-class="(step_number == 30 and 'text-primary') or 'text-muted'">
+                <t t-if="step_number&gt;30">
+                    <a href="/worktop_configurator/quote_details" class="text-primary">
+                        Informations générales
+                        <span class="chevron"/>
+                    </a>
+                </t>
+                <t t-else="">
+                    Informations générales
+                    <span class="chevron"/>
+                </t>
+            </li>
+            <li t-att-class="(step_number in (40, 50, 60) and 'text-primary') or 'text-muted'">
+                <t t-if="step_number&gt;60">
+                    <a href="/worktop_configurator/product_select" class="text-primary">
+                        Configuration
+                        <span class="chevron"/>
+                    </a>
+                </t>
+                <t t-else="">
+                    Configuration
+                    <span class="chevron"/>
+                </t>
+            </li>
+            <li t-att-class="(step_number==70 and 'text-primary') or 'text-muted'">
+                Synthèse
+                <span class="chevron"/>
+            </li>
+        </ul>
+    </template>
+
+    <!-- OF Website Worktop Configurator - Vendor Select -->
+    <template id="worktop_configurator_vendor_select" name="Configurateur en ligne - Choix du professionnel">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_of_website_worktop_configurator">
+                    <div class="row">
+                        <t t-call="of_website_worktop_configurator.worktop_configurator_breadcrumb_trail"/>
+                        <h1 class="col-md-10 page-header text-primary">Choix du professionnel</h1>
+                        <div class="clearfix"/>
+                        <br/>
+                        <form action="/worktop_configurator/vendor_select" method="post">
+                            <div t-attf-class="form-group form-field #{error_dict.get('vendor_address_id') and 'has-error' or ''} col-md-5">
+                                <select id="vendor_address_id" name="vendor_address_id" class="form-control">
+                                    <option value="">Choisir un professionnel...</option>
+                                    <t t-foreach="vendors" t-as="vendor">
+                                        <option t-att-value="vendor.id"
+                                                t-att-selected="vendor_address_id and vendor.id == int(vendor_address_id)">
+                                            <t t-esc="vendor.name_get()[0][1]"/>
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <input type="hidden" name="submitted" value="1"/>
+                            <div class="clearfix"/>
+                            <div class="mt32 mb64 pull-right" name="buttons">
+                                <button type="submit" class="btn btn-primary a-submit a-submit-disable a-submit-loading">
+                                    Suivant <span class="fa fa-long-arrow-right"/>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- OF Website Worktop Configurator - Customer details -->
+    <template id="worktop_configurator_customer_details" name="Configurateur en ligne - Coordonnées">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_of_website_worktop_configurator">
+                    <div class="row">
+                        <t t-call="of_website_worktop_configurator.worktop_configurator_breadcrumb_trail"/>
+                        <h1 class="col-md-10 page-header text-primary">Coordonnées</h1>
+                        <div class="clearfix"/>
+                        <br/>
+                        <form action="/worktop_configurator/customer_details" method="post" class="address_autoformat configurator_customer_address">
+                            <h2 class="col-md-10">Adresse de chantier</h2>
+                            <div class="clearfix"/>
+                            <br/>
+                            <div t-attf-class="form-group #{error_dict.get('name') and 'has-error' or ''} col-md-5">
+                                <label class="control-label" for="name">
+                                    NOM Prénom *
+                                </label>
+                                <input type="text" name="name" class="form-control" t-att-value="name"/>
+                            </div>
+                            <div class="clearfix"/>
+                            <div class="form-group col-md-5">
+                                <label class="control-label" for="email">
+                                    Courriel
+                                </label>
+                                <input type="email" name="email" class="form-control" t-att-value="email"/>
+                            </div>
+                            <div class="form-group col-md-5">
+                                <label class="control-label" for="phone">
+                                    Téléphone
+                                </label>
+                                <input type="tel" name="phone" class="form-control" t-att-value="phone"/>
+                            </div>
+                            <div class="clearfix"/>
+                            <div t-attf-class="form-group #{error_dict.get('street') and 'has-error' or ''} col-md-10 div_street">
+                                <label class="control-label" for="street">Rue et Numéro *
+                                </label>
+                                <input type="text" name="street" class="form-control" t-att-value="street"/>
+                            </div>
+                            <div class="clearfix"/>
+                            <div class="form-group col-md-10 div_street">
+                                <label class="control-label" for="street2">Complément</label>
+                                <input type="text" name="street2" class="form-control" t-att-value="street2"/>
+                            </div>
+                            <div class="clearfix"/>
+                            <t t-set='zip_city'
+                               t-value='country and [x for x in country.get_address_fields() if x in ["zip", "city"]] or ["city", "zip"]'/>
+                            <t t-if="'zip' in zip_city and zip_city.index('zip') &lt; zip_city.index('city')">
+                                <div t-attf-class="form-group #{error_dict.get('zip') and 'has-error' or ''} col-sm-3 div_zip">
+                                    <label class="control-label" for="zip">CP *</label>
+                                    <input type="text" name="zip" class="form-control" t-att-value="zip_code"/>
+                                </div>
+                            </t>
+                            <div t-attf-class="form-group #{error_dict.get('city') and 'has-error' or ''} col-sm-7 div_city">
+                                <label class="control-label" for="city">Ville *</label>
+                                <input type="text" name="city" class="form-control" t-att-value="city"/>
+                            </div>
+                            <t t-if="'zip' in zip_city and zip_city.index('zip') &gt; zip_city.index('city')">
+                                <div t-attf-class="form-group #{error_dict.get('zip') and 'has-error' or ''} col-sm-3 div_zip">
+                                    <label class="control-label" for="zip">CP *</label>
+                                    <input type="text" name="zip" class="form-control" t-att-value="zip_code"/>
+                                </div>
+                            </t>
+                            <div class="clearfix"/>
+                            <div t-attf-class="form-group #{error_dict.get('country_id') and 'has-error' or ''} col-md-5 div_country">
+                                <label class="control-label" for="country_id">Pays *</label>
+                                <select id="country_id" name="country_id" class="form-control">
+                                    <option value="">Pays...</option>
+                                    <t t-foreach="country_list" t-as="c">
+                                        <option t-att-value="c.id"
+                                                t-att-selected="c.id == (country and country.id or -1)">
+                                            <t t-esc="c.name"/>
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+                            <div class="clearfix"/>
+                            <br/>
+                            <h2 class="col-md-10">Adresse de facturation</h2>
+                            <div class="clearfix"/>
+                            <br/>
+                            <div t-attf-class="form-group #{error_dict.get('invoicing_recipient') and 'has-error' or ''} col-md-4"
+                                 t-att-style="portal_user and 'display: none;' or ''">
+                                <label class="control-label" for="invoicing_recipient">Choix de la facturation *</label><br/>
+                                <input type="radio" name="invoicing_recipient" value="vendor" style="margin-left: 20px;"
+                                       t-att-checked="invoicing_recipient == 'vendor'"/> Le professionnel<br/>
+                                <input type="radio" name="invoicing_recipient" value="customer" style="margin-left: 20px;"
+                                       t-att-checked="invoicing_recipient == 'customer'"/> Le client final
+                            </div>
+                            <div t-attf-class="form-group #{error_dict.get('different_invoicing_address') and 'has-error' or ''} col-md-6 div_different_invoicing_address"
+                                 t-att-style="(invoicing_recipient != 'customer' and not portal_user) and 'display: none;' or ''">
+                                <label class="control-label" for="different_invoicing_address">Adresse de facturation différente de l'adresse de chantier ? *</label><br/>
+                                <input type="radio" name="different_invoicing_address" value="yes" style="margin-left: 20px;"
+                                       t-att-checked="different_invoicing_address == 'yes'"/> Oui<br/>
+                                <input type="radio" name="different_invoicing_address" value="no" style="margin-left: 20px;"
+                                       t-att-checked="different_invoicing_address == 'no'"/> Non
+                            </div>
+                            <div class="clearfix"/>
+                            <br/>
+                            <div class="div_invoicing_address"
+                                 t-att-style="(((invoicing_recipient != 'customer' and not portal_user) or different_invoicing_address != 'yes') and (invoicing_recipient != 'vendor' or (create_vendor_address != 'yes' and update_vendor_address != 'yes'))) and 'display: none;' or ''">
+                                <div class="form-group col-md-5">
+                                    <label class="control-label" for="invoicing_name">
+                                        NOM Prénom (si différent)
+                                    </label>
+                                    <input type="text" name="invoicing_name" class="form-control" t-att-value="invoicing_name"/>
+                                </div>
+                                <div class="clearfix"/>
+                                <div class="form-group col-md-5">
+                                    <label class="control-label" for="invoicing_email">
+                                        Courriel (si différent)
+                                    </label>
+                                    <input type="email" name="invoicing_email" class="form-control" t-att-value="invoicing_email"/>
+                                </div>
+                                <div class="form-group col-md-5">
+                                    <label class="control-label" for="invoicing_phone">
+                                        Téléphone (si différent)
+                                    </label>
+                                    <input type="tel" name="phone" class="form-control" t-att-value="invoicing_phone"/>
+                                </div>
+                                <div class="clearfix"/>
+                                <div t-attf-class="form-group #{error_dict.get('invoicing_street') and 'has-error' or ''} col-md-10 div_invoicing_street">
+                                    <label class="control-label" for="invoicing_street">Rue et Numéro *
+                                    </label>
+                                    <input type="text" name="invoicing_street" class="form-control" t-att-value="invoicing_street"/>
+                                </div>
+                                <div class="clearfix"/>
+                                <div class="form-group col-md-10 div_invoicing_street">
+                                    <label class="control-label" for="invoicing_street2">Complément</label>
+                                    <input type="text" name="invoicing_street2" class="form-control" t-att-value="invoicing_street2"/>
+                                </div>
+                                <div class="clearfix"/>
+                                <t t-set='invoicing_zip_city'
+                                   t-value='invoicing_country and [x for x in invoicing_country.get_address_fields() if x in ["zip", "city"]] or ["city", "zip"]'/>
+                                <t t-if="'zip' in invoicing_zip_city and invoicing_zip_city.index('zip') &lt; invoicing_zip_city.index('city')">
+                                    <div t-attf-class="form-group #{error_dict.get('invoicing_zip') and 'has-error' or ''} col-sm-3 div_invoicing_zip">
+                                        <label class="control-label" for="invoicing_zip">CP *</label>
+                                        <input type="text" name="invoicing_zip" class="form-control" t-att-value="invoicing_zip_code"/>
+                                    </div>
+                                </t>
+                                <div t-attf-class="form-group #{error_dict.get('invoicing_city') and 'has-error' or ''} col-sm-7 div_invoicing_city">
+                                    <label class="control-label" for="invoicing_city">Ville *</label>
+                                    <input type="text" name="invoicing_city" class="form-control" t-att-value="invoicing_city"/>
+                                </div>
+                                <t t-if="'zip' in invoicing_zip_city and invoicing_zip_city.index('zip') &gt; invoicing_zip_city.index('city')">
+                                    <div t-attf-class="form-group #{error_dict.get('invoicing_zip') and 'has-error' or ''} col-sm-3 div_invoicing_zip">
+                                        <label class="control-label" for="invoicing_zip">CP *</label>
+                                        <input type="text" name="invoicing_zip" class="form-control" t-att-value="invoicing_zip_code"/>
+                                    </div>
+                                </t>
+                                <div class="clearfix"/>
+                                <div t-attf-class="form-group #{error_dict.get('invoicing_country_id') and 'has-error' or ''} col-md-5 div_invoicing_country">
+                                    <label class="control-label" for="invoicing_country_id">Pays *</label>
+                                    <select id="invoicing_country_id" name="invoicing_country_id" class="form-control">
+                                        <option value="">Pays...</option>
+                                        <t t-foreach="country_list" t-as="c">
+                                            <option t-att-value="c.id"
+                                                    t-att-selected="c.id == (invoicing_country and invoicing_country.id or -1)">
+                                                <t t-esc="c.name"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="div_all_vendor_addresses"
+                                 t-att-style="(invoicing_recipient != 'vendor' or update_vendor_address != 'no' or create_vendor_address != 'no') and 'display: none;' or ''">
+                                <div class="col-md-10">
+                                    <t t-foreach="vendor_addresses" t-as="address_unit">
+                                        <div class="col-md-4 one_kanban">
+                                            <t t-call="of_website_worktop_configurator.worktop_configurator_address_kanban">
+                                                <t t-set="contact" t-value="address_unit"/>
+                                                <t t-set="readonly" t-value="0"/>
+                                                <t t-set="selected"
+                                                   t-value="vendor_invoicing_address_id and address_unit.id == int(vendor_invoicing_address_id) or len(vendor_addresses) == 1"/>
+                                            </t>
+                                        </div>
+                                    </t>
+                                    <div class="col-md-4" style="text-align: center;">
+                                        <a class="btn btn-default of_js_add_address" style="margin-top: 60px; border-radius: 50px;">
+                                            Ajouter une adresse
+                                            <span class="fa fa-plus"/>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clearfix"/>
+                            <input type="hidden" name="create_vendor_address" t-att-value="create_vendor_address or 'no'"/>
+                            <input type="hidden" name="update_vendor_address" t-att-value="update_vendor_address or 'no'"/>
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <input type="hidden" name="submitted" value="1"/>
+                            <div t-attf-class="mt32 mb64 #{portal_user and 'pull-right' or ''}" name="buttons">
+                                <a t-if="not portal_user" href="/worktop_configurator/vendor_select" class="btn btn-default">
+                                    <span class="fa fa-long-arrow-left"/>
+                                    Retour
+                                </a>
+                                <button type="submit"
+                                        class="btn btn-primary pull-right a-submit a-submit-disable a-submit-loading">
+                                    Valider
+                                    <span class="fa fa-long-arrow-right"/>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- OF Website Worktop Configurator - Kanban Address -->
+    <template id="worktop_configurator_address_kanban" name="Configurateur en ligne - Adresse Kanban">
+        <span id="vendor_invoicing_address_id" t-esc="contact.id" style="display: none;"/>
+        <a t-if="not readonly" class='btn btn-link pull-right fa fa-edit of_js_edit_address no-decoration'
+           title="Modifier cette adresse" style="font-size: 25px"/>
+        <div t-att-class="'panel panel-default %s' % (selected and 'of_border_primary' or 'of_js_change_address')">
+            <div class="panel-body" t-att-style="(not readonly and 'height: 180px; ' or '') + 'overflow: clip;'">
+                <b>
+                    <span t-if="contact.is_company">Société</span>
+                    <span t-else="" t-field="contact.type"/>
+                </b>
+                <t t-esc="contact" t-options="dict(widget='contact', fields=['name', 'address', 'email', 'phone'], no_marker=True)"/>
+            </div>
+        </div>
+    </template>
+
+    <!-- OF Website Worktop Configurator - Quote details -->
+    <template id="worktop_configurator_quote_details" name="Configurateur en ligne - Informations Générales">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_of_website_worktop_configurator">
+                    <div class="row">
+                        <t t-call="of_website_worktop_configurator.worktop_configurator_breadcrumb_trail"/>
+                        <h1 class="col-md-10 page-header text-primary">Informations Générales</h1>
+                        <div class="clearfix"/>
+                        <br/>
+                        <t t-if="error_dict" t-foreach="error_dict.get('error_message', [])" t-as="err">
+                            <h4 class="text-danger" t-esc="err"/>
+                        </t>
+                        <form action="/worktop_configurator/quote_details" method="post">
+                            <div class="form-group col-md-5">
+                                <label class="control-label" for="ref">
+                                    Référence projet
+                                </label>
+                                <input type="text" name="ref" class="form-control" t-att-value="ref"/>
+                            </div>
+                            <div class="form-group col-md-5">
+                                <label class="control-label" for="delivery_expected_date">
+                                    Date de livraison souhaitée
+                                </label>
+                                <input type="date" name="delivery_expected_date" class="form-control" t-att-value="delivery_expected_date"/>
+                            </div>
+                            <div class="clearfix"/>
+                            <div t-attf-class="form-group #{error_dict.get('fiscal_pos_id') and 'has-error' or ''} col-md-5">
+                                <label class="control-label" for="fiscal_pos">TVA *</label>
+                                <select id="fiscal_pos_id" name="fiscal_pos_id" class="form-control">
+                                    <option value="">Choisir une position fiscale...</option>
+                                    <t t-foreach="fiscal_pos_list" t-as="p">
+                                        <option t-att-value="p.id"
+                                                t-att-selected="p.id == (fiscal_pos and fiscal_pos.id or -1)">
+                                            <t t-esc="p.name"/>
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+                            <div class="clearfix"/>
+                            <div t-attf-class="form-group #{error_dict.get('delivery_floor') and 'has-error' or ''} col-md-5">
+                                <label class="control-label" for="delivery_floor">
+                                    Étage de livraison *
+                                </label>
+                                <input type="text" name="delivery_floor" class="form-control" t-att-value="delivery_floor"/>
+                            </div>
+                            <div t-attf-class="form-group #{error_dict.get('site_distance_id') and 'has-error' or ''} col-md-5">
+                                <label class="control-label" for="site_distance">Distance du chantier *</label>
+                                <select id="site_distance_id" name="site_distance_id" class="form-control">
+                                    <option value="">Choisir une distance...</option>
+                                    <t t-foreach="site_distance_list" t-as="sd">
+                                        <option t-att-value="sd.id"
+                                                t-att-selected="sd.id == (site_distance and site_distance.id or -1)">
+                                            <t t-esc="sd.name"/>
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+                            <div class="clearfix"/>
+                            <div t-attf-class="form-group #{error_dict.get('manufacturer_metrics') and 'has-error' or ''} col-md-5">
+                                <label class="control-label" for="manufacturer_metrics">Métré à réaliser par le fabricant *</label><br/>
+                                <input type="radio" name="manufacturer_metrics" value="yes" style="margin-left: 20px;"
+                                       t-att-checked="manufacturer_metrics == 'yes'"/> Oui<br/>
+                                <input type="radio" name="manufacturer_metrics" value="no" style="margin-left: 20px;"
+                                       t-att-checked="manufacturer_metrics == 'no'"/> Non
+                            </div>
+                            <div t-attf-class="form-group #{error_dict.get('junction') and 'has-error' or ''} col-md-5">
+                                <label class="control-label" for="junction">Raccordement *</label><br/>
+                                <input type="radio" name="junction" value="yes" style="margin-left: 20px;"
+                                       t-att-checked="junction == 'yes'"/> Oui<br/>
+                                <input type="radio" name="junction" value="no" style="margin-left: 20px;"
+                                       t-att-checked="junction == 'no'"/> Non
+                            </div>
+                            <div class="clearfix"/>
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <input type="hidden" name="submitted" value="1"/>
+                            <div class="mt32 mb64" name="buttons">
+                                <a href="/worktop_configurator/customer_details" class="btn btn-default">
+                                    <span class="fa fa-long-arrow-left"/>
+                                    Retour
+                                </a>
+                                <button type="submit"
+                                        class="btn btn-primary pull-right a-submit a-submit-disable a-submit-loading">
+                                    Valider
+                                    <span class="fa fa-long-arrow-right"/>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- OF Website Worktop Configurator - Product Select -->
+    <template id="worktop_configurator_product_select" name="Configurateur en ligne - Type de pièce">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_of_website_worktop_configurator">
+                    <div class="row">
+                        <t t-call="of_website_worktop_configurator.worktop_configurator_breadcrumb_trail"/>
+                        <h1 class="col-md-10 page-header text-primary">Type de pièce</h1>
+                        <div class="clearfix"/>
+                        <br/>
+                        <div class="col-md-10">
+                            <t t-foreach="product_types" t-as="product_type">
+                                <form action="/worktop_configurator/product_select" method="post" class="col-md-3" style="display:inline-block; margin-bottom: 20px;">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <input type="hidden" name="submitted" value="1"/>
+                                    <input type="hidden" name="product_type_id" t-att-value="product_type.id"/>
+                                    <a class="btn btn-primary a-submit a-submit-disable a-submit-loading" style="width: 100%;">
+                                        <span t-esc="product_type.name"/>
+                                    </a>
+                                </form>
+                            </t>
+                            <form action="/worktop_configurator/product_select" method="post" class="col-md-3" style="display:inline-block; margin-bottom: 20px;">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <input type="hidden" name="submitted" value="1"/>
+                                <input type="hidden" name="product_type_id" value="Accessoires"/>
+                                <a class="btn btn-primary a-submit a-submit-disable a-submit-loading" style="width: 100%;">
+                                    Accessoires
+                                </a>
+                            </form>
+                        </div>
+                        <div class="clearfix"/>
+                        <br/>
+                        <div class="col-md-10">
+                            <img src="/of_website_worktop_configurator/static/src/img/configurator_product_select.png"
+                                 style="width: 100%;"/>
+                        </div>
+                        <div class="clearfix"/>
+                        <div class="mt32 mb64" name="buttons">
+                            <a href="/worktop_configurator/quote_details" class="btn btn-default">
+                                <span class="fa fa-long-arrow-left"/>
+                                Retour
+                            </a>
+                            <a t-if="display_redirect_button" href="/worktop_configurator/quote_summary"
+                               class="btn btn-default pull-right">
+                                Synthèse <span class="fa fa-long-arrow-right"/>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- OF Website Worktop Configurator - Product Details -->
+    <template id="worktop_configurator_product_details" name="Configurateur en ligne - Matériaux &amp; Finitions">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_of_website_worktop_configurator">
+                    <div class="row">
+                        <t t-call="of_website_worktop_configurator.worktop_configurator_breadcrumb_trail"/>
+                        <h1 class="col-md-10 page-header text-primary">Matériaux &amp; Finitions</h1>
+                        <div class="clearfix"/>
+                        <br/>
+                        <t t-if="error_dict" t-foreach="error_dict.get('error_message', [])" t-as="err">
+                            <h4 class="text-danger" t-esc="err"/>
+                        </t>
+                        <form action="/worktop_configurator/product_details" method="post">
+                            <div class="col-md-8">
+                                <div t-attf-class="form-group #{error_dict.get('material_id') and 'has-error' or ''} col-md-6">
+                                    <label class="control-label" for="material_id">Matériau *</label>
+                                    <select name="material_id" class="form-control">
+                                        <option value="">Choisir un matériau...</option>
+                                        <t t-foreach="material_list" t-as="m">
+                                            <option t-att-value="m.id"
+                                                    t-att-selected="material_id and m.id == int(material_id)">
+                                                <t t-esc="m.name"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div t-attf-class="form-group #{error_dict.get('finishing_id') and 'has-error' or ''} col-md-6">
+                                    <label class="control-label" for="finishing_id">Finition *</label>
+                                    <select name="finishing_id" class="form-control">
+                                        <option value="">Choisir une finition...</option>
+                                        <t t-foreach="finishing_list" t-as="f">
+                                            <option t-att-value="f.id"
+                                                    t-att-selected="finishing_id and f.id == int(finishing_id)">
+                                                <t t-esc="f.name"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="clearfix"/>
+                                <div t-attf-class="form-group #{error_dict.get('color_id') and 'has-error' or ''} col-md-6">
+                                    <label class="control-label" for="color_id">Couleur *</label>
+                                    <select id="color_id" name="color_id" class="form-control">
+                                        <option value="">Choisir une couleur...</option>
+                                        <t t-foreach="color_list" t-as="c">
+                                            <option t-att-value="c.id"
+                                                    t-att-selected="color_id and c.id == int(color_id)">
+                                                <t t-esc="c.name"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <div id="color_image" style="height: 75px;"/>
+                                </div>
+                                <div class="clearfix"/>
+                                <div t-attf-class="#{error_dict.get('length') and 'has-error' or ''} col-md-6">
+                                    <label class="control-label" for="length">Longueur (cm) *</label>
+                                    <input type="text" name="length" class="form-control" t-att-value="length"/>
+                                </div>
+                                <div t-attf-class="#{error_dict.get('width') and 'has-error' or ''} col-md-6">
+                                    <label class="control-label" for="width">Largeur (cm) *</label>
+                                    <input type="text" name="width" class="form-control" t-att-value="width"/>
+                                </div>
+                                <div class="form-group col-md-12">
+                                    <i class="text-muted">
+                                        Le nombre de morceaux dans lequel seront fabriqués les plans dépendra de la dimension des tranches
+                                        et l'accessibilité au chantier. Devis établi sous réserve d’un avis technique de faisabilité par nos
+                                        techniciens et nos fournisseurs ainsi que de la confirmation des cotes lors de la prise de mesures.
+                                    </i>
+                                </div>
+                                <div class="clearfix"/>
+                                <div t-attf-class="form-group #{error_dict.get('thickness_id') and 'has-error' or ''} col-md-6">
+                                    <label class="control-label" for="thickness_id">Épaisseur *</label>
+                                    <select name="thickness_id" class="form-control">
+                                        <option value="">Choisir une épaisseur...</option>
+                                        <t t-foreach="thickness_list" t-as="t">
+                                            <option t-att-value="t.id"
+                                                    t-att-selected="thickness_id and t.id == int(thickness_id)">
+                                                <t t-esc="t.name"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div t-attf-class="form-group #{error_dict.get('edge_type_id') and 'has-error' or ''} col-md-6">
+                                    <label class="control-label" for="edge_type_id">Type de chant *</label>
+                                    <select name="edge_type_id" class="form-control">
+                                        <option value="">Choisir un type de chant...</option>
+                                        <t t-foreach="edge_type_list" t-as="e">
+                                            <option t-att-value="e.id"
+                                                    t-att-selected="edge_type_id and e.id == int(edge_type_id)">
+                                                <t t-esc="e.name"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-md-offset-1">
+                                <h3><span t-esc="type_name"/></h3>
+                                <h3 class="page-header">
+                                    Prix
+                                    <button type="submit" class="btn btn-default btn-xs pull-right a-submit a-submit-disable a-submit-loading"
+                                            name="action" value="compute_price">
+                                        Mettre à jour
+                                    </button>
+                                </h3>
+                                <span class="pull-right">
+                                    <span t-esc="price" t-esc-options="{'widget': 'monetary', 'display_currency': currency}"/> HT
+                                </span>
+                                <br/>
+                                <span class="pull-right">
+                                    <span t-esc="total_price" t-esc-options="{'widget': 'monetary', 'display_currency': currency}"/> TTC
+                                </span>
+                            </div>
+                            <div class="clearfix"/>
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <input type="hidden" name="submitted" value="1"/>
+                            <div class="mt32 mb64" name="buttons">
+                                <a href="/worktop_configurator/product_select" class="btn btn-default">
+                                    <span class="fa fa-long-arrow-left"/>
+                                    Retour
+                                </a>
+                                <button type="submit" class="btn btn-primary pull-right a-submit a-submit-disable a-submit-loading"
+                                        name="action" value="submit">
+                                    Valider
+                                    <span class="fa fa-long-arrow-right"/>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- OF Website Worktop Configurator - Product Accessories -->
+    <template id="worktop_configurator_product_accessories" name="Configurateur en ligne - Accessoires &amp; Prestations">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_of_website_worktop_configurator">
+                    <div class="row">
+                        <t t-call="of_website_worktop_configurator.worktop_configurator_breadcrumb_trail"/>
+                        <h1 class="col-md-10 page-header text-primary">Accessoires &amp; Prestations</h1>
+                        <div class="clearfix"/>
+                        <br/>
+                        <div class="col-md-10">
+                            <div class="products_pager">
+                                <div class="row" style="width: 100%;">
+                                    <form action="/worktop_configurator/product_accessories" method="post" class="pagination form-inline o_website_sale_search">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <input type="hidden" name="submitted" value="1"/>
+                                        <div class="input-group">
+                                            <div class="oe_search">
+                                                <input type="text" name="search" class="search-query form-control oe_search_box" placeholder="Recherche..." t-att-value="search" />
+                                            </div>
+                                            <span class="input-group-btn">
+                                               <button type="submit" class="btn btn-default oe_search_button"><i class="fa fa-search"/></button>
+                                            </span>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <br/>
+                            <div class="clearfix"/>
+                            <div class="row no-gutter">
+                                <t t-foreach="product_lines" t-as="product_line">
+                                    <div class="col-md-3">
+                                        <div class="product-item of_product-item">
+                                            <div class="product-wrap">
+                                                <div class="product-img of_product-img">
+                                                    <span id="product_id" t-esc="product_line.product_id.id" style="display: none;"/>
+                                                    <span id="product_price" t-esc="product_line.price" style="display: none;"/>
+                                                    <span itemprop="image" t-esc="product_line.product_id.image" t-esc-options='{"widget": "image"}'
+                                                          t-att-alt="product_line.product_id.name"/>
+                                                    <div class="buttons-wrap clearfix">
+                                                        <a class="of_js_add_to_quote btn btn-xs pull-right">
+                                                            <i class="fa fa-shopping-cart"></i>
+                                                            Ajouter
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="product-body text-center">
+                                                    <h5 class="title mb-0">
+                                                        <span t-field="product_line.product_id.name"/>
+                                                    </h5>
+                                                    <div class="product_price">
+                                                        <span t-esc="product_line.price"
+                                                              t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                                <t t-if="not product_lines">
+                                    <div class="text-center text-muted">
+                                        <h3 class="css_editable_display">Aucun article ne correspond à votre recherche.</h3>
+                                        <br/>
+                                    </div>
+                                </t>
+                            </div>
+                            <div class="products_pager">
+                                <ul t-if="pager['page_count'] > 1" class="pagination">
+                                    <li t-att-class=" 'disabled' if pager['page']['num'] == 1 else None ">
+                                        <a t-att-href=" pager['page_previous']['url'] if pager['page']['num'] != 1 else None">Préc.</a>
+                                    </li>
+                                    <t t-foreach="pager['pages']" t-as="page">
+                                        <li t-att-class=" 'active' if page['num'] == pager['page']['num'] else None "> <a t-att-href="page['url']" t-raw="page['num']"></a></li>
+                                    </t>
+                                    <li t-att-class=" 'disabled' if pager['page']['num'] == pager['page_count'] else None ">
+                                        <a t-att-href="pager['page_next']['url'] if pager['page']['num'] != pager['page_count'] else None">Suiv.</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="clearfix"/>
+                        <div class="mt32 mb64" name="buttons">
+                            <a href="/worktop_configurator/product_details" class="btn btn-default">
+                                <span class="fa fa-long-arrow-left"/> Retour
+                            </a>
+                            <a href="/worktop_configurator/quote_summary" class="btn btn-primary pull-right">
+                                Suivant <span class="fa fa-long-arrow-right"/>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- OF Website Worktop Configurator - All Accessories -->
+    <template id="worktop_configurator_all_accessories" name="Configurateur en ligne - Accessoires">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_of_website_worktop_configurator">
+                    <div class="row">
+                        <t t-call="of_website_worktop_configurator.worktop_configurator_breadcrumb_trail"/>
+                        <h1 class="col-md-10 page-header text-primary">Accessoires</h1>
+                        <div class="clearfix"/>
+                        <br/>
+                        <div class="col-md-10">
+                            <div class="products_pager">
+                                <div class="row" style="width: 100%;">
+                                    <form action="/worktop_configurator/all_accessories" method="post" class="pagination form-inline o_website_sale_search">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <input type="hidden" name="submitted" value="1"/>
+                                        <div class="input-group">
+                                            <div class="oe_search">
+                                                <input type="text" name="search" class="search-query form-control oe_search_box" placeholder="Recherche..." t-att-value="search" />
+                                            </div>
+                                            <span class="input-group-btn">
+                                               <button type="submit" class="btn btn-default oe_search_button"><i class="fa fa-search"/></button>
+                                            </span>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <br/>
+                            <div class="clearfix"/>
+                            <div class="row no-gutter">
+                                <t t-foreach="accessories" t-as="accessory">
+                                    <div class="col-md-3">
+                                        <div class="product-item of_product-item">
+                                            <div class="product-wrap">
+                                                <div class="product-img of_product-img">
+                                                    <span id="product_id" t-esc="accessory.id" style="display: none;"/>
+                                                    <span id="product_price" t-esc="accessory.list_price" style="display: none;"/>
+                                                    <span itemprop="image" t-esc="accessory.image" t-esc-options='{"widget": "image"}'
+                                                          t-att-alt="accessory.name"/>
+                                                    <div class="buttons-wrap clearfix">
+                                                        <a class="of_js_add_to_quote btn btn-xs pull-right">
+                                                            <i class="fa fa-shopping-cart"></i>
+                                                            Ajouter
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="product-body text-center">
+                                                    <h5 class="title mb-0">
+                                                        <span t-field="accessory.name"/>
+                                                    </h5>
+                                                    <div class="product_price">
+                                                        <span t-esc="accessory.list_price"
+                                                              t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                                <t t-if="not accessories">
+                                    <div class="text-center text-muted">
+                                        <h3 class="css_editable_display">Aucun article ne correspond à votre recherche.</h3>
+                                        <br/>
+                                    </div>
+                                </t>
+                            </div>
+                            <div class="products_pager">
+                                <ul t-if="pager['page_count'] > 1" class="pagination">
+                                    <li t-att-class=" 'disabled' if pager['page']['num'] == 1 else None ">
+                                        <a t-att-href=" pager['page_previous']['url'] if pager['page']['num'] != 1 else None">Préc.</a>
+                                    </li>
+                                    <t t-foreach="pager['pages']" t-as="page">
+                                        <li t-att-class=" 'active' if page['num'] == pager['page']['num'] else None "> <a t-att-href="page['url']" t-raw="page['num']"></a></li>
+                                    </t>
+                                    <li t-att-class=" 'disabled' if pager['page']['num'] == pager['page_count'] else None ">
+                                        <a t-att-href="pager['page_next']['url'] if pager['page']['num'] != pager['page_count'] else None">Suiv.</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="clearfix"/>
+                        <div class="mt32 mb64" name="buttons">
+                            <a href="/worktop_configurator/product_select" class="btn btn-default">
+                                <span class="fa fa-long-arrow-left"/> Retour
+                            </a>
+                            <a href="/worktop_configurator/quote_summary" class="btn btn-primary pull-right">
+                                Suivant <span class="fa fa-long-arrow-right"/>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- OF Website Worktop Configurator - Product Modal -->
+    <template id="worktop_configurator_product_modal" name="Configurateur en ligne - Pop-up Article">
+        <div id="modal_optional_products" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content oe_website_sale">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                        <h4 class="modal-title" id="myModalLabel">Article à ajouter à votre devis</h4>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-striped table-condensed">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">Article</th>
+                                    <th style="min-width: 140px;"> </th>
+                                    <th width="100">Prix</th>
+                                    <th width="120">Quantité</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr id="product_confirmation" class="js_product">
+                                    <td width="100">
+                                        <span t-esc="product.image_medium" t-esc-options='{"widget": "image"}'/>
+                                    </td>
+                                    <td colspan="2">
+                                        <strong t-esc="product.with_context(display_default_code=False).display_name"/>
+                                        <div class="text-muted">
+                                            <div t-field="product.description_sale"/>
+                                            <div class="js_attributes"/>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <input type="hidden" name="product_price" t-att-value="price"/>
+                                        <span class="oe_price product_id" style="white-space: nowrap;"
+                                              t-att-data-product-id="product.id"
+                                              t-esc="price"
+                                              t-esc-options='{"widget": "monetary", "display_currency": website.currency_id}'/>
+                                    </td>
+                                    <td>
+                                        <div class="input-group oe_website_spinner">
+                                            <a t-attf-href="#" class="mb8 input-group-addon js_add_cart_json">
+                                                <i class="fa fa-minus"></i>
+                                            </a>
+                                            <input type="text" class="js_quantity form-control quantity" data-min="1" name="add_qty" value="1"/>
+                                            <a t-attf-href="#" class="mb8 input-group-addon float_left js_add_cart_json">
+                                                <i class="fa fa-plus"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn btn-default" data-dismiss="modal"><i class="fa fa-chevron-left"></i> Annuler</a>
+                        <a class="btn btn-primary pull-right a-submit"><i class="fa fa-shopping-cart fa-fw"></i> Ajouter</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- OF Website Worktop Configurator - Quote Summary -->
+    <template id="worktop_configurator_quote_summary" name="Configurateur en ligne - Synthèse du devis">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container oe_of_website_worktop_configurator">
+                    <div class="row">
+                        <t t-call="of_website_worktop_configurator.worktop_configurator_breadcrumb_trail"/>
+                        <h1 class="col-md-10 page-header text-primary">Synthèse du devis</h1>
+                        <div class="clearfix"/>
+                        <br/>
+                        <div class="oe_website_sale col-md-8">
+                            <t t-call="of_website_worktop_configurator.quote_lines"/>
+                        </div>
+                        <div class="col-md-3 col-md-offset-1">
+                            <h4 class="page-header">
+                                Informations Générales
+                            </h4>
+                            <div>
+                                <b>Référence : </b><span t-field="quote.client_order_ref"/><br/>
+                                <b>Code interne : </b><span t-field="quote.of_worktop_configurator_internal_code"/><br/>
+                                <b>Date du devis : </b><span t-field="quote.date_order" t-options="{'widget': 'date'}"/>
+                            </div>
+                            <h4 class="page-header">
+                                Adresse de chantier
+                            </h4>
+                            <div>
+                                <t t-esc="quote.partner_shipping_id" t-options="dict(widget='contact', fields=['name', 'address', 'email', 'phone'], no_marker=True)"/>
+                            </div>
+                            <h4 class="page-header">
+                                Adresse de facturation
+                            </h4>
+                            <div>
+                                <t t-esc="quote.partner_invoice_id" t-options="dict(widget='contact', fields=['name', 'address', 'email', 'phone'], no_marker=True)"/>
+                            </div>
+                            <h4 class="page-header">
+                                Déposer un fichier
+                            </h4>
+                            <form action="/worktop_configurator/upload_file" method="post" enctype="multipart/form-data" style="text-align: right;">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <input type="hidden" name="order_id" t-att-value="quote.id"/>
+                                <input type="file" name="attachment" class="file" id="file"/>
+                                <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading" style="margin-top: 10px;">Envoyer</button>
+                            </form>
+                        </div>
+                        <div class="clearfix"/>
+                        <div class="mt32 mb64" name="buttons">
+                            <a href="/worktop_configurator/product_details" class="btn btn-default">
+                                <span class="fa fa-long-arrow-left"/>
+                                Retour
+                            </a>
+                            <span class="pull-right">
+                                <a href="/worktop_configurator/new_product" class="btn btn-default">
+                                    Ajouter une pièce
+                                </a>
+                                <form action="/worktop_configurator/quote_summary" method="post" style="display:inline-block">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <input type="hidden" name="submitted" value="1"/>
+                                    <button type="submit" class="btn btn-primary a-submit a-submit-disable a-submit-loading"
+                                            name="action" value="submit">
+                                        Valider le devis
+                                        <span class="fa fa-long-arrow-right"/>
+                                    </button>
+                                </form>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="quote_lines" name="Configurateur en ligne - Lignes de devis">
+        <table class="table table-striped table-condensed js_quote_lines">
+            <thead>
+                <tr>
+                    <th width="100">Article</th>
+                    <th></th>
+                    <th width="130" class="text-center">Quantité</th>
+                    <th width="100" class="text-center">Prix</th>
+                </tr>
+            </thead>
+            <tbody>
+                <t t-foreach="quote.order_lines_layouted()[0]" t-as="layout_category">
+                    <tr class="active">
+                        <td colspan="4" style="font-weight: bold; border-bottom: 1px solid black;">&amp;bull;
+                            <t t-esc="layout_category['name']"/>
+                        </td>
+                    </tr>
+                    <t t-foreach="layout_category['lines']" t-as="line">
+                        <tr>
+                            <td colspan="2" t-if="not line.product_id.product_tmpl_id"></td>
+                            <td align="center" t-if="line.product_id.product_tmpl_id">
+                                <span t-field="line.product_id.image_small" t-options="{'widget': 'image', 'class': 'img-rounded'}" />
+                            </td>
+                            <td t-if="line.product_id.product_tmpl_id">
+                                <div>
+                                    <strong t-esc="line.product_id.with_context(display_default_code=False).display_name" />
+                                </div>
+                                <div class="text-muted">
+                                    <t t-foreach="line.name.splitlines()[1:]" t-as="name_line">
+                                        <span><t t-esc="name_line"/></span><br/>
+                                    </t>
+                                </div>
+                                <a t-if="line.layout_category_id.id != request.env['ir.values'].sudo().get_default('sale.config.settings', 'of_website_worktop_configurator_extra_layout_category_id')"
+                                   href='#' class='js_delete_product no-decoration'> <small><i class='fa fa-trash-o'></i> Supprimer</small></a>
+                            </td>
+                            <td class="text-center" id="td-qty">
+                                <div t-if="line.layout_category_id.id != request.env['ir.values'].sudo().get_default('sale.config.settings', 'of_website_worktop_configurator_extra_layout_category_id')"
+                                     class="input-group oe_website_spinner">
+                                    <a class="mb8 input-group-addon js_add_cart_json" data-no-instant="">
+                                        <i class="fa fa-minus"></i>
+                                    </a>
+                                    <input type="text" class="js_quantity form-control quantity" t-att-data-line-id="line.id" t-att-data-product-id="line.product_id.id" t-att-value="int(line.product_uom_qty) == line.product_uom_qty and int(line.product_uom_qty) or line.product_uom_qty" />
+                                    <a class="mb8 input-group-addon float_left js_add_cart_json" data-no-instant="">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </div>
+                                <div t-else="">
+                                    <span t-esc="int(line.product_uom_qty) == line.product_uom_qty and int(line.product_uom_qty) or line.product_uom_qty"/>
+                                </div>
+                            </td>
+                            <td class="text-center" id="td-price" name="price">
+                                <span t-field="line.price_reduce_taxexcl" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'from_currency': quote.pricelist_id.currency_id, 'display_currency': website.currency_id}" groups="sale.group_show_price_subtotal" />
+                                <span t-field="line.price_reduce_taxinc" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'from_currency': quote.pricelist_id.currency_id, 'display_currency': website.currency_id}" groups="sale.group_show_price_total" />
+                            </td>
+                        </tr>
+                    </t>
+                </t>
+            </tbody>
+        </table>
+        <div class="js_quote_lines col-sm-4 col-sm-offset-8 col-xs-12">
+            <div class="row" id="order_total_untaxed">
+                <span class="col-xs-6 text-right text-muted">Sous-total :</span>
+                <span class="col-xs-6 text-left text-muted">
+                    <span t-field="quote.amount_untaxed" style="white-space: nowrap;" t-options="{'widget': 'monetary','from_currency': quote.pricelist_id.currency_id,'display_currency': website.currency_id}" />
+                </span>
+            </div>
+            <div class="row" id="order_total_taxes">
+                <span class="col-xs-6 text-right text-muted">Taxes :</span>
+                <span class="col-xs-6 text-left text-muted">
+                    <span t-field="quote.amount_tax" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'from_currency': quote.pricelist_id.currency_id, 'display_currency': website.currency_id}" />
+                </span>
+            </div>
+            <div class="row" id="order_total">
+                <span class="col-xs-6 text-right h4">Total :</span>
+                <span class="col-xs-6 text-left h4" style="white-space: nowrap;">
+                    <span t-field="quote.amount_total" style="white-space: nowrap;" t-options="{'widget': 'monetary','from_currency': quote.pricelist_id.currency_id,'display_currency': website.currency_id}" />
+                </span>
+            </div>
+        </div>
+    </template>
+
+</odoo>

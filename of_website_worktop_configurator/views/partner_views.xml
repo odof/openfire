@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Res Partner Form View -->
+    <record id="of_res_partner_form_view" model="ir.ui.view">
+        <field name="name">of.res.partner.form.view</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <field name="user_id" position="after">
+                <field name="of_worktop_configurator_contact"/>
+                <field name="of_worktop_configurator_responsible" attrs="{'invisible': [('of_worktop_configurator_contact', '=', False)]}"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

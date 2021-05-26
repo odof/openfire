@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Website menu -->
+        <record id="of_website_worktop_configurator_menu" model="website.menu">
+            <field name="name">Nouveau devis</field>
+            <field name="url">/worktop_configurator</field>
+            <field name="parent_id" ref="website.main_menu"/>
+            <field name="sequence" type="int">60</field>
+            <field name="website_id" ref="website.default_website"/>
+        </record>
+
+    </data>
+</odoo>
