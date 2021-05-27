@@ -293,7 +293,7 @@
                                 </div>
                                 <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; margin-bottom: 12px;">
                                     <div class="col-xs-12" style="display: table; padding: 0px;">
-                                        <div style="display: table-cell; width: 50%;">
+                                        <div name="general_info_left" style="display: table-cell; width: 50%;">
                                             <t t-if="o.name">
                                                 <div class="h5" style="padding: 0px 16px;">
                                                    <div>
@@ -302,7 +302,7 @@
                                                 </div>
                                             </t>
                                         </div>
-                                        <div style="display: table-cell; width: 50%; border-left: 1px solid lightgray">
+                                        <div name="general_info_right" style="display: table-cell; width: 50%; border-left: 1px solid lightgray">
                                             <t t-if="o.company_id">
                                                 <div class="h5" style="padding: 0px 16px;">
                                                    <div>
