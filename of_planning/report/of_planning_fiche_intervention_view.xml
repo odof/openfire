@@ -471,7 +471,7 @@
                         </t>
 
                         <!-- Description (affichage conditionel si pas vide) -->
-                        <t t-if="o.description and o.cleantext_description">
+                        <t t-if="o.description and o.cleantext_description" name="cadre_description">
                             <div name="description">
                                 <div class="row h4 mb4">
                                     <div class="col-xs-12"><strong>Description</strong></div>
