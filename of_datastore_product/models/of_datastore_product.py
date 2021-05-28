@@ -676,6 +676,7 @@ class OfDatastoreCentralized(models.AbstractModel):
 
         # Ajout de certains champs
         res += [
+            'invoice_policy',
             'purchase_method',
 
             # Champs de notes
