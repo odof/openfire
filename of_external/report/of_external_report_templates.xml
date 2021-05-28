@@ -13,7 +13,7 @@
         </div>
 
         <!-- Si bandeau image + pastille ou en-tête logo société et adresse configurable à droite ou en dessous-->
-        <div t-if="company.of_position_header_lines != 'bandeau_totalite'" name="cadre_adresse_pastille" t-attf-style="max-height: #{company.of_max_height_bandeau}; padding-top: 16px;">
+        <div t-if="company and company.of_position_header_lines != 'bandeau_totalite'" name="cadre_adresse_pastille" t-attf-style="max-height: #{company.of_max_height_bandeau}; padding-top: 16px;">
             <!-- Si bandeau image + pastille -->
             <div t-if="company.of_position_header_lines == 'bandeau_pastille'" name="company_header_image_pastille" style="width: 73%; display: inline-block; vertical-align: top;">
                 <img t-att-src="'data:image/png;base64,%s' % company.getLogo('Bandeau')" t-attf-style="max-height: #{company.of_max_height_bandeau}; max-width: 665px;"/>
