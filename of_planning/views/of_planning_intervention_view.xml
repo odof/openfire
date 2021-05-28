@@ -220,14 +220,14 @@
                     <field name="alert_hors_creneau" invisible="1"/>
                     <field name="alert_incapable" invisible="1"/>
                     <field name="alert_coherence_date" invisible="1"/>
-                    <group col="4">
-                        <group col="2" colspan="2">
+                    <group>
+                        <group>
                             <field name="template_id" attrs="{'readonly': [('number', '!=', False), ('state', 'not in', ('draft', 'cancel'))]}"/>
                         </group>
-                        <group col="2" colspan="2">
+                        <group>
                             <field name="user_id"/>
                         </group>
-                        <group name="who" col="2" colspan="2" string="Qui" class="of_grey_background">
+                        <group name="who" string="Qui" class="of_grey_background">
                             <group colspan="2">
                                 <field name="equipe_id" autofocus="autofocus"/>
                                 <label for="employee_ids" string="Intervenants"/>
@@ -242,7 +242,7 @@
                                 <field name="company_id" options="{'no_create': True, 'no_edit': True}"/>
                             </group>
                         </group>
-                        <group name="where" col="2" colspan="2" string="Où" class="of_grey_background">
+                        <group name="where" string="Où" class="of_grey_background">
                             <group colspan="2">
                                 <field name="partner_id" invisible="1"/>
                                 <label for="address_id"/>
@@ -262,13 +262,13 @@
                                 <field name="name"/>
                             </group>
                         </group>
-                        <group name="what" col="2" colspan="2" string="Quoi" class="of_grey_background">
+                        <group name="what" string="Quoi" class="of_grey_background">
                             <group colspan="2">
                                 <field name="tache_id" context="{'intervenant_prio_ids': employee_ids}"/>
                                 <field name="duree" string="Durée" widget="float_time"/>
                             </group>
                         </group>
-                        <group name="when" col="2" colspan="2" string="Quand" class="of_grey_background">
+                        <group name="when" string="Quand" class="of_grey_background">
                             <group colspan="2">
                                 <label for="date"/>
                                 <div>
@@ -303,7 +303,7 @@
                     <notebook>
                         <page name="infos" string="Informations">
                             <group col="4">
-                                <group col="2" colspan="2">
+                                <group colspan="2">
                                     <field name="order_id" groups="sales_team.group_sale_salesman,
                                                                    account.group_account_invoice,
                                                                    stock.group_stock_user"/>
@@ -311,7 +311,7 @@
                                                                    account.group_account_invoice,
                                                                    stock.group_stock_user"/>
                                 </group>
-                                <group col="2" colspan="2">
+                                <group colspan="2">
                                     <field name="tag_ids" widget="many2many_tags"/>
                                 </group>
                                 <field name="description" nolabel="1" witget="html"
@@ -320,13 +320,13 @@
                                     * Les données saisies dans ce champ seront imprimées dans la fiche d'intervention.
                                 </div>
                                 <!-- Notes client -->
-                                <group attrs="{'invisible':[('of_notes_client','=',False)]}" col="2">
+                                <group attrs="{'invisible':[('of_notes_client','=',False)]}">
                                     <separator string="Notes client" colspan="2"/>
                                     <field name="of_notes_client" colspan="2" nolabel="1" readonly="1"
                                            help="Ces notes proviennent de la fiche client sous la rubrique 'Notes internes'. Ils sont uniquement modifiables dans la fiche client."/>
                                 </group>
                                 <!-- Notes intervention -->
-                                <group attrs="{'invisible':[('of_notes_intervention','=',False)]}" col="2">
+                                <group attrs="{'invisible':[('of_notes_intervention','=',False)]}">
                                     <separator string="Notes intervention" colspan="2"/>
                                     <field name="of_notes_intervention" nolabel="1"
                                            help="Ces notes proviennent du devis / commande sous la rubrique 'Notes intervention'. Ils sont uniquement modifiables dans le  devis / commande (voir la commande associée)."/>
@@ -375,9 +375,7 @@
                         </page>
 
                         <page name="recap" string="Compte rendu" invisible="1">
-                            <group>
-
-                            </group>
+                            <group/>
                         </page>
                     </notebook>
                 </sheet>
