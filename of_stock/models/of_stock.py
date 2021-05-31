@@ -430,7 +430,7 @@ class InventoryLine(models.Model):
     of_note = fields.Text(string="Notes")
     of_theoretical_qty = fields.Float(string=u"Quantité théorique")
     of_product_lot_serial_management = fields.Boolean(
-        related='product_id.of_lot_serial_management', string=u"Géré par lot/num. de série", readonly=True)
+        related='product_id.of_lot_serial_management', string=u"Géré par lot/num. de série", readonly=True, store=True)
     of_inventory_gap = fields.Float(string=u"Écart d'inventaire", compute='_compute_of_inventory_gap', store=True)
 
     @api.depends('of_theoretical_qty', 'product_qty')
@@ -554,6 +554,10 @@ class InventoryLine(models.Model):
             self.of_theoretical_qty = line.theoretical_qty
 
     def of_get_stock_history(self):
+        """
+        :return: [quantité en stock, valeur de l'inventaire (coût)]
+        :TODO: Ajouter des filtres pour les champs partner_id et package_id
+        """
         if not self.product_id:
             return [0.0, 0.0]
         in_move_request = """
