@@ -1776,9 +1776,10 @@ class OfPlanningInterventionLine(models.Model):
         """
         precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
         new_procs = self.env['procurement.order']  # Empty recordset
+        do_deliveries = self.env['ir.values'].get_default('of.intervention.settings', 'do_deliveries')
         for line in self:
             if line.intervention_id.state not in ('confirm', 'done') or not line.product_id._need_procurement() \
-                    or line.order_line_id:
+                    or line.order_line_id or not do_deliveries:
                 continue
             qty = 0.0
             for proc in line.procurement_ids.filtered(lambda r: r.state != 'cancel'):
@@ -2121,6 +2122,13 @@ class StockMove(models.Model):
         for line in planning_intervention_lines:
             line.qty_delivered = line._get_delivered_qty()
         return result
+
+    def _get_new_picking_values(self):
+        res = super(StockMove, self)._get_new_picking_values()
+        if isinstance(res, dict) and self.procurement_id.of_intervention_line_id:
+            res['min_date'] = self.procurement_id.of_intervention_line_id.intervention_id.date
+        return res
+
 
 class ProcurementOrder(models.Model):
     _inherit = "procurement.order"
