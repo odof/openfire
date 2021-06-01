@@ -208,4 +208,35 @@
         </t>
     </template>
 
+    <!-- Portail - Devis -->
+    <template id="of_website_portal_portal_my_quotations" name="OF Website Portal My Quotations" inherit_id="website_portal_sale.portal_my_quotations">
+        <xpath expr="//table/thead/tr/th[1]" position="replace">
+            <th style="width: 20%;">Numéro</th>
+            <th style="width: 20%; text-align: center;">Référence</th>
+        </xpath>
+        <xpath expr="//table/thead/tr/th[3]" position="replace">
+            <th style="width: 25%;">Date d'échéance</th>
+        </xpath>
+        <xpath expr="//span[@t-field='quotation.validity_date']/parent::td" position="before">
+            <td><span t-field="quotation.client_order_ref"/></td>
+        </xpath>
+    </template>
+
+    <!-- Portail - Commandes -->
+    <template id="of_website_portal_portal_my_orders" name="OF Website Portal My Sale Orders" inherit_id="website_portal_sale.portal_my_orders">
+        <xpath expr="//table/thead/tr/th[1]" position="replace">
+            <th style="width: 20%;">Numéro</th>
+            <th style="width: 20%; text-align: center;">Référence</th>
+        </xpath>
+        <xpath expr="//table/thead/tr/th[3]" position="replace">
+            <th style="width: 30%;">Date de la commande</th>
+        </xpath>
+        <xpath expr="//span[@t-field='order.date_order']/parent::td" position="before">
+            <td><span t-field="order.client_order_ref"/></td>
+        </xpath>
+        <xpath expr="//span[@t-field='order.date_order']" position="replace">
+            <span t-field="order.date_order" t-options="{'widget': 'date'}"/>
+        </xpath>
+    </template>
+
 </odoo>

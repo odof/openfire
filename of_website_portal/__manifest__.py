@@ -16,6 +16,7 @@ Module OpenFire pour le portail du site internet
     'depends': [
         'website_portal',
         'website_project_issue',
+        'website_portal_sale',
         'of_base',
         'of_account_invoice_report',
         'of_service',
