@@ -1356,6 +1356,10 @@ class ProductProduct(models.Model):
 
     @api.model
     def of_datastore_get_fields_to_not_empty(self):
+        result = [
+            'norme_id',
+            'ecotax_amount',
+        ]
         # On ne veut aucun des champs ajoutés par le module of_product_chem
         cr = self._cr
         cr.execute(
@@ -1368,7 +1372,8 @@ class ProductProduct(models.Model):
                  AND d.module IN ('of_product_chem')
             """,
             (self._name, ))
-        return [row[0] for row in cr.fetchall()]
+        result += [row[0] for row in cr.fetchall()]
+        return result
 
     @api.multi
     def of_datastore_import(self):
