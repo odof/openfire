@@ -82,7 +82,7 @@ class OFReportFileLine(models.Model):
             self.model = self.report_file_id.model_id.model
 
     @api.multi
-    def get_combined_doc(self, doc):
+    def get_combined_doc(self, doc, obj):
         self.ensure_one()
         data = []
         if doc.file:
@@ -95,7 +95,7 @@ class OFReportFileLine(models.Model):
                     [('res_model', '=', doc._name),
                      ('res_field', '=', 'file'),
                      ('res_id', '=', doc.id)])
-                datas = dict(self.env['of.compose.mail'].eval_champs(self, doc.chp_ids))
+                datas = dict(self.env['of.compose.mail'].eval_champs(obj, doc.chp_ids))
                 file_path = self.env['ir.attachment']._full_path(attachment.store_fname)
                 fd, generated_pdf = tempfile.mkstemp(prefix='doc_joint_', suffix='.pdf')
                 try:
@@ -128,7 +128,8 @@ class Report(models.Model):
                 if line.type == 'qweb':
                     tmp_result = super(Report, self).get_pdf(docids, line.report_id.report_name, html=html, data=data)
                 elif line.type == 'doc':
-                    tmp_result = line.get_combined_doc(line.combined_document_id)
+                    obj = self.env[report_file.model_id.model].browse(docids)
+                    tmp_result = line.get_combined_doc(line.combined_document_id, obj)
 
                 if tmp_result:
                     for i in range(line.copy_nb):
