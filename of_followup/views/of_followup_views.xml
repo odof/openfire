@@ -88,6 +88,11 @@
                                     </field>
                                 </group>
                                 <group col="4" colspan="4" string="Autres tâches">
+                                    <button class="btn btn-sm btn-primary"
+                                            name="last_step_for_all"
+                                            string="Tout valider"
+                                            help="Passer toutes les tâches au dernier état possible."
+                                            type="object"/>
                                     <field name="other_task_ids" nolabel="1" colspan="4">
                                         <tree decoration-danger="is_late" decoration-success="is_done" decoration-muted="is_not_processed">
                                             <field name="is_late" invisible="1"/>

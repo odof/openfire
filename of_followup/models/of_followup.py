@@ -426,6 +426,15 @@ class OFFollowupProject(models.Model):
         for project in self.search([]):
             project._compute_stage_id()
 
+    @api.multi
+    def last_step_for_all(self):
+        self.ensure_one()
+        for task in self.other_task_ids:
+            states = self.env['of.followup.task.type.state'].search(
+                    [('task_type_id', '=', task.type_id.id), ('sequence', '>', task.state_id.sequence)])
+            if states:
+                task.state_id = states[-1].id
+
 
 class OFFollowupProjectStage(models.Model):
     _name = 'of.followup.project.stage'
