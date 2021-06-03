@@ -45,6 +45,9 @@
                         <field name="of_referred_id" />
                     </group>
                 </xpath>
+                <xpath expr="//field[@name='user_id']" position="after">
+                    <field name="of_canvasser_id"/>
+                </xpath>
             </field>
         </record>
 
@@ -104,5 +107,17 @@
                 </xpath>
             </field>
         </record>
+
+    <!-- Account Invoice Form View -->
+    <record id="of_crm_account_invoice_form_view" model="ir.ui.view">
+        <field name="name">of.crm.account.invoice.form.view</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="of_canvasser_id"/>
+            </xpath>
+        </field>
+    </record>
 
 </odoo>
