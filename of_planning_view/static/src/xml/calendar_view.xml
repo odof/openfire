@@ -19,7 +19,7 @@
                     </span>
                 </div>
 
-                <div t-if="record.partner_name">
+                <div t-if="record.partner_name" class="of_inherit_name">
                     <i class="fa fa-user"/>
                     <span class="of_ws"/>
                     <t t-raw="record.partner_name"/>
