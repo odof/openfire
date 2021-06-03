@@ -764,6 +764,10 @@ class AccountInvoice(models.Model):
 
     @api.multi
     def copy(self, default=None):
+        default = default or {}
+        # On force les commissions à False pour éviter que celle du vendeur ne se regénère automatiquement.
+        default['of_commi_ids'] = False
+
         result = super(AccountInvoice, self).copy(default=default)
         if self.type not in ('out_invoice', 'out_refund'):
             return result
