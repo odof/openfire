@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Sale Order Form View -->
+    <record id="of_sale_order_dates_sale_order_form_view" model="ir.ui.view">
+        <field name="name">of.sale.order.dates.sale.order.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_order_dates.view_order_form_inherit_sale_stock_inherit_sale_order_dates"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='requested_date']" position="after">
+                <field name="of_requested_week"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Sale Order Line Views -->
+
+    <record id="of_sale_order_dates_sale_order_line_tree_view" model="ir.ui.view">
+        <field name="name">of.sale.order.dates.sale.order.line.tree.view</field>
+        <field name="model">sale.order.line</field>
+        <field name="inherit_id" ref="of_sale_stock.of_sale_stock_sale_order_line_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_picking_min_week']" position="before">
+                <field name="of_order_requested_week"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_order_dates_sale_order_line_search_view" model="ir.ui.view">
+        <field name="name">of.sale.order.dates.sale.order.line.search.view</field>
+        <field name="model">sale.order.line</field>
+        <field name="inherit_id" ref="of_sale_stock.of_sale_stock_sale_order_line_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_product_brand_id']" position="after">
+                <field name="of_order_requested_week"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -22,6 +22,7 @@
         <field name="name">of.stock.picking.form</field>
         <field name="model">stock.picking</field>
         <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="priority" eval="20"/>
         <field name="arch" type="xml">
             <!-- smart button achats -->
             <xpath expr="//div[@name='button_box']" position="inside">
@@ -33,6 +34,9 @@
                     attrs="{'invisible': [('of_purchase_count', '=', 0)]}" groups="base.group_user">
                     <field name="of_purchase_count" widget="statinfo" string="Achats"/>
                 </button>
+            </xpath>
+            <xpath expr="//field[@name='min_date']" position="after">
+                <field name="of_min_week"/>
             </xpath>
             <xpath expr="//notebook//page[1]" position="inside">
                 <field name="of_note_operations" placeholder="Ajouter une note qui figurera sur le bon de livraison" class="oe_inline"/>
@@ -86,14 +90,32 @@
         </field>
     </record>
 
-    <!-- Ajout du champ route -->
+    <!-- Sale Order Form View -->
     <record id="of_sale_stock_view_order_form" model="ir.ui.view">
         <field name="name">of.sale.stock.view.order.form</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="priority" eval="30"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='payment_term_id']" position="before">
                 <field name="of_route_id" groups="sale_stock.group_route_so_lines"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="after">
+                <field name="of_reserved_qty" invisible="context.get('hide_sale')" groups="of_sale_stock.group_sale_order_line_display_stock_info+sales_team.group_sale_manager"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='price_total']" position="after">
+                <field name="of_total_stock_qty" groups="of_sale_stock.group_sale_order_line_display_stock_info+sales_team.group_sale_manager"/>
+                <field name="of_available_stock_qty" groups="of_sale_stock.group_sale_order_line_display_stock_info+sales_team.group_sale_manager"/>
+                <field name="of_theoretical_stock_qty" groups="of_sale_stock.group_sale_order_line_display_stock_info+sales_team.group_sale_manager"/>
+                <field name="of_stock_moves_state" invisible="context.get('hide_sale')" groups="of_sale_stock.group_sale_order_line_display_stock_info+sales_team.group_sale_manager"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form/group/group[2]" position="inside">
+                <separator colspan="2" string="Informations de Stock" name="stock_info_sep" groups="of_sale_stock.group_sale_order_line_display_stock_info+sales_team.group_sale_manager"/>
+                <field name="of_total_stock_qty" groups="of_sale_stock.group_sale_order_line_display_stock_info+sales_team.group_sale_manager"/>
+                <field name="of_available_stock_qty" groups="of_sale_stock.group_sale_order_line_display_stock_info+sales_team.group_sale_manager"/>
+                <field name="of_theoretical_stock_qty" groups="of_sale_stock.group_sale_order_line_display_stock_info+sales_team.group_sale_manager"/>
+                <field name="of_reserved_qty" invisible="context.get('hide_sale')" groups="of_sale_stock.group_sale_order_line_display_stock_info+sales_team.group_sale_manager"/>
+                <field name="of_stock_moves_state" invisible="context.get('hide_sale')" groups="of_sale_stock.group_sale_order_line_display_stock_info+sales_team.group_sale_manager"/>
             </xpath>
         </field>
     </record>
@@ -186,8 +208,90 @@
                     <field name="of_inclure_service_bl" class="oe_inline"/>
                     <span>Inclure les articles de type 'service' dans les bons de livraisons</span>
                 </div>
+                <label for="group_sale_order_line_display_stock_info"/>
+                <div name="group_sale_order_line_display_stock_info">
+                    <field name="group_sale_order_line_display_stock_info" class="oe_inline"/>
+                    <span>Afficher les informations de stock au niveau des lignes de commande</span>
+                </div>
             </xpath>
         </field>
     </record>
+
+    <!-- Res Partner Form View -->
+    <record id="of_sale_stock_res_partner_form_view" model="ir.ui.view">
+        <field name="name">of.sale.stock.res.partner.form.view</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="sale.res_partner_view_buttons"/>
+        <field name="arch" type="xml">
+            <!-- Ajout smart button Lignes de commande -->
+            <xpath expr="//button[@name='%(sale.act_res_partner_2_sale_order)d']" position="after">
+                <button class="oe_stat_button" name="action_view_sale_order_lines" type="object" icon="fa-usd">
+                    <field string="Lignes de commande" name="of_sale_order_lines_count" widget="statinfo"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Sale Order Line Views -->
+
+    <record id="of_sale_stock_sale_order_line_tree_view" model="ir.ui.view">
+        <field name="name">of.sale.stock.sale.order.line.tree.view</field>
+        <field name="model">sale.order.line</field>
+        <field name="arch" type="xml">
+            <tree edit="false" create="false" delete="false">
+                <field name="date_order"/>
+                <field name="order_id"/>
+                <field name="state"/>
+                <field name="confirmation_date_order"/>
+                <field name="product_id"/>
+                <field name="name"/>
+                <field name="product_uom_qty"/>
+                <field name="of_reserved_qty"/>
+                <field name="of_picking_min_week"/>
+                <field name="of_receipt_min_week"/>
+                <field name="of_supplier_delivery_delay"/>
+                <field name="of_has_reordering_rule"/>
+                <field name="of_stock_moves_state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_sale_stock_sale_order_line_search_view" model="ir.ui.view">
+        <field name="name">of.sale.stock.sale.order.line.search.view</field>
+        <field name="model">sale.order.line</field>
+        <field name="inherit_id" ref="sale.view_sales_order_line_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='salesman_id']" position="after">
+                <field name="of_stock_moves_state"/>
+                <field name="of_product_brand_id"/>
+                <field name="of_picking_min_week"/>
+            </xpath>
+            <xpath expr="//filter[2]" position="after">
+                <separator/>
+                <filter string="Commande validée" name="validated_order" domain="[('state', 'not in', ('draft', 'sent', 'cancel'))]"/>
+                <separator/>
+                <filter string="Nouveau" domain="[('of_stock_moves_state', '=', 'draft')]"/>
+                <filter string="En attente de réception" domain="[('of_stock_moves_state', '=', 'waiting')]"/>
+                <filter string="Attente de disponibilité" domain="[('of_stock_moves_state', '=', 'confirmed')]"/>
+                <filter string="Disponible" domain="[('of_stock_moves_state', '=', 'assigned')]"/>
+                <filter string="Fait" domain="[('of_stock_moves_state', '=', 'done')]"/>
+                <filter string="Annulé" domain="[('of_stock_moves_state', '=', 'cancel')]"/>
+                <separator/>
+                <filter string="Produit stockable" domain="[('of_product_type', '=', 'product')]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_stock_sale_order_line_action" model="ir.actions.act_window">
+        <field name="name">Lignes de commande</field>
+        <field name="res_model">sale.order.line</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="of_sale_stock_sale_order_line_tree_view"/>
+        <field name="context">{'search_default_validated_order': 1}</field>
+    </record>
+
+    <menuitem id="of_sale_stock_sale_order_line_menu" name="Lignes de commande" parent="sales_team.menu_sales"
+              action="of_sale_stock_sale_order_line_action" sequence="13"/>
 
 </odoo>

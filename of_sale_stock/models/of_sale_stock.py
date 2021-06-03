@@ -2,7 +2,11 @@
 
 from odoo import api, fields, models
 import odoo.addons.decimal_precision as dp
-from odoo.tools.float_utils import float_compare
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools.float_utils import float_compare, float_round
+
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 
 class StockInventory(models.Model):
@@ -135,6 +139,36 @@ class SaleOrderLine(models.Model):
 
     of_invoice_policy = fields.Selection(
         selection_add=[('ordered_delivery', u'Quantités commandées à date de livraison')])
+    of_stock_moves_state = fields.Selection(
+        selection=[('draft', u"Nouveau"),
+                   ('cancel', u"Annulé"),
+                   ('waiting', u"En attente de réception"),
+                   ('confirmed', u"Attente de disponibilité"),
+                   ('assigned', u"Disponible"),
+                   ('done', u"Fait")], string=u"État de suivi", compute='_compute_of_stock_moves_state', store=True)
+    of_total_stock_qty = fields.Float(
+        string=u"Stock total", digits=dp.get_precision('Product Unit of Measure'), compute='_compute_of_stock_qty')
+    of_available_stock_qty = fields.Float(
+        string=u"Stock dispo.", digits=dp.get_precision('Product Unit of Measure'), compute='_compute_of_stock_qty')
+    of_theoretical_stock_qty = fields.Float(
+        string=u"Stock théo.", digits=dp.get_precision('Product Unit of Measure'), compute='_compute_of_stock_qty',
+        help=u"Si une règle de stock est définie pour l'article avec une date limite de prévision, le stock théorique "
+             u"est calculé à cette date ; sinon le stock théorique calculé est le stock théorique global de l'article")
+    of_reserved_qty = fields.Float(
+        string=u"Qté(s) réservée(s)", digits=dp.get_precision('Product Unit of Measure'),
+        compute='_compute_of_stock_qty')
+    of_picking_min_week = fields.Char(string=u"Semaine prévue", compute='_compute_of_picking_min_week', store=True)
+    of_receipt_min_week = fields.Char(string=u"Semaine de réception", compute='_compute_of_receipt_min_week')
+    of_product_type = fields.Selection(
+        selection=[('product', u"Produit stockable"),
+                   ('consu', u"Consommable"),
+                   ('service', u"Service")], string=u"Type d'article", related='product_id.type', readonly=True,
+        store=True)
+    of_supplier_delivery_delay = fields.Float(
+        string=u"Délai de livraison", compute='_compute_of_supplier_delivery_delay', store=True)
+    of_has_reordering_rule = fields.Boolean(
+        string=u"Gérer sur règle de stock", compute='_compute_of_has_reordering_rule',
+        help=u"L'article dispose de règles de réapprovisionnement.")
 
     @api.onchange('route_id')
     def _get_route_id(self):
@@ -195,6 +229,113 @@ class SaleOrderLine(models.Model):
                         line.of_invoice_date_prev = fields.Date.to_string(
                             fields.Date.from_string(moves[-1].date_expected))
 
+    @api.depends('procurement_ids', 'procurement_ids.move_ids', 'procurement_ids.move_ids.state')
+    def _compute_of_stock_moves_state(self):
+        for line in self:
+            stock_moves = line.procurement_ids.mapped('move_ids')
+            if stock_moves:
+                if stock_moves.filtered(lambda m: m.state == 'draft'):
+                    line.of_stock_moves_state = 'draft'
+                elif stock_moves.filtered(lambda m: m.state == 'waiting'):
+                    line.of_stock_moves_state = 'waiting'
+                elif stock_moves.filtered(lambda m: m.state == 'confirmed'):
+                    line.of_stock_moves_state = 'confirmed'
+                elif stock_moves.filtered(lambda m: m.state == 'assigned'):
+                    line.of_stock_moves_state = 'assigned'
+                elif stock_moves.filtered(lambda m: m.state == 'cancel'):
+                    line.of_stock_moves_state = 'cancel'
+                elif stock_moves.filtered(lambda m: m.state == 'done'):
+                    line.of_stock_moves_state = 'done'
+                else:
+                    line.of_stock_moves_state = False
+            else:
+                line.of_stock_moves_state = False
+
+    @api.depends('product_id', 'order_id.warehouse_id', 'order_id.warehouse_id.lot_stock_id')
+    def _compute_of_stock_qty(self):
+        for line in self:
+            if line.order_id.warehouse_id:
+                location = line.order_id.warehouse_id.lot_stock_id
+                product_context = dict(self._context, location=location.id)
+
+                # Stock total
+                line.of_total_stock_qty = line.product_id.with_context(product_context).qty_available
+
+                # Stock dispo
+                domain_quant = [('product_id', '=', line.product_id.id), ('reservation_id', '=', False)]
+                domain_quant += line.product_id.with_context(product_context)._get_domain_locations()[0]
+                quants = self.env['stock.quant'].search(domain_quant)
+                line.of_available_stock_qty = float_round(
+                    sum(quants.mapped('qty')), precision_rounding=line.product_id.uom_id.rounding)
+
+                # Stock théorique
+                orderpoints = self.env['stock.warehouse.orderpoint'].search([('product_id', '=', line.product_id.id)],
+                                                                            limit=1)
+                if orderpoints and orderpoints.of_forecast_limit:
+                    product_context['of_to_date_expected'] = \
+                        (datetime.today() + relativedelta(days=orderpoints.of_forecast_period)).\
+                        strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+                line.of_theoretical_stock_qty = line.product_id.with_context(product_context).virtual_available
+
+                # Qté(s) réservée(s)
+                stock_moves = line.procurement_ids.mapped('move_ids')
+                if stock_moves:
+                    domain_quant = [('product_id', '=', line.product_id.id), ('reservation_id', 'in', stock_moves.ids)]
+                    domain_quant += line.product_id.with_context(product_context)._get_domain_locations()[0]
+                    quants = self.env['stock.quant'].search(domain_quant)
+                    line.of_reserved_qty = float_round(
+                        sum(quants.mapped('qty')), precision_rounding=line.product_id.uom_id.rounding)
+                else:
+                    line.of_reserved_qty = 0
+
+            else:
+                line.of_total_stock_qty = 0
+                line.of_available_stock_qty = 0
+                line.of_theoretical_stock_qty = 0
+                line.of_reserved_qty = 0
+
+    @api.depends('procurement_ids', 'procurement_ids.move_ids', 'procurement_ids.move_ids.picking_id',
+                 'procurement_ids.move_ids.picking_id.move_lines',
+                 'procurement_ids.move_ids.picking_id.move_lines.date_expected')
+    def _compute_of_picking_min_week(self):
+        for line in self:
+            pickings = line.procurement_ids.mapped('move_ids').mapped('picking_id')
+            if pickings:
+                line.of_picking_min_week = pickings[0].of_min_week
+            else:
+                line.of_picking_min_week = ""
+
+    @api.depends('procurement_ids', 'procurement_ids.move_ids')
+    def _compute_of_receipt_min_week(self):
+        for line in self:
+            moves = line.procurement_ids.mapped('move_ids')
+            if moves:
+                purchase_procurement_orders = self.env['procurement.order'].search(
+                    [('move_dest_id', 'in', moves.ids)])
+                validated_purchase_lines = purchase_procurement_orders.mapped('purchase_line_id').filtered(
+                    lambda l: l.order_id.state == 'purchase')
+                receipts = validated_purchase_lines.mapped('order_id').mapped('picking_ids')
+                if receipts:
+                    line.of_receipt_min_week = receipts[0].of_min_week
+                else:
+                    line.of_receipt_min_week = ""
+            else:
+                line.of_receipt_min_week = ""
+
+    @api.depends('product_id', 'product_id.seller_ids', 'product_id.seller_ids.delay')
+    def _compute_of_supplier_delivery_delay(self):
+        for line in self:
+            if line.product_id and line.product_id.seller_ids:
+                line.of_supplier_delivery_delay = line.product_id.seller_ids[0].delay
+            else:
+                line.of_supplier_delivery_delay = 0.0
+
+    @api.depends('product_id', 'product_id.nbr_reordering_rules')
+    def _compute_of_has_reordering_rule(self):
+        for line in self:
+            if line.product_id:
+                line.of_has_reordering_rule = line.product_id.nbr_reordering_rules > 0
+
 
 class SaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'
@@ -205,6 +346,11 @@ class SaleConfiguration(models.TransientModel):
 
     default_invoice_policy = fields.Selection(
         selection_add=[('ordered_delivery', u"Facturer les quantités commandées à date de livraison")])
+    group_sale_order_line_display_stock_info = fields.Boolean(
+        string=u"(OF) Informations de stock",
+        implied_group='of_sale_stock.group_sale_order_line_display_stock_info',
+        group='base.group_portal,base.group_user,base.group_public',
+        help=u"Affiche les informations de stock au niveau des lignes de commande")
 
     @api.multi
     def set_stock_warning_defaults(self):
@@ -245,6 +391,8 @@ class StockPicking(models.Model):
     of_purchase_ids = fields.Many2many(
         'purchase.order', compute='_compute_of_purchase_ids', string=u'Achats associés à cette livraison')
     of_purchase_count = fields.Integer('Achats', compute='_compute_of_purchase_ids')
+
+    of_min_week = fields.Char(string=u"Semaine prévue", compute='_compute_of_min_week', store=True)
 
     @api.multi
     def _compute_of_purchase_ids(self):
@@ -297,6 +445,17 @@ class StockPicking(models.Model):
             'res_id': wizard.id,
             'target': 'new',
         }
+
+    @api.depends('move_lines.date_expected')
+    def _compute_of_min_week(self):
+        for picking in self:
+            min_date = min(picking.move_lines.mapped('date_expected') or [False])
+            if min_date:
+                min_year = fields.Date.from_string(min_date).year
+                min_week = datetime.strptime(min_date, "%Y-%m-%d %H:%M:%S").date().isocalendar()[1]
+                picking.of_min_week = "%s - S%02d" % (min_year, min_week)
+            else:
+                picking.of_min_week = ""
 
 
 class PackOperation(models.Model):
@@ -473,6 +632,21 @@ class ResPartner(models.Model):
 
     of_invoice_policy = fields.Selection(
         selection_add=[('ordered_delivery', u'Quantités commandées à date de livraison')])
+    of_sale_order_lines_count = fields.Integer(
+        string=u"Nombre de lignes de commande", compute='_compute_of_sale_order_lines_count')
+
+    @api.multi
+    def _compute_of_sale_order_lines_count(self):
+        for partner in self:
+            partner.of_sale_order_lines_count = len(self.env['sale.order.line'].search(
+                [('order_partner_id', 'child_of', partner.id)]))
+
+    @api.multi
+    def action_view_sale_order_lines(self):
+        self.ensure_one()
+        action = self.env.ref('of_sale_stock.of_sale_stock_sale_order_line_action').read()[0]
+        action['domain'] = [('order_partner_id', 'child_of', self.id)]
+        return action
 
 
 class OFSaleConfiguration(models.TransientModel):

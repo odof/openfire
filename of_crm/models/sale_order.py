@@ -17,6 +17,7 @@ class SaleOrder(models.Model):
         """
         cr = self._cr
         new_workflow = False
+        new_canvasser_field = False
         if self._auto:
             cr.execute(
                 "SELECT * "
@@ -24,6 +25,13 @@ class SaleOrder(models.Model):
                 "WHERE table_name = '%s' "
                 "AND column_name = 'of_sent_quotation'" % self._table)
             new_workflow = not bool(cr.fetchall())
+
+            cr.execute(
+                "SELECT * "
+                "FROM information_schema.columns "
+                "WHERE table_name = '%s' "
+                "AND column_name = 'of_canvasser_id'" % self._table)
+            new_canvasser_field = not bool(cr.fetchall())
 
         res = super(SaleOrder, self)._auto_init()
 
@@ -34,6 +42,16 @@ class SaleOrder(models.Model):
             cr.execute("UPDATE %s "
                        "SET state = 'sent' "
                        "WHERE state = 'draft'" % self._table)
+
+        if new_canvasser_field:
+            cr.execute(
+                "UPDATE %s SO "
+                "SET of_canvasser_id = COALESCE(CL.of_prospecteur_id, RP.of_prospecteur_id, NULL) "
+                "FROM %s SO2 "
+                "INNER JOIN res_partner RP ON RP.id = SO2.partner_id "
+                "LEFT JOIN crm_lead CL ON (CL.id = SO2.opportunity_id) "
+                "WHERE SO.id = SO2.id" % (self._table, self._table))
+
         return res
 
     @api.model
@@ -66,6 +84,13 @@ class SaleOrder(models.Model):
         ('cancel', u'Annulé'),
     ], default=_default_state)
     of_sent_quotation = fields.Boolean(string=u"Devis envoyé")
+    of_canvasser_id = fields.Many2one(comodel_name='res.users', string=u"Prospecteur")
+
+    @api.onchange('partner_id')
+    def onchange_partner_id(self):
+        super(SaleOrder, self).onchange_partner_id()
+        if self.partner_id.of_prospecteur_id:
+            self.of_canvasser_id = self.partner_id.of_prospecteur_id
 
     @api.onchange('opportunity_id')
     def onchange_opportunity(self):
@@ -77,6 +102,8 @@ class SaleOrder(models.Model):
             self.team_id = self.opportunity_id.team_id
             if self.opportunity_id.user_id and self.state != 'sale':
                 self.user_id = self.opportunity_id.user_id
+            if self.opportunity_id.of_prospecteur_id and self.state != 'sale':
+                self.of_canvasser_id = self.opportunity_id.of_prospecteur_id
 
     @api.model
     def create(self, vals):
@@ -153,9 +180,44 @@ class SaleOrder(models.Model):
             'context': ctx,
         }
 
+    @api.multi
+    def _prepare_invoice(self):
+        invoice_vals = super(SaleOrder, self)._prepare_invoice()
+        invoice_vals['of_canvasser_id'] = self.of_canvasser_id.id
+        return invoice_vals
+
 
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
+
+    @api.model
+    def _auto_init(self):
+        cr = self._cr
+        new_canvasser_field = False
+        if self._auto:
+            cr.execute(
+                "SELECT * "
+                "FROM information_schema.columns "
+                "WHERE table_name = '%s' "
+                "AND column_name = 'of_canvasser_id'" % self._table)
+            new_canvasser_field = not bool(cr.fetchall())
+
+        res = super(AccountInvoice, self)._auto_init()
+
+        if new_canvasser_field:
+            cr.execute(
+                "UPDATE %s AI "
+                "SET of_canvasser_id = COALESCE(SO.of_canvasser_id, RP.of_prospecteur_id, NULL) "
+                "FROM  %s AI2 "
+                "INNER JOIN res_partner RP ON RP.id = AI2.partner_id "
+                "LEFT JOIN sale_order SO ON (SO.name = AI2.origin) "
+                "WHERE AI.id = AI2.id" % (self._table, self._table))
+
+        return res
+
+    of_canvasser_id = fields.Many2one(
+        comodel_name='res.users', string=u"Prospecteur", readonly=True, states={'draft': [('readonly', False)]},
+        default=lambda self: self.env.user)
 
     @api.multi
     def invoice_validate(self):
