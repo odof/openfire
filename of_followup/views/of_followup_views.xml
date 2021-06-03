@@ -88,6 +88,11 @@
                                     </field>
                                 </group>
                                 <group col="4" colspan="4" string="Autres tâches">
+                                    <button class="btn btn-sm btn-primary"
+                                            name="last_step_for_all"
+                                            string="Tout valider"
+                                            help="Passer toutes les tâches au dernier état possible."
+                                            type="object"/>
                                     <field name="other_task_ids" nolabel="1" colspan="4">
                                         <tree decoration-danger="is_late" decoration-success="is_done" decoration-muted="is_not_processed">
                                             <field name="is_late" invisible="1"/>
@@ -243,6 +248,21 @@
         <field name="res_model">of.followup.project</field>
         <field name="view_mode">kanban,tree,form</field>
         <field name="context">{'search_default_not_done': 1}</field>
+    </record>
+
+    <record id="action_of_followup_last_step_for_all" model="ir.actions.server">
+        <field name="name">Tout valider</field>
+        <field name="model_id" ref="model_of_followup_project"/>
+        <field name="state">code</field>
+        <field name="code">action = records.last_step_for_all()</field>
+        <field name="groups">of_access_control.of_group_sale_responsible</field>
+    </record>
+
+    <record id="action_of_followup_last_step_for_all_values" model="ir.values">
+        <field name="name">Tout valider</field>
+        <field name="key2">client_action_multi</field>
+        <field name="model">of.followup.project</field>
+        <field name="value" eval="'ir.actions.server,%d'%action_of_followup_last_step_for_all"/>
     </record>
 
     <!-- Followup Task Views -->
