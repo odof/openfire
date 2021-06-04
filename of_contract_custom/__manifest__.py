@@ -86,6 +86,7 @@ Bloquer l'utilisation de la récurrence sur le modèle `of.service` car les cont
         'wizards/of_contract_custom_wizard_view.xml',
         'wizards/of_contract_indice_wizard_views.xml',
         'wizards/of_contract_line_cancel_wizard_views.xml',
+        'wizards/of_contract_mass_avenant_wizard_views.xml',
         'wizards/of_contract_revision_wizard_views.xml',
         'wizards/of_rdv_wizard_views.xml',
         ],

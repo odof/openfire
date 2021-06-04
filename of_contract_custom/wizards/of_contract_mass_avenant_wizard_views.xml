@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_contract_mass_avenant_view_form" model="ir.ui.view">
+        <field name="name">Avenants multiples</field>
+        <field name="model">of.contract.mass.avenant.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Avenant">
+                <group>
+                    <field name="date_start"/>
+                    <field name="frequency_type"/>
+                    <field name="recurring_invoicing_payment_id"/>
+                </group>
+                <field name="line_ids" nolabel="1">
+                    <tree colors="green:selected" editable="bottom" delete="false" create="false">
+                        <field name="selected"/>
+                        <field name="contract_line_id" readonly="1"/>
+                        <field name="address_id"/>
+                        <field name="tache_id"/>
+                    </tree>
+                </field>
+                <footer>
+                    <button string="Créer avenant" name="button_create" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                    <button string="Tout sélectionner" name="select_all" type="object" class="btn-default"/>
+                    <button string="Tout dé-sélectionner" name="deselect_all" type="object" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
