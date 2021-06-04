@@ -12,8 +12,8 @@ class SaleOrder(models.Model):
     def onchange_template_id(self):
         # Change the order type if the selected quote template has one
         super(SaleOrder, self).onchange_template_id()
-        if self.of_template_id and self.of_template_id.order_type_id:
-            self.of_sale_type_id = self.of_template_id.order_type_id
+        if self.of_template_id and self.of_template_id.of_sale_type_id:
+            self.of_sale_type_id = self.of_template_id.of_sale_type_id
 
     @api.multi
     def _prepare_invoice(self):
