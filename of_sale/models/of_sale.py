@@ -352,8 +352,28 @@ class SaleOrder(models.Model):
 
     @api.multi
     def action_confirm(self):
+        sale_responsible = self.env.user.has_group('sales_team.group_sale_manager')
+        action = False
+        for order in self:
+            article_principal = order.order_line.filtered('of_article_principal')
+            if not self._context.get('no_verif_margin', False) and article_principal \
+               and article_principal[0].product_id.categ_id.of_taux_marge:
+                if int(order.of_marge_pc) < article_principal[0].product_id.categ_id.of_taux_marge:
+                    message = u"Le montant de marge de la commande %s est de %.2f%% alors que la catégorie %s de " \
+                              u"l'article principal %s %s une marge minimum de %s%%" % (
+                                  order.name,
+                                  order.of_marge_pc,
+                                  article_principal[0].product_id.categ_id.name,
+                                  article_principal[0].product_id.display_name,
+                                  sale_responsible and u"demande" or u"requiert",
+                                  article_principal[0].product_id.categ_id.of_taux_marge)
+                    action = self.env['of.popup.wizard'].popup_return(message=message, titre=u"Contrôle de marge")
+                if not sale_responsible and action:
+                    return action
         super(SaleOrder, self).action_confirm()
         self.of_update_dates_echeancier()
+        if sale_responsible and action:
+            return action
         return True
 
     @api.multi
@@ -1760,6 +1780,16 @@ class ProductCategory(models.Model):
     of_article_principal = fields.Boolean(string="Article principal",
                                           help=u"Les articles de cette catégorie seront considérés comme articles"
                                                u" principaux sur les commandes / factures clients")
+    of_taux_marge = fields.Integer(
+        string="Taux de marge",
+        help=u"Taux de marge en %% minimum recommandé quand l'article principal d'un devis fait partie"
+             u"de la catégorie.")
+
+    @api.constrains('of_taux_marge')
+    def _constraint_taux_marge(self):
+        for category in self:
+            if 0 > category.of_taux_marge or category.of_taux_marge > 100:
+                raise UserError("Le taux de marge doit être compris entre 0% et 100%")
 
 
 class ProductPricelist(models.Model):
