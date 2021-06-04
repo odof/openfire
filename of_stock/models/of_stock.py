@@ -361,6 +361,55 @@ class Inventory(models.Model):
         self.post_inventory()
         return True
 
+    @api.multi
+    def action_compile_lines(self):
+        self.ensure_one()
+        for line in self.line_ids:
+            if line.exists() and not line.prod_lot_id and line.product_id.tracking == 'none':
+                other_lines = self.line_ids.filtered(
+                    lambda l: l.id != line.id and l.product_id == line.product_id and not l.prod_lot_id)
+                if other_lines:
+                    line.product_qty = line.product_qty + sum(other_lines.mapped('product_qty'))
+                    other_lines.unlink()
+        return True
+
+    @api.multi
+    def create_missing_lines(self):
+        self.ensure_one()
+
+        locations = self.env['stock.location'].search([('id', 'child_of', [self.location_id.id])])
+        self.env.cr.execute(
+            """ SELECT      product_id
+                ,           sum(qty)        as product_qty
+                ,           location_id
+                ,           lot_id          as prod_lot_id
+                ,           package_id
+                ,           owner_id        as partner_id
+                FROM        stock_quant
+                WHERE       location_id     in %s
+                AND         company_id      = %s
+                GROUP BY    product_id
+                ,           location_id
+                ,           lot_id
+                ,           package_id
+                ,           partner_id
+            """, (tuple(locations.ids), self.company_id.id,))
+
+        vals = []
+        for product_data in self.env.cr.dictfetchall():
+            if product_data['product_qty'] != 0:
+                product_data['theoretical_qty'] = product_data['product_qty']
+                product_data['product_qty'] = 0.0
+                if product_data['product_id'] and \
+                        product_data['product_id'] not in self.line_ids.mapped('product_id').ids:
+                    product_data['product_uom_id'] = self.env['product.product'].browse(
+                        product_data['product_id']).uom_id.id
+                    vals.append(product_data)
+
+        if vals:
+            self.write({'line_ids': [(0, 0, line_values) for line_values in vals]})
+        return True
+
 
 class InventoryLine(models.Model):
     _inherit = "stock.inventory.line"
@@ -380,6 +429,14 @@ class InventoryLine(models.Model):
 
     of_note = fields.Text(string="Notes")
     of_theoretical_qty = fields.Float(string=u"Quantité théorique")
+    of_product_lot_serial_management = fields.Boolean(
+        related='product_id.of_lot_serial_management', string=u"Géré par lot/num. de série", readonly=True, store=True)
+    of_inventory_gap = fields.Float(string=u"Écart d'inventaire", compute='_compute_of_inventory_gap', store=True)
+
+    @api.depends('of_theoretical_qty', 'product_qty')
+    def _compute_of_inventory_gap(self):
+        for line in self:
+            line.of_inventory_gap = line.product_qty - line.of_theoretical_qty
 
     @api.multi
     def _write(self, vals):
@@ -483,7 +540,7 @@ class InventoryLine(models.Model):
     def _compute_theoretical_qty(self):
         if not self.env['ir.values'].get_default('stock.config.settings', 'of_forcer_date_inventaire'):
             return super(InventoryLine, self)._compute_theoretical_qty()
-        theoretical_qty = sum([x.quantity for x in self.of_get_stock_history()])
+        theoretical_qty = self.of_get_stock_history()[0]
         if theoretical_qty and self.product_uom_id and self.product_id.uom_id != self.product_uom_id:
             theoretical_qty = self.product_id.uom_id._compute_quantity(theoretical_qty, self.product_uom_id)
         self.theoretical_qty = theoretical_qty
@@ -497,13 +554,95 @@ class InventoryLine(models.Model):
             self.of_theoretical_qty = line.theoretical_qty
 
     def of_get_stock_history(self):
-        # :TODO: Ajouter des filtres pour les champs lot_id, partner_id, package_id ?
-        #        Remplacer l'appel à cette fonction requête SQL plus rapide n'utilisant pas stock_history
-        return self.env['stock.history'].search(
-            [('company_id', '=', self.inventory_id.company_id.id),
-             ('location_id', '=', self.location_id.id),
-             ('product_id', '=', self.product_id.id),
-             ('date', '<=', self.inventory_id.date)])
+        """
+        :return: [quantité en stock, valeur de l'inventaire (coût)]
+        :TODO: Ajouter des filtres pour les champs partner_id et package_id
+        """
+        if not self.product_id:
+            return [0.0, 0.0]
+        in_move_request = """
+            SELECT  SQ.qty                      AS quantity
+            ,       SQ.cost                     AS cost
+            FROM    stock_quant                 SQ
+            ,       stock_quant_move_rel        SQMR
+            ,       stock_move                  SM
+            ,       stock_location              SL1
+            ,       stock_location              SL2
+            ,       product_product             PP
+            WHERE   SQMR.quant_id               = SQ.id
+            AND     SM.id                       = SQMR.move_id
+            AND     SM.location_dest_id         = SL1.id
+            AND     SM.location_id              = SL2.id
+            AND     PP.id                       = SM.product_id
+            AND     SQ.qty                      > 0
+            AND     SM.state                    = 'done'
+            AND     SL1.usage                   IN ('internal', 'transit')
+            AND     (NOT    (   SL2.company_id  IS NULL
+                            AND SL1.company_id  IS NULL
+                            )
+                    OR      SL2.company_id      != SL1.company_id
+                    OR      SL2.usage           NOT IN ('internal', 'transit')
+                    )
+            AND     SM.date                     <= %s
+            AND     SL1.id                      = %s
+            AND     PP.id                       = %s
+        """
+        out_move_request = """
+            SELECT  -SQ.qty                     AS quantity
+            ,       SQ.cost                     AS cost
+            FROM    stock_quant                 SQ
+            ,       stock_quant_move_rel        SQMR
+            ,       stock_move                  SM
+            ,       stock_location              SL1
+            ,       stock_location              SL2
+            ,       product_product             PP
+            WHERE   SQMR.quant_id               = SQ.id
+            AND     SM.id                       = SQMR.move_id
+            AND     SM.location_dest_id         = SL1.id
+            AND     SM.location_id              = SL2.id
+            AND     PP.id                       = SM.product_id
+            AND     SQ.qty                      > 0
+            AND     SM.state                    = 'done'
+            AND     SL2.usage                   IN ('internal', 'transit')
+            AND     (NOT    (   SL2.company_id  IS NULL
+                            AND SL1.company_id  IS NULL
+                            )
+                    OR      SL2.company_id      != SL1.company_id
+                    OR      SL1.usage           NOT IN ('internal', 'transit')
+                    )
+            AND     SM.date                     <= %s
+            AND     SL2.id                      = %s
+            AND     PP.id                       = %s
+        """
+
+        if self.prod_lot_id:
+            in_move_request += """
+            AND     SQ.lot_id                   = %s
+            """ % self.prod_lot_id.id
+            out_move_request += """
+            AND     SQ.lot_id                   = %s
+            """ % self.prod_lot_id.id
+        else:
+            in_move_request += """
+            AND     SQ.lot_id                   IS NULL
+            """
+            out_move_request += """
+            AND     SQ.lot_id                   IS NULL
+            """
+
+        self.env.cr.execute(
+            """
+                SELECT  SUM(quantity)
+                ,       SUM(quantity * cost)
+                FROM    (
+                        %s
+                        UNION ALL
+                        %s
+                        )                       AS FOO
+            """ % (in_move_request, out_move_request),
+            (self.inventory_id.date, self.location_id.id, self.product_id.id,
+             self.inventory_id.date, self.location_id.id, self.product_id.id,))
+        return self.env.cr.fetchone()
 
 
 class StockConfigSettings(models.TransientModel):
@@ -554,3 +693,18 @@ class StockQuant(models.Model):
 
         return super(StockQuant, self)._quants_get_reservation_domain(
             move, pack_operation_id, lot_id, company_id, initial_domain)
+
+
+class ProductTemplate(models.Model):
+    _inherit = 'product.template'
+
+    of_lot_serial_management = fields.Boolean(
+        string=u"Géré par lot/num. de série", compute='_compute_of_lot_serial_management', store=True)
+
+    @api.depends('tracking')
+    def _compute_of_lot_serial_management(self):
+        for rec in self:
+            if rec.tracking != 'none':
+                rec.of_lot_serial_management = True
+            else:
+                rec.of_lot_serial_management = False

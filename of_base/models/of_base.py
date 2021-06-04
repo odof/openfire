@@ -36,7 +36,7 @@ def user_has_groups(self, groups):
     not_has_groups = []
     for group_ext_id in groups.split(','):
         group_ext_id = group_ext_id.strip()
-        if group_ext_id[0] == '!':
+        if group_ext_id[0] == '!' and '+' not in group_ext_id:
             not_has_groups.append(group_ext_id[1:])
         else:
             has_groups.append(group_ext_id)
@@ -56,6 +56,9 @@ def user_has_groups(self, groups):
             if of_group_ext_id == 'base.group_no_one':
                 # check: the group_no_one is effective in debug mode only
                 if not user.has_group(of_group_ext_id) or not request or not request.debug:
+                    break
+            elif of_group_ext_id[0] == '!':
+                if user.has_group(of_group_ext_id[1:]):
                     break
             else:
                 if not user.has_group(of_group_ext_id):
