@@ -59,7 +59,7 @@ class OfAnalyseChantierInherit(models.AbstractModel):
             'order_line_ids': [(6, 0, [order_line.id])],
             'qty_ordered': sum(self.saleorder_kit_line_ids.mapped('qty_total')),
             'qty_delivered': sum(self.saleorder_kit_line_ids.mapped('qty_delivered')),
-            'qty_invoiced': self.saleorder_kit_line_ids.invoiced and sum(self.saleorder_kit_line_ids.mapped('qty_total')) or 0,
+            'qty_invoiced': sum(self.saleorder_kit_line_ids.filtered('invoiced').mapped('qty_total')) or 0,
             'product_id': self.saleorder_kit_line_ids.mapped('product_id').id,
             'subtotal': sum(self.saleorder_kit_line_ids.mapped('price_total')),
             'price_unit': sum(self.saleorder_kit_line_ids.mapped('price_unit')) / len(self.saleorder_kit_line_ids),
@@ -130,7 +130,7 @@ class OfAnalyseChantierInherit(models.AbstractModel):
             'order_line_ids': [(4, order_line.id)],
             'qty_ordered': sum(kit_lines.mapped('qty_total')),
             'qty_delivered': sum(kit_lines.mapped('qty_delivered')),
-            'qty_invoiced': kit_lines.invoiced and sum(kit_lines.mapped('qty_total')) or 0,
+            'qty_invoiced': sum(kit_lines.filtered('invoiced').mapped('qty_total')) or 0,
             'product_id': kit_lines.mapped('product_id').id,
             'subtotal': sum(kit_lines.mapped('price_total')),
             }
