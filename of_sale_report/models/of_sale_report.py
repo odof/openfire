@@ -7,6 +7,18 @@ class SaleOrder(models.Model):
 
     of_date_de_pose = fields.Date(u'Date de pose prévisionnelle')
 
+    @api.multi
+    def action_confirm(self):
+        action = False
+        for order in self:
+            action = self.env['of.sale.order.verification'].do_verification(order)
+        super(SaleOrder, self).action_confirm()
+        self.of_update_dates_echeancier()
+        if action:
+            return action
+        return True
+
+
 class OFSaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'
 
