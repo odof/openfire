@@ -65,6 +65,8 @@
                 <field name="duree_debut_fin"/>
                 <field name="tache_name"/>
                 <field name="name"/>
+                <field name="phone"/>
+                <field name="mobile"/>
                 <field name="tache_id"/>
                 <field name="tache_categ_id"/>
                 <field name="partner_name"/>
