@@ -19,10 +19,22 @@
                     </span>
                 </div>
 
-                <div t-if="record.partner_name">
-                    <i class="fa fa-user"/>
-                    <span class="of_ws"/>
-                    <t t-raw="record.partner_name"/>
+                <div>
+                    <div t-if="record.partner_name">
+                        <i class="fa fa-user"/>
+                        <span class="of_ws"/>
+                        <t t-raw="record.partner_name"/>
+                    </div>
+                    <div t-if="record.mobile">
+                        <i class="fa fa-phone"/>
+                        <span class="of_ws"/>
+                        <t t-raw="record.mobile"/>
+                    </div>
+                    <div t-if="record.phone">
+                        <i class="fa fa-phone"/>
+                        <span class="of_ws"/>
+                        <t t-raw="record.phone"/>
+                    </div>
                 </div>
 
                 <div t-if="record.tache_name">
@@ -51,7 +63,7 @@
                     </span>
                 </div>
 
-                <div t-if="record.name">
+                <div t-if="record.name" name="name">
                     <i class="fa fa-tag"/>
                     <span class="of_ws"/>
                     <t t-esc="record.name"/>

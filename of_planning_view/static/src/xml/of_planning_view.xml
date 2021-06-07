@@ -210,10 +210,22 @@
                 </t>
             </div>
 
-            <div t-if="record.partner_name" class="of_planning_info of_planning_info_partner_name">
-                <i class="fa fa-user"/>
-                <span class="of_ws"/>
-                <t t-raw="record.partner_name"/>
+            <div class="of_planning_info of_planning_info_partner">
+                <div t-if="record.partner_name" class="of_planning_subinfo_partner_name">
+                    <i class="fa fa-user"/>
+                    <span class="of_ws"/>
+                    <t t-raw="record.partner_name"/>
+                </div>
+                <div t-if="record.mobile" class="of_planning_subinfo_mobile">
+                    <i class="fa fa-phone"/>
+                    <span class="of_ws"/>
+                    <t t-raw="record.mobile"/>
+                </div>
+                <div t-if="record.phone" class="of_planning_subinfo_phone">
+                    <i class="fa fa-phone"/>
+                    <span class="of_ws"/>
+                    <t t-raw="record.phone"/>
+                </div>
             </div>
 
             <div t-if="record.name" class="of_planning_info of_planning_info_name">
@@ -300,16 +312,28 @@
                 </t>
             </div>
 
-            <div t-if="record.name">
+            <div>
+                <div t-if="record.name">
                 <i class="fa fa-folder-open-o"/>
                 <span class="of_ws"/>
                 <t t-raw="record.name"/>
             </div>
 
             <div t-if="record.partner_name">
-                <i class="fa fa-user"/>
-                <span class="of_ws"/>
-                <t t-raw="record.partner_name"/>
+                    <i class="fa fa-user"/>
+                    <span class="of_ws"/>
+                    <t t-raw="record.partner_name"/>
+                </div>
+                <div t-if="record.mobile">
+                    <i class="fa fa-phone"/>
+                    <span class="of_ws"/>
+                    <t t-raw="record.mobile"/>
+                </div>
+                <div t-if="record.phone">
+                    <i class="fa fa-phone"/>
+                    <span class="of_ws"/>
+                    <t t-raw="record.phone"/>
+                </div>
             </div>
 
             <div t-if="record.tache_name">
@@ -337,7 +361,7 @@
                 </span>
             </div>
 
-            <div t-if="record.name">
+            <div t-if="record.name" name="name">
                 <i class="fa fa-tag"/>
                 <span class="of_ws"/>
                 <t t-esc="record.name"/>

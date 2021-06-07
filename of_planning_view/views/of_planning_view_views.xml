@@ -64,6 +64,8 @@
                 <field name="duree_prompt"/>
                 <field name="duree_debut_fin"/>
                 <field name="name"/>
+                <field name="phone"/>
+                <field name="mobile"/>
                 <field name="tache_name"/>
                 <field name="tache_id"/>
                 <field name="tache_categ_id"/>
