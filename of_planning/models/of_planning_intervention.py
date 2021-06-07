@@ -443,6 +443,8 @@ class OfPlanningIntervention(models.Model):
     calendar_name = fields.Char(string="Calendar Name", compute="_compute_calendar_name")  # vue Calendar
     tache_name = fields.Char(related='tache_id.name', readonly=True)  # vue Planning
     partner_name = fields.Char(related='partner_id.name')  # vue Planning, vue Map
+    mobile = fields.Char(related='address_id.mobile')  # vue Planning, of_sms
+    phone = fields.Char(related='address_id.phone')  # vue Planning
     tz = fields.Selection(_tz_get, compute='_compute_tz', string="Fuseau horaire")  # vue Calendar
     tz_offset = fields.Char(compute='_compute_tz_offset', string="Timezone offset", invisible=True)  # vue Calendar
     geo_lat = fields.Float(related='address_id.geo_lat', readonly=True)  # vue Map

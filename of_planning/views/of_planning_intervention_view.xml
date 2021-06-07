@@ -421,6 +421,8 @@
                 <field name="calendar_name"/>
                 <field name="state" invisible="1"/>
                 <field name="name" invisible="1"/>
+                <field name="mobile" invisible="1"/>
+                <field name="phone" invisible="1"/>
                 <field name="tache_id" invisible="1"/>
                 <field name="tache_categ_id" invisible="1"/>
                 <field name="state_int" invisible="1"/>
@@ -450,6 +452,8 @@
                 <field name="calendar_name"/>
                 <field name="tache_id" invisible="1"/>
                 <field name="name" invisible="1"/>
+                <field name="mobile" invisible="1"/>
+                <field name="phone" invisible="1"/>
                 <field name="tache_categ_id" invisible="1"/>
                 <field name="state" invisible="1"/>
                 <field name="state_int" invisible="1"/>
