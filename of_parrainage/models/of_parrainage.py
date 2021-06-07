@@ -68,7 +68,7 @@ class ResPartner(models.Model):
             convert = self._fields[name].convert_to_display_name
             for record in self:
                 result.append((record.id, ' - '.join([st.strip() for st in
-                                                      (convert(record[name], record),
+                                                      (convert(record[name], record).strip() or u"Sans nom",
                                                        record.sudo().company_id.name or '', record.email or '',
                                                        record.mobile or '') if st and st.strip()])))
         else:
