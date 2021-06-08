@@ -76,7 +76,7 @@
                         <b attrs="{'invisible': [('verify_color','=','none')]}">
                             <i>
                                 <i class="fa fa-lg fa-warning of_red" attrs="{'invisible': [('verify_color','!=','red')]}"/>
-                                <i class="fa fa-lg fa-warning" attrs="{'invisible': [('verify_color','!=','grey')]}"/>
+                                <i class="fa fa-lg fa-warning oe_grey" attrs="{'invisible': [('verify_color','!=','grey')]}"/>
                                 <field name="verify_equipment" nolabel="1"/>
                             </i>
                         </b>

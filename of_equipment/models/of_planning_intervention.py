@@ -15,7 +15,7 @@ class OfPlanningIntervention(models.Model):
         ('none', 'Aucune')
         ], string="Couleur alerte", compute="_compute_verify_equipment")
 
-    @api.depends('equipment_ids', 'date', 'employee_ids')
+    @api.depends('equipment_ids', 'date', 'employee_ids', 'date_deadline')
     def _compute_verify_equipment(self):
         for rdv in self:
             if rdv.equipment_ids and rdv.date:
@@ -25,7 +25,7 @@ class OfPlanningIntervention(models.Model):
                         rdv.verify_color = 'red'
                         rdv.verify_equipment = u"Alerte : l'équipement %s est déjà utilisé sur ce créneau." % \
                                                equipment.name
-                        continue
+                        break
                     interventions = equipment.equipment_not_available(rdv, check_day=True)
                     if interventions and any([employee not in rdv.employee_ids for employee in interventions.mapped('employee_ids')]):
                         rdv.verify_color = 'grey'
@@ -71,7 +71,7 @@ class MaintenanceEquipment(models.Model):
     @api.multi
     def equipment_not_available(self, base_intervention, check_day=False):
         self.ensure_one()
-        day = fields.Date.to_string(fields.Date.from_string(base_intervention.date))
+        day = base_intervention.date_date
         interventions = self.env['of.planning.intervention'].search([
             ('date_date', '=', day),
             ('equipment_ids', 'in', [self.id]),
@@ -83,7 +83,9 @@ class MaintenanceEquipment(models.Model):
             return False
         if check_day and interventions:
             return interventions
-        intervention = interventions.filtered(lambda i: se_chevauchent(i.date, i.date_deadline, base_intervention.date,
+        intervention = interventions.filtered(lambda i: se_chevauchent(i.date,
+                                                                       i.date_deadline,
+                                                                       base_intervention.date,
                                                                        base_intervention.date_deadline))
         if intervention:
             return intervention
