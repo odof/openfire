@@ -33,7 +33,7 @@ class OfSaleOrderVerification(models.TransientModel):
                         'default_type': 'margin',
                         'default_message': message,
                         'default_order_id': order.id,
-                        'skipped_types' : skipped_types,
+                        # 'skipped_types' : skipped_types,
                         }
                     return self.action_return(context, 'margin')
 

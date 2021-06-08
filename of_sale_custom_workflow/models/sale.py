@@ -23,28 +23,16 @@ class SaleOrder(models.Model):
         sale_responsible = self.env.user.has_group('sales_team.group_sale_manager')
         action = False
         for order in self:
-            article_principal = order.order_line.filtered('of_article_principal')
-            if not self._context.get('no_verif_margin', False) and article_principal \
-                    and article_principal[0].product_id.categ_id.of_taux_marge:
-                if int(order.of_marge_pc) < article_principal[0].product_id.categ_id.of_taux_marge:
-                    message = u"Le montant de marge de la commande %s est de %.2f%% alors que la catégorie %s de " \
-                              u"l'article principal %s %s une marge minimum de %s%%" % (
-                                  order.name,
-                                  order.of_marge_pc,
-                                  article_principal[0].product_id.categ_id.name,
-                                  article_principal[0].product_id.display_name,
-                                  sale_responsible and u"demande" or u"requiert",
-                                  article_principal[0].product_id.categ_id.of_taux_marge)
-                    action = self.env['of.popup.wizard'].popup_return(message=message, titre=u"Contrôle de marge")
-                if not sale_responsible and action:
-                    return action
+            action, verification_type = self.env['of.sale.order.verification'].do_verification(order)
+            if not sale_responsible and action and verification_type == 'margin':
+                return action
             order.state = 'presale'
             order.of_custom_confirmation_date = fields.Datetime.now()
             if not self._context.get('order_cancellation', False):
                 order.with_context(auto_followup=True, followup_creator_id=self.env.user.id).sudo().\
                     action_followup_project()
-        if sale_responsible and action:
-            return action
+        # if action:
+        #     return action
         return True
 
     @api.multi

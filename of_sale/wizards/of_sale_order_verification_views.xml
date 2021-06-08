@@ -8,7 +8,9 @@
             <field name="arch" type="xml">
                 <form>
                     <div class="of_title">
-                        <field name="type" nolabel="1"/>
+                        <h3>
+                            <field name="type" nolabel="1" readonly="1"/>
+                        </h3>
                     </div>
                     <field name="order_id" invisible="1"/>
                     <field name="message" readonly="1" nolabel="1"/>
