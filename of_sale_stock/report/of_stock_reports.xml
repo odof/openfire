@@ -12,6 +12,17 @@
                 <span t-field="pack_operation.move_state"/>
             </td>
         </xpath>
+        <!-- Affichage conditionnel de la colonne description -->
+        <xpath expr="//table[@t-if='o.pack_operation_ids']//th[1]" position="after">
+            <th groups="of_sale_stock.group_description_BL_variant">
+                <strong>Description</strong>
+            </th>
+        </xpath>
+        <xpath expr="//table[@t-if='o.pack_operation_ids']//td[1]" position="after">
+            <td groups="of_sale_stock.group_description_BL_variant">
+                <span t-field="pack_operation.move_name"/>
+            </td>
+        </xpath>
     </template>
 
     <template id="report_of_picking_preparation">
