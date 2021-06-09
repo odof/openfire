@@ -748,6 +748,7 @@ Tous les articles seront considérés comme disponibles et marqués comme livré
         <field name="arch" type="xml">
             <xpath expr="//group[@name='first']" position="inside">
                 <field name="of_article_principal"/>
+                <field name="of_taux_marge"/>
             </xpath>
         </field>
     </record>

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 
 class ProductCategory(models.Model):
@@ -8,6 +9,16 @@ class ProductCategory(models.Model):
     of_article_principal = fields.Boolean(string="Article principal",
                                           help=u"Les articles de cette catégorie seront considérés comme articles"
                                                u" principaux sur les commandes / factures clients")
+    of_taux_marge = fields.Integer(
+        string="Taux de marge",
+        help=u"Taux de marge en %% minimum recommandé quand l'article principal d'un devis fait partie"
+             u"de la catégorie.")
+
+    @api.constrains('of_taux_marge')
+    def _constraint_taux_marge(self):
+        for category in self:
+            if 0 > category.of_taux_marge or category.of_taux_marge > 100:
+                raise UserError("Le taux de marge doit être compris entre 0% et 100%")
 
 
 class ProductPricelist(models.Model):
