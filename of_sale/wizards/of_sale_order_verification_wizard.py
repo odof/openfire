@@ -15,27 +15,29 @@ class OfSaleOrderVerification(models.TransientModel):
     def do_verification(self, order):
         sale_responsible = self.env.user.has_group('sales_team.group_sale_manager')
         skipped_types = self._context.get('skipped_types', [])
-        if 'margin' not in skipped_types:
+        if 'margin' not in skipped_types and not self._context.get('no_verif_margin', False):
             article_principal = order.order_line.filtered('of_article_principal')
-            if not self._context.get('no_verif_margin', False) and article_principal \
-                    and article_principal[0].product_id.categ_id.of_taux_marge:
+            if article_principal and article_principal[0].product_id.categ_id.of_taux_marge:
                 if int(order.of_marge_pc) < article_principal[0].product_id.categ_id.of_taux_marge:
-                    message = u"Le montant de marge de la commande %s est de %.2f%% alors que la catégorie %s de " \
-                              u"l'article principal %s %s une marge minimum de %s%%" % (
+                    # les " et ' risque de faire planter le js, on les remplace par des espaces à la fin.
+                    message = (u"Le montant de marge de la commande %s est de %.2f%% alors que la catégorie %s de "
+                               u"l'article principal %s %s une marge minimum de %s%%" % (
                                   order.name,
                                   order.of_marge_pc,
                                   article_principal[0].product_id.categ_id.name,
                                   article_principal[0].product_id.display_name,
                                   sale_responsible and u"demande" or u"requiert",
                                   article_principal[0].product_id.categ_id.of_taux_marge)
+                               ).replace('"', ' ').replace("'", " ")
                     skipped_types.append('margin')
                     context = {
                         'default_type': 'margin',
                         'default_message': message,
                         'default_order_id': order.id,
-                        # 'skipped_types' : skipped_types,
-                        }
+                        'skipped_types' : skipped_types,
+                    }
                     return self.action_return(context, 'margin')
+        return False, False
 
     @api.model
     def action_return(self, context, type, titre="Informations"):
@@ -48,3 +50,13 @@ class OfSaleOrderVerification(models.TransientModel):
             'target': 'new',
             'context': str(context),
         }, type
+
+    @api.multi
+    def next_step(self):
+        action, type = self.do_verification(self.order_id)
+        return action
+
+    @api.multi
+    def skip_validation(self):
+        action, type = self.do_verification(self.order_id)
+        return action

@@ -31,8 +31,8 @@ class SaleOrder(models.Model):
             if not self._context.get('order_cancellation', False):
                 order.with_context(auto_followup=True, followup_creator_id=self.env.user.id).sudo().\
                     action_followup_project()
-        # if action:
-        #     return action
+        if action:
+            return action
         return True
 
     @api.multi
