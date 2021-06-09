@@ -14,11 +14,8 @@
         </xpath>
     </template>
 
-    <!-- Modifications rapport bon de livraison -->
+    <!-- écraser le template de sale_stock -->
     <template id="sale_stock.report_delivery_document_inherit_sale_stock" inherit_id="stock.report_delivery_document">
-        <!--####################
-            Cette vue est entièrement modifiée depuis le module of_sale_stock.
-            ####################-->
         <xpath expr="//div[@name='customer_address']//div[@t-field='o.move_lines[0].partner_id']" position="replace">
             <div t-field="o.move_lines[0].partner_id"
                  t-options='{"widget": "contact", "fields": ["address", "name", "phone", "mobile"], "no_marker": True}'/>
@@ -41,23 +38,6 @@
                 </div>
             </div>
         </xpath>
-
-        <!-- not o.pack_operation_ids -->
-        <xpath expr="//table[2]/thead//th" position="after">
-            <th groups="of_sale_stock.group_description_BL_variant" >Description</th>
-        </xpath>
-        <xpath expr="//table[2]//tbody//td" position="after">
-            <td groups="of_sale_stock.group_description_BL_variant" ><span t-field="move.name"/></td>
-        </xpath>
-
-        <!-- with o.pack_operation_ids -->
-        <xpath expr="//table[3]/thead//th" position="after">
-            <th groups="of_sale_stock.group_description_BL_variant">Description</th>
-        </xpath>
-        <xpath expr="//table[3]//tbody//td" position="after">
-            <td groups="of_sale_stock.group_description_BL_variant"><span t-field="pack_operation.move_name"/></td>
-        </xpath>
-
     </template>
 
 </odoo>
