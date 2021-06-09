@@ -8,10 +8,18 @@ class OfSaleOrderConfirmation(models.TransientModel):
     order_id = fields.Many2one('sale.order')
 
     def button_ok(self):
-        return self.order_id.action_confirm()
+        res = self.order_id.action_confirm()
+        action, type = self.env['of.sale.order.verification'].do_verification(self.order_id)
+        if action:
+            return action
+        return res
 
     def button_no(self):
-        return self.with_context(no_update_confirm=True).order_id.action_confirm()
+        res = self.with_context(no_update_confirm=True).order_id.action_confirm()
+        action, type = self.env['of.sale.order.verification'].do_verification(self.order_id)
+        if action:
+            return action
+        return res
 
 
 class SaleOrder(models.Model):

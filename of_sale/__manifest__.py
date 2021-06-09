@@ -106,6 +106,7 @@ Droits utilisateurs:
         'wizards/sale_make_invoice_advance_views.xml',
         'wizards/of_sale_order_confirmation_views.xml',
         'wizards/of_sale_order_add_quote_views.xml',
+        'wizards/of_sale_order_verification_views.xml',
     ],
     'installable': True,
     'application': False,

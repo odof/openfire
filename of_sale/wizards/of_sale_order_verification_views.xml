@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Permet de créer une fenêtre et d'afficher le champ message envoyé -->
+    <record id="of_sale_order_verification_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.sale.order.verification.wizard.form</field>
+        <field name="model">of.sale.order.verification</field>
+        <field name="arch" type="xml">
+            <form>
+                <div class="of_title">
+                    <h3>
+                        <field name="type" nolabel="1" readonly="1"/>
+                    </h3>
+                </div>
+                <field name="order_id" invisible="1"/>
+                <group name="wizard_group" col="2">
+                    <field name="message" readonly="1" nolabel="1" attrs="{'invisible': [('type','!=','margin')]}" colspan="2"/>
+                </group>
+                <footer>
+                    <button string="Valider" name="next_step" type="object" class="btn-primary"/>
+                    <button string="Ok" name="skip_validation" type="object" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_of_sale_order_verification" model="ir.actions.act_window">
+        <field name="name">of.sale.order.verification.wizard.action</field>
+        <field name="res_model">of.sale.order.verification</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="of_sale_order_verification_wizard_view_form"/>
+    </record>
+
+</odoo>

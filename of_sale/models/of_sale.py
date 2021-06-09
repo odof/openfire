@@ -398,9 +398,17 @@ class SaleOrder(models.Model):
 
     @api.multi
     def action_confirm(self):
-        super(SaleOrder, self).action_confirm()
+        sale_responsible = self.env.user.has_group('sales_team.group_sale_manager')
+        action = False
+        for order in self:
+            action, verification_type = self.env['of.sale.order.verification'].do_verification(order)
+            if not sale_responsible and action and verification_type == 'margin':
+                return action
+        res = super(SaleOrder, self).action_confirm()
         self.of_update_dates_echeancier()
-        return True
+        if action:
+            return action
+        return res
 
     @api.multi
     def of_recompute_echeance_last(self):
