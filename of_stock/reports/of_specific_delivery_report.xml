@@ -71,17 +71,17 @@
                             </tr>
                         </tbody>
                     </table>
-                    <table class="table table-condensed mt48">
+                    <table class="table table-condensed mt48" name="move_lines">
                         <thead>
                             <tr>
-                                <th><strong>Article</strong></th>
-                                <th><strong>Quantité</strong></th>
+                                <th name="product"><strong>Article</strong></th>
+                                <th name="quantity"><strong>Quantité</strong></th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr t-foreach="o.line_ids.filtered(lambda l: l.selected)" t-as="line">
-                                <td><span t-field="line.move_id.product_id"/></td>
-                                <td>
+                                <td name="product"><span t-field="line.move_id.product_id"/></td>
+                                <td name="quantity">
                                     <span t-field="line.move_id.product_uom_qty"/>
                                     <span t-field="line.move_id.product_uom"/>
                                 </td>
