@@ -2,10 +2,23 @@
 
 from odoo import api, fields, models
 
+
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     of_date_de_pose = fields.Date(u'Date de pose prévisionnelle')
+
+
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+
+    @api.multi
+    def _prepare_order_line_procurement(self, group_id=False):
+        res = super(SaleOrderLine, self)._prepare_order_line_procurement(group_id)
+        if isinstance(res, dict) and self.order_id.of_date_de_pose:
+            res['date_planned'] = self.order_id.of_date_de_pose
+        return res
+
 
 class OFSaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'
@@ -20,6 +33,7 @@ class OFSaleConfiguration(models.TransientModel):
     @api.multi
     def set_of_rapport_sur_mesure_defaults(self):
         return self.env['ir.values'].sudo().set_default('sale.config.settings', 'of_rapport_sur_mesure', self.of_rapport_sur_mesure)
+
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
