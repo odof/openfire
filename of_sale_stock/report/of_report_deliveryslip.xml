@@ -2,6 +2,20 @@
 <odoo>
         <!-- Inherit report_delivery_document (depuis module stock) -->
         <template id="of_report_deliveryslip" inherit_id="stock.report_delivery_document">
+            <!-- afficher la description article si besoin -->
+            <xpath expr="//table[@t-if='not o.pack_operation_ids']//th[1]" position="after">
+                <th groups="of_sale_stock.group_description_BL_variant"><strong>Description</strong></th>
+            </xpath>
+            <xpath expr="//table[@t-if='not o.pack_operation_ids']//td[1]" position="after">
+                <td groups="of_sale_stock.group_description_BL_variant"><span t-field="move.name"/></td>
+            </xpath>
+            <xpath expr="//table[@t-if='o.pack_operation_ids']//th[1]" position="after">
+                <th groups="of_sale_stock.group_description_BL_variant"><strong>Description</strong></th>
+            </xpath>
+            <xpath expr="//table[@t-if='o.pack_operation_ids']//td[1]" position="after">
+                <td groups="of_sale_stock.group_description_BL_variant"><span t-field="pack_operation.move_name"/></td>
+            </xpath>
+            <!-- ne pas afficher les lignes annulées, afficher un message si toutes les lignes sont annulées -->
             <xpath expr="//tr[@t-foreach='o.move_lines']" position="attributes">
                 <attribute name="t-if">move.state != 'cancel'</attribute>
             </xpath>
@@ -22,4 +36,17 @@
                 </t>
             </xpath>
         </template>
+
+    <template id="of_specific_delivery_report_document_inh_sale_stock"
+              inherit_id="of_stock.of_specific_delivery_report_document">
+        <xpath expr="//th[@name='product']" position="after">
+            <th name="description" groups="of_sale_stock.group_description_BL_variant">Description</th>
+        </xpath>
+        <xpath expr="//td[@name='product']" position="after">
+            <td name="description" groups="of_sale_stock.group_description_BL_variant">
+                <span t-field="line.move_id.name"/>
+            </td>
+        </xpath>
+    </template>
+
 </odoo>
