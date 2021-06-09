@@ -24,8 +24,12 @@
         </field>
     </record>
 
-    <delete model="ir.ui.view" id="of_project_issue.of_project_issue_partner_form_view"/>
-    <delete model="ir.ui.view" id="project_issue.res_partner_issues_button_view"/>
+    <record model="ir.ui.view" id="project_issue.res_partner_issues_button_view">
+        <field name="active">False</field>
+    </record>
+    <record model="ir.ui.view" id="of_project_issue.of_project_issue_partner_form_view">
+        <field name="active">False</field>
+    </record>
 
     <delete model="ir.ui.menu" id="of_project_issue.menu_of_planning_intervention_sav"/>
     <delete model="ir.ui.menu" id="of_project_issue.of_menu_project_issue_ventes"/>
