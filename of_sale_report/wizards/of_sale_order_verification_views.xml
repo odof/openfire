@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Permet de créer une fenêtre et d'afficher le champ message envoyé -->
+    <record id="of_sale_report_verification_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.sale.report.verification.wizard.form</field>
+        <field name="model">of.sale.order.verification</field>
+        <field name="inherit_id" ref="of_sale.of_sale_order_verification_wizard_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='wizard_group']" position="inside">
+                <field name="date" attrs="{'invisible': [('type','!=','date_de_pose')]}" colspan="2"/>
+            </xpath>
+        </field>
+    </record>
+
+
+</odoo>
