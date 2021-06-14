@@ -388,24 +388,6 @@
     <menuitem name="Catégorie de question" id="menu_of_questionnaire_line_category" parent="of_questionnaire.menu_of_questionnaire_config" sequence="20" action="action_of_questionnaire_line_category"/>
     <menuitem name="Questions" id="menu_of_questionnaire_line" parent="of_questionnaire.menu_of_questionnaire_config" sequence="30" action="action_of_questionnaire_line"/>
 
-<!-- *************************** Modèle d'intervention ***************************-->
-
-    <record id="of_questionnaire_of_planning_intervention_template_view_form" model="ir.ui.view">
-        <field name="name">of.questionnaire.of.planning.intervention.template.view.form</field>
-        <field name="model">of.planning.intervention.template</field>
-        <field name="inherit_id" ref="of_planning.of_planning_intervention_template_view_form"/>
-        <field name="arch" type="xml">
-        <xpath expr="//notebook" position="inside">
-            <page string="Questionnaire">
-                <group>
-                    <field name="questionnaire_id" domain="[('type', '=', 'intervention')])" context="{'default_type': 'product', 'lock_type': True}"/>
-                </group>
-                <field name="question_ids" nolabel="1"/>
-            </page>
-        </xpath>
-        </field>
-    </record>
-
 <!-- *************************** Interventions ***************************-->
 
     <record id="of_questionnaire_of_planning_intervention_view_form" model="ir.ui.view">
