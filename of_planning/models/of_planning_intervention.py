@@ -1396,6 +1396,8 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def of_get_report_name(self, docs):
+        if self._context.get('of_report_name'):
+            return self._context.get('of_report_name')
         return "Rapport d'intervention"
 
     @api.multi
@@ -1565,6 +1567,16 @@ class OfPlanningIntervention(models.Model):
 
     def _prepare_procurement_group(self):
         return {'name': self.name, 'partner_id': self.address_id.id}
+
+    @api.multi
+    def picking_lines_layouted(self):
+        self.ensure_one()
+        layouted = []
+        pickings = self.picking_id
+        for picking in pickings:
+            layouted.append({'name': picking.name, 'lines': picking.move_lines})
+        return layouted
+
 
 class OfPlanningInterventionLine(models.Model):
     _name = "of.planning.intervention.line"
@@ -1906,86 +1918,6 @@ class SaleOrder(models.Model):
 
     def fiche_intervention_cacher_montant(self):
         return self.env['ir.values'].get_default('of.intervention.settings', 'fiche_intervention_cacher_montant')
-
-
-class OfPlanningInterventionTemplate(models.Model):
-    _name = 'of.planning.intervention.template'
-
-    name = fields.Char(string=u"Nom du modèle", required=True)
-    active = fields.Boolean(string="Active", default=True)
-    code = fields.Char(string="Code", compute="_compute_code", inverse="_inverse_code", store=True, required=True)
-    sequence_id = fields.Many2one('ir.sequence', string=u"Séquence", readonly=True)
-    tache_id = fields.Many2one('of.planning.tache', string=u"Tâche")
-    fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale", company_dependent=True)
-    line_ids = fields.One2many('of.planning.intervention.template.line', 'template_id', string="Lignes de facturation")
-
-    @api.depends('sequence_id')
-    def _compute_code(self):
-        for template in self:
-            template.code = template.sequence_id.prefix
-
-    def _inverse_code(self):
-        sequence_obj = self.env['ir.sequence']
-        for template in self:
-            if not template.code:
-                continue
-            sequence_name = u"Modèle d'intervention " + template.code
-            sequence_code = self._name
-            # Si une séquence existe déjà avec ce code, on la reprend
-            sequence = sequence_obj.search([('code', '=', sequence_code), ('prefix', '=', self.code)])
-            if sequence:
-                template.sequence_id = sequence
-                continue
-
-            if template.sequence_id:
-                # Si la séquence n'est pas utilisée par un autre modèle, on la modifie directement,
-                # sinon il faudra en re-créer une.
-                if not self.search([('sequence_id', '=', template.sequence_id.id), ('id', '!=', template.id)]):
-                    template.sequence_id.sudo().write({'prefix': template.code, 'name': sequence_name})
-                    continue
-
-            # Création d'une séquence pour le modèle
-            sequence_data = {
-                'name': sequence_name,
-                'code': sequence_code,
-                'implementation': 'no_gap',
-                'prefix': template.code,
-                'padding': 4,
-            }
-            template.sequence_id = self.env['ir.sequence'].sudo().create(sequence_data)
-
-
-class OfPlanningInterventionTemplateLine(models.Model):
-    _name = 'of.planning.intervention.template.line'
-
-    template_id = fields.Many2one('of.planning.intervention.template', string=u"Modèle", required=True)
-    product_id = fields.Many2one('product.product', string='Article')
-    price_unit = fields.Float(string='Prix unitaire', digits=dp.get_precision('Product Price'), default=0.0)
-    qty = fields.Float(string=u'Qté', digits=dp.get_precision('Product Unit of Measure'))
-    name = fields.Text(string='Description')
-
-    @api.onchange('product_id')
-    def _onchange_product(self):
-        product = self.product_id
-        self.qty = 1
-        self.price_unit = product.lst_price
-        if product:
-            name = product.name_get()[0][1]
-            if product.description_sale:
-                name += '\n' + product.description_sale
-            self.name = name
-        else:
-            self.name = ''
-
-    @api.multi
-    def get_intervention_line_values(self):
-        self.ensure_one()
-        return {
-            'product_id': self.product_id,
-            'price_unit': self.price_unit,
-            'qty': self.qty,
-            'name': self.name,
-            }
 
 
 class OfPlanningTag(models.Model):
