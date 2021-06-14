@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--##########################################################################################################################-->
+    <!--############################################_________Modèle__________#####################################################-->
+    <!--##########################################################################################################################-->
+
+    <record id="of_planning_intervention_template_view_form" model="ir.ui.view">
+        <field name="name">of.planning.intervention.template.view.form</field>
+        <field name="model">of.planning.intervention.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box of_width_600" name="button_box_custom" >
+                        <!-- Bouton Actif -->
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive" display="inline-block">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Nom du modèle"/></h1>
+                    </div>
+                    <group name="general">
+                        <group name="general_one">
+                            <field name="code"/>
+                            <field name="tache_id"/>
+                            <field name="is_default_template" invisible="1"/>
+                        </group>
+                        <group name="general_two"/>
+                    </group>
+                    <notebook>
+                        <page string="Configuration">
+                            <group>
+                                <field name="sequence_id" colspan="2"/>
+                            </group>
+                        </page>
+                        <page name="facturation" string="Facturation">
+                            <group>
+                                <group>
+                                    <field name="fiscal_position_id"/>
+                                </group>
+                                <group>
+                                </group>
+                            </group>
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="name"/>
+                                    <field name="qty"/>
+                                    <field name="price_unit"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page name="products" string="Articles supplémentaires">
+                            <field name="product_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="list_price"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page name="fiche_intervention" string="Fiche d'intervention">
+                            <group col="4">
+                                <group>
+                                    <field name="fi_default" attrs="{'invisible':[('is_default_template','=',True)]}"/>
+                                    <separator string="Champ affichés" colspan="2"/>
+                                    <field name="fi_title"/>
+                                </group>
+                            </group>
+                            <group col="8">
+                                <group name="first">
+                                    <!-- FI - COMMANDE -->
+                                    <field name="fi_order" attrs="{'readonly':[('fi_default','=',True)]}"/>
+                                    <label for="fi_order_client" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_order_client" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_order', '=', False)]}"/>
+                                    </div>
+                                    <label for="fi_order_name" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_order_name" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_order', '=', False)]}"/>
+                                    </div>
+                                    <label for="fi_order_confirmation_date" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_order_confirmation_date" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_order', '=', False)]}"/>
+                                    </div>
+
+                                    <label for="fi_order_interv_label" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_order_interv_label" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_order', '=', False)]}"/>
+                                    </div>
+
+                                    <label for="fi_order_company" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_order_company" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_order', '=', False)]}"/>
+                                    </div>
+
+                                    <label for="fi_order_seller" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_order_seller" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_order', '=', False)]}"/>
+                                    </div>
+                                    <separator string="" colspan="2"/>
+                                    <!-- FI - ARTICLES -->
+                                    <separator string="" colspan="2"/>
+                                    <field name="fi_products" attrs="{'readonly':[('fi_default','=',True)]}"/>
+
+                                    <label for="fi_products_order" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_products_order" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_products', '=', False)]}"/>
+                                    </div>
+
+                                    <label for="fi_products_picking" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_products_picking" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_products', '=', False)]}"/>
+                                    </div>
+                                </group>
+                                <group name="second">
+                                    <!-- FI - INTERVENTION -->
+                                    <field name="fi_rdv" attrs="{'readonly':[('fi_default','=',True)]}"/>
+
+                                    <label for="fi_rdv_date_start" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_rdv_date_start" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
+                                    </div>
+
+                                    <label for="fi_rdv_date_end" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_rdv_date_end" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
+                                    </div>
+
+                                    <label for="fi_rdv_task" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_rdv_task" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
+                                    </div>
+
+                                    <label for="fi_rdv_task_description" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_rdv_task_description" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
+                                    </div>
+
+                                    <label for="fi_rdv_duration" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_rdv_duration" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
+                                    </div>
+
+                                    <label for="fi_rdv_tech" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_rdv_tech" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
+                                    </div>
+
+                                    <label for="fi_rdv_address" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_rdv_address" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
+                                    </div>
+
+                                    <label for="fi_rdv_mail" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_rdv_mail" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
+                                    </div>
+
+                                    <label for="fi_rdv_phone" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_rdv_phone" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
+                                    </div>
+
+                                    <separator string="" colspan="2"/>
+                                    <!-- FI - DESCRIPTION(S) -->
+                                    <separator string="" colspan="2"/>
+                                    <field name="fi_description" attrs="{'readonly':[('fi_default','=',True)]}"/>
+
+                                    <label for="fi_description_ext" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_description_ext" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_description', '=', False)]}"/>
+                                    </div>
+                                </group>
+                                <group name="third">
+                                    <field name="fi_invoicing" attrs="{'readonly':[('fi_default','=',True)]}"/>
+
+                                    <label for="fi_invoicing_ht" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_invoicing_ht" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_invoicing', '=', False)]}"/>
+                                    </div>
+
+                                    <label for="fi_invoicing_taxes" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_invoicing_taxes" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_invoicing', '=', False)]}"/>
+                                    </div>
+
+                                    <label for="fi_invoicing_ttc" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_invoicing_ttc" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_invoicing', '=', False)]}"/>
+                                    </div>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_planning_intervention_template_view_tree" model="ir.ui.view">
+        <field name="name">of.planning.intervention.template.view.tree</field>
+        <field name="model">of.planning.intervention.template</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="tache_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_planning_intervention_template" model="ir.actions.act_window">
+        <field name="name">Modèle d'intervention</field>
+        <field name="res_model">of.planning.intervention.template</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_planning.of_planning_intervention_template_view_tree"/>
+    </record>
+
+    <menuitem name="Modèles d'intervention" id="menu_of_planning_intervention_template" parent="of_planning.menu_of_planning_configuration_template" sequence="10" action="action_of_planning_intervention_template"/>
+
+
+</odoo>

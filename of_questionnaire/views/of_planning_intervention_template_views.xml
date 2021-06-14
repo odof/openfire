@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--##########################################################################################################################-->
+    <!--############################################_________Modèle__________#####################################################-->
+    <!--##########################################################################################################################-->
+
+    <record id="of_questionnaire_intervention_template_view_form" model="ir.ui.view">
+        <field name="name">of.questionnaire.intervention.template.view.form</field>
+        <field name="inherit_id" ref="of_service_parc_installe.of_service_parc_installe_intervention_template_view_form"/>
+        <field name="model">of.planning.intervention.template</field>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='fiche_intervention']" position="before">
+                <page string="Questionnaire">
+                    <group>
+                        <field name="questionnaire_id" domain="[('type', '=', 'intervention')])" context="{'default_type': 'product', 'lock_type': True}"/>
+                    </group>
+                    <field name="question_ids" nolabel="1"/>
+                </page>
+            </xpath>
+            <xpath expr="//group[@name='first']" position="inside">
+                <separator string="" colspan="2"/>
+                <!-- FI - QUESTIONNAIRE(S) -->
+                <separator string="" colspan="2"/>
+                <field name="fi_surveys" attrs="{'readonly':[('fi_default','=',True)]}"/>
+                <label for="fi_surveys_rdv" style="font-weight: normal !important"/>
+                <div>
+                    <field name="fi_surveys_rdv" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_surveys', '=', False)]}"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

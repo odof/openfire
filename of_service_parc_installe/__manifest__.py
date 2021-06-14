@@ -23,6 +23,7 @@ Module de lien entre service, interventions et parc installé
     'data' : [
         'report/of_service_parc_installe_fiche_intervention.xml',
         'views/of_service_parc_installe_view.xml',
+        'views/of_planning_intervention_template_views.xml',
         'wizard/of_wizard_invoice_to_parc_installe_view.xml'
     ],
     'installable': True,
