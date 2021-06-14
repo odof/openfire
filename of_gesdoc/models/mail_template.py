@@ -14,7 +14,7 @@ try:
 except ImportError:
     PDFParser = PSLiteral = PDFDocument = resolve1 = decode_text = None
 
-ALLOWED_MODELS = ['sale.order', 'res.partner', 'account.invoice']
+ALLOWED_MODELS = ['sale.order', 'res.partner', 'account.invoice', 'product.template']
 
 class OfMailTemplate(models.Model):
     "Templates for printing mail"
