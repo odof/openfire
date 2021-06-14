@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--##########################################################################################################################-->
+    <!--############################################_________Modèle__________#####################################################-->
+    <!--##########################################################################################################################-->
+
+    <record id="of_service_parc_installe_intervention_template_view_form" model="ir.ui.view">
+        <field name="name">of.service.parc.installe.intervention.template.view.form</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_template_view_form"/>
+        <field name="model">of.planning.intervention.template</field>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='third']/field[@name='fi_invoicing']" position="before">
+                <!-- FI - PARC INSTALLÉ -->
+                <field name="fi_pi" attrs="{'readonly':[('fi_default','=',True)]}"/>
+                <label for="fi_pi_serial" style="font-weight: normal !important"/>
+                <div>
+                    <field name="fi_pi_serial" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_pi', '=', False)]}"/>
+                </div>
+                <label for="fi_pi_product" style="font-weight: normal !important"/>
+                <div>
+                    <field name="fi_pi_product" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_pi', '=', False)]}"/>
+                </div>
+                <label for="fi_pi_brand" style="font-weight: normal !important"/>
+                <div>
+                    <field name="fi_pi_brand" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_pi', '=', False)]}"/>
+                </div>
+                <label for="fi_pi_model" style="font-weight: normal !important"/>
+                <div>
+                    <field name="fi_pi_model" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_pi', '=', False)]}"/>
+                </div>
+                <label for="fi_pi_installation_date" style="font-weight: normal !important"/>
+                <div>
+                    <field name="fi_pi_installation_date" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_pi', '=', False)]}"/>
+                </div>
+                <label for="fi_pi_state" style="font-weight: normal !important"/>
+                <div>
+                    <field name="fi_pi_state" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_pi', '=', False)]}"/>
+                </div>
+                <label for="fi_pi_notes" style="font-weight: normal !important"/>
+                <div>
+                    <field name="fi_pi_notes" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_pi', '=', False)]}"/>
+                </div>
+                <separator string="" colspan="2"/>
+                <!-- FI - FACTURATION -->
+                <separator string="" colspan="2"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

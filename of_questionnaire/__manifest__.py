@@ -36,6 +36,7 @@ Fonctionnalités
         ],
     'data' : [
         'views/of_questionnaire_views.xml',
+        'views/of_planning_intervention_template_views.xml',
         'report/of_questionnaire_fiche_intervention.xml',
         'security/ir.model.access.csv',
         'wizards/of_questionnaire_wizard_view.xml',
