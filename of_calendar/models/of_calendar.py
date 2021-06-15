@@ -20,24 +20,6 @@ class HREmployee(models.Model):
     _inherit = "hr.employee"
     _order = "sequence"
 
-    # Contraintes. @todo: À retirer après la mise à jour avec apply_sql
-
-    _sql_constraints = [
-        ('hor_md_constraint', 'CHECK ( name != NULL )',
-         _(u"Contrainte vide.")),
-        ('hor_md_mf_constraint', 'CHECK ( name != NULL )',
-         _(u"Contrainte vide.")),
-        ('hor_mf_ad_constraint', 'CHECK ( name != NULL )',
-         _(u"Contrainte vide.")),
-        ('hor_ad_af_constraint', 'CHECK ( name != NULL )',
-         _(u"Contrainte vide.")),
-        ('hor_af_constraint', 'CHECK ( name != NULL )',
-         _(u"Contrainte vide.")),
-        # Cette ligne a été commentée il y a un moment mais j'ai peur que la contrainte soit présente sur des base
-        ('of_creneau_temp_start_stop_constraint', 'CHECK ( name != NULL )',
-         _(u"Contrainte vide.")),
-    ]
-
     # Defaults
 
     @api.model
