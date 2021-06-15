@@ -52,7 +52,7 @@
                         <strong><div style="max-width: 100%; padding-top: 10px" t-field="order.partner_id"></div></strong>
                     </t>
                     <t t-else="o.address_id">
-                        <strong><div  style="max-width: 100%; padding-top: 10px" t-field="o.address_id" t-field-options="{'widget': 'contact', 'fields': ['name']}"></div></strong>
+                        <strong><div style="max-width: 100%; padding-top: 10px" t-field="o.address_id"></div></strong>
                     </t>
                 </div>
                 <div class="h5 col-xs-3 text-right" style="vertical-align: top;">
@@ -471,7 +471,7 @@
                         </t>
 
                         <!-- Description (affichage conditionel si pas vide) -->
-                        <t t-if="o.description and o.cleantext_description">
+                        <t t-if="o.description and o.cleantext_description" name="cadre_description">
                             <div name="description">
                                 <div class="row h4 mb4">
                                     <div class="col-xs-12"><strong>Description</strong></div>
