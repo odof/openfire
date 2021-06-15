@@ -397,17 +397,27 @@ class SaleOrder(models.Model):
                     echeance.date = ech_calc[0]
 
     @api.multi
-    def action_confirm(self):
-        sale_responsible = self.env.user.has_group('sales_team.group_sale_manager')
+    def action_verification_confirm(self):
+        """
+        Permet de faire les vérification avant de démarrer la confirmation de la commande.
+        Comme il n'y a pas de raise si on veut une vérification qui bloque la confirmation il faut le faire hors de
+        action_confirm, autrement certaines surcharge qui seraient passées avant/après seront tout de même réalisées
+        """
+
         action = False
         for order in self:
-            action, verification_type = self.env['of.sale.order.verification'].do_verification(order)
-            if not sale_responsible and action and verification_type == 'margin':
+            action, interrupt = self.env['of.sale.order.verification'].do_verification(order)
+            if interrupt:
                 return action
-        res = super(SaleOrder, self).action_confirm()
-        self.of_update_dates_echeancier()
+        res = self.action_confirm()
         if action:
             return action
+        return res
+
+    @api.multi
+    def action_confirm(self):
+        res = super(SaleOrder, self).action_confirm()
+        self.of_update_dates_echeancier()
         return res
 
     @api.multi

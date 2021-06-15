@@ -19,20 +19,30 @@ class SaleOrder(models.Model):
     confirmation_date = fields.Datetime(string=u"Date d'enregistrement")
 
     @api.multi
-    def action_preconfirm(self):
-        sale_responsible = self.env.user.has_group('sales_team.group_sale_manager')
+    def action_verification_preconfirm(self):
+        """
+        Permet de faire les vérification avant de démarrer la pré-confirmation de la commande.
+        Comme il n'y a pas de raise si on veut une vérification qui bloque la confirmation il faut le faire hors de
+        action_preconfirm, autrement certaines surcharge qui seraient passées avant/après seront tout de même réalisées
+        """
         action = False
         for order in self:
-            action, verification_type = self.env['of.sale.order.verification'].do_verification(order)
-            if not sale_responsible and action and verification_type == 'margin':
+            action, interrupt = self.env['of.sale.order.verification'].do_verification(order)
+            if interrupt:
                 return action
+        res = self.action_preconfirm()
+        if action:
+            return action
+        return res
+
+    @api.multi
+    def action_preconfirm(self):
+        for order in self:
             order.state = 'presale'
             order.of_custom_confirmation_date = fields.Datetime.now()
             if not self._context.get('order_cancellation', False):
                 order.with_context(auto_followup=True, followup_creator_id=self.env.user.id).sudo().\
                     action_followup_project()
-        if action:
-            return action
         return True
 
     @api.multi

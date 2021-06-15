@@ -9,18 +9,9 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="priority" eval="10"/>
         <field name="arch" type="xml">
-            <xpath expr="//button[@name='action_confirm'][1]" position="attributes">
-                <attribute name="string">Enregistrer la commande</attribute>
-                <attribute name="states"/>
-                <attribute name="attrs">{'invisible': [('state', '!=', 'presale')]}</attribute>
-                <attribute name="groups">of_access_control.of_group_sale_responsible</attribute>
-            </xpath>
-            <xpath expr="//button[@name='action_confirm'][2]" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
             <xpath expr="//button[@name='action_confirm']" position="after">
-                <button name="action_preconfirm" states="draft" string="Confirmer la vente" type="object"/>
-                <button name="action_preconfirm" states="sent" string="Confirmer la vente" class="btn-primary" type="object"/>
+                <button name="action_verification_preconfirm" states="draft" string="Confirmer la vente" type="object"/>
+                <button name="action_verification_preconfirm" states="sent" string="Confirmer la vente" class="btn-primary" type="object"/>
             </xpath>
             <xpath expr="//button[@name='%(sale.action_view_sale_advance_payment_inv)d'][2]" position="attributes">
                 <attribute name="attrs">{'invisible': ['|',('invoice_status', '!=', 'no'), ('state', 'not in', ['presale', 'sale'])]}</attribute>
@@ -50,16 +41,39 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="of_sale.of_sale_view_confirmation_date_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//button[@name='action_confirm'][1]" position="attributes">
-                <attribute name="string">Enregistrer la commande</attribute>
-                <attribute name="attrs">{'invisible': ['|', ('confirmation_date', '!=', False), ('state', '!=', 'presale')]}</attribute>
-                <attribute name="groups">of_access_control.of_group_sale_responsible</attribute>
-            </xpath>
             <xpath expr="//button[@name='of_sale.action_of_sale_confirmation_devis'][1]" position="replace"/>
             <xpath expr="//button[@name='of_sale.action_of_sale_confirmation_devis'][1]" position="attributes">
                 <attribute name="string">Enregistrer la commande</attribute>
                 <attribute name="attrs">{'invisible': ['|', ('confirmation_date', '=', False), ('state', '!=', 'presale')]}</attribute>
                 <attribute name="groups">of_access_control.of_group_sale_responsible</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_custom_workflow_sale_order_confirmation_date_form_view2" model="ir.ui.view">
+        <field name="name">of.sale.custom.workflow.sale.order.confirmation.date.form.view2</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_verification_confirm'][1]" position="attributes">
+                <attribute name="string">Enregistrer la commande</attribute>
+                <attribute name="states"/>
+                <attribute name="attrs">{'invisible': [('state', '!=', 'presale')]}</attribute>
+                <attribute name="groups">of_access_control.of_group_sale_responsible</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_verification_confirm'][2]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_custom_workflow_sale_order_confirmation_date_form_view3" model="ir.ui.view">
+        <field name="name">of.sale.custom.workflow.sale.order.confirmation.date.form.view3</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale_custom_workflow.of_sale_custom_workflow_sale_order_confirmation_date_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_verification_confirm'][1]" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('confirmation_date', '!=', False), ('state', '!=', 'presale')]}</attribute>
             </xpath>
         </field>
     </record>
