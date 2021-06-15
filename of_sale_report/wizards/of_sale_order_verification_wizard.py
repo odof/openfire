@@ -2,6 +2,7 @@
 
 from odoo import api, fields, models
 
+
 class OfSaleOrderVerification(models.TransientModel):
     _inherit = 'of.sale.order.verification'
 
@@ -12,20 +13,20 @@ class OfSaleOrderVerification(models.TransientModel):
 
     @api.model
     def do_verification(self, order):
-        action, type = super(OfSaleOrderVerification, self).do_verification(order)
-        skipped_types = self._context.get('skipped_types', [])
-        if not (action or type) and 'date_de_pose' not in skipped_types and \
-                not self._context.get('no_date_de_pose', False):
-            if not order.of_date_de_pose:
-                skipped_types.append('date_de_pose')
-                context = {
-                    'default_type': 'date_de_pose',
-                    'default_message': False,
-                    'default_order_id': order.id,
-                    'skipped_types' : skipped_types,
-                }
-                return self.action_return(context, 'date_de_pose')
-        return action, type
+        action, interrupt = super(OfSaleOrderVerification, self).do_verification(order)
+        context = self.env.context.copy()
+        skipped_types = context.get('skipped_types', [])
+        if not (action or interrupt) and 'date_de_pose' not in skipped_types and \
+           not context.get('no_verif_date_de_pose', False) and not order.of_date_de_pose:
+            skipped_types.append('date_de_pose')
+            context.update({
+                'default_type': 'date_de_pose',
+                'default_message': False,
+                'default_order_id': order.id,
+                'skipped_types': skipped_types,
+            })
+            return self.action_return(context, self.need_interrupt(order))
+        return action, interrupt
 
     @api.model
     def action_return(self, context, type, titre="Informations"):
@@ -40,8 +41,8 @@ class OfSaleOrderVerification(models.TransientModel):
         }, type
 
     @api.multi
-    def next_step(self):
-        action = super(OfSaleOrderVerification, self).next_step()
-        if self.type == 'date_de_pose':
+    def validate_step(self):
+        super(OfSaleOrderVerification, self).validate_step()
+        if self.type == 'date_de_pose' and self.order_id:
             self.order_id.write({'of_date_de_pose': self.date})
-        return action
+            self.order_id.order_line.update_procurement_date_planned()

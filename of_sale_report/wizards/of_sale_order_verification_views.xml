@@ -10,6 +10,9 @@
             <xpath expr="//group[@name='wizard_group']" position="inside">
                 <field name="date" attrs="{'invisible': [('type','!=','date_de_pose')]}" colspan="2"/>
             </xpath>
+            <xpath expr="//button[@name='next_step']" position="attributes">
+                <attribute name="attrs">{'invisible': [('type', '=', 'date_de_pose'), ('date','=',False)]}</attribute>
+            </xpath>
         </field>
     </record>
 

@@ -42,6 +42,18 @@
                 <button name="action_done" states="sale" position="attributes">
                     <attribute name="confirm">Êtes-vous sûr de vouloir verrouiller la vente ? Une fois verrouillée, vous ne pourrez plus rien modifier. Cette action est irréversible.</attribute>
                 </button>
+                <xpath expr="//button[@name='action_confirm'][1]" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_confirm'][1]" position="after">
+                    <button name="action_verification_confirm" states="sent" string="Confirm Sale" class="btn-primary o_sale_confirm" type="object" />
+                </xpath>
+                <xpath expr="//button[@name='action_confirm'][2]" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_confirm'][2]" position="after">
+                    <button name="action_verification_confirm" states="draft" string="Confirm Sale" class="o_sale_confirm" type="object" />
+                </xpath>
                 <xpath expr="//header" position="inside">
                     <button name="button_gestion_prix" type="object" string="Gestion prix"/>
                     <field name="of_allow_quote_addition" invisible="1"/>
