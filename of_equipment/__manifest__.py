@@ -17,6 +17,7 @@ Module OpenFire pour les équipements
         'of_planning_tournee',
         ],
     'data': [
+        'security/ir_rules.xml',
         'views/of_equipment_views.xml',
         'views/ir_ui_menus_views.xml',
         ],
