@@ -18,6 +18,7 @@ Module OpenFire pour les équipements
         ],
     'data': [
         'views/of_equipment_views.xml',
+        'views/ir_ui_menus_views.xml',
         ],
     'installable': True,
     'auto_install': False,

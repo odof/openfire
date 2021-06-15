@@ -7,7 +7,8 @@ from odoo.exceptions import UserError, ValidationError
 class OfPlanningIntervention(models.Model):
     _inherit = 'of.planning.intervention'
 
-    equipment_ids = fields.Many2many(comodel_name='maintenance.equipment', string=u"Équipements", copy=False)
+    equipment_ids = fields.Many2many(comodel_name='maintenance.equipment', string=u"Équipements", copy=False,
+                                     domain="['|', ('of_company_ids', '=', False), ('of_company_ids', '=', company_id)]")
     verify_equipment = fields.Text(string=u"Équipement utilisé", compute='_compute_verify_equipment')
     verify_color = fields.Selection(selection=[
         ('red', 'Rouge'),
@@ -20,7 +21,13 @@ class OfPlanningIntervention(models.Model):
         for rdv in self:
             if rdv.equipment_ids and rdv.date:
                 for equipment in rdv.equipment_ids:
-                    interventions = equipment.equipment_not_available(rdv)
+                    # si il y a une différence c'est que nous sommes en train de modifier un record
+                    # le compute est donc utilisé comme un onchange et il n'y a qu'un seul record dans self
+                    if hasattr(self, '_origin') and self._origin != self:
+                        interventions = equipment.with_context(from_id=self._origin.id).equipment_not_available(rdv)
+                    else:
+                        interventions = equipment.equipment_not_available(rdv)
+
                     if interventions:
                         rdv.verify_color = 'red'
                         rdv.verify_equipment = u"Alerte : l'équipement %s est déjà utilisé sur ce créneau." % \
@@ -60,23 +67,35 @@ class OfPlanningIntervention(models.Model):
 class OfService(models.Model):
     _inherit = 'of.service'
 
-    equipment_ids = fields.Many2many(comodel_name='maintenance.equipment', string=u"Équipements")
+    equipment_ids = fields.Many2many(comodel_name='maintenance.equipment', string=u"Équipements",
+                                     domain="['|', ('of_company_ids', '=', False), ('of_company_ids', '=', company_id)]")
 
 
 class MaintenanceEquipment(models.Model):
     _inherit = 'maintenance.equipment'
 
     of_intervention_ids = fields.Many2many(comodel_name='of.planning.intervention', string="Interventions")
+    of_company_ids = fields.Many2many(comodel_name='res.company', string=u"Société(s)")
 
     @api.multi
     def equipment_not_available(self, base_intervention, check_day=False):
         self.ensure_one()
+        # passage en sudo pour faire la vérification, les interventions étant en sudo cela ne pose pas de pb
+        # pour afficher différentes informations des rdv trouvés
+        # Si vérification réalisée sans le sudo on peut ne pas trouver des interventions avec le même équipement et
+        # la même heure qui serait sur une autre société
+        self = self.sudo()
         day = base_intervention.date_date
-        interventions = self.env['of.planning.intervention'].search([
+        domain = [
             ('date_date', '=', day),
             ('equipment_ids', 'in', [self.id]),
-            ('state', 'not in', ('cancel', 'postponed'))
-        ])
+            ('state', 'not in', ('cancel', 'postponed')),
+            ]
+        if self.of_company_ids:
+            domain.append(('company_id', 'in', self.of_company_ids._ids))
+        if self._context.get('from_id'):
+            domain.append(('id', 'not in', [self._context.get('from_id')]))
+        interventions = self.env['of.planning.intervention'].search(domain)
         if base_intervention and base_intervention in interventions:
             interventions -= base_intervention
         if not interventions:
