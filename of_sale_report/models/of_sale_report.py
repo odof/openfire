@@ -19,6 +19,18 @@ class SaleOrderLine(models.Model):
             res['date_planned'] = self.order_id.of_date_de_pose
         return res
 
+    @api.multi
+    def update_procurement_date_planned(self):
+        for order_line in self:
+            if order_line.order_id.of_date_de_pose and order_line.procurement_ids:
+                order_line.procurement_ids.write({'date_planned': order_line.order_id.of_date_de_pose})
+                moves = order_line.procurement_ids.mapped('move_ids')
+                if moves:
+                    moves.write({'date_expected': order_line.order_id.of_date_de_pose})
+                    pickings = order_line.procurement_ids.mapped('move_ids').mapped('picking_id')
+                    if pickings:
+                        pickings.write({'min_date': order_line.order_id.of_date_de_pose})
+
 
 class OFSaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'

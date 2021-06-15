@@ -18,7 +18,7 @@
                 </group>
                 <footer>
                     <button string="Valider" name="next_step" type="object" class="btn-primary"/>
-                    <button string="Ok" name="skip_validation" type="object" class="btn-default"/>
+                    <button string="Passer" name="skip_validation" type="object" class="btn-default"/>
                 </footer>
             </form>
         </field>
