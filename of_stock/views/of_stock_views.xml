@@ -22,6 +22,10 @@
             <xpath expr="//field[@name='date']" position="attributes">
                 <attribute name="attrs">{'readonly': ['|', ('of_option', '=', False), ('state', 'in', ['confirm', 'done'])]}</attribute>
             </xpath>
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="category_child_ids" widget="many2many_tags"
+                       attrs="{'invisible': ['|',('category_child_ids', '=', False),('filter','!=','category')]}"/>
+            </xpath>
             <xpath expr="//notebook//field[@name='line_ids']/tree" position="attributes">
                 <attribute name="editable">top</attribute>
             </xpath>
