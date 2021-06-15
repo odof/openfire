@@ -440,8 +440,8 @@ class OfAnalyseChantier(models.Model):
             orders = analyse.order_ids
             invoices = analyse.invoice_ids
             analyse.name = "%s / %s / %s" % (partner.name,
-                                             " - ".join(orders.mapped('name')),
-                                             " - ".join(invoices.mapped('name')))
+                                             " - ".join([name or '' for name in orders.mapped('name')]),
+                                             " - ".join([name or '' for name in invoices.mapped('move_name')]))
 
 
     def toggle_view_qty(self):
