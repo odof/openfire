@@ -173,6 +173,12 @@
                 <filter string="Mois précédent" name="previous_month"
                         domain="[('date', u'&gt;=', (context_today() - relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
                                  ('date', u'&lt;', context_today().strftime('%Y-%m-01'))]"/>
+                <separator/>
+                <filter string="Ventes" name="journal_sale" domain="[('of_journal_type', '=', 'sale')]"/>
+                <filter string="Achats" name="journal_purchase" domain="[('of_journal_type', '=', 'purchase')]"/>
+                <filter string="Divers" name="journal_general" domain="[('of_journal_type', '=', 'general')]"/>
+                <filter string="Banques" name="journal_bank" domain="[('of_journal_type', '=', 'bank')]"/>
+                <filter string="Liquidités" name="journal_cash" domain="[('of_journal_type', '=', 'cash')]"/>
             </xpath>
         </field>
     </record>

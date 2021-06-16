@@ -189,6 +189,14 @@ class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 
     @api.model
+    def get_journal_types(self):
+        return self.env['account.journal'].fields_get(['type'], ['selection'])['type']['selection']
+
+    of_journal_type = fields.Selection(
+        selection=lambda s: s.get_journal_types(), related='move_id.journal_id.type', string="Type de journal",
+        readonly=True)
+
+    @api.model
     def default_get(self, fields_list):
         def get_line_account(line):
             account_id = line['account_id']
