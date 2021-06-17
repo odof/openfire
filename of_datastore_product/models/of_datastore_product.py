@@ -1184,8 +1184,9 @@ class OfDatastoreCentralized(models.AbstractModel):
         brands = brands.filtered('datastore_supplier_id')
 
         # Recherche des produits non déjà enregistrés
-        orig_ids = self.search([('brand_id', 'in', brands._ids),
-                                ('of_datastore_res_id', '!=', False)]).mapped('of_datastore_res_id')
+        orig_ids = self.with_context(active_test=False).search(
+            [('brand_id', 'in', brands._ids),
+             ('of_datastore_res_id', '!=', False)]).mapped('of_datastore_res_id')
 
         # Mise a jour des paramètres de recherche
         new_args = [('brand_id', 'in', brands.mapped('datastore_brand_id')),
