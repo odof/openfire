@@ -30,7 +30,10 @@ def distance_points(lat1, lon1, lat2, lon2):
 
 
 def format_date(date, lang):
-    return fields.Date.from_string(date).strftime(lang.date_format)
+    # Si la date est en string, la convertir en date puis lui appliquer le format. Sinon, lui appliquer le format
+    if isinstance(date, basestring):
+        return fields.Date.from_string(date).strftime(lang.date_format)
+    return date.strftime(lang.date_format)
 
 
 def se_chevauchent(min_1, max_1, min_2, max_2, strict=True):

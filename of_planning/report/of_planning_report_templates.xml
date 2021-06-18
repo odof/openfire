@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <odoo>
+
+    <!-- Planning général semaine -->
     <report
         string="Planning général semaine "
         id="action_report_planning_general_semaine"
@@ -89,4 +91,110 @@
                 </t>
             </t>
     </template>
+
+    <!-- Planning semaine -->
+    <report
+        string="Planning semaine "
+        id="action_report_planning_semaine"
+        model="of_planning.report_planning_semaine"
+        report_type="qweb-pdf"
+        name="of_planning.report_planning_semaine"
+        file="of_planning.report_planning_semaine"
+        paperformat="of_base.paperformat_euro_internal"
+    />
+
+    <template id="of_planning.report_planning_semaine">
+        <t t-call="report.html_container">
+            <t t-call="report.internal_layout">
+                <div class="page">
+                    <style>
+                        td, th { padding:8px; border: 1px solid #E6E6E6; }
+                        table { width: 100%; }
+                        thead { background-color: #E6E6FA; }
+                    </style>
+                    <div t-foreach="data['employee_ids']" t-as="employee_id" style="page-break-after: always;">
+                        <t t-set="interventions" t-value="get_interventions(employee_id, data['date_start'])"/>
+                        <t t-set="title" t-value="get_title(employee_id, data['date_start'])"/>
+                        <b>
+                            <h3 style="text-align:center" t-raw="title"/>
+                        </b>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 10%">Date</th>
+                                    <th style="width: 7%">Heure</th>
+                                    <th style="width: 32%">Client</th>
+                                    <th style="width: 17%">Tâche</th>
+                                    <th style="width: 34%">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="interventions" t-as="intervention">
+                                    <t t-set="columns" t-value="get_columns(intervention)"/>
+                                    <t t-foreach="columns" t-as="column">
+                                        <td>
+                                            <span t-raw="column"/>
+                                        </td>
+                                    </t>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- Planning journée -->
+    <report
+            string="Planning journée "
+            id="action_report_planning_jour"
+            model="of_planning.report_planning_jour"
+            report_type="qweb-pdf"
+            name="of_planning.report_planning_jour"
+            file="of_planning.report_planning_jour"
+            paperformat="of_base.paperformat_euro_internal"
+    />
+
+    <template id="of_planning.report_planning_jour">
+        <t t-call="report.html_container">
+            <t t-call="report.internal_layout">
+                <div class="page">
+                    <style>
+                        td, th { padding:8px; border: 1px solid #E6E6E6; }
+                        table { width: 100%; }
+                        thead { background-color: #E6E6FA; }
+                    </style>
+                    <div t-foreach="data['employee_ids']" t-as="employee_id" style="page-break-after: always;">
+                        <t t-set="interventions" t-value="get_interventions(employee_id, data['date_start'])"/>
+                        <t t-set="title" t-value="get_title(employee_id, data['date_start'])"/>
+                        <b>
+                            <h3 style="text-align:center" t-raw="title"/>
+                        </b>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 9%">Heure</th>
+                                    <th style="width: 35%">Client</th>
+                                    <th style="width: 17%">Tâche</th>
+                                    <th style="width: 39%">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="interventions" t-as="intervention">
+                                    <t t-set="columns" t-value="get_columns(intervention)"/>
+                                    <t t-foreach="columns" t-as="column">
+                                        <td>
+                                            <span t-raw="column"/>
+                                        </td>
+                                    </t>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
 </odoo>

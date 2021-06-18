@@ -26,7 +26,7 @@ class PlanningImpressionWizard(models.TransientModel):
 
     @api.onchange('type')
     def check_change(self):
-        if self.type and self.type == 'week2' :
+        if self.type and self.type == 'week2':
             employee_ids = self.env['hr.employee'].search([])  # filtrer les employés qui sont des poseurs?
             self.employee_ids = [(6, 0, employee_ids._ids)]
             date_start = self.date_start or fields.Date.context_today(self)
@@ -37,7 +37,7 @@ class PlanningImpressionWizard(models.TransientModel):
                 date_start -= timedelta(days=week_day-1)
 
             self.date_start = date_start
-        else :
+        else:
             self.employee_ids = [(5, 0, 0)]
 
     @api.multi
@@ -53,22 +53,25 @@ class PlanningImpressionWizard(models.TransientModel):
             }
 
             return self.env['report'].get_action(self, 'of_planning.report_planning_general_semaine', data=data)
+
+        elif self.type == 'week':
+            data = {
+                'ids': self.env.context.get('active_ids', []),
+                'model': self.env.context.get('active_model', 'ir.ui.menu'),
+                'form': tmp,
+                'date_start': self.date_start,
+                'employee_ids': self.employee_ids.ids,
+            }
+
+            return self.env['report'].get_action(self, 'of_planning.report_planning_semaine', data=data)
+
         else:
             data = {
-                'ids' : self._ids,
-                'model' : self._name,
-                'form' : tmp,
+                'ids': self.env.context.get('active_ids', []),
+                'model': self.env.context.get('active_model', 'ir.ui.menu'),
+                'form': tmp,
                 'date_start': self.date_start,
+                'employee_ids': self.employee_ids.ids,
             }
 
-            report_type_name = {
-                'day': 'of_planning.of_planning_jour',
-                'week': 'of_planning.of_planning_semaine',
-                # 'week2': 'of_planning.report_planning_general_semaine',
-            }
-
-            return {
-                'type' : 'ir.actions.report.xml',
-                'report_name': report_type_name[self.type],
-                'datas' : data,
-            }
+            return self.env['report'].get_action(self, 'of_planning.report_planning_jour', data=data)
