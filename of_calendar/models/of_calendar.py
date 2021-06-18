@@ -189,14 +189,20 @@ class HREmployee(models.Model):
         }
 
     @api.multi
-    def get_horaires_date(self, date_str, response_text=False, seg_type='regular'):
+    def get_horaires_date(self, date_param, response_text=False, seg_type='regular'):
         """Renvoie les horaires des employés à la date donnée en paramètre.
-        :param date_str: date d'évaluation
+        :param date_param: date d'évaluation au format string ou Date
         :param response_text: True si on veut le résultat sous forme de chaine de caractères
         :param seg_type: Type d'horaire
         :rtype: { employee_id :  [(h_deb, h_fin), (h_deb, h_fin), ..] ,  .. }"""
         segment_obj = self.env['of.horaire.segment']
-        date_da = fields.Date.from_string(date_str)
+        # init date_str et date_da en fonction de date_param
+        if isinstance(date_param, basestring):
+            date_da = fields.Date.from_string(date_param)
+            date_str = date_param
+        else:
+            date_da = date_param
+            date_str = fields.Date.to_string(date_param)
         if not date_da:  # sur création depuis vue liste, date peut être None
             if response_text:
                 return u""

@@ -29,8 +29,14 @@ def distance_points(lat1, lon1, lat2, lon2):
     return 2*asin(sqrt((sin((lat1-lat2)/2)) ** 2 + cos(lat1)*cos(lat2)*(sin((lon1-lon2)/2)) ** 2)) * 6366
 
 
-def format_date(date, lang):
-    return fields.Date.from_string(date).strftime(lang.date_format)
+def format_date(date, lang, with_year=True):
+    # Si la date est en string, la convertir en date puis lui appliquer le format. Sinon, lui appliquer le format
+    if isinstance(date, basestring):
+        res = fields.Date.from_string(date).strftime(lang.date_format)
+    res = date.strftime(lang.date_format)
+    if not with_year:
+        res = res[:-5]
+    return res
 
 
 def se_chevauchent(min_1, max_1, min_2, max_2, strict=True):
