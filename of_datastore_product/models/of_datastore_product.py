@@ -679,6 +679,12 @@ class OfDatastoreCentralized(models.AbstractModel):
             'invoice_policy',
             'purchase_method',
 
+            # Champs à valeur forcée manuellement pour l'import
+            'of_import_categ_id',
+            'of_import_cout',
+            'of_import_price',
+            'of_import_remise',
+
             # Champs de notes
             'description_sale',  # Description pour les devis
             'description_purchase',  # Description pour les fournisseurs
