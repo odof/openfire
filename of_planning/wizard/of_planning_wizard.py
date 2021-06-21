@@ -22,12 +22,15 @@ class PlanningImpressionWizard(models.TransientModel):
     date_start = fields.Date("Date", required=True)
     employee_ids = fields.Many2many(
         'hr.employee', string=u"Employés",
-        domain="['|', ('of_est_intervenant', '=', True), ('of_est_commercial', '=', True)]")
+        domain="['|', ('of_est_intervenant', '=', True), ('of_est_commercial', '=', True),"
+               "('of_impression_planning', '=', True)]")
 
     @api.onchange('type')
     def check_change(self):
         if self.type and self.type == 'week2':
-            employee_ids = self.env['hr.employee'].search([])  # filtrer les employés qui sont des poseurs?
+            employee_ids = self.env['hr.employee'].search([
+                ('of_impression_planning', '=', True)
+            ])
             self.employee_ids = [(6, 0, employee_ids._ids)]
             date_start = self.date_start or fields.Date.context_today(self)
             date_start = fields.Date.from_string(date_start)

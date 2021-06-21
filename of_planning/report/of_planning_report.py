@@ -2,8 +2,9 @@
 
 import time
 from datetime import timedelta, datetime
+from collections import OrderedDict
 from odoo import models, fields, api
-from odoo.addons.of_utils.models.of_utils import format_date
+from odoo.addons.of_utils.models.of_utils import format_date, float_2_heures_minutes
 
 
 class ReportPlanningGeneralSemaine(models.AbstractModel):
@@ -40,56 +41,77 @@ class ReportPlanningGeneralSemaine(models.AbstractModel):
                                                                           date_stop.strftime(" %B %Y"))
         return title
 
-    def get_dates(self, date_start=None):
-        self.set_context(date_start)
-        date_start_date = self.localcontext['date_start']
-        date_stop_date = self.localcontext['date_stop']
-
-        date_debut = date_start_date
-        date_fin = date_stop_date
-        return (date_debut, date_fin)
-
     def get_interventions(self, employee_ids, date_inter=None):
         intervention_obj = self.env['of.planning.intervention']
 
         self.set_context(date_inter)
 
         date_start = fields.Date.to_string(self.localcontext['date_start'])
+        date_start_da = self.localcontext['date_start']
         date_stop = fields.Date.to_string(self.localcontext['date_stop'])
+        date_stop_da = self.localcontext['date_stop']
 
-        domain = [('date_deadline', '>=', date_start), ('date', '<=', date_stop),
-                  ('employee_ids', 'in', employee_ids),
-                  ('state', 'in', ('draft', 'confirm', 'done', 'unfinished'))]
-        interventions = intervention_obj.search(domain, order='date')
+        temp = OrderedDict()
+        days = range(5)  # @todo: jours travaillés
+        employee_obj = self.env['hr.employee']
+        employees = employee_obj.browse(employee_ids).sorted('sequence')
 
-        temp = {}
-        days = range(5) # @todo: jours travaillés
+        for employee in employees:
+            domain = [('date_deadline', '>=', date_start), ('date', '<=', date_stop),
+                      ('employee_ids', 'in', employee.id),
+                      ('state', 'in', ('draft', 'confirm', 'done', 'unfinished'))]
+            interventions = intervention_obj.search(domain, order='date')
 
-        for interv in interventions:
-            # Datetime UTC
-            date_utc_str = datetime.strptime(interv.date, "%Y-%m-%d %H:%M:%S")
-            # Datetime local
-            date_locale_dt = fields.Datetime.context_timestamp(interv, date_utc_str)
+            for interv in interventions:
+                # Datetime UTC début
+                date_start_utc_dt = datetime.strptime(interv.date, "%Y-%m-%d %H:%M:%S")
+                # Datetime local début
+                date_start_locale_dt = fields.Datetime.context_timestamp(interv, date_start_utc_dt)
+                # Datetime UTC fin
+                date_stop_utc_dt = datetime.strptime(interv.date_deadline, "%Y-%m-%d %H:%M:%S")
+                # Datetime local fin
+                date_stop_locale_dt = fields.Datetime.context_timestamp(interv, date_stop_utc_dt)
 
-            day = date_locale_dt.weekday()
-            if day not in days:
-                days.append(day)
+                date_da = date_start_locale_dt.date()
+                date_deadline_da = date_stop_locale_dt.date()
+                date_current_da = date_da
+                while date_current_da <= date_deadline_da:
+                    # Cette date est en dehors de la semaine d'évaluation
+                    if not (date_start_da <= date_current_da <= date_stop_da):
+                        date_current_da += timedelta(days=1)
+                        continue
 
-            heure = date_locale_dt.strftime("%H:%M")
-            for employee in interv.employee_ids:
-                if not temp or employee.name not in temp:
-                    temp[employee.name] = {}
-                employee_jours_dict = temp[employee.name]
-                employee_jours_dict.setdefault(day, [False, []])[1].append((heure, interv))
-                if interv.tache_id.imp_detail:
-                    employee_jours_dict[day][0] = True
-        days.sort()
+                    # premier jour de l'intervention : l'heure est l'heure de début de l'intervention
+                    if date_current_da == date_da:
+                        heure = date_start_locale_dt.strftime("%H:%M")
+                    # jour suivant : l'heure est celle du début de la journée de l'employé
+                    else:
+                        horaires_du_jour = interv.employee_ids.get_horaires_date(date_current_da)
+                        if horaires_du_jour[employee.id]:
+                            # heure de début du premier créneau de la journée
+                            heure = u"%02d:%02d" % float_2_heures_minutes(horaires_du_jour[employee.id][0][0])
+                        else:
+                            heure = -1
+                    if heure >= 0.0:
+                        day = date_current_da.weekday()
+                        if day not in days:
+                            days.append(day)
+                        if not temp or employee.name not in temp:
+                            temp[employee.name] = {}
+                        employee_jours_dict = temp[employee.name]
+                        employee_jours_dict.setdefault(day, [False, []])[1].append((heure, interv))
+                        if interv.tache_id.imp_detail:
+                            employee_jours_dict[day][0] = True
+                    date_current_da += timedelta(days=1)
+            days.sort()
 
         res = [[key, temp[key]] for key in temp.keys()]
         for _, intervs_dict in res:
             for day, (imp_detail, intervs) in intervs_dict.iteritems():
                 if imp_detail:
-                    intervs_dict[day] = [(heure, interv.partner_id.name or '', interv.state == 'confirm') for heure, interv in intervs]
+                    intervs_dict[day] = [
+                        (heure, self.get_intervention_detail(interv), self.get_interv_state_display(interv))
+                        for heure, interv in intervs]
                 else:
                     maxi = {}
                     for _, j in intervs :
@@ -105,6 +127,12 @@ class ReportPlanningGeneralSemaine(models.AbstractModel):
             return [res, days]
         else:
             return [[], []]
+
+    def get_intervention_detail(self, intervention):
+        return intervention.partner_id and intervention.partner_id.name or u""
+
+    def get_interv_state_display(self, intervention):
+        return intervention.state == 'confirm' and '<span class="fa fa-check"/>' or ''
 
     def int_to_day(self, day_int):
         return ("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche")[day_int]
@@ -181,33 +209,51 @@ class ReportPlanningSemaine(models.AbstractModel):
     def get_columns(self, intervention):
         # date, heure, client, tâche, description
         res = []
-        res.append(self.get_date(intervention))
-        res.append(self.get_heure(intervention))
+        res.append(self.get_date_et_heure(intervention))
         res.append(self.get_client(intervention))
         res.append(intervention.tache_id.name)
         res.append(self.get_description(intervention))
         return res
 
-    def get_date(self, intervention):
-        date_datetime_local = fields.Datetime.context_timestamp(
-            intervention, fields.Datetime.from_string(intervention.date))
-        date_local = date_datetime_local.date()
+    def get_date_et_heure(self, intervention):
         lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
-        return format_date(date_local, lang)
-
-    def get_heure(self, intervention):
-        date_datetime_local = fields.Datetime.context_timestamp(
+        date_start_datetime_local = fields.Datetime.context_timestamp(
             intervention, fields.Datetime.from_string(intervention.date))
-        return "%02d:%02d" % (date_datetime_local.hour, date_datetime_local.minute)
+        date_start_local = date_start_datetime_local.date()
+        date_stop_datetime_local = fields.Datetime.context_timestamp(
+            intervention, fields.Datetime.from_string(intervention.date_deadline))
+        date_stop_local = date_stop_datetime_local.date()
+        if date_start_local != date_stop_local:
+            res = u"du %s %s à %02d:%02d<br/>au %s %s à %02d:%02d" % (
+                self.int_to_day(date_start_local.weekday()),
+                format_date(date_start_local, lang, with_year=False),
+                date_start_datetime_local.hour,
+                date_start_datetime_local.minute,
+                self.int_to_day(date_stop_local.weekday()),
+                format_date(date_stop_local, lang, with_year=False),
+                date_stop_datetime_local.hour,
+                date_stop_datetime_local.minute,
+            )
+        else:
+            res = u"le %s %s<br/>de %02d:%02d à %02d:%02d" % (
+                self.int_to_day(date_start_local.weekday()),
+                format_date(date_start_local, lang, with_year=False),
+                date_start_datetime_local.hour,
+                date_start_datetime_local.minute,
+                date_stop_datetime_local.hour,
+                date_stop_datetime_local.minute,
+            )
+        return res
+
+    def int_to_day(self, day_int):
+        return ("Lun.", "Mar.", "Mer.", "Jeu.", "Ven.", "Sam.", "Dim.")[day_int]
 
     def get_client(self, line):
         if not line.address_id:
             return ""
         address = line.address_id
         city_vals = [s for s in (address.zip, address.city) if s]
-        name = u""
-        if line.state == 'confirm':
-            name += u'<i class="fa fa-check"/> '
+        name = self.get_interv_state_display(line)
         name += address.name
         partner_vals = [s for s in (
             name,
@@ -220,7 +266,12 @@ class ReportPlanningSemaine(models.AbstractModel):
         ) if s]
         return "<br/>".join(partner_vals)
 
+    def get_interv_state_display(self, intervention):
+        return intervention.state == 'confirm' and u'<span class="fa fa-check"/> ' or u''
+
     def get_description(self, line):
+        if not line.description:
+            return u""
         return line.description.replace('<br>', '\n').replace('<br/>', '\n').replace('<p>', '').replace('</p>', '\n')\
             .replace('<p/>', '\n').replace('<b>', '').replace('</b>', '').replace('<i>', '').replace('</i>', '')\
             .replace('<u>', '').replace('</u>', '')
@@ -256,8 +307,6 @@ class ReportPlanningJour(models.AbstractModel):
             date_start_date = fields.Date.from_string(fields.Date.context_today(self))
 
         week_day = date_start_date.isocalendar()[2]
-        if week_day > 1:
-            date_start_date -= timedelta(days=week_day - 1)
         self.localcontext = {}
         self.localcontext['date_start'] = date_start_date
         self.localcontext['date_stop'] = date_start_date
@@ -309,9 +358,7 @@ class ReportPlanningJour(models.AbstractModel):
             return ""
         address = line.address_id
         city_vals = [s for s in (address.zip, address.city) if s]
-        name = u""
-        if line.state == 'confirm':
-            name += u'<i class="fa fa-check"/> '
+        name = self.get_interv_state_display(line)
         name += address.name
         partner_vals = [s for s in (
             name,
@@ -324,7 +371,12 @@ class ReportPlanningJour(models.AbstractModel):
         ) if s]
         return "<br/>".join(partner_vals)
 
+    def get_interv_state_display(self, intervention):
+        return intervention.state == 'confirm' and u'<span class="fa fa-check"/> ' or u''
+
     def get_description(self, line):
+        if not line.description:
+            return u""
         return line.description.replace('<br>', '\n').replace('<br/>', '\n').replace('<p>', '').replace('</p>', '\n')\
             .replace('<p/>', '\n').replace('<b>', '').replace('</b>', '').replace('<i>', '').replace('</i>', '')\
             .replace('<u>', '').replace('</u>', '')
