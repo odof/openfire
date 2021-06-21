@@ -124,6 +124,8 @@
                             </div>
                             <field name="journal_id" attrs="{'readonly': [('invoice_count','>',0)]}" options="{'no_create': True}"/>
                             <field name="fiscal_position_id" options="{'no_create': True}"/>
+                            <field name="account_analytic_id" options="{'no_create': True}"
+                                   groups="analytic.group_analytic_accounting"/>
                             <field name="payment_term_id"/>
                             <field name="grouped"/>
                             <field name="recurring_next_date"/>
@@ -536,9 +538,11 @@
                             <field name="uom_id" groups="product.group_uom" class="oe_inline oe_no_button"/>
                         </div>
                         <field name="discount" groups="sale.group_discount_per_so_line"/>
-                   </group>
+                    </group>
                     <group>
                         <field name="tax_ids" widget="many2many_tags"/>
+                        <field name="account_analytic_id" options="{'no_create': True}"
+                               groups="analytic.group_analytic_accounting"/>
                     </group>
                     <separator string="Description"/>
                     <field name="name" nolabel="1" colspan="4"/>
