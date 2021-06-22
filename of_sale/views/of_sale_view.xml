@@ -377,6 +377,16 @@
                         <div name="of_color_bg_section_setting">
                             <field name="of_color_bg_section" class="oe_inline" widget="color"/>
                         </div>
+                        <label string="(OF) Pastille commercial" for="pdf_masquer_pastille_commercial"/>
+                        <div name="pdf_masquer_pastille_commercial">
+                            <field name="pdf_masquer_pastille_commercial" class="oe_inline"/>
+                            <span>NE PAS afficher dans les rapports PDF</span>
+                        </div>
+                        <label string="(OF) Pastille conditions de règlement" for="pdf_masquer_pastille_payment_term"/>
+                        <div name="pdf_masquer_pastille_payment_term">
+                            <field name="pdf_masquer_pastille_payment_term" class="oe_inline"/>
+                            <span>NE PAS afficher dans les rapports PDF</span>
+                        </div>
                     </group>
                 </xpath>
                 <xpath expr="//group[@name='quotations_sales']" position="inside">
