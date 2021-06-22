@@ -245,7 +245,7 @@ var PlanningView = View.extend({
         }
     },
     /**
-     *  initialise les couleurs des créneaux dispos. 
+     *  initialise les couleurs des créneaux dispos.
      *  Ainsi que la durée minimale pour qu'un créneau libre soit considéré comme disponible
      */
     set_creneaux_dispo_data: function () {
@@ -848,7 +848,7 @@ var PlanningView = View.extend({
                         col_offset_stop = undefined;
                     }
                     //console.log("duration: ",day_span);
-                    
+
                     record_options = {
                         "col_offset_start": col_offset_start,
                         "col_offset_stop": col_offset_stop,
@@ -2128,7 +2128,7 @@ PlanningView.SidebarResoFilter = Widget.extend({
             // Retire l'id des filtres sélectionnés et sauvegarde la sélection
             for (var i=0; i<this.view.filter_attendee_ids.length; i++) {
                 if (this.view.filter_attendee_ids[i] == e.target.value) {
-                    this.view.filter_attendee_ids.splice(i, 1); 
+                    this.view.filter_attendee_ids.splice(i, 1);
                 }
             }
             ir_values_model.call("set_default",
@@ -2589,5 +2589,8 @@ var SidebarCaption = Widget.extend({
 
 core.view_registry.add('planning', PlanningView);
 
-return PlanningView;
+return {
+PlanningView: PlanningView,
+PlanningRecord: PlanningRecord,
+};
 });
