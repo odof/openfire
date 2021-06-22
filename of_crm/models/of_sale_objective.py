@@ -2,6 +2,7 @@
 
 from odoo import api, fields, models
 from odoo.exceptions import UserError
+from datetime import date
 
 
 def get_years():
@@ -35,6 +36,13 @@ class OFSaleObjective(models.Model):
     year = fields.Selection(selection=get_years(), string=u"Année", required=True)
     objective_line_ids = fields.One2many(
         comodel_name='of.sale.objective.line', inverse_name='objective_id', string=u"Lignes d'objectif")
+    objective_date = fields.Date(string="Date objectif", compute="_compute_objective_date", store=True)
+
+    @api.depends('month', 'year')
+    def _compute_objective_date(self):
+        for objective in self:
+            objective.objective_date = fields.Date.to_string(
+                    date(year=objective.year, month=int(objective.month), day=1))
 
     @api.multi
     def name_get(self):
