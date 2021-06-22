@@ -1,6 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- Ajout logos au pied de page -->
+    <template id="of_report_footer_with_logo" inherit_id="report.external_layout_footer">
+        <xpath expr="//div[@name='borderline']" position="replace">
+            <div style="text-align: center">
+                <t t-foreach="company.get_logo_footer()" t-as="i_logo">
+                    <img t-att-src="'data:image/png;base64,%s' % i_logo_value"
+                         style="margin-left: auto; margin-right: auto; display: inline-block; max-height: 70px;"/>
+                </t>
+            </div>
+            <div name="borderline" style="margin-top: 8px; border-bottom: 1px solid black"/>
+            <div style="position: absolute; margin-top: 4px">
+                <img t-if="company.getLogo('Logo_corner')"
+                     t-att-src="'data:image/png;base64,%s' % company.getLogo('Logo_corner')"
+                     style="max-height: 70px; max-width: 150px;"/>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Format papier pour le pied de page étendu -->
+    <record id="paperformat_euro_of_logo_footer" model="report.paperformat">
+        <field name="name">OF Logos footer European A4 Custom Portrait</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">40</field>
+        <field name="margin_bottom">35</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">35</field>
+        <field name="dpi">90</field>
+    </record>
+
     <!-- Permettre l'affichage des logos additionnels dans l'en-tête des rapports pdf -->
     <!-- Désactivé le temps de mettre tous les templates report.external_layout_header en no_update = False. Réactiver ensuite. -->
 <!--     <template id="of_external_layout_header_multi_logos" inherit_id="report.external_layout_header">

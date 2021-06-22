@@ -236,7 +236,7 @@
             La vue d'origine est entièrement réécrite ici.
             ####################-->
         <div class="footer">
-            <div style="border-bottom: 1px solid black; padding-top: 16px;"/>
+            <div name="borderline" style="border-bottom: 1px solid black; padding-top: 16px;"/>
             <div class="col-xs-10 col-xs-offset-1 text-center" style="font-size: small; padding-top: 8px;">
 
                <t t-if="not company.custom_footer and not company.use_of_custom_footer" class="list-inline">
