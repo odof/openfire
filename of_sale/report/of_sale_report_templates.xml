@@ -98,7 +98,7 @@
                             <strong>Conditions de règlement&amp;nbsp;:</strong>
                             <p t-field="doc.payment_term_id"/>
                         </div>
-                        <div t-if="doc.payment_term_id" style="display: table-cell; width: 4px;"/>
+                        <div t-if="doc.payment_term_id and not pdf_masquer_payment_term" style="display: table-cell; width: 4px;"/>
 
                         <div name="pastille_date_vt" t-if="doc.of_date_vt and pdf_vt_pastille"
                              style="flex: 1; padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
