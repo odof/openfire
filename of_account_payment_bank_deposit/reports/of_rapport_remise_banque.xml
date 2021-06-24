@@ -24,8 +24,21 @@
                                         <t t-if="o.journal_id.bank_id">
                                             <div style="margin-bottom: 4px"><strong>Banque&amp;nbsp;:</strong> <span t-field="o.journal_id.bank_id.name"/></div>
                                         </t>
+                                        <t t-if="o.bank_acc_number">
+                                            <div style="margin-bottom: 4px">
+                                                <strong>IBAN&amp;nbsp;:</strong> <span t-field="o.bank_acc_number"/>
+                                            </div>
+                                        </t>
                                         <t t-if="o.date">
-                                            <div><strong>Date remise&amp;nbsp;:</strong> <span t-field="o.date"/></div>
+                                            <div style="margin-bottom: 4px"><strong>Date remise&amp;nbsp;:</strong> <span t-field="o.date"/></div>
+                                        </t>
+                                        <t t-if="o.payment_count">
+                                            <div>
+                                                <strong>Nombre de <t t-esc="u'%ss' % (o.get_of_payment_mode_name_formatted() or 'paiement')"/>
+                                                    &amp;nbsp;:
+                                                </strong>
+                                                <span t-field="o.payment_count"/>
+                                            </div>
                                         </t>
                                     </div>
                                 </div>
