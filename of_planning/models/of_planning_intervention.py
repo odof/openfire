@@ -1344,9 +1344,9 @@ class OfPlanningIntervention(models.Model):
                     ('state', 'not in', ('cancel', 'postponed')),
                 ], limit=1)
                 if rdv:
-                    raise ValidationError(u"L'employé %s a déjà au moins un rendez-vous sur ce créneau."
-                                          u"\n id du rdv: %d" % (
-                                            (rdv.employee_ids & rdv.employee_ids)[0].name), rdv.id)
+                    raise ValidationError(
+                        u"L'employé %s a déjà au moins un rendez-vous sur ce créneau.\nid du rdv: %d" %
+                        ((rdv.employee_ids & interv.employee_ids)[0].name, rdv.id))
 
     @api.multi
     def _affect_number(self):
