@@ -8,8 +8,11 @@ from odoo.exceptions import UserError
 from odoo.addons.stock.models.stock_inventory import Inventory
 from odoo.addons.stock.models.stock_quant import Quant
 from odoo.addons.stock.models.stock_move import StockMove
+import odoo.addons.decimal_precision as dp
 
 import time
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 
 @api.multi
@@ -669,11 +672,49 @@ class StockMove(models.Model):
         string=u"Règle de stock", compute="_compute_of_of_has_reordering_rule",
         help=u"L'article dispose de règles de réapprovisionnement."
     )
+    of_reserved_qty = fields.Float(
+        string=u"Qté(s) réservée(s)", digits=dp.get_precision('Product Unit of Measure'), compute='_compute_of_qty')
+    of_available_qty = fields.Float(
+        string=u"Qté(s) dispo(s)", digits=dp.get_precision('Product Unit of Measure'), compute='_compute_of_qty')
+    of_theoretical_qty = fields.Float(
+        string=u"Qté(s) théorique(s)", digits=dp.get_precision('Product Unit of Measure'), compute='_compute_of_qty',
+        help=u"Si une règle de stock est définie pour l'article avec une date limite de prévision, le stock théorique "
+             u"est calculé à cette date ; sinon le stock théorique calculé est le stock théorique global de l'article")
 
     @api.depends('product_id', 'product_id.type')
     def _compute_of_of_has_reordering_rule(self):
         for move in self:
             move.of_has_reordering_rule = move.product_id.nbr_reordering_rules > 0
+
+    @api.depends('product_id', 'location_id')
+    def _compute_of_qty(self):
+        for move in self:
+            if move.product_id:
+                # Qté(s) réservée(s)
+                reserved_quants = self.env['stock.quant'].search(
+                    [('location_id', 'child_of', move.location_id.id), ('product_id', '=', move.product_id.id),
+                     ('reservation_id', '=', move.id)])
+                move.of_reserved_qty = sum(reserved_quants.mapped('qty'))
+
+                # Qté(s) dispo(s)
+                available_quants = self.env['stock.quant'].search(
+                    [('location_id', 'child_of', move.location_id.id), ('product_id', '=', move.product_id.id),
+                     ('reservation_id', '=', False)])
+                move.of_available_qty = sum(available_quants.mapped('qty'))
+
+                # Qté(s) théorique(s)
+                product_context = dict(self._context, location=move.location_id.id)
+                orderpoints = self.env['stock.warehouse.orderpoint'].search([('product_id', '=', move.product_id.id)],
+                                                                            limit=1)
+                if orderpoints and orderpoints.of_forecast_limit:
+                    product_context['of_to_date_expected'] = \
+                        (datetime.today() + relativedelta(days=orderpoints.of_forecast_period)). \
+                        strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+                move.of_theoretical_qty = move.product_id.with_context(product_context).virtual_available
+            else:
+                move.of_reserved_qty = 0
+                move.of_available_qty = 0
+                move.of_theoretical_qty = 0
 
     @api.multi
     def write(self, vals):
