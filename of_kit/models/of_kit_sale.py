@@ -101,6 +101,15 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
+    @api.model
+    def _init_sale_order_line_of_stock_moves_state(self):
+        # Initialise la valeur de of_stock_moves_state pour les lignes de commandes déjà existantes en base de données
+        # A supprimer une fois installé
+        all_order_lines = self.env['sale.order.line'].search([])
+        all_order_lines._compute_of_stock_moves_state()
+        all_order_lines._compute_of_picking_min_week()
+        all_order_lines._compute_of_receipt_min_week()
+
     kit_id = fields.Many2one('of.saleorder.kit', string="Components", copy=True)
     of_is_kit = fields.Boolean(string='Is a kit')
 
@@ -256,6 +265,67 @@ class SaleOrderLine(models.Model):
                     else:
                         line.of_invoice_date_prev = fields.Date.to_string(
                             fields.Date.from_string(moves[-1].date_expected))
+
+    @api.depends('procurement_ids', 'procurement_ids.move_ids', 'procurement_ids.move_ids.state', 'of_is_kit', 'kit_id',
+                 'kit_id.kit_line_ids', 'kit_id.kit_line_ids.procurement_ids',
+                 'kit_id.kit_line_ids.procurement_ids.move_ids', 'kit_id.kit_line_ids.procurement_ids.move_ids.state')
+    def _compute_of_stock_moves_state(self):
+        super(SaleOrderLine, self)._compute_of_stock_moves_state()
+        for line in self.filtered(lambda l: l.of_is_kit):
+            stock_moves = line.kit_id.kit_line_ids.mapped('procurement_ids').mapped('move_ids')
+            if stock_moves:
+                if stock_moves.filtered(lambda m: m.state == 'draft'):
+                    line.of_stock_moves_state = 'draft'
+                elif stock_moves.filtered(lambda m: m.state == 'waiting'):
+                    line.of_stock_moves_state = 'waiting'
+                elif stock_moves.filtered(lambda m: m.state == 'confirmed'):
+                    line.of_stock_moves_state = 'confirmed'
+                elif stock_moves.filtered(lambda m: m.state == 'assigned'):
+                    line.of_stock_moves_state = 'assigned'
+                elif stock_moves.filtered(lambda m: m.state == 'cancel'):
+                    line.of_stock_moves_state = 'cancel'
+                elif stock_moves.filtered(lambda m: m.state == 'done'):
+                    line.of_stock_moves_state = 'done'
+                else:
+                    line.of_stock_moves_state = False
+            else:
+                line.of_stock_moves_state = False
+
+    @api.depends('procurement_ids', 'procurement_ids.move_ids', 'procurement_ids.move_ids.picking_id',
+                 'procurement_ids.move_ids.picking_id.move_lines',
+                 'procurement_ids.move_ids.picking_id.move_lines.date_expected', 'of_is_kit', 'kit_id',
+                 'kit_id.kit_line_ids', 'kit_id.kit_line_ids.procurement_ids',
+                 'kit_id.kit_line_ids.procurement_ids.move_ids',
+                 'kit_id.kit_line_ids.procurement_ids.move_ids.picking_id',
+                 'kit_id.kit_line_ids.procurement_ids.move_ids.picking_id.move_lines',
+                 'kit_id.kit_line_ids.procurement_ids.move_ids.picking_id.move_lines.date_expected')
+    def _compute_of_picking_min_week(self):
+        super(SaleOrderLine, self)._compute_of_stock_moves_state()
+        for line in self.filtered(lambda l: l.of_is_kit):
+            pickings = line.kit_id.kit_line_ids.mapped('procurement_ids').mapped('move_ids').mapped('picking_id')
+            if pickings:
+                line.of_picking_min_week = pickings[0].of_min_week
+            else:
+                line.of_picking_min_week = ""
+
+    @api.depends('procurement_ids', 'procurement_ids.move_ids', 'of_is_kit', 'kit_id', 'kit_id.kit_line_ids',
+                 'kit_id.kit_line_ids.procurement_ids', 'kit_id.kit_line_ids.procurement_ids.move_ids')
+    def _compute_of_receipt_min_week(self):
+        super(SaleOrderLine, self)._compute_of_receipt_min_week()
+        for line in self.filtered(lambda l: l.of_is_kit):
+            moves = line.kit_id.kit_line_ids.mapped('procurement_ids').mapped('move_ids')
+            if moves:
+                purchase_procurement_orders = self.env['procurement.order'].search(
+                    [('move_dest_id', 'in', moves.ids)])
+                validated_purchase_lines = purchase_procurement_orders.mapped('purchase_line_id').filtered(
+                    lambda l: l.order_id.state == 'purchase')
+                receipts = validated_purchase_lines.mapped('order_id').mapped('picking_ids')
+                if receipts:
+                    line.of_receipt_min_week = receipts[0].of_min_week
+                else:
+                    line.of_receipt_min_week = ""
+            else:
+                line.of_receipt_min_week = ""
 
     @api.onchange('of_pricing')
     def _onchange_of_pricing(self):

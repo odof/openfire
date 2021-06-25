@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_crm_account_invoice_report_search_view" model="ir.ui.view">
+        <field name="name">of.crm.account.invoice.report.search.view</field>
+        <field name="model">account.invoice.report</field>
+        <field name="inherit_id" ref="account.view_account_invoice_report_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='categ_id']" position="after">
+                <field name="of_canvasser_id"/>
+                <field name="of_partner_tags"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
