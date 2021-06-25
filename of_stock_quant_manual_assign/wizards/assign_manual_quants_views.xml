@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="of_assign_manual_quants_form_view" model="ir.ui.view">
+        <field name="name">of.assign.manual.quants.form.view</field>
+        <field name="model">assign.manual.quants</field>
+        <field name="inherit_id" ref="stock_quant_manual_assign.assign_manual_quants_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='quants_lines']/tree/field[@name='selected']" position="before">
+                <field name="reservation_id"/>
+                <field name="reservation_partner_id"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

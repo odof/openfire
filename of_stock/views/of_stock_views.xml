@@ -88,6 +88,11 @@
         <field name="model">stock.move</field>
         <field name="inherit_id" ref="stock.view_move_picking_tree"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_uom_qty']" position="after">
+                <field name="of_reserved_qty"/>
+                <field name="of_available_qty"/>
+                <field name="of_theoretical_qty"/>
+            </xpath>
             <xpath expr="//field[@name='state']" position="after">
                 <field name="of_has_reordering_rule"/>
             </xpath>
