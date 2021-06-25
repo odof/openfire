@@ -53,7 +53,7 @@
         <field name="name">ofab.pricelist.sale.order.form</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
-        <field name="priority">100</field>
+        <field name="priority">20</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='pricelist_id']" position="after">
                 <field name="of_coef" readonly="0"/>

@@ -1924,3 +1924,41 @@ class PurchaseOrderLine(models.Model):
                     self.price_unit = self.price_unit + (self.price_unit * (option.purchase_price_update_value / 100))
                 self.price_unit = self.order_id.currency_id.round(self.price_unit)
             self.name = self.name + "\n%s" % option.description_update
+
+
+class ProductTemplate(models.Model):
+    _inherit = 'product.template'
+
+    @api.multi
+    def action_view_sales(self):
+        self.ensure_one()
+        action = self.env.ref('sale.action_product_sale_list')
+        product_ids = self.with_context(active_test=False).product_variant_ids.ids
+
+        return {
+            'name': action.name,
+            'help': action.help,
+            'type': action.type,
+            'view_type': action.view_type,
+            'view_mode': action.view_mode,
+            'target': action.target,
+            'context': "{'default_product_id': " + str(product_ids[0]) + "}",
+            'res_model': action.res_model,
+            'domain': [('product_id.product_tmpl_id', '=', self.id)],
+        }
+
+
+class ProductProduct(models.Model):
+    _inherit = 'product.product'
+
+    @api.multi
+    def _sales_count(self):
+        r = {}
+        domain = [
+            ('product_id', 'in', self.ids),
+        ]
+        for group in self.env['sale.report'].read_group(domain, ['product_id', 'product_uom_qty'], ['product_id']):
+            r[group['product_id'][0]] = group['product_uom_qty']
+        for product in self:
+            product.sales_count = r.get(product.id, 0)
+        return r

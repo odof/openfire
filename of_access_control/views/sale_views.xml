@@ -23,4 +23,45 @@
         </field>
     </record>
 
+    <record id="of_access_control_sale_order3_form_view" model="ir.ui.view">
+        <field name="name">of.access.control.sale.order3.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale_stock.of_sale_stock_view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/tree/field[@name='of_reserved_qty']" position="attributes">
+                <attribute name="groups">of_sale_stock.group_sale_order_line_display_stock_info+of_access_control.of_group_sale_responsible</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='of_total_stock_qty']" position="attributes">
+                <attribute name="groups">of_sale_stock.group_sale_order_line_display_stock_info+of_access_control.of_group_sale_responsible</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='of_available_stock_qty']" position="attributes">
+                <attribute name="groups">of_sale_stock.group_sale_order_line_display_stock_info+of_access_control.of_group_sale_responsible</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='of_theoretical_stock_qty']" position="attributes">
+                <attribute name="groups">of_sale_stock.group_sale_order_line_display_stock_info+of_access_control.of_group_sale_responsible</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='of_stock_moves_state']" position="attributes">
+                <attribute name="groups">of_sale_stock.group_sale_order_line_display_stock_info+of_access_control.of_group_sale_responsible</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//separator[@name='stock_info_sep']" position="attributes">
+                <attribute name="groups">of_sale_stock.group_sale_order_line_display_stock_info+of_access_control.of_group_sale_responsible</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='of_total_stock_qty']" position="attributes">
+                <attribute name="groups">of_sale_stock.group_sale_order_line_display_stock_info+of_access_control.of_group_sale_responsible</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='of_available_stock_qty']" position="attributes">
+                <attribute name="groups">of_sale_stock.group_sale_order_line_display_stock_info+of_access_control.of_group_sale_responsible</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='of_theoretical_stock_qty']" position="attributes">
+                <attribute name="groups">of_sale_stock.group_sale_order_line_display_stock_info+of_access_control.of_group_sale_responsible</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='of_reserved_qty']" position="attributes">
+                <attribute name="groups">of_sale_stock.group_sale_order_line_display_stock_info+of_access_control.of_group_sale_responsible</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='of_stock_moves_state']" position="attributes">
+                <attribute name="groups">of_sale_stock.group_sale_order_line_display_stock_info+of_access_control.of_group_sale_responsible</attribute>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>

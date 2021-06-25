@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- Res Groups -->
+
     <record id="group_description_BL_variant" model="res.groups">
         <field name="name">Manage View BL Variants</field>
         <field name="category_id" ref="base.module_category_hidden"/>
@@ -10,6 +12,12 @@
         <field name="name">(OF) Inventaire - Valeur réelle des mouvements</field>
         <field name="category_id" ref="base.module_category_hidden"/>
         <field name="comment">Permet d'afficher la valeur réelle des mouvements dans les ajustements de stock (Quants)</field>
+    </record>
+
+    <record id="group_sale_order_line_display_stock_info" model="res.groups">
+        <field name="name">Lignes de commande - Affichage des informations de stock</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="comment">Affiche les informations de stock au niveau des lignes de commande</field>
     </record>
 
 </odoo>

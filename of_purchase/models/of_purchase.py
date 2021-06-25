@@ -413,6 +413,16 @@ INSERT INTO ir_property (
             property_obj.with_context(force_company=company.id).set_multi(
                 'property_of_purchase_coeff', 'product.product', coeff_values)
 
+    @api.multi
+    def _purchase_count(self):
+        domain = [
+            ('product_id', 'in', self.mapped('id')),
+        ]
+        PurchaseOrderLines = self.env['purchase.order.line'].search(domain)
+        for product in self:
+            product.purchase_count = len(
+                PurchaseOrderLines.filtered(lambda r: r.product_id == product).mapped('order_id'))
+
 
 class ProductSupplierinfo(models.Model):
     _inherit = "product.supplierinfo"

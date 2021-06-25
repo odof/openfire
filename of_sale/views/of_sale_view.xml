@@ -653,6 +653,7 @@ Tous les articles seront considérés comme disponibles et marqués comme livré
                 <field name="of_invoice_policy"/>
                 <field name="invoice_status"/>
                 <field name="of_invoice_date_prev"/>
+                <field name="state"/>
             </tree>
         </field>
     </record>
@@ -666,6 +667,10 @@ Tous les articles seront considérés comme disponibles et marqués comme livré
         <field name="domain">[('order_id.state', '=', 'sale'),
                               ('order_id.of_force_invoice_status', '=', False),
                               ('invoice_status', '!=', 'invoiced')]</field>
+    </record>
+
+    <record id="sale.action_product_sale_list" model="ir.actions.act_window">
+        <field name="domain">[]</field>
     </record>
 
     <menuitem id="menu_sale_order_line_test" parent="sale.menu_sale_invoicing" action="action_sale_order_line_tree_all"
