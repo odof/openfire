@@ -25,10 +25,4 @@
         <field name="args"></field>
     </record>
 
-    <!--
-        Initialise la valeur de of_stock_moves_state pour les lignes de commandes déjà existantes en base de données
-        A supprimer une fois installé
-    -->
-    <function name="_init_sale_order_line_of_stock_moves_state" model="sale.order.line"/>
-
 </odoo>

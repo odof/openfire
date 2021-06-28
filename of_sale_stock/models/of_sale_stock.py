@@ -351,11 +351,24 @@ class SaleConfiguration(models.TransientModel):
         implied_group='of_sale_stock.group_sale_order_line_display_stock_info',
         group='base.group_portal,base.group_user,base.group_public',
         help=u"Affiche les informations de stock au niveau des lignes de commande")
+    group_sale_order_line_display_menu_info = fields.Boolean(
+            string=u"(OF) Menu lignes de commande",
+            implied_group='of_sale_stock.group_sale_order_line_display_menu_info',
+            group='base.group_portal,base.group_user,base.group_public',
+            help=u"Affiche le menu lignes de commande depuis le menu ventes")
+    of_inclure_service_bl = fields.Boolean(
+        string="(OF) Bons de Livraison", help=u"Inclure les articles de type 'service' dans les bons de livraison"
+        )
 
     @api.multi
     def set_stock_warning_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_stock_warning_setting', self.of_stock_warning_setting)
+
+    @api.multi
+    def set_of_inclure_service_bl(self):
+        return self.env['ir.values'].sudo().set_default(
+                'sale.config.settings', 'of_inclure_service_bl', self.of_inclure_service_bl)
 
 
 # Ajout configuration "Description articles"
@@ -647,16 +660,3 @@ class ResPartner(models.Model):
         action = self.env.ref('of_sale_stock.of_sale_stock_sale_order_line_action').read()[0]
         action['domain'] = [('order_partner_id', 'child_of', self.id)]
         return action
-
-
-class OFSaleConfiguration(models.TransientModel):
-    _inherit = 'sale.config.settings'
-
-    of_inclure_service_bl = fields.Boolean(
-        string="(OF) Bons de Livraison", help=u"Inclure les articles de type 'service' dans les bons de livraison"
-    )
-
-    @api.multi
-    def set_of_inclure_service_bl(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'of_inclure_service_bl', self.of_inclure_service_bl)

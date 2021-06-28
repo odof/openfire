@@ -213,6 +213,11 @@
                     <field name="group_sale_order_line_display_stock_info" class="oe_inline"/>
                     <span>Afficher les informations de stock au niveau des lignes de commande</span>
                 </div>
+                <label for="group_sale_order_line_display_menu_info"/>
+                <div name="group_sale_order_line_display_menu_info">
+                    <field name="group_sale_order_line_display_menu_info" class="oe_inline"/>
+                    <span>Afficher le menu lignes de commande depuis le menu ventes</span>
+                </div>
             </xpath>
         </field>
     </record>
@@ -225,7 +230,8 @@
         <field name="arch" type="xml">
             <!-- Ajout smart button Lignes de commande -->
             <xpath expr="//button[@name='%(sale.act_res_partner_2_sale_order)d']" position="after">
-                <button class="oe_stat_button" name="action_view_sale_order_lines" type="object" icon="fa-usd">
+                <button class="oe_stat_button" name="action_view_sale_order_lines" type="object" icon="fa-usd"
+                        groups="of_sale_stock.group_sale_order_line_display_menu_info">
                     <field string="Lignes de commande" name="of_sale_order_lines_count" widget="statinfo"/>
                 </button>
             </xpath>
@@ -292,6 +298,7 @@
     </record>
 
     <menuitem id="of_sale_stock_sale_order_line_menu" name="Lignes de commande" parent="sales_team.menu_sales"
-              action="of_sale_stock_sale_order_line_action" sequence="13"/>
+              action="of_sale_stock_sale_order_line_action" sequence="13"
+              groups="of_sale_stock.group_sale_order_line_display_menu_info"/>
 
 </odoo>
