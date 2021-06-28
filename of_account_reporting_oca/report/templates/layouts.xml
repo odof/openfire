@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="account_financial_report_qweb.assets_specific" inherit_id="report.assets_common">
+        <xpath expr="." position="inside">
+            <link href="/of_account_reporting_oca/static/src/css/report.css" rel="stylesheet"/>
+        </xpath>
+    </template>
+
+</odoo>
