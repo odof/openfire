@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, api, tools, fields, SUPERUSER_ID, _
-from odoo.exceptions import AccessError
+from odoo.exceptions import AccessError, UserError
 from odoo.tools import OrderedSet
 from odoo.tools.safe_eval import safe_eval
 from lxml import etree
+from lxml.builder import E
 try:
     import simplejson as json
 except ImportError:
     import json
 from odoo.models import BaseModel
+from odoo.addons.base.res.res_users import GroupsView, name_boolean_group, name_selection_groups
 
 
 @api.model
@@ -70,6 +72,71 @@ def user_has_groups(self, groups):
 
 
 BaseModel.user_has_groups = user_has_groups
+
+
+@api.model
+def _update_user_groups_view(self):
+    """
+        Remplacement de méthode pour masquer les params de droits du formulaire utilisateur.
+        Modify the view with xmlid ``base.user_groups_view``, which inherits
+        the user form view, and introduces the reified group fields.
+    """
+    if self._context.get('install_mode'):
+        # use installation/admin language for translatable names in the view
+        user_context = self.env['res.users'].context_get()
+        self = self.with_context(**user_context)
+
+    # We have to try-catch this, because at first init the view does not
+    # exist but we are already creating some basic groups.
+    view = self.env.ref('base.user_groups_view', raise_if_not_found=False)
+    if view and view.exists() and view._name == 'ir.ui.view':
+        group_no_one = view.env.ref('base.group_no_one')
+        xml1, xml2 = [], []
+        xml1.append(E.separator(string=_('Application'), colspan="2"))
+        for app, kind, gs in self.get_groups_by_application():
+            # hide groups in categories 'Hidden' and 'Extra' (except for group_no_one)
+            attrs = {}
+            if app.xml_id in (
+            'base.module_category_hidden', 'base.module_category_extra', 'base.module_category_usability'):
+                # MODIF OF
+                attrs['groups'] = 'of_base.of_group_root_only'
+                # FIN DE MODIF OF
+
+            if kind == 'selection':
+                # application name with a selection field
+                field_name = name_selection_groups(gs.ids)
+                xml1.append(E.field(name=field_name, **attrs))
+                xml1.append(E.newline())
+            else:
+                # application separator with boolean fields
+                app_name = app.name or _('Other')
+                # MODIF OF
+                # masquer la rubrique "Autres"
+                if not app.name:
+                    attrs['groups'] = 'of_base.of_group_root_only'
+                # FIN DE MODIF OF
+                xml2.append(E.separator(string=app_name, colspan="4", **attrs))
+                for g in gs:
+                    field_name = name_boolean_group(g.id)
+                    if g == group_no_one:
+                        # make the group_no_one invisible in the form view
+                        xml2.append(E.field(name=field_name, invisible="1", **attrs))
+                    else:
+                        xml2.append(E.field(name=field_name, **attrs))
+
+        xml2.append({'class': "o_label_nowrap"})
+        xml = E.field(E.group(*(xml1), col="2"), E.group(*(xml2), col="4"), name="groups_id", position="replace")
+        xml.addprevious(etree.Comment("GENERATED AUTOMATICALLY BY GROUPS"))
+        xml_content = etree.tostring(xml, pretty_print=True, xml_declaration=True, encoding="utf-8")
+        if not view.check_access_rights('write', raise_exception=False):
+            # erp manager has the rights to update groups/users but not
+            # to modify ir.ui.view
+            if self.env.user.has_group('base.group_erp_manager'):
+                view = view.sudo()
+        view.with_context(lang=None).write({'arch': xml_content, 'arch_fs': False})
+
+
+GroupsView._update_user_groups_view = _update_user_groups_view
 
 
 class IrModelFields(models.Model):
@@ -282,6 +349,23 @@ class ResUsers(models.Model):
         if SUPERUSER_ID in self._ids and self._uid != SUPERUSER_ID:
             raise AccessError(u'Seul le compte administrateur peut modifier les informations du compte administrateur.')
         return super(ResUsers, self).write(values)
+
+
+class ResGroups(models.Model):
+    _inherit = 'res.groups'
+
+    @api.multi
+    def write(self, vals):
+        res = super(ResGroups, self).write(vals)
+        # Ne pas autoriser l'ajout d'utilisateurs dans le groupe of_group_root_only
+        group_root_id = self.env.ref('of_base.of_group_root_only').id
+        if group_root_id in self.ids and vals.get('users'):
+            group_root = self.env['res.groups'].browse(group_root_id)
+            if not len(group_root.users):
+                raise UserError(u"Le compte admin ne peut pas être retiré de ce groupe!")
+            if len(group_root.users) > 1 or SUPERUSER_ID not in group_root.users.ids:
+                raise UserError(u"Seul le compte admin peut appartenir à ce groupe!")
+        return res
 
 
 class Module(models.Model):

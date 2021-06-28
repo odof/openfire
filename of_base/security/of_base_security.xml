@@ -12,4 +12,12 @@
 
     </data>
 
+    <!-- Restreindre l'accès au menu "Applications" à l'utilisateur root (admin) -->
+    <!-- Ajout d'un groupe pour l'administrateur uniquement -->
+    <record id="of_group_root_only" model="res.groups">
+        <field name="name">Admin seulement</field>
+        <field name="comment">Groupe uniquement pour l'utilisateur admin (root)</field>
+        <field name="users" eval="[(4, ref('base.user_root'))]"/>
+    </record>
+
 </odoo>
