@@ -190,6 +190,28 @@ class AccountAccount(models.Model):
 
     of_account_counterpart_id = fields.Many2one('account.account', string="Compte de contrepartie")
 
+    @api.model
+    def create(self, vals):
+        if 'group_id' in self._fields and '' not in vals:
+            # Le module OCA des groupes de comptes est installé et le groupe n'est pas mentionné.
+            # (module : account-financial-tools/account_group)
+            # On cherche le groupe adapté en fonction du préfixe.
+            # Code copié de la fonction account.account.onchange_code() du module account_group.
+
+            group_obj = self.env['account.group']
+            group = False
+            code_prefix = vals.get('code', '')
+            # find group with longest matching prefix
+            while code_prefix:
+                matching_group = group_obj.search([('code_prefix', '=', code_prefix)], limit=1)
+                if matching_group:
+                    group = matching_group.id
+                    break
+                code_prefix = code_prefix[:-1]
+            vals['group_id'] = group
+        return super(AccountAccount, self).create(vals)
+
+
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 

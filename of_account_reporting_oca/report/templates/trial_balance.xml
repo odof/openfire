@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="of_report_trial_balance_qweb_lines_header"
+              inherit_id="account_financial_report_qweb.report_trial_balance_qweb_lines_header">
+        <!-- Plus d'espace pour le code de compte au détriment de son libellé -->
+        <xpath expr="//t[@t-if='not show_partner_details']/div[1]" position="attributes">
+            <attribute name="style">width: 11.82%;</attribute>
+        </xpath>
+        <xpath expr="//t[@t-if='not show_partner_details']/div[2]" position="attributes">
+            <attribute name="style">width: 34.62%;</attribute>
+        </xpath>
+    </template>
+
+</odoo>

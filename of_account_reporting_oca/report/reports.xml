@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Passage du grand Livre au format paysage -->
+    <record id="account_financial_report_qweb.action_report_general_ledger_qweb" model="ir.actions.report.xml">
+        <field name="paperformat_id" ref="of_base.paperformat_euro_internal_landscape"/>
+    </record>
+
+    <!-- Passage de la balance agée des tiers au format paysage -->
+    <record id="account_financial_report_qweb.action_report_aged_partner_balance_qweb" model="ir.actions.report.xml">
+        <field name="paperformat_id" ref="of_base.paperformat_euro_internal_landscape"/>
+    </record>
+
+</odoo>
