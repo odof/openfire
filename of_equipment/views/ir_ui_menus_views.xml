@@ -1,48 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Maintenance -->
-    <!--    <delete model="ir.ui.menu" id="maintenance.menu_maintenance_title"/>-->
+    <!-- Cacher les menus Maintenance -->
     <record id="maintenance.menu_maintenance_title" model="ir.ui.menu">
         <field name="groups_id" eval="[(6,0,[ref('of_base.of_group_root_only')])]"/>
     </record>
-    <!--    <delete model="ir.ui.menu" id="maintenance.menu_m_dashboard"/>-->
     <record id="maintenance.menu_m_dashboard" model="ir.ui.menu">
         <field name="groups_id" eval="[(6,0,[ref('of_base.of_group_root_only')])]"/>
     </record>
-    <!--    <delete model="ir.ui.menu" id="maintenance.menu_m_request"/>-->
     <record id="maintenance.menu_m_request" model="ir.ui.menu">
         <field name="groups_id" eval="[(6,0,[ref('of_base.of_group_root_only')])]"/>
     </record>
-    <!--    <delete model="ir.ui.menu" id="maintenance.menu_m_request_form"/>-->
     <record id="maintenance.menu_m_request_form" model="ir.ui.menu">
         <field name="groups_id" eval="[(6,0,[ref('of_base.of_group_root_only')])]"/>
     </record>
-    <!--    <delete model="ir.ui.menu" id="maintenance.menu_m_request_calendar"/>-->
     <record id="maintenance.menu_m_request_calendar" model="ir.ui.menu">
         <field name="groups_id" eval="[(6,0,[ref('of_base.of_group_root_only')])]"/>
     </record>
-    <!--    <delete model="ir.ui.menu" id="maintenance.menu_m_reports"/>-->
     <record id="maintenance.menu_m_reports" model="ir.ui.menu">
         <field name="groups_id" eval="[(6,0,[ref('of_base.of_group_root_only')])]"/>
     </record>
-    <!--    <delete model="ir.ui.menu" id="maintenance.menu_m_reports_oee"/>-->
     <record id="maintenance.menu_m_reports_oee" model="ir.ui.menu">
         <field name="groups_id" eval="[(6,0,[ref('of_base.of_group_root_only')])]"/>
     </record>
-    <!--    <delete model="ir.ui.menu" id="maintenance.menu_m_reports_losses"/>-->
     <record id="maintenance.menu_m_reports_losses" model="ir.ui.menu">
         <field name="groups_id" eval="[(6,0,[ref('of_base.of_group_root_only')])]"/>
     </record>
-    <!--    <delete model="ir.ui.menu" id="maintenance.menu_maintenance_configuration"/>-->
     <record id="maintenance.menu_maintenance_configuration" model="ir.ui.menu">
         <field name="groups_id" eval="[(6,0,[ref('of_base.of_group_root_only')])]"/>
     </record>
-    <!--    <delete model="ir.ui.menu" id="maintenance.menu_maintenance_teams"/>-->
     <record id="maintenance.menu_maintenance_teams" model="ir.ui.menu">
         <field name="groups_id" eval="[(6,0,[ref('of_base.of_group_root_only')])]"/>
     </record>
-    <!--    <delete model="ir.ui.menu" id="maintenance.menu_maintenance_stage_configuration"/>-->
     <record id="maintenance.menu_maintenance_stage_configuration" model="ir.ui.menu">
         <field name="groups_id" eval="[(6,0,[ref('of_base.of_group_root_only')])]"/>
     </record>

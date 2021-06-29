@@ -4,11 +4,13 @@ from odoo import api, models, fields, _
 from odoo.addons.of_utils.models.of_utils import se_chevauchent
 from odoo.exceptions import UserError, ValidationError
 
+
 class OfPlanningIntervention(models.Model):
     _inherit = 'of.planning.intervention'
 
-    equipment_ids = fields.Many2many(comodel_name='maintenance.equipment', string=u"Équipements", copy=False,
-                                     domain="['|', ('of_company_ids', '=', False), ('of_company_ids', '=', company_id)]")
+    equipment_ids = fields.Many2many(
+        comodel_name='maintenance.equipment', string=u"Équipements", copy=False,
+        domain="['|', ('of_company_ids', '=', False), ('of_company_ids', 'in', company_id)]")
     verify_equipment = fields.Text(string=u"Équipement utilisé", compute='_compute_verify_equipment')
     verify_color = fields.Selection(selection=[
         ('red', 'Rouge'),
@@ -92,7 +94,7 @@ class MaintenanceEquipment(models.Model):
             ('state', 'not in', ('cancel', 'postponed')),
             ]
         if self.of_company_ids:
-            domain.append(('company_id', 'in', self.of_company_ids._ids))
+            domain.append(('company_id', 'in', self.of_company_ids.ids))
         if self._context.get('from_id'):
             domain.append(('id', 'not in', [self._context.get('from_id')]))
         interventions = self.env['of.planning.intervention'].search(domain)
