@@ -382,6 +382,13 @@
                             <field name="pdf_masquer_pastille_commercial" class="oe_inline"/>
                             <span>NE PAS afficher dans les rapports PDF</span>
                         </div>
+                        <label string="(OF) Pastille commercial" for="pdf_mail_commercial"
+                               attrs="{'invisible': [('pdf_masquer_pastille_commercial', '=', True)]}"/>
+                        <div name="pdf_mail_commercial"
+                             attrs="{'invisible': [('pdf_masquer_pastille_commercial', '=', True)]}">
+                            <field name="pdf_mail_commercial" class="oe_inline"/>
+                            <span>Afficher l'email du commercial dans la pastille des rapports PDF</span>
+                        </div>
                         <label string="(OF) Pastille conditions de règlement" for="pdf_masquer_pastille_payment_term"/>
                         <div name="pdf_masquer_pastille_payment_term">
                             <field name="pdf_masquer_pastille_payment_term" class="oe_inline"/>
@@ -618,6 +625,24 @@ Tous les articles seront considérés comme disponibles et marqués comme livré
         <field name="arch" type="xml">
             <xpath expr="//field[@name='property_payment_term_id']" position="after">
                 <field name="of_invoice_policy" groups="account.group_account_invoice"/>
+            </xpath>
+        </field>
+    </record>
+
+<!--##############################################################################-->
+<!--########################### ______ Utilisateurs ______ ###########################-->
+<!--##############################################################################-->
+
+    <record id="of_sale_view_users_simple_form" model="ir.ui.view">
+        <field name="name">of.sale.view.users.simple.form</field>
+        <field name="model">res.users</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="base.view_users_simple_form"/>
+        <field name="arch" type="xml">
+            <!-- déplacer le champ email qui était présent en invisible à un endroit moche -->
+            <xpath expr="//field[@name='email']" position="replace"/>
+            <xpath expr="//field[@name='fax']" position="after">
+                <field name="email"/>
             </xpath>
         </field>
     </record>
