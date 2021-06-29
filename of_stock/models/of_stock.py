@@ -28,6 +28,7 @@ def _get_inventory_lines_values(self):
     quant_products = self.env['product.product']
     # Empty recordset of products to filter
     products_to_filter = self.env['product.product']
+    categ_obj = self.env['product.category']
 
     # case 0: Filter on company
     if self.company_id:
@@ -53,7 +54,8 @@ def _get_inventory_lines_values(self):
         args += (self.package_id.id,)
     # case 5: Filter on One product category + Exahausted Products
     if self.category_id:
-        categ_products = Product.search([('categ_id', '=', self.category_id.id)])
+        categ_ids = categ_obj.search([('id', 'child_of', self.category_id.id)])
+        categ_products = Product.search([('categ_id', 'in', categ_ids.ids)])
         domain += ' AND product_id = ANY (%s)'
         args += (categ_products.ids,)
         products_to_filter |= categ_products
@@ -331,12 +333,26 @@ class Inventory(models.Model):
 
     date = fields.Datetime(readonly=False)
     of_option = fields.Boolean('Peut forcer la date', compute="_compute_of_option")
+    category_child_ids = fields.Many2many(
+        string=u"Catégories filles", comodel_name='product.category', compute='_compute_category_child_ids')
 
     @api.depends('company_id')
     def _compute_of_option(self):
         option = self.env['ir.values'].get_default('stock.config.settings', 'of_forcer_date_inventaire')
         for inventory in self:
             inventory.of_option = option
+
+    @api.depends('category_id')
+    def _compute_category_child_ids(self):
+        categ_obj = self.env['product.category']
+        for inventory in self:
+            if inventory.category_id:
+                children = categ_obj.search([
+                    ('id', 'child_of', inventory.category_id.id),
+                    ('id', '!=', inventory.category_id.id)])
+            else:
+                children = categ_obj
+            inventory.category_child_ids = children.ids
 
     @api.multi
     def action_check(self):
