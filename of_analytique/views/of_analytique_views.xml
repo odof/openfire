@@ -43,22 +43,8 @@
         <field name="model">account.invoice</field>
         <field name="inherit_id" ref="account.invoice_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='account_analytic_id']" position="attributes">
-                <attribute name="invisible">True</attribute>
-            </xpath>
             <xpath expr="//field[@name='move_id']" position="after">
                 <field name="of_project_id"/>
-            </xpath>
-        </field>
-    </record>
-
-    <record id="of_analytic_invoice_line_form" model="ir.ui.view">
-        <field name="name">of.analytic.invoice.line.form</field>
-        <field name="model">account.invoice.line</field>
-        <field name="inherit_id" ref="account.view_invoice_line_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='account_analytic_id']" position="attributes">
-                <attribute name="invisible">True</attribute>
             </xpath>
         </field>
     </record>

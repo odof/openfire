@@ -43,6 +43,7 @@ class OfContract(models.Model):
     journal_id = fields.Many2one(
         'account.journal', string='Journal', default=lambda s: s._default_journal(),
         domain="[('type', '=', 'sale'),('company_id', '=', company_id)]")
+    account_analytic_id = fields.Many2one('account.analytic.account', string=u"Compte analytique")
     company_id = fields.Many2one(
         'res.company', string=u'Société', required=True,
         default=lambda self: self.env.context.get('company_id', self.env.user.company_id.id))
@@ -271,6 +272,10 @@ class OfContract(models.Model):
     def create(self, vals):
         """ Générer les périodes lors de la création """
         res = super(OfContract, self).create(vals)
+        if res.account_analytic_id:
+            product_lines = res.line_ids.mapped('contract_product_ids')\
+                .filtered(lambda p: not p.account_analytic_id)
+            product_lines.write({'account_analytic_id': res.account_analytic_id.id})
         res._generate_periods()
         return res
 
@@ -280,6 +285,10 @@ class OfContract(models.Model):
         if 'renewal' in vals and vals.get('renewal'):
             vals['date_end'] = False
         res = super(OfContract, self).write(vals)
+        if vals.get('account_analytic_id'):
+            product_lines = self.mapped('line_ids').mapped('contract_product_ids')\
+                .filtered(lambda p: not p.account_analytic_id)
+            product_lines.write({'account_analytic_id': vals['account_analytic_id']})
         if 'date_start' in vals:
             for contract in self:
                 contract.period_ids.unlink()
@@ -456,6 +465,7 @@ class OfContract(models.Model):
             'fiscal_position_id': self.fiscal_position_id.id,
             'payment_term_id': self.payment_term_id.id,
             'of_intervention_id': intervention_id,
+            'of_project_id': self.account_analytic_id and self.account_analytic_id.id,
         })
         # Get other invoice values from partner onchange
         invoice._onchange_partner_id()
@@ -1477,6 +1487,7 @@ class OfContractProduct(models.Model):
     invoice_line_ids = fields.One2many(
         'account.invoice.line', 'of_contract_product_id', string="Lignes de factures", readonly=True)
     tax_ids = fields.Many2many('account.tax', string='Taxes', domain=[('type_tax_use', '=', 'sale')], copy=True)
+    account_analytic_id = fields.Many2one('account.analytic.account', string=u"Compte analytique")
     qty_per_period = fields.Float(string=u"Qté facturée par année", compute="_compute_quantities", store=True)
     qty_to_invoice = fields.Float(string=u"Qté a facturer", compute="_compute_quantities", store=True)
     qty_invoiced = fields.Float(string=u"Qté facturée", compute="_compute_qty_invoiced", store=True)
@@ -1633,15 +1644,16 @@ class OfContractProduct(models.Model):
                              self.line_id.partner_code_magasin and
                              (u", Magasin n°%s" % self.line_id.partner_code_magasin) or u'')
         invoice_line_vals.update({
-            'quantity'     : self.qty_to_invoice,
-            'uom_id'       : self.product_id.uom_id.id,
-            'discount'     : self.discount,
+            'quantity': self.qty_to_invoice,
+            'uom_id': self.product_id.uom_id.id,
+            'discount': self.discount,
             'of_contract_product_id': self.id,
-            'invoice_line_tax_ids' : [(6, 0, [tax.id for tax in self.tax_ids])],
-            'name'          : name,
-            'price_unit'    : self.price_unit,
+            'invoice_line_tax_ids': [(6, 0, [tax.id for tax in self.tax_ids])],
+            'name': name,
+            'price_unit': self.price_unit,
             'of_contract_supposed_date': self.line_id.next_date,
-            'account_id'    : account.id,
+            'account_id': account.id,
+            'account_analytic_id': self.account_analytic_id and self.account_analytic_id.id,
         })
 
         return invoice_line_vals

@@ -64,6 +64,7 @@ Bloquer l'utilisation de la récurrence sur le modèle `of.service` car les cont
         "of_project_issue",
         # "date_range",
         "of_base",
+        "of_analytique",
     ],
     "category": "OpenFire",
     "data": [
