@@ -15,7 +15,7 @@ class SaleOrder(models.Model):
         res = super(SaleOrder, self).action_preconfirm()
 
         # Stockage des infos de marge sur les lignes et calcul des totaux si elles n'existant pas déjà:
-        if not self.of_margin_followup_ids.filtered(lambda rec: rec.type == 'sale'):
+        if not self.of_margin_followup_ids.filtered(lambda rec: rec.type == 'presale'):
             total_presale_cost = 0.0
             total_presale_price = 0.0
             total_presale_price_variation = 0.0
