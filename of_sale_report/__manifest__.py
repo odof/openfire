@@ -22,6 +22,7 @@ Rapports de vente OpenFire
     "data": [
         'views/of_sale_report_views.xml',
         'wizards/of_report_openflam_wizard.xml',
+        'wizards/of_sale_order_verification_views.xml',
     ],
     'installable': True,
     'application': False,

@@ -19,6 +19,23 @@ class SaleOrder(models.Model):
     confirmation_date = fields.Datetime(string=u"Date d'enregistrement")
 
     @api.multi
+    def action_verification_preconfirm(self):
+        """
+        Permet de faire les vérification avant de démarrer la pré-confirmation de la commande.
+        Comme il n'y a pas de raise si on veut une vérification qui bloque la confirmation il faut le faire hors de
+        action_preconfirm, autrement certaines surcharge qui seraient passées avant/après seront tout de même réalisées
+        """
+        action = False
+        for order in self:
+            action, interrupt = self.env['of.sale.order.verification'].do_verification(order)
+            if interrupt:
+                return action
+        res = self.action_preconfirm()
+        if action:
+            return action
+        return res
+
+    @api.multi
     def action_preconfirm(self):
         for order in self:
             order.state = 'presale'

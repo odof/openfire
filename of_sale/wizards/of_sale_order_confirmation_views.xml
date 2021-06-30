@@ -52,11 +52,20 @@
                             context="{'default_order_id': active_id}"
                             attrs="{'invisible': ['|', ('confirmation_date', '=', False), ('state', 'not in', 'sent')]}"/>
                 </xpath>
-                <xpath expr="//button[@name='action_confirm'][1]" position="attributes">
+            </field>
+        </record>
+
+        <record id="of_sale_view_confirmation_date_order_form2" model="ir.ui.view">
+            <field name="name">of.sale.view.confirmation.date.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+            <field name="active">False</field>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_verification_confirm'][1]" position="attributes">
                     <attribute name="states"></attribute>
                     <attribute name="attrs">{'invisible': ['|', ('confirmation_date', '!=', False), ('state', 'not in', ['draft'])]}</attribute>
                 </xpath>
-                <xpath expr="//button[@name='action_confirm'][2]" position="attributes">
+                <xpath expr="//button[@name='action_verification_confirm'][2]" position="attributes">
                     <attribute name="states"></attribute>
                     <attribute name="attrs">{'invisible': ['|', ('confirmation_date', '!=', False), ('state', 'not in', ['sent'])]}</attribute>
                 </xpath>

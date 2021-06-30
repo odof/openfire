@@ -351,10 +351,28 @@ class SaleOrder(models.Model):
                     echeance.date = ech_calc[0]
 
     @api.multi
+    def action_verification_confirm(self):
+        """
+        Permet de faire les vérification avant de démarrer la confirmation de la commande.
+        Comme il n'y a pas de raise si on veut une vérification qui bloque la confirmation il faut le faire hors de
+        action_confirm, autrement certaines surcharge qui seraient passées avant/après seront tout de même réalisées
+        """
+
+        action = False
+        for order in self:
+            action, interrupt = self.env['of.sale.order.verification'].do_verification(order)
+            if interrupt:
+                return action
+        res = self.action_confirm()
+        if action:
+            return action
+        return res
+
+    @api.multi
     def action_confirm(self):
-        super(SaleOrder, self).action_confirm()
+        res = super(SaleOrder, self).action_confirm()
         self.of_update_dates_echeancier()
-        return True
+        return res
 
     @api.multi
     def of_recompute_echeance_last(self):
@@ -1760,6 +1778,16 @@ class ProductCategory(models.Model):
     of_article_principal = fields.Boolean(string="Article principal",
                                           help=u"Les articles de cette catégorie seront considérés comme articles"
                                                u" principaux sur les commandes / factures clients")
+    of_taux_marge = fields.Integer(
+        string="Taux de marge",
+        help=u"Taux de marge en % minimum recommandé quand l'article principal d'un devis fait partie"
+             u" de la catégorie.")
+
+    @api.constrains('of_taux_marge')
+    def _constraint_taux_marge(self):
+        for category in self:
+            if category.of_taux_marge < 0 or category.of_taux_marge > 100:
+                raise UserError("Le taux de marge doit être compris entre 0% et 100%")
 
 
 class ProductPricelist(models.Model):
