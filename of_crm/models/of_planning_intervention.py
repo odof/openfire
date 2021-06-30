@@ -8,5 +8,5 @@ class OfPlanningIntervention(models.Model):
     _inherit = ['of.planning.intervention', 'of.crm.stage.auto.update']
 
     opportunity_id = fields.Many2one(
-        comodel_name='crm.lead', string=u"Opportunité associée",
+        comodel_name='crm.lead', string=u"Opportunité",
         domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")

@@ -431,7 +431,7 @@ class OfPlanningIntervention(models.Model):
 
     # Rubrique Documents liés
     order_id = fields.Many2one(
-        "sale.order", string=u"Commande associée",
+        "sale.order", string=u"Commande",
         domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")
 
     # Onglet Description
@@ -492,7 +492,7 @@ class OfPlanningIntervention(models.Model):
     invoice_count = fields.Integer(string="Nombre de factures", compute="_compute_invoice_ids")
 
     picking_id = fields.Many2one(
-        comodel_name='stock.picking', string=u"BL associé",
+        comodel_name='stock.picking', string=u"Bon de livraison",
         domain="[('id', 'in', picking_domain and picking_domain[0] and picking_domain[0][2] or False)]")
     picking_domain = fields.Many2many(comodel_name='stock.picking', compute='_compute_picking_domain')
 
