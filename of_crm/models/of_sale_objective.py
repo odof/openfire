@@ -84,6 +84,8 @@ class OFSaleObjectiveLine(models.Model):
     turnover_budget = fields.Float(string=u"Budget CA")
     ordered_turnover = fields.Float(string=u"CA commandé")
     invoiced_turnover = fields.Float(string=u"CA facturé")
+    company_id = fields.Many2one(related='objective_id.company_id', string=u"Société")
+    objective_date = fields.Date(related='objective_id.objective_date', string=u"Date objectif")
 
     _sql_constraints = [
         ('of_sale_objective_line_employee_uniq',
