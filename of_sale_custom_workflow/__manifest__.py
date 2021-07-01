@@ -37,6 +37,7 @@ Module ajoutant une étape intermédiaire dans le workflow des commandes de vent
         'of_retail_analysis',
     ],
     'data': [
+        'data/of_sale_custom_workflow_data.xml',
         'security/ir.model.access.csv',
         'security/of_sale_custom_workflow_security.xml',
         'wizards/of_sale_order_closure_wizard_views.xml',
