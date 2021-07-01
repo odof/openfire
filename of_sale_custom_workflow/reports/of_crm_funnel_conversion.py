@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from odoo import fields, models, api, tools
-
-from datetime import datetime
+from ast import literal_eval
+import base64
+from cStringIO import StringIO
+import xlsxwriter
+from datetime import date
 from dateutil.relativedelta import relativedelta
+
+from odoo import fields, models, api, tools
+from odoo.tools.safe_eval import safe_eval
 
 
 class OFCRMFunnelConversion4(models.Model):
@@ -557,49 +562,49 @@ class OFCRMFunnelConversion4(models.Model):
 
     @api.model
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
-        if 'quotation_nb' not in fields:
-            fields.append('quotation_nb')
-        if 'opportunity_nb' not in fields:
-            fields.append('opportunity_nb')
-        if 'order_nb' not in fields:
-            fields.append('order_nb')
-        if 'total_turnover' not in fields:
-            fields.append('total_turnover')
-        if 'lost_turnover' not in fields:
-            fields.append('lost_turnover')
-        if 'lost_quotation_nb' not in fields:
-            fields.append('lost_quotation_nb')
-        if 'ordered_turnover' not in fields:
-            fields.append('ordered_turnover')
-        if 'ordered_margin' not in fields:
-            fields.append('ordered_margin')
-        if 'recorded_turnover' not in fields:
-            fields.append('recorded_turnover')
-        if 'recorded_margin' not in fields:
-            fields.append('recorded_margin')
-        if 'total_margin' not in fields:
-            fields.append('total_margin')
-        if 'ordered_turnover_objective' not in fields:
-            fields.append('ordered_turnover_objective')
-        if 'previous_recorded_turnover' not in fields:
-            fields.append('previous_recorded_turnover')
+        fields_copy = fields
+        if 'quotation_nb' not in fields_copy:
+            fields_copy.append('quotation_nb')
+        if 'opportunity_nb' not in fields_copy:
+            fields_copy.append('opportunity_nb')
+        if 'order_nb' not in fields_copy:
+            fields_copy.append('order_nb')
+        if 'total_turnover' not in fields_copy:
+            fields_copy.append('total_turnover')
+        if 'lost_turnover' not in fields_copy:
+            fields_copy.append('lost_turnover')
+        if 'lost_quotation_nb' not in fields_copy:
+            fields_copy.append('lost_quotation_nb')
+        if 'ordered_turnover' not in fields_copy:
+            fields_copy.append('ordered_turnover')
+        if 'ordered_margin' not in fields_copy:
+            fields_copy.append('ordered_margin')
+        if 'recorded_turnover' not in fields_copy:
+            fields_copy.append('recorded_turnover')
+        if 'recorded_margin' not in fields_copy:
+            fields_copy.append('recorded_margin')
+        if 'total_margin' not in fields_copy:
+            fields_copy.append('total_margin')
+        if 'ordered_turnover_objective' not in fields_copy:
+            fields_copy.append('ordered_turnover_objective')
+        if 'previous_recorded_turnover' not in fields_copy:
+            fields_copy.append('previous_recorded_turnover')
         res = super(OFCRMFunnelConversion4, self).read_group(
-            domain, fields.extend(['sales_total']), groupby, offset=offset, limit=limit,
-            orderby=orderby, lazy=lazy)
+            domain, fields_copy, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
         for line in res:
-            if 'quotation_rate' in fields:
+            if 'quotation_rate' in fields_copy:
                 if 'quotation_nb' in line and line['quotation_nb'] is not None and line.get('opportunity_nb', False):
                     line['quotation_rate'] = \
                         ('%.2f' % (round(100.0 * line['quotation_nb'] / line['opportunity_nb'], 2))).replace('.', ',')
                 else:
                     line['quotation_rate'] = "N/E"
-            if 'order_rate' in fields:
+            if 'order_rate' in fields_copy:
                 if 'order_nb' in line and line['order_nb'] is not None and line.get('quotation_nb', False):
                     line['order_rate'] = ('%.2f' % (round(100.0 * line['order_nb'] / line['quotation_nb'], 2))).\
                         replace('.', ',')
                 else:
                     line['order_rate'] = "N/E"
-            if 'turnover_rate' in fields:
+            if 'turnover_rate' in fields_copy:
                 if 'total_turnover' in line and line['total_turnover'] is not None and \
                         line.get('quotation_amount', False):
                     line['turnover_rate'] = \
@@ -607,26 +612,26 @@ class OFCRMFunnelConversion4(models.Model):
                         replace('.', ',')
                 else:
                     line['turnover_rate'] = "N/E"
-            if 'quotation_cart' in fields:
+            if 'quotation_cart' in fields_copy:
                 if 'total_turnover' in line and line['total_turnover'] is not None and line.get('quotation_nb', False):
                     line['quotation_cart'] = ('%.2f' % (round(line['total_turnover'] / line['quotation_nb'], 2))).\
                         replace('.', ',')
                 else:
                     line['quotation_cart'] = "N/E"
-            if 'sale_cart' in fields:
+            if 'sale_cart' in fields_copy:
                 if 'total_turnover' in line and line['total_turnover'] is not None and line.get('order_nb', False):
                     line['sale_cart'] = ('%.2f' % (round(line['total_turnover'] / line['order_nb'], 2))).\
                         replace('.', ',')
                 else:
                     line['sale_cart'] = "N/E"
-            if 'lost_cart' in fields:
+            if 'lost_cart' in fields_copy:
                 if 'lost_turnover' in line and line['lost_turnover'] is not None and \
                         line.get('lost_quotation_nb', False):
                     line['lost_cart'] = ('%.2f' % (round(line['lost_turnover'] / line['lost_quotation_nb'], 2))).\
                         replace('.', ',')
                 else:
                     line['lost_cart'] = "N/E"
-            if 'ordered_margin_percent' in fields:
+            if 'ordered_margin_percent' in fields_copy:
                 if 'ordered_turnover' in line and line['ordered_turnover'] is not None and \
                         'ordered_margin' in line and line['ordered_margin'] is not None and \
                         line.get('ordered_turnover', False):
@@ -637,7 +642,7 @@ class OFCRMFunnelConversion4(models.Model):
                                 2))).replace('.', ',')
                 else:
                     line['ordered_margin_percent'] = "N/E"
-            if 'recorded_margin_percent' in fields:
+            if 'recorded_margin_percent' in fields_copy:
                 if 'recorded_turnover' in line and line['recorded_turnover'] is not None and \
                         'recorded_margin' in line and line['recorded_margin'] is not None and \
                         line.get('recorded_turnover', False):
@@ -648,7 +653,7 @@ class OFCRMFunnelConversion4(models.Model):
                                 2))).replace('.', ',')
                 else:
                     line['recorded_margin_percent'] = "N/E"
-            if 'total_margin_percent' in fields:
+            if 'total_margin_percent' in fields_copy:
                 if 'total_turnover' in line and line['total_turnover'] is not None and 'total_margin' in line and \
                         line['total_margin'] is not None and line.get('total_turnover', False):
                     line['total_margin_percent'] = \
@@ -658,7 +663,7 @@ class OFCRMFunnelConversion4(models.Model):
                                 2))).replace('.', ',')
                 else:
                     line['total_margin_percent'] = "N/E"
-            if 'rest_to_do' in fields:
+            if 'rest_to_do' in fields_copy:
                 if 'total_turnover' in line and line['total_turnover'] is not None and \
                         line.get('ordered_turnover_objective', False):
                     line['rest_to_do'] = \
@@ -666,7 +671,7 @@ class OFCRMFunnelConversion4(models.Model):
                         replace('.', ',')
                 else:
                     line['rest_to_do'] = "N/E"
-            if 'total_turnover_comparison' in fields:
+            if 'total_turnover_comparison' in fields_copy:
                 if 'total_turnover' in line and line['total_turnover'] is not None and \
                         line.get('previous_recorded_turnover', False):
                     line['total_turnover_comparison'] = \
@@ -676,3 +681,231 @@ class OFCRMFunnelConversion4(models.Model):
                     line['total_turnover_comparison'] = "N/E"
 
         return res
+
+    @api.model
+    def export_to_excel_and_send(self):
+        # Récupèration du filtre par défaut
+        default_filter = self.env['ir.filters'].search(
+            [('model_id', '=', self._name), ('user_id', '=', False), ('is_default', '=', True)], limit=1)
+        if default_filter:
+            # Calcul des données de la vue pivot
+            context = literal_eval(default_filter.context)
+            groupby_param = []
+            data = dict()
+            eval_context = {'date': date, 'relativedelta': relativedelta, 'context_today': date.today}
+            data['TOTAL_DATA'] = self.read_group(
+                domain=safe_eval(default_filter.domain, eval_context), fields=context['pivot_measures'], groupby=[],
+                lazy=False)
+            for groupby in context['pivot_row_groupby']:
+                groupby_param.append(groupby)
+                data[groupby] = self.read_group(
+                    domain=safe_eval(default_filter.domain, eval_context),
+                    fields=context['pivot_measures'] + groupby_param, groupby=groupby_param, lazy=False)
+
+            # Création du fichier Excel
+
+            # Ouverture du workbook
+            fp = StringIO()
+            workbook = xlsxwriter.Workbook(fp, {'in_memory': True})
+
+            # Création de la page
+            worksheet = workbook.add_worksheet(u"Suivi quotidien")
+
+            # Initialisation des colonnes
+            worksheet.set_column(0, 0, 23)
+            worksheet.set_column(1, len(literal_eval(default_filter.context)['pivot_measures']), 10)
+
+            # Styles
+            title_style = workbook.add_format({
+                'valign': 'vcenter',
+                'align': 'left',
+                'text_wrap': False,
+                'bold': True,
+                'font_name': "Arial",
+                'font_size': 18,
+            })
+
+            column_header_style = workbook.add_format({
+                'valign': 'vcenter',
+                'align': 'center',
+                'text_wrap': True,
+                'border': 1,
+                'bold': True,
+                'font_name': "Arial",
+                'font_size': 10,
+                'bg_color': '#FFFF99',
+            })
+
+            even_column_categ_style = workbook.add_format({
+                'valign': 'vcenter',
+                'align': 'right',
+                'text_wrap': True,
+                'border': 1,
+                'bold': True,
+                'font_name': "Arial",
+                'font_size': 10,
+                'bg_color': '#FFFF99',
+                'num_format': '# ### ##0',
+            })
+
+            odd_column_categ_style = workbook.add_format({
+                'valign': 'vcenter',
+                'align': 'right',
+                'text_wrap': True,
+                'border': 1,
+                'bold': True,
+                'font_name': "Arial",
+                'font_size': 10,
+                'bg_color': '#FFFF00',
+                'num_format': '# ### ##0',
+            })
+
+            last_level_style = workbook.add_format({
+                'valign': 'vcenter',
+                'align': 'right',
+                'text_wrap': True,
+                'border': 1,
+                'font_name': "Arial",
+                'font_size': 10,
+                'num_format': '# ### ##0',
+            })
+
+            even_line_header_style = workbook.add_format({
+                'valign': 'vcenter',
+                'align': 'left',
+                'text_wrap': False,
+                'border': 1,
+                'bold': True,
+                'font_name': "Arial",
+                'font_size': 10,
+                'bg_color': '#FFFF99',
+            })
+
+            odd_line_header_style = workbook.add_format({
+                'valign': 'vcenter',
+                'align': 'left',
+                'text_wrap': False,
+                'border': 1,
+                'bold': True,
+                'font_name': "Arial",
+                'font_size': 10,
+                'bg_color': '#FFFF00',
+            })
+
+            last_level_line_header_style = workbook.add_format({
+                'valign': 'vcenter',
+                'align': 'left',
+                'text_wrap': False,
+                'border': 1,
+                'bold': True,
+                'font_name': "Arial",
+                'font_size': 10,
+            })
+
+            # Ajout des lignes
+
+            def write_row(rdata, line_num, style):
+                column_num = 1
+                for m in literal_eval(default_filter.context)['pivot_measures']:
+                    f = self.env['ir.model.fields'].search([('model', '=', self._name), ('name', '=', m)], limit=1)
+                    if f:
+                        worksheet.write(line_num, column_num, rdata.get(m), style)
+                        column_num += 1
+
+            # En-tête
+
+            worksheet.set_row(0, 25)
+            worksheet.merge_range(
+                0, 0, 0, 3, u"Export suivi quotidien du %s" % date.today().strftime('%d/%m/%Y'), title_style)
+            line_number = 2
+            worksheet.set_row(line_number, 50)
+            i = 1
+            for measure in literal_eval(default_filter.context)['pivot_measures']:
+                field = self.env['ir.model.fields'].search(
+                    [('model', '=', self._name), ('name', '=', measure)], limit=1)
+                if field:
+                    worksheet.write(line_number, i, field.field_description, column_header_style)
+                    i += 1
+
+            # Ligne de total
+
+            line_number += 1
+            worksheet.write(line_number, 0, u"Total", even_line_header_style)
+            write_row(data['TOTAL_DATA'][0], line_number, even_column_categ_style)
+
+            # Données
+
+            groupby_list = context['pivot_row_groupby']
+            domain = dict()
+            line_number_param = [4]
+
+            def write_children(data_param, groupby_field, domain_param):
+                groupby_index = groupby_list.index(groupby_field)
+                if len(groupby_list) > groupby_index + 1:
+                    for child_row_data in data_param.get(groupby_list[groupby_index + 1]):
+                        is_child = False
+                        for key in domain_param:
+                            if key in child_row_data and child_row_data[key] != domain_param[key]:
+                                break
+                        else:
+                            is_child = True
+                        if is_child:
+                            if len(groupby_list) == groupby_index + 2:
+                                header_style = last_level_line_header_style
+                                data_style = last_level_style
+                            elif ((groupby_index + 2) % 2) == 0:
+                                header_style = even_line_header_style
+                                data_style = even_column_categ_style
+                            else:
+                                header_style = odd_line_header_style
+                                data_style = odd_column_categ_style
+
+                            worksheet.write(
+                                line_number_param[0], 0,
+                                ('    ' * (groupby_index + 2)) + (child_row_data[groupby_list[groupby_index + 1]] and
+                                                                  child_row_data[groupby_list[groupby_index + 1]][1] or
+                                                                  u"Indéfini"),
+                                header_style)
+                            write_row(child_row_data, line_number_param[0], data_style)
+                            line_number_param[0] += 1
+                            new_domain_param = domain_param.copy()
+                            new_domain_param[groupby_list[groupby_index + 1]] = \
+                                child_row_data[groupby_list[groupby_index + 1]]
+                            write_children(data_param, groupby_list[groupby_index + 1], new_domain_param)
+
+            for row_data in data.get(groupby_list[0]):
+                first_header_style = odd_line_header_style
+                first_data_style = odd_column_categ_style
+                if len(groupby_list) == 1:
+                    first_header_style = last_level_line_header_style
+                    first_data_style = last_level_style
+                worksheet.write(
+                    line_number_param[0], 0,
+                    '    ' + (row_data[groupby_list[0]] and row_data[groupby_list[0]][1] or u"Indéfini"),
+                    first_header_style)
+                write_row(row_data, line_number_param[0], first_data_style)
+                line_number_param[0] += 1
+                domain[groupby_list[0]] = row_data[groupby_list[0]]
+                write_children(data, groupby_list[0], domain)
+
+            # Fermeture du workbook
+            workbook.close()
+            fp.seek(0)
+            file_data = fp.read()
+            fp.close()
+
+            # Envoi du mail
+            email_template = self.env['ir.model.data'].get_object(
+                'of_sale_custom_workflow', 'of_sale_custom_workflow_daily_followup_email_template')
+            if email_template:
+                file_name = 'suivi_quotidien_%s.xlsx' % date.today().strftime('%Y%m%d')
+                mail = self.env['mail.mail'].create({
+                    'email_from': email_template.email_from,
+                    'email_to': email_template.email_to,
+                    'subject': email_template.subject,
+                    'body_html': email_template.body_html,
+                    'attachment_ids': [(0, 0, {'name': file_name,
+                                               'datas_fname': file_name,
+                                               'datas': base64.b64encode(file_data)})]
+                })
+                mail.send()
