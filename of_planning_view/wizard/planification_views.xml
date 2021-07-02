@@ -55,7 +55,7 @@
                     <group colspan="6" col="1" name="propositions" string="Propositions"
                       attrs="{'invisible': [('proposition_ids', '=', [])]}">
                         <field name="proposition_ids" mode="tree" nolabel="1"
-                           options="{'reload_on_button': True}">
+                           options="{'reload_on_button': True}" attrs="{'invisible': [('mode_recherche', '=', 'duree')]}">
                             <tree limit="10" colors="blue: selected==True; grey: fait==False;" create="0" options="{'reload_on_button': True}">
                                 <button name="button_select_from_list" type="object" icon="fa-cogs"/>
                                 <field name="service_id" invisible="1"/>
@@ -76,7 +76,39 @@
                                 <field name="distance_oiseau_suiv" invisible="1"/>
                                 <field name="distance_reelle_prec" invisible="1"/>
                                 <field name="distance_reelle_suiv" invisible="1"/>
-                                <field name="distance_reelle_tota"/>
+                                <field name="distance_reelle_tota" invisible="1"/>
+                                <field name="distance_utile" string="Distance (km)"/>
+                                <field name="distance_order" groups="base.group_no_one"/>
+                                <field name="distance_arrondi_order" groups="base.group_no_one"/>
+                                <field name="osrm_response" invisible="1"/>
+                            </tree>
+                        </field>
+                        <field name="proposition_duree_ids" mode="tree" nolabel="1"
+                               options="{'reload_on_button': True}"
+                               attrs="{'invisible': [('mode_recherche', '=', 'distance')]}">
+                            <tree limit="10" colors="blue: selected==True; grey: fait==False;" create="0"
+                                  options="{'reload_on_button': True}">
+                                <button name="button_select_from_list" type="object" icon="fa-cogs"/>
+                                <field name="service_id" invisible="1"/>
+                                <field name="fait" invisible="1"/>
+                                <field name="priorite" groups="base.group_no_one"/>
+                                <field name="selected" invisible="1"/>
+                                <field name="id" invisible="1"/>
+                                <field name="tache_name"/>
+                                <field name="partner_name"/>
+                                <field name="address_city"/>
+                                <field name="address_zip"/>
+                                <field name="partner_of_telephones"/>
+                                <field name="date_next"/>
+                                <field name="date_fin"/>
+                                <field name="duree_restante" string="Durée restante" widget="float_time"/>
+                                <field name="origin"/>
+                                <field name="distance_oiseau_prec" invisible="1"/>
+                                <field name="distance_oiseau_suiv" invisible="1"/>
+                                <field name="distance_reelle_prec" invisible="1"/>
+                                <field name="distance_reelle_suiv" invisible="1"/>
+                                <field name="distance_reelle_tota" invisible="1"/>
+                                <field name="duree_utile" string="Durée (min)"/>
                                 <field name="distance_order" groups="base.group_no_one"/>
                                 <field name="distance_arrondi_order" groups="base.group_no_one"/>
                                 <field name="osrm_response" invisible="1"/>
@@ -143,7 +175,9 @@
                     <group colspan="2">
                         <separator string="Recherche" colspan="2"/>
                         <group col="2" colspan="2">
-                            <field name="distance_max"/>
+                            <field name="rayon_max"/>
+                            <field name="trajet_utile"/>
+                            <field name="mode_recherche"/>
                             <field name="secteur_id" widget="selection"/>
                             <field name="pre_tache_categ_ids" widget="many2many_tags" options="{'no_create': True}"/>
                             <field name="pre_tache_ids" widget="many2many_tags" options="{'no_create': True}"/>
