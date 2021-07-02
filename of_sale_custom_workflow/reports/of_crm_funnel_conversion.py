@@ -38,16 +38,18 @@ class OFCRMFunnelConversion4(models.Model):
     quotation_amount = fields.Float(string=u"Montant devis", readonly=True)
     ordered_turnover = fields.Float(string=u"CA commandé", readonly=True)
     recorded_turnover = fields.Float(string=u"CA enregistré", readonly=True)
+    recorded_turnover2 = fields.Float(string=u"CA enregistré à date de confirmation", readonly=True)
     lost_turnover = fields.Float(string=u"CA perdu", readonly=True)
     total_turnover = fields.Float(string=u"CA total", readonly=True)
 
     ordered_margin = fields.Float(string=u"Marge commandé €", readonly=True)
     recorded_margin = fields.Float(string=u"Marge enregistré €", readonly=True)
+    recorded_margin2 = fields.Float(string=u"Marge enregistré € à date de confirmation", readonly=True)
     total_margin = fields.Float(string=u"Marge total €", readonly=True)
 
     budget_turnover_objective = fields.Float(string=u"Budget", readonly=True)
     ordered_turnover_objective = fields.Float(string=u"Objectif CA", readonly=True)
-    previous_recorded_turnover = fields.Float(string=u"CA enregistré N-1", readonly=True)
+    previous_recorded_turnover = fields.Float(string=u"CA N-1", readonly=True)
 
     quotation_rate = fields.Char(
         string=u"Nb devis / Nb opportunités (%)", compute='_compute_quotation_rate', compute_sudo=True, readonly=True)
@@ -76,14 +78,16 @@ class OFCRMFunnelConversion4(models.Model):
         string=u"Comparaison N-1 (%)", compute='_compute_total_turnover_comparison', compute_sudo=True, readonly=True)
 
     def init(self):
-        lost_opportunity_stage_id = self.env['ir.values'].get_default(
-            'sale.config.settings', 'of_lost_opportunity_stage_id')
         tools.drop_view_if_exists(self._cr, 'of_crm_funnel_conversion4')
         self._cr.execute("""
             CREATE VIEW of_crm_funnel_conversion4 AS (
                 %s
                 FROM
                     (   %s
+                        %s
+                        %s
+                    UNION ALL
+                        %s
                         %s
                         %s
                     UNION ALL
@@ -136,6 +140,9 @@ class OFCRMFunnelConversion4(models.Model):
                     self._sub_select_objective(),
                     self._sub_from_objective(),
                     self._sub_where_objective(),
+                    self._sub_select_sale_order2(),
+                    self._sub_from_sale_order2(),
+                    self._sub_where_sale_order2(),
                     self._from(),
                     self._where(),
                     self._group_by()))
@@ -158,11 +165,13 @@ class OFCRMFunnelConversion4(models.Model):
             ,           SUM(T.quotation_amount)                         AS quotation_amount
             ,           SUM(T.ordered_turnover)                         AS ordered_turnover
             ,           SUM(T.recorded_turnover)                        AS recorded_turnover
+            ,           SUM(T.recorded_turnover2)                       AS recorded_turnover2
             ,           SUM(T.lost_turnover)                            AS lost_turnover
-            ,           SUM(T.ordered_turnover + T.recorded_turnover)   AS total_turnover
+            ,           SUM(T.ordered_turnover + T.recorded_turnover2)  AS total_turnover
             ,           SUM(T.ordered_margin)                           AS ordered_margin
             ,           SUM(T.recorded_margin)                          AS recorded_margin
-            ,           SUM(T.ordered_margin + T.recorded_margin)       AS total_margin
+            ,           SUM(T.recorded_margin2)                         AS recorded_margin2
+            ,           SUM(T.ordered_margin + T.recorded_margin2)      AS total_margin
             ,           SUM(T.budget_turnover_objective)                AS budget_turnover_objective
             ,           SUM(T.ordered_turnover_objective)               AS ordered_turnover_objective
             ,           SUM(T.previous_recorded_turnover)               AS previous_recorded_turnover
@@ -184,9 +193,11 @@ class OFCRMFunnelConversion4(models.Model):
             ,       0                       AS quotation_amount
             ,       0                       AS ordered_turnover
             ,       0                       AS recorded_turnover
+            ,       0                       AS recorded_turnover2
             ,       0                       AS lost_turnover
             ,       0                       AS ordered_margin
             ,       0                       AS recorded_margin
+            ,       0                       AS recorded_margin2
             ,       0                       AS budget_turnover_objective
             ,       0                       AS ordered_turnover_objective
             ,       0                       AS previous_recorded_turnover
@@ -223,9 +234,11 @@ class OFCRMFunnelConversion4(models.Model):
             ,       SO.amount_untaxed                               AS quotation_amount
             ,       0                                               AS ordered_turnover
             ,       0                                               AS recorded_turnover
+            ,       0                                               AS recorded_turnover2
             ,       0                                               AS lost_turnover
             ,       0                                               AS ordered_margin
             ,       0                                               AS recorded_margin
+            ,       0                                               AS recorded_margin2
             ,       0                                               AS budget_turnover_objective
             ,       0                                               AS ordered_turnover_objective
             ,       0                                               AS previous_recorded_turnover
@@ -262,9 +275,11 @@ class OFCRMFunnelConversion4(models.Model):
             ,       0                                               AS quotation_amount
             ,       0                                               AS ordered_turnover
             ,       0                                               AS recorded_turnover
+            ,       0                                               AS recorded_turnover2
             ,       0                                               AS lost_turnover
             ,       0                                               AS ordered_margin
             ,       0                                               AS recorded_margin
+            ,       0                                               AS recorded_margin2
             ,       0                                               AS budget_turnover_objective
             ,       0                                               AS ordered_turnover_objective
             ,       0                                               AS previous_recorded_turnover
@@ -298,9 +313,11 @@ class OFCRMFunnelConversion4(models.Model):
             ,       0                               AS quotation_amount
             ,       SO3.amount_untaxed              AS ordered_turnover
             ,       0                               AS recorded_turnover
+            ,       0                               AS recorded_turnover2
             ,       0                               AS lost_turnover
             ,       SO3.margin                      AS ordered_margin
             ,       0                               AS recorded_margin
+            ,       0                               AS recorded_margin2
             ,       0                               AS budget_turnover_objective
             ,       0                               AS ordered_turnover_objective
             ,       0                               AS previous_recorded_turnover
@@ -334,9 +351,11 @@ class OFCRMFunnelConversion4(models.Model):
             ,       0                       AS quotation_amount
             ,       0                       AS ordered_turnover
             ,       SO4.amount_untaxed      AS recorded_turnover
+            ,       0                       AS recorded_turnover2
             ,       0                       AS lost_turnover
             ,       0                       AS ordered_margin
             ,       SO4.margin              AS recorded_margin
+            ,       0                       AS recorded_margin2
             ,       0                       AS budget_turnover_objective
             ,       0                       AS ordered_turnover_objective
             ,       0                       AS previous_recorded_turnover
@@ -370,9 +389,11 @@ class OFCRMFunnelConversion4(models.Model):
             ,       0                   AS quotation_amount
             ,       0                   AS ordered_turnover
             ,       0                   AS recorded_turnover
+            ,       0                   AS recorded_turnover2
             ,       SO5.amount_untaxed  AS lost_turnover
             ,       0                   AS ordered_margin
             ,       0                   AS recorded_margin
+            ,       0                   AS recorded_margin2
             ,       0                   AS budget_turnover_objective
             ,       0                   AS ordered_turnover_objective
             ,       0                   AS previous_recorded_turnover
@@ -411,17 +432,19 @@ class OFCRMFunnelConversion4(models.Model):
             ,       0                                           AS quotation_amount
             ,       0                                           AS ordered_turnover
             ,       0                                           AS recorded_turnover
+            ,       0                                           AS recorded_turnover2
             ,       0                                           AS lost_turnover
             ,       0                                           AS ordered_margin
             ,       0                                           AS recorded_margin
+            ,       0                                           AS recorded_margin2
             ,       OSOL.turnover_budget                        AS budget_turnover_objective
             ,       OSOL.ordered_turnover                       AS ordered_turnover_objective
             ,       (   SELECT  SUM(SO6.amount_untaxed)
-                        FROM    sale_order                                  SO6
-                        WHERE   SO6.user_id                                 = RR.user_id
-                        AND     EXTRACT(MONTH FROM SO6.confirmation_date)   = TO_NUMBER(OSO.month, '99')
-                        AND     EXTRACT(YEAR FROM SO6.confirmation_date)    = OSO.year - 1
-                        AND     SO6.state                                   NOT IN ('draft', 'sent', 'cancel', 'presale')
+                        FROM    sale_order                                          SO6
+                        WHERE   SO6.user_id                                         = RR.user_id
+                        AND     EXTRACT(MONTH FROM SO6.of_custom_confirmation_date) = TO_NUMBER(OSO.month, '99')
+                        AND     EXTRACT(YEAR FROM SO6.of_custom_confirmation_date)  = OSO.year - 1
+                        AND     SO6.state                                           NOT IN ('draft', 'sent', 'cancel')
                     )                                           AS previous_recorded_turnover
         """
         return sub_select_objective_str
@@ -442,6 +465,44 @@ class OFCRMFunnelConversion4(models.Model):
             AND     RR.id               = HR.resource_id
         """
         return sub_where_objective_str
+
+    def _sub_select_sale_order2(self):
+        sub_select_sale_order2_str = """
+            SELECT  70000000 + SO7.id               AS id
+            ,       SO7.of_custom_confirmation_date AS date
+            ,       SO7.company_id                  AS company_id
+            ,       SO7.user_id                     AS vendor_id
+            ,       SO7.project_id                  AS project_id
+            ,       SO7.partner_id                  AS partner_id
+            ,       0                               AS opportunity_nb
+            ,       0                               AS quotation_nb
+            ,       0                               AS order_nb
+            ,       0                               AS lost_quotation_nb
+            ,       0                               AS quotation_amount
+            ,       0                               AS ordered_turnover
+            ,       0                               AS recorded_turnover
+            ,       SO7.amount_untaxed              AS recorded_turnover2
+            ,       0                               AS lost_turnover
+            ,       0                               AS ordered_margin
+            ,       0                               AS recorded_margin
+            ,       SO7.margin                      AS recorded_margin2
+            ,       0                               AS budget_turnover_objective
+            ,       0                               AS ordered_turnover_objective
+            ,       0                               AS previous_recorded_turnover
+        """
+        return sub_select_sale_order2_str
+
+    def _sub_from_sale_order2(self):
+        sub_from_sale_order2_str = """
+            FROM    sale_order  SO7
+        """
+        return sub_from_sale_order2_str
+
+    def _sub_where_sale_order2(self):
+        sub_where_sale_order2_str = """
+            WHERE   SO7.state   NOT IN ('draft', 'sent', 'cancel', 'presale')
+        """
+        return sub_where_sale_order2_str
 
     def _from(self):
         from_str = """
