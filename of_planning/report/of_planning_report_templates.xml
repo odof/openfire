@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <odoo>
+
+    <!-- Planning général semaine -->
     <report
         string="Planning général semaine "
         id="action_report_planning_general_semaine"
@@ -14,47 +16,45 @@
     <template id="of_planning.report_planning_general_semaine">
         <t t-call="report.html_container">
             <t t-call="report.internal_layout">
-               <t t-set="res" t-value="get_interventions(data['employee_ids'],data['date_start'])"/>
-               <t t-set="interventions" t-value="res[0]"/>
-               <t t-set="days" t-value="res[1]"/>
-               <t t-set="title" t-value="get_title(data['date_start'])"/>
-               <div class="page">
+                <t t-set="res" t-value="get_interventions(data['employee_ids'],data['date_start'])"/>
+                <t t-set="interventions" t-value="res[0]"/>
+                <t t-set="days" t-value="res[1]"/>
+                <t t-set="title" t-value="get_title(data['date_start'])"/>
+                <div class="page">
                     <style>
-                       table {
+                        table.main_table {
                             width:100%;
                             table-layout: fixed;
-                       }
-                       th,tr:nth-child(2n) {
+                        }
+                        th,tr:nth-child(2n) {
                             background-color:#C7C7C7;
                             border: 1px solid #E6E6E6;
-                       }
-                       thead,th,td {
+                        }
+                        thead,th,td {
                             border: 1px solid #E6E6E6;
                             margin:4px;
                             padding:4px;
-                       }
-                       .col_day {
+                        }
+                        .col_day {
                             text-align:center;
                             width:13.2%!important;
-                       }
-                       .col_employee {
+                        }
+                        .col_employee {
                             text-align:center;
                             width:5%!important;
-                       }
-                       p {
-                            margin-left: 39px;
-                            text-indent: -39px;
-                       }
+                        }
                     </style>
-                    <b><h3 style="text-align:center" t-esc="title"></h3></b>
-                    <table>
+                    <b>
+                        <h3 style="text-align:center" t-esc="title"/>
+                    </b>
+                    <table class="main_table">
                         <thead>
                             <tr>
                                 <th class="col_employee">
                                     Employés
                                 </th>
                                 <t t-foreach="days" t-as="day">
-                                    <th class="col_day" >
+                                    <th class="col_day">
                                         <span t-esc="int_to_day(day)"/>
                                     </th>
                                 </t>
@@ -70,14 +70,17 @@
                                         <t t-set="day_data" t-value="employee_data[1].get(day, [])"/>
                                         <t t-foreach="day_data" t-as="interv_data">
                                             <p>
-                                            <t t-if="interv_data[0]">
-                                                <t t-esc="interv_data[0]"/>
-                                                <t t-esc="interv_data[1]"/>
-                                                <t t-if="interv_data[2]"><font color="red" t-esc="u'\u2022'"/></t>
-                                            </t>
-                                            <t t-if="not interv_data[0]">
-                                                <t t-esc="interv_data[1]"/>
-                                            </t>
+                                                <div t-if="interv_data[0]" style="display:table;">
+                                                    <span t-esc="interv_data[0]" style="display:table-cell;"/>
+                                                    <span style="display:table-cell; min-width: 8px"/>
+                                                    <span style="display:table-cell">
+                                                        <t t-raw="interv_data[2]" name="state_display"/>
+                                                        <t t-esc="interv_data[1]"/>
+                                                    </span>
+                                                </div>
+                                                <t t-if="not interv_data[0]">
+                                                    <t t-esc="interv_data[1]"/>
+                                                </t>
                                             </p>
                                         </t>
                                     </td>
@@ -86,7 +89,112 @@
                         </tbody>
                     </table>
                 </div>
-                </t>
             </t>
+        </t>
     </template>
+
+    <!-- Planning semaine -->
+    <report
+        string="Planning semaine "
+        id="action_report_planning_semaine"
+        model="of_planning.report_planning_semaine"
+        report_type="qweb-pdf"
+        name="of_planning.report_planning_semaine"
+        file="of_planning.report_planning_semaine"
+        paperformat="of_base.paperformat_euro_internal"
+    />
+
+    <template id="of_planning.report_planning_semaine">
+        <t t-call="report.html_container">
+            <t t-call="report.internal_layout">
+                <div class="page">
+                    <style>
+                        td, th { padding:8px; border: 1px solid #E6E6E6; }
+                        table { width: 100%; }
+                        thead { background-color: #E6E6FA; }
+                    </style>
+                    <div t-foreach="data['employee_ids']" t-as="employee_id" style="page-break-after: always;">
+                        <t t-set="interventions" t-value="get_interventions(employee_id, data['date_start'])"/>
+                        <t t-set="title" t-value="get_title(employee_id, data['date_start'])"/>
+                        <b>
+                            <h3 style="text-align:center" t-raw="title"/>
+                        </b>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 17%">Date et heure</th>
+                                    <th style="width: 32%">Client</th>
+                                    <th style="width: 17%">Tâche</th>
+                                    <th style="width: 34%">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="interventions" t-as="intervention">
+                                    <t t-set="columns" t-value="get_columns(intervention)"/>
+                                    <t t-foreach="columns" t-as="column">
+                                        <td>
+                                            <span t-raw="column"/>
+                                        </td>
+                                    </t>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- Planning journée -->
+    <report
+            string="Planning journée "
+            id="action_report_planning_jour"
+            model="of_planning.report_planning_jour"
+            report_type="qweb-pdf"
+            name="of_planning.report_planning_jour"
+            file="of_planning.report_planning_jour"
+            paperformat="of_base.paperformat_euro_internal"
+    />
+
+    <template id="of_planning.report_planning_jour">
+        <t t-call="report.html_container">
+            <t t-call="report.internal_layout">
+                <div class="page">
+                    <style>
+                        td, th { padding:8px; border: 1px solid #E6E6E6; }
+                        table { width: 100%; }
+                        thead { background-color: #E6E6FA; }
+                    </style>
+                    <div t-foreach="data['employee_ids']" t-as="employee_id" style="page-break-after: always;">
+                        <t t-set="interventions" t-value="get_interventions(employee_id, data['date_start'])"/>
+                        <t t-set="title" t-value="get_title(employee_id, data['date_start'])"/>
+                        <b>
+                            <h3 style="text-align:center" t-raw="title"/>
+                        </b>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 9%">Heure</th>
+                                    <th style="width: 35%">Client</th>
+                                    <th style="width: 17%">Tâche</th>
+                                    <th style="width: 39%">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="interventions" t-as="intervention">
+                                    <t t-set="columns" t-value="get_columns(intervention)"/>
+                                    <t t-foreach="columns" t-as="column">
+                                        <td>
+                                            <span t-raw="column"/>
+                                        </td>
+                                    </t>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
 </odoo>

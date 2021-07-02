@@ -35,6 +35,13 @@ class HREmployee(models.Model):
     of_changed_intervention_id = fields.Many2one('of.planning.intervention', string=u"Dernier RDV modifié")
     of_est_intervenant = fields.Boolean(string=u"Est intervenant", default=False)
     of_est_commercial = fields.Boolean(string=u"Est commercial", default=False)
+    of_impression_planning = fields.Boolean(string=u"Impression planning", default=True)
+
+    @api.onchange('of_est_intervenant', 'of_est_commercial')
+    def _onchange_est_intervenant(self):
+        self.ensure_one()
+        if not self.of_est_intervenant and not self.of_est_commercial:
+            self.of_impression_planning = False
 
     @api.multi
     def peut_faire(self, tache_id, all_required=False):
