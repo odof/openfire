@@ -19,8 +19,12 @@ from odoo.tools.float_utils import float_compare
 _logger = logging.getLogger(__name__)
 
 SEARCH_MODES = [
-    ('distance', u'Distance (km)'),
-    ('duree', u'Durée (min)'),
+    ('distance_a', u'Distance Aller (km)'),
+    ('distance_r', u'Distance Retour (km)'),
+    ('distance_ar', u'Distance Aller/Retour (km)'),
+    ('duree_a', u'Durée Aller (min)'),
+    ('duree_r', u'Durée Retour (min)'),
+    ('duree_ar', u'Durée Aller/Retour (min)'),
 ]
 
 """
@@ -128,7 +132,7 @@ class OfTourneeRdv(models.TransientModel):
         default=lambda *a: (date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
     date_recherche_fin = fields.Date(
         string="Jusqu'au", required=True, default=lambda *a: (date.today() + timedelta(days=7)).strftime('%Y-%m-%d'))
-    mode_recherche = fields.Selection(SEARCH_MODES, string="Mode de recherche", required=True, default="distance")
+    mode_recherche = fields.Selection(SEARCH_MODES, string="Mode de recherche", required=True, default="distance_a")
     max_recherche = fields.Float(string="Maximum")
     orthodromique = fields.Boolean(string=u"Distances à vol d'oiseau")
 
@@ -869,12 +873,32 @@ class OfTourneeRdv(models.TransientModel):
                             duree_dispo = sum([c.date_flo_deadline - c.date_flo for c in crens])
 
                             if crens[0].disponible:
-                                if mode_recherche == 'distance' and vals['distance'] > maxi:
-                                    vals['force_color'] = "#FF0000"
-                                    vals['name'] = "TROP LOIN"
-                                    vals['disponible'] = False
+                                if mode_recherche == 'distance_a':
+                                    vals['distance_utile'] = vals['dist_prec']
+                                    vals['duree_utile'] = vals['duree_prec']
+                                    val_utile = 'distance_utile'
+                                elif mode_recherche == 'distance_r':
+                                    vals['distance_utile'] = vals['dist_suiv']
+                                    vals['duree_utile'] = vals['duree_suiv']
+                                    val_utile = 'distance_utile'
+                                elif mode_recherche == 'distance_ar':
+                                    vals['distance_utile'] = vals['distance']
+                                    vals['duree_utile'] = vals['duree']
+                                    val_utile = 'distance_utile'
+                                elif mode_recherche == 'duree_a':
+                                    vals['duree_utile'] = vals['duree_prec']
+                                    vals['distance_utile'] = vals['dist_prec']
+                                    val_utile = 'duree_utile'
+                                elif mode_recherche == 'duree_r':
+                                    vals['duree_utile'] = vals['duree_suiv']
+                                    vals['distance_utile'] = vals['dist_suiv']
+                                    val_utile = 'duree_utile'
+                                else:
+                                    vals['duree_utile'] = vals['duree']
+                                    vals['distance_utile'] = vals['distance']
+                                    val_utile = 'duree_utile'
                                 # Créneau plus loin que la recherche accepte
-                                elif mode_recherche == 'duree' and vals['duree'] > maxi:
+                                if vals[val_utile] > maxi:
                                     vals['force_color'] = "#FF0000"
                                     vals['name'] = "TROP LOIN"
                                     vals['disponible'] = False
@@ -921,6 +945,8 @@ class OfTourneeRdvLine(models.TransientModel):
     duree = fields.Float(string=u'Durée.tot. (min)', default=-1, digits=(12, 0), help=u"durée prec + durée suiv")
     duree_prec = fields.Float(string=u'Durée.Prec. (min)', digits=(12, 0))
     duree_suiv = fields.Float(string=u'Durée.Suiv. (min)', digits=(12, 0))
+    distance_utile = fields.Float(string=u"Dist. utile (km)", digits=(12, 0))
+    duree_utile = fields.Float(string=u'Durée. utile (min)', digits=(12, 0))
     of_color_ft = fields.Char(related="employee_id.of_color_ft", readonly=True)
     of_color_bg = fields.Char(related="employee_id.of_color_bg", readonly=True)
     disponible = fields.Boolean(string="Est dispo", default=True)

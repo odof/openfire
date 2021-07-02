@@ -90,7 +90,21 @@ class OfPlanifCreneau(models.TransientModel):
     precision_suiv = fields.Selection(GEO_PRECISION, compute="compute_prec_suiv_vals")
 
     # Recherche
-    distance_max = fields.Integer("Distance max. (km)", default=30, help=u"À vol d'oiseau.")
+    rayon_max = fields.Integer(
+        "Rayon (km)", default=30,
+        help=u"Le rayon permet de pré-sélectionner les interventions en fonction de leur distance à vol d'oiseau"
+             u" du point de départ et/ou du point d'arrivée.")
+    trajet_utile = fields.Selection(
+        [
+            ('aller', u"Aller"),
+            ('retour', u"Retour"),
+            ('aller_retour', u"Aller/Retour"),
+        ], string=u"Trajet", default='aller', required=True)
+    mode_recherche = fields.Selection(
+        [
+            ('duree', u"Durée"),
+            ('distance', u"Distance"),
+        ], string=u"Mode de recherche", default='duree', required=True)
     secteur_id = fields.Many2one(
         'of.secteur', string="Secteur", help=u"laisser vide pour ne pas restreindre à un secteur en particulier")
     pre_tache_categ_ids = fields.Many2many(
@@ -103,6 +117,7 @@ class OfPlanifCreneau(models.TransientModel):
 
     # Propositions
     proposition_ids = fields.One2many('of.planif.creneau.prop', 'creneau_id', string="propositions")
+    proposition_duree_ids = fields.One2many(related="proposition_ids")
     proposition_readonly_ids = fields.One2many(related="proposition_ids", readonly=True)
     aucun_res = fields.Boolean(string=u"Aucun résultat!")
     priorite_max = fields.Integer(string=u"Priorité max", help=u"Priorité la plus haute parmis les propositions")
@@ -458,7 +473,7 @@ class OfPlanifCreneau(models.TransientModel):
                 service_domain.append(('address_zip', 'not in', zip_range_excluded.ids))  # à corriger
         # services
         services = self.env['of.service'].search(service_domain).filter_state_poncrec_date(date_eval=self.date_creneau)
-        distance_max = self.distance_max * 1.3  # approximation
+        rayon_max = self.rayon_max  # * 1.3  # approximation
         priorite_max = 0
         lieu_prec = self.lieu_prec_manual_id or self.lieu_prec_id
         lieu_suiv = self.lieu_suiv_manual_id or self.lieu_suiv_id
@@ -476,10 +491,13 @@ class OfPlanifCreneau(models.TransientModel):
             if calcul_distance_oiseau:
                 voloiseau_prec = voloiseau(service.geo_lat, service.geo_lng, lieu_prec.geo_lat, lieu_prec.geo_lng)
                 voloiseau_suiv = voloiseau(service.geo_lat, service.geo_lng, lieu_suiv.geo_lat, lieu_suiv.geo_lng)
-                if voloiseau_prec > distance_max:  # trop loins
+                # Si le trajet est aller ou aller/retour, on élimine les résultats trop loins du point de départ
+                if voloiseau_prec > rayon_max and self.trajet_utile != 'retour':
                     continue
-                if voloiseau_suiv > distance_max:
+                # Si le trajet est retour ou aller/retour, on élimine les résultats trop loins du point d'arrivée
+                if voloiseau_suiv > rayon_max and self.trajet_utile != 'aller':
                     continue
+                # Augmenter la priorité en fonction de la proximité
                 if voloiseau_prec + voloiseau_suiv <= 5:
                     priorite += 3
                 elif voloiseau_prec + voloiseau_suiv <= 10:
@@ -519,9 +537,6 @@ class OfPlanifCreneau(models.TransientModel):
         if prop_selected:
             prop_selected.selected = False
         self.proposition_ids.compute_distance_reelle()
-        prop_a_supr = self.proposition_ids.filtered(lambda p: p.distance_reelle_tota > self.distance_max)
-        self.proposition_ids -= prop_a_supr
-        prop_a_supr.unlink()
         self.selected_id = self.proposition_ids.get_closer_one()
         if self.selected_id:
             self.selected_id.selected = True
@@ -603,6 +618,8 @@ class OfPlanifCreneauProp(models.TransientModel):
     distance_reelle_prec = fields.Float(string=u'Distance du précédent', digits=(5, 2), help=u"Réelle")
     distance_reelle_suiv = fields.Float(string=u'Distance du suivant', digits=(5, 2), help=u"Réelle")
     distance_reelle_tota = fields.Float(string=u'Distance totale (km)', digits=(5, 2), help=u"Réelle", default=-1)
+    distance_utile = fields.Float(string=u"Distance utile", digits=(5, 2))
+    duree_utile = fields.Float(string=u"Durée utile", digits=(7, 0), default="99999")
 
     # Rubrique Planification
     selected = fields.Boolean(string=u"Sélectionné")
@@ -726,6 +743,8 @@ class OfPlanifCreneauProp(models.TransientModel):
         if not self:
             return
         creneau = self[0].creneau_id
+        trajet_utile = creneau.trajet_utile
+        use_duree = creneau.mode_recherche == 'duree'
         lieu_prec = creneau.lieu_prec_manual_id or creneau.lieu_prec_id
         lieu_suiv = creneau.lieu_suiv_manual_id or creneau.lieu_suiv_id
         if not lieu_prec and not lieu_suiv:
@@ -787,15 +806,47 @@ class OfPlanifCreneauProp(models.TransientModel):
                 a_planifier.distance_reelle_prec = dist_prec
                 a_planifier.distance_reelle_suiv = dist_suiv
                 a_planifier.distance_reelle_tota = dist_prec + dist_suiv
-                a_planifier.distance_order = dist_prec + dist_suiv
-                a_planifier.distance_arrondi_order = arrondi_sup(dist_prec + dist_suiv, 5)
+                duree_prec = round(legs[0][u'duration'] / 60.0, 2)
+                duree_suiv = round(legs[1][u'duration'] / 60.0, 2)
+                # on utilise les champs d'ordre des distance pour les durées, pour limiter le code supplémentaire
+                if trajet_utile == 'aller':
+                    a_planifier.distance_utile = dist_prec
+                    a_planifier.duree_utile = duree_prec
+                    a_planifier.distance_order = use_duree and duree_prec or dist_prec
+                    a_planifier.distance_arrondi_order = arrondi_sup(use_duree and duree_prec or dist_prec, 5)
+                elif trajet_utile == 'retour':
+                    a_planifier.distance_utile = dist_suiv
+                    a_planifier.duree_utile = duree_suiv
+                    a_planifier.distance_order = use_duree and duree_suiv or dist_suiv
+                    a_planifier.distance_arrondi_order = arrondi_sup(use_duree and duree_suiv or dist_suiv, 5)
+                else:
+                    a_planifier.distance_utile = dist_prec + dist_suiv
+                    a_planifier.duree_utile = duree_prec + duree_suiv
+                    a_planifier.distance_order = use_duree and (duree_prec + duree_suiv) or (dist_prec + dist_suiv)
+                    a_planifier.distance_arrondi_order = arrondi_sup(
+                        use_duree and (duree_prec + duree_suiv) or (dist_prec + dist_suiv), 5)
+
                 a_planifier.osrm_response = legs
                 a_planifier.fait = True
             else:
-                distance_oiseau = a_planifier.distance_oiseau_prec + a_planifier.distance_oiseau_suiv
-                a_planifier.distance_reelle_prec = orthodromique and a_planifier.distance_oiseau_prec or -1
-                a_planifier.distance_reelle_suiv = orthodromique and a_planifier.distance_oiseau_suiv or -1
+                dist_prec = a_planifier.distance_oiseau_prec
+                dist_suiv = a_planifier.distance_oiseau_suiv
+                distance_oiseau = dist_prec + dist_suiv
+                a_planifier.distance_reelle_prec = orthodromique and dist_prec or -1
+                a_planifier.distance_reelle_suiv = orthodromique and dist_suiv or -1
                 a_planifier.distance_reelle_tota = orthodromique and distance_oiseau or -1
+                if trajet_utile == 'aller':
+                    a_planifier.distance_order = dist_prec
+                    a_planifier.distance_utile = dist_prec
+                    a_planifier.distance_arrondi_order = arrondi_sup(dist_prec, 5)
+                elif trajet_utile == 'retour':
+                    a_planifier.distance_order = dist_suiv
+                    a_planifier.distance_utile = dist_suiv
+                    a_planifier.distance_arrondi_order = arrondi_sup(dist_suiv, 5)
+                else:
+                    a_planifier.distance_order = orthodromique and distance_oiseau or 99999
+                    a_planifier.distance_utile = orthodromique and distance_oiseau or 99999
+                    a_planifier.distance_arrondi_order = orthodromique and arrondi_sup(distance_oiseau, 5) or 99999
                 a_planifier.distance_order = orthodromique and distance_oiseau or 99999
                 a_planifier.distance_arrondi_order = orthodromique and arrondi_sup(distance_oiseau, 5) or 99999
                 a_planifier.osrm_response = res
