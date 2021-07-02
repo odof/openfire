@@ -165,7 +165,7 @@ class SaleOrderLine(models.Model):
                    ('service', u"Service")], string=u"Type d'article", related='product_id.type', readonly=True,
         store=True)
     of_supplier_delivery_delay = fields.Float(
-        string=u"Délai de livraison", compute='_compute_of_supplier_delivery_delay', store=True)
+        string=u"Délai de livraison", compute='_compute_of_supplier_delivery_delay', store=True, compute_sudo=True)
     of_has_reordering_rule = fields.Boolean(
         string=u"Gérer sur règle de stock", compute='_compute_of_has_reordering_rule',
         help=u"L'article dispose de règles de réapprovisionnement.")
