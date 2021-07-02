@@ -22,6 +22,8 @@ class OfAccountPaymentBankDeposit(models.Model):
     date = fields.Date('Date', required=True, default=fields.Date.context_today)
     payment_ids = fields.One2many(
         'account.payment', 'of_deposit_id', 'Payments', copy=False, default=_get_default_payments)
+    of_payment_mode_id = fields.Many2one(
+        string=U"Mode de paiement", comodel_name='of.account.payment.mode', compute='_compute_of_payment_mode_id')
     payment_count = fields.Integer(string=u"Nombre de paiements", compute='_compute_payment_count')
     payment_total = fields.Float(string=u"Montant total des paiements", compute='_compute_payment_total')
     currency_id = fields.Many2one(
@@ -33,8 +35,14 @@ class OfAccountPaymentBankDeposit(models.Model):
     journal_id = fields.Many2one(
         'account.journal', 'Journal', required=True,
         domain="[('type', 'in', ('cash', 'bank')), ('of_allow_bank_deposit', '=', True)]")
+    bank_acc_number = fields.Char(string=u"IBAN", compute='_compute_bank_acc_number')
 
     _order = 'date DESC'
+
+    @api.depends('payment_ids')
+    def _compute_of_payment_mode_id(self):
+        for rec in self:
+            rec.of_payment_mode_id = rec.payment_ids and rec.payment_ids[0].of_payment_mode_id
 
     @api.depends('payment_ids')
     def _compute_payment_count(self):
@@ -45,6 +53,14 @@ class OfAccountPaymentBankDeposit(models.Model):
     def _compute_payment_total(self):
         for rec in self:
             rec.payment_total = sum(rec.payment_ids.mapped('amount'))
+
+    @api.depends('journal_id')
+    def _compute_bank_acc_number(self):
+        for rec in self:
+            if rec.journal_id.type == 'bank':
+                rec.bank_acc_number = rec.journal_id.bank_acc_number
+            else:
+                rec.bank_acc_number = u""
 
     @api.multi
     def post(self):
@@ -178,6 +194,14 @@ class OfAccountPaymentBankDeposit(models.Model):
     def create(self, vals):
         self._check_payment_ids(vals.get('payment_ids', False))
         return super(OfAccountPaymentBankDeposit, self).create(vals)
+
+    def get_of_payment_mode_name_formatted(self):
+        self.ensure_one()
+        res = u""
+        if self.of_payment_mode_id:
+            name = self.of_payment_mode_id.name
+            res = u"%s%s" % (name[0].lower(), name[1:])
+        return res
 
 #    Uncomment this method to have an error message at the opening of the wizard when a payment is already deposited
 #    The main drawback is that the user loses his selection of payments, so we prefer an error at the deposit creation
