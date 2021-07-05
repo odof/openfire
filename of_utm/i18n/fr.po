@@ -27,8 +27,33 @@ msgstr "Campagnes"
 msgid "Medium"
 msgstr "Canaux"
 
+#. module: utm
+#: model:ir.actions.act_window,name:utm.utm_medium_action
+#: model:ir.model.fields,field_description:utm.field_account_invoice_medium_id
+#: model:ir.model.fields,field_description:utm.field_crm_lead_medium_id
+#: model:ir.model.fields,field_description:utm.field_hr_applicant_medium_id
+#: model:ir.model.fields,field_description:utm.field_link_tracker_medium_id
+#: model:ir.model.fields,field_description:utm.field_sale_order_medium_id
+#: model:ir.model.fields,field_description:utm.field_utm_mixin_medium_id
+#: model:ir.ui.menu,name:utm.menu_utm_medium
+#: model:ir.ui.view,arch_db:utm.utm_medium_view_tree
+#: model:ir.ui.view,arch_db:utm.utm_source_view_tree
+msgid "Medium"
+msgstr "Canal"
+
 #. module: of_utm
 #: model:ir.actions.act_window,name:utm.utm_source_action
 #: model:ir.ui.menu,name:utm.menu_utm_source
 msgid "Sources"
-msgstr "Origines"
+msgstr "Sources"
+
+#. module: utm
+#: model:ir.model,name:utm.model_utm_source
+#: model:ir.model.fields,field_description:utm.field_account_invoice_source_id
+#: model:ir.model.fields,field_description:utm.field_crm_lead_source_id
+#: model:ir.model.fields,field_description:utm.field_hr_applicant_source_id
+#: model:ir.model.fields,field_description:utm.field_link_tracker_source_id
+#: model:ir.model.fields,field_description:utm.field_sale_order_source_id
+#: model:ir.model.fields,field_description:utm.field_utm_mixin_source_id
+msgid "Source"
+msgstr "Source"
