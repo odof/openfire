@@ -248,8 +248,7 @@ class AccountJournal(models.Model):
     of_cancel_moves = fields.Boolean(string=u"Autoriser l'annulation d'écritures (banque)")
 
     @api.onchange('type')
-    def _onchange_type(self):
-        super(AccountJournal, self)._onchange_type()
+    def _onchange_type2(self):
         if self.type == 'bank':
             self.of_allow_bank_deposit = True
         else:
