@@ -61,6 +61,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//form//field[@name='group_warning_purchase']" position="after">
                     <field name="of_description_as_order_setting" widget="radio"/>
+                    <field name="of_date_purchase_order" widget="radio"/>
                 </xpath>
             </field>
         </record>
