@@ -94,6 +94,9 @@
             <xpath expr="//header" position="inside">
                 <button name="action_picking_send" string="Envoyer par email" type="object"/>
             </xpath>
+            <xpath expr="//field[@name='origin']" position="after">
+                <field name="of_transporter_id"/>
+            </xpath>
         </field>
     </record>
 
