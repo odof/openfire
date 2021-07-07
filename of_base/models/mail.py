@@ -46,7 +46,8 @@ class MailComposer(models.TransientModel):
     @api.depends()
     def _compute_of_computed_body(self):
         for composer in self:
-            composer.of_computed_body = composer.render_message([composer.res_id])[composer.res_id]['body']
+            if composer.res_id:
+                composer.of_computed_body = composer.render_message([composer.res_id])[composer.res_id]['body']
 
     @api.multi
     def button_reload_computed_body(self):

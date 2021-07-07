@@ -20,6 +20,7 @@ Extension OpenFire du module stock
         "of_external",
     ],
     "data": [
+        'data/mail_template_data.xml',
         'data/res_groups.xml',
         'views/of_stock_views.xml',
         'wizards/of_stock_date_confirmation_views.xml',

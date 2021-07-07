@@ -96,6 +96,7 @@ class StockPicking(models.Model):
         string=u"Montant HT", readonly=True, currency_field='company_currency_id', compute='_compute_of_amount_untaxed')
     company_currency_id = fields.Many2one(
         'res.currency', related='company_id.currency_id', string=u"Company currency", readonly=True)
+    of_transporter_id = fields.Many2one(string=u"Transporteur", comodel_name='res.partner')
 
     def pdf_mention_legale(self):
         return self.env['ir.values'].get_default('stock.config.settings', 'pdf_mention_legale') or ""
