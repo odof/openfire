@@ -85,6 +85,9 @@
                 <button name="action_fill_operation_qty_done" string="Remplir opérations" type="object"
                         attrs="{'invisible': ['|', ('pack_operation_product_ids', '=', False), ('state', 'in', ['cancel', 'done'])]}"/>
             </xpath>
+            <xpath expr="//field[@name='origin']" position="after">
+                <field name="of_transporter_id"/>
+            </xpath>
             <xpath expr="//field[@name='min_date']" position="after">
                 <field name="date_done" string="Date réelle"/>
             </xpath>
