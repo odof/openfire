@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_equipment_contract_custom_view_form_service" model="ir.ui.view" >
+        <field name="name">of.equipment.contract.custom.view.form.service</field>
+        <field name="model">of.service</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="of_contract_custom.view_of_contract_service_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='where']/group[1]" position="inside">
+                <field name="equipment_ids" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+
+
+</odoo>

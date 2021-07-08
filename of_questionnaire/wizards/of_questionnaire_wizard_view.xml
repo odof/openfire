@@ -48,14 +48,14 @@
         <field name="model">of.planning.intervention</field>
         <field name="inherit_id" ref="of_questionnaire.of_questionnaire_of_planning_intervention_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//notebook/page[@name='recap']//field[@name='questionnaire_id']" position="after">
+            <xpath expr="//notebook/page[@name='questionnaire']//field[@name='questionnaire_id']" position="after">
                 <button class="oe_right" name="of_questionnaire.action_of_repondre_questionnaire"
                         string="Répondre"
                         context="{'question_ids': question_ids}"
                         attrs="{'invisible': ['|', ('state', 'in', ('draft', 'cancel', 'postponed')), ('question_ids', '=', False)]}"
                         type="action"/>
             </xpath>
-            <xpath expr="//notebook/page[@name='recap']//field[@name='question_ids']/tree//field[@name='definitive_answer']" position="after">
+            <xpath expr="//notebook/page[@name='questionnaire']//field[@name='question_ids']/tree//field[@name='definitive_answer']" position="after">
                 <field name="id" invisible="1"/>
                 <button name="of_questionnaire.action_of_repondre_questionnaire" type="action" icon="fa-pencil" context="{'question_ids': [], 'default_question_id': id}"/>
             </xpath>

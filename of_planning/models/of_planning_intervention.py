@@ -431,7 +431,7 @@ class OfPlanningIntervention(models.Model):
 
     # Rubrique Documents liés
     order_id = fields.Many2one(
-        "sale.order", string=u"Commande associée",
+        "sale.order", string=u"Commande",
         domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")
 
     # Onglet Description
@@ -487,12 +487,11 @@ class OfPlanningIntervention(models.Model):
     price_subtotal = fields.Monetary(compute='_compute_amount', string='Sous-total HT', readonly=True, store=True)
     price_tax = fields.Monetary(compute='_compute_amount', string='Taxes', readonly=True, store=True)
     price_total = fields.Monetary(compute='_compute_amount', string='Sous-total TTC', readonly=True, store=True)
-    product_ids = fields.Many2many('product.product', related='template_id.product_ids')
     invoice_ids = fields.One2many('account.invoice', string="Factures", compute="_compute_invoice_ids")
     invoice_count = fields.Integer(string="Nombre de factures", compute="_compute_invoice_ids")
 
     picking_id = fields.Many2one(
-        comodel_name='stock.picking', string=u"BL associé",
+        comodel_name='stock.picking', string=u"Bon de livraison",
         domain="[('id', 'in', picking_domain and picking_domain[0] and picking_domain[0][2] or False)]")
     picking_domain = fields.Many2many(comodel_name='stock.picking', compute='_compute_picking_domain')
 
@@ -1689,7 +1688,6 @@ class OfPlanningInterventionTemplate(models.Model):
     tache_id = fields.Many2one('of.planning.tache', string=u"Tâche")
     fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale", company_dependent=True)
     line_ids = fields.One2many('of.planning.intervention.template.line', 'template_id', string="Lignes de facturation")
-    product_ids = fields.Many2many('product.product')
 
     @api.depends('sequence_id')
     def _compute_code(self):

@@ -201,6 +201,18 @@
         </field>
     </record>
 
+    <!-- Vue configuration des parcs installés -->
+    <record id="of_parc_installe_stock_config_settings" model="ir.ui.view">
+        <field name="name">of parc installe settings</field>
+        <field name="model">stock.config.settings</field>
+        <field name="inherit_id" ref="stock.view_stock_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='group_stock_production_lot']" position="after">
+                <field name="of_parc_installe_auto" attrs="{'invisible': [('group_stock_production_lot', '!=', 1)]}"/>
+            </xpath>
+        </field>
+    </record>
+
 <!-- *************************************************** -->
 <!-- *************** SAV (project.issue) *************** -->
 <!-- *************************************************** -->
@@ -310,6 +322,56 @@
         </field>
     </record>
 
+    <!-- *************************************************** -->
+    <!-- ********************* ACTIONS ********************* -->
+    <!-- *************************************************** -->
+
+    <!-- Action vue parc installé -->
+    <!-- Cette action doit être créée avant la vue qui la référence (déclarée plus bas) -->
+    <record id="action_view_of_parc_installe_sale" model="ir.actions.act_window">
+        <field name="name">Parc installé</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.parc.installe</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form,map</field>
+        <field name="search_view_id" ref="of_parc_installe_search_view"/>
+        <field name="help">Parc des produits installés</field>
+    </record>
+
+    <record id="action_view_of_parc_installe_planning" model="ir.actions.act_window">
+        <field name="name">Parc installé</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.parc.installe</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form,map</field>
+        <field name="search_view_id" ref="of_parc_installe_search_view"/>
+        <field name="help">Parc des produits installés</field>
+    </record>
+
+    <!-- Action vue SAV -->
+    <record id="of_project_issue.action_of_project_issue_view_sale" model="ir.actions.act_window">
+        <field name="view_mode">tree,kanban,map,form,pivot,graph</field>
+    </record>
+    <record id="of_project_issue.action_of_project_issue_view_planning" model="ir.actions.act_window">
+        <field name="view_mode">tree,kanban,map,form,pivot,graph</field>
+    </record>
+
+    <!-- Lien pour action créer SAV depuis parc installé -->
+    <record id="of_action_pi_open_creer_sav" model="ir.actions.server">
+        <field name="name">Créer un SAV</field>
+        <field name="model_id" ref="project_issue.model_project_issue"/>
+        <field name="state">code</field>
+        <field name="code">action = env['of.parc.installe'].action_creer_sav()</field>
+    </record>
+
+    <record id="of_action_pi_creer_sav" model="ir.values">
+        <field name="name">Créer un SAV</field>
+        <field name="key2">client_action_multi</field>
+        <field name="model">of.parc.installe</field>
+        <field name="value" eval="'ir.actions.server,%d'%of_action_pi_open_creer_sav"/>
+    </record>
+
+
 <!-- *************************************************** -->
 <!-- ************* PARTENAIRE (res.partner) ************ -->
 <!-- *************************************************** -->
@@ -341,35 +403,35 @@
 <!-- *********** DEVIS/COMMANDE (sale.order) *********** -->
 <!-- *************************************************** -->
 
-<record id="of_parc_installe_order_form_view" model="ir.ui.view">
-    <field name="name">of.parc.installe.order.form.view</field>
-    <field name="model">sale.order</field>
-    <field name="inherit_id" ref="sale.view_order_form"/>
-    <field name="arch" type="xml">
-        <xpath expr="//div[@name='button_box']" position="inside">
-            <button class="oe_stat_button" name="action_view_parc_installe" type="object" icon="fa-home" attrs="{'invisible': [('of_parc_count', '=', 0)]}">
-                <field string="Parc installé" name="of_parc_count" widget="statinfo"/>
-            </button>
-        </xpath>
-    </field>
-</record>
+    <record id="of_parc_installe_order_form_view" model="ir.ui.view">
+        <field name="name">of.parc.installe.order.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" name="action_view_parc_installe" type="object" icon="fa-home" attrs="{'invisible': [('of_parc_count', '=', 0)]}">
+                    <field string="Parc installé" name="of_parc_count" widget="statinfo"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
 
 <!-- *************************************************** -->
 <!-- ************ FACTURES (account.invoice) *********** -->
 <!-- *************************************************** -->
 
-<record id="of_parc_installe_invoice_form_view" model="ir.ui.view">
-    <field name="name">of.parc.installe.invoice.form.view</field>
-    <field name="model">account.invoice</field>
-    <field name="inherit_id" ref="of_account.of_account_invoice_form"/>
-    <field name="arch" type="xml">
-        <xpath expr="//div[@name='button_box']" position="inside">
-            <button class="oe_stat_button" name="action_view_parc_installe" type="object" icon="fa-home" attrs="{'invisible': [('of_parc_count', '=', 0)]}">
-                <field string="Parc installé" name="of_parc_count" widget="statinfo"/>
-            </button>
-        </xpath>
-    </field>
-</record>
+    <record id="of_parc_installe_invoice_form_view" model="ir.ui.view">
+        <field name="name">of.parc.installe.invoice.form.view</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="of_account.of_account_invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" name="action_view_parc_installe" type="object" icon="fa-home" attrs="{'invisible': [('of_parc_count', '=', 0)]}">
+                    <field string="Parc installé" name="of_parc_count" widget="statinfo"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
 
 <!-- *************************************************** -->
 <!-- ********************** MENUS  ********************* -->
@@ -380,64 +442,5 @@
          parent="sales_team.menu_sales" groups="project.group_project_user" sequence="100"/>
     <menuitem id="menu_of_parc_installe_planning" action="action_view_of_parc_installe_planning" name="Parc installé"
         parent="of_planning.menu_of_planning_clients" groups="project.group_project_user" sequence="20"/>
-
-<!-- *************************************************** -->
-<!-- ********************* ACTIONS ********************* -->
-<!-- *************************************************** -->
-
-    <!-- Action vue parc installé -->
-    <record id="action_view_of_parc_installe_sale" model="ir.actions.act_window">
-         <field name="name">Parc installé</field>
-         <field name="type">ir.actions.act_window</field>
-         <field name="res_model">of.parc.installe</field>
-         <field name="view_type">form</field>
-         <field name="view_mode">tree,form,map</field>
-         <field name="search_view_id" ref="of_parc_installe_search_view"/>
-         <field name="help">Parc des produits installés</field>
-    </record>
-
-    <record id="action_view_of_parc_installe_planning" model="ir.actions.act_window">
-         <field name="name">Parc installé</field>
-         <field name="type">ir.actions.act_window</field>
-         <field name="res_model">of.parc.installe</field>
-         <field name="view_type">form</field>
-         <field name="view_mode">tree,form,map</field>
-         <field name="search_view_id" ref="of_parc_installe_search_view"/>
-         <field name="help">Parc des produits installés</field>
-    </record>
-
-    <!-- Action vue SAV -->
-    <record id="of_project_issue.action_of_project_issue_view_sale" model="ir.actions.act_window">
-        <field name="view_mode">tree,kanban,map,form,pivot,graph</field>
-    </record>
-    <record id="of_project_issue.action_of_project_issue_view_planning" model="ir.actions.act_window">
-        <field name="view_mode">tree,kanban,map,form,pivot,graph</field>
-    </record>
-
-    <!-- Lien pour action créer SAV depuis parc installé -->
-    <record id="of_action_pi_open_creer_sav" model="ir.actions.server">
-        <field name="name">Créer un SAV</field>
-        <field name="model_id" ref="project_issue.model_project_issue"/>
-        <field name="state">code</field>
-        <field name="code">action = env['of.parc.installe'].action_creer_sav()</field>
-    </record>
-
-    <record id="of_action_pi_creer_sav" model="ir.values">
-        <field name="name">Créer un SAV</field>
-        <field name="key2">client_action_multi</field>
-        <field name="model">of.parc.installe</field>
-        <field name="value" eval="'ir.actions.server,%d'%of_action_pi_open_creer_sav"/>
-    </record>
-
-        <record id="of_parc_installe_stock_config_settings" model="ir.ui.view">
-            <field name="name">of parc installe settings</field>
-            <field name="model">stock.config.settings</field>
-            <field name="inherit_id" ref="stock.view_stock_config_settings"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='group_stock_production_lot']" position="after">
-                    <field name="of_parc_installe_auto" attrs="{'invisible': [('group_stock_production_lot', '!=', 1)]}"/>
-                </xpath>
-            </field>
-        </record>
 
 </odoo>

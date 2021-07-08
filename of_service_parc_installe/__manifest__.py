@@ -17,7 +17,7 @@ Module de lien entre service, interventions et parc installé
 """,
     'depends' : [
         'of_parc_installe',
-        'of_service',
+        'of_planning_tournee',
         'of_account',
     ],
     'data' : [

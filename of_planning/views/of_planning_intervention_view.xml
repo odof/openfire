@@ -186,7 +186,7 @@
         <field name="name">of.planning.intervention.form</field>
         <field name="model">of.planning.intervention</field>
         <field name="arch" type="xml" >
-            <form string="Nouvelle Intervention">
+            <form string="Nouveau RDV d'intervention">
                 <header>
                     Passer à
                     <button name="button_confirm" string="Confirmé" states="draft" type="object"/>
@@ -196,22 +196,22 @@
                     <button name="button_cancel" string="Annulé" states="draft,confirm" type="object"/>
                     <button name="button_draft" string="Brouillon" states="confirm,done,unfinished,cancel,postponed" type="object"/>
                     <button name="action_intervention_send" string="Envoyer par email" type="object"/>
-                    <field name="state" widget="statusbar" nolabel="1" statusbar_visible="draft,confirm,done" statusbar_colors='{"proforma":"blue","proforma2":"blue"}'/>
+                    <field name="state" widget="statusbar" nolabel="1" statusbar_visible="draft,confirm,done"/>
                     <div align="right" style="align:right;padding: 0px 18px 0px 0px;width:100%">
-                        <field name="raison_id" widget="selection" context="{'tz': 'Europe/Paris'}" attrs="{'invisible':[('state', '!=', 'postponed')]}"/>
+                        <field name="raison_id" widget="selection" attrs="{'invisible':[('state', '!=', 'postponed')]}"/>
                     </div>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_invoice"
-                            type="object"
-                            class="oe_stat_button"
-                            icon="fa-pencil-square-o"
-                            attrs="{'invisible': [('invoice_count', '=', 0)]}">
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-pencil-square-o"
+                                attrs="{'invisible': [('invoice_count', '=', 0)]}">
                             <field name="invoice_count" widget="statinfo" string="Factures"/>
                         </button>
                     </div>
-                        <div class="oe_title" name="num">
+                    <div class="oe_title" name="num">
                         <h1><b>
                             <span class="of_title of_ws">Rendez-vous d'intervention</span>
                             <field name="number" placeholder="N° d'intervention" readonly="1" nolabel="1" class="oe_inline"/>
@@ -221,19 +221,32 @@
                     <field name="alert_incapable" invisible="1"/>
                     <field name="alert_coherence_date" invisible="1"/>
                     <group>
-                        <group col="2" name="refs" string="Références">
-                            <field name="equipe_id" autofocus="autofocus"/>
-                            <label for="employee_ids" string="Intervenants"/>
-                            <div>
-                                <field name="employee_ids" string="Intervenants" widget="many2many_tags"
-                                   options='{"no_open": True, "no_create": True}'
-                                   context="{'tache_prio_id': tache_id}"/>
-                                <div attrs="{'invisible': [('alert_incapable', '=', False)]}" class="of_red">
-                                    <i class="fa fa-warning of_ws"/>Aucun intervenant ne peut réaliser cette tâche
+                        <group>
+                            <field name="template_id" attrs="{'readonly': [('number', '!=', False), ('state', 'not in', ('draft', 'cancel'))]}"/>
+                        </group>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="tag_ids" widget="many2many_tags"/>
+                        </group>
+                        <group name="who" string="Qui" class="of_grey_background">
+                            <group colspan="2">
+                                <field name="equipe_id" autofocus="autofocus"/>
+                                <label for="employee_ids" string="Intervenants"/>
+                                <div>
+                                    <field name="employee_ids" string="Intervenants" widget="many2many_tags"
+                                           options='{"no_open": True, "no_create": True}'
+                                           context="{'tache_prio_id': tache_id}"/>
+                                    <div attrs="{'invisible': [('alert_incapable', '=', False)]}" class="of_red">
+                                        <i class="fa fa-warning of_ws"/>Aucun intervenant ne peut réaliser cette tâche
+                                    </div>
                                 </div>
-                            </div>
-                            <field name="partner_id" invisible="1"/>
-                            <label for="address_id"/>
+                                <field name="company_id" options="{'no_create': True, 'no_edit': True}"/>
+                            </group>
+                        </group>
+                        <group name="where" string="Où" class="of_grey_background">
+                            <group colspan="2">
+                                <field name="partner_id" invisible="1"/>
+                                <label for="address_id"/>
                             <div class="o_address_format">
                                 <div><field name="address_id" domain="[('customer','=',True)]"/></div>
                                 <field name="address_street"/>
@@ -246,124 +259,123 @@
                                 <span attrs="{'invisible': ['|', ('address_mobile', '=', False), ('address_phone', '=', False)]}"> - </span>
                                 <field name="address_phone"/>
                             </div>
-                            <field name="secteur_id"/>
-                            <field name="user_id"/>
-                            <field name="company_id" options="{'no_create': True, 'no_edit': True}"
-                                   context="{'of_filter_magasin':True}"/>
-                            <field name="name" string="Libellé"/>
-                            <field name="tag_ids" widget="many2many_tags"/>
+                                <field name="secteur_id"/>
+                                <field name="name"/>
+                            </group>
                         </group>
-                        <group col="2" name="planif" string="Planification">
-                            <field name="template_id" attrs="{'readonly': ['|', ('number', '!=', False), ('state', '!=', 'draft')]}"/>
-                            <field name="tache_id" context="{'intervenant_prio_ids': employee_ids}"/>
-                            <field name="forcer_dates"/>
-                            <label for="date"/>
-                            <div>
-                                <field name="jour" class="oe_inline of_ws"/>
-                                <field name="date" class="oe_inline"/>
-                            </div>
-                            <field name="duree" string="Durée" widget="float_time"/>
-                            <label for="date_deadline" attrs="{'invisible': [('forcer_dates', '=', True)]}"/>
-                            <div attrs="{'invisible': [('forcer_dates', '=', True)]}">
-                                <field name="jour_fin" class="oe_inline of_ws"
-                                       attrs="{'invisible': [('alert_hors_creneau', '=', True)]}"/>
-                                <field name="date_deadline" class="oe_inline"
-                                       attrs="{'invisible': [('alert_hors_creneau', '=', True)]}"/>
-                                <div attrs="{'invisible': [('alert_hors_creneau', '=', False)]}" class="of_red">
-                                    <i class="fa fa-warning of_ws"/>L'horaire de début des travaux est en dehors des heures de travail.
+                        <group name="what" string="Quoi" class="of_grey_background">
+                            <group colspan="2">
+                                <field name="tache_id" context="{'intervenant_prio_ids': employee_ids}"/>
+                                <field name="duree" string="Durée" widget="float_time"/>
+                            </group>
+                        </group>
+                        <group name="when" string="Quand" class="of_grey_background">
+                            <group colspan="2">
+                                <label for="date"/>
+                                <div>
+                                    <field name="jour" class="oe_inline of_ws"/>
+                                    <field name="date" class="oe_inline"/>
                                 </div>
-                            </div>
-                            <field name="horaire_du_jour" attrs="{'invisible': [('alert_hors_creneau', '=', False)]}"/>
-                            <label for="date_deadline_forcee" attrs="{'invisible': [('forcer_dates', '=', False)]}"/>
-                            <div attrs="{'invisible': [('forcer_dates', '=', False)]}">
-                                <field name="jour_fin_force" class="oe_inline of_ws"/>
-                                <field name="date_deadline_forcee" class="oe_inline"
-                                       attrs="{'required': [('forcer_dates', '=', True)]}"/>
-                                <div attrs="{'invisible': [('alert_coherence_date', '=', False)]}" class="of_red">
-                                    <i class="fa fa-warning of_ws"/>la date de fin doit être au moins égale à la date de début + la durée
+                                <label for="date_deadline" attrs="{'invisible': [('forcer_dates', '=', True)]}"/>
+                                <div attrs="{'invisible': [('forcer_dates', '=', True)]}">
+                                    <field name="jour_fin" class="oe_inline of_ws"
+                                           attrs="{'invisible': [('alert_hors_creneau', '=', True)]}"/>
+                                    <field name="date_deadline" class="oe_inline"
+                                           attrs="{'invisible': [('alert_hors_creneau', '=', True)]}"/>
+                                    <div attrs="{'invisible': [('alert_hors_creneau', '=', False)]}" class="of_red">
+                                        <i class="fa fa-warning of_ws"/>L'horaire de début des travaux est en dehors des heures de travail.
+                                    </div>
                                 </div>
-                            </div>
-                            <field name="verif_dispo"/>
+                                <field name="horaire_du_jour" attrs="{'invisible': [('alert_hors_creneau', '=', False)]}"/>
+                                <label for="date_deadline_forcee" attrs="{'invisible': [('forcer_dates', '=', False)]}"/>
+                                <div attrs="{'invisible': [('forcer_dates', '=', False)]}">
+                                    <field name="jour_fin_force" class="oe_inline of_ws"/>
+                                    <field name="date_deadline_forcee" class="oe_inline"
+                                           attrs="{'required': [('forcer_dates', '=', True)]}"/>
+                                    <div attrs="{'invisible': [('alert_coherence_date', '=', False)]}" class="of_red">
+                                        <i class="fa fa-warning of_ws"/>la date de fin doit être au moins égale à la date de début + la durée
+                                    </div>
+                                </div>
+                                <field name="forcer_dates"/>
+                                <field name="verif_dispo"/>
+                            </group>
                         </group>
-                        <group name="liens">
-                            <separator string="Documents liés" colspan="2"/>
-                            <field name="order_id"
-                                   groups="sales_team.group_sale_salesman,
-                                           account.group_account_invoice,
-                                           stock.group_stock_user"/>
-                            <field name="picking_domain" invisible="1"/>
-                            <field name="picking_id"
-                                   groups="sales_team.group_sale_salesman,
-                                           account.group_account_invoice,
-                                           stock.group_stock_user"/>
-                        </group>
-                        <group name="autre" string="Divers" invisible="1"/>
                     </group>
                     <notebook>
-                        <!-- Description -->
-                        <page name="description" string="Description">
-                            <separator string="Description"/>
-                                <field name="description" nolabel="1" witget="html"
-                                help="Ce champ sera imprimé dans la fiche d'intervention."/>
-                            <div class="oe_edit_only" style="margin-top: -20px; padding-top: 0px">
-                                * Les données saisies dans ce champ seront imprimées dans la fiche d'intervention.
-                            </div>
-                        </page>
-                        <page name="notes" string="Notes" attrs="{'invisible':[('of_notes_client','=',False),('of_notes_intervention','=',False)]}">
-                            <group>
+                        <page name="infos" string="Informations">
+                            <group col="4">
+                                <group colspan="2" name="origin" string="Origine">
+                                    <field name="order_id" groups="sales_team.group_sale_salesman,
+                                                                   account.group_account_invoice,
+                                                                   stock.group_stock_user"/>
+                                    <field name="picking_id" groups="sales_team.group_sale_salesman,
+                                                                   account.group_account_invoice,
+                                                                   stock.group_stock_user"/>
+                                </group>
+                                <group colspan="2" name="misc" string="Divers">
+                                </group>
+                                <field name="description" nolabel="1" witget="html" colspan="2"
+                                       help="Ce champ sera imprimé dans la fiche d'intervention."/>
+                                <div class="oe_edit_only" style="margin-top: -20px; padding-top: 0px" name="div_infos_description">
+                                    * Les données saisies dans ce champ seront imprimées dans la fiche d'intervention.
+                                </div>
                                 <!-- Notes client -->
-                                <group attrs="{'invisible':[('of_notes_client','=',False)]}" col="2">
+                                <group attrs="{'invisible':[('of_notes_client','=',False)]}">
                                     <separator string="Notes client" colspan="2"/>
                                     <field name="of_notes_client" colspan="2" nolabel="1" readonly="1"
-                                        help="Ces notes proviennent de la fiche client sous la rubrique 'Notes internes'. Ils sont uniquement modifiables dans la fiche client."/>
+                                           help="Ces notes proviennent de la fiche client sous la rubrique 'Notes internes'. Ils sont uniquement modifiables dans la fiche client."/>
                                 </group>
                                 <!-- Notes intervention -->
-                                <group attrs="{'invisible':[('of_notes_intervention','=',False)]}" col="2">
+                                <group attrs="{'invisible':[('of_notes_intervention','=',False)]}">
                                     <separator string="Notes intervention" colspan="2"/>
                                     <field name="of_notes_intervention" nolabel="1"
-                                        help="Ces notes proviennent du devis / commande sous la rubrique 'Notes intervention'. Ils sont uniquement modifiables dans le  devis / commande (voir la commande associée)."/>
+                                           help="Ces notes proviennent du devis / commande sous la rubrique 'Notes intervention'. Ils sont uniquement modifiables dans le  devis / commande (voir la commande associée)."/>
                                 </group>
-                                </group>
-                            </page>
-                            <page name="facturation" string="Facturation">
-                                <field name="lien_commande" invisible="1"/>
-                                <field name="currency_id" invisible="1"/>
-                                <group>
-                                    <group>
-                                        <field name="fiscal_position_id" attrs="{'readonly': [('order_id', '!=', False)]}"/>
-                                    </group>
-                                    <div class="oe_button_box">
-                                        <button name="button_import_order_line" string="Importer"
-                                                type="object"
-                                                attrs="{'invisible': [('order_id','=',False)]}"
-                                                class="oe_right btn-default"/>
-                                        <button name="button_update_lines" string="Mettre à jour"
-                                                type="object"
-                                                attrs="{'invisible': [('order_id','=',False)]}"
-                                                class="oe_right btn-default"/>
-                                    </div>
-                                </group>
-                                <field name="line_ids">
-                                    <tree editable="bottom" colors="blue:order_line_id!=False;">
-                                        <field name="order_line_id" invisible="1"/>
-                                        <field name="product_id" attrs="{'readonly': [('order_line_id', '!=', False)]}"/>
-                                        <field name="name" attrs="{'readonly': [('order_line_id', '!=', False)]}"/>
-                                        <field name="qty"/>
-                                        <field name="price_unit" attrs="{'readonly': [('order_line_id', '!=', False)]}"/>
-                                        <field name="taxe_ids" attrs="{'readonly': [('order_line_id', '!=', False)]}"
-                                               widget="many2many_tags"/>
-                                        <field name="price_subtotal" readonly="1"/>
-                                        <field name="price_total" readonly="1"/>
-                                    </tree>
-                                </field>
-                                <group class="oe_subtotal_footer oe_right" colspan="2" name="intervention_total">
-                                    <field name="price_subtotal" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                                    <field name="price_tax" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                                    <div class="oe_subtotal_footer_separator oe_inline o_td_label">
-                                        <label for="price_total"/>
-                                    </div>
-                                    <field name="price_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                             </group>
+                        </page>
+                        <page name="facturation" string="Facturation">
+                            <field name="lien_commande" invisible="1"/>
+                            <field name="currency_id" invisible="1"/>
+                            <group>
+                                <group>
+                                    <field name="fiscal_position_id" attrs="{'readonly': [('order_id', '!=', False)]}"/>
+                                </group>
+                                <div class="oe_button_box">
+                                    <button name="button_import_order_line" string="Importer"
+                                            type="object"
+                                            attrs="{'invisible': [('order_id','=',False)]}"
+                                            class="oe_right btn-default"/>
+                                    <button name="button_update_lines" string="Mettre à jour"
+                                            type="object"
+                                            attrs="{'invisible': [('order_id','=',False)]}"
+                                            class="oe_right btn-default"/>
+                                </div>
+                            </group>
+                            <field name="line_ids">
+                                <tree editable="bottom" colors="blue:order_line_id!=False;">
+                                    <field name="order_line_id" invisible="1"/>
+                                    <field name="product_id" attrs="{'readonly': [('order_line_id', '!=', False)]}"/>
+                                    <field name="name" attrs="{'readonly': [('order_line_id', '!=', False)]}"/>
+                                    <field name="qty"/>
+                                    <field name="price_unit" attrs="{'readonly': [('order_line_id', '!=', False)]}"/>
+                                    <field name="taxe_ids" attrs="{'readonly': [('order_line_id', '!=', False)]}"
+                                           widget="many2many_tags"/>
+                                    <field name="price_subtotal" readonly="1"/>
+                                    <field name="price_total" readonly="1"/>
+                                </tree>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right" colspan="2" name="intervention_total">
+                                <field name="price_subtotal" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                <field name="price_tax" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                                    <label for="price_total"/>
+                                </div>
+                                <field name="price_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            </group>
+                        </page>
+
+                        <page name="recap" string="Compte rendu" invisible="1">
+                            <group/>
                         </page>
                     </notebook>
                 </sheet>
@@ -989,11 +1001,12 @@
                     <div class="oe_title">
                         <h1><field name="name" placeholder="Nom du modèle"/></h1>
                     </div>
-                    <group>
-                        <group>
+                    <group name="general">
+                        <group name="general_one">
                             <field name="code"/>
                             <field name="tache_id"/>
                         </group>
+                        <group name="general_two"/>
                     </group>
                     <notebook>
                         <page string="Configuration">
@@ -1009,20 +1022,13 @@
                                 <group>
                                 </group>
                             </group>
+                            <separator string="Lignes facturables"/>
                             <field name="line_ids">
                                 <tree editable="bottom">
                                     <field name="product_id"/>
                                     <field name="name"/>
                                     <field name="qty"/>
                                     <field name="price_unit"/>
-                                </tree>
-                            </field>
-                        </page>
-                        <page name="products" string="Articles supplémentaires">
-                            <field name="product_ids">
-                                <tree>
-                                    <field name="name"/>
-                                    <field name="list_price"/>
                                 </tree>
                             </field>
                         </page>

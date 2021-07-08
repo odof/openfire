@@ -3,7 +3,7 @@
 
     <!-- Ajout de la machine installée dans la fiche intervention -->
     <template id="of_parc_installe_extension_fiche_intervention_report" inherit_id="of_planning.of_fiche_intervention_report_template">
-        <xpath expr="//t[@t-if='o.description and o.cleantext_description']" position="before">
+        <xpath expr="//t[@name='cadre_description']" position="before">
             <t t-if="o.parc_installe_id">
                 <div>
                     <div class="row h4 mb4">
