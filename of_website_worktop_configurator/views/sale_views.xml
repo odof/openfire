@@ -13,9 +13,10 @@
                        attrs="{'invisible': [('of_worktop_configurator_order', '=', False)]}"/>
             </xpath>
             <xpath expr="//group[@name='docs']" position="after">
-                <group string="Calculateur" name="website_worktop_configurator">
+                <group string="Calculateur" name="website_worktop_configurator" attrs="{'invisible': [('of_worktop_configurator_order', '=', False)]}">
                     <field name="of_worktop_configurator_internal_vendor"/>
                     <field name="of_worktop_configurator_internal_code"/>
+                    <field name="of_worktop_configurator_discount_id"/>
                     <field name="of_delivery_floor"/>
                     <field name="of_site_distance_id"/>
                     <field name="of_manufacturer_metrics"/>
@@ -60,6 +61,10 @@
                     <label for="of_website_worktop_configurator_extra_weight_product_id"/>
                     <div name="of_website_worktop_configurator_extra_weight_product_id">
                         <field name="of_website_worktop_configurator_extra_weight_product_id" class="oe_inline"/>
+                    </div>
+                    <label for="of_website_worktop_configurator_discount_product_id"/>
+                    <div name="of_website_worktop_configurator_discount_product_id">
+                        <field name="of_website_worktop_configurator_discount_product_id" class="oe_inline"/>
                     </div>
                     <label for="of_website_worktop_configurator_acc_layout_category_id"/>
                     <div name="of_website_worktop_configurator_acc_layout_category_id">

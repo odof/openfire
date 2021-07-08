@@ -29,6 +29,8 @@ class OFWebsiteWorktopConfigurator(http.Controller):
             return request.redirect('/worktop_configurator/customer_details')
         if step_number > 30 and not request.session.get('worktop_quote_id'):
             return request.redirect('/worktop_configurator/quote_details')
+        if step_number == 50 and not request.session.get('product_type_id'):
+            return request.redirect('/worktop_configurator/product_select')
         return False
 
     @http.route(['/worktop_configurator'], type='http', auth='user', website=True)
@@ -413,6 +415,7 @@ class OFWebsiteWorktopConfigurator(http.Controller):
                         quote_line_id = self._create_quote_line()
                         request.session['worktop_quote_line_id'] = quote_line_id
                     self._control_weight()
+                    self._compute_discount()
                     return request.redirect('/worktop_configurator/product_accessories')
 
         values['error_dict'] = error
@@ -533,45 +536,55 @@ class OFWebsiteWorktopConfigurator(http.Controller):
 
         values = kw
 
-        # Le formulaire a été soumis -> validation du devis
+        # Le formulaire a été soumis -> validation du devis ou calcul de la remise
         if 'submitted' in values:
             values.pop('submitted')
-            # On valide le devis
             quote = request.env['sale.order'].sudo().browse(request.session['worktop_quote_id'])
-            quote.write({'state': 'sent',
-                         'of_submitted_worktop_configurator_order': True})
-            # On abonne le client et les responsables de la même société
-            responsibles = request.env['res.partner'].sudo().search(
-                [('id', 'child_of', quote.partner_id.commercial_partner_id.id),
-                 ('of_worktop_configurator_responsible', '=', True)])
-            quote.message_subscribe(partner_ids=responsibles.ids + [quote.partner_id.id])
+            if values.get('action') == 'compute_discount':
+                # Calcul de la remise
+                quote.of_worktop_configurator_discount_id = request.params.get('discount_id') and \
+                    int(request.params.get('discount_id')) or False
+                self._compute_discount()
+            elif values.get('action') == 'submit':
+                # On valide le devis
+                quote.write({'state': 'sent',
+                             'of_submitted_worktop_configurator_order': True})
+                # On abonne le client et les responsables de la même société
+                responsibles = request.env['res.partner'].sudo().search(
+                    [('id', 'child_of', quote.partner_id.commercial_partner_id.id),
+                     ('of_worktop_configurator_responsible', '=', True)])
+                quote.message_subscribe(partner_ids=responsibles.ids + [quote.partner_id.id])
 
-            # On vide les variables de session
-            request.session.pop('vendor_address_id', None)
-            request.session.pop('customer_address_id', None)
-            request.session.pop('invoicing_recipient', None)
-            request.session.pop('different_invoicing_address', None)
-            request.session.pop('customer_invoicing_address_id', None)
-            request.session.pop('vendor_invoicing_address_id', None)
-            request.session.pop('worktop_quote_id', None)
-            request.session.pop('product_type_id', None)
-            request.session.pop('product_price', None)
-            request.session.pop('worktop_quote_line_id', None)
-            request.session.pop('material_id', None)
-            request.session.pop('finishing_id', None)
-            request.session.pop('color_id', None)
-            request.session.pop('thickness_id', None)
-            request.session.pop('edge_type_id', None)
-            request.session.pop('length', None)
-            request.session.pop('width', None)
+                # On vide les variables de session
+                request.session.pop('vendor_address_id', None)
+                request.session.pop('customer_address_id', None)
+                request.session.pop('invoicing_recipient', None)
+                request.session.pop('different_invoicing_address', None)
+                request.session.pop('customer_invoicing_address_id', None)
+                request.session.pop('vendor_invoicing_address_id', None)
+                request.session.pop('worktop_quote_id', None)
+                request.session.pop('product_type_id', None)
+                request.session.pop('product_price', None)
+                request.session.pop('worktop_quote_line_id', None)
+                request.session.pop('material_id', None)
+                request.session.pop('finishing_id', None)
+                request.session.pop('color_id', None)
+                request.session.pop('thickness_id', None)
+                request.session.pop('edge_type_id', None)
+                request.session.pop('length', None)
+                request.session.pop('width', None)
 
-            # On redirige vers le portail
-            return request.redirect('/my/home')
+                # On redirige vers le portail
+                return request.redirect('/my/home')
 
         # Arrivée sur la page
         values['step_number'] = STEP_NAME_NUMBER.get(current_step, 0)
         quote = request.env['sale.order'].sudo().browse(request.session['worktop_quote_id'])
         values['quote'] = quote
+        values['discount'] = values.get('discount_id') and \
+            request.env['of.worktop.configurator.discount'].browse(int(values['discount_id'])) or \
+            quote.of_worktop_configurator_discount_id
+        values['discount_list'] = request.env['of.worktop.configurator.discount'].search([])
 
         return request.render('of_website_worktop_configurator.worktop_configurator_quote_summary', values)
 
@@ -635,6 +648,7 @@ class OFWebsiteWorktopConfigurator(http.Controller):
         quote_line.of_no_coef_price = quote_line.price_unit
         quote_line.price_unit = quote_line.price_unit * quote_line.get_pricelist_coef()
         quote_line._compute_tax_id()
+        self._compute_discount()
         return True
 
     @http.route(['/worktop_configurator/quote_line/update_qty'], type='json', auth='user', website=True)
@@ -647,6 +661,8 @@ class OFWebsiteWorktopConfigurator(http.Controller):
             self._control_weight()
         else:
             quote_line.write({'product_uom_qty': qty})
+
+        self._compute_discount()
 
         return {
             'line_id': quote_line.id,
@@ -931,6 +947,7 @@ class OFWebsiteWorktopConfigurator(http.Controller):
 
         if vals:
             quote.write(vals)
+            self._compute_discount()
 
     def _get_product_price(self):
         params = request.params
@@ -1089,3 +1106,23 @@ class OFWebsiteWorktopConfigurator(http.Controller):
             if max_weight < 150.0 and quote.order_line.filtered(lambda l: l.product_id.id == extra_weight_product_id):
                 # On supprime le supplément poids
                 quote.order_line.filtered(lambda l: l.product_id.id == extra_weight_product_id).unlink()
+
+    def _compute_discount(self):
+        quote = request.env['sale.order'].sudo().browse(request.session['worktop_quote_id'])
+        discount_product_id = request.env['ir.values'].sudo().get_default(
+            'sale.config.settings', 'of_website_worktop_configurator_discount_product_id')
+        if discount_product_id:
+            # On supprime la ligne de remise si elle est déjà présente
+            quote.order_line.filtered(lambda l: l.product_id.id == discount_product_id).unlink()
+            # On traite la nouvelle remise
+            if quote.of_worktop_configurator_discount_id:
+                # On calcul le prix de la remise
+                discount_price = -quote.amount_untaxed * (quote.of_worktop_configurator_discount_id.value / 100.0)
+                # On ajoute la ligne de remise
+                vals = quote._website_product_id_change(quote.id, discount_product_id, qty=1)
+                vals['name'] = quote._get_line_description(quote.id, discount_product_id)
+                vals['price_unit'] = discount_price
+                quote_line = request.env['sale.order.line'].sudo().create(vals)
+                quote_line.of_no_coef_price = quote_line.price_unit
+                quote_line.price_unit = quote_line.price_unit * quote_line.get_pricelist_coef()
+                quote_line._compute_tax_id()

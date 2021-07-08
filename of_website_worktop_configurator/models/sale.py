@@ -11,6 +11,8 @@ class SaleOrder(models.Model):
     of_submitted_worktop_configurator_order = fields.Boolean(string=u"Devis soumis issu du calculateur")
     of_worktop_configurator_internal_vendor = fields.Boolean(string=u"Réalisé par HM Déco")
     of_worktop_configurator_internal_code = fields.Char(string=u"Code interne", compute='_compute_internal_code')
+    of_worktop_configurator_discount_id = fields.Many2one(
+        comodel_name='of.worktop.configurator.discount', string=u"Remise")
     of_delivery_floor = fields.Integer(string=u"Étage de livraison")
     of_site_distance_id = fields.Many2one(
         comodel_name='of.worktop.configurator.distance', string=u"Distance du chantier")
@@ -19,9 +21,50 @@ class SaleOrder(models.Model):
 
     def _compute_internal_code(self):
         for order in self.filtered(lambda o: o.of_worktop_configurator_order):
+            discount_product_id = self.env['ir.values'].sudo().get_default(
+                'sale.config.settings', 'of_website_worktop_configurator_discount_product_id')
+            if discount_product_id:
+                order_lines = order.order_line.filtered(lambda l: l.product_id.id != discount_product_id)
+            else:
+                order_lines = order.order_line
             diff = sum(order.order_line.mapped(lambda l: l.price_unit * l.product_uom_qty)) - \
-                   sum(order.order_line.mapped(lambda l: l.of_no_coef_price * l.product_uom_qty))
+                sum(order_lines.mapped(lambda l: l.of_no_coef_price * l.product_uom_qty))
             order.of_worktop_configurator_internal_code = u"CDI%05d" % int(diff)
+
+    @api.multi
+    @api.onchange('pricelist_id')
+    def onchange_pricelist_id(self):
+        for line in self.order_line:
+            line.price_unit = line.of_no_coef_price * line.get_pricelist_coef()
+        self._compute_internal_code()
+
+    @api.multi
+    def write(self, vals):
+        super(SaleOrder, self).write(vals)
+        # Gestion de la remise en cas de modification de la remise ou de la liste de prix
+        if 'of_worktop_configurator_discount_id' in vals or 'pricelist_id' in vals:
+            discount_product_id = self.env['ir.values'].sudo().get_default(
+                'sale.config.settings', 'of_website_worktop_configurator_discount_product_id')
+            if discount_product_id:
+                for order in self.filtered(lambda o: o.of_worktop_configurator_order):
+                    # On supprime la ligne de remise si elle est déjà présente
+                    order.order_line.filtered(lambda l: l.product_id.id == discount_product_id).unlink()
+                    # On traite la nouvelle remise
+                    if order.of_worktop_configurator_discount_id:
+                        # On calcul le prix de la remise
+                        discount_price = -order.amount_untaxed * \
+                                         (order.of_worktop_configurator_discount_id.value / 100.0)
+                        # On ajoute la ligne de remise
+                        order_line = self.env['sale.order.line'].create(
+                            {'order_id': order.id,
+                             'product_id': discount_product_id,
+                             'product_uom_qty': 1.0})
+                        order_line.product_id_change()
+                        order_line.price_unit = discount_price
+                        order_line.of_no_coef_price = order_line.price_unit
+                        order_line.price_unit = order_line.price_unit * order_line.get_pricelist_coef()
+                        order_line._compute_tax_id()
+        return True
 
 
 class SaleOrderLine(models.Model):
@@ -75,6 +118,8 @@ class SaleConfigSettings(models.TransientModel):
         comodel_name='product.product', string=u"(OF) Article supplément raccordement")
     of_website_worktop_configurator_extra_weight_product_id = fields.Many2one(
         comodel_name='product.product', string=u"(OF) Article supplément poids")
+    of_website_worktop_configurator_discount_product_id = fields.Many2one(
+        comodel_name='product.product', string=u"(OF) Article remise")
     of_website_worktop_configurator_acc_layout_category_id = fields.Many2one(
         comodel_name='sale.layout_category', string=u"(OF) Section de devis pour les accessoires et prestations")
     of_website_worktop_configurator_extra_layout_category_id = fields.Many2one(
@@ -121,6 +166,12 @@ class SaleConfigSettings(models.TransientModel):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_website_worktop_configurator_extra_weight_product_id',
             self.of_website_worktop_configurator_extra_weight_product_id.id)
+
+    @api.multi
+    def set_of_website_worktop_configurator_discount_product_id_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_website_worktop_configurator_discount_product_id',
+            self.of_website_worktop_configurator_discount_product_id.id)
 
     @api.multi
     def set_of_website_worktop_configurator_acc_layout_category_id_defaults(self):

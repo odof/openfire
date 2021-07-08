@@ -882,6 +882,29 @@
                                 <b>Date du devis : </b><span t-field="quote.date_order" t-options="{'widget': 'date'}"/>
                             </div>
                             <h4 class="page-header">
+                                Remise
+                            </h4>
+                            <div>
+                                <form action="/worktop_configurator/quote_summary" method="post" style="display:inline-block">
+                                    <select id="discount_id" name="discount_id" class="form-control">
+                                        <option value=""/>
+                                        <t t-foreach="discount_list" t-as="d">
+                                            <option t-att-value="d.id"
+                                                    t-att-selected="d.id == (discount and discount.id or -1)">
+                                                <t t-esc="d.name"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                    <br/>
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <input type="hidden" name="submitted" value="1"/>
+                                    <button type="submit" class="btn btn-default btn-xs pull-right a-submit a-submit-disable a-submit-loading"
+                                            name="action" value="compute_discount">
+                                        Mettre à jour
+                                    </button>
+                                </form>
+                            </div>
+                            <h4 class="page-header">
                                 Adresse de chantier
                             </h4>
                             <div>
@@ -962,11 +985,11 @@
                                         <span><t t-esc="name_line"/></span><br/>
                                     </t>
                                 </div>
-                                <a t-if="line.layout_category_id.id != request.env['ir.values'].sudo().get_default('sale.config.settings', 'of_website_worktop_configurator_extra_layout_category_id')"
+                                <a t-if="line.layout_category_id.id != request.env['ir.values'].sudo().get_default('sale.config.settings', 'of_website_worktop_configurator_extra_layout_category_id') and line.product_id.id != request.env['ir.values'].sudo().get_default('sale.config.settings', 'of_website_worktop_configurator_discount_product_id')"
                                    href='#' class='js_delete_product no-decoration'> <small><i class='fa fa-trash-o'></i> Supprimer</small></a>
                             </td>
                             <td class="text-center" id="td-qty">
-                                <div t-if="line.layout_category_id.id != request.env['ir.values'].sudo().get_default('sale.config.settings', 'of_website_worktop_configurator_extra_layout_category_id')"
+                                <div t-if="line.layout_category_id.id != request.env['ir.values'].sudo().get_default('sale.config.settings', 'of_website_worktop_configurator_extra_layout_category_id') and line.product_id.id != request.env['ir.values'].sudo().get_default('sale.config.settings', 'of_website_worktop_configurator_discount_product_id')"
                                      class="input-group oe_website_spinner">
                                     <a class="mb8 input-group-addon js_add_cart_json" data-no-instant="">
                                         <i class="fa fa-minus"></i>
@@ -989,25 +1012,34 @@
                 </t>
             </tbody>
         </table>
-        <div class="js_quote_lines col-sm-4 col-sm-offset-8 col-xs-12">
-            <div class="row" id="order_total_untaxed">
-                <span class="col-xs-6 text-right text-muted">Sous-total :</span>
-                <span class="col-xs-6 text-left text-muted">
-                    <span t-field="quote.amount_untaxed" style="white-space: nowrap;" t-options="{'widget': 'monetary','from_currency': quote.pricelist_id.currency_id,'display_currency': website.currency_id}" />
-                </span>
+        <div class="js_quote_lines col-md-5 col-md-offset-7">
+            <t t-set='totals_group' t-value="quote._of_get_printable_totals()"/>
+            <div class="row" id="order_total_untaxed" style="border-top: 1px solid black;">
+                <strong>
+                    <span class="col-md-7 text-right">Total hors taxe</span>
+                    <span class="col-md-5 text-right">
+                        <span t-esc="totals_group['subtotal']" style="white-space: nowrap;" t-options="{'widget': 'monetary','from_currency': quote.pricelist_id.currency_id,'display_currency': website.currency_id}" />
+                    </span>
+                </strong>
             </div>
-            <div class="row" id="order_total_taxes">
-                <span class="col-xs-6 text-right text-muted">Taxes :</span>
-                <span class="col-xs-6 text-left text-muted">
-                    <span t-field="quote.amount_tax" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'from_currency': quote.pricelist_id.currency_id, 'display_currency': website.currency_id}" />
-                </span>
-            </div>
-            <div class="row" id="order_total">
-                <span class="col-xs-6 text-right h4">Total :</span>
-                <span class="col-xs-6 text-left h4" style="white-space: nowrap;">
-                    <span t-field="quote.amount_total" style="white-space: nowrap;" t-options="{'widget': 'monetary','from_currency': quote.pricelist_id.currency_id,'display_currency': website.currency_id}" />
-                </span>
-            </div>
+            <t t-foreach="totals_group['untaxed'] + totals_group['taxes'] + totals_group['total']" t-as="total_group">
+                <t t-foreach="total_group[0]" t-as="total_line">
+                    <div class="row">
+                        <span class="col-md-7 text-right text-muted" t-esc="total_line[0]"/>
+                        <span class="col-md-5 text-right text-muted">
+                            <span t-esc="total_line[1]" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'from_currency': quote.pricelist_id.currency_id, 'display_currency': website.currency_id}" />
+                        </span>
+                    </div>
+                </t>
+                <div class="row" style="border-top: 1px solid black;">
+                    <strong>
+                        <span class="col-md-7 text-right" t-esc="total_group[1][0]"/>
+                        <span class="col-md-5 text-right" style="white-space: nowrap;">
+                            <span t-esc="total_group[1][1]" style="white-space: nowrap;" t-options="{'widget': 'monetary','from_currency': quote.pricelist_id.currency_id,'display_currency': website.currency_id}" />
+                        </span>
+                    </strong>
+                </div>
+            </t>
         </div>
     </template>
 

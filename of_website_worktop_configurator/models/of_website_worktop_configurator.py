@@ -79,6 +79,16 @@ class OFWorktopConfiguratorDistance(models.Model):
     blocking_message = fields.Char(string=u"Message de blocage")
 
 
+class OFWorktopConfiguratorDiscount(models.Model):
+    _name = 'of.worktop.configurator.discount'
+    _description = u"Remise pour le configurateur de plan de travail"
+    _order = 'sequence'
+
+    name = fields.Char(string=u"Nom", required=True)
+    sequence = fields.Integer(string=u"Séquence")
+    value = fields.Float(string=u"Valeur", required=True, help=u"Valeur de la remise exprimée en pourcentage")
+
+
 class OFWorktopConfiguratorPrice(models.Model):
     _name = 'of.worktop.configurator.price'
     _description = u"Tarif pour le configurateur de plan de travail"

@@ -158,6 +158,28 @@
         <field name="view_id" ref="of_worktop_configurator_distance_tree_view"/>
     </record>
 
+    <!-- OF Worktop Configurator Discount Views -->
+
+    <record id="of_worktop_configurator_discount_tree_view" model="ir.ui.view">
+        <field name="name">of.worktop.configurator.discount.tree.view</field>
+        <field name="model">of.worktop.configurator.discount</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence"/>
+                <field name="name"/>
+                <field name="value"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_worktop_configurator_discount_action" model="ir.actions.act_window">
+        <field name="name">Remises</field>
+        <field name="res_model">of.worktop.configurator.discount</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_worktop_configurator_discount_tree_view"/>
+    </record>
+
     <!-- OF Worktop Configurator Price Views -->
 
     <record id="of_worktop_configurator_price_tree_view" model="ir.ui.view">
@@ -281,5 +303,7 @@
               parent="of_worktop_configurator_menu" sequence="80"/>
     <menuitem id="of_worktop_configurator_distance_menu" name="Distances" action="of_worktop_configurator_distance_action"
               parent="of_worktop_configurator_menu" sequence="90"/>
+    <menuitem id="of_worktop_configurator_discount_menu" name="Remises" action="of_worktop_configurator_discount_action"
+              parent="of_worktop_configurator_menu" sequence="100"/>
 
 </odoo>
