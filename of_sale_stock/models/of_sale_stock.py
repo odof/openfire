@@ -157,8 +157,8 @@ class SaleOrderLine(models.Model):
     of_reserved_qty = fields.Float(
         string=u"Qté(s) réservée(s)", digits=dp.get_precision('Product Unit of Measure'),
         compute='_compute_of_stock_qty')
-    of_picking_min_week = fields.Char(string=u"Semaine prévue", compute='_compute_of_picking_min_week', store=True)
-    of_receipt_min_week = fields.Char(string=u"Semaine de réception", compute='_compute_of_receipt_min_week')
+    of_picking_min_week = fields.Char(string=u"Sem. de livraison prévue", compute='_compute_of_picking_min_week', store=True)
+    of_receipt_min_week = fields.Char(string=u"Sem. de réception prévue", compute='_compute_of_receipt_min_week')
     of_product_type = fields.Selection(
         selection=[('product', u"Produit stockable"),
                    ('consu', u"Consommable"),
@@ -312,11 +312,14 @@ class SaleOrderLine(models.Model):
             if moves:
                 purchase_procurement_orders = self.env['procurement.order'].search(
                     [('move_dest_id', 'in', moves.ids)])
-                validated_purchase_lines = purchase_procurement_orders.mapped('purchase_line_id').filtered(
-                    lambda l: l.order_id.state == 'purchase')
-                receipts = validated_purchase_lines.mapped('order_id').mapped('picking_ids')
-                if receipts:
-                    line.of_receipt_min_week = receipts[0].of_min_week
+                purchase_procurement_orders = purchase_procurement_orders.filtered(
+                    lambda p: p.purchase_line_id.order_id.state == 'purchase')
+                purchase_moves = purchase_procurement_orders.mapped('move_ids')
+                min_date = min(purchase_moves.mapped('date_expected') or [False])
+                if min_date:
+                    min_year = fields.Date.from_string(min_date).year
+                    min_week = datetime.strptime(min_date, "%Y-%m-%d %H:%M:%S").date().isocalendar()[1]
+                    line.of_receipt_min_week = "%s - S%02d" % (min_year, min_week)
                 else:
                     line.of_receipt_min_week = ""
             else:
