@@ -33,7 +33,8 @@ def format_date(date, lang, with_year=True):
     # Si la date est en string, la convertir en date puis lui appliquer le format. Sinon, lui appliquer le format
     if isinstance(date, basestring):
         res = fields.Date.from_string(date).strftime(lang.date_format)
-    res = date.strftime(lang.date_format)
+    else:
+        res = date.strftime(lang.date_format)
     if not with_year:
         res = res[:-5]
     return res

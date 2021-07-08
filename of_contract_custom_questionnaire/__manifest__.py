@@ -21,7 +21,7 @@ Module de lien entre les modules of_contract_custom et of_questionnaire
     "data": [
         'views/of_planning_views.xml',
         ],
-    'installable': True,
+    'installable': False,
     'application': False,
-    'auto_install': True,
+    'auto_install': False,
 }
