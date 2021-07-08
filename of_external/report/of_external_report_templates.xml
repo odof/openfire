@@ -97,8 +97,18 @@
                             <span t-if="o.state == 'cancel'">Annulé</span>
                         </t>
                         <t t-elif="o._name in ('stock.picking', 'of.specific.delivery.report.wizard')">
-                            <!-- si le document est de type bon de préparation -->
-                            <span name="bon_livraison" style="font-size: medium;">Bon de livraison</span>
+                            <!-- si le document est de type bon de transfert -->
+                            <t t-if="o.picking_type_code == 'outgoing'">
+                                <span name="bon_livraison" style="font-size: medium;">Bon de livraison</span>
+                            </t>
+                            <t t-if="o.picking_type_code == 'incoming'">
+                                <span name="bon_reception" style="font-size: medium;">Bon de réception</span>
+                            </t>
+                            <t t-if="o.picking_type_code == 'internal'">
+                                <span name="bon_transfert_interne" style="font-size: medium;">
+                                    Bon de transfert interne
+                                </span>
+                            </t>
                         </t>
                     </t>
                     <!-- Si le document ne possède pas de type (exemple: aperçu de rapport) -->
