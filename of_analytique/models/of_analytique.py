@@ -17,7 +17,7 @@ class OFSaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'
 
     of_compte_analytique = fields.Boolean(
-        string="(OF) Analytique", readonly=True, states={'draft': [('readonly', False)]})
+        string="(OF) Analytique")
 
     @api.multi
     def set_of_compte_analytique_setting(self):
@@ -32,7 +32,8 @@ class OFSaleConfiguration(models.TransientModel):
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
-    of_project_id = fields.Many2one('account.analytic.account', string='Compte analytique')
+    of_project_id = fields.Many2one(
+        'account.analytic.account', string='Compte analytique', readonly=True, states={'draft': [('readonly', False)]})
 
     @api.onchange('of_project_id')
     def _onchange_project_id(self):
