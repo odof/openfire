@@ -267,7 +267,7 @@
                 </div>
             </div>
 
-            <p t-if="doc.of_date_vt and not pdf_vt_pastille">
+            <p name="date_vt_bas" t-if="doc.of_date_vt and not pdf_vt_pastille">
                 <t t-set="date_order" t-value="doc.of_date_vt[8:10] + '/' + doc.of_date_vt[5:7] + '/' + doc.of_date_vt[0:4]"/>
                 Date de visite technique : <span t-esc="date_order"/>
             </p>
