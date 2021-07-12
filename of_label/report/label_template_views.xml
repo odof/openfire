@@ -3,27 +3,28 @@
 
     <template id="report_of_label_style">
         <style type="text/css">
-            .of_label_stock {
-            display:table;
-            width:674px;
-            height:476px; // sans l'attribute height, les valeurs height en % ne sont pas appliqués
-            overflow: hidden;
+            .of_label_4x4 {
+                display:table;
+                width:674px;
+                height:476px; // sans l'attribute height, les valeurs height en % ne sont pas appliqués
+                overflow: hidden;
             }
             .of_label_table {
-            display:table;
+                display:table;
             }
             .of_label_row {
-            display:table-row;
+                display:table-row;
             }
             .of_label_cell {
-            display: table-cell;
-            padding: 16px;
+                display: table-cell;
+                padding: 16px;
             }
         </style>
     </template>
 
+    <!-- étiquettes de stockage 2x2 pour stock.picking, intialement demandé par hexa -->
     <template id="report_of_label_stock_1">
-        <div class="of_label_stock">
+        <div class="of_label_4x4">
             <div class="of_label_table" style="height: 10%; width: 100%">
                 <div class="of_label_row">
                     <div class="of_label_cell" t-field="o.product_id.brand_id.name"/>
