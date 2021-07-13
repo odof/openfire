@@ -95,6 +95,7 @@ Droits utilisateurs:
         'security/of_sale_security.xml',
         'security/ir.model.access.csv',
         'views/of_sale_view.xml',
+        'views/sale_config_setting_views.xml',
         'report/of_report_sale_order_list.xml',
         'report/of_sale_report_templates.xml',
         'report/sale_report_views.xml',
