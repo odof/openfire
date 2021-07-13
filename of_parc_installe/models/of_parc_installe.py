@@ -25,10 +25,9 @@ class OFParcInstalle(models.Model):
         'res.partner', string='Site installation', required=False,
         domain="['|',('parent_id','=',client_id),('id','=',client_id)]", ondelete='restrict')
     revendeur_id = fields.Many2one(
-        'res.partner', string='Revendeur', required=False, domain="[('of_revendeur','=',True)]", ondelete='restrict')
+        comodel_name='res.partner', string='Revendeur', required=False, ondelete='restrict')
     installateur_id = fields.Many2one(
-        'res.partner', string='Installateur', required=False,
-        domain="[('of_installateur','=',True)]", ondelete='restrict')
+        comodel_name='res.partner', string='Installateur', required=False, ondelete='restrict')
     installateur_adresse_id = fields.Many2one(
         'res.partner', string='Adresse installateur', required=False,
         domain="['|',('parent_id','=',installateur_id),('id','=',installateur_id)]", ondelete='restrict')
@@ -108,6 +107,26 @@ class OFParcInstalle(models.Model):
 
     # Héritages
 
+    @api.model
+    def create(self, vals):
+        parc = super(OFParcInstalle, self).create(vals)
+        if parc.revendeur_id and not parc.revendeur_id.of_revendeur:
+            parc.revendeur_id.of_revendeur = True
+        if parc.installateur_id and not parc.installateur_id.of_installateur:
+            parc.installateur_id.of_installateur = True
+        return parc
+
+    @api.multi
+    def write(self, vals):
+        res = super(OFParcInstalle, self).write(vals)
+        if vals.get('revendeur_id'):
+            non_revendeurs = self.mapped('revendeur_id').filtered(lambda p: not p.of_revendeur)
+            non_revendeurs.write({'of_revendeur': True})
+        if vals.get('installateur_id'):
+            non_installateurs  = self.mapped('installateur_id').filtered(lambda p: not p.of_installateur)
+            non_installateurs.write({'of_installateur': True})
+        return res
+
     @api.multi
     def name_get(self):
         """Permet dans un SAV lors de la saisie du no de série d'une machine installée de proposer les machines
@@ -182,6 +201,47 @@ class ResPartner(models.Model):
     def _compute_of_parc_installe_count(self):
         for partner in self:
             partner.of_parc_installe_count = self.env['of.parc.installe'].search_count([('client_id', '=', partner.id)])
+
+    @api.multi
+    def name_get(self):
+        """
+        Permet, dans un parc installé ou un pop-up de création de parc installé, de proposer les partenaires
+        qui ne sont pas revendeurs/installateurs entre parenthèse. """
+        revendeur_prio = self._context.get('of_revendeur_prio')
+        installateur_prio = self._context.get('of_installateur_prio')
+        if revendeur_prio or installateur_prio:
+            result = []
+            for employee in self:
+                est_prio = revendeur_prio and employee.of_revendeur or installateur_prio and employee.of_installateur
+                result.append((employee.id, "%s%s%s" % ('' if est_prio else '(',
+                                                        employee.name,
+                                                        '' if est_prio else ')')))
+            return result
+        return super(ResPartner, self).name_get()
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        """Permet dans un parc installé de proposer en premier les partenaires revendeurs/installateurs"""
+        champ_prio = ''
+        if self._context.get('of_revendeur_prio'):
+            champ_prio = 'of_revendeur'
+        elif self._context.get('of_installateur_prio'):
+            champ_prio = 'of_installateur'
+        if champ_prio:
+            args = args or []
+            res = super(ResPartner, self).name_search(
+                name,
+                args + [[champ_prio, '=', True]],
+                operator,
+                limit) or []
+            limit = limit - len(res)
+            res += super(ResPartner, self).name_search(
+                name,
+                args + [[champ_prio, '=', False]],
+                operator,
+                limit) or []
+            return res
+        return super(ResPartner, self).name_search(name, args, operator, limit)
 
 
 class ProjectIssue(models.Model):

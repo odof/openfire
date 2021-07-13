@@ -11,8 +11,8 @@
                     <field name="product_id" required="1"/>
                     <field name="client_id" required="1"/>
                     <field name="site_adresse_id"/>
-                    <field name="revendeur_id"/>
-                    <field name="installateur_id"/>
+                    <field name="revendeur_id" context="{'default_of_revendeur': 1, 'of_revendeur_prio': 1}"/>
+                    <field name="installateur_id" context="{'default_of_installateur': 1, 'of_installateur_prio': 1}"/>
                     <field name="date_service"/>
                 </group>
                 <footer>
