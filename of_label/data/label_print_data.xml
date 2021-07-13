@@ -13,5 +13,25 @@
             <field name="template_css_id" ref="of_label.report_of_label_style"/>
         </record>
 
+        <record id="of_label_product_product_1" model="label.print">
+            <field name="name">Étiquette article 3x7</field>
+            <field name="label_brand_id" ref="of_label.b0"/>
+            <field name="label_config_id" ref="of_label.s02"/>
+            <field name="model_id" ref="product.model_product_product"/>
+            <field name="mode">template</field>
+            <field name="template_id" ref="of_label.report_of_label_product_1"/>
+            <field name="template_css_id" ref="of_label.report_of_label_style"/>
+        </record>
+
+        <record id="of_label_product_template_1" model="label.print">
+            <field name="name">Étiquette article 3x7</field>
+            <field name="label_brand_id" ref="of_label.b0"/>
+            <field name="label_config_id" ref="of_label.s02"/>
+            <field name="model_id" ref="product.model_product_template"/>
+            <field name="mode">template</field>
+            <field name="template_id" ref="of_label.report_of_label_product_1"/>
+            <field name="template_css_id" ref="of_label.report_of_label_style"/>
+        </record>
+
     </data>
 </odoo>

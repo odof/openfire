@@ -9,6 +9,12 @@
                 height:476px; // sans l'attribute height, les valeurs height en % ne sont pas appliqués
                 overflow: hidden;
             }
+            .of_label_3x7 {
+                display:table;
+                width:99mm!important;
+                height:30mm!important; // sans l'attribute height, les valeurs height en % ne sont pas appliqués
+                overflow: hidden;
+            }
             .of_label_table {
                 display:table;
             }
@@ -17,7 +23,9 @@
             }
             .of_label_cell {
                 display: table-cell;
-                padding: 16px;
+                padding: 8px;
+                text-align:center;
+                vertical-align:center;
             }
         </style>
     </template>
@@ -75,6 +83,55 @@
                     <div class="of_label_cell" style="width: 25%; text-align:center;" t-field="o.product_uom_qty"/>
                     <div class="of_label_cell" style="width: 25%; text-align:center;"
                          t-field="o.location_dest_id.display_name"/>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- étiquettes de stockage 3x7 pour product.template et product.product, intialement demandé par hcl -->
+    <template id="report_of_label_product_1">
+        <div class="of_label_3x7">
+            <div class="of_label_table" style="width:100%; height:10mm!important;">
+                <div name="row_1" class="of_label_row" style="width:100%; height:100%!important;">
+                    <div class="of_label_cell">
+                        <span t-field="o.name"/>
+                    </div>
+                </div>
+            </div>
+            <div class="of_label_table" style="width:100%; height:10mm!important;">
+                <div name="row_2" class="of_label_row" style="height:100%!important;">
+                    <div name="default_code" class="of_label_cell" style="width:33%;">
+                        <span t-field="o.default_code"/>
+                    </div>
+                    <div name="barcode" style="display: table-cell; width:77%;">
+                        <span t-if="o.barcode">
+                            <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', o.barcode, 600, 100)"
+                                 style="max-width:250px;height:40px"/>
+                        </span>
+                        <span t-if="not o.barcode">
+                            Pas de code barre pour cet article.
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="of_label_table" style="width:100%; height:10mm!important;">
+                <div name="row_3" class="of_label_row" style="height:100%!important;">
+                    <div name="brand" style="width:33%;">
+                        <span t-if="o.brand_id.logo"
+                              style="display: table-cell; text-align:center; vertical-align:center;">
+                            <img t-att-src="'data:image/png;base64,%s' % o.brand_id.logo"
+                                 style="margin-left: 4px; margin-bottom: 4px; max-height: 44px; max-width: 100px;"/>
+                        </span>
+                        <span t-if="not o.brand_id.logo"
+                              style="display: table-cell; text-align:center; vertical-align:center;">
+                            <span t-field="o.brand_id.name"/>
+                        </span>
+                    </div>
+                    <div name="price" class="of_label_cell" style="width:77%;">
+                        <span t-field="o.list_price"
+                              t-field-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;o.currency_id&quot;}"/>
+                        TTC
+                    </div>
                 </div>
             </div>
         </div>
