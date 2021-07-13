@@ -14,6 +14,7 @@
                 <field name="of_deposit_product_categ_id_setting" class="oe_inline"/>
             </xpath>
             <xpath expr="//group[@name='quotations_sales']" position="inside">
+                <field name="of_invoice_grouped" widget="radio"/>
                 <label for="of_position_fiscale"/>
                 <div name="of_position_fiscale">
                     <field name="of_position_fiscale" class="oe_inline"/>

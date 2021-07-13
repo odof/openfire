@@ -143,6 +143,11 @@ class OFSaleConfiguration(models.TransientModel):
         string=u"(OF) Options de ligne de commande", implied_group='of_sale.group_of_order_line_option',
         group='base.group_portal,base.group_user,base.group_public')
 
+    of_invoice_grouped = fields.Selection(selection=[
+        (0, 'Groupement par partenaire + devise'),
+        (1, 'Groupement par commande'),
+        ], string=u"(OF) Facturation groupée")
+
     @api.multi
     def set_pdf_adresse_nom_parent_defaults(self):
         return self.env['ir.values'].sudo().set_default(
@@ -246,3 +251,8 @@ class OFSaleConfiguration(models.TransientModel):
     def set_of_allow_quote_addition_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_allow_quote_addition', self.of_allow_quote_addition)
+
+    @api.multi
+    def set_of_invoice_grouped_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_invoice_grouped', self.of_invoice_grouped)
