@@ -414,13 +414,20 @@ class Inventory(models.Model):
                 ,           partner_id
             """, (tuple(locations.ids), self.company_id.id,))
 
+        data = self.env.cr.dictfetchall()
         vals = []
-        for product_data in self.env.cr.dictfetchall():
+        product_ids = self.line_ids.mapped('product_id').ids
+        prod_lot_ids = self.line_ids.mapped('prod_lot_id').ids
+        for product_data in data:
             if product_data['product_qty'] != 0:
                 product_data['theoretical_qty'] = product_data['product_qty']
                 product_data['product_qty'] = 0.0
-                if product_data['product_id'] and \
-                        product_data['product_id'] not in self.line_ids.mapped('product_id').ids:
+                if product_data['product_id'] and product_data['product_id'] not in product_ids:
+                    product_data['product_uom_id'] = self.env['product.product'].browse(
+                        product_data['product_id']).uom_id.id
+                    vals.append(product_data)
+                elif product_data['prod_lot_id'] and product_data['product_id'] and \
+                        product_data['prod_lot_id'] not in prod_lot_ids:
                     product_data['product_uom_id'] = self.env['product.product'].browse(
                         product_data['product_id']).uom_id.id
                     vals.append(product_data)
@@ -428,6 +435,49 @@ class Inventory(models.Model):
         if vals:
             self.write({'line_ids': [(0, 0, line_values) for line_values in vals]})
         return True
+
+    @api.multi
+    def action_control(self):
+        self.ensure_one()
+        title = u"ATTENTION !!!\n\nCertaines lignes de l'inventaire vont empêcher sa validation.\n\n" \
+                u"Voici une liste d'erreurs bloquantes :\n\n"
+        message = u""
+        for line in self.line_ids:
+            if line.product_qty < 0 and line.product_qty != line.theoretical_qty:
+                message += u"- Vous ne pouvez pas saisir une quantité négative sur une ligne d'inventaire : " \
+                           u"%s - qté : %s (ID de la ligne : %s)\n" % \
+                           (line.product_id.name, line.product_qty, line.id)
+            if line.product_id.tracking in ('serial', 'lot'):
+                if not line.prod_lot_id:
+                    message += u"- Vous devez renseigner un lot/numéro de série pour l'article %s " \
+                               u"(ID de la ligne : %s)\n" % \
+                               (line.product_id.name, line.id)
+                if line.product_id.tracking == 'serial' and \
+                        float_compare(line.product_qty, line.theoretical_qty, 5) != 0:
+                    if float_compare(line.product_qty, 1.0, 5) != 0 and float_compare(line.product_qty, 0.0, 5) != 0:
+                        message += u"- Vous ne pouvez pas saisir une quantité différente de 0 ou 1 pour un article " \
+                                   u"géré par numéro de série : %s (ID de la ligne : %s)\n" % \
+                                   (line.product_id.name, line.id)
+                    same_serial_lines = self.line_ids.filtered(
+                        lambda l: l.product_id == line.product_id and l.prod_lot_id == line.prod_lot_id and
+                        l.id < line.id)
+                    if same_serial_lines:
+                        message += u"- Vous ne pouvez pas saisir deux lignes avec le même article et le même numéro " \
+                                   u"de série : %s - %s (ID de la ligne : %s)\n" % \
+                                   (line.product_id.name, line.prod_lot_id.name, line.id)
+                    if float_compare(line.product_qty, 0.0, 5) != 0:
+                        other_quants = self.env['stock.quant'].sudo().search(
+                            [('product_id', '=', line.product_id.id), ('lot_id', '=', line.prod_lot_id.id),
+                             ('qty', '>', 0.0), ('location_id.usage', '=', 'internal')])
+                        if other_quants:
+                            message += u"- L'article %s avec le numéro de série %s est déjà présent en stock " \
+                                       u"(ID de la ligne : %s)\n" % \
+                                       (line.product_id.name, line.prod_lot_id.name, line.id)
+
+        if message:
+            raise UserError(title + message)
+        else:
+            raise UserError(u"Tout semble correct.")
 
 
 class InventoryLine(models.Model):
@@ -470,6 +520,20 @@ class InventoryLine(models.Model):
         if 'theoretical_qty' in vals:
             vals['of_theoretical_qty'] = vals['theoretical_qty']
         return super(InventoryLine, self)._write(vals)
+
+    @api.onchange('product_id', 'product_qty')
+    def _onchange_product_id_or_qty(self):
+        qty = self.product_qty
+        if self.product_id and self.product_id.tracking == 'serial' and \
+                float_compare(qty, 0.0, 0) and float_compare(qty, 1.0, 0):
+            self.product_qty = self.theoretical_qty
+            return {
+                'warning': {
+                    'title': 'Avertissement',
+                    'message': u"Vous ne pouvez pas utiliser une quantité différente de 1 ou 0 pour un article géré "
+                               u"par numéro de série.",
+                }
+            }
 
     @api.model
     def create(self, values):
@@ -788,3 +852,40 @@ class StockWarehouseOrderpoint(models.Model):
     def onchange_of_forecast_limit(self):
         if not self.of_forecast_limit:
             self.of_forecast_period = 0
+
+
+class StockProductionLot(models.Model):
+    _inherit = 'stock.production.lot'
+
+    @api.multi
+    def name_get(self):
+        location_id = self._context.get('prio_location_id')
+        if location_id:
+            result = []
+            for prod_lot in self:
+                est_prio = location_id in prod_lot.quant_ids.mapped('location_id').ids
+                result.append((prod_lot.id, "%s%s%s" % ('' if est_prio else '(',
+                                                        prod_lot.name,
+                                                        '' if est_prio else ')')))
+            return result
+        return super(StockProductionLot, self).name_get()
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        location_id = self._context.get('prio_location_id')
+        if location_id:
+            args = args or []
+            res = super(StockProductionLot, self).name_search(
+                name,
+                args + [['quant_ids.location_id', '=', location_id]],
+                operator,
+                limit) or []
+            limit = limit - len(res)
+            res += super(StockProductionLot, self).name_search(
+                name,
+                args + [['id', 'not in', [r[0] for r in res]], '|', ['quant_ids.location_id', '!=', location_id],
+                        ['quant_ids', '=', False]],
+                operator,
+                limit) or []
+            return res
+        return super(StockProductionLot, self).name_search(name, args, operator, limit)

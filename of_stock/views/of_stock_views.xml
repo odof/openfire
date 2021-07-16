@@ -6,6 +6,9 @@
         <field name="model">stock.inventory</field>
         <field name="inherit_id" ref="stock.view_inventory_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='action_done']" position="after">
+                <button name="action_control" states="confirm" string="Contrôler" type="object" class="oe_highlight" groups="stock.group_stock_manager"/>
+            </xpath>
             <button name="reset_real_qty" position="attributes">
                 <attribute name="confirm">Voulez-vous réellement mettre les quantités à zéro ?</attribute>
             </button>
@@ -40,6 +43,7 @@
             </xpath>
             <xpath expr="//notebook//field[@name='line_ids']/tree/field[@name='prod_lot_id']" position="attributes">
                 <attribute name="attrs">{'required': [('of_product_lot_serial_management', '=', True)]}</attribute>
+                <attribute name="context">{'prio_location_id': location_id}</attribute>
             </xpath>
             <xpath expr="//notebook//field[@name='line_ids']/tree/field[@name='product_qty']" position="after">
                 <field name="of_inventory_gap"/>
