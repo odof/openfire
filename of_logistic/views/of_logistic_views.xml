@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem name="Logistics" id="menu_logistic_sale" parent="sales_team.menu_sale_config" sequence="150"/>
+
+<!-- ******************************************************************************************* -->
+<!-- ************************************** Logistic Rate ************************************** -->
+<!-- ******************************************************************************************* -->
+
+    <record id="of_logistic_rate_search_view" model="ir.ui.view">
+        <field name="name">Search Logistic rates</field>
+        <field name="model">of.logistic.rate</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <field name="department_id"/>
+                <field name="min_weight"/>
+                <field name="max_weight"/>
+                <group string="Group By" name="groupby">
+                    <filter name="partner_id" string="Carrier" context="{'group_by': 'partner_id'}"/>
+                    <filter name="department_id" string="Department" context="{'group_by': 'department_id'}"/>
+                </group>
+                <separator/>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_logistic_rate_tree_view" model="ir.ui.view">
+        <field name="name">Logistic rates</field>
+        <field name="model">of.logistic.rate</field>
+        <field name="arch" type="xml">
+            <tree editable="top">
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="partner_id"/>
+                <field name="department_id"/>
+                <field name="min_weight"/>
+                <field name="max_weight"/>
+                <field name="type"/>
+                <field name="company_id" invisible="1"/>
+                <field name="company_currency_id" invisible="1"/>
+                <field name="rate"/>
+<!--                <field name="rounding"/>-->
+            </tree>
+        </field>
+    </record>
+
+<!--    <record id="of_logitic_rate_view_form" model="ir.ui.view">-->
+<!--        <field name="name">Logistic rate</field>-->
+<!--        <field name="model">of.logistic.rate</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--        </field>-->
+<!--    </record>-->
+
+    <record id="action_logistic_rates" model="ir.actions.act_window">
+        <field name="name">Logistic rates</field>
+        <field name="res_model">of.logistic.rate</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="of_logistic_rate_tree_view"/>
+    </record>
+
+    <menuitem name="Logistic rates" id="menu_logistic_rates" parent="of_logistic.menu_logistic_sale" sequence="151" action="action_logistic_rates"/>
+
+<!-- ******************************************************************************************* -->
+<!-- ************************************** Logistic Rate ************************************** -->
+<!-- ******************************************************************************************* -->
+
+    <record id="of_logistic_constraint_search_view" model="ir.ui.view">
+        <field name="name">Search Logistic constraits</field>
+        <field name="model">of.logistic.constraint</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <field name="type"/>
+                <group string="Group By" name="groupby"/>
+                <separator/>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_logistic_constraint_tree_view" model="ir.ui.view">
+        <field name="name">Logistic contraints</field>
+        <field name="model">of.logistic.constraint</field>
+        <field name="arch" type="xml">
+            <tree editable="top">
+                <field name="partner_id"/>
+                <field name="type"/>
+                <field name="value"/>
+            </tree>
+        </field>
+    </record>
+
+<!--    <record id="of_logitic_constraint_view_form" model="ir.ui.view">-->
+<!--        <field name="name">Logistic constraint</field>-->
+<!--        <field name="model">of.logistic.constraint</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--        </field>-->
+<!--    </record>-->
+
+    <record id="action_logistic_constraints" model="ir.actions.act_window">
+        <field name="name">Logistic constraints</field>
+        <field name="res_model">of.logistic.constraint</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="of_logistic_constraint_tree_view"/>
+    </record>
+
+    <menuitem name="Logistic constraints" id="menu_logistic_constraints" parent="of_logistic.menu_logistic_sale" sequence="152" action="action_logistic_constraints"/>
+
+</odoo>
