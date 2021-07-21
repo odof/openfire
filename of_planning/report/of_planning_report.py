@@ -34,11 +34,11 @@ class ReportPlanningGeneralSemaine(models.AbstractModel):
         date_start = self.localcontext['date_start']
         date_stop = self.localcontext['date_stop']
 
-        title = "Planning d'intervention - Semaine %s du %s%s au %s%s" % (date_start.isocalendar()[1],
-                                                                          date_start.day,
-                                                                          date_start.strftime(" %B"),
-                                                                          date_stop.day,
-                                                                          date_stop.strftime(" %B %Y"))
+        title = u"Planning d'intervention - Semaine %s du %s%s au %s%s" % (date_start.isocalendar()[1],
+                                                                           date_start.day,
+                                                                           date_start.strftime(" %B").decode('utf-8'),
+                                                                           date_stop.day,
+                                                                           date_stop.strftime(" %B %Y").decode('utf-8'))
         return title
 
     def get_interventions(self, employee_ids, date_inter=None):
@@ -182,13 +182,13 @@ class ReportPlanningSemaine(models.AbstractModel):
         date_stop = self.localcontext['date_stop']
         employee = self.env['hr.employee'].sudo().browse(employee_id)
 
-        title = "Planning d'intervention - %s<br/>Semaine %s du %s%s au %s%s" % (
+        title = u"Planning d'intervention - %s<br/>Semaine %s du %s%s au %s%s" % (
             employee.name,
             date_start.isocalendar()[1],
             date_start.day,
-            date_start.strftime(" %B"),
+            date_start.strftime(" %B").decode('utf-8'),
             date_stop.day,
-            date_stop.strftime(" %B %Y"))
+            date_stop.strftime(" %B %Y").decode('utf-8'))
         return title
 
     def get_interventions(self, employee_id, date_start=None):
@@ -318,10 +318,10 @@ class ReportPlanningJour(models.AbstractModel):
         date_start = self.localcontext['date_start']
         employee = self.env['hr.employee'].sudo().browse(employee_id)
 
-        title = "%s - Planning d'intervention du %s%s" % (
+        title = u"%s - Planning d'intervention du %s%s" % (
             employee.name,
             date_start.day,
-            date_start.strftime(" %B %Y"))
+            date_start.strftime(" %B %Y").decode('utf-8'))
         return title
 
     def get_interventions(self, employee_id, date_start=None):
