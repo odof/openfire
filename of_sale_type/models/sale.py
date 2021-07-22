@@ -28,3 +28,9 @@ class SaleQuoteTemplate(models.Model):
     _inherit = "sale.quote.template"
 
     of_sale_type_id = fields.Many2one(comodel_name='of.sale.type', string="Sale order type")
+
+
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+
+    of_sale_type_id = fields.Many2one(related='order_id.of_sale_type_id', string="Sale order type")

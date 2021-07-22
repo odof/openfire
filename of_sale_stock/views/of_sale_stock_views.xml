@@ -288,11 +288,54 @@
         </field>
     </record>
 
+    <record id="of_sale_stock_sale_order_line_form_view" model="ir.ui.view">
+        <field name="name">of.sale.stock.sale.order.line.form.view</field>
+        <field name="model">sale.order.line</field>
+        <field name="arch" type="xml">
+            <form edit="false" create="false" delete="false">
+                <sheet>
+                    <group string="Informations sur la commande" name="order_info">
+                        <field name="order_id"/>
+                        <field name="date_order"/>
+                        <field name="state"/>
+                    </group>
+                    <group string="Informations sur l'article" name="product_info" col="4">
+                        <group colspan="2">
+                            <field name="product_id"/>
+                            <label for="product_uom_qty" string="Qté(s) commandée(s)"/>
+                            <div>
+                                <field name="product_uom_qty" class="oe_inline"/>
+                                <field name="product_uom" groups="product.group_uom" class="oe_inline oe_no_button"/>
+                            </div>
+                            <field name="of_seller_price" groups="of_sale.of_group_sale_marge_manager+sales_team.group_sale_manager"/>
+                            <field name="purchase_price" groups="of_sale.of_group_sale_marge_manager"/>
+                            <field name="price_unit"/>
+                            <field name="tax_id" widget="many2many_tags"/>
+                        </group>
+                        <group string="Informations sur le stock" name="stock_info" groups="of_sale_stock.group_sale_order_line_display_stock_info+sales_team.group_sale_manager">
+                            <field name="of_total_stock_qty"/>
+                            <field name="of_available_stock_qty"/>
+                            <field name="of_theoretical_stock_qty"/>
+                            <field name="of_reserved_qty"/>
+                            <field name="of_picking_min_week"/>
+                            <field name="of_receipt_min_week"/>
+                            <field name="of_stock_moves_state"/>
+                        </group>
+                        <group colspan="4">
+                            <field name="name" nolabel="1" colspan="4"/>
+                        </group>
+                    </group>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
     <record id="of_sale_stock_sale_order_line_action" model="ir.actions.act_window">
         <field name="name">Lignes de commande</field>
         <field name="res_model">sale.order.line</field>
         <field name="view_type">form</field>
-        <field name="view_mode">tree</field>
+        <field name="view_mode">tree,form</field>
         <field name="view_id" ref="of_sale_stock_sale_order_line_tree_view"/>
         <field name="context">{'search_default_validated_order': 1}</field>
     </record>

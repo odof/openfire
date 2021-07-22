@@ -36,6 +36,7 @@ msgstr "Type de devis"
 #: model:ir.model.fields,field_description:of_sale_type.field_account_invoice_of_sale_type_id
 #: model:ir.model.fields,field_description:of_sale_type.field_account_invoice_report_of_sale_type_id
 #: model:ir.model.fields,field_description:of_sale_type.field_sale_order_of_sale_type_id
+#: model:ir.model.fields,field_description:of_sale_type.field_sale_order_line_of_sale_type_id
 #: model:ir.model.fields,field_description:of_sale_type.field_sale_quote_template_of_sale_type_id
 #: model:ir.model.fields,field_description:of_sale_type.field_sale_report_of_sale_type_id
 #: model:ir.ui.menu,name:of_sale_type.menu_of_sale_type

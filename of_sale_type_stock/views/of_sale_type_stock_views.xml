@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Sale Order Line Views -->
+    <record id="of_sale_typ_stock_sale_order_line_tree_view" model="ir.ui.view">
+        <field name="name">of.sale.type.stock.sale.order.line.tree.view</field>
+        <field name="model">sale.order.line</field>
+        <field name="inherit_id" ref="of_sale_stock.of_sale_stock_sale_order_line_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_id']" position="before">
+                <field name="of_sale_type_id"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
