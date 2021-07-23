@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_of_res_partner_fuel_stock_employee,access.of.res.partner.fuel.stock.employee,model_of_res_partner_fuel_stock,base.group_user,1,0,0,0
+access_of_res_partner_fuel_stock_manager,access.of.res.partner.fuel.stock.manager,model_of_res_partner_fuel_stock,stock.group_stock_manager,1,1,1,1
