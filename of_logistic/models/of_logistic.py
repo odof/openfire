@@ -99,8 +99,9 @@ class OfLogisticConstraint(models.Model):
         :return: return False if all the weight/pallets is within the constraint
                  else return the first constraint to be broken
         """
+
         for constraint in self:
-            if constraint.type == 'weight' and float_compare(weight, constraint.value) == 1 or \
-                    constraint.type == 'pallets' and float_compare(pallets, constraint.value, 0) == 1:
+            if not (not (constraint.type == 'weight' and float_compare(weight, constraint.value, 2) == 1) and not (
+                    constraint.type == 'pallets' and float_compare(pallets, constraint.value, 0) == 1)):
                 return constraint
         return False
