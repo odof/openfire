@@ -27,19 +27,33 @@ class OfPlanningInterventionTemplate(models.Model):
         if self._auto:
             cr.execute(
                     "SELECT * FROM information_schema.columns "
-                    "WHERE table_name = %s AND column_name = 'ri_default'", (self._table,))
+                    "WHERE table_name = %s AND column_name = 'fi_surveys'", (self._table,))
             init = not bool(cr.fetchall())
         res = super(OfPlanningInterventionTemplate, self)._auto_init()
         if init:
             default = self.env.ref('of_planning.of_planning_default_intervention_template', raise_if_not_found=False)
             if default:
                 cr.execute(
+                    "SELECT * FROM information_schema.columns "
+                    "WHERE table_name = %s AND column_name = 'ri_surveys'", (self._table,))
+                init2 = not bool(cr.fetchall())
+                cr.execute(
                         "UPDATE of_planning_intervention_template "
                         "SET fi_surveys = 't', "
                         "fi_surveys_rdv = 't' "
+                        "WHERE id = %s", (default.id, ))
+                if init2:
+                    cr.execute(
+                        "UPDATE of_planning_intervention_template "
+                        "SET ri_surveys = 't', "
+                        "ri_surveys_rdv = 't' "
                         "WHERE id = %s", (default.id, ))
         return res
 
     # -- FI - Questionnaires
     fi_surveys = fields.Boolean(string="QUESTIONNAIRE(S)")
     fi_surveys_rdv = fields.Boolean(string="Intervention")
+
+    # -- RI - Questionnaire
+    ri_surveys = fields.Boolean(string="QUESTIONNAIRE(S)")
+    ri_surveys_rdv = fields.Boolean(string="Intervention")
