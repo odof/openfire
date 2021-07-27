@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="of_questionnaire_rapport_intervention_report_template" inherit_id="of_service_parc_installe.of_service_parc_installe_rapport_intervention_report_template">
+        <!-- L'impression de ce rapport peut être déclenché des devis/commandes ou du planning.
+        L'affichage diffère selon l'origine. -->
+        <xpath expr="//div[@name='invoicing']" position="after">
+            <div name="questions" style="width: 100%; page-break-inside: avoid;">
+                <t t-if="template.ri_surveys and template.ri_surveys_rdv and o.question_ids" name="questionnaire_rdv">
+                    <div class="row h4 mb4">
+                        <div class="col-xs-12">
+                            <strong>Questionnaire</strong>
+                        </div>
+                    </div>
+                    <t t-set="first" t-value="True"/>
+                    <div class="row"
+                         style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
+                        <t t-foreach="o.question_ids" t-as="question">
+                            <t t-if="question.answer_type not in ['photo', 'drawing']">
+                                <div class="col-xs-12" style="display: table; padding: 0px;">
+                                    <div style="display: table-cell;" t-attf-style="#{'' if first else 'border-top: 1px solid lightgray;'}">
+                                        <!-- Questions -->
+                                        <div class="h5" style="padding: 0px 16px;">
+                                            <strong><span t-field="question.name"/><span>&amp;nbsp;:</span></strong>
+                                            <span t-field="question.definitive_answer"/>
+                                        </div>
+                                    </div>
+                                    <t t-if="first">
+                                        <t t-set="first" t-value="False"/>
+                                    </t>
+                                </div>
+                            </t>
+                        </t>
+                    </div>
+                </t>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>
