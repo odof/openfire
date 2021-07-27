@@ -1069,6 +1069,13 @@ class OfPlanningIntervention(models.Model):
 
     @api.model
     def create(self, vals):
+        if 'default_date' in self._context:
+            # On doit supprimer 'default_date' du context, sans quoi il affecte la creation des mail.message
+            if 'date' not in vals:
+                vals['date'] = self._context['default_date']
+            new_context = dict(self._context)
+            del new_context['default_date']
+            self = self.with_context(new_context)
         if 'date' in vals:
             # Tronqué à la minute
             vals['date'] = vals['date'][:17] + '00'
