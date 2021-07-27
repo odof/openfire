@@ -50,6 +50,7 @@ Inclut la gestion des équipes d'intervention.
         'report/of_planning_fiche_intervention.xml',
         'report/of_planning_fiche_intervention_view.xml',
         'report/of_planning_report_templates.xml',
+        'report/of_planning_rapport_intervention.xml',
         'views/of_planning_intervention_template_views.xml',
     ],
     'css': [
