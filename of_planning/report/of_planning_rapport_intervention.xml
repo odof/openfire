@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Action imprimer dans le planning d'intervention -->
+    <report id="of_planning_raport_intervention_report"
+            string="Rapport d'intervention"
+            model="of.planning.intervention"
+            report_type="qweb-pdf"
+            name="of_planning.of_planning_rapport_intervention_report_template"
+            paperformat="report.paperformat_euro">
+    </report>
+
+    <!-- Template pour planning -->
+    <template id="of_planning_rapport_intervention_report_template">
+        <t t-call="of_planning.of_rapport_intervention_report_template"/>
+    </template>
+
+    <template id="of_rapport_intervention_report_template">
+        <!-- L'impression de ce rapport peut être déclenché des devis/commandes ou du planning.
+        L'affichage diffère selon l'origine. -->
+        <t t-call="report.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="template" t-value="o.template_id or o.env.ref('of_planning.of_planning_default_intervention_template', raise_if_not_found=False) or o.template_id"/>
+                <t t-set="o" t-value="o.with_context(of_report_name=template.ri_title)"/>
+                <t t-call="report.external_layout">
+                    <div class="page">
+                        <t t-if="template">
+                            <div name="first" style="width: 100%;">
+                                <div name="intervention" style="width: 47%; float: left; page-break-inside: avoid;">
+                                    <t t-if="template.ri_rdv">
+                                        <div class="row h4 mb4">
+                                            <div class="col-xs-12">
+                                                <strong>Intervention</strong>
+                                            </div>
+                                        </div>
+                                        <div class="row"
+                                             style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
+                                            <div class="col-xs-12" style="display: table; padding: 0px;">
+                                                <div style="display: table-cell;">
+                                                    <!-- Libellé -->
+                                                    <t t-if="template.ri_rdv_lib">
+                                                        <div class="h5" style="padding: 0px 16px;">
+                                                            <strong><span>Libellé&amp;nbsp;:</span></strong>
+                                                            <span t-field="o.name"/>
+                                                        </div>
+                                                    </t>
+                                                    <!-- Technicien -->
+                                                    <t t-if="template.ri_rdv_tech">
+                                                        <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                                        <div class="h5" style="padding: 0px 16px;">
+                                                            <strong><span>Par&amp;nbsp;:</span></strong>
+                                                            <span t-field="o.employee_main_id.name"/>
+                                                        </div>
+                                                    </t>
+                                                    <!-- Tâche -->
+                                                    <t t-if="template.ri_rdv_task">
+                                                        <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                                        <div class="h5" style="padding: 0px 16px;">
+                                                            <strong><span>Tâche&amp;nbsp;:</span></strong>
+                                                            <span t-field="o.tache_id.name"/>
+                                                        </div>
+                                                    </t>
+                                                    <!-- Description de la tâche -->
+                                                    <t t-if="template.ri_rdv_task_description">
+                                                        <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                                        <div class="h5" style="padding: 0px 16px;">
+                                                            <strong><span>Description de la tâche&amp;nbsp;:</span></strong>
+                                                            <span t-field="o.tache_id.description"/>
+                                                        </div>
+                                                    </t>
+                                                    <!-- Durée -->
+                                                    <t name="duration" t-if="template.ri_rdv_duration">
+                                                        <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                                        <div class="h5" style="padding: 0px 16px;">
+                                                            <strong><span>Durée&amp;nbsp;:</span></strong>
+                                                            <span t-field="o.duree" t-field-options='{"widget": "duration", "unit": "hour", "round": "minute"}'/>
+                                                        </div>
+                                                    </t>
+                                                    <!-- Date -->
+                                                    <t name="dates" t-if="template.ri_rdv_date_start or template.ri_rdv_date_end">
+                                                        <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                                        <div class="h5" style="padding: 0px 16px;">
+                                                            <strong><span>Date&amp;nbsp;:</span></strong>
+                                                            <t t-if="template.ri_rdv_date_start and template.ri_rdv_date_end">
+                                                                <span>Du </span><span t-field="o.date"/><span> au </span><span t-field="o.date_deadline"/>
+                                                            </t>
+                                                            <t t-elif="template.ri_rdv_date_start and not template.ri_rdv_date_end">
+                                                                <span>Début </span><span t-field="o.date"/>
+                                                            </t>
+                                                            <t t-elif="not template.ri_rdv_date_start and template.ri_rdv_date_end">
+                                                                <span>Fin </span><span t-field="o.date_deadline"/>
+                                                            </t>
+                                                        </div>
+                                                    </t>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                            <div name="desc_interv" style="width: 100%; page-break-inside: avoid;">
+                                <t t-if="template.ri_notes and template.ri_notes_desc and o.description">
+                                    <div class="row h4 mb4">
+                                        <div class="col-xs-12">
+                                            <strong>Description Intervention</strong>
+                                        </div>
+                                    </div>
+                                    <div class="row"
+                                         style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
+                                        <div class="col-xs-12" style="display: table; padding: 0px;">
+                                            <div style="display: table-cell;">
+                                                <!-- Description -->
+                                                <div class="h5" style="padding: 0px 16px;">
+                                                    <span t-field="o.description"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                            <div name="invoicing" style="display: inline-block; width : 100%; float: left; page-break-inside: avoid;">
+                                <t t-if="template.ri_invoicing and o.line_ids">
+                                    <div class="row h4 mb4">
+                                        <div class="col-xs-12">
+                                            <strong>Facturation</strong>
+                                        </div>
+                                    </div>
+                                    <div class="row mb16" style="display: table !important; border: 1px solid lightgray !important; width : 100%; border-radius: 10px !important; border-collapse: unset !important;">
+                                        <div style="display : table-row !important; border: 1px solid lightgray;">
+                                            <div style="display: table-cell !important; padding: 4px; vertical-align: middle">Article</div>
+                                            <div class="text-left" style="display: table-cell !important; padding: 4px;">Description</div>
+                                            <div class="text-right" style="display: table-cell !important; padding: 4px;">Qté</div>
+                                            <div class="text-right" style="display: table-cell !important; padding: 4px;">PU</div>
+                                            <div class="text-right" style="display: table-cell !important; padding: 4px;">TVA</div>
+                                            <div class="text-right" style="display: table-cell !important; padding: 4px;">Total HT</div>
+                                            <div class="text-right" style="display: table-cell !important; padding: 4px;">Total TTC</div>
+                                        </div>
+                                        <t t-foreach="[(False, line.product_id.name, line.name, line.qty, line.price_unit, ', '.join(line.taxe_ids.mapped('description')), line.price_subtotal, line.price_total) for line in o.line_ids] + [(True, '', '', '', '', 'TOTAL', o.price_subtotal, o.price_total)]" t-as="line">
+                                            <div style="display : table-row !important;">
+                                                <div style="display: table-cell !important; margin-top: 8px; border-top: 1px solid lightgray; padding: 4px">
+                                                    <span t-raw="line[1]"/>
+                                                </div>
+                                                <div class="text-left" style="display: table-cell !important; margin-top: 8px; border-top: 1px solid lightgray; padding: 4px">
+                                                    <span t-raw="line[2]"/>
+                                                </div>
+                                                <div class="text-right" style="display: table-cell !important; margin-top: 8px; border-top: 1px solid lightgray; padding: 4px">
+                                                    <span t-raw="line[3]"/>
+                                                </div>
+                                                <div class="text-right" style="display: table-cell !important; margin-top: 8px; border-top: 1px solid lightgray; padding: 4px">
+                                                    <t t-if="line[0]">
+                                                        <span t-raw="line[4]"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span><t t-esc="line[4]" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></span>
+                                                    </t>
+                                                </div>
+                                                <div class="text-right" style="display: table-cell !important; margin-top: 8px; border-top: 1px solid lightgray; padding: 4px">
+                                                    <span t-raw="line[5]" t-attf-style="font-weight: #{line[0] and 'bold' or 'normal'}"/>
+                                                </div>
+                                                <div class="text-right" style="display: table-cell !important; margin-top: 8px; border-top: 1px solid lightgray; padding: 4px">
+                                                    <span t-attf-style="font-weight: #{line[0] and 'bold' or 'normal'}"><t t-esc="line[6]" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></span>
+                                                </div>
+                                                <div class="text-right" style="display: table-cell !important; margin-top: 8px; border-top: 1px solid lightgray; padding: 4px">
+                                                    <span t-attf-style="font-weight: #{line[0] and 'bold' or 'normal'}"><t t-esc="line[7]" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></span>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </t>
+                            </div>
+                            <div name="legal" style="width: 100%; page-break-inside: avoid;">
+                                <t t-if="template.ri_legal and template.legal">
+                                    <div class="row h4 mb4">
+                                        <div class="col-xs-12">
+                                            <strong>Mentions légales</strong>
+                                        </div>
+                                    </div>
+                                    <div class="row"
+                                         style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
+                                        <div class="col-xs-12" style="display: table; padding: 0px;">
+                                            <div style="display: table-cell;">
+                                                <!-- Mentions légales -->
+                                                <div class="h5" style="padding: 0px 16px;">
+                                                    <span t-field="template.legal"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

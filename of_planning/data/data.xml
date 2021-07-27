@@ -52,6 +52,27 @@
         <field name="fi_invoicing_ht">True</field>
         <field name="fi_invoicing_taxes">True</field>
         <field name="fi_invoicing_ttc">True</field>
+
+        <!-- Rapport d'intervention -->
+        <field name="ri_default">True</field>
+        <field name="ri_title">Rapport d'intervention</field>
+        <!-- RI - Rdv d'intervention -->
+        <field name="ri_rdv">True</field>
+        <field name="ri_rdv_lib">True</field>
+        <field name="ri_rdv_tech">True</field>
+        <field name="ri_rdv_date_start">False</field>
+        <field name="ri_rdv_date_end">True</field>
+        <field name="ri_rdv_duration">False</field>
+        <field name="ri_rdv_task">False</field>
+        <field name="ri_rdv_task_description">False</field>
+        <!-- RI - Facturation -->
+        <field name="ri_invoicing">True</field>
+        <!-- RI - Notes -->
+        <field name="ri_notes">False</field>
+        <field name="ri_notes_desc">False</field>
+        <!-- RI - Mentions légales -->
+        <field name="ri_legal">True</field>
+
     </record>
 
 </odoo>

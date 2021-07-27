@@ -1,28 +1,90 @@
 # -*- coding: utf-8 -*-
 
-from dateutil.relativedelta import relativedelta
-import pytz
-import re
-import requests
-import urllib
-
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError, ValidationError
-from odoo.tools import config, DEFAULT_SERVER_DATETIME_FORMAT
-from odoo.tools.float_utils import float_compare
-from odoo.tools.safe_eval import safe_eval
-
 import odoo.addons.decimal_precision as dp
-from odoo.addons.of_utils.models.of_utils import se_chevauchent, float_2_heures_minutes, heures_minutes_2_float, \
-    compare_date
+import os
+import base64
+import tempfile
+try:
+    import pypdftk
+except ImportError:
+    pypdftk = None
 
 
 class OfPlanningInterventionTemplate(models.Model):
     _name = 'of.planning.intervention.template'
 
+    @api.model_cr_context
+    def _auto_init(self):
+        old_default_template = self.env['ir.model.data'].search([
+            ('name', '=', 'of_planning_default_intervention_template'),
+            ('module', '=', 'of_mobile')
+            ])
+        res = super(OfPlanningInterventionTemplate, self)._auto_init()
+        if old_default_template:
+            default = self.env.ref('of_mobile.of_planning_default_intervention_template', raise_if_not_found=False)
+            old_default_template.write({'module': 'of_planning'})
+            default.write({
+                'fi_default': False,
+                'fi_title': "Fiche d'intervention",
+                'fi_order': True,
+                'fi_order_client': True,
+                'fi_order_name': True,
+                'fi_order_interv_label': True,
+                'fi_products': True,
+                'fi_products_order': True,
+                'fi_rdv': True,
+                'fi_rdv_date_start': True,
+                'fi_rdv_date_end': True,
+                'fi_rdv_task': True,
+                'fi_rdv_task_description': True,
+                'fi_rdv_duration': True,
+                'fi_rdv_tech': True,
+                'fi_rdv_address': True,
+                'fi_rdv_mail': True,
+                'fi_rdv_phone': True,
+                'fi_description': True,
+                'fi_description_ext': True,
+                'fi_invoicing': True,
+                'fi_invoicing_ht': True,
+                'fi_invoicing_taxes': True,
+                'fi_invoicing_ttc': True,
+            })
+            # self.env.cr.execute(
+            #     "UPDATE of_planning_intervention_template "
+            #     "SET fi_title = 'Fiche d'intervention', "
+            #     "fi_order = 't', "
+            #     "fi_order_client = 't', "
+            #     "fi_order_name = 't', "
+            #     "fi_order_interv_label = 't', "
+            #     "fi_products = 't', "
+            #     "fi_products_order = 't', "
+            #     "fi_rdv = 't', "
+            #     "fi_rdv_date_start = 't', "
+            #     "fi_rdv_date_end = 't', "
+            #     "fi_rdv_task = 't', "
+            #     "fi_rdv_task_description = 't', "
+            #     "fi_rdv_duration = 't', "
+            #     "fi_rdv_tech = 't', "
+            #     "fi_rdv_address = 't', "
+            #     "fi_rdv_mail = 't', "
+            #     "fi_rdv_phone = 't', "
+            #     "fi_description = 't', "
+            #     "fi_rdv_mail = 't', "
+            #     "fi_description_ext = 't', "
+            #     "fi_invoicing = 't', "
+            #     "fi_invoicing_ht = 't', "
+            #     "fi_invoicing_taxes = 't', "
+            #     "fi_invoicing_ttc = 't' "
+            #     "WHERE id = %s", (default.id,))
+        return res
+
     @api.model
     def _get_default_template_values(self):
-        return self._get_default_template_values_fi()
+        res = self._get_default_template_values_fi()
+        res.update(self._get_default_template_values_ri())
+        return res
 
     @api.model
     def _get_default_template_values_fi(self):
@@ -33,6 +95,18 @@ class OfPlanningInterventionTemplate(models.Model):
             for key, value in copy.iteritems():
                 # copier les valeurs du rapport d'intervention
                 if isinstance(key, basestring) and key.startswith("fi_") and key != 'fi_default':
+                    values[key] = value
+        return values
+
+    @api.model
+    def _get_default_template_values_ri(self):
+        default_template = self.env.ref('of_planning.of_planning_default_intervention_template', raise_if_not_found=False)
+        values = {}
+        if default_template:
+            copy = default_template.copy_data()[0] or {}
+            for key, value in copy.iteritems():
+                # copier les valeurs du rapport d'intervention
+                if isinstance(key, basestring) and key.startswith("ri_") and key != 'ri_default':
                     values[key] = value
         return values
 
@@ -54,7 +128,6 @@ class OfPlanningInterventionTemplate(models.Model):
     tache_id = fields.Many2one('of.planning.tache', string=u"Tâche")
     fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale", company_dependent=True)
     line_ids = fields.One2many('of.planning.intervention.template.line', 'template_id', string="Lignes de facturation")
-    product_ids = fields.Many2many('product.product')
 
     is_default_template = fields.Boolean(compute="_compute_is_default_template")
     # FICHE D'INTERVENTION
@@ -84,13 +157,50 @@ class OfPlanningInterventionTemplate(models.Model):
     fi_rdv_mail = fields.Boolean(string="E-mail")
     fi_rdv_phone = fields.Boolean(string=u"Téléphone")
     # -- FI - Descriptions
-    fi_description = fields.Boolean(sring="DESCRIPTION(S)")
-    fi_description_ext = fields.Boolean(sring="Description externe")
+    fi_description = fields.Boolean(string="DESCRIPTION(S)")
+    fi_description_ext = fields.Boolean(string="Description externe")
     # -- FI - Facturation
     fi_invoicing = fields.Boolean(string="FACTURATION")
     fi_invoicing_ht = fields.Boolean(string="Total HT")
     fi_invoicing_taxes = fields.Boolean(string="Taxes")
     fi_invoicing_ttc = fields.Boolean(string="Total TTC")
+    # -- FI - Documents joints
+    fi_order_pdf = fields.Boolean(string="Commande")
+    fi_picking_pdf = fields.Boolean(string="Bon(s) de livraison(s)")
+    fi_invoice_pdf = fields.Boolean(string="Facture(s)")
+    # fi_purchase_pdf = fields.Boolean(string="Achat(s)")
+    fi_mail_template_ids = fields.Many2many(
+        comodel_name='of.mail.template', relation='fi_intervention_mail_template', string="Documents joints")
+
+    # Rapport d'intervention
+    ri_default = fields.Boolean(string=u"Rapport par défaut", default=True)
+    ri_title = fields.Char(string="Titre du rapport", default="Rapport d'intervention")
+    # -- RI - Rdv d'intervention
+    ri_rdv = fields.Boolean(string="INTERVENTION")
+    ri_rdv_lib = fields.Boolean(string=u"Libellé de l'intervention")
+    ri_rdv_tech = fields.Boolean(string="Technicien")
+    ri_rdv_date_start = fields.Boolean(string=u"Date de début")
+    ri_rdv_date_end = fields.Boolean(string="Date de fin")
+    ri_rdv_duration = fields.Boolean(string=u"Durée")
+    ri_rdv_task = fields.Boolean(string=u"Tâche")
+    ri_rdv_task_description = fields.Boolean(string=u"Description tâche")
+    # -- RI - Facturation
+    ri_origin = fields.Boolean(string="ORIGINE")
+    # -- RI - Facturation
+    ri_invoicing = fields.Boolean(string="FACTURATION")
+    # -- RI - Notes
+    ri_notes = fields.Boolean(string="NOTES")
+    ri_notes_desc = fields.Boolean(string="Description intervention")
+    # -- RI - Documents joints
+    ri_order_pdf = fields.Boolean(string="Commande")
+    ri_picking_pdf = fields.Boolean(string="Bon(s) de livraison(s)")
+    ri_invoice_pdf = fields.Boolean(string="Facture(s)")
+    # fi_purchase_pdf = fields.Boolean(string="Achat(s)")
+    ri_mail_template_ids = fields.Many2many(
+        comodel_name='of.mail.template', relation='ri_intervention_mail_template', string="Documents joints")
+    # -- RI - Mentions légales
+    legal = fields.Text(string=u"Mentions légales")
+    ri_legal = fields.Boolean(string=u"MENTIONS LÉGALES")
 
     @api.depends()
     def _compute_is_default_template(self):
@@ -138,21 +248,32 @@ class OfPlanningInterventionTemplate(models.Model):
         if self.fi_default:
             self.update(self._get_default_template_values_fi())
 
+    @api.onchange('ri_default')
+    def _onchange_ri_default(self):
+        if self.ri_default:
+            self.update(self._get_default_template_values_ri())
+
     @api.model
     def create(self, vals):
         if vals.get('fi_default', False):
             vals.update(self._get_default_template_values_fi())
+        if vals.get('ri_default', False):
+            vals.update(self._get_default_template_values_ri())
         return super(OfPlanningInterventionTemplate, self).create(vals)
 
     @api.multi
     def write(self, vals):
         if vals.get('fi_default', False):
             vals.update(self._get_default_template_values_fi())
+        if vals.get('ri_default', False):
+            vals.update(self._get_default_template_values_ri())
         res = super(OfPlanningInterventionTemplate, self).write(vals)
         default_template = self.env.ref('of_planning.of_planning_default_intervention_template', raise_if_not_found=False)
         if default_template and default_template in self:
             others = self.search([('id', '!=', default_template.id), ('fi_default', '=', True)])
             others.write(self._get_default_template_values_fi())
+            others = self.search([('id', '!=', default_template.id), ('ri_default', '=', True)])
+            others.write(self._get_default_template_values_ri())
         return res
 
     @api.multi
@@ -162,6 +283,112 @@ class OfPlanningInterventionTemplate(models.Model):
             raise UserError(u"Impossible de supprimer le modèle d'intervention par défaut")
         res = super(OfPlanningInterventionTemplate, self).unlink()
         return res
+
+    @api.multi
+    def get_fi_mail_template_data(self):
+        self.ensure_one()
+        compose_mail_obj = self.env['of.compose.mail']
+        attachment_obj = self.env['ir.attachment']
+        data = []
+        for mail_template in self.fi_mail_template_ids:
+            if mail_template.file:
+                # Utilisation des documents pdf fournis
+                if not mail_template.chp_ids:
+                    data.append(mail_template.file)
+                    continue
+                # Calcul des champs remplis sur le modèle de courrier
+                attachment = attachment_obj.search([('res_model', '=', mail_template._name),
+                                                    ('res_field', '=', 'file'),
+                                                    ('res_id', '=', mail_template.id)])
+                datas = dict(compose_mail_obj.eval_champs(self, mail_template.chp_ids))
+                file_path = attachment_obj._full_path(attachment.store_fname)
+                fd, generated_pdf = tempfile.mkstemp(prefix='doc_joint_', suffix='.pdf')
+                try:
+                    pypdftk.fill_form(file_path, datas, out_file=generated_pdf, flatten=not mail_template.fillable)
+                    with open(generated_pdf, "rb") as encode:
+                        encoded_file = base64.b64encode(encode.read())
+                finally:
+                    os.close(fd)
+                    try:
+                        os.remove(generated_pdf)
+                    except Exception:
+                        pass
+                data.append(encoded_file)
+        return data
+
+    @api.multi
+    def get_fi_internal_docs(self, rdv):
+        self.ensure_one()
+        report_obj = self.env['report']
+        data = []
+        # order : sale.report_saleorder
+        # invoice : account.report_invoice
+        # picking : stock.report_deliveryslip
+        if rdv.order_id and self.fi_order_pdf:
+            data.append(base64.b64encode(report_obj.get_pdf([rdv.order_id.id], 'sale.report_saleorder')))
+        if rdv.picking_id and self.fi_picking_pdf:
+            data.append(base64.b64encode(report_obj.get_pdf([rdv.picking_id.id], 'stock.report_deliveryslip')))
+        if rdv.invoice_ids and self.fi_invoice_pdf:
+            data.append(base64.b64encode(report_obj.get_pdf(rdv.invoice_ids.ids, 'account.report_invoice')))
+        return data
+
+    @api.multi
+    def fi_doc_joints(self, rdv):
+        self.ensure_one()
+        return self.get_fi_mail_template_data() + self.get_fi_internal_docs(rdv)
+
+    @api.multi
+    def get_ri_mail_template_data(self):
+        self.ensure_one()
+        compose_mail_obj = self.env['of.compose.mail']
+        attachment_obj = self.env['ir.attachment']
+        data = []
+        for mail_template in self.ri_mail_template_ids:
+            if mail_template.file:
+                # Utilisation des documents pdf fournis
+                if not mail_template.chp_ids:
+                    data.append(mail_template.file)
+                    continue
+                # Calcul des champs remplis sur le modèle de courrier
+                attachment = attachment_obj.search([('res_model', '=', mail_template._name),
+                                                    ('res_field', '=', 'file'),
+                                                    ('res_id', '=', mail_template.id)])
+                datas = dict(compose_mail_obj.eval_champs(self, mail_template.chp_ids))
+                file_path = attachment_obj._full_path(attachment.store_fname)
+                fd, generated_pdf = tempfile.mkstemp(prefix='doc_joint_', suffix='.pdf')
+                try:
+                    pypdftk.fill_form(file_path, datas, out_file=generated_pdf, flatten=not mail_template.fillable)
+                    with open(generated_pdf, "rb") as encode:
+                        encoded_file = base64.b64encode(encode.read())
+                finally:
+                    os.close(fd)
+                    try:
+                        os.remove(generated_pdf)
+                    except Exception:
+                        pass
+                data.append(encoded_file)
+        return data
+
+    @api.multi
+    def get_ri_internal_docs(self, rdv):
+        self.ensure_one()
+        report_obj = self.env['report']
+        data = []
+        # order : sale.report_saleorder
+        # invoice : account.report_invoice
+        # picking : stock.report_deliveryslip
+        if rdv.order_id and self.ri_order_pdf:
+            data.append(base64.b64encode(report_obj.get_pdf([rdv.order_id.id], 'sale.report_saleorder')))
+        if rdv.picking_id and self.ri_picking_pdf:
+            data.append(base64.b64encode(report_obj.get_pdf([rdv.picking_id.id], 'stock.report_deliveryslip')))
+        if rdv.invoice_ids and self.ri_invoice_pdf:
+            data.append(base64.b64encode(report_obj.get_pdf(rdv.invoice_ids.ids, 'account.report_invoice')))
+        return data
+
+    @api.multi
+    def ri_doc_joints(self, rdv):
+        self.ensure_one()
+        return self.get_ri_mail_template_data() + self.get_ri_internal_docs(rdv)
 
 
 class OfPlanningInterventionTemplateLine(models.Model):
@@ -214,4 +441,6 @@ class IrModelData(models.Model):
             if default_template:
                 others = template_obj.search([('id', '!=', default_template.id), ('fi_default', '=', True)])
                 others.write(template_obj._get_default_template_values_fi())
+                others = template_obj.search([('id', '!=', default_template.id), ('ri_default', '=', True)])
+                others.write(template_obj._get_default_template_values_ri())
         return res

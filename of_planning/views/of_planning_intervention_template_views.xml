@@ -51,13 +51,10 @@
                                 </tree>
                             </field>
                         </page>
-                        <page name="products" string="Articles supplémentaires">
-                            <field name="product_ids">
-                                <tree>
-                                    <field name="name"/>
-                                    <field name="list_price"/>
-                                </tree>
-                            </field>
+                        <page name="legal" string="Mentions légales">
+                            <group>
+                                <field name="legal" nolabel="1"/>
+                            </group>
                         </page>
                         <page name="fiche_intervention" string="Fiche d'intervention">
                             <group col="4">
@@ -189,6 +186,108 @@
                                     <div>
                                         <field name="fi_invoicing_ttc" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_invoicing', '=', False)]}"/>
                                     </div>
+                                </group>
+                            </group>
+                            <separator string="Documents joints" name="fi_joined_documents"/>
+                            <group col="8">
+                                <h5 colspan="8">Documents internes</h5>
+                                <field name="fi_order_pdf"/>
+                                <field name="fi_picking_pdf"/>
+                                <field name="fi_invoice_pdf"/>
+<!--                                <field name="fi_purchase_pdf"/>-->
+                            </group>
+                            <group col="4">
+                                <group>
+                                    <h5 colspan="2">Annexes <i>(Modèles de courrier)</i></h5>
+                                    <field name="fi_mail_template_ids" nolabel="1" widget="many2many_tags"/>
+                                </group>
+                                <group>
+                                </group>
+                            </group>
+                        </page>
+                        <page name="ri" string="Rapport d'intervention">
+                            <group col="4">
+                                <group>
+                                    <field name="ri_default" attrs="{'invisible':[('is_default_template','=',True)]}"/>
+                                    <separator string="Champ affichés" colspan="2"/>
+                                    <field name="ri_title"/>
+                                </group>
+                            </group>
+                            <group col="8">
+                                <group name="ri_first">
+                                    <!-- RI - Rdv d'intervention -->
+                                    <separator string="" colspan="2" name="ri_rdv_above"/>
+                                    <field name="ri_rdv" attrs="{'readonly':[('ri_default','=',True)]}"/>
+                                    <label for="ri_rdv_lib" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="ri_rdv_lib" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
+                                    </div>
+                                    <label for="ri_rdv_tech" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="ri_rdv_tech" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
+                                    </div>
+                                    <label for="ri_rdv_date_start" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="ri_rdv_date_start" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
+                                    </div>
+                                    <label for="ri_rdv_date_end" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="ri_rdv_date_end" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
+                                    </div>
+                                    <label for="ri_rdv_duration" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="ri_rdv_duration" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
+                                    </div>
+                                    <label for="ri_rdv_task" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="ri_rdv_task" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
+                                    </div>
+                                    <label for="ri_rdv_task_description" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="ri_rdv_task_description" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
+                                    </div>
+                                    <separator string="" colspan="2" name="ri_rdv_below"/>
+                                    <!-- RI - Originee -->
+<!--                                    <separator string="" colspan="2" name="ri_origin_below"/>-->
+<!--                                    <field name="ri_origin" attrs="{'readonly':[('ri_default','=',True)]}"/>-->
+<!--                                    <separator string="" colspan="2" name="ri_origin_below"/>-->
+                                </group>
+                                <group name="ri_second">
+                                    <!-- RI - Notes -->
+                                    <separator string="" colspan="2" name="ri_notes_above"/>
+                                    <field name="ri_notes" attrs="{'readonly':[('ri_default','=',True)]}"/>
+                                    <label for="ri_notes_desc" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="ri_notes_desc" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_notes', '=', False)]}"/>
+                                    </div>
+                                    <separator string="" colspan="2" name="ri_notes_below"/>
+                                    <!-- RI - Facturation -->
+                                    <separator string="" colspan="2" name="ri_invoicing_above"/>
+                                    <field name="ri_invoicing" attrs="{'readonly':[('ri_default','=',True)]}"/>
+                                    <separator string="" colspan="2" name="ri_invoicing_below"/>
+
+                                </group>
+                                <group name="ri_third">
+                                    <!-- RI - Mentions légales -->
+                                    <separator string="" colspan="2" name="ri_legal_above"/>
+                                    <field name="ri_legal" attrs="{'readonly':[('ri_default','=',True)]}"/>
+                                    <separator string="" colspan="2" name="ri_legal_below"/>
+                                </group>
+                                <group name="ri_fourth"></group>
+                            </group>
+
+                            <separator string="Documents joints" name="ri_joined_documents"/>
+                            <group col="8">
+                                <h5 colspan="8">Documents internes</h5>
+                                <field name="ri_order_pdf"/>
+                                <field name="ri_picking_pdf"/>
+                                <field name="ri_invoice_pdf"/>
+                                <!--                                <field name="fi_purchase_pdf"/>-->
+                            </group>
+                            <group col="4">
+                                <group colspan="2">
+                                    <h5 colspan="2">Annexes <i>(Modèles de courrier)</i></h5>
+                                    <field name="ri_mail_template_ids" nolabel="1" widget="many2many_tags"/>
                                 </group>
                             </group>
                         </page>

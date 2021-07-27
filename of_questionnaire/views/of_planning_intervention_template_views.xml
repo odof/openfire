@@ -28,6 +28,16 @@
                     <field name="fi_surveys_rdv" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_surveys', '=', False)]}"/>
                 </div>
             </xpath>
+            <xpath expr="//separator[@name='ri_legal_above']" position="before">
+                <!-- RI - Questionnaire -->
+                <separator string="" colspan="2" name="ri_surveys_above"/>
+                <field name="ri_surveys" attrs="{'readonly':[('ri_default','=',True)]}"/>
+                <label for="ri_surveys_rdv" style="font-weight: normal !important"/>
+                <div>
+                    <field name="ri_surveys_rdv" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_surveys', '=', False)]}"/>
+                </div>
+                <separator string="" colspan="2" name="ri_surveys_below"/>
+            </xpath>
         </field>
     </record>
 

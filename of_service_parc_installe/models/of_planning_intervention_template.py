@@ -27,12 +27,16 @@ class OfPlanningInterventionTemplate(models.Model):
         if self._auto:
             cr.execute(
                     "SELECT * FROM information_schema.columns "
-                    "WHERE table_name = %s AND column_name = 'ri_default'", (self._table,))
+                    "WHERE table_name = %s AND column_name = 'fi_pi'", (self._table,))
             init = not bool(cr.fetchall())
         res = super(OfPlanningInterventionTemplate, self)._auto_init()
         if init:
             default = self.env.ref('of_planning.of_planning_default_intervention_template', raise_if_not_found=False)
             if default:
+                cr.execute(
+                    "SELECT * FROM information_schema.columns "
+                    "WHERE table_name = %s AND column_name = 'ri_pi'", (self._table,))
+                init2 = not bool(cr.fetchall())
                 cr.execute(
                         "UPDATE of_planning_intervention_template "
                         "SET fi_pi = 't', "
@@ -43,6 +47,18 @@ class OfPlanningInterventionTemplate(models.Model):
                         "fi_pi_installation_date = 't', "
                         "fi_pi_state = 't', "
                         "fi_pi_notes = 't' "
+                        "WHERE id = %s", (default.id,))
+                if init2:
+                    cr.execute(
+                        "UPDATE of_planning_intervention_template "
+                        "SET ri_pi = 't', "
+                        "ri_pi_serial = 't', "
+                        "ri_pi_product = 't', "
+                        "ri_pi_brand = 't', "
+                        "ri_pi_model = 't', "
+                        "ri_pi_installation_date = 't', "
+                        "ri_pi_state = 't', "
+                        "ri_pi_notes = 't' "
                         "WHERE id = %s", (default.id,))
         return res
 
@@ -55,3 +71,13 @@ class OfPlanningInterventionTemplate(models.Model):
     fi_pi_installation_date = fields.Boolean(string="Date d'installation")
     fi_pi_state = fields.Boolean(string=u"État")
     fi_pi_notes = fields.Boolean(string="Notes")
+
+    # -- RI - Parc installé
+    ri_pi = fields.Boolean(string=u"PARC INSTALLÉ")
+    ri_pi_product = fields.Boolean(string=u"Produit installé")
+    ri_pi_serial = fields.Boolean(string=u"N° série")
+    ri_pi_brand = fields.Boolean(string="Marque")
+    ri_pi_model = fields.Boolean(string=u"Modèle")
+    ri_pi_installation_date = fields.Boolean(string="Date d'installation")
+    ri_pi_state = fields.Boolean(string=u"État")
+    ri_pi_notes = fields.Boolean(string="Notes")

@@ -2,143 +2,143 @@
 <odoo>
 
     <!-- Ajout de la machine installée dans la fiche intervention -->
-    <template id="of_parc_installe_extension_fiche_intervention_report" inherit_id="of_planning.of_fiche_intervention_report_template">
-        <xpath expr="//t[@name='cadre_description']" position="before">
-            <t t-if="o.parc_installe_id">
-                <div>
-                    <div class="row h4 mb4">
-                        <div class="col-xs-12"><strong>Parc installé</strong></div>
-                    </div>
-                    <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; margin-bottom: 12px;">
-                        <div class="col-xs-12" style="display: table; padding: 0px;">
-                            <div style="display: table-cell; width: 50%;">
-                                <div class="h5" style="padding: 0px 16px;">
-                                    <div>
-                                        <span>N° de série :</span>
-                                        <t t-if="o.parc_installe_id.name">
-                                            <strong><span t-field="o.parc_installe_id.name"/></strong>
-                                        </t>
-                                    </div>
-                                </div>
-                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
-                                <div class="h5" style="padding: 0px 16px;">
-                                    <div>
-                                        <span>Produit :</span>
-                                        <t t-if="o.parc_installe_id.product_id.name">
-                                            <strong><span t-field="o.parc_installe_id.product_id.name"/></strong>
-                                        </t>
-                                    </div>
-                                </div>
-                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
-                                <div class="h5" style="padding: 0px 16px;">
-                                    <div>
-                                        <span>Modèle :</span>
-                                        <span t-field="o.parc_installe_id.modele"/>
-                                    </div>
-                                </div>
-                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
-                                <div class="h5" style="padding: 0px 16px;">
-                                    <div>
-                                        <span>Marque :</span>
-                                        <t t-if="o.parc_installe_id.brand_id">
-                                            <span t-field="o.parc_installe_id.brand_id.name"/>
-                                        </t>
-                                    </div>
-                                </div>
-                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
-                                <div class="h5" style="padding: 0px 16px;">
-                                    <div>
-                                        <span>Catégorie :</span>
-                                        <t t-if="o.parc_installe_id.product_category_id">
-                                            <span t-field="o.parc_installe_id.product_category_id.name"/>
-                                        </t>
-                                    </div>
-                                </div>
-                            </div>
-                            <div style="display: table-cell; width: 50%; border-left: 1px solid lightgray">
-                                <div class="h5" style="padding: 0px 16px;">
-                                    <div>
-                                        <span>Date d'installation :</span>
-                                        <t t-if="o.parc_installe_id.date_installation">
-                                            <span t-field="o.parc_installe_id.date_installation"/>
-                                        </t>
-                                    </div>
-                                </div>
-                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
-                                <div class="h5" style="padding: 0px 16px;">
-                                    <div>
-                                        <span>Type d'installation :</span>
-                                        <span t-field="o.parc_installe_id.installation"/>
-                                    </div>
-                                </div>
-                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
-                                <div class="h5" style="padding: 0px 16px;">
-                                    <div>
-                                        <span>Conforme :</span>
-                                        <span t-if="o.parc_installe_id.conforme">Oui</span>
-                                        <span t-else="">Non</span>
-                                    </div>
-                                </div>
-                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
-                                <div class="h5" style="padding: 0px 16px;">
-                                    <div>
-                                        <span>Installateur :</span>
-                                        <t t-if="o.parc_installe_id.installateur_id">
-                                            <span t-field="o.parc_installe_id.installateur_id.name"/>
-                                        </t>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xs-12" style="display: table; padding: 0px;">
-                            <div style="display: table-cell; width: 100%;">
-                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
-                                <div class="h5" style="padding: 0px 16px;">
-                                    <div>
-                                        <span>Notes :</span>
-                                        <t t-if="o.parc_installe_id.note">
-                                            <span t-field="o.parc_installe_id.note"/>
-                                        </t>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<!--    <template id="of_parc_installe_extension_fiche_intervention_report" inherit_id="of_planning.of_fiche_intervention_report_template">-->
+<!--        <xpath expr="//t[@name='cadre_description']" position="before">-->
+<!--            <t t-if="o.parc_installe_id">-->
+<!--                <div>-->
+<!--                    <div class="row h4 mb4">-->
+<!--                        <div class="col-xs-12"><strong>Parc installé</strong></div>-->
+<!--                    </div>-->
+<!--                    <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; margin-bottom: 12px;">-->
+<!--                        <div class="col-xs-12" style="display: table; padding: 0px;">-->
+<!--                            <div style="display: table-cell; width: 50%;">-->
+<!--                                <div class="h5" style="padding: 0px 16px;">-->
+<!--                                    <div>-->
+<!--                                        <span>N° de série :</span>-->
+<!--                                        <t t-if="o.parc_installe_id.name">-->
+<!--                                            <strong><span t-field="o.parc_installe_id.name"/></strong>-->
+<!--                                        </t>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>-->
+<!--                                <div class="h5" style="padding: 0px 16px;">-->
+<!--                                    <div>-->
+<!--                                        <span>Produit :</span>-->
+<!--                                        <t t-if="o.parc_installe_id.product_id.name">-->
+<!--                                            <strong><span t-field="o.parc_installe_id.product_id.name"/></strong>-->
+<!--                                        </t>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>-->
+<!--                                <div class="h5" style="padding: 0px 16px;">-->
+<!--                                    <div>-->
+<!--                                        <span>Modèle :</span>-->
+<!--                                        <span t-field="o.parc_installe_id.modele"/>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>-->
+<!--                                <div class="h5" style="padding: 0px 16px;">-->
+<!--                                    <div>-->
+<!--                                        <span>Marque :</span>-->
+<!--                                        <t t-if="o.parc_installe_id.brand_id">-->
+<!--                                            <span t-field="o.parc_installe_id.brand_id.name"/>-->
+<!--                                        </t>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>-->
+<!--                                <div class="h5" style="padding: 0px 16px;">-->
+<!--                                    <div>-->
+<!--                                        <span>Catégorie :</span>-->
+<!--                                        <t t-if="o.parc_installe_id.product_category_id">-->
+<!--                                            <span t-field="o.parc_installe_id.product_category_id.name"/>-->
+<!--                                        </t>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div style="display: table-cell; width: 50%; border-left: 1px solid lightgray">-->
+<!--                                <div class="h5" style="padding: 0px 16px;">-->
+<!--                                    <div>-->
+<!--                                        <span>Date d'installation :</span>-->
+<!--                                        <t t-if="o.parc_installe_id.date_installation">-->
+<!--                                            <span t-field="o.parc_installe_id.date_installation"/>-->
+<!--                                        </t>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>-->
+<!--                                <div class="h5" style="padding: 0px 16px;">-->
+<!--                                    <div>-->
+<!--                                        <span>Type d'installation :</span>-->
+<!--                                        <span t-field="o.parc_installe_id.installation"/>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>-->
+<!--                                <div class="h5" style="padding: 0px 16px;">-->
+<!--                                    <div>-->
+<!--                                        <span>Conforme :</span>-->
+<!--                                        <span t-if="o.parc_installe_id.conforme">Oui</span>-->
+<!--                                        <span t-else="">Non</span>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>-->
+<!--                                <div class="h5" style="padding: 0px 16px;">-->
+<!--                                    <div>-->
+<!--                                        <span>Installateur :</span>-->
+<!--                                        <t t-if="o.parc_installe_id.installateur_id">-->
+<!--                                            <span t-field="o.parc_installe_id.installateur_id.name"/>-->
+<!--                                        </t>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="col-xs-12" style="display: table; padding: 0px;">-->
+<!--                            <div style="display: table-cell; width: 100%;">-->
+<!--                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>-->
+<!--                                <div class="h5" style="padding: 0px 16px;">-->
+<!--                                    <div>-->
+<!--                                        <span>Notes :</span>-->
+<!--                                        <t t-if="o.parc_installe_id.note">-->
+<!--                                            <span t-field="o.parc_installe_id.note"/>-->
+<!--                                        </t>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
 
-                <div class="row h4 mb4">
-                    <div class="col-xs-12"><strong>Parc installé - Historique</strong></div>
-                </div>
-                <t t-set="historique" t-value="o.parc_installe_id.historique(o)"/>
-                <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; padding: 0px 16px; ">
-                    <table class="table table-condensed" style="padding-bottom: 0px; margin-bottom: 0px">
-                        <thead>
-                            <tr colspan="3">
-                                <th class="col-xs-7" style="vertical-align: middle">Description</th>
-                                <th class="col-xs-2">Tache</th>
-                                <th class="col-xs-2">Date</th>
-                            </tr>
-                        </thead>
-                        <tbody class="sale_tbody">
-                            <t t-foreach="historique" t-as="interv">
-                                <tr>
-                                    <td>
-                                        <span t-field="interv.name"/>
-                                    </td>
-                                    <td>
-                                        <span t-field="interv.tache_id.name"/>
-                                    </td>
-                                    <td>
-                                        <span class="text-right" t-field="interv.date"/>
-                                    </td>
-                                </tr>
-                            </t>
-                        </tbody>
-                    </table>
-                </div>
-            </t>
-        </xpath>
-    </template>
+<!--                <div class="row h4 mb4">-->
+<!--                    <div class="col-xs-12"><strong>Parc installé - Historique</strong></div>-->
+<!--                </div>-->
+<!--                <t t-set="historique" t-value="o.parc_installe_id.historique(o)"/>-->
+<!--                <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; padding: 0px 16px; ">-->
+<!--                    <table class="table table-condensed" style="padding-bottom: 0px; margin-bottom: 0px">-->
+<!--                        <thead>-->
+<!--                            <tr colspan="3">-->
+<!--                                <th class="col-xs-7" style="vertical-align: middle">Description</th>-->
+<!--                                <th class="col-xs-2">Tache</th>-->
+<!--                                <th class="col-xs-2">Date</th>-->
+<!--                            </tr>-->
+<!--                        </thead>-->
+<!--                        <tbody class="sale_tbody">-->
+<!--                            <t t-foreach="historique" t-as="interv">-->
+<!--                                <tr>-->
+<!--                                    <td>-->
+<!--                                        <span t-field="interv.name"/>-->
+<!--                                    </td>-->
+<!--                                    <td>-->
+<!--                                        <span t-field="interv.tache_id.name"/>-->
+<!--                                    </td>-->
+<!--                                    <td>-->
+<!--                                        <span class="text-right" t-field="interv.date"/>-->
+<!--                                    </td>-->
+<!--                                </tr>-->
+<!--                            </t>-->
+<!--                        </tbody>-->
+<!--                    </table>-->
+<!--                </div>-->
+<!--            </t>-->
+<!--        </xpath>-->
+<!--    </template>-->
 
     <template id="of_parc_installe_extension_fiche_intervention_report2"
               inherit_id="of_planning.of_planning_fiche2_intervention_report_template">
@@ -159,7 +159,7 @@
                                 <t t-set="pi_name"
                                    t-value="(template.fi_pi_model and parc.modele) or (template.fi_pi_product and parc.product_id.name) or ''"/>
                                 <t t-if="template.fi_pi_brand and parc.brand_id or template.fi_pi_serial and parc.name or pi_name">
-                                    <t t-set="pi" t-value="template.fi_pi_brand and [parc.brand_id.name] or [] + template.fi_pi_serial and [parc.name] or [] + pi_name and [pi_name] or []"/>
+                                    <t t-set="pi" t-value="((template.fi_pi_brand and [parc.brand_id.name]) or []) + ((template.fi_pi_serial and [parc.name]) or []) + ((pi_name and [pi_name]) or [])"/>
                                     <div class="h5" style="padding: 0px 16px;">
                                         <strong><span>Sur&amp;nbsp;:</span></strong>
                                         <span t-raw="' - '.join(pi)"/>
@@ -170,7 +170,7 @@
                                     <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
                                     <div class="h5" style="padding: 0px 16px;">
                                         <strong><span>Date d'installation&amp;nbsp;:</span></strong>
-<!--                                        <span t-field="parc.date_installation"/>-->
+                                        <span t-field="parc.date_installation"/>
                                     </div>
                                 </t>
                                 <!-- État -->

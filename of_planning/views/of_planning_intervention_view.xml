@@ -352,7 +352,7 @@
                                 <group>
                                     <field name="warehouse_id"  options="{'no_create': True, 'no_open': True}"/>
                                         <field name="invoice_policy"/>
-                                        <field name="fiscal_position_id" attrs="{'readonly': [('order_id', '!=', False)]}"  options="{'no_create': True, 'no_open': True}"/>
+                                        <field name="fiscal_position_id" attrs="{'readonly': [('lien_commande', '!=', False)]}"  options="{'no_create': True, 'no_open': True}"/>
                                 </group>
                                 <div class="oe_button_box">
                                     <button name="button_import_order_line" string="Importer"

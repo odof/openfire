@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="of_service_parc_installe_rapport_intervention_report_template" inherit_id="of_planning.of_rapport_intervention_report_template">
+        <!-- L'impression de ce rapport peut être déclenché des devis/commandes ou du planning.
+        L'affichage diffère selon l'origine. -->
+        <xpath expr="//div[@name='first']" position="inside">
+            <div name="parc_installe" style="width: 47%; float: right; page-break-inside: avoid;">
+                <t t-if="template.ri_pi and o.parc_installe_id">
+                    <t t-set="parc" t-value="o.parc_installe_id"/>
+                    <div class="row h4 mb4">
+                        <div class="col-xs-12">
+                            <strong>Parc installé</strong>
+                        </div>
+                    </div>
+                    <div class="row"
+                         style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
+                        <div class="col-xs-12" style="display: table; padding: 0px;">
+                            <div style="display: table-cell;">
+                                <!-- Produit installé -->
+                                <t t-set="pi_name"
+                                   t-value="(template.ri_pi_model and parc.modele) or (template.ri_pi_product and parc.product_id.name) or ''"/>
+                                <t t-if="template.ri_pi_brand and parc.brand_id or template.ri_pi_serial and parc.name or pi_name">
+                                    <t t-set="pi" t-value="((template.ri_pi_brand and [parc.brand_id.name]) or []) + ((template.ri_pi_serial and [parc.name]) or []) + ((pi_name and [pi_name]) or [])"/>
+                                    <div class="h5" style="padding: 0px 16px;">
+                                        <strong><span>Sur&amp;nbsp;:</span></strong>
+                                        <span t-raw="' - '.join(pi)"/>
+                                    </div>
+                                </t>
+                                <!-- Date d'installation -->
+                                <t t-if="template.ri_pi_installation_date and parc.date_installation">
+                                    <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                    <div class="h5" style="padding: 0px 16px;">
+                                        <strong><span>Date d'installation&amp;nbsp;:</span></strong>
+                                        <span t-field="parc.date_installation"/>
+                                    </div>
+                                </t>
+                                <!-- État -->
+                                <t t-if="template.ri_pi_state and parc.state">
+                                    <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                    <div class="h5" style="padding: 0px 16px;">
+                                        <strong><span>État&amp;nbsp;:</span></strong>
+                                        <span t-field="parc.state"/>
+                                    </div>
+                                </t>
+                                <!-- Notes -->
+                                <t t-if="template.ri_pi_notes and parc.note">
+                                    <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                    <div class="h5" style="padding: 0px 16px;">
+                                        <strong><span>Notes&amp;nbsp;:</span></strong>
+                                        <span t-field="parc.note"/>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>
