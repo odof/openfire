@@ -1002,7 +1002,8 @@ class OfPlanningIntervention(models.Model):
                 val = getattr(self.address_id, field)
                 if val:
                     name.append(val)
-            self.fiscal_position_id = self.address_id.commercial_partner_id.property_account_position_id
+            if not self.fiscal_position_id:
+                self.fiscal_position_id = self.address_id.commercial_partner_id.property_account_position_id
         self.name = name and " ".join(name) or "Intervention"
 
     @api.onchange('template_id')
@@ -1508,6 +1509,33 @@ class OfPlanningIntervention(models.Model):
         for picking in pickings:
             layouted.append({'name': picking.name, 'lines': picking.move_lines})
         return layouted
+
+    @api.model
+    def _allowed_reports(self):
+        """
+        Fonction qui affecte un nom de rapport à un modèle.
+        Si le nom de rapport imprimé n'est pas dans la liste de clés du dictionnaire,
+        alors les documents joints ne seront pas imprimés.
+        :return: {'nom_du_rapport' : modèle.concerné'}
+        """
+        return ['of_planning.of_planning_fiche2_intervention_report_big_template',
+                'of_planning.of_planning_rapport_intervention_report_template']
+
+    @api.multi
+    def _detect_doc_joint(self, report_name):
+        """
+        Cette fonction retourne les données des documents à joindre au fichier pdf du devis/commande au format binaire.
+        Le document retourné correspond au fichier pdf joint au modéle de courrier.
+        @todo: Permettre l'utilisation de courriers classiques et le remplissage des champs.
+        :return: liste des documents à ajouter à la suite du rapport
+        """
+        template = self.template_id or self.env.ref('of_planning.of_planning_default_intervention_template',
+                                                    raise_if_not_found=False)
+        if template and report_name == 'of_planning.of_planning_fiche2_intervention_report_big_template':
+            return template.fi_doc_joints(self)
+        if template and report_name == 'of_planning.of_planning_rapport_intervention_report_template':
+            return template.ri_doc_joints(self)
+        return []
 
 
 class OfPlanningInterventionLine(models.Model):

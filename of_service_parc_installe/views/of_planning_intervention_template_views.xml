@@ -45,6 +45,40 @@
                 <!-- FI - FACTURATION -->
                 <separator string="" colspan="2"/>
             </xpath>
+            <xpath expr="//separator[@name='ri_notes_above']" position="before">
+                <!-- RI - Parc installé -->
+                <separator string="" colspan="2" name="ri_pi_above"/>
+                <field name="ri_pi" attrs="{'readonly':[('ri_default','=',True)]}"/>
+                <label for="ri_pi_product" style="font-weight: normal !important"/>
+                <div>
+                    <field name="ri_pi_product" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_pi', '=', False)]}"/>
+                </div>
+                <label for="ri_pi_serial" style="font-weight: normal !important"/>
+                <div>
+                    <field name="ri_pi_serial" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_pi', '=', False)]}"/>
+                </div>
+                <label for="ri_pi_brand" style="font-weight: normal !important"/>
+                <div>
+                    <field name="ri_pi_brand" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_pi', '=', False)]}"/>
+                </div>
+                <label for="ri_pi_model" style="font-weight: normal !important"/>
+                <div>
+                    <field name="ri_pi_model" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_pi', '=', False)]}"/>
+                </div>
+                <label for="ri_pi_installation_date" style="font-weight: normal !important"/>
+                <div>
+                    <field name="ri_pi_installation_date" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_pi', '=', False)]}"/>
+                </div>
+                <label for="ri_pi_state" style="font-weight: normal !important"/>
+                <div>
+                    <field name="ri_pi_state" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_pi', '=', False)]}"/>
+                </div>
+                <label for="ri_pi_notes" style="font-weight: normal !important"/>
+                <div>
+                    <field name="ri_pi_notes" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_pi', '=', False)]}"/>
+                </div>
+                <separator string="" colspan="2" name="ri_pi_below"/>
+            </xpath>
         </field>
     </record>
 
