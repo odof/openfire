@@ -3,6 +3,7 @@
 from odoo import api, fields, models, _
 from odoo.addons import decimal_precision as dp
 from odoo.tools.float_utils import float_compare
+from odoo.exceptions import UserError, ValidationError
 
 
 class OfLogisticRate(models.Model):
@@ -16,8 +17,8 @@ class OfLogisticRate(models.Model):
     date_end = fields.Date(string="Date end", required=True)
     partner_id = fields.Many2one(comodel_name='res.partner', string="Carrier", required=True)
     department_id = fields.Many2one(comodel_name='res.country.department', name="Department")
-    min_weight = fields.Float(string="Min. value (kg)", required=True)
-    max_weight = fields.Float(string="Max. value (kg)", required=True)
+    min_weight = fields.Float(string="Min. value (kg)", required=True, digits=(16, 2))
+    max_weight = fields.Float(string="Max. value (kg)", required=True, digits=(16, 2))
     type = fields.Selection([
         ('flat_rate', 'Flat rate'),
         ('10kg', 'Rate/10kg'),
@@ -34,6 +35,16 @@ class OfLogisticRate(models.Model):
     #     ('round_100', 'Round/100kg'),
     #     ], string="Rounding", required=True)
 
+    @api.constrains('date_start', 'date_end')
+    def constraint_dates(self):
+        if self.date_start and self.date_end and self.date_end <= self.date_start:
+            raise ValidationError("The end date must be later than the start date.")
+
+    @api.constrains('min_weight', 'max_weight')
+    def constraint_weights(self):
+        if self.min_weight and self.max_weight and self.max_weight <= self.min_weight:
+            raise ValidationError("The maximum weight must be superior than the minimum weight/")
+
     @api.depends()
     def _compute_name(self):
         type_selection = dict(self._fields['type'].selection)
@@ -49,6 +60,16 @@ class OfLogisticRate(models.Model):
     # def get_rounding(self):
     #     self.ensure_one()
     #     return int(self.rounding[6:])
+
+    @api.onchange('date_start', 'date_end')
+    def onchange_dates(self):
+        if self.date_start and self.date_end and self.date_end <= self.date_start:
+            raise UserError("The end date must be later than the start date.")
+
+    @api.onchange('min_weight', 'max_weight')
+    def onchange_weights(self):
+        if self.min_weight and self.max_weight and self.max_weight <= self.min_weight:
+            raise UserError("The maximum weight must be superior than the minimum weight.")
 
     @api.multi
     def compute_rate_by_weight(self, weight):

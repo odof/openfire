@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+
+    <template id="of_specific_logistic_delivery_report_document" inherit_id="of_stock.of_specific_delivery_report_document">
+        <xpath expr="//table[@name='move_lines']" position="after">
+            <div name="logistic" style="width: 47%; float: left; page-break-inside: avoid;">
+                <div class="row h4 mb4">
+                    <div class="col-xs-12">
+                        <strong>Logistic</strong>
+                    </div>
+                </div>
+                <div class="row"
+                     style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; ">
+                    <div class="col-xs-12" style="display: table; padding: 0px;">
+                        <div style="display: table-cell;">
+                            <!-- Total weight -->
+                            <div class="h5" style="padding: 0px 16px;">
+                                <strong><span>Total weight&amp;nbsp;:</span></strong>
+                                <span t-field="o.total_weight"/><span> Kg</span>
+                            </div>
+                            <!-- Nbr of pallets -->
+                            <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                            <div class="h5" style="padding: 0px 16px;">
+                                <strong><span>Nbr. of pallets&amp;nbsp;:</span></strong>
+                                <span t-field="o.nbr_pallets"/><span> pallets</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="of_logistic_delivery_report_document" inherit_id="stock.report_delivery_document">
+        <xpath expr="//table[@t-if='o.pack_operation_ids']" position="after">
+            <div name="logistic" style="width: 47%; float: left; page-break-inside: avoid;">
+                <div class="row h4 mb4">
+                    <div class="col-xs-12">
+                        <strong>Logistic</strong>
+                    </div>
+                </div>
+                <div class="row"
+                     style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; ">
+                    <div class="col-xs-12" style="display: table; padding: 0px;">
+                        <div style="display: table-cell;">
+                            <!-- Total weight -->
+                            <div class="h5" style="padding: 0px 16px;">
+                                <strong><span>Total weight&amp;nbsp;:</span></strong>
+                                <span t-field="o.of_total_weight"/><span> Kg</span>
+                            </div>
+                            <!-- Nbr of pallets -->
+                            <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                            <div class="h5" style="padding: 0px 16px;">
+                                <strong><span>Nbr. of pallets&amp;nbsp;:</span></strong>
+                                <span t-field="o.of_nbr_pallets"/><span> pallets</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+<!--    <table class="table table-condensed mt48" t-if="o.pack_operation_ids">-->
+
+</odoo>

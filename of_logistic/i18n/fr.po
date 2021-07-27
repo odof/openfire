@@ -192,6 +192,7 @@ msgstr "Nom"
 #: model:ir.model.fields,field_description:of_logistic.field_product_product_of_nbr_pallets
 #: model:ir.model.fields,field_description:of_logistic.field_product_template_of_nbr_pallets
 #: model:ir.model.fields,field_description:of_logistic.field_stock_picking_of_nbr_pallets
+#: model:ir.model.fields,field_description:of_logistic.field_of_specific_delivery_report_wizard_nbr_pallets
 msgid "Nbr. of pallets"
 msgstr "Palettes"
 
@@ -258,6 +259,7 @@ msgstr "Volume total"
 
 #. module: of_logistic
 #: model:ir.model.fields,field_description:of_logistic.field_stock_picking_of_total_weight
+#: model:ir.model.fields,field_description:of_logistic.field_of_specific_delivery_report_wizard_total_weight
 msgid "Total weight"
 msgstr "Poids total"
 
@@ -307,3 +309,46 @@ msgstr "of.logistic.rate"
 msgid "of.stock.picking.logistic.rate"
 msgstr "of.stock.picking.logistic.rate"
 
+#. module: of_logistic
+#: code:addons/of_logistic/models/of_logistic.py:41
+#: code:addons/of_logistic/models/of_logistic.py:67
+#, python-format
+msgid "The end date must be later than the start date."
+msgstr "La date de fin doit être postérieure à la date de début."
+
+#. module: of_logistic
+#: code:addons/of_logistic/models/of_logistic.py:46
+#: code:addons/of_logistic/models/of_logistic.py:72
+#, python-format
+msgid "The maximum weight must be superior than the minimum weight."
+msgstr "Le poids maximum doit être supérieur au poids minimum."
+
+#. module: of_logistic
+#: model:ir.ui.view,arch_db:of_logistic.of_logistic_delivery_report_document
+#: model:ir.ui.view,arch_db:of_logistic.of_specific_logistic_delivery_report_document
+msgid "<span> Kg</span>"
+msgstr "<span> Kg</span>"
+
+#. module: of_logistic
+#: model:ir.ui.view,arch_db:of_logistic.of_logistic_delivery_report_document
+#: model:ir.ui.view,arch_db:of_logistic.of_specific_logistic_delivery_report_document
+msgid "<span> pallets</span>"
+msgstr "<span> palettes</span>"
+
+#. module: of_logistic
+#: model:ir.ui.view,arch_db:of_logistic.of_logistic_delivery_report_document
+#: model:ir.ui.view,arch_db:of_logistic.of_specific_logistic_delivery_report_document
+msgid "<strong><span>Nbr. of pallets&amp;nbsp;:</span></strong>"
+msgstr "<strong><span>Palettes&amp;nbsp;:</span></strong>"
+
+#. module: of_logistic
+#: model:ir.ui.view,arch_db:of_logistic.of_logistic_delivery_report_document
+#: model:ir.ui.view,arch_db:of_logistic.of_specific_logistic_delivery_report_document
+msgid "<strong><span>Total weight&amp;nbsp;:</span></strong>"
+msgstr "<strong><span>Poids total&amp;nbsp;:</span></strong>"
+
+#. module: of_logistic
+#: model:ir.ui.view,arch_db:of_logistic.of_logistic_delivery_report_document
+#: model:ir.ui.view,arch_db:of_logistic.of_specific_logistic_delivery_report_document
+msgid "<strong>Logistic</strong>"
+msgstr "<strong>Logistique</strong>"

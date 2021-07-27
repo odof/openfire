@@ -30,13 +30,14 @@ Stock pickings
 """,
     'depends': [
         'l10n_fr_department',
-        'stock',
+        'of_stock',
         'of_base',
         ],
     'data': [
         'views/of_logistic_views.xml',
         'views/product_views.xml',
         'views/stock_views.xml',
+        'reports/of_logistic_delivery_reports.xml',
         ],
     'installable': True,
     'auto_install': False,
