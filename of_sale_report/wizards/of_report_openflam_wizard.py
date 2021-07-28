@@ -951,7 +951,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
                                 tax_column += 1
                             if account not in payment_dict:
                                 payment_dict[account] = 0.0
-                            payment_dict[account] += abs(tax_move_line.balance) * percent
+                            payment_dict[account] -= tax_move_line.balance * percent
                 else:
                     # On conserve les paiements non intégralement lettrés pour les signaler a l'utilisateur
                     undefined_payments_list.append(payment)
