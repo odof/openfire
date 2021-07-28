@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+
+    <!-- ******************************************************************************************* -->
+    <!-- *********************************** Training modalities *********************************** -->
+    <!-- ******************************************************************************************* -->
+
+    <!--    <record id="of_training_modality_search_view" model="ir.ui.view">-->
+    <!--        <field name="name">Search Training Modalities</field>-->
+    <!--        <field name="model">of.training.modality</field>-->
+    <!--        <field name="arch" type="xml">-->
+    <!--            <search>-->
+    <!--                <field name="name"/>-->
+    <!--                <field name="description"/>-->
+    <!--                <group string="Group By" name="groupby">-->
+    <!--                    <filter name="type" string="Type" context="{'group_by': 'type'}"/>-->
+    <!--                </group>-->
+    <!--                <separator/>-->
+    <!--            </search>-->
+    <!--        </field>-->
+    <!--    </record>-->
+
+    <!--    <record id="of_training_modality_tree_view" model="ir.ui.view">-->
+    <!--        <field name="name">Tree View Training Modalities</field>-->
+    <!--        <field name="model">of.training.modality</field>-->
+    <!--        <field name="arch" type="xml">-->
+    <!--            <tree editable="top">-->
+    <!--                <field name="sequence" widget="handle"/>-->
+    <!--                <field name="name"/>-->
+    <!--                <field name="description"/>-->
+    <!--                <field name="is_printable"/>-->
+    <!--            </tree>-->
+    <!--        </field>-->
+    <!--    </record>-->
+
+    <!-- ******************************************************************************************* -->
+    <!-- ***************************************** Search View *************************************** -->
+    <!-- ******************************************************************************************* -->
+
+    <record id="of_training_modality_search_view" model="ir.ui.view">
+        <field name="name">Search Training Modalities</field>
+        <field name="model">of.training.modality</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="description"/>
+                <group string="Group By" name="groupby">
+                    <filter name="type" string="Type" context="{'group_by': 'type'}"/>
+                </group>
+                <separator/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ******************************************************************************************* -->
+    <!-- ************************************* Tree View ******************************************* -->
+    <!-- ******************************************************************************************* -->
+
+    <record id="of_training_modality_tree_view" model="ir.ui.view">
+        <field name="name">Tree View Training Modalities</field>
+        <field name="model">of.training.modality</field>
+        <field name="arch" type="xml">
+            <tree editable="top" default_order="type desc">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="description"/>
+                <field name="type"/>
+                <field name="is_printable"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_training_equipment_tree_view" model="ir.ui.view">
+        <field name="name">Tree View Training Equipments</field>
+        <field name="model">of.training.equipment</field>
+        <field name="arch" type="xml">
+            <tree editable="top" default_order="sequence,name desc">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="description"/>
+                <field name="availability"/>
+                <field name="type"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_training_program_tree_view" model="ir.ui.view">
+        <field name="name">Tree View Training Programs</field>
+        <field name="model">of.training.program</field>
+        <field name="arch" type="xml">
+            <tree default_order="sequence,name desc">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="default_code"/>
+                <field name="former_ids" widget="many2many_tags"/>
+                <field name="duration"/>
+                <field name="min_participant"/>
+                <field name="max_participant"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_training_session_tree_view" model="ir.ui.view">
+        <field name="name">Tree View Training Sessions</field>
+        <field name="model">of.training.session</field>
+        <field name="arch" type="xml">
+            <tree default_order="sequence,name desc">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="line_ids"/>
+                <field name="equipment_ids"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_training_session_line_tree_view" model="ir.ui.view">
+        <field name="name">Tree View Training Session Lines</field>
+        <field name="model">of.training.session.line</field>
+        <field name="arch" type="xml">
+            <tree default_order="sequence,name desc">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="program_id"/>
+                <field name="nbr_participant"/>
+                <field name="participant_ids" widget="many2many_tags"/>
+                <field name="datetime_start"/>
+                <field name="datetime_stop"/>
+                <field name="duration"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_training_session_participant_line_tree_view" model="ir.ui.view">
+        <field name="name">Tree View Training Session Participant Lines</field>
+        <field name="model">of.training.session.participant.line</field>
+        <field name="arch" type="xml">
+            <tree editable="top" default_order="sequence,name desc">
+                <field name="sequence" widget="handle"/>
+                <field name="partner_id"/>
+                <field name="participation"/>
+                <field name="slot_ids" widget="many2many_tags"/>
+                <field name="nbr_slot"/>
+                <field name="duration"/>
+                <field name="session_line_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_training_program_slot_tree_view" model="ir.ui.view">
+        <field name="name">Tree View Training Program Slot</field>
+        <field name="model">of.training.program.slot</field>
+        <field name="arch" type="xml">
+            <tree editable="top" default_order="datetime_start asc">
+                <field name="datetime_start"/>
+                <field name="datetime_stop"/>
+                <field name="duration"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ******************************************************************************************* -->
+    <!-- ************************************ Form View ******************************************** -->
+    <!-- ******************************************************************************************* -->
+
+    <record id="of_training_program_form_view" model="ir.ui.view">
+        <field name="name">Form View Training Programs</field>
+        <field name="model">of.training.program</field>
+        <field name="arch" type="xml">
+            <form default_order="sequence,name desc">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="sequence" invisible="1"/>
+                            <field name="name"/>
+                            <field name="default_code"/>
+                            <field name="former_ids" widget="many2many_tags"/>
+                        </group>
+                        <group>
+                            <field name="duration"/>
+                            <field name="min_participant"/>
+                            <field name="max_participant"/>
+                        </group>
+                    </group>
+                    <group string="Modalities">
+                        <field name="modality_ids" options="{'no_create_edit': False}" domain="[]" context="{}">
+                            <tree default_order="type asc">
+                                <field name="type"/>
+                                <field name="name"/>
+                                <field name="description"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <group string="Services">
+                        <field name="product_ids"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_training_session_form_view" model="ir.ui.view">
+        <field name="name">Form View Training Sessions</field>
+        <field name="model">of.training.session</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,valid,done,cancel" />
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                    <notebook>
+                        <page string="Session Lines">
+                            <group>
+                                <field name="line_ids" options="{}" domain="[]" context="{}" nolabel="1">
+                                    <tree>
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="program_id"/>
+                                        <field name="participant_ids"/>
+                                        <field name="nbr_participant"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Equipments">
+                            <group>
+                                <field name="equipment_ids" options="{}" domain="[]" context="{}" nolabel="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_training_session_line_form_view" model="ir.ui.view">
+        <field name="name">Form View Training Session Lines</field>
+        <field name="model">of.training.session.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="program_id"/>
+                            <field name="nbr_participant"/>
+                        </group>
+                        <group>
+                            <field name="datetime_start"/>
+                            <field name="datetime_stop"/>
+                            <field name="duration"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Slots">
+                            <group>
+                                <field name="slot_ids" nolabel="1"/>
+                            </group>
+                        </page>
+                        <page string="Participation Lines">
+                            <group>
+                                <field name="participant_line_ids" nolabel="1" context="{'default_session_line_id': id, 'active_id': id, 'parent': parent}" domain="[('slot_ids', 'in', id)]"/>
+                            </group>
+                        </page>
+                        <page string="Participants">
+                            <group>
+                                <field name="participant_ids" nolabel="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_training_session_participant_line_form_view" model="ir.ui.view">
+        <field name="name">Form View Training Session Participation Lines</field>
+        <field name="model">of.training.session.participant.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="name" invisible="1"/>
+                            <field name="program_id"/>
+                            <field name="session_line_id" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="slot_ids"  widget="many2many_tags" context="{'default_session_line_id': session_line_id, 'test': session_line_id, 'active_id': session_line_id}"/>
+                            <field name="nbr_slot"/>
+                            <field name="duration"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ******************************************************************************************* -->
+    <!-- ***************************************** Actions ***************************************** -->
+    <!-- ******************************************************************************************* -->
+
+    <record id="action_training_modality" model="ir.actions.act_window">
+        <field name="name">Training Modalities</field>
+        <field name="res_model">of.training.modality</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="of_training_modality_tree_view"/>
+    </record>
+
+    <record id="action_training_equipment" model="ir.actions.act_window">
+        <field name="name">Training Equipments</field>
+        <field name="res_model">of.training.equipment</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <record id="action_training_program" model="ir.actions.act_window">
+        <field name="name">Training Programs</field>
+        <field name="res_model">of.training.program</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_training_session" model="ir.actions.act_window">
+        <field name="name">Training Sessions</field>
+        <field name="res_model">of.training.session</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_product_template" model="ir.actions.act_window">
+        <field name="name">Services</field>
+        <field name="res_model">product.template</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[["is_training", "=", True]]</field>
+    </record>
+
+    <record id="action_sale_order" model="ir.actions.act_window">
+        <field name="name">Orders</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain"></field>
+    </record>
+
+    <record id="action_training_participant" model="ir.actions.act_window">
+        <field name="name">Participants</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[["is_participant", "=", True]]</field>
+    </record>
+
+    <record id="action_training_former" model="ir.actions.act_window">
+        <field name="name">Formers</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[["is_former", "=", True]]</field>
+        <field name="context">{'default_is_former':True}</field>
+    </record>
+
+    <!-- ******************************************************************************************* -->
+    <!-- ***************************************** Menus ******************************************* -->
+    <!-- ******************************************************************************************* -->
+
+    <menuitem name="Training" id="menu_training" action="of_training.action_training_session" parent="" sequence="10" groups="base.group_user"/>
+
+    <menuitem name="Training" id="menu_training_training" parent="of_training.menu_training" sequence="1" groups="base.group_user"/>
+    <menuitem name="Training sessions" id="menu_training_training_sessions" action="of_training.action_training_session" parent="of_training.menu_training_training" sequence="1"/>
+    <menuitem name="Participants" id="menu_training_training_participants" action="of_training.action_training_participant" parent="of_training.menu_training_training" sequence="2"/>
+    <menuitem name="Orders" id="menu_training_training_orders" action="of_training.action_sale_order" parent="of_training.menu_training_training" sequence="3"/>
+
+    <menuitem name="Resources" id="menu_training_resources" parent="of_training.menu_training" sequence="2"/>
+    <menuitem name="Programs" id="menu_training_resources_programs"  action="of_training.action_training_program" parent="of_training.menu_training_resources" sequence="1"/>
+    <menuitem name="Formers" id="menu_training_resources_formers" action="of_training.action_training_former" parent="of_training.menu_training_resources" sequence="2"/>
+    <menuitem name="Equipments" id="menu_training_resources_equipments"  action="of_training.action_training_equipment" parent="of_training.menu_training_resources" sequence="3"/>
+    <menuitem name="Services" id="menu_training_resources_services"  action="of_training.action_product_template" parent="of_training.menu_training_resources" sequence="4"/>
+
+    <menuitem name="Configuration" id="menu_training_config" parent="of_training.menu_training" sequence="3" groups="base.group_user"/>
+    <menuitem name="Modalities" id="menu_training_config_modalities" action="of_training.action_training_modality" parent="of_training.menu_training_config" sequence="1" groups="base.group_user"/>
+    <menuitem name="Internal docs" id="menu_training_config_internal_docs" parent="of_training.menu_training_config" sequence="2" groups="base.group_user"/>
+    <menuitem name="External docs" id="menu_training_config_external_docs" parent="of_training.menu_training_config" sequence="3" groups="base.group_user"/>
+
+</odoo>

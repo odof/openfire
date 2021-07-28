@@ -1,0 +1,7 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_of_training_modality_user","of.training.modality","model_of_training_modality","base.group_user",1,1,1,1
+"access_of_training_equipment_user","of.training.equipment","model_of_training_equipment","base.group_user",1,1,1,1
+"access_of_training_program_user","of.training.program","model_of_training_program","base.group_user",1,1,1,1
+"access_of_training_session_user","of.training.session","model_of_training_session","base.group_user",1,1,1,1
+"access_of_training_session_line_user","of.training.session.line","model_of_training_session_line","base.group_user",1,1,1,1
+"access_of_training_program_slot_user","of.training.program.slot","model_of_training_program_slot","base.group_user",1,1,1,1

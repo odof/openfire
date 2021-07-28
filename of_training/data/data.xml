@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="of_training_subrogation_category" model="product.category">
+        <field name="name">Subrogation</field>
+        <field name="type">normal</field>
+    </record>
+
+</odoo>

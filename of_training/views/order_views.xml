@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_training_sale_order_form_view" model="ir.ui.view">
+        <field name="name">of.training.sale.order.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="training" string="Training">
+                    <group>
+                        <group>
+                            <group>
+                                <field name="is_training"/>
+                                <field name="is_subrogation" attrs="{'invisible': [('is_training','=',False)]}"/>
+                                <field name="session_id" attrs="{'invisible': [('is_training','=',False)]}"/>
+                            </group>
+                            <group>
+                                <field name="organization_id" attrs="{'invisible': [('is_training','=',False)]}"/>
+                                <field name="organization_file_number" attrs="{'invisible': [('is_training','=',False)]}"/>
+                                <field name="organization_file_date" attrs="{'invisible': [('is_training','=',False)]}"/>
+                            </group>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_training_view_sale_config_settings" model="ir.ui.view">
+        <field name="name">of.training.sale.config.settings.form.view</field>
+        <field name="model">sale.config.settings</field>
+        <field name="inherit_id" ref="sales_team.view_sale_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='main']" position="inside">
+                <group string="Training" name="config_training">
+                    <field name="of_subrogation_product_categ_id_setting" class="oe_inline"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_training_view_sale_advance_payment_inv" model="ir.ui.view">
+        <field name="name">of.training.sale.advance.payment.inv.form.view</field>
+        <field name="model">sale.advance.payment.inv</field>
+        <field name="inherit_id" ref="sale.view_sale_advance_payment_inv"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="of_subrogation_product_categ_id" attrs="{'invisible': 1}" class="oe_inline"/>
+                <field name="of_subrogation_product_id" attrs="{'invisible': [('advance_payment_method', '!=', 'subrogation')]}" class="oe_inline"/>
+                <field name="of_opco_partner_id" attrs="{'invisible': [('advance_payment_method', '!=', 'subrogation')]}" class="oe_inline"/>
+                <field name="of_subrogation_amount" attrs="{'invisible': [('advance_payment_method', '!=', 'subrogation')]}" class="oe_inline" widget="monetary"/>
+            </xpath>
+        </field>
+    </record>
+
+
+</odoo>

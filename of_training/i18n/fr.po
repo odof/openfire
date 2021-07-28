@@ -1,0 +1,625 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_training
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-08-05 14:13+0000\n"
+"PO-Revision-Date: 2021-08-05 14:13+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_sale_advance_payment_inv_of_opco_partner_id
+msgid "(OF) OPCO organization"
+msgstr "(OF) Organisation OPCO"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_sale_advance_payment_inv_of_subrogation_amount
+msgid "(OF) Subrogation amount"
+msgstr "(OF) Montant de subrogation"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_sale_advance_payment_inv_of_subrogation_product_categ_id
+msgid "(OF) Subrogation category"
+msgstr "(OF) Catégorie de subrogation"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_sale_advance_payment_inv_of_subrogation_product_id
+msgid "(OF) Subrogation product"
+msgstr "(OF) Article subrogation"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_sale_config_settings_of_subrogation_product_categ_id_setting
+msgid "(OF)Subrogation category"
+msgstr "(OF)Catégorie de subrogation"
+
+#. module: of_training
+#: selection:of.training.modality,type:0
+msgid "Access modality"
+msgstr "Modalité d'accès"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_equipment_availability
+msgid "Availability"
+msgstr "Disponibilité"
+
+#. module: of_training
+#: selection:of.training.session,state:0
+msgid "Cancelled"
+msgstr "Annulé"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_participant_line_cold_evaluation
+msgid "Cold evaluation"
+msgstr "Evaluation à froid"
+
+#. module: of_training
+#: model:ir.ui.menu,name:of_training.menu_training_config
+msgid "Configuration"
+msgstr "Configuration"
+
+#. module: of_training
+#: selection:of.training.modality,type:0
+msgid "Contract modality"
+msgstr "Modalité contractuelle"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_equipment_create_uid
+#: model:ir.model.fields,field_description:of_training.field_of_training_modality_create_uid
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_create_uid
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_slot_create_uid
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_create_uid
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_line_create_uid
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_participant_line_create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_equipment_create_date
+#: model:ir.model.fields,field_description:of_training.field_of_training_modality_create_date
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_create_date
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_slot_create_date
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_create_date
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_line_create_date
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_participant_line_create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_equipment_description
+#: model:ir.model.fields,field_description:of_training.field_of_training_modality_description
+msgid "Description"
+msgstr "Description"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_training_program
+msgid "Detailed program"
+msgstr "Programme détaillé"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_equipment_display_name
+#: model:ir.model.fields,field_description:of_training.field_of_training_modality_display_name
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_display_name
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_slot_display_name
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_display_name
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_line_display_name
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_participant_line_display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_training
+#: selection:of.training.session,state:0
+#: selection:of.training.session.participant.line,cold_evaluation:0
+#: selection:of.training.session.participant.line,evaluation_of_prior_learning:0
+#: selection:of.training.session.participant.line,hot_evaluation:0
+#: selection:of.training.session.participant.line,pre_evaluation:0
+msgid "Done"
+msgstr "Terminé"
+
+#. module: of_training
+#: selection:of.training.session,state:0
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_duration
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_slot_duration
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_line_duration
+msgid "Duration"
+msgstr "Durée"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_slot_datetime_stop
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_line_datetime_stop
+msgid "End time"
+msgstr "End time"
+
+#. module: of_training
+#: model:ir.model,name:of_training.model_of_training_equipment
+msgid "Equipment"
+msgstr "Equipement"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_equipment_ids
+#: model:ir.ui.menu,name:of_training.menu_training_resources_equipments
+#: model:ir.ui.view,arch_db:of_training.of_training_session_form_view
+msgid "Equipments"
+msgstr "Equipements"
+
+#. module: of_training
+#: selection:of.training.modality,type:0
+msgid "Evaluation modality"
+msgstr "Modalité d'évaluation"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_participant_line_evaluation_of_prior_learning
+msgid "Evaluation of prior learning"
+msgstr "Evaluation des acquis"
+
+#. module: of_training
+#: model:ir.ui.menu,name:of_training.menu_training_config_external_docs
+msgid "External docs"
+msgstr "Docs externes"
+
+#. module: of_training
+#: model:ir.actions.act_window,name:of_training.action_training_former
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_former_ids
+#: model:ir.ui.menu,name:of_training.menu_training_resources_formers
+msgid "Formers"
+msgstr "Formateurs"
+
+#. module: of_training
+#: selection:of.training.session.participant.line,participation:0
+msgid "Free"
+msgstr "Libre"
+
+#. module: of_training
+#: model:ir.ui.view,arch_db:of_training.of_training_modality_search_view
+msgid "Group By"
+msgstr "Grouper par"
+
+#. module: of_training
+#: selection:of.training.equipment,type:0
+msgid "Hardware"
+msgstr "Hardware"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_participant_line_hot_evaluation
+msgid "Hot evaluation"
+msgstr "Evaluation à chaud"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_equipment_id
+#: model:ir.model.fields,field_description:of_training.field_of_training_modality_id
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_id
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_slot_id
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_id
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_line_id
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_participant_line_id
+msgid "ID"
+msgstr "ID"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_modality_is_printable
+msgid "Impression"
+msgstr "Impression"
+
+#. module: of_training
+#: model:ir.ui.menu,name:of_training.menu_training_config_internal_docs
+msgid "Internal docs"
+msgstr "Docs internes"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_res_partner_is_former
+#: model:ir.model.fields,field_description:of_training.field_res_users_is_former
+msgid "Is former"
+msgstr "Est formateur"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_res_partner_is_participant
+#: model:ir.model.fields,field_description:of_training.field_res_users_is_participant
+msgid "Is participant"
+msgstr "Est participant"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_sale_order_is_training
+msgid "Is training"
+msgstr "Formation"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_equipment___last_update
+#: model:ir.model.fields,field_description:of_training.field_of_training_modality___last_update
+#: model:ir.model.fields,field_description:of_training.field_of_training_program___last_update
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_slot___last_update
+#: model:ir.model.fields,field_description:of_training.field_of_training_session___last_update
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_line___last_update
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_participant_line___last_update
+msgid "Last Modified on"
+msgstr "Dernière Modification le"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_equipment_write_uid
+#: model:ir.model.fields,field_description:of_training.field_of_training_modality_write_uid
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_slot_write_uid
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_write_uid
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_line_write_uid
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_participant_line_write_uid
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_equipment_write_date
+#: model:ir.model.fields,field_description:of_training.field_of_training_modality_write_date
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_slot_write_date
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_write_date
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_line_write_date
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_participant_line_write_date
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: of_training
+#: selection:of.training.equipment,availability:0
+msgid "Limited"
+msgstr "Limité"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_max_participant
+msgid "Max. participant"
+msgstr "Max. participant"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_min_participant
+msgid "Min. participant"
+msgstr "Min. participant"
+
+#. module: of_training
+#: model:ir.ui.view,arch_db:of_training.of_training_res_partner_form_view
+msgid "Misc"
+msgstr "Divers"
+
+#. module: of_training
+#: model:ir.ui.view,arch_db:of_training.of_training_product_template_form_view
+msgid "Miscellaneous"
+msgstr "Divers"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_modality_ids
+#: model:ir.ui.menu,name:of_training.menu_training_config_modalities
+#: model:ir.ui.view,arch_db:of_training.of_training_program_form_view
+msgid "Modalities"
+msgstr "Modalités"
+
+#. module: of_training
+#: model:ir.model,name:of_training.model_of_training_modality
+msgid "Modality"
+msgstr "Modalité"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_equipment_name
+#: model:ir.model.fields,field_description:of_training.field_of_training_modality_name
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_name
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_slot_name
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_line_name
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_name
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_participant_line_name
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_participant_line_duration
+msgid "Nbr. of hour"
+msgstr "Nombre d'heure"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_line_nbr_participant
+msgid "Nbr. of participant"
+msgstr "Nombre de participant"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_participant_line_nbr_slot
+msgid "Nbr. of slot"
+msgstr "Nbr. de créneaux"
+
+#. module: of_training
+#: selection:of.training.session.participant.line,cold_evaluation:0
+#: selection:of.training.session.participant.line,evaluation_of_prior_learning:0
+#: selection:of.training.session.participant.line,hot_evaluation:0
+#: selection:of.training.session.participant.line,pre_evaluation:0
+msgid "Not done"
+msgstr "Pas fait"
+
+#. module: of_training
+#: model:ir.actions.act_window,name:of_training.action_sale_order
+#: model:ir.ui.menu,name:of_training.menu_training_training_orders
+msgid "Orders"
+msgstr "Commandes"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_sale_order_organization_id
+msgid "Organization"
+msgstr "Organisme"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_sale_order_organization_file_date
+msgid "Organization file date"
+msgstr "Organisme file date"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_sale_order_organization_file_number
+msgid "Organization file number"
+msgstr "Organisme numéro de dossier"
+
+#. module: of_training
+#: selection:of.training.session.participant.line,participation:0
+msgid "Paid"
+msgstr "Payé"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_participant_line_partner_id
+msgid "Participant"
+msgstr "Participant(e)"
+
+#. module: of_training
+#: model:ir.actions.act_window,name:of_training.action_training_participant
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_line_participant_ids
+#: model:ir.ui.menu,name:of_training.menu_training_training_participants
+#: model:ir.ui.view,arch_db:of_training.of_training_session_line_form_view
+msgid "Participants"
+msgstr "Participants"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_participant_line_participation
+msgid "Participation"
+msgstr "Participation"
+
+#. module: of_training
+#: model:ir.model,name:of_training.model_of_training_session_participant_line
+msgid "Participation Line"
+msgstr "Ligne de participation"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_line_participant_line_ids
+#: model:ir.ui.view,arch_db:of_training.of_training_session_line_form_view
+msgid "Participation Lines"
+msgstr "Lignes de participation"
+
+#. module: of_training
+#: selection:of.training.modality,type:0
+msgid "Participation modality"
+msgstr "Modalité de participation"
+
+#. module: of_training
+#: model:ir.model,name:of_training.model_res_partner
+msgid "Partner"
+msgstr "Partenaire"
+
+#. module: of_training
+#: selection:of.training.modality,type:0
+msgid "Pedagogic modality"
+msgstr "Modalité pédagogique"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_participant_line_pre_evaluation
+msgid "Pre evaluation"
+msgstr "Pré-évaluation"
+
+#. module: of_training
+#: model:ir.model,name:of_training.model_product_template
+msgid "Product Template"
+msgstr "Modèle d'article"
+
+#. module: of_training
+#: model:ir.model,name:of_training.model_of_training_program
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_line_program_id
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_participant_line_program_id
+msgid "Program"
+msgstr "Programme"
+
+#. module: of_training
+#: model:ir.model,name:of_training.model_of_training_program_slot
+msgid "Program Slot"
+msgstr "Créneau"
+
+#. module: of_training
+#: model:ir.ui.menu,name:of_training.menu_training_resources_programs
+#: model:ir.ui.view,arch_db:of_training.of_training_res_partner_form_view
+msgid "Programs"
+msgstr "Programmes"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_default_code
+msgid "Reference"
+msgstr "Référence"
+
+#. module: of_training
+#: model:ir.ui.menu,name:of_training.menu_training_resources
+msgid "Resources"
+msgstr "Ressources"
+
+#. module: of_training
+#: selection:of.training.equipment,type:0
+msgid "Room"
+msgstr "Salle"
+
+#. module: of_training
+#: model:ir.model,name:of_training.model_sale_advance_payment_inv
+msgid "Sales Advance Payment Invoice"
+msgstr "Facture de paiement d'avance"
+
+#. module: of_training
+#: model:ir.model,name:of_training.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_equipment_sequence
+#: model:ir.model.fields,field_description:of_training.field_of_training_modality_sequence
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_sequence
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_line_sequence
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_participant_line_sequence
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_sequence
+msgid "Sequence"
+msgstr "Séquence"
+
+#. module: of_training
+#: model:ir.model.fields,help:of_training.field_of_training_equipment_sequence
+#: model:ir.model.fields,help:of_training.field_of_training_modality_sequence
+#: model:ir.model.fields,help:of_training.field_of_training_program_sequence
+#: model:ir.model.fields,help:of_training.field_of_training_session_line_sequence
+#: model:ir.model.fields,help:of_training.field_of_training_session_participant_line_sequence
+#: model:ir.model.fields,help:of_training.field_of_training_session_sequence
+msgid "Sequence for the handle."
+msgstr "Séquence pour l'ordre."
+
+#. module: of_training
+#: model:ir.actions.act_window,name:of_training.action_product_template
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_product_ids
+#: model:ir.ui.menu,name:of_training.menu_training_resources_services
+#: model:ir.ui.view,arch_db:of_training.of_training_program_form_view
+msgid "Services"
+msgstr "Prestations"
+
+#. module: of_training
+#: model:ir.model,name:of_training.model_of_training_session
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_session_id
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_line_session_id
+#: model:ir.model.fields,field_description:of_training.field_sale_order_session_id
+msgid "Session"
+msgstr "Session"
+
+#. module: of_training
+#: model:ir.model,name:of_training.model_of_training_session_line
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_slot_session_line_id
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_participant_line_session_line_id
+msgid "Session Line"
+msgstr "Ligne de session"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_line_ids
+#: model:ir.ui.view,arch_db:of_training.of_training_session_form_view
+msgid "Session Lines"
+msgstr "Lignes de session"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_line_slot_ids
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_participant_line_slot_ids
+#: model:ir.ui.view,arch_db:of_training.of_training_session_line_form_view
+msgid "Slots"
+msgstr "Créneaux"
+
+#. module: of_training
+#: selection:of.training.equipment,type:0
+msgid "Software"
+msgstr "Logiciel"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_slot_datetime_start
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_line_datetime_start
+msgid "Start time"
+msgstr "Heure de début"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_session_state
+msgid "State"
+msgstr "État"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_sale_order_is_subrogation
+#: model:product.category,name:of_training.of_training_subrogation_category
+msgid "Subrogation"
+msgstr "Subrogation"
+
+#. module: of_training
+#: code:addons/of_training/models/sale_order.py:98
+#, python-format
+msgid "Subrogation of %s"
+msgstr "Subrogation de %s"
+
+#. module: of_training
+#: selection:of.training.modality,type:0
+msgid "Technic modality"
+msgstr "Modalité technique"
+
+#. module: of_training
+#: selection:of.training.session.participant.line,cold_evaluation:0
+#: selection:of.training.session.participant.line,evaluation_of_prior_learning:0
+#: selection:of.training.session.participant.line,hot_evaluation:0
+#: selection:of.training.session.participant.line,pre_evaluation:0
+msgid "To do"
+msgstr "A faire"
+
+#. module: of_training
+#: model:ir.ui.menu,name:of_training.menu_training
+#: model:ir.ui.menu,name:of_training.menu_training_training
+#: model:ir.ui.view,arch_db:of_training.of_training_res_partner_form_view
+#: model:ir.ui.view,arch_db:of_training.of_training_sale_order_form_view
+#: model:ir.ui.view,arch_db:of_training.of_training_view_sale_config_settings
+msgid "Training"
+msgstr "Formation"
+
+#. module: of_training
+#: model:ir.actions.act_window,name:of_training.action_training_equipment
+msgid "Training Equipments"
+msgstr "Equipements de formation"
+
+#. module: of_training
+#: model:ir.actions.act_window,name:of_training.action_training_modality
+msgid "Training Modalities"
+msgstr "Modalités de formation"
+
+#. module: of_training
+#: model:ir.actions.act_window,name:of_training.action_training_program
+msgid "Training Programs"
+msgstr "Programmes de formations"
+
+#. module: of_training
+#: model:ir.actions.act_window,name:of_training.action_training_session
+msgid "Training Sessions"
+msgstr "Sessions de formation"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_program_training_objectives
+msgid "Training objectives"
+msgstr "Objectifs de formation"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_product_product_is_training
+#: model:ir.model.fields,field_description:of_training.field_product_template_is_training
+msgid "Training related"
+msgstr "Formation"
+
+#. module: of_training
+#: model:ir.ui.menu,name:of_training.menu_training_training_sessions
+msgid "Training sessions"
+msgstr "Sessions de formation"
+
+#. module: of_training
+#: model:ir.model.fields,field_description:of_training.field_of_training_equipment_type
+#: model:ir.model.fields,field_description:of_training.field_of_training_modality_type
+#: model:ir.ui.view,arch_db:of_training.of_training_modality_search_view
+msgid "Type"
+msgstr "Type"
+
+#. module: of_training
+#: selection:of.training.equipment,availability:0
+msgid "Unlimited"
+msgstr "Illimité"
+
+#. module: of_training
+#: selection:of.training.session,state:0
+msgid "Valid"
+msgstr "Validé"
+
+#. module: of_training
+#: model:ir.model,name:of_training.model_sale_config_settings
+msgid "sale.config.settings"
+msgstr "sale.config.settings"
