@@ -743,7 +743,7 @@ class SaleOrder(models.Model):
     @api.multi
     def action_view_commissions(self):
         action = self.env.ref('of_sale_commission.action_of_sale_commi_tree').read()[0]
-        action['domain'] = ['|', ('order_id', 'in', self.ids), ('inv_commi_id.order_id', 'in', self.ids)]
+        action['domain'] = ['|', ('order_id', 'in', self.ids), ('order_commi_ids.order_id', 'in', self.ids)]
         action['context'] = {
             'default_type': 'acompte',
             'default_order_id': len(self) == 1 and self.id,
@@ -937,7 +937,7 @@ class AccountInvoice(models.Model):
     @api.multi
     def action_view_commissions(self):
         action = self.env.ref('of_sale_commission.action_of_sale_commi_tree').read()[0]
-        action['domain'] = ['|', ('invoice_id', 'in', self.ids), ('order_commi_ids.order_id', 'in', self.ids)]
+        action['domain'] = ['|', ('invoice_id', 'in', self.ids), ('inv_commi_id.invoice_id', 'in', self.ids)]
         commi_type = 'solde' if self.type == 'out_invoice' else 'avoir'
         action['context'] = {
             'default_type': commi_type,
