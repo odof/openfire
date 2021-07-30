@@ -30,6 +30,14 @@
                 </div>
             </div>
         </xpath>
+        <xpath expr="//table[@name='move_lines']/thead/tr" position="inside">
+            <th name="weight"><strong>Weight</strong></th>
+        </xpath>
+        <xpath expr="//table[@name='move_lines']/tbody/tr" position="inside">
+            <td name="weight">
+                <span t-field="line.product_weight"/> kg
+            </td>
+        </xpath>
     </template>
 
     <template id="of_logistic_delivery_report_document" inherit_id="stock.report_delivery_document">
@@ -59,6 +67,22 @@
                     </div>
                 </div>
             </div>
+        </xpath>
+        <xpath expr="//table[@t-if='not o.pack_operation_ids']/thead/tr" position="inside">
+            <th name="weight"><strong>Weight</strong></th>
+        </xpath>
+        <xpath expr="//table[@t-if='not o.pack_operation_ids']/tbody/tr" position="inside">
+            <td name="weight">
+                <span t-field="move.of_product_weight"/> kg
+            </td>
+        </xpath>
+        <xpath expr="//table[@t-if='o.pack_operation_ids']/thead/tr" position="inside">
+            <th name="weight"><strong>Weight</strong></th>
+        </xpath>
+        <xpath expr="//table[@t-if='o.pack_operation_ids']/tbody/tr" position="inside">
+            <td name="weight">
+                <span t-field="pack_operation.of_product_weight"/> kg
+            </td>
         </xpath>
     </template>
 

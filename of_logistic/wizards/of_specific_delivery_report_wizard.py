@@ -38,3 +38,20 @@ class OFSpecificDeliveryReportWizard(models.TransientModel):
                 qty = move_uom._compute_price(line.product_uom_qty, product_uom)
                 nbr_pallets += qty * product.of_nbr_pallets
             wizard.total_weight = nbr_pallets
+
+
+class OFDeliveryDivisionWizardLine(models.TransientModel):
+    _inherit = 'of.specific.delivery.report.wizard.line'
+
+    product_weight = fields.Float(string="Weight", compute='_compute_of_product_weight')
+
+    @api.depends('product_id', 'move_id.product_uom', 'move_id.product_uom_qty')
+    def _compute_of_product_weight(self):
+        for line in self:
+            product = line.move_id.product_id
+            product_uom = product.uom_id
+            move_uom = line.move_id.product_uom
+            # Since the values are for the UOM of the product, convert the qty to the one of the product
+            # _compute_price also works for quantities since it only applies the factors
+            qty = move_uom._compute_price(line.move_id.product_uom_qty, product_uom)
+            line.product_weight = qty * product.weight

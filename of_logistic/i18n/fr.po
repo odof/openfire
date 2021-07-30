@@ -352,3 +352,9 @@ msgstr "<strong><span>Poids total&amp;nbsp;:</span></strong>"
 #: model:ir.ui.view,arch_db:of_logistic.of_specific_logistic_delivery_report_document
 msgid "<strong>Logistic</strong>"
 msgstr "<strong>Logistique</strong>"
+
+#. module: of_logistic
+#: model:ir.ui.view,arch_db:of_logistic.of_logistic_delivery_report_document
+#: model:ir.ui.view,arch_db:of_logistic.of_specific_logistic_delivery_report_document
+msgid "<strong>Weight</strong>"
+msgstr "<strong>Poids</strong>"

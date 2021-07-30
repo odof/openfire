@@ -127,10 +127,16 @@ class StockMove(models.Model):
 
     of_product_weight = fields.Float(string="Weight", compute='_compute_of_product_weight')
 
-    @api.depends('product_id')
+    @api.depends('product_id', 'product_uom', 'product_uom_qty')
     def _compute_of_product_weight(self):
         for move in self:
-            move.of_product_weight = move.product_id.weight
+            product = move.product_id
+            product_uom = product.uom_id
+            move_uom = move.product_uom
+            # Since the values are for the UOM of the product, convert the qty to the one of the product
+            # _compute_price also works for quantities since it only applies the factors
+            qty = move_uom._compute_price(move.product_uom_qty, product_uom)
+            move.of_product_weight = qty * product.weight
 
 
 class StockPackOperation(models.Model):
@@ -138,7 +144,13 @@ class StockPackOperation(models.Model):
 
     of_product_weight = fields.Float(string="Weight", compute='_compute_of_product_weight')
 
-    @api.depends('product_id')
+    @api.depends('product_id', 'product_qty', 'product_uom_id')
     def _compute_of_product_weight(self):
-        for move in self:
-            move.of_product_weight = move.product_id.weight
+        for operation in self:
+            product = operation.product_id
+            product_uom = product.uom_id
+            operation_uom = operation.product_uom_id
+            # Since the values are for the UOM of the product, convert the qty to the one of the product
+            # _compute_price also works for quantities since it only applies the factors
+            qty = operation_uom._compute_price(operation.product_qty, product_uom)
+            operation.of_product_weight = qty * product.weight
