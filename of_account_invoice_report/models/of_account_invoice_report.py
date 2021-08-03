@@ -34,6 +34,9 @@ class AccountInvoice(models.Model):
     def pdf_mention_legale(self):
         return self.env['ir.values'].get_default('account.config.settings', 'pdf_mention_legale') or ""
 
+    def pdf_masquer_commercial(self):
+        return self.env['ir.values'].get_default('account.config.settings', 'pdf_masquer_pastille_commercial')
+
     @api.multi
     def _of_get_total_lines_by_group(self, invoices):
         u"""
@@ -352,6 +355,10 @@ class AccountConfigSettings(models.TransientModel):
     pdf_mention_legale = fields.Text(
         string=u"(OF) Mentions légales", help=u"Sera affiché dans les factures sous les commentaires du bas"
     )
+    pdf_masquer_pastille_commercial = fields.Boolean(
+        string=u"(OF) Masquer pastille commercial", required=True, default=False,
+        help=u"Masquer la pastille commercial dans les rapports PDF ?"
+    )
 
     @api.multi
     def set_pdf_adresse_nom_parent_defaults(self):
@@ -400,6 +407,11 @@ class AccountConfigSettings(models.TransientModel):
         return self.env['ir.values'].sudo().set_default(
             'account.config.settings', 'pdf_mention_legale', self.pdf_mention_legale
         )
+
+    @api.multi
+    def set_pdf_masquer_pastille_commercial(self):
+        return self.env['ir.values'].sudo().set_default(
+            'account.config.settings', 'pdf_masquer_pastille_commercial', self.pdf_masquer_pastille_commercial)
 
 
 class OFInvoiceReportTotalGroup(models.Model):

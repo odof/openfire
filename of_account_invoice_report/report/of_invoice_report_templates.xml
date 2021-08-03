@@ -9,6 +9,7 @@
         <t t-set="pdf_fax" t-value="o.pdf_afficher_fax()"/>
         <t t-set="pdf_email" t-value="o.pdf_afficher_email()"/>
         <t t-set="pdf_mention_legale" t-value="o.pdf_mention_legale()"/>
+        <t t-set="pdf_masquer_commercial" t-value="o.pdf_masquer_commercial()"/>
         <t t-set="client_info_pastille" t-value="(pdf_telephone &gt; 1 and o.partner_id.phone) or (pdf_mobile &gt; 1 and o.partner_id.mobile) or (pdf_fax &gt; 1 and o.partner_id.fax) or (pdf_email &gt; 1 and o.partner_id.email)"/>
         <!--####################
             La vue d'origine est entièrement réécrite ici.
@@ -64,7 +65,7 @@
                     </div>
                     <div t-if="o.date_due and o.type == 'out_invoice' and (o.state == 'open' or o.state == 'paid')" style="display: table-cell; width: 4px;"/>
 
-                    <div name="commercial" t-if="o.user_id" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                    <div name="commercial" t-if="o.user_id and not pdf_masquer_commercial" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                         <strong>Salesperson:</strong>
                         <p>
                             <t t-if="o.user_id.name"><span t-field="o.user_id.name"/><br/></t>
