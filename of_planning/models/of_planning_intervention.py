@@ -513,7 +513,7 @@ class OfPlanningIntervention(models.Model):
     )
     warehouse_id = fields.Many2one(
         'stock.warehouse', string=u'Entrepôt',
-        required=True, readonly=True, states={'draft': [('readonly', False)]},
+        readonly=True, states={'draft': [('readonly', False), ('required', True)]},
         default=lambda s: s._default_warehouse_id)
     procurement_group_id = fields.Many2one('procurement.group', 'Procurement Group', copy=False)
     picking_ids = fields.One2many(comodel_name='stock.picking', compute="_compute_pickings", string=u"BL associés")
