@@ -38,14 +38,15 @@
     """,
     # Modules sale, purchase nécessaires pour historique documents
     # of_base nécessaire pour onglet historique dans vue partenaire
-    'depends': ['project_issue', 'sale', 'purchase', 'of_base', 'of_planning', 'of_gesdoc'],
+    'depends': ['project_issue', 'sale', 'purchase', 'of_base', 'of_planning', 'of_gesdoc', 'of_access_control'],
     'css': [
         "static/src/css/of_project_issue.css",
     ],
     'data': [
         'security/ir.model.access.csv',
         'report/of_project_issue_fiche_intervention.xml',
-        'views/of_project_issue.xml',
+        'views/of_project_issue_views.xml',
+        'wizard/of_confirm_action_views.xml',
         'data/of_project_issue_canal_data.xml',
         'data/of_project_issue_sequence.xml',
     ],

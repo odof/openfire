@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_confirm_action_wizard_view" model="ir.ui.view">
+        <field name="name">of.confirm.action.wizard.form</field>
+        <field name="model">of.confirm.action</field>
+        <field name="arch" type="xml">
+            <form>
+                <div class="of_title">
+                    <h1>
+                        <b>
+                            Commandes déjà générées
+                        </b>
+                    </h1>
+                    <p>
+                        Des commandes ont déjà été générées. Voulez vous en générer de nouvelles ?
+                    </p>
+                </div>
+                <field name="project_issue_id" invisible="1"/>
+                <field name="type" invisible="1"/>
+                <footer>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                    <button string="Confirmer" name="confirm_open_purchase_order" type="object" class="oe_highlight"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

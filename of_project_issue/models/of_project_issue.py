@@ -42,10 +42,16 @@ class ProjectIssue(models.Model):
 
     of_code = fields.Char("Code", required=True, readonly=True, default='Nouveau')
     partner_note = fields.Text("Note client", related='partner_id.comment', readonly=False)
-    invoice_ids = fields.One2many(
-        'account.invoice', compute='_get_partner_invoices', string='Factures du client', method=True, readonly=True)
+    invoice_ids = fields.One2many('account.invoice', compute='_get_partner_invoices', string="Factures du client")
+    saleorder_ids = fields.One2many('sale.order', compute='_compute_saleorder_ids', string="Commandes client")
+    purchaseorder_ids = fields.One2many(
+        'purchase.order', compute='_compute_purchaseorder_ids', string="Commandes fournisseur")
+    saleorder_count = fields.Integer("Nombre de commande (client)", compute='_compute_saleorder_ids')
+    purchaseorder_count = fields.Integer("Nombre de commande (fournisseur)", compute='_compute_purchaseorder_ids')
+    saleorder_created = fields.Boolean("CC Générée")
+    purchaseorder_created = fields.Boolean("CF Générée")
     of_categorie_id = fields.Many2one('of.project.issue.categorie', string=u"Catégorie", ondelete='restrict')
-    of_categorie_mere_id = fields.Many2one(related="of_categorie_id.pparent_id", string=u"Catégorie mère", store=True)
+    of_categorie_mere_id = fields.Many2one(related='of_categorie_id.pparent_id', string=u"Catégorie mère", store=True)
     of_canal_id = fields.Many2one('of.project.issue.canal', string=u"Canal", required=False, ondelete='restrict')
     of_garantie = fields.Boolean("Garantie")
     of_payant_client = fields.Boolean("Payant client")
@@ -54,19 +60,56 @@ class ProjectIssue(models.Model):
     of_piece_commande = fields.Text(u'Pièces à commander')
     doc_ids = fields.One2many('of.sav.docs', 'project_issue_id', string="Liste de documents")
     interventions_liees = fields.One2many('of.planning.intervention', 'sav_id', string=u"Interventions liées")
+    interventions_count = fields.Integer(string="Nombre d'intervention", compute='_compute_interventions_count')
     of_partner_id_ref = fields.Char(u"Réf. contact", related='partner_id.ref', readonly=True)
     of_partner_id_address = fields.Char("Adresse", related='partner_id.contact_address', readonly=True)
     of_partner_id_phone = fields.Char(u"Téléphone", related='partner_id.phone', readonly=True)
     of_partner_id_mobile = fields.Char(u"Mobile", related='partner_id.mobile', readonly=True)
     of_partner_id_function = fields.Char(u"Fonction", related='partner_id.function', readonly=True)
+    # active_test indispensable car il y a un active_test à False sur of_user_profile_id dans of_access_control
+    of_create_uid_profile_id = fields.Many2one(
+        related="create_uid.of_user_profile_id", string=u"Profil de création",
+        readonly=True, store=True, context={'active_test': True})
 
     company_id = fields.Many2one(default=False)
 
     of_create_date_formatted = fields.Char(
         string=u"Date de création formatée", compute='_compute_of_create_date_formatted')
     of_planification_date = fields.Datetime(string=u"Date de planification", compute='_compute_of_planification_date')
+    of_line_ids = fields.One2many(comodel_name='of.project.issue.line', inverse_name='issue_id', string="Facturation")
+    of_sale_fiscal_position_id = fields.Many2one(
+        comodel_name='account.fiscal.position', string="Position fiscale (client)",
+        domain="[('tax_ids.tax_src_id.type_tax_use','=','sale')]"
+    )
+    of_purchase_fiscal_position_id = fields.Many2one(
+        comodel_name='account.fiscal.position', string="Position fiscale (fournisseur)",
+        domain="[('tax_ids.tax_src_id.type_tax_use','=','purchase')]",
+        help="La position fiscale par défaut qui sera renseignée si le fournisseur de \
+        l'article n'a pas lui même de position fiscale."
+    )
 
     # @api.depends
+
+    @api.depends("of_code")
+    def _compute_saleorder_ids(self):
+        saleorder_obj = self.env['sale.order']
+        for sav in self:
+            saleorder_ids = saleorder_obj.search([('origin', '=', sav.of_code)])
+            sav.saleorder_ids = saleorder_ids
+            sav.saleorder_count = len(saleorder_ids)
+
+    @api.depends("of_code")
+    def _compute_purchaseorder_ids(self):
+        purchaseorder_obj = self.env['purchase.order']
+        for sav in self:
+            purchaseorder_ids = purchaseorder_obj.search([('origin', '=', sav.of_code)])
+            sav.purchaseorder_ids = purchaseorder_ids
+            sav.purchaseorder_count = len(purchaseorder_ids)
+
+    @api.depends("interventions_liees")
+    def _compute_interventions_count(self):
+        for sav in self:
+            sav.interventions_count = len(sav.interventions_liees)
 
     @api.depends
     def _get_partner_invoices(self):
@@ -152,6 +195,7 @@ class ProjectIssue(models.Model):
     # Actions
 
     # Quand on clique sur le bouton "Ouvrir" dans la liste des SAV pour aller sur le SAV
+
     @api.multi
     def button_open_of_sav(self):
         if self.ensure_one():
@@ -161,6 +205,42 @@ class ProjectIssue(models.Model):
                 'view_mode': 'form',
                 'res_model': 'project.issue',
                 'res_id': self._ids[0],
+                'type': 'ir.actions.act_window',
+            }
+
+    @api.multi
+    def action_view_saleorder(self):
+        if self.ensure_one():
+            return {
+                'name': 'Commandes client',
+                'view_mode': 'tree,kanban,form',
+                'res_model': 'sale.order',
+                'res_id': self.saleorder_ids.ids,
+                'domain': "[('id', 'in', %s)]" % self.saleorder_ids.ids,
+                'type': 'ir.actions.act_window',
+            }
+
+    @api.multi
+    def action_view_purchaseorder(self):
+        if self.ensure_one():
+            return {
+                'name': 'Commandes fournisseur',
+                'view_mode': 'tree,kanban,form',
+                'res_model': 'purchase.order',
+                'res_id': self.purchaseorder_ids.ids,
+                'domain': "[('id', 'in', %s)]" % self.purchaseorder_ids.ids,
+                'type': 'ir.actions.act_window',
+            }
+
+    @api.multi
+    def action_view_intervention(self):
+        if self.ensure_one():
+            return {
+                'name': 'Interventions',
+                'view_mode': 'tree,kanban,form',
+                'res_model': 'of.planning.intervention',
+                'res_id': self.interventions_liees.ids,
+                'domain': "[('id', 'in', %s)]" % self.interventions_liees.ids,
                 'type': 'ir.actions.act_window',
             }
 
@@ -184,42 +264,144 @@ class ProjectIssue(models.Model):
 
     @api.model
     def open_purchase_order(self):
+        self.ensure_one()
+
+        # On test si les commandes ont été créées, on demande une confirmation si elle n'a pas encore été reçue
+        if self.purchaseorder_created and not self._context.get('confirmed'):
+            return {
+                'type': 'ir.actions.act_window',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'of.confirm.action',
+                'views': [(self.env.ref('of_project_issue.of_confirm_action_wizard_view').id, 'form')],
+                'view_id': self.env.ref('of_project_issue.of_confirm_action_wizard_view').id,
+                'target': 'new',
+                'context': {
+                    'default_project_issue_id': self.id,
+                    'default_type': 'purchase',
+                },
+            }
+
         res = {
             'name': 'Demande de prix',
-            'view_type': 'form',
-            'view_mode': 'form',
+            'view_mode': 'form,tree',
             'res_model': 'purchase.order',
             'type': 'ir.actions.act_window',
             'target': 'current',
         }
-        active_ids = self._context.get('active_ids')
-        if active_ids:
-            project_issue = self.browse(active_ids[0])
-            if project_issue.partner_id:
-                res['context'] = {'client_id': project_issue.partner_id.id,
-                                  'default_origin': project_issue.of_code}
+        if not self.of_line_ids:
+            if self.partner_id:
+                res['context'] = {'client_id': self.partner_id.id,
+                                  'default_origin': self.of_code}
             else:
-                res['context'] = {'default_origin': project_issue.of_code}
+                res['context'] = {'default_origin': self.of_code}
+        else:
+            purchase_obj = self.env['purchase.order']
+            lines_by_supplier = {}
+            no_supplier = []
+            # Séparer les ligne par fournisseur, lignes sans fournisseur ignorées pour l'instant
+            for line in self.of_line_ids:
+                suppliers = line.product_id.seller_ids \
+                                .filtered(lambda r: (not r.company_id or r.company_id == line.company_id) and
+                                                    (not r.product_id or r.product_id == line.product_id))
+                if suppliers:
+                    supplier = suppliers[0].name  # supplier.name est un many2one vers res.partner
+                    if supplier not in lines_by_supplier:
+                        lines_by_supplier[supplier] = []
+                    lines_by_supplier[supplier].append(line)
+                else:
+                    no_supplier.append(line)
+            purchase_orders = purchase_obj
+            # Création de chaque CF
+            for supplier, lines in lines_by_supplier.iteritems():
+                # utilisation de new() pour trigger les onchanges facilement
+                purchase_order_new = purchase_obj.new({
+                    'partner_id': supplier.id,
+                    'customer_id': self.partner_id.id,
+                    'origin': self.of_code,
+                })
+                purchase_order_new.onchange_partner_id()
+                order_values = purchase_order_new._convert_to_write(purchase_order_new._cache)
+                # On passe la position fiscale ici car si un onchange_partner_id() est appelé, il la supprime
+                if not order_values.get("fiscal_position_id", False):
+                    order_values["fiscal_position_id"] = self.of_purchase_fiscal_position_id \
+                                                         and self.of_purchase_fiscal_position_id.id
+                purchase_order = purchase_obj.create(order_values)
+                purchase_lines = []
+                for line in lines:
+                    line_vals = line._prepare_purchase_order_line(purchase_order)
+                    purchase_lines.append((0, 0, line_vals))
+                purchase_order.write({'order_line': purchase_lines})
+                purchase_orders |= purchase_order
+            # Si plusieurs CF retourner vue liste avec les différentes CF
+            # Si une seule, afficher la CF en vue form
+            if len(purchase_orders) > 1:
+                res['view_mode'] = 'tree,kanban,form'
+                res['domain'] = "[('id', 'in', %s)]" % purchase_orders.ids
+            elif len(purchase_orders) == 1:
+                res['res_id'] = purchase_orders.id
+
+        # On indique que les commandes ont été générées
+        self.purchaseorder_created = True
+
         return res
 
     @api.model
     def open_sale_order(self):
+        self.ensure_one()
+
+        # On test si les commandes ont été créées, on demande une confirmation si elle n'a pas encore été reçue
+        if self.saleorder_created and not self._context.get('confirmed'):
+            return {
+                'type': 'ir.actions.act_window',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'of.confirm.action',
+                'views': [(self.env.ref('of_project_issue.of_confirm_action_wizard_view').id, 'form')],
+                'view_id': self.env.ref('of_project_issue.of_confirm_action_wizard_view').id,
+                'target': 'new',
+                'context': {
+                    'default_project_issue_id': self.id,
+                    'default_type': 'sale',
+                },
+            }
+
         res = {
             'name': 'Devis',
-            'view_type': 'form',
             'view_mode': 'form',
             'res_model': 'sale.order',
             'type': 'ir.actions.act_window',
             'target': 'current',
-        }
-        active_ids = self._context.get('active_ids')
-        if active_ids:
-            project_issue = self.browse(active_ids[0])
-            if project_issue.partner_id:
-                res['context'] = {'default_partner_id': project_issue.partner_id.id,
-                                  'default_origin': project_issue.of_code}
+            }
+        if not self.of_line_ids or not self.of_sale_fiscal_position_id:
+            if self.partner_id:
+                res['context'] = {'default_partner_id': self.partner_id.id,
+                                  'default_origin': self.of_code}
             else:
-                res['context'] = {'default_origin': project_issue.of_code}
+                res['context'] = {'default_origin': self.of_code}
+        else:
+            sale_obj = self.env['sale.order']
+            # utilisation de new() pour trigger les onchanges facilement
+            sale_order_new = sale_obj.new({
+                'partner_id': self.partner_id.id,
+                'origin': self.of_code,
+            })
+            sale_order_new.onchange_partner_id()
+            sale_order_new.update({'fiscal_position_id': self.of_sale_fiscal_position_id.id})
+            order_values = sale_order_new._convert_to_write(sale_order_new._cache)
+            sale_order = sale_obj.create(order_values)
+            lines_to_create = []
+            # Récupération des lignes de commandes
+            for line in self.of_line_ids:
+                line_vals = line._prepare_sale_order_line(sale_order)
+                lines_to_create.append((0, 0, line_vals))
+            sale_order.write({'order_line': lines_to_create})
+            # Renvoyer la commande créée
+            res['res_id'] = sale_order.id
+
+            # On indique que les commandes ont été générées
+            self.saleorder_created = True
+
         return res
 
     # Autres
@@ -236,7 +418,8 @@ class ProjectIssue(models.Model):
             invoice_ids = self.env['account.invoice'].search([('partner_id', '=', partner_id)])
             sale_order_ids = self.env['sale.order'].search([('partner_id', '=', partner_id)])
             # Migration achats fournisseurs inhibés provisoirement car of_appro pas encore migré
-            # Migration purchase_order_ids = self.env['purchase.order'].search(cr, uid, [('client_id', '=', partner_id)])
+            # Migration purchase_order_ids = self.env['purchase.order']
+            # .search(cr, uid, [('client_id', '=', partner_id)])
             if invoice_ids:
                 for inv in invoice_ids:
                     docs.append({
@@ -480,8 +663,39 @@ class OfPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
     sav_id = fields.Many2one(
-        'project.issue', string="SAV",
-        domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")
+        'project.issue', string="SAV", domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")
+    sav_of_code = fields.Char(string="SAV Code", related='sav_id.of_code')
+    saleorder_ids = fields.One2many(
+        'sale.order', related='sav_id.saleorder_ids', string="Commandes client", readonly=True)
+    purchaseorder_ids = fields.One2many(
+        'purchase.order', related='sav_id.purchaseorder_ids', string="Commandes fournisseur", readonly=True)
+    saleorder_count = fields.Integer(
+        string="Nombre de commandes (client)", related='sav_id.saleorder_count', readonly=True)
+    purchaseorder_count = fields.Integer(
+        string="Nombre de commandes (fournisseur)", related='sav_id.purchaseorder_count', readonly=True)
+    fiscal_position_id = fields.Many2one(domain="[('tax_ids.tax_src_id.type_tax_use','=','purchase')]")
+
+    @api.multi
+    def action_view_saleorder(self):
+        self.ensure_one()
+        return self.sav_id and self.sav_id.action_view_saleorder()
+
+    @api.multi
+    def action_view_purchaseorder(self):
+        self.ensure_one()
+        return self.sav_id and self.sav_id.action_view_purchaseorder()
+
+    @api.multi
+    def action_view_sav(self):
+        if self.ensure_one():
+            return {
+                'name': 'SAV',
+                'view_mode': 'form,tree,kanban',
+                'res_model': 'project.issue',
+                'res_id': self.sav_id.id,
+                'domain': "[('id', '=', %s)]" % self.sav_id.id,
+                'type': 'ir.actions.act_window',
+            }
 
 
 class OfMailTemplate(models.Model):
@@ -490,3 +704,37 @@ class OfMailTemplate(models.Model):
     @api.model
     def _get_allowed_models(self):
         return super(OfMailTemplate, self)._get_allowed_models() + ['project.issue']
+
+
+class OfProjectIssueLine(models.Model):
+    _name = 'of.project.issue.line'
+    _description = "Helpdesk Line"
+
+    issue_id = fields.Many2one(comodel_name='project.issue', string="SAV", required=True)
+    product_id = fields.Many2one(comodel_name='product.product', string="Article", required=True)
+    qty = fields.Float(string=u"Qté", required=True)
+    company_id = fields.Many2one(comodel_name='res.company', string=u"Société", related='issue_id.company_id')
+
+    @api.multi
+    def _prepare_sale_order_line(self, order):
+        sale_line_obj = self.env['sale.order.line']
+        order_line_new = sale_line_obj.new({
+            'product_id': self.product_id.id,
+            'order_id': order.id
+            })
+        order_line_new.product_id_change()
+        order_line_new.product_uom_change()
+        order_line_new.update({'product_uom_qty': self.qty})
+        return order_line_new._convert_to_write(order_line_new._cache)
+
+    @api.multi
+    def _prepare_purchase_order_line(self, order):
+        purchase_line_obj = self.env['purchase.order.line']
+        order_line_new = purchase_line_obj.new({
+            'product_id': self.product_id.id,
+            'order_id': order.id
+            })
+        order_line_new.onchange_product_id()
+        order_line_new.update({'product_qty': self.qty})
+        order_line_new._onchange_quantity()
+        return order_line_new._convert_to_write(order_line_new._cache)
