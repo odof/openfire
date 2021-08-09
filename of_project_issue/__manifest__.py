@@ -38,7 +38,7 @@
     """,
     # Modules sale, purchase nécessaires pour historique documents
     # of_base nécessaire pour onglet historique dans vue partenaire
-    'depends': ['project_issue', 'sale', 'purchase', 'of_base', 'of_planning', 'of_gesdoc'],
+    'depends': ['project_issue', 'sale', 'purchase', 'of_base', 'of_planning', 'of_gesdoc', 'of_access_control'],
     'css': [
         "static/src/css/of_project_issue.css",
     ],

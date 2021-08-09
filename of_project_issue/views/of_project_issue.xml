@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-<!-- Help Desk (menu) -->
+    <!-- Help Desk (menu) -->
 
     <record id="of_view_project_issue_filter" model="ir.ui.view">
         <field name="name">of.view.project.issue.filter</field>
@@ -15,13 +15,17 @@
             <field name="id" position="replace"/>
             <field name="user_id" position="replace">
                 <field name="user_id" string="Responsable"/>
-                </field>
+                <field name="of_create_uid_profile_id" string="Créé par profil"/>
+            </field>
             <field name="project_id" position="replace"/>
 
             <filter name="project" position="after">
                 <filter name="categ_id" string="Catégorie" context="{'group_by' : 'of_categorie_id'}"/>
                 <filter name="categ_mere_id" string="Catégorie mère" context="{'group_by' : 'of_categorie_mere_id'}"/>
             </filter>
+            <group position="inside">
+                <filter string="Profil de création" context="{'group_by':'of_create_uid_profile_id'}"/>
+            </group>
         </field>
     </record>
 
@@ -63,6 +67,29 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']/button[@name='toggle_active']" position="attributes">
                 <attribute name="groups"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_saleorder"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-pencil-square-o"
+                        attrs="{'invisible': [('saleorder_count', '=', 0)]}">
+                    <field name="saleorder_count" widget="statinfo" string="Commandes client"/>
+                </button>
+                <button name="action_view_purchaseorder"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-pencil-square-o"
+                        attrs="{'invisible': [('purchaseorder_count', '=', 0)]}">
+                    <field name="purchaseorder_count" widget="statinfo" string="Commandes fournisseur"/>
+                </button>
+                <button name="action_view_intervention"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-calendar-o"
+                        attrs="{'invisible': [('interventions_count', '=', 0)]}">
+                    <field name="interventions_count" widget="statinfo" string="Interventions"/>
+                </button>
             </xpath>
             <xpath expr="//form/sheet/group/group" position="attributes">
                 <attribute name="string">SAV</attribute>
@@ -114,6 +141,8 @@
 
             <page name="extra_info" position="inside">
                 <group string="Liste de documents">
+                    <field name="saleorder_ids" nolabel="1" colspan="4" invisible="1"/>
+                    <field name="purchaseorder_ids" nolabel="1" colspan="4" invisible="1"/>
                     <field name="invoice_ids" nolabel="1" colspan="4" invisible="1"/>
                     <field name="doc_ids" nolabel="1" colspan="4" readonly="1">
                         <tree string="Documents" editable="bottom">
@@ -169,6 +198,24 @@
                     <field name="partner_note" colspan="4" nolabel="1"/>
                 </group>
             </page>
+            <xpath expr="//notebook" position="inside">
+                <page name="invoicing" string="Facturation">
+                    <group>
+                        <group>
+                            <field name="of_sale_fiscal_position_id"/>
+                        </group>
+                        <group>
+                            <field name="of_purchase_fiscal_position_id"/>
+                        </group>
+                        <field name="of_line_ids" nolabel="1">
+                            <tree editable="bottom">
+                                <field name="product_id"/>
+                                <field name="qty"/>
+                            </tree>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
         </field>
     </record>
 
@@ -192,31 +239,31 @@
     <!-- Rapport Fiche SAV dans le SAV -->
 
     <report
-        auto="True"
-        id="report_of_project_issue"
-        model="project.issue"
-        name="of_project_issue.sav"
-        rml="of_project_issue/report/sav.rml"
-        string="Fiche SAV"
-        header="False"
-        />
+            auto="True"
+            id="report_of_project_issue"
+            model="project.issue"
+            name="of_project_issue.sav"
+            rml="of_project_issue/report/sav.rml"
+            string="Fiche SAV"
+            header="False"
+    />
 
-<!-- Rapport Fiche SAV dans le panning intervention-->
+    <!-- Rapport Fiche SAV dans le panning intervention-->
 
     <report
-        auto="True"
-        id="report_of_project_issue_planning"
-        model="of.planning.intervention"
-        name="of_project_issue.sav_planning"
-        rml="of_project_issue/report/sav.rml"
-        string="Fiche SAV"
-        header="False"
-        />
+            auto="True"
+            id="report_of_project_issue_planning"
+            model="of.planning.intervention"
+            name="of_project_issue.sav_planning"
+            rml="of_project_issue/report/sav.rml"
+            string="Fiche SAV"
+            header="False"
+    />
 
 
-<!--  Menu -->
+    <!--  Menu -->
 
-   <!-- Menu SAV dans ventes -->
+    <!-- Menu SAV dans ventes -->
     <record id="action_of_project_issue_view_sale" model="ir.actions.act_window">
         <field name="name">SAV</field>
         <field name="res_model">project.issue</field>
@@ -229,7 +276,7 @@
         </field>
     </record>
 
-   <!-- Menu SAV dans planning -->
+    <!-- Menu SAV dans planning -->
     <record id="action_of_project_issue_view_planning" model="ir.actions.act_window">
         <field name="name">SAV</field>
         <field name="res_model">project.issue</field>
@@ -243,16 +290,16 @@
     </record>
 
     <menuitem id="of_menu_project_issue_ventes"
-        parent="sales_team.menu_sales"
-        action="action_of_project_issue_view_sale"
-        groups="project.group_project_user"
-        sequence="100"/>
+              parent="sales_team.menu_sales"
+              action="action_of_project_issue_view_sale"
+              groups="project.group_project_user"
+              sequence="100"/>
 
     <menuitem id="menu_of_planning_intervention_sav"
-        parent="of_planning.menu_of_planning_intervention"
-        action="action_of_project_issue_view_planning"
-        groups="project.group_project_user"
-        sequence="40"/>
+              parent="of_planning.menu_of_planning_intervention"
+              action="action_of_project_issue_view_planning"
+              groups="project.group_project_user"
+              sequence="40"/>
 
     <!-- Menu configuration catégories de SAV dans Ventes/Configuration-->
     <record id="of_project_issue_categorie_action_form" model="ir.actions.act_window">
@@ -263,9 +310,9 @@
     </record>
 
     <menuitem action="of_project_issue_categorie_action_form"
-        groups="project.group_project_manager"
-        id="menu_of_project_issue_categorie_action_form"
-        parent="sales_team.menu_sale_config" sequence="100"/>
+              groups="project.group_project_manager"
+              id="menu_of_project_issue_categorie_action_form"
+              parent="sales_team.menu_sale_config" sequence="100"/>
 
     <!-- Menu configuration étiquettes de SAV dans Ventes/Configuration -->
     <record id="of_project_issue_tag_action_form" model="ir.actions.act_window">
@@ -276,14 +323,14 @@
     </record>
 
     <menuitem action="of_project_issue_tag_action_form"
-        groups="project.group_project_manager"
-        id="menu_of_project_issue_tag_action_form"
-        parent="sales_team.menu_sale_config" sequence="100"/>
+              groups="project.group_project_manager"
+              id="menu_of_project_issue_tag_action_form"
+              parent="sales_team.menu_sale_config" sequence="100"/>
 
 
-<!-- *************************************************** -->
-<!-- ************** SAV CONFIG CATEGORIES ************** -->
-<!-- *************************************************** -->
+    <!-- *************************************************** -->
+    <!-- ************** SAV CONFIG CATEGORIES ************** -->
+    <!-- *************************************************** -->
 
     <!-- SAV catégories tree -->
     <record id="of_project_issue_categorie_tree_view" model="ir.ui.view">
@@ -314,9 +361,9 @@
     </record>
 
 
-<!-- *************************************************** -->
-<!-- ********************* ACTIONS ********************* -->
-<!-- *************************************************** -->
+    <!-- *************************************************** -->
+    <!-- ********************* ACTIONS ********************* -->
+    <!-- *************************************************** -->
 
     <!-- *** Action dans sav (project.issue) *** -->
 
@@ -340,9 +387,9 @@
 
     <record id="action_open_sale_order" model="ir.actions.server">
         <field name="name">Générer devis client</field>
-        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="model_id" ref="project_issue.model_project_issue"/>
         <field name="state">code</field>
-        <field name="code">action = env['project.issue'].open_sale_order()</field>
+        <field name="code">action = obj.open_sale_order()</field>
     </record>
 
     <record id="action_create_sale_order" model="ir.values">
@@ -357,9 +404,9 @@
 
     <record id="action_open_purchase_order" model="ir.actions.server">
         <field name="name">Générer commande fournisseur</field>
-        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="model_id" ref="project_issue.model_project_issue"/>
         <field name="state">code</field>
-        <field name="code">action = env['project.issue'].open_purchase_order()</field>
+        <field name="code">action = obj.open_purchase_order()</field>
     </record>
 
     <record id="action_create_purchase_order" model="ir.values">
@@ -370,9 +417,9 @@
     </record>
 
 
-<!-- *************************************************** -->
-<!-- ************** PLANNING INTERVENTION ************** -->
-<!-- *************************************************** -->
+    <!-- *************************************************** -->
+    <!-- ************** PLANNING INTERVENTION ************** -->
+    <!-- *************************************************** -->
 
     <!-- insertion SAV lié dans planning intervention form -->
     <record id="of_planning_intervention_sav_liee" model="ir.ui.view" >
@@ -382,7 +429,26 @@
         <field name="groups_id" eval="[(4, ref('project.group_project_user')), (4, ref('base.group_portal'))]"/>
         <field name="arch" type="xml" >
             <xpath expr="//field[@name='picking_id']" position="after">
-                <field name="sav_id" string="SAV" readonly="context.get('view_readonly_sav')" widget="selection"/>
+                <field name="sav_id"
+                       string="SAV"
+                       readonly="context.get('view_readonly_sav')"
+                       options="{'no_open': True, 'no_create':True}"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_saleorder"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-usd"
+                        attrs="{'invisible': [('saleorder_count', '=', 0)]}">
+                    <field name="saleorder_count" widget="statinfo" string="Ventes"/>
+                </button>
+                <button name="action_view_purchaseorder"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-credit-card"
+                        attrs="{'invisible': [('purchaseorder_count', '=', 0)]}">
+                    <field name="purchaseorder_count" widget="statinfo" string="Achats"/>
+                </button>
             </xpath>
         </field>
     </record>
@@ -427,15 +493,15 @@
 
     <!-- Ajoute action générer pdf dans menu "Imprimer" -->
     <act_window
-        name="Générer un pdf"
-        res_model="of.compose.mail"
-        src_model="project.issue"
-        view_mode="form"
-        key2="client_print_multi"
-        view_id="of_gesdoc.view_courrier_wizard"
-        id="action_view_courrier_wizard_project_issue"
-        target="new"
-        context="{'model':'project.issue'}"
+            name="Générer un pdf"
+            res_model="of.compose.mail"
+            src_model="project.issue"
+            view_mode="form"
+            key2="client_print_multi"
+            view_id="of_gesdoc.view_courrier_wizard"
+            id="action_view_courrier_wizard_project_issue"
+            target="new"
+            context="{'model':'project.issue'}"
     />
 
 </odoo>
