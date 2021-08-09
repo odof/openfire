@@ -73,22 +73,19 @@
                 <button name="action_view_saleorder"
                         type="object"
                         class="oe_stat_button"
-                        icon="fa-usd"
-                        attrs="{'invisible': [('saleorder_count', '=', 0)]}">
+                        icon="fa-usd">
                     <field name="saleorder_count" widget="statinfo" string="Ventes"/>
                 </button>
                 <button name="action_view_purchaseorder"
                         type="object"
                         class="oe_stat_button"
-                        icon="fa-credit-card"
-                        attrs="{'invisible': [('purchaseorder_count', '=', 0)]}">
+                        icon="fa-credit-card">
                     <field name="purchaseorder_count" widget="statinfo" string="Achats"/>
                 </button>
                 <button name="action_view_intervention"
                         type="object"
                         class="oe_stat_button"
-                        icon="fa-calendar-o"
-                        attrs="{'invisible': [('interventions_count', '=', 0)]}">
+                        icon="fa-calendar-o">
                     <field name="interventions_count" widget="statinfo" string="Interventions"/>
                 </button>
             </xpath>
