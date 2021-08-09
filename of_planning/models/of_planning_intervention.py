@@ -35,6 +35,13 @@ class HREmployee(models.Model):
     of_changed_intervention_id = fields.Many2one('of.planning.intervention', string=u"Dernier RDV modifié")
     of_est_intervenant = fields.Boolean(string=u"Est intervenant", default=False)
     of_est_commercial = fields.Boolean(string=u"Est commercial", default=False)
+    of_impression_planning = fields.Boolean(string=u"Impression planning", default=True)
+
+    @api.onchange('of_est_intervenant', 'of_est_commercial')
+    def _onchange_est_intervenant(self):
+        self.ensure_one()
+        if not self.of_est_intervenant and not self.of_est_commercial:
+            self.of_impression_planning = False
 
     @api.multi
     def peut_faire(self, tache_id, all_required=False):
@@ -175,10 +182,8 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
 
     @api.multi
     def _compute_employee_ids(self):
-        intervenants = self.env['hr.employee'].search([
-                                                        '|',
-                                                            ('of_est_intervenant', '=', True),
-                                                            ('of_est_commercial', '=', True)])
+        intervenants = self.env['hr.employee'].search(
+            ['|', ('of_est_intervenant', '=', True), ('of_est_commercial', '=', True)])
         for tache in self:
             tache.employee_ids = intervenants.filtered(lambda i: i.of_toutes_taches or tache.id in i.of_tache_ids.ids)
 
@@ -273,6 +278,7 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
                    'invoice_line_tax_ids': [(6, 0, taxes._ids)],
                    }, ""
 
+
 class OfPlanningEquipe(models.Model):
     _name = "of.planning.equipe"
     _description = u"Équipe d'intervention"
@@ -335,7 +341,14 @@ class OfPlanningIntervention(models.Model):
     def _domain_employee_ids(self):
         return ['|', ('of_est_intervenant', '=', True), ('of_est_commercial', '=', True)]
 
-    # Defaults #
+    # Default #
+
+    @api.model
+    def _default_company(self):
+        # Pour les objets du planning, le choix de société se fait par un paramètre de config
+        if self.env['ir.values'].get_default('of.intervention.settings', 'company_choice') == 'user':
+            return self.env['res.company']._company_default_get('of.planning.intervention')
+        return False
 
     @api.model
     def default_get(self, fields_list):
@@ -378,8 +391,7 @@ class OfPlanningIntervention(models.Model):
     address_mobile = fields.Char(related='address_id.mobile', string=u"Mobile", readonly=1)
     secteur_id = fields.Many2one(related='address_id.of_secteur_tech_id', readonly=True)
     user_id = fields.Many2one('res.users', string="Utilisateur", default=lambda self: self.env.uid)
-    company_id = fields.Many2one(
-        'res.company', string="Magasin", required=True, default=lambda self: self.env.user.company_id.id)
+    company_id = fields.Many2one('res.company', string='Magasin', required=True, default=lambda s: s._default_company())
     name = fields.Char(string=u"Libellé", required=True)
     tag_ids = fields.Many2many('of.planning.tag', column1='intervention_id', column2='tag_id', string=u"Étiquettes")
 
@@ -419,7 +431,7 @@ class OfPlanningIntervention(models.Model):
 
     # Rubrique Documents liés
     order_id = fields.Many2one(
-        "sale.order", string=u"Commande associée",
+        "sale.order", string=u"Commande",
         domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")
 
     # Onglet Description
@@ -445,11 +457,14 @@ class OfPlanningIntervention(models.Model):
     partner_name = fields.Char(related='partner_id.name')  # vue Planning, vue Map
     mobile = fields.Char(related='address_id.mobile')  # vue Planning, of_sms
     phone = fields.Char(related='address_id.phone')  # vue Planning
+    partner_phone = fields.Char(related='partner_id.phone')  # vue Map
+    partner_mobile = fields.Char(related='partner_id.mobile')  # vue Map
     tz = fields.Selection(_tz_get, compute='_compute_tz', string="Fuseau horaire")  # vue Calendar
     tz_offset = fields.Char(compute='_compute_tz_offset', string="Timezone offset", invisible=True)  # vue Calendar
     geo_lat = fields.Float(related='address_id.geo_lat', readonly=True)  # vue Map
     geo_lng = fields.Float(related='address_id.geo_lng', readonly=True)  # vue Map
     precision = fields.Selection(related='address_id.precision', readonly=True)  # vue Map
+    color_map = fields.Char(compute='_compute_color_map', string=u"Couleur carte") # vue Map
     of_color_ft = fields.Char(related="employee_main_id.of_color_ft", readonly=True, oldname='color_ft')  # vue Calendar
     of_color_bg = fields.Char(related="employee_main_id.of_color_bg", readonly=True, oldname='color_bg')  # vue Calendar
 
@@ -461,9 +476,9 @@ class OfPlanningIntervention(models.Model):
     cleantext_description = fields.Text(compute='_compute_cleantext_description')
     cleantext_intervention = fields.Text(compute='_compute_cleantext_intervention', store=True)
     interv_before_id = fields.Many2one(
-        'of.planning.intervention', compute="_compute_interventions_before_after", store=True, compute_sudo=True)
+        'of.planning.intervention', compute="_compute_interventions_before_after", store=True)
     interv_after_id = fields.Many2one(
-        'of.planning.intervention', compute="_compute_interventions_before_after", store=True, compute_sudo=True)
+        'of.planning.intervention', compute="_compute_interventions_before_after", store=True)
     before_to_this = fields.Float(compute="_compute_interval", store=True, digits=(12, 5))
 
     line_ids = fields.One2many('of.planning.intervention.line', 'intervention_id', string='Lignes de facturation')
@@ -474,12 +489,11 @@ class OfPlanningIntervention(models.Model):
     price_subtotal = fields.Monetary(compute='_compute_amount', string='Sous-total HT', readonly=True, store=True)
     price_tax = fields.Monetary(compute='_compute_amount', string='Taxes', readonly=True, store=True)
     price_total = fields.Monetary(compute='_compute_amount', string='Sous-total TTC', readonly=True, store=True)
-    product_ids = fields.Many2many('product.product', related='template_id.product_ids')
     invoice_ids = fields.One2many('account.invoice', string="Factures", compute="_compute_invoice_ids")
     invoice_count = fields.Integer(string="Nombre de factures", compute="_compute_invoice_ids")
 
     picking_id = fields.Many2one(
-        comodel_name='stock.picking', string=u"BL associé",
+        comodel_name='stock.picking', string=u"Bon de livraison",
         domain="[('id', 'in', picking_domain and picking_domain[0] and picking_domain[0][2] or False)]")
     picking_domain = fields.Many2many(comodel_name='stock.picking', compute='_compute_picking_domain')
 
@@ -501,7 +515,7 @@ class OfPlanningIntervention(models.Model):
                     partner = partner.parent_id
             interv.partner_id = partner and partner.id
 
-    @api.depends('date', 'date_deadline_forcee')
+    @api.depends('date', 'date_deadline_forcee', 'date_deadline')
     def _compute_jour(self):
         for interv in self:
             t = ''
@@ -667,7 +681,6 @@ class OfPlanningIntervention(models.Model):
             fin_locale_str = fields.Datetime.to_string(fin_locale_dt)
             intervention.heure_fin_str = fin_locale_str[10:16]
 
-
     @api.depends('employee_ids', 'date_date')
     def _compute_horaire_du_jour(self):
         for interv in self:
@@ -721,11 +734,15 @@ class OfPlanningIntervention(models.Model):
             cleantext = re.sub(cleanr, '', interv.order_id.of_notes_intervention or '')
             interv.cleantext_intervention = cleantext
 
-    @api.depends('employee_main_id', 'employee_main_id.of_changed_intervention_id')
+    @api.depends('employee_main_id')
     def _compute_interventions_before_after(self):
+        return  # Temporary 'fix'
+        # Cette fonction n'a jamais eu le fonctionnement voulu à cause d'une erreur sur le comparateur
+        # Nous devons modifier soit le compute pour avoir un calcul plus précis ne prenant que les rdv impactés
+        # Soit modifier l'appel du calcul pour ne plus être un compute.
         interv_obj = self.env['of.planning.intervention']
         for interv in self:
-            if compare_date(interv.date, fields.Datetime.now(), compare=">") or \
+            if compare_date(interv.date, fields.Datetime.now(), compare="<") or \
                     not compare_date(interv.date, interv.employee_main_id.of_changed_intervention_id.date):
                 continue
             if interv.interv_before_id and interv.interv_before_id == interv.employee_main_id.of_changed_intervention_id:
@@ -831,14 +848,6 @@ class OfPlanningIntervention(models.Model):
             rdv.invoice_count = len(invoices)
             rdv.invoice_ids = invoices
 
-    @api.one
-    @api.depends('order_id')
-    def _compute_picking_domain(self):
-        picking_list = []
-        if self.order_id:
-            picking_list = self.order_id.picking_ids.ids
-        self.picking_domain = picking_list
-
     @api.depends('state')
     def _compute_state_int(self):
         for interv in self:
@@ -850,6 +859,32 @@ class OfPlanningIntervention(models.Model):
                 interv.state_int = 2
             elif interv.state and interv.state in ('cancel', 'postponed'):
                 interv.state_int = 3
+
+    @api.depends('order_id')
+    def _compute_picking_domain(self):
+        for intervention in self:
+            picking_list = []
+            if intervention.order_id:
+                picking_list = intervention.order_id.picking_ids.ids
+            intervention.picking_domain = picking_list
+
+    @api.depends('state')
+    def _compute_color_map(self):
+        u""" COULEURS :
+        Gris  : RDV brouillon
+        Orange: RDV confirmé
+        Rouge : RDV réalisé
+        Noir  : autres RDV
+        """
+        for intervention in self:
+            if intervention.state == 'draft':
+                intervention.color_map = 'gray'
+            elif intervention.state == 'confirm':
+                intervention.color_map = 'orange'
+            elif intervention.state == 'done':
+                intervention.color_map = 'red'
+            else:
+                intervention.color_map = 'black'
 
     # Search #
 
@@ -941,13 +976,19 @@ class OfPlanningIntervention(models.Model):
     @api.onchange('address_id')
     def _onchange_address_id(self):
         name = False
-        if self.address_id:
-            name = [self.address_id.name_get()[0][1]]
+        address = self._context.get('from_portal') and self.address_id.sudo() or self.address_id
+        if address:
+            name = [address.name_get()[0][1]]
             for field in ('zip', 'city'):
                 val = getattr(self.address_id, field)
                 if val:
                     name.append(val)
-            self.fiscal_position_id = self.address_id.commercial_partner_id.property_account_position_id
+            self.fiscal_position_id = address.commercial_partner_id.property_account_position_id
+            # Pour les objets du planning, le choix de la société se fait par un paramètre de config
+            company_choice = self.env['ir.values'].get_default(
+                'of.intervention.settings', 'company_choice') or 'contact'
+            if company_choice == 'contact' and self.address_id.company_id:
+                self.company_id = address.company_id.id
         self.name = name and " ".join(name) or "Intervention"
 
     @api.onchange('template_id')
@@ -974,6 +1015,8 @@ class OfPlanningIntervention(models.Model):
         if self.tache_id:
             if self.tache_id.duree:
                 self.duree = self.tache_id.duree
+            if self.tache_id.fiscal_position_id and not self.fiscal_position_id:
+                self.fiscal_position_id = self.tache_id.fiscal_position_id
             if self.tache_id.product_id:
                 self.line_ids.new({
                     'intervention_id': self.id,
@@ -983,8 +1026,6 @@ class OfPlanningIntervention(models.Model):
                     'name'           : self.tache_id.product_id.name,
                     })
                 self.line_ids.compute_taxes()
-            if self.tache_id.fiscal_position_id and not self.fiscal_position_id:
-                self.fiscal_position_id = self.tache_id.fiscal_position_id
 
     @api.onchange('forcer_dates')
     def _onchange_forcer_dates(self):
@@ -1030,12 +1071,20 @@ class OfPlanningIntervention(models.Model):
 
     @api.model
     def create(self, vals):
+        if 'default_date' in self._context:
+            # On doit supprimer 'default_date' du context, sans quoi il affecte la creation des mail.message
+            if 'date' not in vals:
+                vals['date'] = self._context['default_date']
+            new_context = dict(self._context)
+            del new_context['default_date']
+            self = self.with_context(new_context)
         if 'date' in vals:
             # Tronqué à la minute
             vals['date'] = vals['date'][:17] + '00'
         res = super(OfPlanningIntervention, self).create(vals)
         res.do_verif_dispo()
         res._affect_number()
+
         # Si BL associé, on met à jour la date du BL en fonction de la date d'intervention
         if 'picking_id' in vals and 'date' in vals:
             if res.picking_id:
@@ -1068,8 +1117,8 @@ class OfPlanningIntervention(models.Model):
                     date_dt = fields.Datetime.from_string(self[0].date)
                 vals['duree'] = (date_deadline_dt - date_dt).total_seconds() / 3600
         super(OfPlanningIntervention, self).write(vals)
-        self.do_verif_dispo()
         self._affect_number()
+
         # Si BL associé, on met à jour la date du BL en fonction de la date d'intervention
         if 'picking_id' in vals or 'date' in vals:
             for rdv in self:
@@ -1077,6 +1126,13 @@ class OfPlanningIntervention(models.Model):
                     rdv.picking_id.min_date = rdv.date
 
         return True
+
+    @api.multi
+    def _write(self, vals):
+        res = super(OfPlanningIntervention, self)._write(vals)
+        if vals.get('employee_ids') or vals.get('date') or vals.get('date_deadline') or vals.get('verif_dispo'):
+            self.do_verif_dispo()
+        return res
 
     @api.model
     def _read_group_process_groupby(self, gb, query):
@@ -1303,8 +1359,9 @@ class OfPlanningIntervention(models.Model):
                     ('state', 'not in', ('cancel', 'postponed')),
                 ], limit=1)
                 if rdv:
-                    raise ValidationError(u"L'employé %s a déjà au moins un rendez-vous sur ce créneau." %
-                                          (rdv.employee_ids & interv.employee_ids)[0].name)
+                    raise ValidationError(
+                        u"L'employé %s a déjà au moins un rendez-vous sur ce créneau.\nid du rdv: %d" %
+                        ((rdv.employee_ids & interv.employee_ids)[0].name, rdv.id))
 
     @api.multi
     def _affect_number(self):
@@ -1403,6 +1460,18 @@ class OfPlanningIntervention(models.Model):
 
         return res
 
+    @api.model
+    def get_color_map(self):
+        u"""
+        Fonction pour la légende de la vue map
+        """
+        title = "Interventions"
+        v0 = {'label': u"Brouillon", 'value': 'gray'}
+        v1 = {'label': u"Confirmé", 'value': 'orange'}
+        v2 = {'label': u"Réalisé", 'value': 'red'}
+        v3 = {'label': u"Autre", 'value': 'black'}
+        return {"title": title, "values": (v0, v1, v2, v3)}
+
 
 class OfPlanningInterventionLine(models.Model):
     _name = "of.planning.intervention.line"
@@ -1471,7 +1540,7 @@ class OfPlanningInterventionLine(models.Model):
                 taxes = taxes.filtered(lambda r: r.company_id == partner.company_id)
             if fiscal_position:
                 taxes = fiscal_position.map_tax(taxes, product, partner)
-                line.taxe_ids = taxes
+            line.taxe_ids = taxes
 
     @api.multi
     def _prepare_invoice_line(self):
@@ -1568,7 +1637,7 @@ class ResPartner(models.Model):
         action['domain'] = ['|', ('partner_id', 'child_of', self.ids), ('partner_id', 'child_of', self.ids)]
         if len(self._ids) == 1:
             context = safe_eval(action['context'])
-            action['context'] = str(self._get_action_view_intervention_context(context))
+            action['context'] = self._get_action_view_intervention_context(context)
 
         return action
 
@@ -1628,7 +1697,6 @@ class OfPlanningInterventionTemplate(models.Model):
     tache_id = fields.Many2one('of.planning.tache', string=u"Tâche")
     fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale", company_dependent=True)
     line_ids = fields.One2many('of.planning.intervention.template.line', 'template_id', string="Lignes de facturation")
-    product_ids = fields.Many2many('product.product')
 
     @api.depends('sequence_id')
     def _compute_code(self):
