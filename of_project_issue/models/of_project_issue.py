@@ -38,8 +38,17 @@ class ProjectIssue(models.Model):
     def default_get(self, fields_list):
         res = super(ProjectIssue, self).default_get(fields_list)
         res['date'] = time.strftime('%Y-%m-%d %H:%M:00')
+
         return res
 
+    # @api.model
+    # def _default_company(self):
+    #     if self.env['ir.values'].get_default('of.intervention.settings', 'company_choice') == 'user':
+    #         return self.env['res.company']._company_default_get('project.issue')
+    #     return False
+
+    # Modification du default défini dans project.issue
+    # company_id = fields.Many2one(default=lambda s: s._default_company())
     of_code = fields.Char("Code", required=True, readonly=True, default='Nouveau')
     partner_note = fields.Text("Note client", related='partner_id.comment', readonly=False)
     invoice_ids = fields.One2many(
@@ -106,7 +115,11 @@ class ProjectIssue(models.Model):
             docs.append((0, 0, i))
         self.doc_ids = docs
         if self.partner_id:
-            self.company_id = self.partner_id.company_id
+            # Pour les objets du planning, le choix de la société se fait par un paramètre de config
+            company_choice = self.env['ir.values'].get_default(
+                'of.intervention.settings', 'company_choice') or 'contact'
+            if company_choice == 'contact' and self.partner_id.company_id:
+                self.company_id = self.partner_id.company_id.id
 
     @api.onchange('project_id')
     def _onchange_project_id(self):
@@ -179,7 +192,7 @@ class ProjectIssue(models.Model):
             project_issue = self.browse(active_ids[0])
             res['context'] = {'default_sav_id': project_issue.id}
             if project_issue.partner_id:
-                res['context']['default_partner_id'] = project_issue.partner_id.id
+                res['context']['default_address_id'] = project_issue.partner_id.id
         return res
 
     @api.model

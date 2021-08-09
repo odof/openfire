@@ -218,6 +218,13 @@ class OfService(models.Model):
 
     # Default
 
+    @api.model
+    def _default_company(self):
+        # Pour les objets du planning, le choix de société se fait par un paramètre de config
+        if self.env['ir.values'].get_default('of.intervention.settings', 'company_choice') == 'user':
+            return self.env['res.company']._company_default_get('of.service')
+        return False
+
     def _default_jours(self):
         # Lundi à vendredi comme valeurs par défaut
         jours = self.env['of.jours'].search([('numero', 'in', (1, 2, 3, 4, 5))], order="numero")
@@ -368,8 +375,20 @@ class OfService(models.Model):
     def _onchange_partner_id(self):
         self.ensure_one()
         if self.partner_id:
-            self.address_id = self.partner_id
-            self.company_id = self.partner_id.company_id
+            addresses = self.partner_id.address_get(['delivery', 'invoice', 'contact'])
+            self.address_id = addresses['delivery'] or addresses['invoice'] or addresses['contact']
+
+    @api.onchange('address_id')
+    def _onchange_address_id(self):
+        self.ensure_one()
+        if self.address_id:
+            # Pour les objets du planning, le choix de la société se fait par un paramètre de config
+            company_choice = self.env['ir.values'].get_default(
+                'of.intervention.settings', 'company_choice') or 'contact'
+            if company_choice == 'contact' and self.address_id.company_id:
+                self.company_id = self.address_id.company_id.id
+            elif company_choice == 'contact' and self.partner_id.company_id:
+                self.company_id = self.partner_id.company_id.id
 
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
@@ -387,7 +406,7 @@ class OfService(models.Model):
         #       avant que l'utilisateur ait confirmé son choix.
         #     Cette fonction doit donc être autorisée à écraser le mois déjà saisi
         #     Pour éviter les ennuis, elle est donc restreinte à un usage en mode création de nouveau service uniquement
-        if self.date_next and not self._origin:  # <- signifie mode creation
+        if self.date_next and (not hasattr(self, '_origin') or not self._origin):  # <- signifie mode creation
             mois = self.env['of.mois'].search([('numero', '=', int(self.date_next[5:7]))])
             mois_id = mois[0] and mois[0].id or False
             if mois_id:
@@ -426,7 +445,7 @@ class OfService(models.Model):
 
         if len(self._ids) == 1:
             context = safe_eval(action['context'])
-            action['context'] = str(self.get_action_view_intervention_context(context))
+            action['context'] = self.get_action_view_intervention_context(context)
 
         return action
 
@@ -813,16 +832,6 @@ class OFPlanningIntervention(models.Model):
         domain="address_id and ['|', ('address_id', '=', address_id), ('partner_id', '=', address_id)] or []")
 
     # @api.onchange
-
-    @api.onchange('address_id', 'tache_id')
-    def _onchange_address_id(self):
-        super(OFPlanningIntervention, self)._onchange_address_id()
-        if self.address_id and self.address_id.service_address_ids and not self.service_id:
-            if self.tache_id:
-                service = self.address_id.service_address_ids.filtered(lambda x: x.tache_id.id == self.tache_id.id)
-                self.service_id = service and service[0] or False
-            else:
-                self.service_id = self.address_id.service_address_ids[0]
 
     @api.onchange('service_id')
     def _onchange_service_id(self):

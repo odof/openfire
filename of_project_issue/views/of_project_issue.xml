@@ -41,7 +41,6 @@
                 <field name="partner_id" string="Partenaire"/>
             </field>
             <field name="priority" position="replace"/>
-
             <field name="project_id" position="replace"/>
             <field name="create_date" position="replace">
                 <field name="date"/>
@@ -63,7 +62,7 @@
         <field name="inherit_id" ref="project_issue.project_issue_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']/button[@name='toggle_active']" position="attributes">
-                <attribute name="groups"></attribute>
+                <attribute name="groups"/>
             </xpath>
             <xpath expr="//form/sheet/group/group" position="attributes">
                 <attribute name="string">SAV</attribute>
@@ -144,11 +143,9 @@
                                 <field name="amount_total"/>
                                 <field name="state"/>
                                 <field name="doc_objet" invisible="1"/>
-                                <group colspan="4" col="4">
-                                    <field name="invoice_id" attrs="{'invisible': [('doc_objet', '!=', 'account.invoice')]}"/>
-                                    <field name="sale_order_id" attrs="{'invisible': [('doc_objet', '!=', 'sale.order')]}"/>
-                                    <field name="purchase_order_id" attrs="{'invisible': [('doc_objet', '!=', 'purchase.order')]}"/>
-                                </group>
+                                <field name="invoice_id" attrs="{'invisible': [('doc_objet', '!=', 'account.invoice')]}"/>
+                                <field name="sale_order_id" attrs="{'invisible': [('doc_objet', '!=', 'sale.order')]}"/>
+                                <field name="purchase_order_id" attrs="{'invisible': [('doc_objet', '!=', 'purchase.order')]}"/>
                             </group>
                         </form>
                     </field>
@@ -185,12 +182,14 @@
             </xpath>
             <xpath expr="//div[@class='oe_kanban_content']/div[1]" position="inside">
                 <t t-set="date" t-value="record.of_create_date_formatted.raw_value"/>
-                <span>Date de création : </span><t t-esc="date"/><br/>
+                <span>Date de création :</span>
+                <t t-esc="date"/>
+                <br/>
             </xpath>
         </field>
     </record>
 
-<!-- Rapport Fiche SAV dans le SAV -->
+    <!-- Rapport Fiche SAV dans le SAV -->
 
     <report
         auto="True"
@@ -382,9 +381,9 @@
         <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
         <field name="groups_id" eval="[(4, ref('project.group_project_user')), (4, ref('base.group_portal'))]"/>
         <field name="arch" type="xml" >
-            <group name="liens" position="inside">
+            <xpath expr="//field[@name='picking_id']" position="after">
                 <field name="sav_id" string="SAV" readonly="context.get('view_readonly_sav')" widget="selection"/>
-            </group>
+            </xpath>
         </field>
     </record>
 

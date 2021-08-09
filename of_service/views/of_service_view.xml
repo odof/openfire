@@ -171,13 +171,12 @@
                             </group>
                         </group>
                     </group>
-
-                    </sheet>
-                    <div class="oe_chatter">
-                        <field name="message_follower_ids" widget="mail_followers"/>
-                        <field name="message_ids" widget="mail_thread"/>
-                    </div>
-                </form>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
         </field>
     </record>
 
@@ -635,7 +634,7 @@
         <field name="type">form</field>
         <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='order_id']" position="after">
+            <xpath expr="//field[@name='duree']" position="after">
                 <field name="service_id" context="{
                 'default_partner_id': partner_id,
                 'default_address_id': address_id,
