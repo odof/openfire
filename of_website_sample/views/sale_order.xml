@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Sale Order -->
+
+    <record id="of_website_sample_view_order_form" model="ir.ui.view">
+        <field name="name">of.website.sample.sale.order.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='sales_person']" position="inside">
+                <field name="is_sample"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_website_sample.view_sales_order_filter_ecommerce" model="ir.ui.view">
+        <field name="name">of.website.sample.sale.order.search.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="website_sale.view_sales_order_filter_ecommerce"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='from_website']" position="after">
+                <separator/>
+                <filter string="Sample Order" name="sample" domain="[('is_sample','=',True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
