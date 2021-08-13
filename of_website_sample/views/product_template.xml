@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Product Template -->
+
+    <record id="of_website_sample_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.website.sample.product.template.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='options']" position="inside">
+                <div>
+                    <field name="sample_available"/>
+                    <label for="sample_available"/>
+                </div>
+            </xpath>
+            <xpath expr="//group[@name='group_general']" position="inside">
+                <field name="is_sample"/>
+                <field name="sample_id" invisible="1"/>
+                <field name="sample_parent_id" invisible="1"/>
+                <field name="sample_active" invisible="1"/>
+                <field name="sample_parent_active" invisible="1"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_sample"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-pencil-square-o"
+                        attrs="{'invisible': ['|','|',('sample_id', '==', False),('sample_available', '==', False),('sample_active', '==', False)]}">
+                    <field name="sample_default_code" widget="statinfo" string="Sample"/>
+                </button>
+                <button name="action_view_sample_parent"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-pencil-square-o"
+                        attrs="{'invisible': ['|','|',('sample_parent_id', '==', False),('is_sample', '==', False),('sample_parent_active', '==', False)]}">
+                    <field name="sample_parent_default_code" widget="statinfo" string="Parent"/>
+                </button>
+
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_website_sample_product_template_search_view" model="ir.ui.view">
+        <field name="name">of.website.sample.product.template.search.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='filter_to_purchase']" position="after">
+                <separator/>
+                <filter string="Sample" name="sample" domain="[('is_sample','=',True)]"/>
+                <filter string="Sample parent" name="sample_parent" domain="[('sample_available','=',True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
