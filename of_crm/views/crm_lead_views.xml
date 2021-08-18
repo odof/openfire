@@ -475,19 +475,35 @@
                                 </group>
 
                                 <field name="of_projet_line_ids" nolabel="1" mode="kanban">
-                                    <form>
-                                        <group>
+                                    <form string="Entrée de Projet">
+                                        <sheet>
+                                            <group>
+                                                <group>
+                                                    <field name="name" readonly="1"/>
+                                                    <field name="val_bool" readonly="1"
+                                                           attrs="{'invisible': [('type','!=','bool')]}"/>
+                                                    <field name="val_date" readonly="1"
+                                                           attrs="{'invisible': [('type','!=','date')]}"/>
+                                                    <field name="val_char" readonly="1"
+                                                           attrs="{'invisible': [('type','!=','char')]}"/>
+                                                    <field name="val_text" readonly="1"
+                                                           attrs="{'invisible': [('type','!=','text')]}"/>
+                                                    <field name="val_select_id" widget="selection" readonly="1"
+                                                           attrs="{'invisible': [('type','!=','selection')]}"/>
+                                                    <field name="answer_date" readonly="1"/>
+                                                    <field name="answer_user_id" readonly="1"/>
+                                                </group>
+                                                <group>
+                                                    <field name="answer_last" readonly="1"/>
+                                                    <field name="answer_last_date" readonly="1"/>
+                                                    <field name="answer_init_user_id" readonly="1"/>
+                                                </group>
+                                            </group>
+                                            <field name="lead_id" invisible="1"/>
+                                            <field name="attr_id" invisible="1"/>
+                                            <field name="sequence" invisible="1"/>
                                             <field name="type" invisible="1"/>
-                                            <field name="attr_id" widget="selection"/>
-                                            <field name="name"/>
-                                            <field name="val_bool" attrs="{'invisible': [('type','!=','bool')]}"/>
-                                            <field name="val_date" attrs="{'invisible': [('type','!=','date')]}"/>
-                                            <field name="val_char" attrs="{'invisible': [('type','!=','char')]}"/>
-                                            <field name="val_text" attrs="{'invisible': [('type','!=','text')]}"/>
-                                            <field name="val_select_id" options="{'no_create': True}" attrs="{'invisible': [('type','!=','selection')]}" domain="[('attr_id','=',attr_id)]"/>
-                                            <!--field name="val_select_ids" widget="many2many_tags" attrs="{'invisible': [('type','!=','multiple')]}" domain="[('attr_id','=',attr_id)]"/-->
-                                            <field name="sequence"/>
-                                        </group>
+                                        </sheet>
                                     </form>
                                 </field>
                             </page>
@@ -727,19 +743,35 @@
 
                                 <!--label for="of_projet_line_ids"/-->
                                 <field name="of_projet_line_ids" nolabel="1" mode="kanban">
-                                    <form>
-                                        <group>
+                                    <form string="Entrée de Projet">
+                                        <sheet>
+                                            <group>
+                                                <group>
+                                                    <field name="name" readonly="1"/>
+                                                    <field name="val_bool" readonly="1"
+                                                           attrs="{'invisible': [('type','!=','bool')]}"/>
+                                                    <field name="val_date" readonly="1"
+                                                           attrs="{'invisible': [('type','!=','date')]}"/>
+                                                    <field name="val_char" readonly="1"
+                                                           attrs="{'invisible': [('type','!=','char')]}"/>
+                                                    <field name="val_text" readonly="1"
+                                                           attrs="{'invisible': [('type','!=','text')]}"/>
+                                                    <field name="val_select_id" widget="selection" readonly="1"
+                                                           attrs="{'invisible': [('type','!=','selection')]}"/>
+                                                    <field name="answer_date" readonly="1"/>
+                                                    <field name="answer_user_id" readonly="1"/>
+                                                </group>
+                                                <group>
+                                                    <field name="answer_last" readonly="1"/>
+                                                    <field name="answer_last_date" readonly="1"/>
+                                                    <field name="answer_init_user_id" readonly="1"/>
+                                                </group>
+                                            </group>
+                                            <field name="lead_id" invisible="1"/>
+                                            <field name="attr_id" invisible="1"/>
+                                            <field name="sequence" invisible="1"/>
                                             <field name="type" invisible="1"/>
-                                            <field name="attr_id" widget="selection"/>
-                                            <field name="name"/>
-                                            <field name="val_bool" attrs="{'invisible': [('type','!=','bool')]}"/>
-                                            <field name="val_date" attrs="{'invisible': [('type','!=','date')]}"/>
-                                            <field name="val_char" attrs="{'invisible': [('type','!=','char')]}"/>
-                                            <field name="val_text" attrs="{'invisible': [('type','!=','text')]}"/>
-                                            <field name="val_select_id" options="{'no_create': True}" attrs="{'invisible': [('type','!=','selection')]}" domain="[('attr_id','=',attr_id)]"/>
-                                            <!--field name="val_select_ids" widget="many2many_tags" attrs="{'invisible': [('type','!=','multiple')]}" domain="[('attr_id','=',attr_id)]"/-->
-                                            <field name="sequence"/>
-                                        </group>
+                                        </sheet>
                                     </form>
                                 </field>
                             </page>
