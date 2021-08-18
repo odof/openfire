@@ -2,13 +2,35 @@
 
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
+from odoo.tools.safe_eval import safe_eval
 
 
 class OFCRMProjetLine(models.Model):
     _name = 'of.crm.projet.line'
     _order = 'sequence'
 
-    name = fields.Char(string=u"Libellé", required=True, translate=True)
+    @api.model_cr_context
+    def _auto_init(self):
+        # auto_init temporaire pour l'ajout des champs 'is_answered' et affiliés
+        cr = self._cr
+        cr.execute("SELECT 1 FROM information_schema.columns "
+                   "WHERE table_name = 'of_crm_projet_line' AND column_name = 'is_answered'")
+        is_answered_exists = bool(cr.fetchall())
+        res = super(OFCRMProjetLine, self)._auto_init()
+
+        if not is_answered_exists:
+            # Initialisation des champs
+            cr.execute("UPDATE of_crm_projet_line "
+                       "SET is_answered = 't',  answer_date = write_date, "
+                       "answer_user_id = write_uid, answer_init_user_id = create_uid "
+                       "WHERE type = 'bool' "
+                       "OR type = 'char' AND val_char IS NOT NULL AND val_char != '' "
+                       "OR type = 'text' AND val_text IS NOT NULL AND val_text != '' "
+                       "OR type = 'selection' AND val_select_id IS NOT NULL "
+                       "OR type = 'date' AND val_date IS NOT NULL")
+        return res
+
+    name = fields.Char(string=u"Question", required=True, translate=True)
     lead_id = fields.Many2one('crm.lead', string=u"Opportunité", required=True, ondelete="cascade")
     attr_id = fields.Many2one('of.crm.projet.attr', string="Attribut", required=True, ondelete="restrict")
     type = fields.Selection([
@@ -20,16 +42,23 @@ class OFCRMProjetLine(models.Model):
         ('date', u'Date'),
         ], string=u'Type', required=True, default='char')
     # xml will not display val_bool and val_select_id if type set to 'char'
-    val_bool = fields.Boolean(string="Valeur", default=False)
-    val_char = fields.Char(string="Valeur")
-    val_text = fields.Text(string="Valeur")
-    val_date = fields.Date(string="Valeur", default=fields.Date.today)
+    val_bool = fields.Boolean(string=u"Réponse")
+    val_char = fields.Char(string=u"Réponse")
+    val_text = fields.Text(string=u"Réponse")
+    val_date = fields.Date(string=u"Réponse")
     val_select_id = fields.Many2one(
-        'of.crm.projet.attr.select', string="Valeur", ondelete="set null")  # , domain="[('attr_id','=',attr_id)]")
+        'of.crm.projet.attr.select', string=u"Réponse", ondelete="set null")  # , domain="[('attr_id','=',attr_id)]")
     # val_select_ids = fields.Many2many(
     #     'of.crm.projet.attr.select', 'crm_projet_multiple_rel', 'line_id', 'val_id', string="Valeurs")
     sequence = fields.Integer(string=u'Séquence', default=10)
-    type_var_name = fields.Char(string="nom de la variable de valeur", compute="_compute_type_var_name")
+    type_var_name = fields.Char(string="nom de la variable de réponse", compute="_compute_type_var_name")
+
+    is_answered = fields.Boolean(string=u"A été répondue")
+    answer_date = fields.Date(string=u"Date de la réponse")
+    answer_user_id = fields.Many2one(string=u"Auteur de la réponse", comodel_name='res.users')
+    answer_last = fields.Text(string=u"Réponse précédente")
+    answer_last_date = fields.Date(string=u"Date réponse précédente")
+    answer_init_user_id = fields.Many2one(string=u"Auteur réponse initiale", comodel_name='res.users', readonly=True)
 
     @api.multi
     @api.depends('type')
@@ -55,6 +84,49 @@ class OFCRMProjetLine(models.Model):
                 'sequence': self.attr_id.sequence,
                 }
             self.update(vals)
+
+    @api.multi
+    def action_edit_answer(self):
+        u"""Ouvrir la ligne de projet et signaler (par le context) de mettre à jour les champs de réponse précédente"""
+        action = self.env.ref('of_crm.action_of_crm_projet_line_form').read()[0]
+        if len(self._ids) == 1:
+            context = safe_eval(action['context'])
+            context['create'] = False
+            context['update_last_answer'] = True
+            action['context'] = str(context)
+            action['target'] = 'new'
+            action['res_id'] = self.id
+        return action
+
+    @api.model
+    def create(self, vals):
+        type = vals.get('type')
+        # on a une réponse -> on initialise la date et l'utilisateur
+        if type and (type == 'char' and vals.get('val_char')
+                     or type == 'bool'
+                     or type == 'text' and vals.get('val_text')
+                     or type == 'date' and vals.get('val_date')
+                     or type == 'selection' and vals.get('val_select_id')):
+            vals['answer_date'] = fields.Date.today()
+            vals['answer_user_id'] = self.env.user.id
+            vals['answer_init_user_id'] = self.env.user.id
+            vals['is_answered'] = True
+        return super(OFCRMProjetLine, self).create(vals)
+
+    @api.multi
+    def write(self, vals):
+        if len(self) == 1:
+            set_answer = {'val_bool', 'val_char', 'val_text', 'val_date', 'val_select_id'}
+            set_vals = set(vals)
+            if set_answer & set_vals:
+                if self.is_answered and self._context.get('update_last_answer'):
+                    # modification de réponse : on stocke les informations de la réponse précédente
+                    vals['answer_last'] = self.get_name_and_val()[1]
+                    vals['answer_last_date'] = self.answer_date
+                vals['is_answered'] = True
+                vals['answer_date'] = fields.Date.today()
+                vals['answer_user_id'] = self.env.user.id
+        return super(OFCRMProjetLine, self).write(vals)
 
     @api.multi
     def name_get(self):
