@@ -4,7 +4,6 @@
     <span class="btn-group dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
             <t t-raw="current_value.name"/>
-            <!--span t-att-class="'oe_kanban_status ' + (current_value_class &amp;&amp; current_value_class || '')"/-->
         </a>
         <ul class="dropdown-menu" role="menu">
             <li t-foreach="values" t-as="rec" t-att-data-value="rec.name" t-att-data-id="rec.id">
@@ -17,9 +16,7 @@
 </t>
 
 <t t-name="OFFAButton">
-    <button type="button" class="btn active of_fa_button">
-        <!--i t-attf-class="#{fa_class}"></i-->
-    </button>
+    <button type="button" class="btn active of_fa_button"/>
 </t>
 
 <t t-name="FieldOne2One">

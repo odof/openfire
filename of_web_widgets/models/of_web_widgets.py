@@ -2,6 +2,7 @@
 
 from odoo import models, api
 
+
 class OFWebWidgetsUtils(models.Model):
     _name = "of.web.widgets.utils"
 
