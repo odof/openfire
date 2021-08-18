@@ -286,8 +286,11 @@ class AccountMoveLine(models.Model):
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
         if self.partner_id and not self.account_id and not self._context.get('line_ids', False):
-            if self.journal_id.type == 'purchase':
+            if self.journal_id.type == 'purchase'\
+                    or (self.journal_id.type != 'sale' and self.partner_id.supplier and not self.partner_id.customer):
                 # Pour un journal d'achat on prend le compte de tiers fournisseur.
+                # Pour un journal qui n'est pas d'achat, on prend le compte de tiers fournisseur si le partenaire
+                #   est un fournisseur et n'est pas un client.
                 self.account_id = self.partner_id.property_account_payable_id
             else:
                 # Pour tout autre journal on prend le compte de tiers client.
