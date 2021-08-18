@@ -24,6 +24,25 @@ function print_fail_message() {
     console.log("NONONO EPIC FAIL!",arguments);
 };
 
+AbstractField.include({
+    init: function() {
+        this._super.apply(this, arguments);
+        this.parent = arguments[0];
+        this.update_read_only_mode();
+    },
+    /**
+     *  NB : in the kanban record qweb template, one can now set a variable read_only_fields to force readonly
+     *  eg: of.crm.projet.line kanban view
+     */
+    update_read_only_mode: function() {
+        if (this.parent.qweb_context && this.parent.qweb_context.read_only_fields) {
+            this.read_only_mode = true;
+        }else{
+            this.read_only_mode = this.parent.read_only_mode || false;
+        }
+    },
+});
+
 var OFKanbanSelection = AbstractField.extend({
     // inspired by web_kanban.widgets.KanbanSelection and web.form_widgets.FieldSelection
     template: "OFKanbanSelection",
@@ -35,7 +54,7 @@ var OFKanbanSelection = AbstractField.extend({
         this._super.apply(this, arguments);
         this.name = $node.attr('name');
         this.parent = parent;
-        this.read_only_mode = this.parent.read_only_mode || false;
+        //this.read_only_mode = this.parent.read_only_mode || false;
         this.records_orderer = new utils.DropMisordered(); // function query_values
 
         this.options = _.defaults(options||{},this.defaults);
@@ -43,8 +62,6 @@ var OFKanbanSelection = AbstractField.extend({
 
         this.context = this.build_context();
         this.set("domain", this.build_domain().eval());
-
-        //console.log("of_kanban_selection init this and arguments: ", this, arguments);
     },
     /**
      *  queries possible values and returns them in the form of an array of dictionaries {'id': id, 'name': name}. Called by renderElement
@@ -72,6 +89,8 @@ var OFKanbanSelection = AbstractField.extend({
     renderElement: function() {
         var self = this;
         var value;
+        this.update_read_only_mode();
+
         if (this.read_only_mode) { // make it not selectable in read_only mode
             this.$el.text(formats.format_value(this.get('value'), this, ''));
         }else{
@@ -227,7 +246,7 @@ var OFKanbanDate = AbstractField.extend({
         this._super.apply(this, arguments);
         this.name = $node.attr('name');
         this.parent = parent;
-        this.read_only_mode = this.parent.read_only_mode || false;
+        //this.read_only_mode = this.parent.read_only_mode || false;
         this.options = _.defaults(options||{},this.defaults);
 
         this.initialize_content();
@@ -268,6 +287,7 @@ var OFKanbanDate = AbstractField.extend({
      *  renders this.$el, as text in readonly mode
      */
     renderElement: function() {
+        this.update_read_only_mode();
         if (this.read_only_mode) {
             this.$el.text(formats.format_value(this.get('value'), this, ''));
         } else {
@@ -329,7 +349,7 @@ var OFKanbanChar = AbstractField.extend({
         this._super.apply(this, arguments);
         this.name = $node.attr('name');
         this.parent = parent;
-        this.read_only_mode = this.parent.read_only_mode || false;
+        //this.read_only_mode = this.parent.read_only_mode || false;
         this.options = _.defaults(options||{},this.defaults);
 
         //console.log("of_kanban_char init this and arguments: ", this, arguments);
@@ -353,6 +373,7 @@ var OFKanbanChar = AbstractField.extend({
      */
     renderElement: function() {
         var self = this;
+        this.update_read_only_mode();
         if (this.read_only_mode) {
             this.$el.text(formats.format_value(this.get('value'), this, ''));
         }else{
@@ -431,6 +452,7 @@ var OFKanbanText = OFKanbanChar.extend({
      */
     renderElement: function() {
         var self = this;
+        this.update_read_only_mode();
         if (this.read_only_mode) {
             var txt = this.get("value") || '';
             this.$el.toggleClass("of_kanban_text_input");
@@ -458,7 +480,7 @@ var OFKanbanBool = AbstractField.extend({
         this._super.apply(this, arguments);
         this.name = $node.attr('name');
         this.parent = parent;
-        this.read_only_mode = this.parent.read_only_mode || false;
+        //this.read_only_mode = this.parent.read_only_mode || false;
         this.options = _.defaults(options||{},this.defaults);
 
         this.$input = new OFFAToggleButton(this,{default_up: field.raw_value}); // initializes toggle button
