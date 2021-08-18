@@ -111,10 +111,7 @@ ListView.List.include({
                         record.set(column.id + '__display',
                                    _(names).pluck(1).join(', '));
                         record.set(column.id,  _(names).pluck(1).join(', '));
-                        //record.set(column.id, ids);
                     });
-                // temporary empty display name
-                //record.set(column.id + '__display', false);
             }
         } /////// FIN CODE OF
         return column.format(record.toForm().data, {
