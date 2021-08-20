@@ -69,4 +69,19 @@
         </field>
     </record>
 
+    <!-- Intervention config wizard -->
+    <record id="view_of_intervention_settings_sale_planning" model="ir.ui.view">
+        <field name="name">view.of.intervention.settings.sale.planning</field>
+        <field name="model">of.intervention.settings</field>
+        <field name="inherit_id" ref="of_planning.view_of_intervention_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='company_choice']" position="after">
+                <label for="of_tache_categ_vt_id" string="(OF) Catégorie des VT"/>
+                <div name="of_tache_categ_vt_id">
+                    <field name="of_tache_categ_vt_id" class="oe_inline"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>

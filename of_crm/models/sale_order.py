@@ -113,16 +113,25 @@ class SaleOrder(models.Model):
                 vals.update(state='sent')
         else:
             vals.update(state='draft')
-
-        return super(SaleOrder, self).create(vals)
+        order = super(SaleOrder, self).create(vals)
+        if vals.get('opportunity_id'):
+            lead = self.env['crm.lead'].browse(vals['opportunity_id'])
+            # on connecte la commande aux RDV plutôt que l'inverse car plus facile de toucher un M2O qu'un O2M
+            lead.of_intervention_ids.write({'order_id': order.id})
+        return order
 
     @api.multi
     def write(self, values):
         start_state = self.env['ir.values'].get_default('sale.config.settings', 'of_sale_order_start_state')
         if values.get('state', False) == 'draft' and start_state == 'quotation':
             values.update(state='sent')
+        res =  super(SaleOrder, self).write(values)
+        if values.get('opportunity_id') and len(self) == 1:
+            lead = self.env['crm.lead'].browse(values['opportunity_id'])
+            # on connecte la commande aux RDV plutôt que l'inverse car plus facile de toucher un M2O qu'un O2M
+            lead.of_intervention_ids.write({'order_id': self.id})
 
-        return super(SaleOrder, self).write(values)
+        return res
 
     @api.multi
     def action_confirm(self):
