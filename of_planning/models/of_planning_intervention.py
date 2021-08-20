@@ -1011,7 +1011,7 @@ class OfPlanningIntervention(models.Model):
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
         if self.tache_id:
-            if self.tache_id.duree:
+            if self.tache_id.duree and not self._context.get('of_inhiber_maj_duree'):
                 self.duree = self.tache_id.duree
             if self.tache_id.fiscal_position_id and not self.fiscal_position_id:
                 self.fiscal_position_id = self.tache_id.fiscal_position_id

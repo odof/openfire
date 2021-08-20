@@ -3,20 +3,20 @@
 from odoo import models, fields, api
 
 
-class OfPlanningIntervention(models.Model):
+class OFPlanningIntervention(models.Model):
     _name = 'of.planning.intervention'
     _inherit = ['of.planning.intervention', 'of.crm.stage.auto.update']
 
     @api.model
     def create(self, vals):
-        rec = super(OfPlanningIntervention, self).create(vals).sudo()
+        rec = super(OFPlanningIntervention, self).create(vals).sudo()
         if rec.order_date_vt_need_update():
             rec.order_id.of_date_vt = rec.date_date
         return rec
 
     @api.multi
     def write(self, vals):
-        res = super(OfPlanningIntervention, self).write(vals)
+        res = super(OFPlanningIntervention, self).write(vals)
         # les RDVs viennent d'être passés en "réalisé" ou on vient de rattacher une commande
         if vals.get('state', '') == 'done' or vals.get('order_id'):
             for rec in self:
@@ -38,6 +38,21 @@ class OfPlanningIntervention(models.Model):
                           and i.state == 'done').sorted('date')
             return not interv_other_ids or (interv_other_ids and interv_other_ids[-1].date < self.date)
         return False
+
+    @api.onchange('tache_id')
+    def _onchange_tache_id(self):
+        # Si la commande a une durée de pose prévisionnelle, inhiber les mises à jour de durée automatiques
+        if self.order_id and self.order_id.of_duration:
+            self = self.with_context(of_inhiber_maj_duree=True)
+        super(OFPlanningIntervention, self)._onchange_tache_id()
+
+    @api.onchange('order_id')
+    def onchange_order_id(self):
+        # Si la commande a une durée de pose prévisionnelle, inhiber les mises à jour de durée automatiques
+        if self.order_id and self.order_id.of_duration:
+            self.duree = self.order_id.of_duration
+            self = self.with_context(of_inhiber_maj_duree=True)
+        return super(OFPlanningIntervention, self).onchange_order_id()
 
 
 class OFInterventionSettings(models.TransientModel):

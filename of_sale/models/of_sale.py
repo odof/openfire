@@ -137,6 +137,9 @@ class SaleOrder(models.Model):
     def pdf_masquer_commercial(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_masquer_pastille_commercial')
 
+    def pdf_mail_commercial(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_mail_commercial')
+
     def pdf_masquer_payment_term(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_masquer_pastille_payment_term')
 
@@ -800,6 +803,9 @@ class SaleOrderLine(models.Model):
     of_price_unit_ttc = fields.Float(
         string='Unit Price incl', compute='_compute_of_price_unit', help="Unit price with taxes", store=True
     )
+    of_marge_pc = fields.Float(
+        compute='_compute_of_marge', string=u"Marge %", store=True)
+
     of_product_default_code = fields.Char(related='product_id.default_code', string=u"Référence article", readonly=True)
     of_order_line_option_id = fields.Many2one(comodel_name='of.order.line.option', string=u"Option")
     of_reset_option = fields.Boolean(string=u"Réinitialiser l'option ?")
@@ -836,6 +842,14 @@ class SaleOrderLine(models.Model):
                     WHERE   arch_db     LIKE '%of_product_seller_price%'
                 """)
         return res
+
+    @api.depends('price_subtotal', 'margin')
+    def _compute_of_marge(self):
+        for line in self:
+            if line.price_subtotal:
+                line.of_marge_pc = line.margin * 100.0 / line.price_subtotal
+            else:
+                line.of_marge_pc = 0.0
 
     @api.depends('price_unit', 'order_id.currency_id', 'order_id.partner_shipping_id', 'product_id',
                  'price_subtotal', 'product_uom_qty')
@@ -1291,6 +1305,11 @@ class OFSaleConfiguration(models.TransientModel):
         help=u"Masquer la pastille commercial dans les rapports PDF ?"
     )
 
+    pdf_mail_commercial = fields.Boolean(
+        string=u"(OF) pastille commercial", required=True, default=False,
+        help=u"Afficher l'email dans la pastille commercial des rapports PDF ?"
+    )
+
     pdf_masquer_pastille_payment_term = fields.Boolean(
         string=u"(OF) Masquer pastille conditions de règlement", required=True, default=False,
         help=u"Masquer la pastille conditions de règlement dans les rapports PDF ?"
@@ -1411,6 +1430,11 @@ class OFSaleConfiguration(models.TransientModel):
     def set_pdf_masquer_pastille_commercial(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'pdf_masquer_pastille_commercial', self.pdf_masquer_pastille_commercial)
+
+    @api.multi
+    def set_pdf_mail_commercial_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_mail_commercial', self.pdf_mail_commercial)
 
     @api.multi
     def set_pdf_masquer_pastille_payment_term(self):
