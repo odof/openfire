@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- ******************************************************************************************* -->
+<!-- ************************************** Stock Picking ************************************** -->
+<!-- ******************************************************************************************* -->
+
+    <record id="of_logistic_stock_picking_form_view" model="ir.ui.view">
+        <field name="name">of.logistic.stock.picking.form.view</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='pack_operation_product_ids']/tree/field[@name='qty_done']" position="before">
+                <field name="of_product_weight"/>
+            </xpath>
+            <xpath expr="//field[@name='pack_operation_pack_ids']/tree/field[@name='qty_done']" position="before">
+                <field name="of_product_weight"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page name="logistic" string="Logistics" attrs="{'invisible': [('picking_type_code', '!=', 'outgoing')]}">
+                    <button name="button_compute_logistics" string="Compute logistics" type="object"/>
+                    <group>
+<!--                        <button class="oe_right" name="button_compute_logistics" string="Compute logistics" type="object"/>-->
+                        <group>
+                            <field name="of_department_id"/>
+                            <field name="of_nbr_pallets"/>
+                        </group>
+                        <group>
+                            <field name="of_total_volume"/>
+                            <field name="of_total_weight"/>
+                        </group>
+                        <field name="of_rate_ids" nolabel="1">
+                            <tree editable="top" nocreate="1">
+                                <field name="partner_id"/>
+                                <field name="min_weight"/>
+                                <field name="max_weight"/>
+                                <field name="rate"/>
+                                <field name="constraint"/>
+                                <field name="selected"/>
+                            </tree>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+
+<!-- ******************************************************************************************* -->
+<!-- **************************************** Stock move *************************************** -->
+<!-- ******************************************************************************************* -->
+
+    <record id="of_logistic_stock_move_tree_view" model="ir.ui.view">
+        <field name="name">of.logistic.stock.move.tree.view</field>
+        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="stock.view_move_picking_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="before">
+                <field name="of_product_weight"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

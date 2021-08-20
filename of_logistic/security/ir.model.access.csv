@@ -1,0 +1,6 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_of_logistic_rate_user","of.logistic.rate","model_of_logistic_rate","base.group_user",1,0,0,0
+"access_of_logistic_rate_manager","of.logistic.rate","model_of_logistic_rate","sales_team.group_sale_manager",1,1,1,1
+"access_of_logistic_constraint_user","of.logistic.constraint","model_of_logistic_constraint","base.group_user",1,0,0,0
+"access_of_logistic_constraint_manager","of.logistic.constraint","model_of_logistic_constraint","sales_team.group_sale_manager",1,1,1,1
+"access_of_stock_picking_logistic_rate_user","of.stock.picking.logistic.rate","model_of_stock_picking_logistic_rate","base.group_user",1,1,1,1
