@@ -51,6 +51,12 @@
                                                  '|', ('vendor_id', '=', False), ('vendor_id.company_ids', 'child_of', [user.company_id.id])]</field>
         </record>
 
+        <record id="of_crm_of_crm_projet_line_comp_rule" model="ir.rule">
+            <field name="name">OF CRM Projet Lines multi-company</field>
+            <field name="model_id" ref="model_of_crm_projet_line"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'child_of', [user.company_id.id])]</field>
+        </record>
+
         <record id="of_sale_activity_salesman_rule" model="ir.rule">
             <field name="name">OF Sale Activities (salesman)</field>
             <field name="model_id" ref="model_of_sale_activity"/>

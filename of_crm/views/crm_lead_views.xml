@@ -494,9 +494,9 @@
                                                     <field name="answer_user_id" readonly="1"/>
                                                 </group>
                                                 <group>
-                                                    <field name="answer_last" readonly="1"/>
-                                                    <field name="answer_last_date" readonly="1"/>
-                                                    <field name="answer_init_user_id" readonly="1"/>
+                                                    <field name="answer_orig" readonly="1"/>
+                                                    <field name="answer_orig_date" readonly="1"/>
+                                                    <field name="answer_orig_user_id" readonly="1"/>
                                                 </group>
                                             </group>
                                             <field name="lead_id" invisible="1"/>
@@ -762,9 +762,9 @@
                                                     <field name="answer_user_id" readonly="1"/>
                                                 </group>
                                                 <group>
-                                                    <field name="answer_last" readonly="1"/>
-                                                    <field name="answer_last_date" readonly="1"/>
-                                                    <field name="answer_init_user_id" readonly="1"/>
+                                                    <field name="answer_orig" readonly="1"/>
+                                                    <field name="answer_orig_date" readonly="1"/>
+                                                    <field name="answer_orig_user_id" readonly="1"/>
                                                 </group>
                                             </group>
                                             <field name="lead_id" invisible="1"/>
