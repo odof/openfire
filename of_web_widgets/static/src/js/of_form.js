@@ -399,7 +399,7 @@ var FieldOne2One = FieldMany2One.extend({
 
     display_string: function (str) {
         var noValue = (str === null);
-        var text_empty = this.options.text_empty || _t("Create: ") + this.field.string;//_t(this.field.string);
+        var text_empty = this.options.text_empty || _t("Create: ") + this.field.string;
         var text_nonempty = this.options.text_nonempty || _t("See: ") + _t(this.field.string);
         this.$el.html(noValue ? text_empty : text_nonempty || data.noDisplayContent);
     },

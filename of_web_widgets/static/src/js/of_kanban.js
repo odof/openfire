@@ -16,13 +16,23 @@ var web_k_widgets = require('web_kanban.widgets');
 var AbstractField = web_k_widgets.AbstractField;
 var web_k_registry = web_k_widgets.registry;
 
-// functions called for development
-function print_win_message() {
-    console.log("HAHAHA EPIC WIN!",arguments);
-};
-function print_fail_message() {
-    console.log("NONONO EPIC FAIL!",arguments);
-};
+AbstractField.include({
+    init: function() {
+        this._super.apply(this, arguments);
+        this.parent = arguments[0];
+        this.update_read_only_mode();
+    },
+    /**
+     *  NB : in the kanban record qweb template, one can now set a variable read_only_fields to force readonly
+     */
+    update_read_only_mode: function() {
+        if (this.parent.qweb_context && this.parent.qweb_context.read_only_fields) {
+            this.read_only_mode = true;
+        }else{
+            this.read_only_mode = this.parent.read_only_mode || false;
+        }
+    },
+});
 
 var OFKanbanSelection = AbstractField.extend({
     // inspired by web_kanban.widgets.KanbanSelection and web.form_widgets.FieldSelection
@@ -35,7 +45,6 @@ var OFKanbanSelection = AbstractField.extend({
         this._super.apply(this, arguments);
         this.name = $node.attr('name');
         this.parent = parent;
-        this.read_only_mode = this.parent.read_only_mode || false;
         this.records_orderer = new utils.DropMisordered(); // function query_values
 
         this.options = _.defaults(options||{},this.defaults);
@@ -43,8 +52,6 @@ var OFKanbanSelection = AbstractField.extend({
 
         this.context = this.build_context();
         this.set("domain", this.build_domain().eval());
-
-        //console.log("of_kanban_selection init this and arguments: ", this, arguments);
     },
     /**
      *  queries possible values and returns them in the form of an array of dictionaries {'id': id, 'name': name}. Called by renderElement
@@ -52,7 +59,6 @@ var OFKanbanSelection = AbstractField.extend({
     prepare_dropdown_selection: function() {
         var self = this;
         var _data = [];
-        //console.log("OFKanbanSelection.prepare_dropdown_selection this",this);
         var def = $.Deferred();
         this.query_values().then(function () { // this.query_values() will set self.field.selection
             _.map(self.field.selection || [], function(res) {
@@ -72,6 +78,8 @@ var OFKanbanSelection = AbstractField.extend({
     renderElement: function() {
         var self = this;
         var value;
+        this.update_read_only_mode();
+
         if (this.read_only_mode) { // make it not selectable in read_only mode
             this.$el.text(formats.format_value(this.get('value'), this, ''));
         }else{
@@ -90,18 +98,15 @@ var OFKanbanSelection = AbstractField.extend({
                         }
                     }) || {'id': -1, 'name': _t('Unknown / Unset')};
                 };
-                //console.log("current_value: ",current_value);
                 var args = { // arguments passed to qweb template
                     current_value: current_value,
                     values: _.without(self.values, current_value) // don't display current value in dropdown menu
                 }
-                //console.log("args: ",args);
                 self.$el.html(QWeb.render(self.template, args));
                 self.$('a').click(function (ev) {
                     ev.preventDefault();
                 });
                 self.$('a').click(self.set_kanban_selection.bind(self));
-                //console.log("$el",self.$el);
             });
         }
     },
@@ -127,7 +132,6 @@ var OFKanbanSelection = AbstractField.extend({
         var def;
         if (this.field.type === "many2one") { // supposed to be always the case, maybe force it with an error?
             var model = new Model(this.field.relation);
-            //console.log("query_value this.domain: ",[this.domain, this.domain_eval]);
             def = model.call("name_search", ['', this.get("domain")], {"context": this.context});
         } else { // copied code
             var values = _.reject(this.field.selection, function (v) { return v[0] === false && v[1] === ''; });
@@ -137,7 +141,6 @@ var OFKanbanSelection = AbstractField.extend({
         var def2 = $.Deferred();
         var prom = def2.promise({target: vals});
         this.records_orderer.add(def).then(function(values) {
-            //console.log("values: ",values); // an array of arrays of the form [id,'name']
             if (! _.isEqual(values, self.field.selection)) {
                 self.field.selection = values;
                 vals = values;
@@ -158,8 +161,8 @@ var OFKanbanSelection = AbstractField.extend({
         if (! v_context) {
             v_context = (this.field || {}).context || {};
         }
-        /* was in original function, commented for now cause no field_manager
-        if (v_context.__ref || true) { //TODO: remove true 
+        /* was in original function, commented for now because kanban AbstractField parent is not a field_manager
+        if (v_context.__ref) {
             var fields_values = this.field_manager.build_eval_context();
             v_context = new data.CompoundContext(v_context).set_eval_context(fields_values);
         }*/
@@ -173,7 +176,6 @@ var OFKanbanSelection = AbstractField.extend({
         var n_domain = this.$node[0].attributes.domain || null;
         // if there is a domain on the node, overrides the model's domain
         var final_domain = n_domain !== null ? n_domain : f_domain;
-        //console.log("final_domain A: ",final_domain);
         var fields_values = this.build_eval_context();
         final_domain = new data.CompoundDomain(final_domain).set_eval_context(fields_values);
         var len = final_domain['__domains'].length;
@@ -182,8 +184,7 @@ var OFKanbanSelection = AbstractField.extend({
                 final_domain['__domains'][i] = final_domain['__domains'][i]['value']
             }
         };
-        //console.log("final_domain B: ",final_domain);
-        
+
         return final_domain;
     },
     /**
@@ -227,12 +228,9 @@ var OFKanbanDate = AbstractField.extend({
         this._super.apply(this, arguments);
         this.name = $node.attr('name');
         this.parent = parent;
-        this.read_only_mode = this.parent.read_only_mode || false;
         this.options = _.defaults(options||{},this.defaults);
 
         this.initialize_content();
-
-        //console.log("of_kanban_date init this and arguments: ", this, arguments);
     },
     /**
      *  creates a new instance of DateWidget. called by initialize_content to set this.datewidget
@@ -268,6 +266,7 @@ var OFKanbanDate = AbstractField.extend({
      *  renders this.$el, as text in readonly mode
      */
     renderElement: function() {
+        this.update_read_only_mode();
         if (this.read_only_mode) {
             this.$el.text(formats.format_value(this.get('value'), this, ''));
         } else {
@@ -282,13 +281,7 @@ var OFKanbanDate = AbstractField.extend({
         var dict = {};
         dict[this.name] = value;
         this.trigger_up('kanban_update_record', dict, this); // see kanban_record.update_record and kanban_view.update_record
-        //console.log("value set: ",this.get('value'));
     },
-    /* from a copy-paste, doesn't seem necessary in this context. will stay commented for a while just in case
-    is_syntax_valid: function() {
-        console.log("PAY ATTENTION DANG");
-        return this.read_only_mode || !this.datewidget || this.datewidget.is_valid();
-    },*/
     /**
      *  from a copy-paste
      */
@@ -329,10 +322,7 @@ var OFKanbanChar = AbstractField.extend({
         this._super.apply(this, arguments);
         this.name = $node.attr('name');
         this.parent = parent;
-        this.read_only_mode = this.parent.read_only_mode || false;
         this.options = _.defaults(options||{},this.defaults);
-
-        //console.log("of_kanban_char init this and arguments: ", this, arguments);
     },
     /**
      *  inits this.$input and attaches it to this.$el
@@ -353,6 +343,7 @@ var OFKanbanChar = AbstractField.extend({
      */
     renderElement: function() {
         var self = this;
+        this.update_read_only_mode();
         if (this.read_only_mode) {
             this.$el.text(formats.format_value(this.get('value'), this, ''));
         }else{
@@ -367,7 +358,6 @@ var OFKanbanChar = AbstractField.extend({
      *  handles change of value. called after clicking somewhere else than this.$el
      */
     handle_change: function () {
-        //console.log("OFKanbanChar.handle_change");
         if (this.$input.value !== this.get('value')) {
             this.set_value();
         }
@@ -377,7 +367,6 @@ var OFKanbanChar = AbstractField.extend({
      */
     set_value: function() {
         this.set('value',this.$input.value);
-        //console.log("this.get('value'): ",this.get('value'));
         var dict = {};
         var value = this.$input.value;
         dict[this.name] = value;
@@ -431,6 +420,7 @@ var OFKanbanText = OFKanbanChar.extend({
      */
     renderElement: function() {
         var self = this;
+        this.update_read_only_mode();
         if (this.read_only_mode) {
             var txt = this.get("value") || '';
             this.$el.toggleClass("of_kanban_text_input");
@@ -458,13 +448,10 @@ var OFKanbanBool = AbstractField.extend({
         this._super.apply(this, arguments);
         this.name = $node.attr('name');
         this.parent = parent;
-        this.read_only_mode = this.parent.read_only_mode || false;
         this.options = _.defaults(options||{},this.defaults);
 
         this.$input = new OFFAToggleButton(this,{default_up: field.raw_value}); // initializes toggle button
         this.set('value',field.raw_value);
-
-        //console.log("of_kanban_bool init this and arguments: ", this, arguments);
     },
     /**
      *  wait for this.$input to be rendered
@@ -494,7 +481,6 @@ var OFKanbanBool = AbstractField.extend({
         if (!this.read_only_mode) {
             this.do_toggle_button();
             this.set_value(!this.get('value'));
-            //console.log("this.get('value'): ", this.get('value'));
         }
     },
 });
@@ -508,12 +494,9 @@ var OFFAButton = Widget.extend({
 
     init: function(parent, options) {
         this._super.apply(this, arguments);
-        //this.name = $node.attr('name');
         this.parent = parent;
         this.options = _.defaults(options||{},this.defaults);
         this.read_only_mode = parent.read_only_mode || false;
-
-        //console.log("of_fa_button init this and arguments: ", this, arguments);
     },
     /**
      *  disables button if readonly mode
@@ -535,7 +518,6 @@ var OFFAButton = Widget.extend({
             ev.preventDefault();
             self.parent.trigger_up('of_fa_button_clicked');
         });
-        //console.log("fa_button render this: ",this);
     },
     /**
      *  makes the icon and attaches it to this.$el. Called by renderElement
@@ -566,7 +548,6 @@ var OFFAToggleButton = OFFAButton.extend({
     init: function(parent, options) {
         this._super.apply(this, arguments);
         this.is_up = this.options.default_up;
-        //console.log("of_fa_toggle_button init this and arguments: ", this, arguments);
     },
     /**
      *  override to implement toggleability

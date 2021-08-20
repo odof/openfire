@@ -2,14 +2,47 @@
 
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
+from odoo.tools.safe_eval import safe_eval
 
 
 class OFCRMProjetLine(models.Model):
     _name = 'of.crm.projet.line'
     _order = 'sequence'
 
-    name = fields.Char(string=u"Libellé", required=True, translate=True)
+    @api.model_cr_context
+    def _auto_init(self):
+        # auto_init temporaire pour l'ajout des champs 'is_answered' et affiliés
+        cr = self._cr
+        cr.execute("SELECT 1 FROM information_schema.columns "
+                   "WHERE table_name = 'of_crm_projet_line' AND column_name = 'is_answered'")
+        is_answered_exists = bool(cr.fetchall())
+        res = super(OFCRMProjetLine, self)._auto_init()
+
+        if not is_answered_exists:
+            # Initialisation des champs
+            cr.execute("UPDATE of_crm_projet_line AS l "
+                       "SET is_answered = 't', answer_date = write_date, answer_orig_date = write_date, "
+                       "answer_user_id = create_uid, answer_orig_user_id = create_uid,"
+                       "answer_orig = CASE "
+                       "    WHEN type = 'bool' AND val_bool THEN 'Oui'"
+                       "    WHEN type = 'bool' THEN 'Non'"
+                       "    WHEN type = 'char' THEN val_char "
+                       "    WHEN type = 'text' THEN val_text "
+                       "    WHEN type = 'selection' THEN "
+                       "        (SELECT name FROM of_crm_projet_attr_select AS s WHERE s.id = l.val_select_id) "
+                       "    WHEN type = 'date' THEN TEXT(val_date) "
+                       "    ELSE '' END "
+                       "WHERE type = 'bool' "
+                       "OR type = 'char' AND val_char IS NOT NULL AND val_char != '' "
+                       "OR type = 'text' AND val_text IS NOT NULL AND val_text != '' "
+                       "OR type = 'selection' AND val_select_id IS NOT NULL "
+                       "OR type = 'date' AND val_date IS NOT NULL")
+        return res
+
+    name = fields.Char(string=u"Question", required=True, translate=True)
     lead_id = fields.Many2one('crm.lead', string=u"Opportunité", required=True, ondelete="cascade")
+    company_id = fields.Many2one(
+        comodel_name='res.company', related='lead_id.company_id', store=True, string=u"Société")
     attr_id = fields.Many2one('of.crm.projet.attr', string="Attribut", required=True, ondelete="restrict")
     type = fields.Selection([
         ('bool', u'Booléen (Oui/Non)'),
@@ -20,16 +53,24 @@ class OFCRMProjetLine(models.Model):
         ('date', u'Date'),
         ], string=u'Type', required=True, default='char')
     # xml will not display val_bool and val_select_id if type set to 'char'
-    val_bool = fields.Boolean(string="Valeur", default=False)
-    val_char = fields.Char(string="Valeur")
-    val_text = fields.Text(string="Valeur")
-    val_date = fields.Date(string="Valeur", default=fields.Date.today)
+    val_bool = fields.Boolean(string=u"Réponse")
+    val_char = fields.Char(string=u"Réponse")
+    val_text = fields.Text(string=u"Réponse")
+    val_date = fields.Date(string=u"Réponse")
     val_select_id = fields.Many2one(
-        'of.crm.projet.attr.select', string="Valeur", ondelete="set null")  # , domain="[('attr_id','=',attr_id)]")
+        'of.crm.projet.attr.select', string=u"Réponse", ondelete="set null")  # , domain="[('attr_id','=',attr_id)]")
     # val_select_ids = fields.Many2many(
     #     'of.crm.projet.attr.select', 'crm_projet_multiple_rel', 'line_id', 'val_id', string="Valeurs")
     sequence = fields.Integer(string=u'Séquence', default=10)
-    type_var_name = fields.Char(string="nom de la variable de valeur", compute="_compute_type_var_name")
+    type_var_name = fields.Char(string="nom de la variable de réponse", compute="_compute_type_var_name")
+
+    is_answered = fields.Boolean(string=u"A eu une réponse")
+    is_corrected = fields.Boolean(string=u"A été corrigé", compute='_compute_is_corrected', store=True)
+    answer_date = fields.Date(string=u"Date de la réponse")
+    answer_user_id = fields.Many2one(string=u"Auteur de la réponse", comodel_name='res.users')
+    answer_orig = fields.Text(string=u"Réponse d'origine")
+    answer_orig_date = fields.Date(string=u"Date réponse d'origine")
+    answer_orig_user_id = fields.Many2one(string=u"Auteur réponse d'origine", comodel_name='res.users', readonly=True)
 
     @api.multi
     @api.depends('type')
@@ -46,6 +87,11 @@ class OFCRMProjetLine(models.Model):
             else:
                 line.type_var_name = 'val_select_id'
 
+    @api.depends('answer_user_id')
+    def _compute_is_corrected(self):
+        for line in self:
+            line.is_corrected = line.answer_user_id and line.answer_user_id != line.answer_orig_user_id
+
     @api.onchange('attr_id')
     def _onchange_attr_id(self):
         if self.attr_id:
@@ -55,6 +101,62 @@ class OFCRMProjetLine(models.Model):
                 'sequence': self.attr_id.sequence,
                 }
             self.update(vals)
+
+    @api.multi
+    def action_edit_answer(self):
+        u"""Ouvrir la ligne de projet et signaler (par le context) de mettre à jour les champs de réponse précédente"""
+        action = self.env.ref('of_crm.action_of_crm_projet_line_form').read()[0]
+        if len(self._ids) == 1:
+            context = safe_eval(action['context'])
+            context['create'] = False
+            # context['update_last_answer'] = True
+            action['context'] = str(context)
+            action['target'] = 'new'
+            action['res_id'] = self.id
+        return action
+
+    @api.model
+    def create(self, vals):
+        line_type = vals.get('type')
+        # on a une réponse -> on initialise la date et l'utilisateur
+        if line_type and (line_type == 'char' and vals.get('val_char')
+                          or line_type == 'bool'
+                          or line_type == 'text' and vals.get('val_text')
+                          or line_type == 'date' and vals.get('val_date')
+                          or line_type == 'selection' and vals.get('val_select_id')):
+            field = 'val_' + line_type
+            if line_type == 'selection':
+                field = 'val_select_id'
+            vals['answer_orig'] = self.val_to_text(line_type, vals[field])
+            vals['answer_date'] = fields.Date.today()
+            vals['answer_orig_date'] = fields.Date.today()
+            vals['answer_user_id'] = self.env.user.id
+            vals['answer_orig_user_id'] = self.env.user.id
+            vals['is_answered'] = True
+        res = super(OFCRMProjetLine, self).create(vals)
+        if res.answer_orig_date and not res.answer_orig:
+            res.answer_orig = res.get_name_and_val()[1]
+        return res
+
+    @api.multi
+    def write(self, vals):
+        if len(self) == 1:
+            field = 'val_' + self.type
+            if self.type == 'selection':
+                field = 'val_select_id'
+            if field in vals:
+                if not self.is_answered:
+                    if not vals[field]:
+                        # Erreur de manip' ?
+                        return super(OFCRMProjetLine, self).write(vals)
+                    # Première réponse à la question : on stocke les informations
+                    vals['answer_orig'] = self.val_to_text(self.type, vals[field])
+                    vals['answer_orig_date'] = fields.Date.today()
+                    vals['answer_orig_user_id'] = self.env.user.id
+                    vals['is_answered'] = True
+                vals['answer_date'] = fields.Date.today()
+                vals['answer_user_id'] = self.env.user.id
+        return super(OFCRMProjetLine, self).write(vals)
 
     @api.multi
     def name_get(self):
@@ -95,19 +197,29 @@ class OFCRMProjetLine(models.Model):
             args = args + ['|'] * (nb_name_args-1) + name_args
         return super(OFCRMProjetLine, self)._name_search('', args, 'ilike', limit, name_get_uid)
 
+    @api.model
+    def val_to_text(self, line_type, val):
+        res = ""
+        if line_type == 'bool':
+            res = val and "Oui" or "Non"
+        elif line_type == 'char':
+            res = val
+        elif line_type == 'text':
+            res = val
+        elif line_type == 'date':
+            res = val
+        else:
+            if isinstance(val, (int, long)):
+                val = self.env['of.crm.projet.attr.select'].browse(val)
+            res = val.name
+        return res
+
     def get_name_and_val(self):
         self.ensure_one()
-        if self.type == 'bool':
-            # value = "Oui" if self.val_bool  else "Non"
-            value = ("Non", "Oui")[self.val_bool]
-        elif self.type == 'char':
-            value = self.val_char
-        elif self.type == 'text':
-            value = self.val_text
-        elif self.type == 'date':
-            value = self.val_date
-        else:
-            value = self.val_select_id.name
+        field = 'val_' + self.type
+        if self.type == 'selection':
+            field = 'val_select_id'
+        value = self.val_to_text(self.type, self[field])
         return self.name, value
 
 
