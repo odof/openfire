@@ -12,6 +12,16 @@
         </xpath>
     </template>
 
+    <!-- /shop/cart page -->
+    <template id="cart_lines" inherit_id="website_sale.cart_lines" name="Sample Shopping Cart Lines">
+        <xpath expr="//a[@t-attf-href='/shop/product/#{ slug(line.product_id.product_tmpl_id) }']" position="attributes">
+            <attribute name="t-attf-href">#{line.product_id.product_tmpl_id.is_sample and '/shop/product/'+slug(line.product_id.product_tmpl_id.sample_parent_id) or '/shop/product/'+slug(line.product_id.product_tmpl_id)}</attribute>
+        </xpath>
+        <xpath expr="//input" position="attributes">
+            <attribute name="t-attf-data-max">#{line.product_id.product_tmpl_id.is_sample and '1'}</attribute>
+        </xpath>
+    </template>
+
     <!-- Code utilisé si les sample sont en website_published. On part sur un non -->
 <!--    <template id="products" inherit_id="website_sale.products" name="Products">-->
 <!--        <xpath expr="//div[@class='oe_product_cart']" position="attributes">-->
