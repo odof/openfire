@@ -9,24 +9,31 @@ from odoo.addons.website_sale.controllers.main import WebsiteSale
 from odoo.addons.base.ir.ir_qweb.fields import nl2br
 from odoo.addons.website.models.website import slug
 from odoo.addons.website.controllers.main import QueryURL
-from odoo.exceptions import ValidationError
+from werkzeug.exceptions import Forbidden, NotFound
+from odoo.exceptions import ValidationError, UserError
 from odoo.addons.website_form.controllers.main import WebsiteForm
 
 _logger = logging.getLogger(__name__)
 
 class WebsiteSaleSample(WebsiteSale):
 
-
-    # Techniquement on pourrait utiliser le controller /shop/cart/update car celui ne diffère en rien mais il sera amener à évoluer
-    @http.route(['/shop/cart/sample_update'], type='http', auth="public", methods=['POST'], website=True, csrf=False)
-    def cart_sample_update(self, product_id, add_qty=1, set_qty=0, **kw):
-        print('cart_sample_update')
-        print(self)
+    @http.route(['/shop/cart/update'], type='http', auth="public", methods=['POST'], website=True, csrf=False)
+    def cart_update(self, product_id, add_qty=1, set_qty=0, **kw):
+        product = request.env['product.product'].browse(int(product_id))
 
         sale_order = request.website.sale_get_order(force_create=True)
         if sale_order.state != 'draft':
             request.session['sale_order_id'] = None
             sale_order = request.website.sale_get_order(force_create=True)
+
+        if sale_order.order_line and sale_order.order_line[0].product_id.is_sample != product.is_sample:
+
+            if product.is_sample:
+                return request.redirect("/shop/product/%s?invalid=1" % slug(product.product_tmpl_id.sample_parent_id))
+            else:
+                return request.redirect("/shop/product/%s?invalid=1" % slug(product.product_tmpl_id))
+
+
         sale_order._cart_update(
             product_id=int(product_id),
             add_qty=add_qty,
@@ -34,3 +41,14 @@ class WebsiteSaleSample(WebsiteSale):
             attributes=self._filter_attributes(**kw),
         )
         return request.redirect("/shop/cart")
+
+
+    @http.route(['/shop/product/<model("product.template"):product>'], type='http', auth="public", website=True)
+    def product(self, product, category='', search='', **kwargs):
+
+        res = super(WebsiteSaleSample, self).product(product, category, search, **kwargs)
+
+        if kwargs.get('invalid', False):
+            res.__dict__['qcontext']['invalid'] = int(kwargs.get('invalid'))
+
+        return res

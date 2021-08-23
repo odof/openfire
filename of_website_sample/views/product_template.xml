@@ -15,7 +15,7 @@
                 </div>
             </xpath>
             <xpath expr="//group[@name='group_general']" position="inside">
-                <field name="is_sample" invisible="1"/>
+                <field name="is_sample"/>
                 <field name="sample_id" invisible="1"/>
                 <field name="sample_parent_id" invisible="1"/>
                 <field name="sample_active" invisible="1"/>
