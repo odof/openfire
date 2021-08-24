@@ -668,6 +668,7 @@ class SaleOrder(models.Model):
 
     @api.multi
     def action_invoice_create(self, grouped=False, final=False):
+        grouped = self.env['ir.values'].get_default('sale.config.settings', 'of_invoice_grouped')
         invoice_ids = super(SaleOrder, self).action_invoice_create(grouped=grouped, final=final)
         invoices = self.env['account.invoice'].browse(invoice_ids)
 
@@ -683,6 +684,14 @@ class SaleOrder(models.Model):
                         vals = order_line._prepare_invoice_line(qty=0.0)
                         vals.update({'invoice_id': invoice.id, 'sale_line_ids': [(6, 0, [order_line.id])]})
                         self.env['account.invoice.line'].create(vals)
+
+        # Pour les factures groupées, on indique pour chaque ligne de facture sa commande d'origine
+        for inv in invoices:
+            if len(inv.invoice_line_ids.mapped('sale_line_ids').mapped('order_id')) > 1:
+                for line in inv.invoice_line_ids:
+                    order_line = line.sale_line_ids[:1]
+                    line.name = "%s %s\n%s" % (
+                        order_line.order_id.name, order_line.order_id.client_order_ref or "", line.name)
 
         return invoice_ids
 
@@ -705,13 +714,6 @@ class SaleOrder(models.Model):
             'res_id': wizard.id,
             'target': 'new',
         }
-
-    @api.multi
-    def action_invoice_create(self, grouped=False, final=False):
-        grouped = self.env['ir.values'].get_default('sale.config.settings', 'of_invoice_grouped')
-        if not grouped:
-            self = self.with_context(of_action_invoice_create=True)
-        return super(SaleOrder, self).action_invoice_create(grouped=grouped, final=final)
 
 
 class Report(models.Model):
@@ -1155,19 +1157,8 @@ class SaleOrderLine(models.Model):
             uom=self.product_uom.id,
             fiscal_position=self.env.context.get('fiscal_position')
         )
-        return self.env['account.tax']._fix_tax_included_price_company(self._get_display_price(product),
-                                                                       product.taxes_id, self.tax_id,
-                                                                       self.company_id)
-
-    @api.multi
-    def _prepare_invoice_line(self, qty):
-        # self.ensure_one() présent dans le super
-        res = super(SaleOrderLine, self)._prepare_invoice_line(qty)
-        if self._context.get('of_action_invoice_create') and isinstance(res, dict):
-            res['name'] = "%s - %s\n\n%s" % (self.order_id.name,
-                                             self.order_id.client_order_ref or self.order_id.partner_id.name,
-                                             res['name'])
-        return res
+        return self.env['account.tax']._fix_tax_included_price_company(
+            self._get_display_price(product), product.taxes_id, self.tax_id, self.company_id)
 
 
 class AccountInvoiceLine(models.Model):
