@@ -348,7 +348,13 @@ class ResUsers(models.Model):
     def write(self, values):
         if SUPERUSER_ID in self._ids and self._uid != SUPERUSER_ID:
             raise AccessError(u'Seul le compte administrateur peut modifier les informations du compte administrateur.')
-        return super(ResUsers, self).write(values)
+        result = super(ResUsers, self).write(values)
+        group_root = self.env.ref('of_base.of_group_root_only')
+        if not len(group_root.users):
+            raise UserError(u'Le groupe "%s" ne peut être retiré du compte administrateur !' % group_root.name)
+        if len(group_root.users) > 1 or group_root.users.id != SUPERUSER_ID:
+            raise UserError(u'Le groupe "%s" ne peut être ajouté à un utilisateur !' % group_root.name)
+        return result
 
 
 class ResGroups(models.Model):
