@@ -282,7 +282,7 @@ class OFSaleForecastOverviewLine(models.Model):
     _order = 'sequence'
 
     sale_forecast_id = fields.Many2one(
-        comodel_name='of.sale.forecast', string=u"Prévision de vente", required=True, index=True)
+        comodel_name='of.sale.forecast', string=u"Prévision de vente", required=True, index=True, ondelete='cascade')
     name = fields.Char(string=u"Période", required=True)
     sequence = fields.Integer(string=u"Séquence")
     forecast = fields.Boolean(string=u"Prévision")
@@ -310,7 +310,7 @@ class OFSaleForecastForecastLine(models.Model):
     _order = 'sequence'
 
     sale_forecast_id = fields.Many2one(
-        comodel_name='of.sale.forecast', string=u"Prévision de vente", required=True, index=True)
+        comodel_name='of.sale.forecast', string=u"Prévision de vente", required=True, index=True, ondelete='cascade')
     name = fields.Char(string=u"Période", required=True)
     sequence = fields.Integer(string=u"Séquence")
     start_date = fields.Date(string=u"Date de début", required=True)
