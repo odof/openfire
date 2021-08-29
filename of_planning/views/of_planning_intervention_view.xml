@@ -308,6 +308,7 @@
                                     <field name="order_id" groups="sales_team.group_sale_salesman,
                                                                    account.group_account_invoice,
                                                                    stock.group_stock_user"/>
+                                    <field name="picking_domain" invisible="1"/>
                                     <field name="picking_id" groups="sales_team.group_sale_salesman,
                                                                    account.group_account_invoice,
                                                                    stock.group_stock_user"/>
