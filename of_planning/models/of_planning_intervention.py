@@ -402,7 +402,7 @@ class OfPlanningIntervention(models.Model):
     forcer_dates = fields.Boolean(
         "Forcer les dates", default=False, help=u"/!\\ outrepasser les horaires des intervenants")
     jour = fields.Char("Jour", compute="_compute_jour")
-    date = fields.Datetime(string="Date intervention", required=True, track_visibility='always')
+    date = fields.Datetime(string=u"Date de début", required=True, track_visibility='always')
     date_date = fields.Date(
         string="Jour intervention", compute='_compute_date_date', search='_search_date_date', readonly=True)
     duree = fields.Float(string=u"Durée intervention", required=True, digits=(12, 5), track_visibility='always')
