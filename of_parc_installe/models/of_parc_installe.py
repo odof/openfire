@@ -76,6 +76,8 @@ class OFParcInstalle(models.Model):
 
     company_id = fields.Many2one(comodel_name='res.company', string=u"Société")
 
+    technician_id = fields.Many2one(comodel_name='hr.employee', string=u"Technicien")
+
     # @api.depends
 
     @api.depends('sale_order_ids', 'account_invoice_ids')

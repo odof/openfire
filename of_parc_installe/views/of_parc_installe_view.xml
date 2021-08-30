@@ -100,6 +100,7 @@
                             <field name="conforme"/>
                             <field name="revendeur_id"/>
                             <field name="installateur_id"/>
+                            <field name="technician_id"/>
                         </group>
                     </group>
                     <group name="produit_installe">
