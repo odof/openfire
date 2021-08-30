@@ -541,6 +541,8 @@ class StockMove(models.Model):
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
+    of_transporter_id = fields.Many2one(string=u"Transporteur", comodel_name='res.partner')
+
     @api.multi
     def action_picking_send(self):
         self.ensure_one()

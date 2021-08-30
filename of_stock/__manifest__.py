@@ -19,6 +19,7 @@ Extension OpenFire du module stock
         "stock",
     ],
     "data": [
+        'data/mail_template_data.xml',
         'views/of_stock_views.xml',
         'wizards/of_specific_delivery_report_wizard_views.xml',
         'reports/of_specific_delivery_report.xml',
