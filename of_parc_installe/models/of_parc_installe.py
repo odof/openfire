@@ -69,6 +69,8 @@ class OFParcInstalle(models.Model):
              u"très haut: au numéro de rue\n")
     lot_id = fields.Many2one('stock.production.lot', string="Lot d'origine")
 
+    technician_id = fields.Many2one(comodel_name='hr.employee', string=u"Technicien")
+
     # @api.depends
 
     @api.depends('sale_order_ids', 'account_invoice_ids')

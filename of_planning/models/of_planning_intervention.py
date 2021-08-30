@@ -417,7 +417,7 @@ class OfPlanningIntervention(models.Model):
     forcer_dates = fields.Boolean(
         "Forcer les dates", default=False, help=u"/!\\ outrepasser les horaires des intervenants")
     jour = fields.Char("Jour", compute="_compute_jour")
-    date = fields.Datetime(string="Date intervention", required=True, track_visibility='always')
+    date = fields.Datetime(string=u"Date de début", required=True, track_visibility='always')
     date_date = fields.Date(
         string="Jour intervention", compute='_compute_date_date', search='_search_date_date', readonly=True)
     duree = fields.Float(string=u"Durée intervention", required=True, digits=(12, 5), track_visibility='always')
@@ -426,7 +426,7 @@ class OfPlanningIntervention(models.Model):
         help=u"Prend en compte le temp de pause au milieu du RDV")
     jour_fin = fields.Char("Jour fin", compute="_compute_jour")
     date_deadline = fields.Datetime(
-        compute="_compute_date_deadline", string="Date fin", store=True, track_visibility='always')
+        compute="_compute_date_deadline", string=u"Date de fin", store=True, track_visibility='always')
     jour_fin_force = fields.Char(u"Jour fin forcé", compute="_compute_jour")
     date_deadline_forcee = fields.Datetime(string=u"Date fin (forcée)")
     # les fonctions de calcul et de recherche des 2 champs suivants sont héritées dans of_mobile
@@ -746,7 +746,7 @@ class OfPlanningIntervention(models.Model):
     @api.depends('tz')
     def _compute_tz_offset(self):
         for interv in self:
-            tz = interv.employee_ids and interv.employee_ids[0].tz or 'GMT'
+            tz = interv.employee_ids and interv.employee_ids[0].of_tz or 'GMT'
             interv.tz_offset = datetime.now(pytz.timezone(tz)).strftime('%z')
 
     @api.depends('description')

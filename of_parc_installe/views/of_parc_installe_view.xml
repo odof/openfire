@@ -99,6 +99,7 @@
                             <field name="conforme"/>
                             <field name="revendeur_id" context="{'default_of_revendeur': 1, 'of_revendeur_prio': 1}"/>
                             <field name="installateur_id" context="{'default_of_installateur': 1, 'of_installateur_prio': 1}"/>
+                            <field name="technician_id"/>
                         </group>
                     </group>
                     <group name="produit_installe" string="Produit installé">
