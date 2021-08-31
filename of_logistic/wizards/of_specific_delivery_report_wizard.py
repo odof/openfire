@@ -15,13 +15,14 @@ class OFSpecificDeliveryReportWizard(models.TransientModel):
             moves = wizard.line_ids.filtered('selected').mapped('move_id')
             total_weight = 0.0
             for line in moves:
-                product = line.product_id
-                product_uom = product.uom_id
-                move_uom = line.product_uom
-                # Since the values are for the UOM of the product, convert the qty to the one of the product
-                # _compute_price also works for quantities since it only applies the factors
-                qty = move_uom._compute_price(line.product_uom_qty, product_uom)
-                total_weight += qty * product.weight
+                if line.product_id:
+                    product = line.product_id
+                    product_uom = product.uom_id
+                    move_uom = line.product_uom
+                    # Since the values are for the UOM of the product, convert the qty to the one of the product
+                    # _compute_price also works for quantities since it only applies the factors
+                    qty = move_uom._compute_price(line.product_uom_qty, product_uom)
+                    total_weight += qty * product.weight
             wizard.total_weight = total_weight
 
     @api.depends('line_ids', 'line_ids.selected')
@@ -30,14 +31,15 @@ class OFSpecificDeliveryReportWizard(models.TransientModel):
             moves = wizard.line_ids.filtered('selected').mapped('move_id')
             nbr_pallets = 0.0
             for line in moves:
-                product = line.product_id
-                product_uom = product.uom_id
-                move_uom = line.product_uom
-                # Since the values are for the UOM of the product, convert the qty to the one of the product
-                # _compute_price also works for quantities since it only applies the factors
-                qty = move_uom._compute_price(line.product_uom_qty, product_uom)
-                nbr_pallets += qty * product.of_nbr_pallets
-            wizard.total_weight = nbr_pallets
+                if line.product_id:
+                    product = line.product_id
+                    product_uom = product.uom_id
+                    move_uom = line.product_uom
+                    # Since the values are for the UOM of the product, convert the qty to the one of the product
+                    # _compute_price also works for quantities since it only applies the factors
+                    qty = move_uom._compute_price(line.product_uom_qty, product_uom)
+                    nbr_pallets += qty * product.of_nbr_pallets
+            wizard.nbr_pallets = nbr_pallets
 
 
 class OFDeliveryDivisionWizardLine(models.TransientModel):
@@ -48,10 +50,11 @@ class OFDeliveryDivisionWizardLine(models.TransientModel):
     @api.depends('product_id', 'move_id.product_uom', 'move_id.product_uom_qty')
     def _compute_of_product_weight(self):
         for line in self:
-            product = line.move_id.product_id
-            product_uom = product.uom_id
-            move_uom = line.move_id.product_uom
-            # Since the values are for the UOM of the product, convert the qty to the one of the product
-            # _compute_price also works for quantities since it only applies the factors
-            qty = move_uom._compute_price(line.move_id.product_uom_qty, product_uom)
-            line.product_weight = qty * product.weight
+            if line.product_id:
+                product = line.move_id.product_id
+                product_uom = product.uom_id
+                move_uom = line.move_id.product_uom
+                # Since the values are for the UOM of the product, convert the qty to the one of the product
+                # _compute_price also works for quantities since it only applies the factors
+                qty = move_uom._compute_price(line.move_id.product_uom_qty, product_uom)
+                line.product_weight = qty * product.weight

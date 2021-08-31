@@ -34,6 +34,7 @@ Stock pickings
         'of_base',
         ],
     'data': [
+        'security/ir.model.access.csv',
         'views/of_logistic_views.xml',
         'views/product_views.xml',
         'views/stock_views.xml',
