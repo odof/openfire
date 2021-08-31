@@ -2,7 +2,7 @@
 <odoo>
 <template id="sale.report_saleorder_document">
     <t t-call="report.external_layout">
-        <t t-set="doc" t-value="doc.with_context({'lang':doc.partner_id.lang})" />
+        <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)" />
         <t t-set="pdf_telephone" t-value="doc.pdf_afficher_telephone()"/>
         <t t-set="pdf_mobile" t-value="doc.pdf_afficher_mobile()"/>
         <t t-set="pdf_fax" t-value="doc.pdf_afficher_fax()"/>
