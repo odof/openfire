@@ -158,8 +158,8 @@ class OfPlanningInterventionTemplate(models.Model):
     fi_rdv_mail = fields.Boolean(string="E-mail")
     fi_rdv_phone = fields.Boolean(string=u"Téléphone")
     # -- FI - Descriptions
-    fi_description = fields.Boolean(sring="DESCRIPTION(S)")
-    fi_description_ext = fields.Boolean(sring="Description externe")
+    fi_description = fields.Boolean(string="DESCRIPTION(S)")
+    fi_description_ext = fields.Boolean(string="Description externe")
     # -- FI - Facturation
     fi_invoicing = fields.Boolean(string="FACTURATION")
     fi_invoicing_ht = fields.Boolean(string="Total HT")

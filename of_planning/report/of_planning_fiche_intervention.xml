@@ -227,8 +227,12 @@
                                                                 <t t-if="template.fi_rdv_mail and o.address_id.email">
                                                                     <div t-field="o.address_id.email"/>
                                                                 </t>
-                                                                <t t-if="template.fi_rdv_phone and o.address_id.phone">
-                                                                    <div t-field="o.address_id.phone"/>
+                                                                <t t-if="template.fi_rdv_phone and (o.address_id.phone or o.address_id.mobile)">
+                                                                    <div>
+                                                                        <span t-field="o.address_id.phone"/>
+                                                                        <t t-if="o.address_id.phone and o.address_id.mobile"> - </t>
+                                                                        <span t-field="o.address_id.mobile"/>
+                                                                    </div>
                                                                 </t>
                                                             </div>
                                                         </t>
