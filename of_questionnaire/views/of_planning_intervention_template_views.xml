@@ -28,7 +28,7 @@
                     <field name="fi_surveys_rdv" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_surveys', '=', False)]}"/>
                 </div>
             </xpath>
-            <xpath expr="//separator[@name='ri_invoicing_below']" position="after">
+            <xpath expr="//separator[@name='ri_legal_above']" position="before">
                 <!-- RI - Questionnaire -->
                 <separator string="" colspan="2" name="ri_surveys_above"/>
                 <field name="ri_surveys" attrs="{'readonly':[('ri_default','=',True)]}"/>

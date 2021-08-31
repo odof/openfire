@@ -51,6 +51,11 @@
                                 </tree>
                             </field>
                         </page>
+                        <page name="legal" string="Mentions légales">
+                            <group>
+                                <field name="legal" nolabel="1"/>
+                            </group>
+                        </page>
                         <page name="fiche_intervention" string="Fiche d'intervention">
                             <group col="4">
                                 <group>
@@ -211,6 +216,7 @@
                             <group col="8">
                                 <group name="ri_first">
                                     <!-- RI - Rdv d'intervention -->
+                                    <separator string="" colspan="2" name="ri_rdv_above"/>
                                     <field name="ri_rdv" attrs="{'readonly':[('ri_default','=',True)]}"/>
                                     <label for="ri_rdv_lib" style="font-weight: normal !important"/>
                                     <div>
@@ -247,9 +253,6 @@
                                     <separator string="" colspan="2" name="ri_origin_below"/>
                                 </group>
                                 <group name="ri_second">
-                                    <!-- RI - Facturation -->
-                                    <field name="ri_invoicing" attrs="{'readonly':[('ri_default','=',True)]}"/>
-                                    <separator string="" colspan="2" name="ri_invoicing_below"/>
                                     <!-- RI - Notes -->
                                     <separator string="" colspan="2" name="ri_notes_above"/>
                                     <field name="ri_notes" attrs="{'readonly':[('ri_default','=',True)]}"/>
@@ -258,11 +261,21 @@
                                         <field name="ri_notes_desc" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_notes', '=', False)]}"/>
                                     </div>
                                     <separator string="" colspan="2" name="ri_notes_below"/>
+                                    <!-- RI - Facturation -->
+                                    <separator string="" colspan="2" name="ri_invoicing_above"/>
+                                    <field name="ri_invoicing" attrs="{'readonly':[('ri_default','=',True)]}"/>
+                                    <separator string="" colspan="2" name="ri_invoicing_below"/>
+
+                                </group>
+                                <group name="ri_third">
                                     <!-- RI - Mentions légales -->
                                     <separator string="" colspan="2" name="ri_legal_above"/>
                                     <field name="ri_legal" attrs="{'readonly':[('ri_default','=',True)]}"/>
+                                    <separator string="" colspan="2" name="ri_legal_below"/>
                                 </group>
+                                <group name="ri_fourth"></group>
                             </group>
+
                             <separator string="Documents joints" name="ri_joined_documents"/>
                             <group col="8">
                                 <h5 colspan="8">Documents internes</h5>

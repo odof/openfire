@@ -45,9 +45,9 @@
                 <!-- FI - FACTURATION -->
                 <separator string="" colspan="2"/>
             </xpath>
-            <xpath expr="//separator[@name='ri_rdv_below']" position="after">
+            <xpath expr="//separator[@name='ri_notes_above']" position="before">
                 <!-- RI - Parc installé -->
-                <separator string="" colspan="2"/>
+                <separator string="" colspan="2" name="ri_pi_above"/>
                 <field name="ri_pi" attrs="{'readonly':[('ri_default','=',True)]}"/>
                 <label for="ri_pi_product" style="font-weight: normal !important"/>
                 <div>
@@ -77,6 +77,7 @@
                 <div>
                     <field name="ri_pi_notes" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_pi', '=', False)]}"/>
                 </div>
+                <separator string="" colspan="2" name="ri_pi_below"/>
             </xpath>
         </field>
     </record>

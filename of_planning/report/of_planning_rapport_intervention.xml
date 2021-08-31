@@ -69,7 +69,7 @@
                                                         </div>
                                                     </t>
                                                     <!-- Durée -->
-                                                    <t t-if="template.ri_rdv_duration">
+                                                    <t name="duration" t-if="template.ri_rdv_duration">
                                                         <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
                                                         <div class="h5" style="padding: 0px 16px;">
                                                             <strong><span>Durée&amp;nbsp;:</span></strong>
@@ -77,7 +77,7 @@
                                                         </div>
                                                     </t>
                                                     <!-- Date -->
-                                                    <t t-if="template.ri_rdv_date_start or template.ri_rdv_date_end">
+                                                    <t name="dates" t-if="template.ri_rdv_date_start or template.ri_rdv_date_end">
                                                         <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
                                                         <div class="h5" style="padding: 0px 16px;">
                                                             <strong><span>Date&amp;nbsp;:</span></strong>
