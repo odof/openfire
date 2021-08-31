@@ -51,14 +51,6 @@
                                 </tree>
                             </field>
                         </page>
-                        <page name="products" string="Articles supplémentaires">
-                            <field name="product_ids">
-                                <tree>
-                                    <field name="name"/>
-                                    <field name="list_price"/>
-                                </tree>
-                            </field>
-                        </page>
                         <page name="fiche_intervention" string="Fiche d'intervention">
                             <group col="4">
                                 <group>

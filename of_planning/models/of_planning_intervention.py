@@ -1037,7 +1037,8 @@ class OfPlanningIntervention(models.Model):
                 val = getattr(self.address_id, field)
                 if val:
                     name.append(val)
-            self.fiscal_position_id = address.commercial_partner_id.property_account_position_id
+            if not self.fiscal_position_id:
+                self.fiscal_position_id = address.commercial_partner_id.property_account_position_id
             # Pour les objets du planning, le choix de la société se fait par un paramètre de config
             company_choice = self.env['ir.values'].get_default(
                 'of.intervention.settings', 'company_choice') or 'contact'

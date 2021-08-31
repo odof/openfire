@@ -128,7 +128,6 @@ class OfPlanningInterventionTemplate(models.Model):
     tache_id = fields.Many2one('of.planning.tache', string=u"Tâche")
     fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale", company_dependent=True)
     line_ids = fields.One2many('of.planning.intervention.template.line', 'template_id', string="Lignes de facturation")
-    product_ids = fields.Many2many('product.product')
 
     is_default_template = fields.Boolean(compute="_compute_is_default_template")
     # FICHE D'INTERVENTION
