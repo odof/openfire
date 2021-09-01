@@ -107,7 +107,20 @@ class SaleOrder(models.Model):
 
     @api.model
     def create(self, vals):
-        start_state = self.env['ir.values'].get_default('sale.config.settings', 'of_sale_order_start_state')
+        start_state = 'draft'
+
+        # On teste si l'utilisateur a le groupe quotation
+        if self.env.user.has_group('of_crm.group_quotation_sale_order_state'):
+            # Si oui, on teste si la commande ne vient pas du site web/public user
+            public_partner = self.env.ref('base.public_partner')
+            partner_id = self.env['res.partner'].browse(vals.get('partner_id', False))
+
+            if partner_id == public_partner:
+                # La commande vient du site web, on laisse en estimation malgré le paramétrage
+                pass
+            else:
+                start_state = 'quotation'
+
         if start_state == 'quotation':
             if vals.get('state', 'draft') == 'draft':
                 vals.update(state='sent')
@@ -267,7 +280,7 @@ class SaleConfiguration(models.TransientModel):
     group_quotation_sale_order_state = fields.Boolean(
         string=u"Commandes créés à l'étape Devis",
         implied_group='of_crm.group_quotation_sale_order_state',
-        group='base.group_portal,base.group_user,base.group_public')
+        group='base.group_user')
     of_sale_order_start_state = fields.Selection(
         selection=[('estimation', u"Les commandes sont créées à l'étape initiale Estimation"),
                    ('quotation', u"Les commandes sont créées à l'étape initiale Devis")],
