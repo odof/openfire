@@ -148,6 +148,8 @@ class OFSaleConfiguration(models.TransientModel):
         (1, 'Groupement par commande'),
         ], string=u"(OF) Facturation groupée")
 
+    sale_show_tax = fields.Selection(selection_add=[('both', 'Afficher les sous-totaux HT (B2B) et TTC (B2C)')])
+
     @api.multi
     def set_pdf_adresse_nom_parent_defaults(self):
         return self.env['ir.values'].sudo().set_default(
@@ -256,3 +258,22 @@ class OFSaleConfiguration(models.TransientModel):
     def set_of_invoice_grouped_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_invoice_grouped', self.of_invoice_grouped)
+
+    @api.onchange('sale_show_tax')
+    def _onchange_sale_tax(self):
+        # Erase and replace parent function
+        if self.sale_show_tax == "subtotal":
+            self.update({
+                'group_show_price_total': False,
+                'group_show_price_subtotal': True,
+                })
+        elif self.sale_show_tax == "total":
+            self.update({
+                'group_show_price_total': True,
+                'group_show_price_subtotal': False,
+                })
+        else:
+            self.update({
+                'group_show_price_total': True,
+                'group_show_price_subtotal': True,
+                })
