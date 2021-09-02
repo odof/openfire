@@ -314,6 +314,7 @@ class OfTourneeRdv(models.TransientModel):
         values = self.get_values_intervention_create()
 
         res = intervention_obj.create(values)
+        res.onchange_company_id()  # Permet de renseigner l'entrepôt
         contract_custom = self.sudo().env['ir.module.module'].search([('name', '=', 'of_contract_custom')])
 
         # Creation/mise à jour du service si creer_recurrence

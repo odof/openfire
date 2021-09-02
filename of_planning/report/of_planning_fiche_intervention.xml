@@ -3,7 +3,7 @@
 
     <!-- Action imprimer dans le planning d'intervention -->
     <report id="of_planning_fiche2_intervention_report"
-            string="Fiche d'intervention2"
+            string="Fiche d'intervention"
             model="of.planning.intervention"
             report_type="qweb-pdf"
             name="of_planning.of_planning_fiche2_intervention_report_big_template"
@@ -15,14 +15,36 @@
         <t t-call="of_planning.of_planning_fiche2_intervention_report_template"/>
     </template>
 
+    <!-- Action imprimer dans les devis/commandes -->
+    <report id="of_sale_fiche2_intervention_report"
+        string="Fiche intervention"
+        model="sale.order"
+        report_type="qweb-pdf"
+        name="of_planning.of_sale_order2_fiche_intervention_report_template"
+        paperformat="report.paperformat_euro">
+    </report>
+
+    <!-- Template pour devis/commandes -->
+    <template id="of_sale_order2_fiche_intervention_report_template">
+        <t t-set="docs" t-value="docs.with_context(of_from_sale_order=True)"/>
+        <t t-call="of_planning.of_planning_fiche2_intervention_report_template"/>
+    </template>
+
     <template id="of_planning_fiche2_intervention_report_template">
         <!-- L'impression de ce rapport peut être déclenché des devis/commandes ou du planning.
         L'affichage diffère selon l'origine. -->
         <t t-call="report.html_container">
-            <t t-foreach="docs" t-as="o">
+            <t t-if="docs._context.get('of_from_sale_order', False)">
+                <t t-set="documents" t-value="[(i, o) for o in docs for i in (o.intervention_ids or [o.intervention_ids])]"/>
+            </t>
+            <t t-else="">
+                <t t-set="documents" t-value="[(o, o.order_id) for o in docs]"/>
+            </t>
+            <t t-foreach="documents" t-as="vals">
+                <t t-set="o" t-value="vals[0]"/>
+                <t t-set="order" t-value="vals[1]"/>
                 <t t-set="template" t-value="o.template_id or o.env.ref('of_planning.of_planning_default_intervention_template', raise_if_not_found=False) or o.template_id"/>
                 <t t-set="o" t-value="o.with_context(of_report_name=template.fi_title)"/>
-                <t t-set="order" t-value="o.order_id"/>
                 <t t-call="report.external_layout">
                     <div class="page">
                         <t t-if="template">
@@ -91,7 +113,7 @@
                                     </t>
                                 </div>
                                 <div name="invoicing" style="width: 47%; float: right; page-break-inside: avoid;">
-                                    <t t-if="template.fi_invoicing">
+                                    <t t-if="template.fi_invoicing and o">
                                         <div class="row h4 mb4">
                                             <div class="col-xs-12">
                                                 <strong>Facturation</strong>
@@ -132,7 +154,7 @@
                             </div>
                             <div class="row" style="margin-bottom: 12px; width: 100%; "/>
                             <div name="second" style="width: 100%; page-break-inside: avoid;">
-                                <t t-if="template.fi_rdv">
+                                <t t-if="template.fi_rdv and o">
                                     <div class="row h4 mb4">
                                         <div class="col-xs-12">
                                             <strong>Intervention</strong>

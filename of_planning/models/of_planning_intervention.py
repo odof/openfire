@@ -335,6 +335,21 @@ class OfPlanningIntervention(models.Model):
     _inherit = ["of.readgroup", "of.calendar.mixin", 'mail.thread']
     _order = 'date'
 
+    @api.model_cr_context
+    def _auto_init(self):
+        res = super(OfPlanningIntervention, self)._auto_init()
+        cr = self.env.cr
+        cr.execute('SELECT id FROM of_planning_intervention WHERE warehouse_id IS NULL',)
+        fetch = cr.fetchall()
+        if fetch:
+            ids = [tup[0] for tup in fetch]
+            cr.execute("UPDATE of_planning_intervention ofp "
+                       "SET warehouse_id = sw.id "
+                       "FROM stock_warehouse sw "
+                       "WHERE sw.company_id = ofp.company_id "
+                       "  AND ofp.id IN %s", (tuple(ids),))
+        return res
+
     # Domain #
 
     @api.model
@@ -357,12 +372,6 @@ class OfPlanningIntervention(models.Model):
         if 'default_date_deadline_prompt' in self._context:
             self = self.with_context(default_date_deadline=self._context['default_date_deadline_prompt'])
         return super(OfPlanningIntervention, self).default_get(fields_list)
-
-    @api.model
-    def _default_warehouse_id(self):
-        company_id = self.env.user.company_id.id
-        warehouse_id = self.env['stock.warehouse'].search([('company_id', '=', company_id)], limit=1)
-        return warehouse_id
 
     # Champs #
 
@@ -513,8 +522,7 @@ class OfPlanningIntervention(models.Model):
     )
     warehouse_id = fields.Many2one(
         'stock.warehouse', string=u'Entrepôt',
-        readonly=True, states={'draft': [('readonly', False), ('required', True)]},
-        default=lambda s: s._default_warehouse_id)
+        readonly=True, states={'draft': [('readonly', False), ('required', True)]})
     procurement_group_id = fields.Many2one('procurement.group', 'Procurement Group', copy=False)
     picking_ids = fields.One2many(comodel_name='stock.picking', compute="_compute_pickings", string=u"BL associés")
     delivery_count = fields.Integer(string="Nbr Bl", compute="_compute_pickings")
@@ -1044,6 +1052,7 @@ class OfPlanningIntervention(models.Model):
                 'of.intervention.settings', 'company_choice') or 'contact'
             if company_choice == 'contact' and self.address_id.company_id:
                 self.company_id = address.company_id.id
+                self.onchange_company_id()  # forcer l'appel
         self.name = name and " ".join(name) or "Intervention"
 
     @api.onchange('template_id')

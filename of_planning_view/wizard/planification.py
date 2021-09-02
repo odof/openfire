@@ -328,6 +328,7 @@ class OfPlanifCreneau(models.TransientModel):
         if not self.duree_rdv:
             raise UserError(u"Avez-vous pensé à vérifier la durée de votre intervention?")
         intervention = self.create_intervention()
+        intervention.onchange_company_id()  # Permet de renseigner l'entrepôt
         if self.selected_id.service_id.recurrence:
             date_next = intervention.service_id.get_next_date(self.date_creneau)
             intervention.service_id.write({
