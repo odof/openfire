@@ -56,7 +56,7 @@ Cette action irréversible recalculera la catégorie, le prix d'achat et le prix
                             <field name="use_prefix"/>
                             <field name="show_in_sales"/>
                         </group>
-                        <group groups="of_base.of_group_root_only">
+                        <group groups="base.group_system">
                             <group>
                                 <field name="use_brand_description_sale"/>
                             </group>
