@@ -276,6 +276,7 @@ class OfTourneeRdv(models.TransientModel):
         values = self.get_values_intervention_create()
 
         res = intervention_obj.create(values)
+        res.onchange_company_id()  # Permet de renseigner l'entrepôt
 
         # Creation/mise à jour du service si creer_recurrence
         if self.date_next:

@@ -159,7 +159,7 @@
                                 <t t-set="pi_name"
                                    t-value="(template.fi_pi_model and parc.modele) or (template.fi_pi_product and parc.product_id.name) or ''"/>
                                 <t t-if="template.fi_pi_brand and parc.brand_id or template.fi_pi_serial and parc.name or pi_name">
-                                    <t t-set="pi" t-value="((template.fi_pi_brand and [parc.brand_id.name]) or []) + ((template.fi_pi_serial and [parc.name]) or []) + ((pi_name and [pi_name]) or [])"/>
+                                    <t t-set="pi" t-value="((template.fi_pi_brand and parc.brand_id.name and [parc.brand_id.name]) or []) + ((template.fi_pi_serial and parc.name and [parc.name]) or []) + ((pi_name and [pi_name]) or [])"/>
                                     <div class="h5" style="padding: 0px 16px;">
                                         <strong><span>Sur&amp;nbsp;:</span></strong>
                                         <span t-raw="' - '.join(pi)"/>
