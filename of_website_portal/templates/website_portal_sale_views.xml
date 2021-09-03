@@ -1,0 +1,47 @@
+<odoo>
+
+    <template id="assets_frontend" inherit_id="website.assets_frontend" name="Website Portal Sale">
+      <xpath expr="." position="inside">
+          <link rel='stylesheet' href='/of_website_portal/static/src/less/style.less'/>
+      </xpath>
+    </template>
+
+    <template id="layout_b2c" inherit_id="website.layout">
+        <xpath expr="//div[@id='wrapwrap']" position="attributes">
+            <attribute name="t-attf-portal">{{'B2B' if request.env.user.has_group('base.group_portal') or request.env.user.has_group('base.group_user') else 'B2C'}}</attribute>
+        </xpath>
+        <xpath expr="//header" position="inside">
+            <div class="ribbon B2B" groups="base.group_portal" style="background-color: green">
+                <span>B2B</span>
+            </div>
+            <div class="ribbon B2C" groups="of_website_portal.group_portal_b2c" style="background-color: red">
+                <span>B2C</span>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="portal_my_home_menu_sale_b2c" name="Portal layout : sales menu entries b2c" inherit_id="website_portal_sale.portal_my_home_menu_sale">
+        <xpath expr="//a[@href='/my/quotes']/.." position="attributes">
+            <attribute name="groups">base.group_portal,base.group_user</attribute>
+        </xpath>
+        <xpath expr="//a[@href='/my/orders']/.." position="attributes">
+            <attribute name="groups">base.group_portal,base.group_user</attribute>
+        </xpath>
+        <xpath expr="//a[@href='/my/of_contracts']/.." position="attributes">
+            <attribute name="groups">base.group_portal,base.group_user</attribute>
+        </xpath>
+    </template>
+
+    <template id="portal_my_home_sale_b2c" name="Portal My Home : sales entries b2c" inherit_id="website_portal_sale.portal_my_home_sale">
+        <xpath expr="//a[@href='/my/quotes']/.." position="attributes">
+            <attribute name="groups">base.group_portal,base.group_user</attribute>
+        </xpath>
+        <xpath expr="//a[@href='/my/orders']/.." position="attributes">
+            <attribute name="groups">base.group_portal,base.group_user</attribute>
+        </xpath>
+        <xpath expr="//a[@href='/my/of_contracts']/.." position="attributes">
+            <attribute name="groups">base.group_portal,base.group_user</attribute>
+        </xpath>
+    </template>
+
+</odoo>

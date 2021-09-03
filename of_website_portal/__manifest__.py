@@ -14,6 +14,7 @@ Module OpenFire pour le portail du site internet
 """,
     'website': "www.openfire.fr",
     'depends': [
+        'base',
         'website_portal',
         'website_project_issue',
         'website_portal_sale',
@@ -25,10 +26,12 @@ Module OpenFire pour le portail du site internet
         'of_kit',
     ],
     'data': [
+        'data/res_groups.xml',
         'security/ir.model.access.csv',
         'security/of_website_portal_security.xml',
         'views/of_website_portal_views.xml',
         'views/templates.xml',
+        'templates/website_portal_sale_views.xml',
     ],
     'qweb': [
     ],
