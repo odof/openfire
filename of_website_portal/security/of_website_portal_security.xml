@@ -8,7 +8,7 @@
         <field name="name">OF Service Published</field>
         <field name="model_id" ref="of_service.model_of_service"/>
         <field name="domain_force">[('website_published', '=', True)]</field>
-        <field name="groups" eval="[(4, ref('base.group_public')), (4, ref('base.group_portal'))]"/>
+        <field name="groups" eval="[(4, ref('base.group_public')), (4, ref('base.group_portal')), (4, ref('of_website_portal.group_portal_b2c'))]"/>
     </record>
 
     <!-- OF Planning Tache -->
@@ -16,7 +16,7 @@
         <field name="name">OF Planning Tache Published</field>
         <field name="model_id" ref="of_planning.model_of_planning_tache"/>
         <field name="domain_force">[('website_published', '=', True)]</field>
-        <field name="groups" eval="[(4, ref('base.group_public')), (4, ref('base.group_portal'))]"/>
+        <field name="groups" eval="[(4, ref('base.group_public')), (4, ref('base.group_portal')), (4, ref('of_website_portal.group_portal_b2c'))]"/>
     </record>
 
 </odoo>
