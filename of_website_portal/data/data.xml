@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- On créé un groupe Portail B2C, le groupe Portail étant considéré comme le groupe Portail B2B-->
+        <record id="group_portal_b2c" model="res.groups">
+            <field name="is_portal" eval="True"/>
+            <field name="name">Portail B2C</field>
+            <field name="category_id" ref="base.module_category_extra"/>
+            <field name="implied_ids" eval="[(4, ref('sale.group_show_price_total')), (4, ref('of_crm.group_estimation_sale_order_state'))]"/>
+        </record>
+
+        <!-- On créé également une liste de prix et une position fiscale-->
+        <record id="product_pricelist_b2c" model="product.pricelist">
+            <field name="name">Liste de prix B2C</field>
+        </record>
+
+        <record id="account_fiscal_position_b2c" model="account.fiscal.position">
+            <field name="name">B2C</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- On le rempli avec les même info du groupe Portail-->
+        <function
+                id="auto_init_group_portal_b2c"
+                model="res.groups"
+                name="_auto_init_group_portal_b2c">
+        </function>
+
+        <!-- On passe la base en Affichage des sous-totaux HT (B2B) -->
+        <record id="sale_show_tax_b2b" model="sale.config.settings">
+            <field name="sale_show_tax">subtotal</field>
+        </record>
+
+        <function model="sale.config.settings" name="execute">
+            <!-- ids = -->        <value eval="[ref('of_website_portal.sale_show_tax_b2b')]"/>
+            <!-- context = -->    <value eval="{}"/>
+        </function>
+
+        <!-- Le execute du dessus n'a pas répercuté les modification de groupe, on les force donc sur le groupe Portail et Employé -->
+        <record id="base.group_portal" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('sale.group_show_price_subtotal')),(3, ref('sale.group_show_price_total'))]"/>
+        </record>
+        <record id="base.group_user" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('sale.group_show_price_subtotal')),(3, ref('sale.group_show_price_total'))]"/>
+        </record>
+
+        <!-- On force le groupe Public a rester en Affichage des sous-totaux TTC (B2C) pour le site web -->
+        <record id="base.group_public" model="res.groups">
+            <field name="implied_ids" eval="[(3, ref('sale.group_show_price_subtotal')),(4, ref('sale.group_show_price_total'))]"/>
+        </record>
+
+        <!-- On modifie temporairement le noupdate du partner Public pour lui ajouter la position fiscale et la liste de prix B2C -->
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'base'), ('name', 'in', ['public_partner'])]"/>
+            </function>
+            <value eval="{'noupdate': False}" />
+        </function>
+
+        <record id="base.public_partner" model="res.partner">
+            <field name="property_product_pricelist" ref="of_website_portal.product_pricelist_b2c"/>
+            <field name="property_account_position_id" ref="of_website_portal.account_fiscal_position_b2c"/>
+        </record>
+
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'base'), ('name', 'in', ['public_partner'])]"/>
+            </function>
+            <value eval="{'noupdate': True}" />
+        </function>
+
+        <!-- On définit la position fiscale et la liste de prix des nouveaux utilisateur B2C-->
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'website'), ('name', 'in', ['default_website'])]"/>
+            </function>
+            <value eval="{'noupdate': False}" />
+        </function>
+
+        <record id="website.default_website" model="website">
+            <field name="name">Mon site</field>
+            <field name="of_pricelist_b2c_id" ref="of_website_portal.product_pricelist_b2c"/>
+            <field name="of_pricelist_b2b_id" ref="product.list0"/>
+            <field name="of_fiscal_position_b2c_id" ref="of_website_portal.account_fiscal_position_b2c"/>
+            <field name="of_fiscal_position_b2b_id" eval="False"/>
+        </record>
+
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'website'), ('name', 'in', ['default_website'])]"/>
+            </function>
+            <value eval="{'noupdate': True}" />
+        </function>
+
+    </data>
+</odoo>

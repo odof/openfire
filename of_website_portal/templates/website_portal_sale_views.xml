@@ -1,0 +1,78 @@
+<odoo>
+
+    <template id="assets_frontend" inherit_id="website.assets_frontend" name="Website Portal Sale">
+        <xpath expr="." position="inside">
+            <link rel='stylesheet' href='/of_website_portal/static/src/less/style.less'/>
+        </xpath>
+    </template>
+
+    <template id="layout_b2c" inherit_id="website.layout">
+        <xpath expr="//div[@id='wrapwrap']" position="attributes">
+            <attribute name="t-attf-portal">{{'B2B' if request.env.user.has_group('base.group_portal') or request.env.user.has_group('base.group_user') else 'B2C'}}</attribute>
+        </xpath>
+        <xpath expr="//header" position="inside">
+            <div class="ribbon B2B" groups="base.group_portal" style="background-color: green">
+                <span>B2B</span>
+            </div>
+            <div class="ribbon B2C" groups="of_website_portal.group_portal_b2c" style="background-color: red">
+                <span>B2C</span>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="portal_my_home_menu_sale_b2c" name="Portal layout : sales menu entries b2c" inherit_id="website_portal_sale.portal_my_home_menu_sale">
+        <xpath expr="//a[@href='/my/quotes']/.." position="attributes">
+            <attribute name="groups">base.group_portal,base.group_user</attribute>
+        </xpath>
+        <xpath expr="//a[@href='/my/orders']/.." position="attributes">
+            <attribute name="groups">base.group_portal,base.group_user</attribute>
+        </xpath>
+        <xpath expr="//a[@href='/my/of_contracts']/.." position="attributes">
+            <attribute name="groups">base.group_portal,base.group_user</attribute>
+        </xpath>
+        <xpath expr="//a[@href='/my/invoices']/.." position="after">
+            <li groups="base.group_portal,base.group_user">
+                <a href="/my/deliveries">Livraisons</a>
+            </li>
+        </xpath>
+    </template>
+
+    <template id="portal_my_home_sale_b2c" name="Portal My Home : sales entries b2c" inherit_id="website_portal_sale.portal_my_home_sale">
+        <xpath expr="//a[@href='/my/quotes']/.." position="attributes">
+            <attribute name="groups">base.group_portal,base.group_user</attribute>
+        </xpath>
+        <xpath expr="//a[@href='/my/orders']/.." position="attributes">
+            <attribute name="groups">base.group_portal,base.group_user</attribute>
+        </xpath>
+        <xpath expr="//a[@href='/my/of_contracts']/.." position="attributes">
+            <attribute name="groups">base.group_portal,base.group_user</attribute>
+        </xpath>
+        <xpath expr="//a[@href='/my/invoices']/.." position="after">
+            <h3 class="page-header" groups="base.group_portal,base.group_user">
+                <a href="/my/deliveries">Vos livraisons
+                    <small class="ml8">
+                        <t t-if="delivery_count">
+                            <span class="badge"><t t-esc="delivery_count"/></span>
+                        </t>
+                        <t t-if="not delivery_count">
+                            Il n'y a actuellement pas de livraisons pour votre compte.
+                        </t>
+                    </small>
+                </a>
+            </h3>
+        </xpath>
+    </template>
+
+    <template id="of_portal_my_quotations" inherit_id="website_portal_sale.portal_my_quotations">
+        <xpath expr="//table/t/tr/td[3]" position="inside">
+            <t t-if="quotation.state == 'sent'">
+                <form action="/of_validate_sale_order" method="post">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <input type="hidden" name="order_id" t-att-value="quotation.id"/>
+                    <button type="submit" class="btn btn-primary btn-sm">Valider</button>
+                </form>
+            </t>
+        </xpath>
+    </template>
+
+</odoo>
