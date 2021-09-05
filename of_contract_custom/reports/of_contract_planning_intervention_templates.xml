@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-<!--    <report id="of_planning.of_planning_fiche_intervention_report"-->
-<!--        string="Fiche intervention"-->
-<!--        model="of.planning.intervention"-->
-<!--        report_type="qweb-pdf"-->
-<!--        name="of_planning.of_planning_fiche_intervention_report_template"-->
-<!--        paperformat="of_planning.paperformat_euro_portrait_custom"-->
-<!--        attachment_use="True"-->
-<!--        attachment="(object.state in ('confirm','done')) and ('RDV '+(object.number or object.name or '').replace('/','')+'.pdf')">-->
-<!--    </report>-->
+    <report id="of_planning.of_planning_fiche_intervention_report"
+        string="Fiche intervention"
+        model="of.planning.intervention"
+        report_type="qweb-pdf"
+        name="of_planning.of_planning_fiche_intervention_report_template"
+        paperformat="of_planning.paperformat_euro_portrait_custom"
+        attachment_use="True"
+        attachment="(object.state in ('confirm','done')) and ('RDV '+(object.number or object.name or '').replace('/','')+'.pdf')">
+    </report>
 
 </odoo>

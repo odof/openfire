@@ -2,23 +2,23 @@
 <odoo>
 
     <!-- Ajout de la machine installée dans la fiche intervention -->
-<!--    <template id="of_parc_chem_extension_fiche_intervention_report" inherit_id="of_service_parc_installe.of_parc_installe_extension_fiche_intervention_report">-->
-<!--        <xpath expr="//span[@t-field='o.parc_installe_id.installation']/parent::div/parent::div" position="after">-->
-<!--            <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>-->
-<!--            <div class="h5" style="padding: 0px 16px;">-->
-<!--                <div>-->
-<!--                    <span>Type de conduit :</span>-->
-<!--                    <span t-field="o.parc_installe_id.type_conduit"/>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>-->
-<!--            <div class="h5" style="padding: 0px 16px;">-->
-<!--                <div>-->
-<!--                    <span>Type d'arrivée d'air :</span>-->
-<!--                    <span t-field="o.parc_installe_id.type_air"/>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </xpath>-->
-<!--    </template>-->
+    <template id="of_parc_chem_extension_fiche_intervention_report" inherit_id="of_service_parc_installe.of_parc_installe_extension_fiche_intervention_report">
+        <xpath expr="//span[@t-field='o.parc_installe_id.installation']/parent::div/parent::div" position="after">
+            <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
+            <div class="h5" style="padding: 0px 16px;">
+                <div>
+                    <span>Type de conduit :</span>
+                    <span t-field="o.parc_installe_id.type_conduit"/>
+                </div>
+            </div>
+            <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
+            <div class="h5" style="padding: 0px 16px;">
+                <div>
+                    <span>Type d'arrivée d'air :</span>
+                    <span t-field="o.parc_installe_id.type_air"/>
+                </div>
+            </div>
+        </xpath>
+    </template>
 
 </odoo>
