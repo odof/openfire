@@ -28,6 +28,12 @@ class Directory(dms_base.DMSModel):
             vals['name'] = vals['name'].replace('/', '|').lstrip()
         return vals
 
+    def _before_write(self, vals, operation):
+        vals = super(Directory, self)._before_write(vals, operation)
+        if 'name' in vals:
+            vals['name'] = vals['name'].replace('/', '|').lstrip()
+        return vals
+
     @api.model
     def of_get_partner_parent_directory(self, partner):
         # Find parent directory
@@ -126,6 +132,12 @@ class File(dms_base.DMSModel):
 
     def _before_create(self, vals):
         vals = super(File, self)._before_create(vals)
+        if 'name' in vals:
+            vals['name'] = vals['name'].replace('/', '|').lstrip()
+        return vals
+
+    def _before_write(self, vals, operation):
+        vals = super(File, self)._before_write(vals, operation)
         if 'name' in vals:
             vals['name'] = vals['name'].replace('/', '|').lstrip()
         return vals
