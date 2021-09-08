@@ -148,18 +148,26 @@
                 <field name="info_display"/>
                 <field name="date_alert_display"/>
                 <field name="picking_alert_display"/>
+                <field name="vendor_id"/>
+                <field name="main_product_brand_id"/>
+                <field name="amount_untaxed"/>
+                <field name="currency_id"/>
                 <templates>
                     <t t-name="kanban-box">
                         <div class="oe_kanban_global_click">
                             <div class="of_followup_kanban_main">
                                 <div class="o_kanban_card_content">
                                     <div class="o_kanban_tags_section">
-                                        <field name="tag_ids"/>
+                                        <field style="max-height: 100px;" name="tag_ids"/>
                                     </div>
-                                    <div style="margin-left: 5px; margin-bottom: 25px;">
+                                    <div style="margin-left: 5px; margin-right: 5px; margin-bottom: 25px;">
                                         <h4>
                                             <b><field name="order_id"/></b> - <field name="partner_id"/><br/>
                                         </h4>
+                                        <span style="white-space: inherit;">
+                                            <b><field name="vendor_id"/> / <field name="main_product_brand_id"/></b>
+                                        </span>
+                                        <br/>
                                         <span><b>Sem. de pose : <field name="laying_week"/></b>
                                         <t t-value="JSON.parse(record.date_alert_display.raw_value)[0]" t-set="date_alert"/>
                                         <span t-if="date_alert" class="of_alert_tag"><t t-esc="date_alert"/></span>
@@ -193,6 +201,9 @@
                                             <li><t t-esc="late_task"/></li>
                                         </t>
                                     </ul>
+                                </div>
+                                <div class="of_followup_kanban_box">
+                                    <field name="amount_untaxed" t-options="{'widget': 'monetary', 'display_currency': currency_id}"/>
                                 </div>
                                 <div class="of_followup_kanban_box">
                                     <field name="invoice_status"/>
