@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, models, fields, _
+from odoo import api, models, fields, SUPERUSER_ID, _
 from odoo.exceptions import UserError, ValidationError
 import odoo.addons.decimal_precision as dp
 import os
@@ -17,67 +17,21 @@ class OfPlanningInterventionTemplate(models.Model):
 
     @api.model_cr_context
     def _auto_init(self):
-        old_default_template = self.env['ir.model.data'].search([
-            ('name', '=', 'of_planning_default_intervention_template'),
-            ('module', '=', 'of_mobile')
-            ])
+        """ A supprimer après mise en ligne
+            Les anciens template n'ont plus besoin d'exister vu les modifications
+        """
+        cr = self._cr
+        cr.execute("SELECT * FROM information_schema.columns WHERE table_name = '%s' "
+                   "AND column_name = 'fi_partner_id'" % (self._table,))
+        missing_fields = not cr.fetchall()
         res = super(OfPlanningInterventionTemplate, self)._auto_init()
-        if old_default_template:
-            default = self.env.ref('of_mobile.of_planning_default_intervention_template', raise_if_not_found=False)
-            old_default_template.write({'module': 'of_planning'})
-            default.write({
-                'fi_default': False,
-                'fi_title': "Fiche d'intervention",
-                'fi_order': True,
-                'fi_order_client': True,
-                'fi_order_name': True,
-                'fi_order_interv_label': True,
-                'fi_products': True,
-                'fi_products_order': True,
-                'fi_rdv': True,
-                'fi_rdv_date_start': True,
-                'fi_rdv_date_end': True,
-                'fi_rdv_task': True,
-                'fi_rdv_task_description': True,
-                'fi_rdv_duration': True,
-                'fi_rdv_tech': True,
-                'fi_rdv_address': True,
-                'fi_rdv_mail': True,
-                'fi_rdv_phone': True,
-                'fi_description': True,
-                'fi_description_ext': True,
-                'fi_invoicing': True,
-                'fi_invoicing_ht': True,
-                'fi_invoicing_taxes': True,
-                'fi_invoicing_ttc': True,
-            })
-            # self.env.cr.execute(
-            #     "UPDATE of_planning_intervention_template "
-            #     "SET fi_title = 'Fiche d'intervention', "
-            #     "fi_order = 't', "
-            #     "fi_order_client = 't', "
-            #     "fi_order_name = 't', "
-            #     "fi_order_interv_label = 't', "
-            #     "fi_products = 't', "
-            #     "fi_products_order = 't', "
-            #     "fi_rdv = 't', "
-            #     "fi_rdv_date_start = 't', "
-            #     "fi_rdv_date_end = 't', "
-            #     "fi_rdv_task = 't', "
-            #     "fi_rdv_task_description = 't', "
-            #     "fi_rdv_duration = 't', "
-            #     "fi_rdv_tech = 't', "
-            #     "fi_rdv_address = 't', "
-            #     "fi_rdv_mail = 't', "
-            #     "fi_rdv_phone = 't', "
-            #     "fi_description = 't', "
-            #     "fi_rdv_mail = 't', "
-            #     "fi_description_ext = 't', "
-            #     "fi_invoicing = 't', "
-            #     "fi_invoicing_ht = 't', "
-            #     "fi_invoicing_taxes = 't', "
-            #     "fi_invoicing_ttc = 't' "
-            #     "WHERE id = %s", (default.id,))
+        if missing_fields:
+            default1 = self.env.ref('of_mobile.of_planning_default_intervention_template', raise_if_not_found=False)
+            default2 = self.env.ref('of_planning.of_planning_default_intervention_template', raise_if_not_found=False)
+            if default1:
+                default1.unlink()  # Supression de l'ancien enregistrement par défaut
+            if default2:
+                default2.unlink()  # Supression de l'ancien enregistrement par défaut
         return res
 
     @api.model
@@ -128,6 +82,7 @@ class OfPlanningInterventionTemplate(models.Model):
     tache_id = fields.Many2one('of.planning.tache', string=u"Tâche")
     fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale", company_dependent=True)
     line_ids = fields.One2many('of.planning.intervention.template.line', 'template_id', string="Lignes de facturation")
+    legal = fields.Text(string=u"Mentions légales")
     send_reports = fields.Selection(
         selection=[
             ('manual', u"Envoi manuel"),
@@ -137,38 +92,52 @@ class OfPlanningInterventionTemplate(models.Model):
     is_default_template = fields.Boolean(compute="_compute_is_default_template")
     # FICHE D'INTERVENTION
     fi_default = fields.Boolean(string=u"Rapport par défaut", default=True)
-    fi_title = fields.Char(string="Titre du rapport", default="Rapport d'intervention")
-    # -- FI - Commande
-    fi_order = fields.Boolean(string="COMMANDE")
-    fi_order_client = fields.Boolean(string="Client")
-    fi_order_name = fields.Boolean(string=u"Commande associée")  # doublons ?
-    fi_order_confirmation_date = fields.Boolean(string="Date de confirmation")
-    fi_order_interv_label = fields.Boolean(string=u"Libellé")  # doublons ?
-    fi_order_company = fields.Boolean(string="Magasin")
-    fi_order_seller = fields.Boolean(string="Vendeur")
-    # -- FI - Articles
-    fi_products = fields.Boolean(string="ARTICLES")
-    fi_products_order = fields.Boolean(string="Lignes de commande")
-    fi_products_picking = fields.Boolean(string="Lignes de BL")
-    # -- FI - Rdv d'intervention
+    fi_title = fields.Char(string="Titre du rapport")
+    fi_partner_id = fields.Boolean(string="Client")
+    fi_date_date = fields.Boolean(string="Date")
+
+    # Intervention
     fi_rdv = fields.Boolean(string="INTERVENTION")
-    fi_rdv_date_start = fields.Boolean(string=u"Date de début")
-    fi_rdv_date_end = fields.Boolean(string="Date de fin")
-    fi_rdv_task = fields.Boolean(string=u"Tâche")
-    fi_rdv_task_description = fields.Boolean(string=u"Description tâche")
-    fi_rdv_duration = fields.Boolean(string=u"Durée")
-    fi_rdv_tech = fields.Boolean(string="Technicien(s)")
-    fi_rdv_address = fields.Boolean(string="Adresse d'intervention")
-    fi_rdv_mail = fields.Boolean(string="E-mail")
-    fi_rdv_phone = fields.Boolean(string=u"Téléphone")
-    # -- FI - Descriptions
-    fi_description = fields.Boolean(string="DESCRIPTION(S)")
-    fi_description_ext = fields.Boolean(string="Description externe")
-    # -- FI - Facturation
+    fi_rdv_partner_id = fields.Boolean(string="Client")
+    fi_rdv_partner_code = fields.Boolean(string="Code client")
+    fi_rdv_tache_id = fields.Boolean(string=u"Tâche")
+    fi_rdv_date = fields.Boolean(string=u"Date de début")
+    fi_rdv_duree = fields.Boolean(string=u"Durée")
+    fi_rdv_employee_ids = fields.Boolean(string="Intervenant(s)")
+    fi_rdv_company_id = fields.Boolean(string=u"Société")
+    fi_rdv_lib = fields.Boolean(string=u"Libellé")
+    fi_rdv_address = fields.Boolean(string="Adresse")  # Bloc adresse
+    fi_rdv_contact = fields.Boolean(string="Contact")  # Bloc contact
+    fi_rdv_description = fields.Boolean(string="Description")
+
+    # Historique
+    fi_history = fields.Boolean(string="HISTORIQUE")
+
+    # Commande
+    fi_order = fields.Boolean(string="COMMANDE")
+    fi_order_name = fields.Boolean(string="Nom")
+    fi_order_confirmation_date = fields.Boolean(string="Date de confirmation")
+    fi_order_user_id = fields.Boolean(string="Vendeur")
+    fi_order_of_date_vt = fields.Boolean(string="Date VT")
+    fi_order_totals = fields.Boolean(string="Totaux")
+    fi_order_restant_du = fields.Boolean(string=u"Restant dû")
+    fi_order_of_notes_intervention = fields.Boolean(string="Notes d'intervention")
+
+
+    # Produits et travaux (lignes de commande)
+    fi_products = fields.Boolean(string="PRODUITS ET TRAVAUX")
+
+    # Livraisons
+    fi_pickings = fields.Boolean(string="LIVRAISONS")
+
+    # Facturation
     fi_invoicing = fields.Boolean(string="FACTURATION")
-    fi_invoicing_ht = fields.Boolean(string="Total HT")
-    fi_invoicing_taxes = fields.Boolean(string="Taxes")
-    fi_invoicing_ttc = fields.Boolean(string="Total TTC")
+
+    # Mentions légales
+    fi_legal = fields.Boolean(string=u"MENTIONS LÉGALES")
+
+    # Signatures
+    fi_signature = fields.Boolean(string="SIGNATURES")
     # -- FI - Documents joints
     fi_order_pdf = fields.Boolean(string="Commande")
     fi_picking_pdf = fields.Boolean(string="Bon(s) de livraison(s)")
@@ -179,23 +148,52 @@ class OfPlanningInterventionTemplate(models.Model):
 
     # Rapport d'intervention
     ri_default = fields.Boolean(string=u"Rapport par défaut", default=True)
-    ri_title = fields.Char(string="Titre du rapport", default="Rapport d'intervention")
-    # -- RI - Rdv d'intervention
+    ri_title = fields.Char(string="Titre du rapport")
+    ri_partner_id = fields.Boolean(string="Client")
+    ri_date_date = fields.Boolean(string="Date")
+
+    # Intervention
     ri_rdv = fields.Boolean(string="INTERVENTION")
-    ri_rdv_lib = fields.Boolean(string=u"Libellé de l'intervention")
-    ri_rdv_tech = fields.Boolean(string="Technicien")
-    ri_rdv_date_start = fields.Boolean(string=u"Date de début")
-    ri_rdv_date_end = fields.Boolean(string="Date de fin")
-    ri_rdv_duration = fields.Boolean(string=u"Durée")
-    ri_rdv_task = fields.Boolean(string=u"Tâche")
-    ri_rdv_task_description = fields.Boolean(string=u"Description tâche")
-    # -- RI - Facturation
-    ri_origin = fields.Boolean(string="ORIGINE")
-    # -- RI - Facturation
+    ri_rdv_partner_id = fields.Boolean(string="Client")
+    ri_rdv_partner_code = fields.Boolean(string="Code client")
+    ri_rdv_tache_id = fields.Boolean(string=u"Tâche")
+    ri_rdv_date = fields.Boolean(string=u"Date de début")
+    ri_rdv_duree = fields.Boolean(string=u"Durée")
+    ri_rdv_employee_ids = fields.Boolean(string="Intervenant(s)")
+    ri_rdv_company_id = fields.Boolean(string=u"Société")
+    ri_rdv_lib = fields.Boolean(string=u"Libellé")
+    ri_rdv_address = fields.Boolean(string="Adresse")  # Bloc adresse
+    ri_rdv_contact = fields.Boolean(string="Contact")  # Bloc contact
+    ri_rdv_description = fields.Boolean(string="Description")
+
+    # Historique
+    ri_history = fields.Boolean(string="HISTORIQUE")
+
+    # Commande
+    ri_order = fields.Boolean(string="COMMANDE")
+    ri_order_name = fields.Boolean(string="Nom")
+    ri_order_confirmation_date = fields.Boolean(string="Date de confirmation")
+    ri_order_user_id = fields.Boolean(string="Vendeur")
+    ri_order_of_date_vt = fields.Boolean(string="Date VT")
+    ri_order_totals = fields.Boolean(string="Totaux")
+    ri_order_restant_du = fields.Boolean(string=u"Restant dû")
+    ri_order_of_notes_intervention = fields.Boolean(string="Notes d'intervention")
+
+    # Produits et travaux (lignes de commande)
+    ri_products = fields.Boolean(string="PRODUITS ET TRAVAUX")
+
+    # Livraisons
+    ri_pickings = fields.Boolean(string="LIVRAISONS")
+
+    # Facturation
     ri_invoicing = fields.Boolean(string="FACTURATION")
-    # -- RI - Notes
-    ri_notes = fields.Boolean(string="NOTES")
-    ri_notes_desc = fields.Boolean(string="Description intervention")
+
+    # Mentions légales
+    ri_legal = fields.Boolean(string=u"MENTIONS LÉGALES")
+
+    # Signatures
+    ri_signature = fields.Boolean(string="SIGNATURES")
+
     # -- RI - Documents joints
     ri_order_pdf = fields.Boolean(string="Commande")
     ri_picking_pdf = fields.Boolean(string="Bon(s) de livraison(s)")
@@ -203,9 +201,6 @@ class OfPlanningInterventionTemplate(models.Model):
     # fi_purchase_pdf = fields.Boolean(string="Achat(s)")
     ri_mail_template_ids = fields.Many2many(
         comodel_name='of.mail.template', relation='ri_intervention_mail_template', string="Documents joints")
-    # -- RI - Mentions légales
-    legal = fields.Text(string=u"Mentions légales")
-    ri_legal = fields.Boolean(string=u"MENTIONS LÉGALES")
 
     @api.depends()
     def _compute_is_default_template(self):
@@ -258,6 +253,44 @@ class OfPlanningInterventionTemplate(models.Model):
         if self.ri_default:
             self.update(self._get_default_template_values_ri())
 
+    # onchange RDV
+    @api.onchange('fi_rdv')
+    def _onchange_fi_rdv(self):
+        values = {}
+        if self.fi_rdv:
+            rdv_keys = [key for key in self._fields.keys() if key.startswith("fi_rdv_")]
+            for key in rdv_keys:
+                values[key] = True
+            self.update(values)
+
+    @api.onchange('ri_rdv')
+    def _onchange_ri_rdv(self):
+        values = {}
+        if self.ri_rdv:
+            rdv_keys = [key for key in self._fields.keys() if key.startswith("ri_rdv_")]
+            for key in rdv_keys:
+                values[key] = True
+            self.update(values)
+
+    # onchange ORDER
+    @api.onchange('fi_order')
+    def _onchange_fi_order(self):
+        values = {}
+        if self.fi_order:
+            rdv_keys = [key for key in self._fields.keys() if key.startswith("fi_order_")]
+            for key in rdv_keys:
+                values[key] = True
+            self.update(values)
+
+    @api.onchange('ri_order')
+    def _onchange_ri_order(self):
+        values = {}
+        if self.ri_order:
+            rdv_keys = [key for key in self._fields.keys() if key.startswith("ri_order_")]
+            for key in rdv_keys:
+                values[key] = True
+            self.update(values)
+
     @api.model
     def create(self, vals):
         if vals.get('fi_default', False):
@@ -284,7 +317,7 @@ class OfPlanningInterventionTemplate(models.Model):
     @api.multi
     def unlink(self):
         default_template = self.env.ref('of_planning.of_planning_default_intervention_template', raise_if_not_found=False)
-        if default_template and default_template in self:
+        if default_template and default_template in self and self.env.uid != SUPERUSER_ID:
             raise UserError(u"Impossible de supprimer le modèle d'intervention par défaut")
         res = super(OfPlanningInterventionTemplate, self).unlink()
         return res

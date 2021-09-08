@@ -94,6 +94,32 @@ class OfPlanningIntervention(models.Model):
                "('site_adresse_id', '=', address_id)]")
     parc_installe_product_name = fields.Char(
         string=u"Désignation", related="parc_installe_id.product_id.name", readonly=True)
+    historique_parc_ids = fields.One2many(
+        comodel_name='of.planning.intervention',
+        compute="_compute_historique_parc_ids",
+        string=u"Historique (parc installé"
+        )
+
+    @api.depends('partner_id', 'address_id', 'parc_installe_id')
+    def _compute_historique_rdv_ids(self):
+        # l'historique du parc installé se trouvent dans un autre champs
+        for interv in self:
+            if interv.address_id:
+                interventions = interv.address_id.intervention_address_ids
+            elif interv.partner_id:
+                interventions = interv.partner_id.intervention_partner_ids
+            else:
+                continue
+            interv.historique_rdv_ids = interventions.filtered(
+                lambda i: interv.date_date > i.date_date and
+                (not interv.parc_installe_id or interv.parc_installe_id != i.parc_installe_id))
+
+    @api.depends('parc_installe_id')
+    def _compute_historique_parc_ids(self):
+        for interv in self:
+            if interv.parc_installe_id:
+                interv.historique_parc_ids = interv.parc_installe_id.intervention_ids.filtered(
+                    lambda i: interv.date_date > i.date_date)
 
     @api.model
     def create(self, vals):

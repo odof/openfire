@@ -10,74 +10,96 @@
         <field name="inherit_id" ref="of_planning.of_planning_intervention_template_view_form"/>
         <field name="model">of.planning.intervention.template</field>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='third']/field[@name='fi_invoicing']" position="before">
-                <!-- FI - PARC INSTALLÉ -->
-                <field name="fi_pi" attrs="{'readonly':[('fi_default','=',True)]}"/>
-                <label for="fi_pi_serial" style="font-weight: normal !important"/>
+            <xpath expr="//group[@name='fi_second']" position="inside">
+                <separator string="" colspan="2" name="fi_parc_above"/>
+                <field name="fi_parc" attrs="{'readonly':[('fi_default','=',True)]}"/>
+                <label for="fi_parc_name" style="font-weight: normal !important"/>
                 <div>
-                    <field name="fi_pi_serial" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_pi', '=', False)]}"/>
+                    <field name="fi_parc_name" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_parc', '=', False)]}"/>
                 </div>
-                <label for="fi_pi_product" style="font-weight: normal !important"/>
+                <label for="fi_parc_product_id" style="font-weight: normal !important"/>
                 <div>
-                    <field name="fi_pi_product" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_pi', '=', False)]}"/>
+                    <field name="fi_parc_product_id" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_parc', '=', False)]}"/>
                 </div>
-                <label for="fi_pi_brand" style="font-weight: normal !important"/>
+                <label for="fi_parc_modele" style="font-weight: normal !important"/>
                 <div>
-                    <field name="fi_pi_brand" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_pi', '=', False)]}"/>
+                    <field name="fi_parc_modele" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_parc', '=', False)]}"/>
                 </div>
-                <label for="fi_pi_model" style="font-weight: normal !important"/>
+                <label for="fi_parc_brand_id" style="font-weight: normal !important"/>
                 <div>
-                    <field name="fi_pi_model" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_pi', '=', False)]}"/>
+                    <field name="fi_parc_brand_id" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_parc', '=', False)]}"/>
                 </div>
-                <label for="fi_pi_installation_date" style="font-weight: normal !important"/>
+                <label for="fi_parc_product_category_id" style="font-weight: normal !important"/>
                 <div>
-                    <field name="fi_pi_installation_date" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_pi', '=', False)]}"/>
+                    <field name="fi_parc_product_category_id" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_parc', '=', False)]}"/>
                 </div>
-                <label for="fi_pi_state" style="font-weight: normal !important"/>
+                <label for="fi_parc_date_installation" style="font-weight: normal !important"/>
                 <div>
-                    <field name="fi_pi_state" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_pi', '=', False)]}"/>
+                    <field name="fi_parc_date_installation" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_parc', '=', False)]}"/>
                 </div>
-                <label for="fi_pi_notes" style="font-weight: normal !important"/>
+                <label for="fi_parc_installation" style="font-weight: normal !important"/>
                 <div>
-                    <field name="fi_pi_notes" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_pi', '=', False)]}"/>
+                    <field name="fi_parc_installation" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_parc', '=', False)]}"/>
                 </div>
-                <separator string="" colspan="2"/>
-                <!-- FI - FACTURATION -->
-                <separator string="" colspan="2"/>
+                <label for="fi_parc_conforme" style="font-weight: normal !important"/>
+                <div>
+                    <field name="fi_parc_conforme" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_parc', '=', False)]}"/>
+                </div>
+                <label for="fi_parc_installateur_id" style="font-weight: normal !important"/>
+                <div>
+                    <field name="fi_parc_installateur_id" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_parc', '=', False)]}"/>
+                </div>
+                <label for="fi_parc_note" style="font-weight: normal !important"/>
+                <div>
+                    <field name="fi_parc_note" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_parc', '=', False)]}"/>
+                </div>
+                <separator string="" colspan="2" name="fi_parc_below"/>
             </xpath>
-            <xpath expr="//separator[@name='ri_notes_above']" position="before">
-                <!-- RI - Parc installé -->
-                <separator string="" colspan="2" name="ri_pi_above"/>
-                <field name="ri_pi" attrs="{'readonly':[('ri_default','=',True)]}"/>
-                <label for="ri_pi_product" style="font-weight: normal !important"/>
+            <xpath expr="//group[@name='ri_second']" position="inside">
+                <!-- RI - Parc installe -->
+                <separator string="" colspan="2" name="ri_parc_above"/>
+                <field name="ri_parc" attrs="{'readonly':[('ri_default','=',True)]}"/>
+                <label for="ri_parc_name" style="font-weight: normal !important"/>
                 <div>
-                    <field name="ri_pi_product" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_pi', '=', False)]}"/>
+                    <field name="ri_parc_name" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_parc', '=', False)]}"/>
                 </div>
-                <label for="ri_pi_serial" style="font-weight: normal !important"/>
+                <label for="ri_parc_product_id" style="font-weight: normal !important"/>
                 <div>
-                    <field name="ri_pi_serial" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_pi', '=', False)]}"/>
+                    <field name="ri_parc_product_id" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_parc', '=', False)]}"/>
                 </div>
-                <label for="ri_pi_brand" style="font-weight: normal !important"/>
+                <label for="ri_parc_modele" style="font-weight: normal !important"/>
                 <div>
-                    <field name="ri_pi_brand" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_pi', '=', False)]}"/>
+                    <field name="ri_parc_modele" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_parc', '=', False)]}"/>
                 </div>
-                <label for="ri_pi_model" style="font-weight: normal !important"/>
+                <label for="ri_parc_brand_id" style="font-weight: normal !important"/>
                 <div>
-                    <field name="ri_pi_model" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_pi', '=', False)]}"/>
+                    <field name="ri_parc_brand_id" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_parc', '=', False)]}"/>
                 </div>
-                <label for="ri_pi_installation_date" style="font-weight: normal !important"/>
+                <label for="ri_parc_product_category_id" style="font-weight: normal !important"/>
                 <div>
-                    <field name="ri_pi_installation_date" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_pi', '=', False)]}"/>
+                    <field name="ri_parc_product_category_id" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_parc', '=', False)]}"/>
                 </div>
-                <label for="ri_pi_state" style="font-weight: normal !important"/>
+                <label for="ri_parc_date_installation" style="font-weight: normal !important"/>
                 <div>
-                    <field name="ri_pi_state" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_pi', '=', False)]}"/>
+                    <field name="ri_parc_date_installation" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_parc', '=', False)]}"/>
                 </div>
-                <label for="ri_pi_notes" style="font-weight: normal !important"/>
+                <label for="ri_parc_installation" style="font-weight: normal !important"/>
                 <div>
-                    <field name="ri_pi_notes" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_pi', '=', False)]}"/>
+                    <field name="ri_parc_installation" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_parc', '=', False)]}"/>
                 </div>
-                <separator string="" colspan="2" name="ri_pi_below"/>
+                <label for="ri_parc_conforme" style="font-weight: normal !important"/>
+                <div>
+                    <field name="ri_parc_conforme" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_parc', '=', False)]}"/>
+                </div>
+                <label for="ri_parc_installateur_id" style="font-weight: normal !important"/>
+                <div>
+                    <field name="ri_parc_installateur_id" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_parc', '=', False)]}"/>
+                </div>
+                <label for="ri_parc_note" style="font-weight: normal !important"/>
+                <div>
+                    <field name="ri_parc_note" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_parc', '=', False)]}"/>
+                </div>
+                <separator string="" colspan="2" name="ri_parc_below"/>
             </xpath>
         </field>
     </record>
