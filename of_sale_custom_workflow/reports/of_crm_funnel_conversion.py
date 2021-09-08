@@ -114,6 +114,10 @@ class OFCRMFunnelConversion4(models.Model):
                         %s
                         %s
                         %s
+                    UNION ALL
+                        %s
+                        %s
+                        %s
                     )           AS T
                 %s
                 %s
@@ -143,6 +147,9 @@ class OFCRMFunnelConversion4(models.Model):
                     self._sub_select_sale_order2(),
                     self._sub_from_sale_order2(),
                     self._sub_where_sale_order2(),
+                    self._sub_select_sale_order_n_1(),
+                    self._sub_from_sale_order_n_1(),
+                    self._sub_where_sale_order_n_1(),
                     self._from(),
                     self._where(),
                     self._group_by()))
@@ -439,13 +446,7 @@ class OFCRMFunnelConversion4(models.Model):
             ,       0                                           AS recorded_margin2
             ,       OSOL.turnover_budget                        AS budget_turnover_objective
             ,       OSOL.ordered_turnover                       AS ordered_turnover_objective
-            ,       (   SELECT  SUM(SO6.amount_untaxed)
-                        FROM    sale_order                                          SO6
-                        WHERE   SO6.user_id                                         = RR.user_id
-                        AND     EXTRACT(MONTH FROM SO6.of_custom_confirmation_date) = TO_NUMBER(OSO.month, '99')
-                        AND     EXTRACT(YEAR FROM SO6.of_custom_confirmation_date)  = OSO.year - 1
-                        AND     SO6.state                                           NOT IN ('draft', 'sent', 'cancel')
-                    )                                           AS previous_recorded_turnover
+            ,       0                                           AS previous_recorded_turnover
         """
         return sub_select_objective_str
 
@@ -468,12 +469,12 @@ class OFCRMFunnelConversion4(models.Model):
 
     def _sub_select_sale_order2(self):
         sub_select_sale_order2_str = """
-            SELECT  70000000 + SO7.id               AS id
-            ,       SO7.of_custom_confirmation_date AS date
-            ,       SO7.company_id                  AS company_id
-            ,       SO7.user_id                     AS vendor_id
-            ,       SO7.project_id                  AS project_id
-            ,       SO7.partner_id                  AS partner_id
+            SELECT  70000000 + SO6.id               AS id
+            ,       SO6.of_custom_confirmation_date AS date
+            ,       SO6.company_id                  AS company_id
+            ,       SO6.user_id                     AS vendor_id
+            ,       SO6.project_id                  AS project_id
+            ,       SO6.partner_id                  AS partner_id
             ,       0                               AS opportunity_nb
             ,       0                               AS quotation_nb
             ,       0                               AS order_nb
@@ -481,11 +482,11 @@ class OFCRMFunnelConversion4(models.Model):
             ,       0                               AS quotation_amount
             ,       0                               AS ordered_turnover
             ,       0                               AS recorded_turnover
-            ,       SO7.amount_untaxed              AS recorded_turnover2
+            ,       SO6.amount_untaxed              AS recorded_turnover2
             ,       0                               AS lost_turnover
             ,       0                               AS ordered_margin
             ,       0                               AS recorded_margin
-            ,       SO7.margin                      AS recorded_margin2
+            ,       SO6.margin                      AS recorded_margin2
             ,       0                               AS budget_turnover_objective
             ,       0                               AS ordered_turnover_objective
             ,       0                               AS previous_recorded_turnover
@@ -494,15 +495,56 @@ class OFCRMFunnelConversion4(models.Model):
 
     def _sub_from_sale_order2(self):
         sub_from_sale_order2_str = """
-            FROM    sale_order  SO7
+            FROM    sale_order  SO6
         """
         return sub_from_sale_order2_str
 
     def _sub_where_sale_order2(self):
         sub_where_sale_order2_str = """
-            WHERE   SO7.state   NOT IN ('draft', 'sent', 'cancel', 'presale')
+            WHERE   SO6.state   NOT IN ('draft', 'sent', 'cancel', 'presale')
         """
         return sub_where_sale_order2_str
+
+    def _sub_select_sale_order_n_1(self):
+        sub_select_sale_order_n_1_str = """
+            SELECT  80000000 + SO7.id   AS id
+            ,       DATE(
+                        EXTRACT(YEAR FROM SO7.of_custom_confirmation_date) + 1 || '-' || 
+                        TO_CHAR(SO7.of_custom_confirmation_date, 'MM') || '-01'
+                    )                   AS date
+            ,       SO7.company_id      AS company_id
+            ,       SO7.user_id         AS vendor_id
+            ,       SO7.project_id      AS project_id
+            ,       SO7.partner_id      AS partner_id
+            ,       0                   AS opportunity_nb
+            ,       0                   AS quotation_nb
+            ,       0                   AS order_nb
+            ,       0                   AS lost_quotation_nb
+            ,       0                   AS quotation_amount
+            ,       0                   AS ordered_turnover
+            ,       0                   AS recorded_turnover
+            ,       0                   AS recorded_turnover2
+            ,       0                   AS lost_turnover
+            ,       0                   AS ordered_margin
+            ,       0                   AS recorded_margin
+            ,       0                   AS recorded_margin2
+            ,       0                   AS budget_turnover_objective
+            ,       0                   AS ordered_turnover_objective
+            ,       SO7.amount_untaxed  AS previous_recorded_turnover
+        """
+        return sub_select_sale_order_n_1_str
+
+    def _sub_from_sale_order_n_1(self):
+        sub_from_sale_order_n_1_str = """
+            FROM    sale_order          SO7
+        """
+        return sub_from_sale_order_n_1_str
+
+    def _sub_where_sale_order_n_1(self):
+        sub_where_sale_order_n_1_str = """
+            WHERE   SO7.state           NOT IN ('draft', 'sent', 'cancel')
+        """
+        return sub_where_sale_order_n_1_str
 
     def _from(self):
         from_str = """
