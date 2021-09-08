@@ -21,4 +21,30 @@
         </xpath>
     </template>
 
+    <!-- Ajout type de conduit/arrivée d'air dans la fiche intervention -->
+    <template id="of_parc_chem_extension_fiche_intervention_report2" inherit_id="of_service_parc_installe.of_parc_installe_extension_fiche_intervention_report2">
+        <xpath expr="//div[@name='fi_parc_installation']" position="after">
+            <div t-if="template.fi_parc_type_conduit and parc.type_conduit" name="fi_parc_type_conduit">
+                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
+                <t t-set="previous_separator" t-value="True"/>
+                <div class="h5" style="padding: 0px 16px;">
+                    <div>
+                        <span>Type de conduit :</span>
+                        <span t-field="parc.type_conduit"/>
+                    </div>
+                </div>
+            </div>
+            <div t-if="template.fi_parc_type_air and parc.type_air" name="fi_parc_type_air">
+                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
+                <t t-set="previous_separator" t-value="True"/>
+                <div class="h5" style="padding: 0px 16px;">
+                    <div>
+                        <span>Type d'arrivée d'air :</span>
+                        <span t-field="parc.type_air"/>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
 </odoo>

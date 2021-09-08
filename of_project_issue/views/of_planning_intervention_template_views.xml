@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--##########################################################################################################################-->
+    <!--############################################_________Modèle__________#####################################################-->
+    <!--##########################################################################################################################-->
+
+    <record id="of_project_issue_intervention_template_view_form" model="ir.ui.view">
+        <field name="name">of.project.issue.intervention.template.view.form</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_template_view_form"/>
+        <field name="model">of.planning.intervention.template</field>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='fi_third']/separator[@name='fi_history_above']" position="before">
+                <!-- FI - SAV -->
+                <separator string="" colspan="2" name="fi_sav_above"/>
+                <field name="fi_sav" attrs="{'readonly':[('fi_default','=',True)]}"/>
+                <separator string="" colspan="2" name="fi_sav_below"/>
+            </xpath>
+            <xpath expr="//group[@name='ri_third']/separator[@name='ri_history_above']" position="before">
+                <!-- FI - SAV -->
+                <separator string="" colspan="2" name="ri_sav_above"/>
+                <field name="ri_sav" attrs="{'readonly':[('ri_default','=',True)]}"/>
+                <separator string="" colspan="2" name="ri_sav_below"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

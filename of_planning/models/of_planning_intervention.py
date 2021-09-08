@@ -476,6 +476,9 @@ class OfPlanningIntervention(models.Model):
     procurement_group_id = fields.Many2one('procurement.group', 'Procurement Group', copy=False)
     picking_ids = fields.One2many(comodel_name='stock.picking', compute="_compute_pickings", string=u"BL associés")
     delivery_count = fields.Integer(string="Nbr Bl", compute="_compute_pickings")
+    historique_rdv_ids = fields.One2many(
+        comodel_name='of.planning.intervention', compute="_compute_historique_rdv_ids", string="Historique")
+
     # Compute
 
     @api.multi
@@ -876,6 +879,17 @@ class OfPlanningIntervention(models.Model):
             rdv.picking_ids = rdv.procurement_group_id and \
                               self.env['stock.picking'].search([('group_id', '=', rdv.procurement_group_id.id)]) or []
             rdv.delivery_count = len(rdv.picking_ids)
+
+    @api.depends('partner_id', 'address_id')
+    def _compute_historique_rdv_ids(self):
+        for interv in self:
+            if interv.address_id:
+                interventions = interv.address_id.intervention_address_ids
+            elif interv.partner_id:
+                interventions = interv.partner_id.intervention_partner_ids
+            else:
+                continue
+            interv.historique_rdv_ids = interventions.filtered(lambda i: interv.date_date > i.date_date)
 
     # Search #
 

@@ -20,6 +20,7 @@ Module Parc installé : spécial cheministe.
     ],
     'data': [
         'views/of_parc_cheministe_view.xml',
+        'views/of_planning_intervention_template_views.xml',
         'reports/of_parc_chem_fiche_intervention.xml',
     ],
     'installable': True,

@@ -18,25 +18,17 @@
                     <field name="question_ids" nolabel="1"/>
                 </page>
             </xpath>
-            <xpath expr="//group[@name='first']" position="inside">
-                <separator string="" colspan="2"/>
-                <!-- FI - QUESTIONNAIRE(S) -->
-                <separator string="" colspan="2"/>
+            <xpath expr="//group[@name='fi_fourth']/separator[@name='fi_invoicing_below']" position="after">
+                <!-- FI - Questionnaires -->
+                <separator string="" colspan="2" name="fi_survey_above"/>
                 <field name="fi_surveys" attrs="{'readonly':[('fi_default','=',True)]}"/>
-                <label for="fi_surveys_rdv" style="font-weight: normal !important"/>
-                <div>
-                    <field name="fi_surveys_rdv" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_surveys', '=', False)]}"/>
-                </div>
+                <separator string="" colspan="2" name="fi_survey_below"/>
             </xpath>
-            <xpath expr="//separator[@name='ri_legal_above']" position="before">
-                <!-- RI - Questionnaire -->
-                <separator string="" colspan="2" name="ri_surveys_above"/>
+            <xpath expr="//group[@name='ri_fourth']/separator[@name='ri_invoicing_below']" position="after">
+                <!-- RI - Questionnaires -->
+                <separator string="" colspan="2" name="ri_survey_above"/>
                 <field name="ri_surveys" attrs="{'readonly':[('ri_default','=',True)]}"/>
-                <label for="ri_surveys_rdv" style="font-weight: normal !important"/>
-                <div>
-                    <field name="ri_surveys_rdv" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_surveys', '=', False)]}"/>
-                </div>
-                <separator string="" colspan="2" name="ri_surveys_below"/>
+                <separator string="" colspan="2" name="ri_survey_below"/>
             </xpath>
         </field>
     </record>
