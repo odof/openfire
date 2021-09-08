@@ -146,6 +146,15 @@
                     </div>
                 </group>
             </xpath>
+            <xpath expr="//field[@name='sale_show_tax']/.." position="after">
+                <label for="group_of_afficher_total_ttc"/>
+                <div>
+                    <field name="group_of_afficher_total_ttc" class="oe_inline"/>
+                    <span>Affiche les sous-totaux TTC par ligne de commande.</span>
+                    <br/>
+                    <span class="text-muted">Uniquement dans le formulaire et non dans les rapports.</span>
+                </div>
+            </xpath>
         </field>
     </record>
 

@@ -144,6 +144,11 @@ class OFSaleConfiguration(models.TransientModel):
     of_position_fiscale = fields.Boolean(string="(OF) Position fiscale")
     of_allow_quote_addition = fields.Boolean(string=u"(OF) Devis complémentaires")
 
+    group_of_afficher_total_ttc = fields.Boolean(
+        string=u"(OF) Afficher les sous-totaux TTC par ligne de commande", default=False,
+        help=u"Affiche les sous-totaux TTC par ligne de commande. Uniquement dans le formulaire et non dans les "
+             u"rapports.", implied_group='of_sale.group_of_afficher_total_ttc', group='base.group_user')
+
     group_of_order_line_option = fields.Boolean(
         string=u"(OF) Options de ligne de commande", implied_group='of_sale.group_of_order_line_option',
         group='base.group_portal,base.group_user,base.group_public')

@@ -101,6 +101,9 @@
                     <field name="of_invoice_policy" invisible="context.get('hide_sale')" groups="sales_team.group_sale_manager"/>
                     <field name="of_invoice_date_prev" invisible="context.get('hide_sale')" groups="sales_team.group_sale_manager"/>
                 </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='price_total']" position="attributes">
+                    <attribute name="groups">sale.group_show_price_total,of_sale.group_of_afficher_total_ttc</attribute>
+                </xpath>
                 <xpath expr="//field[@name='order_line']/tree//field[@name='product_uom_qty']" position="attributes">
                     <attribute name="string">Qté(s) commandée(s)</attribute>
                 </xpath>
