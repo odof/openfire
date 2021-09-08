@@ -267,6 +267,8 @@ class OFFollowupProject(models.Model):
     date_alert_display = fields.Text(string=u"Infos pour alerte de dates", compute='_compute_alert_display')
     picking_alert_display = fields.Text(
         string=u"Infos pour alerte de livraison/réception", compute='_compute_alert_display')
+    amount_untaxed = fields.Monetary(string=u"Montant HT", related='order_id.amount_untaxed', readonly=True)
+    currency_id = fields.Many2one('res.currency', string=u"Devise", related='order_id.currency_id', readonly=True)
 
     _sql_constraints = [('order_uniq', 'unique (order_id)', u"Un suivi a déjà été créé pour cette commande !")]
 
@@ -611,6 +613,11 @@ class OFFollowupProject(models.Model):
     def cron_move_project(self):
         for project in self.search([]):
             project._compute_stage_id()
+
+    @api.model
+    def cron_recompute_reference_laying_date(self):
+        for project in self.search([]):
+            project._compute_reference_laying_date()
 
     @api.multi
     def last_step_for_all(self):

@@ -305,6 +305,21 @@
             <field name="args">()</field>
         </record>
 
+        <!-- Cron de recalcul quotidien des dates de pose de référence -->
+
+        <record id="of_followup_cron_recompute_reference_laying_date" model="ir.cron">
+            <field name="name">Suivi des projets - Recalcul date de pose</field>
+            <field name="model">of.followup.project</field>
+            <field name="function">cron_recompute_reference_laying_date</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="nextcall"
+               eval="(datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d 02:00:00')"/>
+            <field name="numbercall">-1</field>
+            <field name="active">true</field>
+            <field name="args">()</field>
+        </record>
+
         <!-- Modèle de mail -->
 
         <record id="of_followup_project_email_template" model="mail.template">
