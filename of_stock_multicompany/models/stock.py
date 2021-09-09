@@ -3,7 +3,7 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-from odoo import models, fields, api, _
+from odoo import models, fields, api, _, SUPERUSER_ID
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.exceptions import UserError
 
@@ -22,28 +22,28 @@ class StockWarehouse(models.Model):
         res_company_obj = self.env['res.company']
 
         # Pour les entrepôts
-        for warehouse in self.search([]):
-            company_id = res_company_obj.search([('id','parent_of',warehouse.company_id.ids),
-                                                 ('parent_id','=',False)])
+        for warehouse in self.with_context(active_test=False).search([]):
+            company_id = res_company_obj.with_context(active_test=False).search(
+                [('id','parent_of',warehouse.company_id.ids), ('parent_id','=',False)])
             warehouse.company_id = company_id.id
 
         # Pour les emplacements
-        for location in stock_location_obj.search([('active','=',True)]):
+        for location in stock_location_obj.with_context(active_test=False).search([('active','=',True)]):
             if location.usage == 'internal':
-                company_id = res_company_obj.search([('id','parent_of',location.company_id.ids),
-                                                     ('parent_id','=',False)])
+                company_id = res_company_obj.with_context(active_test=False).search(
+                    [('id','parent_of',location.company_id.ids), ('parent_id','=',False)])
                 location.company_id = company_id.id
             else:
                 location.company_id = False
 
         # Pour les quants
-        for quant in stock_quant_obj.search([]):
-            company_id = res_company_obj.search([('id','parent_of',quant.company_id.ids),
-                                                 ('parent_id','=',False)])
+        for quant in stock_quant_obj.with_context(active_test=False).search([]):
+            company_id = res_company_obj.with_context(active_test=False).search(
+                [('id','parent_of',quant.company_id.ids), ('parent_id','=',False)])
             quant.company_id = company_id.id
 
         # Pour les routes
-        for location_route in stock_location_route_obj.search([]):
+        for location_route in stock_location_route_obj.with_context(active_test=False).search([]):
             location_route.company_id = False
 
         # cr = self._cr
@@ -54,16 +54,14 @@ class StockWarehouse(models.Model):
         #     "UPDATE stock_location_route SET company_id = NULL;"
         #     "UPDATE stock_quant SET company_id = 1;")
 
-        return super(StockWarehouse, self)._auto_init()
+        # return super(StockWarehouse, self)._auto_init()
 
     @api.model
     def _company_default_get_multicompany(self):
         res_company_obj = self.env['res.company']
         company_tmp = res_company_obj._company_default_get()
 
-        company_id = res_company_obj.search([
-            ('id', 'parent_of', company_tmp.ids),
-            ('parent_id', '=', False)])
+        company_id = res_company_obj.search([('id', 'parent_of', company_tmp.ids), ('parent_id', '=', False)])
 
         return company_id
 
@@ -73,11 +71,10 @@ class StockWarehouse(models.Model):
 
     @api.multi
     def write(self, vals):
-        if vals.get('company_id', False):
+        if 'company_id' in vals:
             # On bloque tout le monde, sauf l'admin car nécessaire pour le _auto_init()
-            if self.env.uid != 1:
-                raise UserError(_("Vous essayez de modifier la société alors que vous êtes en multi-société.\n"
-                                  "Merci de contacter l'administrateur."))
+            if self.env.uid != SUPERUSER_ID:
+                raise UserError(_("Vous ne pouvez pas modifier la société d'un entrepôt"))
         return super(StockWarehouse, self).write(vals)
 
 
@@ -86,10 +83,10 @@ class StockLocation(models.Model):
 
     @api.model
     def create(self, vals):
-        if vals.get('company_id', False):
+        if 'company_id' in vals:
             if vals['usage'] == 'internal':
-                company_id = self.env['res.company'].search([('id','parent_of',[vals['company_id']]),
-                                                             ('parent_id','=',False)])
+                company_id = self.env['res.company'].search(
+                    [('id','parent_of',[vals['company_id']]), ('parent_id','=',False)])
                 vals['company_id'] = company_id.id
             else:
                 vals['company_id'] = False
@@ -97,11 +94,10 @@ class StockLocation(models.Model):
 
     @api.multi
     def write(self, vals):
-        if vals.get('company_id', False):
+        if 'company_id' in vals:
             # On bloque tout le monde, sauf l'admin car nécessaire pour le _auto_init()
-            if self.env.uid != 1:
-                raise UserError(_("Vous essayez de modifier la société alors que vous êtes en multi-société.\n"
-                                  "Merci de contacter l'administrateur."))
+            if self.env.uid != SUPERUSER_ID:
+                raise UserError(_("Vous ne pouvez pas modifier la société d'un emplacement"))
         return super(StockLocation, self).write(vals)
 
 
@@ -110,17 +106,16 @@ class StockLocationRoute(models.Model):
 
     @api.model
     def create(self, vals):
-        if vals.get('company_id', False) and vals['company_id'] is not False:
+        if vals.get('company_id', False):
             vals['company_id'] = False
         return super(StockLocationRoute, self).create(vals)
 
     @api.multi
     def write(self, vals):
-        if vals.get('company_id', False):
+        if 'company_id' in vals:
             # On bloque tout le monde, sauf l'admin car nécessaire pour le _auto_init()
-            if self.env.uid != 1:
-                raise UserError(_("Vous essayez de modifier la société alors que vous êtes en multi-société.\n"
-                                  "Merci de contacter l'administrateur."))
+            if self.env.uid != SUPERUSER_ID:
+                raise UserError(_("Vous ne pouvez pas modifier la société d'une route"))
         return super(StockLocationRoute, self).write(vals)
 
 
@@ -187,19 +182,18 @@ class StockQuant(models.Model):
 
     @api.model
     def create(self, vals):
-        if vals.get('company_id', False):
-            company_id = self.env['res.company'].search([('id','parent_of',[vals['company_id']]),
-                                                         ('parent_id','=',False)])
+        if 'company_id' in vals:
+            company_id = self.env['res.company'].search(
+                [('id','parent_of',[vals['company_id']]), ('parent_id','=',False)])
             vals['company_id'] = company_id.id
         return super(StockQuant, self).create(vals)
 
     @api.multi
     def write(self, vals):
-        if vals.get('company_id', False):
+        if 'company_id' in vals:
             # On bloque tout le monde, sauf l'admin car nécessaire pour le _auto_init()
-            if self.env.uid != 1:
-                raise UserError(_("Vous essayez de modifier la société alors que vous êtes en multi-société.\n"
-                                  "Merci de contacter l'administrateur."))
+            if self.env.uid != SUPERUSER_ID:
+                raise UserError(_("Vous ne pouvez pas modifier la société d'un quant"))
         return super(StockQuant, self).write(vals)
 
 class ProcurementOrder(models.Model):
