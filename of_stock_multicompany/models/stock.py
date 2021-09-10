@@ -11,9 +11,6 @@ from odoo.exceptions import UserError
 class StockWarehouse(models.Model):
     _inherit = 'stock.warehouse'
 
-    # A modifier car l'auto_init est appelé à chaques maj. Revenir à _auto_init_stock_multicompany.
-    # @api.model_cr_context
-    # def _auto_init(self):
     @api.model
     def _auto_init_stock_multicompany(self):
         stock_location_obj = self.env['stock.location']
@@ -37,6 +34,13 @@ class StockWarehouse(models.Model):
                 location.company_id = False
 
         # Pour les quants
+        company_ids = res_company_obj.with_context(active_test=False).search([('parent_id','=',False)])
+        for company_id in company_ids:
+            quants = stock_quant_obj.with_context(active_test=False).search([('company_id','child_of',company_id.ids)])
+            if quants:
+                quants.write({'company_id': company_id.id})
+
+        # Pour les quants
         for quant in stock_quant_obj.with_context(active_test=False).search([]):
             company_id = res_company_obj.with_context(active_test=False).search(
                 [('id','parent_of',quant.company_id.ids), ('parent_id','=',False)])
@@ -46,28 +50,15 @@ class StockWarehouse(models.Model):
         for location_route in stock_location_route_obj.with_context(active_test=False).search([]):
             location_route.company_id = False
 
-        # cr = self._cr
-        # cr.execute(
-        #     "UPDATE stock_warehouse SET company_id = 1;"
-        #     "UPDATE stock_location SET company_id = 1 WHERE usage = 'internal' AND active = True;"
-        #     "UPDATE stock_location SET company_id = NULL WHERE usage != 'internal' AND active = True;"
-        #     "UPDATE stock_location_route SET company_id = NULL;"
-        #     "UPDATE stock_quant SET company_id = 1;")
-
-        # return super(StockWarehouse, self)._auto_init()
-
     @api.model
-    def _company_default_get_multicompany(self):
+    def create(self, vals):
+        res = super(StockWarehouse, self).create(vals)
+
         res_company_obj = self.env['res.company']
-        company_tmp = res_company_obj._company_default_get()
+        company_id = res_company_obj.search([('id', 'parent_of', res.company_id.ids), ('parent_id', '=', False)])
+        res.company_id = company_id
 
-        company_id = res_company_obj.search([('id', 'parent_of', company_tmp.ids), ('parent_id', '=', False)])
-
-        return company_id
-
-    # On passe par _company_default_get_multicompany au lieu d'un create pour surcharger la création car company_id
-    # ne passe jamais dans le create
-    company_id = fields.Many2one(default=_company_default_get_multicompany)
+        return res
 
     @api.multi
     def write(self, vals):
@@ -169,17 +160,6 @@ class StockQuant(models.Model):
 
         return domain
 
-
-    # Dev repris d'HCL, à garder ?
-    #
-    # @api.model
-    # def create(self, values):
-    #     if 'company_id' in values:
-    #         company = self.env['res.company'].browse(values['company_id'])
-    #         if company and company.of_is_shop and company.parent_id:
-    #             values['company_id'] = company.parent_id.id
-    #     return super(StockQuant, self).create(values)
-
     @api.model
     def create(self, vals):
         if 'company_id' in vals:
@@ -195,6 +175,7 @@ class StockQuant(models.Model):
             if self.env.uid != SUPERUSER_ID:
                 raise UserError(_("Vous ne pouvez pas modifier la société d'un quant"))
         return super(StockQuant, self).write(vals)
+
 
 class ProcurementOrder(models.Model):
     _inherit = 'procurement.order'

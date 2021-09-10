@@ -8,7 +8,7 @@
 Personnalisation Stock multi-sociétés :
 
 - Modification des domain sur les ir.rule suivantes: stock_warehouse_comp_rule, stock_picking_type_rule, stock_quant_rulestock.warehouse.
-- Passage de company_id a 1 sur les emplacements, entrepots, quant et routes
+- Passage de company_id a la plus société parente la plus haute sur les emplacements, entrepots, quant et routes
 - Message d'erreur sur les tentatives de modification du champ company_id
 """,
     'website': "www.openfire.fr",
