@@ -23,6 +23,8 @@
                     <field name="ordered_real_margin_perc" type="measure"/>
                     <field name="invoiced_real_margin" type="measure"/>
                     <field name="invoiced_real_margin_perc" type="measure"/>
+                    <field name="presale_price_sale_price_gap" type="measure"/>
+                    <field name="presale_margin_sale_margin_gap" type="measure"/>
                     <field name="ordered_real_sale_margin_gap" type="measure"/>
                     <field name="ordered_real_sale_margin_gap_perc" type="measure"/>
                     <field name="invoiced_real_sale_margin_gap" type="measure"/>
@@ -41,6 +43,10 @@
                     <field name="partner_id"/>
                     <field name="order_id"/>
                     <field name="invoice_status"/>
+                    <field name="product_id"/>
+                    <field name="main_product_id"/>
+                    <field name="main_product_brand_id"/>
+                    <field name="main_product_categ_id"/>
                     <filter string="Commande en cours" name="in_progress"
                             domain="[('order_id.state', '!=', 'closed')]"/>
                     <filter string="Commande clôturée" name="closed"
@@ -48,6 +54,9 @@
                     <separator/>
                     <filter string="Commande entièrement facturée" name="invoiced"
                             domain="[('invoice_status', '=', 'invoiced')]"/>
+                    <separator/>
+                    <filter string="Commande avec article principal" name="main_product"
+                            domain="[('main_product_id', '!=', False)]"/>
                     <separator/>
                     <filter string="Mois en cours (dernière facture)" name="this_month"
                             domain="[('invoice_date', u'&gt;=', context_today().strftime('%Y-%m-01')),
