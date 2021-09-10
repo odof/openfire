@@ -64,9 +64,14 @@ class AccountInvoice(models.Model):
         """Mettre le libellé des écritures comptables d'une facture avec nom client (30 1er caractères) + no facture"""
         self._check_journal_company()  # Ajout de vérification de la société du journal
         res = super(AccountInvoice, self).action_invoice_open()
-        ref = (self.partner_id.name or self.partner_id.parent_id.name or '')[:30] + ' ' + self.number
-        self.move_id.line_ids.write({'name': ref})
-        self.move_id.write({'ref': ref})
+        for invoice in self:
+            ref = ((invoice.partner_id.name or invoice.partner_id.parent_id.name or '')[:30]
+                   + ' ' + invoice.number).strip()
+            if invoice.type in ('in_invoice', 'in_refund'):
+                # Facture fournisseur
+                ref = (ref + ' ' + (invoice.reference or '')).rstrip()
+            invoice.move_id.line_ids.write({'name': ref})
+            invoice.move_id.write({'ref': ref})
         return res
 
     @api.multi
@@ -261,25 +266,25 @@ class AccountMoveLine(models.Model):
         return result
 
     def reconcile(self, writeoff_acc_id=False, writeoff_journal_id=False):
-        """Mettre le libellé des écritures comptables d'un paiement avec nom client (30 1er caractères) + no facture"""
-        res = super(AccountMoveLine, self).reconcile(writeoff_acc_id=writeoff_acc_id, writeoff_journal_id=writeoff_journal_id)
-        filt = self.filtered(lambda line: (line.reconciled or (line.matched_debit_ids and len(line.matched_debit_ids) == 1)) and line.payment_id)
-        for line in filt:
-            line_ids = self.env['account.move.line']
-            if line.account_id.reconcile:
-                for reconciled_lines in line.matched_debit_ids:
-                    line_ids += reconciled_lines.debit_move_id
-                invoice_ids = line_ids.mapped('invoice_id')
+        """Mettre le libellé des écritures comptables d'un paiement avec nom client (30 1ers caractères) + no facture"""
+        res = super(AccountMoveLine, self).reconcile(
+            writeoff_acc_id=writeoff_acc_id, writeoff_journal_id=writeoff_journal_id)
+        move_lines = self.filtered(
+            lambda l: (l.reconciled or len(l.matched_debit_ids) == 1) and l.payment_id and l.account_id.reconcile)
+        for line in move_lines:
+            debit_lines = line.matched_debit_ids.mapped('debit_move_id')
+            invoices = debit_lines.mapped('invoice_id')
+            if len(invoices) == 1:
+                name_infos = [(invoices.partner_id.name or invoices.partner_id.parent_id.name or '')[:30],
+                              invoices.number]
+                name = ' '.join([text for text in name_infos if text])
+                line.move_id.line_ids.with_context(check_move_validity=False).write({'name': name})
                 try:
-                    line.move_id.write({'ref': line.payment_id.communication or ''})
+                    line.move_id.write({'ref': name})
                 except UserError:
                     # Avec le module OCA des verrouillages d'écritures, le write peut générer une erreur
                     # Il ne faut pas qu'elle soit bloquante pour les lettrages
                     pass
-                if len(invoice_ids) == 1:
-                    name_infos = [(invoice_ids.partner_id.name or invoice_ids.partner_id.parent_id.name or '')[:30], invoice_ids.number]
-                    name = (' ').join([text for text in name_infos if text])
-                    line.move_id.line_ids.with_context(check_move_validity=False).write({'name': name})
         return res
 
     # Lors d'une saisie d'une pièce comptable, pour préremplir le compte de tiers du partenaire saisi (première ligne uniquement).
@@ -413,11 +418,19 @@ class AccountPayment(models.Model):
         return vals
 
     def post(self):
-        """Lors d'un lettrage d'un paiement, rajoute le libellé sur toutes les écritures du paiement."""
+        """Lors de la confirmation d'un paiement, rajoute le libellé sur toutes les écritures du paiement."""
         res = super(AccountPayment, self).post()
-        client_line = self.move_line_ids.filtered(lambda line: line.credit > 0)
-        if client_line.name == _("Customer Payment"):
-            self.move_line_ids.write({"name":((self.partner_id.name or self.partner_id.parent_id.name or '')[:30] + " " + (self.communication or '')).strip()})  # Permet d'avoir toutes les lignes avec le même libellé
-        else:
-            self.move_line_ids.write({"name": client_line.name})
+        for payment in self:
+            payment.move_line_ids.write({
+                'name': ((self.partner_id.name or self.partner_id.parent_id.name or '')[:30]
+                         + " " + (self.communication or '')).strip()
+            })
+        return res
+
+    def _get_move_vals(self, journal=None):
+        """ Return dict to create the payment move
+        """
+        res = super(AccountPayment, self)._get_move_vals(journal=journal)
+        res['ref'] = ((self.partner_id.name or self.partner_id.parent_id.name or '')[:30]
+                      + " " + (self.communication or '')).strip()
         return res
