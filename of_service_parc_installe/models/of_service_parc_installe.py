@@ -7,11 +7,7 @@ from dateutil.relativedelta import relativedelta
 class OfService(models.Model):
     _inherit = "of.service"
 
-    parc_installe_id = fields.Many2one(
-        'of.parc.installe', string=u"No de série",
-        domain="partner_id and [('client_id', '=', partner_id), '|', ('site_adresse_id', '=', False), "
-               "('site_adresse_id', '=', address_id)] or address_id and [('client_id', 'parent_of', address_id), '|', "
-               "('site_adresse_id', '=', False), ('site_adresse_id', '=', address_id)] or []")
+    parc_installe_id = fields.Many2one(comodel_name='of.parc.installe', string=u"No de série")
     parc_installe_product_id = fields.Many2one(
         'product.product', string=u"Désignation", related="parc_installe_id.product_id", readonly=True)
     parc_installe_site_adresse_id = fields.Many2one(
