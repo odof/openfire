@@ -1,11 +1,31 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
+
+    # @api.depends
+
+    @api.depends('of_service_ids', 'order_line.of_service_line_id')
+    @api.multi
+    def _compute_of_service_count(self):
+        # réécriture de la fonction
+        for sale_order in self:
+            services = sale_order.of_service_ids.filtered(lambda s: s.state != 'cancel')
+            services |= sale_order.order_line.mapped('of_service_line_id').mapped('service_id')
+            sale_order.of_service_count = len(services)
+
+    # Actions
+
+    @api.multi
+    def action_view_a_programmer(self):
+        action = super(SaleOrder, self).action_view_a_programmer()
+        service_ids = self.mapped('order_line').mapped('of_service_line_id').mapped('service_id').ids
+        action['domain'] = ['|', ('order_id', 'in', self.ids), ('id', 'in', service_ids)]
+        return action
 
     @api.multi
     def action_prevoir_intervention(self):
@@ -33,3 +53,9 @@ class SaleOrder(models.Model):
             'default_type_id'   : self.env.ref('of_contract_custom.of_contract_custom_type_installation').id,
             }
         return action
+
+
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+
+    of_service_line_id = fields.Many2one(comodel_name='of.service.line', string=u"Ligne de DI")
