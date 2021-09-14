@@ -25,8 +25,17 @@
         <field name="priority">1</field>
         <field name="inherit_id" ref="of_service.of_planning_intervention_view_form_service"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='template_id']" position="attributes">
+                <attribute name="context">{'type_prio_id': type_id}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='tache_id']" position="before">
+                <field name="type_id" attrs="{'readonly': [('service_id', '!=', False)]}"/>
+            </xpath>
             <xpath expr="//field[@name='address_id']" position="after">
                 <field name="partner_code_magasin"/>
+            </xpath>
+            <xpath expr="//field[@name='service_id']" position="attributes">
+                <attribute name="string">Demande d'intervention</attribute>
             </xpath>
             <xpath expr="//field[@name='picking_id']" position="after">
                 <field name="contract_id"/>
@@ -41,6 +50,21 @@
             'search_default_state_done':1,
             'search_default_state_draft':1,
             'search_default_state_unfinished':1}
+        </field>
+    </record>
+
+    <!--##########################################################################################################################-->
+    <!--############################################_________Modèle__________#####################################################-->
+    <!--##########################################################################################################################-->
+
+    <record id="view_of_planning_intervention_template_form_inh_contract_custom" model="ir.ui.view">
+        <field name="name">view.of.planning.intervention.template.form.inh.contract.custom</field>
+        <field name="model">of.planning.intervention.template</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_template_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tache_id']" position="before">
+                <field name="type_id" options="{'no_open':True, 'no_create': True}"/>
+            </xpath>
         </field>
     </record>
 

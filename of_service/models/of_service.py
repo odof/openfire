@@ -142,7 +142,10 @@ class OfService(models.Model):
     address_mobile = fields.Char(related='address_id.mobile', string=u"Mobile", readonly=1)
     secteur_tech_id = fields.Many2one(
         related='address_id.of_secteur_tech_id', readonly=True, search="_search_secteur_tech_id")
-    tag_ids = fields.Many2many('of.service.tag', string=u"Étiquettes")
+    #tag_ids = fields.Many2many('of.service.tag', string=u"Étiquettes")
+    tag_ids = fields.Many2many(
+        string=u"Étiquettes", comodel_name='of.planning.tag', relation='of_service_of_planning_tag_rel',
+        column1='service_id', column2='tag_id')
     company_id = fields.Many2one('res.company', string=u"Société")
 
     # Rubrique Origine
@@ -764,6 +767,31 @@ class OfService(models.Model):
 class OFServiceTag(models.Model):
     _name = 'of.service.tag'
     _description = u"Étiquettes des services"
+
+    @api.model_cr_context
+    def _auto_init(self):
+        u"""
+        Fusion de of.service.tag dans of.planning.tag
+        """
+        cr = self._cr
+        # au premier _auto_init, la table est créée à la màj de of.service mais est vide
+        cr.execute("SELECT * FROM of_service_of_planning_tag_rel")
+        exists = len(cr.fetchall())
+        res = super(OFServiceTag, self)._auto_init()
+        if not exists:
+            # Créer les étiquettes de planning. Attention au doublons! Ne pas créer si il y a une étiquette planning du même nom
+            cr.execute("INSERT INTO of_planning_tag (name, color, active) "
+                       "SELECT st.name, st.color, st.active "
+                       "FROM of_service_tag AS st "
+                       "WHERE UPPER(st.name) NOT IN (SELECT UPPER(name) FROM of_planning_tag);")
+            # Connecter les étiquettes de planning aux services existants en fonction de leurs étiquettes de service
+            cr.execute("INSERT INTO of_service_of_planning_tag_rel (service_id, tag_id) "
+                       "SELECT osostg.of_service_id, opt.id "
+                       "FROM of_service_of_service_tag_rel osostg "
+                       "JOIN of_service_tag ost ON ost.id = osostg.of_service_tag_id "
+                       "JOIN of_planning_tag opt ON UPPER(opt.name) = UPPER(ost.name);")
+            cr.commit()
+        return res
 
     name = fields.Char(string=u"Libellé", required=True)
     active = fields.Boolean(string='Actif', default=True)

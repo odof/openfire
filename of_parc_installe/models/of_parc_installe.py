@@ -131,22 +131,37 @@ class OFParcInstalle(models.Model):
 
     @api.multi
     def name_get(self):
-        """Permet dans un SAV lors de la saisie du no de série d'une machine installée de proposer les machines
-        du contact en premier précédées d'une puce."""
+        """
+        Permet dans un SAV lors de la saisie du no de série d'une machine installée de proposer les machines
+        du contact précédées d'une puce.
+        Permet dans une DI de proposer les appareils d'une adresse différente entre parenthèses.
+        """
         client_id = self._context.get('partner_id_no_serie_puce')
-        result = []
-        for record in self:
-            result.append((
-                record.id,
-                ("-> " if record.client_id.id == client_id else "")
-                + (record.name or u"(N° non renseigné)")
-                + " - " + record.client_id.display_name))
-        return result
+        if client_id:
+            result = []
+            for record in self:
+                result.append((
+                    record.id,
+                    ("-> " if record.client_id.id == client_id else "")
+                    + (record.name or u"(N° non renseigné)")
+                    + " - " + record.client_id.display_name))
+            return result
+        address_id = self._context.get('address_prio_id')
+        if address_id:
+            result = []
+            for parc in self:
+                parc_address = parc.site_adresse_id or parc.client_id
+                meme = parc_address and parc_address.id == address_id
+                result.append((parc.id, "%s%s%s" % ('' if meme else '(', parc.name, '' if meme else ')')))
+            return result
+        return super(OFParcInstalle, self).name_get()
 
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
-        """Permet dans un SAV lors de la saisie du no de série d'une machine installée de proposer les machines
-        du contact en premier précédées d'une puce."""
+        """
+        Permet dans un SAV lors de la saisie du no de série d'une machine installée de proposer les machines
+        du contact en premier précédées d'une puce.
+        Permet, dans une DI, de montrer en 1er les appareils de l'adresse, puis ceux du client et enfin les autres."""
         if self._context.get('partner_id_no_serie_puce'):
             client_id = self._context.get('partner_id_no_serie_puce')
             res = super(OFParcInstalle, self).name_search(name, [('client_id', '=', client_id)], operator, limit) or []
@@ -154,6 +169,29 @@ class OFParcInstalle(models.Model):
             res = [(parc[0], "-> " + parc[1]) for parc in res]
             res += super(OFParcInstalle, self).name_search(
                 name, [('client_id', '!=', client_id)], operator, limit) or []
+            return res
+        if self._context.get('address_prio_id'):
+            address_id = self._context.get('address_prio_id')
+            args = args or []
+            res = super(OFParcInstalle, self).name_search(
+                name,
+                args + [['site_adresse_id', '=', address_id]],
+                operator,
+                limit) or []
+            limit = limit - len(res)
+            res += super(OFParcInstalle, self).name_search(
+                name,
+                args + ['|', ['site_adresse_id', '=', False], ['site_adresse_id', '!=', address_id],
+                        ['client_id', '=', address_id]],
+                operator,
+                limit) or []
+            limit = limit - len(res)
+            res += super(OFParcInstalle, self).name_search(
+                name,
+                args + ['|', ['site_adresse_id', '=', False], ['site_adresse_id', '!=', address_id],
+                        ['client_id', '!=', address_id]],
+                operator,
+                limit) or []
             return res
         return super(OFParcInstalle, self).name_search(name, args, operator, limit)
 

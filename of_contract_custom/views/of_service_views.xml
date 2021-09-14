@@ -55,11 +55,24 @@
                     <button name="transform_to_contract" string="Transformer" states="calculated" type="object"/>
                     <button name="of_planning_tournee.action_view_rdv_intervention_wizard_service" string="Planifier Intervention"
                             type="action" attrs="{'invisible': [('base_state', '!=', 'calculated')]}"/>
+                    <button name="action_service_send" string="Envoyer par email" type="object"/>
                     <field name="kanban_step_id" widget="statusbar" clickable="True" options="{'fold_field': 'fold'}"/>
                 </header>
                 <sheet>
                     <field name="alert_dates" invisible="1"/>
                     <div class="oe_button_box" name="button_box">
+                        <button name="action_view_saleorder"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-usd">
+                            <field name="saleorder_count" widget="statinfo" string="Ventes"/>
+                        </button>
+                        <button name="action_view_sale_invoice"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-usd">
+                            <field name="sale_invoice_count" widget="statinfo" string="Factures client"/>
+                        </button>
                         <button class="oe_stat_button" name="action_view_intervention" type="object" icon="fa-calendar">
                             <field string="RDVs Tech" name="intervention_count" widget="statinfo"/>
                         </button>
@@ -72,7 +85,13 @@
                     </div>
                     <div class="of_title">
                         <h1><b>
-                            <span>Demande d'intervention</span>
+                            <field name="priority" class="oe_inline of_ws" widget="priority" nolabel="1"/>
+                            <span class="of_ws" attrs="{'invisible': [('number', '!=', False)]}">
+                                Demande d'intervention
+                            </span>
+                            <field name="number" readonly="1" class="oe_inline of_ws"/>
+                            <span attrs="{'invisible': [('titre', '=', False)]}" class="of_ws">-</span>
+                            <field name="titre" class="oe_inline" placeholder="Titre de la demande..."/>
                         </b></h1>
                     </div>
                     <group col="4">
@@ -80,21 +99,23 @@
                         <field name="base_state" invisible="1"/>
                         <group col="2" colspan="2">
                             <field name="type_id" />
-                            <field name="order_id" attrs="{'invisible': [('type_id','not in', [%(of_contract_custom.of_contract_custom_type_installation)d, %(of_contract_custom.of_contract_custom_type_sav)d])]}"/>
-                            <field name="contract_id" attrs="{'invisible': ['|',('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d, %(of_contract_custom.of_contract_custom_type_sav)d]), ('recurrence','=', True)]}"/>
+                            <field name="template_id" context="{'type_prio_id': type_id}"
+                                   attrs="{'readonly': [('number', '!=', False), ('base_state', 'not in', ('draft', 'cancel'))]}"/>
+                            <field name="order_id" attrs="{'invisible': [('type_id','not in', [%(of_contract_custom.of_contract_custom_type_installation)d, %(of_contract_custom.of_contract_custom_type_maintenance)d, %(of_contract_custom.of_contract_custom_type_sav)d])]}"/>
+                            <field name="contract_id" attrs="{'invisible': ['|', ('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d, %(of_contract_custom.of_contract_custom_type_sav)d]), ('recurrence','=', True)]}"/>
                             <field name="contract_line_id" context="{'display_address': True}"
-                                   attrs="{'invisible': ['|',('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d, %(of_contract_custom.of_contract_custom_type_sav)d]), ('recurrence','=', True)]}"/>
-                            <field name="recurrence" attrs="{'invisible': ['|','|',('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d]), ('contract_id','!=', False), ('contract_line_id','!=', False)]}" groups="!of_contract_custom.group_of_contract_custom_lecture"/>
+                                   attrs="{'invisible': ['|', '|', ('contract_id', '=', False), ('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d, %(of_contract_custom.of_contract_custom_type_sav)d]), ('recurrence','=', True)]}"/>
+                            <field name="recurrence" attrs="{'invisible': ['|', '|', ('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d]), ('contract_id','!=', False), ('contract_line_id','!=', False)]}" groups="!of_contract_custom.group_of_contract_custom_lecture"/>
                             <field name="contract_message" nolabel="1" colspan="2"/>
                         </group>
                         <group col="2" colspan="2">
                             <field name="user_id"/>
+                            <field name="tag_ids" widget="many2many_tags"/>
                         </group>
                         <group name="who" col="2" colspan="2" string="Qui" class="of_grey_background">
                             <group colspan="2">
                                 <field name="employee_ids" widget="many2many_tags"/>
                                 <field name="supplier_id"/>
-
                                 <field name="company_id"/>
                             </group>
                         </group>
@@ -102,11 +123,22 @@
                             <group colspan="2">
                                 <field name="partner_id"/>
                                 <field name="partner_code_magasin"/>
-                                <field name="tag_ids" widget="many2many_tags"/>
+                                <field name="partner_tag_ids" widget="many2many_tags"/>
                                 <label for="address_id" string="Adresse d'intervention"/>
                                 <div class="o_address_format">
                                     <div><field name="address_id"/></div>
-                                    <field name="address_address"/>
+                                    <field name="address_street" class="o_address_street"/>
+                                    <field name="address_street2" class="o_address_street"/>
+                                    <field name="address_zip" class="o_address_zip of_ws"/>
+                                    <field name="address_city" class="o_address_city"/>
+                                    <div attrs="{'invisible': [('address_phone', '=', False)]}">
+                                        <i class="fa fa-phone of_ws"/>
+                                        <field name="address_phone"/>
+                                    </div>
+                                    <div attrs="{'invisible': [('address_mobile', '=', False)]}">
+                                        <i class="fa fa-phone of_ws"/>
+                                        <field name="address_mobile"/>
+                                    </div>
                                 </div>
                                 <field name="partner_code_magasin"/>
                                 <field name="secteur_tech_id"/>
@@ -152,10 +184,58 @@
                         </page>
                         <page name="parc" string="Produit installé">
                             <group string="Produit installé" groups="project.group_project_user" colspan="2">
-                                <field name="parc_installe_id"/>
+                                <field name="parc_installe_id" context="{'address_prio_id': address_id or partner_id}"/>
                                 <field name="parc_installe_product_id"/>
                                 <field name="parc_installe_site_adresse_id"/>
                                 <field name="parc_installe_note"/>
+                            </group>
+                        </page>
+                        <page name="historique" string="Historique">
+                            <group name="interventions" string="Interventions">
+                                <field colspan="4" mode="tree" name="historique_interv_ids" nolabel="1"
+                                       widget="one2many_list">
+                                    <tree string="Interventions">
+                                        <field name="employee_ids" widget="many2many_tags"/>
+                                        <field name="type_id"/>
+                                        <field name="tache_id"/>
+                                        <field name="date" string="Date"/>
+                                        <field name="duree" string="Durée"/>
+                                        <field name="date_deadline" string="Date fin"/>
+                                        <field name="state"/>
+                                        <field name="name"/>
+                                        <field name="cleantext_description" string="Description"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                        <page name="facturation" string="Facturation">
+                            <field name="currency_id" invisible="1"/>
+                            <group>
+                                <group>
+                                    <field name="fiscal_position_id" options="{'no_create': True, 'no_open': True}"/>
+                                </group>
+                            </group>
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="name"/>
+                                    <field name="qty"/>
+                                    <field name="price_unit"/>
+                                    <field name="taxe_ids" widget="many2many_tags"/>
+                                    <field name="price_subtotal" readonly="1"/>
+                                    <field name="price_total" readonly="1"/>
+                                    <field name="sol_number"/>
+                                </tree>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right" colspan="2" name="intervention_total">
+                                <field name="price_subtotal" widget="monetary"
+                                       options="{'currency_field': 'currency_id'}"/>
+                                <field name="price_tax" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                                    <label for="price_total"/>
+                                </div>
+                                <field name="price_total" nolabel="1" class="oe_subtotal_footer_separator"
+                                       widget="monetary" options="{'currency_field': 'currency_id'}"/>
                             </group>
                         </page>
                         <page name="docs" string="Documents">
@@ -163,6 +243,10 @@
                         </page>
                     </notebook>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
             </form>
         </field>
     </record>
@@ -229,5 +313,19 @@
     <menuitem id="of_service.menu_of_planning_service_prog" name="Demandes d'intervention" parent="of_planning.menu_of_planning_intervention" sequence="5" action="of_contract_custom.action_of_contract_service_form_planning"/>
     <delete model="ir.ui.menu" id="of_service.menu_of_planning_service_rec"/>
     <delete model="ir.ui.menu" id="of_service.menu_of_planning_service_ponc"/>
+
+    <!-- Générer devis depuis DI -->
+    <record id="action_make_sale_order" model="ir.actions.server">
+        <field name="name">Générer devis client</field>
+        <field name="model_id" ref="of_service.model_of_service"/>
+        <field name="state">code</field>
+        <field name="code">action = obj.make_sale_order()</field>
+    </record>
+    <record id="value_make_sale_order" model="ir.values">
+        <field name="name">Générer devis client</field>
+        <field name="key2">client_action_multi</field>
+        <field name="model">of.service</field>
+        <field name="value" eval="'ir.actions.server,%d'%action_make_sale_order"/>
+    </record>
 
 </odoo>

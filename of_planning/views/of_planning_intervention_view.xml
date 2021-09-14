@@ -380,19 +380,19 @@
                             </group>
                             <field name="line_ids">
                                 <tree editable="bottom" colors="blue:invoice_status=='to invoice';">
-                                        <field name="order_line_id" invisible="1"/>
+                                    <field name="order_line_id" invisible="1"/>
                                     <field name="invoice_status" invisible="1"/>
                                     <field name="product_id" attrs="{'readonly': [('order_line_id', '!=', False)]}"/>
                                     <field name="name" attrs="{'readonly': [('order_line_id', '!=', False)]}"/>
                                     <field name="qty"/>
                                     <field name="qty_delivered" readonly="1"/>
-                                        <field name="qty_invoiced" readonly="1"/>
-                                        <field name="price_unit" attrs="{'readonly': [('order_line_id', '!=', False)]}"/>
+                                    <field name="qty_invoiced" readonly="1"/>
+                                    <field name="price_unit" attrs="{'readonly': [('order_line_id', '!=', False)]}"/>
                                     <field name="taxe_ids" attrs="{'readonly': [('order_line_id', '!=', False)]}"
                                            widget="many2many_tags"/>
                                     <field name="price_subtotal" readonly="1"/>
                                     <field name="price_total" readonly="1"/>
-                                        <field name="from_order"/>
+                                    <field name="from_order"/>
                                 </tree>
                             </field>
                             <group class="oe_subtotal_footer oe_right" colspan="2" name="intervention_total">
