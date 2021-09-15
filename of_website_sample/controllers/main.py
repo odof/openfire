@@ -26,13 +26,17 @@ class WebsiteSaleSample(WebsiteSale):
             request.session['sale_order_id'] = None
             sale_order = request.website.sale_get_order(force_create=True)
 
+        # On ne mélange pas des échantillons et des produits dans un même panier
         if sale_order.order_line and sale_order.order_line[0].product_id.is_sample != product.is_sample:
-
             if product.is_sample:
                 return request.redirect("/shop/product/%s?invalid=1" % slug(product.product_tmpl_id.sample_parent_id))
             else:
                 return request.redirect("/shop/product/%s?invalid=1" % slug(product.product_tmpl_id))
 
+        # Si un échantillon apparait déjà dans le panier, on n'en rajoute pas plus
+        for line in sale_order.order_line:
+            if line.product_id.id == int(product_id) and line.product_id.is_sample:
+                return request.redirect("/shop/cart")
 
         sale_order._cart_update(
             product_id=int(product_id),

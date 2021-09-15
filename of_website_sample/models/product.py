@@ -9,7 +9,6 @@ class ProductTemplate(models.Model):
 
     @api.model
     def create(self, args):
-
         sample_available = args.get('sample_available', False)
 
         # Si gestion des échantillons
@@ -19,15 +18,18 @@ class ProductTemplate(models.Model):
                 "name": args.get('name') + u" (échantillon)",
                 "type": args.get('type',False),
                 "brand_id": args.get('brand_id',False),
-                "default_code": args.get('default_code', '') + u"_ECH",
+                "default_code": args.get('default_code', '')
+                                + self.env['ir.sequence'].next_by_code('product.sample') or '_ECH',
                 "categ_id": args.get('categ_id',False),
                 "public_categ_ids": args.get('public_categ_ids',False),
                 "description_sale": args.get('description_sale',False),
                 "description_purchase": args.get('description_purchase',False),
                 "description_picking": args.get('description_picking',False),
                 "description_fabricant": args.get('description_fabricant',False),
+                "seller_ids": args.get('seller_ids',False),
                 "is_sample": True,
                 "active": True,
+                "website_published": False,
             })
 
             args['sample_id'] = sample_id.id
@@ -77,21 +79,13 @@ class ProductTemplate(models.Model):
 
     @api.multi
     def write(self, args):
-        print('write')
-        print(self)
-        print(args)
-
         sample_available = args.get('sample_available')
-        active = args.get('active')
         website_published = args.get('website_published')
 
         # Si on archive/désarchive le parent, on archive/désarchive l'enfant
-        # On teste active in [False, True] car active peut être à None
-        if active in [False, True]:
+        if 'active' in args:
             if self.sample_id:
-                self.sample_id.write({
-                    "active": active,
-                })
+                self.sample_id.active = args['active']
 
         # ###############
         # Code utilisé si les sample sont en website_published. On part sur un non
@@ -121,22 +115,38 @@ class ProductTemplate(models.Model):
 
         # Si gestion des échantillons
         if sample_available:
+
+            supplierinfo_obj = self.env['product.supplierinfo']
+
             if not self.sample_id:
+
+                # On créé d'abord les fournisseurs
+                seller_ids = []
+                for seller in self.seller_ids:
+                    seller_id = supplierinfo_obj.create({
+                        "name": seller.name.id,
+                    })
+                    seller_ids.append(seller_id.id)
+
+
                 # On créé sample_id
                 sample_id = self.create({
                     "name": self.name + u" (échantillon)",
                     "type": self.type,
                     "brand_id": self.brand_id.id,
-                    "default_code": self.default_code + u"_ECH",
+                    "default_code": self.default_code
+                                    + self.env['ir.sequence'].next_by_code('product.sample') or '_ECH',
                     "categ_id": self.categ_id and self.categ_id.id,
                     "public_categ_ids": self.public_categ_ids and self.public_categ_ids.ids,
                     "description_sale": self.description_sale,
                     "description_purchase": self.description_purchase,
                     "description_picking": self.description_picking,
                     "description_fabricant": self.description_fabricant,
+                    "seller_ids": [[6, 0, seller_ids]],
                     "is_sample": True,
                     "sample_parent_id": self.id,
                     "active": True,
+                    "website_published": False,
                 })
 
                 args['sample_id'] = sample_id.id
@@ -156,6 +166,7 @@ class ProductTemplate(models.Model):
                     "is_sample": True,
                     "sample_parent_id": self.id,
                     "active": True,
+                    "website_published": False,
                 })
 
         # On teste sample_available == False au lieu de not sample_available
@@ -167,3 +178,15 @@ class ProductTemplate(models.Model):
                 })
 
         return super(ProductTemplate, self).write(args)
+
+    @api.multi
+    def unlink(self):
+        # Si gestion des échantillons, on supprime le sample associé
+        if self.sample_available:
+            self.sample_id.unlink()
+
+        # Si échantillon, on désactive la gestion des échantillons sur le parent
+        if self.is_sample:
+            self.sample_parent_id.sample_available = False
+
+        return super(ProductTemplate, self).unlink()
