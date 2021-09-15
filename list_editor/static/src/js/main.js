@@ -89,20 +89,14 @@ odoo.define('list_editor.main', function (require) {
                 var i = self.fields_view.arch.children.map(function (item) {
                     return item.attrs.name;
                 }).indexOf(name);
-                if (i === -1) {
-                    var attrs;
-                    if (self.fields_get[name].type === "many2many" || self.fields_get[name].type === "one2many") {
-                        // assigner un widget empeche creation de filtres personnalisés pour une raison inconnue
-                        attrs = {name: name, modifiers: "{}"};//, widget: "many2many_tags"};
-                    }else {
-                        attrs = {name: name, modifiers: "{}"};
-                    }
+                if (i === -1 && self.fields_get[name]) {
+                    var attrs = {name: name, modifiers: "{}"};
                     self.fields_view.arch.children.splice(j, 0, {
                         tag: 'field', attrs: attrs
                     });
                     self.fields_view.fields[name] = _.extend(self.fields_get[name], attrs);
                     j += 1;
-                } else {
+                } else if (i >= 0) {
                     var column = self.fields_view.arch.children[i];
 
                     // make visible if column is invisible
