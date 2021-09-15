@@ -650,8 +650,8 @@ class OFCRMFunnelConversion4(models.Model):
     @api.multi
     def _compute_rest_to_do(self):
         for rec in self:
-            if rec.ordered_turnover_objective != 0:
-                rec.rest_to_do = '%.2f' % (100.0 * rec.total_turnover / rec.ordered_turnover_objective)
+            if rec.budget_turnover_objective != 0:
+                rec.rest_to_do = '%.2f' % (100.0 * rec.total_turnover / rec.budget_turnover_objective)
             else:
                 rec.rest_to_do = "N/E"
 
@@ -688,8 +688,8 @@ class OFCRMFunnelConversion4(models.Model):
             fields_copy.append('recorded_margin')
         if 'total_margin' not in fields_copy:
             fields_copy.append('total_margin')
-        if 'ordered_turnover_objective' not in fields_copy:
-            fields_copy.append('ordered_turnover_objective')
+        if 'budget_turnover_objective' not in fields_copy:
+            fields_copy.append('budget_turnover_objective')
         if 'previous_recorded_turnover' not in fields_copy:
             fields_copy.append('previous_recorded_turnover')
         res = super(OFCRMFunnelConversion4, self).read_group(
@@ -768,9 +768,9 @@ class OFCRMFunnelConversion4(models.Model):
                     line['total_margin_percent'] = "N/E"
             if 'rest_to_do' in fields_copy:
                 if 'total_turnover' in line and line['total_turnover'] is not None and \
-                        line.get('ordered_turnover_objective', False):
+                        line.get('budget_turnover_objective', False):
                     line['rest_to_do'] = \
-                        ('%.2f' % (round(100.0 * line['total_turnover'] / line['ordered_turnover_objective'], 2))).\
+                        ('%.2f' % (round(100.0 * line['total_turnover'] / line['budget_turnover_objective'], 2))).\
                         replace('.', ',')
                 else:
                     line['rest_to_do'] = "N/E"
