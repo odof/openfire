@@ -24,13 +24,16 @@ Module OpenFire pour le portail du site internet
         'of_planning',
         'of_parc_installe',
         'of_kit',
+        'theme_impacto',
     ],
     'data': [
-        'data/res_groups.xml',
+        'data/data.xml',
         'security/ir.model.access.csv',
         'security/of_website_portal_security.xml',
         'views/of_website_portal_views.xml',
-        'views/templates.xml',
+        'views/res_config_views.xml',
+        'views/templates_views.xml',
+        'templates/customize_modal_views.xml',
         'templates/website_portal_sale_views.xml',
     ],
     'qweb': [
