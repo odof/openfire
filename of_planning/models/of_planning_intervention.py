@@ -1519,7 +1519,7 @@ class OfPlanningIntervention(models.Model):
         return layouted
 
     @api.model
-    def _allowed_reports(self):
+    def _allowed_reports_template(self):
         """
         Fonction qui affecte un nom de rapport à un modèle.
         Si le nom de rapport imprimé n'est pas dans la liste de clés du dictionnaire,
@@ -1530,7 +1530,7 @@ class OfPlanningIntervention(models.Model):
                 'of_planning.of_planning_rapport_intervention_report_template']
 
     @api.multi
-    def _detect_doc_joint(self, report_name):
+    def _detect_doc_joint_template(self, report_name):
         """
         Cette fonction retourne les données des documents à joindre au fichier pdf du devis/commande au format binaire.
         Le document retourné correspond au fichier pdf joint au modéle de courrier.

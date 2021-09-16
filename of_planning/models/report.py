@@ -16,10 +16,10 @@ class Report(models.Model):
     @api.model
     def get_pdf(self, docids, report_name, html=None, data=None):
         result = super(Report, self).get_pdf(docids, report_name, html=html, data=data)
-        if report_name in self.env['of.planning.intervention']._allowed_reports():
+        if report_name in self.env['of.planning.intervention']._allowed_reports_template():
             # On ajoute au besoin les documents joint
             rdv = self.env['of.planning.intervention'].browse(docids)[0]
-            mails_data = rdv._detect_doc_joint(report_name)
+            mails_data = rdv._detect_doc_joint_template(report_name)
             if mails_data:
                 fd, order_pdf = tempfile.mkstemp()
                 os.write(fd, result)
