@@ -46,7 +46,16 @@
             <div class="of_label_table" style="width: 100%; height: 69%;">
                 <div class="of_label_row" style="font-size: 32px; height: 15%">
                     <div class="of_label_cell">Client:</div>
-                    <div class="of_label_cell" t-field="o.picking_id.partner_id.name" style="colspan: 3;"/>
+                    <div class="of_label_cell" style="colspan: 3;">
+                        <!-- BR -->
+                        <t t-if="o.picking_id.picking_type_code == 'incoming'">
+                            <span t-field="o.picking_id.of_customer_id.name"/>
+                        </t>
+                        <!-- BL -->
+                        <t t-if="o.picking_id.picking_type_code == 'outgoing'">
+                            <span t-field="o.picking_id.partner_id.name"/>
+                        </t>
+                    </div>
                 </div>
                 <div class="of_label_row" style="font-size: 24px; height: 12%">
                     <div class="of_label_cell">Projet:</div>
