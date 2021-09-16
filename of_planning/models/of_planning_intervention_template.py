@@ -285,7 +285,7 @@ class OfPlanningInterventionTemplate(models.Model):
         return res
 
     @api.multi
-    def get_fi_mail_template_data(self):
+    def get_fi_mail_template_data(self, rdv):
         self.ensure_one()
         compose_mail_obj = self.env['of.compose.mail']
         attachment_obj = self.env['ir.attachment']
@@ -300,7 +300,7 @@ class OfPlanningInterventionTemplate(models.Model):
                 attachment = attachment_obj.search([('res_model', '=', mail_template._name),
                                                     ('res_field', '=', 'file'),
                                                     ('res_id', '=', mail_template.id)])
-                datas = dict(compose_mail_obj.eval_champs(self, mail_template.chp_ids))
+                datas = dict(compose_mail_obj.eval_champs(rdv, mail_template.chp_ids))
                 file_path = attachment_obj._full_path(attachment.store_fname)
                 fd, generated_pdf = tempfile.mkstemp(prefix='doc_joint_', suffix='.pdf')
                 try:
@@ -335,10 +335,10 @@ class OfPlanningInterventionTemplate(models.Model):
     @api.multi
     def fi_doc_joints(self, rdv):
         self.ensure_one()
-        return self.get_fi_mail_template_data() + self.get_fi_internal_docs(rdv)
+        return self.get_fi_mail_template_data(rdv) + self.get_fi_internal_docs(rdv)
 
     @api.multi
-    def get_ri_mail_template_data(self):
+    def get_ri_mail_template_data(self, rdv):
         self.ensure_one()
         compose_mail_obj = self.env['of.compose.mail']
         attachment_obj = self.env['ir.attachment']
@@ -353,7 +353,7 @@ class OfPlanningInterventionTemplate(models.Model):
                 attachment = attachment_obj.search([('res_model', '=', mail_template._name),
                                                     ('res_field', '=', 'file'),
                                                     ('res_id', '=', mail_template.id)])
-                datas = dict(compose_mail_obj.eval_champs(self, mail_template.chp_ids))
+                datas = dict(compose_mail_obj.eval_champs(rdv, mail_template.chp_ids))
                 file_path = attachment_obj._full_path(attachment.store_fname)
                 fd, generated_pdf = tempfile.mkstemp(prefix='doc_joint_', suffix='.pdf')
                 try:
@@ -388,7 +388,7 @@ class OfPlanningInterventionTemplate(models.Model):
     @api.multi
     def ri_doc_joints(self, rdv):
         self.ensure_one()
-        return self.get_ri_mail_template_data() + self.get_ri_internal_docs(rdv)
+        return self.get_ri_mail_template_data(rdv) + self.get_ri_internal_docs(rdv)
 
 
 class OfPlanningInterventionTemplateLine(models.Model):
