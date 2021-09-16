@@ -22,6 +22,7 @@ class OFProductTemplate(models.Model):
             for product_brand in product_brands:
                 product_brand.write({'description_sale': """% if object.norme_id:
 Norme : ${object.norme_id.name or ""}
+% endif
 % if object.of_flamme_verte:
 ${object.of_flamme_verte}${'\u2605'}
 % endif
@@ -51,7 +52,6 @@ Indice I : ${object.of_indice_i}
 % endif
 % if object.of_fonds_air_bois:
 Éligible Fonds Air Bois
-% endif
 % endif
 % if object.description_sale
 ${'\\n' + object.description_sale}
@@ -73,9 +73,11 @@ ${'\\n' + object.description_sale}
 class OfProductBrand(models.Model):
     _inherit = 'of.product.brand'
 
-    def _get_default_description_sale(self):
+    @api.model
+    def _default_description_sale(self):
         return """% if object.norme_id:
 Norme : ${object.norme_id.name or ""}
+% endif
 % if object.of_flamme_verte:
 ${object.of_flamme_verte}${'\u2605'}
 % endif
@@ -106,9 +108,8 @@ Indice I : ${object.of_indice_i}
 % if object.of_fonds_air_bois:
 Éligible Fonds Air Bois
 % endif
-% endif
 % if object.description_sale
 ${'\\n' + object.description_sale}
 % endif"""
 
-    description_sale = fields.Text(default=_get_default_description_sale)
+    description_sale = fields.Text(default=lambda self: self._default_description_sale())
