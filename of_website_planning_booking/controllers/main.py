@@ -258,8 +258,9 @@ class OFWebsitePlanningBooking(http.Controller):
         if request.session.get('booking_parc_installe_id'):
             parc_installe = parc_installe_obj.browse(request.session.get('booking_parc_installe_id'))
 
-        values['product_categ_list'] = request.env['product.category'].search([])
-        values['brand_list'] = request.env['of.product.brand'].search([])
+        values['product_categ_list'] = request.env['product.category']\
+            .search([('of_website_planning_published', '=', True)])
+        values['brand_list'] = request.env['of.product.brand'].search([('of_website_planning_published', '=', True)])
         values['product_category'] = 'product_category_id' in values and values['product_category_id'] != '' and \
                                      request.env['product.category'].browse(int(values['product_category_id'])) or \
                                      parc_installe.product_category_id

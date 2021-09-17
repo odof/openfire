@@ -478,7 +478,7 @@ class OfTourneeRdv(models.TransientModel):
                     continue
                 # Contrôle des techniciens
                 allowed_employee_ids = self.env['ir.values'].sudo().get_default(
-                    'of.intervention.settings', 'website_booking_allowed_employee_ids')
+                    'of.intervention.settings', 'website_booking_allowed_employee_ids') or []
                 employees_dispo = list(set(employees_dispo) & set(allowed_employee_ids))
 
             # Recherche de créneaux pour la date voulue et les équipes sélectionnées
