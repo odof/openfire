@@ -17,7 +17,7 @@ class OFSaleMarginRegulator(models.Model):
     partner_id = fields.Many2one(comodel_name='res.partner', string=u"Partenaire", readonly=True)
     order_date = fields.Date(string=u"Date de commande", readonly=True)
     custom_confirmation_date = fields.Date(string=u"Date de confirmation", readonly=True)
-    confirmation_date = fields.Date(string=u"Date d'enregistrement'", readonly=True)
+    confirmation_date = fields.Date(string=u"Date d'enregistrement", readonly=True)
     invoice_date = fields.Date(string=u"Date de dernière facture", readonly=True)
     invoice_status = fields.Selection([
         ('upselling', u"Opportunité de montée en gamme"),
@@ -26,6 +26,9 @@ class OFSaleMarginRegulator(models.Model):
         ('no', u"Rien à facturer")
         ], string=u"État de facturation", readonly=True)
     product_id = fields.Many2one(comodel_name='product.product', string=u"Article")
+    main_product_id = fields.Many2one(comodel_name='product.product', string=u"Article principal")
+    main_product_brand_id = fields.Many2one(comodel_name='of.product.brand', string=u"Marque de l'article principal")
+    main_product_categ_id = fields.Many2one(comodel_name='product.category', string=u"Catégorie de l'article principal")
 
     presale_cost = fields.Float(string=u"Prix de revient à la confirmation", readonly=True)
     presale_price = fields.Float(string=u"Prix de vente à la confirmation", readonly=True)
@@ -56,6 +59,13 @@ class OFSaleMarginRegulator(models.Model):
     invoiced_real_margin_perc = fields.Char(
         string=u"Marge réelle sur facturé (%)", compute='_compute_invoiced_real_margin_perc', compute_sudo=True,
         readonly=True)
+
+    presale_price_sale_price_gap = fields.Float(
+        string=u"Écart CA à la confirmation / CA à l'enregistrement (€)",
+        compute='_compute_presale_price_sale_price_gap', compute_sudo=True, readonly=True)
+    presale_margin_sale_margin_gap = fields.Float(
+        string=u"Écart Marge à la confirmation / Marge à l'enregistrement (€)",
+        compute='_compute_presale_margin_sale_margin_gap', compute_sudo=True, readonly=True)
 
     ordered_real_sale_margin_gap = fields.Float(
         string=u"Écart Marge réelle commandée / Marge à l'enregistrement (€)",
@@ -105,6 +115,9 @@ class OFSaleMarginRegulator(models.Model):
                     ,           SOL.of_sale_margin                                          AS sale_margin
                     ,           MOV.delivered_cost                                          AS delivered_cost
                     ,           INV.invoiced_total                                          AS invoiced_total
+                    ,           MAIN.main_product_id                                        AS main_product_id
+                    ,           MAIN.main_product_brand_id                                  AS main_product_brand_id
+                    ,           MAIN.main_product_categ_id                                  AS main_product_categ_id
                     FROM        sale_order                                                  SO
                     ,           sale_order_line                                             SOL
                     LEFT JOIN   (   SELECT      PO.sale_line_id
@@ -127,6 +140,18 @@ class OFSaleMarginRegulator(models.Model):
                                     GROUP BY    SOLIR.order_line_id
                                 )                                                           INV
                         ON      INV.order_line_id                                           = SOL.id
+                    LEFT JOIN   (   SELECT      SOL7.order_id               AS id
+                                    ,           SOL7.product_id             AS main_product_id
+                                    ,           SOL7.of_product_brand_id    AS main_product_brand_id
+                                    ,           SOL7.of_product_categ_id    AS main_product_categ_id
+                                    FROM        sale_order_line             SOL7
+                                    WHERE       SOL7.id                     = ( SELECT  MIN(SOL8.id)
+                                                                                FROM    sale_order_line             SOL8
+                                                                                WHERE   SOL8.order_id              = SOL7.order_id
+                                                                                AND     SOL8.of_article_principal  = True
+                                                                              )
+                                )                                                           MAIN
+                        ON      MAIN.id                                                     = SOL.order_id
                     WHERE       SO.state                                                    IN ('sale', 'done', 'closed')
                     AND         SOL.order_id                                                = SO.id
 
@@ -163,7 +188,22 @@ class OFSaleMarginRegulator(models.Model):
                     ,           NULL                                                        AS sale_margin
                     ,           SM2.of_unit_cost * SM2.product_uom_qty                      AS delivered_cost
                     ,           NULL                                                        AS invoiced_total
+                    ,           MAIN2.main_product_id                                       AS main_product_id
+                    ,           MAIN2.main_product_brand_id                                 AS main_product_brand_id
+                    ,           MAIN2.main_product_categ_id                                 AS main_product_categ_id
                     FROM        sale_order                                                  SO2
+                    LEFT JOIN   (   SELECT      SOL9.order_id               AS id
+                                    ,           SOL9.product_id             AS main_product_id
+                                    ,           SOL9.of_product_brand_id    AS main_product_brand_id
+                                    ,           SOL9.of_product_categ_id    AS main_product_categ_id
+                                    FROM        sale_order_line             SOL9
+                                    WHERE       SOL9.id                     = ( SELECT  MIN(SOL10.id)
+                                                                                FROM    sale_order_line             SOL10
+                                                                                WHERE   SOL10.order_id              = SOL9.order_id
+                                                                                AND     SOL10.of_article_principal  = True
+                                                                              )
+                                )                                                           MAIN2
+                        ON      MAIN2.id                                                    = SO2.id
                     ,           stock_picking                                               SP
                     ,           stock_move                                                  SM2
                     WHERE       SO2.state                                                   IN ('sale', 'done', 'closed')
@@ -210,7 +250,22 @@ class OFSaleMarginRegulator(models.Model):
                     ,           NULL                                                        AS sale_margin
                     ,           NULL                                                        AS delivered_cost
                     ,           AIL4.price_subtotal                                         AS invoiced_total
+                    ,           MAIN3.main_product_id                                       AS main_product_id
+                    ,           MAIN3.main_product_brand_id                                 AS main_product_brand_id
+                    ,           MAIN3.main_product_categ_id                                 AS main_product_categ_id
                     FROM        sale_order                                                  SO3
+                    LEFT JOIN   (   SELECT      SOL11.order_id              AS id
+                                    ,           SOL11.product_id            AS main_product_id
+                                    ,           SOL11.of_product_brand_id   AS main_product_brand_id
+                                    ,           SOL11.of_product_categ_id   AS main_product_categ_id
+                                    FROM        sale_order_line             SOL11
+                                    WHERE       SOL11.id                    = ( SELECT  MIN(SOL12.id)
+                                                                                FROM    sale_order_line             SOL12
+                                                                                WHERE   SOL12.order_id              = SOL11.order_id
+                                                                                AND     SOL12.of_article_principal  = True
+                                                                              )
+                                )                                                           MAIN3
+                        ON      MAIN3.id                                                    = SO3.id
                     ,           account_invoice                                             AI4
                     ,           account_invoice_line                                        AIL4
                     WHERE       SO3.state                                                   IN ('sale', 'done', 'closed')
@@ -220,6 +275,64 @@ class OFSaleMarginRegulator(models.Model):
                                                                                                 FROM    sale_order_line_invoice_rel SOLIR4
                                                                                                 WHERE   SOLIR4.invoice_line_id      = AIL4.id
                                                                                             )
+                    UNION
+
+                    SELECT      300000000 + AIL6.id                                         AS id
+                    ,           SO4.id                                                      AS order_id
+                    ,           SO4.company_id
+                    ,           SO4.user_id
+                    ,           SO4.partner_id
+                    ,           SO4.date_order::timestamp::date                             AS order_date
+                    ,           SO4.of_custom_confirmation_date::timestamp::date            AS custom_confirmation_date
+                    ,           SO4.confirmation_date::timestamp::date                      AS confirmation_date
+                    ,           SO4.invoice_status
+                    ,           (   SELECT  MAX(AI7.date_invoice)
+                                    FROM    sale_order_line             SOL6
+                                    ,       sale_order_line_invoice_rel SOLIR6
+                                    ,       account_invoice_line        AIL7
+                                    ,       account_invoice             AI7
+                                    WHERE   SOL6.order_id               = SO4.id
+                                    AND     SOLIR6.order_line_id        = SOL6.id
+                                    AND     AIL7.id                     = SOLIR6.invoice_line_id
+                                    AND     AI7.id                      = AIL7.invoice_id
+                                    AND     AI7.state                   IN ('open', 'paid')
+                                )                                                           AS invoice_date
+                    ,           AIL6.product_id
+                    ,           NULL                                                        AS presale_cost
+                    ,           NULL                                                        AS presale_price
+                    ,           NULL                                                        AS presale_price_variation
+                    ,           NULL                                                        AS presale_margin
+                    ,           NULL                                                        AS sale_cost
+                    ,           NULL                                                        AS sale_price
+                    ,           NULL                                                        AS sale_price_variation
+                    ,           NULL                                                        AS sale_margin
+                    ,           NULL                                                        AS delivered_cost
+                    ,           - AIL6.price_subtotal                                       AS invoiced_total
+                    ,           MAIN4.main_product_id                                       AS main_product_id
+                    ,           MAIN4.main_product_brand_id                                 AS main_product_brand_id
+                    ,           MAIN4.main_product_categ_id                                 AS main_product_categ_id
+                    FROM        sale_order                                                  SO4
+                    LEFT JOIN   (   SELECT      SOL13.order_id              AS id
+                                    ,           SOL13.product_id            AS main_product_id
+                                    ,           SOL13.of_product_brand_id   AS main_product_brand_id
+                                    ,           SOL13.of_product_categ_id   AS main_product_categ_id
+                                    FROM        sale_order_line             SOL13
+                                    WHERE       SOL13.id                    = ( SELECT  MIN(SOL14.id)
+                                                                                FROM    sale_order_line             SOL14
+                                                                                WHERE   SOL14.order_id              = SOL13.order_id
+                                                                                AND     SOL14.of_article_principal  = True
+                                                                              )
+                                )                                                           MAIN4
+                        ON      MAIN4.id                                                    = SO4.id
+                    ,           account_invoice                                             AI8
+                    ,           account_invoice                                             AI6
+                    ,           account_invoice_line                                        AIL6
+                    WHERE       SO4.state                                                   IN ('sale', 'done', 'closed')
+                    AND         SO4.name                                                    = AI8.origin
+                    AND         AI8.number                                                  = AI6.origin
+                    AND         AI6.company_id                                              = AI8.company_id
+                    AND         AI6.type                                                    = 'out_refund'
+                    AND         AIL6.invoice_id                                             = AI6.id
             )""")
 
     @api.multi
@@ -265,6 +378,16 @@ class OFSaleMarginRegulator(models.Model):
             rec.invoiced_real_margin_perc = 100.0 * (1.0 - rec.delivered_cost / rec.invoiced_total)
 
     @api.multi
+    def _compute_presale_price_sale_price_gap(self):
+        for rec in self:
+            rec.presale_price_sale_price_gap = rec.presale_price - rec.sale_price
+
+    @api.multi
+    def _compute_presale_margin_sale_margin_gap(self):
+        for rec in self:
+            rec.presale_margin_sale_margin_gap = rec.presale_margin - rec.sale_margin
+
+    @api.multi
     def _compute_ordered_real_sale_margin_gap(self):
         for rec in self:
             rec.ordered_real_sale_margin_gap = rec.ordered_real_margin - rec.sale_margin
@@ -306,6 +429,8 @@ class OFSaleMarginRegulator(models.Model):
             fields.append('delivered_cost')
         if 'invoiced_total' not in fields:
             fields.append('invoiced_total')
+        if 'presale_margin' not in fields:
+            fields.append('presale_margin')
         if 'sale_margin' not in fields:
             fields.append('sale_margin')
         if 'ordered_real_margin' not in fields:
@@ -356,6 +481,14 @@ class OFSaleMarginRegulator(models.Model):
                         replace('.', ',')
                 else:
                     line['invoiced_real_margin_perc'] = "N/E"
+            if 'presale_price_sale_price_gap' in fields:
+                if 'presale_price' in line and line['presale_price'] is not None and 'sale_price' in line and \
+                        line['sale_price'] is not None:
+                    line['presale_price_sale_price_gap'] = line['presale_price'] - line['sale_price']
+            if 'presale_margin_sale_margin_gap' in fields:
+                if 'presale_margin' in line and line['presale_margin'] is not None and 'sale_margin' in line and \
+                        line['sale_margin'] is not None:
+                    line['presale_margin_sale_margin_gap'] = line['presale_margin'] - line['sale_margin']
             if 'ordered_real_sale_margin_gap' in fields:
                 if 'sale_margin' in line and line['sale_margin'] is not None and 'ordered_real_margin' in line and \
                         line['ordered_real_margin'] is not None:
