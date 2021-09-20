@@ -27,7 +27,12 @@
             <attribute name="t-if">not line.product_id.product_tmpl_id.is_sample</attribute>
         </xpath>
         <xpath expr="//div[contains(@class, 'oe_website_spinner')]/input" position="after">
-            <input t-if="line.product_id.product_tmpl_id.is_sample" type="text" class="js_quantity form-control quantity" readonly="readonly" t-att-data-line-id="line.id" t-att-data-product-id="line.product_id.id" t-att-value="int(line.product_uom_qty) == line.product_uom_qty and int(line.product_uom_qty) or line.product_uom_qty"/>
+            <input type="text" class="js_quantity form-control quantity"
+                   t-if="line.product_id.product_tmpl_id.is_sample"
+                   readonly="readonly"
+                   t-att-data-line-id="line.id"
+                   t-att-data-product-id="line.product_id.id"
+                   t-att-value="int(line.product_uom_qty) == line.product_uom_qty and int(line.product_uom_qty) or line.product_uom_qty"/>
         </xpath>
         <xpath expr="//div[contains(@class, 'oe_website_spinner')]/a[1]" position="attributes">
             <attribute name="t-attf-class">mb8 input-group-addon js_add_cart_json btn #{line.product_id.product_tmpl_id.is_sample and 'disabled'}</attribute>
