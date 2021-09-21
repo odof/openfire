@@ -243,7 +243,9 @@ class OfService(models.Model):
             service.name = tache_name + " " + partner_name + " " + address_zip
 
     @api.multi
-    @api.depends('date_next', 'date_fin_contrat', 'duree', 'base_state', 'recurrence', 'intervention_ids')
+    @api.depends(
+        'date_next', 'date_fin_contrat', 'duree', 'base_state', 'recurrence', 'intervention_ids',
+        'intervention_ids.state')
     def _compute_state_poncrec(self):
         for service in self:
             service_state = service.get_state_poncrec_date(fields.Date.context_today(self), to_plan_avance=True)
@@ -256,7 +258,7 @@ class OfService(models.Model):
         res = safe_eval("services.filtered(lambda s: s.state_ponc %s %s)" % (operator, operand), {'services': services})
         return [('id', 'in', res.ids)]
 
-    @api.depends('intervention_ids')
+    @api.depends('intervention_ids', 'intervention_ids.state')
     @api.multi
     def _compute_intervention_count(self):
         for service in self:
