@@ -766,7 +766,7 @@ class OfService(models.Model):
 
 class OFServiceTag(models.Model):
     _name = 'of.service.tag'
-    _description = u"Étiquettes des services"
+    _description = u"[obsolète] Étiquettes des services"
 
     @api.model_cr_context
     def _auto_init(self):
@@ -780,9 +780,10 @@ class OFServiceTag(models.Model):
         res = super(OFServiceTag, self)._auto_init()
         if not exists:
             # Créer les étiquettes de planning. Attention au doublons! Ne pas créer si il y a une étiquette planning du même nom
-            cr.execute("INSERT INTO of_planning_tag (name, color, active) "
-                       "SELECT st.name, st.color, st.active "
-                       "FROM of_service_tag AS st "
+            cr.execute("INSERT INTO of_planning_tag "
+                       "(name, color, active, create_uid, write_uid, create_date, write_date) "
+                       "SELECT st.name, st.color, st.active, st.create_uid, st.write_uid, st.create_date, st.write_date"
+                       " FROM of_service_tag AS st "
                        "WHERE UPPER(st.name) NOT IN (SELECT UPPER(name) FROM of_planning_tag);")
             # Connecter les étiquettes de planning aux services existants en fonction de leurs étiquettes de service
             cr.execute("INSERT INTO of_service_of_planning_tag_rel (service_id, tag_id) "
