@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="of_report_delivery_document2" inherit_id="delivery.report_delivery_document2">
+        <xpath expr="//h2" position="after">
+            <div class="row" t-if="o.carrier_id">
+                <div class="col-xs-3 mb16">
+                    <div style="border: 1px solid black; border-radius: 10px; padding: 10px;">
+                        <strong>Mode de livraison:</strong>
+                        <br/>
+                        <span t-field="o.carrier_id"/>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+        <xpath expr="//th[preceding::th[@name='td_sched_date_h']]" position="attributes">
+            <attribute name="style">display: none;</attribute>
+        </xpath>
+        <xpath expr="//td[preceding::td[@name='td_sched_date']]" position="attributes">
+            <attribute name="style">display: none;</attribute>
+        </xpath>
+    </template>
+
+</odoo>

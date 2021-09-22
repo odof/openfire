@@ -733,6 +733,15 @@ class StockConfigSettings(models.TransientModel):
 
     of_forcer_date_inventaire = fields.Boolean(string='(OF) Date inventaire')
     of_forcer_date_move = fields.Boolean(string='(OF) Date transfert')
+    group_of_bon_transfert_valorise = fields.Boolean(
+        string=u"(OF) Bon de transfert valorisé", default=False,
+        help=u"Afficher la valeur du mouvement de stock dans mes bons de livraison.",
+        implied_group='of_stock.group_of_bon_transfert_valorise',
+        group='base.group_system')
+
+    pdf_mention_legale = fields.Text(
+        string=u"(OF) Mentions légales", help=u"Sera affiché dans les BL"
+    )
 
     @api.multi
     def set_of_forcer_date_inventaire_defaults(self):
@@ -743,6 +752,37 @@ class StockConfigSettings(models.TransientModel):
     def set_of_forcer_date_move_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'stock.config.settings', 'of_forcer_date_move', self.of_forcer_date_move)
+
+    @api.multi
+    def set_pdf_mention_legale_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'stock.config.settings', 'pdf_mention_legale', self.pdf_mention_legale
+        )
+
+
+class StockPackOperation(models.Model):
+    _inherit = 'stock.pack.operation'
+
+    of_price_unit = fields.Monetary(
+        string=u"PU HT", readonly=True, currency_field='company_currency_id', compute='_compute_of_price_unit')
+    of_amount_untaxed = fields.Monetary(
+        string=u"Total HT", readonly=True, currency_field='company_currency_id', compute='_compute_of_amount_untaxed')
+    company_currency_id = fields.Many2one(
+        'res.currency', related='picking_id.company_id.currency_id', string=u"Company currency", readonly=True)
+
+    @api.depends('linked_move_operation_ids.move_id.of_computed_price_unit')
+    def _compute_of_price_unit(self):
+        for pack in self:
+            if len(pack.linked_move_operation_ids) == 1:
+                pack.of_price_unit = pack.linked_move_operation_ids.move_id.of_computed_price_unit
+            else:
+                pack.of_price_unit = pack.product_id.lst_price
+
+    @api.depends('linked_move_operation_ids.move_id.of_amount_untaxed')
+    def _compute_of_amount_untaxed(self):
+        for pack in self:
+            if len(pack.linked_move_operation_ids) == 1:
+                pack.of_amount_untaxed = pack.linked_move_operation_ids.move_id.of_amount_untaxed
 
 
 class StockMove(models.Model):
@@ -760,6 +800,38 @@ class StockMove(models.Model):
         string=u"Qté(s) théorique(s)", digits=dp.get_precision('Product Unit of Measure'), compute='_compute_of_qty',
         help=u"Si une règle de stock est définie pour l'article avec une date limite de prévision, le stock théorique "
              u"est calculé à cette date ; sinon le stock théorique calculé est le stock théorique global de l'article")
+    of_computed_price_unit = fields.Float(
+        string=u"PU HT", compute="_compute_of_price_unit", inverse="_inverse_of_price_unit")
+    of_price_unit = fields.Monetary(string=u"PU HT", currency_field='company_currency_id')
+    of_amount_untaxed = fields.Monetary(
+        string=u"Total HT", currency_field='company_currency_id', compute="_compute_of_amount_untaxed")
+    company_currency_id = fields.Many2one(
+        'res.currency', related='company_id.currency_id', string="Company currency", readonly=True)
+
+    def _inverse_of_price_unit(self):
+        for move in self:
+            move.of_price_unit = move.of_computed_price_unit
+
+    @api.onchange('product_id')
+    def _onchange_of_price_unit(self):
+        for move in self:
+            if not move.origin:
+                move.of_computed_price_unit = move.product_id.list_price
+
+    @api.depends('origin')
+    def _compute_of_price_unit(self):
+        for move in self:
+            if move.procurement_id.sale_line_id:
+                move.of_computed_price_unit = move.procurement_id.sale_line_id.price_unit
+                for link in move.linked_move_operation_ids:
+                    link.operation_id._compute_of_price_unit()
+            else:
+                move.of_computed_price_unit = move.of_price_unit or move.product_id.list_price
+
+    @api.depends('of_computed_price_unit', 'product_uom_qty')
+    def _compute_of_amount_untaxed(self):
+        for move in self:
+            move.of_amount_untaxed = move.of_computed_price_unit * move.product_uom_qty
 
     @api.depends('product_id', 'product_id.type')
     def _compute_of_of_has_reordering_rule(self):

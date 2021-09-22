@@ -25,6 +25,8 @@ ________________________________________________________________________________
     'data': [
         'views/delivery_carrier_views.xml',
         'views/purchase_order_views.xml',
+        'views/stock_picking_views.xml',
+        'reports/report_deliveryslip.xml',
         ],
     'installable': True,
     'application': False,

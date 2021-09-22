@@ -7,6 +7,9 @@ class OFSpecificDeliveryReportWizard(models.TransientModel):
     _name = 'of.specific.delivery.report.wizard'
     _description = u"Assistant de rapport Transfert spécifique"
 
+    def pdf_mention_legale(self):
+        return self.env['ir.values'].get_default('stock.config.settings', 'pdf_mention_legale') or ""
+
     @api.model
     def default_get(self, fields=None):
         result = super(OFSpecificDeliveryReportWizard, self).default_get(fields)

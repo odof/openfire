@@ -23,11 +23,11 @@
                             </div>
                             <div t-if="o.picking_id.move_lines and o.picking_id.move_lines[0].partner_id and not o.picking_id.partner_id" name="partner_header">
                                 <div t-field="o.picking_id.move_lines[0].partner_id"
-                                   t-options='{"widget": "contact", "fields": ["address", "name", "phone", "mobile"], "no_marker": True}'/>
+                                     t-options='{"widget": "contact", "fields": ["address", "name", "phone", "mobile"], "no_marker": True}'/>
                             </div>
                             <div t-if="o.picking_id.partner_id" name="partner_header">
                                 <div t-field="o.picking_id.partner_id"
-                                   t-options='{"widget": "contact", "fields": ["address", "name", "phone", "mobile"], "no_marker": True}'/>
+                                     t-options='{"widget": "contact", "fields": ["address", "name", "phone", "mobile"], "no_marker": True}'/>
                             </div>
                         </div>
                     </div>
@@ -75,12 +75,12 @@
                                     <span t-field="o.picking_id.origin"/>
                                 </td>
                                 <td name="td_sched_date">
-                                   <t t-if="o.picking_id.state == 'done'">
+                                    <t t-if="o.picking_id.state == 'done'">
                                         <span t-field="o.picking_id.date_done"/>
-                                   </t>
-                                   <t t-if="o.picking_id.state != 'done'">
+                                    </t>
+                                    <t t-if="o.picking_id.state != 'done'">
                                         <span t-field="o.picking_id.min_date"/>
-                                   </t>
+                                    </t>
                                 </td>
                             </tr>
                         </tbody>
@@ -102,6 +102,18 @@
                             </tr>
                         </tbody>
                     </table>
+                    <t t-set="pdf_mention_legale" t-value="o.pdf_mention_legale()"/>
+                    <p t-if="pdf_mention_legale" name="mentions_legales">
+                        <strong>Mentions légales</strong>
+                        <br/>
+                        <i style="color: grey;">
+                            <t t-set="mention_lines" t-value="pdf_mention_legale.split('\n')"/>
+                            <t t-foreach="mention_lines" t-as="mention_line">
+                                <span t-esc="mention_line"/>
+                                <br/>
+                            </t>
+                        </i>
+                    </p>
                     <t t-if="o.picking_id.note or o.picking_id.of_note_operations">
                         <div style="border-bottom: 1px solid black; padding-bottom: 6px; margin-top: 8px;">
                             <strong style="padding-left: 6px;">Notes</strong>
@@ -119,7 +131,7 @@
                     </p>
                 </div>
             </t>
-         </t>
+        </t>
     </template>
 
 
