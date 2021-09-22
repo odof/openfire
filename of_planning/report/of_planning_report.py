@@ -254,7 +254,7 @@ class ReportPlanningSemaine(models.AbstractModel):
         address = line.address_id
         city_vals = [s for s in (address.zip, address.city) if s]
         name = self.get_interv_state_display(line)
-        name += address.name
+        name += address.name or address.parent_name or ''
         partner_vals = [s for s in (
             name,
             address.street,
@@ -359,7 +359,7 @@ class ReportPlanningJour(models.AbstractModel):
         address = line.address_id
         city_vals = [s for s in (address.zip, address.city) if s]
         name = self.get_interv_state_display(line)
-        name += address.name
+        name += address.name or address.parent_name or ''
         partner_vals = [s for s in (
             name,
             address.street,
