@@ -8,11 +8,17 @@
     </template>
 
     <template id="display_stock_qty_message" inherit_id="website_sale_product_stock.display_stock_qty_message">
-        <xpath expr="//div[@class='in-stock']" position="attributes">
+        <xpath expr="//t[@t-if='product.qty_available &gt; 0']/div[@class='in-stock']" position="attributes">
             <attribute name="class">btn btn-primary in-stock</attribute>
         </xpath>
-        <xpath expr="//div[@class='out-of-stock']" position="attributes">
-            <attribute name="class">btn btn-primary out-of-stock</attribute>
+        <xpath expr="//t[@t-if='not product.qty_available &gt; 0']/div[@class='out-of-stock']" position="attributes">
+            <attribute name="class">btn out-of-stock</attribute>
+        </xpath>
+        <xpath expr="//t[@t-if='not qty_forecasted &gt; 0']/div[@class='out-of-stock']" position="attributes">
+            <attribute name="class">btn out-of-stock</attribute>
+        </xpath>
+        <xpath expr="//t[@t-if='qty_forecasted &gt; 0']/div[@class='in-stock']" position="attributes">
+            <attribute name="class">btn btn-primary in-stock</attribute>
         </xpath>
     </template>
 
