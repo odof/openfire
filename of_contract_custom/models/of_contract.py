@@ -11,13 +11,39 @@ from odoo.addons.of_utils.models.of_utils import format_date, se_chevauchent
 class OfContractRecurringInvoicingPayment(models.Model):
     _name = 'of.contract.recurring.invoicing.payment'
 
-    code = fields.Char(string="Code")
+    code = fields.Char(string="Code", required=True)
     name = fields.Char(string=u"Libellé")
 
+    @api.multi
+    def write(self, vals):
+        if (len(self) > 1 and 'code' in vals) or (len(self) == 1 and vals.get('code', self.code) != self.code):
+            raise UserError("Impossible de modifier le code du type de facturation")
+        if 'code' in vals:
+            del vals['code']
+        return super(OfContractRecurringInvoicingPayment, self).write(vals)
 
 class OfContract(models.Model):
     _name = "of.contract"
     _inherit = ['mail.thread', 'of.form.readonly']
+
+    @api.model_cr_context
+    def _auto_init(self):
+        cr = self._cr
+        cr.execute(
+            "SELECT * FROM information_schema.columns "
+            "WHERE table_name = '%s' AND column_name = 'contract_type'" % (self._table,))
+        exist1 = bool(cr.fetchall())
+        cr.execute(
+            "SELECT * FROM information_schema.columns "
+            "WHERE table_name = '%s' AND column_name = 'type'" % (self._table,))
+        exist2 = bool(cr.fetchall())
+        res = super(OfContract, self)._auto_init()
+        if not exist1 and exist2:
+            cr.execute("UPDATE %s "
+                       "SET contract_type = 'advanced'" % (self._table, ))
+            self.env['ir.values'].sudo().set_default(
+                'of.intervention.settings', 'of_contract', True)
+        return res
 
     active = fields.Boolean(default=True)
     invoice_ids = fields.One2many(comodel_name='account.invoice', inverse_name='of_contract_id', string="Factures")
@@ -29,6 +55,7 @@ class OfContract(models.Model):
         'res.partner.category', related="partner_id.category_id", string=u"Étiquettes client")
     pricelist_id = fields.Many2one('product.pricelist', string='Liste de prix')
     line_ids = fields.One2many('of.contract.line', 'contract_id', string='Lignes de contrat')
+    line_ids_rel = fields.One2many(related='line_ids', string='Lignes de contrat')
     recurring_rule_type = fields.Selection([
         ('date', u'À la prestation'),
         ('month', 'Mensuelle'),
@@ -75,7 +102,12 @@ class OfContract(models.Model):
     type = fields.Selection([
             (0, 'Nouveau contrat'),
             (1, 'Renouvellement'),
-        ], string="Type de contrat"
+        ], string="Type de contrat", default=0
+    )
+    contract_type = fields.Selection([
+        ('simple', u'Simple'),
+        ('advanced', u'Avancé'),
+        ], string="Type de contrat", default='simple'
     )
     state = fields.Selection([
         ('upcoming', u'À venir'),
@@ -267,6 +299,12 @@ class OfContract(models.Model):
         elif self.recurring_rule_type:
             if self.recurring_invoicing_payment_id.code not in ('pre-paid', 'post-paid'):
                 self.recurring_invoicing_payment_id = False
+
+    @api.onchange('contract_type')
+    def _onchange_contract_type(self):
+        if self.contract_type == 'simple':
+            self.grouped = True
+            self.revision = 'none'
 
     @api.model
     def create(self, vals):
@@ -650,6 +688,38 @@ class OfContractLine(models.Model):
     _inherit = ["of.form.readonly", "of.planning.plannification"]
     _order = 'line_avenant_id ASC, code_de_ligne DESC'
 
+    @api.model_cr_context
+    def _auto_init(self):
+        cr = self._cr
+        cr.execute(
+            "SELECT * FROM information_schema.columns "
+            "WHERE table_name = '%s' AND column_name = 'interv_frequency_nbr'" % (self._table,))
+        exist1 = bool(cr.fetchall())
+        cr.execute(
+            "SELECT * FROM information_schema.columns "
+            "WHERE table_name = '%s' AND column_name = 'nbr_interv'" % (self._table,))
+        exist2 = bool(cr.fetchall())
+        change_planif = False
+        if exist2 and not exist1:
+            cr.execute(
+                "SELECT ocl.id, ocl.nbr_interv, sub.nbr_month "
+                "FROM of_contract_line AS ocl "
+                "JOIN (SELECT rel.of_contract_line_id AS line_id, count(rel.of_mois_id) AS nbr_month "
+                "FROM of_contract_line_of_mois_rel AS rel "
+                "GROUP BY rel.of_contract_line_id) AS sub ON sub.line_id=ocl.id")
+            change_planif = cr.fetchall()
+        res = super(OfContractLine, self)._auto_init()
+        if change_planif:
+            for line_id, nbr_interv, nbr_month in change_planif:
+                if (float(nbr_interv)/float(nbr_month)).is_integer():
+                    ratio = nbr_interv/nbr_month
+                    values = ('month', ratio, line_id)
+                else:
+                    values = ('year', nbr_interv, line_id)
+                cr.execute("UPDATE of_contract_line "
+                           "SET interv_frequency = %s, interv_frequency_nbr = %s WHERE id = %s", values)
+        return res
+
     name = fields.Char(string="Nom", compute="_compute_name", store=True)
     partner_id = fields.Many2one('res.partner', related="contract_id.partner_id", string="Client payeur", readonly=True)
     address_id = fields.Many2one('res.partner', string="Adresse d'intervention", required=True)
@@ -758,9 +828,9 @@ class OfContractLine(models.Model):
     contract_date_start = fields.Date(string=u'Date de souscription', related="contract_id.date_start", readonly=True)
     contract_date_end = fields.Date(string='Date de fin', related="contract_id.date_end", readonly=True)
     contract_type = fields.Selection([
-        (0, 'Nouveau contrat'),
-        (1, 'Renouvellement'),
-        ], string="Type de contrat", related="contract_id.type", readonly=True)
+        ('simple', u'Simplifié'),
+        ('advanced', u'Avancé'),
+        ], string="Type de contrat", related="contract_id.contract_type", readonly=True, default='simple')
     contract_renewal = fields.Boolean(string="Renouvellement automatique", related="contract_id.renewal", readonly=True)
     use_index = fields.Boolean(string="Indexer", default=True)
     date_indexed = fields.Date(string=u"Dernière indexation", compute="_compute_date_indexed", store=True)
@@ -1173,7 +1243,7 @@ class OfContractLine(models.Model):
         """ Valide la ligne de contrat """
         no_product = False
         for line in self:
-            if not line.contract_product_ids:
+            if line.contract_type == 'advanced' and not line.contract_product_ids:
                 no_product = line
                 continue
             line.write({'state': 'validated'})
@@ -1296,61 +1366,56 @@ class OfContractLine(models.Model):
         """ Génération des interventions à programmer """
         service_obj = self.with_context(bloquer_recurrence=True).env['of.service']
         type = self.env.ref('of_contract_custom.of_contract_custom_type_maintenance')
-        services = self.env['of.service']
         for line in self:
             if not line.current_period_id or not line.state == 'validated':
                 continue
+            services = self.env['of.service']
             months = line.mois_reference_ids
             nbr_intervs = line.nbr_interv
             nbr_months = len(months)
-            if not nbr_intervs or not nbr_months:
-                continue
             ratio = float(nbr_intervs) / float(nbr_months)
-
+            if not nbr_intervs or not nbr_months:
+                return
             date_start_da = fields.Date.from_string(line.current_period_id.date_start)
             for i in xrange(0, nbr_intervs):
+                if len(line.service_ids.filtered(lambda s: line.current_period_id.date_start <=
+                                                           s.date_next <
+                                                           line.current_period_id.date_end)) >= nbr_intervs:
+                    break
                 month = months[int(i/ratio)]
                 num_mois = month.numero
                 service_da = date_start_da + relativedelta(years=int(date_start_da.month > num_mois),
                                                            month=num_mois, day=1)
                 date_service = fields.Date.to_string(service_da)
                 month_service_end = fields.Date.to_string(service_da + relativedelta(months=1))
-
-                # if date_service < line.date_contract_start:
-                #     continue
-                if line.date_contract_end and date_service > line.date_contract_end:
+                if line.date_end and date_service > line.date_end:
                     break
-                if line.service_ids.filtered(lambda s: date_service <= s.date_next < month_service_end):
+                if len(line.service_ids.filtered(lambda s: date_service <= s.date_next < month_service_end)) >= round(ratio):
                     continue
-                origine = line.line_origine_id
-                while origine:
-                    if origine.service_ids.filtered(lambda s: date_service <= s.date_next < month_service_end):
-                        break
-                    origine = origine.line_origine_id
-                else:
-                    service_vals = {
-                        'type_id'         : type.id,
-                        'partner_id'      : line.partner_id.id,
-                        'address_id'      : line.address_id.id,
-                        'tache_id'        : line.tache_id.id,
-                        'recurrence'      : False,
-                        'contract_id'     : line.contract_id.id,
-                        'contract_line_id': line.id,
-                        'note'            : line.notes,
-                        'supplier_id'     : line.supplier_id.id or False,
-                        'company_id'      : line.company_id.id,
-                        }
-                    new_service = service_obj.new(service_vals)
-                    new_service._onchange_tache_id()
-                    new_service.update({'date_next': date_service})
-                    new_service._onchange_date_next()
-                    if line.parc_installe_id:
-                        new_service.update({'parc_installe_id': line.parc_installe_id.id})
-                    new_service_vals = new_service._convert_to_write(new_service._cache)
-                    new_service = service_obj.create(new_service_vals)
-                    services |= new_service
-        if services:
-            services.button_valider()
+                service_vals = {
+                    'type_id'         : type.id,
+                    'partner_id'      : line.partner_id.id,
+                    'address_id'      : line.address_id.id,
+                    'tache_id'        : line.tache_id.id,
+                    'recurrence'      : False,
+                    'contract_id'     : line.id,
+                    # 'contract_id'     : line.contract_id.id,
+                    # 'contract_line_id': line.id,
+                    'note'            : line.notes,
+                    # 'supplier_id'     : line.supplier_id.id or False,
+                    'company_id'      : line.company_id.id,
+                    }
+                new_service = service_obj.new(service_vals)
+                new_service._onchange_tache_id()
+                new_service.update({'date_next': date_service})
+                new_service._onchange_date_next()
+                if line.parc_installe_id:
+                    new_service.update({'parc_installe_id': line.parc_installe_id.id})
+                new_service_vals = new_service._convert_to_write(new_service._cache)
+                new_service = service_obj.create(new_service_vals)
+                services |= new_service
+            if services:
+                services.button_valider()
 
     @api.multi
     def generate_revision_line(self, invoicing_date):

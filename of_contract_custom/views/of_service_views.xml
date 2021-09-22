@@ -14,6 +14,12 @@
                 <field name="contract_line_id"/>
                 <field name="contract_id"/>
             </xpath>
+            <xpath expr="//filter[@name='filter_rec']" position="attributes">
+                <attribute name="string">Récurrente</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='filter_ponc']" position="attributes">
+                <attribute name="string">Ponctuelle</attribute>
+            </xpath>
             <xpath expr="//filter[@name='filter_rec']" position="after">
                 <filter string="SAV" name="filter_sav"
                         domain="[('type_id', '=', %(of_contract_custom.of_contract_custom_type_sav)d)]"/>
@@ -24,8 +30,6 @@
                 <filter string="Visite technique" name="filter_vt"
                         domain="[('type_id', '=', %(of_contract_custom.of_contract_custom_type_technical)d)]"/>
             </xpath>
-            <xpath expr="//filter[@name='filter_rec']" position="replace"/>
-            <xpath expr="//filter[@name='filter_ponc']" position="replace"/>
         </field>
     </record>
 
@@ -48,6 +52,7 @@
                     <button name="button_annuler" string="Annuler" type="object"
                             attrs="{'invisible': [('base_state', '!=', 'calculated')]}"/>
                     <button name="button_brouillon" string="Remettre en brouillon" states="cancel" type="object"/>
+                    <button name="transform_to_contract" string="Transformer" states="calculated" type="object"/>
                     <button name="of_planning_tournee.action_view_rdv_intervention_wizard_service" string="Planifier Intervention"
                             type="action" attrs="{'invisible': [('base_state', '!=', 'calculated')]}"/>
                     <field name="kanban_step_id" widget="statusbar" clickable="True" options="{'fold_field': 'fold'}"/>
@@ -76,9 +81,10 @@
                         <group col="2" colspan="2">
                             <field name="type_id" />
                             <field name="order_id" attrs="{'invisible': [('type_id','not in', [%(of_contract_custom.of_contract_custom_type_installation)d, %(of_contract_custom.of_contract_custom_type_sav)d])]}"/>
-                            <field name="contract_id" attrs="{'invisible': [('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d, %(of_contract_custom.of_contract_custom_type_sav)d])]}"/>
+                            <field name="contract_id" attrs="{'invisible': ['|',('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d, %(of_contract_custom.of_contract_custom_type_sav)d]), ('recurrence','=', True)]}"/>
                             <field name="contract_line_id" context="{'display_address': True}"
-                                   attrs="{'invisible': [('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d, %(of_contract_custom.of_contract_custom_type_sav)d])]}"/>
+                                   attrs="{'invisible': ['|',('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d, %(of_contract_custom.of_contract_custom_type_sav)d]), ('recurrence','=', True)]}"/>
+                            <field name="recurrence" attrs="{'invisible': ['|','|',('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d]), ('contract_id','!=', False), ('contract_line_id','!=', False)]}" groups="!of_contract_custom.group_of_contract_custom_lecture"/>
                             <field name="contract_message" nolabel="1" colspan="2"/>
                         </group>
                         <group col="2" colspan="2">
@@ -128,6 +134,13 @@
                                 <field name="date_next" string="Entre le"/>
                                 <field name="date_fin" string="et le"/>
                                 <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('recurrence', '=', False)]}"/>
+                                <label for="recurring_interval" attrs="{'invisible': [('recurrence', '=', False)]}"/>
+                                <div attrs="{'invisible': [('recurrence', '=', False)]}" col="2">
+                                    <field name="recurring_interval" nolabel="1" class="oe_inline of_ws"/>
+                                    <field name="recurring_rule_type" nolabel="1" class="oe_inline"/>
+                                </div>
+                                <field name="recurrence_tache" invisible="1"/>
                             </group>
                         </group>
                     </group>
