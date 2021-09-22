@@ -1509,6 +1509,24 @@ class OfPlanningIntervention(models.Model):
             return template.ri_doc_joints(self)
         return []
 
+    @api.multi
+    def get_action_views(self, obj_source, action):
+        interv_count = len(self)
+        if len(obj_source._ids) == 1 and interv_count == 1:
+            # Mettre la vue form si on a un seul partenaire avec un seul RDV
+            views = [(self.env['ir.model.data'].xmlid_to_res_id(
+                'of_planning.of_planning_intervention_view_form'), 'form')]
+            views += [(view[0], view[1]) for view in action['views'] if view[1] != 'form']
+            action['views'] = views
+            action['res_id'] = self.id
+        elif interv_count > 1:
+            # changer l'ordre des vues de l'action est suffisant pour mettre la vue tree en première
+            views = [(self.env['ir.model.data'].xmlid_to_res_id(
+                'of_planning.of_planning_intervention_view_tree'), 'tree')]
+            views += [(view[0], view[1]) for view in action['views'] if view[1] != 'tree']
+            action['views'] = views
+        return action
+
 
 class OfPlanningInterventionLine(models.Model):
     _name = "of.planning.intervention.line"
@@ -1798,8 +1816,8 @@ class ResPartner(models.Model):
         action['domain'] = ['|', ('partner_id', 'child_of', self.ids), ('partner_id', 'child_of', self.ids)]
         if len(self._ids) == 1:
             context = safe_eval(action['context'])
-            action['context'] = str(self._get_action_view_intervention_context(context))
-
+            action['context'] = self._get_action_view_intervention_context(context)
+        action = self.mapped('intervention_ids').get_action_views(self, action)
         return action
 
 
@@ -1842,6 +1860,7 @@ class SaleOrder(models.Model):
                 context['force_date_start'] = self.intervention_ids[-1].date_date
                 context['search_default_order_id'] = self.id
             action['context'] = str(context)
+        action = self.mapped('intervention_ids').get_action_views(self, action)
         return action
 
     def fiche_intervention_cacher_montant(self):
@@ -1956,6 +1975,7 @@ class StockPicking(models.Model):
                 context['force_date_start'] = self.of_intervention_ids[-1].date_date
                 context['search_default_picking_id'] = self.id
             action['context'] = str(context)
+        action = self.mapped('of_intervention_ids').get_action_views(self, action)
         return action
 
 
