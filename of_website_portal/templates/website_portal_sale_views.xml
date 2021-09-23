@@ -30,6 +30,11 @@
         <xpath expr="//a[@href='/my/of_contracts']/.." position="attributes">
             <attribute name="groups">base.group_portal,base.group_user</attribute>
         </xpath>
+        <xpath expr="//a[@href='/my/invoices']/.." position="after">
+            <li groups="base.group_portal,base.group_user">
+                <a href="/my/deliveries">Livraisons</a>
+            </li>
+        </xpath>
     </template>
 
     <template id="portal_my_home_sale_b2c" name="Portal My Home : sales entries b2c" inherit_id="website_portal_sale.portal_my_home_sale">
@@ -41,6 +46,20 @@
         </xpath>
         <xpath expr="//a[@href='/my/of_contracts']/.." position="attributes">
             <attribute name="groups">base.group_portal,base.group_user</attribute>
+        </xpath>
+        <xpath expr="//a[@href='/my/invoices']/.." position="after">
+            <h3 class="page-header" groups="base.group_portal,base.group_user">
+                <a href="/my/deliveries">Vos livraisons
+                    <small class="ml8">
+                        <t t-if="delivery_count">
+                            <span class="badge"><t t-esc="delivery_count"/></span>
+                        </t>
+                        <t t-if="not delivery_count">
+                            Il n'y a actuellement pas de livraisons pour votre compte.
+                        </t>
+                    </small>
+                </a>
+            </h3>
         </xpath>
     </template>
 

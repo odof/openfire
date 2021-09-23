@@ -239,4 +239,37 @@
         </xpath>
     </template>
 
+    <!-- Portail - Livraisons -->
+    <template id="of_website_portal_portal_my_deliveries" name="OF My Contracts">
+        <t t-call="website_portal.portal_layout">
+            <h3 class="page-header">Vos livraisons</h3>
+            <t t-if="not deliveries">
+                <p>Il n'y a actuellement pas de contrats pour votre compte.</p>
+            </t>
+            <t t-if="deliveries">
+                <table class="table table-hover o_my_status_table">
+                    <thead>
+                        <tr class="active">
+                            <th>Livraison</th>
+                            <th>Adresse</th>
+                        </tr>
+                    </thead>
+                    <t t-foreach="deliveries" t-as="delivery">
+                        <tr>
+                            <td>
+                                <a t-att-href="'/my/deliveries/pdf/'+str(delivery.id)" t-att-title="delivery.display_name"><t t-esc="delivery.display_name"/></a>
+                            </td>
+                            <td>
+                                <span t-field="delivery.partner_id" t-options='{"widget": "contact", "fields": ["city"], "no_marker": True}'/>
+                            </td>
+                        </tr>
+                    </t>
+                </table>
+                <div t-if="pager" class="o_portal_pager text-center">
+                    <t t-call="website.pager" />
+                </div>
+            </t>
+        </t>
+    </template>
+
 </odoo>
