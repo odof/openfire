@@ -20,9 +20,25 @@ class SaleOrder(models.Model):
             else:
                 order.of_requested_week = ""
 
+    def pdf_display_requested_week(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'of_pdf_display_requested_week')
+
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     of_order_requested_week = fields.Char(
         string=u"Semaine demandée", related='order_id.of_requested_week', readonly=True, store=True)
+
+
+class SaleConfigSettings(models.TransientModel):
+    _inherit = 'sale.config.settings'
+
+    of_pdf_display_requested_week = fields.Boolean(
+        string=u"(OF) Afficher pastille 'Semaine demandée'", required=True, default=False,
+        help=u"Afficher la pastille 'Semaine demandée' dans les rapports PDF ?")
+
+    @api.multi
+    def set_of_pdf_display_requested_week(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_pdf_display_requested_week', self.of_pdf_display_requested_week)

@@ -8,6 +8,7 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@name='volume']" position="after">
                 <field name="of_nbr_pallets"/>
+                <field name="of_packages"/>
             </xpath>
         </field>
     </record>

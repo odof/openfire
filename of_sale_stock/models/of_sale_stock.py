@@ -169,6 +169,7 @@ class SaleOrderLine(models.Model):
     of_has_reordering_rule = fields.Boolean(
         string=u"Gérer sur règle de stock", compute='_compute_of_has_reordering_rule',
         help=u"L'article dispose de règles de réapprovisionnement.")
+    of_client_order_ref = fields.Char(string=u"Référence Client", related='order_id.client_order_ref', readonly=True)
 
     @api.onchange('route_id')
     def _get_route_id(self):

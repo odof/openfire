@@ -32,6 +32,7 @@ Stock pickings
         'l10n_fr_department',
         'of_stock',
         'of_base',
+        'delivery',
         ],
     'data': [
         'security/ir.model.access.csv',

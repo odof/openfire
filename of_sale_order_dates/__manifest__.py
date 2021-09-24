@@ -16,6 +16,7 @@ Ce module surcharge le module standard Dates sur Commandes de Vente
         'of_sale_stock',
     ],
     'data': [
+        'reports/sale_report_templates.xml',
         'views/sale_views.xml',
     ],
     'installable': True,

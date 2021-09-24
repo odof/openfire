@@ -21,7 +21,7 @@ class StockPickingLogisticRate(models.Model):
     min_weight = fields.Float(string="Min. weight")
     max_weight = fields.Float(string="Max. weight")
     rate = fields.Float(string="Computed rate")
-    constraint = fields.Selection(selection=lambda s : s._get_constraint_selection(), string="Constraint")
+    constraint = fields.Selection(selection=lambda s: s._get_constraint_selection(), string="Constraint")
     selected = fields.Boolean(string="Selected")
 
 
@@ -35,6 +35,7 @@ class StockPicking(models.Model):
     of_total_weight = fields.Float(string="Total weight")
     of_rate_ids = fields.One2many(
         comodel_name='of.stock.picking.logistic.rate', inverse_name='picking_id', string="Computed rates")
+    of_packages = fields.Integer(string="Packages")
 
     @api.depends('partner_id')
     def _compute_of_department_id(self):
@@ -47,7 +48,8 @@ class StockPicking(models.Model):
         total_pallets = 0
         total_volume = 0.0
         total_weight = 0.0
-        for line in self.move_lines:
+        total_packages = 0
+        for line in self.move_lines.filtered(lambda m: m.state != 'cancel'):
             product = line.product_id
             product_uom = product.uom_id
             move_uom = line.product_uom
@@ -57,10 +59,12 @@ class StockPicking(models.Model):
             total_pallets += qty * product.of_nbr_pallets
             total_volume += qty * product.volume
             total_weight += qty * product.weight
+            total_packages += qty * product.of_packages
         self.write({
-            'of_nbr_pallets' : total_pallets,
+            'of_nbr_pallets': total_pallets,
             'of_total_volume': total_volume,
             'of_total_weight': total_weight,
+            'of_packages': total_packages,
             })
 
     @api.multi
@@ -125,10 +129,12 @@ class StockPicking(models.Model):
 class StockMove(models.Model):
     _inherit = 'stock.move'
 
-    of_product_weight = fields.Float(string="Weight", compute='_compute_of_product_weight')
+    of_product_weight = fields.Float(string="Weight", compute='_compute_of_logistic_product_info')
+    of_pallets = fields.Integer(string="Pallets", compute='_compute_of_logistic_product_info')
+    of_packages = fields.Integer(string="Packages", compute='_compute_of_logistic_product_info')
 
     @api.depends('product_id', 'product_uom', 'product_uom_qty')
-    def _compute_of_product_weight(self):
+    def _compute_of_logistic_product_info(self):
         for move in self:
             if move.product_id:
                 product = move.product_id
@@ -138,15 +144,19 @@ class StockMove(models.Model):
                 # _compute_price also works for quantities since it only applies the factors
                 qty = move_uom._compute_price(move.product_uom_qty, product_uom)
                 move.of_product_weight = qty * product.weight
+                move.of_pallets = qty * product.of_nbr_pallets
+                move.of_packages = qty * product.of_packages
 
 
 class StockPackOperation(models.Model):
     _inherit = 'stock.pack.operation'
 
-    of_product_weight = fields.Float(string="Weight", compute='_compute_of_product_weight')
+    of_product_weight = fields.Float(string="Weight", compute='_compute_of_logistic_product_info')
+    of_pallets = fields.Integer(string="Pallets", compute='_compute_of_logistic_product_info')
+    of_packages = fields.Integer(string="Packages", compute='_compute_of_logistic_product_info')
 
     @api.depends('product_id', 'product_qty', 'product_uom_id')
-    def _compute_of_product_weight(self):
+    def _compute_of_logistic_product_info(self):
         for operation in self:
             if operation.product_id:
                 product = operation.product_id
@@ -156,3 +166,5 @@ class StockPackOperation(models.Model):
                 # _compute_price also works for quantities since it only applies the factors
                 qty = operation_uom._compute_price(operation.product_qty, product_uom)
                 operation.of_product_weight = qty * product.weight
+                operation.of_pallets = qty * product.of_nbr_pallets
+                operation.of_packages = qty * product.of_packages

@@ -327,34 +327,6 @@ msgstr "Le poids maximum doit être supérieur au poids minimum."
 #: model:ir.ui.view,arch_db:of_logistic.of_logistic_delivery_report_document
 #: model:ir.ui.view,arch_db:of_logistic.of_specific_logistic_delivery_report_document
 #: model:ir.ui.view,arch_db:of_logistic.of_logistic_report_picking
-msgid "<span> Kg</span>"
-msgstr "<span> Kg</span>"
-
-#. module: of_logistic
-#: model:ir.ui.view,arch_db:of_logistic.of_logistic_delivery_report_document
-#: model:ir.ui.view,arch_db:of_logistic.of_specific_logistic_delivery_report_document
-#: model:ir.ui.view,arch_db:of_logistic.of_logistic_report_picking
-msgid "<span> pallets</span>"
-msgstr "<span> palettes</span>"
-
-#. module: of_logistic
-#: model:ir.ui.view,arch_db:of_logistic.of_logistic_delivery_report_document
-#: model:ir.ui.view,arch_db:of_logistic.of_specific_logistic_delivery_report_document
-#: model:ir.ui.view,arch_db:of_logistic.of_logistic_report_picking
-msgid "<strong><span>Nbr. of pallets&amp;nbsp;:</span></strong>"
-msgstr "<strong><span>Palettes&amp;nbsp;:</span></strong>"
-
-#. module: of_logistic
-#: model:ir.ui.view,arch_db:of_logistic.of_logistic_delivery_report_document
-#: model:ir.ui.view,arch_db:of_logistic.of_specific_logistic_delivery_report_document
-#: model:ir.ui.view,arch_db:of_logistic.of_logistic_report_picking
-msgid "<strong><span>Total weight&amp;nbsp;:</span></strong>"
-msgstr "<strong><span>Poids total&amp;nbsp;:</span></strong>"
-
-#. module: of_logistic
-#: model:ir.ui.view,arch_db:of_logistic.of_logistic_delivery_report_document
-#: model:ir.ui.view,arch_db:of_logistic.of_specific_logistic_delivery_report_document
-#: model:ir.ui.view,arch_db:of_logistic.of_logistic_report_picking
 msgid "<strong>Logistic</strong>"
 msgstr "<strong>Logistique</strong>"
 
@@ -362,5 +334,48 @@ msgstr "<strong>Logistique</strong>"
 #: model:ir.ui.view,arch_db:of_logistic.of_logistic_delivery_report_document
 #: model:ir.ui.view,arch_db:of_logistic.of_specific_logistic_delivery_report_document
 #: model:ir.ui.view,arch_db:of_logistic.of_logistic_report_picking
+msgid "<strong>Total weight</strong>"
+msgstr "<strong>Poids total</strong>"
+
+#. module: of_logistic
+#: model:ir.ui.view,arch_db:of_logistic.of_logistic_delivery_report_document
+#: model:ir.ui.view,arch_db:of_logistic.of_specific_logistic_delivery_report_document
+#: model:ir.ui.view,arch_db:of_logistic.of_logistic_report_picking
+msgid "<strong>Pallets</strong>"
+msgstr "<strong>Palettes</strong>"
+
+#. module: of_logistic
+#: model:ir.ui.view,arch_db:of_logistic.of_logistic_delivery_report_document
+#: model:ir.ui.view,arch_db:of_logistic.of_specific_logistic_delivery_report_document
+#: model:ir.ui.view,arch_db:of_logistic.of_logistic_report_picking
+msgid "<strong>Packages</strong>"
+msgstr "<strong>Colis</strong>"
+
+#. module: of_logistic
+#: model:ir.ui.view,arch_db:of_logistic.of_logistic_delivery_report_document
+#: model:ir.ui.view,arch_db:of_logistic.of_specific_logistic_delivery_report_document
+#: model:ir.ui.view,arch_db:of_logistic.of_logistic_report_picking
+msgid "<span> kg</span>"
+msgstr "<span> kg</span>"
+
+#. module: of_logistic
+#: model:ir.ui.view,arch_db:of_logistic.of_logistic_delivery_report_document
+#: model:ir.ui.view,arch_db:of_logistic.of_specific_logistic_delivery_report_document
+#: model:ir.ui.view,arch_db:of_logistic.of_logistic_report_picking
 msgid "<strong>Weight</strong>"
 msgstr "<strong>Poids</strong>"
+
+#. module: of_logistic
+#: model:ir.model.fields,field_description:of_logistic.field_stock_move_of_pallets
+#: model:ir.model.fields,field_description:of_logistic.field_stock_pack_operation_of_pallets
+msgid "Pallets"
+msgstr "Palettes"
+
+#. module: of_logistic
+#: model:ir.model.fields,field_description:of_logistic.field_product_template_of_packages
+#: model:ir.model.fields,field_description:of_logistic.field_stock_picking_of_packages
+#: model:ir.model.fields,field_description:of_logistic.field_stock_move_of_packages
+#: model:ir.model.fields,field_description:of_logistic.field_stock_pack_operation_of_packages
+#: model:ir.model.fields,field_description:of_logistic.field_of_specific_delivery_report_wizard_packages
+msgid "Packages"
+msgstr "Colis"
