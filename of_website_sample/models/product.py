@@ -87,27 +87,6 @@ class ProductTemplate(models.Model):
             if self.sample_id:
                 self.sample_id.active = args['active']
 
-        # ###############
-        # Code utilisé si les sample sont en website_published. On part sur un non
-        # ###############
-        # On teste False et True car active peut être à None
-        # Si on publie/dépublie le parent, on publie/dépublie l'enfant
-        # Et si on publie l'enfant, on veut que le parent soit publié mais pas inversement
-        # if website_published == True:
-        #     if self.sample_id:
-        #         self.sample_id.write({
-        #             "website_published": False,
-        #         })
-        #     if self.sample_parent_id:
-        #         self.sample_id.write({
-        #             "website_published": True,
-        #         })
-        # elif website_published == False:
-        #     if self.sample_id:
-        #         self.sample_id.write({
-        #             "website_published": False,
-        #         })
-
         # On ne veut pas qu'un sample apparaisse dans le shop
         if website_published == True:
             if self.is_sample:

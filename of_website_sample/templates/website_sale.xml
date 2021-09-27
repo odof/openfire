@@ -42,14 +42,4 @@
         </xpath>
     </template>
 
-
-    <!-- Code utilisé si les sample sont en website_published. On part sur un non -->
-    <!--    <template id="products" inherit_id="website_sale.products" name="Products">-->
-    <!--        <xpath expr="//div[@class='oe_product_cart']" position="attributes">-->
-    <!--            <attribute name="t-att-data-publish">product.website_published and not product.is_sample and 'on' or 'off'</attribute>-->
-    <!--            <attribute name="t-if">not product.is_sample</attribute>-->
-    <!--            <attribute name="t-att-product">product</attribute>-->
-    <!--        </xpath>-->
-    <!--    </template>-->
-
 </odoo>

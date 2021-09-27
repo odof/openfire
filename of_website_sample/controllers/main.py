@@ -15,6 +15,7 @@ from odoo.addons.website_form.controllers.main import WebsiteForm
 
 _logger = logging.getLogger(__name__)
 
+
 class WebsiteSaleSample(WebsiteSale):
 
     @http.route(['/shop/cart/update'], type='http', auth="public", methods=['POST'], website=True, csrf=False)
@@ -45,7 +46,6 @@ class WebsiteSaleSample(WebsiteSale):
             attributes=self._filter_attributes(**kw),
         )
         return request.redirect("/shop/cart")
-
 
     @http.route(['/shop/product/<model("product.template"):product>'], type='http', auth="public", website=True)
     def product(self, product, category='', search='', **kwargs):
