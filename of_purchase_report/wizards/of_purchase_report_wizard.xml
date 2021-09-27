@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_purchase_report_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.purchase.report.wizard.view.form</field>
+        <field name="model">of.purchase.report.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <separator string="Rapport sur mesure"/>
+                <group col="4" colspan="2">
+                    <field name="type"/>
+                    <field name="date"/>
+                </group>
+                <separator string="Sociétés"/>
+                <group>
+                    <field name="user_company_id" invisible="1"/>
+                    <field name="company_ids" widget="many2many_tags" domain="[('id', 'child_of', user_company_id)]"/>
+                </group>
+                <footer>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                        <span attrs="{'invisible': [('file', '=', False)]}">
+                            Télécharger
+                            <field name="file_name" invisible="1"/>
+                            <field name="file" filename="file_name" readonly="1"/>
+                            ou
+                        </span>
+                        <button string="(Re)générer le document" name="button_print" type="object" class="btn-primary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window
+        id="action_of_purchase_report"
+        name="Rapports de gestion"
+        res_model="of.purchase.report.wizard"
+        view_mode="form"
+        view_type="form"
+        view_id="of_purchase_report_wizard_view_form"
+        target="new"/>
+
+    <menuitem name="Rapports" id="menu_of_purchase_report" parent="purchase.menu_purchase_root" sequence="99"/>
+    <record id="purchase.purchase_report" model="ir.ui.menu">
+        <field name="name">Analyse des achats</field>
+        <field name="parent_id" ref="of_purchase_report.menu_of_purchase_report"/>
+        <field name="sequence" eval="10"/>
+    </record>
+    <menuitem name="Rapports de gestion" sequence="50" action="action_of_purchase_report"
+              id="menu_of_purchase_report_reports"
+              parent="of_purchase_report.menu_of_purchase_report"/>
+
+</odoo>

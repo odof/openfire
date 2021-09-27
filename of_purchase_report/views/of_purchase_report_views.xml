@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="purchase_report_purchase_order_form" model="ir.ui.view">
+        <field name="name">of.purchase.report.purchase.order.form</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="groups_id" eval="[(4, ref('base.group_no_one'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/tree" position="attributes">
+                <attribute name="editable"></attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="purchase_order_line_form2" model="ir.ui.view">
+        <field name="name">of.purchase.report.purchase.order.line.form</field>
+        <field name="model">purchase.order.line</field>
+        <field name="inherit_id" ref="purchase.purchase_order_line_form2"/>
+        <field name="arch" type="xml">
+            <!-- Définition de la vue liste des factures pour pouvoir retirer les options de création et édition -->
+            <xpath expr="//field[@name='invoice_lines']" position="attributes">
+                <attribute name="readonly">False</attribute>
+            </xpath>
+            <xpath expr="//field[@name='invoice_lines']" position="inside">
+                <tree edit="false" create="false">
+                    <field name="invoice_id"/>
+                    <field name="name"/>
+                    <field name="account_id"/>
+                    <field name="quantity"/>
+                    <field name="uom_id"/>
+                    <field name="price_unit"/>
+                    <field name="discount"/>
+                    <field name="price_subtotal"/>
+                </tree>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_purchase_report_invoice_supplier_form" model="ir.ui.view">
+        <field name="name">of.purchase.report.account.invoice.supplier.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_supplier_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']/tree" position="attributes">
+                <attribute name="editable"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_purchase_report_account_invoice_line_form" model="ir.ui.view">
+        <field name="name">of.purchase.report.account.invoice.line.form</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="account.view_invoice_line_form"/>
+        <field name="arch" type="xml">
+            <!-- ajout du champ pour le lien à la commande fournisseur -->
+            <xpath expr="//field[@name='purchase_id']" position="after">
+                <field name="of_purchase_id"
+                       invisible="context.get('type') in ('out_invoice', 'out_refund', 'in_refund')"
+                       attrs="{'invisible': [('purchase_id', '!=', False)]}"
+                       domain="[('state','in',('draft','purchase')),
+                                parent and ('partner_id','=',parent.partner_id) or (1,'=',1)])"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_purchase_report_view_picking_form" model="ir.ui.view">
+        <field name="name">of.purchase.report.stock.picking.form</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock_account.view_picking_inherit_form2"/>
+        <field name="arch" type="xml">
+            <!-- Ajout du type de mouvement dans le contexte (picking_type_code) -->
+            <xpath expr="//field[@name='move_lines']" position="attributes">
+                <attribute name="context">{'address_in_id': partner_id, 'form_view_ref':'stock.view_move_picking_form', 'tree_view_ref':'stock.view_move_picking_tree', 'default_picking_type_id': picking_type_id, 'default_location_id': location_id, 'default_location_dest_id': location_dest_id, 'of_picking_type_code': picking_type_code}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_purchase_report_view_move_picking_tree" model="ir.ui.view">
+        <field name="name">of.purchase.report.stock.move.tree</field>
+        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="stock.view_move_picking_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="purchase_line_id" invisible="1"/>
+                <field name="of_purchase_id"
+                       invisible="context.get('of_picking_type_code') != 'incoming'"
+                       attrs="{'readonly': [('purchase_line_id', '!=', False)]}"
+                       domain="[('state','in',('draft','purchase')),
+                                parent and ('partner_id','=',parent.partner_id) or (1,'=',1)])"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
