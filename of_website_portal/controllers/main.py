@@ -111,3 +111,12 @@ class WebsiteAccount(website_account):
             ('Content-Disposition', 'attachment; filename=Commande.pdf;')
         ]
         return request.make_response(pdf, headers=pdfhttpheaders)
+
+    @http.route(['/of_validate_sale_order'], type='http', methods=['POST'], auth="user", website=True)
+    def of_validate_sale_order(self, **kw):
+        if kw.get('order_id', False):
+            order = request.env['sale.order'].browse([int(kw['order_id'])])
+            if order:
+                order.sudo().state = 'sale'
+
+        return request.redirect('/my/quotes')
