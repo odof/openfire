@@ -70,6 +70,8 @@ class OfService(models.Model):
 
     type_id = fields.Many2one(
         comodel_name='of.service.type', string="Type", required=True,)
+    of_categorie_id = fields.Many2one('of.project.issue.categorie', string=u"Catégorie", ondelete='restrict')
+    of_canal_id = fields.Many2one('of.project.issue.canal', string=u"Canal", ondelete='restrict')
     partner_code_magasin = fields.Char(string="Code magasin", related="partner_id.of_code_magasin", readonly=True)
     # partner_id.category_id est un M2M
     partner_tag_ids = fields.Many2many(string=u"Étiquettes client", related='partner_id.category_id', readonly=True)
@@ -107,10 +109,16 @@ class OfService(models.Model):
         domain="[('type_ids','=',type_id)]"
     )
     state = fields.Selection(track_visibility='onchange')
+    parc_type_garantie = fields.Selection(related='parc_installe_id.type_garantie')
     contract_message = fields.Char(string="Infos SAV du contrat", compute="_compute_contract_message")
     employee_ids = fields.Many2many(
         comodel_name='hr.employee', string="Intervenants", domain=lambda self: self._domain_employee_ids()
     )
+    payer_mode = fields.Selection([
+        ('client', u"Client"),
+        ('retailer', u"Revendeur"),
+        ('manufacturer', u"Fabricant"),
+    ], string=u"Payeur")
     last_attachment_id = fields.Many2one(
         comodel_name='ir.attachment', string=u"Dernier rapport", compute="_compute_last_attachment_id"
     )

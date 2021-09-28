@@ -103,8 +103,9 @@
                                    attrs="{'readonly': [('number', '!=', False), ('base_state', 'not in', ('draft', 'cancel'))]}"/>
                             <field name="order_id" attrs="{'invisible': [('type_id','not in', [%(of_contract_custom.of_contract_custom_type_installation)d, %(of_contract_custom.of_contract_custom_type_maintenance)d, %(of_contract_custom.of_contract_custom_type_sav)d])]}"/>
                             <field name="contract_id" attrs="{'invisible': ['|', ('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d, %(of_contract_custom.of_contract_custom_type_sav)d]), ('recurrence','=', True)]}"/>
-                            <field name="contract_line_id" context="{'display_address': True}"
-                                   attrs="{'invisible': ['|', '|', ('contract_id', '=', False), ('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d, %(of_contract_custom.of_contract_custom_type_sav)d]), ('recurrence','=', True)]}"/>
+                            <field name="contract_line_id" context="{'display_address': True}" domain="[('contract_id', '=', contract_id)]"
+                                   attrs="{'invisible': ['|', '|', ('contract_id', '=', False), ('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d, %(of_contract_custom.of_contract_custom_type_sav)d]), ('recurrence','=', True)]
+                                           'required': [('contract_id', '!=', False)]}"/>
                             <field name="recurrence" attrs="{'invisible': ['|', '|', ('type_id','not in',[%(of_contract_custom.of_contract_custom_type_maintenance)d]), ('contract_id','!=', False), ('contract_line_id','!=', False)]}" groups="!of_contract_custom.group_of_contract_custom_lecture"/>
                             <field name="contract_message" nolabel="1" colspan="2"/>
                         </group>

@@ -21,6 +21,7 @@ Module Parc installé : gestion des produits installés avec no de série.
         'of_product_brand',
     ],
     'data': [
+        'data/of_parc_installe_data.xml',
         'security/ir.model.access.csv',
         'security/of_parc_installe_security.xml',
         'views/of_parc_installe_view.xml',

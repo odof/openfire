@@ -31,9 +31,15 @@
         <field name="active">False</field>
     </record>
 
-    <delete model="ir.ui.menu" id="of_project_issue.menu_of_planning_intervention_sav"/>
-    <delete model="ir.ui.menu" id="of_project_issue.of_menu_project_issue_ventes"/>
-    <delete model="ir.ui.menu" id="of_project_issue.menu_of_project_issue_categorie_action_form"/>
-    <delete model="ir.ui.menu" id="of_project_issue.menu_of_project_issue_tag_action_form"/>
+    <!-- migrer les SAV dans les DI -->
+    <function model="project.issue" name="migrer_sav_di"/>
+
+    <!-- déplacer le menu des catégories de SAV -->
+    <menuitem id="of_project_issue.menu_of_project_issue_categorie_action_form"
+              parent="of_planning.menu_of_planning_configuration_res"/>
+    <!-- masquer les menus des SAV et étiquettes de SAV -->
+    <menuitem id="of_project_issue.menu_of_planning_intervention_sav" groups="of_base.of_group_hidden"/>
+    <menuitem id="of_project_issue.of_menu_project_issue_ventes" groups="of_base.of_group_hidden"/>
+    <menuitem id="of_project_issue.menu_of_project_issue_tag_action_form" groups="of_base.of_group_hidden"/>
 
 </odoo>
