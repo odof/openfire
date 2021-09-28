@@ -493,6 +493,20 @@
         </field>
     </record>
 
+    <record id="of_kit_view_invoice_form" model="ir.ui.view">
+        <field name="name">of.kit.account.invoice.supplier.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_supplier_form"/>
+        <field name="arch" type="xml">
+            <!-- Ajout de la tarification dans la vue liste des lignes de factures
+                 pour éviter des erreurs pour les modules dont l'édition est en mode formulaire
+                 cas : chargement d'une commande fournisseur, ouverture et édition de la ligne, sauvegarde -->
+            <xpath expr="//field[@name='invoice_line_ids']/tree" position="inside">
+                <field name="of_pricing" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
     <record id="of_kit_view_invoice_line_form" model="ir.ui.view">
         <field name="name">of.kit.account.invoice.line.form</field>
         <field name="model">account.invoice.line</field>

@@ -57,6 +57,11 @@ class AccountInvoice(models.Model):
                     vals[2]['kit_id'] = kit_obj.browse(vals[2]['kit_id']).copy().id
         return result
 
+    def _prepare_invoice_line_from_po_line(self, line):
+        data = super(AccountInvoice, self)._prepare_invoice_line_from_po_line(line)
+        data['of_pricing'] = 'fixed'
+        return data
+
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
