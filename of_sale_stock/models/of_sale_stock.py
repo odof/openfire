@@ -182,6 +182,11 @@ class StockInventoryLine(models.Model):
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
+    @api.model
+    def _default_warehouse_id(self):
+        return self.env.user.company_id.of_default_warehouse_id
+
+    warehouse_id = fields.Many2one(default=lambda self: self._default_warehouse_id())
     of_picking_min_date = fields.Datetime(
         compute=lambda x: False, search='_search_of_picking_min_date', string="Date bon de livraison")
     of_picking_date_done = fields.Datetime(

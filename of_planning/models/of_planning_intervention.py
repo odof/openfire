@@ -364,11 +364,12 @@ class OfPlanningIntervention(models.Model):
         fetch = cr.fetchall()
         if fetch:
             ids = [tup[0] for tup in fetch]
-            cr.execute("UPDATE of_planning_intervention ofp "
-                       "SET warehouse_id = sw.id "
-                       "FROM stock_warehouse sw "
-                       "WHERE sw.company_id = ofp.company_id "
-                       "  AND ofp.id IN %s", (tuple(ids),))
+            cr.execute(
+                "UPDATE of_planning_intervention ofp "
+                "SET warehouse_id = rc.of_default_warehouse_id "
+                "FROM res_company rc "
+                "WHERE rc.id = ofp.company_id "
+                "  AND ofp.id IN %s", (tuple(ids),))
         if not exists:
             records_to_update = self.search([('description', '!=', False)])
             for rec in records_to_update:
@@ -1258,8 +1259,7 @@ class OfPlanningIntervention(models.Model):
     @api.onchange('company_id')
     def onchange_company_id(self):
         if self.company_id:
-            company_id = self.company_id.id
-            warehouse_id = self.env['stock.warehouse'].search([('company_id', '=', company_id)], limit=1)
+            warehouse_id = self.company_id.of_default_warehouse_id
             if not warehouse_id:
                 warehouse_id = self.env['stock.warehouse'].search([], limit=1)
             self.warehouse_id = warehouse_id
