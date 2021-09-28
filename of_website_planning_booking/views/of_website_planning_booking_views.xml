@@ -19,7 +19,7 @@
         <field name="model">of.parc.installe</field>
         <field name="inherit_id" ref="of_parc_installe.of_parc_installe_form_view"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='date_fin_garantie']" position="after">
+            <xpath expr="//field[@name='date_installation']" position="after">
                 <field name="annee_batiment"/>
             </xpath>
         </field>

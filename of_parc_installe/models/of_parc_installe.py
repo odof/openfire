@@ -7,7 +7,6 @@ from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
 
 class OFParcInstalle(models.Model):
     """Parc installé"""
-
     _name = 'of.parc.installe'
     _description = u"Parc installé"
 
@@ -15,6 +14,11 @@ class OFParcInstalle(models.Model):
     date_service = fields.Date("Date vente", required=False)
     date_installation = fields.Date("Date d'installation", required=False)
     date_fin_garantie = fields.Date(string="Fin de garantie")
+    type_garantie = fields.Selection([
+        ('initial', u"Initiale"),
+        ('extension', u"Extension"),
+        ('expired', u"Expirée"),
+    ], string=u"Type de garantie")
     product_id = fields.Many2one('product.product', 'Produit', required=True, ondelete='restrict')
     product_category_id = fields.Many2one('product.category', string=u'Catégorie')
     client_id = fields.Many2one(
@@ -227,6 +231,19 @@ class OFParcInstalle(models.Model):
                                   'default_of_produit_installe_id': parc_installe.id,
                                   'default_of_type': 'di'}
         return res
+
+    # Autres
+
+    @api.model
+    def recompute_type_garantie_daily(self):
+        today = fields.Date.today()
+        all_parc_date_garantie = self.search([('date_fin_garantie', '!=', False)])
+        # initialiser l'état de garantie pour les parcs qui ont une date de garantie future
+        parc_garantie = all_parc_date_garantie.filtered(lambda p: p.date_fin_garantie >= today and not p.type_garantie)
+        parc_garantie.write({'type_garantie': 'initial'})
+        # Passer l'état de garantie à "Expirée" pour les parcs dont la date de garantie est future
+        parc_expire = all_parc_date_garantie.filtered(lambda p: p.date_fin_garantie < today)
+        parc_expire.write({'type_garantie': 'expired'})
 
 
 class ResPartner(models.Model):
