@@ -112,9 +112,6 @@
                     </div>
                 </button>
             </xpath>
-            <xpath expr="//field[@name='date_installation']" position="after">
-                <field name="date_fin_garantie"/>
-            </xpath>
             <xpath expr="//notebook" position="inside">
                 <page string="Historique des interventions">
                     <group name="intervention">
