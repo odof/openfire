@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-
-from odoo import models, fields, api, _, SUPERUSER_ID
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo import models, api, _, SUPERUSER_ID
 from odoo.exceptions import UserError
 
 
@@ -21,34 +17,28 @@ class StockWarehouse(models.Model):
         # Pour les entrepôts
         for warehouse in self.with_context(active_test=False).search([]):
             company_id = res_company_obj.with_context(active_test=False).search(
-                [('id','parent_of',warehouse.company_id.ids), ('parent_id','=',False)])
+                [('id', 'parent_of', warehouse.company_id.ids), ('parent_id', '=', False)])
             warehouse.company_id = company_id.id
 
         # Pour les emplacements
-        for location in stock_location_obj.with_context(active_test=False).search([('active','=',True)]):
+        for location in stock_location_obj.with_context(active_test=False).search([('active', '=', True)]):
             if location.usage == 'internal':
                 company_id = res_company_obj.with_context(active_test=False).search(
-                    [('id','parent_of',location.company_id.ids), ('parent_id','=',False)])
+                    [('id', 'parent_of', location.company_id.ids), ('parent_id', '=', False)])
                 location.company_id = company_id.id
             else:
                 location.company_id = False
 
         # Pour les quants
-        company_ids = res_company_obj.with_context(active_test=False).search([('parent_id','=',False)])
+        company_ids = res_company_obj.with_context(active_test=False).search([('parent_id', '=', False)])
         for company_id in company_ids:
-            quants = stock_quant_obj.with_context(active_test=False).search([('company_id','child_of',company_id.ids)])
+            quants = stock_quant_obj.with_context(active_test=False).search(
+                [('company_id', 'child_of', company_id.ids)])
             if quants:
                 quants.write({'company_id': company_id.id})
 
-        # Pour les quants
-        for quant in stock_quant_obj.with_context(active_test=False).search([]):
-            company_id = res_company_obj.with_context(active_test=False).search(
-                [('id','parent_of',quant.company_id.ids), ('parent_id','=',False)])
-            quant.company_id = company_id.id
-
         # Pour les routes
-        for location_route in stock_location_route_obj.with_context(active_test=False).search([]):
-            location_route.company_id = False
+        stock_location_route_obj.with_context(active_test=False).search([]).write({'company_id': False})
 
     @api.model
     def create(self, vals):
@@ -65,7 +55,7 @@ class StockWarehouse(models.Model):
         if 'company_id' in vals:
             # On bloque tout le monde, sauf l'admin car nécessaire pour le _auto_init()
             if self.env.uid != SUPERUSER_ID:
-                raise UserError(_("Vous ne pouvez pas modifier la société d'un entrepôt"))
+                raise UserError(_(u"Vous ne pouvez pas modifier la société d'un entrepôt"))
         return super(StockWarehouse, self).write(vals)
 
 
@@ -77,7 +67,7 @@ class StockLocation(models.Model):
         if 'company_id' in vals:
             if vals['usage'] == 'internal':
                 company_id = self.env['res.company'].search(
-                    [('id','parent_of',[vals['company_id']]), ('parent_id','=',False)])
+                    [('id', 'parent_of', [vals['company_id']]), ('parent_id', '=', False)])
                 vals['company_id'] = company_id.id
             else:
                 vals['company_id'] = False
@@ -88,7 +78,7 @@ class StockLocation(models.Model):
         if 'company_id' in vals:
             # On bloque tout le monde, sauf l'admin car nécessaire pour le _auto_init()
             if self.env.uid != SUPERUSER_ID:
-                raise UserError(_("Vous ne pouvez pas modifier la société d'un emplacement"))
+                raise UserError(_(u"Vous ne pouvez pas modifier la société d'un emplacement"))
         return super(StockLocation, self).write(vals)
 
 
@@ -106,7 +96,7 @@ class StockLocationRoute(models.Model):
         if 'company_id' in vals:
             # On bloque tout le monde, sauf l'admin car nécessaire pour le _auto_init()
             if self.env.uid != SUPERUSER_ID:
-                raise UserError(_("Vous ne pouvez pas modifier la société d'une route"))
+                raise UserError(_(u"Vous ne pouvez pas modifier la société d'une route"))
         return super(StockLocationRoute, self).write(vals)
 
 
@@ -164,7 +154,7 @@ class StockQuant(models.Model):
     def create(self, vals):
         if 'company_id' in vals:
             company_id = self.env['res.company'].search(
-                [('id','parent_of',[vals['company_id']]), ('parent_id','=',False)])
+                [('id', 'parent_of', [vals['company_id']]), ('parent_id', '=', False)])
             vals['company_id'] = company_id.id
         return super(StockQuant, self).create(vals)
 
@@ -173,7 +163,7 @@ class StockQuant(models.Model):
         if 'company_id' in vals:
             # On bloque tout le monde, sauf l'admin car nécessaire pour le _auto_init()
             if self.env.uid != SUPERUSER_ID:
-                raise UserError(_("Vous ne pouvez pas modifier la société d'un quant"))
+                raise UserError(_(u"Vous ne pouvez pas modifier la société d'un quant"))
         return super(StockQuant, self).write(vals)
 
 
@@ -181,47 +171,9 @@ class ProcurementOrder(models.Model):
     _inherit = 'procurement.order'
 
     def _get_stock_move_values(self):
-        ''' Returns a dictionary of values that will be used to create a stock move from a procurement.
-        This function assumes that the given procurement has a rule (action == 'move') set on it.
-
-        :param procurement: browse record
-        :rtype: dictionary
-        '''
-        group_id = False
-        if self.rule_id.group_propagation_option == 'propagate':
-            group_id = self.group_id.id
-        elif self.rule_id.group_propagation_option == 'fixed':
-            group_id = self.rule_id.group_id.id
-        date_expected = (datetime.strptime(self.date_planned, DEFAULT_SERVER_DATETIME_FORMAT) -
-                         relativedelta(days=self.rule_id.delay or 0)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-        # it is possible that we've already got some move done, so check for the done qty and create
-        # a new move with the correct qty
-        qty_done = sum(self.move_ids.filtered(lambda move: move.state == 'done').mapped('product_uom_qty'))
-        qty_left = max(self.product_qty - qty_done, 0)
-        return {
-            'name': self.name[:2000],
-            'company_id': self.company_id.id,
-            'product_id': self.product_id.id,
-            'product_uom': self.product_uom.id,
-            'product_uom_qty': qty_left,
-            'partner_id': self.rule_id.partner_address_id.id or (self.group_id and self.group_id.partner_id.id) or
-                False,
-            'location_id': self.rule_id.location_src_id.id,
-            'location_dest_id': self.location_id.id,
-            'move_dest_id': self.move_dest_id and self.move_dest_id.id or False,
-            'procurement_id': self.id,
-            'rule_id': self.rule_id.id,
-            'procure_method': self.rule_id.procure_method,
-            'origin': self.origin,
-            'picking_type_id': self.rule_id.picking_type_id.id,
-            'group_id': group_id,
-            'route_ids': [(4, route.id) for route in self.route_ids],
-            'warehouse_id': self.rule_id.propagate_warehouse_id.id or self.rule_id.warehouse_id.id,
-            'date': date_expected,
-            'date_expected': date_expected,
-            'propagate': self.rule_id.propagate,
-            'priority': self.priority,
-        }
+        result = super(ProcurementOrder, self)._get_stock_move_values()
+        result['company_id'] = self.company_id.id
+        return result
 
 
 class StockPicking(models.Model):

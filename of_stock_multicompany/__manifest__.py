@@ -16,11 +16,12 @@ Personnalisation Stock multi-sociétés :
         'of_base_multicompany',
         'of_stock',
         'of_account_boutique',
+        'of_planning',
     ],
     'category': "OpenFire",
     'data': [
-        'data/ir_rule.xml',
         'data/auto_init.xml',
+        'security/of_stock_multicompany_security.xml',
         'views/stock_views.xml',
         'views/account_views.xml',
     ],
