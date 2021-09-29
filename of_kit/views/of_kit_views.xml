@@ -493,7 +493,7 @@
         </field>
     </record>
 
-    <record id="of_kit_view_invoice_form" model="ir.ui.view">
+    <record id="of_kit_view_invoice_supplier_form" model="ir.ui.view">
         <field name="name">of.kit.account.invoice.supplier.form</field>
         <field name="model">account.invoice</field>
         <field name="inherit_id" ref="account.invoice_supplier_form"/>
