@@ -245,7 +245,7 @@ class OfService(models.Model):
     @api.multi
     @api.depends(
         'date_next', 'date_fin_contrat', 'duree', 'base_state', 'recurrence', 'intervention_ids',
-        'intervention_ids.state')
+                 'intervention_ids.state')
     def _compute_state_poncrec(self):
         for service in self:
             service_state = service.get_state_poncrec_date(fields.Date.context_today(self), to_plan_avance=True)
@@ -263,7 +263,7 @@ class OfService(models.Model):
     def _compute_intervention_count(self):
         for service in self:
             service.intervention_count = len(service.intervention_ids.filtered(
-                lambda r: r.state in ('draft', 'confirm', 'done')))
+                lambda r: r.state not in ('cancel', 'postponed')))
 
     def _search_secteur_tech_id(self, operator, operand):
         services = self.search([])
@@ -275,8 +275,8 @@ class OfService(models.Model):
     @api.depends('duree', 'intervention_ids', 'recurrence', 'intervention_ids.state', 'date_next')
     def _compute_durees(self):
         for service in self:
-            # ne pas prendre les interventions annulées / reportées / non terminées
-            plannings = service.intervention_ids.filtered(lambda p: p.state in ('draft', 'confirm', 'done'))
+            # ne pas prendre les interventions annulées / reportées
+            plannings = service.intervention_ids.filtered(lambda p: p.state not in ('cancel', 'postponed'))
             if plannings:
                 service.date_last = plannings.sorted('date', reverse=True)[0].date_date
             else:
