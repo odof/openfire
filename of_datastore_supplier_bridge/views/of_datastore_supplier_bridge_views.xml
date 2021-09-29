@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Marque -->
+    <record id="of_datastore_supplier_bridge_brand_view_form" model="ir.ui.view">
+        <field name="name">of.datastore.supplier.bridge.brand.form.view</field>
+        <field name="model">of.product.brand</field>
+        <field name="inherit_id" ref="of_datastore_product.of_datastore_product_brand_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='%(of_datastore_product.action_of_datastore_import_product_brand)d']" position="attributes">
+                <attribute name="groups">base.group_system</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
