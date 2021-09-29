@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="ksDashboardNinjaHeader" t-extend="ksDashboardNinjaHeader">
+        <t t-jquery="[name=company_fil_container]" t-operation="after">
+            <div class="ks_dashboard_link ks_am_content_element" name="company_type_fil_container">
+                <button class="o_dropdown_toggler_btn btn btn-sm dropdown-toggle" data-toggle="dropdown"
+                        style="padding: 0.375rem 0.75rem;
+                               border-color: #dee2e6 !important;
+                               border-radius: 3px !important;
+                               border-style: solid !important;
+                               border-width: 1.4px !important;
+                               font-family: inherit;
+                               font-weight: bold;">
+                    <span class="fa fa-lg fa-building"/>
+                    <span id="now_company_type_name" style="padding: 0px 8px 0px 8px;">
+                        <t t-esc="now_company_type_name"/>
+                    </span>
+                    <span class="caret"/>
+                </button>
+                <ul class="dropdown-menu of_filters_menu" role="menu" style="max-height: 500px; overflow: scroll;">
+                    <li t-foreach="company_type_filters" t-as="company_type_filter"
+                        t-att-data-index="filter_index" class="of_company_type_filter"
+                        t-attf-id="company_type_filter_#{company_type_filter.id}">
+                        <a href="#">
+                            <t t-esc="company_type_filter.name"/>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="ks_dashboard_link ks_am_content_element" name="company_name_fil_container">
+                <button class="o_dropdown_toggler_btn btn btn-sm dropdown-toggle" data-toggle="dropdown"
+                        style="padding: 0.375rem 0.75rem;
+                               border-color: #dee2e6 !important;
+                               border-radius: 3px !important;
+                               border-style: solid !important;
+                               border-width: 1.4px !important;
+                               font-family: inherit;
+                               font-weight: bold;">
+                    <span class="fa fa-lg fa-building"/>
+                    <span id="now_company_sector_name" style="padding: 0px 8px 0px 8px;">
+                        <t t-esc="now_company_sector_name"/>
+                    </span>
+                    <span class="caret"/>
+                </button>
+                <ul class="dropdown-menu of_filters_menu" role="menu" style="max-height: 500px; overflow: scroll;">
+                    <li t-foreach="company_sector_filters" t-as="company_sector_filter"
+                        t-att-data-index="filter_index" class="of_company_sector_filter"
+                        t-attf-id="company_sector_filter_#{company_sector_filter.id}">
+                        <a href="#">
+                            <t t-esc="company_sector_filter.name"/>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </t>
+    </t>
+
+</templates>

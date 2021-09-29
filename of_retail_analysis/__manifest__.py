@@ -31,10 +31,15 @@ Module ajoutant des champs de qualification au niveau des sociétés destinés �
     'depends': [
         'of_base',
         'sale',
+        'ks_dashboard_ninja',
     ],
     'data': [
         'security/ir.model.access.csv',
         'views/company_views.xml',
+        'views/assets_views.xml',
+    ],
+    'qweb': [
+        "static/src/xml/*.xml",
     ],
     'installable': True,
     'application': False,

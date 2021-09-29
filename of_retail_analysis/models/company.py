@@ -19,6 +19,20 @@ class OFResCompanyType(models.Model):
     sequence = fields.Integer(string=u"Séquence")
     name = fields.Char(string=u"Nom")
 
+    @api.model
+    def get_company_type_filter_ids(self):
+        u"""
+        Cette fonction renvois les informations nécessaires à l'utilisation du bouton de filtrage par type de société.
+        Ce bouton est présent dans le tableau de bord du module ks_dashboard_ninja.
+        """
+        company_types = self.env['of.res.company.type'].search([])
+        filters = []
+        for type in company_types:
+            fil = {'id': type.id, 'name': type.name}
+            # On ne précise pas le type courant car de base le filtre est en "Tous"
+            filters.append(fil)
+        return filters
+
 
 class OFResCompanySector(models.Model):
     _name = 'of.res.company.sector'
@@ -27,6 +41,20 @@ class OFResCompanySector(models.Model):
 
     sequence = fields.Integer(string=u"Séquence")
     name = fields.Char(string=u"Nom")
+
+    @api.model
+    def get_company_sector_filter_ids(self):
+        u"""
+        Cette fonction renvois les informations nécessaires à l'utilisation du bouton de filtrage par secteur société.
+        Ce bouton est présent dans le tableau de bord du module ks_dashboard_ninja.
+        """
+        company_sectors = self.search([])
+        filters = []
+        for sector in company_sectors:
+            fil = {'id': sector.id, 'name': sector.name}
+            # On ne précise pas le secteur courant car de base le filtre est en "Tous"
+            filters.append(fil)
+        return filters
 
 
 class OFResCompanySalesGroup(models.Model):
