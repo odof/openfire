@@ -1,17 +1,21 @@
 # -*- coding: utf-8 -*-
 
+import re
+
+from lxml import etree
+from lxml.builder import E
+
 from odoo import models, api, tools, fields, SUPERUSER_ID, _
 from odoo.exceptions import AccessError, UserError
 from odoo.tools import OrderedSet
 from odoo.tools.safe_eval import safe_eval
-from lxml import etree
-from lxml.builder import E
+from odoo.models import BaseModel
+from odoo.addons.base.res.res_users import GroupsView, name_boolean_group, name_selection_groups
+
 try:
     import simplejson as json
 except ImportError:
     import json
-from odoo.models import BaseModel
-from odoo.addons.base.res.res_users import GroupsView, name_boolean_group, name_selection_groups
 
 
 @api.model
@@ -137,6 +141,38 @@ def _update_user_groups_view(self):
 
 
 GroupsView._update_user_groups_view = _update_user_groups_view
+
+
+class IrMailServer(models.Model):
+    _inherit = 'ir.mail_server'
+
+    @api.model
+    def send_email(self, message, mail_server_id=None, smtp_server=None, smtp_port=None,
+                   smtp_user=None, smtp_password=None, smtp_encryption=None, smtp_debug=False):
+        if not mail_server_id and not smtp_server:
+            # Recherche de serveur de mails par pertinence
+            email_from = dict(message._headers).get('From', False)
+            if email_from:
+                re_match = re.search(r' <(.*?)>', email_from)
+                if re_match:
+                    # email_from de la forme "nom <prefix@domain>". On extrait l'adresse.
+                    email_from = re_match.groups()[0]
+                email_from = email_from.strip()
+                email_split = email_from.split('@')
+                if len(email_split) == 2:
+                    prefix, domain = email_split
+                    servers = self.sudo().search([('smtp_host', '=like', '%' + domain)])
+                    if not servers:
+                        servers = self.sudo().search([])
+                    if len(servers) > 1:
+                        servers = self.sudo().search(
+                            [('id', 'in', servers.ids), ('smtp_user', 'in', (prefix, email_from))],
+                            order='sequence', limit=1
+                        ) or servers
+                    mail_server_id = servers[:1].id
+        return super(IrMailServer, self).send_email(
+            message, mail_server_id=mail_server_id, smtp_server=smtp_server, smtp_port=smtp_port,
+            smtp_user=smtp_user, smtp_password=smtp_password, smtp_encryption=smtp_encryption, smtp_debug=smtp_debug)
 
 
 class IrModelFields(models.Model):
