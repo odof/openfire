@@ -32,6 +32,7 @@ Module ajoutant des champs de qualification au niveau des sociétés destinés �
         'of_base',
         'sale',
         'ks_dashboard_ninja',
+        'of_crm',
     ],
     'data': [
         'security/ir.model.access.csv',

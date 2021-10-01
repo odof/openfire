@@ -60,6 +60,7 @@ Workflow CRM
         'reports/of_crm_funnel_conversion_views.xml',
         'reports/sale_report_views.xml',
         'reports/account_invoice_report_views.xml',
+        'reports/of_invoiced_revenue_analysis.xml',
         'views/crm_activity_views.xml',
         'views/of_sale_activity_views.xml',
         'views/crm_lead_views.xml',
