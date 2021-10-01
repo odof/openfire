@@ -371,7 +371,9 @@ class OfPlanningIntervention(models.Model):
             self = self.with_context(default_date=self._context['default_date_prompt'])
         if 'default_date_deadline_prompt' in self._context:
             self = self.with_context(default_date_deadline=self._context['default_date_deadline_prompt'])
-        return super(OfPlanningIntervention, self).default_get(fields_list)
+        res = super(OfPlanningIntervention, self).default_get(fields_list)
+        res['do_deliveries'] = self.env['ir.values'].get_default('of.intervention.settings', 'do_deliveries')
+        return res
 
     # Champs #
 
@@ -526,6 +528,9 @@ class OfPlanningIntervention(models.Model):
     procurement_group_id = fields.Many2one('procurement.group', 'Procurement Group', copy=False)
     picking_ids = fields.One2many(comodel_name='stock.picking', compute="_compute_pickings", string=u"BL associés")
     delivery_count = fields.Integer(string="Nbr Bl", compute="_compute_pickings")
+
+    do_deliveries = fields.Boolean(string=u"Utilisation des BL", compute='_compute_do_deliveries')
+
     # Compute
 
     @api.multi
@@ -948,6 +953,11 @@ class OfPlanningIntervention(models.Model):
                 rdv.picking_ids = pickings
                 rdv.delivery_count = len(pickings)
 
+    def _compute_do_deliveries(self):
+        option = self.env['ir.values'].get_default('of.intervention.settings', 'do_deliveries')
+        for rdv in self:
+            rdv.do_deliveries = option
+
     # Search #
 
     def _search_employee_main_id(self, operator, operand):
@@ -1114,6 +1124,8 @@ class OfPlanningIntervention(models.Model):
         if self.company_id:
             company_id = self.company_id.id
             warehouse_id = self.env['stock.warehouse'].search([('company_id', '=', company_id)], limit=1)
+            if not warehouse_id:
+                warehouse_id = self.env['stock.warehouse'].search([], limit=1)
             self.warehouse_id = warehouse_id
 
     # Héritages
