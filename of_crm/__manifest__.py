@@ -54,6 +54,7 @@ Workflow CRM
         'security/of_crm_security.xml',
         'wizards/of_crm_activity_action_views.xml',
         'reports/of_crm_funnel_conversion_views.xml',
+        'reports/of_invoiced_revenue_analysis.xml',
         'views/crm_lead_views.xml',
         'views/sale_order_views.xml',
         'views/partner_views.xml',
