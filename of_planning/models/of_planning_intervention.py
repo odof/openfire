@@ -322,15 +322,15 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
             price_unit = product.with_context(pricelist=pricelist.id).price
         price_unit = self.env['account.tax']._fix_tax_included_price(price_unit, product.taxes_id, taxes)
         return {
-                   'name'                : product.name_get()[0][1],
-                   'account_id'          : line_account.id,
-                   'price_unit'          : price_unit,
-                   'quantity'            : 1.0,
-                   'discount'            : 0.0,
-                   'uom_id'              : product.uom_id.id,
-                   'product_id'          : product.id,
-                   'invoice_line_tax_ids': [(6, 0, taxes._ids)],
-                   }, ""
+            'name'                : product.name_get()[0][1],
+            'account_id'          : line_account.id,
+            'price_unit'          : price_unit,
+            'quantity'            : 1.0,
+            'discount'            : 0.0,
+            'uom_id'              : product.uom_id.id,
+            'product_id'          : product.id,
+            'invoice_line_tax_ids': [(6, 0, taxes._ids)],
+        }, ""
 
 
 class OfPlanningEquipe(models.Model):
@@ -536,7 +536,7 @@ class OfPlanningIntervention(models.Model):
     geo_lat = fields.Float(related='address_id.geo_lat', readonly=True)  # vue Map
     geo_lng = fields.Float(related='address_id.geo_lng', readonly=True)  # vue Map
     precision = fields.Selection(related='address_id.precision', readonly=True)  # vue Map
-    color_map = fields.Char(compute='_compute_color_map', string=u"Couleur carte") # vue Map
+    color_map = fields.Char(compute='_compute_color_map', string=u"Couleur carte")  # vue Map
     of_color_ft = fields.Char(related="employee_main_id.of_color_ft", readonly=True, oldname='color_ft')  # vue Calendar
     of_color_bg = fields.Char(related="employee_main_id.of_color_bg", readonly=True, oldname='color_bg')  # vue Calendar
 
@@ -568,12 +568,14 @@ class OfPlanningIntervention(models.Model):
         comodel_name='stock.picking', string=u"Bon de livraison",
         domain="[('id', 'in', picking_domain and picking_domain[0] and picking_domain[0][2] or False)]")
     picking_domain = fields.Many2many(comodel_name='stock.picking', compute='_compute_picking_domain')
-    invoice_policy = fields.Selection(selection=[
+    invoice_policy = fields.Selection(
+        selection=[
             ('delivery', u'Quantités livrées'),
             ('intervention', u'Quantités planifiées')
         ], string="Politique de facturation", default='intervention', required=True
     )
-    invoice_status = fields.Selection(selection=[
+    invoice_status = fields.Selection(
+        selection=[
             ('no', u'Rien à facturer'),
             ('to invoice', u'À facturer'),
             ('invoiced', u'Totalement facturée'),
@@ -671,7 +673,8 @@ class OfPlanningIntervention(models.Model):
                 date_courante_str = fields.Date.to_string(date_courante_da).decode('utf-8')
                 un_jour = timedelta(days=1)
                 une_semaine = timedelta(days=7)
-                # Pour des raisons pratiques on limite la recherche des horaires à une semaine après la date d'intervention
+                # Pour des raisons pratiques on limite la recherche des horaires
+                # à une semaine après la date d'intervention
                 date_stop_dt = date_locale_dt + une_semaine
                 date_stop_str = fields.Datetime.to_string(date_stop_dt).decode('utf-8')
                 # Récupérer le dictionnaire des segments horaires des employés
@@ -836,7 +839,8 @@ class OfPlanningIntervention(models.Model):
             if compare_date(interv.date, fields.Datetime.now(), compare="<") or \
                     not compare_date(interv.date, interv.employee_main_id.of_changed_intervention_id.date):
                 continue
-            if interv.interv_before_id and interv.interv_before_id == interv.employee_main_id.of_changed_intervention_id:
+            if interv.interv_before_id\
+                    and interv.interv_before_id == interv.employee_main_id.of_changed_intervention_id:
                 limit_date = fields.Datetime.to_string(fields.Datetime.from_string(interv.date)
                                                        + relativedelta(hour=0, minute=0, second=0))
                 interv.interv_before_id = interv_obj.search(
@@ -901,7 +905,7 @@ class OfPlanningIntervention(models.Model):
             try:
                 req = requests.get(full_query)
                 res = req.json()
-            except Exception as e:
+            except Exception:
                 interv.before_to_this = -1.0
                 # TODO: Dans certains cas le code ci-dessous provoque une erreur.
                 #  On commente donc le code avant de trouver une meilleure solution
@@ -1019,7 +1023,8 @@ class OfPlanningIntervention(models.Model):
 
     def _search_employee_main_id(self, operator, operand):
         intervs = self.search([])
-        res = safe_eval("intervs.filtered(lambda r: r.employee_main_id %s %s)" % (operator, operand), {'intervs': intervs})
+        res = safe_eval(
+            "intervs.filtered(lambda r: r.employee_main_id %s %s)" % (operator, operand), {'intervs': intervs})
         return [('id', 'in', res.ids)]
 
     @api.model
@@ -1070,10 +1075,10 @@ class OfPlanningIntervention(models.Model):
             if interv.alert_coherence_date:
                 if interv.all_day:
                     raise UserError(
-                        _(u"Attention /!\ la durée est trop longue considérant les date de début et de fin"))
+                        _(u"Attention /!\\ la durée est trop longue considérant les date de début et de fin"))
                 else:
                     raise UserError(
-                        _(u"Attention /!\ la date de fin doit être au moins égale à la date de début + la durée"))
+                        _(u"Attention /!\\ la date de fin doit être au moins égale à la date de début + la durée"))
 
     @api.constrains('date', 'date_deadline')
     def check_alert_hors_creneau(self):
@@ -1484,9 +1489,10 @@ class OfPlanningIntervention(models.Model):
         self.fiscal_position_id = self.order_id.fiscal_position_id
         in_use = self.line_ids.mapped('order_line_id')._ids
         for line in self.order_id.order_line.filtered(lambda l: l.id not in in_use):
-            qty = line.product_uom_qty - sum(line.of_intervention_line_ids \
-                                             .filtered(lambda r: r.intervention_id.state not in ('cancel', 'postponed')) \
-                                             .mapped('qty'))
+            qty = line.product_uom_qty - sum(
+                line.of_intervention_line_ids
+                .filtered(lambda r: r.intervention_id.state not in ('cancel', 'postponed'))
+                .mapped('qty'))
             if qty > 0.0:
                 line_obj.create({
                     'order_line_id': line.id,
@@ -1606,7 +1612,9 @@ class OfPlanningIntervention(models.Model):
     @api.multi
     def _affect_number(self):
         for interv in self:
-            if interv.template_id and interv.state in ('confirm', 'done', 'unfinished', 'postponed') and not interv.number:
+            if interv.template_id\
+                    and interv.state in ('confirm', 'done', 'unfinished', 'postponed')\
+                    and not interv.number:
                 interv.write({'number': self.template_id.sequence_id.next_by_id()})
 
     @api.multi
@@ -1657,7 +1665,9 @@ class OfPlanningIntervention(models.Model):
                       .default_get(['journal_id'])['journal_id'])
         if not journal_id:
             return (False,
-                    msg_erreur % (self.name, u"Vous devez définir un journal des ventes pour cette société (%s)." % company.name))
+                    msg_erreur % (
+                        self.name,
+                        u"Vous devez définir un journal des ventes pour cette société (%s)." % company.name))
         invoice_data = {
             'origin': self.number or 'Intervention',
             'type': 'out_invoice',
@@ -1797,7 +1807,8 @@ class OfPlanningInterventionLine(models.Model):
     price_total = fields.Monetary(compute='_compute_amount', string='Sous-total TTC', readonly=True, store=True)
 
     intervention_state = fields.Selection(related="intervention_id.state", store=True)
-    invoice_line_ids = fields.One2many('account.invoice.line', 'of_intervention_line_id', string=u"Ligne de facturation")
+    invoice_line_ids = fields.One2many(
+        'account.invoice.line', 'of_intervention_line_id', string=u"Ligne de facturation")
     procurement_ids = fields.One2many('procurement.order', 'of_intervention_line_id', string='Procurements')
     invoice_policy = fields.Selection(related="intervention_id.invoice_policy", string="Politique de facturation")
     invoice_status = fields.Selection(selection=[
@@ -1941,8 +1952,8 @@ class OfPlanningInterventionLine(models.Model):
                 continue
             order_line = line.order_line_id
             planned = sum(order_line.of_intervention_line_ids
-                          .filtered(lambda r: r.intervention_id.state not in ('cancel', 'postponed')
-                                              and r.id != line.id)
+                          .filtered(lambda r: (r.intervention_id.state not in ('cancel', 'postponed')
+                                               and r.id != line.id))
                           .mapped('qty'))
             qty = order_line.product_uom_qty - planned
             line.update({
@@ -2029,7 +2040,8 @@ class ResPartner(models.Model):
         'of.planning.intervention', string="Interventions client", compute="_compute_interventions")
     intervention_address_ids = fields.One2many(
         'of.planning.intervention', string="Interventions adresse", compute="_compute_interventions")
-    intervention_ids = fields.Many2many('of.planning.intervention', string=u"Interventions", compute="_compute_interventions")
+    intervention_ids = fields.Many2many(
+        'of.planning.intervention', string=u"Interventions", compute="_compute_interventions")
     intervention_count = fields.Integer(string="Nb d'interventions", compute='_compute_interventions')
 
     @api.multi
@@ -2038,11 +2050,11 @@ class ResPartner(models.Model):
         for partner in self:
             partner.intervention_partner_ids = interv_obj.search([('partner_id', '=', partner.id)])
             partner.intervention_address_ids = interv_obj.search([('address_id', '=', partner.id)])
-            intervention_ids = interv_obj.search([
-                '|',
+            intervention_ids = interv_obj.search(
+                ['|',
                     ('partner_id', 'child_of', partner.id),
                     ('address_id', 'child_of', partner.id),
-            ])
+                 ])
             partner.intervention_ids = intervention_ids
             partner.intervention_count = len(intervention_ids)
 
@@ -2148,13 +2160,15 @@ class SaleOrderLine(models.Model):
 
     of_intervention_line_ids = fields.One2many('of.planning.intervention.line', 'order_line_id')
     of_qty_planifiee = fields.Float(string=u"Qté(s) réalisée(s)", compute="_compute_of_qty_planifiee", store=True)
-    of_intervention_state = fields.Selection([
-            ('todo', u'À planifier'),
-            ('confirm', u'Planifée'),
-            ('done', u'Réalisée'),
-            ], string=u"État de planification", compute="_compute_intervention_state", store=True)
+    of_intervention_state = fields.Selection(
+        [('todo', u'À planifier'),
+         ('confirm', u'Planifée'),
+         ('done', u'Réalisée'),
+         ],
+        string=u"État de planification", compute="_compute_intervention_state", store=True)
 
-    @api.depends('of_intervention_line_ids', 'of_intervention_line_ids.qty', 'of_intervention_line_ids.intervention_state')
+    @api.depends('of_intervention_line_ids', 'of_intervention_line_ids.qty',
+                 'of_intervention_line_ids.intervention_state')
     def _compute_of_qty_planifiee(self):
         for line in self:
             lines = line.of_intervention_line_ids.filtered(lambda l: l.intervention_state in ('done', ))
@@ -2243,9 +2257,9 @@ class StockMove(models.Model):
         result = super(StockMove, self).action_done()
 
         # Update delivered quantities on intervention lines
-        planning_intervention_lines = self.filtered(lambda move: move.procurement_id.of_intervention_line_id
-                                                                 and move.product_id.expense_policy == 'no')\
-            .mapped('procurement_id.of_intervention_line_id')
+        planning_intervention_lines = self.filtered(
+            lambda move: move.procurement_id.of_intervention_line_id and move.product_id.expense_policy == 'no'
+        ).mapped('procurement_id.of_intervention_line_id')
         for line in planning_intervention_lines:
             line.qty_delivered = line._get_delivered_qty()
         return result
