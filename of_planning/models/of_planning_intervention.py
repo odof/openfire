@@ -1862,11 +1862,10 @@ class OfPlanningInterventionLine(models.Model):
                 taxes = fiscal_position.map_tax(taxes, product, partner)
             line.taxe_ids = taxes
 
-    @api.depends('invoice_line_ids', 'invoice_line_ids.quantity')
+    @api.depends('invoice_line_ids', 'invoice_line_ids.invoice_id', 'invoice_line_ids.quantity')
     def _compute_qty_invoiced(self):
         for line in self:
-            if line.invoice_line_ids:
-                line.qty_invoiced = sum(line.invoice_line_ids.mapped('quantity'))
+            line.qty_invoiced = sum(line.invoice_line_ids.mapped('quantity'))
 
     @api.depends('intervention_id.invoice_policy', 'intervention_id.state',
                  'qty', 'qty_delivered', 'qty_invoiced', 'order_line_id')
