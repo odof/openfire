@@ -119,6 +119,9 @@
                     <field name="of_invoice_policy" invisible="context.get('hide_sale')" groups="sales_team.group_sale_manager"/>
                     <field name="of_invoice_date_prev" invisible="context.get('hide_sale')" groups="sales_team.group_sale_manager"/>
                 </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='price_total']" position="attributes">
+                    <attribute name="groups">sale.group_show_price_total,of_sale.group_of_afficher_total_ttc</attribute>
+                </xpath>
                 <xpath expr="//field[@name='order_line']/tree//field[@name='product_uom_qty']" position="attributes">
                     <attribute name="string">Qté(s) commandée(s)</attribute>
                 </xpath>
@@ -401,6 +404,15 @@
                     <div name="stock_warning_setting">
                         <field name="stock_warning_setting" class="oe_inline"/>
                         <span>Afficher les messages d'avertissement de stock</span>
+                    </div>
+                </xpath>
+                <xpath expr="//field[@name='sale_show_tax']/.." position="after">
+                    <label for="group_of_afficher_total_ttc"/>
+                    <div>
+                        <field name="group_of_afficher_total_ttc" class="oe_inline"/>
+                        <span>Affiche les sous-totaux TTC par ligne de commande.</span>
+                        <br/>
+                        <span class="text-muted">Uniquement dans le formulaire et non dans les rapports.</span>
                     </div>
                 </xpath>
             </field>
