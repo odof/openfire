@@ -14,6 +14,16 @@
                 <field name="contract_line_id"/>
                 <field name="contract_id"/>
             </xpath>
+            <xpath expr="//filter[@name='filter_rec']" position="after">
+                <filter string="SAV" name="filter_sav"
+                        domain="[('type_id', '=', %(of_contract_custom.of_contract_custom_type_sav)d)]"/>
+                <filter string="Entretien" name="filter_entretien"
+                        domain="[('type_id', '=', %(of_contract_custom.of_contract_custom_type_maintenance)d)]"/>
+                <filter string="Installation" name="filter_installation"
+                        domain="[('type_id', '=', %(of_contract_custom.of_contract_custom_type_installation)d)]"/>
+                <filter string="Visite technique" name="filter_vt"
+                        domain="[('type_id', '=', %(of_contract_custom.of_contract_custom_type_technical)d)]"/>
+            </xpath>
             <xpath expr="//filter[@name='filter_rec']" position="replace"/>
             <xpath expr="//filter[@name='filter_ponc']" position="replace"/>
         </field>
