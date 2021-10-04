@@ -2,7 +2,6 @@
 <odoo>
 
     <template id="of_customize_modal" inherit_id="theme_impacto.customize_modal" name="of_website_portal modal">
-<!--        <xpath expr="//div[@id='theme_customize_modal']" position="inside">-->
         <xpath expr="//div[@id='theme_customize_modal']//table[@name='color']" position="after">
             <h5 class="modal-h5">B2B COLOR</h5>
             <table name="color">
