@@ -5,21 +5,21 @@
     <!-- Planning général semaine -->
     <report
         string="Planning général semaine "
-        id="action_report_planning_general_semaine"
-        model="of_planning.report_planning_general_semaine"
+        id="action_report_of_planning_general_semaine"
+        model="of_planning.impression_wizard"
         report_type="qweb-pdf"
-        name="of_planning.report_planning_general_semaine"
-        file="of_planning.report_planning_general_semaine"
+        name="of_planning.report_of_planning_general_semaine"
+        file="of_planning.report_of_planning_general_semaine"
         paperformat="of_base.paperformat_euro_internal_landscape"
     />
 
-    <template id="of_planning.report_planning_general_semaine">
+    <template id="report_of_planning_general_semaine_document">
         <t t-call="report.html_container">
             <t t-call="report.internal_layout">
-                <t t-set="res" t-value="get_interventions(data['employee_ids'],data['date_start'])"/>
+                <t t-set="res" t-value="o.get_interventions_all()"/>
                 <t t-set="interventions" t-value="res[0]"/>
                 <t t-set="days" t-value="res[1]"/>
-                <t t-set="title" t-value="get_title(data['date_start'])"/>
+                <t t-set="title" t-value="o.get_title()"/>
                 <div class="page">
                     <style>
                         table.main_table {
@@ -55,7 +55,7 @@
                                 </th>
                                 <t t-foreach="days" t-as="day">
                                     <th class="col_day">
-                                        <span t-esc="int_to_day(day)"/>
+                                        <span t-esc="o.int_to_day(day)"/>
                                     </th>
                                 </t>
                             </tr>
@@ -93,18 +93,24 @@
         </t>
     </template>
 
+    <template id="report_of_planning_general_semaine">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="of_planning.report_of_planning_general_semaine_document"/>
+        </t>
+    </template>
+
     <!-- Planning semaine -->
     <report
         string="Planning semaine "
-        id="action_report_planning_semaine"
-        model="of_planning.report_planning_semaine"
+        id="action_report_of_planning_semaine"
+        model="of_planning.impression_wizard"
         report_type="qweb-pdf"
-        name="of_planning.report_planning_semaine"
-        file="of_planning.report_planning_semaine"
+        name="of_planning.report_of_planning_semaine"
+        file="of_planning.report_of_planning_semaine"
         paperformat="of_base.paperformat_euro_internal"
     />
 
-    <template id="of_planning.report_planning_semaine">
+    <template id="report_of_planning_semaine_document">
         <t t-call="report.html_container">
             <t t-call="report.internal_layout">
                 <div class="page">
@@ -113,9 +119,9 @@
                         table { width: 100%; }
                         thead { background-color: #E6E6FA; }
                     </style>
-                    <div t-foreach="data['employee_ids']" t-as="employee_id" style="page-break-after: always;">
-                        <t t-set="interventions" t-value="get_interventions(employee_id, data['date_start'])"/>
-                        <t t-set="title" t-value="get_title(employee_id, data['date_start'])"/>
+                    <div t-foreach="o.employee_ids" t-as="employee" style="page-break-after: always;">
+                        <t t-set="interventions" t-value="o.get_interventions_one(employee.id)"/>
+                        <t t-set="title" t-value="o.get_title(employee.id)"/>
                         <b>
                             <h3 style="text-align:center" t-raw="title"/>
                         </b>
@@ -130,7 +136,7 @@
                             </thead>
                             <tbody>
                                 <tr t-foreach="interventions" t-as="intervention">
-                                    <t t-set="columns" t-value="get_columns(intervention)"/>
+                                    <t t-set="columns" t-value="o.get_columns(intervention)"/>
                                     <t t-foreach="columns" t-as="column">
                                         <td>
                                             <span t-raw="column"/>
@@ -145,18 +151,25 @@
         </t>
     </template>
 
+    <template id="report_of_planning_semaine">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="of_planning.report_of_planning_semaine_document"/>
+        </t>
+    </template>
+
     <!-- Planning journée -->
+    <!-- on active l'attachment_use pour pouvoir associer le document à un email dans le cadre de l'envoi journalier -->
     <report
             string="Planning journée "
             id="action_report_planning_jour"
-            model="of_planning.report_planning_jour"
+            model="of_planning.impression_wizard"
             report_type="qweb-pdf"
-            name="of_planning.report_planning_jour"
-            file="of_planning.report_planning_jour"
+            name="of_planning.report_of_planning_jour"
+            file="of_planning.report_of_planning_jour"
             paperformat="of_base.paperformat_euro_internal"
     />
 
-    <template id="of_planning.report_planning_jour">
+    <template id="report_of_planning_jour_document">
         <t t-call="report.html_container">
             <t t-call="report.internal_layout">
                 <div class="page">
@@ -165,9 +178,9 @@
                         table { width: 100%; }
                         thead { background-color: #E6E6FA; }
                     </style>
-                    <div t-foreach="data['employee_ids']" t-as="employee_id" style="page-break-after: always;">
-                        <t t-set="interventions" t-value="get_interventions(employee_id, data['date_start'])"/>
-                        <t t-set="title" t-value="get_title(employee_id, data['date_start'])"/>
+                    <div t-foreach="o.employee_ids" t-as="employee" style="page-break-after: always;">
+                        <t t-set="interventions" t-value="o.get_interventions_one(employee.id)"/>
+                        <t t-set="title" t-value="o.get_title(employee.id)"/>
                         <b>
                             <h3 style="text-align:center" t-raw="title"/>
                         </b>
@@ -182,7 +195,7 @@
                             </thead>
                             <tbody>
                                 <tr t-foreach="interventions" t-as="intervention">
-                                    <t t-set="columns" t-value="get_columns(intervention)"/>
+                                    <t t-set="columns" t-value="o.get_columns(intervention)"/>
                                     <t t-foreach="columns" t-as="column">
                                         <td>
                                             <span t-raw="column"/>
@@ -194,6 +207,12 @@
                     </div>
                 </div>
             </t>
+        </t>
+    </template>
+
+    <template id="report_of_planning_jour">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="of_planning.report_of_planning_jour_document"/>
         </t>
     </template>
 

@@ -35,16 +35,20 @@
                 <page name="interventions" string="Interventions"
                       attrs="{'invisible': [('of_est_intervenant', '=', False), ('of_est_commercial', '=', False)]}">
                     <group>
-                        <group name="gauche_1">
+                        <group name="gauche_1" string="Planning">
                             <field name="of_equipe_ids" widget="many2many_tags"/>
                             <field name="of_impression_planning"/>
-                            <field name="of_toutes_taches"/>
-
+                            <field name="of_daily_email"/>
                         </group>
                         <group name="droite_1"/>
                     </group>
-                    <field name="of_tache_ids" widget="many2many"
-                           attrs="{'invisible': [('of_toutes_taches', '=', True)]}"/>
+                    <group string="Tâches" name="tache">
+                        <field name="of_toutes_taches"/>
+                        <label for="of_tache_ids" colspan="2"
+                               attrs="{'invisible': [('of_toutes_taches', '=', True)]}"/>
+                        <field name="of_tache_ids" widget="many2many" nolabel="1" colspan="2"
+                               attrs="{'invisible': [('of_toutes_taches', '=', True)]}"/>
+                    </group>
                 </page>
             </xpath>
         </field>
