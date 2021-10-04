@@ -1,0 +1,300 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_website_portal
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-10-04 12:58+0000\n"
+"PO-Revision-Date: 2021-10-04 12:58+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_config_settings_view_form
+msgid "(OF) Liste de prix B2B par défaut"
+msgstr "(OF) Liste de prix B2B par défaut"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_config_settings_view_form
+msgid "(OF) Liste de prix B2C par défaut"
+msgstr "(OF) Liste de prix B2C par défaut"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_config_settings_view_form
+msgid "(OF) Position fiscale B2B par défaut"
+msgstr "(OF) Position fiscale B2B par défaut"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_config_settings_view_form
+msgid "(OF) Position fiscale B2C par défaut"
+msgstr "(OF) Position fiscale B2C par défaut"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.layout_b2c
+msgid "<span>B2B</span>"
+msgstr "<span>B2B</span>"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.layout_b2c
+msgid "<span>B2C</span>"
+msgstr "<span>B2C</span>"
+
+#. module: of_website_portal
+#: model:ir.model,name:of_website_portal.model_res_groups
+msgid "Access Groups"
+msgstr "Groupes d'accès"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_portal_my_of_contracts
+msgid "Adresse"
+msgstr "Adresse"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_website_of_contract
+msgid "Adresse :"
+msgstr "Adresse :"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_customize_modal
+msgid "B2B COLOR"
+msgstr "COULEUR B2B "
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_website_of_contract
+msgid "Client :"
+msgstr "Client :"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_portal_my_of_contracts
+msgid "Contrat"
+msgstr "Contrat"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_portal_my_home_menu
+msgid "Contrats"
+msgstr "Contrats"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_website_of_contract
+msgid "Date"
+msgstr "Date "
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_portal_my_quotations
+msgid "Date d'échéance"
+msgstr "Date d'échéance"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_website_of_contract
+msgid "Date de fin :"
+msgstr "Date de fin :"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_portal_my_orders
+msgid "Date de la commande"
+msgstr "Date de la commande"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_portal_my_deliveries
+msgid "Date de livraison"
+msgstr "Date de livraison"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_portal_my_deliveries
+msgid "Document d'origine"
+msgstr "Document d'origine"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_website_of_contract
+msgid "Durée"
+msgstr "Durée"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_portal_my_home_menu
+msgid "Déposer un fichier"
+msgstr "Déposer un fichier"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_website_of_contract
+msgid "Désignation :"
+msgstr "Désignation :"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_portal_my_home_menu
+msgid "Envoyer"
+msgstr "Envoyer"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_website_of_contract
+msgid "Historique des rendez-vous"
+msgstr "Historique des rendez-vous"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_portal_my_deliveries
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_portal_my_home
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_portal_my_of_contracts
+msgid "Il n'y a actuellement pas de contrats pour votre compte."
+msgstr "Il n'y a actuellement pas de contrats pour votre compte."
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.portal_my_home_sale_b2c
+msgid "Il n'y a actuellement pas de livraisons pour votre compte."
+msgstr "Il n'y a actuellement pas de livraisons pour votre compte."
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_website_of_contract
+msgid "Il n'y a pas encore eu de rendez-vous pour ce contrat."
+msgstr "Il n'y a pas encore eu de rendez-vous pour ce contrat."
+
+#. module: of_website_portal
+#: model:ir.model,name:of_website_portal.model_of_service
+msgid "Intervention à programmer"
+msgstr "Intervention à programmer"
+
+#. module: of_website_portal
+#: model:ir.model,name:of_website_portal.model_account_invoice
+msgid "Invoice"
+msgstr "Facture"
+
+#. module: of_website_portal
+#: model:ir.model.fields,field_description:of_website_portal.field_website_config_settings_of_pricelist_b2b_id
+#: model:ir.model.fields,field_description:of_website_portal.field_website_of_pricelist_b2b_id
+msgid "Liste de prix B2B"
+msgstr "Liste de prix B2B"
+
+#. module: of_website_portal
+#: model:ir.model.fields,field_description:of_website_portal.field_website_config_settings_of_pricelist_b2c_id
+#: model:ir.model.fields,field_description:of_website_portal.field_website_of_pricelist_b2c_id
+#: model:product.pricelist,name:of_website_portal.product_pricelist_b2c
+msgid "Liste de prix B2C"
+msgstr "Liste de prix B2C"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_portal_my_deliveries
+msgid "Livraison"
+msgstr "Livraison"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.portal_my_home_menu_sale_b2c
+msgid "Livraisons"
+msgstr "Livraisons"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_website_of_contract
+msgid "Mes contrats"
+msgstr "Mes contrats"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_portal_my_orders
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_portal_my_quotations
+msgid "Numéro"
+msgstr "Numéro"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_website_of_contract
+msgid "Numéro de série :"
+msgstr "Numéro de série :"
+
+#. module: of_website_portal
+#: model:ir.model,name:of_website_portal.model_of_planning_tache
+msgid "Planning OpenFire : Tâches"
+msgstr "Planning OpenFire : Tâches"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_config_settings_view_form
+msgid "Portail B2B"
+msgstr "Portail B2B"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_config_settings_view_form
+#: model:res.groups,name:of_website_portal.group_portal_b2c
+msgid "Portail B2C"
+msgstr "Portail B2C"
+
+#. module: of_website_portal
+#: model:ir.model.fields,field_description:of_website_portal.field_website_config_settings_of_fiscal_position_b2b_id
+#: model:ir.model.fields,field_description:of_website_portal.field_website_of_fiscal_position_b2b_id
+msgid "Position fiscale B2B"
+msgstr "Position fiscale B2B"
+
+#. module: of_website_portal
+#: model:ir.model.fields,field_description:of_website_portal.field_website_config_settings_of_fiscal_position_b2c_id
+#: model:ir.model.fields,field_description:of_website_portal.field_website_of_fiscal_position_b2c_id
+msgid "Position fiscale B2C"
+msgstr "Position fiscale B2C"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_website_of_contract
+msgid "Produit installé"
+msgstr "Produit installé"
+
+#. module: of_website_portal
+#: model:ir.model.fields,field_description:of_website_portal.field_of_planning_tache_website_published
+#: model:ir.model.fields,field_description:of_website_portal.field_of_service_website_published
+msgid "Publié sur le site internet"
+msgstr "Publié sur le site internet"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_portal_my_orders
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_portal_my_quotations
+msgid "Référence"
+msgstr "Référence"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_website_of_contract
+msgid "Répéter chaque :"
+msgstr "Répéter chaque :"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_portal_my_deliveries
+msgid "Statut"
+msgstr "Statut"
+
+#. module: of_website_portal
+#: model:ir.model,name:of_website_portal.model_res_users
+msgid "Users"
+msgstr "Utilisateurs"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_portal_my_quotations
+msgid "Valider"
+msgstr "Valider"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_portal_my_home
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_portal_my_of_contracts
+msgid "Vos contrats"
+msgstr "Vos contrats"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_portal_my_deliveries
+#: model:ir.ui.view,arch_db:of_website_portal.portal_my_home_sale_b2c
+msgid "Vos livraisons"
+msgstr "Vos livraisons"
+
+#. module: of_website_portal
+#: model:ir.model,name:of_website_portal.model_website
+msgid "Website"
+msgstr "Site Web"
+
+#. module: of_website_portal
+#: model:ir.model,name:of_website_portal.model_sale_config_settings
+msgid "sale.config.settings"
+msgstr "sale.config.settings"
+
+#. module: of_website_portal
+#: model:ir.model,name:of_website_portal.model_website_config_settings
+msgid "website.config.settings"
+msgstr "website.config.settings"
+
+#. module: of_website_portal
+#: model:ir.ui.view,arch_db:of_website_portal.of_website_portal_website_of_contract
+msgid "État"
+msgstr "État"
+

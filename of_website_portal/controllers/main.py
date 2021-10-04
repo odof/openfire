@@ -31,7 +31,6 @@ class WebsiteAccount(website_account):
     def portal_my_deliveries(self):
         values = self._prepare_portal_layout_values()
         delivery_ids = request.env['stock.picking'].search([
-            ('state', 'not in', ('draft', 'cancel')),
             ('partner_id', 'child_of', request.env.user.partner_id.id)
         ])
         values.update({
