@@ -90,6 +90,13 @@ class ResPartner(models.Model):
                         AND     RP1.id          = RP.parent_id""")
         return res
 
+    name = fields.Char(track_visibility='onchange')
+    street = fields.Char(track_visibility='onchange')
+    street2 = fields.Char(track_visibility='onchange')
+    zip = fields.Char(track_visibility='onchange')
+    city = fields.Char(track_visibility='onchange')
+    country_id = fields.Many2one(track_visibility='onchange')
+    email = fields.Char(track_visibility='onchange')
     phone = fields.Char(compute='_compute_old_phone_fields', inverse='_inverse_phone')
     mobile = fields.Char(compute='_compute_old_phone_fields', inverse='_inverse_mobile')
     fax = fields.Char(compute='_compute_old_phone_fields', inverse='_inverse_fax')
@@ -484,13 +491,15 @@ class ResPartnerTitle(models.Model):
 
 class OFResPartnerPhone(models.Model):
     _name = 'of.res.partner.phone'
+    _inherit = ['mail.thread']
     _order = 'type,id'
     _rec_name = 'number'
 
     partner_id = fields.Many2one(comodel_name='res.partner', string=u"Partenaire", index=True, ondelete='cascade')
     number = fields.Char(string="Numéro")
     number_display = fields.Char(
-        string="Numéro au format national", compute="_compute_number_display", inverse="_inverse_number_display")
+        string="Numéro au format national", compute="_compute_number_display", inverse="_inverse_number_display",
+        track_visibility='onchange')
     type = fields.Selection(selection=PHONE_TYPES, string="Type de numéro", required=True)
     title_id = fields.Many2one(
         comodel_name="res.partner.title", string="Civilité du numéro", domain="[('of_used_for_phone', '=', True)]")
@@ -575,7 +584,7 @@ class OFResPartnerPhone(models.Model):
                     (self.env.user.company_id.country_id and self.env.user.company_id.country_id.code) or \
                     "FR"
             vals['number'] = convert_phone_number(vals.get('number'), country_code)
-        return super(OFResPartnerPhone, self).create(vals)
+        return super(OFResPartnerPhone, self.with_context(mail_create_nolog=True)).create(vals)
 
     @api.multi
     def write(self, vals):
@@ -595,3 +604,18 @@ class OFResPartnerPhone(models.Model):
 
         return super(OFResPartnerPhone, self)._search(args, offset=offset, limit=limit, order=order,
                                                       count=count, access_rights_uid=access_rights_uid)
+
+    @api.multi
+    def message_post(self, body='', subject=None, message_type='notification',
+                     subtype=None, parent_id=False, attachments=None,
+                     content_subtype='html', **kwargs):
+        self.ensure_one()
+        if self.partner_id:
+            self.partner_id.message_post(body=body, subject=subject, message_type=message_type,
+                                         subtype=subtype, parent_id=parent_id, attachments=attachments,
+                                         content_subtype=content_subtype, **kwargs)
+        return super(OFResPartnerPhone, self).message_post(body=body, subject=subject, message_type=message_type,
+                                                           subtype=subtype, parent_id=parent_id,
+                                                           attachments=attachments, content_subtype=content_subtype,
+                                                           **kwargs)
+
