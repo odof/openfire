@@ -247,20 +247,37 @@
                 <p>Il n'y a actuellement pas de contrats pour votre compte.</p>
             </t>
             <t t-if="deliveries">
-                <table class="table table-hover o_my_status_table">
+                <table class="table table-hover o_my_status_table" id="delivery_table">
                     <thead>
                         <tr class="active">
                             <th>Livraison</th>
-                            <th>Adresse</th>
+                            <th>Document d'origine</th>
+                            <th>Date de livraison</th>
+                            <th>Statut</th>
                         </tr>
                     </thead>
                     <t t-foreach="deliveries" t-as="delivery">
                         <tr>
                             <td>
-                                <a t-att-href="'/my/deliveries/pdf/'+str(delivery.id)" t-att-title="delivery.display_name"><t t-esc="delivery.display_name"/></a>
+                                <a t-att-href="'/my/deliveries/pdf/'+str(delivery.id)" t-att-title="delivery.display_name">
+                                    <span t-esc="delivery.display_name"/>
+                                </a>
                             </td>
                             <td>
-                                <span t-field="delivery.partner_id" t-options='{"widget": "contact", "fields": ["city"], "no_marker": True}'/>
+                                <span t-esc="delivery.origin"/>
+                            </td>
+                            <td>
+                                <span t-esc="delivery.date_done or delivery.min_date" t-options="{'widget': 'date'}"/>
+                            </td>
+                            <td>
+                                <t t-if="delivery.state == 'draft'"  t-set="color" t-value="'text-muted'"/>
+                                <t t-if="delivery.state == 'waiting'"  t-set="color" t-value="'text-warning'"/>
+                                <t t-if="delivery.state == 'confirmed'"  t-set="color" t-value="'text-warning'"/>
+                                <t t-if="delivery.state == 'partially_available'"  t-set="color" t-value="'text-warning'"/>
+                                <t t-if="delivery.state == 'assigned'"  t-set="color" t-value="'text-primary'"/>
+                                <t t-if="delivery.state == 'done'"  t-set="color" t-value="'text-success'"/>
+                                <t t-if="delivery.state == 'cancel'"  t-set="color" t-value="'text-danger'"/>
+                                <span t-field="delivery.state" t-att-class="color"/>
                             </td>
                         </tr>
                     </t>
