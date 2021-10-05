@@ -325,6 +325,7 @@ class OFProductCustomMadeParameter(models.Model):
     unit = fields.Char(string=u"Unité de mesure", required=True)
     min_value = fields.Integer(string=u"Valeur minimale", required=True)
     max_value = fields.Integer(string=u"Valeur maximale", required=True)
+    not_required = fields.Boolean(string=u"Non obligatoire")
 
 
 class SaleConfiguration(models.TransientModel):

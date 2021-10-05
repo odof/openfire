@@ -184,6 +184,7 @@
                                         <field name="unit"/>
                                         <field name="min_value"/>
                                         <field name="max_value"/>
+                                        <field name="not_required"/>
                                     </tree>
                                 </field>
                             </group>
