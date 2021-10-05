@@ -3,3 +3,4 @@
 from . import of_sale_planning
 from . import sale
 from . import product
+from . import stock
