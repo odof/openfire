@@ -300,8 +300,11 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
             return {}, u"Veuillez définir une position fiscale pour l'intervention %s" % self.name
         fiscal_position = intervention.fiscal_position_id or partner.property_account_position_id
         taxes = product.taxes_id
-        if partner.company_id:
-            taxes = taxes.filtered(lambda r: r.company_id == partner.company_id)
+        company = intervention._get_invoicing_company(partner)
+        if company:
+            if 'accounting_company_id' in company._fields:
+                company = company.accounting_company_id
+            taxes = taxes.filtered(lambda r: r.company_id == company)
         taxes = fiscal_position and fiscal_position.map_tax(taxes, product, partner) or []
 
         line_account = product.property_account_income_id or product.categ_id.property_account_income_categ_id
@@ -313,7 +316,6 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
             line_account = tax.map_account(line_account)
 
         pricelist = partner.property_product_pricelist
-        company = intervention._get_invoicing_company(partner)
 
         if pricelist.discount_policy == 'without_discount':
             from_currency = company.currency_id
@@ -1856,8 +1858,11 @@ class OfPlanningInterventionLine(models.Model):
             partner = line.partner_id
             fiscal_position = line.intervention_id.fiscal_position_id
             taxes = product.taxes_id
-            if partner.company_id:
-                taxes = taxes.filtered(lambda r: r.company_id == partner.company_id)
+            if taxes:
+                company = line.intervention_id._get_invoicing_company(partner)
+                if 'accounting_company_id' in company._fields:
+                    company = company.accounting_company_id
+                taxes = taxes.filtered(lambda r: r.company_id == company)
             if fiscal_position:
                 taxes = fiscal_position.map_tax(taxes, product, partner)
             line.taxe_ids = taxes
@@ -1919,9 +1924,13 @@ class OfPlanningInterventionLine(models.Model):
             return {}, u"Veuillez définir une position fiscale pour l'intervention %s" % self.name
         fiscal_position = self.intervention_id.fiscal_position_id
         taxes = self.taxe_ids
-        if partner.company_id and taxes:
-            taxes = taxes.filtered(lambda r: r.company_id == partner.company_id)
-        elif not taxes and fiscal_position:
+        if taxes:
+            company = self.intervention_id._get_invoicing_company(partner)
+            if company:
+                if 'accounting_company_id' in company._fields:
+                    company = company.accounting_company_id
+                taxes = taxes.filtered(lambda r: r.company_id == company)
+        elif fiscal_position:
             taxes = fiscal_position.map_tax(taxes, product, partner)
 
         line_account = product.property_account_income_id or product.categ_id.property_account_income_categ_id
