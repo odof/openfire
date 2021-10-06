@@ -1,0 +1,109 @@
+body [portal="B2B"] {
+
+    /*Buttons*/
+    .btn{
+        border-radius: 0;
+        &.btn-primary{
+            background: @as-theme-b2b;
+            border-color:  @as-theme-b2b;
+            &:hover,
+            &:focus,
+            &:active{
+                background:darken(@as-theme-b2b, 10%);
+                border-color:darken(@as-theme-b2b, 10%);
+            }
+        }
+        &.button-style1{
+            box-shadow: 0 2px 5px -1px rgba(0, 0, 0, 0.26);
+            border-radius: 2px;
+        }
+        &.button-style2{
+            border-radius: 20px;
+            &.btn-lg{
+                border-radius: 30px;
+            }
+        }
+    }
+    .label-primary{
+        background-color: @as-theme-b2b;
+    }
+
+    .creative-btn{
+        padding: 16px 21px 14px 22px;
+        border: 2px solid @as-dark;
+        color: @as-dark;
+        background-color: transparent;
+        margin-left: 5px;
+        margin-right: 5px;
+        font-size: 12px;
+        text-transform: uppercase;
+        line-height: 1;
+        letter-spacing: 2px;
+        border-radius: 3px;
+        .transition(all, 0.35s, ease);
+        display: inline-block;
+        &:hover{
+            background: @as-theme-b2b;
+            color: @as-light;
+            border-color: @as-theme-b2b;
+        }
+    }
+
+    /*creative-btn1*/
+    .creative-btn1{
+        font-size: 15px;
+        font-stretch: 300;
+        border-radius: 30px;
+        padding: 17px 45px;
+        display: inline-block;
+        vertical-align: top;
+        text-transform: uppercase;
+        background:@as-theme-b2b;
+        color: @as-light;
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+        margin: 0 10px;
+        &:hover{
+            background: @as-light;
+            color: @as-dark ;
+        }
+    }
+
+    /**/
+
+    /*creative-btn2*/
+    .creative-btn2{
+        font-size: 14px;
+        font-stretch: 300;
+        border-radius: 30px;
+        padding: 10px 15px;
+        display: inline-block;
+        vertical-align: top;
+        text-transform: uppercase;
+        background:@as-theme-b2b;
+        color: @as-light;
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+        margin: 0 10px;
+        &:hover{
+            background: @as-light;
+            color: @as-dark ;
+        }
+    }
+
+    .creative-btn2-border{
+        font-size: 14px;
+        font-stretch: 300;
+        border-radius: 30px;
+        padding: 10px 15px;
+        display: inline-block;
+        vertical-align: top;
+        text-transform: uppercase;
+        border: 2px solid @as-light;
+        color: @as-light;
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+        margin: 0 10px;
+        &:hover{
+            background:@as-light;
+            color: @as-theme-b2b;
+        }
+    }
+}

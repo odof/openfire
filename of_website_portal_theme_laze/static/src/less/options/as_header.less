@@ -1,0 +1,584 @@
+body [portal="B2B"] {
+
+    .header-top{
+        width: 100%;
+        display: inline-block;
+        vertical-align: top;
+        border-bottom: 1px solid lighten(@as-dark, 85%);
+        @media (max-width:767px){
+            .container{
+                padding: 0;
+            }
+        }
+        .ht-left{
+            float: left;
+            @media (max-width:767px){
+                width: 100%;
+                text-align: center;
+            }
+        }
+        .ht-right{
+            float: right;
+            text-align: right;
+            @media (max-width:767px){
+                width: 100%;
+                text-align: center;
+            }
+            ul{
+                margin: 0;
+                padding: 0;
+                li{
+                    list-style-type: none;
+                }
+            }
+            .dropdown-toggle{
+                margin: 0;
+                padding: 0;
+                height: 50px;
+                line-height: 50px;
+                font-weight: 400;
+                padding: 0 15px;
+                cursor: pointer;
+                color:lighten(@as-dark, 50%);
+                display: block;
+                @media (max-width:767px){
+                    height: 30px;
+                    line-height: 30px;
+                }
+            }
+            .hed-drop{
+                border-left: 1px solid lighten(@as-dark, 85%);
+                float: left;
+                position: relative;
+                @media (max-width:767px){
+                    width: 50%;
+                    text-align: center;
+                    border-bottom: 1px solid lighten(@as-dark, 85%);
+                    min-height: 31px;
+                    &.form-language{
+                        .dropdown-menu{
+                            left: 0;
+                            right: auto;
+                        }
+                    }
+                    &.ht-dropdown{
+                        width: 100%;
+                        .dropdown-toggle{
+                            .fa-user{
+                                display: none;
+                            }
+                        }
+                        .dropdown-menu{
+                            width: 100%;
+                            right: 0;
+                            left: auto;
+                        }
+                    }
+                }
+                &.ht-dropdown{
+                    .dropdown-toggle{
+                        .fa-user{
+                            display: none;
+                        }
+                    }
+                }
+            }
+            .dropdown-menu{
+                right: 0;
+                left: auto;
+                > li {
+                    + li {
+                        border-top: 1px solid lighten(@as-dark, 95%);
+                    }
+                    > a{
+                        padding: 8px 20px;
+                        .fa{
+                            margin-right: 5px;
+                        }
+                    }
+                    &.active,
+                    &.hover{
+                        > a{
+                            background: @as-theme-b2b !important;
+                            color: @as-light !important;
+                        }
+                    }
+                }
+            }
+        }
+        .htl-social{
+            float: left;
+            margin: 0 0 0 -12px;
+            padding: 0;
+            @media (max-width:767px){
+                margin: 0;
+                border-bottom: 1px solid lighten(@as-dark, 85%);
+                width: 100%;
+            }
+            li{
+                list-style-type: none;
+                float: left;
+                @media (max-width:767px){
+                    display: inline-block;
+                    vertical-align: middle;
+                    float: none;
+                }
+                a{
+                    color: fade(@as-dark, 50);
+                    font-size: 17px;
+                    padding: 0 12px;
+                    height: 50px;
+                    line-height: 50px;
+                    display: block;
+                        @media (max-width:767px){
+                            height: 30px;
+                            line-height: 30px;
+                        }
+                    &:hover{
+                        color:@as-theme-b2b;
+                    }
+                }
+            }
+        }
+        .hm-search{
+            float: left;
+            position: relative;
+            @media (max-width:767px){
+                float: right;
+            }
+            .hm-search-hide{
+                line-height: 50px;
+                border-left: 1px solid lighten(@as-dark, 85%);
+                border-right: 1px solid lighten(@as-dark, 85%);
+                padding: 0 15px;
+                cursor: pointer;
+                @media (max-width:767px){
+                    line-height: 30px;
+                }
+                .fa{
+                    color: fade(@as-dark, 50);
+                }
+            }
+            .hm-search-box{
+                display: none;
+                position: absolute;
+                right: 0;
+                width: 250px;
+                padding: 10px;
+                background: lighten(@as-dark, 85%);
+                z-index: 1;
+                top: 100%;
+                .form-control{
+                    box-shadow: none;
+                }
+                .btn-default{
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                }
+                &.hm-search-open{
+                    display: block;
+                }
+            }
+        }
+        .hm-cart{
+            float: left;
+            @media (max-width:767px){
+                width: 50%;
+            }
+            ul {
+                margin: 0;
+                padding: 0;
+                .hm-cart-item{
+                    padding: 0 15px;
+                    border-left: 1px solid lighten(@as-dark, 85%);
+                    cursor: pointer;
+                    position: relative;
+                    > span {
+                        color: fade(@as-dark, 50);
+                        font-weight: 400;
+                        display: block;
+                        cursor: pointer;
+                        line-height: 50px;
+                        text-align: left;
+                        @media (max-width:767px){
+                            line-height: 30px;
+                        }
+                        i{
+                            padding:0 5px;
+                        }
+                    }
+                    > div{
+                        display: none;
+                        position: absolute;
+                        top: 50px;
+                        .transition(all, 0.2s, ease);
+                        box-shadow: 0 0 25px rgba(0, 0, 0, 0.15);
+                        background: @as-light;
+                        width: 340px;
+                        padding: 20px;
+                        right: 0;
+                        z-index: 1;
+                        @media (max-width:767px){
+                            right: auto;
+                            left: 15px;
+                            width: 280px;
+                            top: 30px;
+                        }
+                    }
+
+                    ul{
+                        display: none;
+                        position: absolute;
+                        top: 50px;
+                        .transition(all, 0.2s, ease);
+                        box-shadow: 0 0 25px rgba(0, 0, 0, 0.15);
+                        background: @as-light;
+                        width: 340px;
+                        padding: 20px;
+                        right: 0;
+                        z-index: 1;
+                        @media (max-width:767px){
+                            right: auto;
+                            left: 15px;
+                            width: 280px;
+                            top: 30px;
+                        }
+                        li{
+                            .hci-row{
+                                position: relative;
+                                min-height: 55px;
+                                span.img {
+                                    width: 45px;
+                                    height: 45px;
+                                    overflow: hidden;
+                                    position: absolute;
+                                    left: 0;
+                                    top: 0;
+                                    border: 1px solid darken(@as-light, 10%);
+                                }
+                                .hm-cart-info{
+                                    padding-left: 40px;
+                                    padding-bottom: 10px;
+                                    text-align: left;
+                                    width: 100%;
+                                    display: inline-block;
+                                    vertical-align: top;
+                                    letter-spacing: -0.31em;
+                                    label{
+                                        display: inline-block;
+                                        vertical-align: middle;
+                                        padding: 0 10px;
+                                        letter-spacing: normal;
+
+                                        &.name{
+                                            width: 50%;
+                                            @media (max-width:767px){
+                                                width: 100%;
+                                            }
+                                            strong {
+                                                font-weight: 400;
+                                            }
+                                        }
+                                        &.quantity{
+                                            white-space: nowrap;
+                                            width: 15%;
+                                            @media (max-width:767px){
+                                                width: 40%;
+                                            }
+                                        }
+                                        &.total{
+                                            text-align: right;
+                                            width: 35%;
+                                            @media (max-width:767px){
+                                                width: 50%;
+                                            }
+                                        }
+                                        &.btn-remove{
+                                            text-align: right;
+                                            width: 15%;
+                                            @media (max-width:767px){
+                                                width: 20%;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                    .summary{
+                        width: 100%;
+                        display: inline-block;
+                        vertical-align: top;
+                        border-top: 1px solid darken(@as-light, 8%);
+                        padding: 15px 0 0;
+                        margin: 15px 0 0;
+                        text-align: right;
+                    }
+                    .total{
+                        .label{
+                            font-size: @as-font-size-base + 2;
+                        }
+                    }
+                    .actions{
+                        width: 100%;
+                        display: inline-block;
+                        vertical-align: top;
+                        padding: 15px 0 0;
+                        text-align: right;
+                        a{
+                            background: @as-theme-b2b;
+                            color: @as-light;
+                            padding: 10px 15px;
+                            text-transform: uppercase;
+                            font-size: @as-font-size - 2;
+                            display: inline-block;
+                            border:1px solid @as-theme-b2b;
+                            &:hover{
+                                color:@as-theme-b2b;
+                                background: @as-light;
+                            }
+                        }
+                    }
+
+                    &:hover{
+                        > div {
+                            display: block;
+                        }
+                        ul{
+                            display: block;
+                        }
+                    }
+                    &:hover{
+                        > span{
+                            color: @as-theme-b2b;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    .hm-search-open {
+        .header-top{
+            .hm-search{
+                .hm-search-box{
+                    display: block;
+                }
+            }
+        }
+    }
+
+    /*Menu*/
+    header{
+        .navbar-header{
+            padding: 25px 0px;
+            @media (max-width:767px){
+                margin: 0 !important;
+            }
+            .logo{
+                max-height: 50px;
+            }
+            @media (max-width:991px){
+                width:100%;
+                .navbar-toggle{
+                    display: block;
+                    margin-right: 0;
+                    background: @as-theme-b2b !important;
+                    border: 1px solid @as-theme-b2b;
+                    margin: 3px 0 0;
+                    .icon-bar{
+                        background: @as-light;
+                    }
+                }
+            }
+        }
+        .navbar-default{
+            border: none;
+            background: @as-light;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+            @media (max-width:991px){
+                .navbar-collapse{
+                    display: none !important;
+                    &.in{
+                        display: block !important;
+                        padding: 0 !important;
+                    }
+                }
+            }
+            .navbar-nav {
+                @media (max-width:991px){
+                    width: 100%;
+                    margin: 0 ;
+                    border: 1px solid #eee;
+                }
+                > li {
+                    @media (max-width:991px){
+                        width: 100%;
+                        border-top: 1px solid #fff;
+                        border-bottom: 1px solid #eee;
+                        background: #fafafa;
+                    }
+                    + li {
+                        padding-left: 40px;
+                        @media (max-width:991px){
+                            padding-left: 0px;
+                        }
+                    }
+                    > a{
+                        padding: 0;
+                        line-height: 94px;
+                        border-top: 3px solid transparent;
+                        border-bottom: 3px solid transparent;
+                        text-transform: uppercase;
+                        font-size: 14px;
+                        color: @as-dark;
+                        @media (max-width:991px){
+                            line-height: normal;
+                            border:none !important;
+                            padding: 8px 10px;
+                        }
+                    }
+                    &.active{
+                        > a{
+                            color: @as-theme-b2b !important;
+                            background: transparent !important;
+                        }
+                    }
+                    &:hover{
+                        > a{
+                            border-bottom: 3px solid @as-theme-b2b;
+                            color: @as-theme-b2b;
+                            background: transparent;
+                        }
+                    }
+                    &.dropdown{
+                        > a {
+                            .caret{
+                                @media (max-width:991px){
+                                    display: block;
+                                    width: 35px;
+                                    height: 35px;
+                                    float: right;
+                                    position: absolute;
+                                    right: 0;
+                                    top: 0;
+                                    background: darken(@as-theme-b2b, 5%);
+                                    border: none;
+                                    &:after,
+                                    &:before{
+                                        width:20px;
+                                        height: 1px;
+                                        float: left;
+                                        background:@as-light;
+                                        position: absolute;
+                                        top: 0;
+                                        left: 0;
+                                        bottom: 0;
+                                        right: 0;
+                                        margin: auto;
+                                        content: " ";
+                                    }
+                                    &:before{
+                                        width:1px;
+                                        height: 20px;
+                                    }
+                                }
+                            }
+
+                        }
+                        &.open{
+                            > a {
+                                border-top-color:transparent;
+                                border-bottom-color:transparent;
+                                background: transparent !important;
+                                .caret{
+                                    &:before{
+                                        display:none;
+                                    }
+                                }
+                            }
+                            .dropdown-menu{
+                                display: none;
+                                padding: 0;
+                                @media (max-width:991px){
+                                    display: block;
+                                    position: relative;
+                                    box-shadow: none;
+                                    width: 100%;
+                                    border: none;
+                                }
+                                li {
+                                    > a {
+                                        padding: 8px 10px;
+                                    }
+                                    a:hover{
+                                        color:@as-theme-b2b;
+                                    }
+                                }
+                            }
+                            &:hover{
+                                > a{
+                                    border-bottom-color:@as-theme-b2b;
+                                }
+                                .dropdown-menu{
+                                    display: block;
+                                }
+                            }
+                        }
+                        &:hover{
+                            .dropdown-menu{
+                                display:block;
+                                @media (max-width:991px){
+                                    display: none;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    .fixed-header{
+        padding-top: 120px;
+        @media (max-width:991px){
+            padding-top: 0;
+        }
+        .navbar-default {
+            top: 0;
+            position: fixed;
+            width: 100%;
+            left: 0;
+            right: 0;
+            .navbar-header{
+                padding: 10px 0;
+            }
+            .navbar-nav {
+                > li {
+                    > a{
+                        line-height: 65px;
+                        @media (max-width:991px){
+                            line-height: normal;
+                        }
+                    }
+
+
+                }
+            }
+            .header-top{
+                display: none;
+                @media (max-width:991px){
+                    display: block;
+                }
+
+            }
+            @media (max-width:991px){
+                position: relative;
+            }
+        }
+    }
+}
