@@ -9,12 +9,6 @@
                 <input type="hidden" class="product_id" name="product_id" t-att-value="product.sudo().sample_id and product.sudo().sample_id.product_variant_id.id"/>
                 <a id="add_sample_to_cart" class="btn btn-primary mt8 a-submit" href="#">Add sample to Cart</a>
             </form>
-            <t t-if="invalid">
-                <div class="alert alert-danger mt8">
-                    <strong>Warning!</strong>
-                    You can't make an order of both samples and products. You need to empty your cart before adding that item.
-                </div>
-            </t>
         </xpath>
     </template>
 

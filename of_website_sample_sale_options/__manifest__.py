@@ -22,5 +22,5 @@ Module OpenFire pour e-commerce : Module intermédiaire entre la gestion des éc
     ],
     'installable': True,
     'application': False,
-    'auto_install': True,
+    'auto_install': False,
 }
