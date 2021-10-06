@@ -54,6 +54,12 @@ class PurchaseOrder(models.Model):
                 order.of_reception_state = 'no'
 
     @api.model
+    def create(self, vals):
+        if self.env['ir.values'].get_default('purchase.config.settings', 'of_date_purchase_order'):
+            vals['date_order'] = fields.Datetime.now()
+        return super(PurchaseOrder, self).create(vals)
+
+    @api.model
     def _prepare_picking(self):
         values = super(PurchaseOrder, self)._prepare_picking()
         return isinstance(values, dict) and values.update({'of_customer_id': self.customer_id.id}) or values
@@ -342,10 +348,20 @@ class OFPurchaseConfiguration(models.TransientModel):
         group='base.group_portal,base.group_user,base.group_public',
         help=u"Affiche les informations de stock au niveau des lignes de commande")
 
+    of_date_purchase_order = fields.Selection([
+        (0, 'Standard'),
+        (1, 'Date du jour'),
+        ], string="(OF) Date des commandes fournisseur")
+
     @api.multi
     def set_description_as_order_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'purchase.config.settings', 'of_description_as_order_setting', self.of_description_as_order_setting)
+
+    @api.multi
+    def set_of_date_purchase_order_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'purchase.config.settings', 'of_date_purchase_order', self.of_date_purchase_order)
 
 
 class StockPicking(models.Model):
