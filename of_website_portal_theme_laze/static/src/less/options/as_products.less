@@ -1,0 +1,355 @@
+body [portal="B2B"] {
+
+    /* as-product
+    ------------------*/
+
+    #products_grid{
+        .as-product-list {
+            .col-sm-6 {
+                @media(min-width: 992px) {
+                    &:nth-child(3n+1) {
+                        clear: left;
+                    }
+                }
+                @media(max-width: 991px) {
+                    &:nth-child(3n+1) {
+                        clear: none;
+                    }
+                    &:nth-child(2n+1) {
+                        clear: left;
+                    }
+                }
+                @media(max-width: 767px) {
+                    &:nth-child(2n+1) {
+                        clear: none;
+                    }
+                }
+            }
+        }
+        &.list-view-box,
+        .oe_list{
+            border:none;
+            .as-product{
+                .pro-img{
+                    width: 31%;
+                    float: left;
+                    background: darken(@as-light, 4%);
+                }
+                .pro-action{
+                    position: relative;
+                    left: auto;
+                    right: auto;
+                    text-align: left;
+                    bottom: auto;
+                    a.btn-cart{
+                        padding: 0;
+                        margin-right: 8px;
+                        vertical-align: middle;
+                    }
+                    .add_to_wishlist{
+                        width: 32px;
+                        position: relative;
+                        top: 0;
+                        left: 0;
+                        text-align: center;
+                        z-index: 9;
+                        padding: 0;
+                        display: inline-block;
+                        vertical-align: middle;
+                        height: 30px;
+                        line-height: 32px;
+                        font-size: 18px;
+                        border:none;
+                        box-shadow:none;
+                    }
+                }
+                .pro-info{
+                    width: 69%;
+                    float: left;
+                    padding:0 20px;
+                    background: transparent;
+                    text-align: left;
+                    .o_rating_card {
+                        .rating {
+                            .o_rating_star_card{
+                                text-align: left;
+                            }
+                        }
+                    }
+                }
+            }
+            .as-product-list{
+                .col-md-4{
+                    width: 100%;
+
+                }
+            }
+        }
+    }
+
+
+
+    .owl-item{
+        .as-product{
+            margin-bottom: 0;
+        }
+    }
+
+
+    .as-product {
+        margin-bottom: 30px;
+        .transition(all, 0.5s, ease);
+
+        .asp-inner{
+            width: 100%;
+            display: inline-block;
+            vertical-align: top;
+            position: relative;
+            overflow: hidden;
+            .pro-img{
+                position: relative;
+                height: 263px;
+                overflow: hidden;
+                background: @as-light;
+                border:1px solid darken(@as-light, 6.5%);
+                img{
+                    max-width: 100%;
+                    max-height: 100%;
+                    margin: auto;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    bottom: 0;
+                    right: 0;
+                    z-index: 4;
+                    width: auto;
+                }
+                .preview-image{
+                    overflow: hidden;
+                    .product-hover-img {
+                        position: absolute;
+                        left: 0;
+                        top: -100%;
+                        z-index: 1;
+                        .transition(all, 0.5s, ease);
+                        height: 100%;
+                        width: 100%;
+                        z-index: 9;
+                        img {
+                            max-width: 100%;
+                            max-height: 100%;
+                            width: auto;
+                            height: auto;
+                        }
+                    }
+                }
+
+            }
+            .sale{
+                ul{
+                    margin: 0;
+                    padding: 0;
+                    li{
+                        list-style-type: none;
+                        padding: 4px 10px;
+                        background: #F05656;
+                        color: @as-light;
+                        position: absolute;
+                        left: 10px;
+                        top: 10px;
+                        line-height: normal;
+                        z-index: 10;
+                        margin: 0 0 5px;
+                        font-size: @as-font-size-base - 2;
+                        border-radius: 15px;
+                    }
+                }
+            }
+
+            .pro-action{
+                    width: 100%;
+                    display: inline-block;
+                    vertical-align: top;
+                    padding: 10px 0 0 0;
+                    .add_to_wishlist{
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        position: absolute;
+                        top: 10px;
+                        right: 10px;
+                        text-align: center;
+                        z-index: 9;
+                        line-height: 40px;
+                        background: @as-theme-b2b;
+                        color: @as-light;
+                        font-size: @as-font-size * 2 - 8;
+                        border:none;
+                        box-shadow:none;
+                        span{
+                            display: none;
+                        }
+                    }
+                    a.btn-cart{
+                        display: inline-block;
+                        margin: 0;
+                        padding: 0;
+                    }
+                    .button.btn-cart{
+                        background: transparent;
+                        border: 1px solid @as-dark;
+
+                        .fa{
+                            color: @as-theme-b2b;
+                        }
+                        &:hover{
+                            background: @as-dark;
+
+                            .fa{
+                                color: @as-light !important;
+                            }
+                        }
+                    }
+                }
+
+            .pro-info{
+                width: 100%;
+                float: left;
+                text-align: center;
+                padding: 10px 0 0 0;
+                h3{
+                    font-size: @as-font-size;
+                    font-weight: 300;
+                    margin: 0;
+                    padding: 0 0 10px;
+                    white-space: nowrap;
+                    width: 100%;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    strong{
+                        font-weight: 400;
+                    }
+                    a{
+                        color:darken(@as-body, 5%);
+                    }
+                    &:hover{
+                        a{
+                            color:@as-theme-b2b;
+                        }
+                    }
+                }
+                .product_price{
+                    width: 100%;
+                    float: left;
+                    font-size: @as-font-size;
+                    position: relative;
+                    font-weight: 700;
+                    b{
+                        font-weight: 600;
+                    }
+                    span{
+                        font-weight: 700;
+                    }
+                    .text-danger{
+                         color: #d40707;
+                    }
+                }
+                .o_rating_card{
+                    width: 100%;
+                    display: inline-block;
+                    vertical-align: top;
+                    text-align: center;
+                    margin-top: 5px;
+                    line-height:normal;
+                    .well{
+                        float: none;
+                        text-align: center;
+                    }
+                    .rating{
+                        float: none;
+                        .o_rating_star_card{
+                            float: none;
+                            .stars {
+                                margin: 0;
+                                .fa{
+                                    color: @as-theme-b2b;
+                                    font-size: @as-font-size-base + 1;
+                                    margin: 0;
+                                }
+                            }
+                        }
+                    }
+                    .fa-user{
+                        display: none;
+                    }
+                    .popover{
+                        display: none !important;
+                    }
+                }
+            }
+            &:hover{
+                .pro-action{
+                    bottom: 0;
+                }
+            }
+        }
+        &:hover{
+            .asp-inner{
+            .preview-image{
+                    .product-hover-img{
+                        top: 0;
+                    }
+                }
+            }
+        }
+    }
+
+    /**/
+
+
+    /* Events
+    ---------------------------------------------*/
+    #left_column {
+        .nav-pills{
+            border:1px solid darken(@as-light, 9%);
+            > li{
+                + li {
+                    border-top:1px solid darken(@as-light, 9%);
+                    margin:0;
+                }
+                > a{
+                    padding:10px;
+                    border-radius:0;
+                }
+                &.active{
+                    > a {
+                        background:@as-theme-b2b;
+                        color:@as-light;
+                        .badge{
+                            color:@as-theme-b2b;
+                        }
+                        &:hover,
+                        &:active,
+                        &:focus{
+                            background:@as-theme-b2b;
+                            color:@as-light;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

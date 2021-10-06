@@ -1,0 +1,99 @@
+body [portal="B2B"] {
+
+    .header-top{
+        .ht-right{
+            .dropdown-menu{
+                > li {
+                    &.active,
+                    &.hover{
+                        > a{
+                            background: @as-theme-b2b !important;
+                        }
+                    }
+                }
+            }
+        }
+        .htl-social{
+            li{
+                a{
+                    &:hover{
+                        color:@as-theme-b2b;
+                    }
+                }
+            }
+        }
+        .hm-cart{
+            ul {
+                .hm-cart-item{
+                    .actions{
+                        a{
+                            background: @as-theme-b2b;
+                            border:1px solid @as-theme-b2b;
+                            &:hover{
+                                color:@as-theme-b2b;
+                            }
+                        }
+                    }
+                    &:hover{
+                        > span{
+                            color: @as-theme-b2b;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /*Menu*/
+    header{
+        .navbar-header{
+            @media (max-width:991px){
+                .navbar-toggle{
+                    background: @as-theme-b2b !important;
+                    border: 1px solid @as-theme-b2b;
+                }
+            }
+        }
+        .navbar-default{
+            .navbar-nav {
+                > li {
+                    &.active{
+                        > a{
+                            color: @as-theme-b2b !important;
+                        }
+                    }
+                    &:hover{
+                        > a{
+                            border-bottom: 3px solid @as-theme-b2b;
+                            color: @as-theme-b2b;
+                        }
+                    }
+                    &.dropdown{
+                        > a {
+                            .caret{
+                                @media (max-width:991px){
+                                    background: darken(@as-theme-b2b, 5%);
+                                }
+                            }
+
+                        }
+                        &.open{
+                            .dropdown-menu{
+                                li {
+                                    a:hover{
+                                        color:@as-theme-b2b;
+                                    }
+                                }
+                            }
+                            &:hover{
+                                > a{
+                                    border-bottom-color:@as-theme-b2b;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <template id="of_customize_modal" inherit_id="theme_impacto.customize_modal" name="of_website_portal modal">
+    <template id="of_customize_modal" inherit_id="theme_impacto.customize_modal" name="of_website_portal_theme_impacto modal">
         <xpath expr="//div[@id='theme_customize_modal']//table[@name='color']" position="after">
             <h5 class="modal-h5">B2B COLOR</h5>
             <table name="color">
@@ -10,56 +10,56 @@
                         <label class="color-box">
                             <div class="color-div color1">
                             </div>
-                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal.of_option_color1" />
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_impacto.of_option_color1" />
                         </label>
                     </td>
                     <td>
                         <label class="color-box">
                             <div class="color-div color2">
                             </div>
-                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal.of_option_color2" />
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_impacto.of_option_color2" />
                         </label>
                     </td>
                     <td>
                         <label class="color-box">
                             <div class="color-div color3">
                             </div>
-                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal.of_option_color3" />
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_impacto.of_option_color3" />
                         </label>
                     </td>
                     <td>
                         <label class="color-box">
                             <div class="color-div color4">
                             </div>
-                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal.of_option_color4" />
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_impacto.of_option_color4" />
                         </label>
                     </td>
                     <td>
                         <label class="color-box">
                             <div class="color-div color5">
                             </div>
-                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal.of_option_color5" />
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_impacto.of_option_color5" />
                         </label>
                     </td>
                     <td>
                         <label class="color-box">
                             <div class="color-div color6">
                             </div>
-                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal.of_option_color6" />
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_impacto.of_option_color6" />
                         </label>
                     </td>
                     <td>
                         <label class="color-box">
                             <div class="color-div color7">
                             </div>
-                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal.of_option_color7" />
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_impacto.of_option_color7" />
                         </label>
                     </td>
                     <td>
                         <label class="color-box">
                             <div class="color-div color8">
                             </div>
-                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal.of_option_color8" />
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_impacto.of_option_color8" />
                         </label>
                     </td>
                 </tr>
@@ -68,56 +68,56 @@
                         <label class="color-box">
                             <div class="color-div color9">
                             </div>
-                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal.of_option_color9" />
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_impacto.of_option_color9" />
                         </label>
                     </td>
                     <td>
                         <label class="color-box">
                             <div class="color-div color10">
                             </div>
-                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal.of_option_color10" />
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_impacto.of_option_color10" />
                         </label>
                     </td>
                     <td>
                         <label class="color-box">
                             <div class="color-div color11">
                             </div>
-                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal.of_option_color11" />
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_impacto.of_option_color11" />
                         </label>
                     </td>
                     <td>
                         <label class="color-box">
                             <div class="color-div color12">
                             </div>
-                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal.of_option_color12" />
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_impacto.of_option_color12" />
                         </label>
                     </td>
                     <td>
                         <label class="color-box">
                             <div class="color-div color13">
                             </div>
-                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal.of_option_color13" />
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_impacto.of_option_color13" />
                         </label>
                     </td>
                     <td>
                         <label class="color-box">
                             <div class="color-div color14">
                             </div>
-                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal.of_option_color14" />
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_impacto.of_option_color14" />
                         </label>
                     </td>
                     <td>
                         <label class="color-box">
                             <div class="color-div color15">
                             </div>
-                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal.of_option_color15" />
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_impacto.of_option_color15" />
                         </label>
                     </td>
                     <td>
                         <label class="color-box">
                             <div class="color-div color16">
                             </div>
-                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal.of_option_color16" />
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_impacto.of_option_color16" />
                         </label>
                     </td>
                 </tr>
@@ -131,87 +131,87 @@
 
     <template id="of_option_color" name="of_option_color" inherit_id="website.assets_frontend">
         <xpath expr="." position="inside">
-            <link href="/of_website_portal/static/src/less/theme_option/colors/color.less" rel="stylesheet" type="text/less"/>
+            <link href="/of_website_portal_theme_impacto/static/src/less/theme_option/colors/color.less" rel="stylesheet" type="text/less"/>
         </xpath>
     </template>
     <template id="of_option_color1" name="of_option_color1" inherit_id="website.assets_frontend" active="True">
         <xpath expr="." position="inside">
-            <link href="/of_website_portal/static/src/less/theme_option/colors/color-1.less" rel="stylesheet" type="text/less"/>
+            <link href="/of_website_portal_theme_impacto/static/src/less/theme_option/colors/color-1.less" rel="stylesheet" type="text/less"/>
         </xpath>
     </template>
     <template id="of_option_color2" name="of_option_color2" inherit_id="website.assets_frontend" active="False">
         <xpath expr="." position="inside">
-            <link href="/of_website_portal/static/src/less/theme_option/colors/color-2.less" rel="stylesheet" type="text/less"/>
+            <link href="/of_website_portal_theme_impacto/static/src/less/theme_option/colors/color-2.less" rel="stylesheet" type="text/less"/>
         </xpath>
     </template>
     <template id="of_option_color3" name="of_option_color3" inherit_id="website.assets_frontend" active="False">
         <xpath expr="." position="inside">
-            <link href="/of_website_portal/static/src/less/theme_option/colors/color-3.less" rel="stylesheet" type="text/less"/>
+            <link href="/of_website_portal_theme_impacto/static/src/less/theme_option/colors/color-3.less" rel="stylesheet" type="text/less"/>
         </xpath>
     </template>
     <template id="of_option_color4" name="of_option_color4" inherit_id="website.assets_frontend" active="False">
         <xpath expr="." position="inside">
-            <link href="/of_website_portal/static/src/less/theme_option/colors/color-4.less" rel="stylesheet" type="text/less"/>
+            <link href="/of_website_portal_theme_impacto/static/src/less/theme_option/colors/color-4.less" rel="stylesheet" type="text/less"/>
         </xpath>
     </template>
     <template id="of_option_color5" name="of_option_color5" inherit_id="website.assets_frontend" active="False">
         <xpath expr="." position="inside">
-            <link href="/of_website_portal/static/src/less/theme_option/colors/color-5.less" rel="stylesheet" type="text/less"/>
+            <link href="/of_website_portal_theme_impacto/static/src/less/theme_option/colors/color-5.less" rel="stylesheet" type="text/less"/>
         </xpath>
     </template>
     <template id="of_option_color6" name="of_option_color6" inherit_id="website.assets_frontend" active="False">
         <xpath expr="." position="inside">
-            <link href="/of_website_portal/static/src/less/theme_option/colors/color-6.less" rel="stylesheet" type="text/less"/>
+            <link href="/of_website_portal_theme_impacto/static/src/less/theme_option/colors/color-6.less" rel="stylesheet" type="text/less"/>
         </xpath>
     </template>
     <template id="of_option_color7" name="of_option_color7" inherit_id="website.assets_frontend" active="False">
         <xpath expr="." position="inside">
-            <link href="/of_website_portal/static/src/less/theme_option/colors/color-7.less" rel="stylesheet" type="text/less"/>
+            <link href="/of_website_portal_theme_impacto/static/src/less/theme_option/colors/color-7.less" rel="stylesheet" type="text/less"/>
         </xpath>
     </template>
     <template id="of_option_color8" name="of_option_color8" inherit_id="website.assets_frontend" active="False">
         <xpath expr="." position="inside">
-            <link href="/of_website_portal/static/src/less/theme_option/colors/color-8.less" rel="stylesheet" type="text/less"/>
+            <link href="/of_website_portal_theme_impacto/static/src/less/theme_option/colors/color-8.less" rel="stylesheet" type="text/less"/>
         </xpath>
     </template>
     <template id="of_option_color9" name="of_option_color9" inherit_id="website.assets_frontend" active="False">
         <xpath expr="." position="inside">
-            <link href="/of_website_portal/static/src/less/theme_option/colors/color-9.less" rel="stylesheet" type="text/less"/>
+            <link href="/of_website_portal_theme_impacto/static/src/less/theme_option/colors/color-9.less" rel="stylesheet" type="text/less"/>
         </xpath>
     </template>
     <template id="of_option_color10" name="of_option_color10" inherit_id="website.assets_frontend" active="False">
         <xpath expr="." position="inside">
-            <link href="/of_website_portal/static/src/less/theme_option/colors/color-10.less" rel="stylesheet" type="text/less"/>
+            <link href="/of_website_portal_theme_impacto/static/src/less/theme_option/colors/color-10.less" rel="stylesheet" type="text/less"/>
         </xpath>
     </template>
     <template id="of_option_color11" name="of_option_color11" inherit_id="website.assets_frontend" active="False">
         <xpath expr="." position="inside">
-            <link href="/of_website_portal/static/src/less/theme_option/colors/color-11.less" rel="stylesheet" type="text/less"/>
+            <link href="/of_website_portal_theme_impacto/static/src/less/theme_option/colors/color-11.less" rel="stylesheet" type="text/less"/>
         </xpath>
     </template>
     <template id="of_option_color12" name="of_option_color12" inherit_id="website.assets_frontend" active="False">
         <xpath expr="." position="inside">
-            <link href="/of_website_portal/static/src/less/theme_option/colors/color-12.less" rel="stylesheet" type="text/less"/>
+            <link href="/of_website_portal_theme_impacto/static/src/less/theme_option/colors/color-12.less" rel="stylesheet" type="text/less"/>
         </xpath>
     </template>
     <template id="of_option_color13" name="of_option_color13" inherit_id="website.assets_frontend" active="False">
         <xpath expr="." position="inside">
-            <link href="/of_website_portal/static/src/less/theme_option/colors/color-13.less" rel="stylesheet" type="text/less"/>
+            <link href="/of_website_portal_theme_impacto/static/src/less/theme_option/colors/color-13.less" rel="stylesheet" type="text/less"/>
         </xpath>
     </template>
     <template id="of_option_color14" name="of_option_color14" inherit_id="website.assets_frontend" active="False">
         <xpath expr="." position="inside">
-            <link href="/of_website_portal/static/src/less/theme_option/colors/color-14.less" rel="stylesheet" type="text/less"/>
+            <link href="/of_website_portal_theme_impacto/static/src/less/theme_option/colors/color-14.less" rel="stylesheet" type="text/less"/>
         </xpath>
     </template>
     <template id="of_option_color15" name="of_option_color15" inherit_id="website.assets_frontend" active="False">
         <xpath expr="." position="inside">
-            <link href="/of_website_portal/static/src/less/theme_option/colors/color-15.less" rel="stylesheet" type="text/less"/>
+            <link href="/of_website_portal_theme_impacto/static/src/less/theme_option/colors/color-15.less" rel="stylesheet" type="text/less"/>
         </xpath>
     </template>
     <template id="of_option_color16" name="of_option_color16" inherit_id="website.assets_frontend" active="False">
         <xpath expr="." position="inside">
-            <link href="/of_website_portal/static/src/less/theme_option/colors/color-16.less" rel="stylesheet" type="text/less"/>
+            <link href="/of_website_portal_theme_impacto/static/src/less/theme_option/colors/color-16.less" rel="stylesheet" type="text/less"/>
         </xpath>
     </template>
 

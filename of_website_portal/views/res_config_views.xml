@@ -8,22 +8,22 @@
         <field name="arch" type="xml">
             <xpath expr="//group[@name='delivery']" position="after">
                 <group string="Portail B2C" id="b2c" name="b2c_portal">
-                    <label string="(OF) Liste de prix B2C par défaut" for="of_pricelist_b2c_id" groups="base.group_no_one"/>
-                    <div groups="base.group_no_one" class="oe_inline">
+                    <label string="(OF) Liste de prix B2C par défaut" for="of_pricelist_b2c_id"/>
+                    <div class="oe_inline">
                         <field name="of_pricelist_b2c_id"/>
                     </div>
-                    <label string="(OF) Position fiscale B2C par défaut" for="of_fiscal_position_b2c_id" groups="base.group_no_one"/>
-                    <div groups="base.group_no_one" class="oe_inline">
+                    <label string="(OF) Position fiscale B2C par défaut" for="of_fiscal_position_b2c_id"/>
+                    <div class="oe_inline">
                         <field name="of_fiscal_position_b2c_id"/>
                     </div>
                 </group>
                 <group string="Portail B2B" id="b2b" name="b2b_portal">
-                    <label string="(OF) Liste de prix B2B par défaut" for="of_pricelist_b2b_id" groups="base.group_no_one"/>
-                    <div groups="base.group_no_one" class="oe_inline">
+                    <label string="(OF) Liste de prix B2B par défaut" for="of_pricelist_b2b_id"/>
+                    <div class="oe_inline">
                         <field name="of_pricelist_b2b_id"/>
                     </div>
-                    <label string="(OF) Position fiscale B2B par défaut" for="of_fiscal_position_b2b_id" groups="base.group_no_one"/>
-                    <div groups="base.group_no_one" class="oe_inline">
+                    <label string="(OF) Position fiscale B2B par défaut" for="of_fiscal_position_b2b_id"/>
+                    <div class="oe_inline">
                         <field name="of_fiscal_position_b2b_id"/>
                     </div>
                 </group>
