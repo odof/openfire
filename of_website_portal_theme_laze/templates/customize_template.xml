@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="of_theme_customize" inherit_id="theme_laze.theme_customize" name="of_website_portal_theme_laze modal">
+        <xpath expr="//div[@id='theme_customize_modal']//ul[@class='nav nav-tabs']/li[7]" position="inside">
+            <li class="text-center left-content-block">
+                <a href="#b2b_color" class="" role="tab" data-toggle="tab"><span class="fa fa-pencil center-block"></span>B2B COLORS</a>
+            </li>
+        </xpath>
+        <xpath expr="//div[@id='theme_customize_modal']//div[@id='color']" position="after">
+            <div class="tab-pane" id="b2b_color">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <p class="text-center">Color Preset 1</p>
+                        <label class="chd-color-combi">
+                            <div class="row colorPreset1">
+
+                            </div>
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_laze.of_option_colorPreset1" />
+                        </label>
+                    </div>
+                    <div class="col-xs-12">
+                        <p class="text-center">Color Preset 2</p>
+                        <label class="chd-color-combi">
+                            <div class="row colorPreset2">
+
+                            </div>
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_laze.of_option_colorPreset2" />
+                        </label>
+                    </div>
+                    <div class="col-xs-12">
+                        <p class="text-center">Color Preset 3</p>
+                        <label class="chd-color-combi">
+                            <div class="row colorPreset3">
+
+                            </div>
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_laze.of_option_colorPreset3" />
+                        </label>
+                    </div>
+                    <div class="col-xs-12">
+                        <p class="text-center">Color Preset 4</p>
+                        <label class="chd-color-combi">
+                            <div class="row colorPreset4">
+
+                            </div>
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_laze.of_option_colorPreset4" />
+                        </label>
+                    </div>
+                    <div class="col-xs-12">
+                        <p class="text-center">Color Preset 5</p>
+                        <label class="chd-color-combi">
+                            <div class="row colorPreset5">
+
+                            </div>
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_laze.of_option_colorPreset5" />
+                        </label>
+                    </div>
+                    <div class="col-xs-12">
+                        <p class="text-center">Color Preset 6</p>
+                        <label class="chd-color-combi">
+                            <div class="row colorPreset6">
+
+                            </div>
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_laze.of_option_colorPreset6" />
+                        </label>
+                    </div>
+
+                    <div class="col-xs-12">
+                        <p class="text-center">Color Preset 7</p>
+                        <label class="chd-color-combi">
+                            <div class="row colorPreset7">
+
+                            </div>
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_laze.of_option_colorPreset7" />
+                        </label>
+                    </div>
+                    <div class="col-xs-12">
+                        <p class="text-center">Color Preset 8</p>
+                        <label class="chd-color-combi">
+                            <div class="row colorPreset8">
+
+                            </div>
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_laze.of_option_colorPreset8" />
+                        </label>
+                    </div>
+                    <div class="col-xs-12">
+                        <p class="text-center">Color Preset 9</p>
+                        <label class="chd-color-combi">
+                            <div class="row colorPreset9">
+
+                            </div>
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_laze.of_option_colorPreset9" />
+                        </label>
+                    </div>
+                    <div class="col-xs-12">
+                        <p class="text-center">Color Preset 10</p>
+                        <label class="chd-color-combi">
+                            <div class="row colorPreset10">
+
+                            </div>
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_laze.of_option_colorPreset10" />
+                        </label>
+                    </div>
+                    <div class="col-xs-12">
+                        <p class="text-center">Color Preset 11</p>
+                        <label class="chd-color-combi">
+                            <div class="row colorPreset11">
+
+                            </div>
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_laze.of_option_colorPreset11" />
+                        </label>
+                    </div>
+                    <div class="col-xs-12">
+                        <p class="text-center">Color Preset 12</p>
+                        <label class="chd-color-combi">
+                            <div class="row colorPreset12">
+
+                            </div>
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_laze.of_option_colorPreset12" />
+                        </label>
+                    </div>
+                    <div class="col-xs-12">
+                        <p class="text-center">Color Preset 13</p>
+                        <label class="chd-color-combi">
+                            <div class="row colorPreset13">
+
+                            </div>
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_laze.of_option_colorPreset13" />
+                        </label>
+                    </div>
+                    <div class="col-xs-12">
+                        <p class="text-center">Color Preset 14</p>
+                        <label class="chd-color-combi">
+                            <div class="row colorPreset14">
+
+                            </div>
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_laze.of_option_colorPreset14" />
+                        </label>
+                    </div>
+                    <div class="col-xs-12">
+                        <p class="text-center">Color Preset 15</p>
+                        <label class="chd-color-combi">
+                            <div class="row colorPreset15">
+
+                            </div>
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_laze.of_option_colorPreset15" />
+                        </label>
+                    </div>
+                    <div class="col-xs-12">
+                        <p class="text-center">Color Preset 16</p>
+                        <label class="chd-color-combi">
+                            <div class="row colorPreset16">
+
+                            </div>
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_laze.of_option_colorPreset16" />
+                        </label>
+                    </div>
+                    <div class="col-xs-12">
+                        <p class="text-center">Color Preset 17</p>
+                        <label class="chd-color-combi">
+                            <div class="row colorPreset17">
+
+                            </div>
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_laze.of_option_colorPreset17" />
+                        </label>
+                    </div>
+                    <div class="col-xs-12">
+                        <p class="text-center">Color Preset 18</p>
+                        <label class="chd-color-combi">
+                            <div class="row colorPreset18">
+
+                            </div>
+                            <input name="of_colorvar" type="radio" data-xmlid="of_website_portal_theme_laze.of_option_colorPreset18" />
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+        </xpath>
+    </template>
+
+
+    <template id="of_option" name="of_option" inherit_id="website.assets_frontend">
+        <xpath expr="link[@href='/theme_laze/static/src/less/as_header_a.less']" position="before">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/as_header_a.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+        <xpath expr="link[@href='/theme_laze/static/src/less/as_base.less']" position="before">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/as_base.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+        <xpath expr="link[@href='/theme_laze/static/src/less/as_buttons.less']" position="before">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/as_buttons.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+        <xpath expr="link[@href='/theme_laze/static/src/less/as_mixins.less']" position="before">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/as_mixins.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+        <xpath expr="link[@href='/theme_laze/static/src/less/as_custom.less']" position="before">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/as_custom.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+        <xpath expr="link[@href='/theme_laze/static/src/less/as_snippets.less']" position="before">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/as_snippets.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+        <xpath expr="link[@href='/theme_laze/static/src/less/as_footer.less']" position="before">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/as_footer.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+        <xpath expr="link[@href='/theme_laze/static/src/less/as_products.less']" position="before">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/as_products.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+        <xpath expr="." position="inside">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/laze_fix.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+
+    <!-- ===================== COLOR OPTIONS ======================== -->
+    <template id="of_option_colorPreset1" name="of_option_colorPreset1" inherit_id="website.assets_frontend" active="False">
+        <xpath expr="." position="inside">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-1.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+    <template id="of_option_colorPreset2" name="of_option_colorPreset2" inherit_id="website.assets_frontend" active="False">
+        <xpath expr="." position="inside">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-2.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+    <template id="of_option_colorPreset3" name="of_option_colorPreset3" inherit_id="website.assets_frontend" active="True">
+        <xpath expr="." position="inside">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-3.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+    <template id="of_option_colorPreset4" name="of_option_colorPreset4" inherit_id="website.assets_frontend" active="False">
+        <xpath expr="." position="inside">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-4.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+    <template id="of_option_colorPreset5" name="of_option_colorPreset5" inherit_id="website.assets_frontend" active="False">
+        <xpath expr="." position="inside">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-5.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+    <template id="of_option_colorPreset6" name="of_option_colorPreset6" inherit_id="website.assets_frontend" active="False">
+        <xpath expr="." position="inside">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-6.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+    <template id="of_option_colorPreset7" name="of_option_colorPreset7" inherit_id="website.assets_frontend" active="False">
+        <xpath expr="." position="inside">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-7.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+    <template id="of_option_colorPreset8" name="of_option_colorPreset8" inherit_id="website.assets_frontend" active="False">
+        <xpath expr="." position="inside">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-8.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+    <template id="of_option_colorPreset9" name="of_option_colorPreset9" inherit_id="website.assets_frontend" active="False">
+        <xpath expr="." position="inside">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-9.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+    <template id="of_option_colorPreset10" name="of_option_colorPreset10" inherit_id="website.assets_frontend" active="False">
+        <xpath expr="." position="inside">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-10.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+    <template id="of_option_colorPreset11" name="of_option_colorPreset11" inherit_id="website.assets_frontend" active="False">
+        <xpath expr="." position="inside">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-11.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+    <template id="of_option_colorPreset12" name="of_option_colorPreset12" inherit_id="website.assets_frontend" active="False">
+        <xpath expr="." position="inside">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-12.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+    <template id="of_option_colorPreset13" name="of_option_colorPreset13" inherit_id="website.assets_frontend" active="False">
+        <xpath expr="." position="inside">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-13.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+    <template id="of_option_colorPreset14" name="of_option_colorPreset14" inherit_id="website.assets_frontend" active="False">
+        <xpath expr="." position="inside">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-14.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+    <template id="of_option_colorPreset15" name="of_option_colorPreset15" inherit_id="website.assets_frontend" active="False">
+        <xpath expr="." position="inside">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-15.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+    <template id="of_option_colorPreset16" name="of_option_colorPreset16" inherit_id="website.assets_frontend" active="False">
+        <xpath expr="." position="inside">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-16.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+    <template id="of_option_colorPreset17" name="of_option_colorPreset17" inherit_id="website.assets_frontend" active="False">
+        <xpath expr="." position="inside">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-17.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+    <template id="of_option_colorPreset18" name="of_option_colorPreset18" inherit_id="website.assets_frontend" active="False">
+        <xpath expr="." position="inside">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-18.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+
+
+    <!-- ===================== HEADER Style ======================== -->
+
+    <template id="of_option_header_style1" name="of_website_portal_theme_laze_option_header_style1" inherit_id="theme_laze.option_header_style1">
+        <xpath expr="link" position="after">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/header-option/option_header_style1.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+
+    <template id="of_option_header_style5" name="of_website_portal_theme_laze_option_header_style5" inherit_id="theme_laze.option_header_style5">
+        <xpath expr="link" position="after">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/header-option/option_header_style5.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+</odoo>
