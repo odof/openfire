@@ -13,6 +13,7 @@
             <field name="arch" type="xml">
                 <field name="barcode" position="after">
                     <field name="of_frais_port" widget='monetary'/>
+                    <field name="of_frais_port_corse" widget='monetary'/>
                 </field>
             </field>
         </record>
@@ -25,6 +26,7 @@
             <field name="arch" type="xml">
                 <field name="barcode" position="after">
                     <field name="of_frais_port" widget='monetary'/>
+                    <field name="of_frais_port_corse" widget='monetary'/>
                 </field>
             </field>
         </record>
