@@ -62,24 +62,24 @@ class ProjectIssue(models.Model):
                     date_fin = fields.Date.to_string(fields.Date.from_string(date_next) + timedelta(days=7))
 
                 di_vals = {
-                    'titre': di and di.titre or sav.name,
-                    'active': di and di.active or sav_sans.active,
-                    'partner_id': di and di.partner_id.id or sav.partner_id.id,
-                    'address_id': di and di.address_id and di.address_id.id or sav.partner_id.id,
-                    'company_id': di and di.company_id and di.company_id.id or sav.company_id and sav.company_id.id,
-                    'note': note,
+                    #'titre': di and di.titre or sav.name,
+                    #'active': di and di.active or sav_sans.active,
+                    #'partner_id': di and di.partner_id.id or sav.partner_id.id,
+                    #'address_id': di and di.address_id and di.address_id.id or sav.partner_id.id,
+                    #'company_id': di and di.company_id and di.company_id.id or sav.company_id and sav.company_id.id,
+                    #'note': note,
                     'tag_ids': [(6, 0, tag_ids)],
-                    'priority': di and di.priority or sav.priority,
-                    'user_id': di and di.user_id and di.user_id.id or sav.user_id and sav.user_id.id,
+                    #'priority': di and di.priority or sav.priority,
+                    #'user_id': di and di.user_id and di.user_id.id or sav.user_id and sav.user_id.id,
                     'date_next': date_next,
                     'date_fin': date_fin,
                     'intervention_ids': [(4, i_id, 0) for i_id in intervention_ids],
-                    'of_categorie_id': sav.of_categorie_id and sav.of_categorie_id.id,
-                    'of_canal_id': sav.of_canal_id and sav.of_canal_id.id,
-                    'parc_installe_id': di and di.parc_installe_id and di.parc_installe_id.id or
-                                        sav.of_produit_installe_id and sav.of_produit_installe_id.id,
-                    'sav_id': sav.id,
-                    'payer_mode': payer_mode,
+                    #'of_categorie_id': sav.of_categorie_id and sav.of_categorie_id.id,
+                    #'of_canal_id': sav.of_canal_id and sav.of_canal_id.id,
+                    #'parc_installe_id': di and di.parc_installe_id and di.parc_installe_id.id or
+                    #                    sav.of_produit_installe_id and sav.of_produit_installe_id.id,
+                    #'sav_id': sav.id,
+                    #'payer_mode': payer_mode,
                     'type_id': sav_type.id,
                     'tache_id': sav_tache.id,
                 }
