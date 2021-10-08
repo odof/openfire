@@ -9,7 +9,7 @@
         <xpath expr="//div[@name='pastille_date_vt']" position="before">
             <div t-if="doc.of_requested_week and pdf_display_requested_week" name="requested_week"
                  style="flex: 1; padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
-                <strong>Semaine prévue&amp;nbsp;:</strong>
+                <strong>Semaine demandée&amp;nbsp;:</strong>
                 <p t-field="doc.of_requested_week"/>
             </div>
             <div t-if="doc.of_requested_week and pdf_display_requested_week" style="display: table-cell; width: 4px;"/>
