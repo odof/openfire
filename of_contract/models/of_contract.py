@@ -49,6 +49,14 @@ class AccountAnalyticAccount(models.Model):
             res['fiscal_position_id'] = self.of_fiscal_position_id.id
         return res
 
+    @api.multi
+    def _create_invoice(self):
+        # A chaque création de facture un utilisateur est abonné et le cache est invalidé.
+        # Si plusieurs contrats sont sélectionnés pour générer leur facture, il est donc coûteux de recalculer les
+        # champs sur toutes les factures à chaque itération.
+        # Ce code pourra être retiré à partir de la v12 car l'invalidation du cache sera plus précise.
+        return super(AccountAnalyticAccount, self.with_prefetch())._create_invoice()
+
     @api.model
     def _prepare_invoice_line(self, line, invoice_id):
         # On force l'appel de onchange_tax_ids dans le cas où le module of_account_tax est installé
