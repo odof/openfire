@@ -80,6 +80,8 @@ class OfPlanningIntervention(models.Model):
         'of.parc.installe', string=u"Parc installé",
         domain="['|', '|', ('client_id', '=', partner_id), ('client_id', '=', address_id), "
                "('site_adresse_id', '=', address_id)]")
+    parc_installe_product_name = fields.Char(
+        string=u"Désignation", related="parc_installe_id.product_id.name", readonly=True)
 
     @api.model
     def create(self, vals):

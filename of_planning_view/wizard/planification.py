@@ -632,6 +632,7 @@ class OfPlanifCreneauProp(models.TransientModel):
 
     # Rubrique Description
     description_rdv = fields.Text(related='creneau_id.description_rdv')
+    tooltip_description = fields.Text(string="Description survol", compute='_compute_tooltip_description')
 
     # Vue liste
     fait = fields.Boolean(string=u"déjà calculé")
@@ -651,8 +652,10 @@ class OfPlanifCreneauProp(models.TransientModel):
     geo_lat = fields.Float(related='service_id.geo_lat', readonly=True)
     geo_lng = fields.Float(related='service_id.geo_lng', readonly=True)
     precision = fields.Selection(related='service_id.precision', readonly=True)
+    employee_names = fields.Char(string="Noms des intervenants", compute='_compute_employee_names')
+    tag_names = fields.Char(string=u"Noms des étiquettes", compute='_compute_tag_names')
 
-    # @api.dpends
+    # @api.depends
 
     @api.multi
     @api.depends('geo_lat', 'geo_lng', 'creneau_id')
@@ -674,6 +677,22 @@ class OfPlanifCreneauProp(models.TransientModel):
                 a_planifier.distance_oiseau_suiv = voloiseau(
                     a_planifier.geo_lat, a_planifier.geo_lng, a_planifier.creneau_id.geo_lat_suiv,
                     a_planifier.creneau_id.geo_lng_suiv)
+
+    @api.depends('creneau_id.employee_id.name')
+    def _compute_employee_names(self):
+        for prop in self:
+            prop.employee_names = prop.creneau_id.employee_id.name or ''
+
+    @api.depends('service_id.tag_ids', 'service_id.tag_ids.name')
+    def _compute_tag_names(self):
+        for prop in self:
+            tags = prop.service_id.tag_ids.filtered('name')
+            prop.tag_names = ', '.join(tags.mapped('name'))
+
+    @api.depends('creneau_id.description_rdv')
+    def _compute_tooltip_description(self):
+        for prop in self:
+            prop.tooltip_description = prop.creneau_id.description_rdv[:400]
 
     # @api.onchange
 

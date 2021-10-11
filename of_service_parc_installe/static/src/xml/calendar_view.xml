@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template>
+
+    <!-- Info-bulle d'évènement (RDV d'intervention) -->
+    <t t-extend="CalendarView.record.tooltip">  <!-- variables données par le javascript: record -->
+        <t t-jquery="div[name='address']" t-operation="after">
+            <div t-if="record.parc_installe_product_name" name="parc_installe">
+                <i class="fa fa-cogs"/>
+                <span class="of_ws"/>
+                <t t-esc="record.parc_installe_product_name"/>
+            </div>
+        </t>
+    </t>
+
+</template>

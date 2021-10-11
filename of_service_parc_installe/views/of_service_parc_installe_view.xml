@@ -62,6 +62,29 @@
         </field>
     </record>
 
+    <record id="of_service_parc_installe_planning_intervention_view_calendar" model="ir.ui.view">
+        <field name="name">of.service.parc.installe.planning.intervention.calendar</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_calendar"/>
+        <field name="arch" type="xml">
+            <xpath expr="//calendar" position="inside">
+                <field name="parc_installe_product_name" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_service_parc_installe_planning_intervention_view_planning" model="ir.ui.view">
+        <field name="name">of.service.parc.installe.planning.intervention.view.planning</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning_view.of_planning_intervention_view_planning"/>
+        <field name="arch" type="xml">
+            <xpath expr="//planning" position="inside">
+                <field name="parc_installe_product_name" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+
     <!-- Vue parc installé : ajout smart button service, champ date fin garantie et historique intervention -->
     <record id="view_of_service_parc_installe_form_extended" model="ir.ui.view">
         <field name="name">of.parc.installe.form.extended</field>

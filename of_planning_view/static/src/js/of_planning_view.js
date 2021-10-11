@@ -1733,6 +1733,9 @@ var PlanningRecord = Widget.extend({
         this.tache_name = record.tache_name;
         this.name = record.name;
         this.state_int = record.state_int;
+        this.employee_names = record.employee_names;
+        this.tag_names = record.tag_names;
+        this.tooltip_description = record.tooltip_description;
 
         if (record[this.view.resource].length > 1) {  // several attendees
             this.attendee_other_ids = _.reject(record[this.view.resource], function (attendee_id) { return attendee_id == self.row.res_id})
@@ -2631,5 +2634,8 @@ var SidebarCaption = Widget.extend({
 
 core.view_registry.add('planning', PlanningView);
 
-return PlanningView;
+return {
+PlanningView: PlanningView,
+PlanningRecord: PlanningRecord,
+};
 });

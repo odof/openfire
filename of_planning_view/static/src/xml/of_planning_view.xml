@@ -312,37 +312,43 @@
                 </t>
             </div>
 
-            <div>
-                <div t-if="record.name">
-                <i class="fa fa-folder-open-o"/>
-                <span class="of_ws"/>
-                <t t-raw="record.name"/>
-            </div>
-
-            <div t-if="record.partner_name">
+            <div name="partner_infos">
+                <div t-if="record.partner_name" name="partner_name">
                     <i class="fa fa-user"/>
                     <span class="of_ws"/>
                     <t t-raw="record.partner_name"/>
                 </div>
-                <div t-if="record.mobile">
+                <div t-if="record.mobile" name="partner_mobile">
                     <i class="fa fa-phone"/>
                     <span class="of_ws"/>
                     <t t-raw="record.mobile"/>
                 </div>
-                <div t-if="record.phone">
+                <div t-if="record.phone" name="partner_phone">
                     <i class="fa fa-phone"/>
                     <span class="of_ws"/>
                     <t t-raw="record.phone"/>
                 </div>
             </div>
 
-            <div t-if="record.tache_name">
+            <div t-if="record.tag_names" name="tag_names">
+                <i class="fa fa-tags"/>
+                <span class="of_ws"/>
+                <t t-raw="record.tag_names"/>
+            </div>
+
+            <div t-if="record.tache_name" name="tache_name">
                 <i class="fa fa-cogs"/>
                 <span class="of_ws"/>
                 <t t-raw="record.tache_name"/>
             </div>
 
-            <div>
+            <div t-if="record.employee_names" name="employee_names">
+                <i class="fa fa-user"/>
+                <span class="of_ws"/>
+                <t t-raw="record.employee_names"/>
+            </div>
+
+            <div name="address">
                 <i t-if="record.address_zip || record.address_city || record.secteur_name" class="fa fa-map-marker"/>
                 <span t-if="record.address_zip || record.address_city" class="of_ws"/>
 
@@ -361,8 +367,16 @@
                 </span>
             </div>
 
+            <div t-if="record.tooltip_description" name="description">
+                <i class="fa fa-sticky-note"/>
+                <span class="of_ws"/>
+                <span style="display: inline-table; width: 300px">
+                    <t t-esc="record.tooltip_description"/>
+                </span>
+            </div>
+
             <div t-if="record.name" name="name">
-                <i class="fa fa-tag"/>
+                <i class="fa fa-folder-open"/>
                 <span class="of_ws"/>
                 <t t-esc="record.name"/>
             </div>
