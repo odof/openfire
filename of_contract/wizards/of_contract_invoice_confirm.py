@@ -2,6 +2,7 @@
 
 from odoo import models
 
+
 class OfContractInvoiceConfirm(models.TransientModel):
     _name = 'of.contract.invoice.confirm'
     _description = u"Wizard de confirmation de génération de factures"

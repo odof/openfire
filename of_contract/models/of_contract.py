@@ -2,16 +2,17 @@
 
 from odoo import models, fields, api
 
+
 class AccountAnalyticAccount(models.Model):
     _inherit = 'account.analytic.account'
 
-    of_amount_untaxed = fields.Monetary(string='Montant ht', compute='_get_of_amount_all', store=True)
-    of_amount_tax = fields.Monetary(string='Montant taxes', compute='_get_of_amount_all', store=True)
-    of_amount_total = fields.Monetary(string='Montant total', compute='_get_of_amount_all', store=True)
+    of_amount_untaxed = fields.Monetary(string='Montant ht', compute='_compute_of_amount_all', store=True)
+    of_amount_tax = fields.Monetary(string='Montant taxes', compute='_compute_of_amount_all', store=True)
+    of_amount_total = fields.Monetary(string='Montant total', compute='_compute_of_amount_all', store=True)
     of_fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale")
 
     @api.depends('recurring_invoice_line_ids.price_subtotal', 'of_fiscal_position_id')
-    def _get_of_amount_all(self):
+    def _compute_of_amount_all(self):
         # Code adapté de la fonction _amout_all définie dans le module sale pour sale.order
         for contract in self:
             currency = (
@@ -26,7 +27,8 @@ class AccountAnalyticAccount(models.Model):
 
                 taxes = line.product_id.taxes_id.filtered(lambda r: r.company_id == contract.company_id)
                 line.tax_id = fpos.map_tax(taxes, line.product_id, contract.partner_id) if fpos else taxes
-                tax_amounts = line.tax_id.compute_all(line.price_unit, currency, line.quantity, product=line.product_id, partner=contract.partner_id)
+                tax_amounts = line.tax_id.compute_all(
+                    line.price_unit, currency, line.quantity, product=line.product_id, partner=contract.partner_id)
 
                 if contract.company_id.tax_calculation_rounding_method != 'round_globally':
                     tax_amounts['total_excluded'] = currency.round(tax_amounts['total_excluded'])
@@ -49,5 +51,9 @@ class AccountAnalyticAccount(models.Model):
 
     @api.model
     def _prepare_invoice_line(self, line, invoice_id):
-        # On force l'appel de onchange_tax_ids dans le cas où le module of_account_tax est installé, pour le recalcul correct des comptes
-        return super(AccountAnalyticAccount, self.with_context(of_force_product_onchange_tax=True))._prepare_invoice_line(line, invoice_id)
+        # On force l'appel de onchange_tax_ids dans le cas où le module of_account_tax est installé
+        # pour le recalcul correct des comptes
+        return super(
+            AccountAnalyticAccount,
+            self.with_context(of_force_product_onchange_tax=True)
+        )._prepare_invoice_line(line, invoice_id)
