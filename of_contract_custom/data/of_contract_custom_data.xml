@@ -93,9 +93,15 @@
                           (4, ref('of_contract_custom.of_contract_custom_type_installation'))]"/>
         </record>
 
+        <record id="of_contract_custom_kanban_reception" model="of.service.stage">
+            <field name="name">Réception</field>
+            <field name="sequence">40</field>
+            <field name="type_ids" eval="[(4, ref('of_contract_custom.of_contract_custom_type_sav'))]"/>
+        </record>
+
         <record id="of_contract_custom_kanban_toplan" model="of.service.stage">
             <field name="name">À planifier</field>
-            <field name="sequence">40</field>
+            <field name="sequence">50</field>
             <field name="type_ids"
                    eval="[(4, ref('of_contract_custom.of_contract_custom_type_sav')),
                           (4, ref('of_contract_custom.of_contract_custom_type_maintenance')),
@@ -105,7 +111,7 @@
 
         <record id="of_contract_custom_kanban_planned" model="of.service.stage">
             <field name="name">Planifié</field>
-            <field name="sequence">50</field>
+            <field name="sequence">60</field>
             <field name="type_ids"
                    eval="[(4, ref('of_contract_custom.of_contract_custom_type_sav')),
                           (4, ref('of_contract_custom.of_contract_custom_type_maintenance')),
@@ -115,7 +121,7 @@
 
         <record id="of_contract_custom_kanban_toinvoice" model="of.service.stage">
             <field name="name">À facturer</field>
-            <field name="sequence">60</field>
+            <field name="sequence">70</field>
             <field name="type_ids"
                    eval="[(4, ref('of_contract_custom.of_contract_custom_type_sav')),
                           (4, ref('of_contract_custom.of_contract_custom_type_installation')),
@@ -124,7 +130,17 @@
 
         <record id="of_contract_custom_kanban_closed" model="of.service.stage">
             <field name="name">Clôturé</field>
-            <field name="sequence">70</field>
+            <field name="sequence">80</field>
+            <field name="type_ids"
+                   eval="[(4, ref('of_contract_custom.of_contract_custom_type_sav')),
+                          (4, ref('of_contract_custom.of_contract_custom_type_maintenance')),
+                          (4, ref('of_contract_custom.of_contract_custom_type_installation')),
+                          (4, ref('of_contract_custom.of_contract_custom_type_technical'))]"/>
+        </record>
+
+        <record id="of_contract_custom_kanban_cancelled" model="of.service.stage">
+            <field name="name">Annulé</field>
+            <field name="sequence">90</field>
             <field name="type_ids"
                    eval="[(4, ref('of_contract_custom.of_contract_custom_type_sav')),
                           (4, ref('of_contract_custom.of_contract_custom_type_maintenance')),
