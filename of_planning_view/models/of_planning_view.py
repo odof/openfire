@@ -5,6 +5,7 @@ from odoo.tools.float_utils import float_compare
 from odoo import models, fields, api
 from odoo.addons.of_utils.models.of_utils import se_chevauchent, hours_to_strs
 from odoo.exceptions import ValidationError
+import re
 
 import pytz
 from datetime import datetime, timedelta
@@ -57,6 +58,29 @@ class ResPartner(models.Model):
 class OfPlanningIntervention(models.Model):
     _name = "of.planning.intervention"
     _inherit = ["of.planning.intervention", "of.readgroup", "of.calendar.mixin"]
+
+    employee_names = fields.Char(string="Noms des intervenants", compute='_compute_employee_names')
+    tag_names = fields.Char(string=u"Noms des étiquettes", compute='_compute_tag_names')
+    tooltip_description = fields.Text(string="Description survol", compute='_compute_tooltip_description')
+
+    @api.depends('employee_ids', 'employee_ids.name')
+    def _compute_employee_names(self):
+        for rdv in self:
+            employees = rdv.employee_ids.filtered('name')
+            rdv.employee_names = ', '.join(employees.mapped('name'))
+
+    @api.depends('tag_ids', 'tag_ids.name')
+    def _compute_tag_names(self):
+        for rdv in self:
+            tags = rdv.tag_ids.filtered('name')
+            rdv.tag_names = ', '.join(tags.mapped('name'))
+
+    @api.depends('description')
+    def _compute_tooltip_description(self):
+        cleanr = re.compile('<.*?>')
+        for rdv in self:
+            cleantext = re.sub(cleanr, '', rdv.description or '')
+            rdv.tooltip_description = cleantext[:400]
 
     @api.model
     def get_creneaux_dispo(self, employee_id, date, intervention_heures, creneaux_travailles,

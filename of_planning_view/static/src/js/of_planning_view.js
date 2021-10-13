@@ -242,7 +242,7 @@ var PlanningView = View.extend({
         }
     },
     /**
-     *  initialise les couleurs des créneaux dispos. 
+     *  initialise les couleurs des créneaux dispos.
      *  Ainsi que la durée minimale pour qu'un créneau libre soit considéré comme disponible
      */
     set_creneaux_dispo_data: function () {
@@ -845,7 +845,7 @@ var PlanningView = View.extend({
                         col_offset_stop = undefined;
                     }
                     //console.log("duration: ",day_span);
-                    
+
                     record_options = {
                         "col_offset_start": col_offset_start,
                         "col_offset_stop": col_offset_stop,
@@ -1728,9 +1728,14 @@ var PlanningRecord = Widget.extend({
         this.secteur_name = record.secteur_id && record.secteur_id[1] || false;
         this.name = record.name;
         this.partner_name = record.partner_name;
+        this.mobile = record.mobile;
+        this.phone = record.phone;
         this.tache_name = record.tache_name;
         this.name = record.name;
         this.state_int = record.state_int;
+        this.employee_names = record.employee_names;
+        this.tag_names = record.tag_names;
+        this.tooltip_description = record.tooltip_description;
 
         if (record[this.view.resource].length > 1) {  // several attendees
             this.attendee_other_ids = _.reject(record[this.view.resource], function (attendee_id) { return attendee_id == self.row.res_id})
@@ -2126,7 +2131,7 @@ PlanningView.SidebarResoFilter = Widget.extend({
             // Retire l'id des filtres sélectionnés et sauvegarde la sélection
             for (var i=0; i<this.view.filter_attendee_ids.length; i++) {
                 if (this.view.filter_attendee_ids[i] == e.target.value) {
-                    this.view.filter_attendee_ids.splice(i, 1); 
+                    this.view.filter_attendee_ids.splice(i, 1);
                 }
             }
             ir_values_model.call("set_default",
@@ -2162,9 +2167,11 @@ PlanningView.SidebarInfoFilter = Widget.extend({
     init_filters: function() {
         var self = this;
 
-        var check_tab_names = ["name","client","tache","zip","city","secteur","heure_debut","heure_fin","duree","annule_reporte"];
-        var check_tab_vals = new Array(9);
-        var check_tab_defs = new Array(9);
+        var check_tab_names = [
+            "name", "partner_name", "mobile", "phone", "tache", "zip", "city", "secteur", "heure_debut", "heure_fin",
+            "duree", "annule_reporte"];
+        var check_tab_vals = new Array(12);
+        var check_tab_defs = new Array(12);
         var dfd = $.Deferred();
         var p = dfd.promise(self.info_filters);
         var defs = [], proms = [], les_args, le_def;
@@ -2196,6 +2203,10 @@ PlanningView.SidebarInfoFilter = Widget.extend({
         $.when(check_tab_defs[8]).then(function(res){check_tab_vals[8] = isNullOrUndef(res) || res});
         check_tab_defs[9] = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_filter_" + check_tab_names[9], false]);
         $.when(check_tab_defs[9]).then(function(res){check_tab_vals[9] = isNullOrUndef(res) || res});
+        check_tab_defs[10] = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_filter_" + check_tab_names[10], false]);
+        $.when(check_tab_defs[10]).then(function(res){check_tab_vals[10] = isNullOrUndef(res) || res});
+        check_tab_defs[11] = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_filter_" + check_tab_names[11], false]);
+        $.when(check_tab_defs[11]).then(function(res){check_tab_vals[11] = isNullOrUndef(res) || res});
 
         $.when.apply($, check_tab_defs)
         .then(function () {
@@ -2209,20 +2220,46 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                     "is_checked": check_tab_vals[0],
                     "field_name_ir": "planningview_filter_name",
                 },
-                "client": {
-                    "value": "client",
-                    "input_id": "client_input",
-                    "class": "of_planning_info_partner_name",
+                "partner": {
+                    "value": "partner",
+                    "input_id": "partner_input",
+                    "class": "of_planning_info_partner",
                     "label": "Client",
-                    "is_checked": check_tab_vals[1],
-                    "field_name_ir": "planningview_filter_client",
+                    "is_checked": check_tab_vals[1] || check_tab_vals[2] || check_tab_vals[3],
+                    "child_filters_visible": (local_storage.getItem('planningview_info_filters_visible_partner') == 'true'),
+                    "child_filters": {
+                        "partner_name": {
+                            "value": "partner-partner_name",
+                            "input_id": "partner-partner_name_input",
+                            "class": "of_planning_subinfo_partner_name",
+                            "label": "Nom",
+                            "is_checked": check_tab_vals[1],
+                            "field_name_ir": "planningview_filter_partner_name",
+                        },
+                        "mobile": {
+                            "value": "partner-mobile",
+                            "input_id": "partner-mobile_input",
+                            "class": "of_planning_subinfo_mobile",
+                            "label": "Mobile",
+                            "is_checked": check_tab_vals[2],
+                            "field_name_ir": "planningview_filter_mobile",
+                        },
+                        "phone": {
+                            "value": "partner-phone",
+                            "input_id": "partner-phone_input",
+                            "class": "of_planning_subinfo_phone",
+                            "label": "Fixe",
+                            "is_checked": check_tab_vals[3],
+                            "field_name_ir": "planningview_filter_phone",
+                        },
+                    },
                 },
                 "tache": {
                     "value": "tache",
                     "input_id": "tache_input",
                     "class": "of_planning_info_tache_name",
                     "label": "Tache",
-                    "is_checked": check_tab_vals[2],
+                    "is_checked": check_tab_vals[4],
                     "field_name_ir": "planningview_filter_tache",
                 },
                 "lieu": {
@@ -2230,7 +2267,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                     "input_id": "lieu_input",
                     "class": "of_planning_info_lieu",
                     "label": "Lieu",
-                    "is_checked": check_tab_vals[3] || check_tab_vals[4] || check_tab_vals[5],
+                    "is_checked": check_tab_vals[5] || check_tab_vals[6] || check_tab_vals[7],
                     "child_filters_visible": (local_storage.getItem('planningview_info_filters_visible_lieu') == 'true'),
                     "child_filters": {
                         "zip": {
@@ -2238,7 +2275,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                             "input_id": "lieu-zip_input",
                             "class": "of_planning_subinfo_zip",
                             "label": "Code postal",
-                            "is_checked": check_tab_vals[3],
+                            "is_checked": check_tab_vals[5],
                             "field_name_ir": "planningview_filter_zip",
                         },
                         "city": {
@@ -2246,7 +2283,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                             "input_id": "lieu-city_input",
                             "class": "of_planning_subinfo_city",
                             "label": "Ville",
-                            "is_checked": check_tab_vals[4],
+                            "is_checked": check_tab_vals[6],
                             "field_name_ir": "planningview_filter_city",
                         },
                         "secteur": {
@@ -2254,7 +2291,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                             "input_id": "lieu-secteur_input",
                             "class": "of_planning_subinfo_secteur",
                             "label": "Secteur",
-                            "is_checked": check_tab_vals[5],
+                            "is_checked": check_tab_vals[7],
                             "field_name_ir": "planningview_filter_secteur",
                         },
                     },
@@ -2264,7 +2301,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                     "input_id": "heures_input",
                     "class": "of_planning_info_heures",
                     "label": "Heures / Durées",
-                    "is_checked": check_tab_vals[6] || check_tab_vals[7] || check_tab_vals[8],
+                    "is_checked": check_tab_vals[8] || check_tab_vals[9] || check_tab_vals[10],
                     "child_filters_visible": (local_storage.getItem('planningview_info_filters_visible_heures') == 'true'),
                     "child_filters": {
                         "heure_debut": {
@@ -2272,7 +2309,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                             "input_id": "heures-heure_debut_input",
                             "class": "of_planning_subinfo_heure_debut",
                             "label": "Heure de début",
-                            "is_checked": check_tab_vals[6],
+                            "is_checked": check_tab_vals[8],
                             "field_name_ir": "planningview_filter_heure_debut",
                         },
                         "heure_fin": {
@@ -2280,7 +2317,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                             "input_id": "heures-heure_fin_input",
                             "class": "of_planning_subinfo_heure_fin",
                             "label": "Heure de fin",
-                            "is_checked": check_tab_vals[7],
+                            "is_checked": check_tab_vals[9],
                             "field_name_ir": "planningview_filter_heure_fin",
                         },
                         "duree": {
@@ -2288,7 +2325,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                             "input_id": "heures-duree_input",
                             "class": "of_planning_subinfo_duree",
                             "label": "Durée",
-                            "is_checked": check_tab_vals[8],
+                            "is_checked": check_tab_vals[10],
                             "field_name_ir": "planningview_filter_duree",
                         },
                     },
@@ -2298,7 +2335,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                     "input_id": "annule_reporte_input",
                     "class": "of_planning_info_annule_reporte",
                     "label": "Annulé / Reporté",
-                    "is_checked": check_tab_vals[9],
+                    "is_checked": check_tab_vals[11],
                     "field_name_ir": "planningview_filter_annule_reporte",
                     "separated": true,
                 },
@@ -2597,5 +2634,8 @@ var SidebarCaption = Widget.extend({
 
 core.view_registry.add('planning', PlanningView);
 
-return PlanningView;
+return {
+PlanningView: PlanningView,
+PlanningRecord: PlanningRecord,
+};
 });

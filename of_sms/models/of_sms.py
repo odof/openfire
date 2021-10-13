@@ -499,7 +499,6 @@ class OFPlanningIntervention(models.Model):
     _inherit = ["of.planning.intervention", 'mail.thread']
 
     of_envoye_par_sms_client = fields.Boolean(string=u"SMS client envoyé ?", default=False)
-    mobile = fields.Char(related='partner_id.mobile')
 
     # Appel par l'action "Envoyer SMS" dans vue planning intervention
     @api.multi

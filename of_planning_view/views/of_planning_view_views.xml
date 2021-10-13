@@ -64,6 +64,8 @@
                 <field name="duree_prompt"/>
                 <field name="duree_debut_fin"/>
                 <field name="name"/>
+                <field name="phone"/>
+                <field name="mobile"/>
                 <field name="tache_name"/>
                 <field name="tache_id"/>
                 <field name="tache_categ_id"/>
@@ -72,7 +74,23 @@
                 <field name="address_city"/>
                 <field name="secteur_id"/>
                 <field name="state_int"/>
+                <field name="employee_names" invisible="1"/>
+                <field name="tag_names" invisible="1"/>
+                <field name="tooltip_description" invisible="1"/>
             </planning>
+        </field>
+    </record>
+
+    <record id="of_planning_view_planning_intervention_view_calendar" model="ir.ui.view">
+        <field name="name">of.planning.view.planning.intervention.calendar</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_calendar"/>
+        <field name="arch" type="xml">
+            <xpath expr="//calendar" position="inside">
+                <field name="employee_names" invisible="1"/>
+                <field name="tag_names" invisible="1"/>
+                <field name="tooltip_description" invisible="1"/>
+            </xpath>
         </field>
     </record>
 
