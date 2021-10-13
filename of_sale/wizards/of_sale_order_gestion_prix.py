@@ -29,7 +29,9 @@ class GestionPrix(models.TransientModel):
         liste = [
             ('prix_ttc_cible', 'montant total TTC cible'),
             ('montant_ttc', u'montant TTC à déduire'),
-            ('pc', u'% de remise sur les lignes sélectionnées')
+            ('prix_ht_cible', 'montant total HT cible'),
+            ('montant_ht', u'montant HT à déduire'),
+            ('pc', u'% de remise sur les lignes sélectionnées'),
         ]
         if self.user_has_groups('of_sale.of_group_sale_marge_manager'):
             liste.append(('pc_marge', '% marge'))
@@ -51,6 +53,9 @@ class GestionPrix(models.TransientModel):
     montant_total_ttc_initial = fields.Monetary(
         string='Total TTC initial', related='order_id.amount_total', readonly=True
     )
+    montant_total_ht_initial = fields.Monetary(
+        string='Total HT initial', related='order_id.amount_untaxed', readonly=True
+    )
 
     currency_id = fields.Many2one(related='order_id.currency_id')
     marge_simul = fields.Monetary(
@@ -61,6 +66,8 @@ class GestionPrix(models.TransientModel):
     )
     montant_total_ttc_simul = fields.Monetary(
         string=u'Total TTC simulé', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
+    montant_total_ht_simul = fields.Monetary(
+        string=u'Total HT simulé', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
     afficher_remise = fields.Boolean(
         string='Afficher dans notes',
         help=u"Affiche le montant de la remise effectuée dans les notes du devis/de la commande.")
@@ -80,7 +87,7 @@ class GestionPrix(models.TransientModel):
         ], string=u"Précision d'arrondi", default='0')
     of_client_view = fields.Boolean(string='Vue client/vendeur', related="order_id.of_client_view")
 
-    @api.depends('line_ids.prix_total_ttc_simul')
+    @api.depends('line_ids.prix_total_ttc_simul', 'line_ids.prix_total_ht_simul')
     def _compute_montant_simul(self):
         for wizard in self:
             lines = wizard.line_ids
@@ -90,6 +97,7 @@ class GestionPrix(models.TransientModel):
             wizard.marge_simul = total_vente - total_achat
             wizard.pc_marge_simul = 100 * (1 - total_achat / total_vente) if total_vente else -100
             wizard.montant_total_ttc_simul = sum(lines.mapped('prix_total_ttc_simul'))
+            wizard.montant_total_ht_simul = sum(lines.mapped('prix_total_ht_simul'))
 
     @api.multi
     def name_get(self):
@@ -233,6 +241,9 @@ class GestionPrix(models.TransientModel):
         if self.methode_remise == 'prix_ttc_cible':
             if self.valeur <= 0:
                 raise UserError(u"(Erreur #RG105)\nVous devez saisir un montant total TTC cible.")
+        elif self.methode_remise == 'prix_ht_cible':
+            if self.valeur <= 0:
+                raise UserError(u"(Erreur #RG105)\nVous devez saisir un montant total HT cible.")
         elif self.methode_remise == 'montant_ttc':
             if not self.valeur:
                 raise UserError(u"(Erreur #RG115)\nVous devez saisir un montant TTC à déduire.")
@@ -240,6 +251,14 @@ class GestionPrix(models.TransientModel):
                 raise UserError(
                     u"(Erreur #RG120)\n"
                     u"Le montant TTC à déduire est supérieur au montant total TTC des articles"
+                    u"sur lesquels s'appliquent la remise.")
+        elif self.methode_remise == 'montant_ht':
+            if not self.valeur:
+                raise UserError(u"(Erreur #RG115)\nVous devez saisir un montant HT à déduire.")
+            if self.valeur > self.montant_total_ht_initial:
+                raise UserError(
+                    u"(Erreur #RG120)\n"
+                    u"Le montant HT à déduire est supérieur au montant total HT des articles"
                     u"sur lesquels s'appliquent la remise.")
         elif self.methode_remise == 'pc':
             if not 0 < self.valeur <= 100:
@@ -259,8 +278,14 @@ class GestionPrix(models.TransientModel):
         # On détermine le montant TTC cible en fonction de la méthode de calcul choisie
         if self.methode_remise == 'prix_ttc_cible':
             total = self.valeur - total_ttc_nonselect
+        elif self.methode_remise == 'prix_ht_cible':
+            total = self.valeur - total_ht_nonselect
+            total_select = total_ht_select
         elif self.methode_remise == 'montant_ttc':
             total = total_ttc_select - self.valeur
+        elif self.methode_remise == 'montant_ht':
+            total = total_ht_select - self.valeur
+            total_select = total_ht_select
         elif self.methode_remise == 'pc':
             total = total_ttc_select * (1 - self.valeur / 100.0)
         elif self.methode_remise == 'pc_marge':

@@ -25,8 +25,8 @@
                 <group invisible="context.get('invoice_status') == 'invoiced'">
                     <field name="methode_remise" required="1"/>
                     <field name="valeur"
-                           attrs="{'invisible':[('methode_remise','not in',('prix_ttc_cible','montant_ttc','pc','pc_marge'))],
-                                   'required': [('methode_remise','in',('prix_ttc_cible','montant_ttc','pc','pc_marge'))]}"/>
+                           attrs="{'invisible':[('methode_remise','not in',('prix_ttc_cible','prix_ht_cible','montant_ttc','montant_ht','pc','pc_marge'))],
+                                   'required': [('methode_remise','in',('prix_ttc_cible','prix_ht_cible','montant_ttc','montant_ht','pc','pc_marge'))]}"/>
                     <label for="arrondi_mode"/>
                     <div name="arrondi">
                         <field name="arrondi_mode" class="oe_inline" attrs="{'invisible':[('methode_remise','=',False)]}"/>
@@ -61,6 +61,8 @@
                 <button name="bouton_exclure_tout" type="object" class="oe_left btn-default" string="Tout exclure" invisible="context.get('invoice_status') == 'invoiced'"/>
 
                 <group col="4" string="Total devis/commande">
+                    <field name="montant_total_ht_initial"/>
+                    <field name="montant_total_ht_simul"/>
                     <field name="montant_total_ttc_initial"/>
                     <field name="montant_total_ttc_simul"/>
                     <field name="marge_initiale" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
