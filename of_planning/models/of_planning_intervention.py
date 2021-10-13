@@ -78,14 +78,16 @@ class HREmployee(models.Model):
     @api.multi
     def name_get(self):
         """Permet dans un RDV d'intervention de proposer les intervenants inaptes entre parenthèses"""
+        # Ajout d'un sudo pour éviter des erreurs à l'affichage pour les intervenants d'autres sociétés.
+        self = self.sudo()
+        result = super(HREmployee, self).name_get()
         tache_id = self._context.get('tache_prio_id')
-        tache = tache_id and self.env['of.planning.tache'].browse(tache_id) or False
-        result = []
-        for employee in self:
-            peut_faire = employee.peut_faire(tache) if tache else True
-            result.append((employee.id, "%s%s%s" % ('' if peut_faire else '(',
-                                                    employee.name,
-                                                    '' if peut_faire else ')')))
+        if not tache_id:
+            return result
+        tache = self.env['of.planning.tache'].browse(tache_id)
+        for i, vals in enumerate(result):
+            if not self.browse(vals[0]).peut_faire(tache):
+                result[i] = (vals[0], "(" + vals[1] + ")")
         return result
 
     @api.model
