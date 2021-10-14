@@ -147,4 +147,93 @@
         </field>
     </record>
 
+    <!-- Déplacer/renommer les menus -->
+    <!-- Opérations -->
+    <!-- Ajustements de stock -->
+    <record id="stock.menu_action_inventory_form" model="ir.ui.menu">
+        <field name="parent_id" ref="stock.menu_stock_warehouse_mgmt"/>
+        <field name="sequence">20</field>
+    </record>
+    <!-- Rebut -->
+    <record id="stock.menu_stock_scrap" model="ir.ui.menu">
+        <field name="parent_id" ref="stock.menu_stock_warehouse_mgmt"/>
+        <field name="sequence">30</field>
+    </record>
+    <!-- Lancer les planificateurs -->
+    <record id="stock.menu_procurement_compute" model="ir.ui.menu">
+        <field name="parent_id" ref="stock.menu_stock_warehouse_mgmt"/>
+        <field name="sequence">40</field>
+    </record>
+    <!-- Lancer les règles de réapprovisionnement -->
+    <record id="stock.menu_stock_proc_schedulers" model="ir.ui.menu">
+        <field name="parent_id" ref="stock.menu_stock_warehouse_mgmt"/>
+        <field name="sequence">50</field>
+    </record>
+    <!-- Contrôle d'Inventaire -> Articles -->
+    <record id="stock.menu_stock_inventory_control" model="ir.ui.menu">
+        <field name="name">Articles</field>
+    </record>
+    <!-- Emballages -->
+    <record id="stock.menu_package" model="ir.ui.menu">
+        <field name="parent_id" ref="stock.menu_stock_inventory_control"/>
+        <field name="sequence">20</field>
+    </record>
+    <!-- Numéros de lots/séries -->
+    <record id="stock.menu_action_production_lot_form" model="ir.ui.menu">
+        <field name="sequence">30</field>
+    </record>
+    <!-- Règles de réapprovisionnement -->
+    <record id="stock.menu_reordering_rules_config" model="ir.ui.menu">
+        <field name="sequence">40</field>
+    </record>
+    <!-- Rapports -->
+    <!-- Valorisation de l'inventaire -->
+    <record id="stock.menu_quants" model="ir.ui.menu">
+        <field name="sequence">20</field>
+    </record>
+    <!-- Derniers inventaires et mouvements -->
+    <record id="stock.menu_report_stock_line_date" model="ir.ui.menu">
+        <field name="sequence">30</field>
+    </record>
+    <!-- Mouvements de stocks -->
+    <record id="stock.stock_move_menu" model="ir.ui.menu">
+        <field name="sequence">40</field>
+    </record>
+    <!-- Approvisionnements en exceptions -->
+    <record id="stock.menu_stock_procurement_action" model="ir.ui.menu">
+        <field name="sequence">50</field>
+    </record>
+    <!-- Planificateurs - plus de sous menus, plus de raison d'exister -->
+    <delete model="ir.ui.menu" id="stock.menu_stock_sched"/>
+
+    <record id="of_stock_product_template_tree_view" model="ir.ui.view">
+        <field name="name">of.sale.stock.config.settings.form</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="default_code"/>
+                <field name="name"/>
+                <field name="list_price"/>
+                <field name="standard_price"/>
+                <field name="categ_id"/>
+                <field name="type"/>
+                <field name="uom_id" options="{'no_open': True, 'no_create': True}" groups="product.group_uom"/>
+                <field name="qty_available" string="Qté réelle"/>
+                <field name="outgoing_qty" string="Qté sortante"/>
+                <field name="incoming_qty" string="Qté entrante"/>
+                <field name="virtual_available" string="Qté prévue"/>
+                <field name="reordering_min_qty" string="Qté min réappro"/>
+                <field name="reordering_max_qty" string="Qté max réappro"/>
+                <field name="of_delay" string="Délai de livraison"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action articles du module stock, mettre vue tree en première -->
+    <record id="stock.product_template_action_product" model="ir.actions.act_window">
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="tree_view_ref" ref="of_stock.of_stock_product_template_tree_view"/>
+    </record>
+
 </odoo>

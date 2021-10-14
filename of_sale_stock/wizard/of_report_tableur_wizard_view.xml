@@ -49,7 +49,7 @@
             <field name="target">new</field>
         </record>
 
-        <menuitem id="menu_of_sale_stock_report" name="Rapport gestion stock" parent="stock.menu_stock_inventory_control" action="action_of_rapport_gestion_stock" sequence="4"/>
+        <menuitem id="menu_of_sale_stock_report" name="Rapport gestion stock" parent="stock.menu_warehouse_report" action="action_of_rapport_gestion_stock" sequence="60"/>
 
     </data>
 </openerp>
