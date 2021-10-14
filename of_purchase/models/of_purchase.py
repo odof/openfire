@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
-
+import odoo.addons.decimal_precision as dp
+from odoo.tools.float_utils import float_compare, float_round
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -33,6 +37,19 @@ class PurchaseOrder(models.Model):
     of_sent = fields.Boolean(string=u"CF envoyée")
     of_project_id = fields.Many2one(comodel_name='account.analytic.account', string=u"Compte analytique")
     of_user_id = fields.Many2one(comodel_name='res.users', string="Responsable technique")
+    of_reception_state = fields.Selection(selection=[
+        ('no', u'Non reçue'),
+        ('received', u'Reçue'),
+        ], string=u"État de réception", compute='_compute_of_reception_state', store=True)
+
+    @api.depends('picking_ids', 'picking_ids.state')
+    def _compute_of_reception_state(self):
+        for order in self:
+            if order.picking_ids and all([state == 'done' for state in order.picking_ids.
+                                     filtered(lambda p: p.state not in ['cancel']).mapped('state')]):
+                order.of_reception_state = 'received'
+            else:
+                order.of_reception_state = 'no'
 
     @api.model
     def _prepare_picking(self):
@@ -63,6 +80,61 @@ class PurchaseOrder(models.Model):
 
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
+
+    of_total_stock_qty = fields.Float(
+        string=u"Stock total", digits=dp.get_precision('Product Unit of Measure'), compute='_compute_of_stock_qty')
+    of_available_stock_qty = fields.Float(
+        string=u"Stock dispo.", digits=dp.get_precision('Product Unit of Measure'), compute='_compute_of_stock_qty')
+    of_theoretical_stock_qty = fields.Float(
+        string=u"Stock théo.", digits=dp.get_precision('Product Unit of Measure'), compute='_compute_of_stock_qty',
+        help=u"Si une règle de stock est définie pour l'article avec une date limite de prévision, le stock théorique "
+             u"est calculé à cette date ; sinon le stock théorique calculé est le stock théorique global de l'article")
+    of_reserved_qty = fields.Float(
+        string=u"Qté(s) réservée(s)", digits=dp.get_precision('Product Unit of Measure'),
+        compute='_compute_of_stock_qty')
+
+    @api.depends('product_id', 'order_id.picking_type_id', 'order_id.picking_type_id.default_location_dest_id')
+    def _compute_of_stock_qty(self):
+        for line in self:
+            if line.order_id.picking_type_id.default_location_dest_id:
+                location = line.order_id.picking_type_id.default_location_dest_id
+                product_context = dict(self._context, location=location.id)
+
+                # Stock total
+                line.of_total_stock_qty = line.product_id.with_context(product_context).qty_available
+
+                # Stock dispo
+                domain_quant = [('product_id', '=', line.product_id.id), ('reservation_id', '=', False)]
+                domain_quant += line.product_id.with_context(product_context)._get_domain_locations()[0]
+                quants = self.env['stock.quant'].search(domain_quant)
+                line.of_available_stock_qty = float_round(
+                    sum(quants.mapped('qty')), precision_rounding=line.product_id.uom_id.rounding)
+
+                # Stock théorique
+                orderpoints = self.env['stock.warehouse.orderpoint'].search([('product_id', '=', line.product_id.id)],
+                                                                            limit=1)
+                if orderpoints and orderpoints.of_forecast_limit:
+                    product_context['of_to_date_expected'] = \
+                        (datetime.today() + relativedelta(days=orderpoints.of_forecast_period)). \
+                            strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+                line.of_theoretical_stock_qty = line.product_id.with_context(product_context).virtual_available
+
+                # Qté(s) réservée(s)
+                stock_moves = line.procurement_ids.mapped('move_ids')
+                if stock_moves:
+                    domain_quant = [('product_id', '=', line.product_id.id), ('reservation_id', 'in', stock_moves.ids)]
+                    domain_quant += line.product_id.with_context(product_context)._get_domain_locations()[0]
+                    quants = self.env['stock.quant'].search(domain_quant)
+                    line.of_reserved_qty = float_round(
+                        sum(quants.mapped('qty')), precision_rounding=line.product_id.uom_id.rounding)
+                else:
+                    line.of_reserved_qty = 0
+
+            else:
+                line.of_total_stock_qty = 0
+                line.of_available_stock_qty = 0
+                line.of_theoretical_stock_qty = 0
+                line.of_reserved_qty = 0
 
     @api.multi
     def write(self, vals):
@@ -260,6 +332,12 @@ class OFPurchaseConfiguration(models.TransientModel):
         string="(OF) Description articles",
         help=u"Choisissez le type de description affiché dans la commande fournisseur.\n"
              u"Cela affecte également les documents imprimables.")
+
+    group_purchase_order_line_display_stock_info = fields.Boolean(
+        string=u"(OF) Informations de stock",
+        implied_group='of_purchase.group_purchase_order_line_display_stock_info',
+        group='base.group_portal,base.group_user,base.group_public',
+        help=u"Affiche les informations de stock au niveau des lignes de commande")
 
     @api.multi
     def set_description_as_order_defaults(self):
