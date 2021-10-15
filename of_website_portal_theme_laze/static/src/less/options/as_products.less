@@ -198,34 +198,17 @@ body [portal="B2B"] {
                     .button.btn-cart{
                         background: transparent;
                         border: 1px solid @as-dark;
-                        color: @as-light;
-                        height: 30px;
-                        line-height: 28px;
-                        text-align: center;
-                        display: inline-block;
-                        vertical-align: middle;
-                        padding: 0 25px;
-                        .transition(all, 0.5s, ease);
-                        position: relative;
-                        z-index: 9;
-                        border-radius: 0;
-                        color: @as-body;
 
                         .fa{
-                            font-size: @as-font-size-base + 3;
-                            margin-left: 5px;
-                            display: none;
-                        }
-                        span{
-                            text-transform: uppercase;
-                            font-weight: 600;
-                            font-size: @as-font-base - 2;
+                            color: @as-theme-b2b;
                         }
                         &:hover{
                             background: @as-dark;
-                            color: @as-light;
-                        }
 
+                            .fa{
+                                color: @as-light !important;
+                            }
+                        }
                     }
                 }
 
