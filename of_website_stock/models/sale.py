@@ -64,6 +64,33 @@ class SaleOrder(models.Model):
                     commit_date = min(dates_list) if order.picking_policy == 'direct' else max(dates_list)
                     order.commitment_date = fields.Datetime.to_string(commit_date)
 
+    @api.multi
+    def _cart_update(self, product_id=None, line_id=None, add_qty=0, set_qty=0, attributes=None, **kwargs):
+        res = super(SaleOrder, self)._cart_update(
+            product_id=product_id, line_id=line_id,
+            add_qty=add_qty, set_qty=set_qty, attributes=attributes, **kwargs)
+
+        # On récupère le site web
+        website = self.env['website'].search([])[0]
+
+        product = self.env['product.product'].browse(int(product_id))
+
+        # Si gestion des stocks et interdit de commander stock non disponible
+        if website.get_website_config() != 'none' and website.get_of_unavailability_management() == 'notify':
+
+            # On calcul le product_quantity en fonction de la configuration on_hand/forecast
+            product_quantity = product.qty_available
+            if website.get_website_config() == 'forecast':
+                product_quantity += - product.outgoing_qty + product.incoming_qty
+
+            # Si la quantité en panier est supérieure à la quantité disponible, on modifie par la quantité disponible
+            if res['quantity'] > product_quantity:
+                self.env['sale.order.line'].browse(int(res['line_id'])).write({
+                    'product_uom_qty': product_quantity,
+                })
+
+        return res
+
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
@@ -71,3 +98,10 @@ class SaleOrderLine(models.Model):
     @api.depends('product_id')
     def _compute_product_id_set_customer_lead(self):
         self.customer_lead = self.product_id.sale_delay
+
+
+class ProductTemplate(models.Model):
+    _inherit = 'product.template'
+
+    # On met le default à vide
+    availability = fields.Selection(default='')

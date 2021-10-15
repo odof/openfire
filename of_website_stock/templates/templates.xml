@@ -18,7 +18,7 @@
 			<t t-if="not product_quantity &gt; 0">
 				<div class="alert alert-danger out-of-stock">
 					<span class="fa fa-warning" />
-					<span>Out of Stock</span>
+					<span>Out of Stock</span><span t-if="website.get_of_unavailability_management() == 'delay'">, the delivery time will be extended.</span>
 				</div>
 			</t>
 			<form class="js_notify_form" method="POST">
@@ -45,10 +45,10 @@
 	<template id="show_stock_qty_message" name="Show Stock Qty Message">
 		<t t-foreach="product.product_variant_ids" t-as="product">
 			<t t-if="website.get_website_config() == 'on_hand'">
-				<t t-set="product_quantity" t-value="product.qty_available"/>
+				<t t-set="product_quantity" t-value="product.sudo().qty_available"/>
 			</t>
 			<t t-if="website.get_website_config() == 'forecast'">
-				<t t-set="product_quantity" t-value="product.qty_available - product.outgoing_qty + product.incoming_qty"/>
+				<t t-set="product_quantity" t-value="product.sudo().qty_available - product.sudo().outgoing_qty + product.sudo().incoming_qty"/>
 			</t>
 			<div class="show_hide_stock_change" t-att-id="'%s' % product.id" t-att-value="'%s' % product_quantity">
 				<t t-call="of_website_stock.display_stock_qty_message"/>
@@ -138,7 +138,14 @@
 						<i class="fa fa-minus"></i>
 					</a>
 
-					<t t-if="website.get_website_config() != 'none'">
+					<t t-if="website.get_website_config() == 'none'">
+						<input type="text" class="js_quantity form-control quantity"
+							   t-att-data-line-id="line.id"
+							   t-att-data-product-id="line.product_id.id"
+							   t-att-value="int(line.product_uom_qty) == line.product_uom_qty and int(line.product_uom_qty) or line.product_uom_qty" />
+					</t>
+
+					<t t-if="not website.get_website_config() == 'none'">
 						<t t-if="website.get_website_config() == 'on_hand'">
 							<t t-set="product_quantity" t-value="line.product_id.qty_available"/>
 						</t>
@@ -148,7 +155,7 @@
 						<input type="text" class="js_quantity form-control"
 							   t-att-data-line-id="line.id"
 							   t-att-data-product-id="line.product_id.id"
-							   t-att-data-qty="int(product_quantity)"
+							   t-att-data-qty="int(product_quantity) if website.get_of_unavailability_management() == 'notify' else 'None'"
 							   t-att-value="int(line.product_uom_qty)"/>
 					</t>
 
