@@ -69,9 +69,10 @@ odoo.define('of_website_stock.of_website_stock_notify', function(require) {
 		            var product_id = $form_data.find("input[name='product_id']").val();
 		        	
 		        var qty_available = $product_details.find('#' + product_id).attr('value');
-		        var $form_notify = $product_details.find('.js_notify_email').closest('form');
+		        var $form_notify = $product_details.find('#' + product_id).find('.js_notify_email').closest('form');
 		        var notify = $form_notify.find("input[name='notify']").val();
 		        if (qty_available < parseFloat(qty || 0) && parseInt(notify)) {
+		            console.log('TEST');
 		            $('#add_to_cart').hide();
 		            $js_qty.hide();
 		            $form_notify.show();

@@ -20,27 +20,25 @@
 					<span class="fa fa-warning" />
 					<span>Out of Stock</span>
 				</div>
-				<!--				<t t-if="website.get_of_unavailability_management() == 'notify'">-->
-				<form class="js_notify_form" method="POST">
-					<div class="oe_snippet_body input-group js_notify"
-						 data-list-id="0" t-att-id="product.product_tmpl_id.id">
-						<input type="hidden" name="notify" t-att-value="'1' if website.get_of_unavailability_management() == 'notify' else '0'"/>
-						<input
-								type="email"
-								name="email"
-								class="js_notify_email form-control"
-								placeholder="Enter your e-mail..."/>
-						<span class="input-group-btn">
-							<a href="#" class="btn btn-primary js_notify_btn">Notify</a>
-							<a href="#" class="btn btn-success js_subscribed_btn hidden" disabled="disabled">Thanks</a>
-						</span>
-						<div class="alert alert-success success-message hidden">Thank you for your interest! You will be notified by mail when the product is available.</div>
-
-					</div>
-					<div class="alert alert-danger danger-message hidden" style="margin-top: 10px;">Enter Valid Email Address</div>
-				</form>
-				<!--				</t>-->
 			</t>
+			<form class="js_notify_form" method="POST">
+				<div class="oe_snippet_body input-group js_notify"
+					 data-list-id="0" t-att-id="product.product_tmpl_id.id">
+					<input type="hidden" name="notify" t-att-value="'1' if website.get_of_unavailability_management() == 'notify' else '0'"/>
+					<input
+							type="email"
+							name="email"
+							class="js_notify_email form-control"
+							placeholder="Enter your e-mail..."/>
+					<span class="input-group-btn">
+						<a href="#" class="btn btn-primary js_notify_btn">Notify</a>
+						<a href="#" class="btn btn-success js_subscribed_btn hidden" disabled="disabled">Thanks</a>
+					</span>
+					<div class="alert alert-success success-message hidden">Thank you for your interest! You will be notified by mail when the product is available.</div>
+
+				</div>
+				<div class="alert alert-danger danger-message hidden" style="margin-top: 10px;">Enter Valid Email Address</div>
+			</form>
 		</t>
 	</template>
 
@@ -59,7 +57,7 @@
 	</template>
 
 	<template id="product_qty_in_single_product_page" inherit_id="website_sale.product" active="True" customize_show="True" name="Show Stock Qty 1">
-		<xpath expr="//div[@id='product_details']/hr[1]" position="inside">
+		<xpath expr="//div[@id='product_details']" position="inside">
 			<t t-if="website.get_website_config() != 'none' and product.availability != 'empty'">
 				<t t-call="of_website_stock.show_stock_qty_message"/>
 			</t>
@@ -183,7 +181,7 @@
 				</t>
 			</td>
 		</xpath>
-		<xpath expr="//*[@id='delivery_carrier']" position='before'>
+		<xpath expr="//*[@id='payment_method']/../*[1]" position='before'>
 			<div class="container" t-if="website.get_of_delivery_management()">
 				<div class="row">
 					<div class='col-sm-6'>
