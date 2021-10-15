@@ -63,8 +63,10 @@ class ResCompany(models.Model):
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field")
-    geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field")
+    geo_lat = fields.Float(
+        string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", track_visibility="onchange")
+    geo_lng = fields.Float(
+        string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", track_visibility="onchange")
     date_last_localization = fields.Datetime(string='Last Geolocation Date', readonly=True)
     geocoding_response = fields.Text(string=u"Réponse géocodage", readonly=True)
     geocoding = fields.Selection(
