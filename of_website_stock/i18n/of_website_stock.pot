@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-12 09:47+0000\n"
-"PO-Revision-Date: 2021-10-12 09:47+0000\n"
+"POT-Creation-Date: 2021-10-15 09:08+0000\n"
+"PO-Revision-Date: 2021-10-15 09:08+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -29,6 +29,26 @@ msgstr ""
 #. module: of_website_stock
 #: model:mail.template,subject:of_website_stock.email_template_sale_stock_notification
 msgid " ${object.product_id.name or 'n/a' } is available in stock now."
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_website_config_settings_of_delivery_management
+msgid "(OF) Delivery Management"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_website_config_settings_of_stock_type
+msgid "(OF) Stock Type to Display"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_website_config_settings_of_unavailability_management
+msgid "(OF) Unavailability Management"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_website_config_settings_of_website_security_lead
+msgid "(OF) Website Safety Days *"
 msgstr ""
 
 #. module: of_website_stock
@@ -61,6 +81,11 @@ msgid "<span class=\"label label-primary\">In Stock</span>"
 msgstr ""
 
 #. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.of_payment
+msgid "Choose your Delivery Date"
+msgstr ""
+
+#. module: of_website_stock
 #: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify_create_uid
 msgid "Created by"
 msgstr ""
@@ -72,10 +97,25 @@ msgstr ""
 
 #. module: of_website_stock
 #. openerp-web
-#: code:addons/of_website_stock/static/src/js/custom.js:88
-#: code:addons/of_website_stock/static/src/js/custom.js:138
+#: code:addons/of_website_stock/static/src/js/custom.js:84
+#: code:addons/of_website_stock/static/src/js/custom.js:132
 #, python-format
 msgid "DENIED"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,help:of_website_stock.field_sale_order_website_commitment_date
+msgid "Date by which the products are sure to be delivered. This is a date that you can promise to the customer, based on the Product Lead Times."
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.of_payment
+msgid "Delay"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.of_payment
+msgid "Delivery Delay"
 msgstr ""
 
 #. module: of_website_stock
@@ -144,8 +184,18 @@ msgid "Last Updated on"
 msgstr ""
 
 #. module: of_website_stock
+#: model:ir.model.fields,help:of_website_stock.field_website_config_settings_of_delivery_management
+msgid "Let the customer choose his delivery date"
+msgstr ""
+
+#. module: of_website_stock
 #: selection:website.config.settings,of_unavailability_management:0
 msgid "Mail notification on restock"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,help:of_website_stock.field_website_config_settings_of_website_security_lead
+msgid "Margin of error for dates promised to customers on website."
 msgstr ""
 
 #. module: of_website_stock
@@ -174,6 +224,16 @@ msgid "Qty On Hand"
 msgstr ""
 
 #. module: of_website_stock
+#: model:ir.model,name:of_website_stock.model_sale_order
+msgid "Sales Order"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model,name:of_website_stock.model_sale_order_line
+msgid "Sales Order Line"
+msgstr ""
+
+#. module: of_website_stock
 #: selection:website.config.settings,of_unavailability_management:0
 msgid "Sell with a reception delay"
 msgstr ""
@@ -189,11 +249,6 @@ msgid "Stock Type"
 msgstr ""
 
 #. module: of_website_stock
-#: model:ir.model.fields,field_description:of_website_stock.field_website_config_settings_of_stock_type
-msgid "Stock Type to Display"
-msgstr ""
-
-#. module: of_website_stock
 #: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
 msgid "Thank you for your interest! You will be notified by mail when the product is available."
 msgstr ""
@@ -204,7 +259,6 @@ msgid "Thanks"
 msgstr ""
 
 #. module: of_website_stock
-#: model:ir.model.fields,field_description:of_website_stock.field_website_config_settings_of_unavailability_management
 #: model:ir.ui.view,arch_db:of_website_stock.of_view_website_config_settings
 msgid "Unavailability Management"
 msgstr ""
@@ -212,6 +266,16 @@ msgstr ""
 #. module: of_website_stock
 #: model:ir.model,name:of_website_stock.model_website
 msgid "Website"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_sale_order_website_commitment_date
+msgid "Website Commitment Date"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_website_of_website_security_lead
+msgid "Website Safety Days"
 msgstr ""
 
 #. module: of_website_stock
@@ -229,8 +293,8 @@ msgstr ""
 
 #. module: of_website_stock
 #. openerp-web
-#: code:addons/of_website_stock/static/src/js/custom.js:93
-#: code:addons/of_website_stock/static/src/js/custom.js:143
+#: code:addons/of_website_stock/static/src/js/custom.js:89
+#: code:addons/of_website_stock/static/src/js/custom.js:137
 #, python-format
 msgid "You Can Not Add More than Available Quantity"
 msgstr ""
@@ -250,4 +314,3 @@ msgstr ""
 #: model:ir.model,name:of_website_stock.model_website_config_settings
 msgid "website.config.settings"
 msgstr ""
-
