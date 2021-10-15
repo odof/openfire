@@ -1,0 +1,263 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_website_stock
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-10-12 09:48+0000\n"
+"PO-Revision-Date: 2021-10-12 09:48+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_website_stock
+#: model:mail.template,body_html:of_website_stock.email_template_sale_stock_notification
+msgid "\n"
+"                    <div style=\"font-family: 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; \">\n"
+"                        <p>Dear Customer,</p>\n"
+"                        <p> ${object.product_id.name} is available in stock now. Grab it before it sold out...!!! Thank you...!!! </p>\n"
+"                    </div>\n"
+"                        \n"
+"            "
+msgstr "\n"
+"                    <div style=\"font-family: 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; \">\n"
+"                        <p>Cher client,</p>\n"
+"                        <p> ${object.product_id.name} est de nouveau disponible. Achetez le avant qu'il soit en rupture ! Merci ! </p>\n"
+"                    </div>\n"
+"                        \n"
+"            "
+
+#. module: of_website_stock
+#: model:mail.template,subject:of_website_stock.email_template_sale_stock_notification
+msgid " ${object.product_id.name or 'n/a' } is available in stock now."
+msgstr " ${object.product_id.name or 'n/a' } est de nouveau disponible."
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
+msgid "<span class=\"fa fa-check in-stock\"/>\n"
+"					<span>In Stock</span>"
+msgstr "<span class=\"fa fa-check in-stock\"/>\n"
+"					<span>En stock</span>"
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
+msgid "<span class=\"fa fa-warning\"/>\n"
+"					<span>Out of Stock</span>"
+msgstr "<span class=\"fa fa-warning\"/>\n"
+"					<span>Indisponible</span>"
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message_in_item
+msgid "<span class=\"label label-danger\">Out of Stock</span>"
+msgstr "<span class=\"label label-danger\">Indisponible</span>"
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message_in_item
+msgid "<span class=\"label label-primary\">\n"
+"				<span>In Stock</span>\n"
+"			</span>"
+msgstr "<span class=\"label label-primary\">\n"
+"				<span>En stock</span>\n"
+"			</span>"
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message_in_item
+msgid "<span class=\"label label-primary\">In Stock</span>"
+msgstr "<span class=\"label label-primary\">En stock</span>"
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify_create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify_create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: of_website_stock
+#. openerp-web
+#: code:addons/of_website_stock/static/src/js/custom.js:88
+#: code:addons/of_website_stock/static/src/js/custom.js:138
+#, python-format
+msgid "DENIED"
+msgstr "Refusé"
+
+#. module: of_website_stock
+#: model:ir.model.fields,help:of_website_stock.field_website_config_settings_of_stock_type
+msgid "Display Different stock type in Website."
+msgstr "Afficher différentes disponibilités sur le site web"
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify_display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_website_stock
+#: selection:website.config.settings,of_stock_type:0
+msgid "Display nothing"
+msgstr "Ne rien affiché"
+
+#. module: of_website_stock
+#: selection:of.website.stock.notify,status:0
+msgid "Done"
+msgstr "Fait"
+
+#. module: of_website_stock
+#: selection:of.website.stock.notify,status:0
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify_email
+msgid "Email"
+msgstr "Courriel"
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
+msgid "Enter Valid Email Address"
+msgstr "Entrez une adresse email valide"
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
+msgid "Enter your e-mail..."
+msgstr "Entrez votre email"
+
+#. module: of_website_stock
+#: model:ir.model.fields,help:of_website_stock.field_website_config_settings_of_unavailability_management
+msgid "How to handle unavailability"
+msgstr "Gestion du stock indisponible"
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify_id
+msgid "ID"
+msgstr "ID"
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify___last_update
+msgid "Last Modified on"
+msgstr "Dernière Modification le"
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify_write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify_write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: of_website_stock
+#: selection:website.config.settings,of_unavailability_management:0
+msgid "Mail notification on restock"
+msgstr "Notification par mail de la disponibilité"
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify_partner_id
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
+msgid "Notify"
+msgstr "Recevoir une alerte"
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify_product_id
+msgid "Product"
+msgstr "Article"
+
+#. module: of_website_stock
+#: selection:website.config.settings,of_stock_type:0
+msgid "Qty Forecast"
+msgstr "Stock prévisionnel"
+
+#. module: of_website_stock
+#: selection:website.config.settings,of_stock_type:0
+msgid "Qty On Hand"
+msgstr "Stock réel"
+
+#. module: of_website_stock
+#: selection:website.config.settings,of_unavailability_management:0
+msgid "Sell with a reception delay"
+msgstr "Vente de l’article avec délai de réception"
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify_status
+msgid "Status"
+msgstr "État"
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.of_view_website_config_settings
+msgid "Stock Type"
+msgstr "Type de stock"
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_website_config_settings_of_stock_type
+msgid "Stock Type to Display"
+msgstr "Type de stock visible"
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
+msgid "Thank you for your interest! You will be notified by mail when the product is available."
+msgstr "Merci de votre intérêt! Vous serez notifié par mail quand l'article sera de nouveau disponible."
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
+msgid "Thanks"
+msgstr "Merci"
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_website_config_settings_of_unavailability_management
+#: model:ir.ui.view,arch_db:of_website_stock.of_view_website_config_settings
+msgid "Unavailability Management"
+msgstr "Gestion du stock indisponible"
+
+#. module: of_website_stock
+#: model:ir.model,name:of_website_stock.model_website
+msgid "Website"
+msgstr "Site Web"
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.of_view_website_config_settings
+msgid "Website Stock Availability"
+msgstr "Disponibilité du stock site web"
+
+#. module: of_website_stock
+#: model:ir.actions.act_window,name:of_website_stock.action_stock_notification
+#: model:ir.ui.menu,name:of_website_stock.menu_stock_notification
+#: model:ir.ui.view,arch_db:of_website_stock.view_website_sale_stock_notify_form_view
+#: model:ir.ui.view,arch_db:of_website_stock.view_website_sale_stock_notify_tree_view
+msgid "Website Stock Notify"
+msgstr "Notification stock site web"
+
+#. module: of_website_stock
+#. openerp-web
+#: code:addons/of_website_stock/static/src/js/custom.js:93
+#: code:addons/of_website_stock/static/src/js/custom.js:143
+#, python-format
+msgid "You Can Not Add More than Available Quantity"
+msgstr "Vous ne pouvez ajouter plus que la quantité dispnible"
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
+#: model:ir.ui.view,arch_db:of_website_stock.product_qty_in_products_item_page
+msgid "left."
+msgstr "restante."
+
+#. module: of_website_stock
+#: model:ir.model,name:of_website_stock.model_of_website_stock_notify
+msgid "of.website.stock.notify"
+msgstr "of.website.stock.notify"
+
+#. module: of_website_stock
+#: model:ir.model,name:of_website_stock.model_website_config_settings
+msgid "website.config.settings"
+msgstr "website.config.settings"
+
