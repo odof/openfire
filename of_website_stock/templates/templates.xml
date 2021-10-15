@@ -181,7 +181,7 @@
 				</t>
 			</td>
 		</xpath>
-		<xpath expr="//*[@id='delivery_carrier']" position='before'>
+		<xpath expr="//*[@id='payment_method']/../*[1]" position='before'>
 			<div class="container" t-if="website.get_of_delivery_management()">
 				<div class="row">
 					<div class='col-sm-6'>
