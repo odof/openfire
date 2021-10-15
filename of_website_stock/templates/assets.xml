@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="assets_frontend" inherit_id="website.assets_frontend" name="Custom LESS-JS">
+        <xpath expr="." position="inside">
+            <link href="/of_website_stock/static/src/less/custom.less" rel="stylesheet"/>
+            <script src="/of_website_stock/static/src/js/custom.js" type="text/javascript"/>
+        </xpath>
+    </template>
+
+</odoo>
