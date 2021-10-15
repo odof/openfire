@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_website_sale_stock_notify_tree_view" model="ir.ui.view">
+        <field name="name">of.website.stock.notify.tree.view</field>
+        <field name="model">of.website.stock.notify</field>
+        <field name="arch" type="xml">
+            <tree string="Website Stock Notify">
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="email"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_website_sale_stock_notify_form_view" model="ir.ui.view">
+        <field name="name">of.website.stock.notify.form.view</field>
+        <field name="model">of.website.stock.notify</field>
+        <field name="arch" type="xml">
+            <form string="Website Stock Notify">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,done"/>
+                </header>
+
+                <sheet>
+                    <group>
+                        <field name="partner_id"/>
+                        <field name="product_id"/>
+                        <field name="email"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_stock_notification" model="ir.actions.act_window">
+        <field name="name">Website Stock Notify</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.website.stock.notify</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="Website Stock Notify" id="menu_stock_notification" parent="sales_team.menu_sale_config" action="action_stock_notification" sequence="6"/>
+
+</odoo>

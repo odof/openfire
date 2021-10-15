@@ -1,0 +1,253 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_website_stock
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-10-12 09:47+0000\n"
+"PO-Revision-Date: 2021-10-12 09:47+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_website_stock
+#: model:mail.template,body_html:of_website_stock.email_template_sale_stock_notification
+msgid "\n"
+"                    <div style=\"font-family: 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; \">\n"
+"                        <p>Dear Customer,</p>\n"
+"                        <p> ${object.product_id.name} is available in stock now. Grab it before it sold out...!!! Thank you...!!! </p>\n"
+"                    </div>\n"
+"                        \n"
+"            "
+msgstr ""
+
+#. module: of_website_stock
+#: model:mail.template,subject:of_website_stock.email_template_sale_stock_notification
+msgid " ${object.product_id.name or 'n/a' } is available in stock now."
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
+msgid "<span class=\"fa fa-check in-stock\"/>\n"
+"					<span>In Stock</span>"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
+msgid "<span class=\"fa fa-warning\"/>\n"
+"					<span>Out of Stock</span>"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message_in_item
+msgid "<span class=\"label label-danger\">Out of Stock</span>"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message_in_item
+msgid "<span class=\"label label-primary\">\n"
+"				<span>In Stock</span>\n"
+"			</span>"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message_in_item
+msgid "<span class=\"label label-primary\">In Stock</span>"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify_create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify_create_date
+msgid "Created on"
+msgstr ""
+
+#. module: of_website_stock
+#. openerp-web
+#: code:addons/of_website_stock/static/src/js/custom.js:88
+#: code:addons/of_website_stock/static/src/js/custom.js:138
+#, python-format
+msgid "DENIED"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,help:of_website_stock.field_website_config_settings_of_stock_type
+msgid "Display Different stock type in Website."
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify_display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: of_website_stock
+#: selection:website.config.settings,of_stock_type:0
+msgid "Display nothing"
+msgstr ""
+
+#. module: of_website_stock
+#: selection:of.website.stock.notify,status:0
+msgid "Done"
+msgstr ""
+
+#. module: of_website_stock
+#: selection:of.website.stock.notify,status:0
+msgid "Draft"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify_email
+msgid "Email"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
+msgid "Enter Valid Email Address"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
+msgid "Enter your e-mail..."
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,help:of_website_stock.field_website_config_settings_of_unavailability_management
+msgid "How to handle unavailability"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify_id
+msgid "ID"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify___last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify_write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify_write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_website_stock
+#: selection:website.config.settings,of_unavailability_management:0
+msgid "Mail notification on restock"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify_partner_id
+msgid "Name"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
+msgid "Notify"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify_product_id
+msgid "Product"
+msgstr ""
+
+#. module: of_website_stock
+#: selection:website.config.settings,of_stock_type:0
+msgid "Qty Forecast"
+msgstr ""
+
+#. module: of_website_stock
+#: selection:website.config.settings,of_stock_type:0
+msgid "Qty On Hand"
+msgstr ""
+
+#. module: of_website_stock
+#: selection:website.config.settings,of_unavailability_management:0
+msgid "Sell with a reception delay"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_of_website_stock_notify_status
+msgid "Status"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.of_view_website_config_settings
+msgid "Stock Type"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_website_config_settings_of_stock_type
+msgid "Stock Type to Display"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
+msgid "Thank you for your interest! You will be notified by mail when the product is available."
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
+msgid "Thanks"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model.fields,field_description:of_website_stock.field_website_config_settings_of_unavailability_management
+#: model:ir.ui.view,arch_db:of_website_stock.of_view_website_config_settings
+msgid "Unavailability Management"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model,name:of_website_stock.model_website
+msgid "Website"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.of_view_website_config_settings
+msgid "Website Stock Availability"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.actions.act_window,name:of_website_stock.action_stock_notification
+#: model:ir.ui.menu,name:of_website_stock.menu_stock_notification
+#: model:ir.ui.view,arch_db:of_website_stock.view_website_sale_stock_notify_form_view
+#: model:ir.ui.view,arch_db:of_website_stock.view_website_sale_stock_notify_tree_view
+msgid "Website Stock Notify"
+msgstr ""
+
+#. module: of_website_stock
+#. openerp-web
+#: code:addons/of_website_stock/static/src/js/custom.js:93
+#: code:addons/of_website_stock/static/src/js/custom.js:143
+#, python-format
+msgid "You Can Not Add More than Available Quantity"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
+#: model:ir.ui.view,arch_db:of_website_stock.product_qty_in_products_item_page
+msgid "left."
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model,name:of_website_stock.model_of_website_stock_notify
+msgid "of.website.stock.notify"
+msgstr ""
+
+#. module: of_website_stock
+#: model:ir.model,name:of_website_stock.model_website_config_settings
+msgid "website.config.settings"
+msgstr ""
+
