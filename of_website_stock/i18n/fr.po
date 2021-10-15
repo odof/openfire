@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-15 09:09+0000\n"
-"PO-Revision-Date: 2021-10-15 09:09+0000\n"
+"POT-Creation-Date: 2021-11-02 08:42+0000\n"
+"PO-Revision-Date: 2021-11-02 08:42+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -56,6 +56,11 @@ msgstr "(OF) Gestion du stock indisponible"
 #: model:ir.model.fields,field_description:of_website_stock.field_website_config_settings_of_website_security_lead
 msgid "(OF) Website Safety Days *"
 msgstr "(OF) Délai de livraison minimum"
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
+msgid ", the delivery time will be extended."
+msgstr ", le délai de livraison sera donc rallongé."
 
 #. module: of_website_stock
 #: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
@@ -141,7 +146,7 @@ msgstr "Nom affiché"
 #. module: of_website_stock
 #: selection:website.config.settings,of_stock_type:0
 msgid "Display nothing"
-msgstr "Ne rien affiché"
+msgstr "Ne rien afficher"
 
 #. module: of_website_stock
 #: selection:of.website.stock.notify,status:0
@@ -226,12 +231,12 @@ msgstr "Article"
 #. module: of_website_stock
 #: selection:website.config.settings,of_stock_type:0
 msgid "Qty Forecast"
-msgstr "Stock prévisionnel"
+msgstr "Quantité prévue"
 
 #. module: of_website_stock
 #: selection:website.config.settings,of_stock_type:0
 msgid "Qty On Hand"
-msgstr "Stock réel"
+msgstr "Quantité réelle"
 
 #. module: of_website_stock
 #: model:ir.model,name:of_website_stock.model_sale_order
