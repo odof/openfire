@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data noupdate="1">
+
+		<record id="avail_sale_stock_notification" model="ir.cron">
+			<field name="name"> Website Sale Stock Notify </field>
+			<field name="interval_number">1</field>
+			<field name="interval_type">hours</field>
+			<field name="numbercall">-1</field>
+			<field name="doall" eval="False"/>
+			<field name="model" eval="'of.website.stock.notify'"/>
+			<field name="function" eval="'_cron_of_website_stock_notification'"/>
+			<field name="args" eval="'()'" />
+		</record>
+
+	</data>
+</odoo>
