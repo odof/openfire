@@ -141,7 +141,7 @@ msgstr "Nom affiché"
 #. module: of_website_stock
 #: selection:website.config.settings,of_stock_type:0
 msgid "Display nothing"
-msgstr "Ne rien affiché"
+msgstr "Ne rien afficher"
 
 #. module: of_website_stock
 #: selection:of.website.stock.notify,status:0
@@ -226,12 +226,12 @@ msgstr "Article"
 #. module: of_website_stock
 #: selection:website.config.settings,of_stock_type:0
 msgid "Qty Forecast"
-msgstr "Stock prévisionnel"
+msgstr "Quantité prévue"
 
 #. module: of_website_stock
 #: selection:website.config.settings,of_stock_type:0
 msgid "Qty On Hand"
-msgstr "Stock réel"
+msgstr "Quantité réele"
 
 #. module: of_website_stock
 #: model:ir.model,name:of_website_stock.model_sale_order
