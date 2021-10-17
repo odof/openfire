@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, api, _
+from odoo import models, fields, api, _
 from odoo.addons.stock.models.stock_picking import Picking
 from odoo.exceptions import UserError
 
@@ -91,6 +91,22 @@ Picking.do_new_transfer = do_new_transfer
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
+
+    of_amount_untaxed = fields.Monetary(
+        string=u"Montant HT", readonly=True, currency_field='company_currency_id', compute='_compute_of_amount_untaxed')
+    company_currency_id = fields.Many2one(
+        'res.currency', related='company_id.currency_id', string=u"Company currency", readonly=True)
+
+    def pdf_mention_legale(self):
+        return self.env['ir.values'].get_default('stock.config.settings', 'pdf_mention_legale') or ""
+
+    @api.depends('move_lines.of_amount_untaxed')
+    def _compute_of_amount_untaxed(self):
+        for stock in self:
+            of_amount_untaxed = 0.0
+            for move in stock.move_lines:
+                of_amount_untaxed += move.of_amount_untaxed
+            stock.of_amount_untaxed = of_amount_untaxed
 
     @api.multi
     def action_fill_operation_qty_done(self):

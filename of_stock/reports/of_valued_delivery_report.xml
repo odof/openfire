@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <report
+            id="of_valued_delivery_report_action"
+            string="Bon de Transfert valorisé"
+            groups="of_stock.group_of_bon_transfert_valorise"
+            model="stock.picking"
+            report_type="qweb-pdf"
+            name="of_stock.of_valued_delivery_report"
+            file="of_stock.of_valued_delivery_report"
+    />
+
+    <template id="of_valued_delivery_report">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="of_stock.of_valued_delivery_report_document" t-lang="o.partner_id.lang"/>
+        </t>
+    </template>
+
+    <template id="of_delivery_report_document" inherit_id="stock.report_delivery_document">
+        <xpath expr="//table[last()]" position="after">
+            <div class="row" name="mentions_legales">
+                <div class="col-xs-12 mb16">
+                    <t t-set="pdf_mention_legale" t-value="o.pdf_mention_legale()"/>
+                    <p t-if="pdf_mention_legale">
+                        <strong>Mentions légales</strong>
+                        <br/>
+                        <i style="color: grey;">
+                            <t t-set="mention_lines" t-value="pdf_mention_legale.split('\n')"/>
+                            <t t-foreach="mention_lines" t-as="mention_line">
+                                <span t-esc="mention_line"/>
+                                <br/>
+                            </t>
+                        </i>
+                    </p>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="of_valued_delivery_report_document" inherit_id="stock.report_delivery_document" primary="True">
+        <xpath expr="//table[@t-if='not o.pack_operation_ids']/thead/tr" position="inside">
+            <th class="text-right"><strong>PU HT</strong></th>
+            <th class="text-right"><strong>Total HT</strong></th>
+        </xpath>
+        <xpath expr="//table[@t-if='not o.pack_operation_ids']/tbody/tr" position="inside">
+            <td class="text-right">
+                <span t-field="move.of_computed_price_unit" widget="monetary"
+                      options="{'currency_field': 'company_currency_id'}" />
+            </td>
+            <td class="text-right">
+                <span t-field="move.of_amount_untaxed" widget="monetary"
+                      options="{'currency_field': 'company_currency_id'}" />
+            </td>
+        </xpath>
+        <xpath expr="//table[@t-if='o.pack_operation_ids']/thead/tr" position="inside">
+            <th class="text-right"><strong>PU HT</strong></th>
+            <th class="text-right"><strong>Total HT</strong></th>
+        </xpath>
+        <xpath expr="//table[@t-if='o.pack_operation_ids']/tbody/tr" position="inside">
+            <td class="text-right"><span t-field="pack_operation.of_price_unit"/></td>
+            <td class="text-right"><span t-field="pack_operation.of_amount_untaxed"/></td>
+        </xpath>
+        <xpath expr="//table[@t-if='o.pack_operation_ids']" position="after">
+            <div class="row" name="total">
+                <div name="subdivision" class="col-xs-4 pull-right">
+                    <table class="table table-condensed">
+                        <tr name="total_ht" class="border-black">
+                            <td name="total_ht_libelle"><strong>Total HT</strong></td>
+                            <td class="text-right">
+                                <span>
+                                    <t t-esc="o.of_amount_untaxed"
+                                       t-options="{'widget': 'monetary', 'display_currency': o.company_currency_id}"/>
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </xpath>
+        <xpath expr="//div[@name='mentions_legales']" position="after">
+            <div class="row" name="signature">
+                <div class="col-xs-5 mb16">
+                    <p>
+                        <strong>Signature</strong>
+                    </p>
+                    <div style="border: 1px solid black; width: 100%; height: 130px; border-radius: 10px;"/>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>

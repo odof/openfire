@@ -88,6 +88,20 @@
             <xpath expr="//field[@name='min_date']" position="after">
                 <field name="date_done" string="Date réelle"/>
             </xpath>
+            <xpath expr="//field[@name='move_lines']" position="after">
+                <group class="oe_subtotal_footer oe_right" colspan="2" name="stock_total">
+                    <field name="company_currency_id" invisible="1"/>
+                    <field name="of_amount_untaxed" groups="of_stock.group_of_bon_transfert_valorise"
+                           widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+                </group>
+            </xpath>
+            <xpath expr="//field[@name='pack_operation_product_ids']/tree" position="inside">
+                <field name="company_currency_id" invisible="1"/>
+                <field name="of_price_unit" groups="of_stock.group_of_bon_transfert_valorise"
+                       widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+                <field name="of_amount_untaxed" groups="of_stock.group_of_bon_transfert_valorise"
+                       widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+            </xpath>
         </field>
     </record>
 
@@ -103,6 +117,14 @@
             </xpath>
             <xpath expr="//field[@name='state']" position="after">
                 <field name="of_has_reordering_rule"/>
+            </xpath>
+            <xpath expr="//field[@name='product_uom']" position="after">
+                <field name="origin" invisible="1"/>
+                <field name="company_currency_id" invisible="1"/>
+                <field name="of_computed_price_unit" widget="monetary" options="{'currency_field': 'company_currency_id'}"
+                       attrs="{'readonly': [('origin', '!=', False)]}" groups="of_stock.group_of_bon_transfert_valorise"/>
+                <field name="of_amount_untaxed" groups="of_stock.group_of_bon_transfert_valorise"
+                       widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
             </xpath>
         </field>
     </record>
@@ -135,6 +157,16 @@
                         <field name="of_forcer_date_inventaire" class="oe_inline"/>
                         <span>Permettre de forcer la date de l'inventaire</span>
                     </div>
+                </group>
+                <group name="bon_transfert"  string="Bons de transfert PDF">
+                    <label for="group_of_bon_transfert_valorise"/>
+                    <div>
+                        <div>
+                            <field name="group_of_bon_transfert_valorise" class="oe_inline"/>
+                            <span>Afficher la valeur du mouvement de stock dans les bons de livraison</span>
+                        </div>
+                    </div>
+                    <field name="pdf_mention_legale" groups="base.group_system"/>
                 </group>
             </xpath>
             <xpath expr="//field[@name='group_warning_stock']" position="after">

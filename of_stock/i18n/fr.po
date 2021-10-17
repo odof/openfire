@@ -1,6 +1,7 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # * of_stock
+# * stock
 
 msgid ""
 msgstr ""
@@ -20,3 +21,8 @@ msgstr ""
 #: model:ir.actions.report.xml,name:stock.action_report_delivery
 msgid "Delivery Slip"
 msgstr "Bon de Transfert"
+
+#. module: stock
+#: model:ir.ui.view,arch_db:stock.report_delivery_document
+msgid "<strong>Quantity</strong>"
+msgstr "<strong>Quantité</strong>"
