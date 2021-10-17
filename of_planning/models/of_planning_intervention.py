@@ -6,6 +6,7 @@ import pytz
 import re
 import requests
 import urllib
+import base64
 
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError, ValidationError
@@ -36,12 +37,27 @@ class HREmployee(models.Model):
     of_est_intervenant = fields.Boolean(string=u"Est intervenant", default=False)
     of_est_commercial = fields.Boolean(string=u"Est commercial", default=False)
     of_impression_planning = fields.Boolean(string=u"Impression planning", default=True)
+    of_daily_email = fields.Boolean(
+        string=u"Envoi email veille de RDV", default=False,
+        help=u"Active l'envoi chaque soir du planning au courriel de l'employé, quand celui-ci a des RDV le lendemain.")
 
     @api.onchange('of_est_intervenant', 'of_est_commercial')
     def _onchange_est_intervenant(self):
         self.ensure_one()
         if not self.of_est_intervenant and not self.of_est_commercial:
             self.of_impression_planning = False
+
+    @api.onchange('of_daily_email')
+    def _onchange_of_daily_email(self):
+        self.ensure_one()
+        if self.of_daily_email:
+            self.of_impression_planning = True
+
+    @api.onchange('of_impression_planning')
+    def _onchange_of_impression_planning(self):
+        self.ensure_one()
+        if not self.of_impression_planning:
+            self.of_daily_email = False
 
     @api.multi
     def peut_faire(self, tache_id, all_required=False):
@@ -109,6 +125,42 @@ class HREmployee(models.Model):
                 limit) or []
             return res
         return super(HREmployee, self).name_search(name, args, operator, limit)
+
+    @api.model
+    def send_next_day_planning(self):
+        template_id = self.env.ref('of_planning.email_template_planning_jour_demain')
+        next_day_da = fields.Date.from_string(fields.Date.today()) + timedelta(days=1)
+        next_day_str = fields.Date.to_string(next_day_da)
+        interventions = self.env['of.planning.intervention'].search([
+            ('date', '>=', next_day_str),
+            ('date_deadline', '<=', next_day_str),
+            ('state', 'not in', ['draft', 'postponed', 'cancel']),
+        ])
+        employees = interventions.mapped('employee_ids').filtered(
+            lambda e: e.of_impression_planning and e.of_daily_email)
+        wiz_vals = {'type': 'day', 'date_start': next_day_str, }
+        impression_wizard = self.env['of_planning.impression_wizard'].create(wiz_vals)
+        attachment_obj = self.env['ir.attachment']
+        # Pour chaque employé, générer le PDF et envoyer l'email
+        for employee in employees:
+            impression_wizard.employee_ids = [(6, 0, [employee.id])]
+            email_values = {}
+            # création du pdf et ajout dans les values, il sera automatiquement joint à l'email envoyé
+            planning_pdf = self.env['report'].get_pdf(impression_wizard.ids, 'of_planning.report_of_planning_jour')
+            attachment = self.env['ir.attachment'].create({
+                'name': u"planning_%s" % next_day_str,
+                'datas_fname': u"planning_%s_%s.pdf" % (employee.name, next_day_str),
+                'type': 'binary',
+                'datas': base64.encodestring(planning_pdf),
+                'res_model': 'of_planning.impression_wizard',
+                'res_id': impression_wizard.id,
+                'mimetype': 'application/x-pdf'
+            })
+            email_values['attachment_ids'] = attachment.ids
+            # envoi immédiat de l'email
+            template_id.send_mail(employee.id, force_send=True, email_values=email_values)
+
+        return True
 
 
 class OfPlanningTacheCateg(models.Model):
