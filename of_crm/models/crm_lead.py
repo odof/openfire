@@ -348,6 +348,7 @@ class CrmLead(models.Model):
                 context['force_date_start'] = self.of_intervention_ids[-1].date_date
                 context['search_default_opportunity_id'] = self.id
             action['context'] = str(context)
+        action = self.mapped('of_intervention_ids').get_action_views(self, action)
         return action
 
     @api.multi
