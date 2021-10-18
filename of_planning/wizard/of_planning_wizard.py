@@ -36,7 +36,7 @@ class PlanningImpressionWizard(models.TransientModel):
                 wizard.date_stop = wizard.date_start
             else:
                 date_start_da = fields.Date.from_string(wizard.date_start)
-                date_stop_da = date_start_da + timedelta(days=7)
+                date_stop_da = date_start_da + timedelta(days=6)
                 wizard.date_stop = fields.Date.to_string(date_stop_da)
 
     @api.onchange('type')
