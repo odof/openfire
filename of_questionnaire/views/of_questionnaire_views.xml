@@ -282,6 +282,7 @@
                     <field name="type" invisible="1"/>
                     <field name="parc_installe_id" invisible="1" readonly="1"/>
                     <field name="answer" invisible="1"/>
+                    <field name="condition_unmet" invisible="1"/>
                     <group>
                         <group>
                             <field name="category_id"/>
