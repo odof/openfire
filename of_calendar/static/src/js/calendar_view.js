@@ -931,13 +931,8 @@ CalendarView.include({
             the_title = '',
             attendees = [];
 
-        if (!all_day) {
-            date_start = time.auto_str_to_date(evt[this.date_start]);
-            date_stop = this.date_stop ? time.auto_str_to_date(evt[this.date_stop]) : null;
-        } else {
-            date_start = time.auto_str_to_date(evt[this.date_start].split(' ')[0],'start');
-            date_stop = this.date_stop ? time.auto_str_to_date(evt[this.date_stop].split(' ')[0],'start') : null;
-        }
+        date_start = time.auto_str_to_date(evt[this.date_start]);
+        date_stop = this.date_stop ? time.auto_str_to_date(evt[this.date_stop]) : null;
 
         if (this.info_fields) {
             var temp_ret = {};
