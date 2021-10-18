@@ -18,6 +18,14 @@ class SaleOrder(models.Model):
     of_custom_confirmation_date = fields.Datetime(string=u"Date de confirmation")
     confirmation_date = fields.Datetime(string=u"Date d'enregistrement")
 
+    @api.depends('state', 'order_line.invoice_status', 'of_force_invoice_status', 'of_cancelled_order_id',
+                 'of_cancellation_order_id')
+    def _get_invoiced(self):
+        super(SaleOrder, self)._get_invoiced()
+        for order in self:
+            if order.state == 'closed':
+                order.invoice_status = 'invoiced'
+
     @api.multi
     def action_verification_preconfirm(self):
         """
@@ -60,6 +68,15 @@ class SaleOrderLine(models.Model):
 
     confirmation_date_order = fields.Datetime(string=u"Date d'enregistrement de commande")
     of_confirmation_date = fields.Datetime(string=u"Date d'enregistrement")
+
+    @api.depends('state', 'product_uom_qty', 'qty_delivered', 'qty_to_invoice', 'qty_invoiced',
+                 'order_id.of_invoice_policy', 'order_id.partner_id.of_invoice_policy',
+                 'order_id.of_cancelled_order_id', 'order_id.of_cancellation_order_id')
+    def _compute_invoice_status(self):
+        super(SaleOrderLine, self)._compute_invoice_status()
+        for line in self:
+            if line.state == 'closed':
+                line.invoice_status = 'invoiced'
 
 
 class SaleConfigSettings(models.TransientModel):
