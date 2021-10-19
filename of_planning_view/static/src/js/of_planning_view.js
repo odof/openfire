@@ -521,16 +521,19 @@ var PlanningView = View.extend({
                 // adapter les entêtes de colonnes aux nouvelles bornes de recherche
                 self.set_columns();
                 var event, planning_record, day_span, col_offset_start, col_offset_stop, record_options,
-                    event_res_ids, res_id, row_index;
+                    event_res_ids, res_id, row_index, start_local, stop_local;
                 for (var i=0; i<events.length; i++) {
                     event = events[i];
                     event_res_ids = event[self.resource];
+                    // calculer les heures locales pour placer les events dans les bonnes colonnes
+                    start_local = moment.utc(event[self.date_start]).local()
+                    stop_local = moment.utc(event[self.date_stop]).local()
                     // combien de jours?
-                    day_span = moment(event[self.date_stop]).startOf('day').diff(moment(event[self.date_start]).startOf('day'), 'days')+1;
+                    day_span = stop_local.startOf('day').diff(start_local.startOf('day'), 'days')+1;
                     // l'enregistrement sera ajouté à toutes les colonnes entre col_offset_start et col_offset_stop
-                    col_offset_start = moment(event[self.date_start]).startOf('day').diff(moment(self.range_start), 'days');
+                    col_offset_start = start_local.startOf('day').diff(moment(self.range_start), 'days');
                     if (day_span > 1) {
-                        col_offset_stop = moment(event[self.date_stop]).startOf('day').diff(moment(self.range_start), 'days');
+                        col_offset_stop = stop_local.startOf('day').diff(moment(self.range_start), 'days');
                     }else{
                         col_offset_stop = undefined;
                     }
@@ -1247,16 +1250,20 @@ PlanningView.Row = Widget.extend({
         if (isNullOrUndef(planning_record.col_offset_start)) {  // foolproofing
             console.log("ERREUR: col_offset_start manquant",planning_record);
         }else if(isNullOrUndef(planning_record.col_offset_stop)) {  // évènement sur une journée
-            self.columns[planning_record.col_offset_start].push(planning_record);
-            self.records_added.push(planning_record)
-            self.trigger_up("record_added");
+            if (isNullOrUndef(self.columns[planning_record.col_offset_start])) {
+                console.log("ERREUR: col_offset_start en dehors des bornes", planning_record);
+            }else{
+                self.columns[planning_record.col_offset_start].push(planning_record);
+                self.records_added.push(planning_record)
+                self.trigger_up("record_added");
+            }
         }else{
             // évènement sur plusieurs jours: calculer les heures à afficher (pour trier aussi)
             // exple: 17:00 -> 18:00 et 9:00 -> 11:30 au lieu de 2 fois 17:00 -> 11:30
             self.records_multiples[planning_record.id] = [];
             planning_record["hours_cols"] = {};
             planning_record.$of_el = {};
-            var a_push, horaires_dict;
+            var a_push, horaires_dict, first_hour;
             var descript_ft = {type: "float_time"};
             // assigner des heures de début et de fin pour les évènements sur plusieurs jours
             // pas encore complètement au point
@@ -1300,7 +1307,13 @@ PlanningView.Row = Widget.extend({
                             a_push = false;
                         }else{
                             // heure de début du premier créneau du jour
-                            planning_record["hours_cols"][i].heure_debut = horaires_dict[i+1][0][0]
+                            first_hour = horaires_dict[i+1][0][0]
+                            // si l'heure de début est après l'heure de fin, ramener l'heure de début à minuit
+                            // peut arriver si les dates sont forcées et en dehors des horaires
+                            if (first_hour > planning_record.heure_fin) {
+                                first_hour = 0.0
+                            }
+                            planning_record["hours_cols"][i].heure_debut = first_hour
                             planning_record["hours_cols"][i].heure_fin = planning_record.heure_fin;
                         }
                     }
