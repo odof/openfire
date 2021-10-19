@@ -7,6 +7,7 @@ from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
+
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
@@ -45,8 +46,9 @@ class PurchaseOrder(models.Model):
     @api.depends('picking_ids', 'picking_ids.state')
     def _compute_of_reception_state(self):
         for order in self:
-            if order.picking_ids and all([state == 'done' for state in order.picking_ids.
-                                     filtered(lambda p: p.state not in ['cancel']).mapped('state')]):
+            if order.picking_ids and all([state == 'done' for state in order.picking_ids.filtered(
+                        lambda p: p.state not in ['cancel']
+                    ).mapped('state')]):
                 order.of_reception_state = 'received'
             else:
                 order.of_reception_state = 'no'
@@ -115,8 +117,9 @@ class PurchaseOrderLine(models.Model):
                                                                             limit=1)
                 if orderpoints and orderpoints.of_forecast_limit:
                     product_context['of_to_date_expected'] = \
-                        (datetime.today() + relativedelta(days=orderpoints.of_forecast_period)). \
-                            strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+                        (datetime.today() + relativedelta(
+                            days=orderpoints.of_forecast_period
+                        )).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
                 line.of_theoretical_stock_qty = line.product_id.with_context(product_context).virtual_available
 
                 # Qté(s) réservée(s)
@@ -403,13 +406,15 @@ class ProductProduct(models.Model):
         model = self.env['ir.model'].search([('model', '=', self._name)])
         fields_obj = self.env['ir.model.fields']
         standard_price_field = fields_obj.search([('model_id', '=', model.id), ('name', '=', 'standard_price')])
-        purchase_coeff_field = fields_obj.search([('model_id', '=', model.id), ('name', '=', 'property_of_purchase_coeff')])
+        purchase_coeff_field = fields_obj.search(
+            [('model_id', '=', model.id), ('name', '=', 'property_of_purchase_coeff')])
         test = self.env['ir.config_parameter'].get_param('property_of_purchase_coeff_generated', False)
 
         res = super(ProductProduct, self)._auto_init()
         if not test:
             if not purchase_coeff_field:
-                purchase_coeff_field = fields_obj.search([('model_id', '=', model.id), ('name', '=', 'property_of_purchase_coeff')])
+                purchase_coeff_field = fields_obj.search(
+                    [('model_id', '=', model.id), ('name', '=', 'property_of_purchase_coeff')])
             if purchase_coeff_field:
                 self.env['ir.config_parameter'].set_param('property_of_purchase_coeff_generated', 'True')
                 self.env.cr.execute("DELETE FROM ir_property WHERE name = 'standard_price' AND res_id LIKE 'product.product,%' AND SUBSTRING(res_id FROM 17)::integer NOT IN (SELECT id FROM product_product);")
