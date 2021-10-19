@@ -447,6 +447,12 @@ class SaleOrderLine(models.Model):
             if vals.get("of_pricing"):
                 sale_kit_vals["of_pricing"] = vals.get("of_pricing")
             self.kit_id.write(sale_kit_vals)
+        if len(self) == 1 and 'kit_id' in vals:
+            if not vals.get('kit_id'):
+                self.env['of.saleorder.kit'].search([('order_line_id', '=', self.id)]).unlink()
+            else:
+                self.env['of.saleorder.kit'].search(
+                    [('order_line_id', '=', self.id), ('id', '!=', vals.get('kit_id'))]).unlink()
         return True
 
     @api.multi
