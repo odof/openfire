@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="of_price_variation_analysis_pivot_view" model="ir.ui.view">
+        <field name="name">of.price.variation.analysis.pivot.view</field>
+        <field name="model">of.price.variation.analysis</field>
+        <field name="arch" type="xml">
+            <pivot string="Analyse des remises" disable_linking="True">
+                <field name="confirmation_date" interval="month" type="row"/>
+                <field name="presale_price" type="measure"/>
+                <field name="presale_price_variation" type="measure"/>
+                <field name="presale_margin" type="measure"/>
+                <field name="presale_price_variation_rate" type="measure"/>
+                <field name="sale_price" type="measure"/>
+                <field name="sale_price_variation" type="measure"/>
+                <field name="sale_margin" type="measure"/>
+                <field name="sale_price_variation_rate" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="of_price_variation_analysis_search_view" model="ir.ui.view">
+        <field name="name">of.price.variation.analysis.search.view</field>
+        <field name="model">of.price.variation.analysis</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="company_id"/>
+                <field name="company_type_id"/>
+                <field name="company_sector_id"/>
+                <field name="company_sales_group_id"/>
+                <field name="user_id"/>
+                <field name="partner_id"/>
+                <field name="order_id"/>
+                <field name="invoice_status"/>
+                <field name="product_id"/>
+                <field name="product_brand_id"/>
+                <field name="product_categ_id"/>
+                <filter string="Commande en cours" name="in_progress"
+                        domain="[('order_id.state', '!=', 'closed')]"/>
+                <filter string="Commande clôturée" name="closed"
+                        domain="[('order_id.state', '=', 'closed')]"/>
+                <separator/>
+                <filter string="Commande entièrement facturée" name="invoiced"
+                        domain="[('invoice_status', '=', 'invoiced')]"/>
+                <separator/>
+                <filter string="Mois en cours" name="this_month"
+                        domain="[('confirmation_date', u'&gt;=', context_today().strftime('%Y-%m-01')),
+                                     ('confirmation_date', u'&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Mois précédent" name="previous_month"
+                        domain="[('confirmation_date', u'&gt;=', (context_today() - relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
+                                     ('confirmation_date', u'&lt;', context_today().strftime('%Y-%m-01'))]"/>
+                <filter string="Cumul à date - Mensuel" name="monthly_accumulation"
+                        domain="[('confirmation_date', u'&gt;=', context_today().strftime('%Y-%m-01')),
+                                     ('confirmation_date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Cumul à date - Annuel" name="yearly_accumulation"
+                        domain="[('confirmation_date', u'&gt;=', context_today().strftime('%Y-01-01')),
+                                     ('confirmation_date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_price_variation_analysis_action" model="ir.actions.act_window">
+        <field name="name">Analyse des remises</field>
+        <field name="res_model">of.price.variation.analysis</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">pivot</field>
+        <field name="context">{}</field>
+        <field name="context">{'search_default_this_month': 1}</field>
+        <field name="domain">[]</field>
+    </record>
+
+    <menuitem
+            id="of_price_variation_analysis_menu"
+            name="Analyse des remises"
+            groups="sales_team.group_sale_salesman"
+            parent="sales_team.menu_sale_report"
+            action="of_price_variation_analysis_action"
+            sequence="15"/>
+
+</odoo>
