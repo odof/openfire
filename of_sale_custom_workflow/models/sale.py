@@ -24,7 +24,10 @@ class SaleOrder(models.Model):
         super(SaleOrder, self)._get_invoiced()
         for order in self:
             if order.state == 'closed':
-                order.invoice_status = 'invoiced'
+                if order.of_cancelled_order_id or order.of_cancellation_order_id:
+                    order.invoice_status = 'no'
+                else:
+                    order.invoice_status = 'invoiced'
 
     @api.multi
     def action_verification_preconfirm(self):
@@ -76,7 +79,10 @@ class SaleOrderLine(models.Model):
         super(SaleOrderLine, self)._compute_invoice_status()
         for line in self:
             if line.state == 'closed':
-                line.invoice_status = 'invoiced'
+                if line.order_id.of_cancelled_order_id or line.order_id.of_cancellation_order_id:
+                    line.invoice_status = 'no'
+                else:
+                    line.invoice_status = 'invoiced'
 
 
 class SaleConfigSettings(models.TransientModel):
