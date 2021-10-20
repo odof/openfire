@@ -2,6 +2,8 @@
 
 from datetime import datetime, date, timedelta
 import json
+from odoo.tools.safe_eval import safe_eval
+from odoo.exceptions import UserError
 
 from odoo import api, fields, models
 from odoo.addons.muk_dms.models import dms_base
@@ -81,6 +83,7 @@ class OFFollowupProject(models.Model):
     date_alert_display = fields.Text(string=u"Infos pour alerte de dates", compute='_compute_alert_display')
     picking_alert_display = fields.Text(
         string=u"Infos pour alerte de livraison/réception", compute='_compute_alert_display')
+    validation_sent = fields.Boolean(string=u"Mail de validation envoyé")
     amount_untaxed = fields.Monetary(string=u"Montant HT", related='order_id.amount_untaxed', readonly=True)
     currency_id = fields.Many2one('res.currency', string=u"Devise", related='order_id.currency_id', readonly=True)
 
@@ -227,7 +230,7 @@ class OFFollowupProject(models.Model):
                     else:
                         interventions = rec.order_id.intervention_ids.filtered(
                             lambda i: i.tache_id.tache_categ_id.id in planif_planning_tache_categs.ids
-                                and i.state != 'cancel')
+                            and i.state != 'cancel')
                         if interventions:
                             intervention = interventions[-1]
                             if intervention.date_date != rec.manual_laying_date:
@@ -352,6 +355,31 @@ class OFFollowupProject(models.Model):
             'target': 'new',
             'context': ctx,
         }
+
+    @api.multi
+    def action_send_validation_email(self):
+        self.ensure_one()
+        message_obj = self.env['mail.compose.message']
+        ir_model_data = self.env['ir.model.data']
+        try:
+            template_id = ir_model_data.get_object_reference('of_followup',
+                                                             'of_followup_project_email_validation_template')[1]
+        except ValueError:
+            raise UserError(u"Le modèle pour l'envoi du suivi de projet validé n'existe pas."
+                            u"Veuillez contacter le support.")
+        ctx = dict()
+        ctx.update({
+            'default_model': 'of.followup.project',
+            'default_res_id': self.ids[0],
+            'default_use_template': bool(template_id),
+            'default_template_id': template_id,
+            'default_partner_ids': self.partner_id.ids,
+            'default_composition_mode': 'comment',
+        })
+        obj = message_obj.with_context(ctx).create({})
+        obj.onchange_template_id_wrapper()
+        obj.with_context(mark_followup_as_sent=True).send_mail_action()
+        return True
 
     @api.onchange('template_id')
     def onchange_template_id(self):
@@ -965,7 +993,8 @@ class OFFollowupProjectTemplate(models.Model):
     _description = "Modèle de suivi des projets"
 
     name = fields.Char(string=u"Nom", required=True)
-    task_ids = fields.One2many(comodel_name='of.followup.project.tmpl.task', inverse_name='template_id', string=u"Tâches")
+    task_ids = fields.One2many(
+        comodel_name='of.followup.project.tmpl.task', inverse_name='template_id', string=u"Tâches")
     default = fields.Boolean(string=u"Modèle par défaut")
 
 
@@ -1107,3 +1136,17 @@ class File(dms_base.DMSModel):
         if self.of_file_type == 'related' and self.of_related_model == 'of.followup.project':
             result['view_id'] = self.env.ref('of_followup.of_followup_project_form_view').id
         return result
+
+
+class MailComposeMessage(models.TransientModel):
+    _inherit = 'mail.compose.message'
+
+    @api.multi
+    def send_mail(self, auto_commit=False):
+        if self._context.get('default_model') == 'of.followup.project' and self._context.get('default_res_id') and \
+                self._context.get('mark_followup_as_sent'):
+            followup = self.env['of.followup.project'].browse([self._context['default_res_id']])
+            if followup:
+                followup.write({'validation_sent': True})
+            self = self.with_context(mail_post_autofollow=True)
+        return super(MailComposeMessage, self).send_mail(auto_commit=auto_commit)

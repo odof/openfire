@@ -10,11 +10,14 @@
             <form>
                 <header>
                     <field name="is_done" invisible="1"/>
+                    <field name="validation_sent" invisible="1"/>
                     <button string="Marquer comme terminé" type="object" name="set_to_done" class="oe_highlight" confirm="Êtes-vous sûr que le projet est terminé ?"
                         attrs="{'invisible': [('is_done', '=', True)]}"/>
                     <button string="Remettre en cours" type="object" name="set_to_in_progress"
                         attrs="{'invisible': [('is_done', '=', False)]}"/>
                     <button name="action_send_email" type="object" string="Envoyer un email"/>
+                    <button name="action_send_validation_email" type="object" class="oe_highlight" string="Email de validation à envoyer" attrs="{'invisible': [('validation_sent','=',True)]}"/>
+                    <button name="action_send_validation_email" type="object" string="Email de validation envoyé" attrs="{'invisible': [('validation_sent','!=',True)]}"/>
                     <field name="state" widget="statusbar" statusbar_visible="in_progress,late,ready,done"/>
                 </header>
                 <sheet>
