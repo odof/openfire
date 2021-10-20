@@ -167,7 +167,7 @@
                                     </i></b>
                                 </div>
                                 <field name="line_ids" mode="tree" nolabel="1" colspan="2"
-                                       attrs="{'invisible': [('contract_type','=','simple')]}"
+                                       attrs="{'invisible': [('contract_type','=','simple')],'readonly': [('contract_type','=','simple')]}"
                                        options="{'reload_on_button': True}"
                                        context="{'form_view_ref': 'of_contract_custom.of_contract_line_view_form',
                                                  'tree_view_ref': 'of_contract_custom.of_contract_line_tree_view_advanced',
@@ -185,7 +185,7 @@
                                                  'form_readonly': '[(&quot;state&quot;,&quot;in&quot;,[&quot;validated&quot;,&quot;cancel&quot;])]'}">
                                 </field>
                                 <field name="line_ids_rel" mode="tree" nolabel="1" colspan="2"
-                                       attrs="{'invisible': [('contract_type','!=','simple')]}"
+                                       attrs="{'invisible': [('contract_type','!=','simple')],'readonly': [('contract_type','!=','simple')]}"
                                        options="{'reload_on_button': True}"
                                        context="{'form_view_ref': 'of_contract_custom.of_contract_line_view_form_simplified',
                                                  'tree_view_ref': 'of_contract_custom.of_contract_line_tree_view_simplified',
