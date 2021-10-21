@@ -165,7 +165,7 @@ class OFSaleMarginRegulator(models.Model):
 
     def _where(self):
         where_str = """
-            WHERE       SO.state                                                    IN ('sale', 'done', 'closed')
+            WHERE       SO.state                                                    IN ('presale', 'sale', 'done', 'closed')
             AND         SOL.order_id                                                = SO.id
             AND         SO.company_id                                               = RC.id"""
 
