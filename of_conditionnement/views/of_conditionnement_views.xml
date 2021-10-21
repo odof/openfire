@@ -21,6 +21,11 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/form//label[@for='product_uom_qty']" position="before">
+                <field name="of_packaging_unit_number" invisible="1"/>
+                <field name="of_product_qty_brut" attrs="{'invisible': [('of_packaging_unit_number', '=', 0)]}"/>
+                <field name="of_coefficient_marge" attrs="{'invisible': [('of_packaging_unit_number', '=', 0)]}"/>
+            </xpath>
             <xpath expr="//field[@name='order_line']/form//field[@name='product_uom']/parent::node()" position="after">
                 <field name="of_display_force_qty" invisible="1"/>
                 <field name="of_force_qty" attrs="{'invisible': [('of_display_force_qty', '=', False)]}"/>
