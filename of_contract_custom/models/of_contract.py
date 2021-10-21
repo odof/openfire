@@ -45,6 +45,15 @@ class OfContract(models.Model):
                 'of.intervention.settings', 'of_contract', True)
         return res
 
+    @api.model
+    def _init_number(self):
+        """
+        Màj T2427 : ajout du champ number dans les DI, initialisation du champ.
+        """
+        contract_obj = self.with_context(active_test=False)
+        contracts = contract_obj.search([('number', '=', False)])
+        contracts._affect_number()
+
     active = fields.Boolean(default=True)
     invoice_ids = fields.One2many(comodel_name='account.invoice', inverse_name='of_contract_id', string="Factures")
     invoice_count = fields.Integer(string='Nombre de factures', compute='_get_invoice_count', readonly=True)
@@ -129,6 +138,7 @@ class OfContract(models.Model):
     payment_term_id = fields.Many2one('account.payment.term', string=u'Conditions de règlement')
     date_indexed = fields.Date(string=u"Dernière indexation", compute="_compute_date_indexed", store=True)
     validated = fields.Boolean(string=u"Au moins une ligne validée", compute='_compute_validated')
+    number = fields.Char(string=u"Séquence", copy=False)
 
     @api.model
     def _default_journal(self):
@@ -315,6 +325,7 @@ class OfContract(models.Model):
                 .filtered(lambda p: not p.account_analytic_id)
             product_lines.write({'account_analytic_id': res.account_analytic_id.id})
         res._generate_periods()
+        res._affect_number()
         return res
 
     @api.multi
@@ -331,6 +342,7 @@ class OfContract(models.Model):
             for contract in self:
                 contract.period_ids.unlink()
                 contract._generate_periods()
+        self._affect_number()
         return res
 
     @api.multi
@@ -681,6 +693,14 @@ class OfContract(models.Model):
                       u"et n'ont donc pas été renouvelés :\n%s" % '\n'.join(c.name for c in automatic_renewal)
             return self.env['of.popup.wizard'].popup_return(message=message)
         return {'type': 'ir.actions.do_nothing'}
+
+    @api.multi
+    def _affect_number(self):
+        """ Affectation du code de ligne """
+        sequence = self.env.ref('of_contract_custom.of_contract_custom_seq')
+        for contract in self:
+            if contract.line_ids.filtered(lambda l: l.state == 'validated') and not contract.number:
+                contract.with_context(no_verification=True).write({'number': sequence.next_by_id()})
 
 
 class OfContractLine(models.Model):
@@ -1180,6 +1200,7 @@ class OfContractLine(models.Model):
         """ Affectation du numéro si création à l'état 'validated' """
         res = super(OfContractLine, self).create(vals)
         res._affect_number()
+        res.contract_id._affect_number()
         return res
 
     @api.multi
@@ -1200,6 +1221,7 @@ class OfContractLine(models.Model):
                 if line.address_id.of_prestataire_id and line.address_id.of_prestataire_id.id != supplier_id \
                    or not line.address_id.of_prestataire_id:
                     line.address_id.write({'of_prestataire_id': supplier_id})
+        self.mapped('contract_id')._affect_number()
         return res
 
     @api.multi
