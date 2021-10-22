@@ -22,6 +22,43 @@
                 <xpath expr="//field[@name='partner_ref']" position="after">
                     <field name="of_user_id"/>
                 </xpath>
+
+                <xpath expr="//field[@name='order_line']/tree" position="inside">
+                    <field name="of_total_stock_qty" groups="of_purchase.group_purchase_order_line_display_stock_info+purchase.group_purchase_manager"/>
+                    <field name="of_available_stock_qty" groups="of_purchase.group_purchase_order_line_display_stock_info+purchase.group_purchase_manager"/>
+                    <field name="of_theoretical_stock_qty" groups="of_purchase.group_purchase_order_line_display_stock_info+purchase.group_purchase_manager"/>
+                    <field name="of_reserved_qty" groups="of_purchase.group_purchase_order_line_display_stock_info+purchase.group_purchase_manager"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form/sheet/group/group[1]" position="inside">
+                    <!-- Champs présents en vue liste mais pas en vue form -->
+                    <field name="currency_id" invisible="1"/>
+                    <field name="state" invisible="1"/>
+                    <field name="sequence" invisible="1"/>
+                    <field name="date_planned" invisible="1"/>
+                    <field name="analytic_tag_ids" groups="purchase.group_analytic_accounting" widget="many2many_tags" invisible="1"/>
+                    <field name="qty_received" invisible="not context.get('show_purchase', False)"/>
+                    <field name="qty_invoiced" invisible="not context.get('show_purchase', False)"/>
+                    <field name="price_subtotal" widget="monetary" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form/sheet/group/group[2]" position="inside">
+                    <separator colspan="2" string="Informations de Stock" name="stock_info_sep" groups="of_purchase.group_purchase_order_line_display_stock_info+purchase.group_purchase_manager"/>
+                    <field name="of_total_stock_qty" groups="of_purchase.group_purchase_order_line_display_stock_info+purchase.group_purchase_manager"/>
+                    <field name="of_available_stock_qty" groups="of_purchase.group_purchase_order_line_display_stock_info+purchase.group_purchase_manager"/>
+                    <field name="of_theoretical_stock_qty" groups="of_purchase.group_purchase_order_line_display_stock_info+purchase.group_purchase_manager"/>
+                    <field name="of_reserved_qty" groups="of_purchase.group_purchase_order_line_display_stock_info+purchase.group_purchase_manager"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_purchase_order_customer_form_edit" model="ir.ui.view">
+            <field name="name">purchase.order.form</field>
+            <field name="model">purchase.order</field>
+            <field name="groups_id" eval="[(4, ref('of_purchase.group_purchase_order_line_display_stock_info'))]"/>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/tree" position="attributes">
+                    <attribute name="editable"/>
+                </xpath>
             </field>
         </record>
 
@@ -57,6 +94,12 @@
                 <xpath expr="//group/filter" position="after">
                     <filter string="Client" domain="[]" context="{'group_by':'customer_id'}"/>
                 </xpath>
+                <xpath expr="//filter[@name='message_needaction']" position="after">
+                    <separator/>
+                    <filter name="no" string="Non reçues" domain="[('of_reception_state','=', 'no')]"/>
+                    <filter name="received" string="Reçues" domain="[('of_reception_state','=', 'received')]"/>
+                </xpath>
+
             </field>
         </record>
 
@@ -68,7 +111,13 @@
             <field name="arch" type="xml">
                 <xpath expr="//form//field[@name='group_warning_purchase']" position="after">
                     <field name="of_description_as_order_setting" widget="radio"/>
+                    <label for="group_purchase_order_line_display_stock_info"/>
+                    <div name="group_purchase_order_line_display_stock_info">
+                        <field name="group_purchase_order_line_display_stock_info" class="oe_inline"/>
+                        <span>Afficher les informations de stock au niveau des lignes de commande</span>
+                    </div>
                 </xpath>
+
             </field>
         </record>
 

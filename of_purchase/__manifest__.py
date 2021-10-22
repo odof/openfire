@@ -39,6 +39,7 @@ Fonctionnalités
         'of_product',
     ],
     'data' : [
+        'security/of_purchase_security.xml',
         'report/purchase_report_templates.xml',
         'report/purchase_reports.xml',
         'views/of_purchase_view.xml',
