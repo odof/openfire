@@ -5,7 +5,7 @@
             <div class="of_planning_buttons" />
             <div class="of_planning_table_container" style="width: 100%;"/>
         </div>
-        <div class="of_planning_sidebar_container hidden-xs"/>
+        <div class="of_planning_sidebar_container"/>
     </div>
 
     <!-- Boutons: précédent - Aujourd'hui - suivant -->
