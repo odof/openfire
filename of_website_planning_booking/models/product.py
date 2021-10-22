@@ -6,20 +6,22 @@ from odoo import api, models, fields
 class OFProductBrand(models.Model):
     _inherit = 'of.product.brand'
 
-    website_published = fields.Boolean(string=u"Publié sur le site internet", copy=False)
+    of_website_planning_published = fields.Boolean(
+        string=u"Publié prise de RDV en ligne", copy=False, oldname='website_published')
 
     @api.multi
-    def website_publish_button(self):
+    def button_of_website_planning_published(self):
         self.ensure_one()
-        return self.write({'website_published': not self.website_published})
+        return self.write({'of_website_planning_published': not self.of_website_planning_published})
 
 
 class ProductCategory(models.Model):
     _inherit = 'product.category'
 
-    website_published = fields.Boolean(string=u"Publié sur le site internet", copy=False)
+    of_website_planning_published = fields.Boolean(
+        string=u"Publié prise de RDV en ligne", copy=False, oldname='website_published')
 
     @api.multi
-    def website_publish_button(self):
+    def button_of_website_planning_published(self):
         self.ensure_one()
-        return self.write({'website_published': not self.website_published})
+        return self.write({'of_website_planning_published': not self.of_website_planning_published})

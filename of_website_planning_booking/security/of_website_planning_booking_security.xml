@@ -15,26 +15,4 @@
         <field name="comment">Autorise la création d'un parc installé sur des marques extérieures</field>
     </record>
 
-    <data noupdate="1">
-
-        <!-- Ir Rules -->
-
-        <!-- OF Product Brand -->
-        <record id="of_product_brand_published_rule" model="ir.rule">
-            <field name="name">OF Product Brand Published</field>
-            <field name="model_id" ref="of_product_brand.model_of_product_brand"/>
-            <field name="domain_force">[('website_published', '=', True)]</field>
-            <field name="groups" eval="[(4, ref('base.group_public')), (4, ref('base.group_portal'))]"/>
-        </record>
-
-        <!-- Product category -->
-        <record id="product_category_published_rule" model="ir.rule">
-            <field name="name">Product Category Published</field>
-            <field name="model_id" ref="product.model_product_category"/>
-            <field name="domain_force">[('website_published', '=', True)]</field>
-            <field name="groups" eval="[(4, ref('base.group_public')), (4, ref('base.group_portal'))]"/>
-        </record>
-
-    </data>
-
 </odoo>
