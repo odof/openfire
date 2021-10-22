@@ -16,21 +16,25 @@ class StockWarehouse(models.Model):
 
         # Pour les entrepôts
         for warehouse in self.with_context(active_test=False).search([]):
-            company_id = res_company_obj.with_context(active_test=False).search(
-                [('id', 'parent_of', warehouse.company_id.ids), ('parent_id', '=', False)])
-            warehouse.company_id = company_id.id
+            # On recherche la société parent la plus proche qui est propriétaire des stocks
+            company = warehouse.company_id
+            while not company.of_is_stock_owner and company.parent_id:
+                company = company.parent_id
+            warehouse.company_id = company.id
 
         # Pour les emplacements
-        for location in stock_location_obj.with_context(active_test=False).search([('active', '=', True)]):
+        for location in stock_location_obj.search([]):
             if location.usage == 'internal':
-                company_id = res_company_obj.with_context(active_test=False).search(
-                    [('id', 'parent_of', location.company_id.ids), ('parent_id', '=', False)])
-                location.company_id = company_id.id
+                # On recherche la société parent la plus proche qui est propriétaire des stocks
+                company = location.company_id
+                while not company.of_is_stock_owner and company.parent_id:
+                    company = company.parent_id
+                location.company_id = company.id
             else:
                 location.company_id = False
 
         # Pour les quants
-        company_ids = res_company_obj.with_context(active_test=False).search([('parent_id', '=', False)])
+        company_ids = res_company_obj.search([('of_is_stock_owner', '=', True)])
         for company_id in company_ids:
             quants = stock_quant_obj.with_context(active_test=False).search(
                 [('company_id', 'child_of', company_id.ids)])
@@ -42,13 +46,13 @@ class StockWarehouse(models.Model):
 
     @api.model
     def create(self, vals):
-        res = super(StockWarehouse, self).create(vals)
-
-        res_company_obj = self.env['res.company']
-        company_id = res_company_obj.search([('id', 'parent_of', res.company_id.ids), ('parent_id', '=', False)])
-        res.company_id = company_id
-
-        return res
+        # On force la création des entrepôts sur la société qui est propriétaire des stocks
+        if vals.get('company_id'):
+            company = self.env['res.company'].browse(vals.get('company_id'))
+            while not company.of_is_stock_owner and company.parent_id:
+                company = company.parent_id
+            vals['company_id'] = company.id
+        return super(StockWarehouse, self).create(vals)
 
     @api.multi
     def write(self, vals):
@@ -64,13 +68,15 @@ class StockLocation(models.Model):
 
     @api.model
     def create(self, vals):
-        if 'company_id' in vals:
-            if vals['usage'] == 'internal':
-                company_id = self.env['res.company'].search(
-                    [('id', 'parent_of', [vals['company_id']]), ('parent_id', '=', False)])
-                vals['company_id'] = company_id.id
-            else:
-                vals['company_id'] = False
+        if vals.get('usage') == 'internal':
+            # On force la création des emplacements internes sur la société qui est propriétaire des stocks
+            company_id = vals.get('company_id', self.env.user.company_id.id)
+            company = self.env['res.company'].browse(company_id)
+            while not company.of_is_stock_owner and company.parent_id:
+                company = company.parent_id
+            vals['company_id'] = company.id
+        else:
+            vals['company_id'] = False
         return super(StockLocation, self).create(vals)
 
     @api.multi
@@ -87,7 +93,7 @@ class StockLocationRoute(models.Model):
 
     @api.model
     def create(self, vals):
-        if vals.get('company_id', False):
+        if 'company_id' in vals:
             vals['company_id'] = False
         return super(StockLocationRoute, self).create(vals)
 
@@ -152,10 +158,12 @@ class StockQuant(models.Model):
 
     @api.model
     def create(self, vals):
-        if 'company_id' in vals:
-            company_id = self.env['res.company'].search(
-                [('id', 'parent_of', [vals['company_id']]), ('parent_id', '=', False)])
-            vals['company_id'] = company_id.id
+        # On force la création des quants sur la société qui est propriétaire des stocks
+        if vals.get('company_id'):
+            company = self.env['res.company'].browse(vals.get('company_id'))
+            while not company.of_is_stock_owner and company.parent_id:
+                company = company.parent_id
+            vals['company_id'] = company.id
         return super(StockQuant, self).create(vals)
 
     @api.multi

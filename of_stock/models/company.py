@@ -69,3 +69,8 @@ class ResCompany(models.Model):
                     )
 
     of_default_warehouse_id = fields.Many2one('stock.warehouse', string=u"Entrepôt par défaut", required=True)
+    of_is_stock_owner = fields.Boolean(
+        string=u"Est le propriétaire du stock",
+        help=u"ATTENTION, ce paramètre n'est utile qu'en vue d'installer le module 'of_stock_multicompany'."
+             u"Il permet de définir la société comme propriétaire du stock de toutes ses sociétés enfant, "
+             u"c'est à dire que chaque société enfant pourra partager son stock avec ses sociétés soeurs.")

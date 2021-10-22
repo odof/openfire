@@ -157,6 +157,7 @@
                 <group name="stock" colspan="2">
                     <separator string="Stock" colspan="2"/>
                     <field name="of_default_warehouse_id"/>
+                    <field name="of_is_stock_owner"/>
                 </group>
             </xpath>
         </field>
