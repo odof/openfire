@@ -219,10 +219,7 @@ class OfService(models.Model):
                 self.tache_id = template.tache_id
             if not self.fiscal_position_id:
                 self.fiscal_position_id = template.fiscal_position_id
-            if self.line_ids:
-                new_lines = self.line_ids
-            else:
-                new_lines = service_line_obj
+            new_lines = self.line_ids
             for line in template.line_ids:
                 data = line.get_intervention_line_values()
                 data['service_id'] = self.id
@@ -237,13 +234,14 @@ class OfService(models.Model):
             if self.tache_id.fiscal_position_id and not self.fiscal_position_id:
                 self.fiscal_position_id = self.tache_id.fiscal_position_id
             if self.tache_id.product_id:
-                self.line_ids.new({
+                new_line = self.env['of.service.line'].new({
                     'service__id': self.id,
                     'product_id': self.tache_id.product_id.id,
                     'qty': 1,
                     'price_unit': self.tache_id.product_id.lst_price,
                     'name': self.tache_id.product_id.name,
                 })
+                self.line_ids |= new_line
                 self.line_ids.compute_taxes()
 
     @api.onchange('address_id', 'tache_id')
@@ -326,6 +324,11 @@ class OfService(models.Model):
     def make_sale_order(self):
         self.ensure_one()
 
+        # Ne pas créer de commande si la DI n'est pas validée
+        if self.base_state != 'calculated':
+            return self.env['of.popup.wizard'].popup_return(
+                message=u"Cette demande d'intervention n'est pas validée.")
+
         # Ne pas créer de commande si pas de lignes
         if not self.line_ids:
             return self.env['of.popup.wizard'].popup_return(
@@ -336,7 +339,7 @@ class OfService(models.Model):
             return self.env['of.popup.wizard'].popup_return(
                 message=u"Toutes les lignes sont déjà associées à une commande de vente.")
 
-        # Ne pas créer de commande si toutes les lignes sont déjà associées à une commande
+        # Ne pas créer de commande si la position fiscale n'est pas renseignée
         if not self.fiscal_position_id:
             return self.env['of.popup.wizard'].popup_return(
                 message=u"Veuillez renseigner une position fiscale.")
@@ -413,34 +416,15 @@ class OfService(models.Model):
 
     @api.multi
     def action_service_send(self):
-        self.ensure_one()
-        ir_model_data = self.env['ir.model.data']
+        action = super(OfService, self).action_service_send()
         try:
-            compose_form_id = ir_model_data.get_object_reference('mail', 'email_compose_message_wizard_form')[1]
-        except ValueError:
-            compose_form_id = False
-        ctx = dict()
-        ctx.update({
-            'default_model': 'of.service',
-            'default_res_id': self.ids[0],
-            'default_composition_mode': 'comment'
-        })
-        try:
+            # ajouter le modèle d'email
             template_id = self.env.ref('of_contract_custom.email_template_of_service').id
-            ctx['default_template_id'] = template_id
-            ctx['default_use_template'] = bool(template_id)
+            action['context']['default_template_id'] = template_id
+            action['context']['default_use_template'] = bool(template_id)
         except ValueError:
             pass
-        return {
-            'type': 'ir.actions.act_window',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'mail.compose.message',
-            'views': [(compose_form_id, 'form')],
-            'view_id': compose_form_id,
-            'target': 'new',
-            'context': ctx,
-        }
+        return action
 
     @api.multi
     def print_intervention_report(self):

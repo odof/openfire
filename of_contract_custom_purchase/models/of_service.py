@@ -54,6 +54,11 @@ class OfService(models.Model):
     def make_purchase_order(self):
         self.ensure_one()
 
+        # Ne pas créer de commande si la DI n'est pas validée
+        if self.base_state != 'calculated':
+            return self.env['of.popup.wizard'].popup_return(
+                message=u"Cette demande d'intervention n'est pas validée.")
+
         # Ne pas créer de commande si pas de lignes
         if not self.line_ids:
             return self.env['of.popup.wizard'].popup_return(
@@ -88,6 +93,13 @@ class OfService(models.Model):
             else:
                 no_supplier.append(line)
         purchase_orders = purchase_obj
+        # Vérifier que tous les fournisseurs ont bien une position fiscale, sinon la création de CF echouera
+        suppliers_all = lines_by_supplier.keys()
+        if not all([s.property_account_position_id for s in suppliers_all]):
+            return self.env['of.popup.wizard'].popup_return(
+                message=u"Les fournisseurs suivants n'ont pas de position fiscale, "
+                        u"ce qui empêche la création de la commande.\n"
+                        u"%s" % u", ".join([s.name for s in suppliers_all if not s.property_account_position_id]))
         # Création de chaque CF
         for supplier, lines in lines_by_supplier.iteritems():
             # utilisation de new() pour trigger les onchanges facilement
