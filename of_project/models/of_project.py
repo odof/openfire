@@ -522,6 +522,7 @@ class ProjectTask(models.Model):
 
 class OFProjectTaskPlanning(models.Model):
     _name = 'of.project.task.planning'
+    _order = 'period_id, type_id'
 
     state = fields.Selection(
         selection=[('to_validate', u"À valider"), ('validated', u"Validé")], string=u"État", default='validated')
