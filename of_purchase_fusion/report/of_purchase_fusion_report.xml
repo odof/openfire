@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Retire le champ Réf. fournisseur des informations de la commande fournisseur -->
-    <template id="of_report_purchaseorder_fusion_document2" inherit_id="of_purchase.of_report_purchaseorder_document">
-        <xpath expr="//div[@class='col-xs-12']/div[2]/div[@t-if='o.partner_ref']" position="replace"/>
-        <xpath expr="//div[@class='col-xs-12']/div[2]/div[@t-if='o.partner_ref']" position="replace"/>
-    </template>
-
     <!-- Ajoute le champ contremarque sur les lignes de l'impression commande fournisseur et commande sans prix -->
     <template id="of_report_purchaseorder_fusion_document" inherit_id="purchase.report_purchaseorder_document" priority="100">
         <xpath expr="//table/thead/tr/th[last()]" position="after">
