@@ -324,13 +324,13 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
             price_unit = product.with_context(pricelist=pricelist.id).price
         price_unit = self.env['account.tax']._fix_tax_included_price(price_unit, product.taxes_id, taxes)
         return {
-            'name'                : product.name_get()[0][1],
-            'account_id'          : line_account.id,
-            'price_unit'          : price_unit,
-            'quantity'            : 1.0,
-            'discount'            : 0.0,
-            'uom_id'              : product.uom_id.id,
-            'product_id'          : product.id,
+            'name':                 product.name_get()[0][1],
+            'account_id':           line_account.id,
+            'price_unit':           price_unit,
+            'quantity':             1.0,
+            'discount':             0.0,
+            'uom_id':               product.uom_id.id,
+            'product_id':           product.id,
             'invoice_line_tax_ids': [(6, 0, taxes._ids)],
         }, ""
 
@@ -1161,11 +1161,11 @@ class OfPlanningIntervention(models.Model):
                 self.fiscal_position_id = self.tache_id.fiscal_position_id
             if self.tache_id.product_id:
                 self.line_ids.new({
-                    'intervention_id': self.id,
-                    'product_id'     : self.tache_id.product_id.id,
-                    'qty'            : 1,
-                    'price_unit'     : self.tache_id.product_id.lst_price,
-                    'name'           : self.tache_id.product_id.name,
+                    'intervention_id':  self.id,
+                    'product_id':       self.tache_id.product_id.id,
+                    'qty':              1,
+                    'price_unit':       self.tache_id.product_id.lst_price,
+                    'name':             self.tache_id.product_id.name,
                     })
                 self.line_ids.compute_taxes()
 
@@ -1471,8 +1471,8 @@ class OfPlanningIntervention(models.Model):
     @api.multi
     def button_cancel(self):
         res = self.write({'state': 'cancel'})
-        if self.picking_ids.filtered(lambda p : p.state not in ('done', 'cancel')):
-            self.picking_ids.filtered(lambda p : p.state not in ('done', 'cancel')).action_cancel()
+        if self.picking_ids.filtered(lambda p: p.state not in ('done', 'cancel')):
+            self.picking_ids.filtered(lambda p: p.state not in ('done', 'cancel')).action_cancel()
         self.mapped('line_ids').mapped('procurement_ids').cancel()  # la fonctionne n'annule pas les appro déjà terminés
         self.mapped('line_ids').mapped('procurement_ids').filtered(lambda p: p.state == 'cancel')\
             .write({'of_intervention_line_id': False})
@@ -1831,9 +1831,9 @@ class OfPlanningInterventionLine(models.Model):
             taxes = line.taxe_ids.compute_all(price, line.currency_id, line.qty,
                                               product=line.product_id, partner=line.intervention_id.address_id)
             line.update({
-                'price_tax'     : taxes['total_included'] - taxes['total_excluded'],
-                'price_total'   : taxes['total_included'],
-                'price_subtotal': taxes['total_excluded'],
+                'price_tax':        taxes['total_included'] - taxes['total_excluded'],
+                'price_total':      taxes['total_included'],
+                'price_subtotal':   taxes['total_excluded'],
                 })
 
     @api.onchange('product_id')
@@ -1942,15 +1942,15 @@ class OfPlanningInterventionLine(models.Model):
             line_account = tax.map_account(line_account)
 
         return {
-            'name'                   : product.name_get()[0][1],
-            'account_id'             : line_account.id,
-            'price_unit'             : self.price_unit,
-            'quantity'               : self.qty_invoiceable,
-            'discount'               : 0.0,
-            'uom_id'                 : product.uom_id.id,
-            'product_id'             : product.id,
-            'invoice_line_tax_ids'   : [(6, 0, taxes._ids)],
-            'of_intervention_line_id': self.id,
+            'name':                     product.name_get()[0][1],
+            'account_id':               line_account.id,
+            'price_unit':               self.price_unit,
+            'quantity':                 self.qty_invoiceable,
+            'discount':                 0.0,
+            'uom_id':                   product.uom_id.id,
+            'product_id':               product.id,
+            'invoice_line_tax_ids':     [(6, 0, taxes._ids)],
+            'of_intervention_line_id':  self.id,
             }, ""
 
     @api.multi
@@ -1965,12 +1965,12 @@ class OfPlanningInterventionLine(models.Model):
                           .mapped('qty'))
             qty = order_line.product_uom_qty - planned
             line.update({
-                'order_line_id'  : order_line.id,
-                'product_id'     : order_line.product_id.id,
-                'qty'            : qty,
-                'price_unit'     : order_line.price_unit,
-                'name'           : order_line.name,
-                'taxe_ids'       : [(5, )] + [(4, tax.id) for tax in order_line.tax_id]
+                'order_line_id':    order_line.id,
+                'product_id':       order_line.product_id.id,
+                'qty':              qty,
+                'price_unit':       order_line.price_unit,
+                'name':             order_line.name,
+                'taxe_ids':         [(5, )] + [(4, tax.id) for tax in order_line.tax_id]
                 })
 
     @api.multi
