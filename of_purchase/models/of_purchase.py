@@ -41,9 +41,9 @@ class PurchaseOrder(models.Model):
     of_reception_state = fields.Selection(selection=[
         ('no', u'Non reçue'),
         ('received', u'Reçue'),
-        ], string=u"État de réception", compute='_compute_of_reception_state', store=True)
+        ], string=u"État de réception", compute='_compute_of_reception_state', compute_sudo=True, store=True)
 
-    @api.depends('picking_ids', 'picking_ids.state')
+    @api.depends('order_line.move_ids', 'order_line.move_ids.picking_id.state')
     def _compute_of_reception_state(self):
         for order in self:
             if order.picking_ids and all([state == 'done' for state in order.picking_ids.filtered(
