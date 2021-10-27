@@ -7,6 +7,15 @@ from odoo.exceptions import UserError
 from odoo.exceptions import ValidationError
 from odoo.addons.of_utils.models.of_utils import format_date, se_chevauchent
 
+class OfDocumentsJoints(models.AbstractModel):
+    _inherit = 'of.documents.joints'
+
+    @api.model
+    def _allowed_reports(self):
+        res = super(OfDocumentsJoints, self)._allowed_reports()
+        res.update({'of_contract_custom.report_contract': 'of.contract'})
+        return res
+
 
 class OfContractRecurringInvoicingPayment(models.Model):
     _name = 'of.contract.recurring.invoicing.payment'
@@ -25,7 +34,7 @@ class OfContractRecurringInvoicingPayment(models.Model):
 
 class OfContract(models.Model):
     _name = "of.contract"
-    _inherit = ['mail.thread', 'of.form.readonly']
+    _inherit = ['mail.thread', 'of.form.readonly', 'of.documents.joints']
 
     @api.model_cr_context
     def _auto_init(self):
@@ -700,6 +709,18 @@ class OfContract(models.Model):
                       u"et n'ont donc pas été renouvelés :\n%s" % '\n'.join(c.name for c in automatic_renewal)
             return self.env['of.popup.wizard'].popup_return(message=message)
         return {'type': 'ir.actions.do_nothing'}
+
+    @api.multi
+    def of_get_report_name(self, docs):
+        return "Contrat"
+
+    @api.multi
+    def of_get_report_number(self, docs):
+        return self.reference
+
+    @api.multi
+    def of_get_report_date(self, docs):
+        return fields.Date.today()
 
 
 class OfContractLine(models.Model):

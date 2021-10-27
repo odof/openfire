@@ -65,6 +65,7 @@ Ligne d'indice :
         'views/of_service_views.xml',
         'views/res_partner_views.xml',
         'views/config_settings_views.xml',
+        'reports/of_contract_custom_templates.xml',
         'wizards/of_contract_avenant_wizard_views.xml',
         'wizards/of_contract_custom_wizard_view.xml',
         'wizards/of_contract_indice_wizard_views.xml',
