@@ -173,7 +173,12 @@ class ResPartner(models.Model):
 
     @api.multi
     def _inverse_phone(self):
-        self._of_set_number('phone', '01_domicile')
+        for rec in self:
+            if rec.of_phone_number_ids.filtered(lambda p: p.type == '01_domicile') or \
+                    not rec.of_phone_number_ids.filtered(lambda p: p.type == '02_bureau'):
+                rec._of_set_number('phone', '01_domicile')
+            else:
+                rec._of_set_number('phone', '02_bureau')
 
     @api.multi
     def _inverse_mobile(self):
