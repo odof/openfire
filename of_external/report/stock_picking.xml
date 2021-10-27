@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Modification des pdf BL/BR -->
+    <template id="of_external_delivery_document" inherit_id="stock.report_delivery_document">
+        <h2 position="replace">
+            <div name="date_and_name" t-if="o.company_id.of_position_header_lines == 'bandeau_totalite' and o.company_id.of_display_pastille_as_title">
+                <h3>
+                    <span t-if="o.picking_type_id and o.picking_type_id.id == %(stock.picking_type_in)d">Bon de réception </span>
+                    <span t-if="o.picking_type_id and o.picking_type_id.id == %(stock.picking_type_out)d">Bon de livraison </span>
+                    <span t-field="o.name"/> du <span t-field="o.date" t-options="{'format': 'dd/MM/yyyy'}"/>
+                </h3>
+            </div>
+        </h2>
+    </template>
+
+</odoo>
