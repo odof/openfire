@@ -9,6 +9,7 @@ class OFSpecificDeliveryReportWizard(models.TransientModel):
     total_weight = fields.Float(string="Total weight", compute='_compute_total_weight', digits=(16, 2))
     nbr_pallets = fields.Integer(string="Nbr. of pallets", compute='_compute_nbr_pallets')
     packages = fields.Integer(string="Packages", compute='_compute_packages')
+    of_carrier_id = fields.Many2one(comodel_name='res.partner', string="Carrier", compute='_compute_carrier_id')
 
     @api.depends('line_ids', 'line_ids.selected')
     def _compute_total_weight(self):
@@ -57,6 +58,11 @@ class OFSpecificDeliveryReportWizard(models.TransientModel):
                     qty = move_uom._compute_price(line.product_uom_qty, product_uom)
                     total_packages += qty * product.of_packages
             wizard.packages = total_packages
+
+    @api.depends('picking_id.of_rate_ids.selected')
+    def _compute_carrier_id(self):
+        for wizard in self:
+            wizard.of_carrier_id = wizard.picking_id.of_rate_ids.filtered('selected').partner_id
 
 
 class OFDeliveryDivisionWizardLine(models.TransientModel):

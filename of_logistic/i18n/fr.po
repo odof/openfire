@@ -19,6 +19,8 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_logistic.field_of_logistic_constraint_partner_id
 #: model:ir.model.fields,field_description:of_logistic.field_of_logistic_rate_partner_id
 #: model:ir.model.fields,field_description:of_logistic.field_of_stock_picking_logistic_rate_partner_id
+#: model:ir.model.fields,field_description:of_logistic.field_of_stock_picking_of_carrier_id
+#: model:ir.model.fields,field_description:of_logistic.field_of_specific_delivery_report_wizard_of_carrier_id
 #: model:ir.ui.view,arch_db:of_logistic.of_logistic_rate_search_view
 msgid "Carrier"
 msgstr "Transporteur"
@@ -350,6 +352,13 @@ msgstr "<strong>Palettes</strong>"
 #: model:ir.ui.view,arch_db:of_logistic.of_logistic_report_picking
 msgid "<strong>Packages</strong>"
 msgstr "<strong>Colis</strong>"
+
+#. module: of_logistic
+#: model:ir.ui.view,arch_db:of_logistic.of_logistic_delivery_report_document
+#: model:ir.ui.view,arch_db:of_logistic.of_specific_logistic_delivery_report_document
+#: model:ir.ui.view,arch_db:of_logistic.of_logistic_report_picking
+msgid "<strong>Carrier</strong>"
+msgstr "<strong>Transporteur</strong>"
 
 #. module: of_logistic
 #: model:ir.ui.view,arch_db:of_logistic.of_logistic_delivery_report_document

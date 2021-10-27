@@ -25,7 +25,7 @@ class OfLogisticRate(models.Model):
         ('100kg', 'Rate/100kg'),
         ], required=True)
     company_id = fields.Many2one(
-        comodel_name='res.company', string="Company", default=lambda r : r._get_company_id_default(), required=True)
+        comodel_name='res.company', string="Company", default=lambda r: r._get_company_id_default(), required=True)
     company_currency_id = fields.Many2one('res.currency', compute='_compute_company_currency_id')
     rate = fields.Monetary(string="Rate", currency_field='company_currency_id', required=True)
     # Rounding should always be 'round_value'
@@ -85,14 +85,8 @@ class OfLogisticRate(models.Model):
         if self.type == 'flat_rate':
             return self.rate
         elif self.type == '10kg':
-            rest = weight % 10
-            if rest:
-                weight = weight - rest + 10
             return self.rate * (weight / 10)
         elif self.type == '100kg':
-            rest = weight % 100
-            if rest:
-                weight = weight - rest + 100
             return self.rate * (weight / 100)
 
 
