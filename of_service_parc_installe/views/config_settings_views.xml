@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Intervention config wizard -->
+    <record id="view_of_intervention_settings_inh_contract_custom" model="ir.ui.view">
+        <field name="name">view.of.intervention.settings.inh.contract.custom</field>
+        <field name="model">of.intervention.settings</field>
+        <field name="inherit_id" ref="of_planning.view_of_intervention_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='migration']" position="inside">
+                <button name="button_prepare_project_issue_migration" string="Migrer les SAV" type="object"
+                        class="btn-primary" groups="of_service_parc_installe.group_of_project_issue_not_migrated"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

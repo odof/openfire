@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_project_issue_form_view_serviceparc" model="ir.ui.view">
+        <field name="name">project.issue.form.service_parc_installe</field>
+        <field name="model">project.issue</field>
+        <field name="inherit_id" ref="of_project_issue.of_project_issue_form_view"/>
+        <field name="arch" type="xml">
+            <!-- Ajout bouton prévoir une intervention dans vue form SAV-->
+            <xpath expr="//header" position="inside">
+                <button name="action_prevoir_intervention" string="Demande d'intervention" type="object"/>
+            </xpath>
+            <!-- smart button 'à programmer' -->
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                <button class="oe_stat_button" name="action_view_a_programmer" type="object" icon="fa-calendar-o">
+                    <div class="o_form_field o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="of_a_programmer_count"/>
+                        </span>
+                        <span class="o_stat_text">Demandes d'int.</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="project_issue.res_partner_issues_button_view">
+        <field name="groups_id" eval="[(6,0,[ref('of_service_parc_installe.group_of_project_issue_not_migrated')])]"/>
+    </record>
+    <record model="ir.ui.view" id="of_project_issue.of_project_issue_partner_form_view">
+        <field name="groups_id" eval="[(6,0,[ref('of_service_parc_installe.group_of_project_issue_not_migrated')])]"/>
+    </record>
+
+    <!-- déplacer le menu des catégories de SAV -->
+    <record id="of_project_issue.menu_of_project_issue_categorie_action_form" model="ir.ui.menu">
+        <field name="parent_id" ref="of_planning.menu_of_planning_configuration_res"/>
+    </record>
+    <!-- masquer les menus des SAV et étiquettes de SAV -->
+    <record model="ir.ui.menu" id="of_project_issue.menu_of_planning_intervention_sav">
+        <field name="groups_id" eval="[(6,0,[ref('of_service_parc_installe.group_of_project_issue_not_migrated')])]"/>
+    </record>
+    <record model="ir.ui.menu" id="of_project_issue.of_menu_project_issue_ventes">
+        <field name="groups_id" eval="[(6,0,[ref('of_service_parc_installe.group_of_project_issue_not_migrated')])]"/>
+    </record>
+    <record model="ir.ui.menu" id="of_project_issue.menu_of_project_issue_tag_action_form">
+        <field name="groups_id" eval="[(6,0,[ref('of_service_parc_installe.group_of_project_issue_not_migrated')])]"/>
+    </record>
+
+</odoo>

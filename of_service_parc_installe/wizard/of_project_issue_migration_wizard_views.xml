@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_of_project_issue_migration_wizard_form" model="ir.ui.view">
+        <field name="name">Préparer la migration des SAV</field>
+        <field name="model">of.project.issue.migration.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Migration des SAV">
+                <group>
+                    <span colspan="2">Avant de migrer les SAV dans les demandes d'intervention de type SAV,
+                        vous devez faire la correspondance des étapes Kanban</span>
+                </group>
+                <field name="kanban_step_line_ids" nolabel="1">
+                    <tree editable="bottom" create="0" delete="0">
+                        <field name="sav_step_id"/>
+                        <field name="service_step_id" required="1" options="{'no_create': True, 'no_open': True}"/>
+                    </tree>
+                </field>
+                <footer>
+                    <button string="Lancer la migration" name="button_launch_migration" type="object"
+                            class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

@@ -139,6 +139,10 @@ class OfService(models.Model):
          ('done', u'Terminée'),
          ('part_planned', u'Partiellement planifiée'),  # intervention(s) et durée restante supérieure à 0
          ('all_planned', u'Entièrement planifiée'),  # intervention(s) et durée restante == 0
+         # l'état 'during' est utilisé dans of_mobile mais doit être ajouté ici,
+         # sinon la fonction function_set_date_next plante àla première mise à jour après la migration SAV
+         # si au moins un RDV est à l'état 'during' et a un RDV
+         ('during', u"RDV en cours"),
          ('cancel', u'Annulée')],  # manuellement décidé
         u'État de planification', compute="_compute_state_poncrec", store=True, track_visibility='onchange')
     state_ponc = fields.Selection(
@@ -148,6 +152,7 @@ class OfService(models.Model):
          ('all_planned', u'Entièrement planifiée'),  # intervention(s) et durée restante == 0
          ('late', u'En retard de planification'),  # date de prochaine planification il y a plus d'un mois
          ('done', u'Fait'),  # intervention(s) et durée restante == 0 et date de fin dépassée
+         ('during', u"RDV en cours"),
          ('cancel', u'Annulée')],  # manuellement décidé
         u'État', compute="_compute_state_poncrec", search="_search_state_ponc")
     intervention_ids = fields.One2many('of.planning.intervention', 'service_id', string="RDVs Tech")
