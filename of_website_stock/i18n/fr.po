@@ -231,7 +231,7 @@ msgstr "Quantité prévue"
 #. module: of_website_stock
 #: selection:website.config.settings,of_stock_type:0
 msgid "Qty On Hand"
-msgstr "Quantité réele"
+msgstr "Quantité réelle"
 
 #. module: of_website_stock
 #: model:ir.model,name:of_website_stock.model_sale_order
