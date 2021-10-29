@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Modification des pdf devis/commande fournisseur-->
+    <template id="of_external_purchaseorder_document" inherit_id="purchase.report_purchaseorder_document">
+        <h2 position="before">
+            <div name="date_and_name" t-if="o.company_id.of_position_header_lines == 'bandeau_totalite' and o.company_id.of_display_pastille_as_title">
+                <h3>
+                    <span t-if="o.state not in ['draft','sent']">Commande </span>
+                    <span t-if="o.state in ['draft','sent']">Devis </span>
+                    <span t-field="o.name"/> du <span t-if="o.state in ['sale', 'done'] and o.date_approve" t-field="o.date_approve" t-options="{'format': 'dd/MM/yyyy'}"/><span t-if="o.state not in ['sale', 'done'] and o.date_order" t-field="o.date_order" t-options="{'format': 'dd/MM/yyyy'}"/>
+                </h3>
+            </div>
+        </h2>
+    </template>
+
+    <!-- Modification des pdf demande de prix -->
+    <template id="of_external_purchasequotation_document" inherit_id="purchase.report_purchasequotation_document">
+        <h2 position="before">
+            <div name="date_and_name" t-if="o.company_id.of_position_header_lines == 'bandeau_totalite' and o.company_id.of_display_pastille_as_title">
+                <h3>
+                    <span>Demande de prix </span>
+                    <span t-field="o.name"/> du <span t-if="o.state in ['sale', 'done'] and o.date_approve" t-field="o.date_approve" t-options="{'format': 'dd/MM/yyyy'}"/><span t-if="o.state not in ['sale', 'done'] and o.date_order" t-field="o.date_order" t-options="{'format': 'dd/MM/yyyy'}"/>
+                </h3>
+            </div>
+        </h2>
+    </template>
+
+</odoo>
