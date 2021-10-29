@@ -161,9 +161,9 @@ class IrMailServer(models.Model):
                 email_split = email_from.split('@')
                 if len(email_split) == 2:
                     prefix, domain = email_split
-                    servers = self.sudo().search([('smtp_host', '=like', '%' + domain)])
+                    servers = self.sudo().search([('smtp_host', '=like', '%' + domain)], order='sequence')
                     if not servers:
-                        servers = self.sudo().search([])
+                        servers = self.sudo().search([], order='sequence')
                     if len(servers) > 1:
                         servers = self.sudo().search(
                             [('id', 'in', servers.ids), ('smtp_user', 'in', (prefix, email_from))],
