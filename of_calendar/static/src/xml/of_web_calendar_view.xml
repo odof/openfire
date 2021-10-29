@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates>
 
+    <!-- permettre d'afficher le panneau latéral droit en cas d'affichage sur mmobile -->
+    <t t-extend="CalendarView">
+        <t t-jquery="div.o_calendar_sidebar_container" t-operation="attributes">
+            <!-- retrait du hidden-xs -->
+            <attribute name="class">o_calendar_sidebar_container</attribute>
+        </t>
+    </t>
+
     <!-- Info-bulle d'évènement -->
     <div t-name="CalendarView.record.tooltip"
          class="of_planning_record_tooltip">  <!-- variables données par le javascript: record -->
