@@ -286,6 +286,7 @@
                         </group>
                         <group name="when" string="Quand" class="of_grey_background">
                             <group colspan="2">
+                                <field name="all_day"/>
                                 <label for="date"/>
                                 <div>
                                     <field name="jour" class="oe_inline of_ws"/>
@@ -307,8 +308,15 @@
                                     <field name="jour_fin_force" class="oe_inline of_ws"/>
                                     <field name="date_deadline_forcee" class="oe_inline"
                                            attrs="{'required': [('forcer_dates', '=', True)]}"/>
-                                    <div attrs="{'invisible': [('alert_coherence_date', '=', False)]}" class="of_red">
-                                        <i class="fa fa-warning of_ws"/>la date de fin doit être au moins égale à la date de début + la durée
+                                    <div attrs="{'invisible': ['|', ('alert_coherence_date', '=', False), ('all_day', '=', True)]}"
+                                         class="of_red">
+                                        <i class="fa fa-warning of_ws"/>
+                                        la date de fin doit être au moins égale à la date de début + la durée
+                                    </div>
+                                    <div attrs="{'invisible': ['|', ('alert_coherence_date', '=', False), ('all_day', '=', False)]}"
+                                         class="of_red">
+                                        <i class="fa fa-warning of_ws"/>
+                                        la durée est trop longue considérant les date de début et de fin
                                     </div>
                                 </div>
                                 <field name="forcer_dates"/>
@@ -455,7 +463,8 @@
             <calendar string="Calendrier" date_start="date_prompt" color="employee_ids" attendee="employee_ids"
                       date_stop="date_deadline_prompt" display_states="1" quick_add="0" attendee_model="hr.employee"
                       color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1" color_is_attendee="1"
-                      color_multiple="1" show_all_attendees="1" config_model="of.intervention.settings">
+                      color_multiple="1" show_all_attendees="1" config_model="of.intervention.settings"
+                      all_day="all_day">
                 <field name="calendar_name"/>
                 <field name="state" invisible="1"/>
                 <field name="name" invisible="1"/>
@@ -486,7 +495,7 @@
             <calendar string="Calendrier" date_start="date" color="employee_ids" attendee="employee_ids"
                       date_stop="date_deadline" display_states="1" quick_add="0" attendee_model="hr.employee"
                       color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1"
-                      color_is_attendee="1" jump_to="last">
+                      color_is_attendee="1" jump_to="last" all_day="all_day">
                 <field name="calendar_name"/>
                 <field name="tache_id" invisible="1"/>
                 <field name="name" invisible="1"/>

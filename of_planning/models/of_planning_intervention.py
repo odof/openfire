@@ -16,7 +16,7 @@ from odoo.tools.safe_eval import safe_eval
 
 import odoo.addons.decimal_precision as dp
 from odoo.addons.of_utils.models.of_utils import se_chevauchent, float_2_heures_minutes, heures_minutes_2_float, \
-    compare_date
+    compare_date, hours_to_strs
 
 
 @api.model
@@ -470,6 +470,7 @@ class OfPlanningIntervention(models.Model):
     template_id = fields.Many2one('of.planning.intervention.template', string=u"Modèle d'intervention")
     tache_id = fields.Many2one('of.planning.tache', string=u"Tâche", required=True)
     tache_categ_id = fields.Many2one(related="tache_id.tache_categ_id", readonly=True)
+    all_day = fields.Boolean(string=u"Toute la journée")
     forcer_dates = fields.Boolean(
         "Forcer les dates", default=False, help=u"/!\\ outrepasser les horaires des intervenants")
     jour = fields.Char("Jour", compute="_compute_jour")
@@ -1067,8 +1068,12 @@ class OfPlanningIntervention(models.Model):
     def check_coherence_date_forcee(self):
         for interv in self:
             if interv.alert_coherence_date:
-                raise UserError(
-                    _(u"Attention /!\ la date de fin doit être au moins égale à la date de début + la durée"))
+                if interv.all_day:
+                    raise UserError(
+                        _(u"Attention /!\ la durée est trop longue considérant les date de début et de fin"))
+                else:
+                    raise UserError(
+                        _(u"Attention /!\ la date de fin doit être au moins égale à la date de début + la durée"))
 
     @api.constrains('date', 'date_deadline')
     def check_alert_hors_creneau(self):
@@ -1157,12 +1162,76 @@ class OfPlanningIntervention(models.Model):
                     })
                 self.line_ids.compute_taxes()
 
+    @api.onchange('all_day', 'date', 'employee_ids')
+    def _onchange_all_day(self):
+        u"Pour un RDV sur toute la journée, on ignore les modification d'heure faites par l'utilisateur"
+        self.ensure_one()
+        if self.all_day and self.employee_ids and self.date:
+            update_vals = {'forcer_dates': True}
+            tz = pytz.timezone(self.tz or self.env.context.get('tz'))
+            # Récupérer l'heure de début de journée et l'affecter
+            # passer d'abord la date du RDV en local pour ne pas risquer de récupérer les horaires de la veille
+            current_date_utc_dt = pytz.utc.localize(fields.Datetime.from_string(self.date))
+            current_date_local_dt = current_date_utc_dt.astimezone(tz)
+            current_date_local_str = fields.Date.to_string(current_date_local_dt)
+            horaires_du_jour = self.employee_ids.get_horaires_date(current_date_local_str)
+            if not any([horaires_du_jour[e] for e in horaires_du_jour]):
+                # horaires_du_jour est de la forme { employee1_id : [], employee2_id : [] .. }
+                heure_debut_local = self.env['ir.values']\
+                                        .get_default('of.intervention.settings', 'calendar_min_time') or 0.0
+            else:
+                # forcément != 24 car ici au moins un employé a des horaires
+                heure_debut_local = min([horaires_du_jour[e] and horaires_du_jour[e][0][0] or 24.0
+                                         for e in horaires_du_jour])
+            heure_debut_local_str = hours_to_strs('time', heure_debut_local)[0]
+            datetime_local_str = '%s %s:00' % (current_date_local_str, heure_debut_local_str)
+            datetime_local_dt = tz.localize(datetime.strptime(datetime_local_str, '%Y-%m-%d %H:%M:%S'))
+            datetime_utc_dt = datetime_local_dt.astimezone(pytz.utc)
+            update_vals['date'] = fields.Datetime.to_string(datetime_utc_dt)
+            self.update(update_vals)
+
     @api.onchange('forcer_dates')
     def _onchange_forcer_dates(self):
-        if self.forcer_dates and self.duree and self.date:
+        if self.all_day and not self.forcer_dates:
+            self.forcer_dates = True
+        # lancer le onchange à la main pour initialiser ou mettre à jour la date de fin forcée
+        if self.all_day and self.forcer_dates:
+            self._onchange_date_deadline_forcee()
+        if self.forcer_dates and self.duree and self.date and not self.all_day:
             heures, minutes = float_2_heures_minutes(self.duree)
             self.date_deadline_forcee = fields.Datetime.to_string(
                 fields.Datetime.from_string(self.date) + relativedelta(hours=heures, minutes=minutes))
+
+    @api.onchange('date_deadline_forcee', 'employee_ids')
+    def _onchange_date_deadline_forcee(self):
+        # (re)mettre l'heure de fin à la dernière heure de la journée si RDV sur toute la journée
+        if self.forcer_dates and self.all_day and self.employee_ids and (self.date_deadline_forcee or self.date):
+            tz = pytz.timezone(self.tz or self.env.context.get('tz'))
+            # Récupérer l'heure de fin de journée et l'affecter
+            # passer d'abord la date de fin du RDV en local pour ne pas risquer de récupérer les horaires du lendemain
+            date_used = self.date_deadline_forcee or self.date
+            current_date_utc_dt = pytz.utc.localize(fields.Datetime.from_string(date_used))
+            current_date_local_dt = current_date_utc_dt.astimezone(tz)
+            current_date_local_str = fields.Date.to_string(current_date_local_dt)
+            horaires_du_jour = self.employee_ids.get_horaires_date(current_date_local_str)
+            if not any([horaires_du_jour[e] for e in horaires_du_jour]):
+                # horaires_du_jour est de la forme { employee1_id : [], employee2_id : [] .. }
+                heure_fin_local = self.env['ir.values'] \
+                                        .get_default('of.intervention.settings', 'calendar_max_time') or 24.0
+            else:
+                # forcément != 0 car ici au moins un employé a des horaires
+                heure_fin_local = max([horaires_du_jour[e] and horaires_du_jour[e][-1][-1] or 0.0
+                                       for e in horaires_du_jour])
+            # 00:00 du jour suivant, on met plutôt 23:59 pour rester le même jour et éviter les problèmes
+            if heure_fin_local == 24.0:
+                heure_fin_local_str = '23:59'
+            else:
+                heure_fin_local_str = hours_to_strs('time', heure_fin_local)[0]
+            datetime_local_str = '%s %s:00' % (current_date_local_str, heure_fin_local_str)
+            datetime_local_dt = tz.localize(datetime.strptime(datetime_local_str, '%Y-%m-%d %H:%M:%S'))
+            datetime_utc_dt = datetime_local_dt.astimezone(pytz.utc)
+            update_vals = {'date_deadline_forcee': fields.Datetime.to_string(datetime_utc_dt)}
+            self.update(update_vals)
 
     @api.onchange('order_id')
     def onchange_order_id(self):
