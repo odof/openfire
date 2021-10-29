@@ -68,7 +68,7 @@ class WizardSelectMoveTemplate(models.TransientModel):
                 'move_line_type': line.move_line_type,
             })
         if not self.line_ids and not self.template_id.of_recurring:
-            return self.load_template()
+            return self.load_templates()
 
         data = self.template_id.read(
             ['of_recurring', 'of_rec_interval', 'of_rec_interval_type', 'of_rec_number', 'of_prorata',
