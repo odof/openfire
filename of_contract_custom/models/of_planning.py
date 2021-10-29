@@ -66,7 +66,7 @@ class OfService(models.Model):
 
     @api.depends('contract_line_id', 'contract_line_id.use_sav', 'type_id')
     def _compute_contract_message(self):
-        sav_type = self.env.ref('of_contract_custom.of_contract_custom_type_sav', raise_if_not_found=False)
+        sav_type = self.env.ref('of_service_parc_installe.of_service_type_sav', raise_if_not_found=False)
         if sav_type:
             for service in self:
                 if service.type_id.id == sav_type.id and service.contract_line_id.use_sav:

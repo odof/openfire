@@ -116,7 +116,7 @@
                         <field name="note"/>
                     </group>
                     <notebook>
-                        <page string="Historique SAV">
+                        <page string="Historique SAV" name="historique_sav">
                             <group name="sav">
                                 <field name="project_issue_ids" nolabel="1" context="{'default_partner_id': client_id, 'default_of_produit_installe_id': id}">
                                     <tree string="SAV">

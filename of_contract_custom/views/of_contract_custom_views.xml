@@ -652,7 +652,7 @@
                                            attrs="{'form_readonly_exception': True}"/>
                                     <field name="nbr_interv"/>
                                 </group>
-                                <group colspan="2" name="sav" string="Sav" invisible="1">
+                                <group colspan="2" name="sav" string="Sav">
                                     <field name="use_sav"/>
                                     <field name="sav_count" attrs="{'invisible': [('use_sav','!=',True)]}"/>
                                     <field name="remaining_sav" attrs="{'invisible': [('use_sav','!=',True)]}"/>

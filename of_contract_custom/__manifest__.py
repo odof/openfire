@@ -54,9 +54,9 @@ Ligne d'indice :
     ],
     "category": "OpenFire",
     "data": [
+        'security/of_contract_custom_security.xml',
         'reports/of_contract_invoice_report_templates.xml',
         'data/of_contract_custom_data.xml',
-        'security/of_contract_custom_security.xml',
         'security/ir.model.access.csv',
         'views/account_views.xml',
         'views/of_better_zip_views.xml',
