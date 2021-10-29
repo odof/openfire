@@ -12,6 +12,7 @@
                     <button string="Annuler" type="object" name="cancel" class="oe_link" special="cancel"/>
                 </header>
                 <div id="main">
+                    <group name="migration"/>
                     <group string="Société" groups="base.group_multi_company" invisible="1">
                         <label for="id" string="Société"/>
                         <div>

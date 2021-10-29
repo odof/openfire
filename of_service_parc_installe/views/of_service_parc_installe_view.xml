@@ -13,7 +13,7 @@
             <xpath expr="//field[@name='order_id']" position="after">
                 <field name="sav_id"
                        attrs="{'invisible': [('recurrence', '=', True)]}"
-                       groups="project.group_project_user, base.group_portal"/>
+                       groups="of_service_parc_installe.group_of_project_issue_not_migrated+(project.group_project_user, base.group_portal)"/>
             </xpath>
             <xpath expr="//page[@name='description']" position="after">
                 <page name="parc" string="Produit installé">
@@ -128,7 +128,13 @@
                     </div>
                 </button>
             </xpath>
-            <xpath expr="//notebook" position="inside">
+            <xpath expr="//notebook/page[@name='historique_sav']" position="attributes">
+                <attribute name="groups">of_service_parc_installe.group_of_project_issue_not_migrated</attribute>
+            </xpath>
+            <xpath expr="//notebook/page[@name='historique_sav']//group[@name='sav']" position="attributes">
+                <attribute name="groups">of_service_parc_installe.group_of_project_issue_not_migrated</attribute>
+            </xpath>
+            <xpath expr="//notebook/page[@name='historique_sav']" position="before">
                 <page string="Historique des interventions">
                     <group name="intervention">
                         <field name="intervention_ids" nolabel="1" context="{'default_address_id':site_adresse_id, 'default_parc_installe_id':id}">
@@ -161,48 +167,5 @@
             </xpath>
         </field>
     </record>
-
-    <!--##########################################################################################################################-->
-    <!--##################################################__________SAV_________##################################################-->
-    <!--##########################################################################################################################-->
-
-    <record id="of_project_issue_form_view_serviceparc" model="ir.ui.view">
-        <field name="name">project.issue.form.service_parc_installe</field>
-        <field name="model">project.issue</field>
-        <field name="inherit_id" ref="of_project_issue.of_project_issue_form_view"/>
-        <field name="arch" type="xml">
-            <!-- Ajout bouton prévoir une intervention dans vue form SAV-->
-            <xpath expr="//header" position="inside">
-                <button name="action_prevoir_intervention" string="Demande d'intervention" type="object"/>
-            </xpath>
-            <!-- smart button 'à programmer' -->
-            <xpath expr="//div[@class='oe_button_box']" position="inside">
-                <button class="oe_stat_button" name="action_view_a_programmer" type="object" icon="fa-calendar-o">
-                    <div class="o_form_field o_stat_info">
-                        <span class="o_stat_value"><field name="of_a_programmer_count"/></span>
-                        <span class="o_stat_text">Demandes d'int.</span>
-                    </div>
-                </button>
-            </xpath>
-        </field>
-    </record>
-
-    <record id="project_issue.res_partner_issues_button_view" model="ir.ui.view">
-        <field name="active">False</field>
-    </record>
-    <record id="of_project_issue.of_project_issue_partner_form_view" model="ir.ui.view">
-        <field name="active">False</field>
-    </record>
-
-    <!-- migrer les SAV dans les DI -->
-    <function model="project.issue" name="migrer_sav_di"/>
-
-    <!-- déplacer le menu des catégories de SAV -->
-    <menuitem id="of_project_issue.menu_of_project_issue_categorie_action_form"
-              parent="of_planning.menu_of_planning_configuration_res"/>
-    <!-- masquer les menus des SAV et étiquettes de SAV -->
-    <menuitem id="of_project_issue.menu_of_planning_intervention_sav" groups="of_base.of_group_hidden"/>
-    <menuitem id="of_project_issue.of_menu_project_issue_ventes" groups="of_base.of_group_hidden"/>
-    <menuitem id="of_project_issue.menu_of_project_issue_tag_action_form" groups="of_base.of_group_hidden"/>
 
 </odoo>

@@ -795,8 +795,6 @@ class OfContractLine(models.Model):
     parc_installe_site_adresse_id = fields.Many2one(
         'res.partner', string=u"Adresse de pose", related="parc_installe_id.site_adresse_id", readonly=True)
     parc_installe_note = fields.Text(string=u"Note", related="parc_installe_id.note", readonly=True)
-    sav_id = fields.Many2one(
-        "project.issue", string="SAV", domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")
     recurring_interval = fields.Integer(string=u'Répéter chaque', default=1)
     state = fields.Selection([
         ('draft', 'Brouillon'),
@@ -1130,7 +1128,7 @@ class OfContractLine(models.Model):
 
     @api.depends('sav_count', 'service_ids')
     def _compute_remaining_sav(self):
-        sav_type = self.env.ref('of_contract_custom.of_contract_custom_type_sav', raise_if_not_found=False)
+        sav_type = self.env.ref('of_service_parc_installe.of_service_type_sav', raise_if_not_found=False)
         if sav_type:
             for line in self:
                 period = line.current_period_id

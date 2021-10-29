@@ -22,6 +22,7 @@ Module de lien entre service, interventions et parc installé
         'of_account',
     ],
     'data': [
+        'security/of_service_parc_installe_security.xml',
         'data/of_service_parc_installe_data.xml',
         'report/of_service_parc_installe_fiche_intervention.xml',
         'report/of_planning_rapport_intervention.xml',
@@ -29,7 +30,11 @@ Module de lien entre service, interventions et parc installé
         'views/of_service_parc_installe_view.xml',
         'views/of_planning_intervention_template_views.xml',
         'views/of_service_parc_installe_view_templates.xml',
-        'wizard/of_wizard_invoice_to_parc_installe_view.xml'
+        'views/res_views.xml',
+        'views/project_issue_views.xml',
+        'views/config_settings_views.xml',
+        'wizard/of_wizard_invoice_to_parc_installe_view.xml',
+        'wizard/of_project_issue_migration_wizard_views.xml',
     ],
     'qweb': [
         'static/src/xml/*.xml',
