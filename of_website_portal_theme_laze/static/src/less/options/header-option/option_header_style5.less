@@ -1,5 +1,4 @@
-body [portal="B2B"] {
-
+[portal="B2B"] {
     .header-top{
         .ht-right{
             .dropdown-menu{
@@ -8,6 +7,7 @@ body [portal="B2B"] {
                     &.hover{
                         > a{
                             background: @as-theme-b2b !important;
+                            color: @as-light !important;
                         }
                     }
                 }
@@ -24,13 +24,26 @@ body [portal="B2B"] {
         }
         .hm-cart{
             ul {
+                margin: 0;
+                padding: 0;
                 .hm-cart-item{
                     .actions{
+                        width: 100%;
+                        display: inline-block;
+                        vertical-align: top;
+                        padding: 15px 0 0;
+                        text-align: right;
                         a{
                             background: @as-theme-b2b;
+                            color: @as-light;
+                            padding: 10px 15px;
+                            text-transform: uppercase;
+                            font-size: @as-font-size - 2;
+                            display: inline-block;
                             border:1px solid @as-theme-b2b;
                             &:hover{
                                 color:@as-theme-b2b;
+                                background: @as-light;
                             }
                         }
                     }
@@ -48,9 +61,15 @@ body [portal="B2B"] {
     header{
         .navbar-header{
             @media (max-width:991px){
+                width:100%;
                 .navbar-toggle{
+                    display: block;
+                    margin-right: 0;
                     background: @as-theme-b2b !important;
-                    border: 1px solid @as-theme-b2b;
+                    border-radius: 0;
+                    .icon-bar{
+                        background: @as-light !important;
+                    }
                 }
             }
         }
@@ -60,12 +79,13 @@ body [portal="B2B"] {
                     &.active{
                         > a{
                             color: @as-theme-b2b !important;
+                            background: transparent !important;
                         }
                     }
                     &:hover{
                         > a{
-                            border-bottom: 3px solid @as-theme-b2b;
                             color: @as-theme-b2b;
+                            background: transparent;
                         }
                     }
                     &.dropdown{
@@ -80,8 +100,17 @@ body [portal="B2B"] {
                         &.open{
                             .dropdown-menu{
                                 li {
-                                    a:hover{
+                                    a:hover,
+                                    a:active,
+                                    a:focus{
                                         color:@as-theme-b2b;
+                                        background: transparent;
+                                    }
+                                    &.active{
+                                        > a {
+                                            background: transparent;
+                                            color:@as-theme-b2b;
+                                        }
                                     }
                                 }
                             }

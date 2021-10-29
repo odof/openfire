@@ -1,0 +1,149 @@
+[portal="B2B"] {
+    .header-top{
+        .ht-right{
+            .dropdown-menu{
+                > li {
+                    &.active,
+                    &.hover{
+                        > a{
+                            background: @as-theme-b2b !important;
+                            color: @as-light !important;
+                        }
+                    }
+                }
+            }
+        }
+        .htl-social{
+            li{
+                a{
+                    &:hover{
+                        color:@as-theme-b2b;
+                    }
+                }
+            }
+        }
+        .hm-cart{
+            ul {
+                margin: 0;
+                padding: 0;
+                .hm-cart-item{
+                    .actions{
+                        a{
+                            background: @as-theme-b2b;
+                            color: @as-light;
+                            padding: 10px 15px;
+                            text-transform: uppercase;
+                            font-size: @as-font-size - 2;
+                            display: inline-block;
+                            border:1px solid @as-theme-b2b;
+                            &:hover{
+                                color:@as-theme-b2b;
+                                background: @as-light;
+                            }
+                        }
+                    }
+                    &:hover{
+                        > span{
+                            color: @as-theme-b2b;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /*Menu*/
+    header{
+
+        .navbar-header{
+            @media (max-width:991px){
+                .navbar-toggle{
+                    display: block;
+                    margin-right: 0;
+                    background: @as-theme-b2b !important;
+                    border: none;
+                    border-radius: 0;
+                    .icon-bar{
+                        background: @as-light;
+                    }
+                }
+            }
+        }
+        .navbar-default{
+
+            .navbar-nav {
+                > li {
+                    &.active{
+                        > a{
+                            color: @as-light !important;
+                            background: @as-theme-b2b !important;
+                        }
+                    }
+                    &:hover,
+                    &:active,
+                    &:focus{
+                        > a{
+                            color: @as-light !important;
+                            background: @as-theme-b2b !important;
+                        }
+                    }
+                    &.dropdown{
+                        > a {
+                            .caret{
+                                @media (max-width:991px){
+                                    display: block;
+                                    width: 35px;
+                                    height: 35px;
+                                    float: right;
+                                    position: absolute;
+                                    right: 0;
+                                    top: 0;
+                                    background: @as-theme-b2b;
+                                    border: none;
+                                    &:after,
+                                    &:before{
+                                        width:20px;
+                                        height: 1px;
+                                        float: left;
+                                        background:@as-light;
+                                        position: absolute;
+                                        top: 0;
+                                        left: 0;
+                                        bottom: 0;
+                                        right: 0;
+                                        margin: auto;
+                                        content: " ";
+                                    }
+                                    &:before{
+                                        width:1px;
+                                        height: 20px;
+                                    }
+                                }
+                            }
+
+                        }
+                        &.open{
+                            .dropdown-menu{
+                                li {
+                                    a:hover{
+                                        color:@as-theme-b2b;
+                                    }
+                                    &.active{
+                                        > a {
+                                            color:@as-theme-b2b;
+                                        }
+                                    }
+                                }
+                            }
+                            &.active{
+                                > a{
+                                    background: @as-theme-b2b !important;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

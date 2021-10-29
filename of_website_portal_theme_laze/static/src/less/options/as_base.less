@@ -1,197 +1,28 @@
-body [portal="B2B"] {
-
-	font-family: @as-font-family;
-	color: @as-body;
-	background: @as-light;
+[portal="B2B"] {
 
     a{
-        color: @as-body;
         &:hover,
         &:active,
         &:focus{
             color:@as-theme-b2b;
-            text-decoration: none;
         }
     }
-
-    img{
-        max-width:100%;
-    }
-
     div.carousel {
         .carousel-indicators {
             li {
-                border:3px solid @as-theme-b2b;
-                width: 15px;
-                height: 15px;
-                margin: 0 10px 0 0;
-                transition: all 300ms ease-out 0s;
-                -o-transition: all 300ms ease-out 0s;
-                -webkit-transition: all 300ms ease-out 0s;
-                -moz-transition: all 300ms ease-out 0s;
-                .border-radius (@radius: 0);
-                transform: rotate(45deg);
-                -moz-transform: rotate(45deg);
-                -webkit-transform: rotate(45deg);
-                -o-transform: rotate(45deg);
-                box-shadow: none;
                 &:hover,
                 &.active {
                     background: @as-theme-b2b !important;
                     border: 1px solid @as-theme-b2b;
-                    margin: 0 10px 0 0;
                 }
             }
-        }
-    }
-    .o_livechat_button { z-index: 999; }
-
-    .o_rating_card{
-        .well{
-            background: none;
-            border: none;
-            text-align: left;
-            box-shadow: none;
-            float: right;
-            padding: 0;
-            margin: 0;
-            position: relative;
-            z-index: 2;
-            .rating{
-                float:right;
-                .o_rating_star_card{
-                    float: right;
-                }
-            }
-        }
-    }
-    #review {
-        hr{
-            display: none;
-        }
-        .container{
-            .col-md-10.col-md-offset-1{
-                margin: -30px 0 0 0;
-                padding: 0;
-                width: 100%;
-                @media (max-width:767px){
-                    margin: 0;
-                }
-                .fa-comment-o {
-                    margin-top: 0;
-                }
-            }
-        }
-    }
-    .o_website_comments{
-        width: 100%;
-        display: inline-block;
-        vertical-align: top;
-        .media{
-            border: 1px solid darken(@as-light, 10%);
-            border-bottom: 2px solid darken(@as-light, 10%);
-            background: darken(@as-light, 6%);
-            padding: 15px;
-            margin: 10px;
-            width: 100%;
-            float: left;
-        }
-    }
-
-
-
-
-
-    .dropdown-menu {
-        border-radius: 0;
-    }
-    .btn-group.open .dropdown-toggle {
-        box-shadow: none;
-    }
-
-
-    .is-breadcrumb {
-        .bg-img('title-bg.jpg');
-        .bg-size(cover);
-        background-attachment: fixed;
-        text-align: center;
-        position: relative;
-        padding: 40px 0;
-        margin: 0 0 20px 0;
-            .container{
-                position: relative;
-                z-index: 1;
-            }
-            h1{
-                font-size:@as-font-size-base * 2 + 2 ;
-                font-family: @as-font-family-title;
-                margin: 0;
-                padding: 0 0 15px;
-                color: @as-light;
-                span{
-                    color: @as-light;
-                    font-weight: 700;
-                }
-            }
-            .breadcrumb{
-                margin: 0;
-                padding: 0;
-                li{
-                    color: @as-light;
-                    span,
-                    a{
-                        color: @as-light;
-                    }
-                }
-            }
-    }
-
-    /*breadcrumb
-    -------------------------------------*/
-    .breadcrumb {
-        width: 100%;
-        display: inline-block;
-        vertical-align: top;
-        margin:20px 0;
-        padding: 0;
-        background: none;
-    }
-    .page-header{
-        padding: 0;
-        margin: 0;
-        border:none;
-        width: 100%;
-        display: inline-block;
-        vertical-align: top;
-        margin-bottom: 25px;
-    }
-    .category-title{
-        width: 100%;
-        display: inline-block;
-        vertical-align: top;
-        h1{
-            font-size: @as-font-size + 8;
-            margin: 0;
-            padding: 0 0 20px;
-            text-transform: uppercase;
         }
     }
 
     /* Pagination
     --------------------------------------*/
     .top-bread{
-        width: 100%;
-        display: inline-block;
-        vertical-align: top;
-        padding: 15px 0;
-        .breadcrumb {
-            margin: 0;
-            padding: 0;
-            float: left;
-            width: 70%;
-        }
         .back-page{
-            float: right;
             a {
                 color: @as-theme-b2b;
             }
@@ -199,19 +30,7 @@ body [portal="B2B"] {
     }
 
     .pagination{
-        display: inline-block;
-        vertical-align: middle;
-        margin: 0;
         li{
-            float: left;
-            margin: 0 2px;
-            .transition(all, 0.5s, ease);
-            a {
-                border-radius:0 !important;
-                color: @as-body-color;
-                border-color: darken(@as-light, 60%);
-                .transition(all, 0.5s, ease);
-            }
             &.active,
             &.active:hover,
             &.active:focus,
@@ -220,44 +39,17 @@ body [portal="B2B"] {
                 a {
                     background: @as-theme-b2b !important;
                     border-color: @as-theme-b2b !important;
-                    color: @as-light;
                 }
             }
         }
     }
-    /**/
 
-    .category_description{
-        width: 100%;
-        display: inline-block;
-        vertical-align:top;
-        font-size: 0px;
-        padding: 0 0 20px;
-        p{
-            width: 100%;
-            display: inline-block;
-            vertical-align:top;
-            font-size: @as-font-size;
-            margin: 10px 0 0 0;
-        }
-    }
     /* Toolbar
     --------------------------------------*/
     #products_grid{
         .products_pager{
-            margin: 30px 0 25px 0;
-            padding:0 0 15px 0;
-            border-bottom:1px solid darken(@as-light, 8%);
-            position: relative;
-            width: 100%;
-            float: none;
-            @media (max-width:767px){
-                margin-top: 25px !important;
-            }
-
             .view-mode{
                 button {
-                    border-radius: 3px;
                     &.active,
                     &:hover{
                         color:@as-theme-b2b;
@@ -267,107 +59,12 @@ body [portal="B2B"] {
         }
     }
     .products_pager {
-        width: calc(100% - 25.7%);
-        width: -moz-calc(100% - 25.7%);
-        width: -webkit-calc(100% - 25.7%);
-        width: -o-calc(100% - 25.7%);
-        width: -ms-calc(100% - 25.7%);
-        float: right;
-        padding: 0;
-        @media (max-width:767px){
-            width: 100%;
-        }
-        > div {
-            > * {
-                padding: 0 !important;
-            }
-        }
-        .toolbar-pager{
-
-            .pager_right{
-                float: right;
-                text-align: right;
-                .sort-by{
-                    display: inline-block;
-                    vertical-align: middle;
-                    .dropdown{
-                        button {
-                            background: @as-light;
-                            border: 1px solid darken(@as-light, 10%);
-                            padding: 6px 15px;
-                            border-radius: none;
-                        }
-                    }
-                }
-            }
-        }
         .view-mode{
-            float: left;
-            @media (max-width:991px){
-                width: 100%;
-                margin-bottom: 15px;
-            }
-            @media (max-width:767px){
-                width: auto;
-            }
             button {
-                background: none;
-                border: 1px solid darken(@as-light, 10%);
-                padding: 5px 10px;
                 &:hover{
                     color: @as-theme-b2b;
                 }
             }
-        }
-        .pagination{
-            @media (max-width:767px){
-                width: 100%;
-                letter-spacing: -0.31em;
-                padding-top: 10px;
-                li{
-                    display: inline-block;
-                    letter-spacing: normal;
-                }
-            }
-        }
-        .dropdown_sorty_by{
-            float: right;
-            .dropdown-menu{
-                left: auto;
-                right: 0;
-            }
-            .form-group{
-                float: right;
-                .control-label{
-                    border-radius: 0;
-                    display: inline-block;
-                    vertical-align: middle;
-                    float: none !important;
-                    margin: 0;
-                }
-                .form-control{
-                    border-radius: 0;
-                    display: inline-block;
-                    vertical-align: middle;
-                    float: none !important;
-                    margin: 0;
-                }
-            }
-            @media (max-width:767px){
-                width: 150px;
-                position: absolute;
-                top: 0;
-                right: 0;
-                    .form-group{
-                        width: 100%;
-                        text-align: right;
-                        .control-label{
-
-                        }
-                        .form-control{
-                        }
-                    }
-                }
         }
     }
 
@@ -375,57 +72,17 @@ body [portal="B2B"] {
     /*Back to top
     -------------------------*/
     .cd-top {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
         background: @as-theme-b2b;
-        color: @as-light;
-        float: left;
-        text-align: center;
-        line-height: 50px;
-        position: fixed;
-        z-index: 9;
-        bottom: -50px;
-        right: -50px;
-        .transition(all, 0.5s, ease);
 
         &:hover,
         &:active,
         &:focus{
-            color: @as-light;
             background: darken(@as-theme-b2b, 10%);
-        }
-        .fa{
-            font-size: @as-font-size + 8;
-        }
-        &.cd-is-visible{
-            bottom: 50px;
-            right: 50px;
-            @media (max-width:767px) {
-                bottom: 50px;
-                right: 5px;
-            }
         }
     }
 
     ul.wizard{
-        width: 100%;
-        display: inline-block;
-        vertical-align: top;
-        text-align: center;
-        letter-spacing: 0.31em;
-        box-shadow: none;
-        margin-top: 30px;
-        margin-bottom: 30px;
         li{
-            float: none;
-            display: inline-block;
-            vertical-align: middle;
-            letter-spacing: 0;
-            margin-left: -9px;
-            .chevron{
-                right: -9px;
-            }
             &.text-primary{
                 background: @as-theme-b2b;
                 color: @as-light;
@@ -439,253 +96,33 @@ body [portal="B2B"] {
         }
     }
 
-    #payment_method{
-        border:1px solid darken(@as-light, 10%);
-        padding: 15px 0;
-        margin: 0;
-        h4 {
-            margin-top: 0;
-        }
-        #acquirers_list{
-            form {
-                padding: 0 0 10px;
-            }
-
-        }
-    }
-
     .oe_cart{
-        .js_cart_lines.pull-right{
-            min-width:220px;
-            margin-bottom:25px;
-        }
         .table-striped{
-            border: 1px solid darken(@as-light, 8%);
             td{
-                border-left: 1px solid darken(@as-light, 8%);
-                border-bottom: 1px solid darken(@as-light, 8%);
-                border-top: none;
-                padding:10px 5px;
                 a {
                     color: @as-theme-b2b;
-                }
-                .text-muted{
-                    color: darken(@as-light, 45%);
-                }
-            }
-            thead{
-                th{
-                    background: darken(@as-light, 70%);
-                    color: @as-light;
-                    border: none;
-                    padding: 10px;
                 }
             }
         }
 
         .oe_website_spinner{
             .js_add_cart_json{
-                border-radius: 0;
                 background: @as-theme-b2b;
-                color: @as-light;
-            }
-        }
-
-
-    }
-    #cart_products{
-        td,
-        th{
-            &:first-child{
-                width:80px;
-                + th + th,
-                + td + td{
-                    width: 135px;
-                }
-            }
-            &:last-child{
-                width: 65px;
-                text-align: center !important;
-            }
-            .img {
-                width: 65px;
             }
         }
     }
-
-    /**/
-
 
     .page-404{
-        width: 100%;
-        display: inline-block;
-        text-align: center;
-        padding: 100px 0px !important;
         a{
             color: @as-theme-b2b;
         }
-        h1{
-            margin: 0;
-            padding: 0;
-            font-size: 30px;
-            font-weight: 900;
-            text-transform: uppercase;
-        }
-        h2{
-            margin: 0px;
-            padding: 30px 0px;
-            font-size: 120px;
-            font-weight: 900;
-            text-shadow: 2px 2px #ddd;
-            @media (max-width:767px){
-                font-size: 80px;
-                }
-        }
-        p{
-            font-size: 20px;
-            font-weight: 600;
-        }
     }
-
-    #customize-menu {
-        .dropdown-menu{
-            max-height: 400px;
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-    }
-
-
-    .o_my_documents{
-        margin-top: 40px;
-    }
-    .o_my_sidebar{
-        margin-top: 40px;
-    }
-
-
 
     .js_event {
         .col-md-8{
             .panel-info{
                 border-color: @as-theme-b2b;
-                .panel-heading{
-                    h2{
-                        color: @as-light;
-                    }
-                    p{
-                        color: @as-light;
-                    }
-                }
             }
         }
     }
-}
-
-#wrapwrap[portal="B2B"] {
-	background: @as-light;
-	main {
- 
-	}
-}
-
-
-
-
-/*theme_customize_modal
-------------------------------------------*/
-#theme_customize_modal.loading {
-	.modal-dialog{
-		&:after{
-			background:fade(@as-dark, 50);
-			content: " ";
-			width: 100% ;
-			height: 100%;
-			float: left;
-			position: absolute;
-			left: 0;
-			top: 0;
-		}
-	}
-}
-body #theme_customize_modal{
-
-	.modal-dialog{
-
-		#b2b_color{
-			padding: 11px 13px;
-			.text-center{
-				display: none;
-			}
-			.col-xs-12{
-				width: 33%;
-				padding: 4px;
-			}
-			.chd-color-combi{
-				width: 100%;
-				float: left;
-				margin: 0;
-				.row{
-					height: 40px;	
-					display: block;
-					border:none;
-				}
-				.colorPreset1{
-					background: #e0d2a3;
-				}
-				.colorPreset2{
-					background: #a3d032;
-				}
-				.colorPreset3{
-					background: #37bc98;					
-				}
-				.colorPreset4{
-					background: #ff9c00;
-				}
-				.colorPreset5{
-					background: #E91E63;
-				}
-				.colorPreset6{
-					background: #a02d70;
-				}
-				.colorPreset7{
-					background: #9C27B0;
-				}
-				.colorPreset8{
-					background: #673AB7;
-				}
-				.colorPreset9{
-					background: #2196F3;
-				}
-				.colorPreset10{
-					background: #00BCD4;
-				}
-				.colorPreset11{
-					background: #4CAF50;
-				}
-				.colorPreset12{
-					background: #36255C;
-				}
-				.colorPreset13{
-					background: #FFEB3B;
-				}
-				.colorPreset14{
-					background: #795548;
-				}
-				.colorPreset15{
-					background: #9E9E9E;
-				}
-				.colorPreset16{
-					background: #607D8B;
-				}
-				.colorPreset17{
-					background: #FED879;
-				}
-				.colorPreset18{
-					background: #ED3D52;
-				}
-				
-			}
-		}
-	}
 }

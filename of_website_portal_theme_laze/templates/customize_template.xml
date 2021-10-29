@@ -181,23 +181,38 @@
 
 
     <template id="of_option" name="of_option" inherit_id="website.assets_frontend">
-        <xpath expr="." position="inside">
-            <link href="/of_website_portal_theme_laze/static/src/less/options/as_base.less" rel="stylesheet" type="text/less"/>
-            <link href="/of_website_portal_theme_laze/static/src/less/options/as_buttons.less" rel="stylesheet" type="text/less"/>
-            <link href="/of_website_portal_theme_laze/static/src/less/options/as_custom.less" rel="stylesheet" type="text/less"/>
-            <link href="/of_website_portal_theme_laze/static/src/less/options/as_footer.less" rel="stylesheet" type="text/less"/>
-            <link href="/of_website_portal_theme_laze/static/src/less/options/as_header.less" rel="stylesheet" type="text/less"/>
+        <xpath expr="link[@href='/theme_laze/static/src/less/as_header_a.less']" position="before">
             <link href="/of_website_portal_theme_laze/static/src/less/options/as_header_a.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+        <xpath expr="link[@href='/theme_laze/static/src/less/as_base.less']" position="before">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/as_base.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+        <xpath expr="link[@href='/theme_laze/static/src/less/as_buttons.less']" position="before">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/as_buttons.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+        <xpath expr="link[@href='/theme_laze/static/src/less/as_mixins.less']" position="before">
             <link href="/of_website_portal_theme_laze/static/src/less/options/as_mixins.less" rel="stylesheet" type="text/less"/>
-            <link href="/of_website_portal_theme_laze/static/src/less/options/as_products.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+        <xpath expr="link[@href='/theme_laze/static/src/less/as_custom.less']" position="before">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/as_custom.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+        <xpath expr="link[@href='/theme_laze/static/src/less/as_snippets.less']" position="before">
             <link href="/of_website_portal_theme_laze/static/src/less/options/as_snippets.less" rel="stylesheet" type="text/less"/>
-            <link href="/of_website_portal_theme_laze/static/src/less/options/colors.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+        <xpath expr="link[@href='/theme_laze/static/src/less/as_footer.less']" position="before">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/as_footer.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+        <xpath expr="link[@href='/theme_laze/static/src/less/as_products.less']" position="before">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/as_products.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+        <xpath expr="." position="inside">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/laze_fix.less" rel="stylesheet" type="text/less"/>
         </xpath>
     </template>
 
-<!-- ===================== COLOR OPTIONS ======================== -->
+    <!-- ===================== COLOR OPTIONS ======================== -->
     <template id="of_option_colorPreset1" name="of_option_colorPreset1" inherit_id="website.assets_frontend" active="False">
-       <xpath expr="." position="inside">
+        <xpath expr="." position="inside">
             <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-1.less" rel="stylesheet" type="text/less"/>
         </xpath>
     </template>
@@ -241,7 +256,7 @@
             <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-9.less" rel="stylesheet" type="text/less"/>
         </xpath>
     </template>
-     <template id="of_option_colorPreset10" name="of_option_colorPreset10" inherit_id="website.assets_frontend" active="False">
+    <template id="of_option_colorPreset10" name="of_option_colorPreset10" inherit_id="website.assets_frontend" active="False">
         <xpath expr="." position="inside">
             <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-10.less" rel="stylesheet" type="text/less"/>
         </xpath>
@@ -251,7 +266,7 @@
             <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-11.less" rel="stylesheet" type="text/less"/>
         </xpath>
     </template>
-     <template id="of_option_colorPreset12" name="of_option_colorPreset12" inherit_id="website.assets_frontend" active="False">
+    <template id="of_option_colorPreset12" name="of_option_colorPreset12" inherit_id="website.assets_frontend" active="False">
         <xpath expr="." position="inside">
             <link href="/of_website_portal_theme_laze/static/src/less/options/colors/color-12.less" rel="stylesheet" type="text/less"/>
         </xpath>
@@ -287,4 +302,18 @@
         </xpath>
     </template>
 
+
+    <!-- ===================== HEADER Style ======================== -->
+
+    <template id="of_option_header_style1" name="of_website_portal_theme_laze_option_header_style1" inherit_id="theme_laze.option_header_style1">
+        <xpath expr="link" position="after">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/header-option/option_header_style1.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+
+    <template id="of_option_header_style5" name="of_website_portal_theme_laze_option_header_style5" inherit_id="theme_laze.option_header_style5">
+        <xpath expr="link" position="after">
+            <link href="/of_website_portal_theme_laze/static/src/less/options/header-option/option_header_style5.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
 </odoo>
