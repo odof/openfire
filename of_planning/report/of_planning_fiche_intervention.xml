@@ -45,6 +45,7 @@
                 <t t-set="order" t-value="vals[1]"/>
                 <t t-set="template" t-value="o.template_id or o.env.ref('of_planning.of_planning_default_intervention_template', raise_if_not_found=False) or o.template_id"/>
                 <t t-set="o" t-value="o.with_context(of_report_name=template.fi_title)"/>
+                <t t-if="not o and order and order.company_id"><t t-set="res_company" t-value="order.company_id"/></t>
                 <t t-call="report.external_layout">
                     <div class="page">
                         <t t-if="template">
