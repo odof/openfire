@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, models, fields
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 from datetime import datetime, timedelta, date
 from dateutil.relativedelta import relativedelta
 import pytz
@@ -74,7 +75,7 @@ class OfTourneeRdv(models.TransientModel):
         res['partner_id'] = partner and partner.id or False
         res['partner_address_id'] = address and address.id or False
         res['service_id'] = service and service.id or False
-        if service and service.date_next:
+        if service and service.date_next and service.date_next >= date.today().strftime(DEFAULT_SERVER_DATE_FORMAT):
             res['date_recherche_debut'] = service.date_next
 
 
