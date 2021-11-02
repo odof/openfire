@@ -18,7 +18,7 @@
 			<t t-if="not product_quantity &gt; 0">
 				<div class="alert alert-danger out-of-stock">
 					<span class="fa fa-warning" />
-					<span>Out of Stock</span>
+					<span>Out of Stock</span><span t-if="website.get_of_unavailability_management() == 'delay'">, the delivery time will be extended.</span>
 				</div>
 			</t>
 			<form class="js_notify_form" method="POST">

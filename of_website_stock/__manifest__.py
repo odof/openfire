@@ -14,6 +14,7 @@ Module OpenFire pour les stocks du site internet
     'depends': [
         'website',
         'of_website_sale',
+        'sale_order_dates',
     ],
     'data': [
         'data/mail_template.xml',
