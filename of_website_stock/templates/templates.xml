@@ -45,10 +45,10 @@
 	<template id="show_stock_qty_message" name="Show Stock Qty Message">
 		<t t-foreach="product.product_variant_ids" t-as="product">
 			<t t-if="website.get_website_config() == 'on_hand'">
-				<t t-set="product_quantity" t-value="product.qty_available"/>
+				<t t-set="product_quantity" t-value="product.sudo().qty_available"/>
 			</t>
 			<t t-if="website.get_website_config() == 'forecast'">
-				<t t-set="product_quantity" t-value="product.qty_available - product.outgoing_qty + product.incoming_qty"/>
+				<t t-set="product_quantity" t-value="product.sudo().qty_available - product.sudo().outgoing_qty + product.sudo().incoming_qty"/>
 			</t>
 			<div class="show_hide_stock_change" t-att-id="'%s' % product.id" t-att-value="'%s' % product_quantity">
 				<t t-call="of_website_stock.display_stock_qty_message"/>
