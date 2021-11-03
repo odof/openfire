@@ -148,7 +148,7 @@
 						<input type="text" class="js_quantity form-control"
 							   t-att-data-line-id="line.id"
 							   t-att-data-product-id="line.product_id.id"
-							   t-att-data-qty="int(product_quantity)"
+							   t-att-data-qty="int(product_quantity) if website.get_of_unavailability_management() == 'notify' else 'None'"
 							   t-att-value="int(line.product_uom_qty)"/>
 					</t>
 
