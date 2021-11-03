@@ -72,7 +72,6 @@ odoo.define('of_website_stock.of_website_stock_notify', function(require) {
 		        var $form_notify = $product_details.find('#' + product_id).find('.js_notify_email').closest('form');
 		        var notify = $form_notify.find("input[name='notify']").val();
 		        if (qty_available < parseFloat(qty || 0) && parseInt(notify)) {
-		            console.log('TEST');
 		            $('#add_to_cart').hide();
 		            $js_qty.hide();
 		            $form_notify.show();
@@ -83,9 +82,7 @@ odoo.define('of_website_stock.of_website_stock_notify', function(require) {
 						animation: true,
 						title: _t('DENIED'),
 						container: $js_qty,
-//				        focus: 'trigger',
 				        placement: 'bottom',
-//				        html: true,
 				        content: _t('You Can Not Add More than Available Quantity'),
                     });
                     $js_qty.popover('show');
@@ -107,49 +104,26 @@ odoo.define('of_website_stock.of_website_stock_notify', function(require) {
 
 
    			$(oe_website_sale).on("change", '.oe_cart input.js_quantity[data-product-id]', function (event) {
-		        var product_ids = [];
-		        var product_dom = $(".js_product .js_add_cart_variants[data-attribute_value_ids]");
-		        var qty = $(this).val();
-
-
-		        var $form_data = $('div.js_product').closest('form');
-		        var $js_qty = $form_data.find('.css_quantity.input-group.oe_website_spinner');
-		        if ($("input[name='product_id']").is(':radio')){
-		            var product_id = $form_data.find("input[name='product_id']:checked").val();
-		        } else {
-		            var product_id = $form_data.find("input[name='product_id']").val();
-
+		        var $input_product_id = $(this);
+		        var qty = $input_product_id.val();
 		        var qty_available = parseInt($(this).data('qty'),10);
+
 		        if (qty_available < qty) {
-		            $('#add_to_cart').hide();
-		            _qty.hide();
+		            $input_product_id.val(qty_available);
 
-		            var qty = $(this).val(qty_available);
-
-		            $('.js_quantity').popover({
+		            $input_product_id.popover({
 						animation: true,
-						//html: true,
 						title: _t('DENIED'),
 						container: 'body',
-						trigger: 'focus',
 				        placement: 'top',
 				        html: true,
 				        content: _t('You Can Not Add More than Available Quantity'),
                     });
-                    $('.js_quantity').popover('show');
+                    $input_product_id.popover('show');
                     setTimeout(function() {
-                        $('.js_quantity').popover('destroy')
+                        $input_product_id.popover('hide');
                     }, 1000);
-
-
-		        } else {
-		            $('#add_to_cart').show();
-		            $js_qty.show();
 		        }
-
-
-		        }
-
             });
 
 
