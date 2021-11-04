@@ -20,6 +20,11 @@
 
         <!-- ################# Création des groupes de droits planning intervention ################# -->
 
+        <!-- Active la flexibilité des interventions -->
+        <record id="of_group_planning_intervention_flexibility" model="res.groups">
+            <field name="name">Flexibilité des interventions</field>
+        </record>
+
         <!-- Droits de lecture planning intervention -->
         <record id="of_group_planning_intervention_lecture_siens" model="res.groups">
             <field name="name">Voir mes interventions seulement</field>
