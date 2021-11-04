@@ -644,7 +644,8 @@ CalendarView.include({
         fc.minTime = this.minTime;
         fc.maxTime = this.maxTime;
         fc.slotEventOverlap = false;
-        fc.timeFormat = fc.timeFormat.replace(':ss', '');
+        // Replace made to remove seconds. Must be done twice, once for date_start and once for date_end
+        fc.timeFormat = fc.timeFormat = fc.timeFormat.replace(':ss', '').replace(':ss', '');
         // callback
         fc.eventAfterAllRender = function(view) {
             self.on_event_after_all_render();

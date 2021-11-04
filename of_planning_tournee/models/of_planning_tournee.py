@@ -82,7 +82,7 @@ class OfPlanningIntervention(models.Model):
                 employee_ids = old_data.setdefault(intervention.date_date, set())
                 employee_ids |= set(intervention.employee_ids.ids)
 
-        super(OfPlanningIntervention, self).write(vals)
+        res = super(OfPlanningIntervention, self).write(vals)
 
         if old_data:
             if 'date' in vals or 'employee_ids' in vals:
@@ -96,7 +96,7 @@ class OfPlanningIntervention(models.Model):
             intervention.create_tournees()
             intervention._recompute_todo(self._fields['tournee_ids'])
 
-        return True
+        return res
 
     @api.multi
     def unlink(self):

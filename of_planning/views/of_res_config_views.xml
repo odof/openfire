@@ -30,6 +30,13 @@
                             <br/>
                             <i class="oe_grey">/!\ ce paramètre est partagé entre toutes les sociétés</i>
                         </div>
+                        <label for="group_of_group_planning_intervention_flexibility"/>
+                        <div name="group_of_group_planning_intervention_flexibility">
+                            <field name="group_of_group_planning_intervention_flexibility" class="oe_inline"/>
+                            <span> Activer la flexibilité des RDV. Ceci influence la planification de RDV.</span>
+                            <br/>
+                            <i class="oe_grey">/!\ ce paramètre est partagé entre toutes les sociétés</i>
+                        </div>
                     </group>
                     <group name="deliveries" string="Bons de livraisons">
                         <field name="do_deliveries" widget="radio"/>

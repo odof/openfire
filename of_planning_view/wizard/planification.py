@@ -578,6 +578,7 @@ class OfPlanifCreneau(models.TransientModel):
             'verif_dispo': True,
             'order_id': service.order_id.id,
             'origin_interface': u"Remplir un créneau (wizard planif)",
+            'flexible': service.tache_id.flexible,
         }
 
         return values

@@ -1005,6 +1005,7 @@ class OFWebsitePlanningBooking(http.Controller):
             'parc_installe_id': parc_installe.id,
             'address_id': adresse.id,
             'tache_id': tache.id,
+            'flexible': tache.flexible,
             'employee_ids': [(4, creneau_employee.employee_id.id, 0)],
             'duree': tache.duree,
             'company_id': request.website.company_id.id,

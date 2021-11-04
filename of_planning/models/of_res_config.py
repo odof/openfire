@@ -48,6 +48,9 @@ class OfInterventionSettings(models.TransientModel):
         (0, 'Ne pas utiliser les bons de livraisons depuis les RDV'),
         (1, 'Utiliser les bons de livraisons depuis les RDV'),
         ], string="(OF) BL d'intervention")
+    group_of_group_planning_intervention_flexibility = fields.Boolean(
+        string=u"Flexibilité des RDV", implied_group='of_planning.of_group_planning_intervention_flexibility')
+
 
     @api.multi
     def set_calendar_min_time_defaults(self):
