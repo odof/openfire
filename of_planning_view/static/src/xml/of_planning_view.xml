@@ -393,7 +393,8 @@
             <i t-if="creneau.warning_horaires" class="fa fa-warning of_warning_horaires"
                style="float: right; padding-top: 4px;"/>
             <i class="fa fa-calendar-o of_ws"/>
-            <span>Dispo</span>
+            <span t-if="!creneau.ferie">Dispo</span>
+            <span t-if="creneau.ferie">Férié</span>
             <span class="of_planning_subinfo of_planning_subinfo_heure_debut">
                 <t t-raw="creneau.heure_debut_str"/>
             </span>
@@ -404,19 +405,21 @@
             <span class="of_planning_subinfo of_planning_subinfo_duree">(<t t-raw="creneau.duree_str"/>)
             </span>
             <br/>
-            <a name="%(of_planning_view.action_view_of_planif_wizard)d" type="action"
-               class="of_planning_creneau_action"
-               action_id="of_planning_view.action_view_of_planif_wizard"
-            >
-                <i class="fa fa-lg fa-search" title="Rechercher une intervention à programmer"/>
-            </a>
-            |
+            <t t-if="!(creneau.ferie &amp;&amp; creneau.view.jours_feries_opt.ignorer_jours_feries)">
+                <a name="%(of_planning_view.action_view_of_planif_wizard)d" type="action"
+                   class="of_planning_creneau_action"
+                   action_id="of_planning_view.action_view_of_planif_wizard"
+                >
+                    <i class="fa fa-lg fa-search" title="Rechercher une intervention à programmer"/>
+                </a>
+                |
+            </t>
             <a name="%(of_planning_view.action_view_of_planning_intervention_form_wizard)d" type="action"
                class="of_planning_creneau_action"
                action_id="of_planning_view.action_view_of_planning_intervention_form_wizard">
                 <i class="fa fa-lg fa-edit" title="Créer un RDV"/>
             </a>
-            <t t-if="creneau.display_secteur">
+            <t t-if="creneau.display_secteur &amp;&amp; !(creneau.ferie &amp;&amp; creneau.view.jours_feries_opt.ignorer_jours_feries)">
                 |
                 <t t-if="creneau.secteur_id">
                     <a name="%(of_planning_view.action_view_of_planif_creneau_secteur_wizard)d" type="action"

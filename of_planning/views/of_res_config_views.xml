@@ -62,6 +62,16 @@
                             <field name="color_bg_creneaux_indispo" class="oe_inline" widget="color"/>
                             <span> Couleur de fond</span>
                         </div>
+                        <label for="ignorer_jours_feries" string="(OF) Jours fériés"/>
+                        <div name="ignorer_jours_feries">
+                            <field name="ignorer_jours_feries" class="oe_inline"/>
+                            <span> Ignorer les jours fériés dans la planification</span>
+                        </div>
+                        <label for="color_jours_feries" string=" "/>
+                        <div name="color_jours_feries">
+                            <field name="color_jours_feries" class="oe_inline" widget="color"/>
+                            <span> Couleur des jours fériés</span>
+                        </div>
                     </group>
                     <group name="calendar_view" string="Vue Calendrier">
                         <label for="calendar_min_time" string="(OF) heure min"/>

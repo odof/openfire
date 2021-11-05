@@ -27,7 +27,8 @@
                         margin-top: -3px;"/>
             </t>
             <div t-if="record.virtuel" name="virtuel">
-                <div>Dispo</div>
+                <div t-if="!record.ferie">Dispo</div>
+                <div t-if="record.ferie">Férié</div>
                 <div><t t-esc="record.attendee_name"/></div>
                 <i class="fa fa-clock-o"/>
                 <span class="of_ws"/>

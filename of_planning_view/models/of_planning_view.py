@@ -250,7 +250,8 @@ class OfPlanningIntervention(models.Model):
 
     @api.model
     def get_emp_horaires_info(
-            self, employee_ids, date_start, date_stop, horaires_list_dict=False, fusion_creneaux=True):
+            self, employee_ids, date_start, date_stop, horaires_list_dict=False, fusion_creneaux=True,
+            view_mode='planning'):
         """
         Fonction appelée par le javascript de la vue Planning.
         Renvoie toutes les informations nécessaires à l'affichage de la vue Planning:
@@ -272,6 +273,12 @@ class OfPlanningIntervention(models.Model):
 
         # durée minimale pour qu'un créneau libre soit consiféré comme disponible
         duree_min = self.env['ir.values'].get_default("of.intervention.settings", "duree_min_creneaux_dispo") or 0.5
+
+        jours_feries = self.env.user.company_id.get_jours_feries(date_start, date_stop)
+        if view_mode == 'planning':
+            passer_jours_feries = False
+        else:
+            passer_jours_feries = self.env['ir.values'].get_default('of.intervention.settings', 'ignorer_jours_feries')
 
         # On récupère les segments des employés s'ils ne sont pas fournis en paramètre
         if not horaires_list_dict:
@@ -319,6 +326,7 @@ class OfPlanningIntervention(models.Model):
 
             # Parcours de toutes les dates à évaluer
             while date_current_da <= date_stop_da:
+                date_current_str = fields.Date.to_string(date_current_da)
                 res[employee_id]['col_offset_to_segment'].append(i_col_offset_to_segment)
                 num_jour = date_current_da.isoweekday()
                 # Pré-remplissage de la fillerbar
@@ -333,7 +341,11 @@ class OfPlanningIntervention(models.Model):
                     'creneaux_du_jour': "",
                 }
 
-                horaires_du_jour = segment_courant[2].get(num_jour, False)  # [ [h_debut, h_fin] ,  .. ]
+                # le jour est férié et la case "Ignorer jours fériés" est cochée
+                if passer_jours_feries and date_current_str in jours_feries:
+                    horaires_du_jour = []
+                else:
+                    horaires_du_jour = segment_courant[2].get(num_jour, False)  # [ [h_debut, h_fin] ,  .. ]
                 if not horaires_du_jour:
                     # L'employé ne travaille pas ce jour ci
                     fillerbarzz.append(fillerbar)
@@ -356,7 +368,6 @@ class OfPlanningIntervention(models.Model):
                 journee_debut = horaires_du_jour[0][0]
                 journee_fin = horaires_du_jour[-1][1]
 
-                date_current_str = fields.Date.to_string(date_current_da)
                 # On récupère tous les rdvs de la journée
                 interventions = intervention_obj.sudo().search(
                     [('employee_ids', 'in', employee_id),

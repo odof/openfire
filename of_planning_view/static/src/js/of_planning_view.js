@@ -164,17 +164,22 @@ var PlanningView = View.extend({
         var company_filters_def = new Model("res.company").call("get_company_filter_ids", []);
         var company_filter_def = ir_values_model.call("get_default",
                                                       ["of.intervention.settings", "company_filter_id", false]);
-
+        // de quelle couleur afficher les jours fériés?
+        var color_jours_feries_def = ir_values_model.call(
+            "get_default", ["of.intervention.settings", "color_jours_feries"]);
+        // masquer les pictos de recherche et d'assignation de secteur?
+        var ignorer_jours_feries_def = ir_values_model.call(
+            "get_default", ["of.intervention.settings", "ignorer_jours_feries"]);
         // initialiser les couleurs des créneaux dispo et leur durée minimale
         var creneaux_dispo_data_def = self.set_creneaux_dispo_data();
 
         return $.when(
             write_def, create_def, excluded_ids_def, intervenants_ids_def, mode_calendar_def, duree_to_px_def,
             heure_min_def, heure_max_def, time_line_def, attendee_mode_def, company_filters_def, company_filter_def,
-            rendered_prom, creneaux_dispo_data_def, this._super()
+            color_jours_feries_def, ignorer_jours_feries_def, rendered_prom, creneaux_dispo_data_def, this._super()
         ).then(
             function (write, create, excluded, emp_ids, mode_calendar, duree_to_px, min_time, max_time, time_line,
-            attendee_mode, company_filters, now_company_id) {
+            attendee_mode, company_filters, now_company_id, color_jours_feries, ignorer_jours_feries) {
                 self.write_right = write;
                 self.create_right = create;
                 // affecter le mode de planning (com, tech ou comtech)
@@ -226,6 +231,11 @@ var PlanningView = View.extend({
                 if (isNullOrUndef(self.now_company_name)){
                     self.now_company_name = self.company_filters[current_comp_j].name;
                     self.now_company_id = self.company_filters[current_comp_j].id;
+                }
+
+                self.jours_feries_opt = {
+                    'ignorer_jours_feries': ignorer_jours_feries,
+                    'color_jours_feries': color_jours_feries,
                 }
 
                 return $.when(all_filters_def);
@@ -511,97 +521,99 @@ var PlanningView = View.extend({
             self.col_offset_today = moment().startOf('day').diff(moment(self.range_start), 'days');
         }
         // générer le domain effectif de la vue planning (qui n'a pas de vue recherche)
-        var event_domain = self.get_range_domain([],this.range_start,this.range_stop);
-        // rechercher les évènements en bdd
-        self.dataset.read_slice(self.fields_keys, {
-                    offset: 0,
-                    domain: event_domain,
-                    context: context,
-            }).done(function(events) {
-                // adapter les entêtes de colonnes aux nouvelles bornes de recherche
-                self.set_columns();
-                var event, planning_record, day_span, col_offset_start, col_offset_stop, record_options,
-                    event_res_ids, res_id, row_index, start_local, stop_local;
-                for (var i=0; i<events.length; i++) {
-                    event = events[i];
-                    event_res_ids = event[self.resource];
-                    // calculer les heures locales pour placer les events dans les bonnes colonnes
-                    start_local = moment.utc(event[self.date_start]).local()
-                    stop_local = moment.utc(event[self.date_stop]).local()
-                    // combien de jours?
-                    day_span = stop_local.startOf('day').diff(start_local.startOf('day'), 'days')+1;
-                    // l'enregistrement sera ajouté à toutes les colonnes entre col_offset_start et col_offset_stop
-                    col_offset_start = start_local.startOf('day').diff(moment(self.range_start), 'days');
-                    if (day_span > 1) {
-                        col_offset_stop = stop_local.startOf('day').diff(moment(self.range_start), 'days');
-                    }else{
-                        col_offset_stop = undefined;
-                    }
-
-                    record_options = {
-                        "col_offset_start": col_offset_start,
-                        "col_offset_stop": col_offset_stop,
-                        "day_span": day_span,
-                    }
-                    // ajouter l'évènement aux lignes de ressource concernées
-                    for (var j in event_res_ids) {
-                        res_id = event_res_ids[j];
-                        row_index = self.rows_ids_indexes[res_id]
-                        // Ajouter l'évènement seulement aux lignes à afficher
-                        if (_.contains(self.actual_res_ids, res_id)) {
-                            planning_record = new PlanningRecord(self.rows[row_index],self,event,record_options);
-                            self.rows[row_index]["records_to_add"].push(planning_record);
+        // actualise la liste des jours fériés au passage
+        var temp = self.get_range_domain([],this.range_start,this.range_stop).then(function () {
+            // rechercher les évènements en bdd
+            self.dataset.read_slice(self.fields_keys, {
+                        offset: 0,
+                        domain: self.event_domain,
+                        context: context,
+                }).done(function(events) {
+                    // adapter les entêtes de colonnes aux nouvelles bornes de recherche
+                    self.set_columns();
+                    var event, planning_record, day_span, col_offset_start, col_offset_stop, record_options,
+                        event_res_ids, res_id, row_index, start_local, stop_local;
+                    for (var i=0; i<events.length; i++) {
+                        event = events[i];
+                        event_res_ids = event[self.resource];
+                        // calculer les heures locales pour placer les events dans les bonnes colonnes
+                        start_local = moment.utc(event[self.date_start]).local()
+                        stop_local = moment.utc(event[self.date_stop]).local()
+                        // combien de jours?
+                        day_span = stop_local.startOf('day').diff(start_local.startOf('day'), 'days')+1;
+                        // l'enregistrement sera ajouté à toutes les colonnes entre col_offset_start et col_offset_stop
+                        col_offset_start = start_local.startOf('day').diff(moment(self.range_start), 'days');
+                        if (day_span > 1) {
+                            col_offset_stop = stop_local.startOf('day').diff(moment(self.range_start), 'days');
+                        }else{
+                            col_offset_stop = undefined;
                         }
-                    }
-                }
 
-                // initialiser les segments horaires, les fillerbars, les créneaux dispos et les couleurs des attendees
-                var prom = self.set_res_horaires_data();
-                $.when(prom).then(function () {
-                    if (self.sidebar) {
-                        // rendre les filtres des attendee en appliquant les couleurs
-                        self.sidebar.reso_filter.render();
-                        // ne pas montrer les lignes de ressources pour les filtres décochés
-                        for (var row_index in self.rows) {
-                            var key_num = Number(self.rows[row_index].res_id);
-                            if (self.all_filters[self.res_ids_indexes[key_num]].is_checked) {
-                                self.rows[row_index].hidden = false;
-                            }else{
-                                self.rows[row_index].hidden = true;
+                        record_options = {
+                            "col_offset_start": col_offset_start,
+                            "col_offset_stop": col_offset_stop,
+                            "day_span": day_span,
+                        }
+                        // ajouter l'évènement aux lignes de ressource concernées
+                        for (var j in event_res_ids) {
+                            res_id = event_res_ids[j];
+                            row_index = self.rows_ids_indexes[res_id]
+                            // Ajouter l'évènement seulement aux lignes à afficher
+                            if (_.contains(self.actual_res_ids, res_id)) {
+                                planning_record = new PlanningRecord(self.rows[row_index],self,event,record_options);
+                                self.rows[row_index]["records_to_add"].push(planning_record);
                             }
                         }
                     }
-                    var bg_rgb, ft_rgb, rgb_today, key;
-                    // Affecter les valeurs reçues par set_res_horaires_data aux lignes
-                    for (var row_index in self.rows) {
-                        key = self.rows[row_index].res_id;
-                        self.rows[row_index].segments_horaires = self.res_horaires_info[key]['segments'];
-                        self.rows[row_index].col_offset_to_segment = self.res_horaires_info[key]['col_offset_to_segment'];
-                        self.rows[row_index].fillerbars = self.res_horaires_info[key]['fillerbars'];
-                        self.rows[row_index].creneaux_dispo = self.res_horaires_info[key]['creneaux_dispo'];
-                        self.rows[row_index].color_bg = self.res_horaires_info[key]['color_bg'];
-                        self.rows[row_index].color_ft = self.res_horaires_info[key]['color_ft'];
-                        self.rows[row_index].tz = self.res_horaires_info[key]['tz'];
-                        self.rows[row_index].tz_offset = self.res_horaires_info[key]['tz_offset'];
-                        bg_rgb = hexToRgb(self.res_horaires_info[key]['color_bg']);
-                        self.rows[row_index].color_bg_rgba = "rgba(" + bg_rgb.r + "," + bg_rgb.g + "," + bg_rgb.b +
-                            ",0.3);";
-                        ft_rgb = hexToRgb(self.res_horaires_info[key]['color_ft']);
-                        self.rows[row_index].color_ft_rgba = "rgba(" + ft_rgb.r + "," + ft_rgb.g + "," + ft_rgb.b +
-                            ",0.8);";
-                        self.rows[row_index].col_offset_today = isNullOrUndef(self.col_offset_today) ?
-                            -1 : self.col_offset_today;
-                        if (self.rows[row_index].col_offset_today != -1) {
-                            rgb_today = hexToRgb(self.res_horaires_info[key]['color_bg'], -30);
-                            self.rows[row_index].color_bg_rgba_today = "rgba(" + rgb_today.r + "," + rgb_today.g + "," +
-                                rgb_today.b + ",0.4);";
-                        }
-                    }
 
-                    self.table.rows = self.rows;
-                    self.render_table();
-                })
-            });
+                    // initialiser les segments horaires, les fillerbars, les créneaux dispos et les couleurs des attendees
+                    var prom = self.set_res_horaires_data();
+                    $.when(prom).then(function () {
+                        if (self.sidebar) {
+                            // rendre les filtres des attendee en appliquant les couleurs
+                            self.sidebar.reso_filter.render();
+                            // ne pas montrer les lignes de ressources pour les filtres décochés
+                            for (var row_index in self.rows) {
+                                var key_num = Number(self.rows[row_index].res_id);
+                                if (self.all_filters[self.res_ids_indexes[key_num]].is_checked) {
+                                    self.rows[row_index].hidden = false;
+                                }else{
+                                    self.rows[row_index].hidden = true;
+                                }
+                            }
+                        }
+                        var bg_rgb, ft_rgb, rgb_today, key;
+                        // Affecter les valeurs reçues par set_res_horaires_data aux lignes
+                        for (var row_index in self.rows) {
+                            key = self.rows[row_index].res_id;
+                            self.rows[row_index].segments_horaires = self.res_horaires_info[key]['segments'];
+                            self.rows[row_index].col_offset_to_segment = self.res_horaires_info[key]['col_offset_to_segment'];
+                            self.rows[row_index].fillerbars = self.res_horaires_info[key]['fillerbars'];
+                            self.rows[row_index].creneaux_dispo = self.res_horaires_info[key]['creneaux_dispo'];
+                            self.rows[row_index].color_bg = self.res_horaires_info[key]['color_bg'];
+                            self.rows[row_index].color_ft = self.res_horaires_info[key]['color_ft'];
+                            self.rows[row_index].tz = self.res_horaires_info[key]['tz'];
+                            self.rows[row_index].tz_offset = self.res_horaires_info[key]['tz_offset'];
+                            bg_rgb = hexToRgb(self.res_horaires_info[key]['color_bg']);
+                            self.rows[row_index].color_bg_rgba = "rgba(" + bg_rgb.r + "," + bg_rgb.g + "," + bg_rgb.b +
+                                ",0.3);";
+                            ft_rgb = hexToRgb(self.res_horaires_info[key]['color_ft']);
+                            self.rows[row_index].color_ft_rgba = "rgba(" + ft_rgb.r + "," + ft_rgb.g + "," + ft_rgb.b +
+                                ",0.8);";
+                            self.rows[row_index].col_offset_today = isNullOrUndef(self.col_offset_today) ?
+                                -1 : self.col_offset_today;
+                            if (self.rows[row_index].col_offset_today != -1) {
+                                rgb_today = hexToRgb(self.res_horaires_info[key]['color_bg'], -30);
+                                self.rows[row_index].color_bg_rgba_today = "rgba(" + rgb_today.r + "," + rgb_today.g + "," +
+                                    rgb_today.b + ",0.4);";
+                            }
+                        }
+
+                        self.table.rows = self.rows;
+                        self.render_table();
+                    })
+                });
+        });
     },
     /**
      *  Appelé par _do_search.
@@ -616,7 +628,7 @@ var PlanningView = View.extend({
         end = end || self.range_stop;
 
         var Planning = new Model(self.model);
-        Planning.call('get_emp_horaires_info', [res_ids, start, end, segments, !self.mode_calendar])
+        Planning.call('get_emp_horaires_info', [res_ids, start, end, segments, !self.mode_calendar, 'planning'])
         .then(function (result) {
             if (isNullOrUndef(self.res_horaires_info)) {
                 self.res_horaires_info = result;
@@ -812,17 +824,13 @@ var PlanningView = View.extend({
         date_column = date_column._d;
         var columns_todo = [];
         var event_domain = this.get_range_domain(this.domain || [], date_column, date_fin, [res_id]);
-        //event_domain = new CompoundDomain(event_domain, ['id', '=', res_id]);
-        //console.log("event_domain",event_domain);
         this.rows[res_id].clear_column(column);
         this.dataset.read_slice(this.fields_keys, {offset: 0, domain: event_domain, context: self.context,
         }).done(function(events) {
             if (events.length >0) {
-               //console.log("events: ",events,self.fields_keys);
 
                 var event, planning_record, day_span, col_offset_start, col_offset_stop, record_options, row_options, event_res_ids;
                 for (var i=0; i<events.length; i++) {
-                    //console.log(i,events.length);
                     event = events[i];
                     event_res_ids = event[self.resource];
                     // how many days?
@@ -834,8 +842,6 @@ var PlanningView = View.extend({
                     }else if (col_offset_start >= self.column_nb) {
                        //console.log("TROP TARD");
                     }
-                    //console.log("EVENT:",event);
-                    //console.log("DAY SPAN:",day_span);
                     if (day_span > 1) {  // multiple day record, we need to reload every column this record is in
                         col_offset_stop = moment(event[self.date_stop]).startOf('day').diff(moment(self.range_start), 'days');
                         /*for (var c=Math.max(0, col_offset_start); c < Math.min(self.column_nb, col_offset_stop + 1)) {
@@ -847,7 +853,6 @@ var PlanningView = View.extend({
                     }else{
                         col_offset_stop = undefined;
                     }
-                    //console.log("duration: ",day_span);
 
                     record_options = {
                         "col_offset_start": col_offset_start,
@@ -856,11 +861,8 @@ var PlanningView = View.extend({
                         //"color_ft": event[self.color_ft] || "#0C0C0C",
                         "day_span": day_span,
                     }
-                    //console.log("col_offset_start: ",col_offset_start);
 
-                    //console.log("event: ",event);
                     //self.view_res_ids = _.union(self.view_res_ids, event_res_ids);
-                    //console.log("self.res_ids",self.res_ids);
                     //for (var j in event_res_ids) {
                         //res_id = event_res_ids[j];
                         /*if (!self.all_filters[res_id]) {
@@ -885,18 +887,14 @@ var PlanningView = View.extend({
                                 //"color_ft": event[self.color_ft] || "#0C0C0C",
                                 "auto_render": false,
                             }
-                            //console.log("PLANNING_ROECORD",planning_record);
                             self.rows[res_id] = new PlanningView.Row(self.table,self,[],row_options);
                         }* /
-                        //console.log("WEUT");
 
                         planning_record = new PlanningRecord(self.rows[res_id],self,event,record_options);
                         self.rows[res_id]["records_to_add"].push(planning_record);
                     //}
                 }
             }
-            //console.log("res_id", res_id, typeof(res_id));
-            //console.log("self.res_horaires_info",self.res_horaires_info);
             var prom = self.set_res_horaires_data([res_id], date_column, date_fin, self.res_horaires_info[res_id].segments_horaires);
             $.when(prom).then(function () {
                 self.rows[res_id].fillerbars[column] = self.res_horaires_info[res_id]['fillerbars'][0];
@@ -962,8 +960,11 @@ var PlanningView = View.extend({
      * Construit un Domain pour filtrer par les champs de this.date_start et this.date_stop
      * entre les dates start et end.
      * pour les id de resource res_ids
+     * actualise self.jours_feries
      */
     get_range_domain: function(domain, start, end, res_ids) {
+        var self = this;
+        var jours_feries_def = new Model("res.company").call("get_jours_feries", [start, end]);
         var format = time.datetime_to_str;
         res_ids = res_ids || this.actual_res_ids;
         var extend_domain = [[this.date_start, '<=', format(end)]];
@@ -973,7 +974,11 @@ var PlanningView = View.extend({
             extend_domain.push([this.date_start, '>=', format(start)]);
         }
         extend_domain.push(['employee_ids', 'in', res_ids]);
-        return new CompoundDomain(domain, extend_domain);
+        return $.when(jours_feries_def).then(function (jours_feries_dict) {
+            self.jours_feries = jours_feries_dict
+            self.event_domain = new CompoundDomain(domain, extend_domain)
+            return $.when();
+        })
     },
 });
 
@@ -1402,8 +1407,6 @@ var PlanningCreneauDispo = Widget.extend({
         this.row = row;
         this.view = view;
         this.options = options;
-        this.color_bg = this.view.creneaux_dispo.color_bg;
-        this.color_ft = this.view.creneaux_dispo.color_ft;
         this.col_offset = options.col_offset;
 
         var self= this;
@@ -1433,6 +1436,14 @@ var PlanningCreneauDispo = Widget.extend({
         }
 
         this.date = moment(this.view.range_start).add(self.col_offset, 'days').format('YYYY-MM-DD');
+        //utiliser la couleur des jours fériés si besoin
+        if (this.view.jours_feries[this.date]) {
+            this.color_bg = this.view.jours_feries_opt.color_jours_feries;
+            this.ferie = true;
+        }else{
+            this.color_bg = this.view.creneaux_dispo.color_bg;
+        }
+        this.color_ft = this.view.creneaux_dispo.color_ft;
         this.lieu_debut = record.lieu_debut;
         this.lieu_fin = record.lieu_fin;
 
