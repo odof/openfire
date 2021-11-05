@@ -4,7 +4,7 @@
     <!-- Modification des pdf factures-->
     <template id="of_external_invoice_document" inherit_id="account.report_invoice_document">
         <div name="invoice_address" position="after">
-            <h3 t-if="o.company_id.of_position_header_lines == 'bandeau_totalite' and o.company_id.of_display_pastille_as_title">
+            <h3 name="pastille_as_title" t-if="o.company_id.of_position_header_lines == 'bandeau_totalite'">
                 <span t-if="o.type == 'out_invoice' and (o.state == 'open' or o.state == 'paid')">Facture </span>
                 <span t-if="o.type == 'out_invoice' and o.state == 'proforma2'">Facture PRO-FORMA </span>
                 <span t-if="o.type == 'out_invoice' and o.state == 'draft'">Facture brouillon </span>

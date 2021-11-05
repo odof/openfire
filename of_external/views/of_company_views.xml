@@ -16,10 +16,9 @@
                             <field name="of_position_header_lines"/>
                             <button name="%(of_external_open_mako_wizard_action)d" type="action"
                               string="Variables Mako" class="pull-right" icon="fa-question"/>
-                            <field name="of_display_pastille_as_title" attrs="{'invisible':[('of_position_header_lines','!=','bandeau_totalite')]}" colspan="3"/>
                             <field name="of_max_height_bandeau" groups="base.group_no_one"/>
                             <newline/>
-                            <div attrs="{'invisible':[('of_position_header_lines','!=','bandeau_pastille'),('of_position_header_lines','!=','bandeau_totalite')]}">
+                            <div attrs="{'invisible':[('of_position_header_lines','!=','bandeau_pastille'),('of_position_header_lines','!=','bandeau_totalite')]}" colspan="3">
                                 Le logo doit s'appeler "Bandeau".
                             </div>
                         </group>

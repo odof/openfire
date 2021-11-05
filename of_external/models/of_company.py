@@ -51,8 +51,6 @@ class ResCompany(models.Model):
         help=u"Position des lignes d'en-tête relativement au logo de société\n"
              u"Sous le logo : les lignes d'en-tête seront placées sous le logo de société.\n"
              u"À droite du logo : les lignes d'en-tête seront placées à droite du logo.")
-    of_display_pastille_as_title = fields.Boolean(
-        string=u'Afficher un titre avec le contenu de la pastille', default=False)
 
     @api.multi
     def get_line_content(self, header_or_footer="header", number=1):
