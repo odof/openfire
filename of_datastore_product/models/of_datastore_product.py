@@ -825,12 +825,16 @@ class OfDatastoreCentralized(models.AbstractModel):
 
             if not create_mode:
                 # Les champs manquants dans la table du fournisseur ne sont pas renvoyés, sans générer d'erreur
-                # Il faut donc leur attribuer une valeur par défaut (False ou [] pour des one2many)
+                # Il faut donc leur attribuer une valeur par défaut
+                missing_fields = [field for field in fields_to_read if field not in datastore_product_data[0]]
+                # Valeur remplie en 2 étapes
+                # 1 : on met une valeur vide (False ou [] pour des one2many)
                 datastore_defaults = {
                     field: [] if self._fields[field].type in ('one2many', 'many2many') else False
-                    for field in fields_to_read
-                    if field not in datastore_product_data[0]
+                    for field in missing_fields
                 }
+                # 2 : On renseigne les valeurs qui sont trouvées avec la fonction default_get
+                datastore_defaults.update(product_tmpl_obj.default_get(missing_fields))
 
             # Traitement des données
             match_dicts = {}
