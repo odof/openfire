@@ -412,6 +412,10 @@ class OfTourneeRdv(models.TransientModel):
         if not jours_service:  # si les jours ne sont pas renseignés dans le service
             jours_service = range(1, 8)
 
+        jours_feries = self.company_id.get_jours_feries(self.date_recherche_debut, self.date_recherche_fin)
+        passer_jours_feries = self.env['ir.values'].get_default('of.intervention.settings', 'ignorer_jours_feries')
+        color_jours_feries = self.env['ir.values'].get_default('of.intervention.settings', 'color_jours_feries')
+
         un_jour = timedelta(days=1)
         # --- Création des créneaux de début et fin de recherche ---
         avant_recherche_da = fields.Date.from_string(self.date_recherche_debut) - un_jour
@@ -455,6 +459,25 @@ class OfTourneeRdv(models.TransientModel):
                 'disponible': False,
                 'allday': True,
             })
+            for d in jours_feries:
+                ferie_debut_dt = tz.localize(datetime.strptime(d + " 00:00:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
+                ferie_debut_dt = ferie_debut_dt.astimezone(pytz.utc)
+                ferie_fin_dt = tz.localize(datetime.strptime(d + " 23:59:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
+                ferie_fin_dt = ferie_fin_dt.astimezone(pytz.utc)
+                wizard_line_obj.create({
+                    'name': u"Férié: %s" % jours_feries[d],
+                    'debut_dt': ferie_debut_dt,
+                    'fin_dt': ferie_fin_dt,
+                    'date_flo': 0.0,
+                    'date_flo_deadline': 23.99,
+                    'date': fields.Date.from_string(d),
+                    'wizard_id': self.id,
+                    'employee_id': employee.id,
+                    'intervention_id': False,
+                    'disponible': False,
+                    'allday': True,
+                    'force_color': color_jours_feries,
+                })
 
         # --- Recherche des créneaux ---
         date_recherche_da = avant_recherche_da
@@ -529,7 +552,7 @@ class OfTourneeRdv(models.TransientModel):
                     if employee_id in employees_dispo:
                         employee_intervention_dates[employee_id].append(intervention_dates)
 
-            # Calcul des créneaux dispos
+            # Calcul des créneaux dispos et des créneaux occupés
             for employee in employee_obj.browse(employees_dispo):
                 intervention_dates = employee_intervention_dates[employee.id]
 
@@ -552,7 +575,8 @@ class OfTourneeRdv(models.TransientModel):
                             continue
 
                 horaires_employee = horaires_du_jour[employee.id]
-                if horaires_employee:
+                # ne pas calculer les créneau dispo les jours fériés si la case "ignorer jours fériés" est cochée
+                if horaires_employee and not (passer_jours_feries and date_recherche_str in jours_feries):
 
                     index_courant = 0
                     deb, fin = horaires_employee[index_courant]  # horaires courants

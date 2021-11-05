@@ -7,6 +7,7 @@ from odoo.tools.float_utils import float_compare
 from datetime import datetime, timedelta
 from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
 import pytz
+import holidays
 from copy import deepcopy
 
 
@@ -771,6 +772,41 @@ class Users(models.Model):
                 user.employee_ids.write({'of_color_bg': vals.get("of_color_bg", False), 'no_rebounce': True})
         # Création automatique employee sur création utilisateur? -> non: utilisateurs portail
         return user
+
+
+class ResCompany(models.Model):
+    _inherit = 'res.company'
+
+    @api.model
+    def get_jours_feries(self, date_debut, date_fin):
+        u"""
+            Renvois un dictionnaire de jours fériés avec pour clé la date et pour valeur le nom du jour férié.
+            Contient tous les jours fériés compris entre date_debug et date_fin inclus.
+            date_debut et date_fin peuvent être de type Datetime, Date ou basestring
+            """
+        if not len(self):
+            company = self.env.user.company_id
+        else:
+            company = self[0]
+        if isinstance(date_debut, basestring):
+            date_debut_da = fields.Date.from_string(date_debut)
+            date_debut_str = date_debut[:10]
+        elif isinstance(date_debut, date) or isinstance(date_debut, datetime):
+            date_debut_da = date_debut
+            date_debut_str = date_debut[:10]
+        if isinstance(date_fin, basestring):
+            date_fin_da = fields.Date.from_string(date_fin)
+            date_fin_str = date_fin[:10]
+        elif isinstance(date_fin, date) or isinstance(date_fin, datetime):
+            date_fin_da = date_fin
+            date_fin_str = date_fin[:10]
+        country = company.country_id
+        holi_dict = holidays.CountryHoliday(country.code or 'FR', years=[date_debut_da.year, date_fin_da.year])
+        res = {}
+        for key, val in holi_dict.iteritems():
+            if date_debut_da <= key <= date_fin_da:
+                res[str(key)] = val
+        return res
 
 
 class ResPartner(models.Model):

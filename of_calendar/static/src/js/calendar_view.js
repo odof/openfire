@@ -33,18 +33,24 @@ function is_virtual_id(id) {
  *  convertis une chaine de caractères de la forme #000000 en son tuple RGB équivalent
  */
 function hexToRgb(hex, mod) {
-  var parsed = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  var result = parsed ? {
-    r: parseInt(parsed[1], 16),
-    g: parseInt(parsed[2], 16),
-    b: parseInt(parsed[3], 16)
-  } : null;
-  if (!isNullOrUndef(mod) && !isNullOrUndef(parsed)) {
-    result["r"] = mod < 0 ? Math.max(0, result["r"] + mod) : Math.min(255, result["r"] + mod);
-    result["g"] = mod < 0 ? Math.max(0, result["g"] + mod) : Math.min(255, result["g"] + mod);
-    result["b"] = mod < 0 ? Math.max(0, result["b"] + mod) : Math.min(255, result["b"] + mod);
-  }
-  return result;
+    var parsed = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    var result = parsed ? {
+        r: parseInt(parsed[1], 16),
+        g: parseInt(parsed[2], 16),
+        b: parseInt(parsed[3], 16)
+    } : null;
+    if (isNullOrUndef(hex)) {
+        result = {
+            r: 255,
+            g: 255,
+            b: 255
+        }
+    }else if (!isNullOrUndef(mod) && !isNullOrUndef(parsed)) {
+        result["r"] = mod < 0 ? Math.max(0, result["r"] + mod) : Math.min(255, result["r"] + mod);
+        result["g"] = mod < 0 ? Math.max(0, result["g"] + mod) : Math.min(255, result["g"] + mod);
+        result["b"] = mod < 0 ? Math.max(0, result["b"] + mod) : Math.min(255, result["b"] + mod);
+    }
+    return result;
 }
 
 CalendarView.include({
@@ -200,6 +206,13 @@ CalendarView.include({
      */
     set_res_horaires_data: function(res_ids=false, start=false, end=false, get_segments=false) {
         this.events_dispo = [];
+        return $.when();
+    },
+    /**
+     *  Hérité dans of_planning_view. Créé des évènements virtuels pour voir les jours fériés
+     */
+    set_events_feries: function(start) {
+        this.events_feries = [];
         return $.when();
     },
     /**
@@ -561,6 +574,11 @@ CalendarView.include({
                     self.set_res_horaires_data(self.now_filter_ids, start, end).then(function(){
                         self.dfd_res_horaires_calc.resolve()
                     });
+                    // caluler les jours fériés
+                    self.dfd_events_feries = $.Deferred();
+                    self.set_events_feries(start, end).then(function(){
+                        self.dfd_events_feries.resolve()
+                    });
 
                     var all_attendees = $.map(events, function (e) { return e[self.attendee_people]; });
                     all_attendees = _.chain(all_attendees).flatten().uniq().value();
@@ -577,14 +595,21 @@ CalendarView.include({
                                 });
                             })
                             .done(function() {
-                                return $.when(self.dfd_filters_rendered, self.dfd_res_horaires_calc)
+                                return $.when(
+                                    self.dfd_filters_rendered, self.dfd_res_horaires_calc, self.dfd_events_feries)
                             .then(function() {
                                 return self.perform_necessary_name_gets(events)
                             })
                             .then(function(){
+                                // ajouter les créneaux dispo
                                 for (var i=0; i<self.events_dispo.length; i++) {
                                     self.events_dispo[i].view = self;
                                     events.push(self.events_dispo[i]);
+                                }
+                                // ajouter les jours fériés (fonctionnalité implémentée dans of_planning_view)
+                                for (var j=0; j<self.events_feries.length; j++) {
+                                    self.events_feries[j].view = self;
+                                    events.push(self.events_feries[j]);
                                 }
                                 self.events = events;
                                 return events;
@@ -651,7 +676,7 @@ CalendarView.include({
             self.on_event_after_all_render();
         };
         fc.select = function (start_date, end_date, all_day, _js_event, _view) {
-            if (self.options.action.context.inhiber_create) {
+            if (self.options.action && self.options.action.context && self.options.action.context.inhiber_create) {
                 Dialog.alert(self.$el, self.options.action.context.inhiber_message);  // inhiber création
                 self.$calendar.fullCalendar('unselect');
             }else{
@@ -950,7 +975,7 @@ CalendarView.include({
                     else if (_.contains(["date", "datetime"], self.fields[fieldname].type)) {
                         temp_ret[fieldname] = formats.format_value(value, self.fields[fieldname]);
                     }
-                    else {
+                    else if (!evt["ferie"]) {
                         throw new Error("Incomplete data received from dataset for record " + evt.id);
                     }
                 }
@@ -961,7 +986,7 @@ CalendarView.include({
                     else if (value instanceof Array)  {
                         temp_ret[fieldname] = value; // if x2many, keep all id !
                     }
-                    else {
+                    else if (!evt["ferie"]) {
                         throw new Error("Incomplete data received from dataset for record " + evt.id);
                     }
                 }
@@ -1058,7 +1083,7 @@ CalendarView.include({
                                             icon_offset_px + 'px;" ></i>';
                                         icon_offset_px += 15;
                                     }
-                                }else if (evt["virtuel"]){
+                                }else if (evt["virtuel"] && !evt["ferie"]){
                                     var tempColorFT, tempColorBG;
                                     var now_id;
 
@@ -1129,7 +1154,10 @@ CalendarView.include({
                 r.textColor = self.all_filters[self.res_ids_indexes[index]]['color_ft'];
             }else if (self.attendee_multiple) {  // multiple attendees
                 if (!isNullOrUndef(evt["color_filter_id"])) {
-                    if (evt["virtuel"]) {
+                    if (evt["ferie"]) {
+                        r.textColor = evt[self.color_ft_field];
+                        r.backgroundColor = self.jours_feries_opt.color_jours_feries;
+                    }else if (evt["virtuel"]) {
                         var rgb_bg = hexToRgb(self.creneau_dispo_opt['color_bg']);
                         var rgb_ft = hexToRgb(self.creneau_dispo_opt['color_ft']);
                         r.backgroundColor = "rgba(" + rgb_bg.r + "," + rgb_bg.g + "," + rgb_bg.b + ",0.2);";
