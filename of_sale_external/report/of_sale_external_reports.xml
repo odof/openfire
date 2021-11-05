@@ -5,14 +5,16 @@
 
     <!-- Modification des pdf devis/commande -->
     <template id="of_external_saleorder_document" inherit_id="sale.report_saleorder_document">
-        <div name="addresses" position="after">
-            <h3 name="pastille_as_title" t-if="doc.company_id.of_position_header_lines == 'bandeau_totalite'">
-                <span t-if="doc.state == 'draft'">Estimation</span>
-                <span t-if="doc.state == 'sent'">Devis</span>
-                <span t-if="doc.state not in ['draft','sent']">Bon de commande</span>
-                <span t-field="doc.name"/> du <span t-if="doc.state in ['sale', 'done'] and doc.confirmation_date" t-field="doc.confirmation_date" t-options="{'format': 'dd/MM/yyyy'}"/><span t-if="doc.state not in ['sale', 'done'] and doc.date_order" t-field="doc.date_order" t-options="{'format': 'dd/MM/yyyy'}"/>
-            </h3>
-        </div>
+        <h2 position="replace">
+            <h2>
+                <div name="pastille_as_title" t-if="doc.company_id.of_position_header_lines == 'bandeau_totalite'">
+                    <span t-if="doc.state == 'draft'">Estimation</span>
+                    <span t-if="doc.state == 'sent'">Devis</span>
+                    <span t-if="doc.state not in ['draft','sent']">Bon de commande</span>
+                    <span t-field="doc.name"/> du <span t-if="doc.state in ['sale', 'done'] and doc.confirmation_date" t-field="doc.confirmation_date" t-options="{'format': 'dd/MM/yyyy'}"/><span t-if="doc.state not in ['sale', 'done'] and doc.date_order" t-field="doc.date_order" t-options="{'format': 'dd/MM/yyyy'}"/>
+                </div>
+            </h2>
+        </h2>
     </template>
 
     <template id="saleorder_specific_external_layout_header" inherit_id="report.external_layout_header" primary="True">
