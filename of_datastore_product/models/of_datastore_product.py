@@ -228,8 +228,9 @@ class OfDatastoreSupplierBrand(models.AbstractModel):
             ds_brand_id = ds_brand_full_id % DATASTORE_IND
 
             new_brand_id = vals['brand_id']
-            old_brand = brand_obj.search([('datastore_supplier_id', '=', ds_supplier_id),
-                                          ('datastore_brand_id', '=', ds_brand_id)])
+            old_brand = brand_obj.search(
+                [('datastore_supplier_id', '=', ds_supplier_id),
+                 ('datastore_brand_id', '=', ds_brand_id)])
             if old_brand:
                 if new_brand_id != old_brand.id:
                     old_brand.write({'datastore_supplier_id': False, 'datastore_brand_id': False})
@@ -376,8 +377,8 @@ class OfProductBrand(models.Model):
             @warning: Cette façon de faire est dangereuse car les éléments ont pu être modifiés à la main,
                       ne l'utiliser que pour de rares modèles.
             """
-            model_ids = ds_supplier_obj.of_datastore_search(ds_model_obj, [('model', '=', obj_name),
-                                                                           ('res_id', '=', obj_id)])
+            model_ids = ds_supplier_obj.of_datastore_search(
+                ds_model_obj, [('model', '=', obj_name), ('res_id', '=', obj_id)])
             if not model_ids:
                 return self.env[obj_name]
             model = ds_supplier_obj.of_datastore_read(ds_model_obj, model_ids, ['module', 'name'])[0]
@@ -411,8 +412,9 @@ class OfProductBrand(models.Model):
             else:
                 # Ajouter un search par article est couteux.
                 # Tant pis pour les règles d'accès, on fait une recherche SQL
-                self._cr.execute("SELECT id FROM product_template WHERE brand_id = %s AND of_datastore_res_id = %s",
-                                 (self.id, res_id))
+                self._cr.execute(
+                    "SELECT id FROM product_template WHERE brand_id = %s AND of_datastore_res_id = %s",
+                    (self.id, res_id))
                 result = self._cr.fetchall()
                 if result:
                     result = obj_obj.browse(result[0][0])
@@ -432,16 +434,17 @@ class OfProductBrand(models.Model):
                     raise ValidationError(u"Catégorie d'UDM inexistante : " + res_name)
         elif obj == 'product.uom':
             # Etape 1 : Déterminer la catégorie d'udm
-            ds_obj = ds_supplier_obj.of_datastore_read(ds_obj_obj, [res_id],
-                                                       ['category_id', 'factor', 'uom_type', 'rounding'])[0]
+            ds_obj = ds_supplier_obj.of_datastore_read(
+                ds_obj_obj, [res_id], ['category_id', 'factor', 'uom_type', 'rounding'])[0]
 
-            categ = self.datastore_match(client, 'product.uom.categ', ds_obj['category_id'][0],
-                                         ds_obj['category_id'][1], product, match_dicts)
+            categ = self.datastore_match(
+                client, 'product.uom.categ', ds_obj['category_id'][0], ds_obj['category_id'][1], product, match_dicts)
 
             # Etape 2 : Vérifier si l'unité de mesure existe
-            uoms = obj_obj.search([('factor', '=', ds_obj['factor']),
-                                   ('uom_type', '=', ds_obj['uom_type']),
-                                   ('category_id', '=', categ.id)])
+            uoms = obj_obj.search(
+                [('factor', '=', ds_obj['factor']),
+                 ('uom_type', '=', ds_obj['uom_type']),
+                 ('category_id', '=', categ.id)])
 
             if uoms:
                 if len(uoms) > 1:
@@ -460,11 +463,11 @@ class OfProductBrand(models.Model):
             elif create:
                 # Etape 3 : Créer l'unité de mesure
                 uom_data = {
-                    'name'       : res_name,
-                    'uom_type'   : ds_obj['uom_type'],
-                    'factor'     : ds_obj['factor'],
+                    'name':        res_name,
+                    'uom_type':    ds_obj['uom_type'],
+                    'factor':      ds_obj['factor'],
                     'category_id': categ.id,
-                    'rounding'   : ds_obj['rounding'],
+                    'rounding':    ds_obj['rounding'],
                 }
                 result = obj_obj.create(uom_data)
         else:
@@ -548,18 +551,6 @@ class OfDatastoreCache(models.TransientModel):
     res_id = BigInteger(string='Resource id', required=True)
     vals = fields.Char(string='Values', help="Dictionnary of values for this object", required=True)
 
-    @api.model_cr_context
-    def _auto_init(self):
-        """
-        @TODO : A Supprimer après application en ligne
-        Passage de res_id de Integer vers BigInteger
-        """
-        cr = self._cr
-        column_data = self._select_column_data().get('res_id')
-        if column_data and column_data['typname'] == 'int4':
-            cr.execute("ALTER TABLE of_datastore_cache ALTER COLUMN res_id TYPE int8")
-        return super(OfDatastoreCache, self)._auto_init()
-
     @contextmanager
     def _get_cache_token(self, key, blocking=True):
         """
@@ -630,8 +621,9 @@ class OfDatastoreCache(models.TransientModel):
         cr = registry(self._cr.dbname).cursor()
 
         # Requête SQL pour gagner en performance
-        cr.execute("SELECT vals FROM of_datastore_cache WHERE model = %s AND res_id = %s",
-                   (record._name, record.id))
+        cr.execute(
+            "SELECT vals FROM of_datastore_cache WHERE model = %s AND res_id = %s",
+            (record._name, record.id))
         vals = cr.fetchall()
         cr.close()
         if vals:
@@ -665,13 +657,15 @@ class OfDatastoreCentralized(models.AbstractModel):
         cr = self._cr
 
         # On ne veut aucun des champs ajoutés par les modules stock, mrp, purchase
-        cr.execute("SELECT f.name "
-                   "FROM ir_model_data AS d "
-                   "INNER JOIN ir_model_fields AS f "
-                   "  ON d.res_id=f.id "
-                   "WHERE d.model = 'ir.model.fields' "
-                   "  AND f.model = %s "
-                   "  AND d.module IN ('mrp','procurement','stock')", (self._name, ))
+        cr.execute(
+            "SELECT f.name "
+            "FROM ir_model_data AS d "
+            "INNER JOIN ir_model_fields AS f "
+            "  ON d.res_id=f.id "
+            "WHERE d.model = 'ir.model.fields' "
+            "  AND f.model = %s "
+            "  AND d.module IN ('mrp','procurement','stock')",
+            (self._name, ))
         res = [row[0] for row in cr.fetchall()]
 
         # Ajout de certains champs
@@ -770,16 +764,16 @@ class OfDatastoreCentralized(models.AbstractModel):
 
         # Champs a valeurs spécifiques
         fields_defaults = [
-            ('of_datastore_supplier_id'       , lambda: create_mode and supplier_id or supplier.sudo().name_get()[0]),
-            ('of_datastore_res_id'            , lambda: vals['id']),
-            ('of_seller_pp_ht'                , lambda: vals['of_seller_pp_ht']),
+            ('of_datastore_supplier_id',        lambda: create_mode and supplier_id or supplier.sudo().name_get()[0]),
+            ('of_datastore_res_id',             lambda: vals['id']),
+            ('of_seller_pp_ht',                 lambda: vals['of_seller_pp_ht']),
             ('of_seller_product_category_name', lambda: vals['categ_id'][1]),
-            ('of_tmpl_datastore_res_id'       , lambda: vals['product_tmpl_id'][0]),
-            ('description_norme'              , lambda: product.description_norme or vals['description_norme']),
-            ('of_template_image'              , lambda: vals.get('of_template_image') or product.image),
+            ('of_tmpl_datastore_res_id',        lambda: vals['product_tmpl_id'][0]),
+            ('description_norme',               lambda: product.description_norme or vals['description_norme']),
+            ('of_template_image',               lambda: vals.get('of_template_image') or product.image),
             # Attention, l'ordre des deux lignes suivantes est important
-            ('of_seller_product_code'         , lambda: vals['default_code']),
-            ('default_code'                   , lambda: default_code_func[brand](vals['default_code'])),
+            ('of_seller_product_code',          lambda: vals['default_code']),
+            ('default_code',                    lambda: default_code_func[brand](vals['default_code'])),
         ]
 
         fields_defaults = [(k, v) for k, v in fields_defaults if k in fields_to_read]
@@ -791,9 +785,9 @@ class OfDatastoreCentralized(models.AbstractModel):
 
             # Création de la relation fournisseur
             fields_defaults.append(('seller_ids', lambda: [(5, ), (0, 0, {
-                'name'   : brand.partner_id.id,
+                'name':    brand.partner_id.id,
                 'min_qty': 1,
-                'delay'  : vals['of_seller_delay'],
+                'delay':   vals['of_seller_delay'],
             })]))
 
         datastore_fields = [field for field in fields_to_read if field not in unused_fields]
@@ -813,23 +807,30 @@ class OfDatastoreCentralized(models.AbstractModel):
                     result += [{'id': product_id} for product_id in product_ids]
                 else:
                     # Pas d'accès à la base centrale, on remplit l'id et on met tout le reste à False ou []
-                    datastore_defaults = {field: [] if self._fields[field].type in ('one2many', 'many2many') else False
-                                          for field in fields_to_read if field != 'id'}
-                    result += [dict(datastore_defaults, id=-(product_id + supplier_value))
-                               for product_id in product_ids]
+                    datastore_defaults = {
+                        field: [] if self._fields[field].type in ('one2many', 'many2many') else False
+                        for field in fields_to_read
+                        if field != 'id'
+                    }
+                    result += [
+                        dict(datastore_defaults, id=-(product_id + supplier_value))
+                        for product_id in product_ids]
                 continue
             supplier = supplier_obj.browse(supplier_id)
             client = supplier.of_datastore_connect()
             ds_product_obj = supplier_obj.of_datastore_get_model(client, self._name)
 
-            datastore_product_data = supplier_obj.of_datastore_read(ds_product_obj, product_ids, datastore_fields,
-                                                                    '_classic_read')
+            datastore_product_data = supplier_obj.of_datastore_read(
+                ds_product_obj, product_ids, datastore_fields, '_classic_read')
 
             if not create_mode:
                 # Les champs manquants dans la table du fournisseur ne sont pas renvoyés, sans générer d'erreur
                 # Il faut donc leur attribuer une valeur par défaut (False ou [] pour des one2many)
-                datastore_defaults = {field: [] if self._fields[field].type in ('one2many', 'many2many') else False
-                                      for field in fields_to_read if field not in datastore_product_data[0]}
+                datastore_defaults = {
+                    field: [] if self._fields[field].type in ('one2many', 'many2many') else False
+                    for field in fields_to_read
+                    if field not in datastore_product_data[0]
+                }
 
             # Traitement des données
             match_dicts = {}
@@ -847,14 +848,16 @@ class OfDatastoreCentralized(models.AbstractModel):
                 # Ajouter un search par article est couteux.
                 # Tant pis pour les règles d'accès, on fait une recherche SQL
                 if self._name == 'product.template':
-                    self._cr.execute("SELECT id FROM product_template "
-                                     "WHERE brand_id = %s AND of_datastore_res_id = %s",
-                                     (brand.id, vals['id']))
+                    self._cr.execute(
+                        "SELECT id FROM product_template "
+                        "WHERE brand_id = %s AND of_datastore_res_id = %s",
+                        (brand.id, vals['id']))
                 else:
-                    self._cr.execute("SELECT t.id FROM product_product p "
-                                     "INNER JOIN product_template t ON t.id=p.product_tmpl_id "
-                                     "WHERE t.brand_id = %s AND p.of_datastore_res_id = %s",
-                                     (brand.id, vals['id']))
+                    self._cr.execute(
+                        "SELECT t.id FROM product_product p "
+                        "INNER JOIN product_template t ON t.id=p.product_tmpl_id "
+                        "WHERE t.brand_id = %s AND p.of_datastore_res_id = %s",
+                        (brand.id, vals['id']))
                 rows = self._cr.fetchall()
                 product = product_tmpl_obj.browse(rows and rows[0][0])
                 categ_name = vals['categ_id'][1]
@@ -874,8 +877,8 @@ class OfDatastoreCentralized(models.AbstractModel):
                     # Conversion du many2one pour la base courante
                     if vals[field]:
                         obj = self._fields[field].comodel_name
-                        res = brand.datastore_match(client, obj, vals[field][0], vals[field][1], product, match_dicts,
-                                                    create=create_mode)
+                        res = brand.datastore_match(
+                            client, obj, vals[field][0], vals[field][1], product, match_dicts, create=create_mode)
                         if field in ('categ_id', 'uom_id', 'uom_po_id'):
                             obj_dict[field] = res
                         if res:
@@ -910,10 +913,9 @@ class OfDatastoreCentralized(models.AbstractModel):
                 vals['of_datastore_has_link'] = bool(product)
 
                 # Prix d'achat/vente
-                vals.update(brand.compute_product_price(vals['of_seller_pp_ht'], categ_name, obj_dict['uom_id'],
-                                                        obj_dict['uom_po_id'], product=product,
-                                                        price=vals['of_seller_price'], remise=None,
-                                                        based_on_price=vals['of_is_net_price']))
+                vals.update(brand.compute_product_price(
+                    vals['of_seller_pp_ht'], categ_name, obj_dict['uom_id'], obj_dict['uom_po_id'], product=product,
+                    price=vals['of_seller_price'], remise=None, based_on_price=vals['of_is_net_price']))
                 # Calcul de la marge et de la remise
                 if 'of_seller_remise' in fields_to_read:
                     vals['of_seller_remise'] =\
@@ -1021,8 +1023,10 @@ class OfDatastoreCentralized(models.AbstractModel):
                     #   automatique que si le cache est vide, ce qui n'est plus le cas à ce stade.
                     cache_obj.apply_values(obj)
                     # Filtre des champs à récupérer et conversion au format read
-                    vals = {field.name: field.convert_to_read(obj[field.name], self, use_name_get)
-                            for field in obj_fields}
+                    vals = {
+                        field.name: field.convert_to_read(obj[field.name], self, use_name_get)
+                        for field in obj_fields
+                    }
                     vals['id'] = obj.id
                     res[obj.id] = vals
 
@@ -1162,8 +1166,8 @@ class OfDatastoreCentralized(models.AbstractModel):
                 res = [-(product_id + supplier_value) for product_id in res]
         else:
             # Éxecution de la requête sur la base courante
-            res = super(OfDatastoreCentralized, self)._search(args, offset=offset, limit=limit, order=order,
-                                                              count=count, access_rights_uid=access_rights_uid)
+            res = super(OfDatastoreCentralized, self)._search(
+                args, offset=offset, limit=limit, order=order, count=count, access_rights_uid=access_rights_uid)
         return res
 
     @api.model
@@ -1340,12 +1344,14 @@ class ProductProduct(models.Model):
     def of_datastore_get_import_fields(self):
         unused_fields = self._get_datastore_unused_fields()
         computed_fields = self._of_get_datastore_computed_fields()
-        fields = [f for f in self._fields
-                  if f not in computed_fields
-                  and f not in unused_fields
-                  and f != 'product_tmpl_id']
+        import_fields = [
+            f for f in self._fields
+            if f not in computed_fields
+            and f not in unused_fields
+            and f != 'product_tmpl_id'
+        ]
 
-        fields += [
+        import_fields += [
             # Champs relatifs au modèle d'article
             'product_tmpl_id',
             'of_tmpl_datastore_res_id',
@@ -1359,7 +1365,7 @@ class ProductProduct(models.Model):
             # Kits
             'kit_line_ids',
         ]
-        return fields
+        return import_fields
 
     @api.model
     def of_datastore_get_fields_to_not_empty(self):
@@ -1406,8 +1412,9 @@ class ProductProduct(models.Model):
 
         fields_to_read = self.of_datastore_get_import_fields()
         result = self.browse()
-        for product_data in sorted(self._of_read_datastore(fields_to_read, create_mode=True),
-                                   key=lambda vals: vals['of_is_kit']):
+        for product_data in sorted(
+                self._of_read_datastore(fields_to_read, create_mode=True),
+                key=lambda vals: vals['of_is_kit']):
             # Les kits sont ajoutés en dernier pour éviter d'importer des composants après qu'ils aient été
             # importés par le kit.
             result += self_obj.create(product_data)
@@ -1498,8 +1505,8 @@ class OfProductKitLine(models.Model):
 
                 # Unités de mesure
                 uom_id, uom_name = kit['product_uom_id']
-                uom_id = brand_obj.datastore_match(client, 'product.uom', uom_id, uom_name, False, match_dicts,
-                                                   create=create_mode).id
+                uom_id = brand_obj.datastore_match(
+                    client, 'product.uom', uom_id, uom_name, False, match_dicts, create=create_mode).id
                 kit['product_uom_id'] = (uom_id, uom_name)
             res += kits_data
         return res
