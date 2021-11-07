@@ -900,6 +900,7 @@ class ProductTemplate(models.Model):
 
     of_lot_serial_management = fields.Boolean(
         string=u"Géré par lot/num. de série", compute='_compute_of_lot_serial_management', store=True)
+    of_delay = fields.Integer(string="Delivery Lead Time", related='seller_ids.delay', readonly=True)
 
     @api.depends('tracking')
     def _compute_of_lot_serial_management(self):

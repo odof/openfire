@@ -26,3 +26,8 @@ msgstr "Bon de Transfert"
 #: model:ir.ui.view,arch_db:stock.report_delivery_document
 msgid "<strong>Quantity</strong>"
 msgstr "<strong>Quantité</strong>"
+
+#. module: stock
+#: model:ir.ui.menu,name:stock.menu_stock_inventory_control
+msgid "Inventory Control"
+msgstr "Articles"
