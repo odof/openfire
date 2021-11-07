@@ -116,6 +116,7 @@
                         <field name="group_purchase_order_line_display_stock_info" class="oe_inline"/>
                         <span>Afficher les informations de stock au niveau des lignes de commande</span>
                     </div>
+                    <field name="of_date_purchase_order" widget="radio"/>
                 </xpath>
 
             </field>
