@@ -60,13 +60,58 @@ class AccountInvoiceReport(models.Model):
     _inherit = 'account.invoice.report'
 
     of_margin = fields.Float(string=u"Marge", readonly=True)
+    of_margin_perc = fields.Char(string=u"Marge %", compute='_compute_of_margin_perc')
+    of_invoice_number = fields.Char(string=u"Numéro de facture", readonly=True)
+    of_invoice_origin = fields.Char(string=u"Origine", readonly=True)
 
     def _select(self):
         res = super(AccountInvoiceReport, self)._select()
-        res += ", sub.of_margin"
+        res += """
+            , sub.of_margin
+            , sub.number    AS of_invoice_number
+            , sub.origin    AS of_invoice_origin
+        """
         return res
 
     def _sub_select(self):
         res = super(AccountInvoiceReport, self)._sub_select()
-        res += ", ail.of_margin"
+        res += """
+            , ail.of_margin
+            , ai.number
+            , ai.origin
+        """
+        return res
+
+    def _group_by(self):
+        res = super(AccountInvoiceReport, self)._group_by()
+        res += """
+            , ai.number
+            , ai.origin
+        """
+        return res
+
+    @api.multi
+    def _compute_of_margin_perc(self):
+        for rec in self:
+            if rec.price_total != 0:
+                rec.of_margin_perc = \
+                    '%.2f' % (100.0 * rec.of_margin / rec.price_total)
+            else:
+                rec.of_margin_perc = "N/E"
+
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        if 'of_margin' not in fields:
+            fields.append('of_margin')
+        if 'price_total' not in fields:
+            fields.append('price_total')
+        res = super(AccountInvoiceReport, self).read_group(
+            domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
+        for line in res:
+            if 'of_margin_perc' in fields:
+                if 'of_margin' in line and line['of_margin'] is not None and line.get('price_total', False):
+                    line['of_margin_perc'] = \
+                        ('%.2f' % (round(100.0 * line['of_margin'] / line['price_total'], 2))).replace('.', ',')
+                else:
+                    line['of_margin_perc'] = "N/E"
         return res

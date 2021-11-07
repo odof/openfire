@@ -15,4 +15,15 @@
         </field>
     </record>
 
+    <record id="of_account_margin_account_invoice_report_pivot_view" model="ir.ui.view">
+        <field name="name">of.account.margin.account.invoice.report.pivot.view</field>
+        <field name="model">account.invoice.report</field>
+        <field name="inherit_id" ref="account.view_account_invoice_report_pivot"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='price_total']" position="after">
+                <field name="of_margin_perc" type="measure"/>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
