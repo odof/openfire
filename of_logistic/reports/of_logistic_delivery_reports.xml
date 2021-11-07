@@ -14,6 +14,7 @@
                             <th name="th_total_weight"><strong>Total weight</strong></th>
                             <th name="th_pallets"><strong>Pallets</strong></th>
                             <th name="th_packages"><strong>Packages</strong></th>
+                            <th name="th_carrier"><strong>Carrier</strong></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -26,6 +27,9 @@
                             </td>
                             <td name="td_packages">
                                 <span t-field="o.packages"/>
+                            </td>
+                            <td name="td_carrier">
+                                <span t-field="o.of_carrier_id.name"/>
                             </td>
                         </tr>
                     </tbody>
@@ -64,6 +68,7 @@
                             <th name="th_total_weight"><strong>Total weight</strong></th>
                             <th name="th_pallets"><strong>Pallets</strong></th>
                             <th name="th_packages"><strong>Packages</strong></th>
+                            <th name="th_carrier"><strong>Carrier</strong></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -76,6 +81,9 @@
                             </td>
                             <td name="td_packages">
                                 <span t-esc="pack_operation_packages"/>
+                            </td>
+                            <td name="td_carrier">
+                                <span t-field="o.of_carrier_id.name"/>
                             </td>
                         </tr>
                     </tbody>
@@ -120,6 +128,7 @@
                             <th name="th_total_weight"><strong>Total weight</strong></th>
                             <th name="th_pallets"><strong>Pallets</strong></th>
                             <th name="th_packages"><strong>Packages</strong></th>
+                            <th name="th_carrier"><strong>Carrier</strong></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -132,6 +141,9 @@
                             </td>
                             <td name="td_packages">
                                 <span t-esc="pack_operation_packages"/>
+                            </td>
+                            <td name="td_carrier">
+                                <span t-field="o.of_carrier_id.name"/>
                             </td>
                         </tr>
                     </tbody>

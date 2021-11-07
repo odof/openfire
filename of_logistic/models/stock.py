@@ -29,18 +29,26 @@ class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
     of_department_id = fields.Many2one(
-        comodel_name='res.country.department', string="Department", compute='_compute_of_department_id')
+        comodel_name='res.country.department', string="Department", compute='_compute_of_department_id', store=True)
     of_nbr_pallets = fields.Integer(string="Nbr. of pallets")
     of_total_volume = fields.Float(string="Total volume")
     of_total_weight = fields.Float(string="Total weight")
     of_rate_ids = fields.One2many(
         comodel_name='of.stock.picking.logistic.rate', inverse_name='picking_id', string="Computed rates")
     of_packages = fields.Integer(string="Packages")
+    of_carrier_id = fields.Many2one(comodel_name='res.partner', string="Carrier", compute='_compute_carrier_id')
 
     @api.depends('partner_id')
     def _compute_of_department_id(self):
         for picking in self:
             picking.of_department_id = picking.partner_id.department_id
+
+    @api.depends('of_rate_ids.selected')
+    def _compute_carrier_id(self):
+        for picking in self:
+            rates = picking.of_rate_ids.filtered('selected')
+            if rates:
+                picking.of_carrier_id = rates[0].partner_id
 
     @api.multi
     def compute_logistic_informations(self):
@@ -95,8 +103,7 @@ class StockPicking(models.Model):
                 weight=self.of_total_weight, pallets=self.of_nbr_pallets
             )
             if broken_constraint:
-                new_rates.append(
-                    (0, 0, {
+                new_rates.append((0, 0, {
                         'partner_id': rate.partner_id.id,
                         'min_weight': rate.min_weight,
                         'max_weight': rate.max_weight,
@@ -106,8 +113,7 @@ class StockPicking(models.Model):
                     )
                 )
             else:
-                new_rates.append(
-                    (0, 0, {
+                new_rates.append((0, 0, {
                         'partner_id': rate.partner_id.id,
                         'min_weight': rate.min_weight,
                         'max_weight': rate.max_weight,
