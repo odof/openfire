@@ -5,7 +5,7 @@
     <template id="of_external_invoice_document" inherit_id="account.report_invoice_document">
         <h2 position="replace">
             <h2>
-                <div name="pastille_as_title" t-if="doc.company_id.of_position_header_lines == 'bandeau_totalite'">
+                <div name="pastille_as_title" t-if="o.company_id.of_position_header_lines == 'bandeau_totalite'">
                     <span t-if="o.type == 'out_invoice' and (o.state == 'open' or o.state == 'paid')">Facture </span>
                     <span t-if="o.type == 'out_invoice' and o.state == 'proforma2'">Facture PRO-FORMA </span>
                     <span t-if="o.type == 'out_invoice' and o.state == 'draft'">Facture brouillon </span>
