@@ -419,6 +419,35 @@ class OfImport(models.Model):
     _name = 'of.import'
     _order = 'date desc'
 
+    @api.model_cr_context
+    def _auto_init(self):
+        cr = self._cr
+        init = False
+        if self._auto:
+            cr.execute(
+                "SELECT file FROM %s " % self._table,)
+            init = any([res[0] for res in cr.fetchall()])
+        res = super(OfImport, self)._auto_init()
+        if init:
+            self.transfer_data()
+        return res
+
+    @api.model
+    def transfer_data(self):
+        cr = self._cr
+        of_imports = self.search([])
+        cr.execute(
+            "SELECT * FROM information_schema.columns "
+            "WHERE table_name = %s AND column_name = 'file'", (self._table,))
+        if not bool(cr.fetchall()):
+            return
+        for of_import in of_imports:
+            cr.execute("SELECT file FROM " + self._table + " WHERE id = %s", (of_import.id,))
+            data = cr.fetchall()
+            if data:
+                of_import.write({'file': str(data[0][0])})
+                cr.execute("UPDATE " + self._table + " SET file = NULL WHERE id = %s", (of_import.id,))
+
     @api.model
     def _default_lang_id(self):
         lang = self.env['res.lang'].search([('code', '=', 'en_US')])
@@ -440,7 +469,7 @@ class OfImport(models.Model):
     date_fin_import = fields.Datetime(u'Fin', readonly=True)
     time_lapse = fields.Char(string=u'Importé en', compute="_compute_time_lapse")
 
-    file = fields.Binary(u'Fichier', required=True)
+    file = fields.Binary(u'Fichier', required=True, attachment=True)
     file_name = fields.Char(u'Nom du fichier')
     file_type = fields.Selection(SELECT_EXTENSIONS, u'Type de fichier', compute="_compute_file_type")
     file_size = fields.Char(u'Taille du fichier', compute="_compute_file_size")
