@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <template id="of_external_report_delivery_document" inherit_id="stock.report_delivery_document" priority="10">
+        <xpath expr="//h2" position="replace">
+            <h2 t-if="o.company_id.of_position_header_lines == 'bandeau_totalite'" name="doc_name" style="margin-bottom: 10px;">
+                <span>Bon de transfert</span>
+                <t t-if="o.name"><span>N°</span><span t-field="o.name"/></t>
+            </h2>
+        </xpath>
+    </template>
+
+</odoo>

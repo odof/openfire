@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<odoo>
-
-    <!-- Modification des pdf BL/BR -->
-    <template id="of_external_delivery_document" inherit_id="stock.report_delivery_document"/>
-
-</odoo>

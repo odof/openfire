@@ -38,6 +38,7 @@ devis/bon de commande.
     'data' : [
         'views/sale_order_views.xml',
         'report/of_sale_external_reports.xml',
+        'report/sale_order_reports.xml',
     ],
     'installable': True,
     'application': False,
