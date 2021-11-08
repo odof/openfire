@@ -2,7 +2,7 @@
 <odoo>
 
     <!-- Modifications commande fournisseur (et CF sans prix) -->
-    <template id="of_report_purchaseorder_document" inherit_id="purchase.report_purchaseorder_document">
+    <template id="of_report_purchaseorder_document" inherit_id="purchase.report_purchaseorder_document" priority="10">
         <!-- Modifications de l'affichage des adresses -->
         <xpath expr="//div[@class='row'][1]" position="replace">
             <div name="addresses" class="row">
@@ -29,6 +29,10 @@
                     <p t-if="o.partner_id.vat">TVA: <span t-field="o.partner_id.vat"/></p>
                 </div>
             </div>
+            <h2 t-if="o.company_id.of_position_header_lines == 'bandeau_totalite'" name="doc_name" style="margin-bottom: 10px">
+                <span>Bon de commande</span>
+                <t t-if="o.name"><span>N°</span><span t-field="o.name"/></t>
+            </h2>
         </xpath>
         <!-- Modifications des cadres références -->
         <xpath expr="//div[@class='row mt32 mb32']" position="replace">
@@ -66,10 +70,10 @@
             </div>
         </xpath>
         <!-- Rendre invisible les titres h2 (CF et CF sans prix) -->
-        <xpath expr="//h2[1]" position="attributes">
+        <xpath expr="//h2[2]" position="attributes">
             <attribute name="style">display: none</attribute>
         </xpath>
-        <xpath expr="//h2[2]" position="attributes">
+        <xpath expr="//h2[3]" position="attributes">
             <attribute name="style">display: none</attribute>
         </xpath>
         <xpath expr="//table[@class='table table-condensed']/thead/tr/th[2]" position="replace">
@@ -103,6 +107,10 @@
                 </div>
             </div>
             <br/>
+            <h2 t-if="o.company_id.of_position_header_lines == 'bandeau_totalite'" name="doc_name" style="margin-bottom: 10px;">
+                <span>Demande de prix</span>
+                <t t-if="o.name"><span>N°</span><span t-field="o.name"/></t>
+            </h2>
         </xpath>
         <!-- Ajout des cadres références -->
         <xpath expr="//h2" position="after">
@@ -140,7 +148,7 @@
             </div>
         </xpath>
         <!-- Rendre invisible les titres h2 -->
-        <xpath expr="//h2" position="attributes">
+        <xpath expr="//h2[2]" position="attributes">
             <attribute name="style">display: none</attribute>
         </xpath>
         <!-- Retrait de dates souhaitées des lignes (info présente au niveau de la commande) -->

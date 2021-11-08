@@ -17,6 +17,7 @@ Extension OpenFire du module stock
     "website": "www.openfire.fr",
     "depends": [
         "stock",
+        "of_external",
     ],
     "data": [
         'data/res_groups.xml',
