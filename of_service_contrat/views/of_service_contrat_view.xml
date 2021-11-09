@@ -6,8 +6,8 @@
         <field name="model">of.service</field>
         <field name="inherit_id" ref="of_service.view_of_service_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='origine']" position="after">
-                <group name="contrat" string="Contrat" colspan="2">
+            <xpath expr="//group[@name='interventions']" position="before">
+                <group name="contrat_pdf" colspan="2" attrs="{'invisible': ['|', ('type_id','not in',[%(of_service.of_service_type_maintenance)d]), ('recurrence', '=', False)]}">
                     <field name="contrat"/>
                     <field name="date_contrat"/>
                 </group>

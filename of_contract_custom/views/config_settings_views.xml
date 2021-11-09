@@ -2,20 +2,17 @@
 <odoo>
 
     <!-- Intervention config wizard -->
-    <record id="view_of_contract_custom_intervention_settings" model="ir.ui.view">
-        <field name="name">view.of.contract.custom.intervention.settings</field>
+    <record id="of_contract_custom_of_intervention_settings_form_view" model="ir.ui.view">
+        <field name="name">of.contract.custom.of.intervention.settings.form.view</field>
         <field name="model">of.intervention.settings</field>
         <field name="inherit_id" ref="of_planning.view_of_intervention_settings"/>
         <field name="arch" type="xml">
             <xpath expr="//group[@name='intervention']" position="after">
                 <group name="contract" string="Contrats">
-                    <!--label for="id" string="Configuration des interventions" style="width: 250px"/-->
-                    <label for="of_contract" string="(OF) Contrats"/>
-                    <div name="of_contract">
-                        <field name="of_contract" class="oe_inline"/>
-                        <span>Activer l'utilisation des contrats</span>
-                        <br/>
-                        <i class="oe_grey">/!\ ce paramètre est partagé entre toutes les sociétés</i>
+                    <label for="group_contract_automatic_sequence"/>
+                    <div name="group_contract_automatic_sequence">
+                        <field name="group_contract_automatic_sequence" class="oe_inline"/>
+                        <span>Permet l'affectaton automatique d'un numéro pour la référence des contrats</span>
                     </div>
                 </group>
             </xpath>

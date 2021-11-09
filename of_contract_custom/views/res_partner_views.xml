@@ -61,24 +61,6 @@
         </field>
     </record>
 
-    <record id="of_contract_service_view_partner_form" model="ir.ui.view">
-        <field name="name">of.contract.custom.service.view.partner.form</field>
-        <field name="model">res.partner</field>
-        <field name="inherit_id" ref="of_service.of_service_view_partner_form"/>
-        <field name="arch" type="xml">
-            <!-- renommer les interventions à programmer -->
-            <xpath expr="//field[@name='a_programmer_count']" position="attributes">
-                <attribute name="string">Demande d'intervention</attribute>
-            </xpath>
-            <!-- supprimer l'accès aux interventions récurrentes -->
-            <xpath expr="//button[@name='action_view_recurrent']" position="replace"/>
-            <!-- renommer l'action "prévoir intervention" -->
-            <xpath expr="//button[@name='action_prevoir_intervention']" position="attributes">
-                <attribute name="string">Demande d'intervention</attribute>
-            </xpath>
-        </field>
-    </record>
-
     <record id="of_contract_custom_base_location_partner_form" model="ir.ui.view">
         <field name="name">of.contract.custom.base.location.partner.form</field>
         <field name="model">res.partner</field>

@@ -18,6 +18,3 @@ access_of_index_line_read,of.index.line,model_of_index_line,group_of_contract_cu
 access_of_index_line_write,of.index.line,model_of_index_line,group_of_contract_custom_modification,1,1,0,0
 access_of_index_line_admin,of.index.line,model_of_index_line,group_of_contract_custom_creation,1,1,1,0
 access_of_contract_recurring_invoicing_payment_user,of.contract.recurring.invoicing.payment,model_of_contract_recurring_invoicing_payment,group_of_contract_custom_lecture,1,0,0,0
-access_of_service_type_user,of.service.type,model_of_service_type,group_of_contract_custom_lecture,1,0,0,0
-access_of_service_line_user,of.service.line,model_of_service_line,base.group_user,1,1,1,1
-access_of_service_stage_user,of.service.stage,model_of_service_stage,group_of_contract_custom_lecture,1,0,0,0
