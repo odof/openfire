@@ -20,9 +20,11 @@ Module de lien entre service, interventions et parc installé
         'of_planning_tournee',
         'of_account',
     ],
-    'data' : [
+    'data': [
+        'data/of_service_parc_installe_data.xml',
         'report/of_service_parc_installe_fiche_intervention.xml',
         'report/of_planning_rapport_intervention.xml',
+        'report/of_service_parc_installe_demande_intervention_templates.xml',
         'views/of_service_parc_installe_view.xml',
         'views/of_planning_intervention_template_views.xml',
         'wizard/of_wizard_invoice_to_parc_installe_view.xml'

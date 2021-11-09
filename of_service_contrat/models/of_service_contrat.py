@@ -12,5 +12,5 @@ class OfMailTemplate(models.Model):
 class OFService(models.Model):
     _inherit = "of.service"
 
-    contrat = fields.Many2one('of.mail.template', string='Contrat', domain="[('type', '=', 'contrat')]")
+    contrat = fields.Many2one('of.mail.template', string='Contrat PDF', domain="[('type', '=', 'contrat')]")
     date_contrat = fields.Date(string="Date du contrat")
