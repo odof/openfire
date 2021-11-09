@@ -22,6 +22,7 @@ class OfContractRecurringInvoicingPayment(models.Model):
             del vals['code']
         return super(OfContractRecurringInvoicingPayment, self).write(vals)
 
+
 class OfContract(models.Model):
     _name = "of.contract"
     _inherit = ['mail.thread', 'of.form.readonly']
@@ -44,15 +45,6 @@ class OfContract(models.Model):
             self.env['ir.values'].sudo().set_default(
                 'of.intervention.settings', 'of_contract', True)
         return res
-
-    @api.model
-    def _init_number(self):
-        """
-        Màj T2427 : ajout du champ number dans les DI, initialisation du champ.
-        """
-        contract_obj = self.with_context(active_test=False)
-        contracts = contract_obj.search([('number', '=', False)])
-        contracts._affect_number()
 
     active = fields.Boolean(default=True)
     invoice_ids = fields.One2many(comodel_name='account.invoice', inverse_name='of_contract_id', string="Factures")
@@ -138,7 +130,9 @@ class OfContract(models.Model):
     payment_term_id = fields.Many2one('account.payment.term', string=u'Conditions de règlement')
     date_indexed = fields.Date(string=u"Dernière indexation", compute="_compute_date_indexed", store=True)
     validated = fields.Boolean(string=u"Au moins une ligne validée", compute='_compute_validated')
-    number = fields.Char(string=u"Séquence", copy=False)
+    automatic_sequence = fields.Boolean(
+        string=u"Séquence automatique", compute='_compute_automatic_sequence',
+        default=lambda c: c._default_automatic_sequence())
 
     @api.model
     def _default_journal(self):
@@ -148,6 +142,10 @@ class OfContract(models.Model):
             ('type', '=', 'sale'),
             ('company_id', '=', company_id)]
         return self.env['account.journal'].search(domain, limit=1)
+
+    @api.model
+    def _default_automatic_sequence(self):
+        return self.env.user.has_group('of_contract_custom.group_contract_automatic_sequence')
 
     @api.depends('reference', 'partner_id')
     def _compute_name(self):
@@ -250,7 +248,7 @@ class OfContract(models.Model):
 
     @api.depends('line_ids', 'line_ids.service_ids')
     def _compute_service_ids(self):
-        """ Récupération des demandes d'interventions liées aux différentes lignes de contrat """
+        """ Récupération des demandes d'intervention liées aux différentes lignes de contrat """
         for contract in self:
             contract.service_ids = contract.line_ids.mapped('service_ids')
 
@@ -272,6 +270,14 @@ class OfContract(models.Model):
     def _compute_validated(self):
         for contract in self:
             contract.validated = bool(contract.line_ids.filtered(lambda l: l.state == 'validated'))
+
+    def _compute_automatic_sequence(self):
+        has_group = self.env.user.has_group('of_contract_custom.group_contract_automatic_sequence')
+        for contract in self:
+            if has_group:
+                contract.automatic_sequence = True
+            else:
+                contract.automatic_sequence = False
 
     @api.onchange('renewal')
     def _onchange_renewal(self):
@@ -318,14 +324,16 @@ class OfContract(models.Model):
 
     @api.model
     def create(self, vals):
-        """ Générer les périodes lors de la création """
+        if self.env.user.has_group('of_contract_custom.group_contract_automatic_sequence'):
+            sequence = self.env.ref('of_contract_custom.of_contract_custom_seq')
+            vals['reference'] = sequence.next_by_id()
         res = super(OfContract, self).create(vals)
         if res.account_analytic_id:
             product_lines = res.line_ids.mapped('contract_product_ids')\
                 .filtered(lambda p: not p.account_analytic_id)
             product_lines.write({'account_analytic_id': res.account_analytic_id.id})
+        # Générer les périodes lors de la création
         res._generate_periods()
-        res._affect_number()
         return res
 
     @api.multi
@@ -342,7 +350,6 @@ class OfContract(models.Model):
             for contract in self:
                 contract.period_ids.unlink()
                 contract._generate_periods()
-        self._affect_number()
         return res
 
     @api.multi
@@ -386,7 +393,7 @@ class OfContract(models.Model):
 
     @api.multi
     def action_view_intervention(self):
-        action = self.env.ref('of_contract_custom.of_contract_custom_open_interventions').read()[0]
+        action = self.env.ref('of_planning.of_planning_intervention_open_interventions').read()[0]
         interventions = self.line_ids.mapped('intervention_ids')
         action['domain'] = [('id', 'in', interventions._ids)]
         if len(self) == 1:
@@ -396,7 +403,7 @@ class OfContract(models.Model):
     @api.multi
     def action_view_services(self):
         self.ensure_one()
-        action = self.env.ref('of_contract_custom.action_of_contract_service_form_planning').read()[0]
+        action = self.env.ref('of_service.action_of_service_prog_form_planning').read()[0]
         action['context'] = {
             'search_default_filter_ponc'  : 1,
             'search_default_contract_id'  : self.id,
@@ -693,14 +700,6 @@ class OfContract(models.Model):
                       u"et n'ont donc pas été renouvelés :\n%s" % '\n'.join(c.name for c in automatic_renewal)
             return self.env['of.popup.wizard'].popup_return(message=message)
         return {'type': 'ir.actions.do_nothing'}
-
-    @api.multi
-    def _affect_number(self):
-        """ Affectation du code de ligne """
-        sequence = self.env.ref('of_contract_custom.of_contract_custom_seq')
-        for contract in self:
-            if contract.line_ids.filtered(lambda l: l.state == 'validated') and not contract.number:
-                contract.with_context(no_verification=True).write({'number': sequence.next_by_id()})
 
 
 class OfContractLine(models.Model):
@@ -1084,7 +1083,7 @@ class OfContractLine(models.Model):
 
     @api.depends('service_ids')
     def _compute_service_count(self):
-        """ Calcul du nombre de demandes d'interventions """
+        """ Calcul du nombre de demandes d'intervention """
         for line in self:
             line.service_count = len(line.service_ids)
 
@@ -1200,7 +1199,6 @@ class OfContractLine(models.Model):
         """ Affectation du numéro si création à l'état 'validated' """
         res = super(OfContractLine, self).create(vals)
         res._affect_number()
-        res.contract_id._affect_number()
         return res
 
     @api.multi
@@ -1221,7 +1219,6 @@ class OfContractLine(models.Model):
                 if line.address_id.of_prestataire_id and line.address_id.of_prestataire_id.id != supplier_id \
                    or not line.address_id.of_prestataire_id:
                     line.address_id.write({'of_prestataire_id': supplier_id})
-        self.mapped('contract_id')._affect_number()
         return res
 
     @api.multi
@@ -1333,7 +1330,7 @@ class OfContractLine(models.Model):
     @api.multi
     def action_view_services(self):
         self.ensure_one()
-        action = self.env.ref('of_contract_custom.action_of_contract_service_form_planning').read()[0]
+        action = self.env.ref('of_service.action_of_service_prog_form_planning').read()[0]
         action['context'] = {
             'search_default_filter_ponc': 1,
             'search_default_contract_line_id': self.id,
@@ -1357,7 +1354,7 @@ class OfContractLine(models.Model):
 
     @api.multi
     def action_view_intervention(self):
-        action = self.env.ref('of_contract_custom.of_contract_custom_open_interventions').read()[0]
+        action = self.env.ref('of_planning.action_of_planning_intervention_form').read()[0]
         action['context'] = {'search_default_contract_line_id': self.id}
         return action
 

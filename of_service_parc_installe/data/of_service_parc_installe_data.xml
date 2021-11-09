@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <data noupdate="1">
+
+        <record id="of_service_type_sav" model="of.service.type">
+            <field name="name">SAV</field>
+        </record>
+
+        <record id="of_service.of_service_kanban_new" model="of.service.stage">
+            <field name="type_ids" eval="[(4, ref('of_service_parc_installe.of_service_type_sav'))]"/>
+        </record>
+
+        <record id="of_service.of_service_kanban_quote" model="of.service.stage">
+            <field name="type_ids" eval="[(4, ref('of_service_parc_installe.of_service_type_sav'))]"/>
+        </record>
+
+        <record id="of_service.of_service_kanban_sale" model="of.service.stage">
+            <field name="type_ids" eval="[(4, ref('of_service_parc_installe.of_service_type_sav'))]"/>
+        </record>
+
+        <record id="of_service.of_service_kanban_toplan" model="of.service.stage">
+            <field name="type_ids" eval="[(4, ref('of_service_parc_installe.of_service_type_sav'))]"/>
+        </record>
+
+        <record id="of_service.of_service_kanban_planned" model="of.service.stage">
+            <field name="type_ids" eval="[(4, ref('of_service_parc_installe.of_service_type_sav'))]"/>
+        </record>
+
+        <record id="of_service.of_service_kanban_toinvoice" model="of.service.stage">
+            <field name="type_ids" eval="[(4, ref('of_service_parc_installe.of_service_type_sav'))]"/>
+        </record>
+
+        <record id="of_service.of_service_kanban_closed" model="of.service.stage">
+            <field name="type_ids" eval="[(4, ref('of_service_parc_installe.of_service_type_sav'))]"/>
+        </record>
+
+        <record id="of_service.of_service_kanban_cancelled" model="of.service.stage">
+            <field name="type_ids" eval="[(4, ref('of_service_parc_installe.of_service_type_sav'))]"/>
+        </record>
+
+    </data>
+
+</odoo>

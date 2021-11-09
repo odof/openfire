@@ -22,7 +22,9 @@
         model="of.planning.intervention"
         report_type="qweb-pdf"
         name="of_planning.of_planning_fiche_intervention_report_template"
-        paperformat="paperformat_euro_portrait_custom">
+        paperformat="paperformat_euro_portrait_custom"
+        attachment_use="True"
+        attachment="(object.state in ('confirm','done')) and ('RDV '+(object.number or object.name or '').replace('/','')+'.pdf')">
     </report>
 
     <!-- Action imprimer dans les devis/commandes -->

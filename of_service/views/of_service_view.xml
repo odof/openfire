@@ -21,10 +21,23 @@
                             attrs="{'invisible': [('base_state', '!=', 'calculated')]}"/>
                     <button name="button_brouillon" string="Remettre en brouillon" states="cancel" type="object"/>
                     <button name="action_service_send" string="Envoyer par email" type="object"/>
+                    <field name="kanban_step_id" widget="statusbar" clickable="True" options="{'fold_field': 'fold'}"/>
                 </header>
                 <sheet>
                     <field name="alert_dates" invisible="1"/>
                     <div class="oe_button_box" name="button_box">
+                        <button name="action_view_saleorder"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-usd">
+                            <field name="saleorder_count" widget="statinfo" string="Ventes"/>
+                        </button>
+                        <button name="action_view_sale_invoice"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-usd">
+                            <field name="sale_invoice_count" widget="statinfo" string="Factures client"/>
+                        </button>
                         <button class="oe_stat_button" name="action_view_intervention" type="object" icon="fa-calendar">
                             <field string="RDVs Tech" name="intervention_count" widget="statinfo"/>
                         </button>
@@ -36,147 +49,186 @@
                         </button>
                     </div>
                     <div class="of_title">
-                        <h1 attrs="{'invisible': [('recurrence', '=', False)]}"><b>
-                            <span>Intervention récurrente</span>
-                            <i> (<field name="state" nolabel="1" attrs="{'invisible': [('recurrence', '!=', True)]}"
-                                       class="oe_inline"/>)</i>
-                        </b></h1>
-                        <h1 attrs="{'invisible': [('recurrence', '=', True)]}"><b>
-                            <span>Intervention ponctuelle</span>
-                            <i> (<field name="state_ponc" nolabel="1" attrs="{'invisible': [('recurrence', '=', True)]}"
-                                       class="oe_inline"/>)</i>
+                        <h1><b>
+                            <field name="priority" class="oe_inline of_ws" widget="priority" nolabel="1"/>
+                            <span class="of_ws" attrs="{'invisible': [('number', '!=', False)]}">
+                                Demande d'intervention
+                            </span>
+                            <field name="number" readonly="1" class="oe_inline of_ws"/>
+                            <span attrs="{'invisible': [('titre', '=', False)]}" class="of_ws">-</span>
+                            <field name="titre" class="oe_inline" placeholder="Titre de la demande..."/>
                         </b></h1>
                     </div>
-                    <group>
-                        <group name="gauche_1">
-                            <group colspan="2" name="refs" string="Références">
-                                <field name="base_state" invisible="1"/>
-                                <field name="partner_id" invisible="context.get('hide_service_partner_id')"/>
-                                <label for="address_id" invisible="context.get('hide_service_address_id')"/>
-                                <div class="o_address_format" invisible="context.get('hide_service_address_id')">
-                                    <div><field name="address_id"/></div>
-                                    <field name="address_street"/>
-                                    <span attrs="{'invisible': ['|', ('address_street', '=', False), ('address_street2', '=', False)]}"> - </span>
-                                    <field name="address_street2"/><br/>
-                                    <field name="address_zip"/>
-                                    <span attrs="{'invisible': ['|', ('address_zip', '=', False), ('address_city', '=', False)]}"> - </span>
-                                    <field name="address_city"/><br/>
-                                    <field name="address_mobile"/>
-                                    <span attrs="{'invisible': ['|', ('address_mobile', '=', False), ('address_phone', '=', False)]}"> - </span>
-                                    <field name="address_phone"/>
-                                </div>
-                                <field name="secteur_tech_id"/>
-                                <field name="tag_ids" widget="many2many_tags"/>
+                    <group col="4">
+                        <field name="state" invisible="1"/>
+                        <field name="base_state" invisible="1"/>
+                        <group col="2" colspan="2">
+                            <field name="type_id" />
+                            <field name="template_id" context="{'type_prio_id': type_id}"
+                                   attrs="{'readonly': [('number', '!=', False), ('base_state', 'not in', ('draft', 'cancel'))]}"/>
+                            <field name="order_id" attrs="{'invisible': [('type_id','not in', [%(of_service.of_service_type_installation)d, %(of_service.of_service_type_maintenance)d])]}"/>
+                            <field name="recurrence" attrs="{'invisible': [('type_id','not in',[%(of_service.of_service_type_maintenance)d])]}"/>
+                        </group>
+                        <group col="2" colspan="2">
+                            <field name="user_id"/>
+                            <field name="tag_ids" widget="many2many_tags"/>
+                        </group>
+                        <group name="who" col="2" colspan="2" string="Qui" class="of_grey_background">
+                            <group colspan="2">
+                                <field name="employee_ids" widget="many2many_tags"/>
                                 <field name="company_id"/>
                             </group>
-                            <group colspan="2" name="origine" string="Origine">
-                                <field name="order_id"
-                                   groups="sales_team.group_sale_salesman,
-                                           account.group_account_invoice,
-                                           stock.group_stock_user"/>
-                                <field name="origin" readonly="1" attrs="{'invisible': [('recurrence', '=', True)]}"/>
+                        </group>
+                        <group name="where" col="2" colspan="2" string="Où" class="of_grey_background">
+                            <group colspan="2">
+                                <field name="partner_id"/>
+                                <field name="partner_tag_ids" widget="many2many_tags"/>
+                                <label for="address_id" string="Adresse d'intervention"/>
+                                <div class="o_address_format">
+                                    <div><field name="address_id"/></div>
+                                    <field name="address_street" class="o_address_street"/>
+                                    <field name="address_street2" class="o_address_street"/>
+                                    <field name="address_zip" class="o_address_zip of_ws"/>
+                                    <field name="address_city" class="o_address_city"/>
+                                    <div attrs="{'invisible': [('address_phone', '=', False)]}">
+                                        <i class="fa fa-phone of_ws"/>
+                                        <field name="address_phone"/>
+                                    </div>
+                                    <div attrs="{'invisible': [('address_mobile', '=', False)]}">
+                                        <i class="fa fa-phone of_ws"/>
+                                        <field name="address_mobile"/>
+                                    </div>
+                                </div>
+                                <field name="secteur_tech_id"/>
                             </group>
                         </group>
-                        <group name="droite_1">
-                            <group colspan="2" name="planif" string="Planification">
-                                <div colspan="2" attrs="{'invisible': [('base_state', '!=', 'draft')]}">
-                                    <b><i class="of_red">
-                                        <i class="fa fa-lg fa-warning"/>
-                                        Vous ne pourrez planifier cette intervention que lorsqu’elle sera validée.
-                                    </i></b>
+                        <group name="what" col="2" colspan="2" string="Quoi" class="of_grey_background">
+                            <group colspan="2">
+                                <field name="tache_id"/>
+                                <label for="duree" string="Durées"/>
+                                <div>
+                                    <field name="duree" widget="float_time" nolabel="1" class="oe_inline" attrs="{'invisible': [('state', '=', 'done')]}"/>
+                                    <i class="oe_grey oe_inline" attrs="{'invisible': [('state', '=', 'done')]}"> estimée, dont </i>
+                                    <field name="duree_planif" widget="float_time" nolabel="1" class="oe_inline" attrs="{'invisible': [('state', '=', 'done')]}"/>
+                                    <i class="oe_grey oe_inline" attrs="{'invisible': [('state', '=', 'done')]}"> planifiée et </i>
+                                    <field name="duree_restante" widget="float_time" nolabel="1" class="oe_inline" attrs="{'invisible': [('state', '=', 'done')]}"/>
+                                    <i class="oe_grey oe_inline" attrs="{'invisible': [('state', '=', 'done')]}"> restante</i>
+                                    <i class="oe_grey oe_inline" attrs="{'invisible': [('state', '!=', 'done')]}">
+                                        Cette intervention est terminée
+                                    </i>
                                 </div>
-                                <div colspan="2" attrs="{'invisible': [('base_state', '!=', 'cancel')]}">
-                                    <b><i class="of_red">
-                                        <i class="fa fa-lg fa-warning"/> Une intervention annulée n'est pas planifiable.
-                                    </i></b>
-                                </div>
-                                <group colspan="2">
-                                    <field name="date_last" invisible="1"/>
-                                    <field name="tache_id" context="{'show_rec_icon_first': recurrence}"/>
-                                    <label for="duree" string="Durées"/>
-                                    <div>
-                                        <field name="duree" widget="float_time" nolabel="1" class="oe_inline"
-                                               attrs="{'invisible': [('state', '=', 'done')]}"/>
-                                        <i class="oe_grey oe_inline"
-                                            attrs="{'invisible': [('state', '=', 'done')]}"> (estimée), </i>
-                                        <field name="duree_planif" widget="float_time" nolabel="1" class="oe_inline"
-                                            attrs="{'invisible': [('state', '=', 'done')]}"/>
-                                        <i class="oe_grey oe_inline"
-                                            attrs="{'invisible': [('state', '=', 'done')]}"> (planifiée), </i>
-                                        <field name="duree_restante" widget="float_time" nolabel="1" class="oe_inline"
-                                            attrs="{'invisible': [('state', '=', 'done')]}"/>
-                                        <i class="oe_grey oe_inline"
-                                            attrs="{'invisible': [('state', '=', 'done')]}"> (restante).</i>
-                                        <i class="oe_grey oe_inline" attrs="{'invisible': [('state', '!=', 'done')]}">
-                                            Cette intervention est terminée
-                                        </i>
-                                    </div>
-
-                                    <label for="date_next" string="Dates"/>
-                                    <div name="dates">
-                                        <i class="oe_grey oe_inline">Entre le </i>
-                                        <field name="date_next" nolabel="1" class="oe_inline"/>
-                                        <i class="oe_grey oe_inline"> et le </i>
-                                        <field name="date_fin" nolabel="1" class="oe_inline"/>
-                                        <span attrs="{'invisible': [('recurrence', '=', False)]}">
-                                            <i class="oe_grey oe_inline">. Expire le </i>
-                                            <field name="date_fin_contrat" nolabel="1" class="oe_inline"/>
-                                            <i class="oe_grey oe_inline"> .</i>
-                                        </span>
-                                        <div attrs="{'invisible': [('alert_dates', '=', False)]}" class="of_red">
-                                            <i class="fa fa-warning of_ws"/>Incohérence dans les dates
-                                        </div>
-                                    </div>
-                                    <div colspan="2"
-                                         attrs="{'invisible': ['|',
-                                                                ('date_next', '&lt;=', '_field_date_fin_contrat'),
-                                                                ('date_fin_contrat', '=', False)]}">
-                                        <b><i class="oe_grey">
-                                            La date de prochaine planification est postérieure à la date de fin
-                                            du contrat.<br/>
-                                            Cela signifie que cette intervention est terminée et ne sera plus jamais
-                                            sélectionnée par les outils de planification.<br/>
-                                            Veuillez changer les dates si ce n'est pas ce que vous vouliez faire
-                                        </i></b>
-                                    </div>
-                                    <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
-                                    <field name="recurrence"/>
-                                    <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('recurrence', '=', False)]}"/>
-                                    <label for="recurring_interval" attrs="{'invisible': [('recurrence', '=', False)]}"/>
-                                    <div attrs="{'invisible': [('recurrence', '=', False)]}" col="2">
-                                        <field name="recurring_interval" nolabel="1" class="oe_inline of_ws"/>
-                                        <field name="recurring_rule_type" nolabel="1" class="oe_inline"/>
-                                    </div>
-                                    <field name="recurrence_tache" invisible="1"/>
-                                    <div colspan="2" attrs="{'invisible': [
-                                        '|',
-                                            ('recurrence', '=', '_field_recurrence_tache'),
-                                            ('recurrence', '=', False)]}">
-                                        <b><i class="oe_grey">
-                                            La tâche de cette intervention est ponctuelle alors que cette intervention est récurrente.
-                                        </i></b>
-                                    </div>
-                                    <div colspan="2" attrs="{'invisible': [
-                                        '|',
-                                            ('recurrence', '=', '_field_recurrence_tache'),
-                                            ('recurrence', '=', True)]}">
-                                        <b><i class="oe_grey">
-                                            La tâche de cette intervention est récurrente alors que cette intervention est ponctuelle.
-                                        </i></b>
-                                    </div>
-                                </group>
                             </group>
-                            <group colspan="2" name="notes" string="Description">
-                                <field name="note" colspan="2" nolabel="1"/>
+                        </group>
+                        <group name="when" col="2" colspan="2" string="Quand" class="of_grey_background">
+                            <group colspan="2">
+                                <field name="date_next" string="Entre le"/>
+                                <field name="date_fin" string="et le"/>
+                                <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('recurrence', '=', False)]}"/>
+                                <label for="recurring_interval" attrs="{'invisible': [('recurrence', '=', False)]}"/>
+                                <div attrs="{'invisible': [('recurrence', '=', False)]}" col="2">
+                                    <field name="recurring_interval" nolabel="1" class="oe_inline of_ws"/>
+                                    <field name="recurring_rule_type" nolabel="1" class="oe_inline"/>
+                                </div>
+                                <field name="recurrence_tache" invisible="1"/>
                             </group>
                         </group>
                     </group>
+                    <notebook>
+                        <page name="description" string="Description">
+                            <group>
+                                <field name="note" nolabel="1"/>
+                            </group>
+                        </page>
+                        <page name="historique" string="Historique">
+                            <group name="interventions" string="Interventions">
+                                <field colspan="4" mode="tree" name="historique_interv_ids" nolabel="1"
+                                       widget="one2many_list">
+                                    <tree string="Interventions">
+                                        <field name="employee_ids" widget="many2many_tags"/>
+                                        <field name="type_id"/>
+                                        <field name="tache_id"/>
+                                        <field name="date" string="Date"/>
+                                        <field name="duree" string="Durée"/>
+                                        <field name="date_deadline" string="Date fin"/>
+                                        <field name="state"/>
+                                        <field name="name"/>
+                                        <field name="cleantext_description" string="Description"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                        <page name="facturation" string="Facturation">
+                            <field name="currency_id" invisible="1"/>
+                            <group>
+                                <group>
+                                    <field name="fiscal_position_id" options="{'no_create': True, 'no_open': True}"/>
+                                </group>
+                            </group>
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="name"/>
+                                    <field name="qty"/>
+                                    <field name="price_unit"/>
+                                    <field name="taxe_ids" widget="many2many_tags"/>
+                                    <field name="price_subtotal" readonly="1"/>
+                                    <field name="price_total" readonly="1"/>
+                                    <field name="sol_number"/>
+                                </tree>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right" colspan="2" name="intervention_total">
+                                <field name="price_subtotal" widget="monetary"
+                                       options="{'currency_field': 'currency_id'}"/>
+                                <field name="price_tax" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                                    <label for="price_total"/>
+                                </div>
+                                <field name="price_total" nolabel="1" class="oe_subtotal_footer_separator"
+                                       widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers"/>
                     <field name="message_ids" widget="mail_thread"/>
                 </div>
             </form>
+        </field>
+    </record>
+
+    <record id="of_service_kanban_view" model="ir.ui.view">
+        <field name="name">of.service.kanban.view</field>
+        <field name="model">of.service</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column" default_group_by="kanban_step_id">
+                <field name="type_id"/>
+                <field name="kanban_step_id"/>
+                <field name="date_next"/>
+                <field name="date_fin"/>
+                <field name="partner_id"/>
+                <field name="address_id"/>
+                <field name="address_address"/>
+                <field name="spec_date"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div>
+                                    <field name="tag_ids"/>
+                                </div>
+                                <strong class="oe_partner_heading"><field name="address_id"/> - <field name="type_id"/></strong>
+                                <ul>
+                                    <li t-if="record.address_address.raw_value"><field name="address_address"/></li>
+                                    <br/>
+                                    <li t-if="record.spec_date.raw_value"><field name="spec_date"/></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
         </field>
     </record>
 
@@ -267,19 +319,18 @@
         <field name="arch" type="xml">
             <tree colors="grey:active==False;red:color=='red';orange:color=='orange';gray:color=='gray';blue:color=='blue'">
                 <field name="color" invisible="1"/>
+                <field name="active" invisible="1"/>
                 <field name="partner_id"/>
                 <field name="address_zip"/>
                 <field name="address_city"/>
                 <field name="tache_id"/>
-                <field name="mois_ids"/>
-                <field name="jour_ids"/>
-                <field name="note"/>
-                <field name="date_last"/>
-                <field name="date_next"/>
-                <field name="date_fin_contrat" string="Fin du contrat"/>
-                <field name="active" invisible="1"/>
-                <field name="tag_ids" widget="many2many_tags"/>
                 <field name="recurrence"/>
+                <field name="date_next" string="À partir du"/>
+                <field name="date_fin" string="Au plus tard le"/>
+                <field name="date_last"/>
+                <field name="date_fin_contrat" string="Fin du contrat"/>
+                <field name="note"/>
+                <field name="tag_ids" widget="many2many_tags"/>
                 <field name="state"/>
             </tree>
         </field>
@@ -291,8 +342,15 @@
         <field name="type">search</field>
         <field name="arch" type="xml">
             <search>
-                <filter string="Récurrent" name="filter_rec" domain="[('recurrence', '=', True)]"/>
-                <filter string="Ponctuel" name="filter_ponc" domain="[('recurrence', '=', False)]"/>
+                <filter string="Récurrente" name="filter_rec" domain="[('recurrence', '=', True)]"/>
+                <filter string="Ponctuelle" name="filter_ponc" domain="[('recurrence', '=', False)]"/>
+                <separator/>
+                <filter string="Entretien" name="filter_entretien"
+                        domain="[('type_id', '=', %(of_service.of_service_type_maintenance)d)]"/>
+                <filter string="Installation" name="filter_installation"
+                        domain="[('type_id', '=', %(of_service.of_service_type_installation)d)]"/>
+                <filter string="Visite technique" name="filter_vt"
+                        domain="[('type_id', '=', %(of_service.of_service_type_technical)d)]"/>
                 <separator/>
                 <filter string="Brouillon" name="filter_draft" domain="[('state', '=', 'draft')]"/>
 
@@ -381,29 +439,6 @@
         </field>
     </record>
 
-    <!-- ### Services ponctuels  invisible="1"-->
-
-    <record id="view_of_service_ponc_tree" model="ir.ui.view">
-        <field name="name">of.service.tree</field>
-        <field name="model">of.service</field>
-        <field name="arch" type="xml">
-            <tree colors="grey:active==False;red:color=='red';orange:color=='orange';gray:color=='gray';blue:color=='blue'">
-                <field name="color" invisible="1"/>
-                <field name="partner_id"/>
-                <field name="address_zip"/>
-                <field name="address_city"/>
-                <field name="tache_id"/>
-                <field name="date_next" string="À partir du"/>
-                <field name="date_fin" string="Au plus tard le"/>
-                <field name="jour_ids"/>
-                <field name="note"/>
-                <field name="active" invisible="1"/>
-                <field name="recurrence"/>
-                <field name="state"/>
-            </tree>
-        </field>
-    </record>
-
     <record id="of_service_pivot" model="ir.ui.view">
         <field name="name">of.service.pivot</field>
         <field name="model">of.service</field>
@@ -418,121 +453,41 @@
     <!--#################################################________Actions_________#################################################-->
     <!--##########################################################################################################################-->
 
-    <!-- ### Services récurrents depuis planning -->
-    <record id="action_of_service_rec_form_planning" model="ir.actions.act_window">
-        <field name="name">Interventions récurrentes</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">of.service</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">tree,map,form,pivot</field>
-        <field name="search_view_id" ref="view_of_service_filter"/>
-        <field name="context">{
-            'search_default_filter_rec': 1,
-            'default_recurrence': True,
-        }</field>
-    </record>
-
-    <record id="action_service_rec_tree_view_planning" model="ir.actions.act_window.view">
-        <field eval="0" name="sequence"/>
-        <field name="view_mode">tree</field>
-        <field name="view_id" ref="view_of_service_rec_tree"/>
-        <field name="act_window_id" ref="action_of_service_rec_form_planning"/>
-    </record>
-
-    <record id="action_service_rec_map_view_planning" model="ir.actions.act_window.view">
-        <field eval="1" name="sequence"/>
-        <field name="view_mode">map</field>
-        <field name="view_id" ref="of_service_map_view"/>
-        <field name="act_window_id" ref="action_of_service_rec_form_planning"/>
-    </record>
-
-    <record id="action_service_rec_form_view_planning" model="ir.actions.act_window.view">
-        <field name="sequence" eval="2"/>
-        <field name="view_mode">form</field>
-        <field name="view_id" ref="view_of_service_form"/>
-        <field name="act_window_id" ref="action_of_service_rec_form_planning"/>
-    </record>
-
-    <!-- ### Services ponctuels depuis planning -->
-    <record id="action_of_service_ponc_form_planning" model="ir.actions.act_window">
-        <field name="name">Interventions ponctuelles</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">of.service</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">tree,map,form,pivot</field>
-        <field name="search_view_id" ref="view_of_service_filter"/>
-        <field name="context">{
-            'search_default_filter_ponc': 1,
-            'default_recurrence': False,
-        }</field>
-    </record>
-
-    <record id="action_service_ponc_tree_view_planning" model="ir.actions.act_window.view">
-        <field eval="0" name="sequence"/>
-        <field name="view_mode">tree</field>
-        <field name="view_id" ref="view_of_service_ponc_tree"/>
-        <field name="act_window_id" ref="action_of_service_ponc_form_planning"/>
-    </record>
-
-    <record id="action_service_ponc_map_view_planning" model="ir.actions.act_window.view">
-        <field eval="1" name="sequence"/>
-        <field name="view_mode">map</field>
-        <field name="view_id" ref="of_service_map_view"/>
-        <field name="act_window_id" ref="action_of_service_ponc_form_planning"/>
-    </record>
-
-    <record id="action_service_ponc_form_view_planning" model="ir.actions.act_window.view">
-        <field name="sequence" eval="2"/>
-        <field name="view_mode">form</field>
-        <field name="view_id" ref="view_of_service_form"/>
-        <field name="act_window_id" ref="action_of_service_ponc_form_planning"/>
-    </record>
-
-    <!-- ### Services à programmer depuis planning -->
     <record id="action_of_service_prog_form_planning" model="ir.actions.act_window">
-        <field name="name">Interventions à programmer</field>
+        <field name="name">Demandes d'intervention</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">of.service</field>
         <field name="view_type">form</field>
-        <field name="view_mode">tree,map,form,pivot</field>
+        <field name="view_mode">tree,kanban,map,form,pivot</field>
         <field name="search_view_id" ref="view_of_service_filter"/>
         <field name="context">{
             'search_default_this_week': 1,
             'search_default_next_week': 1,
             'search_default_filter_late': 1,
             'search_default_filter_plan': 1,
-            'default_recurrence': False,
         }</field>
     </record>
 
-    <record id="action_service_prog_tree_view_planning" model="ir.actions.act_window.view">
-        <field eval="0" name="sequence"/>
-        <field name="view_mode">tree</field>
-        <field name="view_id" ref="view_of_service_ponc_tree"/>
-        <field name="act_window_id" ref="action_of_service_prog_form_planning"/>
+    <!-- Générer devis depuis DI -->
+    <record id="action_make_sale_order" model="ir.actions.server">
+        <field name="name">Générer devis client</field>
+        <field name="model_id" ref="of_service.model_of_service"/>
+        <field name="state">code</field>
+        <field name="code">action = obj.make_sale_order()</field>
     </record>
-
-    <record id="action_service_prog_map_view_planning" model="ir.actions.act_window.view">
-        <field eval="1" name="sequence"/>
-        <field name="view_mode">map</field>
-        <field name="view_id" ref="of_service_map_view"/>
-        <field name="act_window_id" ref="action_of_service_prog_form_planning"/>
-    </record>
-
-    <record id="action_service_prog_form_view_planning" model="ir.actions.act_window.view">
-        <field name="sequence" eval="2"/>
-        <field name="view_mode">form</field>
-        <field name="view_id" ref="view_of_service_form"/>
-        <field name="act_window_id" ref="action_of_service_prog_form_planning"/>
+    <record id="value_make_sale_order" model="ir.values">
+        <field name="name">Générer devis client</field>
+        <field name="key2">client_action_multi</field>
+        <field name="model">of.service</field>
+        <field name="value" eval="'ir.actions.server,%d'%action_make_sale_order"/>
     </record>
 
     <!--##########################################################################################################################-->
     <!--#################################################_________Menus__________#################################################-->
     <!--##########################################################################################################################-->
 
-    <menuitem id="menu_of_planning_service_prog" name="Interventions à programmer" parent="of_planning.menu_of_planning_intervention" sequence="5" action="action_of_service_prog_form_planning"/>
-    <menuitem id="menu_of_planning_service_rec" name="Interventions récurrentes" parent="of_planning.menu_of_planning_intervention" sequence="6" action="action_of_service_rec_form_planning"/>
-    <menuitem id="menu_of_planning_service_ponc" name="Interventions ponctuelles" parent="of_planning.menu_of_planning_intervention" sequence="7" action="action_of_service_ponc_form_planning"/>
+    <menuitem id="menu_of_planning_service_prog" name="Demandes d'intervention" parent="of_planning.menu_of_planning_intervention"
+              sequence="5" action="action_of_service_prog_form_planning"/>
 
     <!--##########################################################################################################################-->
     <!--##################################################_______Taches_______####################################################-->
@@ -545,7 +500,7 @@
         <field name="arch" type="xml" >
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button class="oe_stat_button" type="action"
-                    name="%(action_of_service_rec_form_planning)d"
+                    name="%(action_of_service_prog_form_planning)d"
                     icon="fa-home"
                     context="{'search_default_tache_id': active_id}">
                     <field string="Interventions" name="service_count" widget="statinfo"/>
@@ -641,6 +596,23 @@
                 'default_tache_id': tache_id,
                 }"/>
             </xpath>
+            <xpath expr="//field[@name='template_id']" position="attributes">
+                <attribute name="context">{'type_prio_id': type_id}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='tache_id']" position="before">
+                <field name="type_id" attrs="{'readonly': [('service_id', '!=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_service_of_planning_intervention_template_form_view" model="ir.ui.view">
+        <field name="name">of.service.of.planning.intervention.template.form.view</field>
+        <field name="model">of.planning.intervention.template</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_template_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tache_id']" position="before">
+                <field name="type_id" options="{'no_open':True, 'no_create': True}"/>
+            </xpath>
         </field>
     </record>
 
@@ -656,18 +628,18 @@
         <field name="view_type">form</field>
     </record>
 
-    <!-- Vue formulaire devis/commande :  ajout bouton "prévoir intervention"-->
+    <!-- Vue formulaire devis/commande :  ajout bouton "Demande d'intervention"-->
     <record id="sale_order_form_quote" model="ir.ui.view">
         <field name="name">sale.order.form.payment</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="action_prevoir_intervention" string="Prévoir Intervention" type="object"/>
+                <button name="action_prevoir_intervention" string="Demande d'intervention" type="object"/>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button class="oe_stat_button" name="action_view_a_programmer" type="object" icon="fa-wrench">
-                    <field string="À programmer" name="of_service_count" widget="statinfo"/>
+                    <field string="Demande d'intervention" name="of_service_count" widget="statinfo"/>
                 </button>
             </xpath>
         </field>
@@ -684,16 +656,16 @@
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="action_prevoir_intervention" string="Prévoir Intervention" type="object"/>
+                <button name="action_prevoir_intervention" string="Demande d'intervention" type="object"/>
             </xpath>
             <xpath expr="//form//div[@name='button_box']" position="inside">
                 <button class="oe_stat_button" name="action_view_recurrent" type="object" icon="fa-wrench"
                   groups="of_planning.of_group_planning_intervention_lecture_tout">
-                    <field string="Récurrents" name="recurrent_count" widget="statinfo"/>
+                    <field string="DI récurrentes" name="recurrent_count" widget="statinfo"/>
                 </button>
                 <button class="oe_stat_button" name="action_view_a_programmer" type="object" icon="fa-wrench"
                   groups="of_planning.of_group_planning_intervention_lecture_tout">
-                    <field string="À programmer" name="a_programmer_count" widget="statinfo"/>
+                    <field string="DI à programmer" name="a_programmer_count" widget="statinfo"/>
                 </button>
             </xpath>
             <page name="sales_purchases" position="after">

@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
 
 {
-    "name": "OpenFire / Contrat Custom - Achats",
+    "name": "OpenFire / Demande d'intervention - Achats",
     "version": "10.0.1.0.0",
     "author": "OpenFire",
     'license': 'AGPL-3',
-    'summary': u"Module de lien entre contrats et achats",
+    'summary': u"Module de lien entre demandes d'intervention et achats",
     "description": u"""
-OpenFire / Contrat custom - Achats
+OpenFire / Demande d'intervention - Achats
 ==================================
 
-Module de lien entre les modules of_contract_custom et of_purchase
+Module de lien entre les modules of_service et of_purchase
 
 """,
     "website": "www.openfire.fr",
     "depends": [
-        "of_contract_custom",
+        "of_service",
         "of_purchase",
         ],
     "category": "OpenFire",

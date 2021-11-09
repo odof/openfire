@@ -58,6 +58,7 @@ class OfTourneeRdv(models.TransientModel):
             service = service_obj.browse(service_id)
             partner = service.partner_id
             address = service.address_id
+            res['pre_employee_ids'] = [(6, 0, [emp.id for emp in service.employee_ids])]
         elif active_model == 'sale.order':
             order_id = self._context['active_ids'][0]
             order = self.env['sale.order'].browse(order_id)

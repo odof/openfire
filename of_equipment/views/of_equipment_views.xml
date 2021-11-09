@@ -46,7 +46,7 @@
         <field name="type">form</field>
         <field name="inherit_id" ref="of_service.view_of_service_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='gauche_1']/group[1]" position="inside">
+            <xpath expr="//group[@name='where']/group[1]" position="inside">
                 <field name="equipment_ids" widget="many2many_tags"/>
             </xpath>
         </field>
