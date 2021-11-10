@@ -75,16 +75,19 @@ class SaleOrder(models.Model):
 
         product = self.env['product.product'].browse(int(product_id))
 
-        # On calcul le product_quantity en fonction de la configuration on_hand/forecast
-        product_quantity = product.qty_available
-        if website.get_website_config() == 'forecast':
-            product_quantity += - product.outgoing_qty + product.incoming_qty
+        # Si gestion des stocks et interdit de commander stock non disponible
+        if website.get_website_config() != 'none' and website.get_of_unavailability_management() == 'notify':
 
-        # Si la quantité en panier est supérieure à la quantité disponible, on modifie par la quantité disponible
-        if res['quantity'] > product_quantity:
-            self.env['sale.order.line'].browse(int(res['line_id'])).write({
-                'product_uom_qty': product_quantity,
-            })
+            # On calcul le product_quantity en fonction de la configuration on_hand/forecast
+            product_quantity = product.qty_available
+            if website.get_website_config() == 'forecast':
+                product_quantity += - product.outgoing_qty + product.incoming_qty
+
+            # Si la quantité en panier est supérieure à la quantité disponible, on modifie par la quantité disponible
+            if res['quantity'] > product_quantity:
+                self.env['sale.order.line'].browse(int(res['line_id'])).write({
+                    'product_uom_qty': product_quantity,
+                })
 
         return res
 

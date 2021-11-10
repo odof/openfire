@@ -7,12 +7,56 @@
         </xpath>
     </template>
 
+    <!-- /shop/product product page -->
+    <template id="product" inherit_id="of_website_sample.product" name="Product (of_website_sample_stock)">
+        <xpath expr="//form[@id='form_sample_to_cart']" position="replace">
+            <t t-set="sample" t-value="product.sudo().sample_id"/>
+            <t t-if="sample">
+                <t t-if="website.get_website_config() == 'none'">
+                    <form action="/shop/cart/update" class="js_add_sample_cart_variants"
+                          t-att-data-attribute_value_ids="attribute_value_ids" method="POST" id="form_sample_to_cart_2">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                        <input type="hidden" class="product_id" name="product_id" t-att-value="sample and sample.product_variant_id.id"/>
+                        <a id="add_sample_to_cart" class="btn btn-primary mt8 a-submit" href="#">Add sample to Cart</a>
+                    </form>
+                </t>
+                <t t-if="not website.get_website_config() == 'none'">
+                    <t t-if="website.get_website_config() == 'on_hand'">
+                        <t t-set="sample_quantity" t-value="sample.product_variant_id.qty_available"/>
+                    </t>
+                    <t t-if="website.get_website_config() == 'forecast'">
+                        <t t-set="sample_quantity" t-value="sample.product_variant_id.qty_available - sample.product_variant_id.outgoing_qty + sample.product_variant_id.incoming_qty"/>
+                    </t>
+                    <form t-if="sample_quantity or website.get_of_unavailability_management() == 'delay'"
+                          action="/shop/cart/update" class="js_add_sample_cart_variants"
+                          t-att-data-attribute_value_ids="attribute_value_ids" method="POST" id="form_sample_to_cart">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                        <input type="hidden" class="product_id" name="product_id" t-att-value="sample and sample.product_variant_id.id"/>
+                        <a id="add_sample_to_cart" class="btn btn-primary mt8 a-submit" href="#">Add sample to Cart</a>
+                    </form>
+                </t>
+            </t>
+        </xpath>
+    </template>
+
     <!-- /shop/cart page -->
     <template id="of_cart_lines_inherit" inherit_id="of_website_stock.cart_lines_inherit" name="OF Show Qty Validation">
         <xpath expr="//div[contains(@class, 'oe_website_spinner')]/t[1]/input" position="attributes">
             <attribute name="t-if">not line.product_id.product_tmpl_id.is_sample</attribute>
         </xpath>
         <xpath expr="//div[contains(@class, 'oe_website_spinner')]/t[1]/input" position="after">
+            <input type="text" class="js_quantity form-control quantity"
+                   readonly="readonly"
+                   t-if="line.product_id.product_tmpl_id.is_sample"
+                   t-att-data-line-id="line.id"
+                   t-att-data-product-id="line.product_id.id"
+                   t-att-data-qty="int(line.product_id.qty_available)"
+                   t-att-value="int(line.product_uom_qty)"/>
+        </xpath>
+        <xpath expr="//div[contains(@class, 'oe_website_spinner')]/t[2]/input" position="attributes">
+            <attribute name="t-if">not line.product_id.product_tmpl_id.is_sample</attribute>
+        </xpath>
+        <xpath expr="//div[contains(@class, 'oe_website_spinner')]/t[2]/input" position="after">
             <input type="text" class="js_quantity form-control quantity"
                    readonly="readonly"
                    t-if="line.product_id.product_tmpl_id.is_sample"

@@ -138,7 +138,14 @@
 						<i class="fa fa-minus"></i>
 					</a>
 
-					<t t-if="website.get_website_config() != 'none'">
+					<t t-if="website.get_website_config() == 'none'">
+						<input type="text" class="js_quantity form-control quantity"
+							   t-att-data-line-id="line.id"
+							   t-att-data-product-id="line.product_id.id"
+							   t-att-value="int(line.product_uom_qty) == line.product_uom_qty and int(line.product_uom_qty) or line.product_uom_qty" />
+					</t>
+
+					<t t-if="not website.get_website_config() == 'none'">
 						<t t-if="website.get_website_config() == 'on_hand'">
 							<t t-set="product_quantity" t-value="line.product_id.qty_available"/>
 						</t>
