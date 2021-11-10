@@ -125,7 +125,7 @@
                         <b>
                             <h3 style="text-align:center" t-raw="title"/>
                         </b>
-                        <table>
+                        <table class="table table-condensed">
                             <thead>
                                 <tr>
                                     <th style="width: 17%">Date et heure</th>
@@ -138,7 +138,8 @@
                                 <tr t-foreach="interventions" t-as="intervention">
                                     <t t-set="columns" t-value="o.get_columns(intervention)"/>
                                     <t t-foreach="columns" t-as="column">
-                                        <td>
+                                        <!-- taille de la police = 12px -->
+                                        <td style="line-height: 16px;">
                                             <span t-raw="column"/>
                                         </td>
                                     </t>
