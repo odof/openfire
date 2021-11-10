@@ -7,23 +7,8 @@
         </xpath>
     </template>
 
-    <template id="display_stock_qty_message" inherit_id="website_sale_product_stock.display_stock_qty_message">
-        <xpath expr="//t[@t-if='product.qty_available &gt; 0']/div[@class='in-stock']" position="attributes">
-            <attribute name="class">btn btn-primary in-stock</attribute>
-        </xpath>
-        <xpath expr="//t[@t-if='not product.qty_available &gt; 0']/div[@class='out-of-stock']" position="attributes">
-            <attribute name="class">btn out-of-stock</attribute>
-        </xpath>
-        <xpath expr="//t[@t-if='not qty_forecasted &gt; 0']/div[@class='out-of-stock']" position="attributes">
-            <attribute name="class">btn out-of-stock</attribute>
-        </xpath>
-        <xpath expr="//t[@t-if='qty_forecasted &gt; 0']/div[@class='in-stock']" position="attributes">
-            <attribute name="class">btn btn-primary in-stock</attribute>
-        </xpath>
-    </template>
-
     <!-- /shop/cart page -->
-    <template id="of_cart_lines_inherit" inherit_id="website_sale_product_stock.cart_lines_inherit" name="OF Show Qty Validation">
+    <template id="of_cart_lines_inherit" inherit_id="of_website_stock.cart_lines_inherit" name="OF Show Qty Validation">
         <xpath expr="//div[contains(@class, 'oe_website_spinner')]/t[1]/input" position="attributes">
             <attribute name="t-if">not line.product_id.product_tmpl_id.is_sample</attribute>
         </xpath>
@@ -34,18 +19,6 @@
                    t-att-data-line-id="line.id"
                    t-att-data-product-id="line.product_id.id"
                    t-att-data-qty="int(line.product_id.qty_available)"
-                   t-att-value="int(line.product_uom_qty)"/>
-        </xpath>
-        <xpath expr="//div[contains(@class, 'oe_website_spinner')]/t[2]/input" position="attributes">
-            <attribute name="t-if">not line.product_id.product_tmpl_id.is_sample</attribute>
-        </xpath>
-        <xpath expr="//div[contains(@class, 'oe_website_spinner')]/t[2]/input" position="after">
-            <input type="text" class="js_quantity form-control"
-                   readonly="readonly"
-                   t-if="line.product_id.product_tmpl_id.is_sample"
-                   t-att-data-line-id="line.id"
-                   t-att-data-product-id="line.product_id.id"
-                   t-att-data-qty="int(qty_forecasted)"
                    t-att-value="int(line.product_uom_qty)"/>
         </xpath>
         <xpath expr="//div[contains(@class, 'oe_website_spinner')]/a[1]" position="attributes">

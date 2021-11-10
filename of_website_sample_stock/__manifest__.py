@@ -12,7 +12,7 @@ OpenFire / Website Sample Stock
     'website': 'openfire.fr',
     'depends': [
         'of_website_sample',
-        'website_sale_product_stock',
+        'of_website_stock',
     ],
     'data': [
         'templates/website_sale.xml',
@@ -21,5 +21,6 @@ OpenFire / Website Sample Stock
         'static/src/xml/*.xml',
     ],
     'installable': True,
+    'application': False,
     'auto_install': True,
 }
