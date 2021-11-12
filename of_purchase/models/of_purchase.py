@@ -85,6 +85,15 @@ class PurchaseOrder(models.Model):
                 sale_lines.write({'of_seller_price': line.price_unit,
                                   'purchase_price': line.price_unit * line.product_id.property_of_purchase_coeff})
 
+    @api.multi
+    def action_view_invoice(self):
+        result = super(PurchaseOrder, self).action_view_invoice()
+        if not self.invoice_ids:
+            result['context']['default_company_id'] = self.company_id.id
+        else:
+            result['context']['default_company_id'] = self.invoice_ids[0].company_id.id
+        return result
+
 
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
