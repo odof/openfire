@@ -171,17 +171,16 @@
 
 	<template id="of_payment" inherit_id="website_sale.payment"  name="(OF) Payment">
 		<xpath expr="//*[@id='cart_products']/thead/tr" position='inside'>
-			<th class="text-right">Delay</th>
-			<th class="text-right">Delivery Delay</th>
+			<th t-if="website.get_of_delivery_management()" class="text-right">Delay</th>
+			<th t-if="website.get_of_delivery_management()" class="text-right">Delivery Delay</th>
 		</xpath>
 		<xpath expr="//*[@id='cart_products']/tbody/tr" position='inside'>
-			<td class="text-right">
-				<!--				<span t-esc="line.product_id.sale_delay"/>-->
-				<span t-esc="line.customer_lead"/>
+			<td t-if="website.get_of_delivery_management()" class="text-right">
+				<span t-esc="float(max(line.customer_lead, website.get_of_website_security_lead()) or 0.0)"/>
 			</td>
-			<td class="text-right">
-				<t t-if="line.product_id.sale_delay">
-					<span t-esc="(datetime.date.today() + datetime.timedelta(days=line.customer_lead)).strftime('%Y-%m-%d')" t-options="{'widget': 'date'}"/>
+			<td t-if="website.get_of_delivery_management()" class="text-right">
+				<t t-if="line.customer_lead">
+					<span t-esc="(datetime.date.today() + datetime.timedelta(days=max(line.customer_lead, website.get_of_website_security_lead()) or 0.0)).strftime('%Y-%m-%d')" t-options="{'widget': 'date'}"/>
 				</t>
 				<t t-else="website_sale_order.commitment_date">
 					<span t-esc="website_sale_order.commitment_date" t-options="{'widget': 'date'}"/>

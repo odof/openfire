@@ -15,27 +15,40 @@ class SaleOrder(models.Model):
 
         # On récupère le site web
         website = self.env['website'].search([])[0]
+        of_delivery_management = website.get_of_delivery_management()
         of_website_security_lead = float(website.get_of_website_security_lead()) or 0
 
         for order in self:
+
+            if not of_delivery_management:
+                order.website_commitment_date = False
+                return
+
             dates_list = []
-            order_datetime = fields.Datetime.from_string(order.date_order)
+
+            # On prend la date max entre la date de la comande et la date d'aujourd'hui
+            if order.date_order:
+                order_datetime = max([fields.Datetime.from_string(order.date_order), fields.Datetime.from_string(fields.Datetime.now())])
+            else:
+                order_datetime = fields.Datetime.from_string(fields.Datetime.now())
+
             # Avec le test sur sale_ok, on exclue la ligne qui corrrespond à la livraison
             for line in order.order_line.filtered(lambda x: x.state != 'cancel' and x.product_id.sale_ok is True):
-
-                # On calcul le product_quantity en fonction de la configuration on_hand/forecast
-                product_quantity = line.product_id.qty_available
-                if website.get_website_config() == 'forecast':
-                    product_quantity += - line.product_id.outgoing_qty + line.product_id.incoming_qty
 
                 # On prend le max entre customer_lead et of_website_security_lead
                 days = max(line.customer_lead, of_website_security_lead) or 0.0
 
-                # Si article indisponible, on rajoute le délai fournisseur et la marge de sécurité
-                if not product_quantity > 0:
-                    days += (website.company_id.security_lead + line.product_id._select_seller(
-                        quantity=line.product_qty, uom_id=line.product_uom).delay) \
-                            or 0.0
+                # On calcul le product_quantity en fonction de la configuration on_hand/forecast
+                if website.get_website_config() != 'none':
+                    product_quantity = line.product_id.qty_available
+                    if website.get_website_config() == 'forecast':
+                        product_quantity += - line.product_id.outgoing_qty + line.product_id.incoming_qty
+
+                    # Si article indisponible, on rajoute le délai fournisseur et la marge de sécurité
+                    if not product_quantity > 0:
+                        days += (website.company_id.security_lead + line.product_id._select_seller(
+                            quantity=line.product_qty, uom_id=line.product_uom).delay) \
+                                or 0.0
 
                 dt = order_datetime + timedelta(days=days)
                 dates_list.append(dt)
