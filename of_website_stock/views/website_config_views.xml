@@ -10,15 +10,11 @@
                 <group string="Website Stock Availability" name="stock_availability" groups="website.group_website_designer">
                     <label for="of_stock_type" string="Stock Type"/>
                     <div>
-                        <div>
-                            <field name="of_stock_type" widget="radio"/>
-                        </div>
+                        <field name="of_stock_type" widget="radio"/>
                     </div>
-                    <label for="of_unavailability_management" string="Unavailability Management"/>
-                    <div>
-                        <div>
-                            <field name="of_unavailability_management" widget="radio"/>
-                        </div>
+                    <label for="of_unavailability_management" string="Unavailability Management" attrs="{'invisible': [('of_stock_type', '=', 'none')]}"/>
+                    <div attrs="{'invisible': [('of_stock_type', '=', 'none')]}">
+                        <field name="of_unavailability_management" widget="radio"/>
                     </div>
                 </group>
             </xpath>
