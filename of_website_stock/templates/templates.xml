@@ -171,22 +171,24 @@
 
 	<template id="of_payment" inherit_id="website_sale.payment"  name="(OF) Payment">
 		<xpath expr="//*[@id='cart_products']/thead/tr" position='inside'>
-			<th class="text-right">Delay</th>
-			<th class="text-right">Delivery Delay</th>
+			<t t-if="website.get_of_delivery_management()">
+				<th class="text-right">Delay</th>
+				<th class="text-right">Delivery Delay</th>
+			</t>
 		</xpath>
 		<xpath expr="//*[@id='cart_products']/tbody/tr" position='inside'>
-			<td class="text-right">
-				<!--				<span t-esc="line.product_id.sale_delay"/>-->
-				<span t-esc="line.customer_lead"/>
-			</td>
-			<td class="text-right">
-				<t t-if="line.product_id.sale_delay">
-					<span t-esc="(datetime.date.today() + datetime.timedelta(days=line.customer_lead)).strftime('%Y-%m-%d')" t-options="{'widget': 'date'}"/>
-				</t>
-				<t t-else="website_sale_order.commitment_date">
-					<span t-esc="website_sale_order.commitment_date" t-options="{'widget': 'date'}"/>
-				</t>
-			</td>
+			<t t-if="website.get_of_delivery_management()">
+				<td class="text-right">
+					<t t-if="website.get_website_config() != 'none'">
+						<span t-esc="line.get_days_of_delay()"/> <span>days</span>
+					</t>
+				</td>
+				<td class="text-right">
+					<t t-if="website.get_website_config() != 'none'">
+						<span t-esc="line.get_delivery_date().strftime('%d/%m/%Y') or ''"/>
+					</t>
+				</td>
+			</t>
 		</xpath>
 		<xpath expr="//*[@id='payment_method']/../*[1]" position='before'>
 			<div class="container" t-if="website.get_of_delivery_management()">
@@ -195,21 +197,23 @@
 						<h4>Choose your Delivery Date</h4>
 						<div class="form-group">
 							<div class='input-group date' id='datetimepicker'>
-								<input name="requested_date" type='text' class="form-control"/>
+								<input name="requested_date" type='text' class="form-control" autocomplete="off"/>
 								<span class="input-group-addon">
 									<span class="glyphicon glyphicon-calendar"></span>
 								</span>
 							</div>
 						</div>
-						<p>
-							<span t-esc="'website_commitment_date : '"/>
-							<span t-esc="website_sale_order.website_commitment_date" t-options="{'widget': 'date'}"/>
-						</p>
-						<p t-esc="'of_website_security_lead : ' + str(website.get_of_website_security_lead())"/>
-						<p>
-							<span t-esc="'requested_date : '"/>
-							<span t-esc="website_sale_order.requested_date" t-options="{'widget': 'date'}"/>
-						</p>
+<!--						Pour facilité le débug. A supprimer à la mise en prod-->
+<!--						<p>-->
+<!--							<span t-esc="'website_commitment_date : '"/>-->
+<!--							<span t-esc="website_sale_order.website_commitment_date" t-options="{'widget': 'date'}"/>-->
+<!--						</p>-->
+<!--						<p t-esc="'(OF) Délai de livraison minimum (of_website_security_lead) : ' + str(website.get_of_website_security_lead())"/>-->
+<!--						<p t-esc="'Délai de sécurité à la vente (jours)* (website.company_id.security_lead) : ' + str(website.company_id.security_lead)"/>-->
+<!--						<p>-->
+<!--							<span t-esc="'requested_date : '"/>-->
+<!--							<span t-esc="website_sale_order.requested_date" t-options="{'widget': 'date'}"/>-->
+<!--						</p>-->
 					</div>
 					<script type="text/javascript">
 						$(function () {

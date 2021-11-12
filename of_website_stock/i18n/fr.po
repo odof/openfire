@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-02 08:42+0000\n"
-"PO-Revision-Date: 2021-11-02 08:42+0000\n"
+"POT-Creation-Date: 2021-11-18 10:57+0000\n"
+"PO-Revision-Date: 2021-11-18 10:57+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -19,15 +19,15 @@ msgstr ""
 #: model:mail.template,body_html:of_website_stock.email_template_sale_stock_notification
 msgid "\n"
 "                    <div style=\"font-family: 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; \">\n"
-"                        <p>Dear Customer,</p>\n"
-"                        <p> ${object.product_id.name} is available in stock now. Grab it before it sold out...!!! Thank you...!!! </p>\n"
+"                        <p style=\"margin:0px 0px 9px 0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;\">Cher client,</p>\n"
+"                        <p style=\"margin:0px 0px 9px 0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;\"> ${object.product_id.name} est de nouveau disponible. Achetez le avant qu'il soit en rupture ! Merci ! </p>\n"
 "                    </div>\n"
 "                        \n"
 "            "
 msgstr "\n"
 "                    <div style=\"font-family: 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; \">\n"
-"                        <p>Cher client,</p>\n"
-"                        <p> ${object.product_id.name} est de nouveau disponible. Achetez le avant qu'il soit en rupture ! Merci ! </p>\n"
+"                        <p style=\"margin:0px 0px 9px 0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;\">Cher client,</p>\n"
+"                        <p style=\"margin:0px 0px 9px 0px;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;\"> ${object.product_id.name} est de nouveau disponible. Achetez le avant qu'il soit en rupture ! Merci ! </p>\n"
 "                    </div>\n"
 "                        \n"
 "            "
@@ -35,7 +35,7 @@ msgstr "\n"
 #. module: of_website_stock
 #: model:mail.template,subject:of_website_stock.email_template_sale_stock_notification
 msgid " ${object.product_id.name or 'n/a' } is available in stock now."
-msgstr " ${object.product_id.name or 'n/a' } est de nouveau disponible."
+msgstr " ${object.product_id.name or 'n/a' } est maintenant disponible en stock"
 
 #. module: of_website_stock
 #: model:ir.model.fields,field_description:of_website_stock.field_website_config_settings_of_delivery_management
@@ -97,6 +97,11 @@ msgstr "<span class=\"label label-primary\">En stock</span>"
 
 #. module: of_website_stock
 #: model:ir.ui.view,arch_db:of_website_stock.of_payment
+msgid "<span>days</span>"
+msgstr "<span>jours</span>"
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.of_payment
 msgid "Choose your Delivery Date"
 msgstr "Choisissez votre date de livraison"
 
@@ -112,8 +117,8 @@ msgstr "Créé le"
 
 #. module: of_website_stock
 #. openerp-web
-#: code:addons/of_website_stock/static/src/js/custom.js:84
-#: code:addons/of_website_stock/static/src/js/custom.js:132
+#: code:addons/of_website_stock/static/src/js/custom.js:83
+#: code:addons/of_website_stock/static/src/js/custom.js:116
 #, python-format
 msgid "DENIED"
 msgstr "Refusé"
@@ -171,7 +176,7 @@ msgstr "Entrez une adresse email valide"
 #. module: of_website_stock
 #: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
 msgid "Enter your e-mail..."
-msgstr "Entrez votre email"
+msgstr "Entrez votre adresse mail"
 
 #. module: of_website_stock
 #: model:ir.model.fields,help:of_website_stock.field_website_config_settings_of_unavailability_management
@@ -229,6 +234,11 @@ msgid "Product"
 msgstr "Article"
 
 #. module: of_website_stock
+#: model:ir.model,name:of_website_stock.model_product_template
+msgid "Product Template"
+msgstr "Modèle d'article"
+
+#. module: of_website_stock
 #: selection:website.config.settings,of_stock_type:0
 msgid "Qty Forecast"
 msgstr "Quantité prévue"
@@ -246,7 +256,7 @@ msgstr "Bon de commande"
 #. module: of_website_stock
 #: model:ir.model,name:of_website_stock.model_sale_order_line
 msgid "Sales Order Line"
-msgstr "Ligne de bons de commande"
+msgstr "Lignes de bon de commande"
 
 #. module: of_website_stock
 #: selection:website.config.settings,of_unavailability_management:0
@@ -308,8 +318,8 @@ msgstr "Notification stock site web"
 
 #. module: of_website_stock
 #. openerp-web
-#: code:addons/of_website_stock/static/src/js/custom.js:89
-#: code:addons/of_website_stock/static/src/js/custom.js:137
+#: code:addons/of_website_stock/static/src/js/custom.js:86
+#: code:addons/of_website_stock/static/src/js/custom.js:120
 #, python-format
 msgid "You Can Not Add More than Available Quantity"
 msgstr "Vous ne pouvez ajouter plus que la quantité disponible"
@@ -318,7 +328,7 @@ msgstr "Vous ne pouvez ajouter plus que la quantité disponible"
 #: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
 #: model:ir.ui.view,arch_db:of_website_stock.product_qty_in_products_item_page
 msgid "left."
-msgstr "restant."
+msgstr "restant(s)"
 
 #. module: of_website_stock
 #: model:ir.model,name:of_website_stock.model_of_website_stock_notify
