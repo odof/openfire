@@ -22,9 +22,8 @@
                 <t t-set="title" t-value="o.get_title()"/>
                 <div class="page">
                     <style>
-                        table.main_table {
-                            width:100%;
-                            table-layout: fixed;
+                        th,td {
+                            line-height: 16px !important;
                         }
                         th,tr:nth-child(2n) {
                             background-color:#C7C7C7;
@@ -47,7 +46,7 @@
                     <b>
                         <h3 style="text-align:center" t-esc="title"/>
                     </b>
-                    <table class="main_table">
+                    <table class="table table-condensed">
                         <thead>
                             <tr>
                                 <th class="col_employee">
@@ -115,8 +114,7 @@
             <t t-call="report.internal_layout">
                 <div class="page">
                     <style>
-                        td, th { padding:8px; border: 1px solid #E6E6E6; }
-                        table { width: 100%; }
+                        td, th { padding:8px !important; border: 1px solid #E6E6E6; line-height: 16px !important;}
                         thead { background-color: #E6E6FA; }
                     </style>
                     <div t-foreach="o.employee_ids" t-as="employee" style="page-break-after: always;">
@@ -125,7 +123,7 @@
                         <b>
                             <h3 style="text-align:center" t-raw="title"/>
                         </b>
-                        <table>
+                        <table class="table table-condensed">
                             <thead>
                                 <tr>
                                     <th style="width: 17%">Date et heure</th>
@@ -174,8 +172,8 @@
             <t t-call="report.internal_layout">
                 <div class="page">
                     <style>
-                        td, th { padding:8px; border: 1px solid #E6E6E6; }
-                        table { width: 100%; }
+                        td, th { padding:8px !important; border: 1px solid #E6E6E6; }
+                        td { line-height: 16px !important; }
                         thead { background-color: #E6E6FA; }
                     </style>
                     <div t-foreach="o.employee_ids" t-as="employee" style="page-break-after: always;">
@@ -184,7 +182,7 @@
                         <b>
                             <h3 style="text-align:center" t-raw="title"/>
                         </b>
-                        <table>
+                        <table class="table table-condensed">
                             <thead>
                                 <tr>
                                     <th style="width: 9%">Heure</th>
