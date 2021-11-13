@@ -5,11 +5,17 @@
         <field name="model">sale.config.settings</field>
         <field name="inherit_id" ref="of_sale.of_sale_view_sale_config_settings"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='of_deposit_product_categ_id_setting']" position="before">
+            <xpath expr="//div[@name='of_position_fiscale']" position="after">
                 <label for="of_compte_analytique" groups="analytic.group_analytic_accounting"/>
                 <div name="of_compte_analytique" groups="analytic.group_analytic_accounting">
                     <field name="of_compte_analytique" class="oe_inline"/>
-                    <span>Forcer l'utilisation des comptes analytique</span>
+                    <span>Forcer l'utilisation des comptes analytiques</span>
+                    <br/>
+                    <field name="of_analytique_preset" class="oe_inline"/>
+                    <span>Remplir le compte analytique de la commande avec celui du client, si il existe.</span>
+                    <br/>
+                    <span>Configurer un couple (nom, code) pour générer automatiquement un compte analytique selon ce modèle, laisser vide sinon.</span>
+                    <field name="of_analytique_code"/>
                 </div>
             </xpath>
         </field>
