@@ -49,12 +49,14 @@ def action_assign(self, no_prepare=False):
 
             ancestors_list[move.id] = True if ancestors else False
             if move.state == 'waiting' and not ancestors:
-                # if the waiting move hasn't yet any ancestor (PO/MO not confirmed yet), don't find any quant available in stock
+                # if the waiting move hasn't yet any ancestor (PO/MO not confirmed yet), don't find any quant available
+                # in stock
                 main_domain[move.id] += [('id', '=', False)]
             elif ancestors:
                 main_domain[move.id] += [('history_ids', 'in', ancestors.ids)]
 
-            # if the move is returned from another, restrict the choice of quants to the ones that follow the returned move
+            # if the move is returned from another, restrict the choice of quants to the ones that follow the returned
+            # move
             if move.origin_returned_move_id:
                 main_domain[move.id] += [('history_ids', 'in', move.origin_returned_move_id.id)]
             for link in move.linked_move_operation_ids:
@@ -65,8 +67,9 @@ def action_assign(self, no_prepare=False):
         key=lambda x: ((x.package_id and not x.product_id) and -4 or 0) + (x.package_id and -2 or 0) + (
                 x.pack_lot_ids and -1 or 0))
     for ops in operations:
-        # TDE FIXME: this code seems to be in action_done, isn't it ?
-        # first try to find quants based on specific domains given by linked operations for the case where we want to rereserve according to existing pack operations
+        # TDE FIXME: this code seems to be in action_done, isn't it ? first try to find quants based on specific
+        #  domains given by linked operations for the case where we want to rereserve according to existing pack
+        #  operations
         if not (ops.product_id and ops.pack_lot_ids):
             for record in ops.linked_move_operation_ids:
                 move = record.move_id
@@ -88,9 +91,8 @@ def action_assign(self, no_prepare=False):
                 move = record.move_id
                 domain = main_domain[move.id]
                 for lot in lot_qty:
-                    if float_compare(lot_qty[lot], 0, precision_rounding=rounding) > 0 and float_compare(move_qty,
-                                                                                                         0,
-                                                                                                         precision_rounding=rounding) > 0:
+                    if float_compare(lot_qty[lot], 0, precision_rounding=rounding) > 0 and \
+                            float_compare(move_qty, 0, precision_rounding=rounding) > 0:
                         qty = min(lot_qty[lot], move_qty)
                         quants = Quant.quants_get_preferred_domain(qty, move, ops=ops, lot_id=lot, domain=domain,
                                                                    preferred_domain_list=[])
@@ -269,7 +271,8 @@ class SaleOrderLine(models.Model):
     of_reserved_qty = fields.Float(
         string=u"Qté(s) réservée(s)", digits=dp.get_precision('Product Unit of Measure'),
         compute='_compute_of_stock_qty')
-    of_picking_min_week = fields.Char(string=u"Sem. de livraison prévue", compute='_compute_of_picking_min_week', store=True)
+    of_picking_min_week = fields.Char(
+        string=u"Sem. de livraison prévue", compute='_compute_of_picking_min_week', store=True)
     of_receipt_min_week = fields.Char(string=u"Sem. de réception prévue", compute='_compute_of_receipt_min_week')
     of_product_type = fields.Selection(
         selection=[('product', u"Produit stockable"),
@@ -316,7 +319,7 @@ class SaleOrderLine(models.Model):
                 moves = moves.filtered(
                     lambda m: m.origin and
                     (m.picking_id.state == 'done' or (m.picking_id.state == 'cancel' and m.picking_id.backorder_id))
-                )
+                    )
                 line.qty_to_invoice = sum(moves.mapped('of_ordered_qty')) - line.qty_invoiced
             else:
                 line.qty_to_invoice = 0
@@ -495,7 +498,7 @@ class StockConfiguration(models.TransientModel):
         [
             (0, "Afficher uniquement l'article dans le bon de livraison"),
             (1, "Afficher l'article et sa description dans le bon de livraison")
-        ], "(OF) Description articles",
+            ], "(OF) Description articles",
         help=u"Choisissez si la description de l'article s'affichée dans le bon de livraison.\n"
              u"Cela affecte également les documents imprimables.",
         implied_group='of_sale_stock.group_description_BL_variant')
@@ -552,7 +555,6 @@ class StockPicking(models.Model):
             action['res_id'] = purchases.id
         return action
 
-
     @api.multi
     def action_delivery_division(self):
         self.ensure_one()
@@ -564,16 +566,16 @@ class StockPicking(models.Model):
         wizard = self.env['of.delivery.division.wizard'].create({
             'picking_id': self.id,
             'line_ids': line_vals,
-        })
+            })
 
         return {
             'type': 'ir.actions.act_window',
-            'name': "Division du BL",
+            'name': "Division du bon de transfert",
             'view_mode': 'form',
             'res_model': 'of.delivery.division.wizard',
             'res_id': wizard.id,
             'target': 'new',
-        }
+            }
 
     @api.depends('move_lines.date_expected')
     def _compute_of_min_week(self):

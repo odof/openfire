@@ -6,9 +6,9 @@ from odoo.exceptions import Warning
 
 class OFDeliveryDivisionWizard(models.TransientModel):
     _name = 'of.delivery.division.wizard'
-    _description = "Assistant de division des BL"
+    _description = "Assistant de division de bon de transfert"
 
-    picking_id = fields.Many2one(comodel_name='stock.picking', string=u"BL à diviser")
+    picking_id = fields.Many2one(comodel_name='stock.picking', string=u"Bon de transfert à diviser")
     line_ids = fields.One2many(
         comodel_name='of.delivery.division.wizard.line', inverse_name='wizard_id', string=u"Lignes à diviser")
 
@@ -24,13 +24,13 @@ class OFDeliveryDivisionWizard(models.TransientModel):
         elif self.line_ids.filtered(lambda line: line.qty_to_divide < 0):
             raise Warning(u"Vous avez saisi des quantités négatives !")
         else:
-            # On copie le BL
+            # On copie le Bon de transfert
             new_delivery = self.picking_id.copy()
 
-            # On met à jour les lignes des 2 BL
+            # On met à jour les lignes des 2 Bon de transfert
             for line_to_divide in self.line_ids:
                 if line_to_divide.qty_to_divide == 0:
-                    # On supprime la ligne du nouveau BL
+                    # On supprime la ligne du nouveau Bon de transfert
                     line_to_delete = new_delivery.move_lines.filtered(
                         lambda line: line.procurement_id == line_to_divide.move_id.procurement_id)
                     line_to_delete.action_cancel()
@@ -38,7 +38,7 @@ class OFDeliveryDivisionWizard(models.TransientModel):
                 else:
                     initial_qty = line_to_divide.product_uom_qty - line_to_divide.qty_to_divide
                     if initial_qty == 0:
-                        # On supprime la ligne du BL initial
+                        # On supprime la ligne du Bon de transfert initial
                         line_to_divide.move_id.action_cancel()
                         line_to_divide.move_id.unlink()
                     else:
@@ -54,7 +54,7 @@ class OFDeliveryDivisionWizard(models.TransientModel):
             self.picking_id.action_assign()
             new_delivery.action_assign()
 
-            # On renvoie sur le nouveau BL
+            # On renvoie sur le nouveau Bon de transfert
             action = self.env.ref('stock.action_picking_tree_all').read()[0]
             action['views'] = [(self.env.ref('stock.view_picking_form').id, 'form')]
             action['res_id'] = new_delivery.id
@@ -64,10 +64,10 @@ class OFDeliveryDivisionWizard(models.TransientModel):
 
 class OFDeliveryDivisionWizardLine(models.TransientModel):
     _name = 'of.delivery.division.wizard.line'
-    _description = "Ligne de l'assistant de division des BL"
+    _description = "Ligne de l'assistant de division des Bon de transfert"
 
-    wizard_id = fields.Many2one(comodel_name='of.delivery.division.wizard', string=u"Division du BL")
-    move_id = fields.Many2one(comodel_name='stock.move', string=u"Ligne du BL")
+    wizard_id = fields.Many2one(comodel_name='of.delivery.division.wizard', string=u"Division du Bon de transfert")
+    move_id = fields.Many2one(comodel_name='stock.move', string=u"Ligne du Bon de transfert")
     product_id = fields.Many2one(
         comodel_name='product.product', related='move_id.product_id', string=u"Article", readonly=True)
     product_uom_qty = fields.Float(related='move_id.product_uom_qty', string=u"Quantité initiale", readonly=True)
