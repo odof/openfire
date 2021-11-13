@@ -46,6 +46,29 @@
                 <field name="of_parent_category_id" widget="many2many_tags"
                        attrs="{'invisible': [('parent_id', '=', False)]}"/>
             </xpath>
+            <!-- Retirer le petit lien "(éditer)" qui permettait de modifier l'adresse quand il y a un parent -->
+            <xpath expr="//button[@name='open_parent']/.." position="attributes">
+                <attribute name="style">display: none;</attribute>
+            </xpath>
+            <!-- permettre l'éition de l'adresse quand il y a un parent -->
+            <xpath expr="//field[@name='street']" position="attributes">
+                <attribute name="attrs">{}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='street2']" position="attributes">
+                <attribute name="attrs">{}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='city']" position="attributes">
+                <attribute name="attrs">{}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='state_id']" position="attributes">
+                <attribute name="attrs">{}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='zip']" position="attributes">
+                <attribute name="attrs">{}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='country_id']" position="attributes">
+                <attribute name="attrs">{}</attribute>
+            </xpath>
             <xpath expr="//form//notebook//page[@name='sales_purchases']//field[@name='customer']"
                    position="attributes">
                 <attribute name="attrs">{'readonly': [('parent_id', '!=', False), ('is_company', '=', False)]}

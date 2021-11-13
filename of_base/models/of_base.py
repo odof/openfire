@@ -11,6 +11,7 @@ from odoo.tools import OrderedSet
 from odoo.tools.safe_eval import safe_eval
 from odoo.models import BaseModel
 from odoo.addons.base.res.res_users import GroupsView, name_boolean_group, name_selection_groups
+from odoo.addons.base.res.res_partner import Partner
 
 try:
     import simplejson as json
@@ -141,6 +142,26 @@ def _update_user_groups_view(self):
 
 
 GroupsView._update_user_groups_view = _update_user_groups_view
+
+
+@api.onchange('parent_id')
+def onchange_parent_id(self):
+    # return values in result, as this method is used by _fields_sync()
+    if not self.parent_id:
+        return
+    result = {}
+    partner = getattr(self, '_origin', self)
+    if partner.parent_id and partner.parent_id != self.parent_id:
+        result['warning'] = {
+            'title': _('Warning'),
+            'message': _('Changing the company of a contact should only be done if it '
+                         'was never correctly set. If an existing contact starts working for a new '
+                         'company then a new contact should be created under that new '
+                         'company. You can use the "Discard" button to abandon this change.')}
+    # OPENFIRE : On avait ici un remplacement de l'adresse par celle du parent
+    return result
+
+Partner.onchange_parent_id = onchange_parent_id
 
 
 class IrMailServer(models.Model):
