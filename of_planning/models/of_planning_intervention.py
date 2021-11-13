@@ -479,7 +479,7 @@ class OfPlanningIntervention(models.Model):
         string="Jour intervention", compute='_compute_date_date', search='_search_date_date', readonly=True)
     duree = fields.Float(string=u"Durée intervention", required=True, digits=(12, 5), track_visibility='always')
     duree_debut_fin = fields.Float(
-        string=u"Durée entre le début et la fin", compute="_compute_duree_debut_fin", store=True,
+        string=u"Durée entre le début et la fin", compute="_compute_duree_debut_fin",
         help=u"Prend en compte le temp de pause au milieu du RDV")
     jour_fin = fields.Char("Jour fin", compute="_compute_jour")
     date_deadline = fields.Datetime(
