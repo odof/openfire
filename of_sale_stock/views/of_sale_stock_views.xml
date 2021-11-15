@@ -69,6 +69,7 @@
     <record id="of_view_move_picking_tree" model="ir.ui.view">
         <field name="name">of.stock.move.tree</field>
         <field name="model">stock.move</field>
+        <field name="priority">10</field>
         <field name="inherit_id" ref="stock.view_move_picking_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//tree//field[@name='name']" position="attributes">
@@ -76,7 +77,7 @@
                 <attribute name="groups">of_sale_stock.group_description_BL_variant</attribute>
             </xpath>
             <!-- Afficher la date prévue -->
-            <xpath expr="//button[1]" position="before">
+            <xpath expr="//tree" position="inside">
                 <field name="date_expected" attrs="{'readonly': [('state','in',['done','assigned', 'cancel'])]}"/>
             </xpath>
         </field>
