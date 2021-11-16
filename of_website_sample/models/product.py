@@ -6,7 +6,6 @@ from odoo import models, fields, api
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-
     @api.model
     def create(self, args):
         sample_available = args.get('sample_available', False)
@@ -16,17 +15,17 @@ class ProductTemplate(models.Model):
             # On créé le sample
             sample_id = self.create({
                 "name": args.get('name') + u" (échantillon)",
-                "type": args.get('type',False),
-                "brand_id": args.get('brand_id',False),
+                "type": args.get('type', False),
+                "brand_id": args.get('brand_id', False),
                 "default_code": args.get('default_code', '')
-                                + self.env['ir.sequence'].next_by_code('product.sample') or '_ECH',
-                "categ_id": args.get('categ_id',False),
-                "public_categ_ids": args.get('public_categ_ids',False),
-                "description_sale": args.get('description_sale',False),
-                "description_purchase": args.get('description_purchase',False),
-                "description_picking": args.get('description_picking',False),
-                "description_fabricant": args.get('description_fabricant',False),
-                "seller_ids": args.get('seller_ids',False),
+                + self.env['ir.sequence'].next_by_code('product.sample') or '_ECH',
+                "categ_id": args.get('categ_id', False),
+                "public_categ_ids": args.get('public_categ_ids', False),
+                "description_sale": args.get('description_sale', False),
+                "description_purchase": args.get('description_purchase', False),
+                "description_picking": args.get('description_picking', False),
+                "description_fabricant": args.get('description_fabricant', False),
+                "seller_ids": args.get('seller_ids', False),
                 "is_sample": True,
                 "active": True,
                 "website_published": False,
@@ -43,16 +42,15 @@ class ProductTemplate(models.Model):
 
         return res
 
-
     sample_available = fields.Boolean("Sample available")
     is_sample = fields.Boolean("Is sample")
     sample_id = fields.Many2one("product.template", string="Sample")
     sample_default_code = fields.Char(related="sample_id.default_code", string="Sample ref.", readonly=True)
     sample_active = fields.Boolean(related="sample_id.active", string="Sample active", readonly=True)
     sample_parent_id = fields.Many2one("product.template", string="Sample parent")
-    sample_parent_default_code = fields.Char(related="sample_parent_id.default_code", string="Parent ref.", readonly=True)
+    sample_parent_default_code = fields.Char(related="sample_parent_id.default_code",
+                                             string="Parent ref.", readonly=True)
     sample_parent_active = fields.Boolean(related="sample_parent_id.active", string="Parent active", readonly=True)
-
 
     @api.multi
     def action_view_sample(self):
@@ -76,7 +74,6 @@ class ProductTemplate(models.Model):
                 'type': 'ir.actions.act_window',
             }
 
-
     @api.multi
     def write(self, args):
         sample_available = args.get('sample_available')
@@ -88,7 +85,7 @@ class ProductTemplate(models.Model):
                 self.sample_id.active = args['active']
 
         # On ne veut pas qu'un sample apparaisse dans le shop
-        if website_published == True:
+        if website_published:
             if self.is_sample:
                 args.pop('website_published')
 
@@ -107,14 +104,13 @@ class ProductTemplate(models.Model):
                     })
                     seller_ids.append(seller_id.id)
 
-
                 # On créé sample_id
                 sample_id = self.create({
                     "name": self.name + u" (échantillon)",
                     "type": self.type,
                     "brand_id": self.brand_id.id,
                     "default_code": self.default_code
-                                    + self.env['ir.sequence'].next_by_code('product.sample') or '_ECH',
+                    + self.env['ir.sequence'].next_by_code('product.sample') or '_ECH',
                     "categ_id": self.categ_id and self.categ_id.id,
                     "public_categ_ids": self.public_categ_ids and self.public_categ_ids.ids,
                     "description_sale": self.description_sale,
@@ -148,9 +144,9 @@ class ProductTemplate(models.Model):
                     "website_published": False,
                 })
 
-        # On teste sample_available == False au lieu de not sample_available
+        # On teste sample_available is False au lieu de not sample_available
         # Car sample_available = args.get('sample_available') renvoie None si non présent dans le dict
-        elif sample_available == False:
+        elif sample_available is False:
             # on désactive sample_available et on archive le sample")
             self.sample_id.write({
                     "active": False,
