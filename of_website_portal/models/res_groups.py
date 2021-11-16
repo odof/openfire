@@ -27,7 +27,6 @@ class ResUsers(models.Model):
 
             # On teste si on ajoute le groupe b2b sur l'utilisateur
             if group_portal_b2b.id == values['groups_id'][0][1] and values['groups_id'][0][0] == 4:
-                print('B2B')
 
                 # On ajoute la liste de prix b2b ainsi que la position fiscale b2c
                 self.partner_id.property_product_pricelist = website_id.of_pricelist_b2b_id
@@ -58,4 +57,3 @@ class ResGroups(models.Model):
             })
 
         return True
-

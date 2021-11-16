@@ -1,0 +1,123 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_website_sample
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-11-23 11:12+0000\n"
+"PO-Revision-Date: 2021-11-23 11:12+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_website_sample
+#: code:addons/of_website_sample/models/product.py:85
+#: code:addons/of_website_sample/models/product.py:109
+#, python-format
+msgid " (sample)"
+msgstr " (échantillon)"
+
+#. module: of_website_sample
+#: model:ir.ui.view,arch_db:of_website_sample.product
+msgid "Add sample to Cart"
+msgstr "Ajouter échantillon au panier"
+
+#. module: of_website_sample
+#: model:ir.model.fields,help:of_website_sample.field_product_product_sample_active
+#: model:ir.model.fields,help:of_website_sample.field_product_product_sample_parent_active
+#: model:ir.model.fields,help:of_website_sample.field_product_template_sample_active
+#: model:ir.model.fields,help:of_website_sample.field_product_template_sample_parent_active
+msgid "If unchecked, it will allow you to hide the product without removing it."
+msgstr "En décochant cette case, il est possible de masquer l'article sans le supprimer."
+
+#. module: of_website_sample
+#: model:ir.model.fields,field_description:of_website_sample.field_product_product_is_sample
+#: model:ir.model.fields,field_description:of_website_sample.field_product_template_is_sample
+#: model:ir.model.fields,field_description:of_website_sample.field_sale_order_is_sample
+msgid "Is sample"
+msgstr "Est un échantillon"
+
+#. module: of_website_sample
+#: model:ir.ui.view,arch_db:of_website_sample.of_website_sample_product_template_form_view
+msgid "Parent"
+msgstr "Parent"
+
+#. module: of_website_sample
+#: model:ir.model.fields,field_description:of_website_sample.field_product_product_sample_parent_active
+#: model:ir.model.fields,field_description:of_website_sample.field_product_template_sample_parent_active
+msgid "Parent active"
+msgstr "Parent actif"
+
+#. module: of_website_sample
+#: model:ir.model.fields,field_description:of_website_sample.field_product_product_sample_parent_default_code
+#: model:ir.model.fields,field_description:of_website_sample.field_product_template_sample_parent_default_code
+msgid "Parent ref."
+msgstr "Réf parent"
+
+#. module: of_website_sample
+#: model:ir.model,name:of_website_sample.model_product_template
+msgid "Product Template"
+msgstr "Modèle d'article"
+
+#. module: of_website_sample
+#: model:ir.ui.view,arch_db:of_website_sample.of_website_sample_product_template_form_view
+msgid "Sale-related settings are managed on"
+msgstr "Les paramètres de Ventes sont gérés sur"
+
+#. module: of_website_sample
+#: model:ir.ui.view,arch_db:of_website_sample.of_website_sample_product_template_form_view
+msgid "Sales"
+msgstr "Ventes"
+
+#. module: of_website_sample
+#: model:ir.model,name:of_website_sample.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_website_sample
+#: model:ir.model.fields,field_description:of_website_sample.field_product_product_sample_id
+#: model:ir.model.fields,field_description:of_website_sample.field_product_template_sample_id
+#: model:ir.ui.view,arch_db:of_website_sample.of_website_sample_product_template_form_view
+#: model:ir.ui.view,arch_db:of_website_sample.of_website_sample_product_template_search_view
+msgid "Sample"
+msgstr "Échantillon"
+
+#. module: of_website_sample
+#: model:ir.ui.view,arch_db:of_website_sample.view_sales_order_filter_ecommerce
+msgid "Sample Order"
+msgstr "Commande échantillon"
+
+#. module: of_website_sample
+#: model:ir.model.fields,field_description:of_website_sample.field_product_product_sample_active
+#: model:ir.model.fields,field_description:of_website_sample.field_product_template_sample_active
+msgid "Sample active"
+msgstr "Échantillon actif"
+
+#. module: of_website_sample
+#: model:ir.model.fields,field_description:of_website_sample.field_product_product_sample_available
+#: model:ir.model.fields,field_description:of_website_sample.field_product_template_sample_available
+msgid "Sample available"
+msgstr "Disponible en échantillon"
+
+#. module: of_website_sample
+#: model:ir.model.fields,field_description:of_website_sample.field_product_product_sample_parent_id
+#: model:ir.model.fields,field_description:of_website_sample.field_product_template_sample_parent_id
+#: model:ir.ui.view,arch_db:of_website_sample.of_website_sample_product_template_search_view
+msgid "Sample parent"
+msgstr "Parent de l'échantillon"
+
+#. module: of_website_sample
+#: model:ir.model.fields,field_description:of_website_sample.field_product_product_sample_default_code
+#: model:ir.model.fields,field_description:of_website_sample.field_product_template_sample_default_code
+msgid "Sample ref."
+msgstr "Réf échantillon"
+
+#. module: of_website_sample
+#: model:ir.ui.view,arch_db:of_website_sample.of_website_sample_product_template_form_view
+msgid "the sample parent"
+msgstr "le parent de l'échantillon"

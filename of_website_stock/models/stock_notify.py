@@ -13,22 +13,20 @@ class OfWebsiteStockNotify(models.Model):
 
     @api.model
     def _cron_of_website_stock_notification(self):
+        mail_mail_obj = self.env['mail.mail']
         stock_notify_ids = self.search([('status', '=', 'draft')])
         super_user = self.env['res.users'].browse(SUPERUSER_ID)
         for stock_notify_id in stock_notify_ids:
             if stock_notify_id.product_id.qty_available > 0:
                 template_id = self.env.ref('of_website_stock.email_template_sale_stock_notification')
+                values = template_id.generate_email(stock_notify_id.id, fields=None)
+                values['email_from'] = super_user.email
+                values['email_to'] = stock_notify_id.email
+                values['res_id'] = False
+                msg_id = mail_mail_obj.create(values)
+                if msg_id:
+                    mail_mail_obj.send([msg_id])
 
-                if template_id:
-                    values = template_id.generate_email(stock_notify_id.id, fields=None)
-                    values['email_from'] = super_user.email
-                    values['email_to'] = stock_notify_id.email
-                    values['res_id'] = False
-                    mail_mail_obj = self.env['mail.mail']
-                    msg_id = mail_mail_obj.create(values)
-                    if msg_id:
-                        mail_mail_obj.send([msg_id])
-
-                    stock_notify_id.status = 'done'
+                stock_notify_id.status = 'done'
 
         return True
