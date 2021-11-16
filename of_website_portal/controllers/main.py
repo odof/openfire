@@ -116,6 +116,6 @@ class WebsiteAccount(website_account):
         if kw.get('order_id', False):
             order = request.env['sale.order'].browse([int(kw['order_id'])])
             if order:
-                order.sudo().state = 'sale'
+                order.action_confirm()
 
         return request.redirect('/my/quotes')
