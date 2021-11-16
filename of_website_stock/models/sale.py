@@ -6,9 +6,9 @@ from datetime import timedelta
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    website_commitment_date = fields.Datetime(string='Website Commitment Date',
-        help="Date by which the products are sure to be delivered. This is a date that you can "
-             "promise to the customer, based on the Product Lead Times.")
+    website_commitment_date = fields.Datetime(
+        string='Website Commitment Date', help="Date by which the products are sure to be delivered."
+        "This is a date that you can promise to the customer, based on the Product Lead Times.")
 
     def _compute_website_commitment_date(self):
         """Compute the website commitment date, only called on /shop/payment from the website"""
@@ -17,6 +17,7 @@ class SaleOrder(models.Model):
         website = self.env['website'].search([])[0]
         of_delivery_management = website.get_of_delivery_management()
         of_website_security_lead = float(website.get_of_website_security_lead()) or 0
+        datetime_now = fields.Datetime.now()
 
         for order in self:
 
@@ -28,9 +29,10 @@ class SaleOrder(models.Model):
 
             # On prend la date max entre la date de la comande et la date d'aujourd'hui
             if order.date_order:
-                order_datetime = max([fields.Datetime.from_string(order.date_order), fields.Datetime.from_string(fields.Datetime.now())])
+                order_datetime = max(
+                    [fields.Datetime.from_string(order.date_order), fields.Datetime.from_string(datetime_now)])
             else:
-                order_datetime = fields.Datetime.from_string(fields.Datetime.now())
+                order_datetime = fields.Datetime.from_string(datetime_now)
 
             # Avec le test sur sale_ok, on exclue la ligne qui corrrespond à la livraison
             for line in order.order_line.filtered(lambda x: x.state != 'cancel' and x.product_id.sale_ok is True):
@@ -57,6 +59,13 @@ class SaleOrder(models.Model):
                 # On détermine la commitment_date en fonction de la picking policy
                 commit_date = min(dates_list) if order.picking_policy == 'direct' else max(dates_list)
                 order.website_commitment_date = fields.Datetime.to_string(commit_date)
+
+                # Si la requested_date n'est plus à jour, on la met à jour
+                if order.requested_date:
+                    order.requested_date = fields.Datetime.to_string(max([
+                        fields.Datetime.from_string(order.requested_date),
+                        fields.Datetime.from_string(order.website_commitment_date)
+                    ]))
 
     # Add a depends on picking_policy
     @api.depends('date_order', 'picking_policy', 'order_line.customer_lead')

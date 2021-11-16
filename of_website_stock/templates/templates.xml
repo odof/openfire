@@ -194,7 +194,7 @@
 						<h4>Choose your Delivery Date</h4>
 						<div class="form-group">
 							<div class='input-group date' id='datetimepicker'>
-								<input name="requested_date" type='text' class="form-control"/>
+								<input name="requested_date" type='text' class="form-control" autocomplete="off"/>
 								<span class="input-group-addon">
 									<span class="glyphicon glyphicon-calendar"></span>
 								</span>
@@ -217,15 +217,15 @@
 						$pay_button.prop('disabled', false);
 
 						$('#datetimepicker').datetimepicker({
-						format: 'DD/MM/YYYY',
-						defaultDate: "<t t-esc="website_sale_order.requested_date if website_sale_order.requested_date else website_sale_order.website_commitment_date" t-options="{'widget': 'date'}"/>",
-						minDate: "<t t-esc="website_sale_order.website_commitment_date" t-options="{'widget': 'date'}"/>",
-						pickTime: false,
-						}).on('dp.change', function () {
-						$pay_button.prop('disabled', true);
-						var requested_date = $(this).find("input[name='requested_date']").val();
-						window.location.href = '/shop/payment?requested_date=' + requested_date;
-						});
+							format: 'DD/MM/YYYY',
+							defaultDate: "<t t-esc="website_sale_order.requested_date if website_sale_order.requested_date else website_sale_order.website_commitment_date" t-options="{'widget': 'date'}"/>",
+							minDate: "<t t-esc="website_sale_order.website_commitment_date" t-options="{'widget': 'date'}"/>",
+							pickTime: false,
+							}).on('dp.change', function () {
+								$pay_button.prop('disabled', true);
+								var requested_date = $(this).find("input[name='requested_date']").val();
+								window.location.href = '/shop/payment?requested_date=' + requested_date;
+							});
 						});
 					</script>
 				</div>

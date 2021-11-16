@@ -33,7 +33,8 @@ class WebsiteConfigSettings(models.TransientModel):
     @api.model
     def _auto_init(self):
         """
-        Cette fonction est appelée à chaque mise à jour mais ne fait quelque chose que la première fois qu'elle est appelée.
+        Cette fonction est appelée à chaque mise à jour mais ne fait quelque chose
+        que la première fois qu'elle est appelée.
         """
         super(WebsiteConfigSettings, self)._auto_init()
         if not self.env['ir.values'].get_default('website.config.settings', 'of_stock_type'):
