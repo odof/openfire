@@ -16,23 +16,14 @@ class SaleOrder(models.Model):
         # On récupère le site web
         website = self.env['website'].search([])[0]
         of_delivery_management = website.get_of_delivery_management()
-        of_website_security_lead = float(website.get_of_website_security_lead()) or 0
-        datetime_now = fields.Datetime.now()
 
         for order in self:
 
             if not of_delivery_management:
                 order.website_commitment_date = False
-                return
+                continue
 
             dates_list = []
-
-            # On prend la date max entre la date de la comande et la date d'aujourd'hui
-            if order.date_order:
-                order_datetime = max(
-                    [fields.Datetime.from_string(order.date_order), fields.Datetime.from_string(datetime_now)])
-            else:
-                order_datetime = fields.Datetime.from_string(datetime_now)
 
             # Avec le test sur sale_ok, on exclue la ligne qui corrrespond à la livraison
             for line in order.order_line.filtered(lambda x: x.state != 'cancel' and x.product_id.sale_ok is True):
@@ -109,7 +100,7 @@ class SaleOrderLine(models.Model):
 
     def get_quantity_available(self):
         # On récupère le site web
-        website = self.env['website'].search([])[0]
+        website = self.env['website'].search([], limit=1)
 
         # On calcul le product_quantity en fonction de la configuration on_hand/forecast
         quantity_available = self.product_id.qty_available
@@ -120,18 +111,19 @@ class SaleOrderLine(models.Model):
 
     def get_days_of_delay(self):
         # On récupère le site web
-        website = self.env['website'].search([])[0]
+        website = self.env['website'].search([], limit=1)
 
         # On calcul le days_of_delay en fonction de la quantity_available
         days_of_delay = float(max(self.customer_lead, website.get_of_website_security_lead()) or 0.0)
         if self.product_uom_qty > self.get_quantity_available():
-            days_of_delay += (website.company_id.security_lead or 0.0) + (self.product_id._select_seller(quantity=self.product_qty, uom_id=self.product_uom).delay or 0.0)
+            days_of_delay += (website.company_id.security_lead or 0.0) + (self.product_id._select_seller(
+                quantity=self.product_qty, uom_id=self.product_uom).delay or 0.0)
 
         return days_of_delay or 0.0
 
     def get_delivery_date(self):
         # On calcul le delivery_date en fonction du days_of_delay
-        return (datetime.now() + timedelta(days=self.get_days_of_delay()))
+        return datetime.now() + timedelta(days=self.get_days_of_delay())
 
 
 class ProductTemplate(models.Model):

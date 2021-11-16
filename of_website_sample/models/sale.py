@@ -6,7 +6,6 @@ from odoo import models, fields, api
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-
     is_sample = fields.Boolean("Is sample", compute="_compute_is_sample", store=True)
 
     @api.depends('order_line', 'order_line.product_id', 'order_line.product_id.is_sample')

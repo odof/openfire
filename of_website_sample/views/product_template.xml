@@ -10,12 +10,12 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@name='options']" position="inside">
                 <div>
-                    <field name="sample_available"/>
+                    <field name="sample_available" attrs="{'readonly': [('is_sample', '=', True)]}"/>
                     <label for="sample_available"/>
                 </div>
             </xpath>
             <xpath expr="//group[@name='group_general']" position="inside">
-                <field name="is_sample"/>
+                <field name="is_sample" invisible="1"/>
                 <field name="sample_id" invisible="1"/>
                 <field name="sample_parent_id" invisible="1"/>
                 <field name="sample_active" invisible="1"/>
@@ -26,17 +26,121 @@
                         type="object"
                         class="oe_stat_button"
                         icon="fa-pencil-square-o"
-                        attrs="{'invisible': ['|','|',('sample_id', '==', False),('sample_available', '==', False),('sample_active', '==', False)]}">
+                        attrs="{'invisible': ['|','|',('sample_id', '=', False),('sample_available', '=', False),('sample_active', '=', False)]}">
                     <field name="sample_default_code" widget="statinfo" string="Sample"/>
                 </button>
                 <button name="action_view_sample_parent"
                         type="object"
                         class="oe_stat_button"
                         icon="fa-pencil-square-o"
-                        attrs="{'invisible': ['|','|',('sample_parent_id', '==', False),('is_sample', '==', False),('sample_parent_active', '==', False)]}">
+                        attrs="{'invisible': ['|','|',('sample_parent_id', '=', False),('is_sample', '=', False),('sample_parent_active', '=', False)]}">
                     <field name="sample_parent_default_code" widget="statinfo" string="Parent"/>
                 </button>
+            </xpath>
 
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="attrs">{'form_readonly_exception': True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='list_price']" position="attributes">
+                <attribute name="attrs">{'form_readonly_exception': True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='standard_price']" position="attributes">
+                <attribute name="attrs">{'form_readonly_exception': True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='uom_id']" position="attributes">
+                <attribute name="attrs">{'form_readonly_exception': True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='uom_po_id']" position="attributes">
+                <attribute name="attrs">{'form_readonly_exception': True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='description_sale']" position="attributes">
+                <attribute name="attrs">{'form_readonly_exception': True}</attribute>
+            </xpath>
+
+            <xpath expr="//page[@name='sales']" position="attributes">
+                <attribute name="attrs">{'invisible':['|',('sale_ok','=',False),('is_sample','=',True)]}</attribute>
+            </xpath>
+            <xpath expr="//page[@name='sales']" position="after">
+                <page string="Sales" name="sales_disabled" attrs="{'invisible':['|',('sale_ok','=',False),('is_sample','=',False)]}">
+                    <div>
+                        <p>Sale-related settings are managed on <button name="action_view_sample_parent" type="object" string="the sample parent" class="oe_link"/></p>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_website_sample_product_template_only_form_view" model="ir.ui.view">
+        <field name="name">of.website.sample.product.template.only.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='default_code']" position="attributes">
+                <attribute name="attrs">{'invisible': [('product_variant_count', '&gt;', 1)], 'form_readonly_exception': True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='list_price']" position="attributes">
+                <attribute name="attrs">{'form_readonly_exception': True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='standard_price']" position="attributes">
+                <attribute name="attrs">{'form_readonly_exception': True}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_website_sample_of_website_sale_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.website.sample.of.website.sale.product.template.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="of_website_sale.of_website_sale_product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='website_description']" position="attributes">
+                <attribute name="attrs">{'form_readonly_exception': True}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_website_sample_of_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.website.sample.of.product.template.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="of_product.of_product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='description_fabricant']" position="attributes">
+                <attribute name="attrs">{'form_readonly_exception': True}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_website_sample_view_product_supplier_inherit" model="ir.ui.view">
+        <field name="name">of.website.sample.view.product.supplier.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="purchase.view_product_supplier_inherit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='seller_ids']" position="attributes">
+                <attribute name="attrs">{'form_readonly_exception': True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='description_purchase']" position="attributes">
+                <attribute name="attrs">{'form_readonly_exception': True}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_website_sample_view_template_property_form" model="ir.ui.view">
+        <field name="name">of.website.sample.view.template.property.template.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="stock.view_template_property_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='description_picking']" position="attributes">
+                <attribute name="attrs">{'form_readonly_exception': True}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_website_sample_website_sale_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.website.sample.website.sale.product.template.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="website_sale.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='website_publish_button']" position="attributes">
+                <attribute name="attrs">{'invisible': [('is_sample', '=', True)]}</attribute>
             </xpath>
         </field>
     </record>
@@ -52,6 +156,26 @@
                 <filter string="Sample parent" name="sample_parent" domain="[('sample_available','=',True)]"/>
             </xpath>
         </field>
+    </record>
+
+    <record id="product.product_template_action_all" model="ir.actions.act_window">
+        <field name="context">{'form_readonly': '[("is_sample","=",True)]'}</field>
+    </record>
+
+    <record id="product.product_template_action" model="ir.actions.act_window">
+        <field name="context">{'search_default_filter_to_sell': 1, 'form_readonly': '[("is_sample","=",True)]'}</field>
+    </record>
+
+    <record id="website_sale.product_template_action" model="ir.actions.act_window">
+        <field name="context">{'search_default_published': 1, 'default_website_published': True, 'form_readonly': '[("is_sample","=",True)]'}</field>
+    </record>
+
+    <record id="stock.product_template_action_product" model="ir.actions.act_window">
+        <field name="context">{"search_default_consumable": 1, 'default_type': 'product', 'form_readonly': '[("is_sample","=",True)]'}</field>
+    </record>
+
+    <record id="purchase.product_normal_action_puchased" model="ir.actions.act_window">
+        <field name="context">{"search_default_filter_to_purchase": 1, 'form_readonly': '[("is_sample","=",True)]'}</field>
     </record>
 
 </odoo>

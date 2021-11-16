@@ -11,7 +11,7 @@
     <template id="product" inherit_id="of_website_sample.product" name="Product (of_website_sample_stock)">
         <xpath expr="//form[@id='form_sample_to_cart']" position="replace">
             <t t-set="sample" t-value="product.sudo().sample_id"/>
-            <t t-if="sample">
+            <t t-if="sample and sample.active">
                 <t t-if="website.get_website_config() == 'none'">
                     <form action="/shop/cart/update" class="js_add_sample_cart_variants"
                           t-att-data-attribute_value_ids="attribute_value_ids" method="POST" id="form_sample_to_cart_2">
