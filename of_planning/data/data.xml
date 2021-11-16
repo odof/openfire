@@ -106,4 +106,21 @@ Cordialement,
 ]]></field>
     </record>
 
+    <record id="email_template_of_planning_intervention_rapport_intervention" model="mail.template">
+        <field name="name">RDV - Rapport d'intervention</field>
+        <field name="partner_to">${object.address_id.email and object.address_id.id or object.partner_id.id}</field>
+        <field name="subject">Votre rapport d'intervention du ${format_date(object.date_date)}</field>
+        <field name="model_id" ref="of_planning.model_of_planning_intervention"/>
+        <field name="auto_delete" eval="False"/>
+        <field name="lang">${object.address_id.lang}</field>
+        <field name="report_template" ref="of_planning.of_planning_raport_intervention_report"/>
+        <field name="report_name">${("Rapport d'intervention du %s" % format_date(object.date_date)).replace("/","_")}</field>
+        <field name="body_html"><![CDATA[
+<p>Bonjour ${object.address_id.name or ''},
+<br/><br/>
+Veuillez trouver ci-joint le rapport de l'intervention effectuée le ${format_date(object.date_date)}.
+</p>
+]]></field>
+    </record>
+
 </odoo>

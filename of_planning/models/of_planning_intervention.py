@@ -1324,6 +1324,8 @@ class OfPlanningIntervention(models.Model):
                 vals['duree'] = (date_deadline_dt - date_dt).total_seconds() / 3600
         super(OfPlanningIntervention, self).write(vals)
         self._affect_number()
+        if vals.get('state', '') == 'done':
+            self._send_report()
 
         # Si BL associé, on met à jour la date du BL en fonction de la date d'intervention
         if 'picking_id' in vals or 'date' in vals:
@@ -1636,6 +1638,23 @@ class OfPlanningIntervention(models.Model):
                     and interv.state in ('confirm', 'done', 'unfinished', 'postponed')\
                     and not interv.number:
                 interv.write({'number': self.template_id.sequence_id.next_by_id()})
+
+    @api.multi
+    def _send_report(self):
+        ir_model_data = self.env['ir.model.data']
+        default_template = self.env.ref('of_planning.of_planning_default_intervention_template',
+                                        raise_if_not_found=False)
+        for interv in self:
+            if interv.state == 'done' and (interv.template_id and interv.template_id.send_reports == 'auto_done'
+                                           or not interv.template_id and default_template
+                                           and default_template.send_reports == 'auto_done'):
+                try:
+                    mail_template = ir_model_data.get_object(
+                        'of_planning', 'email_template_of_planning_intervention_rapport_intervention')
+                except ValueError:
+                    raise UserError(u"Le modèle pour l'envoi du rapport d'intervention n'existe pas. "
+                                    u"Veuillez contacter le support.")
+                mail_template.send_mail(interv.id, force_send=True)
 
     @api.multi
     def _get_invoicing_company(self, partner):
