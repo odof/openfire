@@ -128,6 +128,11 @@ class OfPlanningInterventionTemplate(models.Model):
     tache_id = fields.Many2one('of.planning.tache', string=u"Tâche")
     fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale", company_dependent=True)
     line_ids = fields.One2many('of.planning.intervention.template.line', 'template_id', string="Lignes de facturation")
+    send_reports = fields.Selection(
+        selection=[
+            ('manual', u"Envoi manuel"),
+            ('auto_done', u"Envoi automatique quand intervention en “Réalisé”")
+        ], string=u"Envoi des rapports", default='manual')
 
     is_default_template = fields.Boolean(compute="_compute_is_default_template")
     # FICHE D'INTERVENTION
