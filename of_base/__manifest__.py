@@ -53,7 +53,6 @@ Ajout d'un modèle servant de log interne :
         'views/of_base_view.xml',
         'views/of_log_message_views.xml',
         'views/templates.xml',
-        'wizard/wizard_change_active_product.xml',
         'wizard/of_popup_wizard_view.xml',
         'wizard/of_res_partner_check_duplications_views.xml',
     ],
