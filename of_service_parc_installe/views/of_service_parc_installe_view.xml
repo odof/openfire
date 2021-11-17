@@ -15,12 +15,24 @@
                        attrs="{'invisible': [('recurrence', '=', True)]}"
                        groups="of_service_parc_installe.group_of_project_issue_not_migrated+(project.group_project_user, base.group_portal)"/>
             </xpath>
+            <xpath expr="//field[@name='tag_ids']" position="after">
+                <field name="of_canal_id"
+                       attrs="{'invisible': [('type_id', '!=', %(of_service_parc_installe.of_service_type_sav)d)]}"/>
+            </xpath>
+            <xpath expr="//field[@name='tache_id']" position="before">
+                <field name="of_categorie_id"
+                       attrs="{'invisible': [('type_id', '!=', %(of_service_parc_installe.of_service_type_sav)d)]}"/>
+            </xpath>
             <xpath expr="//page[@name='description']" position="after">
                 <page name="parc" string="Produit installé">
                     <group string="Produit installé" groups="project.group_project_user" colspan="2">
                         <field name="parc_installe_id" context="{'address_prio_id': address_id or partner_id}"/>
                         <field name="parc_installe_product_id"/>
                         <field name="parc_installe_site_adresse_id"/>
+                        <field name="parc_type_garantie"
+                               attrs="{'invisible': [('type_id', '!=', %(of_service_parc_installe.of_service_type_sav)d)]}"/>
+                        <field name="payer_mode"
+                               attrs="{'invisible': [('type_id', '!=', %(of_service_parc_installe.of_service_type_sav)d)]}"/>
                         <field name="parc_installe_note"/>
                     </group>
                 </page>
