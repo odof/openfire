@@ -108,6 +108,10 @@ Nature de l''intervention: ' || pi.of_intervention ELSE '' END)
 Pièces à commander: ' || pi.of_piece_commande ELSE '' END)
         || '
 nº SAV ancienne version: ' || pi.of_code
+        || (CASE WHEN pi.stage_id IS NOT NULL
+            THEN '
+Étape SAV ancienne version: '
+            || (SELECT ptt.name FROM project_task_type ptt WHERE ptt.id = pi.stage_id) ELSE '' END)
         || (CASE WHEN pi.product_name_id IS NOT NULL AND pi.of_produit_installe_id IS NULL 
             THEN '
 Article associé ancienne version: ['
@@ -185,6 +189,10 @@ Nature de l''intervention: ' || pi.of_intervention ELSE '' END)
 Pièces à commander: ' || pi.of_piece_commande ELSE '' END)
         || '
 nº SAV ancienne version: ' || pi.of_code
+        || (CASE WHEN pi.stage_id IS NOT NULL
+            THEN '
+Étape SAV ancienne version: '
+            || (SELECT ptt.name FROM project_task_type ptt WHERE ptt.id = pi.stage_id) ELSE '' END)
         || (CASE WHEN pi.product_name_id IS NOT NULL AND pi.of_produit_installe_id IS NULL
             THEN '
 Article associé ancienne version: [' 
