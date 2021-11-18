@@ -1382,7 +1382,7 @@ class OfContractLine(models.Model):
     def _generate_services(self):
         """ Génération des interventions à programmer """
         service_obj = self.with_context(bloquer_recurrence=True).env['of.service']
-        type = self.env.ref('of_contract_custom.of_contract_custom_type_maintenance')
+        type = self.env.ref('of_service.of_service_type_maintenance')
         for line in self:
             if not line.current_period_id or not line.state == 'validated':
                 continue
