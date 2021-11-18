@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import fields, models, api, _
-from datetime import timedelta
+from datetime import datetime, date, timedelta
 
 
 class SaleOrder(models.Model):
@@ -37,22 +37,8 @@ class SaleOrder(models.Model):
             # Avec le test sur sale_ok, on exclue la ligne qui corrrespond à la livraison
             for line in order.order_line.filtered(lambda x: x.state != 'cancel' and x.product_id.sale_ok is True):
 
-                # On prend le max entre customer_lead et of_website_security_lead
-                days = max(line.customer_lead, of_website_security_lead) or 0.0
-
-                # On calcul le product_quantity en fonction de la configuration on_hand/forecast
-                if website.get_website_config() != 'none':
-                    product_quantity = line.product_id.qty_available
-                    if website.get_website_config() == 'forecast':
-                        product_quantity += - line.product_id.outgoing_qty + line.product_id.incoming_qty
-
-                    # Si article indisponible, on rajoute le délai fournisseur et la marge de sécurité
-                    if not product_quantity > 0:
-                        days += (website.company_id.security_lead + line.product_id._select_seller(
-                            quantity=line.product_qty, uom_id=line.product_uom).delay) \
-                                or 0.0
-
-                dt = order_datetime + timedelta(days=days)
+                # On récupère la date de livraison pour cette ligne
+                dt = line.get_delivery_date()
                 dates_list.append(dt)
 
             if dates_list:
@@ -120,6 +106,32 @@ class SaleOrderLine(models.Model):
     @api.depends('product_id')
     def _compute_product_id_set_customer_lead(self):
         self.customer_lead = self.product_id.sale_delay
+
+    def get_quantity_available(self):
+        # On récupère le site web
+        website = self.env['website'].search([])[0]
+
+        # On calcul le product_quantity en fonction de la configuration on_hand/forecast
+        quantity_available = self.product_id.qty_available
+        if website.get_website_config() == 'forecast':
+            quantity_available += - self.product_id.outgoing_qty + self.product_id.incoming_qty
+
+        return quantity_available or 0
+
+    def get_days_of_delay(self):
+        # On récupère le site web
+        website = self.env['website'].search([])[0]
+
+        # On calcul le days_of_delay en fonction de la quantity_available
+        days_of_delay = float(max(self.customer_lead, website.get_of_website_security_lead()) or 0.0)
+        if self.product_uom_qty > self.get_quantity_available():
+            days_of_delay += (website.company_id.security_lead or 0.0) + (self.product_id._select_seller(quantity=self.product_qty, uom_id=self.product_uom).delay or 0.0)
+
+        return days_of_delay or 0.0
+
+    def get_delivery_date(self):
+        # On calcul le delivery_date en fonction du days_of_delay
+        return (datetime.now() + timedelta(days=self.get_days_of_delay()))
 
 
 class ProductTemplate(models.Model):

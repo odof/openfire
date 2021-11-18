@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-25 10:05+0000\n"
-"PO-Revision-Date: 2021-11-25 10:05+0000\n"
+"POT-Creation-Date: 2021-11-18 10:57+0000\n"
+"PO-Revision-Date: 2021-11-18 10:57+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -94,6 +94,11 @@ msgstr "<span class=\"label label-primary\">\n"
 #: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message_in_item
 msgid "<span class=\"label label-primary\">In Stock</span>"
 msgstr "<span class=\"label label-primary\">En stock</span>"
+
+#. module: of_website_stock
+#: model:ir.ui.view,arch_db:of_website_stock.of_payment
+msgid "<span>days</span>"
+msgstr "<span>jours</span>"
 
 #. module: of_website_stock
 #: model:ir.ui.view,arch_db:of_website_stock.of_payment
