@@ -109,7 +109,7 @@ class ProductTemplate(models.Model):
                     "name": self.name + u" (échantillon)",
                     "type": self.type,
                     "brand_id": self.brand_id.id,
-                    "default_code": self.default_code
+                    "default_code": (self.default_code or '')
                     + self.env['ir.sequence'].next_by_code('product.sample') or '_ECH',
                     "categ_id": self.categ_id and self.categ_id.id,
                     "public_categ_ids": self.public_categ_ids and self.public_categ_ids.ids,
