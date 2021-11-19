@@ -579,6 +579,8 @@ class OfService(models.Model):
         if self.base_state == "draft" and template:
             if template.tache_id:
                 self.tache_id = template.tache_id
+            if template.type_id:
+                self.type_id = template.type_id
             if not self.fiscal_position_id:
                 self.fiscal_position_id = template.fiscal_position_id
             new_lines = self.line_ids
@@ -593,6 +595,11 @@ class OfService(models.Model):
     def onchange_type_id(self):
         if self.type_id and self.type_id.kanban_ids:
             self.kanban_step_id = self.type_id.kanban_ids[0]
+
+    @api.onchange('fiscal_position_id')
+    def onchange_fiscal_position_id(self):
+        if self.fiscal_position_id:
+            self.line_ids.compute_taxes()
 
     # CRUD
 
@@ -1176,6 +1183,7 @@ class OfServiceLine(models.Model):
             'name': self.name,
             'taxe_ids': [(6, 0, self.taxe_ids and self.taxe_ids._ids or [])],
             'discount': self.discount,
+            'order_line_id': self.saleorder_line_id,
         }
 
     @api.multi

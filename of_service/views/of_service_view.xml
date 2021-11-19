@@ -21,7 +21,7 @@
                             attrs="{'invisible': [('base_state', '!=', 'calculated')]}"/>
                     <button name="button_brouillon" string="Remettre en brouillon" states="cancel" type="object"/>
                     <button name="action_service_send" string="Envoyer par email" type="object"/>
-                    <field name="kanban_step_id" widget="statusbar" clickable="True" options="{'fold_field': 'fold'}"/>
+                    <field name="kanban_step_id" widget="statusbar" clickable="True"/>
                 </header>
                 <sheet>
                     <field name="alert_dates" invisible="1"/>
@@ -431,6 +431,7 @@
                 <field name="mois_ids"/>
                 <field name="jour_ids"/>
                 <field name="state"/>
+                <field name="note"/>
                 <field name="recurrence" invisible="1"/>
                 <field name="date_fin" invisible="1"/>
                 <field name="date_fin_min" filter_domain="[('date_fin','&gt;=',self)]"/>

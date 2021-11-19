@@ -1137,9 +1137,12 @@ class OfPlanningIntervention(models.Model):
     def onchange_template_id(self):
         intervention_line_obj = self.env['of.planning.intervention.line']
         template = self.template_id
-        # context ajouté dans of_contract_custom pour initialiser les champs d'un RDV. Utile ici pour prioriser la DI
+        # context ajouté dans of_service pour initialiser les champs d'un RDV. Utile ici pour prioriser la DI
         if self.state == "draft" and template and not self._context.get('of_import_service_lines'):
-            self.tache_id = template.tache_id
+            if template.tache_id:
+                self.tache_id = template.tache_id
+            if template.type_id:
+                self.type_id = template.type_id
             if not self.lien_commande and not self.fiscal_position_id:
                 self.fiscal_position_id = template.fiscal_position_id
             if self.line_ids:

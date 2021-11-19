@@ -99,6 +99,11 @@ class OFParcInstalle(models.Model):
 
     # @api.onchange
 
+    @api.onchange('date_fin_garantie')
+    def onchange_date_fin_garantie(self):
+        if self.date_fin_garantie and self.date_fin_garantie < fields.Date.today():
+            self.type_garantie = 'expired'
+
     @api.onchange('product_id')
     def onchange_product_id(self):
         if self.product_id:
