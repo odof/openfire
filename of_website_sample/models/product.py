@@ -6,6 +6,16 @@ from odoo import models, fields, api
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
+    sample_available = fields.Boolean("Sample available")
+    is_sample = fields.Boolean("Is sample")
+    sample_id = fields.Many2one("product.template", string="Sample")
+    sample_default_code = fields.Char(related="sample_id.default_code", string="Sample ref.", readonly=True)
+    sample_active = fields.Boolean(related="sample_id.active", string="Sample active", readonly=True)
+    sample_parent_id = fields.Many2one("product.template", string="Sample parent")
+    sample_parent_default_code = fields.Char(related="sample_parent_id.default_code",
+                                             string="Parent ref.", readonly=True)
+    sample_parent_active = fields.Boolean(related="sample_parent_id.active", string="Parent active", readonly=True)
+
     @api.model
     def create(self, args):
         sample_available = args.get('sample_available', False)
@@ -41,38 +51,6 @@ class ProductTemplate(models.Model):
             })
 
         return res
-
-    sample_available = fields.Boolean("Sample available")
-    is_sample = fields.Boolean("Is sample")
-    sample_id = fields.Many2one("product.template", string="Sample")
-    sample_default_code = fields.Char(related="sample_id.default_code", string="Sample ref.", readonly=True)
-    sample_active = fields.Boolean(related="sample_id.active", string="Sample active", readonly=True)
-    sample_parent_id = fields.Many2one("product.template", string="Sample parent")
-    sample_parent_default_code = fields.Char(related="sample_parent_id.default_code",
-                                             string="Parent ref.", readonly=True)
-    sample_parent_active = fields.Boolean(related="sample_parent_id.active", string="Parent active", readonly=True)
-
-    @api.multi
-    def action_view_sample(self):
-        if self.ensure_one():
-            return {
-                'name': 'Sample',
-                'view_mode': 'form',
-                'res_model': 'product.template',
-                'res_id': self.sample_id.id,
-                'type': 'ir.actions.act_window',
-            }
-
-    @api.multi
-    def action_view_sample_parent(self):
-        if self.ensure_one():
-            return {
-                'name': 'Sample',
-                'view_mode': 'form',
-                'res_model': 'product.template',
-                'res_id': self.sample_parent_id.id,
-                'type': 'ir.actions.act_window',
-            }
 
     @api.multi
     def write(self, args):
@@ -165,3 +143,25 @@ class ProductTemplate(models.Model):
             self.sample_parent_id.sample_available = False
 
         return super(ProductTemplate, self).unlink()
+
+    @api.multi
+    def action_view_sample(self):
+        self.ensure_one()
+        return {
+            'name': 'Sample',
+            'view_mode': 'form',
+            'res_model': 'product.template',
+            'res_id': self.sample_id.id,
+            'type': 'ir.actions.act_window',
+        }
+
+    @api.multi
+    def action_view_sample_parent(self):
+        self.ensure_one()
+        return {
+            'name': 'Sample',
+            'view_mode': 'form',
+            'res_model': 'product.template',
+            'res_id': self.sample_parent_id.id,
+            'type': 'ir.actions.act_window',
+        }
