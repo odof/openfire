@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="of_unsubscribe" inherit_id="website_mass_mailing.unsubscribe">
+        <xpath expr="//h1" position="replace">
+            <h1 class="page-header">My Subscriptions</h1>
+        </xpath>
+        <xpath expr="//input[@type='submit']" position="replace">
+            <button type="submit" id="send_form" class="btn btn-primary">Update my subscriptions</button>
+        </xpath>
+    </template>
+
+</odoo>
