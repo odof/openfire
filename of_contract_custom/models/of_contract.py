@@ -1203,6 +1203,8 @@ class OfContractLine(models.Model):
     def write(self, vals):
         """ Affectation du numéro si passage à l'état 'validated' """
         fields_allowed = self.get_write_allowed_fields()
+        if 'contract_id' in vals:  # On ne doit pas changer de contrat après la création
+            del vals['contract_id']
         if not self._context.get('no_verification'):
             for line in self:
                 if line.state == 'validated' and any([key not in fields_allowed for key in vals.keys()]):
