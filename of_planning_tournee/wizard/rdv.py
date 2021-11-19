@@ -405,12 +405,17 @@ class OfTourneeRdv(models.TransientModel):
         # --- Création des créneaux de début et fin de recherche ---
         avant_recherche_da = fields.Date.from_string(self.date_recherche_debut) - un_jour
         avant_recherche = fields.Date.to_string(avant_recherche_da)
+        # Il faut mettre les date de début et de fin des bornes en UTC pour utilisation par le JS
         avant_recherche_debut_dt = tz.localize(datetime.strptime(avant_recherche+" 00:00:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
+        avant_recherche_debut_dt = avant_recherche_debut_dt.astimezone(pytz.utc)  # passage en UTC
         avant_recherche_fin_dt = tz.localize(datetime.strptime(avant_recherche+" 23:59:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
+        avant_recherche_fin_dt = avant_recherche_fin_dt.astimezone(pytz.utc)  # passage en UTC
         apres_recherche_da = fields.Date.from_string(self.date_recherche_fin) + un_jour
         apres_recherche = fields.Date.to_string(apres_recherche_da)
         apres_recherche_debut_dt = tz.localize(datetime.strptime(apres_recherche+" 00:00:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
+        apres_recherche_debut_dt = apres_recherche_debut_dt.astimezone(pytz.utc)  # passage en UTC
         apres_recherche_fin_dt = tz.localize(datetime.strptime(apres_recherche+" 23:59:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
+        apres_recherche_fin_dt = apres_recherche_fin_dt.astimezone(pytz.utc)  # passage en UTC
 
         for employee in employees:
             wizard_line_obj.create({
