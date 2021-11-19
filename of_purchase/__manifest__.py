@@ -37,6 +37,7 @@ Fonctionnalités
         'purchase',
         'sale',
         'of_product',
+        'of_external',
     ],
     'data' : [
         'security/of_purchase_security.xml',

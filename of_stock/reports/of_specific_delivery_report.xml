@@ -57,8 +57,9 @@
                             </div>
                         </div>
                     </div>
-                    <h2>
-                        <span t-field="o.picking_id.name"/>
+                    <h2 t-if="o.picking_id.company_id.of_position_header_lines == 'bandeau_totalite'" name="doc_name" style="margin-bottom: 10px;">
+                        <span>Bon de transfert</span>
+                        <t t-if="o.picking_id.name"><span>N°</span><span t-field="o.picking_id.name"/></t>
                     </h2>
                     <table class="table table-condensed">
                         <thead>
