@@ -74,6 +74,11 @@ class ProductTemplate(models.Model):
         if self.seller_ids:
             self.seller_ids[0].price = self.of_seller_price
 
+    @api.model
+    def create(self, vals):
+        # On désactive le log dans le RSE pour gagner du temps lors d'import d'articles
+        return super(ProductTemplate, self.with_context(mail_create_nolog=True)).create(vals)
+
 
 class ProductProduct(models.Model):
     _inherit = "product.product"
