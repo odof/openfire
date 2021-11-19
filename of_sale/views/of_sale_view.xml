@@ -176,6 +176,18 @@
             </field>
         </record>
 
+        <record id="of_sale_order_manager_form_view" model="ir.ui.view">
+            <field name="name">of.sale.order.manager.form.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+            <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='confirmation_date']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('state', 'in', ['draft', 'sent', 'cancel'])]}</attribute>
+                    <attribute name="readonly">0</attribute>
+                </xpath>
+            </field>
+        </record>
 
         <!-- Ajout etiquettes partenaire sur les devis -->
         <record id="of_sale_view_devis" model="ir.ui.view">
