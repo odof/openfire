@@ -78,8 +78,15 @@ class OfService(models.Model):
         }
         purchase_obj = self.env['purchase.order']
         po_line_obj = self.env['purchase.order.line']
+        service_line_obj = self.env['of.service.line']
+        if self.company_id:
+            my_company_partners = self.company_id.partner_id
+        else:
+            my_company_partners = self.env['res.company'].search([]).mapped('partner_id')
         lines_by_supplier = {}
-        no_supplier = []
+        lines_no_supplier = service_line_obj
+        lines_i_supply = service_line_obj
+        lines_already_done = self.line_ids.filtered(lambda l: l.purchaseorder_line_id)
         # Séparer les ligne par fournisseur, lignes sans fournisseur ignorées pour l'instant
         for line in self.line_ids.filtered(lambda l: not l.purchaseorder_line_id):
             suppliers = line.product_id.seller_ids \
@@ -87,11 +94,43 @@ class OfService(models.Model):
                                     (not r.product_id or r.product_id == line.product_id))
             if suppliers:
                 supplier = suppliers[0].name  # supplier.name est un many2one vers res.partner
-                if supplier not in lines_by_supplier:
-                    lines_by_supplier[supplier] = []
-                lines_by_supplier[supplier].append(line)
+                if supplier in my_company_partners:
+                    lines_i_supply |= line
+                else:
+                    if supplier not in lines_by_supplier:
+                        lines_by_supplier[supplier] = []
+                    lines_by_supplier[supplier].append(line)
             else:
-                no_supplier.append(line)
+                lines_no_supplier |= line
+        # Informer si au moins une ligne ne sera pas traitée
+        if not self._context.get('of_make_po_validated'):
+            validation_message = u""
+            if lines_no_supplier or lines_i_supply or lines_already_done:
+                validation_message = u"Certaines lignes ne seront pas prises en compte."
+            if lines_already_done:
+                validation_message += u"\n  - Parce qu'elles ont déjà donné lieu à une commande fournisseur : "
+                for line in lines_already_done:
+                    validation_message += u"\n\t%s" % line.name
+            if lines_i_supply:
+                validation_message += u"\n  - Parceque vous en êtes le fournisseur : "
+                for line in lines_i_supply:
+                    validation_message += u"\n\t%s" % line.name
+            if lines_no_supplier:
+                validation_message += u"\n  - Parcequ'elles n'ont pas de fournisseur : "
+                for line in lines_no_supplier:
+                    validation_message += u"\n\t%s" % line.name
+            if validation_message:
+                context = {'default_message': validation_message, 'default_service_id': self.id}
+                res = {
+                    'name': u"Veuillez confirmer",
+                    'view_mode': 'form,tree',
+                    'res_model': 'of.make.po.validation.wizard',
+                    'type': 'ir.actions.act_window',
+                    'target': 'new',
+                    'context': context,
+                }
+                return res
+
         purchase_orders = purchase_obj
         # Vérifier que tous les fournisseurs ont bien une position fiscale, sinon la création de CF echouera
         suppliers_all = lines_by_supplier.keys()

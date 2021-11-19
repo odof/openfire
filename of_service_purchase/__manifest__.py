@@ -21,6 +21,7 @@ Module de lien entre les modules of_service et of_purchase
     "category": "OpenFire",
     "data": [
         'views/of_service_views.xml',
+        'wizard/of_make_po_validation_wizard_views.xml',
         ],
     'installable': True,
     'application': False,
