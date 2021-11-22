@@ -1176,15 +1176,17 @@ class OfServiceLine(models.Model):
     @api.multi
     def prepare_intervention_line_vals(self):
         self.ensure_one()
-        return {
-            'product_id': self.product_id and self.product_id.id,
+        res = {
+            'product_id': self.product_id and self.product_id.id or False,
             'price_unit': self.price_unit,
             'qty': self.qty,
             'name': self.name,
-            'taxe_ids': [(6, 0, self.taxe_ids and self.taxe_ids._ids or [])],
             'discount': self.discount,
-            'order_line_id': self.saleorder_line_id,
+            'order_line_id': self.saleorder_line_id and self.saleorder_line_id.id or False,
         }
+        if self.taxe_ids:
+            res['tax_ids'] = [(6, 0, self.taxe_ids._ids)]
+        return res
 
     @api.multi
     def prepare_so_line_vals(self, order):
