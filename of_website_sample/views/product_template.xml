@@ -10,12 +10,12 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@name='options']" position="inside">
                 <div>
-                    <field name="sample_available"/>
+                    <field name="sample_available" attrs="{'readonly': [('is_sample', '==', True)]}"/>
                     <label for="sample_available"/>
                 </div>
             </xpath>
             <xpath expr="//group[@name='group_general']" position="inside">
-                <field name="is_sample"/>
+                <field name="is_sample" invisible="1"/>
                 <field name="sample_id" invisible="1"/>
                 <field name="sample_parent_id" invisible="1"/>
                 <field name="sample_active" invisible="1"/>
@@ -37,6 +37,17 @@
                     <field name="sample_parent_default_code" widget="statinfo" string="Parent"/>
                 </button>
 
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_website_sample_website_sale_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.website.sample.website.sale.product.template.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="website_sale.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='website_publish_button']" position="attributes">
+                <attribute name="attrs">{'invisible': [('is_sample', '==', True)]}</attribute>
             </xpath>
         </field>
     </record>

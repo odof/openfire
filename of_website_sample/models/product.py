@@ -72,15 +72,13 @@ class ProductTemplate(models.Model):
 
             supplierinfo_obj = self.env['product.supplierinfo']
 
-            if not self.sample_id:
+            # On créé d'abord les fournisseurs
+            seller_ids = []
+            for seller in self.seller_ids:
+                seller_id_copy = seller.copy()
+                seller_ids.append(seller_id_copy.id)
 
-                # On créé d'abord les fournisseurs
-                seller_ids = []
-                for seller in self.seller_ids:
-                    seller_id = supplierinfo_obj.create({
-                        "name": seller.name.id,
-                    })
-                    seller_ids.append(seller_id.id)
+            if not self.sample_id:
 
                 # On créé sample_id
                 sample_id = self.create({
@@ -116,6 +114,7 @@ class ProductTemplate(models.Model):
                     "description_purchase": self.description_purchase,
                     "description_picking": self.description_picking,
                     "description_fabricant": self.description_fabricant,
+                    "seller_ids": [[6, 0, seller_ids]],
                     "is_sample": True,
                     "sample_parent_id": self.id,
                     "active": True,
