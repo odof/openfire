@@ -6,14 +6,21 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-16 09:13+0000\n"
-"PO-Revision-Date: 2021-11-16 09:13+0000\n"
+"POT-Creation-Date: 2021-11-23 11:12+0000\n"
+"PO-Revision-Date: 2021-11-23 11:12+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: of_website_sample
+#: code:addons/of_website_sample/models/product.py:85
+#: code:addons/of_website_sample/models/product.py:109
+#, python-format
+msgid " (sample)"
+msgstr " (échantillon)"
 
 #. module: of_website_sample
 #: model:ir.ui.view,arch_db:of_website_sample.product
@@ -58,6 +65,16 @@ msgid "Product Template"
 msgstr "Modèle d'article"
 
 #. module: of_website_sample
+#: model:ir.ui.view,arch_db:of_website_sample.of_website_sample_product_template_form_view
+msgid "Sale-related settings are managed on"
+msgstr "Les paramètres de Ventes sont gérés sur"
+
+#. module: of_website_sample
+#: model:ir.ui.view,arch_db:of_website_sample.of_website_sample_product_template_form_view
+msgid "Sales"
+msgstr "Ventes"
+
+#. module: of_website_sample
 #: model:ir.model,name:of_website_sample.model_sale_order
 msgid "Sales Order"
 msgstr "Bon de commande"
@@ -100,3 +117,7 @@ msgstr "Parent de l'échantillon"
 msgid "Sample ref."
 msgstr "Réf échantillon"
 
+#. module: of_website_sample
+#: model:ir.ui.view,arch_db:of_website_sample.of_website_sample_product_template_form_view
+msgid "the sample parent"
+msgstr "le parent de l'échantillon"
