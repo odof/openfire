@@ -110,15 +110,15 @@ class OfService(models.Model):
             if lines_already_done:
                 validation_message += u"\n  - Parce qu'elles ont déjà donné lieu à une commande fournisseur : "
                 for line in lines_already_done:
-                    validation_message += u"\n\t%s" % line.name
+                    validation_message += u"\n\t%s" % line.product_id.name
             if lines_i_supply:
                 validation_message += u"\n  - Parceque vous en êtes le fournisseur : "
                 for line in lines_i_supply:
-                    validation_message += u"\n\t%s" % line.name
+                    validation_message += u"\n\t%s" % line.product_id.name
             if lines_no_supplier:
                 validation_message += u"\n  - Parcequ'elles n'ont pas de fournisseur : "
                 for line in lines_no_supplier:
-                    validation_message += u"\n\t%s" % line.name
+                    validation_message += u"\n\t%s" % line.product_id.name
             if validation_message:
                 context = {'default_message': validation_message, 'default_service_id': self.id}
                 res = {
