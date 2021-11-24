@@ -6,7 +6,7 @@ from odoo import api, models, fields
 class OFMakePOValidationWizard(models.TransientModel):
     _name = 'of.make.po.validation.wizard'
 
-    message = fields.Text(string=u"Message")
+    message = fields.Text(string=u"Message", readonly=True)
     service_id = fields.Many2one(
         string=u"Demande d'intervention", comodel_name='of.service', required=True)
 
