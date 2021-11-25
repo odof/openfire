@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_service_public_b2c,access.of.service.public.b2c,of_service.model_of_service,of_website_sale.group_portal_b2c,1,0,0,0
+access_of_planning_intervention_public_b2c,access.of.planning.intervention.public.b2c,of_planning.model_of_planning_intervention,of_website_sale.group_portal_b2c,1,0,0,0
+access_of_parc_installe_public_b2c,access.of.parc.installe.public.b2c,of_parc_installe.model_of_parc_installe,of_website_sale.group_portal_b2c,1,0,0,0
+access_of_res_partner_phone_public_b2c,access.of.res.partner.phone.public.b2c,of_base.model_of_res_partner_phone,of_website_sale.group_portal_b2c,1,0,0,0
+access_of_invoice_kit_public_b2c,access.of.invoice.kit.public.b2c,of_kit.model_of_invoice_kit,of_website_sale.group_portal_b2c,1,0,0,0
+access_of_invoice_kit_line_public_b2c,access.of.invoice.kit.line.public.b2c,of_kit.model_of_invoice_kit_line,of_website_sale.group_portal_b2c,1,0,0,0
+access_of_planning_tache_public_b2c,access.of.planning.tache.public.b2c,of_planning.model_of_planning_tache,of_website_sale.group_portal_b2c,1,0,0,0
