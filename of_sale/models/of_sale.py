@@ -727,11 +727,19 @@ class Report(models.Model):
             # On ajoute au besoin les documents joint
             model = self.env[allowed_reports[report_name]].browse(docids)[0]
             mails_data = model._detect_doc_joint()
+
             if mails_data:
                 fd, order_pdf = tempfile.mkstemp()
                 os.write(fd, result)
                 os.close(fd)
                 file_paths = [order_pdf]
+
+                if report_name == 'sale.report_saleorder':
+                    for attachment in model.order_line.mapped('sale_product_attachment_ids'):
+                        fd, attachment_pdf = tempfile.mkstemp()
+                        os.write(fd, base64.b64decode(attachment.datas))
+                        os.close(fd)
+                        file_paths.append(attachment_pdf)
 
                 for mail_data in mails_data:
                     fd, mail_pdf = tempfile.mkstemp()
@@ -749,6 +757,7 @@ class Report(models.Model):
                     os.remove(result_file_path)
                 except Exception:
                     pass
+
         return result
 
 
@@ -834,6 +843,8 @@ class SaleOrderLine(models.Model):
 
     of_date_tarif = fields.Date(string="Date du tarif", related="product_id.date_tarif", readonly=True)
     of_obsolete = fields.Boolean(string=u"Article obsolète", related="product_id.of_obsolete", readonly=True)
+    sale_product_image_ids = fields.Many2many('sale.product.image', string='Images')
+    sale_product_attachment_ids = fields.Many2many("ir.attachment", string="Documents joints")
 
     @api.model_cr_context
     def _auto_init(self):
@@ -957,13 +968,26 @@ class SaleOrderLine(models.Model):
             self.update({'name': name})
 
         # Remise interdite
-        if self.product_id and self.product_id.of_forbidden_discount and self.of_discount_formula:
-            self.of_discount_formula = False
-        if self.product_id and self.product_id.categ_id:
-            self.of_article_principal = self.product_id.categ_id.of_article_principal
-        if self.env.user.has_group('sale.group_sale_layout'):
-            if self.product_id and self.product_id.categ_id.of_layout_id:
-                self.layout_category_id = self.product_id.categ_id.of_layout_id
+
+        if self.product_id:
+            if self.product_id.of_forbidden_discount and self.of_discount_formula:
+                self.of_discount_formula = False
+            if self.product_id.categ_id:
+                self.of_article_principal = self.product_id.categ_id.of_article_principal
+            if self.env.user.has_group('sale.group_sale_layout'):
+                if self.product_id.categ_id.of_layout_id:
+                    self.layout_category_id = self.product_id.categ_id.of_layout_id
+            if self.env.user.has_group('of_sale.group_of_sale_multiimage'):
+                if self.env.user.has_group('of_sale.group_of_sale_print_multiimage'):
+                    if self.product_id.product_tmpl_id.sale_product_image_ids:
+                        self.sale_product_image_ids = self.product_id.product_tmpl_id.sale_product_image_ids
+                if self.env.user.has_group('of_sale.group_of_sale_print_attachment'):
+                    attachment_ids = self.env['ir.attachment']\
+                        .search([('res_model', '=', 'product.template'),
+                                 ('res_id', '=', self.product_id.product_tmpl_id.id),
+                                 ('mimetype', '=', 'application/pdf')])
+                    if attachment_ids:
+                        res['domain']['sale_product_attachment_ids'] = [('id', 'in', attachment_ids.ids)]
 
         return res
 
@@ -1751,6 +1775,8 @@ class PurchaseOrderLine(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
+    sale_product_image_ids = fields.One2many('sale.product.image', 'product_tmpl_id', string='Sale Images')
+
     @api.multi
     def action_view_sales(self):
         self.ensure_one()
@@ -1784,3 +1810,12 @@ class ProductProduct(models.Model):
         for product in self:
             product.sales_count = r.get(product.id, 0)
         return r
+
+
+class SaleProductImage(models.Model):
+    _name = 'sale.product.image'
+    _description = 'Images to display in Sale Order'
+
+    name = fields.Char('Name')
+    image = fields.Binary('Image', attachment=True)
+    product_tmpl_id = fields.Many2one('product.template', 'Related Product', copy=True)

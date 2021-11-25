@@ -239,6 +239,30 @@
                 <xpath expr="//field[@name='order_line']/tree" position="inside">
                     <field name="of_client_view" invisible="1"/>
                 </xpath>
+                <xpath expr="//field[@name='order_line']/form" position="inside">
+                    <label for="sale_product_image_ids"/>
+                    <field name="sale_product_image_ids" mode="kanban" context="{'default_name': name, 'default_product_tmpl_id': active_id}" groups="of_sale.group_of_sale_print_multiimage">
+                        <kanban string="Product Images">
+                            <field name="name"/>
+                            <field name="image" />
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <div class="oe_kanban_global_click">
+                                        <a t-if="!read_only_mode" type="delete" class="fa fa-times pull-right"/>
+                                        <div class="o_kanban_image">
+                                            <img t-if="record.image.raw_value" t-att-src="'data:image/png;base64,'+record.image.raw_value"/>
+                                        </div>
+                                        <div class="oe_kanban_details">
+                                            <field name="name"/>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
+                    <label for="sale_product_attachment_ids"/>
+                    <field name="sale_product_attachment_ids" widget="many2many_tags"/>
+                </xpath>
             </field>
         </record>
 
@@ -329,6 +353,29 @@
                 </xpath>
                 <xpath expr="//group[@name='group_general']/span" position="attributes">
                     <attribute name="groups">of_sale.of_group_sale_marge_manager</attribute>
+                </xpath>
+                <xpath expr="//notebook[last()]" position="inside">
+                    <page string="Images" name="of_sale_multiimage" groups="of_sale.group_of_sale_multiimage">
+                        <field name="sale_product_image_ids" mode="kanban">
+                            <kanban string="Product Images">
+                                <field name="name"/>
+                                <field name="image" />
+                                <templates>
+                                    <t t-name="kanban-box">
+                                        <div class="oe_kanban_global_click">
+                                            <a t-if="!read_only_mode" type="delete" class="fa fa-times pull-right"/>
+                                            <div class="o_kanban_image">
+                                                <img t-if="record.image.raw_value" t-att-src="'data:image/png;base64,'+record.image.raw_value"/>
+                                            </div>
+                                            <div class="oe_kanban_details">
+                                                <field name="name"/>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </templates>
+                            </kanban>
+                        </field>
+                    </page>
                 </xpath>
             </field>
         </record>
