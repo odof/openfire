@@ -260,8 +260,9 @@ WHERE opi.sav_id = pi.id""")
             self.env['ir.config_parameter'].sudo().set_param('of_migration_sav_di', True)
             # retirer le groupe project_issue_not_migrated pour masquer les menus de SAV
             group_not_migrated = self.env.ref('of_service_parc_installe.group_of_project_issue_not_migrated')
-            all_users = self.env['res.users'].sudo().with_context(active_test=False).search([])
-            all_users.write({'groups_id': [(3, group_not_migrated.id)]})
+            group_user = self.env.ref('base.group_user')
+            if group_not_migrated in group_user.implied_ids:
+                group_user.write({'implied_ids': [(3, group_not_migrated.id)]})
             _logger.info(u"OPENFIRE SUCCÈS : migration des SAV dans les DI (T2356)")
 
 
