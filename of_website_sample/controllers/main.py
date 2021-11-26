@@ -27,7 +27,7 @@ class WebsiteSaleSample(WebsiteSale):
 
         # Si un échantillon apparait déjà dans le panier, on n'en rajoute pas plus
         for line in sale_order.order_line:
-            if line.product_id.id == int(product_id) and line.product_id.is_sample:
+            if line.product_id.id == int(product_id) and line.product_id.of_is_sample:
                 return request.redirect("/shop/cart")
 
         sale_order._cart_update(

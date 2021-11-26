@@ -10,31 +10,31 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@name='options']" position="inside">
                 <div>
-                    <field name="sample_available" attrs="{'readonly': [('is_sample', '=', True)]}"/>
-                    <label for="sample_available"/>
+                    <field name="of_sample_available" attrs="{'readonly': [('of_is_sample', '=', True)]}"/>
+                    <label for="of_sample_available"/>
                 </div>
             </xpath>
             <xpath expr="//group[@name='group_general']" position="inside">
-                <field name="is_sample" invisible="1"/>
-                <field name="sample_id" invisible="1"/>
-                <field name="sample_parent_id" invisible="1"/>
-                <field name="sample_active" invisible="1"/>
-                <field name="sample_parent_active" invisible="1"/>
+                <field name="of_is_sample" invisible="1"/>
+                <field name="of_sample_id" invisible="1"/>
+                <field name="of_sample_parent_id" invisible="1"/>
+                <field name="of_sample_active" invisible="1"/>
+                <field name="of_sample_parent_active" invisible="1"/>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="action_view_sample"
                         type="object"
                         class="oe_stat_button"
                         icon="fa-pencil-square-o"
-                        attrs="{'invisible': ['|','|',('sample_id', '=', False),('sample_available', '=', False),('sample_active', '=', False)]}">
-                    <field name="sample_default_code" widget="statinfo" string="Sample"/>
+                        attrs="{'invisible': ['|','|',('of_sample_id', '=', False),('of_sample_available', '=', False),('of_sample_active', '=', False)]}">
+                    <field name="of_sample_default_code" widget="statinfo" string="Sample"/>
                 </button>
                 <button name="action_view_sample_parent"
                         type="object"
                         class="oe_stat_button"
                         icon="fa-pencil-square-o"
-                        attrs="{'invisible': ['|','|',('sample_parent_id', '=', False),('is_sample', '=', False),('sample_parent_active', '=', False)]}">
-                    <field name="sample_parent_default_code" widget="statinfo" string="Parent"/>
+                        attrs="{'invisible': ['|','|',('of_sample_parent_id', '=', False),('of_is_sample', '=', False),('of_sample_parent_active', '=', False)]}">
+                    <field name="of_sample_parent_default_code" widget="statinfo" string="Parent"/>
                 </button>
             </xpath>
 
@@ -58,10 +58,10 @@
             </xpath>
 
             <xpath expr="//page[@name='sales']" position="attributes">
-                <attribute name="attrs">{'invisible':['|',('sale_ok','=',False),('is_sample','=',True)]}</attribute>
+                <attribute name="attrs">{'invisible':['|',('sale_ok','=',False),('of_is_sample','=',True)]}</attribute>
             </xpath>
             <xpath expr="//page[@name='sales']" position="after">
-                <page string="Sales" name="sales_disabled" attrs="{'invisible':['|',('sale_ok','=',False),('is_sample','=',False)]}">
+                <page string="Sales" name="sales_disabled" attrs="{'invisible':['|',('sale_ok','=',False),('of_is_sample','=',False)]}">
                     <div>
                         <p>Sale-related settings are managed on <button name="action_view_sample_parent" type="object" string="the sample parent" class="oe_link"/></p>
                     </div>
@@ -140,7 +140,7 @@
         <field name="inherit_id" ref="website_sale.product_template_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='website_publish_button']" position="attributes">
-                <attribute name="attrs">{'invisible': [('is_sample', '=', True)]}</attribute>
+                <attribute name="attrs">{'invisible': [('of_is_sample', '=', True)]}</attribute>
             </xpath>
         </field>
     </record>
@@ -152,30 +152,30 @@
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='filter_to_purchase']" position="after">
                 <separator/>
-                <filter string="Sample" name="sample" domain="[('is_sample','=',True)]"/>
-                <filter string="Sample parent" name="sample_parent" domain="[('sample_available','=',True)]"/>
+                <filter string="Sample" name="sample" domain="[('of_is_sample','=',True)]"/>
+                <filter string="Sample parent" name="sample_parent" domain="[('of_sample_available','=',True)]"/>
             </xpath>
         </field>
     </record>
 
     <record id="product.product_template_action_all" model="ir.actions.act_window">
-        <field name="context">{'form_readonly': '[("is_sample","=",True)]'}</field>
+        <field name="context">{'form_readonly': '[("of_is_sample","=",True)]'}</field>
     </record>
 
     <record id="product.product_template_action" model="ir.actions.act_window">
-        <field name="context">{'search_default_filter_to_sell': 1, 'form_readonly': '[("is_sample","=",True)]'}</field>
+        <field name="context">{'search_default_filter_to_sell': 1, 'form_readonly': '[("of_is_sample","=",True)]'}</field>
     </record>
 
     <record id="website_sale.product_template_action" model="ir.actions.act_window">
-        <field name="context">{'search_default_published': 1, 'default_website_published': True, 'form_readonly': '[("is_sample","=",True)]'}</field>
+        <field name="context">{'search_default_published': 1, 'default_website_published': True, 'form_readonly': '[("of_is_sample","=",True)]'}</field>
     </record>
 
     <record id="stock.product_template_action_product" model="ir.actions.act_window">
-        <field name="context">{"search_default_consumable": 1, 'default_type': 'product', 'form_readonly': '[("is_sample","=",True)]'}</field>
+        <field name="context">{"search_default_consumable": 1, 'default_type': 'product', 'form_readonly': '[("of_is_sample","=",True)]'}</field>
     </record>
 
     <record id="purchase.product_normal_action_puchased" model="ir.actions.act_window">
-        <field name="context">{"search_default_filter_to_purchase": 1, 'form_readonly': '[("is_sample","=",True)]'}</field>
+        <field name="context">{"search_default_filter_to_purchase": 1, 'form_readonly': '[("of_is_sample","=",True)]'}</field>
     </record>
 
 </odoo>

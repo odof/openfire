@@ -6,11 +6,11 @@ from datetime import datetime, date, timedelta
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    website_commitment_date = fields.Datetime(
+    of_website_commitment_date = fields.Datetime(
         string='Website Commitment Date', help="Date by which the products are sure to be delivered."
         "This is a date that you can promise to the customer, based on the Product Lead Times.")
 
-    def _compute_website_commitment_date(self):
+    def _compute_of_website_commitment_date(self):
         """Compute the website commitment date, only called on /shop/payment from the website"""
 
         # On récupère le site web
@@ -20,7 +20,7 @@ class SaleOrder(models.Model):
         for order in self:
 
             if not of_delivery_management:
-                order.website_commitment_date = False
+                order.of_website_commitment_date = False
                 continue
 
             dates_list = []
@@ -35,13 +35,13 @@ class SaleOrder(models.Model):
             if dates_list:
                 # On détermine la commitment_date en fonction de la picking policy
                 commit_date = min(dates_list) if order.picking_policy == 'direct' else max(dates_list)
-                order.website_commitment_date = fields.Datetime.to_string(commit_date)
+                order.of_website_commitment_date = fields.Datetime.to_string(commit_date)
 
                 # Si la requested_date n'est plus à jour, on la met à jour
                 if order.requested_date:
                     order.requested_date = fields.Datetime.to_string(max([
                         fields.Datetime.from_string(order.requested_date),
-                        fields.Datetime.from_string(order.website_commitment_date)
+                        fields.Datetime.from_string(order.of_website_commitment_date)
                     ]))
 
     # Add a depends on picking_policy
@@ -52,9 +52,9 @@ class SaleOrder(models.Model):
             dates_list = []
             order_datetime = fields.Datetime.from_string(order.date_order)
 
-            # Si c'est une commande website, le website_commitment_date est défini et vient remplir le commitment_date
-            if order.website_commitment_date:
-                order.commitment_date = order.website_commitment_date
+            # Si c'est une commande website, le of_website_commitment_date est défini et vient remplir le commitment_date
+            if order.of_website_commitment_date:
+                order.commitment_date = order.of_website_commitment_date
             else:
                 for line in order.order_line.filtered(lambda x: x.state != 'cancel'):
                     dt = order_datetime + timedelta(days=line.customer_lead or 0.0)
@@ -117,7 +117,7 @@ class SaleOrderLine(models.Model):
         days_of_delay = float(max(self.customer_lead, website.get_of_website_security_lead()) or 0.0)
         if self.product_uom_qty > self.get_quantity_available():
             days_of_delay += (website.company_id.security_lead or 0.0) + (self.product_id._select_seller(
-                quantity=self.product_qty, uom_id=self.product_uom).delay or 0.0)
+                quantity=self.product_uom_qty, uom_id=self.product_uom).delay or 0.0)
 
         return days_of_delay or 0.0
 
