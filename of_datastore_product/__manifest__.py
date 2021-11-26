@@ -33,6 +33,8 @@ Ce module nécessite l'installation de openerplib sur le serveur : sudo easy_ins
 """,
     'depends': [
         'of_datastore_connector',
+        # Surcharge de la vue formulaire produit
+        'of_product',
         # Les marques sont utilisées pour filtrer les produits accédés dans la base centralisée
         'of_product_brand',
         # Surcharge des lignes de facture
