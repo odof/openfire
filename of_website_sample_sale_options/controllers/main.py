@@ -17,7 +17,7 @@ class OfWebsiteSaleOptions(WebsiteSaleOptions):
             sale_order = request.website.sale_get_order(force_create=True)
 
         # On ne mélange pas des échantillons et des produits dans un même panier
-        if sale_order.order_line and sale_order.order_line[0].product_id.is_sample != product.is_sample:
+        if sale_order.order_line and sale_order.order_line[0].product_id.of_is_sample != product.of_is_sample:
             return request.env['ir.ui.view'].render_template("of_website_sample_sale_options.modal_error", {})
 
         return super(OfWebsiteSaleOptions, self).modal(product_id, **kw)

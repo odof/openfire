@@ -9,7 +9,7 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//group[@name='sales_person']" position="inside">
-                <field name="is_sample"/>
+                <field name="of_is_sample"/>
             </xpath>
         </field>
     </record>
@@ -21,7 +21,7 @@
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='from_website']" position="after">
                 <separator/>
-                <filter string="Sample Order" name="sample" domain="[('is_sample','=',True)]"/>
+                <filter string="Sample Order" name="sample" domain="[('of_is_sample','=',True)]"/>
             </xpath>
         </field>
     </record>

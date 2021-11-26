@@ -28,17 +28,17 @@ msgid "Add sample to Cart"
 msgstr "Ajouter échantillon au panier"
 
 #. module: of_website_sample
-#: model:ir.model.fields,help:of_website_sample.field_product_product_sample_active
-#: model:ir.model.fields,help:of_website_sample.field_product_product_sample_parent_active
-#: model:ir.model.fields,help:of_website_sample.field_product_template_sample_active
-#: model:ir.model.fields,help:of_website_sample.field_product_template_sample_parent_active
+#: model:ir.model.fields,help:of_website_sample.field_product_product_of_sample_active
+#: model:ir.model.fields,help:of_website_sample.field_product_product_of_sample_parent_active
+#: model:ir.model.fields,help:of_website_sample.field_product_template_of_sample_active
+#: model:ir.model.fields,help:of_website_sample.field_product_template_of_sample_parent_active
 msgid "If unchecked, it will allow you to hide the product without removing it."
 msgstr "En décochant cette case, il est possible de masquer l'article sans le supprimer."
 
 #. module: of_website_sample
-#: model:ir.model.fields,field_description:of_website_sample.field_product_product_is_sample
-#: model:ir.model.fields,field_description:of_website_sample.field_product_template_is_sample
-#: model:ir.model.fields,field_description:of_website_sample.field_sale_order_is_sample
+#: model:ir.model.fields,field_description:of_website_sample.field_product_product_of_is_sample
+#: model:ir.model.fields,field_description:of_website_sample.field_product_template_of_is_sample
+#: model:ir.model.fields,field_description:of_website_sample.field_sale_order_of_is_sample
 msgid "Is sample"
 msgstr "Est un échantillon"
 
@@ -48,14 +48,14 @@ msgid "Parent"
 msgstr "Parent"
 
 #. module: of_website_sample
-#: model:ir.model.fields,field_description:of_website_sample.field_product_product_sample_parent_active
-#: model:ir.model.fields,field_description:of_website_sample.field_product_template_sample_parent_active
+#: model:ir.model.fields,field_description:of_website_sample.field_product_product_of_sample_parent_active
+#: model:ir.model.fields,field_description:of_website_sample.field_product_template_of_sample_parent_active
 msgid "Parent active"
 msgstr "Parent actif"
 
 #. module: of_website_sample
-#: model:ir.model.fields,field_description:of_website_sample.field_product_product_sample_parent_default_code
-#: model:ir.model.fields,field_description:of_website_sample.field_product_template_sample_parent_default_code
+#: model:ir.model.fields,field_description:of_website_sample.field_product_product_of_sample_parent_default_code
+#: model:ir.model.fields,field_description:of_website_sample.field_product_template_of_sample_parent_default_code
 msgid "Parent ref."
 msgstr "Réf parent"
 
@@ -80,8 +80,8 @@ msgid "Sales Order"
 msgstr "Bon de commande"
 
 #. module: of_website_sample
-#: model:ir.model.fields,field_description:of_website_sample.field_product_product_sample_id
-#: model:ir.model.fields,field_description:of_website_sample.field_product_template_sample_id
+#: model:ir.model.fields,field_description:of_website_sample.field_product_product_of_sample_id
+#: model:ir.model.fields,field_description:of_website_sample.field_product_template_of_sample_id
 #: model:ir.ui.view,arch_db:of_website_sample.of_website_sample_product_template_form_view
 #: model:ir.ui.view,arch_db:of_website_sample.of_website_sample_product_template_search_view
 msgid "Sample"
@@ -93,27 +93,27 @@ msgid "Sample Order"
 msgstr "Commande échantillon"
 
 #. module: of_website_sample
-#: model:ir.model.fields,field_description:of_website_sample.field_product_product_sample_active
-#: model:ir.model.fields,field_description:of_website_sample.field_product_template_sample_active
+#: model:ir.model.fields,field_description:of_website_sample.field_product_product_of_sample_active
+#: model:ir.model.fields,field_description:of_website_sample.field_product_template_of_sample_active
 msgid "Sample active"
 msgstr "Échantillon actif"
 
 #. module: of_website_sample
-#: model:ir.model.fields,field_description:of_website_sample.field_product_product_sample_available
-#: model:ir.model.fields,field_description:of_website_sample.field_product_template_sample_available
+#: model:ir.model.fields,field_description:of_website_sample.field_product_product_of_sample_available
+#: model:ir.model.fields,field_description:of_website_sample.field_product_template_of_sample_available
 msgid "Sample available"
 msgstr "Disponible en échantillon"
 
 #. module: of_website_sample
-#: model:ir.model.fields,field_description:of_website_sample.field_product_product_sample_parent_id
-#: model:ir.model.fields,field_description:of_website_sample.field_product_template_sample_parent_id
+#: model:ir.model.fields,field_description:of_website_sample.field_product_product_of_sample_parent_id
+#: model:ir.model.fields,field_description:of_website_sample.field_product_template_of_sample_parent_id
 #: model:ir.ui.view,arch_db:of_website_sample.of_website_sample_product_template_search_view
 msgid "Sample parent"
 msgstr "Parent de l'échantillon"
 
 #. module: of_website_sample
-#: model:ir.model.fields,field_description:of_website_sample.field_product_product_sample_default_code
-#: model:ir.model.fields,field_description:of_website_sample.field_product_template_sample_default_code
+#: model:ir.model.fields,field_description:of_website_sample.field_product_product_of_sample_default_code
+#: model:ir.model.fields,field_description:of_website_sample.field_product_template_of_sample_default_code
 msgid "Sample ref."
 msgstr "Réf échantillon"
 

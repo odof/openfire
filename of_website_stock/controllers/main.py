@@ -42,6 +42,6 @@ class WebsiteSaleDelivery(WebsiteSale):
         for line in order.order_line:
             line.customer_lead = line.product_id.sale_delay
 
-        order._compute_website_commitment_date()
+        order._compute_of_website_commitment_date()
 
         return super(WebsiteSaleDelivery, self).payment(**post)

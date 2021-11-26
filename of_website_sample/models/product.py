@@ -7,159 +7,113 @@ class ProductTemplate(models.Model):
     _name = 'product.template'
     _inherit = ['product.template', 'of.form.readonly']
 
-    sample_available = fields.Boolean("Sample available")
-    is_sample = fields.Boolean("Is sample", readonly=True)
-    sample_id = fields.Many2one("product.template", string="Sample")
-    sample_default_code = fields.Char(related="sample_id.default_code", string="Sample ref.", readonly=True)
-    sample_active = fields.Boolean(related="sample_id.active", string="Sample active", readonly=True)
-    sample_parent_id = fields.Many2one("product.template", string="Sample parent")
-    sample_parent_default_code = fields.Char(related="sample_parent_id.default_code",
+    of_sample_available = fields.Boolean("Sample available")
+    of_is_sample = fields.Boolean("Is sample", readonly=True)
+    of_sample_id = fields.Many2one("product.template", string="Sample")
+    of_sample_default_code = fields.Char(related="of_sample_id.default_code", string="Sample ref.", readonly=True)
+    of_sample_active = fields.Boolean(related="of_sample_id.active", string="Sample active", readonly=True)
+    of_sample_parent_id = fields.Many2one("product.template", string="Sample parent")
+    of_sample_parent_default_code = fields.Char(related="of_sample_parent_id.default_code",
                                              string="Parent ref.", readonly=True)
-    sample_parent_active = fields.Boolean(related="sample_parent_id.active", string="Parent active", readonly=True)
+    of_sample_parent_active = fields.Boolean(related="of_sample_parent_id.active", string="Parent active", readonly=True)
 
     @api.model
     def create(self, args):
-        sample_available = args.get('sample_available', False)
-
-        # Si gestion des échantillons
-        if sample_available:
-            # On créé le sample
-            sample_id = self.create({
-                "name": args.get('name') + u" (échantillon)",
-                "type": args.get('type', False),
-                "brand_id": args.get('brand_id', False),
-                "default_code": args.get('default_code', '')
-                + self.env['ir.sequence'].next_by_code('product.sample') or '_ECH',
-                "categ_id": args.get('categ_id', False),
-                "public_categ_ids": args.get('public_categ_ids', False),
-                "description_sale": args.get('description_sale', False),
-                "description_purchase": args.get('description_purchase', False),
-                "description_picking": args.get('description_picking', False),
-                "description_fabricant": args.get('description_fabricant', False),
-                "seller_ids": args.get('seller_ids', False),
-                "is_sample": True,
-                "active": True,
-                "website_published": False,
-            })
-
-            args['sample_id'] = sample_id.id
         res = super(ProductTemplate, self).create(args)
-
-        if sample_available:
-            # On assigne le parent
-            res.sample_id.write({
-                "sample_parent_id": res.id,
-            })
-
+        # Si gestion des écantillons
+        if res.of_sample_available:
+            args_sample = res.get_sample_values()
+            # On crée of_sample_id
+            sample = res.create(args_sample)
+            res.with_context(skip_sample=True).of_sample_id = sample.id
         return res
 
     @api.multi
     def write(self, args):
-        sample_available = args.get('sample_available')
         website_published = args.get('website_published')
-
-        # Si on archive/désarchive le parent, on archive/désarchive l'enfant
-        if 'active' in args:
-            if self.sample_id:
-                self.sample_id.active = args['active']
-
-        # On ne veut pas qu'un sample apparaisse dans le shop
+        templates = self.env['product.template']
+        samples = self.env['product.template']
         if website_published:
-            if self.is_sample:
-                args.pop('website_published')
+            # Les échantillons ne doivent pas être publiés, on sépare les échantillons des autres articles pour le super
+            for pt in self:
+                if pt.of_is_sample:
+                    samples += pt
+                else:
+                    templates += pt
+            res1 = super(ProductTemplate, templates).write(args)
+            args.pop('website_published')
+            res2 = super(ProductTemplate, samples).write(args)
+            res = res1 and res2
+        else:
+            res = super(ProductTemplate, self).write(args)
 
-        # Si on passe en gestion des échantillons
-        if sample_available:
-
-            # On créé d'abord les fournisseurs
-            seller_ids = []
-            for seller in self.seller_ids:
-                seller_id_copy = seller.copy()
-                seller_ids.append(seller_id_copy.id)
-
-            if not self.sample_id:
-
-                # On créé sample_id
-                sample_id = self.create({
-                    "name": self.name + _(u" (sample)"),
-                    "type": self.type,
-                    "brand_id": self.brand_id.id,
-                    "default_code": (self.default_code or '')
-                    + self.env['ir.sequence'].next_by_code('product.sample') or '_ECH',
-                    "categ_id": self.categ_id and self.categ_id.id,
-                    "public_categ_ids": self.public_categ_ids and self.public_categ_ids.ids,
-                    "website_description": self.website_description,
-                    "description_sale": self.description_sale,
-                    "description_purchase": self.description_purchase,
-                    "description_picking": self.description_picking,
-                    "description_fabricant": self.description_fabricant,
-                    "seller_ids": [[6, 0, seller_ids]],
-                    "is_sample": True,
-                    "sample_parent_id": self.id,
-                    "active": True,
-                    "website_published": False,
-                })
-
-                args['sample_id'] = sample_id.id
-
-            else:
-                # On met à jour sample_id et on le désarchive
-                self.sample_id.write({
-                    "name": self.name + _(u" (sample)"),
-                    "type": self.type,
-                    "brand_id": self.brand_id.id,
-                    "categ_id": self.categ_id and self.categ_id.id,
-                    "public_categ_ids": self.public_categ_ids and self.public_categ_ids.ids,
-                    "website_description": self.website_description,
-                    "description_sale": self.description_sale,
-                    "description_purchase": self.description_purchase,
-                    "description_picking": self.description_picking,
-                    "description_fabricant": self.description_fabricant,
-                    "seller_ids": [[6, 0, seller_ids]],
-                    "is_sample": True,
-                    "sample_parent_id": self.id,
-                    "active": True,
-                    "website_published": False,
-                })
-
-        # Si on sort de la gestion des échantillons
-        # On teste sample_available is False au lieu de not sample_available
-        # Car sample_available = args.get('sample_available') renvoie None si non présent dans le dict
-        elif sample_available is False:
-            # on désactive sample_available et on archive le sample
-            self.sample_id.write({
-                    "active": False,
-                })
-
-        # Si on est déjà en gestion des échantillons
-        elif self.sample_available and self.sample_id:
-
-            # On copie le dict pour le reporter sur le sample_id
-            args_sample = args.copy()
-            unaffected_fields = ['name', 'default_code', 'seller_ids', 'website_description',
-                                 'description_sale', 'description_purchase', 'description_picking',
-                                 'description_fabricant', 'list_price', 'standard_price']
-
-            # On ne reporte sur sample_id pas les changements sur les champs de unaffected_fields
-            for arg in unaffected_fields:
-                if arg in args_sample:
-                    args_sample.pop(arg)
-
-            self.sample_id.write(args_sample)
-
-        return super(ProductTemplate, self).write(args)
+        if not self._context.get('skip_sample'):
+            unaffected_fields = self.sample_unaffected_fields()
+            any_field = any([field not in unaffected_fields for field in args.keys()])
+            for pt in self:
+                if pt.of_sample_available and not pt.of_sample_id:
+                    args_sample = pt.get_sample_values()
+                    # On crée of_sample_id
+                    of_sample_id = pt.with_context(skip_sample=True).create(args_sample)
+                    pt.with_context(skip_sample=True).of_sample_id = of_sample_id.id
+                elif any_field:
+                    args_sample = pt.get_sample_values()
+                    if not pt.of_sample_available:
+                        # si pt.active == False alors args_sample['active'] déjà à False donc pas besoin de vérifier
+                        args_sample['active'] = False
+                    # On met à jour of_sample_id et on le désarchive
+                    pt.of_sample_id.with_context(skip_sample=True).write(args_sample)
+        return res
 
     @api.multi
     def unlink(self):
         # Si gestion des échantillons, on supprime le sample associé
-        if self.sample_available:
-            self.sample_id.unlink()
+        if self.of_sample_id:
+            self.of_sample_id.unlink()
 
         # Si échantillon, on désactive la gestion des échantillons sur le parent
-        if self.is_sample:
-            self.sample_parent_id.sample_available = False
+        if self.of_is_sample:
+            self.of_sample_parent_id.of_sample_available = False
 
         return super(ProductTemplate, self).unlink()
+
+    @api.multi
+    def get_sample_values(self, force=False):
+        """ Renvoi un dictionnaire de valeur pour permettre la création/synchronisation d'un échantillon avec les
+            valeurs de son parent. """
+        self.ensure_one()
+        sample_dict = self.copy_data()[0]
+        if not self.of_sample_id or force:
+            seller_ids = []
+            for seller in self.seller_ids:
+                seller_id_copy = seller.copy()
+                seller_ids.append(seller_id_copy.id)
+            args_sample = dict(sample_dict, **{
+                "name": self.name + _(u" (sample)"),
+                "default_code": (self.default_code or '')
+                                + self.env['ir.sequence'].next_by_code('product.sample') or '_ECH',
+                "of_is_sample": True,
+                "website_published": False,
+                "of_sample_parent_id": self.id,
+                "seller_ids": [[6, 0, seller_ids]]
+                })
+        else:
+            unaffected_fields = self.sample_unaffected_fields()
+
+            args_sample = {key: val for key, val in sample_dict.iteritems() if key not in unaffected_fields}
+        args_sample['of_sample_available'] = False
+        args_sample['of_is_sample'] = True
+        if args_sample.get('website_name'):
+            args_sample['website_name'] = args_sample['website_name'] + _(u" (sample)")
+        return args_sample
+
+    @api.model
+    def sample_unaffected_fields(self):
+        return [
+            'name', 'default_code', 'seller_ids', 'website_description',
+            'description_sale', 'description_purchase', 'description_picking',
+            'description_fabricant', 'list_price', 'standard_price', 'website_published'
+            ]
 
     @api.multi
     def action_view_sample(self):
@@ -168,9 +122,9 @@ class ProductTemplate(models.Model):
             'name': 'Sample',
             'view_mode': 'form',
             'res_model': 'product.template',
-            'res_id': self.sample_id.id,
+            'res_id': self.of_sample_id.id,
             'type': 'ir.actions.act_window',
-            'context': {'form_readonly': '[("is_sample","=",True)]'},
+            'context': {'form_readonly': '[("of_is_sample","=",True)]'},
         }
 
     @api.multi
@@ -180,7 +134,7 @@ class ProductTemplate(models.Model):
             'name': 'Sample',
             'view_mode': 'form',
             'res_model': 'product.template',
-            'res_id': self.sample_parent_id.id,
+            'res_id': self.of_sample_parent_id.id,
             'type': 'ir.actions.act_window',
-            'context': {'form_readonly': '[("is_sample","=",True)]'},
+            'context': {'form_readonly': '[("of_is_sample","=",True)]'},
         }

@@ -104,7 +104,7 @@ msgid "DENIED"
 msgstr ""
 
 #. module: of_website_stock
-#: model:ir.model.fields,help:of_website_stock.field_sale_order_website_commitment_date
+#: model:ir.model.fields,help:of_website_stock.field_sale_order_of_website_commitment_date
 msgid "Date by which the products are sure to be delivered. This is a date that you can promise to the customer, based on the Product Lead Times."
 msgstr ""
 
@@ -269,7 +269,7 @@ msgid "Website"
 msgstr ""
 
 #. module: of_website_stock
-#: model:ir.model.fields,field_description:of_website_stock.field_sale_order_website_commitment_date
+#: model:ir.model.fields,field_description:of_website_stock.field_sale_order_of_website_commitment_date
 msgid "Website Commitment Date"
 msgstr ""
 

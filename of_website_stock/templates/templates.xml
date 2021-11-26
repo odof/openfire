@@ -123,7 +123,7 @@
 		</xpath>
 
 		<xpath expr="//div[@itemscope='itemscope']" position="attributes">
-			<attribute name="t-att-data-publish">'off' if product.product_variant_ids and not (product.qty_available - product.outgoing_qty + product.incoming_qty) &gt; 0 else 'on'</attribute>
+			<attribute name="t-att-data-publish">'off' if product.product_variant_ids and not (product.sudo().qty_available - product.sudo().outgoing_qty + product.sudo().incoming_qty) &gt; 0 else 'on'</attribute>
 		</xpath>
 
 	</template>
@@ -179,14 +179,10 @@
 		<xpath expr="//*[@id='cart_products']/tbody/tr" position='inside'>
 			<t t-if="website.get_of_delivery_management()">
 				<td class="text-right">
-					<t t-if="website.get_website_config() != 'none'">
-						<span t-esc="line.get_days_of_delay()"/> <span>days</span>
-					</t>
+					<span t-esc="line.get_days_of_delay()"/> <span>days</span>
 				</td>
 				<td class="text-right">
-					<t t-if="website.get_website_config() != 'none'">
-						<span t-esc="line.get_delivery_date().strftime('%d/%m/%Y') or ''"/>
-					</t>
+					<span t-esc="line.get_delivery_date().strftime('%d/%m/%Y') or ''"/>
 				</td>
 			</t>
 		</xpath>
@@ -203,17 +199,6 @@
 								</span>
 							</div>
 						</div>
-<!--						Pour facilité le débug. A supprimer à la mise en prod-->
-<!--						<p>-->
-<!--							<span t-esc="'website_commitment_date : '"/>-->
-<!--							<span t-esc="website_sale_order.website_commitment_date" t-options="{'widget': 'date'}"/>-->
-<!--						</p>-->
-<!--						<p t-esc="'(OF) Délai de livraison minimum (of_website_security_lead) : ' + str(website.get_of_website_security_lead())"/>-->
-<!--						<p t-esc="'Délai de sécurité à la vente (jours)* (website.company_id.security_lead) : ' + str(website.company_id.security_lead)"/>-->
-<!--						<p>-->
-<!--							<span t-esc="'requested_date : '"/>-->
-<!--							<span t-esc="website_sale_order.requested_date" t-options="{'widget': 'date'}"/>-->
-<!--						</p>-->
 					</div>
 					<script type="text/javascript">
 						$(function () {
@@ -223,8 +208,8 @@
 
 						$('#datetimepicker').datetimepicker({
 						format: 'DD/MM/YYYY',
-						defaultDate: "<t t-esc="website_sale_order.requested_date if website_sale_order.requested_date else website_sale_order.website_commitment_date" t-options="{'widget': 'date'}"/>",
-						minDate: "<t t-esc="website_sale_order.website_commitment_date" t-options="{'widget': 'date'}"/>",
+						defaultDate: "<t t-esc="website_sale_order.requested_date if website_sale_order.requested_date else website_sale_order.of_website_commitment_date" t-options="{'widget': 'date'}"/>",
+						minDate: "<t t-esc="website_sale_order.of_website_commitment_date" t-options="{'widget': 'date'}"/>",
 						pickTime: false,
 						}).on('dp.change', function () {
 						$pay_button.prop('disabled', true);
