@@ -291,49 +291,6 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
             return res
         return super(OfPlanningTache, self).name_search(name, args, operator, limit)
 
-    @api.multi
-    def _prepare_invoice_line(self, intervention):
-        self.ensure_one()
-        product = self.product_id
-        partner = intervention.partner_id
-        if not intervention.fiscal_position_id and not partner.property_account_position_id:
-            return {}, u"Veuillez définir une position fiscale pour l'intervention %s" % self.name
-        fiscal_position = intervention.fiscal_position_id or partner.property_account_position_id
-        taxes = product.taxes_id
-        company = intervention._get_invoicing_company(partner)
-        if company:
-            if 'accounting_company_id' in company._fields:
-                company = company.accounting_company_id
-            taxes = taxes.filtered(lambda r: r.company_id == company)
-        taxes = fiscal_position and fiscal_position.map_tax(taxes, product, partner) or []
-
-        line_account = product.property_account_income_id or product.categ_id.property_account_income_categ_id
-        if not line_account:
-            return {}, u'Il faut configurer les comptes de revenus pour la catégorie du produit %s.\n' % product.name
-
-        # Mapping des comptes par taxe induit par le module of_account_tax
-        for tax in taxes:
-            line_account = tax.map_account(line_account)
-
-        pricelist = partner.property_product_pricelist
-
-        if pricelist.discount_policy == 'without_discount':
-            from_currency = company.currency_id
-            price_unit = from_currency.compute(product.lst_price, pricelist.currency_id)
-        else:
-            price_unit = product.with_context(pricelist=pricelist.id).price
-        price_unit = self.env['account.tax']._fix_tax_included_price(price_unit, product.taxes_id, taxes)
-        return {
-            'name':                 product.name_get()[0][1],
-            'account_id':           line_account.id,
-            'price_unit':           price_unit,
-            'quantity':             1.0,
-            'discount':             0.0,
-            'uom_id':               product.uom_id.id,
-            'product_id':           product.id,
-            'invoice_line_tax_ids': [(6, 0, taxes._ids)],
-        }, ""
-
 
 class OfPlanningEquipe(models.Model):
     _name = "of.planning.equipe"
@@ -1137,8 +1094,10 @@ class OfPlanningIntervention(models.Model):
     def onchange_template_id(self):
         intervention_line_obj = self.env['of.planning.intervention.line']
         template = self.template_id
-        if self.state == "draft" and template:
-            self.tache_id = template.tache_id
+        # context ajouté dans of_service pour initialiser les champs d'un RDV. Utile ici pour prioriser la DI
+        if self.state == "draft" and template and not self._context.get('of_import_service_lines'):
+            if template.tache_id:
+                self.tache_id = template.tache_id
             if not self.lien_commande and not self.fiscal_position_id:
                 self.fiscal_position_id = template.fiscal_position_id
             if self.line_ids:
@@ -1385,7 +1344,8 @@ class OfPlanningIntervention(models.Model):
 
         msgs = []
         for interv in self:
-            if interv.lien_commande:
+            # toutes les lignes sont liées à une commande (au moins une avec commande et aucune sans commande)
+            if interv.lien_commande and not interv.line_ids.filtered(lambda l: not l.order_line_id):
                 msgs.append(u"Les lignes facturables du rendez-vous %s étant liées à des lignes de commandes "
                             u"veuillez effectuer la facturation depuis le bon de commande." % interv.name)
                 continue
@@ -1628,7 +1588,7 @@ class OfPlanningIntervention(models.Model):
         self.ensure_one()
         lines_data = []
         error = ''
-        for line in self.line_ids.filtered(lambda l: l.invoice_status == 'to invoice'):
+        for line in self.line_ids.filtered(lambda l: l.invoice_status == 'to invoice' and not l.order_line_id):
             line_data, line_error = line._prepare_invoice_line()
             lines_data.append((0, 0, line_data))
             error += line_error
@@ -1650,13 +1610,6 @@ class OfPlanningIntervention(models.Model):
         if error:
             return (False,
                     msg_erreur % (self.name, error))
-        if not lines_data:
-            line_data, error = self.tache_id._prepare_invoice_line(self)
-            if error:
-                return (False,
-                        msg_erreur % (self.name, error))
-            if line_data:
-                lines_data = [(0, 0, line_data)]
         if not lines_data:
             return (False,
                     msg_erreur % (self.name, u"Aucune ligne facturable."))
@@ -1787,11 +1740,13 @@ class OfPlanningInterventionLine(models.Model):
 
     intervention_id = fields.Many2one(
         'of.planning.intervention', string='Intervention', required=True, ondelete='cascade')
-    partner_id = fields.Many2one('res.partner', related='intervention_id.partner_id')
-    company_id = fields.Many2one('res.company', related='intervention_id.company_id', string=u'Société')
+    partner_id = fields.Many2one('res.partner', related='intervention_id.partner_id', readonly=True)
+    company_id = fields.Many2one('res.company', related='intervention_id.company_id', string=u'Société', readonly=True)
     currency_id = fields.Many2one('res.currency', string='Currency', readonly=True, related="company_id.currency_id")
 
     order_line_id = fields.Many2one('sale.order.line', string='Ligne de commande')
+    so_number = fields.Char(
+        string=u"Numéro de commande client", related='order_line_id.order_id.name', readonly=True)
     product_id = fields.Many2one('product.product', string='Article')
     price_unit = fields.Monetary(
         string='Prix unitaire', digits=dp.get_precision('Product Price'), default=0.0, currency_field='currency_id'
@@ -1819,7 +1774,6 @@ class OfPlanningInterventionLine(models.Model):
         ('invoiced', u'Totalement facturée'),
         ], string=u"État de facturation", compute='_compute_invoice_status', store=True
     )
-    from_order = fields.Boolean(string=u"CC liée", compute="_compute_from_order")
 
     @api.depends('qty', 'price_unit', 'taxe_ids')
     def _compute_amount(self):
@@ -1895,11 +1849,6 @@ class OfPlanningInterventionLine(models.Model):
                 line.invoice_status = 'invoiced'
             else:
                 line.invoice_status = 'no'
-
-    @api.depends('order_line_id')
-    def _compute_from_order(self):
-        for line in self:
-            line.from_order = bool(line.order_line_id)
 
     @api.model
     def create(self, vals):

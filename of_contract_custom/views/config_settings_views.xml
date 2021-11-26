@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Intervention config wizard -->
+    <record id="of_contract_custom_of_intervention_settings_form_view" model="ir.ui.view">
+        <field name="name">of.contract.custom.of.intervention.settings.form.view</field>
+        <field name="model">of.intervention.settings</field>
+        <field name="inherit_id" ref="of_planning.view_of_intervention_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='intervention']" position="after">
+                <group name="contract" string="Contrats">
+                    <label for="group_contract_automatic_sequence"/>
+                    <div name="group_contract_automatic_sequence">
+                        <field name="group_contract_automatic_sequence" class="oe_inline"/>
+                        <span>Permet l'affectaton automatique d'un numéro pour la référence des contrats</span>
+                    </div>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

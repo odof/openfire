@@ -7,7 +7,6 @@ from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
 
 class OFParcInstalle(models.Model):
     """Parc installé"""
-
     _name = 'of.parc.installe'
     _description = u"Parc installé"
 
@@ -15,6 +14,11 @@ class OFParcInstalle(models.Model):
     date_service = fields.Date("Date vente", required=False)
     date_installation = fields.Date("Date d'installation", required=False)
     date_fin_garantie = fields.Date(string="Fin de garantie")
+    type_garantie = fields.Selection([
+        ('initial', u"Initiale"),
+        ('extension', u"Extension"),
+        ('expired', u"Expirée"),
+    ], string=u"Type de garantie")
     product_id = fields.Many2one('product.product', 'Produit', required=True, ondelete='restrict')
     product_category_id = fields.Many2one('product.category', string=u'Catégorie')
     client_id = fields.Many2one(
@@ -95,6 +99,14 @@ class OFParcInstalle(models.Model):
 
     # @api.onchange
 
+    @api.onchange('date_fin_garantie')
+    def onchange_date_fin_garantie(self):
+        if self.date_fin_garantie and self.date_fin_garantie < fields.Date.today():
+            self.type_garantie = 'expired'
+        elif self.date_fin_garantie and self.date_fin_garantie >= fields.Date.today() and \
+                self.type_garantie == 'expired':
+            self.type_garantie = 'extension'
+
     @api.onchange('product_id')
     def onchange_product_id(self):
         if self.product_id:
@@ -131,22 +143,37 @@ class OFParcInstalle(models.Model):
 
     @api.multi
     def name_get(self):
-        """Permet dans un SAV lors de la saisie du no de série d'une machine installée de proposer les machines
-        du contact en premier précédées d'une puce."""
+        """
+        Permet dans un SAV lors de la saisie du no de série d'une machine installée de proposer les machines
+        du contact précédées d'une puce.
+        Permet dans une DI de proposer les appareils d'une adresse différente entre parenthèses.
+        """
         client_id = self._context.get('partner_id_no_serie_puce')
-        result = []
-        for record in self:
-            result.append((
-                record.id,
-                ("-> " if record.client_id.id == client_id else "")
-                + (record.name or u"(N° non renseigné)")
-                + " - " + record.client_id.display_name))
-        return result
+        if client_id:
+            result = []
+            for record in self:
+                result.append((
+                    record.id,
+                    ("-> " if record.client_id.id == client_id else "")
+                    + (record.name or u"(N° non renseigné)")
+                    + " - " + record.client_id.display_name))
+            return result
+        address_id = self._context.get('address_prio_id')
+        if address_id:
+            result = []
+            for parc in self:
+                parc_address = parc.site_adresse_id or parc.client_id
+                meme = parc_address and parc_address.id == address_id
+                result.append((parc.id, "%s%s%s" % ('' if meme else '(', parc.name, '' if meme else ')')))
+            return result
+        return super(OFParcInstalle, self).name_get()
 
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
-        """Permet dans un SAV lors de la saisie du no de série d'une machine installée de proposer les machines
-        du contact en premier précédées d'une puce."""
+        """
+        Permet dans un SAV lors de la saisie du no de série d'une machine installée de proposer les machines
+        du contact en premier précédées d'une puce.
+        Permet, dans une DI, de montrer en 1er les appareils de l'adresse, puis ceux du client et enfin les autres."""
         if self._context.get('partner_id_no_serie_puce'):
             client_id = self._context.get('partner_id_no_serie_puce')
             res = super(OFParcInstalle, self).name_search(name, [('client_id', '=', client_id)], operator, limit) or []
@@ -154,6 +181,29 @@ class OFParcInstalle(models.Model):
             res = [(parc[0], "-> " + parc[1]) for parc in res]
             res += super(OFParcInstalle, self).name_search(
                 name, [('client_id', '!=', client_id)], operator, limit) or []
+            return res
+        if self._context.get('address_prio_id'):
+            address_id = self._context.get('address_prio_id')
+            args = args or []
+            res = super(OFParcInstalle, self).name_search(
+                name,
+                args + [['site_adresse_id', '=', address_id]],
+                operator,
+                limit) or []
+            limit = limit - len(res)
+            res += super(OFParcInstalle, self).name_search(
+                name,
+                args + ['|', ['site_adresse_id', '=', False], ['site_adresse_id', '!=', address_id],
+                        ['client_id', '=', address_id]],
+                operator,
+                limit) or []
+            limit = limit - len(res)
+            res += super(OFParcInstalle, self).name_search(
+                name,
+                args + ['|', ['site_adresse_id', '=', False], ['site_adresse_id', '!=', address_id],
+                        ['client_id', '!=', address_id]],
+                operator,
+                limit) or []
             return res
         return super(OFParcInstalle, self).name_search(name, args, operator, limit)
 
@@ -189,6 +239,20 @@ class OFParcInstalle(models.Model):
                                   'default_of_produit_installe_id': parc_installe.id,
                                   'default_of_type': 'di'}
         return res
+
+    # Autres
+
+    @api.model
+    def recompute_type_garantie_daily(self):
+        today = fields.Date.today()
+        all_parc_date_garantie = self.search([('date_fin_garantie', '!=', False)])
+        # initialiser l'état de garantie pour les parcs qui ont une date de garantie future
+        parc_garantie = all_parc_date_garantie.filtered(lambda p: p.date_fin_garantie >= today and not p.type_garantie)
+        parc_garantie.write({'type_garantie': 'initial'})
+        # Passer l'état de garantie à "Expirée" pour les parcs dont la date de garantie est future
+        parc_expire = all_parc_date_garantie.filtered(
+            lambda p: p.date_fin_garantie < today and p.type_garantie != 'expired')
+        parc_expire.write({'type_garantie': 'expired'})
 
 
 class ResPartner(models.Model):

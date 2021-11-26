@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="group_of_project_issue_not_migrated" model="res.groups">
+        <field name="name">Groupe spécial SAV non migrés</field>
+        <field name="comment">Groupe spécial OpenFire : retiré à tout le monde après la migration des SAV dans les DI.
+            Permet de cacher certains éléments de menu</field>
+    </record>
+
+</odoo>

@@ -33,41 +33,60 @@
         <field name="users" eval="[(4, ref('base.user_root'))]"/>
     </record>
 
-<data noupdate="1">
-
-    <record id="of_contract_planning_multicompany_rule_read" model="ir.rule">
-        <field name="name">OF Contract multi-company Read</field>
-        <field name="model_id" ref="model_of_contract"/>
-        <field name="global" eval="True"/>
-        <field name="perm_write" eval="False"/>
-        <field name="perm_create" eval="False"/>
-        <field name="perm_unlink" eval="False"/>
-        <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
-    </record>
-    <record id="of_contract_planning_multicompany_rule_write" model="ir.rule">
-        <field name="name">OF Contract multi-company Write</field>
-        <field name="model_id" ref="model_of_contract"/>
-        <field name="global" eval="True"/>
-        <field name="perm_read" eval="False"/>
-        <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+    <record id="group_contract_automatic_sequence" model="res.groups">
+        <field name="name">Contrats - Séquence automatique</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="comment">Permet l'affectaton automatique d'un numéro pour la référence des contrats</field>
     </record>
 
-    <record id="of_contract_line_planning_multicompany_rule_read" model="ir.rule">
-        <field name="name">OF Contract Line multi-company Read</field>
-        <field name="model_id" ref="model_of_contract_line"/>
-        <field name="global" eval="True"/>
-        <field name="perm_write" eval="False"/>
-        <field name="perm_create" eval="False"/>
-        <field name="perm_unlink" eval="False"/>
-        <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
-    </record>
-    <record id="of_contract_line_planning_multicompany_rule_write" model="ir.rule">
-        <field name="name">OF Contract Line multi-company Write</field>
-        <field name="model_id" ref="model_of_contract_line"/>
-        <field name="global" eval="True"/>
-        <field name="perm_read" eval="False"/>
-        <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
-    </record>
+    <data noupdate="1">
 
-</data>
+        <record id="of_contract_planning_multicompany_rule_read" model="ir.rule">
+            <field name="name">OF Contract multi-company Read</field>
+            <field name="model_id" ref="model_of_contract"/>
+            <field name="global" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+        </record>
+        <record id="of_contract_planning_multicompany_rule_write" model="ir.rule">
+            <field name="name">OF Contract multi-company Write</field>
+            <field name="model_id" ref="model_of_contract"/>
+            <field name="global" eval="True"/>
+            <field name="perm_read" eval="False"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+        </record>
+
+        <record id="of_contract_line_planning_multicompany_rule_read" model="ir.rule">
+            <field name="name">OF Contract Line multi-company Read</field>
+            <field name="model_id" ref="model_of_contract_line"/>
+            <field name="global" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+        </record>
+        <record id="of_contract_line_planning_multicompany_rule_write" model="ir.rule">
+            <field name="name">OF Contract Line multi-company Write</field>
+            <field name="model_id" ref="model_of_contract_line"/>
+            <field name="global" eval="True"/>
+            <field name="perm_read" eval="False"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+        </record>
+
+        <record model="res.groups" id="base.group_public">
+            <field name="implied_ids" eval="[(4, ref('of_contract_custom.group_contract_automatic_sequence'))]"/>
+        </record>
+
+        <record model="res.groups" id="base.group_portal">
+            <field name="implied_ids" eval="[(4, ref('of_contract_custom.group_contract_automatic_sequence'))]"/>
+        </record>
+
+        <record model="res.groups" id="base.group_user">
+            <field name="implied_ids" eval="[(4, ref('of_contract_custom.group_contract_automatic_sequence'))]"/>
+        </record>
+
+    </data>
+
 </odoo>

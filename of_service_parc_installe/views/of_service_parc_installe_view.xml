@@ -7,18 +7,46 @@
         <field name="model">of.service</field>
         <field name="inherit_id" ref="of_service.view_of_service_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_id']" position="attributes">
+                <attribute name="attrs">{'invisible': [('type_id','not in', [%(of_service.of_service_type_installation)d, %(of_service.of_service_type_maintenance)d, %(of_service_parc_installe.of_service_type_sav)d])]}</attribute>
+            </xpath>
             <xpath expr="//field[@name='order_id']" position="after">
                 <field name="sav_id"
                        attrs="{'invisible': [('recurrence', '=', True)]}"
-                       groups="project.group_project_user, base.group_portal"/>
+                       groups="of_service_parc_installe.group_of_project_issue_not_migrated+(project.group_project_user, base.group_portal)"/>
             </xpath>
-            <xpath expr="//group[@name='gauche_1']" position="inside">
-                <group string="Produit installé" groups="project.group_project_user" colspan="2">
-                        <field name="parc_installe_id"/>
+            <xpath expr="//field[@name='tag_ids']" position="after">
+                <field name="of_canal_id"
+                       attrs="{'invisible': [('type_id', '!=', %(of_service_parc_installe.of_service_type_sav)d)]}"/>
+            </xpath>
+            <xpath expr="//field[@name='tache_id']" position="before">
+                <field name="of_categorie_id"
+                       attrs="{'invisible': [('type_id', '!=', %(of_service_parc_installe.of_service_type_sav)d)]}"/>
+            </xpath>
+            <xpath expr="//page[@name='description']" position="after">
+                <page name="parc" string="Produit installé">
+                    <group string="Produit installé" groups="project.group_project_user" colspan="2">
+                        <field name="parc_installe_id" context="{'address_prio_id': address_id or partner_id}"/>
                         <field name="parc_installe_product_id"/>
                         <field name="parc_installe_site_adresse_id"/>
+                        <field name="parc_type_garantie"
+                               attrs="{'invisible': [('type_id', '!=', %(of_service_parc_installe.of_service_type_sav)d)]}"/>
+                        <field name="payer_mode"
+                               attrs="{'invisible': [('type_id', '!=', %(of_service_parc_installe.of_service_type_sav)d)]}"/>
                         <field name="parc_installe_note"/>
-                </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_service_parc_installe_of_service_search_view" model="ir.ui.view">
+        <field name="name">of.service.parc.installe.of.service.search.view</field>
+        <field name="model">of.service</field>
+        <field name="inherit_id" ref="of_service.view_of_service_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="filter[@name='filter_entretien']" position="before">
+                <filter string="SAV" name="filter_sav" domain="[('type_id', '=', %(of_service_parc_installe.of_service_type_sav)d)]"/>
             </xpath>
         </field>
     </record>
@@ -93,7 +121,7 @@
         <field name="arch" type="xml">
             <!-- Ajout bouton prévoir une intervention-->
             <xpath expr="//header" position="inside">
-                <button name="action_prevoir_intervention" string="Prévoir Intervention" type="object"/>
+                <button name="action_prevoir_intervention" string="Demande d'intervention" type="object"/>
             </xpath>
             <xpath expr="//group[@name='produit_installe']" position="inside">
                 <field name="id" invisible="1"/>
@@ -102,20 +130,23 @@
                 <button class="oe_stat_button" name="action_view_service" type="object" icon="fa-home">
                     <div class="o_form_field o_stat_info">
                         <span class="o_stat_value"><field name="service_count"/></span>
-                        <span class="o_stat_text">Récurrents</span>
+                        <span class="o_stat_text">DI récurrentes</span>
                     </div>
                 </button>
                 <button class="oe_stat_button" name="action_view_a_programmer" type="object" icon="fa-calendar-o">
                     <div class="o_form_field o_stat_info">
                         <span class="o_stat_value"><field name="a_programmer_count"/></span>
-                        <span class="o_stat_text">À programmer</span>
+                        <span class="o_stat_text">DI à programmer</span>
                     </div>
                 </button>
             </xpath>
-            <xpath expr="//field[@name='date_installation']" position="after">
-                <field name="date_fin_garantie"/>
+            <xpath expr="//notebook/page[@name='historique_sav']" position="attributes">
+                <attribute name="groups">of_service_parc_installe.group_of_project_issue_not_migrated</attribute>
             </xpath>
-            <xpath expr="//notebook" position="inside">
+            <xpath expr="//notebook/page[@name='historique_sav']//group[@name='sav']" position="attributes">
+                <attribute name="groups">of_service_parc_installe.group_of_project_issue_not_migrated</attribute>
+            </xpath>
+            <xpath expr="//notebook/page[@name='historique_sav']" position="before">
                 <page string="Historique des interventions">
                     <group name="intervention">
                         <field name="intervention_ids" nolabel="1" context="{'default_address_id':site_adresse_id, 'default_parc_installe_id':id}">
@@ -145,27 +176,6 @@
             </xpath>
             <xpath expr="//field[@name='service_address_ids']" position="attributes">
                 <attribute name="context">{'hide_service_address_id':True, 'form_view_ref':'of_service_parc_installe.view_of_service_parc_installe_service_rec_form'}</attribute>
-            </xpath>
-        </field>
-    </record>
-
-    <record id="of_project_issue_form_view_serviceparc" model="ir.ui.view">
-        <field name="name">project.issue.form.service_parc_installe</field>
-        <field name="model">project.issue</field>
-        <field name="inherit_id" ref="of_project_issue.of_project_issue_form_view"/>
-        <field name="arch" type="xml">
-            <!-- Ajout bouton prévoir une intervention dans vue form SAV-->
-            <xpath expr="//header" position="inside">
-                <button name="action_prevoir_intervention" string="Prévoir Intervention" type="object"/>
-            </xpath>
-            <!-- smart button 'à programmer' -->
-            <xpath expr="//div[@class='oe_button_box']" position="inside">
-                <button class="oe_stat_button" name="action_view_a_programmer" type="object" icon="fa-calendar-o">
-                    <div class="o_form_field o_stat_info">
-                        <span class="o_stat_value"><field name="of_a_programmer_count"/></span>
-                        <span class="o_stat_text">À programmer</span>
-                    </div>
-                </button>
             </xpath>
         </field>
     </record>

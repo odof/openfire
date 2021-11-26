@@ -1,12 +1,12 @@
 # -*- encoding: utf-8 -*-
 
 {
-    'name': "OpenFire / Services",
+    'name': "OpenFire / Demande d'intervention",
     'version': "10.0.1.0.0",
     'author': "OpenFire",
     'website': "http://www.openfire.fr",
     'category': "Generic Modules",
-    'description': """Module OpenFire de gestion des services.""",
+    'description': """Module OpenFire de gestion des demandes d'intervention.""",
     'depends': [
         'of_planning',
         'of_map_view',
@@ -18,9 +18,10 @@
     'init_xml': [],
     'demo_xml': [],
     'data': [
+        'reports/of_service_demande_intervention_templates.xml',
+        'data/of_service_data.xml',
         'security/ir.model.access.csv',
         'views/of_service_view.xml',
-        'data/of_service_data.xml',
     ],
     'installable': True,
 }

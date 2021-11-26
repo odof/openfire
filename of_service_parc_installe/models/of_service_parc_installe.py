@@ -2,16 +2,15 @@
 
 from odoo import models, fields, api
 from dateutil.relativedelta import relativedelta
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class OfService(models.Model):
     _inherit = "of.service"
 
-    parc_installe_id = fields.Many2one(
-        'of.parc.installe', string=u"No de série",
-        domain="partner_id and [('client_id', '=', partner_id), '|', ('site_adresse_id', '=', False), "
-               "('site_adresse_id', '=', address_id)] or address_id and [('client_id', 'parent_of', address_id), '|', "
-               "('site_adresse_id', '=', False), ('site_adresse_id', '=', address_id)] or []")
+    parc_installe_id = fields.Many2one(comodel_name='of.parc.installe', string=u"No de série")
     parc_installe_product_id = fields.Many2one(
         'product.product', string=u"Désignation", related="parc_installe_id.product_id", readonly=True)
     parc_installe_site_adresse_id = fields.Many2one(
@@ -19,6 +18,19 @@ class OfService(models.Model):
     parc_installe_note = fields.Text(string=u"Note", related="parc_installe_id.note", readonly=True)
     sav_id = fields.Many2one(
         "project.issue", string="SAV", domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")
+    parc_type_garantie = fields.Selection(related='parc_installe_id.type_garantie')
+
+    of_categorie_id = fields.Many2one('of.project.issue.categorie', string=u"Catégorie", ondelete='restrict')
+    of_canal_id = fields.Many2one('of.project.issue.canal', string=u"Canal", ondelete='restrict')
+
+    @api.depends('parc_installe_id.intervention_ids', 'address_id.intervention_address_ids',
+                 'partner_id.intervention_address_ids')
+    def _compute_historique_interv_ids(self):
+        for service in self:
+            if service.parc_installe_id:
+                service.historique_interv_ids = service.parc_installe_id.intervention_ids
+            else:
+                super(OfService, self)._compute_historique_interv_ids()
 
     @api.onchange('address_id')
     def _onchange_address_id(self):
@@ -136,6 +148,7 @@ class OfParcInstalle(models.Model):
             'default_date_next': fields.Date.today(),
             'default_parc_installe_id': self.id,
             'default_origin': u"[parc installé] " + (self.name or ''),
+            'default_type_id': self.env.ref('of_service.of_service_type_maintenance').id,
         }
         return action
 
@@ -150,6 +163,7 @@ class OfParcInstalle(models.Model):
             'default_date_next': fields.Date.today(),
             'default_parc_installe_id': self.id,
             'default_origin': u"[parc installé] " + (self.name or ''),
+            'default_type_id': self.env.ref('of_service.of_service_type_maintenance').id,
         }
         return action
 
@@ -170,6 +184,7 @@ class OfParcInstalle(models.Model):
             'default_date_next': fields.Date.today(),
             'default_parc_installe_id': self.id,
             'default_origin': u"[Parc installé] " + (self.name or ''),
+            'default_type_id': self.env.ref('of_service.of_service_type_maintenance').id,
         }
         return action
 
@@ -184,52 +199,3 @@ class OfParcInstalle(models.Model):
             ('id', 'in', self.intervention_ids.ids),
             ('date', '<', intervention.date)
             ], order="date DESC", limit=3)
-
-class ProjectIssue(models.Model):
-    _inherit = 'project.issue'
-
-    of_a_programmer_count = fields.Integer(compute="_compute_of_a_programmer_count")
-
-    @api.multi
-    def _compute_of_a_programmer_count(self):
-        """Smart button vue SAV : renvoi le nombre d'interventions à programmer liées à la machine installée"""
-        service_obj = self.env['of.service']
-        for sav in self:
-            sav.of_a_programmer_count = len(service_obj.search([('sav_id', '=', sav.id), ('recurrence', '=', False)]))
-
-    @api.multi
-    def action_view_a_programmer(self):
-        self.ensure_one()
-        action = self.env.ref('of_service_parc_installe.of_service_parc_installe_open_a_programmer').read()[0]
-        action['domain'] = [('sav_id', '=', self.id), ('recurrence', '=', False)]
-        action['context'] = {
-            'default_partner_id': self.of_parc_installe_client_id.id,
-            'default_address_id': self.of_parc_installe_lieu_id.id,
-            'default_recurrence': False,
-            'default_date_next': fields.Date.today(),
-            'default_sav_id': self.id,
-            'default_parc_installe_id': self.of_produit_installe_id.id,
-            'default_origin': u"[SAV] " + self.name,
-        }
-        return action
-
-    @api.multi
-    def action_prevoir_intervention(self):
-        self.ensure_one()
-        action = self.env.ref('of_service_parc_installe.of_service_parc_installe_open_a_programmer').read()[0]
-        action['name'] = u"Prévoir une intervention"
-        action['view_mode'] = "form"
-        action['view_ids'] = False
-        action['view_id'] = self.env['ir.model.data'].xmlid_to_res_id("of_service.view_of_service_form")
-        action['views'] = False
-        action['target'] = "new"
-        action['context'] = {
-            'default_partner_id': self.of_parc_installe_client_id.id,
-            'default_address_id': self.of_parc_installe_lieu_id.id,
-            'default_recurrence': False,
-            'default_date_next': fields.Date.today(),
-            'default_sav_id': self.id,
-            'default_parc_installe_id': self.of_produit_installe_id.id,
-            'default_origin': u"[SAV] " + self.name,
-        }
-        return action

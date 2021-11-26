@@ -5,6 +5,7 @@
     ####        I R . C R O N
     #############################################################################################################-->
     <data noupdate="1">
+
         <!-- Cron journalier de calcul d'état des services -->
         <record id="of_cron_service_state_daily" model="ir.cron">
             <field name="name">Recalcul états des services</field>
@@ -18,6 +19,118 @@
             <field name="active">true</field>
             <field name="args">()</field>
         </record>
+
+        <record id="of_service_sequence" model="ir.sequence">
+            <field name="name">Séquence de demande d'intervention</field>
+            <field name="prefix">DI/</field>
+            <field name="code">of.service</field>
+            <field name="padding">6</field>
+        </record>
+
+        <!-- Types de demande d'intervention -->
+
+        <record id="of_service_type_maintenance" model="of.service.type">
+            <field name="name">Entretien - Maintenance</field>
+        </record>
+
+        <record id="of_service_type_installation" model="of.service.type">
+            <field name="name">Installation</field>
+        </record>
+
+        <record id="of_service_type_technical" model="of.service.type">
+            <field name="name">Visite technique</field>
+        </record>
+
+        <!-- Étapes kanban des demandes d'intervention -->
+
+        <record id="of_service_kanban_new" model="of.service.stage">
+            <field name="name">Nouveau</field>
+            <field name="sequence">10</field>
+            <field name="type_ids" eval="[(4, ref('of_service.of_service_type_maintenance')),
+                                          (4, ref('of_service.of_service_type_installation'))]"/>
+        </record>
+
+        <record id="of_service_kanban_quote" model="of.service.stage">
+            <field name="name">Devis</field>
+            <field name="sequence">20</field>
+            <field name="type_ids" eval="[(4, ref('of_service.of_service_type_maintenance')),
+                                          (4, ref('of_service.of_service_type_installation'))]"/>
+        </record>
+
+        <record id="of_service_kanban_sale" model="of.service.stage">
+            <field name="name">Commande</field>
+            <field name="sequence">30</field>
+            <field name="type_ids" eval="[(4, ref('of_service.of_service_type_maintenance')),
+                                          (4, ref('of_service.of_service_type_installation'))]"/>
+        </record>
+
+        <record id="of_service_kanban_toplan" model="of.service.stage">
+            <field name="name">À planifier</field>
+            <field name="sequence">50</field>
+            <field name="type_ids"
+                   eval="[(4, ref('of_service.of_service_type_maintenance')),
+                          (4, ref('of_service.of_service_type_installation')),
+                          (4, ref('of_service.of_service_type_technical'))]"/>
+        </record>
+
+        <record id="of_service_kanban_planned" model="of.service.stage">
+            <field name="name">Planifié</field>
+            <field name="sequence">60</field>
+            <field name="type_ids"
+                   eval="[(4, ref('of_service.of_service_type_maintenance')),
+                          (4, ref('of_service.of_service_type_installation')),
+                          (4, ref('of_service.of_service_type_technical'))]"/>
+        </record>
+
+        <record id="of_service_kanban_toinvoice" model="of.service.stage">
+            <field name="name">À facturer</field>
+            <field name="sequence">70</field>
+            <field name="type_ids"
+                   eval="[(4, ref('of_service.of_service_type_maintenance')),
+                          (4, ref('of_service.of_service_type_installation'))]"/>
+        </record>
+
+        <record id="of_service_kanban_closed" model="of.service.stage">
+            <field name="name">Clôturé</field>
+            <field name="sequence">80</field>
+            <field name="type_ids"
+                   eval="[(4, ref('of_service.of_service_type_maintenance')),
+                          (4, ref('of_service.of_service_type_installation')),
+                          (4, ref('of_service.of_service_type_technical'))]"/>
+        </record>
+
+        <record id="of_service_kanban_cancelled" model="of.service.stage">
+            <field name="name">Annulé</field>
+            <field name="sequence">90</field>
+            <field name="type_ids"
+                   eval="[(4, ref('of_service.of_service_type_maintenance')),
+                          (4, ref('of_service.of_service_type_installation')),
+                          (4, ref('of_service.of_service_type_technical'))]"/>
+        </record>
+
+        <!-- Modèle de mail pour les demandes d'intervention -->
+        <record id="email_template_of_service" model="mail.template">
+            <field name="name">DI - Envoyer par email</field>
+            <field name="email_from">
+                ${(object.user_id.email and '%s &lt;%s&gt;' % (object.user_id.name, object.user_id.email) or '')|safe}
+            </field>
+            <field name="subject">${object.company_id.name} - Demande d'intervention (n°${object.number or 'n/a'})
+            </field>
+            <field name="partner_to">${object.partner_id.id}</field>
+            <field name="model_id" ref="of_service.model_of_service"/>
+            <field name="report_template" ref="of_service.report_service_demande_intervention"/>
+            <field name="report_name">Demande d'intervention</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="body_html"><![CDATA[
+<p>Bonjour ${object.partner_id.name},</p>
+
+<p>Veuillez trouver ci-joint la demande d'intervention nº${object.number or 'n/a'} à prévoir entre le
+${format_date(object.date_next)} et le ${format_date(object.date_fin)}.</p>
+<p>Cordialement,</p>
+]]></field>
+        </record>
+
     </data>
 
  <!--#############################################################################################################
@@ -29,5 +142,11 @@
         <field name="allow_overlap">False</field>
         <field name="company_id"></field>
     </record>
+
+    <!-- Initialiser le numéro de DI -->
+    <function model="of.service" name="_init_number"/>
+
+    <!-- Initialiser le type de DI -->
+    <function model="of.service" name="_init_type"/>
 
 </odoo>

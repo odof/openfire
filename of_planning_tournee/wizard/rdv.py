@@ -58,6 +58,7 @@ class OfTourneeRdv(models.TransientModel):
             service = service_obj.browse(service_id)
             partner = service.partner_id
             address = service.address_id
+            res['pre_employee_ids'] = [(6, 0, [emp.id for emp in service.employee_ids])]
         elif active_model == 'sale.order':
             order_id = self._context['active_ids'][0]
             order = self.env['sale.order'].browse(order_id)
@@ -316,6 +317,7 @@ class OfTourneeRdv(models.TransientModel):
 
         res = intervention_obj.create(values)
         res.onchange_company_id()  # Permet de renseigner l'entrepôt
+        res.with_context(of_import_service_lines=True)._onchange_service_id()  # Charger les lignes de facturation
         contract_custom = self.sudo().env['ir.module.module'].search([('name', '=', 'of_contract_custom')])
 
         # Creation/mise à jour du service si creer_recurrence
@@ -400,6 +402,8 @@ class OfTourneeRdv(models.TransientModel):
 
         # Jours du service, jours travaillés des équipes et horaires de travail
         jours_service = sudo and range(1, 8) or [jour.numero for jour in service.jour_ids] if service else range(1, 8)
+        if not jours_service:  # si les jours ne sont pas renseignés dans le service
+            jours_service = range(1, 8)
 
         un_jour = timedelta(days=1)
         # --- Création des créneaux de début et fin de recherche ---
@@ -735,11 +739,16 @@ class OfTourneeRdv(models.TransientModel):
         :return: dictionnaires de valeurs pour la création du RDV Tech
         """
         self.ensure_one()
+        if self.service_id and self.service_id.template_id:
+            template = self.service_id.template_id
+        else:
+            template = False
 
         return {
             'partner_id': self.partner_id.id,
             'address_id': self.partner_address_id.id,
             'tache_id': self.tache_id.id,
+            'template_id': template and template.id,
             'service_id': self.service_id.id,
             'employee_ids': [(4, self.employee_id.id, 0)],
             'date': self.date_propos,

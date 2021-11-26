@@ -1,3 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_of_service_user,of.service.user,model_of_service,base.group_user,1,1,1,1
+access_of_service_line_user,of.service.line.user,model_of_service_line,base.group_user,1,1,1,1
 access_of_service_tag_user,of.service.tag.user,model_of_service_tag,base.group_user,1,1,1,1
+access_of_service_type_user,of.service.type.user,model_of_service_type,base.group_user,1,0,0,0
+access_of_service_stage_user,of.service.stage.user,model_of_service_stage,base.group_user,1,0,0,0
+access_of_service_stage_manager,of.service.stage.manager,model_of_service_stage,of_planning.of_group_planning_intervention_modification_tout,1,1,1,1

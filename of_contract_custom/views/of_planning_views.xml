@@ -35,13 +35,4 @@
         </field>
     </record>
 
-    <record id="of_planning.action_of_planning_intervention_calendar" model="ir.actions.act_window">
-        <field name="context">
-            {'search_default_state_confirm':1,
-            'search_default_state_done':1,
-            'search_default_state_draft':1,
-            'search_default_state_unfinished':1}
-        </field>
-    </record>
-
 </odoo>

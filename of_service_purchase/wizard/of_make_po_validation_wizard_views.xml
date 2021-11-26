@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_of_make_po_validation_wizard_form" model="ir.ui.view">
+        <field name="name">view.of.make.po.validation.wizard.form</field>
+        <field name="model">of.make.po.validation.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="message" colspan="2" nolabel="1"/>
+                </group>
+                <field name="service_id" invisible="1"/>
+                <footer>
+                    <button string="Valider" name="validate" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

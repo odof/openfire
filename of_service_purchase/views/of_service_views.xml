@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_service_purchase_of_service_form_view" model="ir.ui.view">
+        <field name="name">of.service.purchase.of.service.form.view</field>
+        <field name="model">of.service</field>
+        <field name="inherit_id" ref="of_service.view_of_service_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_purchaseorder"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-credit-card">
+                    <field name="purchaseorder_count" widget="statinfo" string="Achats"/>
+                </button>
+                <button name="action_view_purchase_invoice"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-credit-card">
+                    <field name="purchase_invoice_count" widget="statinfo" string="Factures fournisseur"/>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']/tree/field[@name='so_number']" position="after">
+                <field name="po_number" string="CF"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Générer demande de prix depuis DI -->
+    <record id="action_make_purchase_order" model="ir.actions.server">
+        <field name="name">Générer commande fournisseur</field>
+        <field name="model_id" ref="of_service.model_of_service"/>
+        <field name="state">code</field>
+        <field name="code">action = obj.make_purchase_order()</field>
+    </record>
+    <record id="value_make_purchase_order" model="ir.values">
+        <field name="name">Générer commande fournisseur</field>
+        <field name="key2">client_action_multi</field>
+        <field name="model">of.service</field>
+        <field name="value" eval="'ir.actions.server,%d'%action_make_purchase_order"/>
+    </record>
+
+</odoo>

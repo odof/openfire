@@ -82,6 +82,9 @@ of_base_location.access_of_secteur_zip_range_debug,of.secteur.zip.range.debug,of
 of_service.access_of_service_user,of.service.user,of_service.model_of_service,base.group_user,1,0,0,0
 access_of_service_modification,of.service.modification,of_service.model_of_service,of_planning.of_group_planning_intervention_modification_siens,1,1,1,0
 access_of_service_responsible,of.service.responsible,of_service.model_of_service,of_group_planning_intervention_responsible,1,1,1,1
+of_service.access_of_service_line_user,of.service.line.user,of_service.model_of_service_line,base.group_user,1,0,0,0
+access_of_service_line_modification,of.service.line.modification,of_service.model_of_service_line,of_planning.of_group_planning_intervention_modification_siens,1,1,1,0
+access_of_service_line_responsible,of.service.line.responsible,of_service.model_of_service_line,of_group_planning_intervention_responsible,1,1,1,1
 
 of_calendar.access_of_horaire_segment_manager,of.horaire.segment.manager,of_calendar.model_of_horaire_segment,of_group_planning_intervention_manager,1,1,1,1
 of_calendar.access_of_horaire_creneau_manager,of.horaire.creneau.manager,of_calendar.model_of_horaire_creneau,of_group_planning_intervention_manager,1,1,1,1

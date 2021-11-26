@@ -102,17 +102,21 @@
                             <field name="technician_id"/>
                         </group>
                     </group>
-                    <group name="produit_installe" string="Produit installé">
-                        <group name="produit">
+                    <group name="produit_installe">
+                        <group name="produit" string="Produit installé">
                             <field name="date_service"/>
                             <field name="date_installation"/>
+                        </group>
+                        <group name="garantie" string="Garantie">
+                            <field name="date_fin_garantie"/>
+                            <field name="type_garantie"/>
                         </group>
                     </group>
                     <group name="note">
                         <field name="note"/>
                     </group>
                     <notebook>
-                        <page string="Historique SAV">
+                        <page string="Historique SAV" name="historique_sav">
                             <group name="sav">
                                 <field name="project_issue_ids" nolabel="1" context="{'default_partner_id': client_id, 'default_of_produit_installe_id': id}">
                                     <tree string="SAV">
