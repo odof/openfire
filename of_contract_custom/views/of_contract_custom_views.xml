@@ -212,8 +212,9 @@
                             </group>
                         </page>
                         <page name="commentaires" string="Commentaires">
-                            <group name="comments" string="Commentaires">
-                                <field name="commentaires" nolabel="1"/>
+                            <group name="comments" string="Commentaires" col="2">
+                                <field name="commentaires" nolabel="1" colspan="2"/>
+                                <field name="of_mail_template_ids" widget="many2many_tags" colspan="2"/>
                             </group>
                         </page>
                         <page name="tableau" string="Suivi">

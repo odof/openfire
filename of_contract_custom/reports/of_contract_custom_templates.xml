@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <report
+            id="report_of_contract"
+            string="Contrat"
+            model="of.contract"
+            report_type="qweb-pdf"
+            file="of_contract_custom.report_contract"
+            name="of_contract_custom.report_contract"
+    />
+
+    <template id="report_contract">
+        <t t-call="report.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="of_contract_custom.report_contract_document" t-lang="doc.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_contract_document">
+        <t t-call="report.external_layout">
+            <div class="page">
+                <t t-set="o" t-value="doc"/>
+                <h2 t-if="o.company_id.of_position_header_lines == 'bandeau_totalite'" name="doc_name" style="margin-bottom: 10px;">
+                    <span>Contrat&amp;nbsp;</span>
+                    <t t-if="o.reference"><span t-field="o.reference"/></t>
+                </h2>
+                <div name="informations">
+                    <div name="infos" class="row h4 mb4">
+                        <div class="col-xs-12"><strong>Informations</strong></div>
+                    </div>
+                    <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; margin-bottom: 12px;">
+                        <div class="col-xs-12" style="display: table; padding: 0px;">
+                            <div style="display: table-cell; width: 50%;">
+                                <t t-set="previous_separator" t-value="False"/>
+                                <div name="contract_client" t-if="o.partner_id.name">
+                                    <div class="h5" style="padding: 0px 16px;">
+                                        <t t-set="previous_separator" t-value="True"/>
+                                        <div>
+                                            <span>Client payeur&amp;nbsp;:</span>
+                                            <strong><span t-field="o.partner_id.name"/></strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div name="contract_subscription_date" t-if="o.date_souscription">
+                                    <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                    <t t-set="previous_separator" t-value="True"/>
+                                    <div class="h5" style="padding: 0px 16px;">
+                                        <div>
+                                            <span>Date de souscription&amp;nbsp;:</span>
+                                            <strong><span t-field="o.date_souscription"/></strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div name="contract_current_period" t-if="o.current_period_id">
+                                    <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                    <t t-set="previous_separator" t-value="True"/>
+                                    <div class="h5" style="padding: 0px 16px;">
+                                        <div>
+                                            <span>Période du contrat&amp;nbsp;:</span>
+                                            <span t-field="o.current_period_id.name"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div name="contract_date_start">
+                                    <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                    <t t-set="previous_separator" t-value="True"/>
+                                    <div class="h5" style="padding: 0px 16px;">
+                                        <div>
+                                            <span>Date de début&amp;nbsp;:</span>
+                                            <span t-field="o.date_start"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div name="contract_date_end">
+                                    <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                    <t t-set="previous_separator" t-value="True"/>
+                                    <div class="h5" style="padding: 0px 16px;">
+                                        <div>
+                                            <span>Date de fin&amp;nbsp;:</span>
+                                            <span t-field="o.date_end"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display: table-cell; width: 50%; border-left: 1px solid lightgray">
+                                <t t-set="previous_separator" t-value="False"/>
+                                <div name="contract_recurring_rule_type" t-if="o.recurring_rule_type">
+                                    <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                    <t t-set="previous_separator" t-value="True"/>
+                                    <div class="h5" style="padding: 0px 16px;">
+                                        <span>Fréquence de facturation&amp;nbsp;:</span>
+                                        <span t-field="o.recurring_rule_type"/>&amp;nbsp;
+                                    </div>
+                                </div>
+                                <div name="contract_recurring_invoicing_payment_id" t-if="o.recurring_invoicing_payment_id">
+                                    <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                    <t t-set="previous_separator" t-value="True"/>
+                                    <div class="h5" style="padding: 0px 16px;">
+                                        <span>Type de facturation&amp;nbsp;:</span>
+                                        <span t-field="o.recurring_invoicing_payment_id.name"/>
+                                    </div>
+                                </div>
+                                <div name="contract_recurring_next_date" t-if="o.recurring_next_date">
+                                    <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                    <t t-set="previous_separator" t-value="True"/>
+                                    <div class="h5" style="padding: 0px 16px;">
+                                        <span>Date de prochaine facture&amp;nbsp;:</span>
+                                        <span t-field="o.recurring_next_date"/>
+                                    </div>
+                                </div>
+                                <div name="contract_payment_term_id" t-if="o.payment_term_id">
+                                    <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                    <t t-set="previous_separator" t-value="True"/>
+                                    <div class="h5" style="padding: 0px 16px;">
+                                        <span>Conditions de règlement&amp;nbsp;:</span>
+                                        <span t-field="o.payment_term_id.name"/>
+                                    </div>
+                                </div>
+                                <div name="contract_revision" t-if="revision">
+                                    <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                    <t t-set="previous_separator" t-value="True"/>
+                                    <div class="h5" style="padding: 0px 16px;">
+                                        <span>Révision&amp;nbsp;:</span>
+                                        <span t-field="o.revision"/>
+                                    </div>
+                                </div>
+                                <div name="contract_fiscal_position" t-if="o.fiscal_position_id">
+                                    <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                    <t t-set="previous_separator" t-value="True"/>
+                                    <div class="h5" style="padding: 0px 16px;">
+                                        <span>Position fiscale&amp;nbsp;:</span>
+                                        <span t-field="o.fiscal_position_id.name"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div t-if="o.line_ids.filtered(lambda l: l.state == 'validated')" name="invoicing">
+                    <div class="row h4 mb4" name="title_invoicing">
+                        <div class="col-xs-12">
+                            <strong>Lignes de contrat</strong>
+                        </div>
+                    </div>
+
+                    <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black;">
+                        <table name="contract_lines" class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th name="number">N°</th>
+                                    <th name="address">Addresse d'intervention</th>
+                                    <th name="task">Tache</th>
+                                    <th name="visits">Nb visites</th>
+                                    <th name="invoicing">Facturation</th>
+                                    <th name="invoicing_date">Prochaine facture</th>
+                                    <th name="total" class="text-right">Total période</th>
+                                </tr>
+                            </thead>
+                            <tbody class="sale_tbody">
+                                <t t-foreach="o.line_ids.filtered(lambda l: l.state == 'validated')" t-as="line">
+                                    <tr>
+                                        <td>
+                                            <span t-field="line.name"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.address_id.display_name"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.tache_id"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.nbr_interv"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.frequency_type"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.next_date"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="line.year_total"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div name="invoicing_total" >
+                    <div class="row" name="total">
+                        <div class="col-xs-4 pull-right">
+                            <table class="table table-condensed">
+                                <!-- Total HT -->
+                                <tr name="invoicing_total_ht">
+                                    <td name="total_ht_libelle" style="border-top: 0px !important;">
+                                        <strong>Total HT</strong>
+                                    </td>
+                                    <td class="text-right" style="border-top: 0px !important;">
+                                        <span t-raw="sum(o.line_ids.filtered(lambda l: l.state == 'validated').mapped('year_subtotal'))" t-options="{'widget': 'monetary', 'display_currency': o.company_currency_id}"/>
+                                    </td>
+                                </tr>
+                                <!-- Taxes -->
+                                <tr name="invoicing_total_taxes">
+                                    <td class="col-xs-8 pull-right">
+                                        <strong>Taxes</strong>
+                                    </td>
+                                    <td>
+                                        <span class="pull-right text-right" t-raw="sum(o.line_ids.filtered(lambda l: l.state == 'validated').mapped('year_taxes'))" t-options="{'widget': 'monetary', 'display_currency': o.company_currency_id}"/>
+                                    </td>
+                                </tr>
+                                <!-- Total TTC -->
+                                <tr name="invoicing_total_ttc">
+                                    <td style="border-top: 2px solid gray !important;">
+                                        <strong>Total TTC</strong>
+                                    </td>
+                                    <td class="text-right"
+                                        style="border-top: 2px solid gray !important;">
+                                        <span t-raw="sum(o.line_ids.filtered(lambda l: l.state == 'validated').mapped('year_total'))" t-options="{'widget': 'monetary', 'display_currency': o.company_currency_id}"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+<!--                </div>-->
+
+
+                <div t-if="o.commentaires" name="contract_comments">
+                    <div name="title_comments" class="row h4 mb4">
+                        <div class="col-xs-12"><strong>Notes</strong></div>
+                    </div>
+                    <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; margin-bottom: 12px;">
+                        <div name="comments" class="h5" style="padding: 0px 16px;">
+                            <div style="padding-top: 4px" t-field="o.commentaires" />
+                        </div>
+                    </div>
+                </div>
+                <div name="signatures" style="width: 100%; page-break-inside: avoid;">
+                    <div style="width: 47%; float: left; page-break-inside: avoid;">
+                        <div class="row h4 mb4">
+                            <div class="col-xs-12">
+                                <strong>Signature Entreprise</strong>
+                            </div>
+                        </div>
+                        <div class="row"
+                             style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
+                            <div class="col-xs-12" style="display: table; padding: 0px;">
+                                <div style="display: table-cell;">
+                                    <!-- Signature Entreprise -->
+                                    <div class="h5" style="padding: 0px 16px;" name="signature_ent">
+                                        <div>&amp;nbsp;</div>
+                                        <div>&amp;nbsp;</div>
+                                        <div>&amp;nbsp;</div>
+                                        <div>&amp;nbsp;</div>
+                                        <div>&amp;nbsp;</div>
+                                        <div>&amp;nbsp;</div>
+                                        <div>&amp;nbsp;</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="width: 47%; float: right; page-break-inside: avoid;">
+                        <div class="row h4 mb4">
+                            <div class="col-xs-12">
+                                <strong>Signature Client</strong>
+                            </div>
+                        </div>
+                        <div class="row"
+                             style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
+                            <div class="col-xs-12" style="display: table; padding: 0px;">
+                                <div style="display: table-cell;">
+                                    <!-- Signature client -->
+                                    <div class="h5" style="padding: 0px 16px;" name="signature_client">
+                                        <div>&amp;nbsp;</div>
+                                        <div>&amp;nbsp;</div>
+                                        <div>&amp;nbsp;</div>
+                                        <div>&amp;nbsp;</div>
+                                        <div>&amp;nbsp;</div>
+                                        <div>&amp;nbsp;</div>
+                                        <div>&amp;nbsp;</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>
