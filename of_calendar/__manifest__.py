@@ -54,6 +54,9 @@ Employés
         "of_geolocalize",
         "of_utils",
     ],
+    "external_dependencies": {
+        "python": ["holidays"],
+    },
     "data": [
         "data/ir_config_parameter_data.xml",
         "data/of_calendar_data.xml",

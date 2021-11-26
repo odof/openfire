@@ -33,8 +33,15 @@ class OfInterventionSettings(models.TransientModel):
         string=u"(OF) Créneaux indispo couleur fond", default="#FF2222",
         help=u"Choisissez un couleur de fond pour les créneaux dispos")
     color_ft_creneaux_indispo = fields.Char(
-        string=u"(OF) Crenéaux indispo couleur texte", default="#0C0C0C",
+        string=u"(OF) Créneaux indispo couleur texte", default="#0C0C0C",
         help=u"Choisissez un couleur de texte pour les créneaux dispos")
+    ignorer_jours_feries = fields.Boolean(
+        string=u"(OF) Ignorer les jours feriés dans la planification",
+        help=u"Si vous cochez cette case, les jours feriés seront considérés "
+             u"comme non travaillés dans la recherche de créneaux")
+    color_jours_feries = fields.Char(
+        string=u"(OF) Couleur des jours fériés", required=True, default="#dadbda",
+        help=u"Les jours fériés seront affichés dans les vue planning et calendrier")
 
     fiche_intervention_cacher_montant = fields.Boolean(string=u"(OF) Cacher montant restant")
     company_choice = fields.Selection(
@@ -90,6 +97,16 @@ class OfInterventionSettings(models.TransientModel):
     def set_color_ft_creneaux_indispo_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'of.intervention.settings', 'color_ft_creneaux_indispo', self.color_ft_creneaux_indispo)
+
+    @api.multi
+    def set_ignorer_jours_feries_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings', 'ignorer_jours_feries', self.ignorer_jours_feries)
+
+    @api.multi
+    def set_color_jours_feries_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings', 'color_jours_feries', self.color_jours_feries)
 
     @api.multi
     def set_fiche_intervention_cacher_montant_defaults(self):

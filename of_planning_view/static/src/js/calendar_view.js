@@ -27,14 +27,24 @@ CalendarView.include({
         var ir_values_model = new Model('ir.values');
         var attendee_mode_def = ir_values_model.call("get_default",
                                                      ["of.intervention.settings", "attendee_mode", false]);
+        // de quelle couleur afficher les jours fériés?
+        var color_jours_feries_def = ir_values_model.call(
+            "get_default", ["of.intervention.settings", "color_jours_feries"]);
+        // masquer les pictos de recherche et d'assignation de secteur?
+        var ignorer_jours_feries_def = ir_values_model.call(
+            "get_default", ["of.intervention.settings", "ignorer_jours_feries"]);
 
-        return $.when(attendee_mode_def,  this._super())
-        .then(function (attendee_mode) {
+        return $.when(attendee_mode_def, color_jours_feries_def, ignorer_jours_feries_def,  this._super())
+        .then(function (attendee_mode, color_jours_feries, ignorer_jours_feries) {
             // affecter le mode de planning (com, tech ou comtech)
             self.attendee_mode = attendee_mode || "comtech";
             self.attendee_mode_name = ATTENDEE_MODES[self.attendee_mode];
             // initialiser l'attendee_mode du view_manager
             self.view_manager.attendee_mode = self.attendee_mode;
+            self.jours_feries_opt = {
+                'ignorer_jours_feries': ignorer_jours_feries,
+                'color_jours_feries': color_jours_feries,
+            }
             return $.when();
         });
     },
@@ -138,14 +148,14 @@ CalendarView.include({
         var self = this;
         this._super.apply(this,arguments);
         if (this.model == "of.planning.intervention" && this.show_creneau_dispo) {
-            var dfd = $.Deferred();
-            var p = dfd.promise()
+            var dfd_creneaux_dispos = $.Deferred();
+            var p_creneaux_dispos = dfd_creneaux_dispos.promise()
             res_ids = res_ids || self.now_filter_ids;
             start = start || self.range_start;
             end = moment(start).endOf(this.mode || "week")._d;
 
             var Planning = new Model(self.model);
-            Planning.call('get_emp_horaires_info', [res_ids, start, end, get_segments, false])
+            Planning.call('get_emp_horaires_info', [res_ids, start, end, get_segments, false, 'calendar'])
             .then(function (result) {
                 if (isNullOrUndef(self.res_horaires_info)) {
                     self.res_horaires_info = result;
@@ -154,14 +164,15 @@ CalendarView.include({
                         self.res_horaires_info[res_ids[i]] = result[res_ids[i]];
                     }
                 }
-
-                dfd.resolve();
+                dfd_creneaux_dispos.resolve();
             });
-            return $.when(p).then(function() {
+
+            return $.when(p_creneaux_dispos).then(function() {
+
+                // ajout des créneaux dispos
                 self.events_dispo = [];
                 var attendee_data, creneaux_dispo_jour, creneau_dispo, cmpt_id = -1;
                 for (var k in self.now_filter_ids) {
-
                     var now_filter_id = self.now_filter_ids[k]
                     attendee_data = self.res_horaires_info[now_filter_id];
                     for (var i=0; i<attendee_data.creneaux_dispo.length; i++) {
@@ -182,10 +193,69 @@ CalendarView.include({
                         }
                     }
                 }
+
                 return $.when();
             });
         }
         return $.when();
+    },
+    set_events_feries: function(start) {
+        if (this.model != "of.planning.intervention") {
+            return this._super.apply(this,arguments);
+        }
+        var self = this;
+        this._super.apply(this,arguments);
+        var end = moment(start).endOf(this.mode || "week")._d;
+        var Company = new Model("res.company");
+
+        var dfd_jours_feries = $.Deferred();
+        var p_jours_feries = dfd_jours_feries.promise()
+        Company.call('get_jours_feries', [start, end])
+        .then(function (result) {
+            if (result) {
+                self.jours_feries = result;
+            }
+
+            dfd_jours_feries.resolve();
+        });
+        return $.when(p_jours_feries).then(function() {
+            // ajout des créneaux de jours fériés
+            self.events_feries = [];
+            var cmpt_id = -10000;
+            for (var kj in self.jours_feries) {
+                var creneau_ferie = {
+                    "id": cmpt_id,
+                    "of_color_bg": "#FFFFFF",
+                    "of_color_ft": "#000000",
+                    "state": "Férié",
+                    "state_int": 0,
+                    "calendar_name": "Férié: " + self.jours_feries[kj],
+                    "employee_ids": [],
+                    "color_filter_id": 0,
+                    "date_prompt": kj,
+                    "date_deadline_prompt": kj,
+                    "heure_debut": 0.0,
+                    "heure_fin": 23.99,
+                    "lieu_debut": false,
+                    "lieu_fin": false,
+                    "duree": 23.99,
+                    "creneaux_reels": [(0.0, 23,99)],
+                    "secteur_id": false,
+                    "secteur_str": "",
+                    "display_secteur": false,
+                    "warning_horaires": false,
+                    "ferie": true,
+                    "virtuel": true,
+                };
+                creneau_ferie[self.all_day] = true
+                for (var k in self.now_filter_ids) {
+                    creneau_ferie["employee_ids"].push(k);
+                }
+                self.events_feries.push(creneau_ferie)
+                cmpt_id--;
+            }
+            return $.when();
+        });
     },
     /**
      *  Gestionnaire pour le clique sur un mode de planning
