@@ -15,7 +15,7 @@ Module OpenFire pour e-commerce : Gestion des échantillons
 """,
     'website': "www.openfire.fr",
     'depends': [
-        'website_sale',
+        'of_website_sale',
     ],
     'data': [
         'data/ir_sequence.xml',

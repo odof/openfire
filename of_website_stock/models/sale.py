@@ -117,7 +117,7 @@ class SaleOrderLine(models.Model):
         days_of_delay = float(max(self.customer_lead, website.get_of_website_security_lead()) or 0.0)
         if self.product_uom_qty > self.get_quantity_available():
             days_of_delay += (website.company_id.security_lead or 0.0) + (self.product_id._select_seller(
-                quantity=self.product_qty, uom_id=self.product_uom).delay or 0.0)
+                quantity=self.product_uom_qty, uom_id=self.product_uom).delay or 0.0)
 
         return days_of_delay or 0.0
 

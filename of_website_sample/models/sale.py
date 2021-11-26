@@ -10,4 +10,5 @@ class SaleOrder(models.Model):
 
     @api.depends('order_line', 'order_line.product_id', 'order_line.product_id.is_sample')
     def _compute_is_sample(self):
-        self.is_sample = any(line.product_id.is_sample for line in self.order_line)
+        for order in self:
+            order.is_sample = any(line.product_id.is_sample for line in order.order_line)
