@@ -20,8 +20,8 @@
                     <field name="purchase_invoice_count" widget="statinfo" string="Factures fournisseur"/>
                 </button>
             </xpath>
-            <xpath expr="//field[@name='line_ids']/tree/field[@name='sol_number']" position="after">
-                <field name="pol_number"/>
+            <xpath expr="//field[@name='line_ids']/tree/field[@name='so_number']" position="after">
+                <field name="po_number" string="CF"/>
             </xpath>
         </field>
     </record>

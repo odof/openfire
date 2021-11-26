@@ -112,11 +112,11 @@ class OfService(models.Model):
                 for line in lines_already_done:
                     validation_message += u"\n\t%s" % line.product_id.name
             if lines_i_supply:
-                validation_message += u"\n  - Parceque vous en êtes le fournisseur : "
+                validation_message += u"\n  - Parce que vous en êtes le fournisseur : "
                 for line in lines_i_supply:
                     validation_message += u"\n\t%s" % line.product_id.name
             if lines_no_supplier:
-                validation_message += u"\n  - Parcequ'elles n'ont pas de fournisseur : "
+                validation_message += u"\n  - Parce qu'elles n'ont pas de fournisseur : "
                 for line in lines_no_supplier:
                     validation_message += u"\n\t%s" % line.product_id.name
             if validation_message:
@@ -176,7 +176,8 @@ class OfServiceLine(models.Model):
     purchaseorder_line_id = fields.Many2one(
         comodel_name='purchase.order.line', string=u"Ligne d'achat",
         help=u"Utilisé pour savoir si une commande a été générée pour cette ligne.")
-    pol_number = fields.Char(string=u"CF", related='purchaseorder_line_id.order_id.name', readonly=True)
+    po_number = fields.Char(
+        string=u"Numéro de commande fournisseur", related='purchaseorder_line_id.order_id.name', readonly=True)
 
     @api.multi
     def prepare_po_line_vals(self, order):

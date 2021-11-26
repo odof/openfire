@@ -1098,8 +1098,6 @@ class OfPlanningIntervention(models.Model):
         if self.state == "draft" and template and not self._context.get('of_import_service_lines'):
             if template.tache_id:
                 self.tache_id = template.tache_id
-            if template.type_id:
-                self.type_id = template.type_id
             if not self.lien_commande and not self.fiscal_position_id:
                 self.fiscal_position_id = template.fiscal_position_id
             if self.line_ids:
@@ -1747,7 +1745,8 @@ class OfPlanningInterventionLine(models.Model):
     currency_id = fields.Many2one('res.currency', string='Currency', readonly=True, related="company_id.currency_id")
 
     order_line_id = fields.Many2one('sale.order.line', string='Ligne de commande')
-    sol_number = fields.Char(string=u"CC", related='order_line_id.order_id.name', readonly=True)
+    so_number = fields.Char(
+        string=u"Numéro de commande client", related='order_line_id.order_id.name', readonly=True)
     product_id = fields.Many2one('product.product', string='Article')
     price_unit = fields.Monetary(
         string='Prix unitaire', digits=dp.get_precision('Product Price'), default=0.0, currency_field='currency_id'

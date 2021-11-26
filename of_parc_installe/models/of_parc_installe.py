@@ -103,6 +103,9 @@ class OFParcInstalle(models.Model):
     def onchange_date_fin_garantie(self):
         if self.date_fin_garantie and self.date_fin_garantie < fields.Date.today():
             self.type_garantie = 'expired'
+        elif self.date_fin_garantie and self.date_fin_garantie >= fields.Date.today() and \
+                self.type_garantie == 'expired':
+            self.type_garantie = 'extension'
 
     @api.onchange('product_id')
     def onchange_product_id(self):
@@ -247,7 +250,8 @@ class OFParcInstalle(models.Model):
         parc_garantie = all_parc_date_garantie.filtered(lambda p: p.date_fin_garantie >= today and not p.type_garantie)
         parc_garantie.write({'type_garantie': 'initial'})
         # Passer l'état de garantie à "Expirée" pour les parcs dont la date de garantie est future
-        parc_expire = all_parc_date_garantie.filtered(lambda p: p.date_fin_garantie < today)
+        parc_expire = all_parc_date_garantie.filtered(
+            lambda p: p.date_fin_garantie < today and p.type_garantie != 'expired')
         parc_expire.write({'type_garantie': 'expired'})
 
 

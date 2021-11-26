@@ -30,7 +30,6 @@ Module de lien entre service, interventions et parc installé
         'views/of_service_parc_installe_view.xml',
         'views/of_planning_intervention_template_views.xml',
         'views/of_service_parc_installe_view_templates.xml',
-        'views/res_views.xml',
         'views/project_issue_views.xml',
         'views/config_settings_views.xml',
         'wizard/of_wizard_invoice_to_parc_installe_view.xml',
