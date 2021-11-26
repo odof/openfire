@@ -2,10 +2,10 @@
 <odoo>
 
     <record id="view_of_make_po_validation_wizard_form" model="ir.ui.view">
-        <field name="name">Valider la création de commande fournisseur</field>
+        <field name="name">view.of.make.po.validation.wizard.form</field>
         <field name="model">of.make.po.validation.wizard</field>
         <field name="arch" type="xml">
-            <form string="Migration des SAV">
+            <form>
                 <group>
                     <field name="message" colspan="2" nolabel="1"/>
                 </group>

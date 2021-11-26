@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-
-    <!-- ajouter le groupe project_issue_not_migrated aux utilisateur qui ne l'ont pas, si besoin -->
-    <function model="res.users" name="update_group_of_project_issue_not_migrated"/>
-
-</odoo>

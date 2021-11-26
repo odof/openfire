@@ -174,7 +174,7 @@
                                     <field name="taxe_ids" widget="many2many_tags"/>
                                     <field name="price_subtotal" readonly="1"/>
                                     <field name="price_total" readonly="1"/>
-                                    <field name="sol_number"/>
+                                    <field name="so_number" string="CC"/>
                                 </tree>
                             </field>
                             <group class="oe_subtotal_footer oe_right" colspan="2" name="intervention_total">
