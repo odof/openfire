@@ -1749,6 +1749,13 @@ var PlanningRecord = Widget.extend({
         this.employee_names = record.employee_names;
         this.tag_names = record.tag_names;
         this.tooltip_description = record.tooltip_description;
+        this.session.user_has_group('of_planning.of_group_planning_intervention_flexibility').then(function(has_group) {
+            if(has_group) {
+                self.flexible = record.flexible;
+            } else {
+                self.flexible = false;
+            }
+        });
 
         if (record[this.view.resource].length > 1) {  // several attendees
             this.attendee_other_ids = _.reject(record[this.view.resource], function (attendee_id) { return attendee_id == self.row.res_id})

@@ -81,6 +81,18 @@
         </field>
     </record>
 
+    <record id="of_planning_intervention_view_planning_flexibility" model="ir.ui.view">
+        <field name="name">of.planning.intervention.planning.flexibility</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="groups_id" eval="[(6,0,[ref('of_planning.of_group_planning_intervention_flexibility')])]" />
+        <field name="inherit_id" ref="of_planning_view.of_planning_intervention_view_planning"/>
+        <field name="arch" type="xml">
+            <xpath expr="//planning" position="inside">
+                <field name="flexible"/>
+            </xpath>
+        </field>
+    </record>
+
     <record id="of_planning_view_planning_intervention_view_calendar" model="ir.ui.view">
         <field name="name">of.planning.view.planning.intervention.calendar</field>
         <field name="model">of.planning.intervention</field>

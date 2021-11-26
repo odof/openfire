@@ -17,6 +17,10 @@ from odoo.tools.safe_eval import safe_eval
 import odoo.addons.decimal_precision as dp
 from odoo.addons.of_utils.models.of_utils import se_chevauchent, float_2_heures_minutes, heures_minutes_2_float, \
     compare_date, hours_to_strs
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 
 @api.model
@@ -233,6 +237,7 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
         'hr.employee', string=u"Employés qualifiés", compute="_compute_employee_ids", search="_search_employee_ids")
     category_id = fields.Many2one('hr.employee.category', string=u"Catégorie d'employés")
     fourchette_planif = fields.Selection(related="tache_categ_id.fourchette_planif", readonly=True)
+    flexible = fields.Boolean(string="Flexible")
 
     @api.multi
     def _compute_employee_ids(self):
@@ -548,6 +553,7 @@ class OfPlanningIntervention(models.Model):
     delivery_count = fields.Integer(string="Nbr Bl", compute="_compute_pickings")
 
     do_deliveries = fields.Boolean(string=u"Utilisation des BL", compute='_compute_do_deliveries')
+    flexible = fields.Boolean(string="Flexible")
 
     # Compute
 
@@ -1127,6 +1133,7 @@ class OfPlanningIntervention(models.Model):
                     'name':             self.tache_id.product_id.name,
                     })
                 self.line_ids.compute_taxes()
+            self.flexible = self.tache_id.flexible
 
     @api.onchange('all_day', 'date', 'employee_ids')
     def _onchange_all_day(self):
@@ -1556,20 +1563,46 @@ class OfPlanningIntervention(models.Model):
     def do_verif_dispo(self):
         # Vérification de la validité du créneau: chevauchement
         interv_obj = self.env['of.planning.intervention']
+        group_flex = self.env.user.has_group('of_planning.of_group_planning_intervention_flexibility')
         for interv in self:
+            if group_flex and interv.flexible:
+                continue
             if interv.verif_dispo:
-                rdv = interv_obj.search([
+                domain = [
                     # /!\ conserver .ids : ._ids est un tuple et génère une erreur à l'évaluation
                     ('employee_ids', 'in', interv.employee_ids.ids),
                     ('date', '<', interv.date_deadline),
                     ('date_deadline', '>', interv.date),
                     ('id', '!=', interv.id),
                     ('state', 'not in', ('cancel', 'postponed')),
-                ], limit=1)
+                    ]
+                if group_flex:
+                    domain += [('flexible', '=', False)]
+                rdv = interv_obj.search(domain, limit=1)
                 if rdv:
                     raise ValidationError(
                         u"L'employé %s a déjà au moins un rendez-vous sur ce créneau.\nid du rdv: %d" %
                         ((rdv.employee_ids & interv.employee_ids)[0].name, rdv.id))
+
+    @api.multi
+    def get_overlapping_intervention(self):
+        # Vérification de la validité du créneau: chevauchement
+        interv_obj = self.env['of.planning.intervention']
+        rdvs = interv_obj
+        for interv in self:
+            if interv.verif_dispo:
+                domain = [
+                    # /!\ conserver .ids : ._ids est un tuple et génère une erreur à l'évaluation
+                    ('employee_ids', 'in', interv.employee_ids.ids),
+                    ('date', '<', interv.date_deadline),
+                    ('date_deadline', '>', interv.date),
+                    ('id', '!=', interv.id),
+                    ('state', 'not in', ('cancel', 'postponed')),
+                    ]
+                rdv = interv_obj.search(domain, limit=1)
+                if rdv:
+                    rdvs |= rdv
+        return rdvs
 
     @api.multi
     def _affect_number(self):

@@ -162,6 +162,8 @@ class OfTourneeRdv(models.TransientModel):
         string=u'Prochaine intervention', help=u"Date à partir de laquelle programmer la prochaine intervention")
     date_fin_planif = fields.Date(
         string=u'expiration de prochaine planif', help=u"Date à partir de laquelle l'intervention devient en retard")
+    flexible = fields.Boolean(
+        string="Inclure les RDV flexibles", help=u"Afficher les créneaux des RDV flexibles comme étant libre")
 
     # @api.depends
 
@@ -300,6 +302,7 @@ class OfTourneeRdv(models.TransientModel):
         Crée aussi une intervention récurrente si besoin.
         """
         self.ensure_one()
+        group_flex = self.env.user.has_group('of_planning.of_group_planning_intervention_flexibility')
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
 
@@ -316,6 +319,10 @@ class OfTourneeRdv(models.TransientModel):
         values = self.get_values_intervention_create()
 
         res = intervention_obj.create(values)
+        if group_flex:
+            others = res.get_overlapping_intervention().filtered('flexible')
+            if others:
+                others.button_postponed()
         res.onchange_company_id()  # Permet de renseigner l'entrepôt
         res.with_context(of_import_service_lines=True)._onchange_service_id()  # Charger les lignes de facturation
         contract_custom = self.sudo().env['ir.module.module'].search([('name', '=', 'of_contract_custom')])
@@ -553,6 +560,10 @@ class OfTourneeRdv(models.TransientModel):
                     # @todo: Possibilité intervention chevauchant la nuit
                     for intervention, intervention_deb, intervention_fin in intervention_dates + [(False, 24, 24)]:
                         # Calcul du temps disponible avant l'intervention étudiée
+                        # On saute les RDVs flexibles pour que leur créneau apparaisse comme dispo
+                        if self.env.user.has_group('of_planning.of_group_planning_intervention_flexibility') and \
+                                self.flexible and intervention and intervention.flexible:
+                            continue
                         if float_compare(intervention_deb, deb, compare_precision) == 1:
                             # Un trou dans le planning, suffisant pour un créneau?
                             duree = 0.0
@@ -761,6 +772,7 @@ class OfTourneeRdv(models.TransientModel):
             'verif_dispo': True,
             'order_id': self.service_id.order_id.id,
             'origin_interface': u"Trouver un créneau (rdv.py)",
+            'flexible': self.tache_id.flexible
         }
 
     @api.multi

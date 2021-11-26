@@ -188,6 +188,20 @@
         </field>
     </record>
 
+    <record id="of_planning_intervention_filter_flexibility" model="ir.ui.view">
+        <field name="name">of.planning.intervention.filter.flexibility</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="groups_id" eval="[(6,0,[ref('of_planning.of_group_planning_intervention_flexibility')])]" />
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='filter']" position="inside">
+                <separator/>
+                <filter string="RDVs flexibles" name="flexible" domain="[('flexible', '=', True)]"/>
+                <filter string="RDVs fixes" name="fixed" domain="[('flexible', '=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+
 <!--###################################################______Vue form______###################################################-->
 
     <record id="of_planning_intervention_view_form" model="ir.ui.view" >
@@ -238,6 +252,7 @@
                     <group>
                         <group>
                             <field name="template_id" attrs="{'readonly': [('number', '!=', False), ('state', 'not in', ('draft', 'cancel'))]}"/>
+                            <field name="flexible" attrs="{'readonly': [('state','in',['done'])]}" groups="of_planning.of_group_planning_intervention_flexibility"/>
                         </group>
                         <group>
                             <field name="user_id"/>
@@ -487,6 +502,18 @@
         </field>
     </record>
 
+    <record id="of_planning_intervention_view_calendar_flexibility" model="ir.ui.view">
+        <field name="name">of.planning.intervention.calendar.flexibility</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="groups_id" eval="[(6,0,[ref('of_planning.of_group_planning_intervention_flexibility')])]" />
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_calendar"/>
+        <field name="arch" type="xml">
+            <xpath expr="//calendar" position="inside">
+                <field name="flexible" icon="exchange" invisible="1" position="bot-right"/>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Vue calendrier avec saut au dernier RDV en date -->
     <record id="of_planning_intervention_view_calendar_with_jump" model="ir.ui.view">
         <field name="name">of.planning.intervention.calendar</field>
@@ -729,13 +756,14 @@
                     </div>
                     <group>
                         <group>
-                            <field  name="product_id" string="Produit lié" attrs="{'readonly':[('verr', '=', True)]}"/>
+                                <field  name="product_id" string="Produit lié" attrs="{'readonly':[('verr', '=', True)]}"/>
                                 <field name="tache_categ_id" options="{'no_create':True, 'no_open': True}"/>
                                 <field name="category_id"/>
                                 <field name="duree" widget="float_time"/>
                                 <field name="fiscal_position_id"/>
                             </group>
                         <group>
+                            <field name="flexible" groups="of_planning.of_group_planning_intervention_flexibility"/>
                             <field name="is_crm"/>
                             <field name="imp_detail"/>
                         </group>

@@ -168,7 +168,7 @@
          t-attf-class="of_planning_record_global_click #{record.annule_reporte and 'of_planning_info_annule_reporte' or ''}"
          t-attf-style="
             height: #{record.day_span > 1 &amp;&amp; record['hours_cols'][col_index].hauteur || record.hauteur};
-            overflow: hidden;">
+            overflow: hidden; position: relative;">
         <!-- variables données par le javascript: record et col_index -->
         <div t-att-class="record.class"
              t-attf-style="color: #{record.color_ft}; background-color: #{record.color_bg}; border-top: 1px solid #{record.color_ft};
@@ -181,6 +181,9 @@
                     border: 1px solid #0D0D0D; float: right; margin-left: 2px; margin-top: -3px;"/>
                 <i t-else="" class="of_calendar_attendee_box_flat"
                    t-attf-style="background: grey; border: 1px solid #0D0D0D; float: right; margin-left: 2px; margin-top: -3px;"/>
+            </t>
+            <t t-if="record.flexible">
+                <i class="fa fa-exchange" style="margin-left: 2px; position: absolute; bottom: 8px; right: 8px"/>
             </t>
             <div class="of_planning_info of_planning_info_heures">
                 <i class="fa fa-clock-o"/>
@@ -266,7 +269,8 @@
 
     <!-- Info-bulle d'évènement (RDV d'intervention) -->
     <div t-name="PlanningView.record.tooltip"
-         class="of_planning_record_tooltip">  <!-- variables données par le javascript: record et col_index -->
+         class="of_planning_record_tooltip"
+         style="position: relative;">  <!-- variables données par le javascript: record et col_index -->
         <div>
             <t t-set="attendees" t-value="record.attendee_other_ids"/>
             <t t-foreach="attendees">
@@ -274,6 +278,9 @@
                    t-attf-style="background: #{record.view.rows[record.view.rows_ids_indexes[attendees_value]].color_bg}; border: 1px solid #0D0D0D; float: right; margin-left: 2px; margin-top: -3px;"/>
                 <i t-else="" class="of_calendar_attendee_box_flat"
                    t-attf-style="background: grey; border: 1px solid #0D0D0D; float: right; margin-left: 2px; margin-top: -3px;"/>
+            </t>
+            <t t-if="record.flexible">
+                <i class="fa fa-exchange" style="margin-left: 2px; position: absolute; bottom: 2px; right: 3px;"/>
             </t>
             <div>
                 <i class="fa fa-clock-o"/>

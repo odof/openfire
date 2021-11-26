@@ -56,6 +56,9 @@ Inclut la gestion des équipes d'intervention.
     'css': [
         'static/src/css/of_planning.css',
     ],
+    'qweb': [
+        'static/src/xml/of_planning_calendar_view.xml',
+    ],
     'installable': True,
     'application': False,
     'auto_install': False,
