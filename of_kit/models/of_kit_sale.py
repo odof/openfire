@@ -314,13 +314,28 @@ class SaleOrderLine(models.Model):
         """
         Creates a procurement order for lines in self. Call ._action_procurement_create() on components.
         """
-        lines = self.filtered(lambda line: not line.of_is_kit)  # get all lines in self that are not kits
-        res_order_lines = super(SaleOrderLine, lines)._action_procurement_create()  # create POs for those lines
-
-        kits = self - lines  # get all lines that are kits
-        # get all comps
-        components = self.env['of.saleorder.kit.line'].search([('kit_id.order_line_id', 'in', kits._ids)])
+        # Create procurements for kit lines
+        kits = self.filtered('of_is_kit')
+        components = self.env['of.saleorder.kit.line'].search([('kit_id.order_line_id', 'in', kits.ids)])
         res_order_comps = components._action_procurement_create()
+
+        # Create procurement for standard lines
+        lines = self - kits
+        res_order_lines = super(SaleOrderLine, lines)._action_procurement_create()
+
+        orders_to_assign = self.mapped('order_id') - lines.mapped('order_id')
+        if orders_to_assign:
+            # Sans lignes classiques (toutes les lignes sont des kits)
+            # si l'option de réservation automatique est active, il faut l'appliquer
+            jit_module = self.sudo().env['ir.module.module'].search([('name', '=', 'procurement_jit')], limit=1)
+            if jit_module.state in ('installed', 'to install', 'to upgrade'):
+                for order in orders_to_assign:
+                    reassign = order.picking_ids.filtered(
+                        lambda x: (x.state == 'confirmed' or
+                                   ((x.state in ['partially_available', 'waiting']) and not x.printed)))
+                    if reassign:
+                        reassign.do_unreserve()
+                        reassign.action_assign()
         return res_order_lines + res_order_comps
 
     @api.multi
@@ -764,13 +779,6 @@ class OfSaleOrderKitLine(models.Model):
                                             subtype_id=self.env.ref('mail.mt_note').id)
             new_procs += new_proc
         new_procs.run()
-        orders = list(set(x.order_id for x in self))
-        for order in orders:
-            reassign = order.picking_ids.filtered(
-                lambda x: x.state == 'confirmed' or ((x.state in ['partially_available', 'waiting']) and not x.printed))
-            if reassign:
-                reassign.do_unreserve()
-                reassign.action_assign()
         return new_procs
 
     @api.multi
