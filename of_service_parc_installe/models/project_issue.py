@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
-from datetime import datetime, timedelta
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -61,10 +60,10 @@ class ProjectIssue(models.Model):
 
     @api.model
     def migrer_sav_di(self):
-        u"""
+        """
         Migre les données des SAV dans les DI.
-        Pour les SAV liés à au moins une DI -> rempli les champ de la 1ère DI avec ceux du SAV
-        Pour les SAV sans DI -> créé une DI avec toutes les informations du SAV
+        Pour les SAV liés à au moins une DI -> remplit les champs de la 1ère DI avec ceux du SAV
+        Pour les SAV sans DI -> crée une DI avec toutes les informations du SAV
         """
         if not self.env['ir.config_parameter'].sudo().get_param('of_migration_sav_di'):
             _logger.info(u"OPENFIRE : début de migration des SAV dans les DI (T2356)")
@@ -72,9 +71,9 @@ class ProjectIssue(models.Model):
             service_obj = self.env['of.service']
             cr = self.env.cr
             sav_type = self.env.ref('of_service_parc_installe.of_service_type_sav')
-            sav_tache  = self.env['of.planning.tache'].search([('name', 'ilike', 'SAV')], limit=1)
+            sav_tache = self.env['of.planning.tache'].search([('name', 'ilike', 'SAV')], limit=1)
             if not sav_tache:
-                sav_tache  = self.env['of.planning.tache'].search([('name', 'ilike', '%SAV%')], limit=1)
+                sav_tache = self.env['of.planning.tache'].search([('name', 'ilike', '%SAV%')], limit=1)
                 if not sav_tache:
                     _logger.error(u"OPENFIRE ERROR : impossible de migrer les SAV dans les DI, tâche 'SAV' inexistante")
                     return

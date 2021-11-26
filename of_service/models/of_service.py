@@ -1088,7 +1088,8 @@ class OfServiceLine(models.Model):
     saleorder_line_id = fields.Many2one(
         comodel_name='sale.order.line', string=u"Ligne de vente",
         help=u"Utilisé pour savoir si une commande a été générée pour cette ligne.")
-    sol_number = fields.Char(string=u"CC", related='saleorder_line_id.order_id.name', readonly=True)
+    so_number = fields.Char(
+        string=u"Numéro de commande client", related='saleorder_line_id.order_id.name', readonly=True)
     partner_id = fields.Many2one(
         comodel_name='res.partner', related='service_id.partner_id', readonly=True)
     company_id = fields.Many2one(
@@ -1370,6 +1371,13 @@ class OFPlanningIntervention(models.Model):
                 self.service_id = service and service[0] or False
             else:
                 self.service_id = self.address_id.service_address_ids[0]
+
+    @api.onchange('template_id')
+    def onchange_template_id(self):
+        super(OFPlanningIntervention, self).onchange_template_id()
+        if self.state == "draft" and self.template_id and not self._context.get('of_import_service_lines'):
+            if self.template_id.type_id:
+                self.type_id = self.template_id.type_id
 
     @api.onchange('service_id')
     def _onchange_service_id(self):

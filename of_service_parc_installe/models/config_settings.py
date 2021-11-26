@@ -8,10 +8,10 @@ class OfInterventionSettings(models.TransientModel):
 
     @api.multi
     def button_prepare_project_issue_migration(self):
-        """ Ouvre un wizard pour faire la correspondance de d'étapes Kanban """
+        """ Ouvre un wizard pour faire la correspondance des étapes Kanban """
         self.ensure_one()
         view_id = self.env.ref('of_service_parc_installe.view_of_project_issue_migration_wizard_form').id
-        # supprimer le éventuelles ligne existantes par sécurité,
+        # Supprimer les éventuelles lignes existantes par sécurité,
         # ces lignes sont utilisées ensuite dans la méthode migrer_sav_di
         self.env['of.project.issue.migration.wizard.step.line'].search([]).unlink()
         kanban_step_line_ids = []
