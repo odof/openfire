@@ -465,7 +465,7 @@ class OfTourneeRdv(models.TransientModel):
                 ferie_fin_dt = tz.localize(datetime.strptime(d + " 23:59:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
                 ferie_fin_dt = ferie_fin_dt.astimezone(pytz.utc)
                 wizard_line_obj.create({
-                    'name': u"Férié: %s" % jours_feries[d],
+                    'name': u"Férié: %s" % jours_feries[d].decode('utf-8'),
                     'debut_dt': ferie_debut_dt,
                     'fin_dt': ferie_fin_dt,
                     'date_flo': 0.0,
