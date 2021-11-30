@@ -108,9 +108,9 @@ class OfService(models.Model):
     @api.model
     def _init_type(self):
         service_obj = self.with_context(active_test=False)
-        services = service_obj.search([('recurrence', '=', True)]).write(
+        service_obj.search([('type_id', '=', False), ('recurrence', '=', True)]).write(
             {'type_id': self.env.ref('of_service.of_service_type_maintenance').id})
-        services = service_obj.search([('recurrence', '=', False)]).write(
+        service_obj.search([('type_id', '=', False), ('recurrence', '=', False)]).write(
             {'type_id': self.env.ref('of_service.of_service_type_installation').id})
 
     @api.model
