@@ -1795,8 +1795,21 @@ class ProductProduct(models.Model):
         res = super(ProductProduct, self).write(values)
         # Si une variante est archivée, on regarde si d'autres variantes sont encore active,
         # sinon, on archive aussi le modèle d'article
-        if 'active' in values and not values['active'] and res and len(self) == 1:
-            variants = self.search_count([('product_tmpl_id', '=', self.product_tmpl_id.id), ('active', '=', True)])
-            if not variants:
-                self.product_tmpl_id.active = False
+        # no rebound dans le context pour éviter une boucle infinie : archiver un template archive ses variantes
+        if 'active' in values and not values['active'] and res and not self._context.get('of_no_rebound'):
+            to_deactivate = self.env['product.template']
+            for product in self:
+                variants = self.search_count([('product_tmpl_id', '=', product.product_tmpl_id.id)])
+                if not variants:
+                    to_deactivate |= product.product_tmpl_id
+            to_deactivate.with_context(of_no_rebound=True).write({'active': False})
+        # Si une variante est désarchivée, on regarde si son template est actif
+        # sinon, on active aussi le modèle d'article
+        # no rebound dans le context pour éviter une boucle infinie : activer un template active ses variantes
+        if 'active' in values and values['active'] and res and not self._context.get('of_no_rebound'):
+            to_activate = self.env['product.template']
+            for product in self:
+                if not product.product_tmpl_id.active:
+                    to_activate |= product.product_tmpl_id
+            to_activate.with_context(of_no_rebound=True).write({'active': True})
         return res
