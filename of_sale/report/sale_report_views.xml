@@ -8,6 +8,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='date']" position="after">
                 <field name="of_partner_tags"/>
+                <field name="of_product_tags"/>
             </xpath>
         </field>
     </record>
