@@ -327,7 +327,7 @@ class AccountJournal(models.Model):
                 elif self:
                     force = self.filtered(lambda o: not o.of_allow_bank_deposit)
                 else:
-                    force = not self.default_get(['of_allow_bank_deposit'])['of_allow_bank_deposit']
+                    force = not self.default_get(['of_allow_bank_deposit']).get('of_allow_bank_deposit')
             if force:
                 force_vals['update_posted'] = False
         elif 'of_allow_bank_deposit' in vals:
