@@ -41,7 +41,7 @@
             <field name="body_html"><![CDATA[
 <p>Bonjour ${object.address_id.commercial_partner_id.title and object.address_id.commercial_partner_id.title.shortcut or ''} ${object.address_id.commercial_partner_id.name},</p>
 <p>
-Votre demande de rendez-vous pour le ${object.get_display_date()} a bien été enregistrée.
+Votre demande de rendez-vous pour le ${format_date(object.date)} a bien été enregistrée.
 </p>
 <p>
 Vous en souhaitant bonne réception.<br/>

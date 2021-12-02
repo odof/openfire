@@ -132,7 +132,7 @@ class OFWebsitePlanningBooking(http.Controller):
         if validated:
             if values.get('create'):
                 # On redirige vers le formulaire de création de parc installé
-                request.session.pop('booking_parc_installe_id')
+                request.session.pop('booking_parc_installe_id', None)
                 return request.redirect('/new_booking/installed_park_create')
             request.session['booking_parc_installe_id'] = int(values['parc_installe_id'])
             if values.get('update'):
@@ -753,7 +753,7 @@ class OFWebsitePlanningBooking(http.Controller):
         amounts = taxes.compute_all(
             price_unit, pricelist.currency_id, 1.0, product=task.product_id, partner=request.env.user.partner_id)
         values['price'] = amounts['total_included']
-        values['company'] = request.website.company_id
+        values['company'] = request.website.company_id.sudo()
         values['terms'] = values.get('terms', False)
         values['opt_in'] = values.get('opt_in', False)
 

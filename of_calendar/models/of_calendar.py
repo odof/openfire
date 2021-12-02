@@ -4,7 +4,7 @@ from odoo import api, models, fields, _
 from odoo.exceptions import UserError
 from odoo.addons.of_utils.models.of_utils import se_chevauchent, format_date, hours_to_strs
 from odoo.tools.float_utils import float_compare
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
 import pytz
 import holidays
@@ -788,18 +788,16 @@ class ResCompany(models.Model):
             company = self.env.user.company_id
         else:
             company = self[0]
+        # Pour la prise de RDV en ligne, on s'affranchit des droits sur la société
+        company = company.sudo()
         if isinstance(date_debut, basestring):
             date_debut_da = fields.Date.from_string(date_debut)
-            date_debut_str = date_debut[:10]
-        elif isinstance(date_debut, date) or isinstance(date_debut, datetime):
+        elif isinstance(date_debut, (date, datetime)):
             date_debut_da = date_debut
-            date_debut_str = date_debut[:10]
         if isinstance(date_fin, basestring):
             date_fin_da = fields.Date.from_string(date_fin)
-            date_fin_str = date_fin[:10]
-        elif isinstance(date_fin, date) or isinstance(date_fin, datetime):
+        elif isinstance(date_fin, (date, datetime)):
             date_fin_da = date_fin
-            date_fin_str = date_fin[:10]
         country = company.country_id
         holi_dict = holidays.CountryHoliday(country.code or 'FR', years=[date_debut_da.year, date_fin_da.year])
         res = {}
