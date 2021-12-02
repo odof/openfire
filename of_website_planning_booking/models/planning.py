@@ -19,11 +19,6 @@ class OFPlanningIntervention(models.Model):
 
     website_create = fields.Boolean(string=u"Créé par le portail web")
 
-    @api.multi
-    def get_display_date(self):
-        self.ensure_one()
-        return fields.Date.from_string(self.date).strftime('%A %d %B')
-
 
 class HREmployee(models.Model):
     _inherit = 'hr.employee'
