@@ -42,7 +42,7 @@ class OfAccountPaymentBankDeposit(models.Model):
     @api.depends('payment_ids')
     def _compute_of_payment_mode_id(self):
         for rec in self:
-            rec.of_payment_mode_id = rec.payment_ids and rec.payment_ids[0].of_payment_mode_id
+            rec.of_payment_mode_id = rec.payment_ids[:1].of_payment_mode_id
 
     @api.depends('payment_ids')
     def _compute_payment_count(self):
