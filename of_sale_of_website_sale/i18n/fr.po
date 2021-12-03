@@ -18,7 +18,7 @@ msgstr ""
 #. module: of_sale_of_website_sale
 #: model:ir.ui.view,arch_db:of_sale_of_website_sale.of_sale_of_website_sale_product_template_form_view
 msgid "Product Images"
-msgstr "Images du produit"
+msgstr "Images de l'article"
 
 #. module: of_sale_of_website_sale
 #: model:ir.ui.view,arch_db:of_sale_of_website_sale.of_sale_of_website_sale_product_template_form_view

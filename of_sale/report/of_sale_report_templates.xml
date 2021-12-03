@@ -125,10 +125,8 @@
                 <table name="order_lines_layouted" class="table table-condensed">
                     <thead>
                         <tr>
-                            <t groups="of_sale.group_of_sale_multiimage">
-                                <t groups="of_sale.group_of_sale_print_one_image">
-                                    <th name="product_image"></th>
-                                </t>
+                            <t groups="of_sale.group_of_sale_multiimage+of_sale.group_of_sale_print_one_image">
+                                <th name="product_image"></th>
                             </t>
                             <th name="descr" style="width: 60%">Description</th>
                             <th name="quant" class="text-right">Quantity</th>
@@ -158,12 +156,10 @@
                                     <t t-set="name_line" t-value="the_name[0]"/>
                                     <t t-set="the_name" t-value="the_name[1:]"/>
 
-                                    <t groups="of_sale.group_of_sale_multiimage">
-                                        <t groups="of_sale.group_of_sale_print_one_image">
-                                            <td name="product_image">
-                                                <img t-att-src="'data:image/png;base64,%s' % l.product_id.image_small" style="max-height: 48px;"/>
-                                            </td>
-                                        </t>
+                                    <t groups="of_sale.group_of_sale_multiimage+of_sale.group_of_sale_print_one_image">
+                                        <td name="product_image">
+                                            <img t-att-src="'data:image/png;base64,%s' % l.product_id.image_small" style="max-height: 48px;"/>
+                                        </td>
                                     </t>
                                     <td name="descr">
                                         <span t-esc="name_line"/>
@@ -282,27 +278,25 @@
                 </div>
             </div>
 
-            <t groups="of_sale.group_of_sale_multiimage">
-                <t groups="of_sale.group_of_sale_print_multiimage">
-                    <div class="row" groups="of_sale.group_of_sale_print_multiimage">
-                        <div class="col-xs-12">
-                            <h4>Annexes</h4>
-                            <t t-foreach="doc.order_line" t-as="line">
-                                <t t-if="line.sale_product_image_ids">
-                                    <h5><em t-field="line.product_id.name"/></h5>
-                                    <div class="row mb16">
-                                        <t t-foreach="line.sale_product_image_ids" t-as="image">
-                                            <div t-if="image.image" class="col-xs-4">
-                                                <img class="img-responsive center-block" t-att-src="'data:image/png;base64,%s' % image.image" style="max-height: 100px;"/>
-                                                <p class="mt8 text-center" t-field="image.name"/>
-                                            </div>
-                                        </t>
-                                    </div>
-                                </t>
+            <t groups="of_sale.group_of_sale_multiimage+of_sale.group_of_sale_print_multiimage">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <h4>Annexes</h4>
+                        <t t-foreach="doc.order_line" t-as="line">
+                            <t t-if="line.of_product_image_ids">
+                                <h5><em t-field="line.product_id.name"/></h5>
+                                <div class="row mb16">
+                                    <t t-foreach="line.of_product_image_ids" t-as="image">
+                                        <div t-if="image.image" class="col-xs-4">
+                                            <img class="img-responsive center-block" t-att-src="'data:image/png;base64,%s' % image.image" style="max-height: 150px;"/>
+                                            <p class="mt8 text-center" t-field="image.name"/>
+                                        </div>
+                                    </t>
+                                </div>
                             </t>
-                        </div>
+                        </t>
                     </div>
-                </t>
+                </div>
             </t>
 
             <p t-if="doc.of_date_vt and not pdf_vt_pastille">

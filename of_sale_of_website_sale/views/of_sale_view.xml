@@ -17,8 +17,8 @@
         <field name="inherit_id" ref="website_sale.product_template_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='product_image_ids']" position="before">
-				<label for="sale_product_image_ids"/>
-				<field name="sale_product_image_ids" mode="kanban" context="{'default_name': name, 'default_product_tmpl_id': active_id}">
+				<label for="of_product_image_ids" groups="of_sale.group_of_sale_multiimage"/>
+				<field name="of_product_image_ids" mode="kanban" context="{'default_name': name, 'default_product_tmpl_id': active_id}" groups="of_sale.group_of_sale_multiimage">
                     <kanban string="Product Images">
                         <field name="name"/>
                         <field name="image"/>
@@ -37,7 +37,7 @@
                         </templates>
                     </kanban>
                 </field>
-                <label for="product_image_ids" string="Website images"/>
+                <label for="product_image_ids" string="Website images" groups="website_sale.group_website_multi_image"/>
             </xpath>
         </field>
     </record>
