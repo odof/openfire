@@ -7,25 +7,25 @@ class ProductTemplate(models.Model):
     _name = 'product.template'
     _inherit = ['product.template', 'of.form.readonly']
 
-    sample_available = fields.Boolean("Sample available")
-    is_sample = fields.Boolean("Is sample", readonly=True)
-    sample_id = fields.Many2one("product.template", string="Sample")
-    sample_default_code = fields.Char(related="sample_id.default_code", string="Sample ref.", readonly=True)
-    sample_active = fields.Boolean(related="sample_id.active", string="Sample active", readonly=True)
-    sample_parent_id = fields.Many2one("product.template", string="Sample parent")
-    sample_parent_default_code = fields.Char(related="sample_parent_id.default_code",
+    of_sample_available = fields.Boolean("Sample available")
+    of_is_sample = fields.Boolean("Is sample", readonly=True)
+    of_sample_id = fields.Many2one("product.template", string="Sample")
+    of_sample_default_code = fields.Char(related="of_sample_id.default_code", string="Sample ref.", readonly=True)
+    of_sample_active = fields.Boolean(related="of_sample_id.active", string="Sample active", readonly=True)
+    of_sample_parent_id = fields.Many2one("product.template", string="Sample parent")
+    of_sample_parent_default_code = fields.Char(related="of_sample_parent_id.default_code",
                                              string="Parent ref.", readonly=True)
-    sample_parent_active = fields.Boolean(related="sample_parent_id.active", string="Parent active", readonly=True)
+    of_sample_parent_active = fields.Boolean(related="of_sample_parent_id.active", string="Parent active", readonly=True)
 
     @api.model
     def create(self, args):
         res = super(ProductTemplate, self).create(args)
         # Si gestion des écantillons
-        if res.sample_available:
+        if res.of_sample_available:
             args_sample = res.get_sample_values()
-            # On crée sample_id
+            # On crée of_sample_id
             sample = res.create(args_sample)
-            res.with_context(skip_sample=True).sample_id = sample.id
+            res.with_context(skip_sample=True).of_sample_id = sample.id
         return res
 
     @api.multi
@@ -36,7 +36,7 @@ class ProductTemplate(models.Model):
         if website_published:
             # Les échantillons ne doivent pas être publiés, on sépare les échantillons des autres articles pour le super
             for pt in self:
-                if pt.is_sample:
+                if pt.of_is_sample:
                     samples += pt
                 else:
                     templates += pt
@@ -51,29 +51,29 @@ class ProductTemplate(models.Model):
             unaffected_fields = self.sample_unaffected_fields()
             any_field = any([field not in unaffected_fields for field in args.keys()])
             for pt in self:
-                if pt.sample_available and not pt.sample_id:
+                if pt.of_sample_available and not pt.of_sample_id:
                     args_sample = pt.get_sample_values()
-                    # On crée sample_id
-                    sample_id = pt.with_context(skip_sample=True).create(args_sample)
-                    pt.with_context(skip_sample=True).sample_id = sample_id.id
+                    # On crée of_sample_id
+                    of_sample_id = pt.with_context(skip_sample=True).create(args_sample)
+                    pt.with_context(skip_sample=True).of_sample_id = of_sample_id.id
                 elif any_field:
                     args_sample = pt.get_sample_values()
-                    if not pt.sample_available:
+                    if not pt.of_sample_available:
                         # si pt.active == False alors args_sample['active'] déjà à False donc pas besoin de vérifier
                         args_sample['active'] = False
-                    # On met à jour sample_id et on le désarchive
-                    pt.sample_id.with_context(skip_sample=True).write(args_sample)
+                    # On met à jour of_sample_id et on le désarchive
+                    pt.of_sample_id.with_context(skip_sample=True).write(args_sample)
         return res
 
     @api.multi
     def unlink(self):
         # Si gestion des échantillons, on supprime le sample associé
-        if self.sample_id:
-            self.sample_id.unlink()
+        if self.of_sample_id:
+            self.of_sample_id.unlink()
 
         # Si échantillon, on désactive la gestion des échantillons sur le parent
-        if self.is_sample:
-            self.sample_parent_id.sample_available = False
+        if self.of_is_sample:
+            self.of_sample_parent_id.of_sample_available = False
 
         return super(ProductTemplate, self).unlink()
 
@@ -83,7 +83,7 @@ class ProductTemplate(models.Model):
             valeurs de son parent. """
         self.ensure_one()
         sample_dict = self.copy_data()[0]
-        if not self.sample_id or force:
+        if not self.of_sample_id or force:
             seller_ids = []
             for seller in self.seller_ids:
                 seller_id_copy = seller.copy()
@@ -92,17 +92,17 @@ class ProductTemplate(models.Model):
                 "name": self.name + _(u" (sample)"),
                 "default_code": (self.default_code or '')
                                 + self.env['ir.sequence'].next_by_code('product.sample') or '_ECH',
-                "is_sample": True,
+                "of_is_sample": True,
                 "website_published": False,
-                "sample_parent_id": self.id,
+                "of_sample_parent_id": self.id,
                 "seller_ids": [[6, 0, seller_ids]]
                 })
         else:
             unaffected_fields = self.sample_unaffected_fields()
 
             args_sample = {key: val for key, val in sample_dict.iteritems() if key not in unaffected_fields}
-        args_sample['sample_available'] = False
-        args_sample['is_sample'] = True
+        args_sample['of_sample_available'] = False
+        args_sample['of_is_sample'] = True
         return args_sample
 
     @api.model
@@ -120,9 +120,9 @@ class ProductTemplate(models.Model):
             'name': 'Sample',
             'view_mode': 'form',
             'res_model': 'product.template',
-            'res_id': self.sample_id.id,
+            'res_id': self.of_sample_id.id,
             'type': 'ir.actions.act_window',
-            'context': {'form_readonly': '[("is_sample","=",True)]'},
+            'context': {'form_readonly': '[("of_is_sample","=",True)]'},
         }
 
     @api.multi
@@ -132,7 +132,7 @@ class ProductTemplate(models.Model):
             'name': 'Sample',
             'view_mode': 'form',
             'res_model': 'product.template',
-            'res_id': self.sample_parent_id.id,
+            'res_id': self.of_sample_parent_id.id,
             'type': 'ir.actions.act_window',
-            'context': {'form_readonly': '[("is_sample","=",True)]'},
+            'context': {'form_readonly': '[("of_is_sample","=",True)]'},
         }

@@ -205,8 +205,8 @@
 						</div>
 <!--						Pour facilité le débug. A supprimer à la mise en prod-->
 <!--						<p>-->
-<!--							<span t-esc="'website_commitment_date : '"/>-->
-<!--							<span t-esc="website_sale_order.website_commitment_date" t-options="{'widget': 'date'}"/>-->
+<!--							<span t-esc="'of_website_commitment_date : '"/>-->
+<!--							<span t-esc="website_sale_order.of_website_commitment_date" t-options="{'widget': 'date'}"/>-->
 <!--						</p>-->
 <!--						<p t-esc="'(OF) Délai de livraison minimum (of_website_security_lead) : ' + str(website.get_of_website_security_lead())"/>-->
 <!--						<p t-esc="'Délai de sécurité à la vente (jours)* (website.company_id.security_lead) : ' + str(website.company_id.security_lead)"/>-->
@@ -223,8 +223,8 @@
 
 						$('#datetimepicker').datetimepicker({
 						format: 'DD/MM/YYYY',
-						defaultDate: "<t t-esc="website_sale_order.requested_date if website_sale_order.requested_date else website_sale_order.website_commitment_date" t-options="{'widget': 'date'}"/>",
-						minDate: "<t t-esc="website_sale_order.website_commitment_date" t-options="{'widget': 'date'}"/>",
+						defaultDate: "<t t-esc="website_sale_order.requested_date if website_sale_order.requested_date else website_sale_order.of_website_commitment_date" t-options="{'widget': 'date'}"/>",
+						minDate: "<t t-esc="website_sale_order.of_website_commitment_date" t-options="{'widget': 'date'}"/>",
 						pickTime: false,
 						}).on('dp.change', function () {
 						$pay_button.prop('disabled', true);
