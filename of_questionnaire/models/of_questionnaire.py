@@ -119,7 +119,8 @@ class OfPlanningIntervention(models.Model):
 
     @api.model_cr_context
     def _auto_init(self):
-        view = self.env.ref('of_questionnaire.of_repondre_questionnaire_planning_intervention_view_form', raise_if_not_found=False)
+        view = self.env.ref(
+            'of_questionnaire.of_repondre_questionnaire_planning_intervention_view_form', raise_if_not_found=False)
         if view:
             view.unlink()
         res = super(OfPlanningIntervention, self)._auto_init()
@@ -150,21 +151,31 @@ class OfPlanningIntervention(models.Model):
 
     @api.onchange('questionnaire_id')
     def onchange_questionnaire(self):
-        for question in self.questionnaire_id.line_ids:
+        # Charger toutes les questions qui n'ont pas d'id_code et celles dont l'id_code n'est pas déjà présent,
+        # pour ne pas avoir de problèmes avec la contrainte d'unicité au moment de sauvegarder
+        for question in self.questionnaire_id.line_ids.filtered(
+                lambda q: not q.id_code or q.id_code not in self.question_ids.mapped('id_code')):
             vals = self._get_question_vals(question)
             self.question_ids.new(vals)
         self.questionnaire_id = False
 
-    @api.onchange('template_id', 'parc_installe_id')
-    def onchange_template_or_parc(self):
-        new_ids = []
-        for question in self.template_id.question_ids:
+    @api.onchange('template_id')
+    def onchange_template(self):
+        # Charger toutes les questions qui n'ont pas d'id_code et celles dont l'id_code n'est pas déjà présent,
+        # pour ne pas avoir de problèmes avec la contrainte d'unicité au moment de sauvegarder
+        for question in self.template_id.question_ids.filtered(
+                lambda q: not q.id_code or q.id_code not in self.question_ids.mapped('id_code')):
             vals = self._get_question_vals(question)
-            new_ids.append((0, 0, vals))
-        for question in self.parc_installe_id.question_ids:
+            self.question_ids.new(vals)
+
+    @api.onchange('parc_installe_id')
+    def onchange_parc(self):
+        # Charger toutes les questions qui n'ont pas d'id_code et celles dont l'id_code n'est pas déjà présent,
+        # pour ne pas avoir de problèmes avec la contrainte d'unicité au moment de sauvegarder
+        for question in self.parc_installe_id.question_ids.filtered(
+                lambda q: not q.id_code or q.id_code not in self.question_ids.mapped('id_code')):
             vals = self._get_question_vals(question, question.id)
-            new_ids.append((0, 0, vals))
-        self.question_ids = new_ids
+            self.question_ids.new(vals)
 
     @api.multi
     def _filter_answers_category(self, questions):
@@ -210,8 +221,8 @@ class OfPlanningInterventionQuestion(models.Model):
     condition_unmet = fields.Boolean(string=u"Condition non respectée")
 
     _sql_constraints = [
-        ('of_id_code_intervention_uniq', 'unique(id_code, intervention_id)',
-         u"Le code identifiant des questions doit être unique par RDV !"),
+        ('of_id_code_intervention_uniq', 'unique(id_code,intervention_id)',
+         u"Le code identifiant des questions doit etre unique par RDV !"),
     ]
 
     @api.multi
