@@ -5,6 +5,7 @@ from odoo.exceptions import UserError, ValidationError
 from odoo.osv.expression import NEGATIVE_TERM_OPERATORS, TERM_OPERATORS_NEGATION, TRUE_LEAF, FALSE_LEAF
 from odoo.tools.safe_eval import safe_eval
 from odoo.addons.of_utils.models.of_utils import BigInteger
+import odoo.addons.decimal_precision as dp
 
 import copy
 from contextlib import contextmanager
@@ -1256,6 +1257,8 @@ class ProductTemplate(models.Model):
     # ce champ va permettre de faire une recherche sur le tarif centralisé
     of_datastore_supplier_id = fields.Many2one('of.datastore.supplier', related='brand_id.datastore_supplier_id')
     of_datastore_has_link = fields.Boolean(_compute='_compute_of_datastore_has_link')
+    prochain_tarif = fields.Float('Prochain tarif', digits=dp.get_precision('Product Price'), default=0.0)
+    date_prochain_tarif = fields.Date(string="Date du prochain tarif")
 
     @api.depends()
     def _compute_of_datastore_has_link(self):
