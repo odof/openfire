@@ -21,28 +21,26 @@
         </field>
     </record>
 
-    <data noupdate="1">
+    <!-- Cette vue est activée par la config des ventes -->
     <record model="ir.ui.view" id="of_analytique_sale_order">
         <field name="name">sale.order.analyse.chantier.view.form</field>
         <field name="model">sale.order</field>
-        <field name="active">False</field>
+        <field name="groups_id" eval="[(6, 0, [ref('of_analytique.group_of_analytique_obligatoire')])]"/>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//notebook//field[@name='related_project_id']" position="attributes">
-                <attribute name="invisible">True</attribute>
-            </xpath>
+            <xpath expr="//notebook//field[@name='related_project_id']" position="replace"/>
             <xpath expr="//notebook//field[@name='project_id']" position="replace"/>
             <xpath expr="//field[@name='payment_term_id']" position="after">
-                <field name="project_id"
-                       required="1"
-                       attrs="{'readonly': ['|',('project_id','!=',False),('invoice_count','!=',0),('state','=','sale')],
-                       'required': ['!','&amp;','|',('project_id','!=',False),('invoice_count','!=',0),('state','=','sale')]}"
+                <field name="project_id" invisible="1" groups="analytic.group_analytic_accounting"/>
+                <field name="related_project_id"
+                       attrs="{
+                        'readonly': [('project_id','!=',False),('state','in',('sale','done','cancel'))],
+                        'required': ['!','&amp;','|',('project_id','!=',False),('invoice_count','!=',0),('state','=','sale')]}"
                        context="{'default_partner_id':partner_invoice_id, 'default_name':name}"
                        groups="analytic.group_analytic_accounting"/>
             </xpath>
         </field>
     </record>
-    </data>
 
     <record id="of_analytic_invoice_form" model="ir.ui.view">
         <field name="name">of.analytic.invoice.form</field>

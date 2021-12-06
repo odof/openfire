@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="group_of_analytique_obligatoire" model="res.groups">
+        <field name="name">Groupe analytique obligatoire</field>
+        <field name="comment">Groupe OpenFire : pour forcer l'utilisation des comptes comptables dans les devis et commandes</field>
+    </record>
+
+    <function model="sale.config.settings" name="_update_groups"/>
+
+</odoo>
