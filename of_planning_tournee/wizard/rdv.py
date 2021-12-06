@@ -759,6 +759,7 @@ class OfTourneeRdv(models.TransientModel):
             'address_id': self.partner_address_id.id,
             'company_id': self.company_id.id,
             'tache_id': self.tache_id.id,
+            'type_id': self.env.ref('of_service.of_service_type_maintenance').id,
             'mois_ids': [(4, mois)],
             'date_next': self.date_next,
             'date_fin': self.date_fin_planif,
