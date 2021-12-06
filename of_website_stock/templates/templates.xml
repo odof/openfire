@@ -123,7 +123,7 @@
 		</xpath>
 
 		<xpath expr="//div[@itemscope='itemscope']" position="attributes">
-			<attribute name="t-att-data-publish">'off' if product.product_variant_ids and not (product.qty_available - product.outgoing_qty + product.incoming_qty) &gt; 0 else 'on'</attribute>
+			<attribute name="t-att-data-publish">'off' if product.product_variant_ids and not (product.sudo().qty_available - product.sudo().outgoing_qty + product.sudo().incoming_qty) &gt; 0 else 'on'</attribute>
 		</xpath>
 
 	</template>
