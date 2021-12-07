@@ -828,7 +828,7 @@ class OfContractLine(models.Model):
         string="Total annuel", compute='_compute_prices', currency_field='company_currency_id', store=True)
 
     service_ids = fields.One2many(
-            comodel_name='of.service', inverse_name='contract_line_id', string=u"Interventions à programmer")
+            comodel_name='of.service', inverse_name='contract_line_id', string=u"Demandes d'intervention")
     service_count = fields.Integer(string="Nb demandes", compute="_compute_service_count")
     intervention_ids = fields.One2many(
             comodel_name='of.planning.intervention', inverse_name='contract_line_id', string="RDVs d'interventions")
@@ -1382,7 +1382,7 @@ class OfContractLine(models.Model):
 
     @api.multi
     def _generate_services(self):
-        """ Génération des interventions à programmer """
+        """ Génération des demandes d'interventions """
         service_obj = self.with_context(bloquer_recurrence=True).env['of.service']
         type = self.env.ref('of_service.of_service_type_maintenance')
         for line in self:

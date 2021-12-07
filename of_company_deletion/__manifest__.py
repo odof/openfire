@@ -32,7 +32,7 @@ Voici l'ensemble des objets supprimés en même temps que la société :
     - Comptes analytiques
     - Contrats analytiques
     - RDVs d'intervention
-    - Interventions à programmer
+    - Demandes d'intervention
     - Contrats d'entretien
     - SAVs
     - Parcs installés
