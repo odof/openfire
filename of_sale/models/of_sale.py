@@ -984,13 +984,13 @@ class SaleOrderLine(models.Model):
                 if self.env.user.has_group('of_sale.group_of_sale_print_multiimage'):
                     if self.product_id.product_tmpl_id.of_product_image_ids:
                         self.of_product_image_ids = self.product_id.product_tmpl_id.of_product_image_ids
-                if self.env.user.has_group('of_sale.group_of_sale_print_attachment'):
-                    attachment_ids = self.env['ir.attachment']\
-                        .search([('res_model', '=', 'product.template'),
-                                 ('res_id', '=', self.product_id.product_tmpl_id.id),
-                                 ('mimetype', '=', 'application/pdf')])
-                    if attachment_ids:
-                        res['domain']['of_product_attachment_ids'] = [('id', 'in', attachment_ids.ids)]
+            if self.env.user.has_group('of_sale.group_of_sale_print_attachment'):
+                attachment_ids = self.env['ir.attachment']\
+                    .search([('res_model', '=', 'product.template'),
+                             ('res_id', '=', self.product_id.product_tmpl_id.id),
+                             ('mimetype', '=', 'application/pdf')])
+                if attachment_ids:
+                    res['domain']['of_product_attachment_ids'] = [('id', 'in', attachment_ids.ids)]
 
         return res
 
@@ -1094,6 +1094,10 @@ class SaleOrderLine(models.Model):
 
     @api.model
     def create(self, vals):
+        """
+        Au moment de la sauvegarde de la commande, les images articles ne sont pas toujours sauvegardées
+        car renseignées par un onchange et affichage en vue en kanban, du coup on surcharge le create
+        """
         res = super(SaleOrderLine, self).create(vals)
 
         if 'of_product_image_ids' in vals.keys() and vals['of_product_image_ids'] and not res.of_product_image_ids:
@@ -1117,6 +1121,8 @@ class SaleOrderLine(models.Model):
             if locked_invoice_lines and blocked and not force:
                 raise UserError(u"""Cette ligne ne peut être modifiée : %s""" % line.name)
 
+        # Au moment de la sauvegarde de la commande, les images articles ne sont pas toujours sauvegardées
+        # car renseignées par un onchange et affichage en vue en kanban, du coup on surcharge le write
         if 'already_tried' not in self._context:
             if 'of_product_image_ids' in vals.keys() and vals['of_product_image_ids'] and not self.of_product_image_ids:
                 self.with_context(already_tried=True).of_product_image_ids = vals['of_product_image_ids']
