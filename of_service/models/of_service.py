@@ -802,7 +802,7 @@ class OfService(models.Model):
     @api.model
     def compute_state_poncrec_daily(self):
         """
-        Force le recalcul de l'état des interventions à programmer.
+        Force le recalcul de l'état des demandes d'intervention.
         Est lancé tous les matins, pour que le changement de date du jour soit pris en compte.
         """
         services = self.search([('base_state', '=', False)])
@@ -1377,7 +1377,7 @@ class OFPlanningIntervention(models.Model):
         return res
 
     service_id = fields.Many2one(
-        'of.service', string=u"À programmer",
+        'of.service', string=u"Demande d'intervention",
         domain="address_id and ['|', ('address_id', '=', address_id), ('partner_id', '=', address_id)] or []")
     type_id = fields.Many2one(comodel_name='of.service.type', string="Type")
 
@@ -1546,8 +1546,8 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     # Utilisé pour ajouter bouton Interventions à Devis (see order_id many2one field above)
-    of_service_ids = fields.One2many("of.service", "order_id", string=u"À programmer", oldname="of_a_programmer_ids")
-    of_service_count = fields.Integer(string=u"Nb à programmer", compute='_compute_of_service_count')
+    of_service_ids = fields.One2many("of.service", "order_id", string=u"DI à programmer", oldname="of_a_programmer_ids")
+    of_service_count = fields.Integer(string=u"Nb DI à programmer", compute='_compute_of_service_count')
 
     # @api.depends
 
@@ -1620,10 +1620,10 @@ class ResPartner(models.Model):
         'of.service', 'partner_id', string=u'Interventions récurrentes du partenaire', context={'active_test': False},
         help=u"Interventions récurrentes liées au partenaire, incluant les interventions récurrentes des contacts "
              u"associés")
-    a_programmer_ids = fields.Many2many('of.service', string=u"À programmer", compute="compute_a_programmer")
-    a_programmer_count = fields.Integer(string=u'Nombre à programmer', compute='compute_a_programmer')
-    recurrent_ids = fields.Many2many('of.service', string=u"Récurrents", compute="compute_a_programmer")
-    recurrent_count = fields.Integer(string=u'Nombre récurrents', compute='compute_a_programmer')
+    a_programmer_ids = fields.Many2many('of.service', string=u"DI à programmer", compute="compute_a_programmer")
+    a_programmer_count = fields.Integer(string=u'Nombre DI à programmer', compute='compute_a_programmer')
+    recurrent_ids = fields.Many2many('of.service', string=u"DI récurrentes", compute="compute_a_programmer")
+    recurrent_count = fields.Integer(string=u'Nombre DI récurrentes', compute='compute_a_programmer')
 
     # @api.depends
 

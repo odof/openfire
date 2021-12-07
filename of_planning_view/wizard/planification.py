@@ -443,7 +443,7 @@ class OfPlanifCreneau(models.TransientModel):
             '|', ('jour_ids', 'in', self.num_jour),
                  ('jour_ids', '=', False),  # les jours peuvent ne pas être renseignés
             ('tache_id', 'in', taches_possibles.ids),
-            ('date_next', '<=', date_un_mois_str),  # ne pas proposer d'interventions à programmer dans plus d'un mois
+            ('date_next', '<=', date_un_mois_str),  # ne pas proposer de demande d'intervention dans plus d'un mois
             '|', ('recurrence', '=', False),
                  '|', ('date_fin_contrat', '=', False),
                       ('date_fin_contrat', '>', self.date_creneau),
@@ -592,7 +592,7 @@ class OfPlanifCreneau(models.TransientModel):
 
 class OfPlanifCreneauProp(models.TransientModel):
     _name = 'of.planif.creneau.prop'
-    _description = u"Proposition d'intervention à programmer"
+    _description = u"Proposition de demande d'intervention"
     _order = "creneau_id DESC, selected DESC, priorite DESC, distance_arrondi_order, date_next, date_fin," \
              " distance_order"
 
@@ -807,7 +807,7 @@ class OfPlanifCreneauProp(models.TransientModel):
                 # Listes de coordonnées : ATTENTION OSRM prend ses coordonnées sous form (lng, lat)
                 # lieu précédent
                 coords_str = str(geo_lng_prec) + "," + str(geo_lat_prec)
-                # lieu de l'intervention à programmer
+                # lieu de la demande d'intervention
                 coords_str += ";" + str(a_planifier.geo_lng) + "," + str(a_planifier.geo_lat)
                 # lieu suivant
                 coords_str += ";" + str(geo_lng_suiv) + "," + str(geo_lat_suiv)

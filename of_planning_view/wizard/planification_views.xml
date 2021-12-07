@@ -189,7 +189,7 @@
                         <separator string="Aucun résultat" colspan="2"/>
                         <div colspan="2" style="color: red">
                             <i>
-                                Aucun service à programmer correspondant à vos critères de recherche n'a été trouvé...
+                                Aucune demande d'intervention correspondant à vos critères de recherche n'a été trouvé...
                             </i>
                         </div>
                     </group>
@@ -288,7 +288,7 @@
                     <field name="service_id" invisible="1"/>
                 </group>
                 <footer>
-                    <button name="button_select" string="Sélectionner cette intervention à programmer" type="object" class="btn-primary"
+                    <button name="button_select" string="Sélectionner cette demande d'intervention" type="object" class="btn-primary"
                         attrs="{'invisible': [('selected','!=',False)]}" style="margin-right: 4px!important"/>
                     <button name="button_confirm" string="Confirmer le RDV" type="object" class="btn-primary"
                         attrs="{'invisible': [('selected','!=',True)]}" style="margin-right: 4px!important"/>

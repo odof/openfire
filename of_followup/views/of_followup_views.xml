@@ -29,7 +29,7 @@
                             <field name="intervention_count" widget="statinfo" string="RDV(s) Tech"/>
                         </button>
                         <button name="action_view_to_schedule" type="object" class="oe_stat_button" icon="fa-clock-o">
-                            <field name="to_schedule_count" widget="statinfo" string="À programmer"/>
+                            <field name="to_schedule_count" widget="statinfo" string="DI à programmer"/>
                         </button>
                         <button name="action_view_delivery" type="object" class="oe_stat_button" icon="fa-truck">
                             <field name="delivery_count" widget="statinfo" string="Livraison(s)"/>

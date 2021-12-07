@@ -116,7 +116,7 @@
         <!-- OF Service -->
 
         <record id="of_service_comp_rule" model="ir.rule">
-            <field name="name">Interventions à programmer multi-company</field>
+            <field name="name">Demandes d'intervention multi-company</field>
             <field name="model_id" ref="of_service.model_of_service"/>
             <field name="global" eval="True"/>
             <field name="perm_read" eval="True"/>

@@ -26,7 +26,7 @@
                         <label for="company_choice"/>
                         <div name="company_choice">
                             <field name="company_choice" class="oe_inline"/>
-                            <span>pour la création des RDVs, interventions à programmer, SAV et parcs installés.</span>
+                            <span>pour la création des RDVs, demandes d'interventions, SAV et parcs installés.</span>
                             <br/>
                             <i class="oe_grey">/!\ ce paramètre est partagé entre toutes les sociétés</i>
                         </div>

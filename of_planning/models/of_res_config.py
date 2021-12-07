@@ -49,7 +49,7 @@ class OfInterventionSettings(models.TransientModel):
             ('contact', u"la société du contact"),
             ('user', u"la société de l'utilisateur"),
         ], string=u"(OF) Création dans", required=True,
-        help=u"Pour la création des RDVs, interventions à programmer, SAV et parcs installés."
+        help=u"Pour la création des RDVs, demandes d'interventions, SAV et parcs installés."
     )
     do_deliveries = fields.Selection(selection=[
         (0, 'Ne pas utiliser les bons de livraisons depuis les RDV'),
