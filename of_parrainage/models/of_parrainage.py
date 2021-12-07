@@ -28,10 +28,10 @@ class ResPartner(models.Model):
     of_referee_lead_ids = fields.One2many(
         comodel_name='crm.lead', inverse_name='of_referred_id', string=u"Opportunités apportées")
     of_referee_count = fields.Integer(string="Nombre de filleuls", compute='_compute_of_referee_count')
-    of_referred_reward_id = fields.Many2one('of.referred.reward', string=u"Récompense")
+    of_referred_reward_id = fields.Many2one('of.referred.reward', string=u"Type de cadeau")
     of_referred_note = fields.Text(string="Notes")
     of_referred_reward_state = fields.Boolean(string="Clos")
-    of_referred_reward_date = fields.Date(string=u"Date de récompense")
+    of_referred_reward_date = fields.Date(string=u"Date de remise du cadeau")
     of_referred_date = fields.Date(string="Date de parrainage")
     of_referee_date = fields.Date(string=u"Date de dernier parrainage", compute='_compute_of_referee_date', store=True)
 
