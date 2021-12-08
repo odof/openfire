@@ -1618,6 +1618,7 @@ var PlanningCreneauDispo = Widget.extend({
         var additional_context = _.extend(self.view.dataset.context, {
             "default_employee_ids": [[6, 0, [self.row.res_id]]],
             "default_date": moment.utc(la_date.toUTCString()).format('YYYY-MM-DD HH:mm:ss'),
+            "default_origin_interface": "Manuelle (vue planning)",
         });
         return data_manager.load_action(action_id, pyeval.eval('context', additional_context)).then(function(result) {
                 var options = {
