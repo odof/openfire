@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="assets_frontend" inherit_id="website_quote.assets_frontend" name="OF Sale Quote Template frontend assets">
+        <xpath expr="//script[@src='/website_quote/static/src/js/website_quotation.js']" position="replace">
+            <script type="text/javascript" src="/of_sale_quote_template/static/src/js/of_sale_quote_template.js"/>
+        </xpath>
+    </template>
+
+    <template id="opt_quotation_signature" inherit_id="website_quote.opt_quotation_signature">
+        <xpath expr="//div[@id='sign-dialog']/*[1]/*[1]" position="replace">
+            <span>Je confirme qu'en signant cette proposition, je l'accepte au nom de </span>
+        </xpath>
+        <xpath expr="//div[@id='signer']" position="after">
+            <div id="signer_email" class="form-group">
+                <label class="control-label" for="email">Confirmez votre adresse mail : </label>
+                <input type="text" name="signer_email" id="email" class="form-control"/>
+            </div>
+            <div id="sign_date" class="form-group">
+                <label class="control-label" for="date">Date de signature : </label>
+                <input type="date" name="sign_date" id="date" class="form-control" readonly="readonly"/>
+            </div>
+        </xpath>
+        <xpath expr="//a[@id='sign_clean']" position="before">
+            <a id="sign_auto" class="btn btn-xs">Auto</a>
+        </xpath>
+        <xpath expr="//div[@id='quote_content']/*[1]" position="before">
+            <div class="alert alert-warning alert-dismissable" t-if="message==5">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&amp;times;</button>
+                Erreur ! L'adresse mail spécifiée n'est pas correcte !
+            </div>
+        </xpath>
+    </template>
+
+    <template id="website_quote.pricing">
+        <section id="quote">
+            <h1 class="page-header">Pricing</h1>
+
+            <!-- Is there a discount on at least one line? -->
+            <t t-set="display_discount" t-value="any([l.discount for l in quotation.order_line])"/>
+
+            <t t-foreach="quotation.order_lines_layouted()" t-as="page">
+                <table class="table wq-table">
+                    <thead>
+                        <tr>
+                            <th name="descr" style="width: 60%">Description</th>
+                            <th name="quant" class="text-right">Quantité</th>
+                            <th t-if="quotation.user_id.has_group('sale.group_show_price_subtotal')" name="price_unit_ht" class="text-right">Prix/U HT</th>
+                            <th t-if="quotation.user_id.has_group('sale.group_show_price_total')" name="price_unit_ttc" class="text-right">Prix/U TTC</th>
+                            <th name="disc" t-if="display_discount and quotation.user_id.has_group('sale.group_discount_per_so_line')" class="text-right">Rem.(%)</th>
+                            <th name="taxe" class="text-right">TVA</th>
+                            <th t-if="quotation.user_id.has_group('sale.group_show_price_subtotal')" name="price_ht" class="text-right">Prix HT</th>
+                            <th t-if="quotation.user_id.has_group('sale.group_show_price_total')" name="price_total" class="text-right price_tax_included">Prix TTC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="page" t-as="layout_category">
+
+                            <t t-if="(layout_category_size > 1 or page_size > 1) and quotation.user_id.has_group('sale.group_sale_layout')">
+                                <tr class="active">
+                                    <td colspan="7" t-att-style="'background-color: ' + quotation.get_color_section() + '; font-weight:  bold; border-bottom: 1px solid black;'">&amp;bull;
+                                        <t t-esc="layout_category['name']"/>
+                                    </td>
+                                </tr>
+                            </t>
+
+                            <!-- Lines associated -->
+                            <t t-foreach="layout_category['lines']" t-as="l">
+                                <tr>
+                                    <t t-set="the_name" t-value="l.of_get_line_name()"/>
+                                    <t t-set="name_line" t-value="the_name[0]"/>
+                                    <t t-set="the_name" t-value="the_name[1:]"/>
+                                    <td name="descr">
+                                        <span t-esc="name_line"/>
+                                        <br t-if="len(the_name) > 0"/>
+                                        <t t-foreach="the_name" t-as="name_line">
+                                            <span t-esc="name_line"/>
+                                            <br/>
+                                        </t>
+                                        <span t-field="l.name" style="display: none;"/>
+                                    </td>
+                                    <td class="text-right" name="quant">
+                                        <span t-esc="(str(l.product_uom_qty)).rstrip('0').rstrip('.').replace('.', ',')"/>
+                                        <span t-if="quotation.user_id.has_group('product.group_uom')" t-field="l.product_uom"/>
+                                    </td>
+                                    <td t-if="quotation.user_id.has_group('sale.group_show_price_subtotal')" name="price_unit_ht" class="text-right">
+                                        <span t-field="l.of_price_unit_ht" t-options='{"widget": "monetary", "display_currency": quotation.pricelist_id.currency_id}'/>
+                                    </td>
+                                    <td t-if="quotation.user_id.has_group('sale.group_show_price_total')" name="price_unit_ttc" class="text-right">
+                                        <span t-field="l.of_price_unit_ttc" t-options='{"widget": "monetary", "display_currency": quotation.pricelist_id.currency_id}'/>
+                                    </td>
+                                    <td t-if="display_discount and quotation.user_id.has_group('sale.group_discount_per_so_line')" class="text-right" name="disc">
+                                        <span t-field="l.discount"/>
+                                    </td>
+                                    <td class="text-right" name="taxe">
+                                        <span t-esc="', '.join(map(lambda x: (x.description or x.name), l.tax_id))"/>
+                                    </td>
+                                    <td t-if="quotation.user_id.has_group('sale.group_show_price_subtotal')" class="text-right" name="price_ht">
+                                        <span t-field="l.price_subtotal"
+                                            t-options='{"widget": "monetary", "display_currency": quotation.pricelist_id.currency_id}'/>
+                                    </td>
+                                    <td t-if="quotation.user_id.has_group('sale.group_show_price_total')" class="text-right" name="price_total">
+                                        <span t-field="l.price_total"
+                                            t-options='{"widget": "monetary", "display_currency": quotation.pricelist_id.currency_id}'/>
+                                    </td>
+                                </tr>
+                            </t>
+
+                            <t t-if="(layout_category_size > 1  or page_size > 1) and layout_category['subtotal'] and quotation.user_id.has_group('sale.group_sale_layout')">
+                                <tr class="text-right">
+                                    <td colspan="6">
+                                        <strong>Sous-total :</strong>
+                                        <t t-if="quotation.user_id.has_group('sale.group_show_price_subtotal')" t-set="subtotal" t-value="sum(line.price_subtotal for line in layout_category['lines'])"/>
+                                        <t t-if="quotation.user_id.has_group('sale.group_show_price_total')" t-set="subtotal" t-value="sum(line.price_total for line in layout_category['lines'])"/>
+                                        <span t-esc="subtotal" t-options="{'widget': 'monetary', 'display_currency': quotation.pricelist_id.currency_id}"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </t>
+                    </tbody>
+                </table>
+
+                <t t-if="(page_index &lt; page_size - 1) and quotation.user_id.has_group('sale.group_sale_layout')">
+                    <p style="page-break-before:always;"> </p>
+                </t>
+
+                <div class="row" name="total">
+                <div name="subdivision" class="col-xs-4 pull-right">
+                    <table class="table table-condensed">
+                        <!-- Affichage des paiements et autres groupes de sous-totaux -->
+                        <t t-set='totals_group' t-value="quotation._of_get_printable_totals()"/>
+                        <tr name="total_ht" class="border-black">
+                            <td name="total_ht_libelle"><strong>Total hors taxe</strong></td>
+                            <td class="text-right">
+                                <span><t t-esc="totals_group['subtotal']" t-options="{'widget': 'monetary', 'display_currency': quotation.currency_id}"/></span>
+                            </td>
+                        </tr>
+                        <t t-foreach="totals_group['untaxed'] + totals_group['taxes'] + totals_group['total']" t-as="total_group">
+                            <!-- Données sous la forme [[('Libellé', montant), ...], ('Libellé total', montant_total)] -->
+                            <tr t-foreach="total_group[0]" t-as="total_line">
+                                <td>
+                                    <span>
+                                        <t t-esc="total_line[0]"/>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="pull-right text-right"><t t-esc="total_line[1]" t-options="{'widget': 'monetary', 'display_currency': quotation.currency_id}"/></span>
+                                </td>
+                            </tr>
+                            <tr class="border-black">
+                                <td><strong><t t-esc="total_group[1][0]"/></strong></td>
+                                <td class="text-right">
+                                    <span t-esc="total_group[1][1]" t-options="{'widget': 'monetary', 'display_currency': quotation.currency_id}"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6" t-if="quotation.pdf_afficher_multi_echeances()" string="Échéances">
+                    <t t-set="show_ech_name" t-value="bool(quotation.of_echeance_line_ids.filtered('date'))"/>
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Vos échéances</th>
+                                <th t-if="show_ech_name">Date</th>
+                                <th class="text-right">Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="quotation.of_echeance_line_ids" t-as="e">
+                                <td><span t-field="e.name"/></td>
+                                <td t-if="show_ech_name"><span t-field="e.date"/></td>
+                                <td class="text-right">
+                                    <span t-field="e.amount" t-options='{"widget": "monetary", "display_currency": quotation.currency_id}'/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <p t-if="quotation.of_date_vt">
+                <t t-set="date_order" t-value="quotation.of_date_vt[8:10] + '/' + quotation.of_date_vt[5:7] + '/' + quotation.of_date_vt[0:4]"/>
+                Date de visite technique : <span t-esc="date_order"/>
+            </p>
+            <p t-field="quotation.note"/>
+            <p t-if="quotation.payment_term_id.note">
+                <span t-field="quotation.payment_term_id.note"/>
+            </p>
+            <p t-if="not quotation.payment_term_id and quotation.partner_id.property_payment_term_id">
+                <span t-field="quotation.partner_id.property_payment_term_id.note"/>
+            </p>
+            <p id="fiscal_position_remark" t-if="quotation.fiscal_position_id and quotation.fiscal_position_id.note">
+                <strong>Note de position fiscale : </strong>
+                <span t-field="quotation.fiscal_position_id.note"/>
+            </p>
+
+                </t>
+        </section>
+        <section id="terms" class="container" t-if="quotation.note">
+              <h2 class="page-header">Terms &amp; Conditions</h2>
+              <p t-field="quotation.note"/>
+        </section>
+    </template>
+
+    <template id="so_quotation_content" inherit_id="website_quote.so_quotation_content">
+        <xpath expr="//small[@t-field='quotation.state']" position="replace"/>
+        <xpath expr="//div[2]/div[1]/div[1]/label" position="replace">
+            <label class="col-sm-4 col-xs-4 text-right">Client</label>
+        </xpath>
+        <xpath expr="//div[2]/div[1]/div[2]/label" position="replace">
+            <label class="col-sm-4 col-xs-4 text-right">Facturer à</label>
+        </xpath>
+        <xpath expr="//div[2]/div[1]/div[3]/label" position="replace">
+            <label class="col-sm-4 col-xs-4 text-right">Livrer à</label>
+        </xpath>
+        <xpath expr="//div[2]/div[2]/div[1]/label" position="replace">
+            <label class="col-sm-4 col-xs-4 text-right">Votre contact</label>
+        </xpath>
+        <xpath expr="//div[2]/div[2]/div[2]/label" position="replace">
+            <label class="col-sm-4 col-xs-4 text-right">Date de devis</label>
+        </xpath>
+        <xpath expr="//div[2]/div[2]/div[2]/div[3]/label" position="replace">
+            <label class="col-sm-4 col-xs-4 text-right">Date d'expiration</label>
+        </xpath>
+        <xpath expr="//div[2]/div[2]/div[2]/div[5]/label" position="replace">
+            <label class="col-sm-4 col-xs-4 text-right">Votre Référence</label>
+        </xpath>
+        <xpath expr='//div[@t-if="quotation.validity_date and quotation.state in [&apos;draft&apos;, &apos;sent&apos;]"]' position="attributes">
+            <attribute name="t-if">quotation.validity_date and quotation.state in ['draft', 'sent'] and quotation.pdf_afficher_date_validite()</attribute>
+        </xpath>
+    </template>
+
+    <template id="so_quotation" inherit_id="website_quote.so_quotation">
+        <xpath expr='//div[@t-if="days_valid &gt; 0"]//strong' position="replace">
+            <strong>Cette offre expirera dans</strong>
+        </xpath>
+    </template>
+
+</odoo>

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<odoo>
+    <template id="of_sale_quote_template_sale_order_report" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//div[@class='oe_structure'][last()]" position="before">
+            <div t-if="doc.of_customer_signature" name="customer_signature" class="row">
+                <div class="col-xs-12" style="page-break-inside: avoid;">
+                    <br/>
+                    <h4>Signature Client :</h4>
+                    <span t-field="doc.of_signer"/><br/>
+                    <span>Le : <span t-field="doc.of_signature_date" t-options='{"format": "dd/MM/yyyy"}'/></span><br/>
+                    <img t-att-src="'data:image/png;base64,%s' % doc.of_customer_signature"/>
+                    <br/>
+                    <span><i>Le présent devis a été envoyé par mail au client suite à sa signature le<span t-field="doc.of_signature_date" t-options='{"format": "dd/MM/yyyy"}'/> à <span t-field="doc.of_signature_date" t-options='{"format": "HH:mm"}'/>.</i></span>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <function name="unlink" model="sale.quote.template">
+        <!-- On cherche l'enregistrement à supprimer -->
+        <function name="search" model="sale.quote.template">
+            <value eval="[('name', '=', 'Default Template')]"/>
+        </function>
+    </function>
+
+    <data noupdate="1">
+
+        <!--Modèles de mail -->
+
+        <record id="of_sale_order_send_email_template" model="mail.template">
+            <field name="name">Devis - Envoyer par email</field>
+            <field name="email_from">${object.user_id.email and '%s &lt;%s&gt;' % (object.user_id.name, object.user_id.email) or '')|safe}</field>
+            <field name="subject">${object.company_id.name} - Devis (Ref ${object.name or 'n/a' })</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="report_template" ref="sale.report_sale_order"/>
+            <field name="report_name">${(object.name or '').replace('/','_')}</field>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="body_html"><![CDATA[
+<p>Bonjour ${object.partner_id.title and object.partner_id.title.shortcut or ''} ${object.partner_id.name},</p>
+% set access_action = object.with_context(force_website=True).get_access_action()
+% set is_online = access_action and access_action['type'] == 'ir.actions.act_url'
+% set access_url = is_online and access_action['url'] or None
+<p>
+Vous trouverez en pièce jointe votre devis (Ref ${object.name or 'n/a' }) pour validation.<br/>
+% if is_online:
+    <br/>
+    Vous pouvez valider votre devis directement en ligne via ce bouton :
+    <center>
+        <a href="${access_url}" style="background-color: #1abc9c; padding: 5px; text-decoration: none; color: #fff; border-radius: 5px; font-size: 16px;" class="o_default_snippet_text">Valider le devis en ligne</a>
+    </center>
+    <br/>
+% endif
+Nous vous laissons en prendre connaissance et nous nous tenons à votre disposition pour tous renseignements complémentaires.
+</p>
+<p>
+Vous en souhaitant bonne réception.<br/>
+</p>
+<p>
+% if user and user.signature:
+    ${user.signature | safe}
+% endif
+</p>
+]]></field>
+        </record>
+
+        <record id="of_sale_order_signed_email_template" model="mail.template">
+            <field name="name">Devis signé - Envoyer par email</field>
+            <field name="email_from">${object.user_id.email and '%s &lt;%s&gt;' % (object.user_id.name, object.user_id.email) or '')|safe}</field>
+            <field name="subject">${object.company_id.name} - Devis signé (Ref ${object.name or 'n/a' })</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="report_template" ref="sale.report_sale_order"/>
+            <field name="report_name">${(object.name or '').replace('/','_')}_signé</field>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="body_html"><![CDATA[
+<p>Bonjour ${object.partner_id.title and object.partner_id.title.shortcut or ''} ${object.partner_id.name},</p>
+<p>
+Vous trouverez en pièce jointe le devis signé (Ref ${object.name or 'n/a' }).<br/>
+Nous vous laissons en prendre connaissance et nous nous tenons à votre disposition pour tous renseignements complémentaires.
+</p>
+<p>
+Vous en souhaitant bonne réception.<br/>
+</p>
+<p>
+% if user and user.signature:
+    ${user.signature | safe}
+% endif
+</p>
+<p style="font-size=8px;">
+<i>
+Ce message et toutes les pièces jointes (ci-après le "message") sont établis a l'intention exclusive de ses destinataires et sont confidentiels.
+Si vous recevez ce message par erreur, merci de le détruire et d'en avertir immédiatement l'expéditeur.
+Toute utilisation de ce message non conforme a sa destination, toute diffusion ou toute publication, totale ou partielle, est interdite.
+</i>
+</p>
+]]></field>
+        </record>
+
+    </data>
+
+</odoo>

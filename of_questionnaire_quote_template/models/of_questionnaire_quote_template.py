@@ -27,13 +27,13 @@ class OfPlanningIntervention(models.Model):
         # les onchanges s'occuperont de charger la tâche et le questionnaire
         if 'order_id' in result:
             order = self.env['sale.order'].browse(result['order_id'])
-            if order.of_template_id and order.of_template_id.of_intervention_template_id:
-                result['template_id'] = order.of_template_id.of_intervention_template_id.id
+            if order.template_id and order.template_id.of_intervention_template_id:
+                result['template_id'] = order.template_id.of_intervention_template_id.id
         return result
 
     @api.onchange('order_id')
     def _onchange_order_id(self):
         self.ensure_one()
         order = self.order_id
-        if order and order.of_template_id and order.of_template_id.of_intervention_template_id:
-            self.template_id = order.of_template_id.of_intervention_template_id
+        if order and order.template_id and order.template_id.of_intervention_template_id:
+            self.template_id = order.template_id.of_intervention_template_id

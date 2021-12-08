@@ -27,9 +27,13 @@ Si une ligne d'article n'a pas pu être ajoutée, le champ 'Note d'insertion' ap
     "website": "www.openfire.fr",
     "depends": [
         "of_sale",
+        'website_quote',
     ],
     "data": [
+        'data/of_sale_quote_template_data.xml',
+        'reports/sale_order_report_templates.xml',
         'views/of_sale_quote_template_views.xml',
+        'views/of_sale_quote_template_templates.xml',
         'security/ir.model.access.csv',
     ],
     'installable': True,

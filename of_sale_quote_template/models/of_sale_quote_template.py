@@ -2,7 +2,6 @@
 
 
 from odoo import api, fields, models
-
 import odoo.addons.decimal_precision as dp
 
 # Les classes sale.quote.template et sale.quote.line proviennent du module Odoo 11 website_quote/models/sale_quote.py
@@ -11,8 +10,35 @@ import odoo.addons.decimal_precision as dp
 
 
 class SaleQuoteTemplate(models.Model):
-    _name = "sale.quote.template"
+    _inherit = "sale.quote.template"
     _description = u"Modèle de devis"
+
+    @api.model_cr_context
+    def _auto_init(self):
+        """
+        Suppression du footer par défaut si module website non installé
+        """
+        cr = self._cr
+        cr.execute("SELECT create_date FROM website WHERE id = 1;")
+        website_date = cr.fetchone()[0]
+        res = super(SaleQuoteTemplate, self)._auto_init()
+        if website_date >= fields.Date.today():
+            arch = "<?xml version='1.0'?>" \
+                   "<data inherit_id='website.footer_default'>" \
+                   "    <xpath expr='//div[@id=\"footer\"]' position='attributes'>" \
+                   "        <attribute name='class' add='hidden' separator=' '/>" \
+                   "    </xpath>" \
+                   "</data>"
+            view_id = self.env['ir.model.data'].xmlid_to_res_id("website.footer_default")
+            if view_id:
+                view_data = {'name': 'footer_custom',
+                             'key': 'of_sale_quote_template.footer_custom',
+                             'type': 'qweb',
+                             'inherit_id': view_id,
+                             'mode': 'extension',
+                             'arch_db': arch}
+                self.env['ir.ui.view'].create(view_data)
+        return res
 
     name = fields.Char(u'Nom du modèle', required=True)
     quote_line = fields.One2many('sale.quote.line', 'quote_id', u'Lignes du modèle', copy=True, help=u"Une ligne rouge signifie que l'article utilisé ne peut pas être vendu ou qu'il est désactivé.")
@@ -46,7 +72,7 @@ class SaleQuoteTemplate(models.Model):
 
 
 class SaleQuoteLine(models.Model):
-    _name = "sale.quote.line"
+    _inherit = 'sale.quote.line'
     _description = u"Lignes de modèle de devis"
     _order = 'sequence, id'
 
@@ -102,10 +128,30 @@ class SaleQuoteLine(models.Model):
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    of_template_id = fields.Many2one('sale.quote.template', string=u'Modèle de devis', readonly=True,
-        states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
+    @api.model_cr_context
+    def _auto_init(self):
+        """
+        Suppression de la colonne 'template_id' pour renommer l'existante 'of_template_id'
+        """
+        cr = self._cr
+        cr.execute(
+            "SELECT * FROM information_schema.columns WHERE table_name = '%s' AND column_name = 'template_id'" %
+            (self._table,))
+        exists_col1 = bool(cr.fetchall())
+        cr.execute(
+            "SELECT * FROM information_schema.columns WHERE table_name = '%s' AND column_name = 'of_template_id'" %
+            (self._table,))
+        exists_col2 = bool(cr.fetchall())
+        if exists_col1 and exists_col2:
+            cr.execute("ALTER TABLE %s DROP COLUMN template_id;" % (self._table, ))
+        return super(SaleOrder, self)._auto_init()
 
-    of_note_insertion = fields.Text(string=u"Note d'insertion", help=u"Cette note disparaitra lorsque le devis sera sauvegardé.",)
+    template_id = fields.Many2one(default=False, oldname='of_template_id')
+    of_note_insertion = fields.Text(
+        string=u"Note d'insertion", help=u"Cette note disparaitra lorsque le devis sera sauvegardé.",)
+    of_signer = fields.Char(string=u"Signataire")
+    of_customer_signature = fields.Binary(string=u"Signature client")
+    of_signature_date = fields.Datetime(string=u"Date de la signature")
 
     @api.model
     def create(self, vals):
@@ -143,13 +189,14 @@ class SaleOrder(models.Model):
         """
         self.order_line._compute_tax_id()
 
-    @api.onchange('of_template_id')
+    @api.onchange('template_id')
     def onchange_template_id(self):
         """ Ajout des informations du modèle de devis dans le devis
         """
-        if not self.of_template_id:
+        super(SaleOrder, self).onchange_template_id()
+        if not self.template_id:
             return
-        template = self.of_template_id.with_context(lang=self.partner_id.lang)
+        template = self.template_id.with_context(lang=self.partner_id.lang)
         order_line_obj = self.env['sale.order.line']
 
         regime = self.env['ir.values'].get_default('sale.config.settings', 'of_quote_template')
@@ -200,6 +247,17 @@ class SaleOrder(models.Model):
         self.of_mail_template_ids = docs
         if inactif:  # @TODO : voir si peut être fait avec une fenêtre en javascript.
             self.of_note_insertion = u"Un ou plusieurs articles du modèle ne sont plus utilisés ou ne peuvent être vendus et n'ont donc pas été importés."
+
+    @api.multi
+    def get_access_action(self):
+        """ Instead of the classic form view, redirect to the online quote if it exists. """
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_url',
+            'url': '/quote/%s/%s' % (self.id, self.access_token),
+            'target': 'self',
+            'res_id': self.id,
+        }
 
 
 class SaleOrderLine(models.Model):
