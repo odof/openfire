@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="of_sale_margin_regulator_pivot_view" model="ir.ui.view">
+            <field name="name">of.sale.margin.regulator.pivot.view</field>
+            <field name="model">of.sale.margin.regulator</field>
+            <field name="arch" type="xml">
+                <pivot disable_linking="True">
+                    <field name="confirmation_date" interval="month" type="row"/>
+                    <field name="ordered_cost" type="measure"/>
+                    <field name="ordered_total" type="measure"/>
+                    <field name="ordered_margin" type="measure"/>
+                    <field name="delivered_cost" type="measure"/>
+                    <field name="delivered_margin" type="measure"/>
+                    <field name="invoiced_cost" type="measure"/>
+                    <field name="invoiced_total" type="measure"/>
+                    <field name="invoiced_margin" type="measure"/>
+                    <field name="delivered_ordered_margin_gap" type="measure"/>
+                    <field name="delivered_ordered_margin_gap_perc" type="measure"/>
+                    <field name="invoiced_ordered_margin_gap" type="measure"/>
+                    <field name="invoiced_ordered_margin_gap_perc" type="measure"/>
+                    <field name="ordered_delivered_margin_regulator" type="measure"/>
+                    <field name="ordered_delivered_margin_regulator_perc" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <record id="of_sale_margin_regulator_search_view" model="ir.ui.view">
+            <field name="name">of.sale.margin.regulator.search.view</field>
+            <field name="model">of.sale.margin.regulator</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="company_id"/>
+                    <field name="user_id"/>
+                    <field name="partner_id"/>
+                    <field name="order_id"/>
+                    <field name="invoice_status"/>
+                    <filter string="Commande entièrement facturée" name="invoiced"
+                            domain="[('invoice_status', '=', 'invoiced')]"/>
+                    <separator/>
+                    <filter string="Mois en cours (dernière facture)" name="this_month"
+                            domain="[('invoice_date', u'&gt;=', context_today().strftime('%Y-%m-01')),
+                                     ('invoice_date', u'&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d'))]"/>
+                    <filter string="Mois précédent (dernière facture)" name="previous_month"
+                            domain="[('invoice_date', u'&gt;=', (context_today() - relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
+                                     ('invoice_date', u'&lt;', context_today().strftime('%Y-%m-01'))]"/>
+                    <filter string="Année en cours (dernière facture)" name="this_year"
+                            domain="[('invoice_date', u'&gt;=', context_today().strftime('%Y-01-01')),
+                                     ('invoice_date', u'&lt;', (context_today() + relativedelta(day=1,month=1,years=1)).strftime('%Y-%m-%d'))]"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="of_sale_margin_regulator_action" model="ir.actions.act_window">
+            <field name="name">Régule de marge</field>
+            <field name="res_model">of.sale.margin.regulator</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">pivot</field>
+            <field name="context">{}</field>
+            <field name="context">{'search_default_invoiced': 1, 'search_default_this_month': 1}</field>
+            <field name="domain">[]</field>
+        </record>
+
+        <menuitem
+            id="of_sale_margin_regulator_menu"
+            name="Régule de marge"
+            groups="sales_team.group_sale_salesman"
+            parent="sales_team.menu_sale_report"
+            action="of_sale_margin_regulator_action"
+            sequence="15"/>
+
+        <record id="of_sale_margin_regulator_rule" model="ir.rule">
+            <field name="name">Régule de marge du vendeur</field>
+            <field name="model_id" ref="model_of_sale_margin_regulator"/>
+            <field name="domain_force">[('vendor_id','=',user.id)]</field>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="groups" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+        </record>
+
+        <record id="of_sale_margin_regulator_rule_all" model="ir.rule">
+            <field name="name">Régule de marge de tout le monde</field>
+            <field name="model_id" ref="model_of_sale_margin_regulator"/>
+            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="groups" eval="[(4, ref('sales_team.group_sale_salesman_all_leads'))]"/>
+        </record>
+
+        <record id="of_sale_margin_regulator_comp_rule" model="ir.rule">
+            <field name="name">Régule de marge multi-company</field>
+            <field name="model_id" ref="model_of_sale_margin_regulator"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'child_of', [user.company_id.id])]</field>
+        </record>
+
+</odoo>

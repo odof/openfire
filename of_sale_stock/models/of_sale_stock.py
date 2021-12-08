@@ -389,6 +389,24 @@ class StockMove(models.Model):
     _inherit = 'stock.move'
 
     of_ordered_qty = fields.Float(string=u"(OF) Quantité commandée", digits=dp.get_precision('Product Unit of Measure'))
+    of_unit_cost = fields.Float(
+        compute='_compute_of_unit_cost', string=u"Coût unitaire", digits=dp.get_precision('Product Price'), store=True)
+
+    @api.depends('state')
+    def _compute_of_unit_cost(self):
+        for move in self.filtered(lambda m: m.state == 'done'):
+            purchase_procurement_orders = self.env['procurement.order'].search([('move_dest_id', '=', move.id)])
+            purchase_lines = purchase_procurement_orders.mapped('purchase_line_id').filtered(
+                lambda l: l.order_id.state == 'purchase')
+            if purchase_lines:
+                unit_cost = sum(purchase_lines.mapped('price_subtotal')) / sum(purchase_lines.mapped('product_qty')) \
+                    if sum(purchase_lines.mapped('product_qty')) else 0.0
+                unit_cost *= move.product_id.property_of_purchase_coeff
+            elif move.procurement_id.sale_line_id:
+                unit_cost = move.procurement_id.sale_line_id.purchase_price
+            else:
+                unit_cost = move.product_id.standard_price
+            move.of_unit_cost = unit_cost
 
     @api.model
     def create(self, vals):
