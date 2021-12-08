@@ -380,7 +380,7 @@
                             </div>
                             <div class="clearfix"/>
                             <div t-attf-class="form-group #{error_dict.get('manufacturer_metrics') and 'has-error' or ''} col-md-5">
-                                <label class="control-label" for="manufacturer_metrics">Métré à réaliser par le fabricant *</label><br/>
+                                <label class="control-label" for="manufacturer_metrics">Métré et pose réalisés par nos soins *</label><br/>
                                 <input type="radio" name="manufacturer_metrics" value="yes" style="margin-left: 20px;"
                                        t-att-checked="manufacturer_metrics == 'yes'"/> Oui<br/>
                                 <input type="radio" name="manufacturer_metrics" value="no" style="margin-left: 20px;"
