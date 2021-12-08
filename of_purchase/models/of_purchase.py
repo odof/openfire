@@ -406,6 +406,25 @@ class ResPartner(models.Model):
                 [('of_customer_id', '=', partner.id), ('of_location_usage', '=', 'supplier')])
 
     @api.multi
+    def _purchase_invoice_count(self):
+        super(ResPartner, self)._purchase_invoice_count()
+        all_partners = self.search([('id', 'child_of', self.ids)])
+        all_partners.read(['parent_id'])
+
+        # On réapplique la deuxième étape de la fonction pour ajouter les avoir fournisseurs
+        supplier_invoice_groups = self.env['account.invoice'].read_group(
+            domain=[('partner_id', 'in', all_partners.ids),
+                    ('type', '=', 'in_refund')],
+            fields=['partner_id'], groupby=['partner_id']
+        )
+        for group in supplier_invoice_groups:
+            partner = self.browse(group['partner_id'][0])
+            while partner:
+                if partner in self:
+                    partner.supplier_invoice_count += group['partner_id_count']
+                partner = partner.parent_id
+
+    @api.multi
     def action_view_picking(self):
         action = self.env.ref('of_purchase.of_purchase_open_picking').read()[0]
         action['domain'] = [('of_customer_id', 'in', self._ids)]
