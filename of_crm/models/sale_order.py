@@ -154,6 +154,18 @@ class SaleOrder(models.Model):
         }
 
 
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+
+    of_amount_to_invoice = fields.Float(
+        string=u"Reste à facturer en €", compute="_compute_of_amount_to_invoice", store=True)
+
+    @api.depends('qty_to_invoice', 'price_unit')
+    def _compute_of_amount_to_invoice(self):
+        for line in self:
+            line.of_amount_to_invoice = line.qty_to_invoice * line.price_unit
+
+
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
