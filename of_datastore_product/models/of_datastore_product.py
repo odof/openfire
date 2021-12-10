@@ -1259,11 +1259,31 @@ class ProductTemplate(models.Model):
     of_datastore_has_link = fields.Boolean(_compute='_compute_of_datastore_has_link')
     prochain_tarif = fields.Float('Prochain tarif', digits=dp.get_precision('Product Price'), default=0.0)
     date_prochain_tarif = fields.Date(string="Date du prochain tarif")
+    # Booléen utilisé par afficher ou non le bouton 'Voir stock founisseur'
+    of_datastore_stock = fields.Boolean(string=u"Stock centralisé", compute='_compute_of_datastore_stock')
 
     @api.depends()
     def _compute_of_datastore_has_link(self):
         for product in self:
             product.of_datastore_has_link = False
+
+    @api.depends('of_datastore_res_id')
+    def _compute_of_datastore_stock(self):
+        for product in self:
+            if product.of_datastore_res_id and product.brand_id.datastore_supplier_id:
+                brand = product.brand_id
+                supplier = brand.datastore_supplier_id
+                # Try except au cas où on ne peut pas atteindre la base centralisée,
+                # pas d'erreur à envoyer, ne pas afficher d'erreur
+                try:
+                    client = supplier.of_datastore_connect()
+                    if isinstance(client, basestring):
+                        continue
+                    ds_brand_obj = supplier.of_datastore_get_model(client, 'of.product.brand')
+                    can_read = supplier.of_datastore_func(ds_brand_obj, 'of_access_stocks', [brand.datastore_brand_id], [])
+                    product.of_datastore_stock = can_read
+                except:
+                    continue
 
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
