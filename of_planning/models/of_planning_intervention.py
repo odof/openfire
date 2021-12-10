@@ -1093,7 +1093,11 @@ class OfPlanningIntervention(models.Model):
                 'of.intervention.settings', 'company_choice') or 'contact'
             if company_choice == 'contact' and self.address_id.company_id:
                 self.company_id = address.company_id.id
-                self.onchange_company_id()  # forcer l'appel
+            else:
+                self.company_id = self.env.user.company_id.id
+        else:
+            self.company_id = self.env.user.company_id.id
+        self.onchange_company_id()  # forcer l'appel
         self.name = name and " ".join(name) or "Intervention"
 
     @api.onchange('template_id')
