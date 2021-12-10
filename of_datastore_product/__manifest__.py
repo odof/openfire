@@ -54,6 +54,7 @@ Ce module nécessite l'installation de openerplib sur le serveur : sudo easy_ins
         'wizard/of_datastore_update_product.xml',
         'wizard/of_remove_unused_products.xml',
         'views/of_datastore_product_view.xml',
+        'wizard/of_datastore_display_stock_wizard_views.xml',
     ],
     'qweb': [
         'static/src/xml/of_datastore_product.xml',

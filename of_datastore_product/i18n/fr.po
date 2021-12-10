@@ -642,3 +642,14 @@ msgstr "Wizard id"
 #, python-format
 msgid "You must select one or several brands using the same centralized database (provided by the same supplier)."
 msgstr "Vous devez sélectionner une ou plusieurs marques connectées au même tarif centralisé (fournies par le même distributeur)."
+
+
+#. module: of_datastore_product
+#: model:ir.ui.view,arch_db:of_datastore_product.of_datastore_display_stock_view_form
+msgid "Supplier stock"
+msgstr "Stock du fournisseur"
+
+#. module: of_datastore_product
+#: model:ir.actions.act_window,name:of_datastore_product.action_of_datastore_display_stock
+msgid "Supplier stock"
+msgstr "Stock du fournisseur"

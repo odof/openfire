@@ -143,6 +143,7 @@
                     <field name="of_datastore_res_id" widget="boolean" readonly="1"/>
                     <label string="Connected"/>
                 </div>
+                <field name="of_datastore_stock" invisible="1"/>
             </xpath>
         </field>
     </record>
