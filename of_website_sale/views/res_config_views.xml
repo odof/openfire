@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_website_sale_config_settings_view_form" model="ir.ui.view">
+        <field name="name">of.website.sale.config.settings.form.inherit</field>
+        <field name="model">website.config.settings</field>
+        <field name="inherit_id" ref="website_sale.website_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='delivery']" position="after">
+                <group string="Portail B2C" id="b2c" name="b2c_portal">
+                    <label string="(OF) Liste de prix B2C par défaut" for="of_pricelist_b2c_id"/>
+                    <div class="oe_inline">
+                        <field name="of_pricelist_b2c_id"/>
+                    </div>
+                    <label string="(OF) Position fiscale B2C par défaut" for="of_fiscal_position_b2c_id"/>
+                    <div class="oe_inline">
+                        <field name="of_fiscal_position_b2c_id"/>
+                    </div>
+                </group>
+                <group string="Portail B2B" id="b2b" name="b2b_portal">
+                    <label string="(OF) Liste de prix B2B par défaut" for="of_pricelist_b2b_id"/>
+                    <div class="oe_inline">
+                        <field name="of_pricelist_b2b_id"/>
+                    </div>
+                    <label string="(OF) Position fiscale B2B par défaut" for="of_fiscal_position_b2b_id"/>
+                    <div class="oe_inline">
+                        <field name="of_fiscal_position_b2b_id"/>
+                    </div>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

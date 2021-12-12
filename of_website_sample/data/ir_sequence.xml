@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+
+    <record id="seq_stock_pickup_request" model="ir.sequence">
+        <field name="name">Product Sample Sequence</field>
+        <field name="code">product.sample</field>
+        <field name="prefix">_ECH</field>
+        <field name="padding">0</field>
+    </record>
+
+</odoo>

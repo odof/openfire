@@ -1,0 +1,71 @@
+body [portal="B2B"] {
+
+    /*BG micin*/
+
+    .bg-img(@img-name){
+        background: url('@{img-path}@{img-name}') no-repeat scroll 0 0;
+    }
+    /*Border radiuse*/
+    .border-radius(@radius) {
+                border-radius:@radius;
+        -webkit-border-radius:@radius;
+           -moz-border-radius:@radius;
+             -o-border-radius:@radius;
+    }
+
+    .bg-size(@cover){
+      background-size: @cover;
+      -moz-background-size: @cover;
+      -webkit-background-size: @cover;
+      -o-background-size: @cover;
+    }
+
+    /* Transition */
+    .transition(@all, @s, @ease){
+            transition: @all @s @ease;
+    -webkit-transition: @all @s @ease;
+       -moz-transition: @all @s @ease;
+         -o-transition: @all @s @ease;
+    }
+    .transform-img-hover(@scale){
+    transform: scale(@scale);
+    -moz-transform: scale(@scale);
+    -webkit-transform: scale(@scale);
+    -o-transform: scale(@scale);
+    }
+
+    /* Media */
+
+
+    /* Hover menu*/
+    .menu-hover-effect(@padding){
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: @as-light;
+      .transition(all, 0.5s, ease);
+      padding: @padding;
+      border-top: 5px solid @as-theme-b2b;
+    }
+    .menu-hover-effect-open{
+      display: block;
+    }
+    .menu-hover-left-effect(@padding){
+      visibility: hidden;
+      position: absolute;
+      top: 0;
+      right: -110%;
+      opacity: 0;
+      background: @as-light;
+      .transition(all, 0.2s, ease);
+      padding: @padding;
+      border-top: 5px solid @as-theme-b2b;
+    }
+    .menu-hover-effect-left-open{
+     visibility: visible;
+      opacity: 1;
+      right: -60%;
+    }
+}

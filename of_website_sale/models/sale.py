@@ -14,4 +14,7 @@ class SaleOrder(models.Model):
         order_line.product_id_change()
         order_line_vals = order_line._convert_to_write(order_line._cache)
 
+        if values.get('product_uom_qty') != order_line_vals.get('product_uom_qty'):
+            order_line_vals['product_uom_qty'] = values['product_uom_qty']
+
         return order_line_vals

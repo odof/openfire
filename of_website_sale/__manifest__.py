@@ -15,11 +15,16 @@ Module OpenFire pour e-commerce
         'website_sale',
         'website_sale_options',
         'of_account_tax',
+        'of_website_portal',
     ],
     'data': [
+        'security/of_website_sale_security.xml',
+        'security/ir.model.access.csv',
+        'data/data.xml',
         'views/product_views.xml',
         'views/payment_views.xml',
         'views/templates.xml',
+        'views/res_config_views.xml',
     ],
     'qweb': [
     ],

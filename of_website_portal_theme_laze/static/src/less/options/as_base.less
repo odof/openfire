@@ -1,0 +1,128 @@
+[portal="B2B"] {
+
+    a{
+        &:hover,
+        &:active,
+        &:focus{
+            color:@as-theme-b2b;
+        }
+    }
+    div.carousel {
+        .carousel-indicators {
+            li {
+                &:hover,
+                &.active {
+                    background: @as-theme-b2b !important;
+                    border: 1px solid @as-theme-b2b;
+                }
+            }
+        }
+    }
+
+    /* Pagination
+    --------------------------------------*/
+    .top-bread{
+        .back-page{
+            a {
+                color: @as-theme-b2b;
+            }
+        }
+    }
+
+    .pagination{
+        li{
+            &.active,
+            &.active:hover,
+            &.active:focus,
+            &:hover,
+            &:focus{
+                a {
+                    background: @as-theme-b2b !important;
+                    border-color: @as-theme-b2b !important;
+                }
+            }
+        }
+    }
+
+    /* Toolbar
+    --------------------------------------*/
+    #products_grid{
+        .products_pager{
+            .view-mode{
+                button {
+                    &.active,
+                    &:hover{
+                        color:@as-theme-b2b;
+                    }
+                }
+            }
+        }
+    }
+    .products_pager {
+        .view-mode{
+            button {
+                &:hover{
+                    color: @as-theme-b2b;
+                }
+            }
+        }
+    }
+
+
+    /*Back to top
+    -------------------------*/
+    .cd-top {
+        background: @as-theme-b2b;
+
+        &:hover,
+        &:active,
+        &:focus{
+            background: darken(@as-theme-b2b, 10%);
+        }
+    }
+
+    ul.wizard{
+        li{
+            &.text-primary{
+                background: @as-theme-b2b;
+                color: @as-light;
+                .chevron{
+                    right: -9px;
+                    &:before{
+                        border-left-color:@as-theme-b2b;
+                    }
+                }
+            }
+        }
+    }
+
+    .oe_cart{
+        .table-striped{
+            td{
+                a {
+                    color: @as-theme-b2b;
+                }
+            }
+        }
+
+        .oe_website_spinner{
+            .js_add_cart_json{
+                background: @as-theme-b2b;
+            }
+        }
+    }
+
+    .page-404{
+        a{
+            color: @as-theme-b2b;
+        }
+    }
+
+    .js_event {
+        .col-md-8{
+            .panel-info{
+                border-color: @as-theme-b2b;
+            }
+        }
+    }
+}
