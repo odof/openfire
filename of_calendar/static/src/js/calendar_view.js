@@ -98,7 +98,9 @@ CalendarView.include({
                                "need to define either 'use_contacts' or 'attendee_model' attribute. \n" +
                                "(use_contacts takes precedence)."));
         }
-        this.draggable = !isNullOrUndef(attrs.draggable)  && _.str.toBool(attrs.draggable) || undefined;
+        if (!isNullOrUndef(attrs.draggable)) {
+            this.draggable = _.str.toBool(attrs.draggable);
+        }
         // integer to make state easily visible. see .less file
         this.display_states = attrs.display_states  && _.str.toBool(attrs.display_states);
 
@@ -148,7 +150,11 @@ CalendarView.include({
         return $.when(dnd_dfd, mintime_dfd, maxtime_dfd, creneau_dispo_data_def, this._super())
         .then(function () {
             // privilégier l'attribut draggable de la vue XML si présent: exemple rdv_view.xml
-            self.draggable = !isNullOrUndef(self.draggable) && self.draggable || _.str.toBool(arguments[0]);
+            if (!isNullOrUndef(self.draggable)) {
+                self.draggable = self.draggable;
+            }else{
+                self.draggable = _.str.toBool(arguments[0]);
+            }
             var min_time = arguments[1];
             var max_time = arguments[2]
             if (min_time && min_time < 10) {  // minTime
