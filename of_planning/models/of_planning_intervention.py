@@ -530,7 +530,8 @@ class OfPlanningIntervention(models.Model):
 
     picking_id = fields.Many2one(
         comodel_name='stock.picking', string=u"Bon de livraison",
-        domain="[('id', 'in', picking_domain and picking_domain[0] and picking_domain[0][2] or False)]")
+        domain="order_id and [('id', 'in', picking_domain and picking_domain[0] and picking_domain[0][2] or [])]"
+               "or [('picking_type_code', '=', 'outgoing')]")
     picking_domain = fields.Many2many(comodel_name='stock.picking', compute='_compute_picking_domain')
     invoice_policy = fields.Selection(
         selection=[
@@ -1218,7 +1219,7 @@ class OfPlanningIntervention(models.Model):
         self.picking_domain = picking_list
         if self.picking_id and self.picking_id.id not in picking_list:
             self.picking_id = False
-        res = {'domain': {'picking_id': [('id', 'in', picking_list)]}}
+        res = {}
         return res
 
     @api.onchange('company_id')
@@ -2218,6 +2219,9 @@ class StockPicking(models.Model):
         if len(self._ids) == 1:
             context = safe_eval(action['context'])
             order = self.move_lines.mapped('procurement_id').mapped('sale_line_id').mapped('order_id')
+            # Un BL peut se retrouver avec uniquement des composants de kits
+            if not order:
+                order = self.move_lines.mapped('procurement_id').mapped('of_sale_comp_id').mapped('order_id')
             if order and len(order) > 1:
                 order = order[0]
             context.update({
