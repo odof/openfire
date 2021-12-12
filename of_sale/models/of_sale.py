@@ -36,6 +36,7 @@ def product_uom_change(self):
             and (not self.price_unit or float_compare(self.price_unit, self.product_id.list_price, 2) != 0):
         self.price_unit = self.of_get_price_unit()
 
+
 SOL.product_uom_change = product_uom_change
 
 
@@ -822,7 +823,8 @@ class SaleOrderLine(models.Model):
     of_order_line_option_id = fields.Many2one(comodel_name='of.order.line.option', string=u"Option")
     of_reset_option = fields.Boolean(string=u"Réinitialiser l'option ?")
 
-    of_confirmation_date = fields.Datetime(string="Date de confirmation", related="order_id.confirmation_date", store=True)
+    of_confirmation_date = fields.Datetime(
+        string="Date de confirmation", related="order_id.confirmation_date", store=True)
     of_invoice_policy = fields.Selection([('order', u'Quantités commandées'), ('delivery', u'Quantités livrées')],
                                          string="Politique de facturation",
                                          compute="_compute_of_invoice_policy",
@@ -932,7 +934,8 @@ class SaleOrderLine(models.Model):
                 m2o_order = dest_model._rec_name
 
             rel_alias, _ = query.add_join(
-                (alias, 'res_partner_res_partner_category_rel', 'order_partner_id', 'partner_id', 'partner_category_rel'),
+                (alias, 'res_partner_res_partner_category_rel',
+                 'order_partner_id', 'partner_id', 'partner_category_rel'),
                 implicit=False, outer=True)
             dest_alias, _ = query.add_join(
                 (rel_alias, 'res_partner_category', 'category_id', 'id', 'partner_category'),
@@ -1305,7 +1308,7 @@ class AccountInvoice(models.Model):
             invoices = invoice | order_lines.mapped('invoice_lines').mapped('invoice_id')
             invoice.of_residual = sum(invoices.mapped('residual'))
             invoice.of_residual_equal = invoice.state == 'draft' or \
-                                        float_compare(invoice.of_residual, invoice.residual, 2) == 0
+                float_compare(invoice.of_residual, invoice.residual, 2) == 0
 
     @api.depends('invoice_line_ids', 'invoice_line_ids.of_is_locked')
     def _compute_of_is_locked(self):
@@ -1352,7 +1355,8 @@ class AccountInvoice(models.Model):
     def action_invoice_open(self):
         """Mise à jour des dates de l'échéancier"""
         res = super(AccountInvoice, self).action_invoice_open()
-        acompte_categ_id = self.env['ir.values'].get_default('sale.config.settings', 'of_deposit_product_categ_id_setting')
+        acompte_categ_id = self.env['ir.values'].get_default(
+            'sale.config.settings', 'of_deposit_product_categ_id_setting')
         lines = self.mapped('invoice_line_ids').filtered(lambda line: line.product_id.categ_id.id != acompte_categ_id)
         orders = lines.mapped('sale_line_ids').mapped('order_id')
         orders.of_update_dates_echeancier()
@@ -1531,7 +1535,8 @@ class AccountConfigSettings(models.TransientModel):
     def _auto_init(self):
         """
         Certain paramètres d'affichage sont passés de Booléen à Sélection.
-        Cette fonction est appelée à chaque mise à jour mais ne fait quelque chose que la première fois qu'elle est appelée.
+        Cette fonction est appelée à chaque mise à jour mais ne fait quelque chose
+        que la première fois qu'elle est appelée.
         """
         super(AccountConfigSettings, self)._auto_init()
         if not self.env['ir.values'].get_default('account.config.settings', 'of_color_font'):
@@ -1784,3 +1789,27 @@ class ProductProduct(models.Model):
         for product in self:
             product.sales_count = r.get(product.id, 0)
         return r
+
+    @api.multi
+    def write(self, values):
+        res = super(ProductProduct, self).write(values)
+        # Si une variante est archivée, on regarde si d'autres variantes sont encore active,
+        # sinon, on archive aussi le modèle d'article
+        # no rebound dans le context pour éviter une boucle infinie : archiver un template archive ses variantes
+        if 'active' in values and not values['active'] and res and not self._context.get('of_no_rebound'):
+            to_deactivate = self.env['product.template']
+            for product in self:
+                variants = self.search_count([('product_tmpl_id', '=', product.product_tmpl_id.id)])
+                if not variants:
+                    to_deactivate |= product.product_tmpl_id
+            to_deactivate.with_context(of_no_rebound=True).write({'active': False})
+        # Si une variante est désarchivée, on regarde si son template est actif
+        # sinon, on active aussi le modèle d'article
+        # no rebound dans le context pour éviter une boucle infinie : activer un template active ses variantes
+        if 'active' in values and values['active'] and res and not self._context.get('of_no_rebound'):
+            to_activate = self.env['product.template']
+            for product in self:
+                if not product.product_tmpl_id.active:
+                    to_activate |= product.product_tmpl_id
+            to_activate.with_context(of_no_rebound=True).write({'active': True})
+        return res
