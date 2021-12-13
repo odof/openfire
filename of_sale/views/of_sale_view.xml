@@ -14,6 +14,10 @@
                 <xpath expr="//search" position="inside">
                     <field name="of_etiquette_partenaire_ids" string="Étiquettes client" widget="many2one"/>
                 </xpath>
+                <!-- Ajouter la recherche sur le partenaire en même temps que le nom -->
+                <xpath expr="//field[@name='name']" position="attributes">
+                    <attribute name="filter_domain">['|','|',('name','ilike',self),('client_order_ref','ilike',self),('partner_id','ilike',self)]</attribute>
+                </xpath>
             </field>
         </record>
 
