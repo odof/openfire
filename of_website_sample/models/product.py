@@ -13,15 +13,26 @@ class ProductTemplate(models.Model):
     of_sample_default_code = fields.Char(related="of_sample_id.default_code", string="Sample ref.", readonly=True)
     of_sample_active = fields.Boolean(related="of_sample_id.active", string="Sample active", readonly=True)
     of_sample_parent_id = fields.Many2one("product.template", string="Sample parent")
-    of_sample_parent_default_code = fields.Char(related="of_sample_parent_id.default_code",
-                                             string="Parent ref.", readonly=True)
-    of_sample_parent_active = fields.Boolean(related="of_sample_parent_id.active", string="Parent active", readonly=True)
+    of_sample_parent_default_code = fields.Char(
+        related="of_sample_parent_id.default_code", string="Parent ref.", readonly=True)
+    of_sample_parent_active = fields.Boolean(
+        related="of_sample_parent_id.active", string="Parent active", readonly=True)
+
+    @api.multi
+    def copy(self, default=None):
+        res = super(ProductTemplate, self).copy(default={
+            'of_sample_available': False,
+            'of_is_sample': False,
+            'of_sample_id': False,
+            'of_sample_parent_id': False,
+        })
+        return res
 
     @api.model
     def create(self, args):
         res = super(ProductTemplate, self).create(args)
-        # Si gestion des écantillons
-        if res.of_sample_available:
+        # Si gestion des échantillons
+        if res.of_sample_available and not res.of_sample_id:
             args_sample = res.get_sample_values()
             # On crée of_sample_id
             sample = res.create(args_sample)
@@ -67,13 +78,14 @@ class ProductTemplate(models.Model):
 
     @api.multi
     def unlink(self):
-        # Si gestion des échantillons, on supprime le sample associé
-        if self.of_sample_id:
-            self.of_sample_id.unlink()
+        for product in self:
+            # Si gestion des échantillons, on supprime le sample associé
+            if product.of_sample_id and product.of_sample_id not in self:
+                product.of_sample_id.unlink()
 
-        # Si échantillon, on désactive la gestion des échantillons sur le parent
-        if self.of_is_sample:
-            self.of_sample_parent_id.of_sample_available = False
+            # Si échantillon, on désactive la gestion des échantillons sur le parent
+            if product.of_is_sample and product.of_sample_parent_id:
+                product.of_sample_parent_id.of_sample_available = False
 
         return super(ProductTemplate, self).unlink()
 
@@ -90,8 +102,8 @@ class ProductTemplate(models.Model):
                 seller_ids.append(seller_id_copy.id)
             args_sample = dict(sample_dict, **{
                 "name": self.name + _(u" (sample)"),
-                "default_code": (self.default_code or '')
-                                + self.env['ir.sequence'].next_by_code('product.sample') or '_ECH',
+                "default_code":
+                    (self.default_code or '') + self.env['ir.sequence'].next_by_code('product.sample') or '_ECH',
                 "of_is_sample": True,
                 "website_published": False,
                 "of_sample_parent_id": self.id,
@@ -101,6 +113,8 @@ class ProductTemplate(models.Model):
             unaffected_fields = self.sample_unaffected_fields()
 
             args_sample = {key: val for key, val in sample_dict.iteritems() if key not in unaffected_fields}
+        args_sample['name'] = self.name + _(u" (sample)")
+        args_sample['of_sample_id'] = False
         args_sample['of_sample_available'] = False
         args_sample['of_is_sample'] = True
         if args_sample.get('website_name'):
