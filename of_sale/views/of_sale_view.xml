@@ -68,7 +68,7 @@
                     <attribute name="attrs">{}</attribute>
                 </xpath>
                 <xpath expr="//field[@name='confirmation_date']" position="attributes">
-                    <attribute name="attrs">{'invisible': [('confirmation_date', '=', False)]}</attribute>
+                    <attribute name="attrs">{'invisible': [('state','in',['draft', 'sent', 'cancel']),('confirmation_date', '=', False)]}</attribute>
                     <attribute name="widget">date</attribute>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/form/group/group[2]" position="inside">
@@ -182,8 +182,11 @@
             <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
             <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
             <field name="arch" type="xml">
+                <!-- Mettre le required uniquement sur cette vue permet de ne pas totalement bloquer les utilisateurs
+                     qui ne peuvent pas modifier la date de confirmation -->
                 <xpath expr="//field[@name='confirmation_date']" position="attributes">
-                    <attribute name="attrs">{'invisible': [('state', 'in', ['draft', 'sent', 'cancel'])]}</attribute>
+                    <attribute name="attrs">{'invisible': [('state','in',['draft', 'sent', 'cancel']),('confirmation_date', '=', False)],
+'required': [('state','not in',['draft', 'sent', 'cancel']),('confirmation_date','=',False)]}</attribute>
                     <attribute name="readonly">0</attribute>
                 </xpath>
             </field>
