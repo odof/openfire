@@ -781,7 +781,7 @@ class ResCompany(models.Model):
     def get_jours_feries(self, date_debut, date_fin):
         u"""
             Renvois un dictionnaire de jours fériés avec pour clé la date et pour valeur le nom du jour férié.
-            Contient tous les jours fériés compris entre date_debug et date_fin inclus.
+            Contient tous les jours fériés compris entre date_debut et date_fin inclus.
             date_debut et date_fin peuvent être de type Datetime, Date ou basestring
             """
         if not len(self):
@@ -800,6 +800,11 @@ class ResCompany(models.Model):
             date_fin_da = date_fin
         country = company.country_id
         holi_dict = holidays.CountryHoliday(country.code or 'FR', years=[date_debut_da.year, date_fin_da.year])
+        # start of code for debugging purposes
+        #today = fields.Date.today()
+        #today_da = fields.Date.from_string(today)
+        #holi_dict[today_da] = u"Testing"
+        # end
         res = {}
         for key, val in holi_dict.iteritems():
             if date_debut_da <= key <= date_fin_da:

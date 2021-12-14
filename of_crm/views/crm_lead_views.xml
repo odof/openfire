@@ -162,7 +162,7 @@
         <field name="name">of.crm.activity.calendar.view</field>
         <field name="model">of.crm.activity</field>
         <field name="arch" type="xml">
-            <calendar date_start="date" color="vendor_id" attendee_model="res.users"
+            <calendar date_start="date" color="vendor_id" attendee="vendor_id" attendee_model="res.users"
                       color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1">
                 <field name="opportunity_id"/>
                 <field name="type_id"/>
@@ -325,7 +325,7 @@
             <field name="inherit_id" ref="crm.crm_case_calendar_view_leads"/>
             <field name="arch" type="xml">
                 <xpath expr="//calendar" position="replace">
-                    <calendar string="Leads Generation" date_start="of_date_action" color="user_id"
+                    <calendar string="Leads Generation" date_start="of_date_action" color="user_id" attendee="user_id"
                       attendee_model="res.users" color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1">
                         <field name="name"/>
                         <field name="of_title_action"/>

@@ -152,7 +152,7 @@ CalendarView.include({
             var p_creneaux_dispos = dfd_creneaux_dispos.promise()
             res_ids = res_ids || self.now_filter_ids;
             start = start || self.range_start;
-            end = moment(start).endOf(this.mode || "week")._d;
+            end = moment(start).endOf(this.get_actual_mode() || "week")._d;
 
             var Planning = new Model(self.model);
             Planning.call('get_emp_horaires_info', [res_ids, start, end, get_segments, false, 'calendar'])
@@ -205,7 +205,7 @@ CalendarView.include({
         }
         var self = this;
         this._super.apply(this,arguments);
-        var end = moment(start).endOf(this.mode || "week")._d;
+        var end = moment(start).endOf(this.get_actual_mode() || "week")._d;
         var Company = new Model("res.company");
 
         var dfd_jours_feries = $.Deferred();

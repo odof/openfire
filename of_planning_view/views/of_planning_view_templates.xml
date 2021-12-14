@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <!-- inherit from web assets backend -->
-    <template id="assets_backend" name="planning_view_assets" inherit_id="web.assets_backend">
+    <template id="assets_backend" name="planning_view_assets" inherit_id="web_calendar.assets_backend">
         <xpath expr="." position="inside">
             <link rel="stylesheet" href="/of_planning_view/static/src/less/of_planning_view.less" />
-            <script type="text/javascript" src="/of_planning_view/static/src/js/of_planning_view.js"></script>
+            <script type="text/javascript" src="/of_planning_view/static/src/js/of_planning_view.js"/>
             <script type="text/javascript" src="/of_planning_view/static/src/js/calendar_view.js"/>
         </xpath>
     </template>

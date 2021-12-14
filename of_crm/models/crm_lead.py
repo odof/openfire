@@ -135,7 +135,9 @@ class CrmLead(models.Model):
     of_next_action_activity_id = fields.Many2one(
         comodel_name='of.crm.activity', string=u"Activité nécessitant la prochaine action",
         compute='_compute_of_action_info')
-    of_date_action = fields.Datetime(string=u"Date de la prochaine action", compute='_compute_of_action_info')
+    # store=True car of_date_action est la date de référence pour la vue calendar
+    of_date_action = fields.Datetime(
+        string=u"Date de la prochaine action", compute='_compute_of_action_info', store=True)
     of_title_action = fields.Char(string=u"Libellé de la prochaine action", compute='_compute_of_action_info')
 
     of_date_projet = fields.Date(string="Date projet")
