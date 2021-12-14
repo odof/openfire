@@ -765,7 +765,7 @@ class OfService(models.Model):
     @api.multi
     def button_open_of_planning_intervention(self):
         self.ensure_one()
-        action = self.env.ref('of_planning.of_planning_intervention_open_interventions').read()[0]
+        action = self.env.ref('of_planning.of_sale_order_open_interventions').read()[0]
         interventions = self.intervention_ids
         if len(interventions) > 1:
             action['context'] = {'search_default_service_id': self.id}

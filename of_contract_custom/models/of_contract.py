@@ -402,7 +402,7 @@ class OfContract(models.Model):
 
     @api.multi
     def action_view_intervention(self):
-        action = self.env.ref('of_planning.of_planning_intervention_open_interventions').read()[0]
+        action = self.env.ref('of_planning.of_sale_order_open_interventions').read()[0]
         interventions = self.line_ids.mapped('intervention_ids')
         action['domain'] = [('id', 'in', interventions._ids)]
         if len(self) == 1:
