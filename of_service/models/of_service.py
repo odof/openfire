@@ -126,7 +126,7 @@ class OfService(models.Model):
         [('draft', u'Brouillon'),  # état par défaut
          ('calculated', u'Calculé'),  # équivalent a state=False mais utile en XML
          ('cancel', u'Annulé')],  # manuellement décidé,
-        u"État de calcul", default="draft", required=True)
+        u"État de calcul", default="draft", required=True, copy=False)
     state = fields.Selection(
         [('draft', u'Brouillon'),  # état par défaut
          ('to_plan', u'À planifier prochainement'),  # prochaine intervention dans moins d'un mois
