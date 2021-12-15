@@ -22,6 +22,11 @@ class OfService(models.Model):
 
     of_categorie_id = fields.Many2one('of.project.issue.categorie', string=u"Catégorie", ondelete='restrict')
     of_canal_id = fields.Many2one('of.project.issue.canal', string=u"Canal", ondelete='restrict')
+    payer_mode = fields.Selection([
+        ('client', u"Client"),
+        ('retailer', u"Revendeur"),
+        ('manufacturer', u"Fabricant"),
+    ], string=u"Payeur")
 
     in_progress_datetime = fields.Datetime(string=u"Date de début de prise en charge", copy=False)
     done_datetime = fields.Datetime(string=u"Date de fin de prise en charge", copy=False)

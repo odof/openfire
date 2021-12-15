@@ -140,8 +140,34 @@
         </xpath>
     </template>
 
+
     <template id="of_parc_installe_extension_fiche_intervention_report2"
               inherit_id="of_planning.of_planning_fiche2_intervention_report_template">
+        <!-- Gestion de la migration des SAV -->
+        <xpath expr="//t[@name='get_template']" position="after">
+            <t t-set="sav_migre" t-value="o.env['ir.config_parameter'].sudo().get_param('of_migration_sav_di')" name="get_template"/>
+        </xpath>
+        <xpath expr="//div[@name='fi_sav']" position="attributes">
+            <attribute name="t-if">not sav_migre and template.fi_sav and o.sav_id</attribute>
+        </xpath>
+        <xpath expr="//div[@name='fi_rdv_type']" position="after">
+            <div t-if="sav_migre and template.fi_sav and o.service_id and o.service_id.of_categorie_id and o.service_id.of_categorie_id.name" name="fi_rdv_sav_categorie">
+                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                <t t-set="previous_separator" t-value="True"/>
+                <div class="h5" style="padding: 0px 16px;">
+                    <span>Catégorie&amp;nbsp;SAV:</span>
+                    <span t-field="o.service_id.of_categorie_id.name"/>
+                </div>
+            </div>
+            <div t-if="sav_migre and template.fi_sav and o.service_id and o.service_id.payer_mode" name="fi_rdv_sav_payer">
+                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                <t t-set="previous_separator" t-value="True"/>
+                <div class="h5" style="padding: 0px 16px;">
+                    <span>Payeur&amp;nbsp;SAV:</span>
+                    <span t-field="o.service_id.payer_mode"/>
+                </div>
+            </div>
+        </xpath>
         <!-- Historique -->
         <xpath expr="//div[@name='fi_history']/div[@name='title_history']" position="replace">
             <div name="title_history" class="row h4 mb4" >
@@ -232,6 +258,16 @@
                                     <div>
                                         <span>Marque :</span>
                                         <span t-field="parc.brand_id.name"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div t-if="template.fi_sav and parc.type_garantie" name="fi_parc_sav">
+                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
+                                <t t-set="previous_separator" t-value="True"/>
+                                <div class="h5" style="padding: 0px 16px;">
+                                    <div>
+                                        <span>Type de garantie :</span>
+                                        <span t-field="parc.type_garantie"/>
                                     </div>
                                 </div>
                             </div>

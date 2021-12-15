@@ -1,7 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <template id="of_service_parc_installe_rapport_intervention_report_template" inherit_id="of_planning.of_rapport_intervention_report_template">
+    <template id="of_service_parc_installe_rapport_intervention_report_template" inherit_id="of_project_issue.of_project_issue_extension_rapport_intervention_report2">
+        <!-- Gestion de la migration des SAV -->
+        <xpath expr="//t[@name='get_template']" position="after">
+            <t t-set="sav_migre" t-value="o.env['ir.config_parameter'].sudo().get_param('of_migration_sav_di')" name="get_template"/>
+        </xpath>
+        <xpath expr="//div[@name='ri_sav']" position="attributes">
+            <attribute name="t-if">not sav_migre and template.ri_sav and o.sav_id</attribute>
+        </xpath>
+        <xpath expr="//div[@name='ri_rdv_type']" position="after">
+            <div t-if="sav_migre and template.ri_sav and o.service_id and o.service_id.of_categorie_id and o.service_id.of_categorie_id.name" name="ri_rdv_sav_categorie">
+                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                <t t-set="previous_separator" t-value="True"/>
+                <div class="h5" style="padding: 0px 16px;">
+                    <span>Catégorie&amp;nbsp;SAV:</span>
+                    <span t-field="o.service_id.of_categorie_id.name"/>
+                </div>
+            </div>
+            <div t-if="sav_migre and template.ri_sav and o.service_id and o.service_id.payer_mode" name="ri_rdv_sav_payer">
+                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                <t t-set="previous_separator" t-value="True"/>
+                <div class="h5" style="padding: 0px 16px;">
+                    <span>Payeur&amp;nbsp;SAV:</span>
+                    <span t-field="o.service_id.payer_mode"/>
+                </div>
+            </div>
+        </xpath>
         <!-- L'impression de ce rapport peut être déclenché des devis/commandes ou du planning.
         L'affichage diffère selon l'origine. -->
         <xpath expr="//div[@name='ri_history']/div[@name='title_history']" position="replace">
@@ -93,6 +118,16 @@
                                     <div>
                                         <span>Marque :</span>
                                         <span t-field="parc.brand_id.name"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div t-if="template.ri_sav and parc.type_garantie" name="ri_parc_sav">
+                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
+                                <t t-set="previous_separator" t-value="True"/>
+                                <div class="h5" style="padding: 0px 16px;">
+                                    <div>
+                                        <span>Type de garantie :</span>
+                                        <span t-field="parc.type_garantie"/>
                                     </div>
                                 </div>
                             </div>
