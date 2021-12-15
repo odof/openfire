@@ -277,3 +277,18 @@ msgstr "Rien à facturer"
 #: selection:sale.order,of_force_invoice_status:0
 msgid "Fully Invoiced"
 msgstr "Entièrement facturé"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "Tax"
+msgstr "TVA"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "Base"
+msgstr "Base"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "Amount"
+msgstr "Montant"
