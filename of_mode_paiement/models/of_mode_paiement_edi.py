@@ -50,6 +50,58 @@ class ResPartnerBank(models.Model):
               u"Lors d'un 1er prélèvement, cette option passera automatiquement à prélèvement récurrent en cours.\n\n"
               u"- Mettre à prélèvement récurrent en cours lorsqu'un prélèvement a déjà été effectué avec ce mandat.\n\n"))
 
+    _sql_constraints = [
+        ('unique_of_sepa_rum', 'unique(of_sepa_rum)', u'La référence unique de mandat (RUM) doit être unique')
+    ]
+
+    @api.multi
+    def action_demande_confirmation_code_rum(self):
+        """Action appelée pour générer code RUM"""
+        self.ensure_one()
+
+        if self.of_sepa_rum:
+            return {
+                'type': 'ir.actions.act_window',
+                'res_model': 'of.generer.code.rum.wizard',
+                'view_mode': 'form',
+                'view_type': 'form',
+                'target': 'new',
+                'context': {
+                    'default_partner_bank_id': self.id,
+                },
+            }
+        else:
+            self.generer_code_rum()
+
+        return True
+
+    @api.multi
+    def generer_code_rum(self):
+        """Action de génération code RUM"""
+        self.ensure_one()
+        self.of_sepa_rum = self.env['ir.sequence'].next_by_code('of.sepa.rum.seq')
+        self.of_sepa_type_prev = 'FRST'
+
+        return True
+
+    def verification_validite(self):
+        """Action de vérification des 3 critères de validité"""
+        self.ensure_one()
+
+        # Un compte bancaire de type IBAN
+        iban = self.acc_type == 'iban'
+
+        # Une séquence RUM unique est définie
+        rum_unique = not self.with_context(active_test=False) \
+            .search_count([('of_sepa_rum', '=', self.of_sepa_rum), ('id', '!=', self.id)])
+
+        # Une date de SEPA est définie et est antérieure ou égale à la date du contrôle
+        date_valide = self.of_sepa_date_mandat and self.of_sepa_date_mandat <= fields.Date.today()
+
+        if iban and rum_unique and date_valide:
+            return True
+        return False
+
 
 class ResCompany(models.Model):
     _inherit = "res.company"
@@ -62,6 +114,29 @@ class ResPartner(models.Model):
     _inherit = "res.partner"
 
     company_registry = fields.Char(u'Registre de la société', size=64)
+
+
+class AccountInvoice(models.Model):
+    _inherit = "account.invoice"
+
+    of_validite_sepa = fields.Selection(
+        [("non_verifie", u"Non vérifiée"), ("non_valide", u"Non valide"), ("valide", u"Valide")],
+        string=u"Validité du SEPA", readonly=True, required=True, default="non_verifie")
+    of_date_verification_sepa = fields.Date(u'Date de vérification', readonly=True)
+
+    @api.multi
+    def verification_validite_sepa(self):
+        """Action appelée pour vérifier la validité du SEPA"""
+        for invoice in self:
+            # On check également le commercial_partner_id car les comptes bancaires
+            # peuvent être définis chez ce partenaire
+            if any(bank.verification_validite() for bank in invoice.partner_id.bank_ids) \
+                    or any(bank.verification_validite() for bank in invoice.partner_id.commercial_partner_id.bank_ids):
+                invoice.of_validite_sepa = 'valide'
+            else:
+                invoice.of_validite_sepa = 'non_valide'
+            invoice.of_date_verification_sepa = fields.Date.today()
+        return True
 
 
 class OfPaiementEdi(models.Model):
