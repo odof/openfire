@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_sepa_rum_seq" model="ir.sequence">
+        <field name="name">Séquence RUM (SEPA)</field>
+        <field name="code">of.sepa.rum.seq</field>
+        <field name="prefix">RUM</field>
+        <field name="padding" eval="7"/>
+    </record>
+
+</odoo>

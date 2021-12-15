@@ -1,5 +1,50 @@
 <odoo>
 
+    <!-- ##################### -->
+    <!-- ###### Facture ###### -->
+    <!-- ##################### -->
+
+    <record id="of_mode_paiement_invoice_form" model="ir.ui.view">
+        <field name="name">of.mode.paiement.invoice.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='other_info']//field[@name='account_id']" position="after">
+                <field name="of_validite_sepa"/>
+                <field name="of_date_verification_sepa"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_mode_paiement_view_account_invoice_filter" model="ir.ui.view">
+        <field name="name">of.mode.paiement.view.account.invoice.filter</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search/separator[last()]" position="after">
+                <filter name="non_verifie" string="Non vérifié" domain="[('of_validite_sepa','=','non_verifie')]"/>
+                <filter name="non_valide" string="Non valide" domain="[('of_validite_sepa','=','non_valide')]"/>
+                <filter name="valide" string="Valide" domain="[('of_validite_sepa','=','valide')]"/>
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_of_verification_validite_sepa" model="ir.actions.server">
+        <field name="name">Vérifier la validité du SEPA</field>
+        <field name="model_id" ref="account.model_account_invoice"/>
+        <field name="state">code</field>
+        <field name="code">records.verification_validite_sepa()</field>
+    </record>
+
+    <record id="action_of_verification_validite_sepa_value" model="ir.values">
+        <field name="model">account.invoice</field>
+        <field name="key" >action</field>
+        <field name="key2">client_action_multi</field>
+        <field name="name">Vérifier la validité du SEPA value</field>
+        <field name="value" eval="'ir.actions.server,%d'%action_of_verification_validite_sepa"/>
+    </record>
+
     <!-- ############################### -->
     <!-- ###### Modes de paiement ###### -->
     <!-- ############################### -->
@@ -31,6 +76,7 @@
                 <group name="of_sepa" col="4">
                     <separator string="Mandat SEPA" colspan="4"/>
                     <field name="of_sepa_rum"/>
+                    <button colspan="2" name="action_demande_confirmation_code_rum" string="Générer code RUM" type="object" icon="fa-file-text"/>
                     <field name="of_sepa_date_mandat"/>
                     <field name="of_sepa_type_prev"/>
                 </group>
@@ -167,19 +213,19 @@
     </record>
 
     <menuitem action="of_action_paiement_edi" id="of_menu_paiement_edi"
-        parent="account.menu_finance_receivables" sequence="50" groups="account.group_account_manager,account.group_account_user"/>
+              parent="account.menu_finance_receivables" sequence="50" groups="account.group_account_manager,account.group_account_user"/>
 
     <!-- Ajout action prélèvements SEPA, LCR par EDI dans vue formulaire factures -->
     <act_window
-        id="action_of_paiement_edi_form"
-        name="Prélèvements SEPA, LCR par EDI"
-        res_model="of.paiement.edi"
-        src_model="account.invoice"
-        multi="True"
-        view_mode="form"
-        view_type="form"
-        view_id="of_paiement_edi_form"
-        target="current"
-        groups="account.group_account_manager,account.group_account_user" />
+            id="action_of_paiement_edi_form"
+            name="Prélèvements SEPA, LCR par EDI"
+            res_model="of.paiement.edi"
+            src_model="account.invoice"
+            multi="True"
+            view_mode="form"
+            view_type="form"
+            view_id="of_paiement_edi_form"
+            target="current"
+            groups="account.group_account_manager,account.group_account_user" />
 
 </odoo>
