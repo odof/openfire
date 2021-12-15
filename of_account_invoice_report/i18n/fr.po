@@ -1,6 +1,7 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 #	* of_account_invoice_report
+#	* account
 #
 msgid ""
 msgstr ""
@@ -248,3 +249,7 @@ msgstr "Total"
 msgid "account.config.settings"
 msgstr "account.config.settings"
 
+#: model:ir.ui.view,arch_db:account.report_invoice_document
+#, python-format
+msgid "Tax"
+msgstr "TVA"
