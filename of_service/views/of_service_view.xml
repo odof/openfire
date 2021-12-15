@@ -580,6 +580,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='order_id']" position="after">
                 <field name="service_id"/>
+                <field name="type_id"/>
             </xpath>
         </field>
     </record>

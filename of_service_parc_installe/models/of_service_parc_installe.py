@@ -22,6 +22,11 @@ class OfService(models.Model):
 
     of_categorie_id = fields.Many2one('of.project.issue.categorie', string=u"Catégorie", ondelete='restrict')
     of_canal_id = fields.Many2one('of.project.issue.canal', string=u"Canal", ondelete='restrict')
+    payer_mode = fields.Selection([
+        ('client', u"Client"),
+        ('retailer', u"Revendeur"),
+        ('manufacturer', u"Fabricant"),
+    ], string=u"Payeur")
 
     @api.depends('parc_installe_id.intervention_ids', 'address_id.intervention_address_ids',
                  'partner_id.intervention_address_ids')

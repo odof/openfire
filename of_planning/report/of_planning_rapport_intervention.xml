@@ -28,7 +28,7 @@
             <t t-foreach="documents" t-as="vals">
                 <t t-set="o" t-value="vals[0]"/>
                 <t t-set="order" t-value="vals[1]"/>
-                <t t-set="template" t-value="o.template_id or o.env.ref('of_planning.of_planning_default_intervention_template', raise_if_not_found=False) or o.template_id"/>
+                <t t-set="template" t-value="o.template_id or o.env.ref('of_planning.of_planning_default_intervention_template', raise_if_not_found=False) or o.template_id" name="get_template"/>
                 <t t-set="o" t-value="o.with_context(of_report_name=template.ri_title)"/>
                 <t t-call="report.external_layout">
                     <div class="page">
@@ -122,6 +122,14 @@
                                                     <t t-foreach="o.employee_ids" t-as="employee">
                                                         <span t-raw="employee_value.name"/>&amp;nbsp;
                                                     </t>
+                                                </div>
+                                            </div>
+                                            <div t-if="template.ri_rdv_type and o.type_id and o.type_id.name" name="ri_rdv_type">
+                                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                                <t t-set="previous_separator" t-value="True"/>
+                                                <div class="h5" style="padding: 0px 16px;">
+                                                    <span>Type&amp;nbsp;de&amp;nbsp;RDV:</span>
+                                                    <span t-field="o.type_id.name"/>
                                                 </div>
                                             </div>
                                             <div t-if="template.ri_rdv_company_id and o.company_id and o.company_id.name" name="ri_rdv_company_id">
@@ -436,7 +444,8 @@
                             </div>
 
                             <!-- Livraisons -->
-                            <div t-if="template.ri_pickings and o.picking_id and o.picking_id.pack_operation_product_ids" name="ri_pickings">
+                            <t t-set="pickings_layouted" t-value="o.pickings_layouted()"/>
+                            <div t-if="template.ri_pickings and pickings_layouted" name="ri_pickings">
                                 <div class="row h4 mb4" name="title_pickings">
                                     <div class="col-xs-12">
                                         <strong>Livraisons</strong>
@@ -452,20 +461,29 @@
                                             </tr>
                                         </thead>
                                         <tbody class="sale_tbody">
-                                            <t t-foreach="o.picking_id.pack_operation_product_ids" t-as="line">
-                                                <tr>
-                                                    <td>
-                                                        <span t-field="line.move_name"/>
-                                                    </td>
-                                                    <td class="text-right">
-                                                        <span t-field="line.product_qty"/>
-                                                        <span t-field="line.product_uom_id.name" groups="product.group_uom"/>
-                                                    </td>
-                                                    <td class="text-right">
-                                                        <span t-field="line.qty_done"/>
-                                                        <span t-field="line.product_uom_id.name" groups="product.group_uom"/>
-                                                    </td>
-                                                </tr>
+                                            <t t-foreach="pickings_layouted" t-as="picking_layouted">
+                                                <t>
+                                                    <tr class="active">
+                                                        <td colspan="3" style="background-color: #cfcfcf; font-weight:  bold; border-bottom: 1px solid black;">
+                                                            <t t-esc="picking_layouted['name']"/>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <t t-foreach="picking_layouted['lines']" t-as="line">
+                                                    <tr>
+                                                        <td>
+                                                            <span t-field="line.move_name"/>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <span t-field="line.product_qty"/>
+                                                            <span t-field="line.product_uom_id.name" groups="product.group_uom"/>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <span t-field="line.qty_done"/>
+                                                            <span t-field="line.product_uom_id.name" groups="product.group_uom"/>
+                                                        </td>
+                                                    </tr>
+                                                </t>
                                             </t>
                                         </tbody>
                                     </table>

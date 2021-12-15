@@ -1817,6 +1817,19 @@ class OfPlanningIntervention(models.Model):
             action['views'] = views
         return action
 
+    @api.multi
+    def pickings_layouted(self):
+        pickings_layouted = []
+        pickings = self.mapped('picking_id') + self.mapped('picking_ids')
+        for picking in pickings:
+            if picking.pack_operation_product_ids:
+                pickings_layouted.append({
+                    'name' : picking.name,
+                    'lines': picking.pack_operation_product_ids,
+                    })
+        return pickings_layouted
+
+
 
 class OfPlanningInterventionLine(models.Model):
     _name = "of.planning.intervention.line"

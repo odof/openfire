@@ -108,6 +108,7 @@ class OfPlanningInterventionTemplate(models.Model):
     fi_rdv_lib = fields.Boolean(string=u"Libellé")
     fi_rdv_address = fields.Boolean(string="Adresse")  # Bloc adresse
     fi_rdv_contact = fields.Boolean(string="Contact")  # Bloc contact
+    fi_rdv_type = fields.Boolean(string="Type de RDV")
     fi_rdv_description = fields.Boolean(string="Description")
 
     # Historique
@@ -164,6 +165,7 @@ class OfPlanningInterventionTemplate(models.Model):
     ri_rdv_lib = fields.Boolean(string=u"Libellé")
     ri_rdv_address = fields.Boolean(string="Adresse")  # Bloc adresse
     ri_rdv_contact = fields.Boolean(string="Contact")  # Bloc contact
+    ri_rdv_type = fields.Boolean(string="Type de RDV")
     ri_rdv_description = fields.Boolean(string="Description")
 
     # Historique
