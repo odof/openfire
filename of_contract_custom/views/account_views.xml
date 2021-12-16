@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="of_contract_invoice_form" model="ir.ui.view">
+        <field name="name">of.contract.invoice.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='other_info']//field[@name='origin']" position="after">
+                <field name="of_contract_id" invisible="1" readonly="1"/>
+                <field name="of_compute_contract_id" attrs="{'readonly': [('of_contract_id','!=',False)]}" domain="[('partner_id', 'child_of', partner_id)]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

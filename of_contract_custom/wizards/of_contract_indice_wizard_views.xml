@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_contract_indice_view_form" model="ir.ui.view">
+        <field name="name">Appliquer des indices</field>
+        <field name="model">of.contract.indice.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Appliquer des indices">
+                <group>
+                    <field name="contract_ids" widget="many2many_tags"/>
+                    <field name="indice_ids" widget="many2many_tags" attrs="{'invisible': [('rollback','=',True)]}"/>
+                    <field name="date_execution" attrs="{'invisible': [('rollback','=',True)]}"/>
+                    <field name="purchase"/>
+                    <field name="rollback"/>
+                </group>
+                <group>
+                    <div class="oe_grey" colspan="4">
+                        Les lignes d'articles non affichés n'utilisent pas les indices.
+                    </div>
+                    <field name="line_ids" nolabel="1">
+                        <tree>
+                            <field name="product_line_id" invisible="1"/>
+                            <field name="contract_line_id"/>
+                            <field name="product_id"/>
+                            <field name="current_price"/>
+                            <field name="new_price"/>
+                            <field name="current_purchase_price" invisible="1"/>
+                            <field name="new_purchase_price" invisible="1"/>
+                        </tree>
+                    </field>
+                </group>
+                <group>
+                    <div class="oe_grey" colspan="4">
+                        Appliquer les indices sélectionnés va mettre à jour le prix unitaire des articles en fonction des indices sélectionnés.
+                        ATTENTION : le prix unitaire ne sera pas mis à jour si la catégorie d'article n'est liée à aucun des indices sélectionnés.
+                        Si le contrat/ligne de contrat n'utilise pas les indices, le prix unitaire des articles ne sera également pas mis à jour.
+                     </div>
+                </group>
+                <footer>
+                    <button string="Appliquer les indices" name="button_apply" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window id="action_index_contract"
+            key2="client_action_multi"
+            name="Appliquer les indices"
+            res_model="of.contract.indice.wizard"
+            src_model="of.contract"
+            view_mode="form"
+            view_type="form"
+            view_id="of_contract_indice_view_form"
+            target="new"/>
+
+</odoo>
