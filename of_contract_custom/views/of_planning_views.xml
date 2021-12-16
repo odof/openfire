@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- ******************************************************************************************* -->
+<!-- *********************************** RDVS INTERVENTIONS ************************************ -->
+<!-- ******************************************************************************************* -->
+
+    <record id="of_contract_planning_intervention_view_search" model="ir.ui.view" >
+        <field name="name">of.contract.planning.intervention.search</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_id']" position="after">
+                <field name="contract_line_id" />
+            </xpath>
+        </field>
+    </record>
+
+
+<!--##############################################______Vue form______###############################################-->
+
+    <record id="of_contract_custom_planning_intervention_view_form" model="ir.ui.view">
+        <field name="name">of.contract.custom.planning.intervention.form</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="priority">1</field>
+        <field name="inherit_id" ref="of_service.of_planning_intervention_view_form_service"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='address_id']" position="after">
+                <field name="partner_code_magasin"/>
+            </xpath>
+            <xpath expr="//field[@name='picking_id']" position="after">
+                <field name="contract_id"/>
+                <field name="contract_line_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_planning.action_of_planning_intervention_calendar" model="ir.actions.act_window">
+        <field name="context">
+            {'search_default_state_confirm':1,
+            'search_default_state_done':1,
+            'search_default_state_draft':1,
+            'search_default_state_unfinished':1}
+        </field>
+    </record>
+
+</odoo>
