@@ -8,7 +8,7 @@
     'summary': u"Module de lien entre demandes d'intervention et mode de paiement",
     "description": u"""
 OpenFire / Demande d'intervention - Modes de paiement
-==================================
+=====================================================
 
 Module de lien entre les modules of_service et of_mode_paiement
 
@@ -20,7 +20,11 @@ Module de lien entre les modules of_service et of_mode_paiement
     ],
     "category": "OpenFire",
     "data": [
+        'security/ir.model.access.csv',
+        'security/of_service_mode_paiement_security.xml',
         'views/of_service_views.xml',
+        'views/of_paiement_edi_views.xml',
+        'views/of_intervention_settings_views.xml',
     ],
     'installable': True,
     'application': False,

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_service_mode_paiement_view_of_intervention_settings" model="ir.ui.view">
+        <field name="name">of.service.mode.paiement.view.of.intervention.settings</field>
+        <field name="model">of.intervention.settings</field>
+        <field name="inherit_id" ref="of_planning.view_of_intervention_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='intervention']" position="inside">
+                <label for="group_of_intervention_sepa"/>
+                <div>
+                    <field name="group_of_intervention_sepa"/>
+                    <span>Gérer les prélèvements SEPA depuis les Demandes d'intervention</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
