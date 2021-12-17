@@ -279,15 +279,6 @@
                                 <div style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
                                 <div class="h5" style="padding: 0px 16px;">
                                     <div>
-                                        <span>Prestataire&amp;nbsp;:</span>
-                                        <t t-if="o.supplier_id">
-                                            <strong><span t-field="o.supplier_id"/></strong>
-                                        </t>
-                                    </div>
-                                </div>
-                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
-                                <div class="h5" style="padding: 0px 16px;">
-                                    <div>
                                         <span>Employés&amp;nbsp;:</span>
                                         <t t-if="o.employee_ids">
                                             <t t-foreach="o.employee_ids" t-as="employee">
