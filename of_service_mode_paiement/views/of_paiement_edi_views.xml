@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ######################### -->
+    <!-- ###### Prélèvement ###### -->
+    <!-- ######################### -->
+
+
+    <record id="of_service_mode_paiement_of_paiement_edi_form" model="ir.ui.view">
+        <field name="name">of.service.mode.paiement.of.paiement.edi.form</field>
+        <field name="model">of.paiement.edi</field>
+        <field name="inherit_id" ref="of_mode_paiement.of_paiement_edi_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='motif']" position="after">
+                <field name="type_source"/>
+                <field name="mode_calcul"/>
+                <field name="montant_a_prelever" attrs="{'required': [('mode_calcul', '=', 'fixe')], 'invisible': [('mode_calcul', '!=', 'fixe')]}"/>
+                <field name="pourcentage_a_prelever" attrs="{'required': [('mode_calcul', '=', 'pc')], 'invisible': [('mode_calcul', '!=', 'pc')]}"/>
+                <button name="action_compute_edi_service_line_ids" colspan="2" string="Recalculer les lignes de prélèvements" type="object"/>
+
+            </xpath>
+            <xpath expr="//field[@name='edi_line_ids']" position="attributes">
+                <attribute name="attrs">{'readonly':[('aff_bouton_genere_fich','=',False)], 'invisible': [('type_source', '!=', 'account.invoice')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='edi_line_ids']" position="after">
+                <field name="edi_service_line_ids" attrs="{'invisible': [('type_source', '!=', 'of.service')]}" style="max-height: 300px; overflow: auto;">
+                    <tree string="Demandes d'intervention à payer" editable="top">
+                        <field name="montant_prelevement" invisible="1"/>
+                        <field name="service_id"/>
+                        <field name="partner" readonly="1"/>
+                        <field name="total_ttc" readonly="1"/>
+                        <field name="methode_calcul_montant"/>
+                        <field name="montant_prelevement" attrs="{'readonly':[('methode_calcul_montant','!=','fixe')]}"/>
+                        <field name="pc_prelevement" attrs="{'readonly':[('methode_calcul_montant','!=','pc')]}"/>
+                    </tree>
+                </field>
+            </xpath>
+            <xpath expr="//button[@name='action_enregistre_paiements']/.." position="attributes">
+                <attribute name="attrs">{'invisible':[('type_source', '!=', 'account.invoice')]}</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_enregistre_paiements']/.." position="after">
+                <group col="3" attrs="{'invisible':[('type_source', '!=', 'of.service')]}">
+                    <button name="action_paiement_lcr_service" string="Générer fichier LCR" type="object" icon="fa-file-text" attrs="{'invisible':[('aff_bouton_genere_fich','=',False)]}"/>
+                    <button name="action_paiement_sepa_prev_service" string="Générer fichier prélèvement SEPA" type="object" icon="fa-file-text" attrs="{'invisible':[('aff_bouton_genere_fich','=',False)]}"/>
+                    <button name="action_enregistre_paiements_service" string="Valider le paiement des DI" type="object" icon="fa-arrow-right" attrs="{'invisible':[('aff_bouton_paiement','=',False)]}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

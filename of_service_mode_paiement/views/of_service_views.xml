@@ -11,9 +11,36 @@
         <field name="model">of.service</field>
         <field name="inherit_id" ref="of_service.view_of_service_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//page[@name='facturation']//field[@name='fiscal_position_id']" position="after">
-                <field name="of_validite_sepa"/>
-                <field name="of_date_verification_sepa"/>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_paiements"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-usd">
+                    <field name="paiements_count" widget="statinfo" string="Paiements"/>
+                </button>
+                <button name="action_view_prelevements"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-credit-card">
+                    <field name="prelevements_count" widget="statinfo" string="Prélèvements"/>
+                </button>
+            </xpath>
+            <xpath expr="//notebook/page[last()]" position="after">
+                <page name="paiement" string="Paiement" groups="of_service_mode_paiement.group_of_intervention_sepa">
+                    <group>
+                        <group>
+                            <field name="validite_sepa"/>
+                            <field name="date_verification_sepa"/>
+                            <field name="paiements_non_lettres_count"/>
+                            <field name="payment_term_id"/>
+                        </group>
+                        <group>
+                            <field name="montant_dernier_prelevement"/>
+                            <field name="date_dernier_prelevement"/>
+                            <field name="date_previsionnelle_prochaine_facture"/>
+                        </group>
+                    </group>
+                </page>
             </xpath>
         </field>
     </record>
@@ -24,9 +51,9 @@
         <field name="inherit_id" ref="of_service.view_of_service_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//search/separator[last()]" position="after">
-                <filter name="non_verifie" string="Non vérifié" domain="[('of_validite_sepa','=','non_verifie')]"/>
-                <filter name="non_valide" string="Non valide" domain="[('of_validite_sepa','=','non_valide')]"/>
-                <filter name="valide" string="Valide" domain="[('of_validite_sepa','=','valide')]"/>
+                <filter name="non_verifie" string="Non vérifié" domain="[('validite_sepa','=','non_verifie')]"/>
+                <filter name="non_valide" string="Non valide" domain="[('validite_sepa','=','non_valide')]"/>
+                <filter name="valide" string="Valide" domain="[('validite_sepa','=','valide')]"/>
                 <separator/>
             </xpath>
         </field>
@@ -46,5 +73,18 @@
         <field name="name">Vérifier la validité du SEPA value</field>
         <field name="value" eval="'ir.actions.server,%d'%action_of_service_verification_validite_sepa"/>
     </record>
+
+    <!-- Ajout action prélèvements SEPA, LCR par EDI dans vue formulaire DI -->
+    <act_window
+            id="action_of_paiement_edi_service_form"
+            name="Prélèvements SEPA, LCR par EDI"
+            res_model="of.paiement.edi"
+            src_model="of.service"
+            multi="True"
+            view_mode="form"
+            view_type="form"
+            view_id="of_mode_paiement.of_paiement_edi_form"
+            target="current"
+            groups="of_service_mode_paiement.group_of_intervention_sepa" />
 
 </odoo>
