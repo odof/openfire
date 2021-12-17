@@ -20,6 +20,7 @@ Module de lien entre les modules of_service et of_mode_paiement
     ],
     "category": "OpenFire",
     "data": [
+        'security/ir.model.access.csv',
         'security/of_service_mode_paiement_security.xml',
         'views/of_service_views.xml',
         'views/of_paiement_edi_views.xml',

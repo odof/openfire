@@ -147,18 +147,15 @@ class OfPaiementEdi(models.Model):
     @api.model
     def _default_edi_line_ids(self):
         """Peuple la liste des factures avec celles sélectionnées, ouvertes et qui n'ont pas déjà été envoyées à l'affacturage"""
-        active_model = self.env.context.get('active_model', 'account.invoice')
-        active_ids = self.env.context['active_ids']
-        domain = [('id', 'in', active_ids)]
 
         facture_vals = [(5, )]  # On efface les lignes existantes
-        facture_ids = self.get_facture_ids_by_active_model(active_model, domain)
-
-        for facture in facture_ids:
+        for facture in self.env['account.invoice'].search([('id', 'in', self._context.get('active_ids', [])),
+                                                           ('state', '=', 'open'),
+                                                           ('type', 'in', ('out_invoice', 'in_refund'))]):
             values = {
                 'invoice_id': facture.id,
                 'montant_prelevement': facture.residual,
-                'pc_prelevement': (facture.residual * 100.) / facture.amount_total,
+                'pc_prelevement': (facture.residual * 100.) / facture.amount_total if facture.amount_total else 0,
                 'date_facture': facture.date_invoice,
                 'partner': facture.partner_id.name,
                 'total_ttc': facture.amount_total,
@@ -166,15 +163,7 @@ class OfPaiementEdi(models.Model):
                 'methode_calcul_montant': 'balance'
             }
             facture_vals.append((0, 0, values))
-
         return facture_vals
-
-    def get_facture_ids_by_active_model(self, active_model, domain):
-        facture_ids = self.env['account.invoice']
-        if active_model == 'account.invoice':
-            domain += [('state', '=', 'open'), ('type', 'in', ('out_invoice', 'in_refund'))]
-            facture_ids = self.env[active_model].search(domain)
-        return facture_ids
 
     @api.onchange('edi_line_ids')
     def onchange_edi_line_ids(self):
@@ -232,7 +221,7 @@ class OfPaiementEdi(models.Model):
 
         self.ensure_one()
 
-        # Teste si au moins une facturé sélectionnée
+        # Teste si au moins une facture sélectionnée
         if not self.edi_line_ids:
             raise UserError(u"Erreur ! (#ED105)\n\nVous devez sélectionner au moins une facture.")
 
@@ -759,7 +748,7 @@ class OfPaiementEdi(models.Model):
                         <Nm>""" + self.chaine2ascii_taillemax(self.mode_paiement_id.company_id.name, 70) + """</Nm>
                     </InitgPty>
                 </GrpHdr>\n"""
-        index = index + 1
+
         # On met l'en-tête de début et les balises de fin
         chaine = chaine_entete + chaine_lot + """
             </CstmrDrctDbtInitn>
@@ -956,7 +945,8 @@ class OfPaiementEdiLine(models.Model):
                 pc = 100
             elif pc < 0:
                 pc = 0
-            montant = self.total_ttc * (pc/100.)
+            # On ne veut pas plus de 2 chiffres après la virgule
+            montant = round(self.total_ttc * (pc/100.), 2)
         else:  # (methode_calcul_montant == 'fixe' normalement)
             montant = self.montant_prelevement
 
@@ -1001,6 +991,8 @@ class OfPaiementEdiLine(models.Model):
                 # Si c'est montant fixe, pas besoin d'initialiser, le champ n'est pas en lecture seule et est transmis.
                 continue
 
-            if facture.montant_prelevement != montant_prelevement:
+            # On utilise round() pour arrondir les montants qui peuvent être calculés avec des pourcentages
+            # et donc donner pleins de chiffres avec la virgule. Ce qui entraine une récursion infinie.
+            if round(facture.montant_prelevement, 2) != round(montant_prelevement, 2):
                 facture.montant_prelevement = montant_prelevement
         return res
