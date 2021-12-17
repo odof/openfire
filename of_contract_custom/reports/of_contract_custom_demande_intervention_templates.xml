@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Ajout des informations du prestataire dans le rapport demande d'intervention -->
+    <template id="of_contract_custom_demande_intervention_report_template" inherit_id="of_service.of_demande_intervention_report_template">
+        <xpath expr="//div[@name='interv_info_left']/div[2]" position="after">
+            <div class="h5" style="padding: 0px 16px;">
+                <div>
+                    <span>Prestataire&amp;nbsp;:</span>
+                    <t t-if="o.supplier_id">
+                        <strong><span t-field="o.supplier_id"/></strong>
+                    </t>
+                </div>
+            </div>
+            <div style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+        </xpath>
+    </template>
+
+</odoo>
