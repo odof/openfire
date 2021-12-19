@@ -297,7 +297,7 @@ class OFCompanyDeletionWizard(models.TransientModel):
 
             self.env.cr.commit()
 
-        # Interventions à programmer
+        # Demandes d'intervention
         if 'of.service' in self.env:
             _logger.info(u"Company Deletion - Companies %s - Ponctual Services - START" % company_ids)
             self.env['of.service'].with_context(active_test=False).search(

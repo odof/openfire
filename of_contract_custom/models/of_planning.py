@@ -30,7 +30,7 @@ class OfPlanningPlannification(models.AbstractModel):
 
     @api.multi
     def _generate_services(self):
-        """Fonction à implémenter pour générer les interventions à programmer"""
+        """Fonction à implémenter pour générer les demandes d'intervention"""
         raise NotImplementedError("A class inheriting from this one must implement '_generate_services' function")
 
     @api.depends('interv_frequency_nbr', 'interv_frequency', 'mois_reference_ids')

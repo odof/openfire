@@ -296,7 +296,7 @@
                                 <i class="of_map_record_main fa fa-repeat"/>Service récurrent<br/>
                             </t>
                             <t t-else="">
-                                Intervention à programmer<br/>
+                                Demande d'intervention<br/>
                             </t>
                             Précision:
                             <t t-if='["manual","high","medium","low"].includes(record.precision.raw_value)'>
@@ -621,9 +621,9 @@
     <!--##################################################______sale.order______##################################################-->
     <!--##########################################################################################################################-->
 
-    <!-- Action pour afficher liste d'interventions à programmer -->
+    <!-- Action pour afficher la liste des demandes d'intervention -->
     <record id="of_sale_order_open_a_programmer" model="ir.actions.act_window">
-        <field name="name">Interventions à programmer</field>
+        <field name="name">Demandes d'intervention</field>
         <field name="res_model">of.service</field>
         <field name="domain">[]</field> <!-- Force empty -->
         <field name="view_type">form</field>

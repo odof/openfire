@@ -14,7 +14,7 @@ class ProjectIssue(models.Model):
 
     @api.multi
     def _compute_of_a_programmer_count(self):
-        """Smart button vue SAV : renvoi le nombre d'interventions à programmer liées à la machine installée"""
+        """Smart button vue SAV : renvoi le nombre de demandes d'intervention liées à la machine installée"""
         service_obj = self.env['of.service']
         for sav in self:
             sav.of_a_programmer_count = len(service_obj.search([('sav_id', '=', sav.id), ('recurrence', '=', False)]))

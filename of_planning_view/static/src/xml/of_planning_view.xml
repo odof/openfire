@@ -417,7 +417,7 @@
                    class="of_planning_creneau_action"
                    action_id="of_planning_view.action_view_of_planif_wizard"
                 >
-                    <i class="fa fa-lg fa-search" title="Rechercher une intervention à programmer"/>
+                    <i class="fa fa-lg fa-search" title="Rechercher une demande d'intervention"/>
                 </a>
                 |
             </t>

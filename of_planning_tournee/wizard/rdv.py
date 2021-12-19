@@ -41,7 +41,7 @@ class OfTourneeRdv(models.TransientModel):
     @api.model
     def default_get(self, fields=None):
         res = super(OfTourneeRdv, self).default_get(fields)
-        # Suivant que la prise de rdv se fait depuis la fiche client ou une intervention à programmer
+        # Suivant que la prise de rdv se fait depuis la fiche client ou une demande d'intervention
         service_obj = self.env['of.service']
         partner_obj = self.env['res.partner']
         active_model = self._context.get('active_model', '')
@@ -118,7 +118,7 @@ class OfTourneeRdv(models.TransientModel):
     partner_address_zip = fields.Char(related="partner_address_id.zip", readonly=True)
     partner_address_country_id = fields.Many2one(related="partner_address_id.country_id", readonly=True)
     company_id = fields.Many2one('res.company', string='Magasin', required=True, default=lambda s: s._default_company())
-    service_id = fields.Many2one('of.service', string=u"À programmer", domain="[('partner_id', '=', partner_id)]")
+    service_id = fields.Many2one('of.service', string=u"Demande d'intervention", domain="[('partner_id', '=', partner_id)]")
     tache_id = fields.Many2one('of.planning.tache', string=u"Tâche", required=True)
     creer_recurrence = fields.Boolean(
         string=u"Créer récurrence?",

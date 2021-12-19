@@ -62,9 +62,9 @@
                           (0,0,{'view_mode':'form', 'view_id': ref('view_of_service_parc_installe_service_form')})]"/>
     </record>
 
-    <!-- Action pour ouvrir les interventions à programmer depuis parc installé -->
+    <!-- Action pour ouvrir les demandes d'intervention depuis parc installé -->
     <record id="of_service_parc_installe_open_a_programmer" model="ir.actions.act_window">
-        <field name="name">Interventions à programmer</field>
+        <field name="name">Demandes d'intervention</field>
         <field name="res_model">of.service</field>
         <field name="domain">[]</field>
         <field name="view_mode">tree,form</field>

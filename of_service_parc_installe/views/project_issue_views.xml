@@ -10,7 +10,7 @@
             <xpath expr="//header" position="inside">
                 <button name="action_prevoir_intervention" string="Demande d'intervention" type="object"/>
             </xpath>
-            <!-- smart button 'à programmer' -->
+            <!-- smart button 'Demandes d'intervention' -->
             <xpath expr="//div[@class='oe_button_box']" position="inside">
                 <button class="oe_stat_button" name="action_view_a_programmer" type="object" icon="fa-calendar-o">
                     <div class="o_form_field o_stat_info">

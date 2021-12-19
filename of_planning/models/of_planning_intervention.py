@@ -188,7 +188,7 @@ class OfPlanningTacheCateg(models.Model):
         ], string=u"Granularité de planif",
         help=u"""
 La granularité permet de définir la période de planification de référence par type de tâche.\n
-Cette granularité permet, à la saisie d'une intervention à programmer,
+Cette granularité permet, à la saisie d'une demande d'intervention,
 de calculer la date de fin une fois la date de début saisie. par défaut :\n
   * Pour une pose la granularité de planification est la quinzaine\n
   * Pour un SAV (quand le champ SAV est rempli), la granularité de planification est la semaine\n
