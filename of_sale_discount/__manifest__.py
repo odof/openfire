@@ -12,7 +12,9 @@ La formule accepte l'operation "+", interprétée comme un cumul de remises succ
     "depends" : ["sale"],
     "category" : "OpenFire",
     "data" : [
+        'security/res_groups.xml',
         'views/of_sale_discount_view.xml',
+        'views/account_config_settings_view.xml',
         'report/of_sale_discount_report.xml',
     ],
     'installable': True,
