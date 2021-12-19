@@ -903,8 +903,8 @@ class OfImport(models.Model):
                 valeurs.update(brand.compute_product_price(
                     valeurs['of_seller_pp_ht'],
                     supplier_categ,
-                    uom_obj.browse(valeurs['uom_id']),
-                    uom_obj.browse(valeurs['uom_po_id']),
+                    uom_obj.browse(valeurs.get('uom_id') or res_objet.uom_id.id),
+                    uom_obj.browse(valeurs.get('uom_po_id') or res_objet.uom_po_id.id),
                     product=res_objet,
                     price=valeurs.get('of_seller_price'),
                     remise=valeurs.get('of_seller_remise'),
@@ -973,7 +973,8 @@ class OfImport(models.Model):
         # PARCOURS DE TOUS LES CHAMPS DE L'ENREGISTREMENT
 
         # Champs à importer (pour envoi à fonction create ou write)
-        valeurs = self._pre_calcule_ligne(champs_fichier, ligne, model_data)
+        valeurs = {}
+        defaults = self._pre_calcule_ligne(champs_fichier, ligne, model_data)
 
         # Parcours de tous les champs de la ligne
         for champ_fichier in champs_fichier:
@@ -1315,8 +1316,9 @@ class OfImport(models.Model):
                     # Pour un article, la clef est le champ primaire ET la marque.
                     # Un article sans marque (créé avant l'installation du module of_product_brand)
                     # est également valide.
-                    if valeurs.get('brand_id'):
-                        domain += ['|', ('brand_id', '=', False), ('brand_id', '=', valeurs['brand_id'])]
+                    brand_id = valeurs.get('brand_id') or defaults.get('brand_id')
+                    if brand_id:
+                        domain += ['|', ('brand_id', '=', False), ('brand_id', '=', brand_id)]
                     else:
                         domain += [('brand_id', '=', False)]
                 res_objet = model_obj.with_context(active_test=False).search(domain)
@@ -1333,7 +1335,7 @@ class OfImport(models.Model):
 
                 if model == 'product.template' and len(res_objet) > 1:
                     # Plusieurs articles trouvés, recherche sur la marque
-                    res_objet = res_objet.filtered(lambda o: o.brand_id.id == valeurs.get('brand_id')) or res_objet
+                    res_objet = res_objet.filtered('brand_id') or res_objet
 
                 if len(res_objet) > 1:
                     # Il existe plusieurs articles dans la base avec cette référence.
@@ -1346,6 +1348,11 @@ class OfImport(models.Model):
                     # Evite notamment des erreurs pour la simulation d'import d'articles,
                     # car l'objet contient des paramètres d'import
                     res_objet = res_objet[0]
+
+                if not res_objet:
+                    # Il s'agit d'une création, on applique donc les valeurs par défaut.
+                    for key, val in defaults.iteritems():
+                        valeurs.setdefault(key, val)
 
         try:
             # Champs à importer (pour envoi à fonction create ou write)
