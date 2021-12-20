@@ -327,7 +327,7 @@ class OfInvoicedRevenueAnalysis(models.Model):
 
     def _sub_where_sale_order_line(self):
         sub_where_sale_order_line_str = """
-            WHERE   SOL.invoice_status          = 'to invoice'
+            WHERE   SOL.invoice_status          IN ('no', 'to invoice')
             AND     SOL.of_amount_to_invoice    != 0
             AND     SO.id                       = SOL.order_id
             AND     SO.state                    NOT IN ('closed', 'cancel')
