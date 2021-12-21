@@ -1277,49 +1277,55 @@ PlanningView.Row = Widget.extend({
 
                 if (i>=0 && i<self.column_nb) {
                     planning_record.$of_el[i] = planning_record.$el.clone(true);
-                    horaires_dict = self.segments_horaires[self.col_offset_to_segment[i]][2];  // récupérer le bon horaires_dict
-
                     planning_record["hours_cols"][i] = {};
-                    if (i == planning_record.col_offset_start) {  // first day
-                        // jour non travaillé. peut arriver pour une intervention de plusieurs jours qui commence le dimanche
-                        if ( isNullOrUndef(horaires_dict[i + 1]) || horaires_dict[i + 1].length == 0 ) {
-                            planning_record["hours_cols"][i].heure_debut = false;
-                            planning_record["hours_cols"][i].heure_fin = false;
-                            a_push = false;
-                        }else{
-                            planning_record["hours_cols"][i].heure_debut = planning_record.heure_debut;
-                            // heure de fin du dernier créneau du jour
-                            planning_record["hours_cols"][i].heure_fin = horaires_dict[i+1][horaires_dict[i+1].length-1][1]
+                    if (isNullOrUndef(self.segments_horaires[self.col_offset_to_segment[i]])) {
+                        planning_record["hours_cols"][i].heure_debut = false;
+                        planning_record["hours_cols"][i].heure_fin = false;
+                        a_push = false;
+                    }else{
+                        horaires_dict = self.segments_horaires[self.col_offset_to_segment[i]][2];  // récupérer le bon horaires_dict
 
-                        }
-                    }else if (i >= planning_record.col_offset_start && i < planning_record.col_offset_stop) {
-                        // jour non travaillé
-                        if ( isNullOrUndef(horaires_dict[i + 1]) || horaires_dict[i + 1].length == 0 ) {
-                            planning_record["hours_cols"][i].heure_debut = false;
-                            planning_record["hours_cols"][i].heure_fin = false;
-                            a_push = false;
-                        }else{
-                            // heure de début du premier créneau du jour
-                            planning_record["hours_cols"][i].heure_debut = horaires_dict[i+1][0][0]
-                            // heure de fin du dernier créneau du jour
-                            planning_record["hours_cols"][i].heure_fin = horaires_dict[i+1][horaires_dict[i+1].length-1][1]
-                        }
-                    }else if (i == planning_record.col_offset_stop) {  // last day
-                        // jour non travaillé. peut arriver pour une intervention de plusieurs jours qui termine la semaine suivante
-                        if ( isNullOrUndef(horaires_dict[i + 1]) || horaires_dict[i + 1].length == 0 ) {
-                            planning_record["hours_cols"][i].heure_debut = false;
-                            planning_record["hours_cols"][i].heure_fin = false;
-                            a_push = false;
-                        }else{
-                            // heure de début du premier créneau du jour
-                            first_hour = horaires_dict[i+1][0][0]
-                            // si l'heure de début est après l'heure de fin, ramener l'heure de début à minuit
-                            // peut arriver si les dates sont forcées et en dehors des horaires
-                            if (first_hour > planning_record.heure_fin) {
-                                first_hour = 0.0
+                        if (i == planning_record.col_offset_start) {  // first day
+                            // jour non travaillé. peut arriver pour une intervention de plusieurs jours qui commence le dimanche
+                            if ( isNullOrUndef(horaires_dict[i + 1]) || horaires_dict[i + 1].length == 0 ) {
+                                planning_record["hours_cols"][i].heure_debut = false;
+                                planning_record["hours_cols"][i].heure_fin = false;
+                                a_push = false;
+                            }else{
+                                planning_record["hours_cols"][i].heure_debut = planning_record.heure_debut;
+                                // heure de fin du dernier créneau du jour
+                                planning_record["hours_cols"][i].heure_fin = horaires_dict[i+1][horaires_dict[i+1].length-1][1]
+
                             }
-                            planning_record["hours_cols"][i].heure_debut = first_hour
-                            planning_record["hours_cols"][i].heure_fin = planning_record.heure_fin;
+                        }else if (i >= planning_record.col_offset_start && i < planning_record.col_offset_stop) {
+                            // jour non travaillé
+                            if ( isNullOrUndef(horaires_dict[i + 1]) || horaires_dict[i + 1].length == 0 ) {
+                                planning_record["hours_cols"][i].heure_debut = false;
+                                planning_record["hours_cols"][i].heure_fin = false;
+                                a_push = false;
+                            }else{
+                                // heure de début du premier créneau du jour
+                                planning_record["hours_cols"][i].heure_debut = horaires_dict[i+1][0][0]
+                                // heure de fin du dernier créneau du jour
+                                planning_record["hours_cols"][i].heure_fin = horaires_dict[i+1][horaires_dict[i+1].length-1][1]
+                            }
+                        }else if (i == planning_record.col_offset_stop) {  // last day
+                            // jour non travaillé. peut arriver pour une intervention de plusieurs jours qui termine la semaine suivante
+                            if ( isNullOrUndef(horaires_dict[i + 1]) || horaires_dict[i + 1].length == 0 ) {
+                                planning_record["hours_cols"][i].heure_debut = false;
+                                planning_record["hours_cols"][i].heure_fin = false;
+                                a_push = false;
+                            }else{
+                                // heure de début du premier créneau du jour
+                                first_hour = horaires_dict[i+1][0][0]
+                                // si l'heure de début est après l'heure de fin, ramener l'heure de début à minuit
+                                // peut arriver si les dates sont forcées et en dehors des horaires
+                                if (first_hour > planning_record.heure_fin) {
+                                    first_hour = 0.0
+                                }
+                                planning_record["hours_cols"][i].heure_debut = first_hour
+                                planning_record["hours_cols"][i].heure_fin = planning_record.heure_fin;
+                            }
                         }
                     }
                     planning_record["hours_cols"][i].heure_debut_str = formats.format_value(planning_record["hours_cols"][i].heure_debut,descript_ft);
