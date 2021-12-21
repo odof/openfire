@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 from odoo import api, models, fields, _
-from datetime import date
+from datetime import date, datetime
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import WEEKLY
@@ -155,6 +155,10 @@ class OfService(models.Model):
          ('during', u"RDV en cours"),
          ('cancel', u'Annulée')],  # manuellement décidé
         u'État', compute="_compute_state_poncrec", search="_search_state_ponc")
+    filter_this_week = fields.Boolean(string=u"Semaine en cours", compute='_compute_date_filters', store=True)
+    filter_next_week = fields.Boolean(string=u"Semaine prochaine", compute='_compute_date_filters', store=True)
+    filter_this_month = fields.Boolean(string=u"Mois en cours", compute='_compute_date_filters', store=True)
+    filter_next_month = fields.Boolean(string=u"Mois prochain", compute='_compute_date_filters', store=True)
     intervention_ids = fields.One2many('of.planning.intervention', 'service_id', string="RDVs Tech")
     intervention_count = fields.Integer(string='Nombre de RDVs', compute='_compute_intervention_count')
 
@@ -343,6 +347,45 @@ class OfService(models.Model):
         services = self.search([])
         res = safe_eval("services.filtered(lambda s: s.state_ponc %s %s)" % (operator, operand), {'services': services})
         return [('id', 'in', res.ids)]
+
+    @api.multi
+    @api.depends('date_next', 'date_fin', 'state')
+    def _compute_date_filters(self):
+        today = fields.Date.context_today(self)
+        today_da = fields.Date.from_string(today)
+        #self = self.filtered(lambda s: s.state in ('to_plan', 'part_planned'))
+        # this / next week
+        start_this_week = (today_da - timedelta(days=today_da.weekday())).strftime('%Y-%m-%d')
+        start_next_week = (today_da + timedelta(days=7 - today_da.weekday())).strftime('%Y-%m-%d')
+        end_next_week = (today_da + timedelta(days=13 - today_da.weekday())).strftime('%Y-%m-%d')
+        # this / next month
+        start_this_month = (datetime.today().replace(day=1)).strftime('%Y-%m-%d')
+        start_next_month = (today_da + relativedelta(day=1, months=1)).strftime('%Y-%m-%d')
+        end_next_month = (today_da + relativedelta(day=1, months=2)).strftime('%Y-%m-%d')  # exclusive
+        for service in self:
+            if service.state not in ('to_plan', 'part_planned'):
+                service.filter_this_week = False
+                service.filter_next_week = False
+                service.filter_this_month = False
+                service.filter_next_month = False
+            if service.date_next < start_next_week and service.date_fin >= start_this_week:
+                service.filter_this_week = True
+                service.filter_next_week = False
+            elif service.date_next <= end_next_week and service.date_fin >= start_next_week:
+                service.filter_next_week = True
+                service.filter_this_week = False
+            else:
+                service.filter_this_week = False
+                service.filter_next_week = False
+            if service.date_next < start_next_month and service.date_fin >= start_this_month:
+                service.filter_this_month = True
+                service.filter_next_month = False
+            elif service.date_next < end_next_month and service.date_fin >= start_next_month:
+                service.filter_next_month = True
+                service.filter_this_month = False
+            else:
+                service.filter_this_month = False
+                service.filter_next_month = False
 
     @api.depends('intervention_ids', 'intervention_ids.state')
     @api.multi
@@ -810,6 +853,15 @@ class OfService(models.Model):
             service.base_state = 'calculated'
         services = self.search([('base_state', '=', 'calculated')])
         services._compute_state_poncrec()
+
+    @api.model
+    def compute_date_filters_daily(self):
+        """
+        Force le recalcul des champs de filtrage semaine / mois, en cours / prochain.
+        Est lancé tous les matins, pour que le changement de date du jour soit pris en compte.
+        """
+        services = self.search([])#('state', 'in', ('to_plan', 'part_planned'))])
+        services._compute_date_filters()
 
     @api.multi
     def filter_state_poncrec_date(self, date_eval=fields.Date.today(), state_list=('to_plan', 'part_planned', 'late')):

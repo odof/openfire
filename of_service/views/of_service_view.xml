@@ -354,50 +354,10 @@
                 <separator/>
                 <filter string="Brouillon" name="filter_draft" domain="[('state', '=', 'draft')]"/>
 
-                <filter string="Semaine en cours" name="this_week"
-                        domain="['|',
-                                 '&amp;',
-                                    ('recurrence', '=', True),
-                                    ('state', '=', 'to_plan'),
-                                 '&amp;',
-                                    ('recurrence', '=', False),
-                                    ('state_ponc', 'in', ('to_plan', 'part_planned')),
-                                 ('date_fin', u'&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
-                                 ('date_next', u'&lt;', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d')),
-                                 ]"/>
-                <filter string="Semaine prochaine" name="next_week"
-                        domain="['|',
-                                 '&amp;',
-                                    ('recurrence', '=', True),
-                                    ('state', '=', 'to_plan'),
-                                 '&amp;',
-                                    ('recurrence', '=', False),
-                                    ('state_ponc', 'in', ('to_plan', 'part_planned')),
-                                 ('date_fin', u'&gt;=', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d')),
-                                 ('date_next', u'&lt;', (context_today() + datetime.timedelta(days=14-context_today().weekday())).strftime('%Y-%m-%d')),
-                                 ]"/>
-                <filter string="Mois en cours" name="this_month"
-                        domain="['|',
-                                 '&amp;',
-                                    ('recurrence', '=', True),
-                                    ('state', '=', 'to_plan'),
-                                 '&amp;',
-                                    ('recurrence', '=', False),
-                                    ('state_ponc', 'in', ('to_plan', 'part_planned')),
-                                 ('date_fin', u'&gt;=', context_today().strftime('%Y-%m-01')),
-                                 ('date_next', u'&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
-                                 ]"/>
-                <filter string="Mois prochain" name="next_month"
-                        domain="['|',
-                                 '&amp;',
-                                    ('recurrence', '=', True),
-                                    ('state', '=', 'to_plan'),
-                                 '&amp;',
-                                    ('recurrence', '=', False),
-                                    ('state_ponc', 'in', ('to_plan', 'part_planned')),
-                                 ('date_fin', u'&gt;=', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
-                                 ('date_next', u'&lt;', (context_today() + relativedelta(day=1,months=2)).strftime('%Y-%m-%d')),
-                                 ]"/>
+                <filter string="Semaine en cours" name="this_week" domain="[('filter_this_week', '=', True)]"/>
+                <filter string="Semaine prochaine" name="next_week" domain="[('filter_next_week', '=', True)]"/>
+                <filter string="Mois en cours" name="this_month" domain="[('filter_this_month', '=', True)]"/>
+                <filter string="Mois prochain" name="next_month" domain="[('filter_next_month', '=', True)]"/>
 
                 <filter string="En retard de planification" name="filter_late" domain="[('state', '=', 'late')]"/>
                 <filter string="Terminé" name="filter_done" domain="[('state', '=', 'done')]"/>
