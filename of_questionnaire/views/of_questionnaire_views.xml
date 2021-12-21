@@ -106,6 +106,8 @@
                             <field name="answer" invisible="1"/>
                             <field name="photo" attrs="{'invisible': [('answer_type', 'in', ('photo', 'drawing'))]}"/>
                             <field name="photo_required" attrs="{'invisible': [('photo', '=', False)]}"/>
+                            <field name="background_image_name" invisible="1"/>
+                            <field name="background_image" filename="background_image_name" attrs="{'invisible': [('answer_type','!=','drawing')]}"/>
                         </group>
                         <group>
                             <field name="id_code"/>
@@ -289,6 +291,8 @@
                             <field name="answer_type"/>
                             <field name="photo" attrs="{'invisible': [('answer_type', 'in', ('photo', 'drawing'))]}"/>
                             <field name="photo_required" attrs="{'invisible': [('photo', '=', False)]}"/>
+                            <field name="background_image_name" invisible="1"/>
+                            <field name="background_image" filename="background_image_name" attrs="{'invisible': [('answer_type','!=','drawing')]}"/>
                             <field name="answer_ids" widget="many2many_tags"
                                    attrs="{'invisible': [('answer_type', 'not in', ('one', 'list'))],
                                            'required': [('answer_type', 'in', ('one', 'list'))]}"/>
@@ -416,6 +420,8 @@
                             <field name="condition_code" invisible="1"/>
                             <field name="photo"/>
                             <field name="photo_required" invisible="1"/>
+                            <field name="background_image_name" invisible="1"/>
+                            <field name="background_image" invisible="1"/>
                         </tree>
                     </field>
                 </page>
