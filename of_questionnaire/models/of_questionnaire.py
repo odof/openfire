@@ -45,6 +45,8 @@ class OfQuestionnaireLine(models.Model):
         string=u"Photo requise", help=u"Indique si une photo doit obligatoirement être jointe à la réponse")
     visibility = fields.Selection(
         selection=[('always', u"Toujours"), ('condition_met', u"Si condition vérifiée")], string=u"Visibilité")
+    background_image = fields.Binary(string=u"Image de fond", attachment=True)
+    background_image_name = fields.Char(string=u"Nom de l'image de fond")
 
     @api.depends('answer_ids', 'answer_type')
     def _compute_answer(self):
@@ -59,6 +61,12 @@ class OfQuestionnaireLine(models.Model):
                 line.answer = u"Photo"
             elif line.answer_type == 'drawing':
                 line.answer = u"Dessin"
+
+    @api.onchange('answer_type')
+    def onchange_answer_type(self):
+        if self.answer_type != 'drawing':
+            self.background_image = False
+            self.background_image_name = False
 
     @api.model
     def create(self, vals):
@@ -147,6 +155,8 @@ class OfPlanningIntervention(models.Model):
             'condition_code': question.condition_code,
             'photo': question.photo,
             'photo_required': question.photo_required,
+            'background_image_name': question.background_image_name,
+            'background_image': question.background_image,
         }
 
     @api.onchange('questionnaire_id')
