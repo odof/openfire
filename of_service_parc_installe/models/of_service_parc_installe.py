@@ -28,6 +28,14 @@ class OfService(models.Model):
         ('manufacturer', u"Fabricant"),
     ], string=u"Payeur")
 
+    in_progress_datetime = fields.Datetime(string=u"Date de début de prise en charge", copy=False)
+    done_datetime = fields.Datetime(string=u"Date de fin de prise en charge", copy=False)
+    in_progress_time = fields.Float(
+        string=u"Temps de prise en compte (heures)", compute='_compute_in_progress_time', store=True,
+        group_operator="avg")
+    done_time = fields.Float(
+        string=u"Temps de gestion (heures)", compute='_compute_done_time', store=True, group_operator="avg")
+
     @api.depends('parc_installe_id.intervention_ids', 'address_id.intervention_address_ids',
                  'partner_id.intervention_address_ids')
     def _compute_historique_interv_ids(self):
@@ -36,6 +44,26 @@ class OfService(models.Model):
                 service.historique_interv_ids = service.parc_installe_id.intervention_ids
             else:
                 super(OfService, self)._compute_historique_interv_ids()
+
+    @api.depends('create_date', 'in_progress_datetime')
+    def _compute_in_progress_time(self):
+        for service in self:
+            if service.create_date and service.in_progress_datetime:
+                duration = fields.Datetime.from_string(service.in_progress_datetime) - fields.Datetime.from_string(
+                    service.create_date)
+                service.in_progress_time = duration.total_seconds() / 3600.0
+            else:
+                service.in_progress_time = 0.0
+
+    @api.depends('create_date', 'done_datetime')
+    def _compute_done_time(self):
+        for service in self:
+            if service.create_date and service.done_datetime:
+                duration = fields.Datetime.from_string(service.done_datetime) - fields.Datetime.from_string(
+                    service.create_date)
+                service.done_time = duration.total_seconds() / 3600.0
+            else:
+                service.done_time = 0.0
 
     @api.onchange('address_id')
     def _onchange_address_id(self):
@@ -89,6 +117,39 @@ class OfService(models.Model):
         context['default_parc_installe_id'] = self.parc_installe_id and self.parc_installe_id.id or False
         context['default_sav_id'] = self.sav_id and self.sav_id.id or False
         return context
+
+    @api.multi
+    def write(self, vals):
+        res = super(OfService, self).write(vals)
+        if vals.get('kanban_step_id'):
+            step = self.env['of.service.stage'].browse(vals.get('kanban_step_id'))
+            if step and step.state == 'open':
+                for service in self.filtered(lambda s: not s.in_progress_datetime):
+                    service.in_progress_datetime = fields.Datetime.now()
+            if step and step.state == 'done':
+                for service in self.filtered(lambda s: not s.done_datetime):
+                    service.done_datetime = fields.Datetime.now()
+        return res
+
+    @api.model
+    def _read_group_stage_ids(self, stages, domain, order):
+        res = super(OfService, self)._read_group_stage_ids(stages, domain, order)
+        if self._context.get('of_kanban_steps') == 'SAV':
+            sav_type = self.env.ref('of_service_parc_installe.of_service_type_sav', raise_if_not_found=False)
+            if sav_type:
+                return res.filtered(lambda s: sav_type.id in s.type_ids.ids)
+        return res
+
+
+class OFServiceStage(models.Model):
+    _inherit = 'of.service.stage'
+
+    state = fields.Selection(selection=[
+        ('draft', u"Nouveau"),
+        ('open', u"En cours"),
+        ('pending', u"En attente"),
+        ('done', u"Terminé"),
+        ('cancelled', u"Annulé")], string=u"État")
 
 
 class OfPlanningIntervention(models.Model):

@@ -684,10 +684,12 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
 
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
-        """
-        Surcharge de la fonction pour afficher toutes les étapes existantes sur vue kanban
-        """
-        return stages.search([], order=order)
+        res = stages.search([], order=order)
+        if self._context.get('of_kanban_steps') == 'Maintenance':
+            ce_type = self.env.ref('of_service.of_service_type_maintenance', raise_if_not_found=False)
+            if ce_type:
+                return res.filtered(lambda s: ce_type.id in s.type_ids.ids)
+        return res
 
     # Actions
 

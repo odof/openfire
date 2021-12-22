@@ -454,6 +454,37 @@
         </field>
     </record>
 
+    <record id="of_service_stage_form_view" model="ir.ui.view">
+        <field name="name">of.service.stage.form.view</field>
+        <field name="model">of.service.stage</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="type_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_service_stage_tree_view" model="ir.ui.view">
+        <field name="name">of.service.stage.tree.view</field>
+        <field name="model">of.service.stage</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
     <!--##########################################################################################################################-->
     <!--#################################################________Actions_________#################################################-->
     <!--##########################################################################################################################-->
@@ -487,12 +518,37 @@
         <field name="value" eval="'ir.actions.server,%d'%action_make_sale_order"/>
     </record>
 
+    <record id="of_service_maintenance_action" model="ir.actions.act_window">
+        <field name="name">Entretien - Maintenance</field>
+        <field name="res_model">of.service</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,kanban,map,form,pivot</field>
+        <field name="search_view_id" ref="view_of_service_filter"/>
+        <field name="domain" eval="[('type_id', '=', ref('of_service.of_service_type_maintenance'))]"/>
+        <field name="context" eval="{'default_type_id': ref('of_service.of_service_type_maintenance'),
+                                     'of_kanban_steps': 'Maintenance'}"/>
+    </record>
+
+    <record id="of_service_stage_action" model="ir.actions.act_window">
+        <field name="name">Étapes de DI</field>
+        <field name="res_model">of.service.stage</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_service_stage_tree_view"/>
+    </record>
+
     <!--##########################################################################################################################-->
     <!--#################################################_________Menus__________#################################################-->
     <!--##########################################################################################################################-->
 
     <menuitem id="menu_of_planning_service_prog" name="Demandes d'intervention" parent="of_planning.menu_of_planning_intervention"
               sequence="5" action="action_of_service_prog_form_planning"/>
+
+    <menuitem id="of_service_maintenance_menu" name="Entretien - Maintenance" parent="of_planning.menu_of_planning_intervention"
+              action="of_service_maintenance_action" sequence="10"/>
+
+    <menuitem id="of_service_stage_menu" name="Étapes de DI" parent="of_planning.menu_of_planning_configuration_res"
+              action="of_service_stage_action" sequence="90"/>
 
     <!--##########################################################################################################################-->
     <!--##################################################_______Taches_______####################################################-->
