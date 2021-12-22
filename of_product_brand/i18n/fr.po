@@ -275,3 +275,12 @@ msgstr "of.product.brand"
 msgid "of.product.brand.add.products"
 msgstr "of.product.brand.add.products"
 
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_supplier_delay
+msgid "Delivery Delay (days)"
+msgstr "Délai de livraison (jours)"
+
+#. module: of_product_brand
+#: model:ir.model.fields,help:of_product_brand.field_of_product_brand_supplier_delay
+msgid "The number of days it takes for the supplier to deliver products of this brand"
+msgstr "Le nombre de jours que le fournisseur met pour livrer les articles de cette marque"

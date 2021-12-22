@@ -4,12 +4,12 @@ from odoo import api, fields, models, _, SUPERUSER_ID
 from odoo.tools import float_utils
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.tools.float_utils import float_compare, float_round
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from odoo.addons.stock.models.stock_inventory import Inventory
 from odoo.addons.stock.models.stock_quant import Quant
 from odoo.addons.stock.models.stock_move import StockMove
 import odoo.addons.decimal_precision as dp
-
+import math
 import time
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -141,11 +141,13 @@ def _quant_create_from_move(self, qty, move, lot_id=False, owner_id=False, src_p
         vals.update({'propagated_from_id': negative_quant_id.id})
 
     picking_type = move.picking_id and move.picking_id.picking_type_id or False
-    if lot_id and move.product_id.tracking == 'serial' and (not picking_type or (picking_type.use_create_lots or picking_type.use_existing_lots)):
+    if lot_id and move.product_id.tracking == 'serial' \
+            and (not picking_type or (picking_type.use_create_lots or picking_type.use_existing_lots)):
         if qty != 1.0:
             raise UserError(_('You should only receive by the piece with the same serial number'))
 
-    # create the quant as superuser, because we want to restrict the creation of quant manually: we should always use this method to create quants
+    # create the quant as superuser, because we want to restrict the creation
+    # of quant manually: we should always use this method to create quants
     return self.sudo().create(vals)
 
 
@@ -197,8 +199,8 @@ def action_done(self):
             qty = operation.product_uom_id._compute_quantity(qty, operation.product_id.uom_id)
         if operation.pack_lot_ids and float_compare(sum(lot_quantities.values()), qty,
                                                     precision_rounding=operation.product_id.uom_id.rounding) != 0.0:
-            raise UserError(_(
-                'You have a difference between the quantity on the operation and the quantities specified for the lots. '))
+            raise UserError(_('You have a difference between the quantity on the operation '
+                              'and the quantities specified for the lots. '))
 
         quants_taken = []
         false_quants = []
@@ -217,7 +219,8 @@ def action_done(self):
             # Le move n'a pas de quantité restante
             if not remaining_move_qty.get(move.id):
                 raise UserError(_(
-                    "The roundings of your unit of measure %s on the move vs. %s on the product don't allow to do these operations or you are not transferring the picking at once. ") % (
+                    "The roundings of your unit of measure %s on the move vs. %s on the product don't allow to do "
+                    "these operations or you are not transferring the picking at once. ") % (
                                 move.product_uom.name, move.product_id.uom_id.name))
 
             if not operation.pack_lot_ids:
@@ -269,14 +272,15 @@ def action_done(self):
                                      quant_dest_package_id)
 
         # Handle pack in pack
-        if not operation.product_id and operation.package_id and operation.result_package_id.id != operation.package_id.parent_id.id:
+        if not operation.product_id and operation.package_id \
+                and operation.result_package_id.id != operation.package_id.parent_id.id:
             operation.package_id.sudo().write({'parent_id': operation.result_package_id.id})
 
     # Check for remaining qtys and unreserve/check move_dest_id in
     move_dest_ids = set()
     for move in self:
-        if float_compare(remaining_move_qty[move.id], 0,
-                         precision_rounding=move.product_id.uom_id.rounding) > 0:  # In case no pack operations in picking
+        # In case no pack operations in picking
+        if float_compare(remaining_move_qty[move.id], 0, precision_rounding=move.product_id.uom_id.rounding) > 0:
             move.check_tracking(False)  # TDE: do in batch ? redone ? check this
 
             preferred_domain_list = [[('reservation_id', '=', move.id)], [('reservation_id', '=', False)],
@@ -560,7 +564,8 @@ class InventoryLine(models.Model):
         grouped_lines_dict = {}
         params = self._of_get_groupby_params()
         option = self.env['ir.values'].get_default('stock.config.settings', 'of_forcer_date_inventaire')
-        # Le dernier paramètre est traité séparément, il ne contiendra pas un dictionnaire mais l'indice des lignes d'inventaire dans grouped_lines
+        # Le dernier paramètre est traité séparément, il ne contiendra pas un dictionnaire
+        # mais l'indice des lignes d'inventaire dans grouped_lines
         last_param = params.pop()
         for line in self:
             d = grouped_lines_dict
@@ -613,7 +618,8 @@ class InventoryLine(models.Model):
                                        ('location_id', '=', move.location_dest_id.id), ('package_id', '!=', False)] + optional_domain, limit=1)
                 if quants:
                     for quant in move.quant_ids:
-                        if quant.location_id.id == move.location_dest_id.id:  # To avoid we take a quant that was reconcile already
+                        # To avoid we take a quant that was reconcile already
+                        if quant.location_id.id == move.location_dest_id.id:
                             quant._quant_reconcile_negative(move)
         return moves
 
@@ -914,12 +920,63 @@ class ProductTemplate(models.Model):
 class StockWarehouseOrderpoint(models.Model):
     _inherit = 'stock.warehouse.orderpoint'
 
+    def _default_of_delivery_delay(self):
+        of_delivery_delay = 0
+        if self.product_id and self.product_id.seller_ids:
+            of_delivery_delay = self.product_id.seller_ids[0].delay
+        return of_delivery_delay
+
     of_forecast_limit = fields.Boolean(
         string=u"Limite de prévision", help=u"Permet de définir une date limite pour les réapprovisionnements.")
     of_forecast_period = fields.Integer(
-        string=u"Période de prévision", help=u"Nombre de jours pour définir la date limite.\n"
-                                             u"Ex : 30 jour(s), ne prend en compte que les mouvements de stock jusqu'"
-                                             u"à J+30 pour décider de créer un nouvel approvisionnement.")
+        string=u"Période de prévision",
+        help=u"Nombre de jours pour définir la date limite.\n"
+        u"Ex : 30 jour(s), ne prend en compte que les mouvements de stock jusqu'"
+        u"à J+30 pour décider de créer un nouvel approvisionnement.")
+
+    of_forecast_qty = fields.Float(string=u"Qté Prév. N", digits=dp.get_precision('Product Unit of Measure'))
+    of_pace_of_sale = fields.Float(string=u"Rythme de vente", digits=(16, 2), compute='_compute_of_pace_of_sale')
+    of_delivery_delay = fields.Integer(string=u"Délai de livraison", default=_default_of_delivery_delay)
+    of_min_theoretical_qty = fields.Float(
+        string=u"Qté mini théorique", digits=(16, 2), compute='_compute_of_min_theoretical_qty')
+    of_min_stock_coef = fields.Float(string=u"Coef stock min", digits=(16, 2), default=1.0)
+    of_max_stock_coef = fields.Float(string=u"Coef stock maxi", digits=(16, 2), default=1.0)
+
+    @api.depends('of_forecast_qty')
+    def _compute_of_pace_of_sale(self):
+        if self.of_forecast_qty:
+            self.of_pace_of_sale = 1 / (self.of_forecast_qty / 365)
+
+    @api.depends('of_delivery_delay', 'of_pace_of_sale')
+    def _compute_of_min_theoretical_qty(self):
+        if self.of_pace_of_sale:
+            self.of_min_theoretical_qty = self.of_delivery_delay / self.of_pace_of_sale
+
+    @api.multi
+    def compute_min_max_qty(self):
+        """Calcul des quantités mini et maxi des règles de stocks"""
+
+        for orderpoint in self:
+            # On ne valorise qty min/max que si la qté min théorique est remplie
+            if orderpoint.of_min_theoretical_qty:
+                product_min_qty = orderpoint.of_min_theoretical_qty * orderpoint.of_min_stock_coef
+                self.product_min_qty = math.ceil(product_min_qty)
+                self.product_max_qty = max(math.floor(product_min_qty * orderpoint.of_max_stock_coef),
+                                           self.product_min_qty)
+
+    @api.constrains('of_min_stock_coef', 'of_max_stock_coef')
+    def constraint_stock_coef(self):
+        if not self.of_max_stock_coef or not self.of_min_stock_coef:
+            raise ValidationError(u"Un coefficient doit toujours être supérieur à 0")
+        if self.of_max_stock_coef < 1.0:
+            raise ValidationError(u"Le coef de stock maxi doit toujours être supérieur ou égal a 1")
+
+    @api.onchange('product_id')
+    def onchange_product_id(self):
+        of_delivery_delay = 0
+        if self.product_id and self.product_id.seller_ids:
+            of_delivery_delay = self.product_id.seller_ids[0].delay
+        self.of_delivery_delay = of_delivery_delay
 
     @api.onchange('of_forecast_limit')
     def onchange_of_forecast_limit(self):
