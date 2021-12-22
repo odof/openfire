@@ -23,6 +23,12 @@
                 <field name="of_categorie_id"
                        attrs="{'invisible': [('type_id', '!=', %(of_service_parc_installe.of_service_type_sav)d)]}"/>
             </xpath>
+            <xpath expr="//field[@name='note']" position="after">
+                <group name="delay" string="Délais" attrs="{'invisible': [('type_id', '!=', %(of_service_parc_installe.of_service_type_sav)d)]}">
+                    <field name="in_progress_time" widget="float_time"/>
+                    <field name="done_time" widget="float_time"/>
+                </group>
+            </xpath>
             <xpath expr="//page[@name='description']" position="after">
                 <page name="parc" string="Produit installé">
                     <group string="Produit installé" groups="project.group_project_user" colspan="2">
@@ -71,6 +77,31 @@
         <field name="view_ids" eval="[(5,0,0),
                           (0,0,{'view_mode':'tree'}),
                           (0,0,{'view_mode':'form', 'view_id': ref('view_of_service_parc_installe_service_form')})]"/>
+    </record>
+
+    <record id="of_service_sav_action" model="ir.actions.act_window">
+        <field name="name">SAV</field>
+        <field name="res_model">of.service</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,kanban,map,form,pivot</field>
+        <field name="search_view_id" ref="of_service.view_of_service_filter"/>
+        <field name="domain" eval="[('type_id', '=', ref('of_service_parc_installe.of_service_type_sav'))]"/>
+        <field name="context" eval="{'default_type_id': ref('of_service_parc_installe.of_service_type_sav'),
+                                     'of_kanban_steps': 'SAV'}"/>
+    </record>
+
+    <menuitem id="of_service_sav_menu" name="SAV" parent="of_planning.menu_of_planning_intervention"
+              action="of_service_sav_action" sequence="15"/>
+
+    <record id="of_service_parc_installe_of_service_stage_form_view" model="ir.ui.view">
+        <field name="name">of.service.parc.installe.of.service.stage.form.view</field>
+        <field name="model">of.service.stage</field>
+        <field name="inherit_id" ref="of_service.of_service_stage_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='type_ids']" position="before">
+                <field name="state"/>
+            </xpath>
+        </field>
     </record>
 
    <!-- Planning intervention : ajout champ parc installé lié -->
