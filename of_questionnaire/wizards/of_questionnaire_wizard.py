@@ -14,35 +14,18 @@ class RepondreQuestionnaireWizard(models.TransientModel):
         [('bool', "Oui/Non"),
          ('text', "Texte libre"),
          ('one', u"Plusieurs choix, une seule réponse possible"),
-         ('list', u"plusieurs choix, plusieurs réponses possibles"),
-         ('photo', u"Photo"),
-         ('drawing', u"Dessin")], compute="_compute_type", store=True)
+         ('list', u"plusieurs choix, plusieurs réponses possibles")], compute="_compute_type", store=True)
     question = fields.Char(related='question_id.name')
     answer_bool = fields.Selection([('Oui', 'Oui'), ('Non', 'Non')], string=u"Réponse")
     answer_id = fields.Many2one('of.questionnaire.line.reponse', string=u"Réponse")
     answer_ids = fields.Many2many(
         'of.questionnaire.line.reponse', relation="of_repondre_questionnaire_reponse_rel", string=u"Réponses")
     answer_text = fields.Text(string=u"Réponse")
-    attachment_answer = fields.Binary(string=u"Fichier réponse", attachment=True)
-    attachment_answer_name = fields.Char(string=u"Nom du fichier réponse")
-    additional_attachment_answer = fields.Boolean(
-        string=u"Fichier réponse supplémentaire", compute='_compute_additional_attachment_answer')
-    attachment_required = fields.Boolean(string=u"Fichier réponse obligatoire", compute='_compute_attachment_required')
 
     @api.depends('question_id')
     def _compute_type(self):
         for reponse in self:
             reponse.answer_type = reponse.question_id.answer_type
-
-    @api.depends('question_id')
-    def _compute_additional_attachment_answer(self):
-        for rec in self:
-            rec.additional_attachment_answer = rec.question_id.photo
-
-    @api.depends('question_id')
-    def _compute_attachment_required(self):
-        for rec in self:
-            rec.attachment_required = rec.question_id.photo_required
 
     @api.model
     def _convert_question_answer(self, question):
@@ -64,10 +47,6 @@ class RepondreQuestionnaireWizard(models.TransientModel):
                                                   ('name', '=', r)], limit=1)
                     reponses |= reponse
             result['answer_ids'] = [(6, 0, reponses._ids)]
-
-        if question.answer_type in ('photo', 'drawing') or question.photo:
-            result['attachment_answer_name'] = question.attachment_answer_name
-            result['attachment_answer'] = question.attachment_answer
 
         return result
 
@@ -96,13 +75,6 @@ class RepondreQuestionnaireWizard(models.TransientModel):
             self.question_id.write({'definitive_answer': self.answer_id.name})
         elif self.question_id.answer_type == 'list':
             self.question_id.write({'definitive_answer': ', '.join([answer.name for answer in self.answer_ids])})
-        elif self.question_id.answer_type in ('photo', 'drawing'):
-            self.question_id.write({'definitive_answer': self.attachment_answer_name})
-
-        if self.question_id.answer_type in ('photo', 'drawing') or (self.additional_attachment_answer and
-                                                                    self.attachment_answer):
-            self.question_id.write({'attachment_answer_name': self.attachment_answer_name,
-                                    'attachment_answer': self.attachment_answer})
 
         if self.question_id.condition_unmet:
             self.question_id.write({'condition_unmet': False})
@@ -128,9 +100,7 @@ class RepondreQuestionnaireWizard(models.TransientModel):
                 # Si la condition n'est pas respectée, on vide la réponse potentielle de la question
                 # et on passe à la question suivante
                 self.question_id.write({'condition_unmet': True,
-                                        'definitive_answer': False,
-                                        'attachment_answer_name': False,
-                                        'attachment_answer': False})
+                                        'definitive_answer': False})
                 return self.next_question()
         if self.question_id:
             self.write(self._convert_question_answer(self.question_id))

@@ -40,7 +40,6 @@
                                         <field name="answer_type"/>
                                         <field name="answer" attrs="{'invisible': [('answer_type', 'in', ('bool', 'text'))]}"/>
                                         <field name="condition"/>
-                                        <field name="photo"/>
                                     </tree>
                                 </field>
                             </group>
@@ -104,10 +103,6 @@
                                    attrs="{'invisible': [('answer_type', 'not in', ('one', 'list'))],
                                            'required': [('answer_type', 'in', ('one', 'list'))]}"/>
                             <field name="answer" invisible="1"/>
-                            <field name="photo" attrs="{'invisible': [('answer_type', 'in', ('photo', 'drawing'))]}"/>
-                            <field name="photo_required" attrs="{'invisible': [('photo', '=', False)]}"/>
-                            <field name="background_image_name" invisible="1"/>
-                            <field name="background_image" filename="background_image_name" attrs="{'invisible': [('answer_type','!=','drawing')]}"/>
                         </group>
                         <group>
                             <field name="id_code"/>
@@ -203,7 +198,6 @@
                 <field name="answer_type"/>
                 <field name="answer"/>
                 <field name="condition"/>
-                <field name="photo"/>
             </tree>
         </field>
     </record>
@@ -289,18 +283,10 @@
                         <group>
                             <field name="category_id"/>
                             <field name="answer_type"/>
-                            <field name="photo" attrs="{'invisible': [('answer_type', 'in', ('photo', 'drawing'))]}"/>
-                            <field name="photo_required" attrs="{'invisible': [('photo', '=', False)]}"/>
-                            <field name="background_image_name" invisible="1"/>
-                            <field name="background_image" filename="background_image_name" attrs="{'invisible': [('answer_type','!=','drawing')]}"/>
                             <field name="answer_ids" widget="many2many_tags"
                                    attrs="{'invisible': [('answer_type', 'not in', ('one', 'list'))],
                                            'required': [('answer_type', 'in', ('one', 'list'))]}"/>
-                            <field name="definitive_answer" readonly="1" attrs="{'invisible': [('answer_type', 'not in', ('bool', 'text', 'one', 'list'))]}"/>
-                            <div attrs="{'invisible': [('answer_type', 'not in', ('photo', 'drawing')), ('photo', '=', False)]}">
-                                <field name="attachment_answer_name" invisible="1"/>
-                                <field name="attachment_answer" filename="attachment_answer_name" readonly="1"/>
-                            </div>
+                            <field name="definitive_answer" readonly="1"/>
                         </group>
                         <group>
                             <field name="id_code"/>
@@ -418,10 +404,6 @@
                             <field name="condition"/>
                             <field name="id_code" invisible="1"/>
                             <field name="condition_code" invisible="1"/>
-                            <field name="photo"/>
-                            <field name="photo_required" invisible="1"/>
-                            <field name="background_image_name" invisible="1"/>
-                            <field name="background_image" invisible="1"/>
                         </tree>
                     </field>
                 </page>
@@ -448,16 +430,10 @@
                         <group>
                             <field name="category_id"/>
                             <field name="answer_type"/>
-                            <field name="photo" attrs="{'invisible': [('answer_type', 'in', ('photo', 'drawing'))]}"/>
-                            <field name="photo_required" attrs="{'invisible': [('photo', '=', False)]}"/>
                             <field name="answer_ids" widget="many2many_tags"
                                    attrs="{'invisible': [('answer_type', 'not in', ('one', 'list'))],
                                            'required': [('answer_type', 'in', ('one', 'list'))]}"/>
-                            <field name="definitive_answer" readonly="1" attrs="{'invisible': [('answer_type', 'not in', ('bool', 'text', 'one', 'list'))]}"/>
-                            <div attrs="{'invisible': [('answer_type', 'not in', ('photo', 'drawing')), ('photo', '=', False)]}">
-                                <field name="attachment_answer_name" invisible="1"/>
-                                <field name="attachment_answer" filename="attachment_answer_name" readonly="1"/>
-                            </div>
+                            <field name="definitive_answer" readonly="1"/>
                         </group>
                         <group>
                             <field name="id_code"/>
@@ -566,8 +542,6 @@
                             <field name="condition"/>
                             <field name="id_code" invisible="1"/>
                             <field name="condition_code" invisible="1"/>
-                            <field name="photo"/>
-                            <field name="photo_required" invisible="1"/>
                         </tree>
                     </field>
                 </page>

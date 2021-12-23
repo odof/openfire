@@ -57,20 +57,18 @@
                         <div class="row"
                              style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
                             <t t-foreach="o.question_ids" t-as="question">
-                                <t t-if="question.answer_type not in ['photo', 'drawing']">
-                                    <div class="col-xs-12" style="display: table; padding: 0px;">
-                                        <div style="display: table-cell;" t-attf-style="#{'' if first else 'border-top: 1px solid lightgray;'}">
-                                            <!-- Questions -->
-                                            <div class="h5" style="padding: 0px 16px;">
-                                                <strong><span t-field="question.name"/><span>&amp;nbsp;:</span></strong>
-                                                <span t-field="question.definitive_answer"/>
-                                            </div>
+                                <div class="col-xs-12" style="display: table; padding: 0px;">
+                                    <div style="display: table-cell;" t-attf-style="#{'' if first else 'border-top: 1px solid lightgray;'}">
+                                        <!-- Questions -->
+                                        <div class="h5" style="padding: 0px 16px;">
+                                            <strong><span t-field="question.name"/><span>&amp;nbsp;:</span></strong>
+                                            <span t-field="question.definitive_answer"/>
                                         </div>
-                                        <t t-if="first">
-                                            <t t-set="first" t-value="False"/>
-                                        </t>
                                     </div>
-                                </t>
+                                    <t t-if="first">
+                                        <t t-set="first" t-value="False"/>
+                                    </t>
+                                </div>
                             </t>
                         </div>
                     </t>

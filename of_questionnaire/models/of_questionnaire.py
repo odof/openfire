@@ -26,9 +26,7 @@ class OfQuestionnaireLine(models.Model):
         [('bool', "Oui/Non"),
          ('text', "Texte libre"),
          ('one', u"Plusieurs choix, une seule réponse possible"),
-         ('list', u"plusieurs choix, plusieurs réponses possibles"),
-         ('photo', u"Photo"),
-         ('drawing', u"Dessin")],
+         ('list', u"plusieurs choix, plusieurs réponses possibles")],
         string="Type de réponse", default='bool', required=True)
     answer = fields.Text(string=u"Réponses possibles", compute='_compute_answer')
     category_id = fields.Many2one('of.questionnaire.line.category', string=u"Catégorie")
@@ -40,13 +38,8 @@ class OfQuestionnaireLine(models.Model):
     condition = fields.Boolean(
         string=u"Condition", help=u"Indique si une condition est à respecter pour poser cette question")
     condition_code = fields.Char(string=u"Code de condition", help=u"Code à respecter pour que la question soit posée")
-    photo = fields.Boolean(string=u"Photo", help=u"Indique si une photo peut être jointe à la réponse")
-    photo_required = fields.Boolean(
-        string=u"Photo requise", help=u"Indique si une photo doit obligatoirement être jointe à la réponse")
     visibility = fields.Selection(
         selection=[('always', u"Toujours"), ('condition_met', u"Si condition vérifiée")], string=u"Visibilité")
-    background_image = fields.Binary(string=u"Image de fond", attachment=True)
-    background_image_name = fields.Char(string=u"Nom de l'image de fond")
 
     @api.depends('answer_ids', 'answer_type')
     def _compute_answer(self):
@@ -57,16 +50,6 @@ class OfQuestionnaireLine(models.Model):
                 line.answer = 'Oui, Non'
             elif line.answer_type == 'text':
                 line.answer = 'Texte libre'
-            elif line.answer_type == 'photo':
-                line.answer = u"Photo"
-            elif line.answer_type == 'drawing':
-                line.answer = u"Dessin"
-
-    @api.onchange('answer_type')
-    def onchange_answer_type(self):
-        if self.answer_type != 'drawing':
-            self.background_image = False
-            self.background_image_name = False
 
     @api.model
     def create(self, vals):
@@ -153,10 +136,6 @@ class OfPlanningIntervention(models.Model):
             'id_code': question.id_code,
             'condition': question.condition,
             'condition_code': question.condition_code,
-            'photo': question.photo,
-            'photo_required': question.photo_required,
-            'background_image_name': question.background_image_name,
-            'background_image': question.background_image,
         }
 
     @api.onchange('questionnaire_id')
@@ -226,8 +205,6 @@ class OfPlanningInterventionQuestion(models.Model):
     definitive_answer = fields.Text(string=u"Réponse")
     intervention_id = fields.Many2one('of.planning.intervention', string="Intervention")
     parc_installe_id = fields.Many2one('of.parc.installe.question', string=u"Équipement")
-    attachment_answer = fields.Binary(string=u"Fichier réponse", attachment=True)
-    attachment_answer_name = fields.Char(string=u"Nom du fichier réponse")
     condition_unmet = fields.Boolean(string=u"Condition non respectée")
 
     _sql_constraints = [
@@ -274,8 +251,6 @@ class OfParcInstalle(models.Model):
             'id_code': question.id_code,
             'condition': question.condition,
             'condition_code': question.condition_code,
-            'photo': question.photo,
-            'photo_required': question.photo_required,
         }
 
     @api.onchange('questionnaire_id')
@@ -297,8 +272,6 @@ class OfParcInstalleQuestion(models.Model):
     answer_ids = fields.Many2many(
         comodel_name='of.questionnaire.line.reponse', relation="of_parc_question_reponse_rel",
         column1='question_id', column2='answer_id', string=u'Réponses possibles')
-    attachment_answer = fields.Binary(string=u"Fichier réponse", attachment=True)
-    attachment_answer_name = fields.Char(string=u"Nom du fichier réponse")
 
     _sql_constraints = [
         ('of_id_code_parc_installe_uniq', 'unique(id_code, parc_installe_id)',
