@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_quote_template_ofab_pricelist_view_order_form" model="ir.ui.view">
+        <field name="name">of.sale.quote.template.ofab.pricelist.sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="priority">40</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']" position="attributes">
+                <attribute name="context">{'hide_sale': context.get('hide_sale'), 'default_of_coef': of_coef, 'default_of_coef_usage': of_coef_usage, 'category_ids': of_layout_category_ids}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -40,9 +40,9 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Lignes d'article">
+                        <page string="Lignes de commande">
                             <field name="quote_line" mode="tree,kanban">
-                                <form string="Lignes d'article du modèle de devis">
+                                <form string="Lignes de commande du modèle de devis">
                                     <group>
                                         <group>
                                             <field name="product_id"/>
@@ -67,7 +67,7 @@
                                         </page>
                                     </notebook>
                                 </form>
-                                <tree string="Lignes d'article du modèle de devis" colors="red:of_active==False;">
+                                <tree string="Lignes de commande du modèle de devis" colors="red:of_active==False;">
                                     <field name="sequence" widget="handle"/>
                                     <field name="product_id"/>
                                     <field name="layout_category_id" groups="sale.group_sale_layout"/>
@@ -101,6 +101,68 @@
         </field>
     </record>
 
+
+    <!-- Configuration modèle de devis pour les sections avancées -->
+    <record id="of_sale_quote_template_view_sale_quote_template_form" model="ir.ui.view">
+        <field name="name">of.sale.quote.template.view.sale.quote.template.form</field>
+        <field name="model">sale.quote.template</field>
+        <field name="inherit_id" ref="of_sale_quote_template.view_sale_quote_template_form"/>
+        <field name="groups_id" eval="[(4, ref('of_sale_quote_template.group_of_advanced_sale_layout_category'))]"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='quote_line']" position="attributes">
+                <attribute name="context">{'category_ids': of_section_line_ids}</attribute>
+            </xpath>
+            <xpath expr="//notebook/page[1]/field[@name='quote_line']/form//field[@name='layout_category_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//notebook/page[1]/field[@name='quote_line']/tree/field[@name='layout_category_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//notebook/page[1]/field[@name='quote_line']/form//field[@name='layout_category_id']" position="after">
+                <field name="of_layout_category_id" domain="[('id', 'in', get_m2m_ids(context.get('category_ids', [[]])))]"/>
+            </xpath>
+            <xpath expr="//notebook/page[1]/field[@name='quote_line']/tree/field[@name='layout_category_id']" position="after">
+                <field name="of_layout_category_id" domain="[('id', 'in', get_m2m_ids(context.get('category_ids', [[]])))]"/>
+            </xpath>
+            <xpath expr="//notebook/page[1]" position="before">
+                <page string="Sections" groups="of_sale_quote_template.group_of_advanced_sale_layout_category">
+                    <button icon="fa-plus" name="action_add" type="object" class="pull-right"/>
+                    <field name="of_section_line_ids" mode="tree,kanban" context="{'default_quote_id': active_id}" options="{'reload_on_button': true}">
+                        <tree string="Sections" create="false" editable="bottom">
+                            <field name="quote_id" invisible="1"/>
+                            <field name="sequence" invisible="1"/>
+                            <field name="sequence_name"/>
+                            <field name="name"/>
+                            <field name="parent_id" domain="[('quote_id', '=', quote_id), '!', ('id', 'child_of', id)]" options="{'no_create': True, 'no_edit': True}"/>
+                            <field name="quote_line_count" string="Composants"/>
+                            <button string="Composants" name="action_wizard_products" type="object" class="oe_highlight"/>
+                            <button icon="fa-files-o" name="action_duplicate" type="object" help="Dupliquer cette ligne"/>
+                            <button icon="fa-arrows" name="action_move" type="object" help="Déplacer cette ligne"/>
+                            <button icon="fa-plus" name="action_add" type="object" help="Ajouter une sous section à cette ligne"/>
+                        </tree>
+                        <form string="Sections">
+                            <sheet>
+                                <group>
+                                    <field name="id" invisible="1"/>
+                                    <field name="quote_id" invisible="1"/>
+                                    <field name="name"/>
+                                    <field name="sequence_name"/>
+                                    <field name="parent_id" domain="[('quote_id', '=', quote_id), ('id', '!=', id)]"/>
+                                </group>
+                                <notebook>
+                                    <page string="Lignes d'article">
+                                        <field name="quote_line_ids" nolabel="1"/>
+                                    </page>
+                                </notebook>
+                            </sheet>
+                        </form>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Configuration modèle de devis : vue liste -->
     <record id="view_sale_quote_template_tree" model="ir.ui.view">
         <field name="name">sale.quote.template.tree</field>
@@ -123,7 +185,8 @@
         <field name="help" type="html">
             <p class="oe_view_nocontent_create">
                 Appuyer ici pour créer votre modèle.
-            </p><p>
+            </p>
+            <p>
                 Utiliser des modèles pour créer des devis professionnels en quelques minutes.
             </p>
         </field>
@@ -131,7 +194,7 @@
 
     <menuitem id="menu_sale_quote_template" action="action_sale_quotation_template" parent="sale.menu_sales_config" sequence="1" name="Modèles de devis" groups="sales_team.group_sale_manager"/>
 
-    <!-- Vue formulaire devis/commande :  ajout champs modèle de devis-->
+    <!-- Vue formulaire devis/commande : ajout champs modèle de devis-->
     <record id="sale_order_form_quote" model="ir.ui.view">
         <field name="name">sale.order.form.payment</field>
         <field name="model">sale.order</field>
@@ -140,8 +203,86 @@
             <xpath expr="//field[@name='partner_shipping_id']" position="after">
                 <field name="of_template_id" context="{'company_id': company_id}"
                     options="{'no_create': True, 'no_open': True}"/>
+                <xpath expr="//field[@name='of_template_id']" position="after">
+                    <button string="Charger les sections" name="load_sections"
+                            groups="of_sale_quote_template.group_of_advanced_sale_layout_category"
+                            type="object" attrs="{'invisible': [('of_template_id', '=', False)]}" icon="fa-download"/>
+                </xpath>
                 <field name="of_note_insertion" nolabel="1" colspan="2" readonly="1"
                        attrs="{'invisible': [('of_note_insertion', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Vue formulaire devis/commande pour les sections avancées-->
+    <record id="of_sale_quote_template_view_order_form" model="ir.ui.view">
+        <field name="name">of.sale.quote.template.view.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="groups_id" eval="[(4, ref('of_sale_quote_template.group_of_advanced_sale_layout_category'))]"/>
+        <field name="priority">30</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']" position="attributes">
+                <attribute name="context">{'hide_sale': context.get('hide_sale'), 'category_ids': of_layout_category_ids}</attribute>
+            </xpath>
+            <xpath expr="//notebook/page[1]/field[@name='order_line']/form//field[@name='layout_category_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//notebook/page[1]/field[@name='order_line']/tree/field[@name='layout_category_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//notebook/page[1]/field[@name='order_line']/form//field[@name='layout_category_id']" position="after">
+                <field name="of_quote_line_id" invisible="1"/>
+                <field name="of_layout_category_id" domain="[('id', 'in', get_m2m_ids(context.get('category_ids', [[]])))]"/>
+            </xpath>
+            <xpath expr="//notebook/page[1]/field[@name='order_line']/tree/field[@name='layout_category_id']" position="after">
+                <field name="of_quote_line_id" invisible="1"/>
+                <field name="of_layout_category_id" domain="[('id', 'in', get_m2m_ids(context.get('category_ids', [[]])))]"/>
+            </xpath>
+            <xpath expr="//notebook/page[1]" position="before">
+                <page string="Sections">
+                    <button icon="fa-plus" name="action_add" type="object" class="pull-right"/>
+                    <field name="of_layout_category_ids" mode="tree,kanban" attrs="{'readonly': [('state', 'in', ('done','cancel'))]}" context="{'default_order_id': active_id}" options="{'reload_on_button': true}">
+                        <tree string="Sale Layout Category" create="false" editable="bottom">
+                            <field name="id" invisible="1"/>
+                            <field name="sequence" invisible="1"/>
+                            <field name="quote_section_line_id" invisible="1"/>
+                            <field name="order_id" invisible="1"/>
+                            <field name="sequence_name"/>
+                            <field name="name"/>
+                            <field name="parent_id" domain="[('order_id', '=', order_id), '!', ('id', 'child_of', id)]" options="{'no_create': True, 'no_edit': True}"/>
+                            <field name="order_line_count"/>
+                            <button string="Lignes de commande" name="action_wizard_products" type="object" class="oe_highlight"/>
+                            <field name="cout" widget="monetary"/>
+                            <field name="prix_vente" widget="monetary"/>
+                            <field name="pc_prix_vente"/>
+                            <button icon="fa-files-o" name="action_duplicate" type="object" help="Dupliquer cette ligne"/>
+                            <button icon="fa-arrows" name="action_move" type="object" help="Déplacer cette ligne"/>
+                            <button icon="fa-plus" name="action_add" type="object" help="Ajouter une sous section à cette ligne"/>
+                        </tree>
+                        <form string="Sale Layout Category">
+                            <sheet>
+                                <group>
+                                    <group>
+                                        <field name="name"/>
+                                        <field name="parent_id"/>
+                                        <field name="sequence_name"/>
+                                    </group>
+                                    <group>
+                                        <field name="cout"/>
+                                        <field name="prix_vente"/>
+                                        <field name="pc_prix_vente"/>
+                                    </group>
+                                </group>
+                                <notebook>
+                                    <page string="Lignes de commande">
+                                        <field name="order_line_ids" nolabel="1"/>
+                                    </page>
+                                </notebook>
+                            </sheet>
+                        </form>
+                    </field>
+                </page>
             </xpath>
         </field>
     </record>
