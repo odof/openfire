@@ -28,9 +28,6 @@ class ResCompany(models.Model):
             companies.write(vals)
         return res
 
-    of_client_id_ref = fields.Boolean(u'Réf. client automatique',
-                                      help=u"Lors de la création d'un nouveau partenaire, si cette case est cochée, "
-                                           u"la référence client prendra par défaut le n° de compte comptable du partenaire.")
     of_code_client = fields.Char('Code client', default="('411%05i' % partner.id, partner.name)")
     of_code_fournisseur = fields.Char('Code fournisseur', default="('401%05i' % partner.id, partner.name)")
 
@@ -168,9 +165,6 @@ class AccountConfigSettings(models.TransientModel):
 
     of_code_client = fields.Char(related='company_id.of_code_client', string='Code client')
     of_code_fournisseur = fields.Char(related='company_id.of_code_fournisseur', string='Code fournisseur')
-    of_client_id_ref = fields.Boolean(
-        related='company_id.of_client_id_ref', string=u"Utiliser les comptes de tiers comme références clients *",
-        help=u"Affectation automatique de la partie variable du compte de tiers dans la référence du partenaire nouvellement créé")
 
 
 class AccountInvoice(models.Model):
