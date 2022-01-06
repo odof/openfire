@@ -31,17 +31,24 @@ class AccountInvoiceLine(models.Model):
     @api.depends('product_id')
     def _compute_of_purchase_price_unit(self):
         for line in self:
-            cost = 0.0
-            if len(line.sale_line_ids) == 1:
-                if line.sale_line_ids.of_is_kit:
-                    purchase_lines = line.sale_line_ids.kit_id.kit_line_ids.mapped('procurement_ids').\
-                        mapped('move_ids').mapped('move_orig_ids').mapped('purchase_line_id')
+            if len(line.sale_line_ids) == 1 and not line.sale_line_ids.of_is_kit:
+                purchase_lines = line.sale_line_ids.procurement_ids.mapped('move_ids').mapped('move_orig_ids'). \
+                    mapped('purchase_line_id')
+                purchase_price = sum(purchase_lines.mapped('price_subtotal'))
+                purchase_qty = sum(purchase_lines.mapped('product_qty'))
+                purchase_cost = purchase_price / purchase_qty if purchase_qty else 0.0
+                purchase_cost *= line.product_id.property_of_purchase_coeff
+                sale_qty = line.sale_line_ids.product_uom_qty
+                if sale_qty and purchase_qty < sale_qty:
+                    cost = ((purchase_cost * purchase_qty) +
+                            (line.product_id.standard_price * (sale_qty - purchase_qty))) / sale_qty
                 else:
-                    purchase_lines = line.sale_line_ids.procurement_ids.mapped('move_ids').mapped('move_orig_ids').\
-                        mapped('purchase_line_id')
-                cost = sum(purchase_lines.mapped('price_subtotal')) / line.quantity if line.quantity else 0.0
-            if cost == 0.0:
-                cost = line.product_id.standard_price
+                    cost = purchase_cost
+            else:
+                if line.product_id.of_is_kit:
+                    cost = line.product_id.cost_comps
+                else:
+                    cost = line.product_id.standard_price
             line.of_purchase_price_unit = cost
 
     def _set_of_purchase_price_unit(self):
