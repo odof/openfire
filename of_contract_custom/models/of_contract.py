@@ -356,8 +356,8 @@ class OfContract(models.Model):
                 .filtered(lambda p: not p.account_analytic_id)
             product_lines.write({'account_analytic_id': vals['account_analytic_id']})
         if 'date_start' in vals:
+            self.mapped('period_ids').sudo().unlink()
             for contract in self:
-                contract.period_ids.unlink()
                 contract._generate_periods()
         return res
 
@@ -547,7 +547,7 @@ class OfContract(models.Model):
             lambda l: l.next_date == self.recurring_next_date)
         if not lines:
             if do_raise:
-                raise UserWarning("Aucune ligne du contrat n'est facturable")
+                raise UserError("Aucune ligne du contrat n'est facturable")
             else:
                 self.message_post(body=u"Création de la facture : Aucune ligne du contrat n'est facturable.")
                 return False
