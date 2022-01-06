@@ -17,3 +17,7 @@ class PosOrder(models.Model):
                     line.onchange_tax_ids()
 
         return res
+
+    def _prepare_bank_statement_line_payment_values(self, data):
+        self.partner_id.update_account()
+        return super(PosOrder, self)._prepare_bank_statement_line_payment_values(data)

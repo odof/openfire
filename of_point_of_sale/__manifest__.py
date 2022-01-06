@@ -17,6 +17,7 @@ les champs marque ('brand_id') et catégorie interne ('categ_id') des articles (
     'depends': [
         'point_of_sale',
         'of_account_payment_mode',
+        'of_tiers',
     ],
     'data': [
         'views/account_views.xml',
