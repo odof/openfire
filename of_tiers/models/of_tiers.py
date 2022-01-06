@@ -33,10 +33,6 @@ class ResCompany(models.Model):
             companies.write(vals)
         return res
 
-    of_client_id_ref = fields.Boolean(
-        string=u'Réf. client automatique',
-        help=u"Lors de la création d'un nouveau partenaire, si cette case est cochée, "
-             u"la référence client prendra par défaut le n° de compte comptable du partenaire.")
     of_code_client = fields.Char('Code client', default="('411%05i' % partner.id, partner.name)")
     of_code_fournisseur = fields.Char('Code fournisseur', default="('401%05i' % partner.id, partner.name)")
 
@@ -191,16 +187,6 @@ class ResPartner(models.Model):
         for comp in companies:
             self._update_account(comp)
 
-    @api.model
-    def create(self, vals):
-        partner = super(ResPartner, self).create(vals)
-
-        # Utilisation de l'id du partenaire comme référence client, si option configurée dans la société
-        if partner.company_id.of_client_id_ref:
-            if not partner.ref:
-                partner.ref = str(partner.id)
-        return partner
-
     @api.multi
     def unlink(self):
         # Suppression des comptes de tiers a la suppression du partenaire.
@@ -244,10 +230,6 @@ class AccountConfigSettings(models.TransientModel):
 
     of_code_client = fields.Char(related='company_id.of_code_client', string='Code client')
     of_code_fournisseur = fields.Char(related='company_id.of_code_fournisseur', string='Code fournisseur')
-    of_client_id_ref = fields.Boolean(
-        related='company_id.of_client_id_ref', string=u"Utiliser les comptes de tiers comme références clients *",
-        help=u"Affectation automatique de la partie variable du compte de tiers "
-             u"dans la référence du partenaire nouvellement créé")
     of_tiers_mode = fields.Selection(
         [
             ('current', u"Sur la société qui en a besoin uniquement"),
