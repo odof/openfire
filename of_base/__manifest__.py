@@ -19,6 +19,12 @@ Personnalisation des fonctions de base Odoo :
 - Ajout de la recherche multi-mots pour les articles
 - Désactive l'envoi des notifications par courriel des changements d'affectation des commandes et factures
 - Restreint l'accès au menu "Applications" à l'utilisateur administrateur
+- Soumet la désinstallation de module à une validation par mot de passe.
+  Le hash du mot de passe doit être placé dans le fichier de configuration sous le nom 'of_module_uninstall_password'.
+
+  Calcul du hash en python :
+
+  from passlib.context import CryptContext; CryptContext(['pbkdf2_sha512']).encrypt("mon_mot_de_passe")
 - API fonction permettant d'afficher un message dans une fenêtre au cours de l'exécution d'une fonction
 - Ajout d'un champ calculé et d'un bouton sur les actions d'envoi de mail pour avoir une pré-visualisation du mail
 - Permet à l'auteur d'un mail de le recevoir en copie (par défaut odoo retire l'expéditeur de la liste des destinataires)
@@ -53,6 +59,7 @@ Ajout d'un modèle servant de log interne :
         'views/of_base_view.xml',
         'views/of_log_message_views.xml',
         'views/templates.xml',
+        'wizard/base_module_upgrade_view.xml',
         'wizard/of_popup_wizard_view.xml',
         'wizard/of_res_partner_check_duplications_views.xml',
     ],
