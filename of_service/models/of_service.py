@@ -263,7 +263,7 @@ class OfService(models.Model):
     spec_date = fields.Char(string="Date", compute="_compute_spec_date")
     user_id = fields.Many2one(comodel_name='res.users', string="Utilisateur", default=lambda r: r.env.user)
     kanban_step_id = fields.Many2one(
-        comodel_name='of.service.stage', string=u"Étapes kanban", group_expand='_read_group_stage_ids',
+        comodel_name='of.service.stage', string=u"Étape", group_expand='_read_group_stage_ids',
         domain="[('type_ids','=',type_id)]")
     employee_ids = fields.Many2many(
         comodel_name='hr.employee', string="Intervenants", domain=lambda self: self._domain_employee_ids())
