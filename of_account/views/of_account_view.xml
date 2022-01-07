@@ -26,6 +26,14 @@
             <button name="action_invoice_sent" position="attributes">
                 <attribute name="attrs">{'invisible':[('state','in',('cancel','draft'))]}</attribute>
             </button>
+            <!-- Ne pas permettre de valider une facture en cours de modification pour éviter de pouvoir sauvegarder et
+                 valider en même temps, ce qui duplique les écritures comptables -->
+            <xpath expr="//button[@name='action_invoice_open'][1]" position="attributes">
+                <attribute name="class">oe_highlight oe_read_only</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_invoice_open'][2]" position="attributes">
+                <attribute name="class">oe_read_only</attribute>
+            </xpath>
             <field name="partner_id" position="after">
                 <label string="Coordonnées client"/>
                 <div>
@@ -44,6 +52,20 @@
             <!-- Afficher la date d'échéance dans la vue facture sans être en mode développeur -->
             <xpath expr="//field[@name='date_due']" position="replace">
                 <field name="date_due"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- formulaire factures fournisseur -->
+    <record id="view_of_account_invoice_supplier_form" model="ir.ui.view">
+        <field name="name">of.account.invoice.supplier.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_supplier_form"/>
+        <field name="arch" type="xml">
+            <!-- Ne pas permettre de valider une facture en cours de modification pour éviter de pouvoir sauvegarder et
+                 valider en même temps, ce qui duplique les écritures comptables -->
+            <xpath expr="//button[@name='action_invoice_open']" position="attributes">
+                <attribute name="class">oe_highlight oe_read_only</attribute>
             </xpath>
         </field>
     </record>
