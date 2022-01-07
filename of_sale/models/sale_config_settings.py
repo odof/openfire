@@ -150,6 +150,9 @@ class OFSaleConfiguration(models.TransientModel):
 
     sale_show_tax = fields.Selection(selection_add=[('both', 'Afficher les sous-totaux HT (B2B) et TTC (B2C)')])
 
+    of_pdf_taxes_display = fields.Boolean(
+        string=u"(OF) Détails des taxes", help=u"Afficher le tableau de détail des taxes dans les rapports PDF")
+
     @api.multi
     def set_pdf_adresse_nom_parent_defaults(self):
         return self.env['ir.values'].sudo().set_default(
@@ -277,3 +280,8 @@ class OFSaleConfiguration(models.TransientModel):
                 'group_show_price_total': True,
                 'group_show_price_subtotal': True,
                 })
+
+    @api.multi
+    def set_of_pdf_taxes_display(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_pdf_taxes_display', self.of_pdf_taxes_display)

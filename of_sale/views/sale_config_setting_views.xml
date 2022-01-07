@@ -108,6 +108,11 @@
                         <field name="pdf_masquer_pastille_payment_term" class="oe_inline"/>
                         <span>NE PAS afficher dans les rapports PDF</span>
                     </div>
+                    <label for="of_pdf_taxes_display"/>
+                    <div name="of_pdf_taxes_display">
+                        <field name="of_pdf_taxes_display" class="oe_inline"/>
+                        <span>Afficher le tableau de détail des taxes dans les rapports PDF</span>
+                    </div>
                 </group>
             </xpath>
             <xpath expr="//group[@name='quotations_sales']" position="inside">

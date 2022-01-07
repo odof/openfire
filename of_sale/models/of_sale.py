@@ -144,6 +144,9 @@ class SaleOrder(models.Model):
     def pdf_masquer_payment_term(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_masquer_pastille_payment_term')
 
+    def pdf_of_pdf_taxes_display(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'of_pdf_taxes_display')
+
     def get_color_section(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'of_color_bg_section')
 
@@ -715,6 +718,36 @@ class SaleOrder(models.Model):
             'res_id': wizard.id,
             'target': 'new',
         }
+
+    @api.multi
+    def of_get_taxes_display(self):
+        tax_obj = self.env['account.tax']
+        tax_grouped = []
+        round_curr = self.currency_id.round
+        for line in self.order_line:
+            price_unit = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
+
+            taxes = line.tax_id.compute_all(price_unit, self.currency_id, line.product_uom_qty,
+                                            product=line.product_id, partner=self.partner_shipping_id)['taxes']
+            for val in taxes:
+                key = val['id']
+                tax = tax_obj.browse(key)
+                for values in tax_grouped:
+                    if values['id'] == key:
+                        values['amount'] += val['amount']
+                        values['base'] += round_curr(val['base'])
+                        break
+                else:
+                    tax_grouped.append({
+                        'id': key,
+                        'name': tax.description,
+                        'amount': val['amount'],
+                        'base': round_curr(val['base'])
+                        })
+        for values in tax_grouped:
+            values['base'] = round_curr(values['base'])
+            values['amount'] = round_curr(values['amount'])
+        return tax_grouped
 
 
 class Report(models.Model):
