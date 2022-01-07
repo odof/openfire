@@ -1105,12 +1105,18 @@ class OfPlanningIntervention(models.Model):
     def onchange_template_id(self):
         intervention_line_obj = self.env['of.planning.intervention.line']
         template = self.template_id
+        template_accounting = template.sudo().with_context(
+            force_company=self.company_id.id or self.env.user.company_id.id)
         # context ajouté dans of_service pour initialiser les champs d'un RDV. Utile ici pour prioriser la DI
         if self.state == "draft" and template and not self._context.get('of_import_service_lines'):
             if template.tache_id:
                 self.tache_id = template.tache_id
-            if not self.lien_commande and not self.fiscal_position_id:
-                self.fiscal_position_id = template.fiscal_position_id
+            # on change la position fiscale par celle du modèle
+            # si celle présente n'est pas sur la société du RDV ou si il n'y en a pas
+            # ET qu'il n'y a pas de lien vers une commande
+            if template_accounting.fiscal_position_id and not self.lien_commande and \
+                    (not self.fiscal_position_id or self.fiscal_position_id.company_id.id != self.company_id.id):
+                self.fiscal_position_id = template_accounting.fiscal_position_id
             if self.line_ids:
                 new_lines = self.line_ids
             else:
@@ -1125,10 +1131,15 @@ class OfPlanningIntervention(models.Model):
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
         if self.tache_id:
+            tache_accounting = self.tache_id.sudo().with_context(
+                force_company=self.company_id.id or self.env.user.company_id.id)
             if self.tache_id.duree and not self._context.get('of_inhiber_maj_duree'):
                 self.duree = self.tache_id.duree
-            if self.tache_id.fiscal_position_id and not self.fiscal_position_id:
-                self.fiscal_position_id = self.tache_id.fiscal_position_id
+            # on change la position fiscale par celle de la tache
+            # si celle présente n'est pas sur la société du RDV ou si il n'y en a pas
+            if tache_accounting.fiscal_position_id and \
+                    (not self.fiscal_position_id or self.fiscal_position_id.company_id.id != self.company_id.id):
+                self.fiscal_position_id = tache_accounting.fiscal_position_id
             if self.tache_id.product_id:
                 self.line_ids.new({
                     'intervention_id':  self.id,
@@ -1230,6 +1241,15 @@ class OfPlanningIntervention(models.Model):
             if not warehouse_id:
                 warehouse_id = self.env['stock.warehouse'].search([], limit=1)
             self.warehouse_id = warehouse_id
+            template_accounting = self.template_id.sudo().with_context(force_company=company_id)
+            tache_accounting = self.tache_id.sudo().with_context(force_company=company_id)
+            # La société a changée, dans tous les cas on change la position fiscale
+            if template_accounting.fiscal_position_id:
+                self.fiscal_position_id = template_accounting.fiscal_position_id
+            elif tache_accounting.fiscal_position_id:
+                self.fiscal_position_id = tache_accounting.fiscal_position_id
+            else:
+                self.fiscal_position_id = False
 
     # Héritages
 
