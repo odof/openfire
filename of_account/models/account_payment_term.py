@@ -10,31 +10,31 @@ import calendar
 class AccountPaymentTermLine(models.Model):
     _inherit = 'account.payment.term.line'
 
-    option = fields.Selection([
-            ('day_after_invoice_date', u'À partir de la date de référence'),
-            ('fix_day_following_month', u'À partir de la fin du mois'),
-            ('last_day_following_month', 'Last day of following month'),
-            ('last_day_current_month', 'Last day of current month'),
+    option = fields.Selection(
+        [
+            ('day_after_invoice_date', u"À partir de la date de référence"),
+            ('fix_day_following_month', u"À partir de la fin du mois"),
+            ('last_day_following_month', "Last day of following month"),
+            ('last_day_current_month', "Last day of current month"),
         ],
-        default='day_after_invoice_date', required=True, string='Mode de calcul'
-        )
+        default='day_after_invoice_date', required=True, string="Mode de calcul")
     name = fields.Char(string=u"Libellé", required=True, default=u"Échéance")
     of_option_date = fields.Selection(
         '_get_of_option_date', string="Date de référence", required=True, default='invoice')
     of_amount_round = fields.Float(
-        string='Arrondi du montant',
+        string="Arrondi du montant",
         digits=dp.get_precision('Account'),
         help=u"Arrondit le montant à un multiple de cette valeur")
-    of_months = fields.Integer(string='Nombre de mois')
-    of_weeks = fields.Integer(string='Nombre de semaines')
+    of_months = fields.Integer(string="Nombre de mois")
+    of_weeks = fields.Integer(string="Nombre de semaines")
     of_payment_days = fields.Char(
-        string='Jours du mois',
-        help="Liste des jours du mois valides pour les paiements, séparés par des virgules (,), 'espaces blancs ( ) "
-             "ou tirets pour des périodes (-).")
+        string="Jours du mois",
+        help=u"Liste des jours du mois valides pour les paiements, séparés par des virgules (,), 'espaces blancs ( ) "
+             u"ou tirets pour des périodes (-).")
 
     @api.model
     def _get_of_option_date(self):
-        return [('invoice', 'Date de facture'), ('previous', u'Échéance précédente')]
+        return [('invoice', "Date de facture"), ('previous', u"Échéance précédente")]
 
     @api.model
     def of_decode_payment_days(self, days_char):
@@ -81,15 +81,17 @@ class AccountPaymentTermLine(models.Model):
             return False
 
         if self.option == 'day_after_invoice_date':
-            next_date += relativedelta(days=self.days,
-                                       weeks=self.of_weeks,
-                                       months=self.of_months)
+            next_date += relativedelta(
+                days=self.days,
+                weeks=self.of_weeks,
+                months=self.of_months)
         elif self.option == 'fix_day_following_month':
             # Getting 1st of next month
             next_first_date = next_date + relativedelta(day=1, months=1)
-            next_date = next_first_date + relativedelta(days=self.days - 1,
-                                                        weeks=self.of_weeks,
-                                                        months=self.of_months)
+            next_date = next_first_date + relativedelta(
+                days=self.days - 1,
+                weeks=self.of_weeks,
+                months=self.of_months)
         elif self.option == 'last_day_following_month':
             # Getting last day of next month
             next_date += relativedelta(day=31, months=1)
@@ -135,8 +137,9 @@ class AccountPaymentTermLine(models.Model):
         if error:
             raise exceptions.Warning(_("Le format des jours de paiement n'est pas valide."))
 
+
 class AccountPaymentTerm(models.Model):
-    _inherit = "account.payment.term"
+    _inherit = 'account.payment.term'
 
     @api.one
     def compute(self, value, date_ref=False, dates={}, force_dates=False):

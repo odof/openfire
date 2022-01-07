@@ -111,7 +111,7 @@ class StockMove(models.Model):
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
-    def compute_br_count(self):
+    def _compute_of_br_count(self):
         picking_obj = self.env['stock.picking']
         move_obj = self.env['stock.move']
         for partner in self:

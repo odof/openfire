@@ -1,10 +1,11 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from odoo import models, fields, api
 from odoo.tools.translate import _
 from odoo.exceptions import UserError
 import time
 
-class of_log_paiement(models.Model):
+
+class OfLogPaiement(models.Model):
     _name = "of.log.paiement"
     _description = u"Table historique modifications paiements"
 
@@ -56,7 +57,9 @@ class of_log_paiement(models.Model):
 
         # On récupère les paiements validés existants qui ne sont pas déjà dans l'historique.
         if module_of_account_payment_mode:
-            self._cr.execute(u"SELECT account_payment.*, res_company.name AS company_name, p.name AS partner_name, of_account_payment_mode.name AS mode_name, u.name AS user_name\
+            self._cr.execute(
+                u"SELECT account_payment.*, res_company.name AS company_name, p.name AS partner_name,\
+                  of_account_payment_mode.name AS mode_name, u.name AS user_name\
                 FROM account_payment\
                 LEFT JOIN of_log_paiement ON account_payment.id = of_log_paiement.paiement_id\
                 LEFT JOIN res_partner AS p ON account_payment.partner_id = p.id\
@@ -67,7 +70,9 @@ class of_log_paiement(models.Model):
                 WHERE of_log_paiement.paiement_id IS NULL AND account_payment.state in ('posted', 'reconciled')\
                 ORDER BY account_payment.id")
         else:
-            self._cr.execute(u"SELECT account_payment.*, res_company.name AS company_name, p.name AS partner_name, u.name AS user_name\
+            self._cr.execute(
+                u"SELECT account_payment.*, res_company.name AS company_name, p.name AS partner_name,\
+                  u.name AS user_name\
                 FROM account_payment\
                 LEFT JOIN of_log_paiement ON account_payment.id = of_log_paiement.paiement_id\
                 LEFT JOIN res_partner AS p ON account_payment.partner_id = p.id\
@@ -80,26 +85,50 @@ class of_log_paiement(models.Model):
         # On peuple l'historique.
         if module_of_account_payment_mode:
             for paiement in self._cr.dictfetchall():
-                self._cr.execute(u"INSERT INTO of_log_paiement (create_uid, user_name, create_date, paiement_id, payment_date, partner_id, partner_name, payment_reference, payment_type, amount, state, name, communication, of_payment_mode_id, of_payment_mode_name, company_id, company_name)\
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (paiement['write_uid'], paiement['user_name'], paiement['write_date'], paiement['id'], paiement['payment_date'] or '', paiement['partner_id'], paiement['partner_name'] or '', paiement['payment_reference'] or '', paiement['payment_type'], paiement['amount'], paiement['state'] or '', paiement['name'] or '', paiement['communication'] or '', paiement['of_payment_mode_id'], paiement['mode_name'] or '', paiement['company_id'], paiement['company_name'] or ''))
+                self._cr.execute(
+                    u"INSERT INTO of_log_paiement (create_uid, user_name, create_date, paiement_id,"
+                    u" payment_date, partner_id, partner_name,"
+                    u" payment_reference, payment_type, amount,"
+                    u" state, name, communication,"
+                    u" of_payment_mode_id, of_payment_mode_name, company_id,"
+                    u" company_name) "
+                    u"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    (paiement['write_uid'], paiement['user_name'], paiement['write_date'], paiement['id'],
+                     paiement['payment_date'] or '', paiement['partner_id'], paiement['partner_name'] or '',
+                     paiement['payment_reference'] or '', paiement['payment_type'], paiement['amount'],
+                     paiement['state'] or '', paiement['name'] or '', paiement['communication'] or '',
+                     paiement['of_payment_mode_id'], paiement['mode_name'] or '', paiement['company_id'],
+                     paiement['company_name'] or ''))
         else:
             for paiement in self._cr.dictfetchall():
-                self._cr.execute(u"INSERT INTO of_log_paiement (create_uid, user_name, create_date, paiement_id, payment_date, partner_id, partner_name, payment_reference, payment_type, amount, state, name, communication, of_payment_mode_id, of_payment_mode_name, company_id, company_name)\
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, Null, Null, %s, %s)", (paiement['write_uid'], paiement['user_name'], paiement['write_date'], paiement['id'], paiement['payment_date'] or '', paiement['partner_id'], paiement['partner_name'] or '', paiement['payment_reference'] or '', paiement['payment_type'], paiement['amount'], paiement['state'] or '', paiement['name'] or '', paiement['communication'] or '', paiement['company_id'], paiement['company_name'] or ''))
+                self._cr.execute(
+                    u"INSERT INTO of_log_paiement (create_uid, user_name, create_date, paiement_id,"
+                    u" payment_date, partner_id, partner_name,"
+                    u" payment_reference, payment_type, amount,"
+                    u" state, name, communication,"
+                    u" of_payment_mode_id, of_payment_mode_name, company_id,"
+                    u" company_name) "
+                    u"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, Null, Null, %s, %s)",
+                    (paiement['write_uid'], paiement['user_name'], paiement['write_date'], paiement['id'],
+                     paiement['payment_date'] or '', paiement['partner_id'], paiement['partner_name'] or '',
+                     paiement['payment_reference'] or '', paiement['payment_type'], paiement['amount'],
+                     paiement['state'] or '', paiement['name'] or '', paiement['communication'] or '',
+                     paiement['company_id'], paiement['company_name'] or ''))
 
         return True
 
 
 class AccountPayment(models.Model):
     _name = "account.payment"
-    _inherit = "account.payment"
+    _inherit = 'account.payment'
 
     active = fields.Boolean(string="Active", default=True)
 
     @api.multi
     def write(self, vals):
         res = super(AccountPayment, self).write(vals)
-        # On ignore les (nombreux) appels à write avec vals vide et quand il s'agit uniquement une modification du lettrage (vals avec une seule clé 'invoice_ids')
+        # On ignore les (nombreux) appels à write avec vals vide et quand il s'agit uniquement
+        # d'une modification du lettrage (vals avec une seule clé 'invoice_ids')
         if vals and not (len(vals) == 1 and 'invoice_ids' in vals):
             user_name = self.env.user.name or ''
             # On récupère les paiements qui ont été modifiés.
@@ -114,24 +143,45 @@ class AccountPayment(models.Model):
 
             # On les parcourt un par un.
             for paiement in paiements:
-                # Si c'est seulement une modification du paiement pour inscrire le no d'une remise en banque, on ne fait pas d'enregistrement dans l'historique.
+                # Si c'est seulement une modification du paiement pour inscrire le no d'une remise en banque,
+                # on ne fait pas d'enregistrement dans l'historique.
                 if 'of_deposit_id' in vals and len(vals) == 1:
                     continue
                 # On récupère l'état du paiement lors de sa dernière modification.
-                self._cr.execute(u"SELECT state from of_log_paiement WHERE paiement_id = %s ORDER BY id DESC LIMIT 1", (paiement.id,))
+                self._cr.execute(
+                    u"SELECT state from of_log_paiement WHERE paiement_id = %s ORDER BY id DESC LIMIT 1",
+                    (paiement.id, ))
                 state_avant = self._cr.fetchone()
                 if state_avant:
                     state_avant = state_avant[0]
                 else:
                     state_avant = ''
-                # On n'enregistre les traces de modification du paiement que si passe de brouillon à validé ou l'inverse (on ignore les modifications quand est en brouillon).
+                # On n'enregistre les traces de modification du paiement que si il passe de brouillon à validé
+                # ou l'inverse (on ignore les modifications quand est en brouillon).
                 if state_avant == 'posted' or paiement.state == 'posted':
                     if module_of_account_payment_mode:
-                        self._cr.execute(u"INSERT INTO of_log_paiement (create_uid, user_name, create_date, paiement_id, payment_date, partner_id, partner_name, payment_reference, payment_type, amount, state, name, communication, of_payment_mode_id, of_payment_mode_name, company_id, company_name)\
-                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (self._uid, user_name, time.strftime('%Y-%m-%d %H:%M:%S'), paiement.id, paiement.payment_date, paiement.partner_id.id, paiement.partner_id.name or '', paiement.payment_reference or '', paiement.payment_type or '', paiement.amount, paiement.state or '', paiement.name or '', paiement.communication or '', paiement.of_payment_mode_id.id, paiement.of_payment_mode_id.name or '', paiement.company_id.id, paiement.company_id.name or ''))
+                        self._cr.execute(
+                            u"INSERT INTO of_log_paiement (create_uid, user_name, create_date, paiement_id, "
+                            u"payment_date, partner_id, partner_name, payment_reference, payment_type, amount, state, "
+                            u"name, communication, of_payment_mode_id, of_payment_mode_name, company_id, company_name) "
+                            u"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                            (self._uid, user_name, time.strftime('%Y-%m-%d %H:%M:%S'), paiement.id,
+                             paiement.payment_date, paiement.partner_id.id, paiement.partner_id.name or '',
+                             paiement.payment_reference or '', paiement.payment_type or '', paiement.amount,
+                             paiement.state or '', paiement.name or '', paiement.communication or '',
+                             paiement.of_payment_mode_id.id, paiement.of_payment_mode_id.name or '',
+                             paiement.company_id.id, paiement.company_id.name or ''))
                     else:
-                        self._cr.execute(u"INSERT INTO of_log_paiement (create_uid, user_name, create_date, paiement_id, payment_date, partner_id, partner_name, payment_reference, payment_type, amount, state, name, communication, of_payment_mode_id, of_payment_mode_name, company_id, company_name)\
-                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, Null, Null, %s, %s)", (self._uid, user_name, time.strftime('%Y-%m-%d %H:%M:%S'), paiement.id, paiement.payment_date, paiement.partner_id.id, paiement.partner_id.name or '', paiement.payment_reference or '', paiement.payment_type or '', paiement.amount, paiement.state or '', paiement.name or '', paiement.communication or '', paiement.company_id.id, paiement.company_id.name or ''))
+                        self._cr.execute(
+                            u"INSERT INTO of_log_paiement (create_uid, user_name, create_date, paiement_id, "
+                            u"payment_date, partner_id, partner_name, payment_reference, payment_type, amount, state, "
+                            u"name, communication, of_payment_mode_id, of_payment_mode_name, company_id, company_name) "
+                            u"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, Null, Null, %s, %s)",
+                            (self._uid, user_name, time.strftime('%Y-%m-%d %H:%M:%S'), paiement.id,
+                             paiement.payment_date, paiement.partner_id.id, paiement.partner_id.name or '',
+                             paiement.payment_reference or '', paiement.payment_type or '', paiement.amount,
+                             paiement.state or '', paiement.name or '', paiement.communication or '',
+                             paiement.company_id.id, paiement.company_id.name or ''))
         return res
 
     @api.multi
@@ -140,7 +190,7 @@ class AccountPayment(models.Model):
 
     # Il y a un onchange dans payment.type qui change de manière non voulue la valeur du type de partenaire
     # dans le formulaire du nouveau paiement.
-    # Fonction qui résoud ce problème.
+    # Fonction qui résout ce problème.
     @api.onchange('payment_type')
     def _onchange_payment_type(self):
         res = super(AccountPayment, self)._onchange_payment_type()
@@ -148,13 +198,17 @@ class AccountPayment(models.Model):
             self.partner_type = self._context['of_default_partner_type']
         return res
 
-class ir_module_module(models.Model):
+
+class Module(models.Model):
     _name = "ir.module.module"
     _inherit = "ir.module.module"
 
     @api.multi
     def write(self, vals):
         # Empêcher la désinstallation des modules de certification comptable.
-        if self.search([('name', 'in', ('l10n_fr_certification', 'of_l10n_fr_certification')), ('id', 'in', isinstance(self._ids, (int, long)) and [self._ids] or self._ids)]) and vals.get('state') == 'to remove':
-            raise UserError(_(u"Vous ne pouvez pas désinstaller les modules l10n_fr_certification et of_l10n_fr_certification."))
-        return super(ir_module_module, self).write(vals)
+        if self.search(
+                [('name', 'in', ('l10n_fr_certification', 'of_l10n_fr_certification')), ('id', 'in', self._ids)]
+        ) and vals.get('state') == 'to remove':
+            raise UserError(_(
+                u"Vous ne pouvez pas désinstaller les modules l10n_fr_certification et of_l10n_fr_certification."))
+        return super(Module, self).write(vals)

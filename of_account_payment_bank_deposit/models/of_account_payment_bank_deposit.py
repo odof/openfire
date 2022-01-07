@@ -9,7 +9,7 @@ class OfAccountPaymentBankDeposit(models.Model):
     _description = 'Payment bank deposit'
 
     @api.multi
-    def _get_default_payments(self):
+    def _default_payment_ids(self):
         res = []
         if self._context.get('active_model', '') == 'account.payment':
             # Allow only payments that have not been already deposited
@@ -21,17 +21,19 @@ class OfAccountPaymentBankDeposit(models.Model):
     name = fields.Char('Deposit code', required=True, help='Deposit code')
     date = fields.Date('Date', required=True, default=fields.Date.context_today)
     payment_ids = fields.One2many(
-        'account.payment', 'of_deposit_id', 'Payments', copy=False, default=_get_default_payments)
+        'account.payment', 'of_deposit_id', 'Payments', copy=False,
+        default=lambda s: s._default_payment_ids())
     of_payment_mode_id = fields.Many2one(
-        string=U"Mode de paiement", comodel_name='of.account.payment.mode', compute='_compute_of_payment_mode_id')
+        string=u"Mode de paiement", comodel_name='of.account.payment.mode', compute='_compute_of_payment_mode_id')
     payment_count = fields.Integer(string=u"Nombre de paiements", compute='_compute_payment_count')
     payment_total = fields.Float(string=u"Montant total des paiements", compute='_compute_payment_total')
     currency_id = fields.Many2one(
         comodel_name='res.currency', string='Devise', required=True,
         default=lambda self: self.env.user.company_id.currency_id)
     move_id = fields.Many2one('account.move', 'Account move', readonly=True, ondelete='restrict')
-    state = fields.Selection([('draft', 'Unposted'), ('posted', 'Posted')], string='Status',
-                             required=True, readonly=True, copy=False, default='draft')
+    state = fields.Selection(
+        [('draft', 'Unposted'), ('posted', 'Posted')],
+        string='Status', required=True, readonly=True, copy=False, default='draft')
     journal_id = fields.Many2one(
         'account.journal', 'Journal', required=True,
         domain="[('type', 'in', ('cash', 'bank')), ('of_allow_bank_deposit', '=', True)]")

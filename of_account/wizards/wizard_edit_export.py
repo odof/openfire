@@ -2,6 +2,7 @@
 
 from odoo import models, api
 
+
 class OfWizardExport(models.TransientModel):
     _name = "of.zz.wizard.export"
 

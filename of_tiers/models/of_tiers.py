@@ -19,13 +19,18 @@ class ResCompany(models.Model):
         vals = {}
         seq_client = sequence_obj.browse(xml_obj.search([('name', 'like', 'sequence_customer_account')]).res_id)
         if seq_client and seq_client.active:
-            code = "'%s%%0%si%s' %% partner.id" % (seq_client.prefix or '', seq_client.padding, seq_client.suffix or '')
+            code = "'%s%%0%si%s' %% partner.id" % (
+                seq_client.prefix or '',
+                seq_client.padding,
+                seq_client.suffix or '')
             vals['of_code_client'] = "(%s, %s)" % (code, 'partner.name')
             seq_client.active = False
         seq_fournisseur = sequence_obj.browse(xml_obj.search([('name', 'like', 'sequence_supplier_account')]).res_id)
         if seq_fournisseur and seq_fournisseur.active:
             code = "'%s%%0%si%s' %% partner.id" % (
-                seq_fournisseur.prefix or '', seq_fournisseur.padding, seq_fournisseur.suffix or '')
+                seq_fournisseur.prefix or '',
+                seq_fournisseur.padding,
+                seq_fournisseur.suffix or '')
             vals['of_code_fournisseur'] = "(%s, %s)" % (code, 'partner.name')
             seq_fournisseur.active = False
         if vals:

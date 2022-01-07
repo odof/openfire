@@ -1,25 +1,57 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 from odoo.exceptions import UserError,  ValidationError
 from odoo.models import regex_order
 from odoo.tools.float_utils import float_compare
 
 NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
 
+
+class AccountAccount(models.Model):
+    _inherit = 'account.account'
+
+    of_account_counterpart_id = fields.Many2one('account.account', string="Compte de contrepartie")
+
+    @api.model
+    def create(self, vals):
+        if 'group_id' in self._fields and '' not in vals:
+            # Le module OCA des groupes de comptes est installé et le groupe n'est pas mentionné.
+            # (module : account-financial-tools/account_group)
+            # On cherche le groupe adapté en fonction du préfixe.
+            # Code copié de la fonction account.account.onchange_code() du module account_group.
+
+            group_obj = self.env['account.group']
+            group = False
+            code_prefix = vals.get('code', '')
+            # find group with longest matching prefix
+            while code_prefix:
+                matching_group = group_obj.search([('code_prefix', '=', code_prefix)], limit=1)
+                if matching_group:
+                    group = matching_group.id
+                    break
+                code_prefix = code_prefix[:-1]
+            vals['group_id'] = group
+        return super(AccountAccount, self).create(vals)
+
+
 class AccountConfigSettings(models.TransientModel):
     _inherit = 'account.config.settings'
 
     # Paramètre de la date d'échéance des factures
-    of_date_due = fields.Selection([(0, u"Date d'échéance en fonction des conditions de règlement"),
-                                    (1, u"Modification manuelle de la date d'échéance possible (non recalcul suivant conditions de règlement si date déjà renseignée)")], string=u"(OF) Date d'échéance")
+    of_date_due = fields.Selection(
+        [(0, u"Date d'échéance en fonction des conditions de règlement"),
+         (1, u"Modification manuelle de la date d'échéance possible "
+             u"(non recalcul suivant conditions de règlement si date déjà renseignée)")],
+        string=u"(OF) Date d'échéance")
 
     @api.multi
     def set_of_date_due_defaults(self):
         return self.env['ir.values'].sudo().set_default('account.config.settings', 'of_date_due', self.of_date_due)
 
+
 class AccountInvoice(models.Model):
-    _inherit = "account.invoice"
+    _inherit = 'account.invoice'
 
     @api.multi
     @api.constrains('company_id', 'journal_id')
@@ -35,14 +67,16 @@ class AccountInvoice(models.Model):
             if invoice.journal_id.company_id not in company_obj.search([('id', 'parent_of', invoice.company_id.id)]):
                 raise ValidationError(u'Erreur ! La société du journal est différente de celle de la facture.')
 
-    of_etiquette_partenaire_ids = fields.Many2many('res.partner.category', related='partner_id.category_id', string=u"Étiquettes client")
+    of_etiquette_partenaire_ids = fields.Many2many(
+        'res.partner.category', related='partner_id.category_id', string=u"Étiquettes client")
 
     of_partner_phone = fields.Char(related='partner_id.phone', string=u"Téléphone du partenaire", readonly=True)
     of_partner_mobile = fields.Char(related='partner_id.mobile', string=u"Mobile du partenaire", readonly=True)
     of_partner_email = fields.Char(related='partner_id.email', string=u"Courriel du partenaire", readonly=True)
 
     # Date d'échéance des factures
-    # Surcharge de la méthode pour permettre la comparaison avec le paramètrage du mode de calcul de la date d'échéance (manuel/auto).
+    # Surcharge de la méthode pour permettre la comparaison avec le paramètrage du mode de calcul
+    # de la date d'échéance (manuel/auto).
     @api.onchange('payment_term_id', 'date_invoice')
     def _onchange_payment_term_date_invoice(self):
         param_date_due = self.env['ir.values'].get_default('account.config.settings', 'of_date_due')
@@ -51,12 +85,15 @@ class AccountInvoice(models.Model):
             date_invoice = fields.Date.context_today(self)
         if not self.payment_term_id:
             # Quand pas de condition de règlement définie
-            if (param_date_due and not self.date_due) or not param_date_due:  # On rajoute la vérification pour permettre de modifier manuellement la date d'échéance.
+            if (param_date_due and not self.date_due) or not param_date_due:
+                # On rajoute la vérification pour permettre de modifier manuellement la date d'échéance.
                 self.date_due = self.date_due or self.date_invoice
         else:
             pterm = self.payment_term_id
-            pterm_list = pterm.with_context(currency_id=self.company_id.currency_id.id).compute(value=1, date_ref=date_invoice)[0]
-            if (param_date_due and not self.date_due) or not param_date_due:  # On rajoute la vérification pour permettre de modifier manuellement la date d'échéance.
+            pterm_list = pterm.with_context(currency_id=self.company_id.currency_id.id)\
+                              .compute(value=1, date_ref=date_invoice)[0]
+            if (param_date_due and not self.date_due) or not param_date_due:
+                # On rajoute la vérification pour permettre de modifier manuellement la date d'échéance.
                 self.date_due = max(line[0] for line in pterm_list)
 
     @api.multi
@@ -94,6 +131,7 @@ class AccountInvoice(models.Model):
         """
         self.journal_id = self.with_context(company_id=self.company_id.id).default_get(['journal_id'])['journal_id']
 
+
 class AccountInvoiceLine(models.Model):
     _name = 'account.invoice.line'
     _inherit = ['account.invoice.line', 'of.readgroup']
@@ -108,13 +146,15 @@ class AccountInvoiceLine(models.Model):
     )
     of_gb_partner_tag_id = fields.Many2one(
         'res.partner.category', compute=lambda *a, **k: {}, search='_search_of_gb_partner_tag_id',
-        string="Étiquette client", of_custom_groupby=True)
+        string=u"Étiquette client", of_custom_groupby=True)
 
-    of_price_unit_ht = fields.Float(string='Unit Price', compute='_compute_of_price_unit', help="Total amount without taxes", store=True)
-    of_price_unit_ttc = fields.Float(string='Unit Price incl', compute='_compute_of_price_unit',
-                                     help="Unit price with taxes", store=True)
+    of_price_unit_ht = fields.Float(
+        string='Unit Price', compute='_compute_of_price_unit', help="Total amount without taxes", store=True)
+    of_price_unit_ttc = fields.Float(
+        string='Unit Price incl', compute='_compute_of_price_unit', help="Unit price with taxes", store=True)
 
-    price_unit = fields.Float(help="""
+    price_unit = fields.Float(
+        help=u"""
     Prix unitaire de l'article.
     À entrer HT ou TTC suivant la TVA de la ligne de facture.
     """)
@@ -127,8 +167,10 @@ class AccountInvoiceLine(models.Model):
         :return:
         """
         for line in self:
-            taxes = line.invoice_line_tax_ids.compute_all(line.price_unit, line.invoice_id.currency_id, 1,
-                                            product=line.product_id, partner=line.invoice_id.partner_id)
+            taxes = line.invoice_line_tax_ids.compute_all(
+                line.price_unit, line.invoice_id.currency_id, 1,
+                product=line.product_id,
+                partner=line.invoice_id.partner_id)
             line.of_price_unit_ht = taxes['total_excluded']
             line.of_price_unit_ttc = taxes['total_included']
 
@@ -185,35 +227,24 @@ class AccountInvoiceLine(models.Model):
         return super(AccountInvoiceLine, self)._write(vals)
 
 
-class AccountAccount(models.Model):
-    _inherit = "account.account"
+class AccountMove(models.Model):
+    _inherit = 'account.move'
 
-    of_account_counterpart_id = fields.Many2one('account.account', string="Compte de contrepartie")
+    of_export = fields.Boolean(string=u"Exporté")
 
-    @api.model
-    def create(self, vals):
-        if 'group_id' in self._fields and '' not in vals:
-            # Le module OCA des groupes de comptes est installé et le groupe n'est pas mentionné.
-            # (module : account-financial-tools/account_group)
-            # On cherche le groupe adapté en fonction du préfixe.
-            # Code copié de la fonction account.account.onchange_code() du module account_group.
-
-            group_obj = self.env['account.group']
-            group = False
-            code_prefix = vals.get('code', '')
-            # find group with longest matching prefix
-            while code_prefix:
-                matching_group = group_obj.search([('code_prefix', '=', code_prefix)], limit=1)
-                if matching_group:
-                    group = matching_group.id
-                    break
-                code_prefix = code_prefix[:-1]
-            vals['group_id'] = group
-        return super(AccountAccount, self).create(vals)
+    # Lors d'une saisie d'une pièce comptable, pour préremplir avec la date de la dernière écriture du journal.
+    @api.onchange('journal_id')
+    def _onchange_journal_id(self):
+        if self.journal_id:
+            move = self.env['account.move'].search(
+                [('journal_id', '=', self.journal_id.id), ('date', '!=', False)],
+                order='date DESC', limit=1)
+            if move:
+                self.date = move.date
 
 
 class AccountMoveLine(models.Model):
-    _inherit = "account.move.line"
+    _inherit = 'account.move.line'
 
     @api.model
     def get_journal_types(self):
@@ -243,7 +274,8 @@ class AccountMoveLine(models.Model):
         if not journal_id or not lines:
             return result
 
-        lines = self.env['account.move'].resolve_2many_commands('line_ids', lines, ('account_id', 'debit', 'credit', 'date_maturity'))
+        lines = self.env['account.move'].resolve_2many_commands(
+            'line_ids', lines, ('account_id', 'debit', 'credit', 'date_maturity'))
         journal = journal_obj.browse(journal_id)
         if journal.type in ('bank', 'cash'):  # pièce comptable de banque ou de caisse
             if len(lines) == 1:
@@ -309,7 +341,8 @@ class AccountMoveLine(models.Model):
                     pass
         return res
 
-    # Lors d'une saisie d'une pièce comptable, pour préremplir le compte de tiers du partenaire saisi (première ligne uniquement).
+    # Lors d'une saisie d'une pièce comptable, pour préremplir le compte de tiers du partenaire saisi
+    # (première ligne uniquement).
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
         if self.partner_id and not self.account_id and not self._context.get('line_ids', False):
@@ -358,7 +391,8 @@ class AccountMoveLine(models.Model):
                                     (line.account_id.code, line.account_id.name))
                         continue
                     for tax_line in invoice.tax_line_ids:
-                        if tax_line.account_id.id == line.account_id.id and float_compare(balance, tax_line.amount, 2) == 0:
+                        if tax_line.account_id.id == line.account_id.id\
+                                and float_compare(balance, tax_line.amount, 2) == 0:
                             tax_line.account_id = vals['account_id']
                             break
 
@@ -404,55 +438,3 @@ class AccountMoveLine(models.Model):
                 values[0].write({'account_id': vals['account_id']})
 
         return super(AccountMoveLine, self).write(vals)
-
-
-class AccountMove(models.Model):
-    _inherit = "account.move"
-
-    of_export = fields.Boolean(string=u'Exporté')
-
-    # Lors d'une saisie d'une pièce comptable, pour préremplir avec la date de la dernière écriture du journal.
-    @api.onchange('journal_id')
-    def _onchange_journal_id(self):
-        if self.journal_id:
-            move = self.env['account.move'].search([('journal_id', '=', self.journal_id.id), ('date', '!=', False)], order='date DESC', limit=1)
-            if move:
-                self.date = move.date
-
-
-class AccountPayment(models.Model):
-    _inherit = "account.payment"
-
-    of_expected_deposit_date = fields.Date(string=u"Date de remise prévue")
-
-    @api.multi
-    def button_invoices(self):
-        """ (smart button facture sur les paiements)
-        Choisit les vues en fonctions du type de partenaire
-        """
-        vals = super(AccountPayment, self).button_invoices()
-        if (self.partner_type == "customer"):
-            vals['views'] = [(self.env.ref('account.invoice_tree').id, 'tree'),
-                             (self.env.ref('account.invoice_form').id, 'form')]
-        elif (self.partner_type == "supplier"):
-            vals['views'] = [(self.env.ref('account.invoice_supplier_tree').id, 'tree'),
-                             (self.env.ref('account.invoice_supplier_form').id, 'form')]
-        return vals
-
-    def post(self):
-        """Lors de la confirmation d'un paiement, rajoute le libellé sur toutes les écritures du paiement."""
-        res = super(AccountPayment, self).post()
-        for payment in self:
-            payment.move_line_ids.write({
-                'name': ((self.partner_id.name or self.partner_id.parent_id.name or '')[:30]
-                         + " " + (self.communication or '')).strip()
-            })
-        return res
-
-    def _get_move_vals(self, journal=None):
-        """ Return dict to create the payment move
-        """
-        res = super(AccountPayment, self)._get_move_vals(journal=journal)
-        res['ref'] = ((self.partner_id.name or self.partner_id.parent_id.name or '')[:30]
-                      + " " + (self.communication or '')).strip()
-        return res
