@@ -74,6 +74,7 @@ class OFAccountInvoiceReminderStage(models.Model):
     _order = 'sequence'
 
     name = fields.Char(string=u"Nom", required=True)
+    active = fields.Boolean(string="Actif", default=True)
     sequence = fields.Integer(string=u"Séquence", required=True)
     trigger_date = fields.Selection(
         selection=[('deadline', u"Après l'échéance de la facture"),
