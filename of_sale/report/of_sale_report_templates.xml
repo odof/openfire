@@ -126,7 +126,7 @@
                     <thead>
                         <tr>
                             <t groups="of_sale.group_of_sale_print_one_image">
-                                <th name="product_image"></th>
+                                <th name="product_image">Image</th>
                             </t>
                             <th name="descr" style="width: 60%">Description</th>
                             <th name="quant" class="text-right">Quantity</th>
@@ -278,7 +278,7 @@
                 </div>
             </div>
 
-            <t groups="of_sale.group_of_sale_multiimage+of_sale.group_of_sale_print_one_image">
+            <t groups="of_sale.group_of_sale_print_one_image">
                 <div class="row">
                     <div class="col-xs-12">
                         <h4>Annexes</h4>

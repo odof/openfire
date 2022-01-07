@@ -340,7 +340,7 @@ msgstr "Impression de PJ article sur Devis/Commande"
 #. module: of_sale
 #: model:res.groups,name:of_sale.group_of_sale_print_multiimage
 msgid "Print product images on Sale Order"
-msgstr "Impression d'images article sur Devis/Commande"
+msgstr "Impression de plusieurs images article sur Devis/Commande"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_delivery_carrier_of_product_image_ids
