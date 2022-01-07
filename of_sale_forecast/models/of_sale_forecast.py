@@ -226,6 +226,23 @@ class OFSaleForecast(models.Model):
         return True
 
     @api.multi
+    def action_update_orderpoint(self):
+        """Actualisation des règles de stock"""
+        for forecast in self:
+            forecast_total = sum(forecast.overview_line_ids.mapped('forecast_qty'))
+            if forecast_total:
+
+                # Il peut y avoir plusieurs règles de réappro pour un même couple (product_id, warehouse_id)
+                # Du coup on met le résultat dans orderpoint_ids
+                orderpoint_ids = self.env['stock.warehouse.orderpoint'].search(
+                    [('product_id', '=', forecast.product_id.id), ('warehouse_id', '=', forecast.warehouse_id.id)])
+
+                # On valorise le champ "Qté Prév.N" des règles de stock trouvées
+                # pour l'article sur l'entrepôt de la prévision
+                for orderpoint in orderpoint_ids:
+                    orderpoint.of_forecast_qty = forecast_total
+
+    @api.multi
     def action_compute_forecast_lines(self):
         self.ensure_one()
 

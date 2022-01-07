@@ -86,6 +86,7 @@
                         </div>
                         <newline/>
                         <field name="partner_id"/>
+                        <field name="supplier_delay"/>
                         <field name="show_in_sales"/>
                         <label for="note" colspan="2"/>
                         <field name="note" colspan="2" nolabel="1"/>

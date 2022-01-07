@@ -3,32 +3,41 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 
+
 class OfProductBrand(models.Model):
     _name = 'of.product.brand'
     _order = 'name'
 
-    name = fields.Char(string='Name', required=True)
-    code = fields.Char(string='Code', required=True, oldname='prefix')
-    use_prefix = fields.Boolean(string="Use code as prefix", default=True, help="The products internal references will be prefixed with the brand code")
-    partner_id = fields.Many2one('res.partner', string='Supplier', domain=[('supplier', '=', True)], required=True)
-    product_ids = fields.One2many('product.template', 'brand_id', string='Products', readonly=True)
-    product_variant_ids = fields.One2many('product.product', 'brand_id', string='Product variants', readonly=True)
-    active = fields.Boolean(string='Active', default=True)
-    logo = fields.Binary(string='Logo')
+    name = fields.Char(string=u'Name', required=True)
+    code = fields.Char(string=u'Code', required=True, oldname='prefix')
+    use_prefix = fields.Boolean(
+        string=u"Use code as prefix", default=True,
+        help=u"The products internal references will be prefixed with the brand code")
+    partner_id = fields.Many2one('res.partner', string=u'Supplier', domain=[('supplier', '=', True)], required=True)
+    supplier_delay = fields.Integer(
+        string=u'Delivery Delay (days)',
+        help=u"The number of days it takes for the supplier to deliver products of this brand")
+    product_ids = fields.One2many('product.template', 'brand_id', string=u'Products', readonly=True)
+    product_variant_ids = fields.One2many('product.product', 'brand_id', string=u'Product variants', readonly=True)
+    active = fields.Boolean(string=u'Active', default=True)
+    logo = fields.Binary(string=u'Logo')
     product_count = fields.Integer(
-        '# Products', compute='_compute_product_count',
-        help="The number of products of this brand")
-    note = fields.Text(string='Notes')
+        u'# Products', compute='_compute_product_count',
+        help=u"The number of products of this brand")
+    note = fields.Text(string=u'Notes')
     product_change_warn = fields.Boolean(compute="_compute_product_change_warn")
     show_in_sales = fields.Boolean(
-        string="Afficher dans les lignes de ventes",
-        help="Si cette option est cochée, la marque sera ajoutée au début du descriptif des lignes de commandes et factures")
+        string=u"Afficher dans les lignes de ventes",
+        help=u"Si cette option est cochée, la marque sera ajoutée au début "
+             u"du descriptif des lignes de commandes et factures")
+
     # les 2 champs suivant sont affichés dans le module of_import car il redéfini la vue form des marques
     description_sale = fields.Text(string=u"Description pour les devis")
     use_brand_description_sale = fields.Boolean(string=u"Utiliser la description vente au niveau de la marque")
 
     def _compute_product_count(self):
-        read_group_res = self.env['product.template'].read_group([('brand_id', 'in', self.ids)], ['brand_id'], ['brand_id'])
+        read_group_res = self.env['product.template'].read_group(
+            [('brand_id', 'in', self.ids)], ['brand_id'], ['brand_id'])
         group_data = dict((data['brand_id'][0], data['brand_id_count']) for data in read_group_res)
         for categ in self:
             categ.product_count = group_data.get(categ.id, 0)
@@ -83,7 +92,8 @@ class OfProductBrand(models.Model):
         if remove_previous_prefix and isinstance(remove_previous_prefix, basestring) and not remove_previous_prefix.endswith('_'):
             remove_previous_prefix += '_'
         for product in products:
-            default_code = product.default_code or ''  # update_products_default_code() can be called from onchange, when default_code is not already filled
+            # update_products_default_code() can be called from onchange, when default_code is not already filled
+            default_code = product.default_code or ''
             if remove_previous_prefix:
                 if isinstance(remove_previous_prefix, basestring):
                     if default_code.startswith(remove_previous_prefix):
@@ -180,6 +190,7 @@ class ProductTemplate(models.Model):
             default['default_code'] = _("%s (copy)") % self.default_code
         return super(ProductTemplate, self).copy(default=default)
 
+
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
@@ -193,7 +204,8 @@ class ProductProduct(models.Model):
                 ('brand_id', '=', product.brand_id.id),
                 ('product_tmpl_id', '!=', product.product_tmpl_id.id)
             ], limit=1):
-                raise ValidationError(_('Product reference must be unique per brand !\nReference : %s') % product.default_code)
+                raise ValidationError(
+                    _('Product reference must be unique per brand !\nReference : %s') % product.default_code)
 
     @api.onchange('brand_id')
     def _onchange_brand_id(self):
@@ -240,6 +252,7 @@ class Partner(models.Model):
     def _compute_supplier_brand_count(self):
         for partner in self:
             partner.supplier_brand_count = len(partner.brand_ids)
+
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
