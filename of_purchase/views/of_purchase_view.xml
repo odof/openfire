@@ -240,6 +240,11 @@
         </field>
     </record>
 
+    <!-- modif du domain sur action existante -->
+    <record id="purchase.act_res_partner_2_supplier_invoices" model="ir.actions.act_window">
+        <field name="domain">[('type','in',('in_invoice','in_refund'))]</field>
+    </record>
+
     <record id="of_purchase_view_sale_config_settings" model="ir.ui.view">
         <field name="name">of sale settings</field>
         <field name="model">sale.config.settings</field>
