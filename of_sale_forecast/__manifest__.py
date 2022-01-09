@@ -22,6 +22,7 @@ Ce module permet d'anticiper les approvisionnements en tenant compte des ventes 
         'security/ir.model.access.csv',
         'views/of_sale_forecast_templates.xml',
         'views/of_sale_forecast_views.xml',
+        'views/stock_views.xml',
         'reports/of_sale_forecast_report_views.xml',
         'wizards/of_sale_forecast_wizard_views.xml',
     ],

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_forecast_stock_warehouse_orderpoint_form_view" model="ir.ui.view">
+        <field name="name">of.sale.forecast.stock.warehouse.orderpoint.form.view</field>
+        <field name="model">stock.warehouse.orderpoint</field>
+        <field name="inherit_id" ref="of_stock.of_stock_warehouse_orderpoint_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='qty_multiple']" position="after">
+                <field name="of_forecast_qty"/>
+                <label for="of_pace_of_sale"/>
+                <div class="o_row">
+                    <span>Une vente tous les <field name="of_pace_of_sale"/> jour(s)</span>
+                </div>
+                <field name="of_delivery_delay"/>
+                <field name="of_min_theoretical_qty"/>
+                <field name="of_min_stock_coef"/>
+                <field name="of_max_stock_coef"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_stock_warehouse_orderpoint_compute_qty" model="ir.actions.server">
+        <field name="name">Calculer les quantités mini / maxi</field>
+        <field name="model_id" ref="stock.model_stock_warehouse_orderpoint"/>
+        <field name="state">code</field>
+        <field name="code">action = records.compute_min_max_qty()</field>
+    </record>
+
+    <record id="action_stock_warehouse_orderpoint_compute_qty_values" model="ir.values">
+        <field name="name">Calculer les quantités mini / maxi</field>
+        <field name="key2">client_action_multi</field>
+        <field name="model">stock.warehouse.orderpoint</field>
+        <field name="value" eval="'ir.actions.server,%d'%action_stock_warehouse_orderpoint_compute_qty"/>
+    </record>
+
+</odoo>
