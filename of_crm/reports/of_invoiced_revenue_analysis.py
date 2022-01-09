@@ -299,20 +299,59 @@ class OfInvoicedRevenueAnalysis(models.Model):
 
     def _sub_select_sale_order_line(self):
         sub_select_sale_order_line_str = """
-            SELECT  40000000 + SOL.id                                   AS id
-            ,       GREATEST(SOL.of_invoice_date_prev, CURRENT_DATE)    AS date
-            ,       SO.company_id                                       AS company_id
-            ,       SO.user_id                                          AS vendor_id
-            ,       SO.partner_id                                       AS partner_id
-            ,       PP.id                                               AS product_id
-            ,       PT.categ_id                                         AS product_categ_id
-            ,       PT.brand_id                                         AS product_brand_id
-            ,       0                                                   AS invoiced_turnover_budget
-            ,       0                                                   AS invoiced_total
-            ,       0                                                   AS previous_invoiced_total
-            ,       0                                                   AS margin_total
-            ,       SOL.of_amount_to_invoice                            AS amount_to_invoice
-            ,       0                                                   AS residual
+            SELECT  40000000 + SOL.id                                               AS id
+            ,       CASE
+                        WHEN SOL.state = 'presale' THEN
+                            CASE
+                                WHEN SO.of_date_de_pose IS NULL THEN
+                                    NULL
+                                ELSE
+                                    GREATEST(SO.of_date_de_pose, CURRENT_DATE)
+                            END
+                        WHEN SOL.product_id = ( SELECT  PP2.id
+                                                FROM    ir_values                   IV
+                                                ,       product_template            PT2
+                                                ,       product_product             PP2
+                                                WHERE   IV.name                     = 'of_deposit_product_categ_id_setting'
+                                                AND     PT2.categ_id                = SUBSTR(value, 2, POSITION(E'\n' in value) - 1)::INT
+                                                AND     PT2.type                    = 'service'
+                                                AND     PP2.product_tmpl_id         = PT2.id
+                                                LIMIT   1
+                                               )
+                        THEN
+                            CASE
+                                WHEN (  SELECT  MAX(SOL2.of_invoice_date_prev)
+                                        FROM    sale_order_line                     SOL2
+                                        WHERE   SOL2.order_id                       = SOL.order_id
+                                     ) IS NULL THEN
+                                    NULL
+                                ELSE
+                                    GREATEST(
+                                        (   SELECT  MAX(SOL3.of_invoice_date_prev)
+                                            FROM    sale_order_line                 SOL3
+                                            WHERE   SOL3.order_id                   = SOL.order_id
+                                        )
+                                    ,   CURRENT_DATE)
+                            END
+                        WHEN SOL.of_invoice_policy = 'order' THEN
+                            CURRENT_DATE
+                        WHEN SOL.of_invoice_date_prev IS NULL THEN
+                            NULL
+                        ELSE
+                            GREATEST(SOL.of_invoice_date_prev, CURRENT_DATE)
+                    END                                                             AS date
+            ,       SO.company_id                                                   AS company_id
+            ,       SO.user_id                                                      AS vendor_id
+            ,       SO.partner_id                                                   AS partner_id
+            ,       PP.id                                                           AS product_id
+            ,       PT.categ_id                                                     AS product_categ_id
+            ,       PT.brand_id                                                     AS product_brand_id
+            ,       0                                                               AS invoiced_turnover_budget
+            ,       0                                                               AS invoiced_total
+            ,       0                                                               AS previous_invoiced_total
+            ,       0                                                               AS margin_total
+            ,       SOL.of_amount_to_invoice                                        AS amount_to_invoice
+            ,       0                                                               AS residual
         """
         return sub_select_sale_order_line_str
 
@@ -330,7 +369,7 @@ class OfInvoicedRevenueAnalysis(models.Model):
             WHERE   SOL.invoice_status          IN ('no', 'to invoice')
             AND     SOL.of_amount_to_invoice    != 0
             AND     SO.id                       = SOL.order_id
-            AND     SO.state                    NOT IN ('closed', 'cancel')
+            AND     SO.state                    NOT IN ('draft', 'sent', 'closed', 'cancel')
             AND     PP.id                       = SOL.product_id
             AND     PP.product_tmpl_id          = PT.id
         """
