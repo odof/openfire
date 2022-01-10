@@ -3,7 +3,7 @@
 from odoo import fields, models, api, tools
 
 
-class OFSaleMarginRegulator(models.Model):
+class OFPriceVariationAnalysis(models.Model):
     """Analyse des remises"""
 
     _name = 'of.price.variation.analysis'
@@ -82,7 +82,7 @@ class OFSaleMarginRegulator(models.Model):
             fields.append('sale_price_variation')
         if 'sale_price_variation_rate' not in fields:
             fields.append('sale_price_variation_rate')
-        res = super(OFSaleMarginRegulator, self).read_group(
+        res = super(OFPriceVariationAnalysis, self).read_group(
             domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
         for line in res:
             if 'presale_price_variation_rate' in fields:

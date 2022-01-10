@@ -302,12 +302,7 @@ class OfInvoicedRevenueAnalysis(models.Model):
             SELECT  40000000 + SOL.id                                               AS id
             ,       CASE
                         WHEN SOL.state = 'presale' THEN
-                            CASE
-                                WHEN SO.of_date_de_pose IS NULL THEN
-                                    NULL
-                                ELSE
-                                    GREATEST(SO.of_date_de_pose, CURRENT_DATE)
-                            END
+                            SO.of_date_de_pose
                         WHEN SOL.product_id = ( SELECT  PP2.id
                                                 FROM    ir_values                   IV
                                                 ,       product_template            PT2
@@ -319,26 +314,14 @@ class OfInvoicedRevenueAnalysis(models.Model):
                                                 LIMIT   1
                                                )
                         THEN
-                            CASE
-                                WHEN (  SELECT  MAX(SOL2.of_invoice_date_prev)
-                                        FROM    sale_order_line                     SOL2
-                                        WHERE   SOL2.order_id                       = SOL.order_id
-                                     ) IS NULL THEN
-                                    NULL
-                                ELSE
-                                    GREATEST(
-                                        (   SELECT  MAX(SOL3.of_invoice_date_prev)
-                                            FROM    sale_order_line                 SOL3
-                                            WHERE   SOL3.order_id                   = SOL.order_id
-                                        )
-                                    ,   CURRENT_DATE)
-                            END
+                            (   SELECT  MAX(SOL2.of_invoice_date_prev)
+                                FROM    sale_order_line                 SOL2
+                                WHERE   SOL2.order_id                   = SOL.order_id
+                            )
                         WHEN SOL.of_invoice_policy = 'order' THEN
                             CURRENT_DATE
-                        WHEN SOL.of_invoice_date_prev IS NULL THEN
-                            NULL
                         ELSE
-                            GREATEST(SOL.of_invoice_date_prev, CURRENT_DATE)
+                            SOL.of_invoice_date_prev
                     END                                                             AS date
             ,       SO.company_id                                                   AS company_id
             ,       SO.user_id                                                      AS vendor_id
