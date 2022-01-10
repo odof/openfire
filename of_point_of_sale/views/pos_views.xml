@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_point_of_sale_view_pos_config_form" model="ir.ui.view">
+        <field name="name">of.point.of.sale.view.pos.config.form</field>
+        <field name="model">pos.config</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_config_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='proxy_ip']/.." position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_point_of_sale_view_sale_config_settings_form_pos" model="ir.ui.view">
+        <field name="name">of.point.of.sale.view.sale.config.settings.form</field>
+        <field name="model">pos.config.settings</field>
+        <field name="inherit_id" ref="point_of_sale.view_sale_config_settings_form_pos"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='module_pos_data_drinks']/../../.." position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='module_pos_restaurant']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
