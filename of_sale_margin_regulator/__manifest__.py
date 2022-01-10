@@ -20,6 +20,7 @@ Ce module ajoute le rapport Régule de marge pour les ventes
         'reports/of_sale_margin_regulator_views.xml',
         'reports/of_price_variation_analysis_views.xml',
         'security/ir.model.access.csv',
+        'security/of_sale_margin_regulator_security.xml',
         'views/sale_views.xml',
     ],
     'installable': True,
