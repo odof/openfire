@@ -31,7 +31,7 @@
     <record id="of_datastore_display_stock_product_template_form_view" model="ir.ui.view">
         <field name="name">of.datastore.display.stock.product.template.form.view</field>
         <field name="model">product.template</field>
-        <field name="inherit_id" ref="of_datastore_product.of_datastore_product_supplier_stock_template_form_view"/>
+        <field name="inherit_id" ref="of_datastore_product.of_datastore_product_template_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//header/button[last()]" position="after">
                 <button string="Voir stock fournisseur" type="action"
