@@ -981,15 +981,17 @@ class SaleOrderLine(models.Model):
                 if self.product_id.categ_id.of_layout_id:
                     self.layout_category_id = self.product_id.categ_id.of_layout_id
             if self.env.user.has_group('of_sale.group_of_sale_multiimage'):
-                if self.env.user.has_group('of_sale.group_of_sale_print_multiimage'):
-                    if self.product_id.product_tmpl_id.of_product_image_ids:
-                        self.of_product_image_ids = self.product_id.product_tmpl_id.of_product_image_ids
+                if self.product_id.product_tmpl_id.of_product_image_ids:
+                    of_product_image_ids = self.product_id.product_tmpl_id.of_product_image_ids
+                    self.of_product_image_ids = self.product_id.product_tmpl_id.of_product_image_ids
+                    res['domain']['of_product_image_ids'] = [('id', 'in', of_product_image_ids.ids)]
             if self.env.user.has_group('of_sale.group_of_sale_print_attachment'):
                 attachment_ids = self.env['ir.attachment']\
                     .search([('res_model', '=', 'product.template'),
                              ('res_id', '=', self.product_id.product_tmpl_id.id),
                              ('mimetype', '=', 'application/pdf')])
                 if attachment_ids:
+                    self.of_product_attachment_ids = attachment_ids
                     res['domain']['of_product_attachment_ids'] = [('id', 'in', attachment_ids.ids)]
 
         return res
