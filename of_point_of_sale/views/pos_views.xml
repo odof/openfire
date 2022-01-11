@@ -23,6 +23,9 @@
             <xpath expr="//field[@name='module_pos_restaurant']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
+            <xpath expr="//field[@name='module_pos_reprint']" position="after">
+                <field name="default_invoice_customer_id"/>
+            </xpath>
         </field>
     </record>
 
