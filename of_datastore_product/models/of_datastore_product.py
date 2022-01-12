@@ -550,6 +550,7 @@ class OfDatastoreCache(models.TransientModel):
 
     model = fields.Char(string='Model', required=True)
     res_id = BigInteger(string='Resource id', required=True)
+    company_id = fields.Many2one('res.company', string=u"Société", required=True)
     vals = fields.Char(string='Values', help="Dictionnary of values for this object", required=True)
 
     @contextmanager
@@ -592,8 +593,15 @@ class OfDatastoreCache(models.TransientModel):
         """
         model_obj = self.env[model]
         res_ids = [v['id'] for v in vals]
-        stored = {ds_cache.res_id: ds_cache
-                  for ds_cache in self.search([('model', '=', model), ('res_id', 'in', res_ids)])}
+        company = self.env.user.company_id
+        if hasattr(company, 'accounting_company_id'):
+            # Utilisation de la société comptable si le module of_base_multicompany est installé
+            company = company.accounting_company_id
+        stored = {
+            ds_cache.res_id: ds_cache
+            for ds_cache in self.search(
+                [('model', '=', model), ('company_id', '=', company.id), ('res_id', 'in', res_ids)])
+        }
         for v in vals:
             # Les champs calculés ne doivent pas être stockés
             v = {key: val for key, val in v.iteritems() if not model_obj._of_datastore_is_computed_field(key)}
@@ -610,6 +618,7 @@ class OfDatastoreCache(models.TransientModel):
                 self.create({
                     'model': model,
                     'res_id': res_id,
+                    'company_id': company.id,
                     'vals': str(v),
                 })
 
@@ -621,10 +630,16 @@ class OfDatastoreCache(models.TransientModel):
         # Indispensable dans la mesure où store_values() s'applique sur un curseur séparé, généré par _get_cache_token()
         cr = registry(self._cr.dbname).cursor()
 
+        # Société, utilisée dans la clef en raison des champs company-dependent
+        company = record.env.user.company_id
+        if hasattr(company, 'accounting_company_id'):
+            # Utilisation de la société comptable si le module of_base_multicompany est installé
+            company = company.accounting_company_id
+
         # Requête SQL pour gagner en performance
         cr.execute(
-            "SELECT vals FROM of_datastore_cache WHERE model = %s AND res_id = %s",
-            (record._name, record.id))
+            "SELECT vals FROM of_datastore_cache WHERE model = %s AND company_id = %s AND res_id = %s",
+            (record._name, company.id, record.id))
         vals = cr.fetchall()
         cr.close()
         if vals:
