@@ -36,12 +36,21 @@ Fonctionnalités
  - Possibilité de répartir le temps prévu de la tache sur plusieurs périodes
 """,
     'depends': [
+        'hr_timesheet',
+        'of_base',
         'project',
         'project_timeline',
         'project_task_category',
-        'hr_timesheet',
-        'of_base',
         'website_support',
+        # Dépendances servant uniquement à faciliter l'installation des modules
+        'project_description',
+        'project_parent',
+        'project_stage_state',
+        'project_task_add_very_high',
+        'project_task_code',
+        'project_task_default_stage',
+        'project_task_dependency',
+        'project_team',
         ],
     'data': [
         'data/of_project_data.xml',
