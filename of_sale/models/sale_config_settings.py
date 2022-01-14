@@ -143,6 +143,31 @@ class OFSaleConfiguration(models.TransientModel):
         string=u"(OF) Options de ligne de commande", implied_group='of_sale.group_of_order_line_option',
         group='base.group_portal,base.group_user,base.group_public')
 
+    group_of_sale_multiimage = fields.Selection([
+        (0, 'One image per product'),
+        (1, 'Several images per product')
+        ], string='(OF) Multi Images', implied_group='of_sale.group_of_sale_multiimage',
+        group='base.group_portal,base.group_user,base.group_public')
+
+    of_sale_print_multiimage_level = fields.Selection([
+        (0, 'Do not print'),
+        (1, 'Print on each line'),
+        (2, 'Print on appendix')
+        ], string='(OF) Print product images on Sale Order')
+    group_of_sale_print_one_image = fields.Boolean(
+        'Print on each line', implied_group='of_sale.group_of_sale_print_one_image',
+        group='base.group_portal,base.group_user,base.group_public')
+    group_of_sale_print_multiimage = fields.Boolean(
+        'Print on appendix', implied_group='of_sale.group_of_sale_print_multiimage',
+        group='base.group_portal,base.group_user,base.group_public')
+
+    group_of_sale_print_attachment = fields.Selection([
+        (0, 'Do not print'),
+        (1, 'Print on appendix')
+        ], string='(OF) Print product attachments on Sale Order',
+        implied_group='of_sale.group_of_sale_print_attachment',
+        group='base.group_portal,base.group_user,base.group_public')
+
     of_invoice_grouped = fields.Selection(selection=[
         (0, 'Groupement par partenaire + devise'),
         (1, 'Groupement par commande'),
@@ -261,6 +286,21 @@ class OFSaleConfiguration(models.TransientModel):
     def set_of_invoice_grouped_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_invoice_grouped', self.of_invoice_grouped)
+
+    @api.multi
+    def set_of_sale_print_multiimage_level_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_sale_print_multiimage_level', self.of_sale_print_multiimage_level)
+
+    @api.onchange('of_sale_print_multiimage_level')
+    def onchange_of_sale_print_multiimage_level(self):
+        self.group_of_sale_print_one_image = self.of_sale_print_multiimage_level == 1
+        self.group_of_sale_print_multiimage = self.of_sale_print_multiimage_level == 2
+
+    @api.onchange('group_of_sale_multiimage')
+    def onchange_group_of_sale_multiimage(self):
+        if not self.group_of_sale_multiimage:
+            self.of_sale_print_multiimage_level = 0
 
     @api.onchange('sale_show_tax')
     def _onchange_sale_tax(self):

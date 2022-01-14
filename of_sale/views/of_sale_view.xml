@@ -246,6 +246,40 @@
             </field>
         </record>
 
+        <record id="of_sale_view_of_product_image_form" model="ir.ui.view">
+            <field name="name">of.sale.of.product.image.form</field>
+            <field name="model">of.product.image</field>
+            <field name="arch" type="xml">
+                <form string="Product Images">
+                    <sheet>
+                        <field name="image" widget="image" class="oe_avatar"/>
+                        <div class="oe_title">
+                            <label class="oe_edit_only" for="name" string="Image Name"/>
+                            <h1><field name="name" placeholder="Image Name" required="True"/></h1>
+                            <field name="product_tmpl_id" invisible="1"/>
+                        </div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="of_sale_view_of_product_image_form" model="ir.ui.view">
+            <field name="name">of.sale.of.product.image.form</field>
+            <field name="model">of.product.image</field>
+            <field name="arch" type="xml">
+                <form string="Product Images">
+                    <sheet>
+                        <field name="image" widget="image" class="oe_avatar"/>
+                        <div class="oe_title">
+                            <label class="oe_edit_only" for="name" string="Image Name"/>
+                            <h1><field name="name" placeholder="Image Name" required="True"/></h1>
+                            <field name="product_tmpl_id" invisible="1"/>
+                        </div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
         <!-- Ajout des droits sur les marges/prix d'achats -->
         <record id="of_sale_margin_sale_order" model="ir.ui.view">
             <field name="name">of.sale.margin.sale.order</field>
@@ -284,6 +318,31 @@
                         </span>
                     </div>
                 </xpath>
+                <xpath expr="//field[@name='order_line']/form" position="inside">
+                    <label for="of_product_image_ids" groups="of_sale.group_of_sale_print_multiimage,of_sale.group_of_sale_print_one_image"/>
+                    <field name="of_product_image_ids" mode="kanban" context="{'default_name': name, 'default_product_tmpl_id': product_tmpl_id or active_id}" groups="of_sale.group_of_sale_print_multiimage,of_sale.group_of_sale_print_one_image">
+                        <kanban string="Product Images">
+                            <field name="name"/>
+                            <field name="image" />
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <div class="oe_kanban_global_click">
+                                        <a t-if="!read_only_mode" type="delete" class="fa fa-times pull-right"/>
+                                        <div class="o_kanban_image">
+                                            <img t-if="record.image.raw_value" t-att-src="'data:image/png;base64,'+record.image.raw_value"/>
+                                        </div>
+                                        <div class="oe_kanban_details">
+                                            <field name="name"/>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
+                    <label for="of_product_attachment_ids" groups="of_sale.group_of_sale_print_attachment"/>
+                    <field name="of_product_attachment_ids" widget="many2many_tags" groups="of_sale.group_of_sale_print_attachment"/>
+                </xpath>
+
             </field>
         </record>
 
@@ -334,6 +393,30 @@
                 <xpath expr="//group[@name='group_general']/span" position="attributes">
                     <attribute name="groups">of_sale.of_group_sale_marge_manager</attribute>
                 </xpath>
+                <xpath expr="//notebook[last()]" position="inside">
+                    <page string="Images" name="of_sale_multiimage" groups="of_sale.group_of_sale_multiimage">
+                        <field name="of_product_image_ids" mode="kanban" context="{'default_name': name, 'default_product_tmpl_id': active_id}" >
+                            <kanban string="Product Images">
+                                <field name="name"/>
+                                <field name="image" />
+                                <templates>
+                                    <t t-name="kanban-box">
+                                        <div class="oe_kanban_global_click">
+                                            <a t-if="!read_only_mode" type="delete" class="fa fa-times pull-right"/>
+                                            <div class="o_kanban_image">
+                                                <img t-if="record.image.raw_value" t-att-src="'data:image/png;base64,'+record.image.raw_value"/>
+                                            </div>
+                                            <div class="oe_kanban_details">
+                                                <field name="name"/>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </templates>
+                            </kanban>
+                        </field>
+                    </page>
+                </xpath>
+
             </field>
         </record>
 

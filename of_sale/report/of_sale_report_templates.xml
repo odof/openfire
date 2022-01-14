@@ -126,6 +126,9 @@
                 <table name="order_lines_layouted" class="table table-condensed">
                     <thead>
                         <tr>
+                            <t groups="of_sale.group_of_sale_print_one_image">
+                                <th name="product_image">Image</th>
+                            </t>
                             <th name="descr" style="width: 60%">Description</th>
                             <th name="quant" class="text-right">Quantity</th>
                             <th name="price_unit_ht" class="text-right" groups="sale.group_show_price_subtotal">Prix/U&amp;nbsp;HT</th> <!-- HT ou les 2 -->
@@ -153,6 +156,12 @@
                                     <t t-set="the_name" t-value="l.of_get_line_name()"/>
                                     <t t-set="name_line" t-value="the_name[0]"/>
                                     <t t-set="the_name" t-value="the_name[1:]"/>
+
+                                    <t groups="of_sale.group_of_sale_print_one_image">
+                                        <td name="product_image">
+                                            <img t-att-src="'data:image/png;base64,%s' % l.product_id.image_small" style="max-height: 48px;"/>
+                                        </td>
+                                    </t>
                                     <td name="descr">
                                         <span t-esc="name_line"/>
                                         <br t-if="len(the_name) > 0"/>
@@ -294,6 +303,51 @@
                     </table>
                 </div>
             </div>
+            <t groups="of_sale.group_of_sale_print_one_image">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <h4>Annexes</h4>
+                        <t t-foreach="doc.order_line" t-as="line">
+                            <t t-if="line.of_product_image_ids">
+                                <h5><em t-field="line.product_id.name"/></h5>
+                                <div class="row mb16">
+                                    <t t-foreach="line.of_product_image_ids" t-as="image">
+                                        <div t-if="image.image" class="col-xs-4">
+                                            <img class="img-responsive center-block" t-att-src="'data:image/png;base64,%s' % image.image" style="max-height: 150px;"/>
+                                            <p class="mt8 text-center" t-field="image.name"/>
+                                        </div>
+                                    </t>
+                                </div>
+                            </t>
+                        </t>
+                    </div>
+                </div>
+            </t>
+
+            <t groups="of_sale.group_of_sale_print_multiimage">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <h4>Annexes</h4>
+                        <t t-foreach="doc.order_line" t-as="line">
+                            <h5><em t-field="line.product_id.name"/></h5>
+                            <div class="row mb16">
+                                <div t-if="line.product_id.image" class="col-xs-4">
+                                    <img class="img-responsive center-block" t-att-src="'data:image/png;base64,%s' % line.product_id.image" style="max-height: 150px;"/>
+                                    <p class="mt8 text-center" t-field="line.product_id.name"/>
+                                </div>
+                                <t groups="of_sale.group_of_sale_multiimage">
+                                    <t t-foreach="line.of_product_image_ids" t-as="image">
+                                        <div t-if="image.image" class="col-xs-4">
+                                            <img class="img-responsive center-block" t-att-src="'data:image/png;base64,%s' % image.image" style="max-height: 150px;"/>
+                                            <p class="mt8 text-center" t-field="image.name"/>
+                                        </div>
+                                    </t>
+                                </t>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </t>
 
             <p t-if="doc.of_date_vt and not pdf_vt_pastille">
                 <t t-set="date_order" t-value="doc.of_date_vt[8:10] + '/' + doc.of_date_vt[5:7] + '/' + doc.of_date_vt[0:4]"/>
