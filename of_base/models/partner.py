@@ -381,9 +381,19 @@ class ResPartner(models.Model):
         if parent_id and not vals.get('is_company', False):
             parent = self.browse(parent_id)
             vals.update(customer=parent.customer, supplier=parent.supplier)
-        res = super(ResPartner, self).create(vals)
+        partner = super(ResPartner, self).create(vals)
         self._check_no_ref_duplicate(vals.get('ref'))
-        return res
+        # Calcul de la ref en fonction de la configuration
+        if partner.company_id.of_ref_mode == 'id' and not partner.ref:
+            if not self.env['res.partner'].with_context(active_test=False).search([('ref', '=', str(partner.id))]):
+                partner.ref = str(partner.id)
+            else:
+                i = 2
+                while self.env['res.partner'].with_context(active_test=False).search(
+                        [('ref', '=', str(partner.id) + '-' + str(i))]):
+                    i += 1
+                partner.ref = str(partner.id) + '-' + str(i)
+        return partner
 
     @api.model
     def _update_refs(self, new_ref, partner_refs):
@@ -426,6 +436,16 @@ class ResPartner(models.Model):
         super(ResPartner, self).write(vals)
         if write_ref:
             self._update_refs(ref, partner_refs)
+        # Calcul de la ref en fonction de la configuration
+        for partner in self.filtered(lambda p: p.company_id.of_ref_mode == 'id' and not p.ref):
+            if not self.env['res.partner'].with_context(active_test=False).search([('ref', '=', str(partner.id))]):
+                partner.ref = str(partner.id)
+            else:
+                i = 2
+                while self.env['res.partner'].with_context(active_test=False).search(
+                        [('ref', '=', str(partner.id) + '-' + str(i))]):
+                    i += 1
+                partner.ref = str(partner.id) + '-' + str(i)
         return True
 
     # Permet à l'auteur du mail de le recevoir en copie.
