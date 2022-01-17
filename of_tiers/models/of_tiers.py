@@ -114,16 +114,6 @@ class ResPartner(models.Model):
             if data:
                 partner.write(data)
 
-    @api.model
-    def create(self, vals):
-        partner = super(ResPartner, self).create(vals)
-
-        # Utilisation de l'id du partenaire comme référence client, si option configurée dans la société
-        if partner.company_id.of_client_id_ref:
-            if not partner.ref:
-                partner.ref = str(partner.id)
-        return partner
-
     @api.multi
     def unlink(self):
         # Suppression des comptes de tiers a la suppression du partenaire.
