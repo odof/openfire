@@ -14,26 +14,25 @@
 
 {
     'name': "OpenFire Projets",
-    'version': "0.1.0.0",
+    'version': "10.0.1.0.0",
     'author': "OpenFire",
     'website': "www.openfire.fr",
     'category': "projet",
     'summary': u"OpenFire Projets",
     'description': u"""
 Module OpenFire Projets
-===============================
+=======================
 Ce module modifie/ajoute des fonctionnalités aux projets
 
 Modifications
 -------------
- - Ajout du choix de période planifié sur les tâches
-
-Fonctionnalités
----------------
- - Ajout des périodes planifiées
-    - Permet de définir un période de travail avec plusieurs utilisateurs
-    - Définir le temps de travail de l'utilisateur et la répartition de ce temps de travail
- - Possibilité de répartir le temps prévu de la tache sur plusieurs périodes
+- Dates de début/fin des tâches et projets
+- Semaine de début du projet
+- État du projet
+- Étiquettes de projet
+- Priorité du projet : Un projet avec 3 tâches importantes est prioritaire sur un projet qui n’en a qu’une
+- Projet et catégorie obligatoires dans la tâche
+- Le code de la tâche apparaît dans son nom
 """,
     'depends': [
         'hr_timesheet',
@@ -41,7 +40,6 @@ Fonctionnalités
         'project',
         'project_timeline',
         'project_task_category',
-        'website_support',
         # Dépendances servant uniquement à faciliter l'installation des modules
         'project_description',
         'project_parent',
@@ -53,9 +51,7 @@ Fonctionnalités
         'project_team',
         ],
     'data': [
-        'data/of_project_data.xml',
         'views/of_project_views.xml',
-        'security/ir.model.access.csv',
     ],
     'installable': True,
     'application': False,

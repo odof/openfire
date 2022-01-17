@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<odoo>
+
+
+    <!--*****************************************************************************************-->
+    <!--******************************************Project Task***********************************-->
+    <!--*****************************************************************************************-->
+
+    <record id="of_project_website_support_view_task_form2_inherited" model="ir.ui.view">
+        <field name="name">of.periode.planifiee.view.task.form2.inherited</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="hr_timesheet.view_task_form2_inherited"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_tickets" type="object" class="oe_stat_button" icon="fa-tasks">
+                    <field name="of_ticket_count" string="Tickets(s)" widget="statinfo"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <!--*****************************************************************************************-->
+    <!--******************************** Website Support Ticket *********************************-->
+    <!--*****************************************************************************************-->
+
+    <record id="of_project_website_support_ticket_form_view" model="ir.ui.view">
+        <field name="name">of.project.website.support.ticket.form.view</field>
+        <field name="model">website.support.ticket</field>
+        <field name="inherit_id" ref="website_support.website_support_ticket_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='sub_category_id']" position="after">
+                <field name="of_task_id"/>
+            </xpath>
+            <!-- Retrait du bouton d'envoi de questionnaire d'évaluation -->
+            <xpath expr="//button[@name='send_survey']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

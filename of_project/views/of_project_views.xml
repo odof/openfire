@@ -2,168 +2,11 @@
 <odoo>
 
     <!--*****************************************************************************************-->
-    <!--***************************************Période planifiée*********************************-->
-    <!--*****************************************************************************************-->
-
-    <record id="view_of_periode_planifiee_form" model="ir.ui.view">
-        <field name="name">of.periode.planifiee.form</field>
-        <field name="model">of.periode.planifiee</field>
-        <field name="arch" type="xml">
-            <form string="Périodes planifiées">
-                <sheet>
-                    <div class="oe_button_box" name="button_box">
-                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
-                            <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
-                        </button>
-                    </div>
-                    <div class="oe_title">
-                        <h1><field name="name"/></h1>
-                    </div>
-                    <group>
-                        <group>
-                            <field name="type"/>
-                            <field name="premier_jour"/>
-                            <field name="dernier_jour"/>
-                        </group>
-                    </group>
-                    <notebook>
-                        <page string="Ressources">
-                            <field name="technicien_ids">
-                                <form>
-                                    <div class="oe_title">
-                                        <h1><field name="user_id" domain="[('share', '=', False)]" placeholder="Ressource"/></h1>
-                                    </div>
-                                    <group>
-                                        <group>
-                                            <field name="periode_id" invisible="1"/>
-                                            <field name="type"/>
-                                            <field name="temps_de_travail" widget="float_time"/>
-                                            <field name="temps_restant_categ" widget="float_time"/>
-                                            <field name="temps_restant_task" widget="float_time"/>
-                                            <field name="temps_effectue" widget="float_time"/>
-                                        </group>
-                                    </group>
-                                    <notebook>
-                                        <page string="Planification">
-                                            <field name="task_planning_ids" widget="one2many">
-                                                <tree editable="bottom">
-                                                    <field name="project_id"/>
-                                                    <field name="task_id"/>
-                                                    <field name="task_stage_id"/>
-                                                    <field name="type_id"/>
-                                                    <field name="duration"/>
-                                                    <field name="notes"/>
-                                                    <field name="state"/>
-                                                </tree>
-                                                <form>
-                                                    <group>
-                                                        <group>
-                                                            <field name="project_id"/>
-                                                            <field name="task_id"/>
-                                                            <field name="task_stage_id"/>
-                                                            <field name="type_id"/>
-                                                        </group>
-                                                        <group>
-                                                            <field name="state"/>
-                                                            <field name="duration"/>
-                                                            <field name="notes"/>
-                                                        </group>
-                                                    </group>
-                                                </form>
-                                            </field>
-                                        </page>
-                                        <page string="Catégories">
-                                            <field name="category_ids">
-                                                <tree editable="bottom" default_order="name">
-                                                    <field name="name" invisible="1"/>
-                                                    <field name="categorie_id"/>
-                                                    <field name="temps_prevu" widget="float_time"/>
-                                                    <field name="temps_restant" widget="float_time"/>
-                                                    <field name="periode_id" invisible="1"/>
-                                                </tree>
-                                            </field>
-                                        </page>
-                                    </notebook>
-                                </form>
-                                <tree colors="darkred:temps_effectue&gt;temps_de_travail;
-                                darkolivegreen:temps_effectue==temps_de_travail" default_order="name">
-                                    <field name="name" invisible="1"/>
-                                    <field name="user_id"  domain="[('share', '=', False)]"/>
-                                    <field name="type"/>
-                                    <field name="temps_de_travail" widget="float_time"/>
-                                    <field name="temps_restant_categ" widget="float_time"/>
-                                    <field name="temps_restant_task" widget="float_time"/>
-                                    <field name="temps_effectue" widget="float_time"/>
-                                </tree>
-                            </field>
-                        </page>
-                    </notebook>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-    <record id="view_of_periode_planifiee_tree" model="ir.ui.view">
-        <field name="name">of.periode.planifiee.tree</field>
-        <field name="model">of.periode.planifiee</field>
-        <field name="arch" type="xml">
-            <tree string="Périodes planifiées"
-                  colors="green: planification_ok; darkred: planification_alert">
-                <field name="planification_alert" invisible="1"/>
-                <field name="planification_ok" invisible="1"/>
-                <field name="name"/>
-                <field name="premier_jour"/>
-                <field name="cust_total_time" string="Total client" widget="float_time" style="background-color: red;"/>
-                <field name="cust_planned_time" string="Planifié" widget="float_time"/>
-                <field name="cust_remaining_task_time" string="RAP" widget="float_time"/>
-                <field name="cust_planned_time_perc" string="% Planif."/>
-                <field name="cust_done_time" string="Produit" widget="float_time"/>
-                <field name="cust_done_time_perc" string="% Prod."/>
-                <field name="tech_total_time" string="Total dev" widget="float_time"/>
-                <field name="tech_planned_time" string="Planifié" widget="float_time"/>
-                <field name="tech_remaining_task_time" string="RAP" widget="float_time"/>
-                <field name="tech_planned_time_perc" string="% Planif."/>
-                <field name="tech_done_time" string="Produit" widget="float_time"/>
-                <field name="tech_done_time_perc" string="% Prod."/>
-            </tree>
-        </field>
-    </record>
-
-    <record id="view_of_periode_planifiee_search" model="ir.ui.view">
-        <field name="name">of.periode.planifiee.search</field>
-        <field name="model">of.periode.planifiee</field>
-        <field name="arch" type="xml">
-            <search string="Périodes planifiées">
-                <field name="name"/>
-                <field name="type"/>
-                <field name="premier_jour"/>
-                <field name="dernier_jour"/>
-                <filter name="incoming" string="À venir" domain="[('dernier_jour', '>=', context_today().strftime('%Y-%m-%d'))]" />
-                <group expand="0" string="Regrouper par...">
-                    <filter string="Type" name="groupby_type" domain="[]" context="{'group_by':'type'}"/>
-                    <filter string="Utilisateur" name="groupby_user" domain="[]" context="{'group_by':'gb_user_id'}"/>
-                    <filter string="Catégories" name="groupby_categ" domain="[]" context="{'group_by':'gb_category_id'}"/>
-                </group>
-            </search>
-        </field>
-    </record>
-
-    <record id="action_view_periode_planifiee" model="ir.actions.act_window">
-        <field name="name">Période planifiées</field>
-        <field name="res_model">of.periode.planifiee</field>
-        <field name="view_mode">tree,form</field>
-        <field name="context">{'search_default_incoming': 1}</field>
-        <field name="search_view_id" ref="view_of_periode_planifiee_search"/>
-    </record>
-
-    <menuitem action="action_view_periode_planifiee" id="menu_action_view_periode_planifiee" parent="project.menu_project_management" sequence="1"/>
-
-    <!--*****************************************************************************************-->
     <!--**************************************** Project ****************************************-->
     <!--*****************************************************************************************-->
 
     <record id="of_project_project_form_view" model="ir.ui.view">
-        <field name="name">of.project.project.form.view</field>
+        <field name="name">of_project.project.form.view</field>
         <field name="model">project.project</field>
         <field name="inherit_id" ref="project.edit_project"/>
         <field name="arch" type="xml">
@@ -179,7 +22,7 @@
     </record>
 
     <record id="of_project_project_kanban_view" model="ir.ui.view">
-        <field name="name">of.project.project.kanban.view</field>
+        <field name="name">of_project.project.kanban.view</field>
         <field name="model">project.project</field>
         <field name="inherit_id" ref="project.view_project_kanban"/>
         <field name="arch" type="xml">
@@ -189,34 +32,17 @@
             <xpath expr="//field[@name='name']" position="before">
                 <field name="of_state" invisible="1"/>
                 <field name="of_tag_ids"/>
-                <field name="of_total_planned_hours"/>
-                <field name="of_total_done_hours"/>
-                <field name="of_ressources"/>
             </xpath>
             <xpath expr="//div[@class='o_kanban_card_content o_visible']" position="before">
                 <div>
                     <field name="of_tag_ids" style="margin-left: -16px;"/>
                 </div>
             </xpath>
-            <xpath expr="//div[@class='o_kanban_primary_left']" position="inside">
-                <div style="margin-top: 10px;">
-                    <span style="display: flex;">Durée prévue :<field name="of_total_planned_hours" widget="float_time"/></span>
-                    <span style="display: flex;">Durée réalisée :<field name="of_total_done_hours" widget="float_time"/></span>
-                </div>
-                <div style="margin-top: 10px;">
-                    <t t-value="JSON.parse(record.of_ressources.raw_value)" t-set="ressources"/>
-                    <t t-foreach="ressources" t-as="ressource">
-                        <img t-att-src="kanban_image('res.users', 'image_small', ressource['id'])"
-                             t-attf-title="#{ressource['name']}" width="24" height="24"
-                             class="oe_kanban_avatar pull-left"/>
-                    </t>
-                </div>
-            </xpath>
         </field>
     </record>
 
     <record id="of_project_project_timeline_view" model="ir.ui.view">
-        <field name="name">of.project.project.timeline.view</field>
+        <field name="name">of_project.project.timeline.view</field>
         <field name="model">project.project</field>
         <field name="type">timeline</field>
         <field name="arch" type="xml">
@@ -228,12 +54,13 @@
     </record>
 
     <record id="of_project_project_search_view" model="ir.ui.view">
-        <field name="name">of.project.project.search.view</field>
+        <field name="name">of_project.project.search.view</field>
         <field name="model">project.project</field>
         <field name="inherit_id" ref="project.view_project_project_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='user_id']" position="before">
                 <separator/>
+                <!-- Vérifier dispo de use_issues -->
                 <filter string="Projets Client" name="customer_projects"
                         domain="['&amp;', ('partner_id', '!=', False), '|', ('use_tasks', '=', True), ('use_issues', '=', True)]"/>
                 <filter string="Projets Produit" name="product_projects"
@@ -259,41 +86,8 @@
     <!--******************************************Project Task***********************************-->
     <!--*****************************************************************************************-->
 
-    <record id="view_of_periode_planifiee_view_task_form2_inherited" model="ir.ui.view">
-        <field name="name">of.periode.planifiee.view.task.form2.inherited</field>
-        <field name="model">project.task</field>
-        <field name="inherit_id" ref="hr_timesheet.view_task_form2_inherited"/>
-        <field name="arch" type="xml">
-            <xpath expr="//div[@name='button_box']" position="inside">
-                <button name="action_view_tickets" type="object" class="oe_stat_button" icon="fa-tasks">
-                    <field name="of_ticket_count" string="Tickets(s)" widget="statinfo"/>
-                </button>
-            </xpath>
-            <xpath expr="//field[@name='planned_hours']" position="attributes">
-                <attribute name="readonly">1</attribute>
-            </xpath>
-            <xpath expr="//page[@name='description_page']" position="after">
-                <page name="review_page" string="Revue">
-                    <field name="of_review_description" type="html"/>
-                    <div class="oe_clear"/>
-                </page>
-                <page name="planning_page" string="Planification">
-                    <field name="of_planning_ids">
-                        <tree editable="bottom">
-                            <field name="type_id"/>
-                            <field name="user_id"/>
-                            <field name="period_id"/>
-                            <field name="duration"/>
-                            <field name="notes"/>
-                        </tree>
-                    </field>
-                </page>
-            </xpath>
-        </field>
-    </record>
-
-    <record id="view_task_kanban_inherited_custom_zz_openfire" model="ir.ui.view">
-        <field name="name">project.task.timesheet.kanban.inherited.custom_zz_openfire</field>
+    <record id="of_project_project_task_kanban_view" model="ir.ui.view">
+        <field name="name">of_project.project.task.kanban.view</field>
         <field name="model">project.task</field>
         <field name="inherit_id" ref="project.view_task_kanban"/>
         <field name="arch" type="xml">
@@ -301,22 +95,11 @@
                 <attribute name="class">o_kanban_small_column</attribute>
                 <attribute name="default_group_by">stage_id</attribute>
             </xpath>
-            <xpath expr="//field[@name='user_id']" position="replace">
-                <field name="of_ressources"/>
-            </xpath>
-            <xpath expr="//div[@class='oe_kanban_bottom_right']/img" position="replace">
-                <t t-value="JSON.parse(record.of_ressources.raw_value)" t-set="ressources"/>
-                <t t-foreach="ressources" t-as="ressource">
-                    <img t-att-src="kanban_image('res.users', 'image_small', ressource['id'])"
-                         t-attf-title="#{ressource['name']}" width="24" height="24"
-                         class="oe_kanban_avatar pull-right"/>
-                </t>
-            </xpath>
          </field>
      </record>
 
     <record id="of_project_project_task_search_view" model="ir.ui.view">
-        <field name="name">of.project.project.task.search.view</field>
+        <field name="name">of_project.project.task.search.view</field>
         <field name="model">project.task</field>
         <field name="inherit_id" ref="project.view_task_search_form"/>
         <field name="arch" type="xml">
@@ -326,185 +109,6 @@
                         domain="[('project_id.partner_id', '!=', False)]"/>
                 <filter string="Projets Produit" name="product_projects"
                         domain="[('project_id.partner_id', '=', False)]"/>
-                <separator/>
-                <filter string="Planifiée cette semaine" name="this_week"
-                        domain="[(u'of_periode_ids.dernier_jour', u'>=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
-                                 (u'of_periode_ids.premier_jour', u'&lt;', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
-                <filter string="Planifiée la semaine dernière" name="last_week"
-                        domain="[(u'of_periode_ids.dernier_jour', u'>=', (context_today() - datetime.timedelta(days=context_today().weekday()+7)).strftime('%Y-%m-%d')),
-                                 (u'of_periode_ids.premier_jour', u'&lt;', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d'))]"/>
-                <filter string="Planifiée la semaine prochaine" name="next_week"
-                        domain="[(u'of_periode_ids.dernier_jour', u'>=', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d')),
-                                 (u'of_periode_ids.premier_jour', u'&lt;', (context_today() + datetime.timedelta(days=14-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
-                <separator/>
-                <filter string="Planifiée ce mois" name="this_month"
-                        domain="[(u'of_periode_ids.dernier_jour', u'>=', context_today().strftime('%Y-%m-01')),
-                                 (u'of_periode_ids.premier_jour', u'&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d'))]"/>
-                <filter string="Planifiée le mois dernier" name="last_month"
-                        domain="[(u'of_periode_ids.dernier_jour', u'>=', (context_today() - relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
-                                 (u'of_periode_ids.premier_jour', u'&lt;', context_today().strftime('%Y-%m-01'))]"/>
-                <filter string="Planifiée le mois prochain" name="next_month"
-                        domain="[(u'of_periode_ids.dernier_jour', u'>=', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
-                                 (u'of_periode_ids.premier_jour', u'&lt;', (context_today() + relativedelta(day=1,months=2)).strftime('%Y-%m-%d'))]"/>
-            </xpath>
-            <xpath expr="//group" position="inside">
-                <filter string="Période(s)" name="groupby_period" domain="[]" context="{'group_by':'of_gb_period_id'}"/>
-            </xpath>
-            <xpath expr="//field[@name='user_id']" position="attributes">
-                <attribute name="filter_domain">['|',('user_id', '=', self),('of_planning_ids.user_id', '=', self)]</attribute>
-            </xpath>
-        </field>
-    </record>
-
-    <!--*****************************************************************************************-->
-    <!--******************************* OF Project Task Planning ********************************-->
-    <!--*****************************************************************************************-->
-
-    <record id="of_project_task_planning_form_view" model="ir.ui.view">
-        <field name="name">of.project.task.planning.form.view</field>
-        <field name="model">of.project.task.planning</field>
-        <field name="arch" type="xml">
-            <form>
-                <sheet>
-                    <group>
-                        <group>
-                            <field name="project_id"/>
-                            <field name="task_id"/>
-                            <field name="task_stage_id"/>
-                            <field name="type_id"/>
-                        </group>
-                        <group>
-                            <field name="user_id"/>
-                            <field name="period_id"/>
-                            <field name="duration"/>
-                            <field name="state"/>
-                        </group>
-                        <field name="notes"/>
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-    <record id="of_project_task_planning_tree_view" model="ir.ui.view">
-        <field name="name">of.project.task.planning.tree.view</field>
-        <field name="model">of.project.task.planning</field>
-        <field name="arch" type="xml">
-            <tree>
-                <field name="project_id"/>
-                <field name="task_id"/>
-                <field name="task_stage_id"/>
-                <field name="type_id"/>
-                <field name="user_id"/>
-                <field name="period_id"/>
-                <field name="state"/>
-            </tree>
-        </field>
-    </record>
-
-    <record id="of_project_task_planning_search_view" model="ir.ui.view">
-        <field name="name">of.project.task.planning.search.view</field>
-        <field name="model">of.project.task.planning</field>
-        <field name="arch" type="xml">
-            <search>
-                <field name="project_id"/>
-                <field name="task_id"/>
-                <field name="type_id"/>
-                <field name="user_id"/>
-                <field name="period_id"/>
-                <filter string="À valider" name="to_validate" domain="[('state', '=', 'to_validate')]"/>
-                <filter string="Validé" name="validated" domain="[('state', '=', 'validated')]"/>
-                <separator/>
-                <filter string="Mes activités" name="my_activities" domain="[('user_id', '=', uid)]"/>
-                <separator/>
-                <filter string="À venir" name="incoming"
-                        domain="[('period_id.dernier_jour', '>=', context_today().strftime('%Y-%m-%d'))]"/>
-            </search>
-        </field>
-    </record>
-
-    <record id="of_project_task_planning_action" model="ir.actions.act_window">
-        <field name="name">Activités planifiées</field>
-        <field name="res_model">of.project.task.planning</field>
-        <field name="view_mode">tree,form</field>
-        <field name="search_view_id" ref="of_project_task_planning_search_view"/>
-        <field name="context">{'search_default_my_activities': 1,
-                               'search_default_incoming': 1,
-                               'search_default_to_validate': 1}</field>
-    </record>
-
-    <menuitem id="of_project_task_planning_menu" action="of_project_task_planning_action"
-              string="Activités planifiées" parent="project.menu_project_management" sequence="10"/>
-
-    <!--*****************************************************************************************-->
-    <!--***************************** OF Project Task Planning Type *****************************-->
-    <!--*****************************************************************************************-->
-
-    <record id="of_project_task_planning_type_form_view" model="ir.ui.view">
-        <field name="name">of.project.task.planning.type.form.view</field>
-        <field name="model">of.project.task.planning.type</field>
-        <field name="arch" type="xml">
-            <form>
-                <sheet>
-                    <group>
-                        <group>
-                            <field name="name"/>
-                            <field name="sequence"/>
-                            <field name="active"/>
-                        </group>
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-    <record id="of_project_task_planning_type_tree_view" model="ir.ui.view">
-        <field name="name">of.project.task.planning.type.tree.view</field>
-        <field name="model">of.project.task.planning.type</field>
-        <field name="arch" type="xml">
-            <tree>
-                <field name="sequence" widget="handle"/>
-                <field name="name"/>
-            </tree>
-        </field>
-    </record>
-
-    <record id="of_project_task_planning_type_search_view" model="ir.ui.view">
-        <field name="name">of.project.task.planning.type.search.view</field>
-        <field name="model">of.project.task.planning.type</field>
-        <field name="arch" type="xml">
-            <search>
-                <field name="name"/>
-                <filter string="Archivé" name="inactive" domain="[('active', '=', False)]"/>
-            </search>
-        </field>
-    </record>
-
-    <record id="of_project_task_planning_type_action" model="ir.actions.act_window">
-        <field name="name">Types d'activité</field>
-        <field name="res_model">of.project.task.planning.type</field>
-        <field name="view_mode">tree,form</field>
-        <field name="search_view_id" ref="of_project_task_planning_type_search_view"/>
-    </record>
-
-    <menuitem id="of_project_task_planning_type_menu" action="of_project_task_planning_type_action"
-              string="Types d'activité" parent="project.menu_project_config" sequence="20"/>
-
-    <!--*****************************************************************************************-->
-    <!--******************************** Website Support Ticket *********************************-->
-    <!--*****************************************************************************************-->
-
-    <record id="of_project_website_support_ticket_form_view" model="ir.ui.view">
-        <field name="name">of.project.website.support.ticket.form.view</field>
-        <field name="model">website.support.ticket</field>
-        <field name="inherit_id" ref="website_support.website_support_ticket_view_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='sub_category_id']" position="after">
-                <field name="of_task_id"/>
-            </xpath>
-            <!-- Retrait du bouton d'envoi de questionnaire d'évaluation -->
-            <xpath expr="//button[@name='send_survey']" position="attributes">
-                <attribute name="invisible">1</attribute>
             </xpath>
         </field>
     </record>
