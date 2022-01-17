@@ -15,6 +15,8 @@ class Project(models.Model):
                    ('04_closed', u"Fermé")], compute='_compute_of_state', string=u"État", store=True)
     of_start_date = fields.Date(compute='_compute_of_dates', string=u"Date de début", store=True)
     of_end_date = fields.Date(compute='_compute_of_dates', string=u"Date de fin", store=True)
+    of_sale_id = fields.Many2one(
+        'sale.order', string=u"Commande client", domain="[('partner_id', 'child_of', partner_id)]")
     of_start_week = fields.Char(compute='_compute_of_dates', string=u"Semaine de début", store=True)
     of_tag_ids = fields.Many2many(comodel_name='project.tags', string=u"Étiquettes")
     of_task_total_priority = fields.Integer(
@@ -58,6 +60,15 @@ class Project(models.Model):
         """
         for project in self:
             project.of_task_total_priority = sum(project.task_ids.mapped(lambda t: int(t.priority)))
+
+    @api.onchange('of_sale_id')
+    def _onchange_of_sale_id(self):
+        if self.of_sale_id and not self.partner_id:
+            self.partner_id = self.of_sale_id.partner_id
+
+    @api.onchange('partner_id')
+    def _onchange_partner_id(self):
+        self.of_sale_id = False
 
 
 class ProjectTask(models.Model):
