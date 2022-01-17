@@ -486,55 +486,6 @@ class MailTemplate(models.Model):
 class ResCompany(models.Model):
     _inherit = "res.company"
 
-    @api.model_cr_context
-    def _auto_init(self):
-        cr = self._cr
-        # Vérification du passage de of_client_id_ref à of_ref_mode
-        cr.execute(
-            "SELECT * "
-            "FROM   information_schema.columns "
-            "WHERE  table_name                  = '%s' "
-            "AND    column_name                 = 'of_ref_mode'" % (self._table,))
-        init = not bool(cr.fetchall())
-        res = super(ResCompany, self)._auto_init()
-        if init:
-            cr.execute(
-                "SELECT id "
-                "FROM   res_company "
-                "WHERE  of_client_id_ref")
-            ids = cr.fetchall()
-            if ids:
-                ids = [rec[0] for rec in ids]
-                companies = self.browse(ids)
-                companies.write({'of_ref_mode': 'id'})
-                cr.execute(
-                    "UPDATE res_partner     RP "
-                    "SET    ref             = RP.id "
-                    "WHERE  RP.ref          IS NULL "
-                    "AND    RP.company_id   IN %s "
-                    "AND    NOT EXISTS      (   SELECT  1 "
-                    "                           FROM    res_partner RP2 "
-                    "                           WHERE   RP2.ref     = RP.id::VARCHAR "
-                    "                       )",
-                    (companies._ids,))
-                condition_request = "SELECT id, ref, company_id FROM res_partner WHERE ref IS NULL AND company_id IN %s"
-                cr.execute(condition_request, (companies._ids,))
-                i = 2
-                while cr.fetchall():
-                    cr.execute(
-                        "UPDATE res_partner     RP "
-                        "SET    ref             = RP.id || '-' || %s "
-                        "WHERE  RP.ref          IS NULL "
-                        "AND    RP.company_id   IN %s "
-                        "AND    NOT EXISTS      (   SELECT  1 "
-                        "                           FROM    res_partner RP2 "
-                        "                           WHERE   RP2.ref     = RP.id || '-' || %s "
-                        "                       )",
-                        (i, companies._ids, i,))
-                    i += 1
-                    cr.execute(condition_request, (companies._ids,))
-        return res
-
     of_juridique = fields.Char(string="Forme juridique")
     of_capital = fields.Char(string="Capital social")
     of_assu_dec = fields.Char(string=u"Assurance décennale")
