@@ -93,95 +93,100 @@
                     <div class="oe_title">
                         <h1><field name="name" placeholder="Question"/></h1>
                     </div>
-                    <group>
+                    <group string="Question">
                         <group>
                             <field name="sequence"/>
                             <field name="type" invisible="context.get('hide_type')"/>
                             <field name="category_id"/>
+                            <field name="print_mode" attrs="{'invisible': [('condition', '=', True)]}"/>
+                            <field name="condition_print_mode" string="Impression" attrs="{'invisible': [('condition', '=', False)]}"/>
+                        </group>
+                        <group>
                             <field name="answer_type"/>
                             <field name="answer_ids" widget="many2many_tags"
                                    attrs="{'invisible': [('answer_type', 'not in', ('one', 'list'))],
                                            'required': [('answer_type', 'in', ('one', 'list'))]}"/>
                             <field name="answer" invisible="1"/>
                         </group>
+                    </group>
+                    <group string="Condition">
                         <group>
                             <field name="id_code"/>
                             <field name="condition"/>
-                            <field name="visibility" attrs="{'invisible': [('condition', '=', False)], 'required': [('condition', '=', True)]}"/>
                             <field name="condition_code" attrs="{'invisible': [('condition', '=', False)]}"/>
-                            <div colspan="2" attrs="{'invisible': [('condition', '=', False)]}">
-                                <h4>Aide pour le code de condition</h4>
-                                <p>
-                                    Le code de condition est utilisé pour mettre une condition d'affichage
-                                    pour la question, c'est à dire de poser cette question en fonction des réponses précédentes.
-                                </p>
-                                <p>
-                                    Il se renseigne de la façon suivante :
-                                    &lt;<i>code identifiant d'une question précédente</i>&gt; = "&lt;<i>réponse attendue</i>&gt;"
-                                </p>
-                                <p>
-                                    <u>Cas particulier</u> :
-                                    <br/>
-                                    Pour les réponses de type plusieurs choix, plusieurs réponses possibles :
-                                    "&lt;<i>réponse attendue</i>&gt;" in &lt;<i>code identifiant d'une question précédente</i>&gt;
-                                </p>
-                                <p>
-                                    <u>Exemples</u> :
-                                    <ul>
-                                        <li>
-                                            Poser cette question uniquement si la réponse à la question ayant
-                                            comme code QUEST1 vaut "Réponse 1" : <br/>
-                                            <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1"</code>
-                                        </li>
-                                        <li>
-                                            Poser cette question uniquement si la réponse à la question ayant
-                                            comme code QUEST1 est différente de "Réponse 1" : <br/>
-                                            <code style='white-space: pre-wrap'>QUEST1 != "Réponse 1"</code>
-                                        </li>
-                                        <li>
-                                            Poser cette question uniquement si la réponse à la question ayant
-                                            comme code QUEST1 vaut "Oui" (question de type Oui/Non): <br/>
-                                            <code style='white-space: pre-wrap'>QUEST1 = "Oui"</code>
-                                        </li>
-                                        <li>
-                                            Poser cette question uniquement si la réponse à la question ayant
-                                            comme code QUEST1 a au moins une des réponses qui vaut "Réponse 1"
-                                            (question de type plusieurs choix, plusieurs réponses possibles): <br/>
-                                            <code style='white-space: pre-wrap'>"Réponse 1" in QUEST1</code>
-                                        </li>
-                                        <li>
-                                            Poser cette question uniquement si la réponse à la question ayant
-                                            comme code QUEST1 vaut "Réponse 1" ou "Réponse 2" : <br/>
-                                            <code style='white-space: pre-wrap'>QUEST1 in ("Réponse 1", "Réponse 2")</code>
-                                        </li>
-                                        <li>
-                                            Poser cette question uniquement si la réponse aux questions ayant
-                                            comme code QUEST1 et QUEST2 valent respectivement "Réponse 1" et "Réponse 2" : <br/>
-                                            <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1" et QUEST2 = "Réponse 2"</code>
-                                        </li>
-                                        <li>
-                                            Poser cette question uniquement si la réponse à la question ayant
-                                            comme code QUEST1 vaut "Réponse 1" ou si la réponse à la question ayant
-                                            comme code QUEST2 vaut "Réponse 2" : <br/>
-                                            <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1" ou QUEST2 = "Réponse 2"</code>
-                                        </li>
-                                        <li>
-                                            Poser cette question uniquement si les conditions suivantes sont remplies :
-                                            <ul>
-                                                <li>
-                                                    la réponse à la question ayant comme code QUEST1 vaut "Réponse 1" ;
-                                                </li>
-                                                <li>
-                                                    la réponse à la question ayant comme code QUEST2 vaut "Réponse 2" ou
-                                                    la réponse à la question ayant comme code QUEST3 vaut "Réponse 3".
-                                                </li>
-                                            </ul>
-                                            <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1" et (QUEST2 = "Réponse 2" ou QUEST3 = "Réponse 3")</code>
-                                        </li>
-                                    </ul>
-                                </p>
-                            </div>
                         </group>
+                        <div colspan="4" attrs="{'invisible': [('condition', '=', False)]}">
+                            <h4>Aide pour le code de condition</h4>
+                            <p>
+                                Le code de condition est utilisé pour mettre une condition d'affichage
+                                pour la question, c'est à dire de poser cette question en fonction des réponses précédentes.
+                            </p>
+                            <p>
+                                Il se renseigne de la façon suivante :
+                                &lt;<i>code identifiant d'une question précédente</i>&gt; = "&lt;<i>réponse attendue</i>&gt;"
+                            </p>
+                            <p>
+                                <u>Cas particulier</u> :
+                                <br/>
+                                Pour les réponses de type plusieurs choix, plusieurs réponses possibles :
+                                "&lt;<i>réponse attendue</i>&gt;" in &lt;<i>code identifiant d'une question précédente</i>&gt;
+                            </p>
+                            <p>
+                                <u>Exemples</u> :
+                                <ul>
+                                    <li>
+                                        Poser cette question uniquement si la réponse à la question ayant
+                                        comme code QUEST1 vaut "Réponse 1" : <br/>
+                                        <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1"</code>
+                                    </li>
+                                    <li>
+                                        Poser cette question uniquement si la réponse à la question ayant
+                                        comme code QUEST1 est différente de "Réponse 1" : <br/>
+                                        <code style='white-space: pre-wrap'>QUEST1 != "Réponse 1"</code>
+                                    </li>
+                                    <li>
+                                        Poser cette question uniquement si la réponse à la question ayant
+                                        comme code QUEST1 vaut "Oui" (question de type Oui/Non): <br/>
+                                        <code style='white-space: pre-wrap'>QUEST1 = "Oui"</code>
+                                    </li>
+                                    <li>
+                                        Poser cette question uniquement si la réponse à la question ayant
+                                        comme code QUEST1 a au moins une des réponses qui vaut "Réponse 1"
+                                        (question de type plusieurs choix, plusieurs réponses possibles): <br/>
+                                        <code style='white-space: pre-wrap'>"Réponse 1" in QUEST1</code>
+                                    </li>
+                                    <li>
+                                        Poser cette question uniquement si la réponse à la question ayant
+                                        comme code QUEST1 vaut "Réponse 1" ou "Réponse 2" : <br/>
+                                        <code style='white-space: pre-wrap'>QUEST1 in ("Réponse 1", "Réponse 2")</code>
+                                    </li>
+                                    <li>
+                                        Poser cette question uniquement si la réponse aux questions ayant
+                                        comme code QUEST1 et QUEST2 valent respectivement "Réponse 1" et "Réponse 2" : <br/>
+                                        <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1" et QUEST2 = "Réponse 2"</code>
+                                    </li>
+                                    <li>
+                                        Poser cette question uniquement si la réponse à la question ayant
+                                        comme code QUEST1 vaut "Réponse 1" ou si la réponse à la question ayant
+                                        comme code QUEST2 vaut "Réponse 2" : <br/>
+                                        <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1" ou QUEST2 = "Réponse 2"</code>
+                                    </li>
+                                    <li>
+                                        Poser cette question uniquement si les conditions suivantes sont remplies :
+                                        <ul>
+                                            <li>
+                                                la réponse à la question ayant comme code QUEST1 vaut "Réponse 1" ;
+                                            </li>
+                                            <li>
+                                                la réponse à la question ayant comme code QUEST2 vaut "Réponse 2" ou
+                                                la réponse à la question ayant comme code QUEST3 vaut "Réponse 3".
+                                            </li>
+                                        </ul>
+                                        <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1" et (QUEST2 = "Réponse 2" ou QUEST3 = "Réponse 3")</code>
+                                    </li>
+                                </ul>
+                            </p>
+                        </div>
                     </group>
                 </sheet>
             </form>
@@ -274,98 +279,103 @@
                         <h1><field name="name" placeholder="Question"/></h1>
                     </div>
                     <field name="intervention_id" invisible="1"/>
-                    <field name="sequence" invisible="1"/>
                     <field name="type" invisible="1"/>
                     <field name="parc_installe_id" invisible="1" readonly="1"/>
                     <field name="answer" invisible="1"/>
                     <field name="condition_unmet" invisible="1"/>
-                    <group>
+                    <group string="Question">
                         <group>
+                            <field name="sequence"/>
                             <field name="category_id"/>
+                            <field name="print_mode" attrs="{'invisible': [('condition', '=', True)]}"/>
+                            <field name="condition_print_mode" string="Impression" attrs="{'invisible': [('condition', '=', False)]}"/>
+                        </group>
+                        <group>
                             <field name="answer_type"/>
                             <field name="answer_ids" widget="many2many_tags"
                                    attrs="{'invisible': [('answer_type', 'not in', ('one', 'list'))],
                                            'required': [('answer_type', 'in', ('one', 'list'))]}"/>
                             <field name="definitive_answer" readonly="1"/>
                         </group>
+                    </group>
+                    <group string="Condition">
                         <group>
                             <field name="id_code"/>
                             <field name="condition"/>
-                            <field name="visibility" attrs="{'invisible': [('condition', '=', False)], 'required': [('condition', '=', True)]}"/>
                             <field name="condition_code" attrs="{'invisible': [('condition', '=', False)]}"/>
-                            <div colspan="2" attrs="{'invisible': [('condition', '=', False)]}">
-                                <h4>Aide pour le code de condition</h4>
-                                <p>
-                                    Le code de condition est utilisé pour mettre une condition d'affichage
-                                    pour la question, c'est à dire de poser cette question en fonction des réponses précédentes.
-                                </p>
-                                <p>
-                                    Il se renseigne de la façon suivante :
-                                    &lt;<i>code identifiant d'une question précédente</i>&gt; = "&lt;<i>réponse attendue</i>&gt;"
-                                </p>
-                                <p>
-                                    <u>Cas particulier</u> :
-                                    <br/>
-                                    Pour les réponses de type plusieurs choix, plusieurs réponses possibles :
-                                    "&lt;<i>réponse attendue</i>&gt;" in &lt;<i>code identifiant d'une question précédente</i>&gt;
-                                </p>
-                                <p>
-                                    <u>Exemples</u> :
-                                    <ul>
-                                        <li>
-                                            Poser cette question uniquement si la réponse à la question ayant
-                                            comme code QUEST1 vaut "Réponse 1" : <br/>
-                                            <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1"</code>
-                                        </li>
-                                        <li>
-                                            Poser cette question uniquement si la réponse à la question ayant
-                                            comme code QUEST1 est différente de "Réponse 1" : <br/>
-                                            <code style='white-space: pre-wrap'>QUEST1 != "Réponse 1"</code>
-                                        </li>
-                                        <li>
-                                            Poser cette question uniquement si la réponse à la question ayant
-                                            comme code QUEST1 vaut "Oui" (question de type Oui/Non): <br/>
-                                            <code style='white-space: pre-wrap'>QUEST1 = "Oui"</code>
-                                        </li>
-                                        <li>
-                                            Poser cette question uniquement si la réponse à la question ayant
-                                            comme code QUEST1 a au moins une des réponses qui vaut "Réponse 1"
-                                            (question de type plusieurs choix, plusieurs réponses possibles): <br/>
-                                            <code style='white-space: pre-wrap'>"Réponse 1" in QUEST1</code>
-                                        </li>
-                                        <li>
-                                            Poser cette question uniquement si la réponse à la question ayant
-                                            comme code QUEST1 vaut "Réponse 1" ou "Réponse 2" : <br/>
-                                            <code style='white-space: pre-wrap'>QUEST1 in ("Réponse 1", "Réponse 2")</code>
-                                        </li>
-                                        <li>
-                                            Poser cette question uniquement si la réponse aux questions ayant
-                                            comme code QUEST1 et QUEST2 valent respectivement "Réponse 1" et "Réponse 2" : <br/>
-                                            <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1" et QUEST2 = "Réponse 2"</code>
-                                        </li>
-                                        <li>
-                                            Poser cette question uniquement si la réponse à la question ayant
-                                            comme code QUEST1 vaut "Réponse 1" ou si la réponse à la question ayant
-                                            comme code QUEST2 vaut "Réponse 2" : <br/>
-                                            <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1" ou QUEST2 = "Réponse 2"</code>
-                                        </li>
-                                        <li>
-                                            Poser cette question uniquement si les conditions suivantes sont remplies :
-                                            <ul>
-                                                <li>
-                                                    la réponse à la question ayant comme code QUEST1 vaut "Réponse 1" ;
-                                                </li>
-                                                <li>
-                                                    la réponse à la question ayant comme code QUEST2 vaut "Réponse 2" ou
-                                                    la réponse à la question ayant comme code QUEST3 vaut "Réponse 3".
-                                                </li>
-                                            </ul>
-                                            <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1" et (QUEST2 = "Réponse 2" ou QUEST3 = "Réponse 3")</code>
-                                        </li>
-                                    </ul>
-                                </p>
-                            </div>
                         </group>
+                        <div colspan="4" attrs="{'invisible': [('condition', '=', False)]}">
+                            <h4>Aide pour le code de condition</h4>
+                            <p>
+                                Le code de condition est utilisé pour mettre une condition d'affichage
+                                pour la question, c'est à dire de poser cette question en fonction des réponses précédentes.
+                            </p>
+                            <p>
+                                Il se renseigne de la façon suivante :
+                                &lt;<i>code identifiant d'une question précédente</i>&gt; = "&lt;<i>réponse attendue</i>&gt;"
+                            </p>
+                            <p>
+                                <u>Cas particulier</u> :
+                                <br/>
+                                Pour les réponses de type plusieurs choix, plusieurs réponses possibles :
+                                "&lt;<i>réponse attendue</i>&gt;" in &lt;<i>code identifiant d'une question précédente</i>&gt;
+                            </p>
+                            <p>
+                                <u>Exemples</u> :
+                                <ul>
+                                    <li>
+                                        Poser cette question uniquement si la réponse à la question ayant
+                                        comme code QUEST1 vaut "Réponse 1" : <br/>
+                                        <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1"</code>
+                                    </li>
+                                    <li>
+                                        Poser cette question uniquement si la réponse à la question ayant
+                                        comme code QUEST1 est différente de "Réponse 1" : <br/>
+                                        <code style='white-space: pre-wrap'>QUEST1 != "Réponse 1"</code>
+                                    </li>
+                                    <li>
+                                        Poser cette question uniquement si la réponse à la question ayant
+                                        comme code QUEST1 vaut "Oui" (question de type Oui/Non): <br/>
+                                        <code style='white-space: pre-wrap'>QUEST1 = "Oui"</code>
+                                    </li>
+                                    <li>
+                                        Poser cette question uniquement si la réponse à la question ayant
+                                        comme code QUEST1 a au moins une des réponses qui vaut "Réponse 1"
+                                        (question de type plusieurs choix, plusieurs réponses possibles): <br/>
+                                        <code style='white-space: pre-wrap'>"Réponse 1" in QUEST1</code>
+                                    </li>
+                                    <li>
+                                        Poser cette question uniquement si la réponse à la question ayant
+                                        comme code QUEST1 vaut "Réponse 1" ou "Réponse 2" : <br/>
+                                        <code style='white-space: pre-wrap'>QUEST1 in ("Réponse 1", "Réponse 2")</code>
+                                    </li>
+                                    <li>
+                                        Poser cette question uniquement si la réponse aux questions ayant
+                                        comme code QUEST1 et QUEST2 valent respectivement "Réponse 1" et "Réponse 2" : <br/>
+                                        <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1" et QUEST2 = "Réponse 2"</code>
+                                    </li>
+                                    <li>
+                                        Poser cette question uniquement si la réponse à la question ayant
+                                        comme code QUEST1 vaut "Réponse 1" ou si la réponse à la question ayant
+                                        comme code QUEST2 vaut "Réponse 2" : <br/>
+                                        <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1" ou QUEST2 = "Réponse 2"</code>
+                                    </li>
+                                    <li>
+                                        Poser cette question uniquement si les conditions suivantes sont remplies :
+                                        <ul>
+                                            <li>
+                                                la réponse à la question ayant comme code QUEST1 vaut "Réponse 1" ;
+                                            </li>
+                                            <li>
+                                                la réponse à la question ayant comme code QUEST2 vaut "Réponse 2" ou
+                                                la réponse à la question ayant comme code QUEST3 vaut "Réponse 3".
+                                            </li>
+                                        </ul>
+                                        <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1" et (QUEST2 = "Réponse 2" ou QUEST3 = "Réponse 3")</code>
+                                    </li>
+                                </ul>
+                            </p>
+                        </div>
                     </group>
                 </sheet>
             </form>
@@ -423,96 +433,101 @@
                         <h1><field name="name" placeholder="Question"/></h1>
                     </div>
                     <field name="parc_installe_id" invisible="1"/>
-                    <field name="sequence" invisible="1"/>
                     <field name="type" invisible="1"/>
                     <field name="answer" invisible="1"/>
-                    <group>
+                    <group string="Question">
                         <group>
+                            <field name="sequence"/>
                             <field name="category_id"/>
+                            <field name="print_mode" attrs="{'invisible': [('condition', '=', True)]}"/>
+                            <field name="condition_print_mode" string="Impression" attrs="{'invisible': [('condition', '=', False)]}"/>
+                        </group>
+                        <group>
                             <field name="answer_type"/>
                             <field name="answer_ids" widget="many2many_tags"
                                    attrs="{'invisible': [('answer_type', 'not in', ('one', 'list'))],
                                            'required': [('answer_type', 'in', ('one', 'list'))]}"/>
                             <field name="definitive_answer" readonly="1"/>
                         </group>
+                    </group>
+                    <group string="Condition">
                         <group>
                             <field name="id_code"/>
                             <field name="condition"/>
-                            <field name="visibility" attrs="{'invisible': [('condition', '=', False)], 'required': [('condition', '=', True)]}"/>
                             <field name="condition_code" attrs="{'invisible': [('condition', '=', False)]}"/>
-                            <div colspan="2" attrs="{'invisible': [('condition', '=', False)]}">
-                                <h4>Aide pour le code de condition</h4>
-                                <p>
-                                    Le code de condition est utilisé pour mettre une condition d'affichage
-                                    pour la question, c'est à dire de poser cette question en fonction des réponses précédentes.
-                                </p>
-                                <p>
-                                    Il se renseigne de la façon suivante :
-                                    &lt;<i>code identifiant d'une question précédente</i>&gt; = "&lt;<i>réponse attendue</i>&gt;"
-                                </p>
-                                <p>
-                                    <u>Cas particulier</u> :
-                                    <br/>
-                                    Pour les réponses de type plusieurs choix, plusieurs réponses possibles :
-                                    "&lt;<i>réponse attendue</i>&gt;" in &lt;<i>code identifiant d'une question précédente</i>&gt;
-                                </p>
-                                <p>
-                                    <u>Exemples</u> :
-                                    <ul>
-                                        <li>
-                                            Poser cette question uniquement si la réponse à la question ayant
-                                            comme code QUEST1 vaut "Réponse 1" : <br/>
-                                            <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1"</code>
-                                        </li>
-                                        <li>
-                                            Poser cette question uniquement si la réponse à la question ayant
-                                            comme code QUEST1 est différente de "Réponse 1" : <br/>
-                                            <code style='white-space: pre-wrap'>QUEST1 != "Réponse 1"</code>
-                                        </li>
-                                        <li>
-                                            Poser cette question uniquement si la réponse à la question ayant
-                                            comme code QUEST1 vaut "Oui" (question de type Oui/Non): <br/>
-                                            <code style='white-space: pre-wrap'>QUEST1 = "Oui"</code>
-                                        </li>
-                                        <li>
-                                            Poser cette question uniquement si la réponse à la question ayant
-                                            comme code QUEST1 a au moins une des réponses qui vaut "Réponse 1"
-                                            (question de type plusieurs choix, plusieurs réponses possibles): <br/>
-                                            <code style='white-space: pre-wrap'>"Réponse 1" in QUEST1</code>
-                                        </li>
-                                        <li>
-                                            Poser cette question uniquement si la réponse à la question ayant
-                                            comme code QUEST1 vaut "Réponse 1" ou "Réponse 2" : <br/>
-                                            <code style='white-space: pre-wrap'>QUEST1 in ("Réponse 1", "Réponse 2")</code>
-                                        </li>
-                                        <li>
-                                            Poser cette question uniquement si la réponse aux questions ayant
-                                            comme code QUEST1 et QUEST2 valent respectivement "Réponse 1" et "Réponse 2" : <br/>
-                                            <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1" et QUEST2 = "Réponse 2"</code>
-                                        </li>
-                                        <li>
-                                            Poser cette question uniquement si la réponse à la question ayant
-                                            comme code QUEST1 vaut "Réponse 1" ou si la réponse à la question ayant
-                                            comme code QUEST2 vaut "Réponse 2" : <br/>
-                                            <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1" ou QUEST2 = "Réponse 2"</code>
-                                        </li>
-                                        <li>
-                                            Poser cette question uniquement si les conditions suivantes sont remplies :
-                                            <ul>
-                                                <li>
-                                                    la réponse à la question ayant comme code QUEST1 vaut "Réponse 1" ;
-                                                </li>
-                                                <li>
-                                                    la réponse à la question ayant comme code QUEST2 vaut "Réponse 2" ou
-                                                    la réponse à la question ayant comme code QUEST3 vaut "Réponse 3".
-                                                </li>
-                                            </ul>
-                                            <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1" et (QUEST2 = "Réponse 2" ou QUEST3 = "Réponse 3")</code>
-                                        </li>
-                                    </ul>
-                                </p>
-                            </div>
                         </group>
+                        <div colspan="4" attrs="{'invisible': [('condition', '=', False)]}">
+                            <h4>Aide pour le code de condition</h4>
+                            <p>
+                                Le code de condition est utilisé pour mettre une condition d'affichage
+                                pour la question, c'est à dire de poser cette question en fonction des réponses précédentes.
+                            </p>
+                            <p>
+                                Il se renseigne de la façon suivante :
+                                &lt;<i>code identifiant d'une question précédente</i>&gt; = "&lt;<i>réponse attendue</i>&gt;"
+                            </p>
+                            <p>
+                                <u>Cas particulier</u> :
+                                <br/>
+                                Pour les réponses de type plusieurs choix, plusieurs réponses possibles :
+                                "&lt;<i>réponse attendue</i>&gt;" in &lt;<i>code identifiant d'une question précédente</i>&gt;
+                            </p>
+                            <p>
+                                <u>Exemples</u> :
+                                <ul>
+                                    <li>
+                                        Poser cette question uniquement si la réponse à la question ayant
+                                        comme code QUEST1 vaut "Réponse 1" : <br/>
+                                        <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1"</code>
+                                    </li>
+                                    <li>
+                                        Poser cette question uniquement si la réponse à la question ayant
+                                        comme code QUEST1 est différente de "Réponse 1" : <br/>
+                                        <code style='white-space: pre-wrap'>QUEST1 != "Réponse 1"</code>
+                                    </li>
+                                    <li>
+                                        Poser cette question uniquement si la réponse à la question ayant
+                                        comme code QUEST1 vaut "Oui" (question de type Oui/Non): <br/>
+                                        <code style='white-space: pre-wrap'>QUEST1 = "Oui"</code>
+                                    </li>
+                                    <li>
+                                        Poser cette question uniquement si la réponse à la question ayant
+                                        comme code QUEST1 a au moins une des réponses qui vaut "Réponse 1"
+                                        (question de type plusieurs choix, plusieurs réponses possibles): <br/>
+                                        <code style='white-space: pre-wrap'>"Réponse 1" in QUEST1</code>
+                                    </li>
+                                    <li>
+                                        Poser cette question uniquement si la réponse à la question ayant
+                                        comme code QUEST1 vaut "Réponse 1" ou "Réponse 2" : <br/>
+                                        <code style='white-space: pre-wrap'>QUEST1 in ("Réponse 1", "Réponse 2")</code>
+                                    </li>
+                                    <li>
+                                        Poser cette question uniquement si la réponse aux questions ayant
+                                        comme code QUEST1 et QUEST2 valent respectivement "Réponse 1" et "Réponse 2" : <br/>
+                                        <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1" et QUEST2 = "Réponse 2"</code>
+                                    </li>
+                                    <li>
+                                        Poser cette question uniquement si la réponse à la question ayant
+                                        comme code QUEST1 vaut "Réponse 1" ou si la réponse à la question ayant
+                                        comme code QUEST2 vaut "Réponse 2" : <br/>
+                                        <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1" ou QUEST2 = "Réponse 2"</code>
+                                    </li>
+                                    <li>
+                                        Poser cette question uniquement si les conditions suivantes sont remplies :
+                                        <ul>
+                                            <li>
+                                                la réponse à la question ayant comme code QUEST1 vaut "Réponse 1" ;
+                                            </li>
+                                            <li>
+                                                la réponse à la question ayant comme code QUEST2 vaut "Réponse 2" ou
+                                                la réponse à la question ayant comme code QUEST3 vaut "Réponse 3".
+                                            </li>
+                                        </ul>
+                                        <code style='white-space: pre-wrap'>QUEST1 = "Réponse 1" et (QUEST2 = "Réponse 2" ou QUEST3 = "Réponse 3")</code>
+                                    </li>
+                                </ul>
+                            </p>
+                        </div>
                     </group>
                 </sheet>
             </form>
