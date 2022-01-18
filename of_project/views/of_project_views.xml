@@ -46,10 +46,28 @@
             <xpath expr="//field[@name='name']" position="before">
                 <field name="of_state" invisible="1"/>
                 <field name="of_tag_ids"/>
+                <field name="partner_id"/>
+                <field name="of_sale_id"/>
+                <field name="description"/>
             </xpath>
             <xpath expr="//div[@class='o_kanban_card_content o_visible']" position="before">
                 <div>
                     <field name="of_tag_ids" style="margin-left: -16px;"/>
+                </div>
+            </xpath>
+            <xpath expr="//div[@class='o_primary']" position="after">
+                <div name="partner">
+                    <a name="get_partner_action" type="object">
+                        <field name="partner_id"/>
+                    </a>
+                </div>
+                <div name="sale_order">
+                    <a name="get_sale_order_action" type="object">
+                        <field name="of_sale_id"/>
+                    </a>
+                </div>
+                <div name="description" t-if="record.description.raw_value" style="max-height:310px;overflow:hidden;text-overflow:ellipsis;">
+                    <t t-raw="record.description.raw_value"/>
                 </div>
             </xpath>
         </field>
