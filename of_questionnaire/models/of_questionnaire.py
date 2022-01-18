@@ -38,8 +38,15 @@ class OfQuestionnaireLine(models.Model):
     condition = fields.Boolean(
         string=u"Condition", help=u"Indique si une condition est à respecter pour poser cette question")
     condition_code = fields.Char(string=u"Code de condition", help=u"Code à respecter pour que la question soit posée")
-    visibility = fields.Selection(
-        selection=[('always', u"Toujours"), ('condition_met', u"Si condition vérifiée")], string=u"Visibilité")
+    print_mode = fields.Selection(selection=[
+        ('always', u"Toujours"),
+        ('answer', u"S'il y a une réponse"),
+        ('never', u"Jamais")], string=u"Impression", required=True, default='always')
+    condition_print_mode = fields.Selection(selection=[
+        ('always', u"Toujours"),
+        ('condition', u"Si condition vérifiée"),
+        ('condition_answer', u"Si condition vérifiée, avec une réponse"),
+        ('never', u"Jamais")], string=u"Impression avec condition", required=True, default='always')
 
     @api.depends('answer_ids', 'answer_type')
     def _compute_answer(self):
@@ -172,15 +179,22 @@ class OfPlanningIntervention(models.Model):
         if questions:
             question_categories = {}
             for question in questions:
-                if not question.category_id:
-                    if 'uncategorized' not in question_categories:
-                        question_categories['uncategorized'] = (1000, [])
-                    question_categories['uncategorized'][1].append((question.name, question.definitive_answer))
-                else:
-                    if question.category_id.name not in question_categories:
-                        question_categories[question.category_id.name] = (question.category_id.sequence, [])
-                    question_categories[question.category_id.name][1].append(
-                        (question.name, question.definitive_answer))
+                if (not question.condition and
+                        (question.print_mode == 'always' or
+                         (question.print_mode == 'answer' and question.definitive_answer))) \
+                        or (question.condition and
+                            (question.condition_print_mode == 'always' or
+                             (question.condition_print_mode == 'condition' and not question.condition_unmet) or
+                             (question.condition_print_mode == 'condition_answer' and question.definitive_answer))):
+                    if not question.category_id:
+                        if u"Indéfini" not in question_categories:
+                            question_categories[u"Indéfini"] = (1000, [])
+                        question_categories[u"Indéfini"][1].append((question.name, question.definitive_answer))
+                    else:
+                        if question.category_id.name not in question_categories:
+                            question_categories[question.category_id.name] = (question.category_id.sequence, [])
+                        question_categories[question.category_id.name][1].append(
+                            (question.name, question.definitive_answer))
             return sorted(question_categories.items(), key=lambda data: data[1][0])
         else:
             return []
