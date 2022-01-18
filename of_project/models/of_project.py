@@ -70,6 +70,25 @@ class Project(models.Model):
     def _onchange_partner_id(self):
         self.of_sale_id = False
 
+    @api.multi
+    def get_partner_action(self):
+        self.ensure_one()
+        # Le module contacts est une dépendance indirecte de ce module
+        action = self.env.ref('contacts.action_contacts').read()[0]
+        action['res_id'] = self.partner_id.id
+        action['view_mode'] = "form"
+        action['views'] = False
+        return action
+
+    @api.multi
+    def get_sale_order_action(self):
+        self.ensure_one()
+        action = self.env.ref('sale.action_orders').read()[0]
+        action['res_id'] = self.of_sale_id.id
+        action['view_mode'] = "form"
+        action['views'] = False
+        return action
+
 
 class ProjectTask(models.Model):
     _name = 'project.task'
