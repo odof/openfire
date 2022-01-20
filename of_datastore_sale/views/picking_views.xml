@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_datastore_picking_view_picking_internal_search" model="ir.ui.view">
+        <field name="name">of.datastore.picking.view.picking.internal.search</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='done']" position="after">
+                <separator/>
+                <filter name="of_datastore_anomalie" string="Anomalie réception" domain="[('of_datastore_anomalie', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_datastore_picking_view_picking_form" model="ir.ui.view">
+        <field name="name">of.datastore.picking.view.picking.form</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="before">
+                <div class="label label-info" attrs="{'invisible': [('of_datastore_anomalie', '=', False)]}" colspan="2">Anomalie</div>
+            </xpath>
+            <xpath expr="//field[@name='location_id']" position="after">
+                <field name="of_datastore_anomalie" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
