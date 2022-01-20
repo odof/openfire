@@ -51,7 +51,9 @@ Modifications
         'project_team',
         ],
     'data': [
+        'security/ir.model.access.csv',
         'views/of_project_views.xml',
+        'views/res_config_views.xml',
     ],
     'installable': True,
     'application': False,

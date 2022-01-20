@@ -18,6 +18,9 @@
             <xpath expr="//h1" position="after">
                 <field name="of_tag_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
             </xpath>
+            <xpath expr="//field[@name='user_id']" position="before">
+                <field name="of_stage_id"/>
+            </xpath>
             <xpath expr="//field[@name='partner_id']" position="before">
                 <field name="of_sale_id"/>
             </xpath>
@@ -40,11 +43,9 @@
         <field name="model">project.project</field>
         <field name="inherit_id" ref="project.view_project_kanban"/>
         <field name="arch" type="xml">
-            <xpath expr="//kanban" position="attributes">
-                <attribute name="default_group_by">of_state</attribute>
-            </xpath>
             <xpath expr="//field[@name='name']" position="before">
                 <field name="of_state" invisible="1"/>
+                <field name="of_stage_id"/>
                 <field name="of_tag_ids"/>
                 <field name="partner_id"/>
                 <field name="of_sale_id"/>
@@ -145,4 +146,92 @@
         </field>
     </record>
 
+    <!--*****************************************************************************************-->
+    <!--************************************* Project Stage *************************************-->
+    <!--*****************************************************************************************-->
+
+    <record id="of_project_stage_form_view" model="ir.ui.view">
+        <field name="name">of.project.stage.form.view</field>
+        <field name="model">of.project.stage</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="description"/>
+                        <field name="sequence"/>
+                        <field name="fold"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_project_stage_tree_view" model="ir.ui.view">
+        <field name="name">of.project.stage.tree.view</field>
+        <field name="model">of.project.stage</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle" groups="base.group_no_one"/>
+                <field name="name"/>
+                <field name="fold"/>
+                <field name="description"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_project_stage_action" model="ir.actions.act_window">
+        <field name="name">Étapes de projets</field>
+        <field name="res_model">of.project.stage</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="of_project_config_project_menu" name="Projets" parent="project.menu_project_config" sequence="2"/>
+
+    <record id="project.menu_projects_config" model="ir.ui.menu">
+        <field name="parent_id" ref="of_project.of_project_config_project_menu"/>
+    </record>
+
+    <menuitem id="of_project_stage_menu" action="of_project_stage_action"
+              name="Étapes" parent="of_project.of_project_config_project_menu" sequence="10"/>
+
+    <menuitem id="of_project_config_task_menu" name="Tâches" parent="project.menu_project_config" sequence="3"/>
+
+    <record id="project.menu_project_config_project" model="ir.ui.menu">
+        <field name="parent_id" ref="of_project.of_project_config_task_menu"/>
+    </record>
+
+    <record id="project.menu_project_tags_act" model="ir.ui.menu">
+        <field name="parent_id" ref="of_project.of_project_config_task_menu"/>
+    </record>
+
+    <record id="project_task_category.menu_project_category" model="ir.ui.menu">
+        <field name="parent_id" ref="of_project.of_project_config_task_menu"/>
+    </record>
+
+<data noupdate="1">
+    <record id="of_project_project_kanban_view_gb_state" model="ir.ui.view">
+        <field name="name">of_project.project.kanban.view.gb.state</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.view_project_kanban"/>
+        <field name="active">False</field>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="default_group_by">of_state</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_project_project_kanban_view_gb_stage_id" model="ir.ui.view">
+        <field name="name">of_project.project.kanban.view.gb.stage_id</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.view_project_kanban"/>
+        <field name="active">False</field>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="default_group_by">of_stage_id</attribute>
+            </xpath>
+        </field>
+    </record>
+</data>
 </odoo>
