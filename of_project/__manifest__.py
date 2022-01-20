@@ -40,6 +40,7 @@ Modifications
         'project',
         'project_timeline',
         'project_task_category',
+        'sale_order_project',
         # Dépendances servant uniquement à faciliter l'installation des modules
         'project_description',
         'project_parent',
@@ -53,6 +54,7 @@ Modifications
     'data': [
         'security/ir.model.access.csv',
         'views/of_project_views.xml',
+        'views/of_sale_views.xml',
         'views/res_config_views.xml',
     ],
     'installable': True,
