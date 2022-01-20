@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="of_project_view_partner_form" model="ir.ui.view">
+        <field name="name">of_project_view_partner_form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" name="of_action_view_project" type="object" icon="fa-puzzle-piece">
+                    <field string="Projets" name="of_project_count" widget="statinfo"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

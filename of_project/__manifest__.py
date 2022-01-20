@@ -55,6 +55,7 @@ Modifications
         'security/ir.model.access.csv',
         'views/of_project_views.xml',
         'views/of_sale_views.xml',
+        'views/res_partner_views.xml',
         'views/res_config_views.xml',
     ],
     'installable': True,
