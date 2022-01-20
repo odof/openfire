@@ -19,11 +19,14 @@ Ce module nécessite l'installation de openerplib sur le serveur : sudo easy_ins
 """,
     'depends': [
         'of_purchase',
-        'of_datastore_connector',
+        # 'of_datastore_connector',
+        'of_datastore_common_sp',
     ],
     'data': [
         'views/of_datastore_purchase_views.xml',
         'views/purchase_views.xml',
+        'views/picking_views.xml',
+        'wizards/datastore_picking_anomalie_wizard_views.xml',
     ],
     'installable': True,
     'application': False,

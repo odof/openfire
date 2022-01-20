@@ -19,10 +19,17 @@ Ce module nécessite l'installation de openerplib sur le serveur : sudo easy_ins
 """,
     'depends': [
         'of_sale',
+        'stock_dropshipping',
+        # 'of_datastore_connector',
+        'of_datastore_common_sp',
     ],
     'data': [
+        'security/of_datastore_sale_security.xml',
         'views/partner_views.xml',
         'views/sale_views.xml',
+        'views/picking_views.xml',
+        'views/of_product_brand_views.xml',
+        'views/of_datastore_sale_views.xml',
     ],
     'installable': True,
     'application': False,

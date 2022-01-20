@@ -11,8 +11,10 @@
             <xpath expr="//field[@name='state']" position="before">
                 <field name="of_datastore_sent" invisible="1"/>
                 <field name="of_datastore_purchase" invisible="1"/>
+                <field name="of_datastore_dropshipping" invisible="1"/>
+                <field name="of_brand_count" invisible="1"/>
                 <button name="button_datastore_send_order" string="Commande directe" type="object"
-                        attrs="{'invisible': ['|', '|', ('state', 'in', ['done', 'cancel']), ('of_datastore_sent', '=', True), ('of_datastore_purchase', '=', False)]}"/>
+                        attrs="{'invisible': ['|', '|', '|', ('state', 'in', ['done', 'cancel']), ('of_datastore_sent', '=', True), ('of_datastore_purchase', '=', False), '&amp;',('of_brand_count', '!=', 1), ('of_datastore_dropshipping', '=', True)]}"/>
             </xpath>
         </field>
     </record>
@@ -25,6 +27,7 @@
             <xpath expr="//filter[@name='to_approve']" position="after">
                 <separator/>
                 <filter name="of_datastore_sent" string="Commandes auto" domain="[('of_datastore_sent', '=', True)]"/>
+                <filter name="of_datastore_anomalie" string="Anomalie réception" domain="[('of_datastore_anomalie', '=', True)]"/>
             </xpath>
         </field>
     </record>

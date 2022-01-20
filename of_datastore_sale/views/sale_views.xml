@@ -22,6 +22,11 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='of_deposit_product_categ_id_setting']" position="after">
                 <field name="of_datastore_sale_misc_product_id" class="oe_inline"/>
+                <label for="group_of_group_datastore_brand_dropshipping"/>
+                <div name="group_of_group_datastore_brand_dropshipping">
+                    <field name="group_of_group_datastore_brand_dropshipping" class="oe_inline"/>
+                    <span>Autoriser l'utilisation de la livraison directe sur les marques.</span>
+                </div>
             </xpath>
         </field>
     </record>
