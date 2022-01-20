@@ -3,21 +3,16 @@
 from odoo import models, fields, api
 
 
-class SaleOrder(models.Model):
-    _inherit = "sale.order"
+class ResPartner(models.Model):
+    _inherit = 'res.partner'
 
-    of_project_ids = fields.One2many('project.project', 'of_sale_id', string="Projets")
+    of_project_ids = fields.One2many('project.project', 'partner_id', string="Projets")
     of_project_count = fields.Integer(string="Nb. projets", compute="_compute_of_project_count")
 
     @api.depends('of_project_ids')
     def _compute_of_project_count(self):
-        for order in self:
-            order.of_project_count = len(order.of_project_ids)
-
-    def _prepare_project_vals(self):
-        vals = super(SaleOrder, self)._prepare_project_vals()
-        vals['of_sale_id'] = self.id
-        return vals
+        for partner in self:
+            partner.of_project_count = len(partner.of_project_ids)
 
     def of_action_view_project(self):
         projects = self.mapped('of_project_ids')

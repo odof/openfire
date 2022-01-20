@@ -2,4 +2,5 @@
 
 from . import of_project
 from . import res_config
+from . import res_partner
 from . import sale
