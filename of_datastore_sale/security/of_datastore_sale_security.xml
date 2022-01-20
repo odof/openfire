@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_group_datastore_brand_dropshipping" model="res.groups">
+        <field name="name">(OF) Autoriser la livraison directe</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+</odoo>

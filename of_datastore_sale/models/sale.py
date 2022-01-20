@@ -7,6 +7,28 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     of_datastore_order = fields.Boolean(string=u"Commande auto", copy=False)
+    of_datastore_purchase_id = fields.Integer(string=u"ID commande base client", copy=False)
+
+    @api.multi
+    def action_confirm(self):
+        datastore_obj = self.env['of.datastore.sale']
+        res = super(SaleOrder, self).action_confirm()
+        for order in self:
+            if not order.of_datastore_purchase_id:
+                continue
+            datastore = datastore_obj.search([('partner_id', '=', order.partner_id.id)])
+            if datastore:
+                client = datastore.of_datastore_connect()
+                if not isinstance(client, basestring):
+                    ds_po_obj = datastore.of_datastore_get_model(client, 'purchase.order')
+                    datastore.of_datastore_func(ds_po_obj, 'button_confirm_xmlrpc', [order.of_datastore_purchase_id], [])
+        return res
+
+
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+
+    of_datastore_line_id = fields.Integer(string=u"ID ligne de commande base client", copy=False)
 
 
 class SaleConfigSettings(models.TransientModel):

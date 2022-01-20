@@ -8,15 +8,27 @@ class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
     of_datastore_purchase = fields.Boolean(string=u"Connecteur achat ?", compute='_compute_of_datastore_purchase')
+    of_datastore_dropshipping = fields.Boolean(string="Livraison directe", compute='_compute_of_datastore_purchase')
     of_datastore_sent = fields.Boolean(string=u"CF envoyée via connecteur achat", copy=False)
+    of_brand_count = fields.Integer(string="Nombre de marques", compute='_compute_of_brand_count')
 
     @api.multi
     def _compute_of_datastore_purchase(self):
+        datastore_obj = self.env['of.datastore.purchase']
         for order in self:
-            if self.env['of.datastore.purchase'].search([('partner_id', '=', order.partner_id.id)]):
+            datastore = datastore_obj.search([('partner_id', '=', order.partner_id.id)])
+            if datastore:
                 order.of_datastore_purchase = True
+                order.of_datastore_dropshipping = datastore.dropshipping > 0
             else:
                 order.of_datastore_purchase = False
+                order.of_datastore_dropshipping = False
+
+    @api.depends('order_line', 'order_line.product_id', 'order_line.product_id.brand_id')
+    def _compute_of_brand_count(self):
+        for record in self:
+            brands = record.mapped('order_line').mapped('product_id').mapped('brand_id')
+            record.of_brand_count = len(brands)
 
     @api.multi
     def button_datastore_send_order(self):
@@ -99,20 +111,17 @@ class PurchaseOrder(models.Model):
             else:
                 raise UserError(u"Aucun entrepôt configuré chez le fournisseur !")
 
-            values = {
-                'partner_id': partner_id,
-                'partner_invoice_id': partner_invoice_id,
-                'partner_shipping_id': partner_shipping_id,
-                'date_order': self.date_order,
-                'client_order_ref': self.customer_id.name,
-                'fiscal_position_id': fiscal_position_id,
-                'company_id': company_id,
-                'user_id': user_id,
-                'warehouse_id': warehouse_id,
-                'requested_date': self.date_planned,
-                'note': self.notes,
-                'of_datastore_order': True,
-            }
+            values = self.get_datastore_order_values(
+                {
+                    'partner_id': partner_id,
+                    'partner_invoice_id': partner_invoice_id,
+                    'partner_shipping_id': partner_shipping_id,
+                    'fiscal_position_id': fiscal_position_id,
+                    'company_id': company_id,
+                    'user_id': user_id,
+                    'warehouse_id': warehouse_id,
+                    }
+                )
 
             ds_order_id = datastore_purchase.of_datastore_create(ds_sale_order_obj, values)
 
@@ -149,15 +158,15 @@ class PurchaseOrder(models.Model):
                         if not tax_count:
                             line_tax_ids.append(tax_id)
 
-                values = {
-                    'order_id': ds_order_id,
-                    'name': line.name,
-                    'product_id': product_id,
-                    'product_uom': ds_product_data['uom_id'][0],
-                    'product_uom_qty': line.product_qty,
-                    'price_unit': ds_product_data['list_price'],
-                    'tax_id': [(6, 0, line_tax_ids)],
-                }
+                values = line.get_datastore_order_line_values(
+                    {
+                        'order_id': ds_order_id,
+                        'product_id': product_id,
+                        'product_uom': ds_product_data['uom_id'][0],
+                        'price_unit': ds_product_data['list_price'],
+                        'tax_id': [(6, 0, line_tax_ids)],
+                        }
+                    )
                 datastore_purchase.of_datastore_create(ds_sale_order_line_obj, values)
 
             # On ajoute un message dans le mail thread
@@ -172,3 +181,62 @@ class PurchaseOrder(models.Model):
             self.of_datastore_sent = True
         else:
             raise UserError(u"Aucun connecteur achat trouvé pour ce fournisseur !")
+
+    @api.multi
+    def get_datastore_order_values(self, base_vals):
+        """ Fonction créée pour faciliter les surcharges potentielles"""
+        self.ensure_one()
+        values = {
+            'partner_id': base_vals.get('partner_id'),
+            'partner_invoice_id': base_vals.get('partner_invoice_id'),
+            'partner_shipping_id': base_vals.get('partner_shipping_id'),
+            'date_order': self.date_order,
+            'client_order_ref': self.customer_id.name,
+            'fiscal_position_id': base_vals.get('fiscal_position_id'),
+            'company_id': base_vals.get('company_id'),
+            'user_id': base_vals.get('user_id'),
+            'warehouse_id': base_vals.get('warehouse_id'),
+            'requested_date': self.date_planned,
+            'note': self.notes,
+            'of_datastore_order': True,
+            'origin': self.name or '',
+            'of_datastore_purchase_id': self.id,
+        }
+
+        return values
+
+    @api.multi
+    def button_confirm_xmlrpc(self):
+        self.button_confirm()
+        return True
+
+
+class PurchaseOrderLine(models.Model):
+    _inherit = 'purchase.order.line'
+
+    @api.multi
+    def get_datastore_move_id(self, datastore_move_id, datastore_picking_id):
+        self.ensure_one()
+        if len(self.move_ids) != 1:
+            return False, False
+        self.move_ids.write({'of_datastore_move_id': datastore_move_id})
+        if self.move_ids.picking_id:
+            self.move_ids.picking_id.write({'of_datastore_id': datastore_picking_id})
+        return self.move_ids.id, self.move_ids.picking_id.id or False
+
+    @api.multi
+    def get_datastore_order_line_values(self, base_vals):
+        """ Fonction créée pour faciliter les surcharges potentielles"""
+        self.ensure_one()
+        values = {
+            'order_id': base_vals.get('order_id'),
+            'name': self.name,
+            'product_id': base_vals.get('product_id'),
+            'product_uom': base_vals.get('product_uom'),
+            'product_uom_qty': self.product_qty,
+            'price_unit': base_vals.get('price_unit'),
+            'tax_id': base_vals.get('tax_id'),
+            }
+        if self.order_id.of_datastore_dropshipping:
+            values['of_datastore_line_id'] = self.id
+        return values

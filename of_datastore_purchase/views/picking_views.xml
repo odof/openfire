@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_datastore_purchase_stock_picking_form_view" model="ir.ui.view">
+        <field name="name">of.datastore.purchase.stock.picking.form.view</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="of_datastore_common_sp.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_picking_send']" position="after">
+                <field name="of_datastore_id" invisible="1"/>
+                <button name="action_receipt_incident" string="Envoyer anomalie" type="object"
+                        attrs="{'invisible': ['|', ('of_datastore_id', '=', False), ('of_datastore_id', '=', 0)]}"/>
+            </xpath>
+            <xpath expr="//field[@name='of_datastore_anomalie']" position="replace"/>
+            <xpath expr="//field[@name='location_id']" position="after">
+                <field name="of_datastore_anomalie"
+                       attrs="{'invisible': ['|', ('of_datastore_id', '=', False), ('of_datastore_id', '=', 0)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

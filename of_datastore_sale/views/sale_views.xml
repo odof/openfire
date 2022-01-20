@@ -3,16 +3,16 @@
 
     <!-- Sale Order Search View -->
     <record id="of_datastore_sale_sale_order_search_view" model="ir.ui.view">
-            <field name="name">of.datastore.sale.sale.order.search.view</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="of_sale.of_sale_view_devis_search"/>
-            <field name="arch" type="xml">
-                <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
-                    <separator/>
-                    <filter name="order_auto" string="Commandes auto" domain="[('of_datastore_order','=',True)]" />
-                </xpath>
-            </field>
-        </record>
+        <field name="name">of.datastore.sale.sale.order.search.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_devis_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
+                <separator/>
+                <filter name="order_auto" string="Commandes auto" domain="[('of_datastore_order','=',True)]" />
+            </xpath>
+        </field>
+    </record>
 
     <!-- Sale Config Settings Form View -->
     <record id="of_datastore_sale_sale_config_settings_form_view" model="ir.ui.view">

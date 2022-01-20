@@ -11,8 +11,10 @@
             <xpath expr="//field[@name='state']" position="before">
                 <field name="of_datastore_sent" invisible="1"/>
                 <field name="of_datastore_purchase" invisible="1"/>
+                <field name="of_datastore_dropshipping" invisible="1"/>
+                <field name="of_brand_count" invisible="1"/>
                 <button name="button_datastore_send_order" string="Commande directe" type="object"
-                        attrs="{'invisible': ['|', '|', ('state', 'in', ['done', 'cancel']), ('of_datastore_sent', '=', True), ('of_datastore_purchase', '=', False)]}"/>
+                        attrs="{'invisible': ['|', '|', '|', ('state', 'in', ['done', 'cancel']), ('of_datastore_sent', '=', True), ('of_datastore_purchase', '=', False), '&amp;',('of_brand_count', '!=', 1), ('of_datastore_dropshipping', '=', True)]}"/>
             </xpath>
         </field>
     </record>
@@ -20,10 +22,9 @@
     <record id="of_datastore_purchase_purchase_order_search_view" model="ir.ui.view">
         <field name="name">of.datastore.purchase.purchase.order.search.view</field>
         <field name="model">purchase.order</field>
-        <field name="inherit_id" ref="purchase.view_purchase_order_filter"/>
+        <field name="inherit_id" ref="of_datastore_common_sp.view_purchase_order_filter"/>
         <field name="arch" type="xml">
-            <xpath expr="//filter[@name='to_approve']" position="after">
-                <separator/>
+            <xpath expr="//filter[@name='of_datastore_anomalie']" position="before">
                 <filter name="of_datastore_sent" string="Commandes auto" domain="[('of_datastore_sent', '=', True)]"/>
             </xpath>
         </field>
