@@ -437,7 +437,7 @@ class ResPartner(models.Model):
         if write_ref:
             self._update_refs(ref, partner_refs)
         # Calcul de la ref en fonction de la configuration
-        for partner in self.filtered(lambda p: p.company_id.of_ref_mode == 'id' and not p.ref):
+        for partner in self.filtered(lambda p: p.company_id.sudo().of_ref_mode == 'id' and not p.ref):
             if not self.env['res.partner'].with_context(active_test=False).search([('ref', '=', str(partner.id))]):
                 partner.ref = str(partner.id)
             else:
