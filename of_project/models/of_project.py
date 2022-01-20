@@ -4,15 +4,32 @@ from odoo import models, fields, api
 from datetime import datetime
 
 
+class OfProjectStage(models.Model):
+    _name = 'of.project.stage'
+    _description = u"Étape de projet"
+    _order = 'sequence, id'
+
+    name = fields.Char(string=u"Nom de l'étape", required=True, translate=True)
+    description = fields.Text(translate=True)
+    sequence = fields.Integer(default=1)
+    fold = fields.Boolean(string=u"Replié dans la vue Kanban")
+
+
 class Project(models.Model):
     _inherit = 'project.project'
     _order = 'of_task_total_priority desc, of_end_date'
+
+    def _default_stage_id(self):
+        return self.env['of.project.stage'].search([('fold', '=', False)], limit=1).id
 
     of_state = fields.Selection(
         selection=[('01_incoming', u"À venir"),
                    ('02_in_progress', u"En cours"),
                    ('03_on_hold', u"En attente"),
                    ('04_closed', u"Fermé")], compute='_compute_of_state', string=u"État", store=True)
+    of_stage_id = fields.Many2one(
+        'of.project.stage', string=u"Étape", default=lambda self: self._default_stage_id(),
+        group_expand='_read_group_stage_ids')
     of_start_date = fields.Date(compute='_compute_of_dates', string=u"Date de début", store=True)
     of_end_date = fields.Date(compute='_compute_of_dates', string=u"Date de fin", store=True)
     of_sale_id = fields.Many2one(
@@ -69,6 +86,10 @@ class Project(models.Model):
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
         self.of_sale_id = False
+
+    @api.model
+    def _read_group_stage_ids(self, stages, domain, order):
+        return stages.search([], order=order)
 
     @api.multi
     def get_partner_action(self):

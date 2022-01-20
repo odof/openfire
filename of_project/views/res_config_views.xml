@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="of_project_view_config_settings" model="ir.ui.view">
+        <field name="name">of_project project settings</field>
+        <field name="model">project.config.settings</field>
+        <field name="inherit_id" ref="project.view_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='module_pad']" position="before">
+                <field name="of_kanban_group"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
