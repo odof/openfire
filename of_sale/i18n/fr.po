@@ -292,3 +292,79 @@ msgstr "Base"
 #: model:ir.ui.view,arch_db:sale.report_saleorder_document
 msgid "Amount"
 msgstr "Montant"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_group_of_sale_multiimage
+msgid "(OF) Multi Images"
+msgstr "(OF) Images multiples dans l’article"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_group_of_sale_print_attachment
+msgid "(OF) Print product attachments on Sale Order"
+msgstr "(OF) Impression PJ de l’article"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_of_sale_print_multiimage_level
+msgid "(OF) Print product images on Sale Order"
+msgstr "(OF) Impression images de l’article"
+
+#. module: of_sale
+#: selection:sale.config.settings,group_of_sale_print_attachment:0
+#: selection:sale.config.settings,of_sale_print_multiimage_level:0
+msgid "Do not print"
+msgstr "Pas d’impression dans le devis"
+
+#. module: of_sale
+#: model:ir.model,name:of_sale.model_of_product_image
+msgid "Images to display in Sale Order"
+msgstr "Images à afficher dans Devis/Commande"
+
+#. module: of_sale
+#: model:res.groups,name:of_sale.group_of_sale_multiimage
+msgid "Multi image on product"
+msgstr "Nombreuses images par article"
+
+#. module: of_sale
+#: selection:sale.config.settings,group_of_sale_multiimage:0
+msgid "One image per product"
+msgstr "Une image par article"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_group_of_sale_print_multiimage
+#: selection:sale.config.settings,group_of_sale_print_attachment:0
+#: selection:sale.config.settings,of_sale_print_multiimage_level:0
+msgid "Print on appendix"
+msgstr "Impression en annexe"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_group_of_sale_print_one_image
+#: selection:sale.config.settings,of_sale_print_multiimage_level:0
+msgid "Print on each line"
+msgstr "Impression à la ligne"
+
+#. module: of_sale
+#: model:res.groups,name:of_sale.group_of_sale_print_one_image
+msgid "Print one product image per line on Sale Order"
+msgstr "Impression d'une image article par ligne sur Devis/Commande"
+
+#. module: of_sale
+#: model:res.groups,name:of_sale.group_of_sale_print_attachment
+msgid "Print product attachments on Sale Order"
+msgstr "Impression de PJ article sur Devis/Commande"
+
+#. module: of_sale
+#: model:res.groups,name:of_sale.group_of_sale_print_multiimage
+msgid "Print product images on Sale Order"
+msgstr "Impression de plusieurs images article sur Devis/Commande"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_delivery_carrier_of_product_image_ids
+#: model:ir.model.fields,field_description:of_sale.field_product_product_of_product_image_ids
+#: model:ir.model.fields,field_description:of_sale.field_product_template_of_product_image_ids
+msgid "Sale Images"
+msgstr "Images de ventes"
+
+#. module: of_sale
+#: selection:sale.config.settings,group_of_sale_multiimage:0
+msgid "Several images per product"
+msgstr "Nombreuses images par article"

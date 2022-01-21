@@ -760,19 +760,27 @@ class Report(models.Model):
         if report_name in allowed_reports:
             # On ajoute au besoin les documents joint
             model = self.env[allowed_reports[report_name]].browse(docids)[0]
+            fd, order_pdf = tempfile.mkstemp()
+            os.write(fd, result)
+            os.close(fd)
+            file_paths = [order_pdf]
+
             mails_data = model._detect_doc_joint()
-            if mails_data:
-                fd, order_pdf = tempfile.mkstemp()
-                os.write(fd, result)
+
+            for mail_data in mails_data:
+                fd, mail_pdf = tempfile.mkstemp()
+                os.write(fd, base64.b64decode(mail_data))
                 os.close(fd)
-                file_paths = [order_pdf]
+                file_paths.append(mail_pdf)
 
-                for mail_data in mails_data:
-                    fd, mail_pdf = tempfile.mkstemp()
-                    os.write(fd, base64.b64decode(mail_data))
+            if report_name == 'sale.report_saleorder' and self.user_has_groups('of_sale.group_of_sale_print_attachment'):
+                for attachment in model.order_line.mapped('of_product_attachment_ids'):
+                    fd, attachment_pdf = tempfile.mkstemp()
+                    os.write(fd, base64.b64decode(attachment.datas))
                     os.close(fd)
-                    file_paths.append(mail_pdf)
+                    file_paths.append(attachment_pdf)
 
+            if file_paths:
                 result_file_path = self.env['report']._merge_pdf(file_paths)
                 try:
                     result_file = file(result_file_path, "rb")
@@ -783,6 +791,7 @@ class Report(models.Model):
                     os.remove(result_file_path)
                 except Exception:
                     pass
+
         return result
 
 
@@ -869,6 +878,8 @@ class SaleOrderLine(models.Model):
 
     of_date_tarif = fields.Date(string="Date du tarif", related="product_id.date_tarif", readonly=True)
     of_obsolete = fields.Boolean(string=u"Article obsolète", related="product_id.of_obsolete", readonly=True)
+    of_product_image_ids = fields.Many2many('of.product.image', string='Images')
+    of_product_attachment_ids = fields.Many2many("ir.attachment", string="Documents joints")
 
     @api.model_cr_context
     def _auto_init(self):
@@ -993,13 +1004,28 @@ class SaleOrderLine(models.Model):
             self.update({'name': name})
 
         # Remise interdite
-        if self.product_id and self.product_id.of_forbidden_discount and self.of_discount_formula:
-            self.of_discount_formula = False
-        if self.product_id and self.product_id.categ_id:
-            self.of_article_principal = self.product_id.categ_id.of_article_principal
-        if self.env.user.has_group('sale.group_sale_layout'):
-            if self.product_id and self.product_id.categ_id.of_layout_id:
-                self.layout_category_id = self.product_id.categ_id.of_layout_id
+
+        if self.product_id:
+            if self.product_id.of_forbidden_discount and self.of_discount_formula:
+                self.of_discount_formula = False
+            if self.product_id.categ_id:
+                self.of_article_principal = self.product_id.categ_id.of_article_principal
+            if self.env.user.has_group('sale.group_sale_layout'):
+                if self.product_id.categ_id.of_layout_id:
+                    self.layout_category_id = self.product_id.categ_id.of_layout_id
+            if self.env.user.has_group('of_sale.group_of_sale_multiimage'):
+                if self.product_id.product_tmpl_id.of_product_image_ids:
+                    of_product_image_ids = self.product_id.product_tmpl_id.of_product_image_ids
+                    self.of_product_image_ids = self.product_id.product_tmpl_id.of_product_image_ids
+                    res['domain']['of_product_image_ids'] = [('id', 'in', of_product_image_ids.ids)]
+            if self.env.user.has_group('of_sale.group_of_sale_print_attachment'):
+                attachment_ids = self.env['ir.attachment'] \
+                    .search([('res_model', '=', 'product.template'),
+                             ('res_id', '=', self.product_id.product_tmpl_id.id),
+                             ('mimetype', '=', 'application/pdf')])
+                if attachment_ids:
+                    self.of_product_attachment_ids = attachment_ids
+                    res['domain']['of_product_attachment_ids'] = [('id', 'in', attachment_ids.ids)]
 
         return res
 
@@ -1101,6 +1127,19 @@ class SaleOrderLine(models.Model):
                             u"""Veuillez annuler vos modifications.""")
         return super(SaleOrderLine, self).unlink()
 
+    @api.model
+    def create(self, vals):
+        """
+        Au moment de la sauvegarde de la commande, les images articles ne sont pas toujours sauvegardées
+        car renseignées par un onchange et affichage en vue en kanban, du coup on surcharge le create
+        """
+        res = super(SaleOrderLine, self).create(vals)
+
+        if 'of_product_image_ids' in vals.keys() and vals['of_product_image_ids'] and not res.of_product_image_ids:
+            res.with_context(already_tried=True).of_product_image_ids = vals['of_product_image_ids']
+
+        return res
+
     @api.multi
     def write(self, vals):
         """
@@ -1117,6 +1156,12 @@ class SaleOrderLine(models.Model):
             if locked_invoice_lines and blocked and not force:
                 raise UserError(u"""Cette ligne ne peut être modifiée : %s""" % line.name)
         return super(SaleOrderLine, self).write(vals)
+
+        # Au moment de la sauvegarde de la commande, les images articles ne sont pas toujours sauvegardées
+        # car renseignées par un onchange et affichage en vue en kanban, du coup on surcharge le write
+        if 'already_tried' not in self._context:
+            if 'of_product_image_ids' in vals.keys() and vals['of_product_image_ids'] and not self.of_product_image_ids:
+                self.with_context(already_tried=True).of_product_image_ids = vals['of_product_image_ids']
 
     @api.multi
     def _additionnal_tax_verifications(self):
@@ -1789,6 +1834,8 @@ class PurchaseOrderLine(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
+    of_product_image_ids = fields.One2many('of.product.image', 'product_tmpl_id', string=u'Images')
+
     @api.multi
     def action_view_sales(self):
         self.ensure_one()
@@ -1846,3 +1893,12 @@ class ProductProduct(models.Model):
                     to_activate |= product.product_tmpl_id
             to_activate.with_context(of_no_rebound=True).write({'active': True})
         return res
+
+
+class OfProductImage(models.Model):
+    _name = 'of.product.image'
+    _description = 'Product Images'
+
+    name = fields.Char('Name')
+    image = fields.Binary('Image', attachment=True)
+    product_tmpl_id = fields.Many2one('product.template', 'Related Product', copy=True)

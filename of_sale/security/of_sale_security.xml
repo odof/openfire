@@ -23,5 +23,25 @@
             <field name="comment">Permet l'activation des options de ligne de commande</field>
         </record>
 
+        <record id="group_of_sale_multiimage" model="res.groups">
+            <field name="name">Multi image on product</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
+
+        <record id="group_of_sale_print_one_image" model="res.groups">
+            <field name="name">Print one product image per line on Sale Order</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
+
+        <record id="group_of_sale_print_multiimage" model="res.groups">
+            <field name="name">Print product images on Sale Order</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
+
+        <record id="group_of_sale_print_attachment" model="res.groups">
+            <field name="name">Print product attachments on Sale Order</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
+
     </data>
 </openerp>
