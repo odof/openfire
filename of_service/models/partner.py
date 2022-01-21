@@ -6,12 +6,11 @@ from odoo import api, models, fields
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    service_address_ids = fields.One2many('of.service', 'address_id', string=u'Interventions récurrentes',
-                                          context={'active_test': False})
+    service_address_ids = fields.One2many(
+        'of.service', 'address_id', string=u"Demandes d'intervention", context={'active_test': False})
     service_partner_ids = fields.One2many(
-        'of.service', 'partner_id', string=u'Interventions récurrentes du partenaire', context={'active_test': False},
-        help=u"Interventions récurrentes liées au partenaire, incluant les interventions récurrentes des contacts "
-             u"associés")
+        'of.service', 'partner_id', string=u"Demandes d'intervention du partenaire", context={'active_test': False},
+        help=u"Demandes d'intervention liées au partenaire, incluant les demandes des contacts associés")
     a_programmer_ids = fields.Many2many('of.service', string=u"DI à programmer", compute="compute_a_programmer")
     a_programmer_count = fields.Integer(string=u'Nombre DI à programmer', compute='compute_a_programmer')
     recurrent_ids = fields.Many2many('of.service', string=u"DI récurrentes", compute="compute_a_programmer")

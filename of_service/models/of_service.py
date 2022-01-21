@@ -717,15 +717,9 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
 
     @api.multi
     def action_view_sale_invoice(self):
-        if self.ensure_one():
-            return {
-                'name': u"Factures client",
-                'view_mode': 'tree,kanban,form',
-                'res_model': 'account.invoice',
-                'res_id': self.sale_invoice_ids.ids,
-                'domain': "[('id', 'in', %s)]" % self.sale_invoice_ids.ids,
-                'type': 'ir.actions.act_window',
-            }
+        action = self.env.ref('account.action_invoice_tree1').read()[0]
+        action['domain'] = [('id', 'in', self.sale_invoice_ids._ids)]
+        return action
 
     @api.multi
     def action_service_send(self):

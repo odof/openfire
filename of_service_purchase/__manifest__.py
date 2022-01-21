@@ -8,7 +8,7 @@
     'summary': u"Module de lien entre demandes d'intervention et achats",
     "description": u"""
 OpenFire / Demande d'intervention - Achats
-==================================
+==========================================
 
 Module de lien entre les modules of_service et of_purchase
 
