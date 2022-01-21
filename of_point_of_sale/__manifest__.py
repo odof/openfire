@@ -22,6 +22,7 @@ les champs marque ('brand_id') et catégorie interne ('categ_id') des articles (
     'data': [
         'views/account_views.xml',
         'views/product_views.xml',
+        'views/pos_views.xml',
         'views/templates.xml',
     ],
     'installable': True,

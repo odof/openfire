@@ -9,6 +9,9 @@
             <xpath expr="//field[@name='pos_categ_id']" position="after">
                 <field name="of_pos_favorite" string="Favori" attrs="{'invisible': [('available_in_pos', '=', False)]}"/>
             </xpath>
+            <xpath expr="//field[@name='to_weight']" position="attributes">
+                <attribute name="attrs">{'invisible': True}</attribute>
+            </xpath>
         </field>
     </record>
 
