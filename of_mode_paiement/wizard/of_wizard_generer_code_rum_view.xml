@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="of_generer_code_rum_wizard_confirm_form" model="ir.ui.view">
+            <field name="name">of.generer.code.rum.wizard.confirm.form</field>
+            <field name="model">of.generer.code.rum.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Génrer code RUM">
+                    <p>Attention, un code RUM existe déjà, souhaitez-vous en générer un nouveau ?</p>
+                    <p>
+                        Cela aura pour conséquence
+                        d'écraser le dernier code RUM connu et de repasser le
+                        <strong>Type de prélèvement SEPA à Premier prélèvement récurrent à venir, voulez-vous continuer ?</strong>
+                    </p>
+                    <group invisible="1">
+                        <field name="partner_bank_id"/>
+                    </group>
+                    <footer>
+                        <button string="Valider" name="validate" type="object" class="oe_highlight"/> or
+                        <button string="Annuler" name ="cancel" type="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>
