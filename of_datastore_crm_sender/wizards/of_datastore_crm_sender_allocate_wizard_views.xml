@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_datastore_crm_sender_allocate_wizard_view" model="ir.ui.view">
+        <field name="name">of.datastore.crm.sender.allocate.wizard.view</field>
+        <field name="model">of.datastore.crm.sender.allocate.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="lead_id" invisible="1"/>
+                    <field name="partner_id"/>
+                </group>
+                <footer>
+                    <button type="object" name="action_done" string="Valider" class="oe_highlight"/>
+                    <button string="Annuler" class="oe_link" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_datastore_crm_sender_auto_allocate_wizard_view" model="ir.ui.view">
+        <field name="name">of.datastore.crm.sender.auto.allocate.wizard.view</field>
+        <field name="model">of.datastore.crm.sender.auto.allocate.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="lead_ids" invisible="1"/>
+                    <label for="wizard_line_ids"/>
+                    <field name="wizard_line_ids" nolabel="1">
+                        <tree editable="bottom" create="false">
+                            <field name="lead_id"/>
+                            <field name="partner_id"/>
+                            <field name="secteur_id"/>
+                        </tree>
+                    </field>
+                </group>
+                <footer>
+                    <button type="object" name="action_done" string="Valider" class="oe_highlight"/>
+                    <button string="Annuler" class="oe_link" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

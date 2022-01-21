@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- UTM Medium -->
+    <record model="utm.medium" id="utm_medium_of_datastore_crm">
+        <field name="name">Réseau</field>
+    </record>
+
+    <record model="ir.cron" id="ir_cron_datastore_leads_to_update">
+        <field name="name">Mettre à jour les opportunités en attente</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False"/>
+        <field name="model" eval="'crm.lead'"/>
+        <field name="function" eval="'datastore_leads_to_update'"/>
+        <field name="args">()</field>
+    </record>
+
+</odoo>

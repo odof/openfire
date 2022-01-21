@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- CRM Lead Search View -->
+    <record id="of_datastore_crm_receiver_view_crm_case_opportunities_filter" model="ir.ui.view">
+        <field name="name">of.datastore.crm.receiver.sale.order.search.view</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.view_crm_case_opportunities_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='overdue_opp']" position="after">
+                <separator/>
+                <filter name="crm_auto" string="Opportunité auto" domain="[('of_datastore_lead','!=',False)]" />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
