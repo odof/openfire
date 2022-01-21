@@ -258,7 +258,7 @@ class OfParcInstalle(models.Model):
             'default_date_next': fields.Date.today(),
             'default_parc_installe_id': self.id,
             'default_origin': u"[parc installé] " + (self.name or ''),
-            'default_type_id': self.env.ref('of_service.of_service_type_maintenance').id,
+            'default_type_id': self.env.ref('of_service_parc_installe.of_service_type_sav').id,
         }
         return action
 
@@ -279,7 +279,7 @@ class OfParcInstalle(models.Model):
             'default_date_next': fields.Date.today(),
             'default_parc_installe_id': self.id,
             'default_origin': u"[Parc installé] " + (self.name or ''),
-            'default_type_id': self.env.ref('of_service.of_service_type_maintenance').id,
+            'default_type_id': self.env.ref('of_service_parc_installe.of_service_type_sav').id,
         }
         return action
 

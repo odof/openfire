@@ -51,9 +51,18 @@
         <field name="model">of.service</field>
         <field name="inherit_id" ref="of_service.view_of_service_filter"/>
         <field name="arch" type="xml">
-            <xpath expr="filter[@name='filter_entretien']" position="before">
+            <xpath expr="//filter[@name='filter_entretien']" position="before">
                 <filter string="SAV" name="filter_sav" domain="[('type_id', '=', %(of_service_parc_installe.of_service_type_sav)d)]"/>
             </xpath>
+        </field>
+    </record>
+
+    <record id="of_service_parc_installe_distinct_type_search_view" model="ir.ui.view">
+        <field name="name">of.service.parc.installe.distinct.type.search.view</field>
+        <field name="model">of.service</field>
+        <field name="inherit_id" ref="of_service.of_service_distinct_type_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='filter_sav']" position="replace"/>
         </field>
     </record>
 
@@ -84,7 +93,7 @@
         <field name="res_model">of.service</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,kanban,map,form,pivot</field>
-        <field name="search_view_id" ref="of_service.view_of_service_filter"/>
+        <field name="search_view_id" ref="of_service.of_service_distinct_type_search_view"/>
         <field name="domain" eval="[('type_id', '=', ref('of_service_parc_installe.of_service_type_sav'))]"/>
         <field name="context" eval="{'default_type_id': ref('of_service_parc_installe.of_service_type_sav'),
                                      'of_kanban_steps': 'SAV'}"/>

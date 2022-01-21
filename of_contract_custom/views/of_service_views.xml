@@ -23,7 +23,7 @@
         <field name="inherit_id" ref="of_service.view_of_service_form"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='button_brouillon']" position="after">
-                <button name="transform_to_contract" string="Transformer" states="calculated" type="object"/>
+                <button name="transform_to_contract" string="Transformer" type="object" attrs="{'invisible': [('base_state', '!=', 'calculated')]}"/>
             </xpath>
             <xpath expr="//field[@name='order_id']" position="after">
                 <field name="contract_id" attrs="{'invisible': ['|', ('type_id','not in',[%(of_service.of_service_type_maintenance)d, %(of_service_parc_installe.of_service_type_sav)d]), ('recurrence','=', True)]}"/>
