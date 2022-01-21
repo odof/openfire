@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!--Email template -->
+    <record id="of_datastore_crm_sender_email_template" model="mail.template">
+        <field name="name">Affectation d’opportunité</field>
+        <field name="email_from">${object.of_allocated.company_id.email or ''}</field>
+        <field name="subject">Une opportunité vous a été affectée</field>
+        <field name="email_to">${object.of_allocated.email or ''}</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="auto_delete" eval="True"/>
+        <field name="lang">${object.env.context.get("lang")}</field>
+        <field name="body_html"><![CDATA[
+            Bonjour ${object.of_allocated.name or ''}, une opportunité vous a été affecté,
+
+            <p>
+                L’opportunité suivante vous a été affectée par ${object.env.user.name or ''} :<br/>
+                Nom du client : ${object.contact_name or object.name or ''}<br/>
+                Adresse: ${object.partner_id.sudo().with_context(show_address=True, html_format=True).name_get()[0][1] | safe}<br/>
+                Etat de l’opportunité : ${object.stage_id.name or ''}<br/>
+                Téléphone : ${object.phone or ''}<br/>
+                Mobile : ${object.mobile or ''}<br/>
+                Courriel : ${object.email_from or ''}<br/>
+                Informations : ${object.of_infos_compl or ''}<br/>
+            </p>
+            <p>Cordialement,</p>
+        ]]></field>
+    </record>
+
+</odoo>

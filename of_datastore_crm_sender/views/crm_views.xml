@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- CRM Views -->
+
+    <record id="of_datastore_crm_sender_view_partner_form" model="ir.ui.view">
+        <field name="name">of.datastore.crm.sender.view.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='sales_purchases']//field[@name='company_id']" position="after">
+                <field name="of_network_member" readonly="0"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_datastore_crm_sender_view_sale_config_settings" model="ir.ui.view">
+        <field name="name">of.datastore.crm.sender.view.sale.config.settings</field>
+        <field name="model">sale.config.settings</field>
+        <field name="inherit_id" ref="crm.view_sale_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='group_use_lead']" position="after">
+                <label for="group_of_lead_allocation"/>
+                <div>
+                    <field name="group_of_lead_allocation"/>
+                    <span>Activer l'affectation automatique des opportunités</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_datastore_crm_sender_crm_case_form_view_oppor" model="ir.ui.view">
+        <field name="name">of.datastore.crm.sender.crm.case.from.wiew.oppor</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="of_datastore_sent" invisible="1"/>
+                <button name="action_allocate_lead" string="Affecter" type="object" class="oe_highlight" attrs="{'invisible': [('of_datastore_sent', '!=', False)]}"/>
+            </xpath>
+            <xpath expr="//field[@name='of_prospecteur_id']" position="after">
+                <field name="of_allocated"/>
+            </xpath>
+        </field>
+    </record>
+
+    <act_window id="action_window_auto_allocate_lead"
+                key2="client_action_multi" name="Lancer l'affectation"
+                res_model="of.datastore.crm.sender.auto.allocate.wizard"
+                src_model="crm.lead"
+                multi="True"
+                view_type="form"
+                view_mode="form"
+                target="new"
+                groups="of_datastore_crm_sender.group_of_lead_allocation"
+                context="{'default_lead_ids':active_ids}"
+    />
+
+</odoo>

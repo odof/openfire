@@ -20,6 +20,8 @@ Ajout d'une classe abstraite permettant de se connecter à une autre base odoo.
     },
     'init_xml': [],
     'demo_xml': [],
-    'data': [],
+    'data': [
+        'views/of_datastore_connector_views.xml',
+    ],
     'installable': True,
 }
