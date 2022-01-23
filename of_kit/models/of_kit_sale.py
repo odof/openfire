@@ -185,10 +185,30 @@ class SaleOrderLine(models.Model):
             if line.of_is_kit:
                 if line.of_pricing == 'computed':
                     price = line.price_unit
-                    line.price_unit = line.price_comps
+                    # Option de ligne pour le prix de vente
+                    if line.of_order_line_option_id and line.of_order_line_option_id.sale_price_update and \
+                            line.price_comps:
+                        if line.of_order_line_option_id.sale_price_update_type == 'fixed':
+                            line.price_unit = line.price_comps + line.of_order_line_option_id.sale_price_update_value
+                        elif line.of_order_line_option_id.sale_price_update_type == 'percent':
+                            line.price_unit = line.price_comps + line.price_comps * (
+                                        line.of_order_line_option_id.sale_price_update_value / 100)
+                        line.price_unit = line.order_id.currency_id.round(line.price_unit)
+                    else:
+                        line.price_unit = line.price_comps
                     if line.price_unit != price:
                         line._compute_amount()
-                line.purchase_price = line.cost_comps
+                # Option de ligne pour le prix d'achat
+                if line.of_order_line_option_id and line.of_order_line_option_id.purchase_price_update and \
+                        line.cost_comps:
+                    if line.of_order_line_option_id.purchase_price_update_type == 'fixed':
+                        line.purchase_price = line.cost_comps + line.of_order_line_option_id.purchase_price_update_value
+                    elif line.of_order_line_option_id.purchase_price_update_type == 'percent':
+                        line.purchase_price = \
+                            line.cost_comps * (1 + line.of_order_line_option_id.purchase_price_update_value / 100)
+                    line.purchase_price = line.order_id.currency_id.round(line.purchase_price)
+                else:
+                    line.purchase_price = line.cost_comps
 
     @api.multi
     @api.onchange('product_id')
@@ -218,6 +238,43 @@ class SaleOrderLine(models.Model):
         self.ensure_one()
         super(SaleOrderLine, self).product_uom_change()
         self._refresh_price_unit()
+
+    @api.onchange('of_order_line_option_id')
+    def _onchange_of_order_line_option_id(self):
+        super(SaleOrderLine, self)._onchange_of_order_line_option_id()
+        if self.of_is_kit and self.of_pricing == 'computed':
+            if self.of_order_line_option_id and self.of_order_line_option_id.sale_price_update and \
+                    self.price_comps:
+                if self.of_order_line_option_id.sale_price_update_type == 'fixed':
+                    self.price_unit = self.price_comps + self.of_order_line_option_id.sale_price_update_value
+                elif self.of_order_line_option_id.sale_price_update_type == 'percent':
+                    self.price_unit = self.price_comps + self.price_comps * (
+                            self.of_order_line_option_id.sale_price_update_value / 100)
+                self.price_unit = self.order_id.currency_id.round(self.price_unit)
+
+    @api.onchange('of_reset_option')
+    def _onchange_of_reset_option(self):
+        if not self.of_is_kit:
+            super(SaleOrderLine, self)._onchange_of_reset_option()
+        elif self.of_reset_option:
+            product = self.product_id.with_context(
+                lang=self.order_id.partner_id.lang,
+                partner=self.order_id.partner_id.id,
+                quantity=self.product_uom_qty,
+                date=self.order_id.date_order,
+                pricelist=self.order_id.pricelist_id.id,
+                uom=self.product_uom.id
+                )
+            if self.of_pricing == 'fixed' and self.order_id.pricelist_id and self.order_id.partner_id:
+                self.price_unit = self.env['account.tax']._fix_tax_included_price_company(
+                    self._get_display_price(product), product.taxes_id, self.tax_id, self.company_id)
+            else:
+                self.price_unit = self.price_comps
+            self.purchase_price = self.cost_comps
+            if self.of_order_line_option_id.description_update:
+                self.name = self.name.replace(self.of_order_line_option_id.description_update, '')
+            self.of_order_line_option_id = False
+            self.of_reset_option = False
 
     @api.depends('qty_invoiced', 'product_uom_qty', 'order_id.state', 'order_id.of_invoice_policy',
                  'order_id.partner_id.of_invoice_policy', 'procurement_ids', 'procurement_ids.move_ids',
@@ -452,8 +509,20 @@ class SaleOrderLine(models.Model):
             update_ol_id = True
         if len(self) == 1 and vals.get('of_pricing', self.of_pricing) == 'computed' \
                 and vals.get('of_is_kit', self.of_is_kit):
-            vals['price_unit'] = vals.get('kit_id') and self.env['of.saleorder.kit'].browse(vals['kit_id']).price_comps\
-                                 or self.price_comps  # price_unit is equal to price_comps if pricing is computed
+            price_comps = vals.get('kit_id') and self.env['of.saleorder.kit'].browse(vals['kit_id']).price_comps or \
+                          self.price_comps
+            # Option de ligne pour le prix de vente
+            option = vals.get('of_order_line_option_id') and \
+                self.env['of.order.line.option'].browse(vals['of_order_line_option_id']) or self.of_order_line_option_id
+            if option and option.sale_price_update and price_comps:
+                price_unit = 0.0
+                if option.sale_price_update_type == 'fixed':
+                    price_unit = price_comps + option.sale_price_update_value
+                elif option.sale_price_update_type == 'percent':
+                    price_unit = price_comps + price_comps * (option.sale_price_update_value / 100)
+                vals['price_unit'] = self.order_id.currency_id.round(price_unit)
+            else:
+                vals['price_unit'] = price_comps
         super(SaleOrderLine, self).write(vals)
         if update_ol_id:
             sale_kit_vals = {'order_line_id': self.id}
@@ -496,7 +565,17 @@ class SaleOrderLine(models.Model):
         for line in self:
             kit_pricing = self._context.get('current_of_pricing', line.of_pricing)
             if line.kit_id and kit_pricing == 'computed':
-                line.of_difference = float_compare(line.kit_id.price_comps, line.price_unit, 2)
+                computed_price = line.kit_id.price_comps
+                # Option de ligne pour le prix de vente
+                if line.of_order_line_option_id and line.of_order_line_option_id.sale_price_update and \
+                        line.kit_id.price_comps:
+                    if line.of_order_line_option_id.sale_price_update_type == 'fixed':
+                        computed_price = line.kit_id.price_comps + line.of_order_line_option_id.sale_price_update_value
+                    elif line.of_order_line_option_id.sale_price_update_type == 'percent':
+                        computed_price = line.kit_id.price_comps + line.kit_id.price_comps * (
+                                line.of_order_line_option_id.sale_price_update_value / 100)
+                    computed_price = line.order_id.currency_id.round(computed_price)
+                line.of_difference = float_compare(computed_price, line.price_unit, 2)
             else:
                 line.of_difference = False
 
