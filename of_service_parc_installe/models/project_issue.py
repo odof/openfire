@@ -67,8 +67,8 @@ class ProjectIssue(models.Model):
         """
         if not self.env['ir.config_parameter'].sudo().get_param('of_migration_sav_di'):
             _logger.info(u"OPENFIRE : début de migration des SAV dans les DI (T2356)")
-            sav_obj = self.env['project.issue']
-            service_obj = self.env['of.service']
+            sav_obj = self.env['project.issue'].with_context(active_test=False)
+            service_obj = self.env['of.service'].with_context(active_test=False)
             cr = self.env.cr
             sav_type = self.env.ref('of_service_parc_installe.of_service_type_sav')
             sav_tache = self.env['of.planning.tache'].search([('name', 'ilike', 'SAV')], limit=1)
