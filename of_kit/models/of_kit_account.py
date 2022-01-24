@@ -184,11 +184,32 @@ class AccountInvoiceLine(models.Model):
         for line in self:
             if line.of_is_kit:
                 price = line.price_unit
+                option = line.sale_line_ids.mapped('of_order_line_option_id')
+                if len(option) > 1:
+                    option = False
                 if line.of_pricing == 'computed':
-                    line.price_unit = line.price_comps
+                    # Option de ligne pour le prix de vente
+                    if option and option.sale_price_update and line.price_comps:
+                        if option.sale_price_update_type == 'fixed':
+                            line.price_unit = line.price_comps + option.sale_price_update_value
+                        elif option.sale_price_update_type == 'percent':
+                            line.price_unit = line.price_comps + line.price_comps * (
+                                    option.sale_price_update_value / 100)
+                        line.price_unit = line.invoice_id.currency_id.round(line.price_unit)
+                    else:
+                        line.price_unit = line.price_comps
                     if line.price_unit != price:
                         line._compute_price()
-                line.purchase_price = line.cost_comps
+                # Option de ligne pour le prix d'achat
+                if option and option.purchase_price_update and line.cost_comps:
+                    if option.purchase_price_update_type == 'fixed':
+                        line.purchase_price = line.cost_comps + option.purchase_price_update_value
+                    elif option.purchase_price_update_type == 'percent':
+                        line.purchase_price = \
+                            line.cost_comps * (1 + option.purchase_price_update_value / 100)
+                    line.purchase_price = line.invoice_id.currency_id.round(line.purchase_price)
+                else:
+                    line.purchase_price = line.cost_comps
 
     @api.onchange('of_is_kit')
     def _onchange_of_is_kit(self):
@@ -267,10 +288,28 @@ class AccountInvoiceLine(models.Model):
             elif vals.get("name") and self.kit_id:
                 # line changed name
                 update_il_id = True
-            if (vals.get('of_pricing') or self.of_pricing) == 'computed':
-                # price_unit is equal to price_comps if pricing is computed
-                vals['price_unit'] = vals.get('price_comps', self.price_comps)
         super(AccountInvoiceLine, self).write(vals)
+        if len(self) == 1 and (vals.get('of_pricing') or self.of_pricing) == 'computed':
+            # Calcul réalisé après le premier write pour simplifier le calcul de l'option au cas où sale_line_ids
+            # est modifié
+            vals_price = {}
+            # price_unit is equal to price_comps if pricing is computed
+            price_comps = vals.get('kit_id') and self.env['of.invoice.kit'].browse(vals['kit_id']).price_comps or \
+                          self.price_comps
+            # Option de ligne pour le prix de vente
+            option = self.sale_line_ids.mapped('of_order_line_option_id')
+            if len(option) > 1:
+                option = False
+            if option and option.sale_price_update and price_comps:
+                price_unit = 0.0
+                if option.sale_price_update_type == 'fixed':
+                    price_unit = price_comps + option.sale_price_update_value
+                elif option.sale_price_update_type == 'percent':
+                    price_unit = price_comps + price_comps * (option.sale_price_update_value / 100)
+                vals_price['price_unit'] = self.invoice_id.currency_id.round(price_unit)
+            else:
+                vals_price['price_unit'] = price_comps
+            super(AccountInvoiceLine, self).write(vals_price)
         if update_il_id:
             account_kit_vals = {'invoice_line_id': self.id}
             if vals.get("name"):
