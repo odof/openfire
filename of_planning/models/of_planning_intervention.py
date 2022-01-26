@@ -1796,14 +1796,7 @@ class OfPlanningIntervention(models.Model):
     @api.multi
     def get_action_views(self, obj_source, action):
         interv_count = len(self)
-        if len(obj_source._ids) == 1 and interv_count == 1:
-            # Mettre la vue form si on a un seul partenaire avec un seul RDV
-            views = [(self.env['ir.model.data'].xmlid_to_res_id(
-                'of_planning.of_planning_intervention_view_form'), 'form')]
-            views += [(view[0], view[1]) for view in action['views'] if view[1] != 'form']
-            action['views'] = views
-            action['res_id'] = self.id
-        elif interv_count > 1:
+        if interv_count >= 1:
             # changer l'ordre des vues de l'action est suffisant pour mettre la vue tree en première
             views = [(self.env['ir.model.data'].xmlid_to_res_id(
                 'of_planning.of_planning_intervention_view_tree'), 'tree')]
