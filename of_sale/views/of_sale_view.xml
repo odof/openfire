@@ -242,6 +242,16 @@
                 <xpath expr="//field[@name='order_line']/tree//field[@name='purchase_price']" position="after">
                     <field name="of_seller_price" groups="of_sale.of_group_sale_marge_manager+sales_team.group_sale_manager"
                            invisible="context.get('hide_sale')" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                    <!-- Champs ajoutés en invisible pour ne pas modifier l'affichage actuel et permettre au list
+                         editor d'hériter des groups+attrs -->
+                    <field name="of_marge_pc"
+                           groups="-base.group_user, of_sale.of_group_sale_marge_manager"
+                           attrs="{'invisible': [('of_client_view', '=', True)]}"
+                           invisible="1"/>
+                    <field name="margin"
+                           groups="-base.group_user, of_sale.of_group_sale_marge_manager"
+                           attrs="{'invisible': [('of_client_view', '=', True)]}"
+                           invisible="1"/>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/tree" position="inside">
                     <field name="of_client_view" invisible="1"/>
@@ -289,11 +299,11 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale_margin.sale_margin_sale_order"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='margin']" position="attributes">
+                <xpath expr="//group[@name='sale_margin_grp']//field[@name='margin']" position="attributes">
                     <attribute name="groups">-base.group_user, of_sale.of_group_sale_marge_manager</attribute>
                     <attribute name="attrs">{'invisible': [('of_client_view', '=', True)]}</attribute>
                 </xpath>
-                <xpath expr="//field[@name='margin']" position="after">
+                <xpath expr="//group[@name='sale_margin_grp']//field[@name='margin']" position="after">
                     <field name="of_marge_pc"
                            groups="-base.group_user, of_sale.of_group_sale_marge_manager"
                            attrs="{'invisible': [('of_client_view', '=', True)]}"/>
