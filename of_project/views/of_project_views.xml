@@ -128,8 +128,37 @@
                 <attribute name="class">o_kanban_small_column</attribute>
                 <attribute name="default_group_by">stage_id</attribute>
             </xpath>
-         </field>
-     </record>
+            <xpath expr="//kanban/field[last()]" position="after">
+                <field name="of_participant_ids"/>
+                <field name="dependency_task_ids"/>
+            </xpath>
+            <xpath expr="//kanban//div[@class='oe_kanban_content']/div[@class='oe_kanban_bottom_left']" position="before">
+                <t t-if="record.dependency_task_ids.raw_value.length &gt; 0">
+                    <div>
+                        <ul>Dépendances : </ul>
+                        <field name="dependency_task_ids"/>
+                    </div>
+                </t>
+            </xpath>
+            <xpath expr="//kanban//div[@class='oe_kanban_content']/div[@class='oe_kanban_bottom_right']" position="inside">
+                <t t-foreach="record.of_participant_ids.raw_value.slice(0,11)" t-as="participant">
+                    <img t-att-name="participant_ids" t-att-src="kanban_image('res.users', 'image_small', participant)" width="24" height="24" class="oe_kanban_avatar pull-right" t-att-data-member_id="participant"/>
+                </t>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_project_project_task_form_view" model="ir.ui.view">
+        <field name="name">of_project.project.task.form.view</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="of_members" invisible="1"/>
+                <field name="of_participant_ids" widget="many2many_tags" domain="[('id', 'in', of_members[0][2])]"/>
+            </xpath>
+        </field>
+    </record>
 
     <record id="of_project_project_task_search_view" model="ir.ui.view">
         <field name="name">of_project.project.task.search.view</field>
@@ -209,29 +238,29 @@
         <field name="parent_id" ref="of_project.of_project_config_task_menu"/>
     </record>
 
-<data noupdate="1">
-    <record id="of_project_project_kanban_view_gb_state" model="ir.ui.view">
-        <field name="name">of_project.project.kanban.view.gb.state</field>
-        <field name="model">project.project</field>
-        <field name="inherit_id" ref="project.view_project_kanban"/>
-        <field name="active">False</field>
-        <field name="arch" type="xml">
-            <xpath expr="//kanban" position="attributes">
-                <attribute name="default_group_by">of_state</attribute>
-            </xpath>
-        </field>
-    </record>
+    <data noupdate="1">
+        <record id="of_project_project_kanban_view_gb_state" model="ir.ui.view">
+            <field name="name">of_project.project.kanban.view.gb.state</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.view_project_kanban"/>
+            <field name="active">False</field>
+            <field name="arch" type="xml">
+                <xpath expr="//kanban" position="attributes">
+                    <attribute name="default_group_by">of_state</attribute>
+                </xpath>
+            </field>
+        </record>
 
-    <record id="of_project_project_kanban_view_gb_stage_id" model="ir.ui.view">
-        <field name="name">of_project.project.kanban.view.gb.stage_id</field>
-        <field name="model">project.project</field>
-        <field name="inherit_id" ref="project.view_project_kanban"/>
-        <field name="active">False</field>
-        <field name="arch" type="xml">
-            <xpath expr="//kanban" position="attributes">
-                <attribute name="default_group_by">of_stage_id</attribute>
-            </xpath>
-        </field>
-    </record>
-</data>
+        <record id="of_project_project_kanban_view_gb_stage_id" model="ir.ui.view">
+            <field name="name">of_project.project.kanban.view.gb.stage_id</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.view_project_kanban"/>
+            <field name="active">False</field>
+            <field name="arch" type="xml">
+                <xpath expr="//kanban" position="attributes">
+                    <attribute name="default_group_by">of_stage_id</attribute>
+                </xpath>
+            </field>
+        </record>
+    </data>
 </odoo>

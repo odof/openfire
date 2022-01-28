@@ -117,6 +117,8 @@ class ProjectTask(models.Model):
 
     project_id = fields.Many2one(required=True)
     categ_id = fields.Many2one(string=u"Catégorie", required=True)
+    of_members = fields.Many2many('res.users', string=u"Membres", related='project_id.members')
+    of_participant_ids = fields.Many2many('res.users', string=u"Participants")
 
     @api.multi
     def name_get(self):
