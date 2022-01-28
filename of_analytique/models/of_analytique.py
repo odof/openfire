@@ -50,6 +50,10 @@ class OFSaleConfiguration(models.TransientModel):
 
     of_compte_analytique = fields.Boolean(
         string="(OF) Analytique")
+    group_of_group_analytique_obligatoire = fields.Boolean(
+        string=u"(OF) Groupe analytique obligatoire", implied_group='of_analytique.group_of_analytique_obligatoire',
+        compute='compute_group_of_group_analytique_obligatoire', store=True)
+
     of_analytique_preset = fields.Boolean(
         string="(OF) Analytique",
         help=u"Remplir automatiquement le compte analytique du devis à sa confirmation avec le premier compte "
@@ -60,11 +64,13 @@ class OFSaleConfiguration(models.TransientModel):
              u"analytique pour le client à la confirmation d'un devis.\n"
              u"Laisser vide pour ne pas générer de compte analytique automatiquement.")
 
+    @api.depends('of_compte_analytique')
+    def compute_group_of_group_analytique_obligatoire(self):
+        for wizard in self:
+            wizard.group_of_group_analytique_obligatoire = wizard.of_compte_analytique
+
     @api.multi
     def set_of_compte_analytique_setting(self):
-        view = self.env.ref('of_analytique.of_analytique_sale_order')
-        if view:
-            self.env.ref('of_analytique.of_analytique_sale_order').write({'active': self.of_compte_analytique})
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_compte_analytique',
             self.of_compte_analytique)
@@ -80,6 +86,13 @@ class OFSaleConfiguration(models.TransientModel):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_analytique_code',
             self.of_analytique_code)
+
+    @api.model
+    def _update_groups(self):
+        if self.env['ir.values'].get_default('sale.config.settings', 'of_compte_analytique'):
+            group = self.env.ref('of_analytique.group_of_analytique_obligatoire')
+            users = self.env['res.users'].search([]).sudo()
+            users.write({'groups_id': [(4, group.id)]})
 
 
 class AccountInvoice(models.Model):

@@ -26,6 +26,7 @@ Factures:
         "base",
     ],
     "data": [
+        "security/of_analytique_security.xml",
         "views/of_analytique_views.xml",
     ],
     'installable': True,
