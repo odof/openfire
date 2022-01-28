@@ -1057,13 +1057,10 @@ class SaleOrderLine(models.Model):
                 self.price_unit = self.order_id.currency_id.round(self.price_unit)
             if option.purchase_price_update and self.purchase_price:
                 if option.purchase_price_update_type == 'fixed':
-                    self.purchase_price = (self.product_id.of_seller_price + option.purchase_price_update_value) *\
-                                          self.product_id.property_of_purchase_coeff
+                    self.purchase_price = self.purchase_price + option.purchase_price_update_value
                 elif option.purchase_price_update_type == 'percent':
-                    self.purchase_price = (self.product_id.of_seller_price +
-                                           (self.product_id.of_seller_price *
-                                            (option.purchase_price_update_value / 100))) *\
-                                          self.product_id.property_of_purchase_coeff
+                    self.purchase_price = \
+                        self.purchase_price + self.purchase_price * (option.purchase_price_update_value / 100)
                 self.purchase_price = self.order_id.currency_id.round(self.purchase_price)
             if option.description_update:
                 self.name = self.name + "\n%s" % option.description_update
