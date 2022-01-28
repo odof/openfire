@@ -1,3 +1,16 @@
+/*
+ * Code modified by OpenFire to extend mode day, in order to add attendee columns.
+ * New type of events : attendee events. Sent through the event source, They indicate how many columns will be there.
+ * Attendee events are displayed inside a line placed above "all day" events.
+ * Calculations for positionning attendee events and their html container is based on "all day" events.
+ * When attendee events are provided, mode day now groups events by attendee.
+ * The events of an attendee are displayed in their corresponding attendee column.
+ * Events with multiple attendee will only be placed under one attendee column,
+ * and therefore need to be duplicated beforehand.
+ */
+
+
+
 /*!
  * FullCalendar v1.6.4
  * Docs & License: http://arshaw.com/fullcalendar/
@@ -9,7 +22,7 @@
  * For event drag & drop, requires jQuery UI draggable.
  * For event resizing, requires jQuery UI resizable.
  */
- 
+
 (function($, undefined) {
 
 
@@ -184,7 +197,7 @@ function setDefaults(d) {
 
 ;;
 
- 
+
 function Calendar(element, options, eventSources) {
     var t = this;
 
@@ -1614,30 +1627,30 @@ function formatDates(date1, date2, format, options) {
 
 
 var dateFormatters = {
-    s	: function(d)	{ return d.getSeconds() },
-    ss	: function(d)	{ return zeroPad(d.getSeconds()) },
-    m	: function(d)	{ return d.getMinutes() },
-    mm	: function(d)	{ return zeroPad(d.getMinutes()) },
-    h	: function(d)	{ return d.getHours() % 12 || 12 },
-    hh	: function(d)	{ return zeroPad(d.getHours() % 12 || 12) },
-    H	: function(d)	{ return d.getHours() },
-    HH	: function(d)	{ return zeroPad(d.getHours()) },
-    d	: function(d)	{ return d.getDate() },
-    dd	: function(d)	{ return zeroPad(d.getDate()) },
-    ddd	: function(d,o)	{ return o.dayNamesShort[d.getDay()] },
-    dddd: function(d,o)	{ return o.dayNames[d.getDay()] },
-    M	: function(d)	{ return d.getMonth() + 1 },
-    MM	: function(d)	{ return zeroPad(d.getMonth() + 1) },
-    MMM	: function(d,o)	{ return o.monthNamesShort[d.getMonth()] },
-    MMMM: function(d,o)	{ return o.monthNames[d.getMonth()] },
-    yy	: function(d)	{ return (d.getFullYear()+'').substring(2) },
-    yyyy: function(d)	{ return d.getFullYear() },
-    t	: function(d)	{ return d.getHours() < 12 ? 'a' : 'p' },
-    tt	: function(d)	{ return d.getHours() < 12 ? 'am' : 'pm' },
-    T	: function(d)	{ return d.getHours() < 12 ? 'A' : 'P' },
-    TT	: function(d)	{ return d.getHours() < 12 ? 'AM' : 'PM' },
-    u	: function(d)	{ return formatDate(d, "yyyy-MM-dd'T'HH:mm:ss'Z'") },
-    S	: function(d)	{
+    s: function(d) { return d.getSeconds() },
+    ss: function(d) { return zeroPad(d.getSeconds()) },
+    m: function(d) { return d.getMinutes() },
+    mm: function(d) { return zeroPad(d.getMinutes()) },
+    h: function(d) { return d.getHours() % 12 || 12 },
+    hh: function(d) { return zeroPad(d.getHours() % 12 || 12) },
+    H: function(d) { return d.getHours() },
+    HH: function(d) { return zeroPad(d.getHours()) },
+    d: function(d) { return d.getDate() },
+    dd: function(d) { return zeroPad(d.getDate()) },
+    ddd: function(d,o) { return o.dayNamesShort[d.getDay()] },
+    dddd: function(d,o) { return o.dayNames[d.getDay()] },
+    M: function(d) { return d.getMonth() + 1 },
+    MM: function(d) { return zeroPad(d.getMonth() + 1) },
+    MMM: function(d,o) { return o.monthNamesShort[d.getMonth()] },
+    MMMM: function(d,o) { return o.monthNames[d.getMonth()] },
+    yy: function(d) { return (d.getFullYear()+'').substring(2) },
+    yyyy: function(d) { return d.getFullYear() },
+    t: function(d) { return d.getHours() < 12 ? 'a' : 'p' },
+    tt: function(d) { return d.getHours() < 12 ? 'am' : 'pm' },
+    T: function(d) { return d.getHours() < 12 ? 'A' : 'P' },
+    TT: function(d) { return d.getHours() < 12 ? 'AM' : 'PM' },
+    u: function(d) { return formatDate(d, "yyyy-MM-dd'T'HH:mm:ss'Z'") },
+    S: function(d) {
         var date = d.getDate();
         if (date > 10 && date < 20) {
             return 'th';
@@ -1655,7 +1668,7 @@ fc.dateFormatters = dateFormatters;
 
 
 /* thanks jQuery UI (https://github.com/jquery/jquery-ui/blob/master/ui/jquery.ui.datepicker.js)
- * 
+ *
  * Set as calculateWeek to determine the week of the year based on the ISO 8601 definition.
  * `date` - the date to get the week for
  * `number` - the number of the week within the year that contains this date
@@ -2135,6 +2148,7 @@ function BasicView(element, calendar, viewName) {
     t.getRowCnt = function() { return rowCnt };
     t.getColCnt = function() { return colCnt };
     t.getColWidth = function() { return colWidth };
+    t.getAttendeeSegmentContainer = function() { return attendeeSegmentContainer };  // added by OpenFire for mode day
     t.getDaySegmentContainer = function() { return daySegmentContainer };
 
 
@@ -2165,6 +2179,7 @@ function BasicView(element, calendar, viewName) {
     var bodyFirstCells;
     var firstRowCellInners;
     var firstRowCellContentInners;
+    var attendeeSegmentContainer; // added by OpenFire. Pretty self explanatory
     var daySegmentContainer;
 
     var viewWidth;
@@ -2225,6 +2240,10 @@ function BasicView(element, calendar, viewName) {
 
 
     function buildEventContainer() {
+        // Initialize container variables by making html elements
+        attendeeSegmentContainer =
+            $("<div class='fc-event-container of-attendee-segment-container' " +
+              "style='position:absolute;z-index:8;top:0;left:0'/>").appendTo(element);
         daySegmentContainer =
             $("<div class='fc-event-container' style='position:absolute;z-index:8;top:0;left:0'/>")
                 .appendTo(element);
@@ -2636,6 +2655,7 @@ function BasicEventRenderer() {
 
 
     // imports
+    AttendeeRenderer.call(t);
     DayEventRenderer.call(t);
 
 
@@ -2645,6 +2665,7 @@ function BasicEventRenderer() {
 
 
     function clearEvents() {
+        t.getAttendeeSegmentContainer().empty();
         t.getDaySegmentContainer().empty();
     }
 
@@ -2793,6 +2814,8 @@ function AgendaView(element, calendar, viewName) {
     t.colRight = colRight;
     t.colContentLeft = colContentLeft;
     t.colContentRight = colContentRight;
+    t.getAttendeeSegmentContainer = function() { return attendeeSegmentContainer };
+    t.getAttendeeColTable = function() { return attendeeColTable };
     t.getDaySegmentContainer = function() { return daySegmentContainer };
     t.getSlotSegmentContainer = function() { return slotSegmentContainer };
     t.getMinMinute = function() { return minMinute };
@@ -2843,7 +2866,9 @@ function AgendaView(element, calendar, viewName) {
     var dayBodyFirstCell;
     var dayBodyFirstCellStretcher;
     var slotLayer;
+    var attendeeSegmentContainer;
     var daySegmentContainer;
+    var attendeeColTable;
     var allDayTable;
     var allDayRow;
     var slotScroller;
@@ -2943,6 +2968,35 @@ function AgendaView(element, calendar, viewName) {
         slotLayer =
             $("<div style='position:absolute;z-index:2;left:0;width:100%'/>")
                 .appendTo(element);
+
+        // We build here attendee container and table elements, we'll make it invisible if no attendee event provided
+        if (colCnt == 1) {
+            attendeeSegmentContainer =
+                 $("<div class='fc-event-container' style='position:absolute;z-index:8;top:0;left:0'/>")
+                      .appendTo(slotLayer);
+
+            s =
+                 "<table style='width:100%' class='fc-agenda-attendee-col' cellspacing='0'>" +
+                 "<tr>" +
+                 "<th class='" + headerClass + " fc-agenda-axis'>" + (opt('attendeeColText') || "Participants") + "</th>" +
+                 "<td>" +
+                 "<div class='fc-day-content'><div style='position:relative'/></div>" +
+                 "</td>" +
+                 "<th class='" + headerClass + " fc-agenda-gutter'>&nbsp;</th>" +
+                 "</tr>" +
+                 "</table>";
+            attendeeColTable = $(s).appendTo(slotLayer);
+            attendeeColRow = attendeeColTable.find('tr');
+
+            slotLayer.append(
+                 "<div class='fc-agenda-divider " + headerClass + "'>" +
+                 "<div class='fc-agenda-divider-inner'/>" +
+                 "</div>"
+            );
+        }else{
+            attendeeSegmentContainer = $([]); // in jQuery 1.4, we can just do $()
+            attendeeColTable = $([]);
+        }
 
         if (opt('allDaySlot')) {
 
@@ -3211,9 +3265,13 @@ function AgendaView(element, calendar, viewName) {
         colPositions.clear();
         colContentPositions.clear();
 
+        // make cells of first column pretty and equal
         var axisFirstCells = dayHead.find('th:first');
         if (allDayTable) {
             axisFirstCells = axisFirstCells.add(allDayTable.find('th:first'));
+        }
+        if (attendeeColTable) {
+                axisFirstCells = axisFirstCells.add(attendeeColTable.find('th:first'));
         }
         axisFirstCells = axisFirstCells.add(slotTable.find('th:first'));
 
@@ -3227,9 +3285,13 @@ function AgendaView(element, calendar, viewName) {
             axisWidth
         );
 
+        // make gutters pretty and equal in the different parts of the view
         var gutterCells = dayTable.find('.fc-agenda-gutter');
         if (allDayTable) {
             gutterCells = gutterCells.add(allDayTable.find('th.fc-agenda-gutter'));
+        }
+        if (attendeeColTable) {
+            gutterCells = gutterCells.add(attendeeColTable.find('th.fc-agenda-gutter'));
         }
 
         var slotTableWidth = slotScroller[0].clientWidth; // needs to be done after axisWidth (for IE7)
@@ -3655,9 +3717,11 @@ function AgendaEventRenderer() {
     t.renderEvents = renderEvents;
     t.clearEvents = clearEvents;
     t.slotSegHtml = slotSegHtml;
+    t.haveAttendeeEvent = haveAttendeeEvent;
 
 
     // imports
+    AttendeeRenderer.call(t);
     DayEventRenderer.call(t);
     var opt = t.opt;
     var trigger = t.trigger;
@@ -3666,6 +3730,8 @@ function AgendaEventRenderer() {
     var eventEnd = t.eventEnd;
     var eventElementHandlers = t.eventElementHandlers;
     var setHeight = t.setHeight;
+    var getAttendeeSegmentContainer = t.getAttendeeSegmentContainer;
+    var getAttendeeColTable = t.getAttendeeColTable;
     var getDaySegmentContainer = t.getDaySegmentContainer;
     var getSlotSegmentContainer = t.getSlotSegmentContainer;
     var getHoverListener = t.getHoverListener;
@@ -3676,6 +3742,7 @@ function AgendaEventRenderer() {
     var colContentLeft = t.colContentLeft;
     var colContentRight = t.colContentRight;
     var cellToDate = t.cellToDate;
+    var getNbAttendeeCol = t.getNbAttendeeCol;
     var getColCnt = t.getColCnt;
     var getColWidth = t.getColWidth;
     var getSnapHeight = t.getSnapHeight;
@@ -3688,10 +3755,12 @@ function AgendaEventRenderer() {
     var eventResize = t.eventResize;
     var renderDayOverlay = t.renderDayOverlay;
     var clearOverlays = t.clearOverlays;
+    var renderAttendeeEvents = t.renderAttendeeEvents;
     var renderDayEvents = t.renderDayEvents;
     var calendar = t.calendar;
     var formatDate = calendar.formatDate;
     var formatDates = calendar.formatDates;
+    var haveAttendeeEventBool = false;
 
 
     // overrides
@@ -3706,13 +3775,26 @@ function AgendaEventRenderer() {
     function renderEvents(events, modifiedEventId) {
         var i, len=events.length,
             dayEvents=[],
-            slotEvents=[];
+            slotEvents=[],
+            attendeeEvents=[];
         for (i=0; i<len; i++) {
+            // Separate the different types of event
             if (events[i].allDay) {
                 dayEvents.push(events[i]);
+            }else if(events[i].is_attendee_col) {
+                attendeeEvents.push(events[i]);
             }else{
                 slotEvents.push(events[i]);
             }
+        }
+
+        if (getColCnt() == 1 && attendeeEvents.length) {
+            haveAttendeeEventBool = true;  // will be used when rendering day and slot events
+            renderAttendeeEvents(attendeeEvents);  // will build the attendee section
+            getAttendeeColTable().show();
+        }else if (getColCnt() == 1) {
+            // no attendee event provided, we hide the attendee col table
+            getAttendeeColTable().hide();
         }
 
         if (opt('allDaySlot')) {
@@ -3723,12 +3805,18 @@ function AgendaEventRenderer() {
         renderSlotSegs(compileSlotSegs(slotEvents), modifiedEventId);
     }
 
+    /**
+     * simply exporting the variable didn't work. I'm not exactly sure why.
+     */
+    function haveAttendeeEvent() {
+        return haveAttendeeEventBool;
+    }
 
     function clearEvents() {
         getDaySegmentContainer().empty();
+        getAttendeeSegmentContainer().empty();
         getSlotSegmentContainer().empty();
     }
-
 
     function compileSlotSegs(events) {
         var colCnt = getColCnt(),
@@ -3740,9 +3828,10 @@ function AgendaEventRenderer() {
             j, seg,
             colSegs,
             segs = [];
+        // if we are in mode day and attendee events are provided
+        var isModeDay = getColCnt() == 1 && haveAttendeeEvent();
 
         for (i=0; i<colCnt; i++) {
-
             d = cellToDate(0, i);
             addMinutes(d, minMinute);
 
@@ -3753,11 +3842,20 @@ function AgendaEventRenderer() {
                 addMinutes(cloneDate(d), maxMinute-minMinute)
             );
 
-            colSegs = placeSlotSegs(colSegs); // returns a new order
+            // for code factorisation in placeSlotSegs
+            if (!isModeDay) {
+                colSegs = { 0: {segs: colSegs} }
+            }
+
+            colSegs = placeSlotSegs(colSegs, isModeDay); // returns a new order
 
             for (j=0; j<colSegs.length; j++) {
                 seg = colSegs[j];
-                seg.col = i;
+                if (isModeDay) {
+                    seg.col = 0;
+                }else{
+                    seg.col = i;
+                }
                 segs.push(seg);
             }
         }
@@ -3765,13 +3863,19 @@ function AgendaEventRenderer() {
         return segs;
     }
 
-
+    /**
+     *  builds initial segments.
+     *  OpenFire addition : grouping segs by attendee, when in mode day
+     */
     function sliceSegs(events, visEventEnds, start, end) {
         var segs = [],
-            i, len=events.length, event,
-            eventStart, eventEnd,
-            segStart, segEnd,
-            isStart, isEnd;
+        i, len=events.length, event,
+        eventStart, eventEnd,
+        segStart, segEnd,
+        isStart, isEnd;
+        var j, nb_attendee_col = getNbAttendeeCol();
+        var grouped_segs = {};
+        var isModeDay = getColCnt() == 1 && haveAttendeeEvent();
         for (i=0; i<len; i++) {
             event = events[i];
             eventStart = event.start;
@@ -3791,18 +3895,43 @@ function AgendaEventRenderer() {
                     segEnd = eventEnd;
                     isEnd = true;
                 }
-                segs.push({
-                    event: event,
-                    start: segStart,
-                    end: segEnd,
-                    isStart: isStart,
-                    isEnd: isEnd
-                });
+                if (isModeDay) {
+                    if (grouped_segs[event.attendee_column] == undefined) {
+                        grouped_segs[event.attendee_column] = {
+                            "value": event.attendee_column,
+                            "segs": [],
+                        }
+                    }
+                    grouped_segs[event.attendee_column]["segs"].push({
+                        attendee_column: event.attendee_column,
+                        event: event,
+                        start: segStart,
+                        end: segEnd,
+                        isStart: isStart,
+                        isEnd: isEnd
+                    });
+                }else{
+                    segs.push({
+                        event: event,
+                        start: segStart,
+                        end: segEnd,
+                        isStart: isStart,
+                        isEnd: isEnd
+                    });
+                }
             }
+        }
+        if (isModeDay){
+            // sort segs within each column
+            for (j in grouped_segs) {
+                grouped_segs[j].segs.sort(compareSlotSegs);
+                grouped_segs[j].backward_offset_pct = j / nb_attendee_col
+                grouped_segs[j].forward_offset_pct = (parseInt(j) + 1) / nb_attendee_col
+            }
+            return grouped_segs;
         }
         return segs.sort(compareSlotSegs);
     }
-
 
     function slotEventEnd(event) {
         if (event.end) {
@@ -3850,7 +3979,10 @@ function AgendaEventRenderer() {
 
             // shave off space on right near scrollbars (2.5%)
             // TODO: move this to CSS somehow
-            columnRight -= columnWidth * .025;
+            if (getColCnt() != 1) {
+                // taken out if day mode for attendee columns to be aligned properly. useless anyway?
+                columnRight -= columnWidth * .025;
+            }
             columnWidth = columnRight - columnLeft;
 
             width = columnWidth * (seg.forwardCoord - seg.backwardCoord);
@@ -4332,38 +4464,44 @@ function AgendaEventRenderer() {
 /* Agenda Event Segment Utilities
 -----------------------------------------------------------------------------*/
 
-// OF Modification OpenFire
 function orderSegByAttendee(segs) {
     return _.sortBy(segs, function(seg){return seg.event.attendees[0]});
 }
-// OF Fin Modification OpenFire
 
 // Sets the seg.backwardCoord and seg.forwardCoord on each segment and returns a new
 // list in the order they should be placed into the DOM (an implicit z-index).
-function placeSlotSegs(segs) {
-    // OF Modification OpenFire
-    segs = orderSegByAttendee(segs);
-    // OF Fin Modification OpenFire
-    var levels = buildSlotSegLevels(segs);
-    var level0 = levels[0];
-    var i;
+// adapted for attendee columns
+function placeSlotSegs(attendee_columns, isModeDay) {
+    var segs, attendee_col;
+    for (var j in attendee_columns) {
+        attendee_col = attendee_columns[j]
+        segs = orderSegByAttendee(attendee_col["segs"]);
+        attendee_col["levels"] = buildSlotSegLevels(segs);
+        var level0 = attendee_col["levels"][0];
+        var i;
 
-    computeForwardSlotSegs(levels);
+        computeForwardSlotSegs(attendee_col["levels"]);
 
-    if (level0) {
+        if (level0) {
+            for (i=0; i<level0.length; i++) {
+                computeSlotSegPressures(level0[i]);
+            }
 
-        for (i=0; i<level0.length; i++) {
-            computeSlotSegPressures(level0[i]);
+            if (isModeDay) {
+                for (i=0; i<level0.length; i++) {
+                    computeSlotSegCoords(
+                        level0[i], 0, attendee_col["backward_offset_pct"],  attendee_col["forward_offset_pct"]);
+                }
+            }else{
+                for (i=0; i<level0.length; i++) {
+                    computeSlotSegCoords(level0[i], 0, 0, 1);
+                }
+            }
         }
 
-        for (i=0; i<level0.length; i++) {
-            computeSlotSegCoords(level0[i], 0, 0);
-        }
     }
-
-    return flattenSlotSegLevels(levels);
+    return flattenSlotSegLevels(attendee_columns);
 }
-
 
 // Builds an array of segments "levels". The first level will be the leftmost tier of segments
 // if the calendar is left-to-right, or the rightmost if the calendar is right-to-left.
@@ -4447,7 +4585,9 @@ function computeSlotSegPressures(seg) {
 // who's width is unknown until an edge has been hit. `seriesBackwardPressure` is the number of
 // segments behind this one in the current series, and `seriesBackwardCoord` is the starting
 // coordinate of the first segment in the series.
-function computeSlotSegCoords(seg, seriesBackwardPressure, seriesBackwardCoord) {
+// adapted for attendee columns in mode day
+function computeSlotSegCoords(
+        seg, seriesBackwardPressure, seriesBackwardCoord, forward_offset_pct) {
     var forwardSegs = seg.forwardSegs;
     var i;
 
@@ -4456,7 +4596,8 @@ function computeSlotSegCoords(seg, seriesBackwardPressure, seriesBackwardCoord) 
         if (!forwardSegs.length) {
 
             // if there are no forward segments, this segment should butt up against the edge
-            seg.forwardCoord = 1;
+            // when not in mode day with attendee columns, forward_offset_pct = 1
+            seg.forwardCoord = forward_offset_pct;
         }
         else {
 
@@ -4465,7 +4606,8 @@ function computeSlotSegCoords(seg, seriesBackwardPressure, seriesBackwardCoord) 
 
             // this segment's forwardCoord will be calculated from the backwardCoord of the
             // highest-pressure forward segment.
-            computeSlotSegCoords(forwardSegs[0], seriesBackwardPressure + 1, seriesBackwardCoord);
+            computeSlotSegCoords(
+                forwardSegs[0], seriesBackwardPressure + 1, seriesBackwardCoord, forward_offset_pct);
             seg.forwardCoord = forwardSegs[0].backwardCoord;
         }
 
@@ -4477,29 +4619,32 @@ function computeSlotSegCoords(seg, seriesBackwardPressure, seriesBackwardCoord) 
         // use this segment's coordinates to computed the coordinates of the less-pressurized
         // forward segments
         for (i=0; i<forwardSegs.length; i++) {
-            computeSlotSegCoords(forwardSegs[i], 0, seg.forwardCoord);
+            computeSlotSegCoords(forwardSegs[i], 0, seg.forwardCoord, forward_offset_pct);
         }
     }
 }
 
-
 // Outputs a flat array of segments, from lowest to highest level
-function flattenSlotSegLevels(levels) {
+// adapted for attendee columns
+function flattenSlotSegLevels(attendee_columns) {
     var segs = [];
+    var levels;
     var i, level;
     var j;
+    for (var k in attendee_columns) {
+        // levels are built during placeSlotSegs function
+        levels = attendee_columns[k]["levels"];
+        for (i=0; i<levels.length; i++) {
+            level = levels[i];
 
-    for (i=0; i<levels.length; i++) {
-        level = levels[i];
-
-        for (j=0; j<level.length; j++) {
-            segs.push(level[j]);
+            for (j=0; j<level.length; j++) {
+                segs.push(level[j]);
+            }
         }
     }
 
     return segs;
 }
-
 
 // Find all the segments in `otherSegs` that vertically collide with `seg`.
 // Append into an optionally-supplied `results` array and return.
@@ -4567,6 +4712,7 @@ function View(element, calendar, viewName) {
     t.hideEvents = hideEvents;
     t.eventDrop = eventDrop;
     t.eventResize = eventResize;
+    t.getNbAttendeeCol = getNbAttendeeCol;
     // t.title
     // t.start, t.end
     // t.visStart, t.visEnd
@@ -4583,8 +4729,10 @@ function View(element, calendar, viewName) {
     var eventElementsByID = {}; // eventID mapped to array of jQuery elements
     var eventElementCouples = []; // array of objects, { event, element } // TODO: unify with segment system
     var options = calendar.options;
-
-
+    // attendee locals
+    var attendeeEventsByID = {};  // attendeeEventID mapped to array of events (there can be multiple b/c of repeating events)
+    var attendeeEventElementsByID = {}; // attendeeEventID mapped to array of jQuery elements
+    var attendeeEventElementCouples = [];
 
     function opt(name, viewNameOverride) {
         var v = options[name];
@@ -4640,17 +4788,41 @@ function View(element, calendar, viewName) {
     /* Event Data
     ------------------------------------------------------------------------------*/
 
+    /**
+     *  Needed for positionning
+     */
+    function getNbAttendeeCol() {
+        var nb = 0;
+        for (var k in attendeeEventsByID) {
+            nb++;
+        }
+        return nb;
+    }
 
     function setEventData(events) { // events are already normalized at this point
         eventsByID = {};
-        var i, len=events.length, event;
+        var i, len=events.length, event, actual_id;
         for (i=0; i<len; i++) {
             event = events[i];
-            if (eventsByID[event._id]) {
-                eventsByID[event._id].push(event);
+            // seperate regular events from attendee events
+            if (event.is_attendee_col) {
+                // there is a -100000 modifier on attendee event ids when transmitted to fullcalendar in order
+                // to not risk having same id for events and attendee events
+                // and the id of the event is also put negative to make sur the result fake ID is negative
+                // the actual id of the attendee is stored in the event for ease of use
+                if (attendeeEventsByID[event.actual_id]) {
+                    attendeeEventsByID[event.actual_id].push(event);
+                }else{
+                    attendeeEventsByID[event.actual_id] = [event];
+                }
             }else{
-                eventsByID[event._id] = [event];
+                if (eventsByID[event._id]) {
+                    eventsByID[event._id].push(event);
+                }else{
+                    eventsByID[event._id] = [event];
+                }
             }
+
         }
     }
 
@@ -4659,6 +4831,9 @@ function View(element, calendar, viewName) {
         eventsByID = {};
         eventElementsByID = {};
         eventElementCouples = [];
+        attendeeEventsByID = {};
+        attendeeEventElementsByID = {};
+        attendeeEventElementCouples = [];
     }
 
 
@@ -4675,11 +4850,20 @@ function View(element, calendar, viewName) {
 
     // report when view creates an element for an event
     function reportEventElement(event, element) {
-        eventElementCouples.push({ event: event, element: element });
-        if (eventElementsByID[event._id]) {
-            eventElementsByID[event._id].push(element);
+        if (event.is_attendee_col) {
+            attendeeEventElementCouples.push({ event: event, element: element });
+            if (attendeeEventElementsByID[event.actual_id]) {
+                attendeeEventElementsByID[event.actual_id].push(element);
+            }else{
+                attendeeEventElementsByID[event.actual_id] = [element];
+            }
         }else{
-            eventElementsByID[event._id] = [element];
+            eventElementCouples.push({ event: event, element: element });
+            if (eventElementsByID[event._id]) {
+                eventElementsByID[event._id].push(element);
+            }else{
+                eventElementsByID[event._id] = [element];
+            }
         }
     }
 
@@ -5086,6 +5270,261 @@ function View(element, calendar, viewName) {
 
 ;;
 
+/**
+ *  Renderer for attendee events. Copied and adapted from day events renderer.
+ */
+function AttendeeRenderer() {
+    var t = this;
+
+    // exports
+    t.renderAttendeeEvents = renderAttendeeEvents;
+
+    // imports
+    var opt = t.opt;
+    var reportEventElement = t.reportEventElement;
+    var getRowCnt = t.getRowCnt;
+    var getColWidth = t.getColWidth;
+    var colLeft = t.colLeft;
+    var colRight = t.colRight;
+    var colContentLeft = t.colContentLeft;
+    var colContentRight = t.colContentRight;
+    var getAttendeeSegmentContainer = t.getAttendeeSegmentContainer;
+
+    function renderAttendeeEvents(events) {
+        // do the actual rendering. Receive the intermediate "segment" data structures.
+        var segments = _renderAttendeeEvents(
+            events,
+            false, // don't append event elements
+            true // set the heights of the rows
+        );
+
+        // report the elements to the View, for it to know how many attendee columns are to be displayed
+        segmentElementEach(segments, function(segment, element) {
+            reportEventElement(segment.event, element);
+        });
+    }
+
+    // Render events onto the calendar. Only responsible for the VISUAL aspect.
+    // Not responsible for attaching handlers or calling callbacks.
+    // Set `doAppend` to `true` for rendering elements without clearing the existing container.
+    // Set `doRowHeights` to allow setting the height of each row, to compensate for vertical event overflow.
+    function _renderAttendeeEvents(events, doAppend, doRowHeights) {
+
+        // where the DOM nodes will eventually end up
+        var finalContainer = getAttendeeSegmentContainer();
+
+        // the container where the initial HTML will be rendered.
+        // If `doAppend`==true, uses a temporary container.
+        var renderContainer = doAppend ? $("<div/>") : finalContainer;
+        var attendee_columns = buildAttendeeSegments(events);
+        var html;
+        var elements;
+
+        // calculate the desired `left` and `width` properties on each segment object
+        calculateHorizontals(attendee_columns);
+
+        // build the HTML string. relies on `left` property
+        html = buildHTML(attendee_columns);
+
+        // render the HTML. innerHTML is considerably faster than jQuery's .html()
+        renderContainer[0].innerHTML = html;
+
+        // retrieve the individual elements
+        elements = renderContainer.children();
+
+        // if we were appending, and thus using a temporary container,
+        // re-attach elements to the real container.
+        if (doAppend) {
+            finalContainer.append(elements);
+        }
+
+        // assigns each element to `segment.event`, after filtering them through user callbacks
+        resolveElements(attendee_columns, elements);
+
+        // Calculate the left and right padding+margin for each element.
+        // We need this for setting each element's desired outer width, because of the W3C box model.
+        // It's important we do this in a separate pass from acually setting the width on the DOM elements
+        // because alternating reading/writing dimensions causes reflow for every iteration.
+        segmentElementEach(attendee_columns, function(attendee_col, element) {
+            attendee_col.hsides = hsides(element, true); // include margins = `true`
+        });
+
+        // Set the width of each element
+        segmentElementEach(attendee_columns, function(attendee_col, element) {
+            element.width(
+                Math.max(0, attendee_col.outerWidth - attendee_col.hsides)
+            );
+        });
+
+        // Grab each element's outerHeight (setVerticals uses this).
+        // To get an accurate reading, it's important to have each element's width explicitly set already.
+        segmentElementEach(attendee_columns, function(attendee_col, element) {
+            attendee_col.outerHeight = element.outerHeight(true); // include margins = `true`
+        });
+
+        // Set the top coordinate on each element (requires segment.outerHeight)
+        setVerticals(attendee_columns, doRowHeights);
+
+        return attendee_columns;
+    }
+
+    /**
+     *  Builds the initial segments to work on.
+     */
+    function buildAttendeeSegments(events) {
+        var segments = [];
+        var attendee_columns_dict = {}, attendee_columns=[], event;
+        var nb_attendee_col = events.length, seg, segs;
+        var bck_offset_pct, frw_offset_pct;
+        var col_width = getColWidth();
+
+        for (var i=0; i<events.length; i++) {
+            event = events[i];
+            bck_offset_pct = i / nb_attendee_col
+            frw_offset_pct = (i+1) / nb_attendee_col
+
+            attendee_columns.push({
+                "value": event.attendee_column,
+                "event": event,
+                "backward_offset_pct": bck_offset_pct,
+                "forward_offset_pct": 1 - frw_offset_pct,
+                "backward_offset": bck_offset_pct * col_width + 1,
+                "forward_offset": (1 - frw_offset_pct) * col_width + 1,
+            })
+        }
+        return attendee_columns;
+    }
+
+    // Sets the `left` and `outerWidth` property of each segment.
+    // These values are the desired dimensions for the eventual DOM elements.
+    function calculateHorizontals(attendee_columns) {
+        var isRTL = opt('isRTL');
+        for (var i=0; i<attendee_columns.length; i++) {
+            var attendee_col = attendee_columns[i];
+
+            // Determine functions used for calulating the elements left/right coordinates,
+            // depending on whether the view is RTL or not.
+            // NOTE:
+            // colLeft/colRight returns the coordinate butting up the edge of the cell.
+            // colContentLeft/colContentRight is indented a little bit from the edge.
+            var leftFunc = (isRTL ? attendee_col.isEnd : attendee_col.isStart) ? colContentLeft : colLeft;
+            var rightFunc = (isRTL ? attendee_col.isStart : attendee_col.isEnd) ? colContentRight : colRight;
+
+            var left = leftFunc(0);
+            var right = rightFunc(0);
+            if (attendee_col.backward_offset != undefined) {
+                left += attendee_col.backward_offset
+            }
+            if (attendee_col.forward_offset != undefined) {
+                right -= attendee_col.forward_offset
+            }
+            attendee_col.left = left;
+            attendee_col.outerWidth = right - left;
+        }
+    }
+
+    // Build a concatenated HTML string for an array of segments
+    function buildHTML(attendee_columns) {
+        var html = '';
+        for (var i=0; i<attendee_columns.length; i++) {
+            html += buildHTMLForSegment(attendee_columns[i]);
+        }
+        return html;
+    }
+
+
+    // Build an HTML string for a single segment.
+    // Relies on the following properties:
+    // - `segment.event` (from `buildSegmentsForEvent`)
+    // - `segment.left` (from `calculateHorizontals`)
+    function buildHTMLForSegment(attendee_col) {
+        var html = '';
+        var isRTL = opt('isRTL');
+
+        var classNames = [ 'fc-event', 'fc-event-hori', 'fc-attendee-event', 'fc-event-start', 'fc-event-end' ];
+
+        html +=
+            "<div" +
+            " class='" + classNames.join(' ') + "'" +
+            " style=" +
+                "'" +
+                "position:absolute;" +
+                "left:" + attendee_col.left + "px;" +
+                "color:" + attendee_col.event.textColor + ";" +
+                "background-color:" + attendee_col.event.backgroundColor + ";" +
+                "'" +
+            ">" +
+            "<div class='fc-event-inner'>";
+        html +=
+            "<span class='fc-event-title'>" +
+            htmlEscape(attendee_col.event.title || '') +
+            "</span>" +
+            "</div>";
+
+          html += "</div>";
+        // TODO:
+        // When these elements are initially rendered, they will be briefly visibile on the screen,
+        // even though their widths/heights are not set.
+        // SOLUTION: initially set them as visibility:hidden ?
+
+        return html;
+    }
+
+    // Associate each segment (an object) with an element (a jQuery object),
+    // by setting each `segment.element`.
+    // Run each element through the `eventRender` filter, which allows developers to
+    // modify an existing element, supply a new one, or cancel rendering.
+    function resolveElements(attendee_columns, elements) {
+        for (var i=0; i<attendee_columns.length; i++) {
+            var attendee_col = attendee_columns[i];
+            var element = elements.eq(i);
+            attendee_col.element = element;
+        }
+    }
+
+    // Sets the "top" CSS property for each element.
+    // If `doRowHeights` is `true`, also sets each row's first cell to an explicit height,
+    // so that if elements vertically overflow, the cell expands vertically to compensate.
+    function setVerticals(attendee_columns, doRowHeights) {
+        var attendeeRowContentHeights = [];
+        for (var i=0; i<attendee_columns.length; i++) {
+            attendee_columns[i].top = 0
+            attendeeRowContentHeights.push(attendee_columns[i].outerHeight)
+        }
+
+        var rowContentElements = getAttendeeRowContentElements(); // returns 1 inner div per row
+        var rowContentTops = [];
+
+        // Set each row's height by setting height of first inner div
+        $('.fc-agenda-attendee-col').height(arrayMax(attendeeRowContentHeights) + 4);
+        // adjust every attendee events height for aesthetic purposes
+        $('.fc-attendee-event').height(arrayMax(attendeeRowContentHeights));
+
+        // Set each segment element's CSS "top" property.
+        // Each segment object has a "top" property, which is relative to the row's top, but...
+        segmentElementEach(attendee_columns, function(attendee_col, element) {
+            element.css(
+                'top',
+                attendee_col.top
+            );
+        });
+    }
+
+    // Return an array of jQuery objects for the placeholder content containers of each row.
+    // The content containers don't actually contain anything, but their dimensions should match
+    // the events that are overlaid on top.
+    function getAttendeeRowContentElements() {
+        var i;
+        var rowCnt = getRowCnt();
+        var rowDivs = [];
+        for (i=0; i<rowCnt; i++) {
+            rowDivs[i] = $('table.fc-agenda-attendee-col > td');
+        }
+        return rowDivs;
+    }
+
+}
+
 function DayEventRenderer() {
     var t = this;
 
@@ -5110,6 +5549,7 @@ function DayEventRenderer() {
     var eventResize = t.eventResize;
     var getRowCnt = t.getRowCnt;
     var getColCnt = t.getColCnt;
+    var getNbAttendeeCol = t.getNbAttendeeCol;
     var getColWidth = t.getColWidth;
     var allDayRow = t.allDayRow; // TODO: rename
     var colLeft = t.colLeft;
@@ -5117,6 +5557,7 @@ function DayEventRenderer() {
     var colContentLeft = t.colContentLeft;
     var colContentRight = t.colContentRight;
     var dateToCell = t.dateToCell;
+    var getAttendeeSegmentContainer = t.getAttendeeSegmentContainer;
     var getDaySegmentContainer = t.getDaySegmentContainer;
     var formatDates = t.calendar.formatDates;
     var renderDayOverlay = t.renderDayOverlay;
@@ -5129,6 +5570,7 @@ function DayEventRenderer() {
     var cellOffsetToDayOffset = t.cellOffsetToDayOffset;
     var dateToDayOffset = t.dateToDayOffset;
     var dayOffsetToCellOffset = t.dayOffsetToCellOffset;
+    var haveAttendeeEvent = t.haveAttendeeEvent;
 
 
     // Render `events` onto the calendar, attach mouse event handlers, and call the `eventAfterRender` callback for each.
@@ -5200,7 +5642,8 @@ function DayEventRenderer() {
         // If `doAppend`==true, uses a temporary container.
         var renderContainer = doAppend ? $("<div/>") : finalContainer;
 
-        var segments = buildSegments(events);
+        var isModeDay = getColCnt() == 1 && haveAttendeeEvent();
+        var segments = buildSegments(events, isModeDay);
         var html;
         var elements;
 
@@ -5252,17 +5695,77 @@ function DayEventRenderer() {
         return segments;
     }
 
-
-    // Generate an array of "segments" for all events.
-    function buildSegments(events) {
+    function buildSegments(events, isModeDay) {
         var segments = [];
+        if (!isModeDay) {
+            for (var i=0; i<events.length; i++) {
+                var eventSegments = buildSegmentsForEvent(events[i]);
+                segments.push.apply(segments, eventSegments); // append an array to an array
+            }
+            return segments;
+        }
+        var attendee_columns = {}, event;
+        var nb_attendee_col = getNbAttendeeCol(), seg, segs;
         for (var i=0; i<events.length; i++) {
-            var eventSegments = buildSegmentsForEvent(events[i]);
-            segments.push.apply(segments, eventSegments); // append an array to an array
+            event = events[i];
+            if (event.is_holiday){
+                attendee_columns["holidays"] = {
+                    "value": "holidays",
+                    "segs": buildSegmentsForEvent(event),
+                }
+            }else{
+                if (attendee_columns[event.attendee_column] == undefined) {
+                    attendee_columns[event.attendee_column] = {
+                        "value": event.attendee_column,
+                        "segs": [],
+                    }
+                }
+                var eventSegments = buildSegmentsForEvent(event);
+                segs = attendee_columns[event.attendee_column]["segs"];
+                segs.push.apply(segs, eventSegments); // append an array to an array
+            }
+
+        }
+        var col_width = getColWidth();
+
+        // sort segs in each column
+        for (var j in attendee_columns) {
+            // When we go from a holiday day to a regular day, for an unknown reason the event is flushed during
+            // buildSegmentsForEvent function
+            if (j == "holidays" && attendee_columns[j].segs[0] != undefined) {
+                seg = attendee_columns[j].segs[0]
+                seg.is_holiday = true
+                seg.backward_offset_pct = 0
+                seg.forward_offset_pct = 0
+                seg.backward_offset = 0
+                seg.forward_offset = 0
+                seg.attendee_col_index = -1;
+                seg.row = 0;
+                seg.nb_attendee_col = nb_attendee_col;
+                segments.push(seg)
+            }else{
+                var int_j = parseInt(j)
+
+                attendee_columns[j].segs.sort(compareSlotSegs);
+                attendee_columns[j].backward_offset_pct = int_j / nb_attendee_col
+                attendee_columns[j].forward_offset_pct = 1 - ((int_j + 1) / nb_attendee_col)
+                attendee_columns[j].backward_offset = attendee_columns[j].backward_offset_pct * col_width
+                attendee_columns[j].forward_offset = attendee_columns[j].forward_offset_pct * col_width
+                for (var k=0; k<attendee_columns[j].segs.length; k++) {
+                    seg = attendee_columns[j].segs[k]
+                    seg.backward_offset_pct = attendee_columns[j].backward_offset_pct
+                    seg.forward_offset_pct = attendee_columns[j].forward_offset_pct
+                    seg.backward_offset = attendee_columns[j].backward_offset
+                    seg.forward_offset = attendee_columns[j].forward_offset
+                    seg.attendee_col_index = int_j;
+                    seg.nb_attendee_col = nb_attendee_col;
+                }
+                    segments.push.apply(segments, attendee_columns[j].segs); // append an array to an array
+            }
+
         }
         return segments;
     }
-
 
     // Generate an array of segments for a single event.
     // A "segment" is the same data structure that View.rangeToSegments produces,
@@ -5276,7 +5779,6 @@ function DayEventRenderer() {
         }
         return segments;
     }
-
 
     // Sets the `left` and `outerWidth` property of each segment.
     // These values are the desired dimensions for the eventual DOM elements.
@@ -5293,13 +5795,19 @@ function DayEventRenderer() {
             var leftFunc = (isRTL ? segment.isEnd : segment.isStart) ? colContentLeft : colLeft;
             var rightFunc = (isRTL ? segment.isStart : segment.isEnd) ? colContentRight : colRight;
 
-            var left = leftFunc(segment.leftCol);
-            var right = rightFunc(segment.rightCol);
+            var left = leftFunc(segment.leftCol || 0);
+            var right = rightFunc(segment.rightCol || 0);
+            // segment.backward_offset and segment.forward_offset are set in mode day with attendee columns
+            if (segment.backward_offset != undefined) {
+                left += segment.backward_offset
+            }
+            if (segment.forward_offset != undefined) {
+                right -= segment.forward_offset
+            }
             segment.left = left;
             segment.outerWidth = right - left;
         }
     }
-
 
     // Build a concatenated HTML string for an array of segments
     function buildHTML(segments) {
@@ -5436,7 +5944,9 @@ function DayEventRenderer() {
     // If `doRowHeights` is `true`, also sets each row's first cell to an explicit height,
     // so that if elements vertically overflow, the cell expands vertically to compensate.
     function setVerticals(segments, doRowHeights) {
-        var rowContentHeights = calculateVerticals(segments); // also sets segment.top
+        var isModeDay = getColCnt() == 1 && haveAttendeeEvent();
+        var rowContentHeights = calculateVerticals(segments, isModeDay); // also sets segment.top
+
         var rowContentElements = getRowContentElements(); // returns 1 inner div per row
         var rowContentTops = [];
 
@@ -5465,18 +5975,27 @@ function DayEventRenderer() {
         });
     }
 
-
     // Calculate the "top" coordinate for each segment, relative to the "top" of the row.
     // Also, return an array that contains the "content" height for each row
     // (the height displaced by the vertically stacked events in the row).
     // Requires segments to have their `outerHeight` property already set.
-    function calculateVerticals(segments) {
-        var rowCnt = getRowCnt();
-        var colCnt = getColCnt();
+    // adapted for mode day with attendee columns
+    function calculateVerticals(segments, isModeDay) {
+        // In mode day with atteendee columns, colCnt and colHeights are attendeeColCnt and attendeeColHeights
+        var colCnt, leftColAttr, rightColAttr;
+        if (isModeDay) {
+            colCnt = getNbAttendeeCol();
+            leftColAttr = "attendee_col_index";
+            rightColAttr = "attendee_col_index";
+        }else{
+            colCnt = getColCnt();
+            leftColAttr = "leftCol";
+            rightColAttr = "rightCol";
+        }
         var rowContentHeights = []; // content height for each row
         var segmentRows = buildSegmentRows(segments); // an array of segment arrays, one for each row
 
-        for (var rowI=0; rowI<rowCnt; rowI++) {
+        for (var rowI=0; rowI<segmentRows.length; rowI++) {
             var segmentRow = segmentRows[rowI];
 
             // an array of running total heights for each column.
@@ -5492,16 +6011,24 @@ function DayEventRenderer() {
 
                 // find the segment's top coordinate by looking at the max height
                 // of all the columns the segment will be in.
-                segment.top = arrayMax(
-                    colHeights.slice(
-                        segment.leftCol,
-                        segment.rightCol + 1 // make exclusive for slice
-                    )
-                );
-
-                // adjust the columns to account for the segment's height
-                for (var colI=segment.leftCol; colI<=segment.rightCol; colI++) {
-                    colHeights[colI] = segment.top + segment.outerHeight;
+                // holiday segment wil be put first before this point, only in mode day at the moment
+                if (segment.is_holiday) {
+                    segment.top = 0;
+                    // adjust all the columns to account for the segment's height
+                    for (var colI=0; colI<colCnt; colI++) {
+                        colHeights[colI] += segment.outerHeight;
+                    }
+                }else{
+                    segment.top = arrayMax(
+                        colHeights.slice(
+                            segment[leftColAttr],
+                            segment[rightColAttr] + 1 // make exclusive for slice
+                        )
+                    );
+                    // adjust the attendee column to account for the segment's height
+                    for (var colI=segment[leftColAttr]; colI<=segment[rightColAttr]; colI++) {
+                        colHeights[colI] = segment.top + segment.outerHeight;
+                    }
                 }
             }
 
@@ -5511,7 +6038,6 @@ function DayEventRenderer() {
 
         return rowContentHeights;
     }
-
 
     // Build an array of segment arrays, each representing the segments that will
     // be in a row of the grid, sorted by which event should be closest to the top.
@@ -5938,7 +6464,7 @@ function SelectionManager() {
 }
 
 ;;
- 
+
 function OverlayManager() {
     var t = this;
 
@@ -6116,3 +6642,5 @@ function HorizontalPositionCache(getElement) {
 ;;
 
 })(jQuery);
+
+
