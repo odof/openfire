@@ -171,6 +171,15 @@
                         domain="[('project_id.partner_id', '!=', False)]"/>
                 <filter string="Projets Produit" name="product_projects"
                         domain="[('project_id.partner_id', '=', False)]"/>
+                <separator/>
+                <filter string="Passé" name="this_week"
+                        domain="[('date_end', '&lt;', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                <filter string="Cette semaine" name="last_week"
+                        domain="[('date_start', '&lt;', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d')),
+                                  '|', ('date_end', '>=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
+                                       ('date_end', '=', False)]"/>
+                <filter string="A venir" name="next_week"
+                        domain="[('date_start', '>=', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
             </xpath>
         </field>
     </record>

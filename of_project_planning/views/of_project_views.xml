@@ -106,28 +106,6 @@
         <field name="model">project.task</field>
         <field name="inherit_id" ref="of_project.of_project_project_task_search_view"/>
         <field name="arch" type="xml">
-            <xpath expr="//filter[@name='product_projects']" position="after">
-                <separator/>
-                <filter string="Planifiée cette semaine" name="this_week"
-                        domain="[(u'of_periode_ids.dernier_jour', u'>=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
-                                 (u'of_periode_ids.premier_jour', u'&lt;', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
-                <filter string="Planifiée la semaine dernière" name="last_week"
-                        domain="[(u'of_periode_ids.dernier_jour', u'>=', (context_today() - datetime.timedelta(days=context_today().weekday()+7)).strftime('%Y-%m-%d')),
-                                 (u'of_periode_ids.premier_jour', u'&lt;', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d'))]"/>
-                <filter string="Planifiée la semaine prochaine" name="next_week"
-                        domain="[(u'of_periode_ids.dernier_jour', u'>=', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d')),
-                                 (u'of_periode_ids.premier_jour', u'&lt;', (context_today() + datetime.timedelta(days=14-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
-                <separator/>
-                <filter string="Planifiée ce mois" name="this_month"
-                        domain="[(u'of_periode_ids.dernier_jour', u'>=', context_today().strftime('%Y-%m-01')),
-                                 (u'of_periode_ids.premier_jour', u'&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d'))]"/>
-                <filter string="Planifiée le mois dernier" name="last_month"
-                        domain="[(u'of_periode_ids.dernier_jour', u'>=', (context_today() - relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
-                                 (u'of_periode_ids.premier_jour', u'&lt;', context_today().strftime('%Y-%m-01'))]"/>
-                <filter string="Planifiée le mois prochain" name="next_month"
-                        domain="[(u'of_periode_ids.dernier_jour', u'>=', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
-                                 (u'of_periode_ids.premier_jour', u'&lt;', (context_today() + relativedelta(day=1,months=2)).strftime('%Y-%m-%d'))]"/>
-            </xpath>
             <xpath expr="//group" position="inside">
                 <filter string="Période(s)" name="groupby_period" domain="[]" context="{'group_by':'of_gb_period_id'}"/>
             </xpath>

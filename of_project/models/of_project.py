@@ -115,6 +115,7 @@ class ProjectTask(models.Model):
     _name = 'project.task'
     _inherit = ['project.task', 'of.readgroup']
 
+    user_id = fields.Many2one(domain="[('share', '=', False)]")
     project_id = fields.Many2one(required=True)
     categ_id = fields.Many2one(string=u"Catégorie", required=True)
     of_members = fields.Many2many('res.users', string=u"Membres", related='project_id.members')
@@ -135,3 +136,8 @@ class ProjectTask(models.Model):
             domain = ['|', ('name', operator, name), ('code', operator, name)]
         tasks = self.search(domain + args, limit=limit)
         return tasks.name_get()
+
+    @api.onchange('user_id')
+    def _onchange_user(self):
+        # Désactivation du _onchange_user qui remet le champ date_start à la date actuelle.
+        pass
