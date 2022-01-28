@@ -367,9 +367,9 @@
                                 <input type="text" name="delivery_floor" class="form-control" t-att-value="delivery_floor"/>
                             </div>
                             <div t-attf-class="form-group #{error_dict.get('site_distance_id') and 'has-error' or ''} col-md-5">
-                                <label class="control-label" for="site_distance">Distance du chantier *</label>
+                                <label class="control-label" for="site_distance">Choix prestation métré, livraison et pose *</label>
                                 <select id="site_distance_id" name="site_distance_id" class="form-control">
-                                    <option value="">Choisir une distance...</option>
+                                    <option value="">Choisir un forfait...</option>
                                     <t t-foreach="site_distance_list" t-as="sd">
                                         <option t-att-value="sd.id"
                                                 t-att-selected="sd.id == (site_distance and site_distance.id or -1)">
@@ -379,13 +379,6 @@
                                 </select>
                             </div>
                             <div class="clearfix"/>
-                            <div t-attf-class="form-group #{error_dict.get('manufacturer_metrics') and 'has-error' or ''} col-md-5">
-                                <label class="control-label" for="manufacturer_metrics">Métré et pose réalisés par nos soins *</label><br/>
-                                <input type="radio" name="manufacturer_metrics" value="yes" style="margin-left: 20px;"
-                                       t-att-checked="manufacturer_metrics == 'yes'"/> Oui<br/>
-                                <input type="radio" name="manufacturer_metrics" value="no" style="margin-left: 20px;"
-                                       t-att-checked="manufacturer_metrics == 'no'"/> Non
-                            </div>
                             <div t-attf-class="form-group #{error_dict.get('junction') and 'has-error' or ''} col-md-5">
                                 <label class="control-label" for="junction">Raccordement *</label><br/>
                                 <input type="radio" name="junction" value="yes" style="margin-left: 20px;"
@@ -642,7 +635,7 @@
                                                 <div class="product-img of_product-img">
                                                     <span id="product_id" t-esc="product_line.product_id.id" style="display: none;"/>
                                                     <span id="product_price" t-esc="product_line.price" style="display: none;"/>
-                                                    <span itemprop="image" t-esc="product_line.product_id.image" t-esc-options='{"widget": "image"}'
+                                                    <span t-if="product_line.product_id.image" itemprop="image" t-esc="product_line.product_id.image" t-esc-options='{"widget": "image"}'
                                                           t-att-alt="product_line.product_id.name"/>
                                                     <div class="buttons-wrap clearfix">
                                                         <a class="of_js_add_to_quote btn btn-xs pull-right">
@@ -738,7 +731,7 @@
                                                 <div class="product-img of_product-img">
                                                     <span id="product_id" t-esc="accessory.id" style="display: none;"/>
                                                     <span id="product_price" t-esc="accessory.list_price" style="display: none;"/>
-                                                    <span itemprop="image" t-esc="accessory.image" t-esc-options='{"widget": "image"}'
+                                                    <span t-if="accessory.image" itemprop="image" t-esc="accessory.image" t-esc-options='{"widget": "image"}'
                                                           t-att-alt="accessory.name"/>
                                                     <div class="buttons-wrap clearfix">
                                                         <a class="of_js_add_to_quote btn btn-xs pull-right">
@@ -818,7 +811,7 @@
                             <tbody>
                                 <tr id="product_confirmation" class="js_product">
                                     <td width="100">
-                                        <span t-esc="product.image_medium" t-esc-options='{"widget": "image"}'/>
+                                        <span t-if="product.image_medium" t-esc="product.image_medium" t-esc-options='{"widget": "image"}'/>
                                     </td>
                                     <td colspan="2">
                                         <strong t-esc="product.with_context(display_default_code=False).display_name"/>
@@ -1004,8 +997,8 @@
                                 </div>
                             </td>
                             <td class="text-center" id="td-price" name="price">
-                                <span t-field="line.price_reduce_taxexcl" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'from_currency': quote.pricelist_id.currency_id, 'display_currency': website.currency_id}" groups="sale.group_show_price_subtotal" />
-                                <span t-field="line.price_reduce_taxinc" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'from_currency': quote.pricelist_id.currency_id, 'display_currency': website.currency_id}" groups="sale.group_show_price_total" />
+                                <span t-field="line.price_subtotal" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'from_currency': quote.pricelist_id.currency_id, 'display_currency': website.currency_id}" groups="sale.group_show_price_subtotal" />
+                                <span t-field="line.price_total" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'from_currency': quote.pricelist_id.currency_id, 'display_currency': website.currency_id}" groups="sale.group_show_price_total" />
                             </td>
                         </tr>
                     </t>

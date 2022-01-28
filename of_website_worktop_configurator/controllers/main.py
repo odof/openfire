@@ -269,8 +269,6 @@ class OFWebsiteWorktopConfigurator(http.Controller):
                 error['delivery_floor'] = True
             if not values.get('site_distance_id'):
                 error['site_distance_id'] = True
-            if not values.get('manufacturer_metrics'):
-                error['manufacturer_metrics'] = True
             if not values.get('junction'):
                 error['junction'] = True
             # Contrôle de l'étage
@@ -845,6 +843,7 @@ class OFWebsiteWorktopConfigurator(http.Controller):
             vals = quote._website_product_id_change(quote.id, extra_distance_product_id, qty=1)
             vals['price_unit'] = quote.of_site_distance_id.price
             vals['name'] = quote._get_line_description(quote.id, extra_distance_product_id)
+            vals['name'] += u"\n%s" % quote.of_site_distance_id.name
             vals['layout_category_id'] = extra_layout_category_id
             quote_line = request.env['sale.order.line'].sudo().create(vals)
             quote_line.of_no_coef_price = quote_line.price_unit
@@ -915,6 +914,8 @@ class OFWebsiteWorktopConfigurator(http.Controller):
                 quote_line = quote.order_line.filtered(lambda l: l.product_id.id == extra_distance_product_id)
                 quote_line.of_no_coef_price = site_distance.price
                 quote_line.price_unit = site_distance.price * quote_line.get_pricelist_coef()
+                quote_line.name = quote._get_line_description(quote.id, extra_distance_product_id)
+                quote_line.name += u"\n%s" % site_distance.name
                 quote_line._compute_tax_id()
         if manufacturer_metrics != quote.of_manufacturer_metrics:
             vals['of_manufacturer_metrics'] = manufacturer_metrics
