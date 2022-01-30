@@ -1203,6 +1203,7 @@
         <field name="view_type">form</field>
         <field name="view_mode">calendar,tree,form,pivot</field>
         <field name="view_id" ref="of_planning_intervention_view_calendar_with_jump"/>
+        <field name="search_view_id" ref="of_planning_intervention_filter"/>
     </record>
 
     <record id="of_planning_sale_order_view_search_inherit_sale" model="ir.ui.view">
