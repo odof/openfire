@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api
 from datetime import datetime
+import json
 
 
 class OfProjectStage(models.Model):
@@ -33,7 +34,7 @@ class Project(models.Model):
     of_start_date = fields.Date(compute='_compute_of_dates', string=u"Date de début", store=True)
     of_end_date = fields.Date(compute='_compute_of_dates', string=u"Date de fin", store=True)
     of_sale_id = fields.Many2one(
-        'sale.order', string=u"Commande client", domain="[('partner_id', 'child_of', partner_id)]")
+        'sale.order', string=u"Commande liée", domain="[('partner_id', 'child_of', partner_id)]")
     of_start_week = fields.Char(compute='_compute_of_dates', string=u"Semaine de début", store=True)
     of_tag_ids = fields.Many2many(comodel_name='project.tags', string=u"Étiquettes")
     of_task_total_priority = fields.Integer(
@@ -120,6 +121,24 @@ class ProjectTask(models.Model):
     categ_id = fields.Many2one(string=u"Catégorie", required=True)
     of_members = fields.Many2many('res.users', string=u"Membres", related='project_id.members')
     of_participant_ids = fields.Many2many('res.users', string=u"Participants")
+    of_dependencies = fields.Text(string=u"Dépendances", compute='_compute_of_dependencies')
+    of_participants = fields.Text(string=u"Participants", compute='_compute_of_participants')
+
+    @api.depends('of_participant_ids')
+    def _compute_of_participants(self):
+        for task in self:
+            participants = []
+            for user in task.of_participant_ids:
+                participants.append({'id': user.id, 'name': user.name})
+            task.of_participants = json.dumps(participants) if participants else False
+
+    @api.depends('dependency_task_ids')
+    def _compute_of_dependencies(self):
+        for task in self:
+            dependencies = []
+            for dependency in task.dependency_task_ids:
+                dependencies.append({'id': dependency.id, 'name': dependency.code})
+            task.of_dependencies = json.dumps(dependencies) if dependencies else False
 
     @api.multi
     def name_get(self):
@@ -141,3 +160,19 @@ class ProjectTask(models.Model):
     def _onchange_user(self):
         # Désactivation du _onchange_user qui remet le champ date_start à la date actuelle.
         pass
+
+    @api.multi
+    def open_task(self):
+        task_id = self._context.get('task_id')
+
+        if task_id:
+            action = {
+                'name': 'Tache',
+                'type': 'ir.actions.act_window',
+                'res_model': 'project.task',
+                'view_mode': 'form',
+                'target': 'current',
+                'res_id': task_id,
+                'context': self._context,
+            }
+            return action

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="of_project_view_quotation_order_form" model="ir.ui.view">
         <field name="name">of_project_view_quotation_order_form</field>

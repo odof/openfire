@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
     <!--*****************************************************************************************-->
@@ -47,17 +47,6 @@
         </field>
     </record>
 
-    <record id="of_project_planning_of_project_project_task_kanban_view" model="ir.ui.view">
-        <field name="name">of_project_planning.of_project.project.task.kanban.view</field>
-        <field name="model">project.task</field>
-        <field name="inherit_id" ref="of_project.of_project_project_task_kanban_view"/>
-        <field name="arch" type="xml">
-            <xpath expr="//img[@t-att-name='participant_ids']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
-        </field>
-    </record>
-
     <record id="of_project_planning_view_task_form2_inherited" model="ir.ui.view">
         <field name="name">of_project_planning.view.task.form2.inherited</field>
         <field name="model">project.task</field>
@@ -100,6 +89,17 @@
             </xpath>
          </field>
      </record>
+
+    <record id="of_project_planning_of_project_project_task_kanban_view" model="ir.ui.view">
+        <field name="name">of_project_planning.of_project.project.task.kanban.view</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="of_project.of_project_project_task_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//img[contains(@class, 'participant_ids')]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
 
     <record id="of_project_planning_project_task_search_view" model="ir.ui.view">
         <field name="name">of_project_planning.project.task.search.view</field>
