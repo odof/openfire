@@ -342,8 +342,10 @@
                             </templates>
                         </kanban>
                     </field>
+                    <field name="of_product_attachment_computed" invisible="1"/>
                     <label for="of_product_attachment_ids" groups="of_sale.group_of_sale_print_attachment"/>
-                    <field name="of_product_attachment_ids" widget="many2many_tags" groups="of_sale.group_of_sale_print_attachment"/>
+                    <field name="of_product_attachment_ids" widget="many2many_tags" groups="of_sale.group_of_sale_print_attachment"
+                           domain="[('id', 'in', of_product_attachment_computed and of_product_attachment_computed[0] and of_product_attachment_computed[0][2] or False)]"/>
                 </xpath>
 
             </field>

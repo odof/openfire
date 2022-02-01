@@ -159,14 +159,15 @@
 
                                     <t groups="of_sale.group_of_sale_print_one_image">
                                         <td name="product_image">
-                                            <img t-att-src="'data:image/png;base64,%s' % l.product_id.image_small" style="max-height: 48px;"/>
+                                            <t t-if="l.product_id.image_small">
+                                                <img t-att-src="'data:image/png;base64,%s' % l.product_id.image_small" style="max-height: 48px;"/>
+                                            </t>
                                         </td>
                                     </t>
                                     <td name="descr">
                                         <span t-esc="name_line"/>
                                         <br t-if="len(the_name) > 0"/>
                                         <t t-foreach="the_name" t-as="name_line">
-                                        <!--<span t-esc="the_name"/-->
                                             <span t-esc="name_line"/>
                                             <br/>
                                         </t>
@@ -304,7 +305,8 @@
                 </div>
             </div>
             <t groups="of_sale.group_of_sale_print_one_image">
-                <div class="row">
+                <t t-set="any_image" t-value="any(doc.order_line.mapped('of_product_image_ids'))"/>
+                <div class="row" t-if="any_image">
                     <div class="col-xs-12">
                         <h4>Annexes</h4>
                         <t t-foreach="doc.order_line" t-as="line">
@@ -325,25 +327,28 @@
             </t>
 
             <t groups="of_sale.group_of_sale_print_multiimage">
-                <div class="row">
+                <t t-set="any_image" t-value="any(doc.order_line.mapped('of_product_image_ids')) or any(doc.order_line.mapped('product_id.image'))"/>
+                <div class="row" t-if="any_image">
                     <div class="col-xs-12">
                         <h4>Annexes</h4>
                         <t t-foreach="doc.order_line" t-as="line">
-                            <h5><em t-field="line.product_id.name"/></h5>
-                            <div class="row mb16">
-                                <div t-if="line.product_id.image" class="col-xs-4">
-                                    <img class="img-responsive center-block" t-att-src="'data:image/png;base64,%s' % line.product_id.image" style="max-height: 150px;"/>
-                                    <p class="mt8 text-center" t-field="line.product_id.name"/>
-                                </div>
-                                <t groups="of_sale.group_of_sale_multiimage">
-                                    <t t-foreach="line.of_product_image_ids" t-as="image">
-                                        <div t-if="image.image" class="col-xs-4">
-                                            <img class="img-responsive center-block" t-att-src="'data:image/png;base64,%s' % image.image" style="max-height: 150px;"/>
-                                            <p class="mt8 text-center" t-field="image.name"/>
-                                        </div>
+                            <t t-if="line.of_product_image_ids or line.product_id.image">
+                                <h5><em t-field="line.product_id.name"/></h5>
+                                <div class="row mb16">
+                                    <div t-if="line.product_id.image" class="col-xs-4">
+                                        <img class="img-responsive center-block" t-att-src="'data:image/png;base64,%s' % line.product_id.image" style="max-height: 150px;"/>
+                                        <p class="mt8 text-center" t-field="line.product_id.name"/>
+                                    </div>
+                                    <t groups="of_sale.group_of_sale_multiimage">
+                                        <t t-foreach="line.of_product_image_ids" t-as="image">
+                                            <div t-if="image.image" class="col-xs-4">
+                                                <img class="img-responsive center-block" t-att-src="'data:image/png;base64,%s' % image.image" style="max-height: 150px;"/>
+                                                <p class="mt8 text-center" t-field="image.name"/>
+                                            </div>
+                                        </t>
                                     </t>
-                                </t>
-                            </div>
+                                </div>
+                            </t>
                         </t>
                     </div>
                 </div>
