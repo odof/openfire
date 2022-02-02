@@ -147,6 +147,7 @@
                 <t t-value="JSON.parse(record.of_participants.raw_value)" t-set="participants"/>
                 <t t-foreach="participants" t-as="participant">
                     <img t-att-src="kanban_image('res.users', 'image_small', participant['id'])"
+                         t-if="participant['id'] != record.user_id.raw_value[0]"
                          t-attf-title="#{participant['name']}" width="24" height="24"
                          class="oe_kanban_avatar pull-right participant_ids"/>
                 </t>
@@ -160,8 +161,8 @@
         <field name="inherit_id" ref="project.view_task_form2"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='user_id']" position="after">
-                <field name="of_members" invisible="1"/>
-                <field name="of_participant_ids" widget="many2many_tags" domain="[('id', 'in', of_members[0][2])]"/>
+                <field name="of_member_ids" invisible="1"/>
+                <field name="of_participant_ids" widget="many2many_tags" domain="of_member_ids and [('id', 'in', of_member_ids[0][2])] or []"/>
             </xpath>
         </field>
     </record>

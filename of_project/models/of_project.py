@@ -119,7 +119,7 @@ class ProjectTask(models.Model):
     user_id = fields.Many2one(domain="[('share', '=', False)]")
     project_id = fields.Many2one(required=True)
     categ_id = fields.Many2one(string=u"Catégorie", required=True)
-    of_members = fields.Many2many('res.users', string=u"Membres", related='project_id.members')
+    of_member_ids = fields.Many2many('res.users', string=u"Membres", related='project_id.members')
     of_participant_ids = fields.Many2many('res.users', string=u"Participants")
     of_dependencies = fields.Text(string=u"Dépendances", compute='_compute_of_dependencies')
     of_participants = fields.Text(string=u"Participants", compute='_compute_of_participants')
