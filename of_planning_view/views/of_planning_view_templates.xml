@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- inherit from web assets backend -->
+    <!-- inherit_id sur le assets_backend de web_calendar plutôt que web
+         pour pouvoir déplacer la librairie fullcalendar -->
     <template id="assets_backend" name="planning_view_assets" inherit_id="web_calendar.assets_backend">
         <xpath expr="." position="inside">
             <link rel="stylesheet" href="/of_planning_view/static/src/less/of_planning_view.less" />

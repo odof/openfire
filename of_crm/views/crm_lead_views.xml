@@ -163,7 +163,7 @@
         <field name="model">of.crm.activity</field>
         <field name="arch" type="xml">
             <calendar date_start="date" color="vendor_id" attendee="vendor_id" attendee_model="res.users"
-                      color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1">
+                      color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1" quick_add="0">
                 <field name="opportunity_id"/>
                 <field name="type_id"/>
                 <field name="title"/>

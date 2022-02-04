@@ -300,9 +300,6 @@ CalendarView.include({
                             }
                         };
                     }
-                    if (self.is_mode_day()) {
-                        //self.make_attendee_columns()
-                    }
                     dfd.resolve();
                 });
             });
@@ -682,6 +679,7 @@ CalendarView.include({
                                 });
                             })
                             .done(function() {
+                                // dfd_attendee_col_made résolu implique dfd_filters_rendered résolu
                                 return $.when(
                                     self.dfd_attendee_col_made, self.dfd_res_horaires_calc, self.dfd_events_feries)
                             .then(function() {
@@ -1058,6 +1056,7 @@ CalendarView.include({
         date_stop = this.date_stop ? time.auto_str_to_date(evt[this.date_stop]) : null;
 
         if (evt["is_attendee_col"]) {
+            // pas besoin de calculs pour le titre des events de participants
             the_title = evt.label;
         } else if (this.info_fields) {
             var temp_ret = {};
@@ -1074,7 +1073,7 @@ CalendarView.include({
                     else if (_.contains(["date", "datetime"], self.fields[fieldname].type)) {
                         temp_ret[fieldname] = formats.format_value(value, self.fields[fieldname]);
                     }
-                    else if (!evt["ferie"] && !evt["is_attendee_col"]) {
+                    else if (!evt["ferie"]) {
                         throw new Error("Incomplete data received from dataset for record " + evt.id);
                     }
                 }
@@ -1085,7 +1084,7 @@ CalendarView.include({
                     else if (value instanceof Array)  {
                         temp_ret[fieldname] = value; // if x2many, keep all id !
                     }
-                    else if (!evt["ferie"] && !evt["is_attendee_col"]) {
+                    else if (!evt["ferie"]) {
                         throw new Error("Incomplete data received from dataset for record " + evt.id);
                     }
                 }
@@ -1127,7 +1126,6 @@ CalendarView.include({
                 var attendee_other = '';
                 var found = false;
                 var icon_offset_px = 2;  // 2 + 15 * nb_icon_places
-                //var the_title_avatar = '<div style="position:sticky; float:right; top:0px;">';
 
                 _.each(evt[this.attendee_people],
                     function (the_attendee_people) {
@@ -1135,11 +1133,11 @@ CalendarView.include({
                         attendee_showed += 1;
                         if (attendee_showed<= MAX_ATTENDEES) {
                             if (self.avatar_model !== null) {
-                               the_title_avatar += '<img title="' + _.escape(self.all_attendees[the_attendee_people]) +
-                                                   '" class="o_attendee_head"' + 'src="/web/image/' +
-                                                   self.avatar_model + '/' + the_attendee_people +
-                                                   '/image_small"></img>';
-                               var now_id;
+                                the_title_avatar += '<img title="' + _.escape(self.all_attendees[the_attendee_people]) +
+                                                    '" class="o_attendee_head"' + 'src="/web/image/' +
+                                                    self.avatar_model + '/' + the_attendee_people +
+                                                    '/image_small"></img>';
+                                var now_id;
 
                                 now_id = the_attendee_people;
                                 if (!isNullOrUndef(self.all_filters[self.res_ids_indexes[now_id]]) &&
@@ -1185,7 +1183,7 @@ CalendarView.include({
                                                 _.escape(self.all_attendees[the_attendee_people]) + '"' +
                                                 'style="background: ' + tempColorBG +
                                                 '; border: 1px solid #0D0D0D; position: absolute; right: ' +
-                                                icon_offset_px + 'px; overflow: hidden;" ></i>';
+                                                icon_offset_px + 'px;" ></i>';
                                                 icon_offset_px += 15;
                                         }
                                     }else{
@@ -1194,7 +1192,7 @@ CalendarView.include({
                                             _.escape(self.all_attendees[the_attendee_people]) + '"' +
                                             'style="background: ' + tempColorBG +
                                             '; border: 1px solid #0D0D0D; position: absolute; right: ' +
-                                            icon_offset_px + 'px; overflow: hidden;" ></i>';
+                                            icon_offset_px + 'px;" ></i>';
                                         icon_offset_px += 15;
                                     }
                                 }else if (evt["virtuel"] && !evt["ferie"]){
@@ -1209,7 +1207,7 @@ CalendarView.include({
                                         _.escape(self.all_attendees[the_attendee_people]) + '"' +
                                         'style="background: ' + tempColorBG +
                                         '; border: 1px solid #0D0D0D; position: absolute; right: ' + icon_offset_px +
-                                        'px; overflow: hidden;" ></i>';
+                                        'px;" ></i>';
                                 }
                             }
                         }else{
@@ -1217,7 +1215,6 @@ CalendarView.include({
                         }
                     }
                 );
-                //the_title_avatar += '</div>';
                 if (evt["color_filter_id"] && attendees.length > 1) {
                     // placer le color_filter_id en premier dans la liste pour le tri par fullcalendar
                     var attendees_temp = [evt["color_filter_id"]];
@@ -1234,14 +1231,6 @@ CalendarView.include({
                 }
             }
         }
-        /*if (attendees.length == 0 && self.fields[self.color_field]) {
-            var color_field = self.fields[self.color_field];
-            if (color_field.type == "many2many") {
-                attendees = evt[self.color_field];
-            }else{
-                attendees = [evt[self.color_field]];
-            }
-        }*/
 
         if (!date_stop && date_delay) {
             var m_start = moment(date_start).add(date_delay,'hours');
@@ -1256,7 +1245,7 @@ CalendarView.include({
             'id': evt.id,
             'attendees':attendees,
             'is_attendee_col': evt.is_attendee_col,
-            'is_holiday': evt.ferie,
+            'is_holiday': evt.ferie,  // fonctionnement ajouté dans fullcalendar pour l'affichage en mode jour
         };
         for (var key in self["icons"]) {
             if (evt[key]) {
@@ -1269,11 +1258,10 @@ CalendarView.include({
                 r.backgroundColor = evt[self.force_color_field];
                 r.textColor = "#0C0C0C";
             // evt de titre de colonne de participant
-            }else if (evt["is_attendee_col"]) {  // evt is phantom
+            }else if (evt["is_attendee_col"]) {
                 r.backgroundColor = evt["color_bg"];
                 r.textColor = evt["color_ft"];
                 r.actual_id = evt["actual_id"];
-            // utilisation de calendar.contact
             // evt dispo
             }else if (evt[self.dispo_field]) {  // evt is phantom
                 r.backgroundColor = self.creneau_dispo_opt['color_bg'];
