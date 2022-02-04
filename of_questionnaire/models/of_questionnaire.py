@@ -143,6 +143,8 @@ class OfPlanningIntervention(models.Model):
             'id_code': question.id_code,
             'condition': question.condition,
             'condition_code': question.condition_code,
+            'print_mode': question.print_mode,
+            'condition_print_mode': question.condition_print_mode,
         }
 
     @api.onchange('questionnaire_id')
@@ -265,6 +267,8 @@ class OfParcInstalle(models.Model):
             'id_code': question.id_code,
             'condition': question.condition,
             'condition_code': question.condition_code,
+            'print_mode': question.print_mode,
+            'condition_print_mode': question.condition_print_mode,
         }
 
     @api.onchange('questionnaire_id')

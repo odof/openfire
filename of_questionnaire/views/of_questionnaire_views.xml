@@ -414,6 +414,8 @@
                             <field name="condition"/>
                             <field name="id_code" invisible="1"/>
                             <field name="condition_code" invisible="1"/>
+                            <field name="print_mode" invisible="1"/>
+                            <field name="condition_print_mode" invisible="1"/>
                         </tree>
                     </field>
                 </page>
@@ -557,6 +559,8 @@
                             <field name="condition"/>
                             <field name="id_code" invisible="1"/>
                             <field name="condition_code" invisible="1"/>
+                            <field name="print_mode" invisible="1"/>
+                            <field name="condition_print_mode" invisible="1"/>
                         </tree>
                     </field>
                 </page>
