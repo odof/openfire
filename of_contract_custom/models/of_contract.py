@@ -6,6 +6,8 @@ from odoo.addons import decimal_precision as dp
 from odoo.exceptions import UserError
 from odoo.exceptions import ValidationError
 from odoo.addons.of_utils.models.of_utils import format_date, se_chevauchent
+from odoo.tools.safe_eval import safe_eval
+
 
 class OfDocumentsJoints(models.AbstractModel):
     _inherit = 'of.documents.joints'
@@ -696,6 +698,7 @@ class OfContract(models.Model):
 
     @api.multi
     def button_renew(self):
+        self = self.with_context(button_renew=True)
         automatic_renewal = self.env['of.contract']
         for contract in self:
             if contract.renewal:
@@ -704,6 +707,9 @@ class OfContract(models.Model):
             current_end = fields.Date.from_string(contract.date_end)
             new_end = current_end + relativedelta(years=1)
             contract.date_end = fields.Date.to_string(new_end)
+        ids_list = safe_eval(self.env['ir.config_parameter'].get_param('contracts_to_do', '[]'))
+        ids_list += [contract_id for contract_id in self._ids if contract_id not in ids_list]
+        self.env['ir.config_parameter'].set_param('contracts_to_do', '%s' % ids_list)
         if automatic_renewal:
             message = u"Les contrats suivants sont en renouvellement automatique, " + \
                       u"et n'ont donc pas été renouvelés :\n%s" % '\n'.join(c.name for c in automatic_renewal)
@@ -721,6 +727,14 @@ class OfContract(models.Model):
     @api.multi
     def of_get_report_date(self, docs):
         return fields.Date.today()
+
+    @api.model
+    def cron_generate_contract_di(self):
+        ids_list = safe_eval(self.env['ir.config_parameter'].get_param('contracts_to_do', '[]'))
+        contracts = self.search([('id', 'in', ids_list)])
+        for contract in contracts:
+            contract.line_ids._generate_services()
+        self.env['ir.config_parameter'].set_param('contracts_to_do', '[]')
 
 
 class OfContractLine(models.Model):
@@ -898,7 +912,7 @@ class OfContractLine(models.Model):
             else:
                 line.name = u'Ligne %s' % line.code_de_ligne
 
-    @api.depends('next_date', 'date_contract_end', 'contract_id', 'contract_id.period_ids', 'date_contract_start')
+    @api.depends('next_date', 'date_contract_end', 'contract_id', 'contract_id.period_ids')
     def _compute_current_period_id(self):
         """ Calcule la période courante """
         for line in self:
@@ -907,7 +921,7 @@ class OfContractLine(models.Model):
             if line.date_end:
                 ref_date = line.date_end
             else:
-                ref_date = line.next_date or line.date_contract_start
+                ref_date = line.next_date or line.date_contract_end
             if not ref_date:
                 continue
             line.current_period_id = line.contract_id.period_ids\
@@ -1250,7 +1264,8 @@ class OfContractLine(models.Model):
                 contract_line._revision_avenant()
                 vals['revision_avenant'] = False
         res = super(OfContractLine, self)._write(vals)
-        self._generate_services()
+        if not self.env.context.get('button_renew', False):
+            self._generate_services()
         return res
 
     @api.multi
@@ -1375,7 +1390,7 @@ class OfContractLine(models.Model):
 
     @api.multi
     def action_view_intervention(self):
-        action = self.env.ref('of_planning.action_of_planning_intervention_form').read()[0]
+        action = self.env.ref('of_planning.action_of_planning_intervention_calendar').read()[0]
         action['context'] = {'search_default_contract_line_id': self.id}
         return action
 
@@ -1406,8 +1421,9 @@ class OfContractLine(models.Model):
         """ Génération des demandes d'interventions """
         service_obj = self.with_context(bloquer_recurrence=True).env['of.service']
         type = self.env.ref('of_service.of_service_type_maintenance')
-        for line in self:
-            if not line.current_period_id or not line.state == 'validated':
+        li = [(line, line.current_period_id) for line in self]
+        for line, period in li:
+            if not period or not line.state == 'validated':
                 continue
             services = self.env['of.service']
             months = line.mois_reference_ids
@@ -1415,12 +1431,11 @@ class OfContractLine(models.Model):
             nbr_months = len(months)
             ratio = float(nbr_intervs) / float(nbr_months)
             if not nbr_intervs or not nbr_months:
-                return
-            date_start_da = fields.Date.from_string(line.current_period_id.date_start)
+                continue
+            date_start_da = fields.Date.from_string(period.date_start)
             for i in xrange(0, nbr_intervs):
-                if len(line.service_ids.filtered(lambda s: line.current_period_id.date_start <=
-                                                           s.date_next <
-                                                           line.current_period_id.date_end)) >= nbr_intervs:
+                if len(line.service_ids.filtered(lambda s: period.date_start <= s.date_next
+                                                           < period.date_end)) >= nbr_intervs:
                     break
                 month = months[int(i/ratio)]
                 num_mois = month.numero
