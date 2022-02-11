@@ -1260,6 +1260,23 @@ class SaleOrderLine(models.Model):
         return self.env['account.tax']._fix_tax_included_price_company(
             self._get_display_price(product), product.taxes_id, self.tax_id, self.company_id)
 
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        if 'of_marge_pc' in fields and 'margin' not in fields:
+            fields.append('margin')
+        if 'of_marge_pc' in fields and 'price_subtotal' not in fields:
+            fields.append('price_subtotal')
+        res = super(SaleOrderLine, self).read_group(
+            domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
+        for line in res:
+            if 'of_marge_pc' in fields:
+                if 'margin' in line and line['margin'] is not None and \
+                        'price_subtotal' in line and line['price_subtotal']:
+                    line['of_marge_pc'] = round(100.0 * line['margin'] / line['price_subtotal'], 2)
+                else:
+                    line['of_marge_pc'] = 0.0
+        return res
+
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
