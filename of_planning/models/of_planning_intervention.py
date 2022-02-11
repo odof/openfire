@@ -1211,31 +1211,7 @@ class OfPlanningIntervention(models.Model):
     def _onchange_date_deadline_forcee(self):
         # (re)mettre l'heure de fin à la dernière heure de la journée si RDV sur toute la journée
         if self.forcer_dates and self.all_day and self.employee_ids and (self.date_deadline_forcee or self.date):
-            tz = pytz.timezone(self.tz or self.env.context.get('tz'))
-            # Récupérer l'heure de fin de journée et l'affecter
-            # passer d'abord la date de fin du RDV en local pour ne pas risquer de récupérer les horaires du lendemain
-            date_used = self.date_deadline_forcee or self.date
-            current_date_utc_dt = pytz.utc.localize(fields.Datetime.from_string(date_used))
-            current_date_local_dt = current_date_utc_dt.astimezone(tz)
-            current_date_local_str = fields.Date.to_string(current_date_local_dt)
-            horaires_du_jour = self.employee_ids.get_horaires_date(current_date_local_str)
-            if not any([horaires_du_jour[e] for e in horaires_du_jour]):
-                # horaires_du_jour est de la forme { employee1_id : [], employee2_id : [] .. }
-                heure_fin_local = self.env['ir.values'] \
-                                        .get_default('of.intervention.settings', 'calendar_max_time') or 24.0
-            else:
-                # forcément != 0 car ici au moins un employé a des horaires
-                heure_fin_local = max([horaires_du_jour[e] and horaires_du_jour[e][-1][-1] or 0.0
-                                       for e in horaires_du_jour])
-            # 00:00 du jour suivant, on met plutôt 23:59 pour rester le même jour et éviter les problèmes
-            if heure_fin_local == 24.0:
-                heure_fin_local_str = '23:59'
-            else:
-                heure_fin_local_str = hours_to_strs('time', heure_fin_local)[0]
-            datetime_local_str = '%s %s:00' % (current_date_local_str, heure_fin_local_str)
-            datetime_local_dt = tz.localize(datetime.strptime(datetime_local_str, '%Y-%m-%d %H:%M:%S'))
-            datetime_utc_dt = datetime_local_dt.astimezone(pytz.utc)
-            update_vals = {'date_deadline_forcee': fields.Datetime.to_string(datetime_utc_dt)}
+            update_vals = {'date_deadline_forcee': self.get_all_day_datetime()}
             self.update(update_vals)
 
     @api.onchange('order_id')
@@ -1320,14 +1296,23 @@ class OfPlanningIntervention(models.Model):
             # Tronqué à la minute
             vals['date'] = vals['date'][:17] + '00'
         # Correspond soit au drag & drop soit au redimensionnage
-        # -> ignorer les horaires de travail et les interventions superposées
+        # -> affecter la date de fin forcée pour les RDVs sur toute la journée
+        # -> ignorer les horaires de travail et les interventions superposées pour les autres RDVs
         if self._context.get('from_ui'):
             vals['verif_dispo'] = False
             vals['forcer_dates'] = True
             vals['date'] = vals.get('date', vals.get('date_prompt', False))
+            all_day = vals.get('all_day') if 'all_day' in vals else self.all_day
             vals['date_deadline'] = vals.get('date_deadline', vals.get('date_deadline_prompt', False))
-            if vals.get('date_deadline'):
+            if all_day:
+                # de la forme [[6, 0, ids_list]] en cas de drag n drop
+                employee_eval = vals.get('employee_ids', [[-1, 0, []]])[0][2]
+                vals['date'], vals['date_deadline_forcee'] = self.get_all_day_datetime(
+                    mode='both',date_eval=vals['date'],employee_eval=employee_eval)
+            elif vals.get('date_deadline'):
                 vals['date_deadline_forcee'] = vals['date_deadline'][:17] + '00'
+
+            if vals.get('date_deadline_forcee'):
                 date_deadline_dt = fields.Datetime.from_string(vals['date_deadline_forcee'])
                 del vals['date_deadline']
                 # date et date_deadline modifiées -> drag n drop
@@ -1609,6 +1594,63 @@ class OfPlanningIntervention(models.Model):
             if une_minute < ecart:
                 return False
         return True
+
+    def get_all_day_datetime(self, mode='end', date_eval=False, employee_eval=[]):
+        u"""
+        Renvois le datetime string de début/fin de journée pour un RDV sur toute la journée
+        :param mode: 'end', 'start' ou 'both'. Tout autre valeur compte comme 'both'
+        :param date_eval: date à évaluer, si différente de celle du RDV
+        :param employee_eval: liste d'employés à évaluer, si différente de celle du RDV
+        :return: suivant le mode, le datetime de début, de fin, ou les 2 dans un tuple
+        """
+        self.ensure_one()
+        tz = pytz.timezone(self.tz or self.env.context.get('tz'))
+        # Récupérer l'heure de fin de journée et l'affecter
+        # passer d'abord la date de fin du RDV en local pour ne pas risquer de récupérer les horaires du lendemain
+        date_used = date_eval or self.date_deadline_forcee or self.date
+        current_date_utc_dt = pytz.utc.localize(fields.Datetime.from_string(date_used))
+        current_date_local_dt = current_date_utc_dt.astimezone(tz)
+        current_date_local_str = fields.Date.to_string(current_date_local_dt)
+        employee_used = self.env['hr.employee'].browse(employee_eval or self.employee_ids)
+        horaires_du_jour = employee_used.get_horaires_date(current_date_local_str)
+        # si mode vaut 'start' ou 'both', on calcul le datetime de début de journée
+        if mode != 'end':
+            if not any([horaires_du_jour[e] for e in horaires_du_jour]):
+                # horaires_du_jour est de la forme { employee1_id : [], employee2_id : [] .. }
+                heure_debut_local = self.env['ir.values'] \
+                                        .get_default('of.intervention.settings', 'calendar_min_time') or 0.0
+            else:
+                # forcément != 0 car ici au moins un employé a des horaires
+                heure_debut_local = min([horaires_du_jour[e] and horaires_du_jour[e][0][0] or 24.0
+                                         for e in horaires_du_jour])
+            heure_debut_local_str = hours_to_strs('time', heure_debut_local)[0]
+            datetime_deb_local_str = '%s %s:00' % (current_date_local_str, heure_debut_local_str)
+            datetime_deb_local_dt = tz.localize(datetime.strptime(datetime_deb_local_str, '%Y-%m-%d %H:%M:%S'))
+            datetime_deb_utc_dt = datetime_deb_local_dt.astimezone(pytz.utc)
+            datetime_deb_utc_str = fields.Datetime.to_string(datetime_deb_utc_dt)
+            if mode == 'start':
+                return datetime_deb_utc_str
+        # ici mode vaut 'end' ou 'both', on calcule le datetime de fin de journée
+        if not any([horaires_du_jour[e] for e in horaires_du_jour]):
+            # horaires_du_jour est de la forme { employee1_id : [], employee2_id : [] .. }
+            heure_fin_local = self.env['ir.values'] \
+                                  .get_default('of.intervention.settings', 'calendar_max_time') or 24.0
+        else:
+            # forcément != 0 car ici au moins un employé a des horaires
+            heure_fin_local = max([horaires_du_jour[e] and horaires_du_jour[e][-1][-1] or 0.0
+                                   for e in horaires_du_jour])
+        # 00:00 du jour suivant, on met plutôt 23:59 pour rester le même jour et éviter les problèmes
+        if heure_fin_local == 24.0:
+            heure_fin_local_str = '23:59'
+        else:
+            heure_fin_local_str = hours_to_strs('time', heure_fin_local)[0]
+        datetime_fin_local_str = '%s %s:00' % (current_date_local_str, heure_fin_local_str)
+        datetime_fin_local_dt = tz.localize(datetime.strptime(datetime_fin_local_str, '%Y-%m-%d %H:%M:%S'))
+        datetime_fin_utc_dt = datetime_fin_local_dt.astimezone(pytz.utc)
+        datetime_fin_utc_str = fields.Datetime.to_string(datetime_fin_utc_dt)
+        if mode == 'end':
+            return datetime_fin_utc_str
+        return (datetime_deb_utc_str, datetime_fin_utc_str)
 
     @api.multi
     def do_verif_dispo(self):

@@ -786,13 +786,17 @@ CalendarView.include({
         fc.minTime = this.minTime;
         fc.maxTime = this.maxTime;
         fc.slotEventOverlap = false;
+        // don't display a line for all_day events if there is no all_day field declared in the view
+        if (!self.all_day) {
+            fc.allDaySlot = false;
+        }
         // Replace made to remove seconds. Must be done twice, once for date_start and once for date_end
         fc.timeFormat = fc.timeFormat = fc.timeFormat.replace(':ss', '').replace(':ss', '');
         // callback
         fc.eventAfterAllRender = function(view) {
             self.on_event_after_all_render();
         };
-        fc.select = function (start_date, end_date, all_day, _js_event, _view) {
+        fc.select = function (start_date, end_date, all_day, attendees, _js_event, _view) {
             if (self.options.action && self.options.action.context && self.options.action.context.inhiber_create) {
                 Dialog.alert(self.$el, self.options.action.context.inhiber_message);  // inhiber création
                 self.$calendar.fullCalendar('unselect');
@@ -802,6 +806,14 @@ CalendarView.include({
                     end: end_date,
                     allDay: all_day,
                 });
+                // prefill attendees in the event to be created
+                if (self.attendee_people && attendees) {
+                    if (self.fields[self.attendee_people].type == "many2many") {
+                        data_template[self.attendee_people] = attendees;
+                    }else{
+                        data_template[self.attendee_people] = attendees[0];
+                    }
+                }
                 self.open_quick_create(data_template);
             }
         }
@@ -1031,6 +1043,14 @@ CalendarView.include({
         return false;
     },
     /**
+     * Transform fullcalendar event object to OpenERP Data object. inherited to add attendee data
+     */
+    get_event_data: function(event) {
+        var data = this._super.apply(this, arguments);
+        data['attendees'] = event['attendees'];
+        return data;
+    },
+    /**
      * Surcharge de la fonction parente car elle n'est pas héritable.
      * Updates record identified by ``id`` with values in object ``data``
      */
@@ -1040,6 +1060,16 @@ CalendarView.include({
         delete(data.name); // Cannot modify actual name yet
         var index = this.dataset.get_id_index(id);
         if (index !== null) {
+            var attendee_field = this.attendee_people;
+            if (attendee_field) {
+                if (self.fields[attendee_field] && self.fields[attendee_field].type == "many2many") {
+                    data[attendee_field] = [[6, 0, data["attendees"]]];
+                } else if (self.fields[attendee_field] && self.fields[attendee_field].type == "many2one") {
+                    // M2O : [id, name]
+                    data[attendee_field] = data["attendees"][0];
+                }
+            }
+            delete(data.attendees);
             event_id = this.dataset.ids[index];
             this.dataset.write(event_id, data, {context: {from_ui: true}}).always(function() {
                 if (self.show_creneau_dispo) {
@@ -1142,7 +1172,7 @@ CalendarView.include({
 
             var the_title_avatar = '';
 
-            if (! _.isUndefined(this.attendee_people)) {
+            if (! _.isUndefined(this.attendee_people) && this.fields[this.attendee_people].type == "many2many") {
                 var MAX_ATTENDEES = 10;
                 var attendee_showed = 0;
                 var attendee_other = '';
@@ -1251,7 +1281,11 @@ CalendarView.include({
                     the_title_avatar += '<span class="o_attendee_head" title="' + attendee_other.slice(0, -2) +
                                         '">+</span>';
                 }
+            } else if (! _.isUndefined(this.attendee_people) && this.fields[this.attendee_people].type == "many2one") {
+                // M2O fields are of form [<id>, <name>]
+                attendees.push(evt[this.attendee_people][0]);
             }
+
         }
 
         if (!date_stop && date_delay) {
