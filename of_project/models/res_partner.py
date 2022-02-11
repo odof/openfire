@@ -23,5 +23,6 @@ class ResPartner(models.Model):
             action['views'] = [(self.env.ref('project.edit_project').id, 'form')]
             action['res_id'] = projects.id
         else:
-            action = {'type': 'ir.actions.act_window_close'}
+            action = self.env.ref('project.open_create_project').read()[0]
+            action['context'] = {'default_partner_id': self.id}
         return action

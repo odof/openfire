@@ -3,6 +3,7 @@
 from odoo import models, fields, api
 from datetime import datetime
 import json
+from odoo import SUPERUSER_ID
 
 
 class OfProjectStage(models.Model):
@@ -123,6 +124,17 @@ class ProjectTask(models.Model):
     of_participant_ids = fields.Many2many('res.users', string=u"Participants")
     of_dependencies = fields.Text(string=u"Dépendances", compute='_compute_of_dependencies')
     of_participants = fields.Text(string=u"Participants", compute='_compute_of_participants')
+
+    @api.model
+    def _read_group_stage_ids(self, stages, domain, order):
+        # On modifie la fonction _read_group_stage_ids pour enlever le search_domain = [('id', 'in', stages.ids)]
+        # Car on veut les étapes kanban, y compris celles qui n'ont pas de tâche
+        search_domain = []
+        if 'default_project_id' in self.env.context:
+            search_domain = [('project_ids', '=', self.env.context['default_project_id'])]
+
+        stage_ids = stages._search(search_domain, order=order, access_rights_uid=SUPERUSER_ID)
+        return stages.browse(stage_ids)
 
     @api.depends('of_participant_ids')
     def _compute_of_participants(self):
