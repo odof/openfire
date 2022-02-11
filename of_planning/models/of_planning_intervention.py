@@ -405,6 +405,7 @@ class OfPlanningIntervention(models.Model):
             ('cancel', u"Annulé"),
             ('postponed', u"Reporté"),
         ], string=u"État", index=True, readonly=True, default='draft', track_visibility='onchange')
+    closed = fields.Boolean(string=u"Clôturé", default=False)
     raison_id = fields.Many2one('of.planning.intervention.raison', string="Raison")
     number = fields.Char(String=u"Numéro", copy=False)
 
@@ -1475,6 +1476,14 @@ class OfPlanningIntervention(models.Model):
     @api.multi
     def button_draft(self):
         return self.write({'state': 'draft'})
+
+    @api.multi
+    def button_close(self):
+        return self.write({'closed': True})
+
+    @api.multi
+    def button_open(self):
+        return self.write({'closed': False})
 
     @api.multi
     def button_import_order_line(self):

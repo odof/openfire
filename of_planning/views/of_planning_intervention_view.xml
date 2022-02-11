@@ -124,6 +124,9 @@
                     <filter string="Annulé" name="state_cancel" icon="terp-dialog-close-red" domain="[('state','=','cancel')]"/>
                     <filter string="Reporté" name="state_postponed" icon="terp-folder-green" domain="[('state','=','postponed')]"/>
                     <separator/>
+                    <filter string="Clôturé" name="closed" domain="[('closed', '=', True)]"/>
+                    <filter string="Non clôturé" name="opened" domain="[('closed', '=', False)]"/>
+                    <separator/>
                     <filter string="Semaine en cours" name="this_week"
                             domain="[('date_deadline', u'&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
                                      ('date', u'&lt;', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
@@ -210,6 +213,7 @@
         <field name="arch" type="xml" >
             <form string="Nouveau RDV d'intervention">
                 <header>
+                    <field name="closed" invisible="1"/>
                     Passer à
                     <button name="button_confirm" string="Confirmé" states="draft" type="object"/>
                     <button name="button_done" string="Réalisé" states="confirm" type="object"/>
@@ -218,6 +222,8 @@
                     <button name="button_cancel" string="Annulé" states="draft,confirm" type="object"/>
                     <button name="button_draft" string="Brouillon" states="confirm,done,unfinished,cancel,postponed" type="object"/>
                     <button name="action_intervention_send" string="Envoyer par email" type="object"/>
+                    <button name="button_close" string="Clôturer" type="object" attrs="{'invisible': [('closed', '=', True)]}"/>
+                    <button name="button_open" string="Ré-ouvrir" type="object" attrs="{'invisible': [('closed', '=', False)]}"/>
                     <field name="state" widget="statusbar" nolabel="1" statusbar_visible="draft,confirm,done"/>
                     <div align="right" style="align:right;padding: 0px 18px 0px 0px;width:100%">
                         <field name="raison_id" widget="selection" attrs="{'invisible':[('state', '!=', 'postponed')]}"/>
@@ -244,6 +250,7 @@
                         <h1><b>
                             <span class="of_title of_ws">Rendez-vous d'intervention</span>
                             <field name="number" placeholder="N° d'intervention" readonly="1" nolabel="1" class="oe_inline"/>
+                            <div class="label label-info" attrs="{'invisible': [('closed', '=', False)]}">Cloturé</div>
                         </b></h1>
                     </div>
                     <field name="alert_hors_creneau" invisible="1"/>
