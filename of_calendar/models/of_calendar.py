@@ -781,7 +781,7 @@ class ResCompany(models.Model):
     def get_jours_feries(self, date_debut, date_fin):
         u"""
             Renvois un dictionnaire de jours fériés avec pour clé la date et pour valeur le nom du jour férié.
-            Contient tous les jours fériés compris entre date_debug et date_fin inclus.
+            Contient tous les jours fériés compris entre date_debut et date_fin inclus.
             date_debut et date_fin peuvent être de type Datetime, Date ou basestring
             """
         if not len(self):

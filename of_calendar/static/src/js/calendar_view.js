@@ -132,6 +132,8 @@ CalendarView.include({
 
         this.on_event_after_all_render = _.debounce(this.on_event_after_all_render, 300, true);
         this.res_ids_indexes = {}; // dictionnaire qui contient les indexes des filtres en fonction de leur id
+        this.res_ids_attendee_columns = {};
+        this.attendee_columns = [];
     },
     /**
      *  go to system parameters to see if we should allow drag and drop. Sets minTime and maxTime if needed
@@ -304,6 +306,37 @@ CalendarView.include({
 
         return $.when(p);
     },
+    make_attendee_columns: function(){
+        var self = this;
+        var fil, attendee_col;
+        self.attendee_columns = [];
+        self.res_ids_attendee_columns = {}
+        $.when(self.dfd_filters_rendered).then(function(){
+            for (var i in self.all_filters) {
+                fil = self.all_filters[i];
+                // is_visible is not set on the odoo standard calendar
+                if (fil.is_checked &&
+                        (self.useContacts || fil.is_visible && isNullOrUndef(self.res_ids_attendee_columns[fil["value"]]))){
+                    attendee_col = {
+                        label: fil['label'],
+                        color_bg: fil['color_bg'],
+                        color_ft: fil['color_ft'],
+                        value: fil['value'],
+                        input_id: fil['value'] + "_input",
+                        sequence: fil['sequence'],
+                        is_attendee_col: true,
+                        id: -100000 - fil['value'],  // be sure to have unique id
+                        actual_id: fil['value'], // save actual id for fullcalendar library
+                    }
+                    attendee_col[self.color_field] = fil['value'];
+                    self.attendee_columns.push(attendee_col);
+                    self.res_ids_attendee_columns[fil["value"]] = self.attendee_columns.length - 1;
+                }
+            }
+            self.dfd_attendee_col_made.resolve()
+            return $.when()
+        })
+    },
     do_search: function (domain, context, _group_by) {
         var self = this;
         this.domain = domain;
@@ -321,6 +354,7 @@ CalendarView.include({
         var self = this;
         // asynchronicity event colors. we need filteres to be rendered to know what color to put on events
         self.dfd_filters_rendered = $.Deferred();
+        self.dfd_attendee_col_made = $.Deferred();
         if (!self.all_filters && self.useContacts) {
             self.all_filters = {};
         }else if (!self.all_filters) {
@@ -550,8 +584,11 @@ CalendarView.include({
                                             // at least one of the attendees of this events is checked in the filters
                                             events_temp.push(e);
                                             // quand on montre les créneaux dispo,
-                                            // on dupplique les events pour conserver l'alignement des des colonnes
-                                            if (!self.show_creneau_dispo) {
+                                            // on duplique les events pour conserver l'alignement des colonnes
+                                            // on duplique également les events en mode jour pour les placer dans toutes
+                                            // les colonnes d'attendee concernées
+                                            // TODO : ne pas dupliquer les events all_day en mode semaine et mois?
+                                            if (!(self.show_creneau_dispo || self.is_mode_day())) {
                                                 break;
                                             }
                                         }
@@ -570,9 +607,40 @@ CalendarView.include({
                             self.dfd_filters_rendered.resolve()
                         }
                     }else{
+                        self.event_ids_attendees = {};
+                        var events_temp = []
                         for (var ie=0; ie<events.length; ie++) {
                             events[ie].view = self;
+                            self.event_ids_attendees[events[ie]["id"]] = [];
+                            if (self.attendee_multiple) {
+                                var keys = events[ie][self.color_field];
+                                var key, added = false;
+                                for (var i in keys) {
+                                    key = keys[i];
+                                    if (_.contains(self.now_filter_ids, key) &&
+                                        self.all_filters[self.res_ids_indexes[key]].is_checked) {
+                                        // at least one of the attendees of this events is checked in the filters
+                                        events_temp.push(events[ie]);
+                                        added = true;
+                                        // quand on montre les créneaux dispo,
+                                        // on duplique les events pour conserver l'alignement des colonnes
+                                        // on duplique également les events en mode jour pour les placer dans toutes
+                                        // les colonnes d'attendee concernées
+                                        if (!(self.show_creneau_dispo || self.is_mode_day())) {
+                                            break;
+                                        }
+                                    }
+                                }
+                                // si aucun participant n'a son filtre coché
+                                // mais que le filtre "tout le monde" est coché, on ajoute l'event
+                                if (!added && self.all_filters[-1] && self.all_filters[-1].is_checked) {
+                                    events_temp.push(events[ie]);
+                                }
+                            }else{
+                                events_temp.push(events[ie])
+                            }
                         }
+                        events = events_temp;
                         self.dfd_filters_rendered.resolve()
                     }
                     // calculer les créneaux dispo
@@ -585,11 +653,21 @@ CalendarView.include({
                     self.set_events_feries(start, end).then(function(){
                         self.dfd_events_feries.resolve()
                     });
-
-                    var all_attendees = $.map(events, function (e) { return e[self.attendee_people]; });
+                    // initialisation all_attendees, utilisé dans event_data_transform
+                    var color_field = self.fields[self.color_field];
+                    if (color_field.type == "many2many" || color_field.type == "selection") {
+                        var all_attendees = $.map(events, function (e) { return e[self.color_field]; });
+                    }else{
+                        var all_attendees = $.map(events, function (e) { return e[self.color_field][0]; });
+                    }
                     all_attendees = _.chain(all_attendees).flatten().uniq().value();
 
                     self.all_attendees = {};
+                    if (self.is_mode_day()) {
+                        self.make_attendee_columns();
+                    }else{
+                        self.dfd_attendee_col_made.resolve();
+                    }
                     if (self.avatar_title !== null) {
                         new Model(self.avatar_title)
                             .query(["name"])
@@ -601,8 +679,9 @@ CalendarView.include({
                                 });
                             })
                             .done(function() {
+                                // dfd_attendee_col_made résolu implique dfd_filters_rendered résolu
                                 return $.when(
-                                    self.dfd_filters_rendered, self.dfd_res_horaires_calc, self.dfd_events_feries)
+                                    self.dfd_attendee_col_made, self.dfd_res_horaires_calc, self.dfd_events_feries)
                             .then(function() {
                                 return self.perform_necessary_name_gets(events)
                             })
@@ -616,6 +695,14 @@ CalendarView.include({
                                 for (var j=0; j<self.events_feries.length; j++) {
                                     self.events_feries[j].view = self;
                                     events.push(self.events_feries[j]);
+                                }
+
+                                if (self.is_mode_day()) {
+                                    // ajouter les events d'attendees seulement en mode jour
+                                    for (var k=0; k<self.attendee_columns.length; k++) {
+                                        self.attendee_columns[k].view = self;
+                                        events.push(self.attendee_columns[k]);
+                                    }
                                 }
                                 self.events = events;
                                 return events;
@@ -671,6 +758,8 @@ CalendarView.include({
     get_fc_init_options: function () {
         var fc = this._super();
         var self = this;
+        // make sure attendee columns are loaded when starting on mode week and going on mode day
+        fc.lazyFetching = false;
         fc.editable = this.draggable;
         fc.minTime = this.minTime;
         fc.maxTime = this.maxTime;
@@ -966,7 +1055,10 @@ CalendarView.include({
         date_start = time.auto_str_to_date(evt[this.date_start]);
         date_stop = this.date_stop ? time.auto_str_to_date(evt[this.date_stop]) : null;
 
-        if (this.info_fields) {
+        if (evt["is_attendee_col"]) {
+            // pas besoin de calculs pour le titre des events de participants
+            the_title = evt.label;
+        } else if (this.info_fields) {
             var temp_ret = {};
             res_computed_text = this.how_display_event;
             _.each(this.info_fields, function (fieldname) {
@@ -1041,12 +1133,26 @@ CalendarView.include({
                         attendee_showed += 1;
                         if (attendee_showed<= MAX_ATTENDEES) {
                             if (self.avatar_model !== null) {
-                               the_title_avatar += '<img title="' + _.escape(self.all_attendees[the_attendee_people]) +
-                                                   '" class="o_attendee_head"' + 'src="/web/image/' +
-                                                   self.avatar_model + '/' + the_attendee_people +
-                                                   '/image_small"></img>';
+                                the_title_avatar += '<img title="' + _.escape(self.all_attendees[the_attendee_people]) +
+                                                    '" class="o_attendee_head"' + 'src="/web/image/' +
+                                                    self.avatar_model + '/' + the_attendee_people +
+                                                    '/image_small"></img>';
+                                var now_id;
+
+                                now_id = the_attendee_people;
+                                if (!isNullOrUndef(self.all_filters[self.res_ids_indexes[now_id]]) &&
+                                        self.all_filters[self.res_ids_indexes[now_id]].is_checked && !found &&
+                                        !isNullOrUndef(self.event_ids_attendees[evt["id"]]) &&
+                                        !_.contains(self.event_ids_attendees[evt["id"]], now_id)) {
+                                    // quand on montre les créneaux dispo,
+                                    // on duplique les events à plusieurs attendees pour avoir un bel alignement
+                                    // il faut donc leur donner chacun une couleur différente
+                                    evt["color_filter_id"] = now_id;
+                                    self.event_ids_attendees[evt["id"]].push(now_id);
+                                    found = true;
+                                }
                             }else{
-                                if (!self.attendee_multiple && (!self.colorIsAttendee ||
+                                if (!self.attendee_multiple && !self.custom_colors && (!self.colorIsAttendee ||
                                     the_attendee_people != evt[self.color_field])) {
                                     var tempColor = (self.all_filters[self.res_ids_indexes[the_attendee_people]] !== undefined)
                                                 ? self.all_filters[self.res_ids_indexes[the_attendee_people]].color
@@ -1138,6 +1244,8 @@ CalendarView.include({
             'allDay': (this.fields[this.date_start].type == 'date' || (this.all_day && evt[this.all_day]) || false),
             'id': evt.id,
             'attendees':attendees,
+            'is_attendee_col': evt.is_attendee_col,
+            'is_holiday': evt.ferie,  // fonctionnement ajouté dans fullcalendar pour l'affichage en mode jour
         };
         for (var key in self["icons"]) {
             if (evt[key]) {
@@ -1149,6 +1257,11 @@ CalendarView.include({
             if (evt[self.force_color_field]) {
                 r.backgroundColor = evt[self.force_color_field];
                 r.textColor = "#0C0C0C";
+            // evt de titre de colonne de participant
+            }else if (evt["is_attendee_col"]) {
+                r.backgroundColor = evt["color_bg"];
+                r.textColor = evt["color_ft"];
+                r.actual_id = evt["actual_id"];
             // evt dispo
             }else if (evt[self.dispo_field]) {  // evt is phantom
                 r.backgroundColor = self.creneau_dispo_opt['color_bg'];
@@ -1262,8 +1375,34 @@ CalendarView.include({
                 }
             }
         }
+        // colonnes vue jour
+        if (self.useContacts && isNullOrUndef(self.res_ids_attendee_columns[r["attendees"][0]])) {
+            r.attendee_column = self.res_ids_attendee_columns["-1"];
+        }else{
+            r.attendee_column = self.res_ids_attendee_columns[r["attendees"][0]];
+        }
         evt.r = r;
         return r;
+    },
+    /**
+     *  Works when get_actual_mode doesn't, My guess is that it's faster and beats asynchronicity
+     */
+    is_mode_day: function () {
+        var $fc_view = this.$calendar.find('.fc-view');
+        var res = ($fc_view.length > 0 && $fc_view.hasClass('fc-view-agendaDay'));
+        return res;
+    },
+    /**
+     *  Returns "day", "week" or "month instead of "agendaDay", "agendaWeek" or "month" (yeah...)
+     */
+    get_actual_mode: function () {
+        var fullcal_mode = this.$calendar.fullCalendar('getView').name;
+        if (fullcal_mode == "agendaWeek") {
+            return "week"
+        }else if ("agendaDay") {
+            return "day"
+        }
+        return "month"
     },
 });
 
