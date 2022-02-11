@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <!--#############################################################################################################
+        ####        I R . C R O N
+        #############################################################################################################-->
+    <data noupdate="1">
+
+        <record id="of_api_partner" model="res.partner">
+            <field name="name">API OpenFire</field>
+            <field name="email">api@openfire.fr</field>
+        </record>
+
+        <record id="of_api_user" model="res.users">
+            <field name="name">Utilisateur API OpenFire</field>
+            <field name="login">openfire_api</field>
+            <field name="partner_id" ref="of_web_api.of_api_partner"/>
+        </record>
+
+    </data>
+
+</odoo>
