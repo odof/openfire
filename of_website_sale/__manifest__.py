@@ -14,6 +14,7 @@ Module OpenFire pour e-commerce
     'depends': [
         'website_sale',
         'website_sale_options',
+        'of_sale',
         'of_account_tax',
         'of_website_portal',
     ],

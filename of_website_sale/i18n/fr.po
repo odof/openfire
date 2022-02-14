@@ -1,0 +1,175 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_website_sale
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-02-14 14:47+0000\n"
+"PO-Revision-Date: 2022-02-14 14:47+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_website_sale
+#: model:ir.ui.view,arch_db:of_website_sale.of_website_sale_config_settings_view_form
+msgid "(OF) Liste de prix B2B par défaut"
+msgstr "(OF) Liste de prix B2B par défaut"
+
+#. module: of_website_sale
+#: model:ir.ui.view,arch_db:of_website_sale.of_website_sale_config_settings_view_form
+msgid "(OF) Liste de prix B2C par défaut"
+msgstr "(OF) Liste de prix B2C par défaut"
+
+#. module: of_website_sale
+#: model:ir.ui.view,arch_db:of_website_sale.of_website_sale_config_settings_view_form
+msgid "(OF) Position fiscale B2B par défaut"
+msgstr "(OF) Position fiscale B2B par défaut"
+
+#. module: of_website_sale
+#: model:ir.ui.view,arch_db:of_website_sale.of_website_sale_config_settings_view_form
+msgid "(OF) Position fiscale B2C par défaut"
+msgstr "(OF) Position fiscale B2C par défaut"
+
+#. module: of_website_sale
+#: model:ir.model,name:of_website_sale.model_res_groups
+msgid "Access Groups"
+msgstr "Groupes d'accès"
+
+#. module: of_website_sale
+#: model:ir.ui.view,arch_db:of_website_sale.of_website_sale_website_sale_recommended_products
+msgid "Articles qui pourraient vous plaire"
+msgstr "Articles qui pourraient vous plaire"
+
+#. module: of_website_sale
+#: model:ir.ui.view,arch_db:of_website_sale.of_website_sale_product_template_form_view
+msgid "Cette note sera affichée sur la fiche produit du site internet."
+msgstr "Cette note sera affichée sur la fiche produit du site internet."
+
+#. module: of_website_sale
+#: model:ir.model,name:of_website_sale.model_account_abstract_payment
+msgid "Contains the logic shared between models which allows to register payments"
+msgstr "Contient la logique partagée entre les modèles qui permet d'enregistrer les paiements"
+
+#. module: of_website_sale
+#: model:ir.ui.view,arch_db:of_website_sale.of_website_sale_product_template_form_view
+msgid "Description pour le site internet"
+msgstr "Description pour le site internet"
+
+#. module: of_website_sale
+#: model:ir.model.fields,field_description:of_website_sale.field_delivery_carrier_website_name
+#: model:ir.model.fields,field_description:of_website_sale.field_product_product_website_name
+#: model:ir.model.fields,field_description:of_website_sale.field_product_template_website_name
+msgid "Dénomination site web"
+msgstr "Dénomination site web"
+
+#. module: of_website_sale
+#: model:ir.model.fields,field_description:of_website_sale.field_website_config_settings_of_pricelist_b2b_id
+#: model:ir.model.fields,field_description:of_website_sale.field_website_of_pricelist_b2b_id
+msgid "Liste de prix B2B"
+msgstr "Liste de prix B2B"
+
+#. module: of_website_sale
+#: model:ir.model.fields,field_description:of_website_sale.field_website_config_settings_of_pricelist_b2c_id
+#: model:ir.model.fields,field_description:of_website_sale.field_website_of_pricelist_b2c_id
+#: model:product.pricelist,name:of_website_sale.product_pricelist_b2c
+msgid "Liste de prix B2C"
+msgstr "Liste de prix B2C"
+
+#. module: of_website_sale
+#: model:ir.model.fields,field_description:of_website_sale.field_payment_acquirer_of_payment_mode_id
+msgid "Mode de paiment"
+msgstr "Mode de paiment"
+
+#. module: of_website_sale
+#: model:ir.model,name:of_website_sale.model_payment_acquirer
+msgid "Payment Acquirer"
+msgstr "Intermédiaire de Paiement"
+
+#. module: of_website_sale
+#: model:ir.model,name:of_website_sale.model_payment_transaction
+msgid "Payment Transaction"
+msgstr "Transaction"
+
+#. module: of_website_sale
+#: model:ir.ui.view,arch_db:of_website_sale.of_website_sale_config_settings_view_form
+msgid "Portail B2B"
+msgstr "Portail B2B"
+
+#. module: of_website_sale
+#: model:ir.ui.view,arch_db:of_website_sale.of_website_sale_config_settings_view_form
+#: model:res.groups,name:of_website_sale.group_portal_b2c
+msgid "Portail B2C"
+msgstr "Portail B2C"
+
+#. module: of_website_sale
+#: model:ir.model.fields,field_description:of_website_sale.field_website_config_settings_of_fiscal_position_b2b_id
+#: model:ir.model.fields,field_description:of_website_sale.field_website_of_fiscal_position_b2b_id
+msgid "Position fiscale B2B"
+msgstr "Position fiscale B2B"
+
+#. module: of_website_sale
+#: model:ir.model.fields,field_description:of_website_sale.field_website_config_settings_of_fiscal_position_b2c_id
+#: model:ir.model.fields,field_description:of_website_sale.field_website_of_fiscal_position_b2c_id
+msgid "Position fiscale B2C"
+msgstr "Position fiscale B2C"
+
+#. module: of_website_sale
+#: model:ir.ui.view,arch_db:of_website_sale.of_website_sale_product_template_form_view_group_website_multi_image
+msgid "Product Images"
+msgstr "Images de l'article"
+
+#. module: of_website_sale
+#: model:ir.ui.view,arch_db:of_website_sale.of_website_sale_website_sale_product
+msgid "Product Name"
+msgstr "Nom de l'article"
+
+#. module: of_website_sale
+#: model:ir.model,name:of_website_sale.model_product_template
+msgid "Product Template"
+msgstr "Modèle d'article"
+
+#. module: of_website_sale
+#: model:ir.model,name:of_website_sale.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_website_sale
+#: model:ir.ui.view,arch_db:of_website_sale.of_website_sale_product_template_website_form_view
+msgid "Suggestions fiche article"
+msgstr "Suggestions fiche article"
+
+#. module: of_website_sale
+#: model:ir.ui.view,arch_db:of_website_sale.of_website_sale_product_template_website_form_view
+msgid "Suggestions panier"
+msgstr "Suggestions panier"
+
+#. module: of_website_sale
+#: model:ir.ui.view,arch_db:of_website_sale.of_website_sale_product_template_website_sale_options_form_view
+msgid "Suggestions pop-up"
+msgstr "Suggestions pop-up"
+
+#. module: of_website_sale
+#: model:ir.model,name:of_website_sale.model_res_users
+msgid "Users"
+msgstr "Utilisateurs"
+
+#. module: of_website_sale
+#: model:ir.model,name:of_website_sale.model_website
+msgid "Website"
+msgstr "Site Web"
+
+#. module: of_website_sale
+#: model:ir.ui.view,arch_db:of_website_sale.of_website_sale_product_template_form_view_group_website_multi_image
+msgid "Website images"
+msgstr "Images site web"
+
+#. module: of_website_sale
+#: model:ir.model,name:of_website_sale.model_website_config_settings
+msgid "website.config.settings"
+msgstr "website.config.settings"
+
