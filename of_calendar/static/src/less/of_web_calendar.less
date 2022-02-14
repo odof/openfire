@@ -111,14 +111,7 @@
 
 // sur certains navigateurs, en mode jour, la scrollbar arrive après les calculs de largeur d'events de participants.
 // par effet boule de neige, ça rend les events de participants très fins quand on a beaucoup de colonnes.
-.o_web_client {
-    >.o_main {
-        > .o_main_content {
-            > .o_content {
-                scrollbar-width: none;
-                scrollbar-gutter: stable;
-            }
-        }
-    }
+.of_scroll_hidden {
+    scrollbar-width: none;
+    scrollbar-gutter: stable;
 }
-

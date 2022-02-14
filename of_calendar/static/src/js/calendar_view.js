@@ -11,6 +11,7 @@ var form_common = require('web.form_common');
 var widgets = require('web_calendar.widgets');
 var Model = require('web.DataModel');
 var Widget = require('web.Widget');
+var View = require('web.View');
 var formats = require("web.formats");
 var utils = require("web.utils");
 var time = require('web.time');
@@ -52,6 +53,26 @@ function hexToRgb(hex, mod) {
     }
     return result;
 }
+
+View.include({
+    /**
+     * When we go from one view to another, "o_content" element isn't always rebuilt.
+     * We need to take out "of_scroll_hidden" if view is not calendar.
+     * we want scrollbar hidden for mode day, else scrollbar appears after calculation of attendee columns width.
+     * and ruins it in case of many attendees shown
+     *
+     * @returns {jQuery.Deferred or any}
+     */
+    start: function() {
+        var $content = $(".o_content");
+        if (this.template == "CalendarView") {
+            $content.addClass("of_scroll_hidden");
+        }else{
+            $content.removeClass("of_scroll_hidden");
+        }
+        return $.when(this._super());
+    },
+});
 
 CalendarView.include({
     custom_events: {
@@ -179,7 +200,6 @@ CalendarView.include({
      */
     start: function() {
         var self = this;
-        //return self._super.apply(self, arguments)
         var all_filters_dfd = $.Deferred();
         var all_filters_prom = all_filters_dfd.promise();
         if (self.attendee_model && self.show_all_attendees && !self.useContacts) {
