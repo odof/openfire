@@ -929,7 +929,7 @@ class SaleOrderLine(models.Model):
                             ('res_id', '=', line.product_id.product_tmpl_id.id),
                         '&',
                             ('res_model', '=', 'product.product'),
-                            ('res_id', '=', product_ids.id),
+                            ('res_id', 'in', product_ids.ids),
                     ('mimetype', '=', 'application/pdf')
                 ]
             attachment_ids = attachment_obj.search(domain)
