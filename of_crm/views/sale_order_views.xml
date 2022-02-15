@@ -57,7 +57,7 @@
                                         <header>
                                             <field name="load_attachment" invisible="1"/>
                                             <field name="uploaded_attachment_id" invisible="1"/>
-                                            <button name="action_add_attachment" class="btn btn-sm" type="object" string="Add attachments" 
+                                            <button name="action_add_attachment" class="btn btn-sm" type="object" string="Add attachments"
                                                 attrs="{'invisible': ['|', ('load_attachment', '=', False), ('uploaded_attachment_id', '!=', False)]}"/>
                                             <button string="Plan" name="action_plan" type="object" states="cancelled,done"/>
                                             <button string="Complete" name="action_complete" type="object" class="oe_highlight" states="planned"/>
@@ -92,9 +92,9 @@
                                             context="{'close_and_reload': True'}"/>
                                         <button name="action_plan" icon="fa-undo" type="object" string="Plan"
                                             attrs="{'invisible': [('state', '=', 'planned')]}" context="{'close_and_reload': True'}"/>
-                                        <button name="action_complete" icon="fa-check" type="object" string="Complete" 
+                                        <button name="action_complete" icon="fa-check" type="object" string="Complete"
                                             attrs="{'invisible': [('state', '!=', 'planned')]}" context="{'close_and_reload': True'}"/>
-                                        <button name="action_cancel" icon="fa-close" type="object" string="Cancel" 
+                                        <button name="action_cancel" icon="fa-close" type="object" string="Cancel"
                                             attrs="{'invisible': [('state', '!=', 'planned')]}" context="{'close_and_reload': True'}"/>
                                     </tree>
                                 </field>
@@ -195,6 +195,17 @@
                 </xpath>
                 <xpath expr="//field[@name='payment_term_id']" position="after">
                         <field name="of_info"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_crm_of_sale_order_line_tree" model="ir.ui.view">
+            <field name="name">of.crm.of.sale.order.line.tree</field>
+            <field name="model">sale.order.line</field>
+            <field name="inherit_id" ref="of_sale.of_sale_order_line_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='price_subtotal']" position="after">
+                    <field name="of_amount_to_invoice"/>
                 </xpath>
             </field>
         </record>
