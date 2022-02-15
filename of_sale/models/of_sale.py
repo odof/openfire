@@ -1162,8 +1162,9 @@ class SaleOrderLine(models.Model):
         return super(SaleOrderLine, self.filtered(lambda line: not line._additionnal_tax_verifications())).\
             _compute_tax_id()
 
-    @api.depends('state', 'product_uom_qty', 'qty_delivered', 'qty_to_invoice', 'qty_invoiced',
-                 'order_id.of_invoice_policy', 'order_id.partner_id.of_invoice_policy')
+    @api.depends(
+        'state', 'product_uom_qty', 'qty_delivered', 'qty_to_invoice', 'qty_invoiced', 'order_id.of_invoice_policy',
+        'order_id.partner_id.of_invoice_policy', 'order_id.of_force_invoice_status')
     def _compute_invoice_status(self):
         """
         Compute the invoice status of a SO line. Possible statuses:
@@ -1180,18 +1181,21 @@ class SaleOrderLine(models.Model):
         """
         precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
         for line in self:
-            invoice_policy = line.of_invoice_policy
-            if line.state not in ('sale', 'done'):
-                line.invoice_status = 'no'
-            elif not float_is_zero(line.qty_to_invoice, precision_digits=precision):
-                line.invoice_status = 'to invoice'
-            elif line.state == 'sale' and invoice_policy == 'order' and \
-                    float_compare(line.qty_delivered, line.product_uom_qty, precision_digits=precision) == 1:
-                line.invoice_status = 'upselling'
-            elif float_compare(line.qty_invoiced, line.product_uom_qty, precision_digits=precision) >= 0:
-                line.invoice_status = 'invoiced'
+            if line.order_id.of_force_invoice_status:
+                line.invoice_status = line.order_id.of_force_invoice_status
             else:
-                line.invoice_status = 'no'
+                invoice_policy = line.of_invoice_policy
+                if line.state not in ('sale', 'done'):
+                    line.invoice_status = 'no'
+                elif not float_is_zero(line.qty_to_invoice, precision_digits=precision):
+                    line.invoice_status = 'to invoice'
+                elif line.state == 'sale' and invoice_policy == 'order' and \
+                        float_compare(line.qty_delivered, line.product_uom_qty, precision_digits=precision) == 1:
+                    line.invoice_status = 'upselling'
+                elif float_compare(line.qty_invoiced, line.product_uom_qty, precision_digits=precision) >= 0:
+                    line.invoice_status = 'invoiced'
+                else:
+                    line.invoice_status = 'no'
 
     @api.depends('qty_invoiced', 'qty_delivered', 'product_uom_qty', 'order_id.state',
                  'order_id.of_invoice_policy', 'order_id.partner_id.of_invoice_policy')

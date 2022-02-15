@@ -10,8 +10,12 @@
                 <field name="invoiced_total" type="measure"/>
                 <field name="invoiced_turnover_budget" type="measure"/>
                 <field name="previous_invoiced_total" type="measure"/>
+                <field name="margin_perc" type="measure"/>
+                <field name="amount_to_invoice" type="measure"/>
+                <field name="residual" type="measure"/>
                 <field name="invoiced_total_comparison" type="measure"/>
                 <field name="invoiced_turnover_budget_comparison" type="measure"/>
+                <field name="invoiced_turnover_budget_gap" type="measure"/>
             </pivot>
         </field>
     </record>
@@ -21,6 +25,7 @@
         <field name="model">of.invoiced.revenue.analysis</field>
         <field name="arch" type="xml">
             <search>
+                <field name="partner_id"/>
                 <field name="company_id"/>
                 <field name="vendor_id"/>
                 <filter string="Mois en cours" name="this_month"
