@@ -13,12 +13,6 @@ from datetime import datetime, timedelta
 PLANNING_VIEW = ('planning', 'Planning')
 
 
-class HREmployee(models.Model):
-    _inherit = 'hr.employee'
-
-    of_est_commercial = fields.Boolean(string=u"Est commercial")
-
-
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
