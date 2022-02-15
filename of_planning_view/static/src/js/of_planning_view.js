@@ -1619,7 +1619,9 @@ var PlanningCreneauDispo = Widget.extend({
     action_creer_rdv: function() {
         var self = this;
         var action_id = "of_planning_view.action_view_of_planning_intervention_form_wizard"
-        var la_date = new Date(self.date + " " + self.heure_debut_str + ":00" + self.row.tz_offset);
+        // contournement : "new Date(xxx)" n'est pas supporté par safari et IE
+        var la_date = moment(self.date + " " + self.heure_debut_str + ":00" + self.row.tz_offset);
+        var la_date = la_date._d;
 
         var additional_context = _.extend(self.view.dataset.context, {
             "default_employee_ids": [[6, 0, [self.row.res_id]]],
