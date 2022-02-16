@@ -369,11 +369,12 @@ class OfPlanningIntervention(models.Model):
         fetch = cr.fetchall()
         if fetch:
             ids = [tup[0] for tup in fetch]
-            cr.execute("UPDATE of_planning_intervention ofp "
-                       "SET warehouse_id = sw.id "
-                       "FROM stock_warehouse sw "
-                       "WHERE sw.company_id = ofp.company_id "
-                       "  AND ofp.id IN %s", (tuple(ids),))
+            cr.execute(
+                "UPDATE of_planning_intervention ofp "
+                "SET warehouse_id = rc.of_default_warehouse_id "
+                "FROM res_company rc "
+                "WHERE rc.id = ofp.company_id "
+                "  AND ofp.id IN %s", (tuple(ids),))
         if not exists:
             records_to_update = self.search([('description', '!=', False)])
             for rec in records_to_update:
@@ -1277,10 +1278,10 @@ class OfPlanningIntervention(models.Model):
             warehouse_id = self.env['stock.warehouse'].search([('company_id', '=', company_id)], limit=1)
             if not warehouse_id:
                 warehouse_id = self.env['stock.warehouse'].search([], limit=1)
-            self.warehouse_id = warehouse_id
+            self.warehouse_id = warehouse_id.of_default_warehouse_id
             template_accounting = self.template_id.sudo().with_context(force_company=company_id)
             tache_accounting = self.tache_id.sudo().with_context(force_company=company_id)
-            # La société a changée, dans tous les cas on change la position fiscale
+            # La société a changé, dans tous les cas on change la position fiscale
             if template_accounting.fiscal_position_id:
                 self.fiscal_position_id = template_accounting.fiscal_position_id
             elif tache_accounting.fiscal_position_id:
