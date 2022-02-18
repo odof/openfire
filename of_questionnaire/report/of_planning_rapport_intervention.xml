@@ -4,42 +4,31 @@
     <template id="of_questionnaire_rapport_intervention_report_template" inherit_id="of_service_parc_installe.of_service_parc_installe_rapport_intervention_report_template">
         <!-- L'impression de ce rapport peut être déclenché des devis/commandes ou du planning.
         L'affichage diffère selon l'origine. -->
-        <xpath expr="//div[@name='invoicing']" position="after">
-            <div name="questions" style="width: 100%; page-break-inside: avoid;">
-                <t t-if="template.ri_surveys and template.ri_surveys_rdv and o.question_ids" name="questionnaire_rdv">
-                    <div class="row h4 mb4">
-                        <div class="col-xs-12">
-                            <strong>Questionnaire</strong>
-                        </div>
+        <xpath expr="//div[@name='ri_invoicing']" position="after">
+            <div t-if="template.ri_surveys and o.question_ids" name="ri_surveys">
+                <div class="row h4 mb4" name="title_surveys">
+                    <div class="col-xs-12">
+                        <strong>Questionnaire d'intervention</strong>
                     </div>
-                    <div class="row"
-                         style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
-                        <t t-set="lines" t-value="o.question_ids and o._filter_answers_category(o.question_ids.filtered(lambda q: q.type == 'intervention'))"/>
-                        <t t-foreach="lines" t-as="q">
-                            <div class="col-xs-12" style="display: table; padding: 0px;">
-                                <div style="display: table-cell;">
-                                    <div class="h5" style="padding: 7px 16px; margin-bottom: 5px; background-color: lightgray; border-bottom: 1px solid lightgray;">
-                                        <strong><span t-esc="q[0]"/></strong>
-                                    </div>
+                </div>
+                <t t-set="first" t-value="True"/>
+                <div class="row"
+                     style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%;">
+                    <t t-foreach="o.question_ids.filtered(lambda q: q.answer_type not in ['photo', 'drawing'])" t-as="question">
+                        <div class="col-xs-12" style="display: table; padding: 0px;">
+                            <div style="display: table-cell;" t-attf-style="#{'' if first else 'border-top: 1px solid lightgray;'}">
+                                <!-- Questions -->
+                                <div class="h5" style="padding: 0px 16px;">
+                                    <strong><span t-field="question.name"/><span>&amp;nbsp;:</span></strong>
+                                    <span t-field="question.definitive_answer"/>
                                 </div>
                             </div>
-                            <t t-set="first" t-value="True"/>
-                            <t t-foreach="q[1][1]" t-as="question">
-                                <div class="col-xs-12" style="display: table; padding: 0px;">
-                                    <div style="display: table-cell;" t-attf-style="#{'' if first else 'border-top: 1px solid lightgray;'}">
-                                        <div class="h5" style="padding: 0px 16px;">
-                                            <strong><span t-esc="question[0]"/><span>&amp;nbsp;:</span></strong>
-                                            <span t-esc="question[1]"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <t t-if="first">
-                                    <t t-set="first" t-value="False"/>
-                                </t>
+                            <t t-if="first">
+                                <t t-set="first" t-value="False"/>
                             </t>
-                        </t>
-                    </div>
-                </t>
+                        </div>
+                    </t>
+                </div>
             </div>
         </xpath>
     </template>

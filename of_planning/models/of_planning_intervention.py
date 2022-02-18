@@ -553,6 +553,8 @@ class OfPlanningIntervention(models.Model):
     procurement_group_id = fields.Many2one('procurement.group', 'Procurement Group', copy=False)
     picking_ids = fields.One2many(comodel_name='stock.picking', compute="_compute_pickings", string=u"BL associés")
     delivery_count = fields.Integer(string="Nbr Bl", compute="_compute_pickings")
+    historique_rdv_ids = fields.One2many(
+        comodel_name='of.planning.intervention', compute="_compute_historique_rdv_ids", string="Historique")
 
     do_deliveries = fields.Boolean(string=u"Utilisation des BL", compute='_compute_do_deliveries')
     flexible = fields.Boolean(string="Flexible")
@@ -980,6 +982,17 @@ class OfPlanningIntervention(models.Model):
                 pickings = rdv.line_ids.mapped('procurement_ids').mapped('move_ids').mapped('picking_id')
                 rdv.picking_ids = pickings
                 rdv.delivery_count = len(pickings)
+
+    @api.depends('partner_id', 'address_id')
+    def _compute_historique_rdv_ids(self):
+        for interv in self:
+            if interv.address_id:
+                interventions = interv.address_id.intervention_address_ids
+            elif interv.partner_id:
+                interventions = interv.partner_id.intervention_partner_ids
+            else:
+                continue
+            interv.historique_rdv_ids = interventions.filtered(lambda i: interv.date_date > i.date_date)
 
     def _compute_do_deliveries(self):
         option = self.env['ir.values'].get_default('of.intervention.settings', 'do_deliveries')
@@ -1812,6 +1825,19 @@ class OfPlanningIntervention(models.Model):
             views += [(view[0], view[1]) for view in action['views'] if view[1] != 'tree']
             action['views'] = views
         return action
+
+    @api.multi
+    def pickings_layouted(self):
+        pickings_layouted = []
+        pickings = self.mapped('picking_id') + self.mapped('picking_ids')
+        for picking in pickings:
+            if picking.pack_operation_product_ids:
+                pickings_layouted.append({
+                    'name' : picking.name,
+                    'lines': picking.pack_operation_product_ids,
+                    })
+        return pickings_layouted
+
 
 
 class OfPlanningInterventionLine(models.Model):

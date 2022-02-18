@@ -9,68 +9,9 @@
         <!-- Fiche d'intervention -->
         <field name="fi_default">False</field>
         <field name="fi_title">Fiche d'intervention</field>
-        <!-- fi - Commande -->
-        <field name="fi_order">True</field>
-        <field name="fi_order_client">True</field>
-        <field name="fi_order_name">True</field>
-        <field name="fi_order_confirmation_date">False</field>
-        <field name="fi_order_interv_label">True</field>
-        <field name="fi_order_company">False</field>
-        <field name="fi_order_seller">False</field>
-        <!-- fi - Articles -->
-        <field name="fi_products">True</field>
-        <field name="fi_products_order">True</field>
-        <!-- fi - Questionnaire -->
-<!--        <field name="fi_surveys">True</field>-->
-<!--        <field name="fi_surveys_rdv">True</field>-->
-        <!-- fi - Rdv d'intervention -->
-        <field name="fi_rdv">True</field>
-        <field name="fi_rdv_date_start">True</field>
-        <field name="fi_rdv_date_end">True</field>
-        <field name="fi_rdv_task">True</field>
-        <field name="fi_rdv_task_description">True</field>
-        <field name="fi_rdv_duration">True</field>
-        <field name="fi_rdv_tech">True</field>
-        <field name="fi_rdv_address">True</field>
-        <field name="fi_rdv_mail">True</field>
-        <field name="fi_rdv_phone">True</field>
-        <!-- fi - Descriptions -->
-        <field name="fi_description">True</field>
-        <field name="fi_description_ext">True</field>
-        <!-- fi - Parc installé -->
-<!--        <field name="fi_pi">True</field>-->
-<!--        <field name="fi_pi_serial">True</field>-->
-<!--        <field name="fi_pi_product">True</field>-->
-<!--        <field name="fi_pi_brand">True</field>-->
-<!--        <field name="fi_pi_model">True</field>-->
-<!--        <field name="fi_pi_installation_date">True</field>-->
-<!--        <field name="fi_pi_state">True</field>-->
-<!--        <field name="fi_pi_notes">True</field>-->
-        <!-- fi - Facturation -->
-        <field name="fi_invoicing">True</field>
-        <field name="fi_invoicing_ht">True</field>
-        <field name="fi_invoicing_taxes">True</field>
-        <field name="fi_invoicing_ttc">True</field>
-
         <!-- Rapport d'intervention -->
-        <field name="ri_default">True</field>
+        <field name="ri_default">False</field>
         <field name="ri_title">Rapport d'intervention</field>
-        <!-- RI - Rdv d'intervention -->
-        <field name="ri_rdv">True</field>
-        <field name="ri_rdv_lib">True</field>
-        <field name="ri_rdv_tech">True</field>
-        <field name="ri_rdv_date_start">False</field>
-        <field name="ri_rdv_date_end">True</field>
-        <field name="ri_rdv_duration">False</field>
-        <field name="ri_rdv_task">False</field>
-        <field name="ri_rdv_task_description">False</field>
-        <!-- RI - Facturation -->
-        <field name="ri_invoicing">True</field>
-        <!-- RI - Notes -->
-        <field name="ri_notes">False</field>
-        <field name="ri_notes_desc">False</field>
-        <!-- RI - Mentions légales -->
-        <field name="ri_legal">True</field>
 
     </record>
 

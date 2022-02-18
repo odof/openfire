@@ -1,13 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <record id="paperformat_euro_portrait_custom2" model="report.paperformat">
+        <field name="name">European A4 Custom Portrait</field>
+        <field name="default" eval="True" />
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">28</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">12</field>
+        <field name="margin_right">12</field>
+        <field name="header_line" eval="False" />
+        <field name="header_spacing">18</field>
+        <field name="dpi">90</field>
+    </record>
+
     <!-- Action imprimer dans le planning d'intervention -->
     <report id="of_planning_fiche2_intervention_report"
             string="Fiche d'intervention"
             model="of.planning.intervention"
             report_type="qweb-pdf"
             name="of_planning.of_planning_fiche2_intervention_report_big_template"
-            paperformat="report.paperformat_euro">
+            paperformat="paperformat_euro_portrait_custom2">
     </report>
 
     <!-- Template pour planning -->
@@ -21,13 +37,48 @@
         model="sale.order"
         report_type="qweb-pdf"
         name="of_planning.of_sale_order2_fiche_intervention_report_template"
-        paperformat="report.paperformat_euro">
+        paperformat="paperformat_euro_portrait_custom2">
     </report>
 
     <!-- Template pour devis/commandes -->
     <template id="of_sale_order2_fiche_intervention_report_template">
         <t t-set="docs" t-value="docs.with_context(of_from_sale_order=True)"/>
         <t t-call="of_planning.of_planning_fiche2_intervention_report_template"/>
+    </template>
+
+    <!-- planning internal layout -->
+    <template id="of_planning.of_internal_layout2">
+        <!-- Multi-sociétés -->
+        <t t-if="o and o.company_id"><t t-set="company" t-value="o.company_id"/></t>
+        <t t-elif="order and order.company_id"><t t-set="company" t-value="order.company_id"/></t>
+        <t t-else=""><t t-set="company" t-value="res_company"/></t>
+        <!-- Header -->
+        <div class="header">
+            <div class="row">
+                <div class="col-xs-3 text-center">
+                    <div style="max-width: 90%; max-height: 90%; vertical-align: middle;">
+                        <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo" style="max-width: 100%; max-height: 80px;"/>
+                    </div>
+                </div>
+                <div class="h4 col-xs-6 text-center" style="padding-top: 2px">
+                    <div>
+                        <span t-field="template.fi_title"/>
+                        <span t-if="template.fi_date_date and o.date_date"> du </span>
+                        <span t-if="template.fi_date_date and o.date_date" t-field="o.date_date"/>
+                    </div>
+                    <t t-if="template.fi_partner_id and o.address_id">
+                        <strong><div style="max-width: 100%; padding-top: 10px" t-field="o.address_id"/></strong>
+                    </t>
+                </div>
+                <div class="h5 col-xs-3 text-right" style="vertical-align: top;">
+                    <t t-if="order">
+                        <span>Commande&amp;nbsp;: </span>
+                        <span t-field="order.name"/>
+                    </t>
+                </div>
+            </div>
+        </div>
+        <t t-raw="0"/>
     </template>
 
     <template id="of_planning_fiche2_intervention_report_template">
@@ -43,371 +94,598 @@
             <t t-foreach="documents" t-as="vals">
                 <t t-set="o" t-value="vals[0]"/>
                 <t t-set="order" t-value="vals[1]"/>
-                <t t-set="template" t-value="o.template_id or o.env.ref('of_planning.of_planning_default_intervention_template', raise_if_not_found=False) or o.template_id"/>
+                <t t-set="template" t-value="o.template_id or o.env.ref('of_planning.of_planning_default_intervention_template', raise_if_not_found=False) or o.template_id" name="get_template"/>
                 <t t-set="o" t-value="o.with_context(of_report_name=template.fi_title)"/>
                 <t t-if="not o and order and order.company_id"><t t-set="res_company" t-value="order.company_id"/></t>
-                <t t-call="report.external_layout">
+                <t t-call="of_planning.of_internal_layout2">
                     <div class="page">
                         <t t-if="template">
-                            <div name="first" style="width: 100%; page-break-inside: avoid;">
-                                <div name="order" style="width: 47%; float: left; page-break-inside: avoid;">
-                                    <t t-if="template.fi_order and order">
-                                        <div class="row h4 mb4">
-                                            <div class="col-xs-12">
-                                                <strong>Commande</strong>
-                                            </div>
-                                        </div>
-                                        <div class="row"
-                                             style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
-                                            <div class="col-xs-12" style="display: table; padding: 0px;">
-                                                <div style="display: table-cell;">
-                                                    <!-- Client -->
-                                                    <t t-if="template.fi_order_client and order.partner_id">
-                                                        <div class="h5" style="padding: 0px 16px;">
-                                                            <strong><span>Client&amp;nbsp;:</span></strong>
-                                                            <span t-field="order.partner_id.name"/>
-                                                        </div>
-                                                    </t>
-                                                    <!-- Nom de la commande -->
-                                                    <t t-if="template.fi_order_name and order.name">
-                                                        <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
-                                                        <div class="h5" style="padding: 0px 16px;">
-                                                            <strong><span>Commande associée&amp;nbsp;:</span></strong>
-                                                            <span t-field="order.name"/>
-                                                        </div>
-                                                    </t>
-                                                    <!-- Date de confirmation -->
-                                                    <t t-if="template.fi_order_confirmation_date and order.confirmation_date">
-                                                        <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
-                                                        <div class="h5" style="padding: 0px 16px;">
-                                                            <strong><span>Date de confirmation&amp;nbsp;:</span></strong>
-                                                            <span t-field="order.confirmation_date"/>
-                                                        </div>
-                                                    </t>
-                                                    <!-- Libellé de l'intervention -->
-                                                    <t t-if="template.fi_order_interv_label and o.name">
-                                                        <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
-                                                        <div class="h5" style="padding: 0px 16px;">
-                                                            <strong><span>Libellé&amp;nbsp;:</span></strong>
-                                                            <span t-field="o.name"/>
-                                                        </div>
-                                                    </t>
-                                                    <!-- Magasin -->
-                                                    <t t-if="template.fi_order_company and order.company_id">
-                                                        <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
-                                                        <div class="h5" style="padding: 0px 16px;">
-                                                            <strong><span>Magasin&amp;nbsp;:</span></strong>
-                                                            <span t-field="order.company_id.name"/>
-                                                        </div>
-                                                    </t>
-                                                    <!-- Vendeur -->
-                                                    <t t-if="template.fi_order_seller and order.user_id">
-                                                        <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
-                                                        <div class="h5" style="padding: 0px 16px;">
-                                                            <strong><span>Vendeur&amp;nbsp;:</span></strong>
-                                                            <span t-field="order.user_id.name"/>
-                                                        </div>
-                                                    </t>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </t>
+                            <!-- Intervention -->
+                            <div t-if="template.fi_rdv" name="fi_rdv">
+                                <div name="title_rdv" class="row h4 mb4">
+                                    <div class="col-xs-12"><strong>Intervention</strong></div>
                                 </div>
-                                <div name="invoicing" style="width: 47%; float: right; page-break-inside: avoid;">
-                                    <t t-if="template.fi_invoicing and o">
-                                        <div class="row h4 mb4">
-                                            <div class="col-xs-12">
-                                                <strong>Facturation</strong>
-                                            </div>
-                                        </div>
-                                        <div class="row"
-                                             style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
-                                            <div class="col-xs-12" style="display: table; padding: 0px;">
-                                                <div style="display: table-cell;">
-                                                    <!-- Total HT -->
-                                                    <t t-if="template.fi_invoicing_ht">
-                                                        <div class="h5" style="padding: 0px 16px;">
-                                                            <strong><span>Total HT&amp;nbsp;:</span></strong>
-                                                            <span t-field="o.price_subtotal"/>
-                                                        </div>
-                                                    </t>
-                                                    <!-- Taxes -->
-                                                    <t t-if="template.fi_invoicing_taxes">
-                                                        <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
-                                                        <div class="h5" style="padding: 0px 16px;">
-                                                            <strong><span>Taxes&amp;nbsp;:</span></strong>
-                                                            <span t-field="o.price_tax"/>
-                                                        </div>
-                                                    </t>
-                                                    <!-- Total TTC -->
-                                                    <t t-if="template.fi_invoicing_ttc">
-                                                        <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
-                                                        <div class="h5" style="padding: 0px 16px;">
-                                                            <strong><span>Total TTC&amp;nbsp;:</span></strong>
-                                                            <span t-field="o.price_total"/>
-                                                        </div>
-                                                    </t>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </t>
-                                </div>
-                            </div>
-                            <div class="row" style="margin-bottom: 12px; width: 100%; "/>
-                            <div name="second" style="width: 100%; page-break-inside: avoid;">
-                                <t t-if="template.fi_rdv and o">
-                                    <div class="row h4 mb4">
-                                        <div class="col-xs-12">
-                                            <strong>Intervention</strong>
-                                        </div>
-                                    </div>
-                                    <div class="row" style="margin-bottom: 4px; width: 100%; "/>
-                                    <div name="intervention" style="width: 47%; float: left; page-break-inside: avoid;">
-                                        <div class="row"
-                                             style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
-                                            <div class="col-xs-12" style="display: table; padding: 0px;">
-                                                <div style="display: table-cell;">
-                                                    <!-- Date de début -->
-                                                    <t t-if="template.fi_rdv_date_start and o.date">
-                                                        <div class="h5" style="padding: 0px 16px;">
-                                                            <strong><span>Date de début&amp;nbsp;:</span></strong>
-                                                            <span t-field="o.date"/>
-                                                        </div>
-                                                    </t>
-                                                    <!-- Date de fin -->
-                                                    <t t-if="template.fi_rdv_date_end and o.date_deadline">
-                                                        <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
-                                                        <div class="h5" style="padding: 0px 16px;">
-                                                            <strong><span>Date de fin&amp;nbsp;:</span></strong>
-                                                            <span t-field="o.date_deadline"/>
-                                                        </div>
-                                                    </t>
-                                                    <!-- Tâche -->
-                                                    <t t-if="template.fi_rdv_task and o.tache_id">
-                                                        <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
-                                                        <div class="h5" style="padding: 0px 16px;">
-                                                            <strong><span>Tâche&amp;nbsp;:</span></strong>
-                                                            <span t-field="o.tache_id.name"/>
-                                                        </div>
-                                                    </t>
-                                                    <!-- description de la tâche -->
-                                                    <t t-if="template.fi_rdv_task_description and o.tache_id and o.tache_id.description">
-                                                        <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
-                                                        <div class="h5" style="padding: 0px 16px;">
-                                                            <strong><span>Description de la tâche&amp;nbsp;:</span></strong>
-                                                            <span t-field="o.tache_id.description"/>
-                                                        </div>
-                                                    </t>
-                                                    <!-- Durée -->
-                                                    <t t-if="template.fi_rdv_duration and o.duree">
-                                                        <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
-                                                        <div class="h5" style="padding: 0px 16px;">
-                                                            <strong><span>Durée&amp;nbsp;:</span></strong>
-                                                            <span t-field="o.duree" t-field-options='{"widget": "duration", "unit": "hour", "round": "minute"}'/>
-                                                        </div>
-                                                    </t>
-                                                    <!-- Technicien(s) -->
-                                                    <t t-if="template.fi_rdv_tech and o.employee_ids">
-                                                        <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
-                                                        <div class="h5" style="padding: 0px 16px;">
-                                                            <strong><span>Technicien(s)&amp;nbsp;:</span></strong>
-                                                            <t t-foreach="o.employee_ids" t-as="employee">
-                                                                <span t-raw="employee_value.name"/>&amp;nbsp;
-                                                            </t>
-                                                        </div>
-                                                    </t>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <t t-if="o.address_id and (template.fi_rdv_address or (template.fi_rdv_mail and o.address_id.email) or (template.fi_rdv_phone and o.address_id.phone))">
-                                        <div name="adresses" style="width: 47%; float: right; page-break-inside: avoid;">
-                                            <div class="row"
-                                                 style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
-                                                <div class="col-xs-12" style="display: table; padding: 0px;">
-                                                    <div style="display: table-cell;">
-                                                        <!-- Adresses -->
-                                                        <t t-if="template.fi_rdv_address and o.address_id">
-                                                            <div class="h5" style="padding: 0px 16px;">
-                                                                <div><strong>Adresse d'intervention&amp;nbsp;:</strong></div>
-                                                                <t t-if="o.address_id">
-                                                                    <div style="padding-top: 4px" t-field="o.address_id" t-field-options="{'widget': 'contact', 'fields': ['address'], 'no_marker': true }"/>
-                                                                </t>
-                                                                <t t-else="">
-                                                                    <!-- Espace vide pour écrire l'adresse à la main -->
-                                                                    <div>&amp;nbsp;</div>
-                                                                    <div>&amp;nbsp;</div>
-                                                                    <div>&amp;nbsp;</div>
-                                                                </t>
-
-                                                            </div>
+                                <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; margin-bottom: 12px;">
+                                    <div class="col-xs-12" style="display: table; padding: 0px;">
+                                        <div style="display: table-cell; width: 50%;">
+                                            <t t-set="previous_separator" t-value="False"/>
+                                            <div t-if="template.fi_rdv_partner_id and (o.address_id.name or o.partner_id.name)" name="fi_rdv_partner_id">
+                                                <div class="h5" style="padding: 0px 16px;">
+                                                    <t t-set="previous_separator" t-value="True"/>
+                                                    <div>
+                                                        <span>Client&amp;nbsp;:</span>
+                                                        <t t-if="o.address_id.name">
+                                                            <strong><span t-field="o.address_id.name"/></strong>
                                                         </t>
-                                                        <!-- Contacts -->
-                                                        <t t-if="o.address_id and (template.fi_rdv_mail and o.address_id.email or template.fi_rdv_phone and o.address_id.phone)">
-                                                            <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
-                                                            <div class="h5" style="padding: 0px 16px;">
-                                                                <div><strong>Contact&amp;nbsp;:</strong></div>
-                                                                <t t-if="template.fi_rdv_mail and o.address_id.email">
-                                                                    <div t-field="o.address_id.email"/>
-                                                                </t>
-                                                                <t t-if="template.fi_rdv_phone and (o.address_id.phone or o.address_id.mobile)">
-                                                                    <div>
-                                                                        <span t-field="o.address_id.phone"/>
-                                                                        <t t-if="o.address_id.phone and o.address_id.mobile"> - </t>
-                                                                        <span t-field="o.address_id.mobile"/>
-                                                                    </div>
-                                                                </t>
-                                                            </div>
+                                                        <t t-elif="o.partner_id.name">
+                                                            <strong><span t-field="o.partner_id.name"/></strong>
                                                         </t>
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div t-if="template.fi_rdv_partner_code and o.partner_id and o.partner_id.property_account_receivable_id and o.partner_id.property_account_receivable_id.code" name="ri_rdv_partner_code">
+                                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                                <t t-set="previous_separator" t-value="True"/>
+                                                <div class="h5" style="padding: 0px 16px;">
+                                                    <div>
+                                                        <span>Code client&amp;nbsp;:</span>
+                                                        <strong><span t-field="o.partner_id.property_account_receivable_id.code"/></strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div t-if="template.fi_rdv_tache_id and o.tache_id and o.tache_id.name" name="fi_rdv_tache_id">
+                                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                                <t t-set="previous_separator" t-value="True"/>
+                                                <div class="h5" style="padding: 0px 16px;">
+                                                    <div>
+                                                        <span>Tâche&amp;nbsp;:</span>
+                                                        <strong><span t-field="o.tache_id.name"/></strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div t-if="template.fi_rdv_date and o.date" name="fi_rdv_date">
+                                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                                <t t-set="previous_separator" t-value="True"/>
+                                                <div class="h5" style="padding: 0px 16px;">
+                                                    <div>
+                                                        <span>Date d'intervention&amp;nbsp;:</span>
+                                                        <span t-field="o.date"/>&amp;nbsp;-&amp;nbsp;<span t-field="o.date_deadline"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div t-if="template.fi_rdv_duree and o.duree" name="fi_rdv_duree">
+                                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                                <t t-set="previous_separator" t-value="True"/>
+                                                <div class="h5" style="padding: 0px 16px;">
+                                                    <div>
+                                                        <span>Durée&amp;nbsp;:</span>
+                                                        <span t-field="o.duree" t-field-options='{"widget": "duration", "unit": "hour", "round": "minute"}'/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div t-if="template.fi_rdv_employee_ids and o.employee_ids" name="fi_rdv_employee_ids">
+                                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                                <t t-set="previous_separator" t-value="True"/>
+                                                <div class="h5" style="padding: 0px 16px;">
+                                                    <span>Intervenants&amp;nbsp;:</span>
+                                                    <t t-foreach="o.employee_ids" t-as="employee">
+                                                        <span t-raw="employee_value.name"/>&amp;nbsp;
+                                                    </t>
+                                                </div>
+                                            </div>
+                                            <div t-if="template.fi_rdv_type and o.type_id and o.type_id.name" name="fi_rdv_type">
+                                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                                <t t-set="previous_separator" t-value="True"/>
+                                                <div class="h5" style="padding: 0px 16px;">
+                                                    <span>Type&amp;nbsp;de&amp;nbsp;RDV:</span>
+                                                    <span t-field="o.type_id.name"/>
+                                                </div>
+                                            </div>
+                                            <div t-if="template.fi_rdv_company_id and o.company_id and o.company_id.name" name="fi_rdv_company_id">
+                                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                                <t t-set="previous_separator" t-value="True"/>
+                                                <div class="h5" style="padding: 0px 16px;">
+                                                    <span>Magasin&amp;nbsp;:</span>
+                                                    <span t-field="o.company_id.name"/>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </t>
-                                </t>
+                                        <div style="display: table-cell; width: 50%; border-left: 1px solid lightgray">
+                                            <t t-set="previous_separator" t-value="False"/>
+                                            <div t-if="template.fi_rdv_lib and o.name" name="fi_rdv_lib">
+                                                <t t-set="previous_separator" t-value="True"/>
+                                                <div class="h5" style="padding: 0px 16px;">
+                                                    <span>Libellé&amp;nbsp;:</span>
+                                                    <span t-field="o.name"/>
+                                                </div>
+                                            </div>
+                                            <div t-if="template.fi_rdv_address" name="fi_rdv_address">
+                                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;padding: 0px 16px;"/>
+                                                <t t-set="previous_separator" t-value="True"/>
+                                                <div class="h5" style="padding: 0px 16px;">
+                                                    <div><strong>Adresse d'intervention</strong></div>
+                                                    <t t-if="o.address_id">
+                                                        <div style="padding-top: 4px" t-field="o.address_id" t-field-options="{'widget': 'contact', 'fields': ['address'], 'no_marker': true }"/>
+                                                    </t>
+                                                    <t t-elif="order.partner_shipping_id">
+                                                        <div style="padding-top: 4px" t-field="order.partner_shipping_id" t-field-options="{'widget': 'contact', 'fields': ['address'], 'no_marker': true }"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <!-- Espace vide pour écrire l'adresse à la main -->
+                                                        <div>&amp;nbsp;</div>
+                                                        <div>&amp;nbsp;</div>
+                                                        <div>&amp;nbsp;</div>
+                                                    </t>
+                                                </div>
+                                            </div>
+                                            <div t-if="template.fi_rdv_contact and (o.address_id or order.partner_shipping_id)" name="fi_rdv_contact">
+                                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;padding: 0px 16px;"/>
+                                                <t t-set="previous_separator" t-value="True"/>
+                                                <div class="h5" style="padding: 0px 16px;">
+                                                    <div><strong>Contact</strong></div>
+                                                    <t t-if="o.address_id">
+                                                        <div style="padding-top: 4px" t-field="o.address_id" t-field-options="{'widget': 'contact', 'fields': ['name', 'phone', 'mobile']}"/>
+                                                    </t>
+                                                    <t t-elif="order.partner_shipping_id">
+                                                        <div style="padding-top: 4px" t-field="order.partner_shipping_id" t-field-options="{'widget': 'contact', 'fields': ['name', 'phone', 'mobile']}"/>
+                                                    </t>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div t-if="template.fi_rdv_description and o.cleantext_description" name="fi_rdv_desc">
+                                    <div name="title_rdv_description" class="row h4 mb4">
+                                        <div class="col-xs-12"><strong>Description</strong></div>
+                                    </div>
+                                    <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; margin-bottom: 12px;">
+                                        <div t-if="template.fi_rdv_description and o.cleantext_description" name="fi_rdv_description">
+                                            <div class="h5" style="padding: 0px 16px;">
+                                                <div style="padding-top: 4px" t-field="o.cleantext_description" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="row" style="margin-bottom: 12px; width: 100%; "/>
-                            <div name="third" style="width: 100%; ">
-                                <div name="descriptions" style="width: 47%; float: right;">
-                                    <t t-if="template.fi_description and o.cleantext_description">
+
+                            <!-- Historique -->
+                            <div t-if="template.fi_history and o.historique_rdv_ids" name="fi_history">
+                                <div name="title_history" class="row h4 mb4" >
+                                    <div class="col-xs-12">
+                                        <strong>Historique</strong>
+                                    </div>
+                                </div>
+                                <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; padding: 0px 16px;">
+                                    <t t-if="o.historique_rdv_ids" name="historique_rdv">
+                                        <div name="title_history" class="row h5 mb5" >
+                                            <div class="col-xs-12">
+                                                <strong>Client</strong>
+                                            </div>
+                                        </div>
+                                        <table class="table table-condensed" style="padding-bottom: 0px; margin-bottom: 0px">
+                                            <thead>
+                                                <tr colspan="3">
+                                                    <th class="col-xs-2" >Date</th>
+                                                    <th class="col-xs-2 text-center">Tâche</th>
+                                                    <th class="col-xs-10 text-center">Description</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="sale_tbody">
+                                                <t t-foreach="o.historique_rdv_ids" t-as="interv">
+                                                    <tr>
+                                                        <td>
+                                                            <span t-field="interv.date_date"/>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span t-field="interv.tache_id.name"/>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span t-field="interv.cleantext_description"/>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </t>
+                                </div>
+                            </div>
+
+                            <!-- Commande -->
+                            <div t-if="template.fi_order and order" name="fi_order">
+                                <div name="title_order" class="row h4 mb4" >
+                                    <div class="col-xs-12">
+                                        <strong>Commande</strong>
+                                    </div>
+                                </div>
+                                <div class="row"
+                                     style="border: 1px solid lightgray; border-top: 2px solid black; margin-bottom: 12px;">
+                                    <div class="col-xs-12" style="display: table; padding: 0px;">
+                                        <t t-set="previous_separator" t-value="False"/>
+                                        <div t-if="(template.fi_order_name and order.name) or (template.fi_order_confirmation_date and order.confirmation_date) or (template.fi_order_user_id and order.user_id and order.user_id.name) or (template.fi_order_of_date_vt and order.of_date_vt)"
+                                             t-attf-style="#{'width: 50%; display: table-cell;' if (template.fi_order_totals or template.fi_order_restant_du) else 'display: table-cell;'}">
+                                            <div t-if="template.fi_order_name and order.name" name="fi_order_name">
+                                                <t t-set="previous_separator" t-value="True"/>
+                                                <div class="h5" style="padding: 0px 16px;">
+                                                    <div>
+                                                        <span>Commande associée&amp;nbsp;:</span>
+                                                        <span t-field="order.name"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div t-if="template.fi_order_confirmation_date and order.confirmation_date" name="fi_order_confirmation_date">
+                                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                                <t t-set="previous_separator" t-value="True"/>
+                                                <div class="h5" style="padding: 0px 16px;">
+                                                    <t t-set="pre_d" t-value="order.confirmation_date"/>
+                                                    <t t-set="confirmation_date"
+                                                       t-value="pre_d[8:10] + '/' + pre_d[5:7] + '/' + pre_d[0:4]"/>
+                                                    <div>
+                                                        <span>Date de confirmation&amp;nbsp;:</span>
+                                                        <span t-esc="confirmation_date"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div t-if="template.fi_order_user_id and order.user_id and order.user_id.name" name="fi_order_user_id">
+                                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                                <t t-set="previous_separator" t-value="True"/>
+                                                <div class="h5" style="padding: 0px 16px;">
+
+                                                    <div>
+                                                        <span>Vendeur&amp;nbsp;:</span>
+                                                        <span t-field="order.user_id.name"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div t-if="template.fi_order_of_date_vt and order.of_date_vt" name="fi_order_of_date_vt">
+                                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                                <t t-set="previous_separator" t-value="True"/>
+                                                <div class="h5" style="padding: 0px 16px;">
+                                                    <div>
+                                                        <span>Date VT&amp;nbsp;:</span>
+                                                        <span t-field="order.of_date_vt"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div t-if="template.fi_order_totals or template.fi_order_restant_du"
+                                             t-attf-style="#{'width: 50%; border-left: 1px solid lightgray; display: table-cell; vertical-align: middle;' if ((template.fi_order_name and order.name) or (template.fi_order_confirmation_date and order.confirmation_date) or (template.fi_order_user_id and order.user_id and order.user_id.name) or (template.fi_order_of_date_vt and order.of_date_vt)) else 'display: table-cell; vertical-align: middle;'}">
+                                            <div name="order_amounts"
+                                                 t-attf-style="#{'padding: 8px 0px; margin: auto;' if ((template.fi_order_name and order.name) or (template.fi_order_confirmation_date and order.confirmation_date) or (template.fi_order_user_id and order.user_id and order.user_id.name) or (template.fi_order_of_date_vt and order.of_date_vt)) else 'padding: 8px 0px; width: 50%; margin: auto;'}">
+                                                <table class="table table-condensed">
+                                                    <t t-if="template.fi_order_totals">
+                                                        <!-- Total HT -->
+                                                        <tr>
+                                                            <td style="border-top: 0px !important;">
+                                                                <strong>Total HT</strong>
+                                                            </td>
+                                                            <td class="text-right" style="border-top: 0px !important;">
+                                                                <span t-field="order.amount_untaxed" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                                                            </td>
+                                                        </tr>
+                                                        <!-- Taxes -->
+                                                        <tr>
+                                                            <td>
+                                                                <strong>Taxes</strong>
+                                                            </td>
+                                                            <td class="text-right">
+                                                                <span t-field="order.amount_tax" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                    <!-- Total TTC -->
+                                                    <tr>
+                                                        <td style="border-top: 2px solid gray !important;">
+                                                            <strong>Total TTC</strong>
+                                                        </td>
+                                                        <td class="text-right" style="border-top: 2px solid gray !important;">
+                                                            <span t-field="order.amount_total" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                                                        </td>
+                                                    </tr>
+                                                    <t t-if="template.fi_order_restant_du">
+                                                        <!-- Paiements -->
+                                                        <t t-foreach="order.payment_ids" t-as="paiement">
+                                                            <tr>
+                                                                <td>
+                                                                    <span>Payé par </span><span t-field="paiement.of_payment_mode_id.name"/>
+                                                                </td>
+                                                                <td class="text-right">
+                                                                    <span t-field="paiement.amount" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                                                                </td>
+                                                            </tr>
+                                                        </t>
+                                                        <!-- Restant dû -->
+                                                        <tr>
+                                                            <td style="border-top: 2px solid gray !important;">
+                                                                <strong>Restant dû :</strong>
+                                                            </td>
+                                                            <td class="text-right" style="border-top: 2px solid gray !important;">
+                                                                <span t-esc="order.amount_total - sum(order.payment_ids.mapped('amount'))"
+                                                                      t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div t-if="template.fi_order_of_notes_intervention and order.of_notes_intervention" name="fi_order_of_notes_intervention" class="col-xs-12" style="display: table; padding: 0px;"
+                                         t-attf-style="#{'display: table; padding: 0px; border-top: 1px solid lightgray;' if previous_separator or template.fi_order_totals or template.fi_order_restant_du else 'display: table; padding: 0px;'}">
+                                        <div style="display: table-cell; padding: 0px 16px;" class="h5">
+                                            <div>
+                                                <span t-field="order.of_notes_intervention"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Produits et travaux -->
+                            <div t-if="template.fi_products and order" name="fi_products">
+                                <div name="title_products">
+                                    <div class="row h4 mb4">
+                                        <div class="col-xs-12">
+                                            <strong>Produits et travaux</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; padding: 0px 16px;">
+                                    <t t-foreach="order.order_lines_layouted()" t-as="page">
+                                        <table class="table table-condensed" style="padding-bottom: 0px; margin-bottom: 0px">
+                                            <thead>
+                                                <tr colspan="3">
+                                                    <th class="col-xs-9" style="vertical-align: middle">Description</th>
+                                                    <th class="col-xs-2 text-right">Quantité prévue</th>
+                                                    <th class="col-xs-1 text-center">· Posé</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="sale_tbody">
+                                                <t t-foreach="page" t-as="layout_category">
+                                                    <t t-if="layout_category_size > 1 or page_size > 1" groups="sale.group_sale_layout">
+                                                        <tr class="active">
+                                                            <td colspan="12" style="font-weight: bold; border-bottom: 1px solid black;">&amp;bull;
+                                                                <t t-esc="layout_category['name']"/>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                    <!-- Lignes de commande -->
+                                                    <t t-foreach="layout_category['lines']" t-as="l">
+                                                        <tr>
+                                                            <td>
+                                                                <span t-field="l.name"/>
+                                                            </td>
+                                                            <td class="text-right">
+                                                                <span t-field="l.product_uom_qty"/>
+                                                                <span t-field="l.product_uom" groups="product.group_uom"/>
+                                                            </td>
+                                                            <td>
+                                                                <span class="text-right"> </span>
+                                                            </td>
+                                                        </tr>
+                                                        <!-- Afficher les composants du kit -->
+                                                        <t t-if="l.of_is_kit">
+                                                            <t t-foreach="l.kit_id.kit_line_ids" t-as="comp">
+                                                                <tr>
+                                                                    <td>
+                                                                        <span style="padding: 0 8px;">-&gt;</span><span t-field="comp.name"/>
+                                                                    </td>
+                                                                    <td class="text-right">
+                                                                        <span t-field="comp.qty_total"/>
+                                                                        <span t-field="comp.product_uom_id" groups="product.group_uom"/>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span class="text-right"> </span>
+                                                                    </td>
+                                                                </tr>
+                                                            </t>
+                                                        </t>
+                                                    </t>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                        <t t-if="page_index &lt; page_size - 1" groups="sale.group_sale_layout">
+                                            <p style="page-break-before:always;"> </p>
+                                        </t>
+                                    </t>
+                                </div>
+                            </div>
+
+                            <!-- Livraisons -->
+                            <t t-set="pickings_layouted" t-value="o.pickings_layouted()"/>
+                            <div t-if="template.fi_pickings and pickings_layouted" name="fi_pickings">
+                                <div class="row h4 mb4" name="title_pickings">
+                                    <div class="col-xs-12">
+                                        <strong>Livraisons</strong>
+                                    </div>
+                                </div>
+                                <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; padding: 0px 16px;">
+                                    <table class="table table-condensed" style="padding-bottom: 0px; margin-bottom: 0px">
+                                        <thead>
+                                            <tr colspan="3">
+                                                <th class="col-xs-8" style="vertical-align: middle">Description</th>
+                                                <th class="col-xs-2 text-right">Qté prévue</th>
+                                                <th class="col-xs-2 text-right">Qté posée</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="sale_tbody">
+                                            <t t-foreach="pickings_layouted" t-as="picking_layouted">
+                                                <t>
+                                                    <tr class="active">
+                                                        <td colspan="3" style="background-color: #cfcfcf; font-weight:  bold; border-bottom: 1px solid black;">
+                                                            <t t-esc="picking_layouted['name']"/>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <t t-foreach="picking_layouted['lines']" t-as="line">
+                                                    <tr>
+                                                        <td>
+                                                            <span t-field="line.move_name"/>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <span t-field="line.product_qty"/>
+                                                            <span t-field="line.product_uom_id.name" groups="product.group_uom"/>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <span t-field="line.qty_done"/>
+                                                            <span t-field="line.product_uom_id.name" groups="product.group_uom"/>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Facturation -->
+                            <div t-if="template.fi_invoicing and o.line_ids" name="fi_invoicing" style="page-break-inside: avoid;">
+                                <div class="row h4 mb4" name="title_invoicing">
+                                    <div class="col-xs-12">
+                                        <strong>Facturation</strong>
+                                    </div>
+                                </div>
+                                <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; padding: 0px 16px;">
+                                    <table class="table table-condensed" style="padding-bottom: 0px; margin-bottom: 0px">
+                                        <thead>
+                                            <tr colspan="5">
+                                                <th class="col-xs-8" style="vertical-align: middle">Description</th>
+                                                <th class="col-xs-2 text-right">Qté</th>
+                                                <th class="col-xs-2 text-right">Prix/U</th>
+                                                <th class="col-xs-2 text-right">Total ht</th>
+                                                <th class="col-xs-2 text-right">Total TTC</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="sale_tbody">
+                                            <t t-foreach="o.line_ids" t-as="line">
+                                                <tr>
+                                                    <td>
+                                                        <span t-field="line.name"/>
+                                                    </td>
+                                                    <td class="text-right">
+                                                        <span t-field="line.qty"/>
+                                                    </td>
+                                                    <td class="text-right">
+                                                        <span t-field="line.price_unit"/>
+                                                    </td>
+                                                    <td class="text-right">
+                                                        <span t-field="line.price_subtotal"/>
+                                                    </td>
+                                                    <td class="text-right">
+                                                        <span t-field="line.price_total"/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                    <div class="row" name="total">
+                                        <div class="col-xs-4 pull-right">
+                                            <table class="table table-condensed">
+                                                <!-- Total HT -->
+                                                <tr name="invoicing_total_ht">
+                                                    <td name="total_ht_libelle" style="border-top: 0px !important;">
+                                                        <strong>Total HT</strong>
+                                                    </td>
+                                                    <td class="text-right" style="border-top: 0px !important;">
+                                                        <span t-field="o.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                                                    </td>
+                                                </tr>
+                                                <!-- Taxes -->
+                                                <tr name="invoicing_total_taxes">
+                                                    <td class="col-xs-8 pull-right">
+                                                        <strong>Taxes</strong>
+                                                    </td>
+                                                    <td>
+                                                        <span class="pull-right text-right" t-field="o.price_tax" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                                                    </td>
+                                                </tr>
+                                                <!-- Total TTC -->
+                                                <tr name="invoicing_total_ttc">
+                                                    <td style="border-top: 2px solid gray !important;">
+                                                        <strong>Total TTC</strong>
+                                                    </td>
+                                                    <td class="text-right"
+                                                        style="border-top: 2px solid gray !important;">
+                                                        <span t-field="o.price_total" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mentions légales -->
+                            <div t-if="template.fi_legal and template.legal" name="fi_legal" style="page-break-inside: avoid;">
+                                <div class="row h4 mb4" name="title_legal">
+                                    <div class="col-xs-12">
+                                        <strong>Mentions légales</strong>
+                                    </div>
+                                </div>
+                                <div class="row"
+                                     style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%;">
+                                    <div class="col-xs-12" style="display: table; padding: 0px;">
+                                        <div style="display: table-cell;">
+                                            <div class="h5" style="padding: 0px 16px;">
+                                                <span t-field="template.legal"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Signatures -->
+                            <div t-if="template.fi_signature and order" name="fi_signature" style="page-break-inside: avoid;">
+                                <div name="signature" style="width: 100%; page-break-inside: avoid;">
+                                    <div style="width: 47%; float: left; page-break-inside: avoid;">
                                         <div class="row h4 mb4">
                                             <div class="col-xs-12">
-                                                <strong>Description</strong>
+                                                <strong>Signature technicien</strong>
                                             </div>
                                         </div>
                                         <div class="row"
                                              style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
                                             <div class="col-xs-12" style="display: table; padding: 0px;">
                                                 <div style="display: table-cell;">
-                                                    <!-- Description -->
-                                                    <t t-if="template.fi_description_ext and o.cleantext_description" name="description_rdv" style="page-break-inside: avoid;">
-                                                        <div class="h5" style="padding: 0px 16px;">
-                                                            <span t-field="o.cleantext_description"/>
-                                                        </div>
-                                                    </t>
+                                                    <!-- Signature technicien -->
+                                                    <div class="h5" style="padding: 0px 16px;" name="signature_tech">
+                                                        <div>&amp;nbsp;</div>
+                                                        <div>&amp;nbsp;</div>
+                                                        <div>&amp;nbsp;</div>
+                                                        <div>&amp;nbsp;</div>
+                                                        <div>&amp;nbsp;</div>
+                                                        <div>&amp;nbsp;</div>
+                                                        <div>&amp;nbsp;</div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </t>
-                                </div>
-                            </div>
-                            <div name="products" style="width: 100%;">
-                                <t t-if="template.fi_products and template.fi_products_order and order">
-                                    <t t-set="order_layouted" t-value="order.order_lines_layouted()"/>
-                                    <t t-if="order_layouted">
-                                        <div style="page-break-inside: avoid;">
-                                            <div class="row h4 mb4">
-                                                <div class="col-xs-12"><strong>Produits et travaux</strong></div>
-                                            </div>
-                                            <div class="row" style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
-                                                <t t-foreach="order_layouted" t-as="page">
-                                                    <table class="table table-condensed" style="padding-bottom: 0px; margin-bottom: 0px">
-                                                        <thead>
-                                                            <tr colspan="3">
-                                                                <th class="col-xs-9" style="vertical-align: middle">Description</th>
-                                                                <th class="col-xs-2 text-right">Quantité prévue</th>
-                                                                <th class="col-xs-1 text-center">· Posé</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody class="sale_tbody">
-                                                            <t t-foreach="page" t-as="layout_category">
-                                                                <t t-if="layout_category_size > 1 or page_size > 1" groups="sale.group_sale_layout">
-                                                                    <tr class="active">
-                                                                        <td colspan="12" style="font-weight: bold; border-bottom: 1px solid black;">&amp;bull;
-                                                                            <t t-esc="layout_category['name']"/>
-                                                                        </td>
-                                                                    </tr>
-                                                                </t>
-                                                                <!-- Lignes de commande -->
-                                                                <t t-foreach="layout_category['lines']" t-as="l">
-                                                                    <tr>
-                                                                        <td>
-                                                                            <span t-field="l.name"/>
-                                                                        </td>
-                                                                        <td class="text-right">
-                                                                            <span t-field="l.product_uom_qty"/>
-                                                                            <span t-field="l.product_uom" groups="product.group_uom"/>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span class="text-right"> </span>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <!-- Afficher les composants du kit -->
-                                                                    <t t-if="l.of_is_kit">
-                                                                        <t t-foreach="l.kit_id.kit_line_ids" t-as="comp">
-                                                                            <tr>
-                                                                                <td>
-                                                                                    <span style="padding: 0 8px;">-&gt;</span><span t-field="comp.name"/>
-                                                                                </td>
-                                                                                <td class="text-right">
-                                                                                    <span t-field="comp.qty_total"/>
-                                                                                    <span t-field="comp.product_uom_id" groups="product.group_uom"/>
-                                                                                </td>
-                                                                                <td>
-                                                                                    <span class="text-right"> </span>
-                                                                                </td>
-                                                                            </tr>
-                                                                        </t>
-                                                                    </t>
-                                                                </t>
-                                                            </t>
-                                                        </tbody>
-                                                    </table>
-                                                    <t t-if="page_index &lt; page_size - 1" groups="sale.group_sale_layout">
-                                                        <p style="page-break-before:always;"> </p>
-                                                    </t>
-                                                </t>
+                                    </div>
+                                    <div style="width: 47%; float: right; page-break-inside: avoid;">
+                                        <div class="row h4 mb4">
+                                            <div class="col-xs-12">
+                                                <strong>Signature client</strong>
                                             </div>
                                         </div>
-                                    </t>
-                                </t>
-                                <t t-if="template.fi_products and template.fi_products_picking and o.picking_id" style="page-break-inside: avoid;">
-                                    <div style="page-break-inside: avoid;">
-                                        <t t-set="picking_lines_layouted" t-value="o.picking_lines_layouted()"/>
-                                        <t t-if="picking_lines_layouted">
-                                            <div class="row h4 mb4">
-                                                <div class="col-xs-12"><strong>BL</strong></div>
+                                        <div class="row"
+                                             style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
+                                            <div class="col-xs-12" style="display: table; padding: 0px;">
+                                                <div style="display: table-cell;">
+                                                    <!-- Signature client -->
+                                                    <div class="h5" style="padding: 0px 16px;" name="signature_client">
+                                                        <div>&amp;nbsp;</div>
+                                                        <div>&amp;nbsp;</div>
+                                                        <div>&amp;nbsp;</div>
+                                                        <div>&amp;nbsp;</div>
+                                                        <div>&amp;nbsp;</div>
+                                                        <div>&amp;nbsp;</div>
+                                                        <div>&amp;nbsp;</div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="row" style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
-                                                <table name="picking_lines_layouted" class="table table-condensed">
-                                                    <thead>
-                                                        <tr>
-                                                            <th name="descr" style="width: 80%">Description</th>
-                                                            <th name="qty_initial" class="text-right" style="width: 10%">Qté prévue</th>
-                                                            <th name="qty_done" class="text-right" style="width: 10%">Posée</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody class="sale_tbody">
-                                                        <t t-foreach="picking_lines_layouted" t-as="layout_category">
-                                                            <t>
-                                                                <tr class="active">
-                                                                    <td colspan="3" t-att-style="'background-color: #F0F0F0; font-weight:  bold; border-bottom: 1px solid black;'">&amp;bull;
-                                                                        <t t-esc="layout_category['name']"/>
-                                                                    </td>
-                                                                </tr>
-                                                            </t>
-                                                            <!-- Lines associated -->
-                                                            <t t-foreach="layout_category['lines']" t-as="l">
-                                                                <tr>
-                                                                    <td name="descr">
-                                                                        <span t-field="l.name"/>
-                                                                    </td>
-                                                                    <th name="qty_initial" class="text-right">
-                                                                        <span t-field="l.product_uom_qty"/>
-                                                                    </th>
-                                                                    <th name="qty_done" class="text-right">
-                                                                        <span>0</span>
-                                                                    </th>
-                                                                </tr>
-                                                            </t>
-                                                        </t>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </t>
+                                        </div>
                                     </div>
-                                </t>
+                                </div>
                             </div>
+
                         </t>
                     </div>
                 </t>

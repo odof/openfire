@@ -6,8 +6,8 @@ from odoo import api, models, fields
 class OfPlanningInterventionTemplate(models.Model):
     _inherit = 'of.planning.intervention.template'
 
-    # Questionnaires
-    fi_surveys = fields.Boolean(string="QUESTIONNAIRE")
+    # SAV
+    fi_sav = fields.Boolean(string="SAV")
 
-    # Questionnaires
-    ri_surveys = fields.Boolean(string="QUESTIONNAIRE")
+    # SAV
+    ri_sav = fields.Boolean(string="SAV")

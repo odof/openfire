@@ -140,59 +140,202 @@
         </xpath>
     </template>
 
+
     <template id="of_parc_installe_extension_fiche_intervention_report2"
               inherit_id="of_planning.of_planning_fiche2_intervention_report_template">
-        <xpath expr="//div[@name='third']/div[@name='descriptions']" position="before">
-            <div name="parc_installe" style="width: 47%; float: left; page-break-inside: avoid;">
-                <t t-if="template.fi_pi and o.parc_installe_id">
-                    <t t-set="parc" t-value="o.parc_installe_id"/>
-                    <div class="row h4 mb4">
-                        <div class="col-xs-12">
-                            <strong>Parc installé</strong>
-                        </div>
+        <!-- Gestion de la migration des SAV -->
+        <xpath expr="//t[@name='get_template']" position="after">
+            <t t-set="sav_migre" t-value="o.env['ir.config_parameter'].sudo().get_param('of_migration_sav_di')" name="get_template"/>
+        </xpath>
+        <xpath expr="//div[@name='fi_sav']" position="attributes">
+            <attribute name="t-if">not sav_migre and template.fi_sav and o.sav_id</attribute>
+        </xpath>
+        <xpath expr="//div[@name='fi_rdv_type']" position="after">
+            <div t-if="sav_migre and template.fi_sav and o.service_id and o.service_id.of_categorie_id and o.service_id.of_categorie_id.name" name="fi_rdv_sav_categorie">
+                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                <t t-set="previous_separator" t-value="True"/>
+                <div class="h5" style="padding: 0px 16px;">
+                    <span>Catégorie&amp;nbsp;SAV:</span>
+                    <span t-field="o.service_id.of_categorie_id.name"/>
+                </div>
+            </div>
+            <div t-if="sav_migre and template.fi_sav and o.service_id and o.service_id.payer_mode" name="fi_rdv_sav_payer">
+                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                <t t-set="previous_separator" t-value="True"/>
+                <div class="h5" style="padding: 0px 16px;">
+                    <span>Payeur&amp;nbsp;SAV:</span>
+                    <span t-field="o.service_id.payer_mode"/>
+                </div>
+            </div>
+        </xpath>
+        <!-- Historique -->
+        <xpath expr="//div[@name='fi_history']/div[@name='title_history']" position="replace">
+            <div name="title_history" class="row h4 mb4" >
+                <div class="col-xs-12">
+                    <strong>Historiques</strong>
+                </div>
+            </div>
+        </xpath>
+        <xpath expr="//div[@name='fi_history']//t[@name='historique_rdv']" position="after">
+            <div t-if="o.historique_rdv_ids and o.historique_parc_ids" style="margin-bottom: 8px; border-top: 2px dotted lightgray; width: 100%;"/>
+            <t t-if="o.historique_parc_ids" name="parc_rdv" style="page-break-inside: avoid;">
+                <div name="title_history" class="row h5 mb5" >
+                    <div class="col-xs-12">
+                        <strong>Parc installé</strong>
                     </div>
-                    <div class="row"
-                         style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
-                        <div class="col-xs-12" style="display: table; padding: 0px;">
-                            <div style="display: table-cell;">
-                                <!-- Produit installé -->
-                                <t t-set="pi_name"
-                                   t-value="(template.fi_pi_model and parc.modele) or (template.fi_pi_product and parc.product_id.name) or ''"/>
-                                <t t-if="template.fi_pi_brand and parc.brand_id or template.fi_pi_serial and parc.name or pi_name">
-                                    <t t-set="pi" t-value="((template.fi_pi_brand and parc.brand_id.name and [parc.brand_id.name]) or []) + ((template.fi_pi_serial and parc.name and [parc.name]) or []) + ((pi_name and [pi_name]) or [])"/>
-                                    <div class="h5" style="padding: 0px 16px;">
-                                        <strong><span>Sur&amp;nbsp;:</span></strong>
-                                        <span t-raw="' - '.join(pi)"/>
+                </div>
+                <table class="table table-condensed" style="padding-bottom: 0px; margin-bottom: 0px">
+                    <thead>
+                        <tr colspan="3">
+                            <th class="col-xs-2" >Dates</th>
+                            <th class="col-xs-2 text-center">Tâches</th>
+                            <th class="col-xs-10 text-center">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody class="sale_tbody">
+                        <t t-foreach="o.historique_parc_ids" t-as="interv">
+                            <tr>
+                                <td>
+                                    <span t-field="interv.date_date"/>
+                                </td>
+                                <td class="text-center">
+                                    <span t-field="interv.tache_id.name"/>
+                                </td>
+                                <td class="text-center">
+                                    <span t-field="interv.cleantext_description"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </t>
+        </xpath>
+
+        <!-- Parc installé -->
+        <xpath expr="//div[@name='fi_rdv']" position="after">
+            <div t-if="template.fi_parc and o.parc_installe_id" name="fi_parc">
+                <t t-set="parc" t-value="o.parc_installe_id"/>
+                <div class="row h4 mb4">
+                    <div class="col-xs-12"><strong>Parc installé</strong></div>
+                </div>
+                <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; margin-bottom: 12px;">
+                    <div class="col-xs-12" style="display: table; padding: 0px;">
+                        <div style="display: table-cell; width: 50%;">
+                            <t t-set="previous_separator" t-value="False"/>
+                            <div t-if="template.fi_parc_name and parc.name" name="fi_parc_name">
+                                <t t-set="previous_separator" t-value="True"/>
+                                <div class="h5" style="padding: 0px 16px;">
+                                    <div>
+                                        <span>N° de série :</span>
+                                        <strong><span t-field="parc.name"/></strong>
                                     </div>
-                                </t>
-                                <!-- Date d'installation -->
-                                <t t-if="template.fi_pi_installation_date and parc.date_installation">
-                                    <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
-                                    <div class="h5" style="padding: 0px 16px;">
-                                        <strong><span>Date d'installation&amp;nbsp;:</span></strong>
+                                </div>
+                            </div>
+                            <div t-if="template.fi_parc_product_id and parc.product_id and parc.product_id.name" name="fi_parc_product_id">
+                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
+                                <t t-set="previous_separator" t-value="True"/>
+                                <div class="h5" style="padding: 0px 16px;">
+                                    <div>
+                                        <span>Produit :</span>
+                                            <strong><span t-field="parc.product_id.name"/></strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div t-if="template.fi_parc_modele and parc.modele" name="fi_parc_modele">
+                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
+                                <t t-set="previous_separator" t-value="True"/>
+                                <div class="h5" style="padding: 0px 16px;">
+                                    <div>
+                                        <span>Modèle :</span>
+                                        <span t-field="parc.modele"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div t-if="template.fi_parc_brand_id and parc.brand_id and parc.brand_id.name" name="fi_parc_brand_id">
+                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
+                                <t t-set="previous_separator" t-value="True"/>
+                                <div class="h5" style="padding: 0px 16px;">
+                                    <div>
+                                        <span>Marque :</span>
+                                        <span t-field="parc.brand_id.name"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div t-if="template.fi_sav and parc.type_garantie" name="fi_parc_sav">
+                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
+                                <t t-set="previous_separator" t-value="True"/>
+                                <div class="h5" style="padding: 0px 16px;">
+                                    <div>
+                                        <span>Type de garantie :</span>
+                                        <span t-field="parc.type_garantie"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div t-if="template.fi_parc_product_category_id and parc.product_category_id and parc.product_category_id.name" name="fi_parc_product_category_id">
+                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
+                                <t t-set="previous_separator" t-value="True"/>
+                                <div class="h5" style="padding: 0px 16px;">
+                                    <div>
+                                        <span>Catégorie :</span>
+                                        <span t-field="parc.product_category_id.name"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: table-cell; width: 50%; border-left: 1px solid lightgray">
+                            <div t-if="template.fi_parc_date_installation and parc.date_installation" name="fi_parc_date_installation">
+                                <div class="h5" style="padding: 0px 16px;">
+                                    <div>
+                                        <span>Date d'installation :</span>
                                         <span t-field="parc.date_installation"/>
                                     </div>
-                                </t>
-                                <!-- État -->
-                                <t t-if="template.fi_pi_state and parc.state">
-                                    <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
-                                    <div class="h5" style="padding: 0px 16px;">
-                                        <strong><span>État&amp;nbsp;:</span></strong>
-                                        <span t-field="parc.state"/>
+                                </div>
+                            </div>
+                            <div t-if="template.fi_parc_installation and parc.installation" name="fi_parc_installation">
+                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
+                                <t t-set="previous_separator" t-value="True"/>
+                                <div class="h5" style="padding: 0px 16px;">
+                                    <div>
+                                        <span>Type d'installation :</span>
+                                        <span t-field="parc.installation"/>
                                     </div>
-                                </t>
-                                <!-- Notes -->
-                                <t t-if="template.fi_pi_notes and parc.note">
-                                    <div style="margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
-                                    <div class="h5" style="padding: 0px 16px;">
-                                        <strong><span>Notes&amp;nbsp;:</span></strong>
-                                        <span t-field="parc.note"/>
+                                </div>
+                            </div>
+                            <div t-if="template.fi_parc_conforme" name="fi_parc_conforme">
+                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
+                                <t t-set="previous_separator" t-value="True"/>
+                                <div class="h5" style="padding: 0px 16px;">
+                                    <div>
+                                        <span>Conforme :</span>
+                                        <span t-if="parc.conforme">Oui</span>
+                                        <span t-else="">Non</span>
                                     </div>
-                                </t>
+                                </div>
+                            </div>
+                            <div t-if="template.fi_parc_installateur_id and parc.installateur_id and parc.installateur_id.name" name="fi_parc_installateur_id">
+                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
+                                <t t-set="previous_separator" t-value="True"/>
+                                <div class="h5" style="padding: 0px 16px;">
+                                    <div>
+                                        <span>Installateur :</span>
+                                        <span t-field="parc.installateur_id.name"/>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </t>
+                    <div t-if="template.fi_parc_note and parc.note" name="fi_parc_note" class="col-xs-12" style="display: table; padding: 0px;">
+                        <div style="display: table-cell; width: 100%;">
+                            <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
+                            <div class="h5" style="padding: 0px 16px;">
+                                <div>
+                                    <span>Notes :</span>
+                                    <span t-field="parc.note"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </xpath>
     </template>

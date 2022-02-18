@@ -267,11 +267,6 @@ class OfService(models.Model):
         domain="[('type_ids','=',type_id)]")
     employee_ids = fields.Many2many(
         comodel_name='hr.employee', string="Intervenants", domain=lambda self: self._domain_employee_ids())
-    payer_mode = fields.Selection([
-        ('client', u"Client"),
-        ('retailer', u"Revendeur"),
-        ('manufacturer', u"Fabricant"),
-    ], string=u"Payeur")
     last_attachment_id = fields.Many2one(
         comodel_name='ir.attachment', string=u"Dernier rapport", compute="_compute_last_attachment_id"
     )
