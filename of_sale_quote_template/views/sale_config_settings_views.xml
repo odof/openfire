@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Sale config wizard -->
+    <record id="of_sale_quote_template_view_sale_config_settings" model="ir.ui.view">
+        <field name="name">of salequote template settings</field>
+        <field name="model">sale.config.settings</field>
+        <field name="inherit_id" ref="sale.view_sales_config"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='quotations_sales']" position="inside">
+                <label for="group_of_advanced_sale_layout_category"/>
+                <div name="group_of_advanced_sale_layout_category">
+                    <field name="group_of_advanced_sale_layout_category" class="oe_inline"/>
+                    <span>Ajoute l'onglet Sections sur les devis</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

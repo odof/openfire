@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 {
     "name": "OpenFire / Modèle de devis",
     "version": "10.0.1.0.0",
@@ -29,10 +28,16 @@ Si une ligne d'article n'a pas pu être ajoutée, le champ 'Note d'insertion' ap
         "of_sale",
     ],
     "data": [
-        'views/of_sale_quote_template_views.xml',
+        'security/of_sale_security.xml',
         'security/ir.model.access.csv',
+        'wizards/of_select_product_wizard_views.xml',
+        'wizards/of_layout_category_wizard_views.xml',
+        'views/of_sale_quote_template_views.xml',
+        'views/sale_config_settings_views.xml',
+        'views/of_sale_quote_template_templates.xml',
     ],
     'installable': True,
     'application': False,
     'auto_install': False,
 }
+

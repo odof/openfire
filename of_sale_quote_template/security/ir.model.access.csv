@@ -1,5 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_sale_quote_template_group_system,sael.quote.template.rule.user,model_sale_quote_template,sales_team.group_sale_manager,1,1,1,1
+access_sale_quote_template_group_system,sale.quote.template.rule.user,model_sale_quote_template,sales_team.group_sale_manager,1,1,1,1
 access_sale_quote_template_group_salesman,sale.quote.template.rule.user,model_sale_quote_template,sales_team.group_sale_salesman,1,0,0,0
-access_sale_quote_line_group_system,sael.quote.line.rule.user,model_sale_quote_line,sales_team.group_sale_manager,1,1,1,1
+access_sale_quote_line_group_system,sale.quote.line.rule.user,model_sale_quote_line,sales_team.group_sale_manager,1,1,1,1
 access_sale_quote_line_group_salesman,sale.quote.line.rule.user,model_sale_quote_line,sales_team.group_sale_salesman,1,0,0,0
+access_of_sale_order_layout_category_group_system,of.sale.order.layout.category.rule.user,model_of_sale_order_layout_category,sales_team.group_sale_manager,1,1,1,1
+access_of_sale_quote_template_layout_category_group_system,of.sale.quote.template.layout.category.rule.user,model_of_sale_quote_template_layout_category,sales_team.group_sale_manager,1,1,1,1
