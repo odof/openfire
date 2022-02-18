@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="1">
 
+    <!-- Res groups -->
+
+    <record id="group_of_validate_order_from_portal" model="res.groups">
+        <field name="name">Activer la validation de commande depuis le portail</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
     <!-- Ir Rules -->
 
     <!-- OF Service -->

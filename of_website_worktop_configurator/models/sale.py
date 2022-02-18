@@ -14,9 +14,8 @@ class SaleOrder(models.Model):
     of_worktop_configurator_discount_id = fields.Many2one(
         comodel_name='of.worktop.configurator.discount', string=u"Remise")
     of_delivery_floor = fields.Integer(string=u"Étage de livraison")
-    of_site_distance_id = fields.Many2one(
-        comodel_name='of.worktop.configurator.distance', string=u"Distance du chantier")
-    of_manufacturer_metrics = fields.Boolean(string=u"Métré à réaliser par le fabricant")
+    of_site_service_id = fields.Many2one(
+        comodel_name='of.worktop.configurator.service', string=u"Prestations du chantier")
     of_junction = fields.Boolean(string=u"Raccordement")
 
     def _compute_internal_code(self):
@@ -110,10 +109,8 @@ class SaleConfigSettings(models.TransientModel):
         comodel_name='account.payment.term', string=u"(OF) Condition de règlement")
     of_website_worktop_configurator_extra_floor_product_id = fields.Many2one(
         comodel_name='product.product', string=u"(OF) Article supplément livraison à l'étage")
-    of_website_worktop_configurator_extra_distance_product_id = fields.Many2one(
-        comodel_name='product.product', string=u"(OF) Article supplément lieu de livraison")
-    of_website_worktop_configurator_extra_metrics_product_id = fields.Many2one(
-        comodel_name='product.product', string=u"(OF) Article supplément métré")
+    of_website_worktop_configurator_extra_service_product_id = fields.Many2one(
+        comodel_name='product.product', string=u"(OF) Article supplément prestation")
     of_website_worktop_configurator_extra_junction_product_id = fields.Many2one(
         comodel_name='product.product', string=u"(OF) Article supplément raccordement")
     of_website_worktop_configurator_extra_weight_product_id = fields.Many2one(
@@ -144,16 +141,10 @@ class SaleConfigSettings(models.TransientModel):
             self.of_website_worktop_configurator_extra_floor_product_id.id)
 
     @api.multi
-    def set_of_website_worktop_configurator_extra_distance_product_id_defaults(self):
+    def set_of_website_worktop_configurator_extra_service_product_id_defaults(self):
         return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'of_website_worktop_configurator_extra_distance_product_id',
-            self.of_website_worktop_configurator_extra_distance_product_id.id)
-
-    @api.multi
-    def set_of_website_worktop_configurator_extra_metrics_product_id_defaults(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'of_website_worktop_configurator_extra_metrics_product_id',
-            self.of_website_worktop_configurator_extra_metrics_product_id.id)
+            'sale.config.settings', 'of_website_worktop_configurator_extra_service_product_id',
+            self.of_website_worktop_configurator_extra_service_product_id.id)
 
     @api.multi
     def set_of_website_worktop_configurator_extra_junction_product_id_defaults(self):

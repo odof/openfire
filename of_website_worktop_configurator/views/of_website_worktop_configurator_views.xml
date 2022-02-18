@@ -52,7 +52,6 @@
         <field name="model">of.worktop.configurator.color</field>
         <field name="arch" type="xml">
             <tree editable="bottom">
-                <field name="sequence"/>
                 <field name="name"/>
                 <field name="image_filename" invisible="1"/>
                 <field name="image_file" filename="image_filename"/>
@@ -66,29 +65,6 @@
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="of_worktop_configurator_color_tree_view"/>
-    </record>
-
-    <!-- OF Worktop Configurator Group Views -->
-
-    <record id="of_worktop_configurator_group_tree_view" model="ir.ui.view">
-        <field name="name">of.worktop.configurator.group.tree.view</field>
-        <field name="model">of.worktop.configurator.group</field>
-        <field name="arch" type="xml">
-            <tree editable="bottom">
-                <field name="sequence"/>
-                <field name="name"/>
-                <field name="color_ids" widget="many2many_tags"/>
-                <field name="pricelist_ids" widget="many2many_tags"/>
-            </tree>
-        </field>
-    </record>
-
-    <record id="of_worktop_configurator_group_action" model="ir.actions.act_window">
-        <field name="name">Groupes</field>
-        <field name="res_model">of.worktop.configurator.group</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
-        <field name="view_id" ref="of_worktop_configurator_group_tree_view"/>
     </record>
 
     <!-- OF Worktop Configurator Thickness Views -->
@@ -106,39 +82,18 @@
     </record>
 
     <record id="of_worktop_configurator_thickness_action" model="ir.actions.act_window">
-        <field name="name">Épaisseurs</field>
+        <field name="name">Épaisseurs et types de chant</field>
         <field name="res_model">of.worktop.configurator.thickness</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="of_worktop_configurator_thickness_tree_view"/>
     </record>
 
-    <!-- OF Worktop Configurator Edge Type Views -->
+    <!-- OF Worktop Configurator Service Views -->
 
-    <record id="of_worktop_configurator_edge_type_tree_view" model="ir.ui.view">
-        <field name="name">of.worktop.configurator.edge.type.tree.view</field>
-        <field name="model">of.worktop.configurator.edge.type</field>
-        <field name="arch" type="xml">
-            <tree editable="bottom">
-                <field name="sequence"/>
-                <field name="name"/>
-            </tree>
-        </field>
-    </record>
-
-    <record id="of_worktop_configurator_edge_type_action" model="ir.actions.act_window">
-        <field name="name">Type de chants</field>
-        <field name="res_model">of.worktop.configurator.edge.type</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
-        <field name="view_id" ref="of_worktop_configurator_edge_type_tree_view"/>
-    </record>
-
-    <!-- OF Worktop Configurator Distance Views -->
-
-    <record id="of_worktop_configurator_distance_tree_view" model="ir.ui.view">
-        <field name="name">of.worktop.configurator.distance.tree.view</field>
-        <field name="model">of.worktop.configurator.distance</field>
+    <record id="of_worktop_configurator_service_tree_view" model="ir.ui.view">
+        <field name="name">of.worktop.configurator.service.tree.view</field>
+        <field name="model">of.worktop.configurator.service</field>
         <field name="arch" type="xml">
             <tree editable="bottom">
                 <field name="sequence"/>
@@ -150,12 +105,12 @@
         </field>
     </record>
 
-    <record id="of_worktop_configurator_distance_action" model="ir.actions.act_window">
-        <field name="name">Distances</field>
-        <field name="res_model">of.worktop.configurator.distance</field>
+    <record id="of_worktop_configurator_service_action" model="ir.actions.act_window">
+        <field name="name">Prestations</field>
+        <field name="res_model">of.worktop.configurator.service</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
-        <field name="view_id" ref="of_worktop_configurator_distance_tree_view"/>
+        <field name="view_id" ref="of_worktop_configurator_service_tree_view"/>
     </record>
 
     <!-- OF Worktop Configurator Discount Views -->
@@ -189,9 +144,10 @@
             <tree editable="top">
                 <field name="material_id"/>
                 <field name="finishing_id"/>
-                <field name="group_id"/>
+                <field name="color_ids" widget="many2many_tags"/>
                 <field name="thickness_id"/>
                 <field name="price"/>
+                <field name="pricelist_ids" widget="many2many_tags"/>
             </tree>
         </field>
     </record>
@@ -221,7 +177,6 @@
                             <field name="sequence"/>
                             <field name="material_ids" widget="many2many_tags"/>
                             <field name="finishing_ids" widget="many2many_tags"/>
-                            <field name="group_ids" widget="many2many_tags"/>
                         </group>
                         <group string="Infos devis">
                             <field name="product_id"/>
@@ -295,15 +250,11 @@
               parent="of_worktop_configurator_menu" sequence="40"/>
     <menuitem id="of_worktop_configurator_color_menu" name="Couleurs" action="of_worktop_configurator_color_action"
               parent="of_worktop_configurator_menu" sequence="50"/>
-    <menuitem id="of_worktop_configurator_group_menu" name="Groupes" action="of_worktop_configurator_group_action"
+    <menuitem id="of_worktop_configurator_thickness_menu" name="Épaisseurs et types de chant" action="of_worktop_configurator_thickness_action"
               parent="of_worktop_configurator_menu" sequence="60"/>
-    <menuitem id="of_worktop_configurator_thickness_menu" name="Épaisseurs" action="of_worktop_configurator_thickness_action"
+    <menuitem id="of_worktop_configurator_service_menu" name="Prestations" action="of_worktop_configurator_service_action"
               parent="of_worktop_configurator_menu" sequence="70"/>
-    <menuitem id="of_worktop_configurator_edge_type_menu" name="Types de chant" action="of_worktop_configurator_edge_type_action"
-              parent="of_worktop_configurator_menu" sequence="80"/>
-    <menuitem id="of_worktop_configurator_distance_menu" name="Distances" action="of_worktop_configurator_distance_action"
-              parent="of_worktop_configurator_menu" sequence="90"/>
     <menuitem id="of_worktop_configurator_discount_menu" name="Remises" action="of_worktop_configurator_discount_action"
-              parent="of_worktop_configurator_menu" sequence="100"/>
+              parent="of_worktop_configurator_menu" sequence="80"/>
 
 </odoo>

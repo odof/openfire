@@ -79,6 +79,12 @@
                 </form>
             </t>
         </xpath>
+        <xpath expr="//table/t/tr/td[3]" position="attributes">
+            <attribute name="groups">of_website_portal.group_of_validate_order_from_portal</attribute>
+        </xpath>
+        <xpath expr="//table/thead/tr/th[3]" position="attributes">
+            <attribute name="groups">of_website_portal.group_of_validate_order_from_portal</attribute>
+        </xpath>
     </template>
 
 </odoo>
