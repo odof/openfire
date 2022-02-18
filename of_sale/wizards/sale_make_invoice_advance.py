@@ -74,4 +74,10 @@ class SaleAdvancePaymentInv(models.TransientModel):
             if self.advance_payment_method in ['delivered', 'all'] and self.of_include_null_qty_lines:
                 self = self.with_context(of_include_null_qty_lines=True)
             result = super(SaleAdvancePaymentInv, self).create_invoices()
+
+        # On ne propage pas les conditions de règlement si le paramètre de propagation n'est pas coché
+        if not self.env['ir.values'].get_default('sale.config.settings', 'of_propagate_payment_term'):
+            invoice = self.env['account.invoice'].browse(result['res_id'])
+            invoice.payment_term_id = False
+
         return result
