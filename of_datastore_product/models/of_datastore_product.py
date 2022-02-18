@@ -1484,6 +1484,23 @@ class OfDatastoreProductReference(models.AbstractModel):
         if vals.get('product_id', 0) < 0:
             vals['product_id'] = self.env['product.product'].browse(vals['product_id']).of_datastore_import().id
 
+        # Gestion des many2many
+        if vals.get('product_ids') and vals['product_ids'][0][2]:
+            res = []
+            product_ids = vals['product_ids'][0][2]
+            ds_products = self.env['product.product'].browse([pid for pid in product_ids if pid < 0])
+
+            # On appelle of_datastore_import() ici plutôt que dans le for
+            # pour éviter d'appeler trop souvent la base centralisée
+            products = ds_products.of_datastore_import()
+            ds_products_dict = {p.of_datastore_res_id: p.id for p in products}
+
+            for pid in product_ids:
+                if pid < 0:
+                    pid = ds_products_dict[-pid % DATASTORE_IND]
+                res.append(pid)
+            vals['product_ids'] = [[6, 0, res]]
+
         return super(OfDatastoreProductReference, self).create(vals)
 
     @api.multi
@@ -1491,6 +1508,23 @@ class OfDatastoreProductReference(models.AbstractModel):
         # Gestion des many2one
         if vals.get('product_id', 0) < 0:
             vals['product_id'] = self.env['product.product'].browse(vals['product_id']).of_datastore_import().id
+
+        # Gestion des many2many
+        if vals.get('product_ids') and vals['product_ids'][0][2]:
+            res = []
+            product_ids = vals['product_ids'][0][2]
+            ds_products = self.env['product.product'].browse([pid for pid in product_ids if pid < 0])
+
+            # On appelle of_datastore_import() ici plutôt que dans le for
+            # pour éviter d'appeler trop souvent la base centralisée
+            products = ds_products.of_datastore_import()
+            ds_products_dict = {p.of_datastore_res_id: p.id for p in products}
+
+            for pid in product_ids:
+                if pid < 0:
+                    pid = ds_products_dict[-pid % DATASTORE_IND]
+                res.append(pid)
+            vals['product_ids'] = [[6, 0, res]]
 
         return super(OfDatastoreProductReference, self).write(vals)
 
