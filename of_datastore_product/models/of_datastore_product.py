@@ -650,7 +650,7 @@ class OfDatastoreCache(models.TransientModel):
 class OfDatastoreCentralized(models.AbstractModel):
     _name = 'of.datastore.centralized'
 
-    of_datastore_res_id = fields.Integer(string="ID on supplier database", index=True)
+    of_datastore_res_id = fields.Integer(string="ID on supplier database", index=True, copy=False)
 
     @classmethod
     def _browse(cls, ids, env, prefetch=None):
@@ -1274,7 +1274,7 @@ class ProductTemplate(models.Model):
     of_datastore_has_link = fields.Boolean(_compute='_compute_of_datastore_has_link')
     prochain_tarif = fields.Float('Prochain tarif', digits=dp.get_precision('Product Price'), default=0.0)
     date_prochain_tarif = fields.Date(string="Date du prochain tarif")
-    # Booléen utilisé par afficher ou non le bouton 'Voir stock founisseur'
+    # Booléen utilisé par afficher ou non le bouton 'Voir stock fournisseur'
     of_datastore_stock = fields.Boolean(string=u"Stock centralisé", compute='_compute_of_datastore_stock')
 
     @api.depends()
@@ -1480,14 +1480,52 @@ class OfDatastoreProductReference(models.AbstractModel):
     @api.model
     def create(self, vals):
         # par défaut .get() retourne None si la clef n'existe pas, et None == -1
+        # Gestion des many2one
         if vals.get('product_id', 0) < 0:
             vals['product_id'] = self.env['product.product'].browse(vals['product_id']).of_datastore_import().id
+
+        # Gestion des many2many
+        if vals.get('product_ids') and vals['product_ids'][0][2]:
+            res = []
+            product_ids = vals['product_ids'][0][2]
+            ds_products = self.env['product.product'].browse([pid for pid in product_ids if pid < 0])
+
+            # On appelle of_datastore_import() ici plutôt que dans le for
+            # pour éviter d'appeler trop souvent la base centralisée
+            products = ds_products.of_datastore_import()
+            ds_products_dict = {p.of_datastore_res_id: p.id for p in products}
+
+            for pid in product_ids:
+                if pid < 0:
+                    pid = ds_products_dict[-pid % DATASTORE_IND]
+                res.append(pid)
+            vals['product_ids'] = [[6, 0, res]]
+
         return super(OfDatastoreProductReference, self).create(vals)
 
     @api.multi
     def write(self, vals):
+        # Gestion des many2one
         if vals.get('product_id', 0) < 0:
             vals['product_id'] = self.env['product.product'].browse(vals['product_id']).of_datastore_import().id
+
+        # Gestion des many2many
+        if vals.get('product_ids') and vals['product_ids'][0][2]:
+            res = []
+            product_ids = vals['product_ids'][0][2]
+            ds_products = self.env['product.product'].browse([pid for pid in product_ids if pid < 0])
+
+            # On appelle of_datastore_import() ici plutôt que dans le for
+            # pour éviter d'appeler trop souvent la base centralisée
+            products = ds_products.of_datastore_import()
+            ds_products_dict = {p.of_datastore_res_id: p.id for p in products}
+
+            for pid in product_ids:
+                if pid < 0:
+                    pid = ds_products_dict[-pid % DATASTORE_IND]
+                res.append(pid)
+            vals['product_ids'] = [[6, 0, res]]
+
         return super(OfDatastoreProductReference, self).write(vals)
 
 

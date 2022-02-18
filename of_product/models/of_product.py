@@ -139,6 +139,10 @@ class ProductSupplierInfo(models.Model):
     # Retrait de la société par défaut
     company_id = fields.Many2one(default=False)
 
+    # On retire ces champs de ceux repris par la duplication
+    product_name = fields.Char(copy=False)
+    product_code = fields.Char(copy=False)
+
     @api.multi
     @api.depends('pp_ht', 'price')
     def _compute_remise(self):
