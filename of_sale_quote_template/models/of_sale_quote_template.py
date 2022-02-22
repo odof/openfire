@@ -659,7 +659,8 @@ class SaleOrder(models.Model):
         string=u"Note d'insertion", help=u"Cette note disparaitra lorsque le devis sera sauvegardé.",)
     of_layout_category_template_id = fields.Many2one(
         'of.sale.layout.category.template', string=u"Modèle de liste de section")
-    of_layout_category_ids = fields.One2many('of.sale.order.layout.category', 'order_id', string=u"Liste de section", copy=True)
+    of_layout_category_ids = fields.One2many(
+        'of.sale.order.layout.category', 'order_id', string=u"Liste de section", copy=True)
 
     # Onchange nécessaire, car lors de la suppression d'une ligne de section, cette ligne de section est toujours
     # renseignée dans les lignes de commande. Du coup, Odoo bloque sur la sauvegarde.
@@ -908,9 +909,9 @@ class SaleOrder(models.Model):
         if self.user_has_groups('of_sale_quote_template.group_of_advanced_sale_layout_category') \
                 and self.of_layout_category_ids:
             new_dict = {}
-            of_layout_category_ids_sorted = self.of_layout_category_ids.sorted(key=lambda x: x.sequence)
+            of_layout_category_ids_sorted = self.of_layout_category_ids.sorted('sequence')
 
-            # On créé une liste de lignes de commande pour chaque section avancée, y compris celles vides
+            # On crée une liste de lignes de commande pour chaque section avancée, y compris celles vides
             for index, layout_category in enumerate(of_layout_category_ids_sorted):
                 new_dict[index] = {
                     'layout_category': layout_category,
@@ -949,6 +950,17 @@ class SaleOrder(models.Model):
 
         return report_pages
 
+    @api.multi
+    def _prepare_invoice(self):
+        """
+        Prepare the dict of values to create the new invoice for a sales order. This method may be
+        overridden to implement custom invoice generation (making sure to call super() to establish
+        a clean extension chain).
+        """
+        invoice_vals = super(SaleOrder, self)._prepare_invoice()
+        if self.of_layout_category_ids:
+            invoice_vals['of_layout_category_ids'] = [(6, 0, self.of_layout_category_ids.ids)]
+        return invoice_vals
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
@@ -964,6 +976,17 @@ class SaleOrderLine(models.Model):
         :return: sale.order.line(<newId>)
         """
         return self.new(data)
+
+    @api.multi
+    def _prepare_invoice_line(self, qty):
+        """
+        Prepare the dict of values to create the new invoice line for a sales order line.
+
+        :param qty: float quantity to invoice
+        """
+        res = super(SaleOrderLine, self)._prepare_invoice_line(qty)
+        res['of_layout_category_id'] = self.of_layout_category_id and self.of_layout_category_id.id or False
+        return res
 
 
 class OFSaleConfiguration(models.TransientModel):
@@ -981,3 +1004,91 @@ class OFSaleConfiguration(models.TransientModel):
     def set_of_quote_template_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_quote_template', self.of_quote_template)
+
+
+class AccountInvoice(models.Model):
+    _inherit = 'account.invoice'
+
+    of_layout_category_ids = fields.Many2many('of.sale.order.layout.category', string=u"Liste de section", copy=True)
+
+    @api.multi
+    def order_lines_layouted(self):
+        """ Surcharge de la fonction de mise en page des lignes de facture groupées par section"""
+        self.ensure_one()
+        report_pages = [[]]
+
+        # Si les sections avancées sont configurées
+        if self.user_has_groups('of_sale_quote_template.group_of_advanced_sale_layout_category') \
+                and self.of_layout_category_ids:
+            new_dict = {}
+            of_layout_category_ids_sorted = self.of_layout_category_ids.sorted('sequence')
+
+            # On crée une liste de lignes de facture pour chaque section avancée, y compris celles vides
+            for index, layout_category in enumerate(of_layout_category_ids_sorted):
+                new_dict[index] = {
+                    'layout_category': layout_category,
+                    'invoice_line_ids': self.invoice_line_ids.filtered(
+                        lambda line: line.of_layout_category_id.id == layout_category.id),
+                }
+
+            # On récupère les lignes de facture qui n'ont pas de lignes de section associées
+            lines_without_layout_category = self.invoice_line_ids.filtered(
+                lambda line: line.of_layout_category_id.id is False)
+            if lines_without_layout_category:
+                new_dict[-1] = {
+                    'layout_category': False,
+                    'invoice_line_ids': lines_without_layout_category,
+                }
+
+            # On remplit la liste de liste qui sera passée au rapport
+            for key, values in new_dict.items():
+                category = values['layout_category']
+                lines = values['invoice_line_ids']
+
+                # If last added category induced a pagebreak, this one will be on a new page
+                if report_pages[-1] and report_pages[-1][-1]['pagebreak']:
+                    report_pages.append([])
+                # Append category to current report page
+                report_pages[-1].append({
+                    'name': category and "%s - %s" % (category.sequence_name, category.name) or _('Uncategorized'),
+                    'subtotal': category and category.prix_vente if len(list(lines)) > 1 else False,
+                    'pagebreak': False,
+                    'lines': list(lines)
+                })
+
+        # Si les sections avancées ne sont pas configurées, on appelle le super()
+        else:
+            report_pages = super(AccountInvoice, self).order_lines_layouted()
+
+        return report_pages
+
+    @api.multi
+    def of_get_printable_data(self):
+        """
+            On surcharge cette fonction pour les sections avancées, car sur les factures,
+            les sections vides ne sont pas affichées.
+        """
+        result = super(AccountInvoice, self).of_get_printable_data()
+
+        # Si les sections avancées sont configurées
+        if self.user_has_groups('of_sale_quote_template.group_of_advanced_sale_layout_category') \
+                and self.of_layout_category_ids:
+            report_pages_full = self.order_lines_layouted()
+            report_lines = result['lines']
+            report_pages = []
+            for page_full in report_pages_full:
+                page = []
+                for group in page_full:
+                    lines = [line for line in group['lines'] if line in report_lines]
+                    group['lines'] = lines
+                    page.append(group)
+                if page:
+                    report_pages.append(page)
+            result['lines_layouted'] = report_pages
+
+        return result
+
+class AccountInvoiceLine(models.Model):
+    _inherit = 'account.invoice.line'
+
+    of_layout_category_id = fields.Many2one('of.sale.order.layout.category', string=u"Ligne de section")

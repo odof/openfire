@@ -323,6 +323,37 @@
         </field>
     </record>
 
+    <!-- Vue formulaire facture pour les sections avancées-->
+    <record id="of_sale_quote_template_account_invoice_form" model="ir.ui.view">
+        <field name="name">of.sale.quote.template.account.invoice.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="sale.account_invoice_form"/>
+        <field name="groups_id" eval="[(4, ref('of_sale_quote_template.group_of_advanced_sale_layout_category'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='layout_category_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='layout_category_id']" position="after">
+                <field name="of_layout_category_id" readonly="True"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_quote_template_account_invoice_line_form" model="ir.ui.view">
+        <field name="name">of.sale.quote.template.account.invoice.line.form</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="sale.account_invoice_line_form"/>
+        <field name="groups_id" eval="[(4, ref('of_sale_quote_template.group_of_advanced_sale_layout_category'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='layout_category_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='layout_category_id']" position="after">
+                <field name="of_layout_category_id" readonly="True"/>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Sale config wizard -->
     <record id="of_sale_quote_template_view_sale_config_settings" model="ir.ui.view">
         <field name="name">of sale settings</field>
