@@ -587,7 +587,7 @@
                             </div>
 
                             <!-- Signatures -->
-                            <div t-if="template.ri_signature and order" name="ri_signature" style="page-break-inside: avoid;">
+                            <div t-if="template.ri_signature" name="ri_signature" style="page-break-inside: avoid;">
                                 <div name="signature" style="width: 100%; page-break-inside: avoid;">
                                     <div style="width: 47%; float: left; page-break-inside: avoid;">
                                         <div class="row h4 mb4">
