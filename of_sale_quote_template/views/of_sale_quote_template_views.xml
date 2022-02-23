@@ -129,9 +129,10 @@
                 <page string="Sections" groups="of_sale_quote_template.group_of_advanced_sale_layout_category">
                     <button icon="fa-plus" name="action_add" type="object" class="pull-right"/>
                     <field name="of_section_line_ids" mode="tree,kanban" context="{'default_quote_id': active_id}" options="{'reload_on_button': true}">
-                        <tree string="Sections" create="false" editable="bottom">
+                        <tree string="Sections" decoration-bf="depth==0" decoration-muted="depth>1" create="false" editable="bottom">
                             <field name="quote_id" invisible="1"/>
                             <field name="sequence" invisible="1"/>
+                            <field name="depth" invisible="1"/>
                             <field name="sequence_name"/>
                             <field name="name"/>
                             <field name="parent_id" domain="[('quote_id', '=', quote_id), '!', ('id', 'child_of', id)]" options="{'no_create': True, 'no_edit': True}"/>
@@ -146,9 +147,9 @@
                                 <group>
                                     <field name="id" invisible="1"/>
                                     <field name="quote_id" invisible="1"/>
+                                    <field name="parent_id" domain="[('quote_id', '=', quote_id), ('id', '!=', id)]"/>
                                     <field name="name"/>
                                     <field name="sequence_name"/>
-                                    <field name="parent_id" domain="[('quote_id', '=', quote_id), ('id', '!=', id)]"/>
                                 </group>
                                 <notebook>
                                     <page string="Lignes d'article">
@@ -171,6 +172,40 @@
         <field name="arch" type="xml">
             <tree string="Modèle de devis">
                 <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Lignes de section du modèle de devis : vue liste -->
+    <record id="view_of_sale_quote_template_layout_category_tree" model="ir.ui.view">
+        <field name="name">of.sale.quote.template.layout.category.tree</field>
+        <field name="model">of.sale.quote.template.layout.category</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Sections">
+                <field name="sequence_name"/>
+                <field name="name"/>
+                <field name="parent_id"/>
+                <field name="quote_line_count" string="Composants"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <!-- Lignes de section du devis : vue liste -->
+    <record id="view_of_sale_order_layout_category_tree" model="ir.ui.view">
+        <field name="name">of.sale.order.layout.category.tree</field>
+        <field name="model">of.sale.order.layout.category</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Lignes de section">
+                <field name="sequence_name"/>
+                <field name="name"/>
+                <field name="parent_id"/>
+                <field name="order_line_count"/>
+                <field name="cout" widget="monetary"/>
+                <field name="prix_vente" widget="monetary"/>
+                <field name="pc_prix_vente"/>
             </tree>
         </field>
     </record>
@@ -243,8 +278,9 @@
                 <page string="Sections">
                     <button icon="fa-plus" name="action_add" type="object" class="pull-right"/>
                     <field name="of_layout_category_ids" mode="tree,kanban" attrs="{'readonly': [('state', 'in', ('done','cancel'))]}" context="{'default_order_id': active_id}" options="{'reload_on_button': true}">
-                        <tree string="Sale Layout Category" create="false" editable="bottom">
+                        <tree string="Sale Layout Category" decoration-bf="depth==0" decoration-muted="depth>1" create="false" editable="bottom">
                             <field name="id" invisible="1"/>
+                            <field name="depth" invisible="1"/>
                             <field name="sequence" invisible="1"/>
                             <field name="quote_section_line_id" invisible="1"/>
                             <field name="order_id" invisible="1"/>
@@ -264,8 +300,8 @@
                             <sheet>
                                 <group>
                                     <group>
-                                        <field name="name"/>
                                         <field name="parent_id"/>
+                                        <field name="name"/>
                                         <field name="sequence_name"/>
                                     </group>
                                     <group>
