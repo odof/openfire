@@ -208,21 +208,52 @@ class OfSaleQuoteTemplateLayoutCategory(models.Model):
     sequence = fields.Integer(required=True, default=10)
     sequence_name = fields.Char(string="Séquence", compute='_compute_sequence_name')
     name = fields.Char(string="Libellé", required=True)
+    depth = fields.Integer(string=u"Profondeur", compute='_compute_depth')
     quote_id = fields.Many2one('sale.quote.template', u'Modèle de devis', ondelete='cascade', index=True)
     parent_id = fields.Many2one('of.sale.quote.template.layout.category', string=u"Parent")
     quote_line_ids = fields.Many2many('sale.quote.line', string=u"Lignes de commande", compute='_compute_product_ids')
     quote_line_count = fields.Integer(string=u"Lignes de commande", compute='_compute_product_ids')
     product_ids = fields.Many2many('product.product', string=u"Composants", compute='_compute_product_ids')
 
+    @api.multi
+    def name_get(self):
+        res = []
+        for category in self:
+            if category.parent_id:
+                name = " %s / %s" % (category.parent_id.name_get_recursive(), category.name)
+            else:
+                name = category.name
+            res.append((category.id, name))
+
+        return res
+
+    def name_get_recursive(self):
+        if self.parent_id:
+            name = " %s / %s" % (self.parent_id.name_get_recursive(), self.name)
+        else:
+            name = self.name
+        return name
+
+    @api.depends('parent_id')
+    def _compute_depth(self):
+        for category in self:
+            if category.parent_id:
+                category.depth = 1 + category.parent_id.depth
+            else:
+                category.depth = 0
+
     @api.depends('quote_id')
     def _compute_product_ids(self):
         quote_line_obj = self.env['sale.quote.line']
         for line in self:
-            quote_line_ids = quote_line_obj.search(
-                [('quote_id', '=', line.quote_id.id), ('of_layout_category_id', '=', line.id)])
-            product_ids = quote_line_ids.mapped('product_id')
-            line.quote_line_ids = [(6, 0, quote_line_ids.ids)]
-            line.quote_line_count = len(quote_line_ids.ids)
+            quote_line = quote_line_obj.search(
+                [('quote_id', '=', line.quote_id.id), ('of_layout_category_id', 'child_of', line.id)])
+            line.quote_line_ids = [(6, 0, quote_line.ids)]
+            line.quote_line_count = len(quote_line.ids)
+
+            # On filtre les enfants indirects pour les produits de ligne de section
+            quote_lines_category_only = quote_line.search([('of_layout_category_id', '=', line.id)])
+            product_ids = quote_lines_category_only.mapped('product_id')
             line.product_ids = [(6, 0, product_ids.ids)]
 
     @api.depends('sequence', 'parent_id')
@@ -418,6 +449,7 @@ class OfSaleOrderLayoutCategory(models.Model):
     sequence = fields.Integer(required=True, default=10)
     sequence_name = fields.Char(string=u"Séquence")
     name = fields.Char(string=u"Libellé", required=True)
+    depth = fields.Integer(string=u"Profondeur", compute='_compute_depth')
     parent_id = fields.Many2one(
         'of.sale.order.layout.category', string=u"Parent", domain=lambda self: self._get_domain_parent_id())
     quote_section_line_id = fields.Many2one('of.sale.quote.template.layout.category', string=u"Ligne d'origine")
@@ -431,20 +463,51 @@ class OfSaleOrderLayoutCategory(models.Model):
     order_line_count = fields.Integer(string=u"Lignes de commande", compute='_compute_product_ids')
     product_ids = fields.Many2many('product.product', string=u"Articles", compute='_compute_product_ids')
 
+    @api.multi
+    def name_get(self):
+        res = []
+        for category in self:
+            if category.parent_id:
+                name = " %s / %s" % (category.parent_id.name_get_recursive(), category.name)
+            else:
+                name = category.name
+            res.append((category.id, name))
+
+        return res
+
+    def name_get_recursive(self):
+        if self.parent_id:
+            name = " %s / %s" % (self.parent_id.name_get_recursive(), self.name)
+        else:
+            name = self.name
+        return name
+
+    @api.depends('parent_id')
+    def _compute_depth(self):
+        for category in self:
+            if category.parent_id:
+                category.depth = 1 + category.parent_id.depth
+            else:
+                category.depth = 0
+
     @api.depends('order_id')
     def _compute_product_ids(self):
         order_line_obj = self.env['sale.order.line']
         for line in self:
+            # On prend toutes les lignes enfants pour le calcul du cout, de prix_vente, pc_prix_vente
             order_lines = order_line_obj.search(
-                [('order_id', '=', line.order_id.id), ('of_layout_category_id', '=', line.id)])
-            product_ids = order_lines.mapped('product_id')
-            line.order_line_ids = [(6, 0, order_lines.ids)]
-            line.order_line_count = len(order_lines.ids)
-            line.product_ids = [(6, 0, product_ids.ids)]
+                [('order_id', '=', line.order_id.id), ('of_layout_category_id', 'child_of', line.id)])
             line.cout = sum(order_lines.mapped('purchase_price'))
-            line.prix_vente = sum(order_lines.mapped('price_unit'))
+            line.prix_vente = sum(order_lines.mapped('price_subtotal'))
             if line.order_id.amount_untaxed:
                 line.pc_prix_vente = (line.prix_vente / line.order_id.amount_untaxed) * 100
+            line.order_line_ids = [(6, 0, order_lines.ids)]
+            line.order_line_count = len(order_lines.ids)
+
+            # On filtre les enfants indirects pour les produits de ligne de section
+            order_lines_category_only = order_lines.search([('of_layout_category_id', '=', line.id)])
+            product_ids = order_lines_category_only.mapped('product_id')
+            line.product_ids = [(6, 0, product_ids.ids)]
 
     @api.multi
     def action_wizard_products(self):
@@ -874,8 +937,8 @@ class SaleOrder(models.Model):
                     report_pages.append([])
                 # Append category to current report page
                 report_pages[-1].append({
-                    'name': category and category.name or _('Uncategorized'),
-                    'subtotal': category and category.prix_vente,
+                    'name': category and "%s - %s" % (category.sequence_name, category.name) or _('Uncategorized'),
+                    'subtotal': category and category.prix_vente if len(list(lines)) > 1 else False,
                     'pagebreak': False,
                     'lines': list(lines)
                 })
