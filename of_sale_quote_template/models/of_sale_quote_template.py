@@ -115,8 +115,6 @@ class SaleQuoteTemplate(models.Model):
                     [('quote_id', '=', quote.id), ('id', 'child_of', layout_category.id)]))
                 sequence = sequence + number_of_child
 
-
-
     @api.multi
     def action_add(self):
         wizard_form = self.env.ref('of_sale_quote_template.of_layout_category_add_wizard_form_view')
@@ -468,6 +466,12 @@ class OfSaleOrderLayoutCategory(models.Model):
     order_line_ids = fields.Many2many('sale.order.line', string=u"Lignes de commande", compute='_compute_product_ids')
     order_line_count = fields.Integer(string=u"Lignes de commande", compute='_compute_product_ids')
     product_ids = fields.Many2many('product.product', string=u"Articles", compute='_compute_product_ids')
+    invoice_status = fields.Selection(
+        selection=[('no', u"Rien à facturer"),
+                   ('to invoice', u"À facturer"),
+                   ('partially invoiced', u"Partiellement facturé"),
+                   ('invoiced', u"Entièrement facturé")],
+        compute='_compute_invoice_status', string=u"État de facturation", readonly=True, default='no')
 
     @api.multi
     def name_get(self):
@@ -520,6 +524,24 @@ class OfSaleOrderLayoutCategory(models.Model):
             order_lines_category_only = order_lines.search([('of_layout_category_id', '=', line.id)])
             product_ids = order_lines_category_only.mapped('product_id')
             line.product_ids = [(6, 0, product_ids.ids)]
+
+    @api.depends('order_line_ids.invoice_status', 'order_id.state')
+    def _compute_invoice_status(self):
+        for category in self:
+            line_invoice_status = category.order_line_ids.mapped('invoice_status')
+
+            if category.order_id.state not in ('sale', 'done'):
+                category.invoice_status = 'no'
+            elif not line_invoice_status:
+                category.invoice_status = 'invoiced'
+            elif all(invoice_status == 'to invoice' for invoice_status in line_invoice_status):
+                category.invoice_status = 'to invoice'
+            elif all(invoice_status == 'invoiced' for invoice_status in line_invoice_status):
+                category.invoice_status = 'invoiced'
+            elif any(invoice_status == 'invoiced' for invoice_status in line_invoice_status):
+                category.invoice_status = 'partially invoiced'
+            else:
+                category.invoice_status = 'no'
 
     @api.multi
     def action_wizard_products(self):
@@ -905,6 +927,26 @@ class SaleOrder(models.Model):
             'view_type': 'form',
             'view_mode': 'form',
             'res_model': 'of.layout.category.add.wizard',
+            'views': [(wizard_form.id, 'form')],
+            'view_id': wizard_form.id,
+            'target': 'new',
+            'context': ctx,
+        }
+
+    @api.multi
+    def action_layout_category_invoicing(self):
+        wizard_form = self.env.ref('of_sale_quote_template.of_layout_category_invoicing_wizard_view_form')
+
+        ctx = dict(
+            default_order_id=self.id,
+            default_layout_category_ids=self.of_layout_category_ids.filtered(
+                lambda c: c.invoice_status == 'to invoice').ids,
+        )
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'of.layout.category.invoicing.wizard',
             'views': [(wizard_form.id, 'form')],
             'view_id': wizard_form.id,
             'target': 'new',

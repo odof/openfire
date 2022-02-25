@@ -176,6 +176,41 @@
         </field>
     </record>
 
+    <!-- Lignes de section du modèle de devis : vue liste -->
+    <record id="view_of_sale_quote_template_layout_category_tree" model="ir.ui.view">
+        <field name="name">of.sale.quote.template.layout.category.tree</field>
+        <field name="model">of.sale.quote.template.layout.category</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Sections">
+                <field name="sequence_name"/>
+                <field name="name"/>
+                <field name="parent_id"/>
+                <field name="quote_line_count" string="Composants"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <!-- Lignes de section du devis : vue liste -->
+    <record id="view_of_sale_order_layout_category_tree" model="ir.ui.view">
+        <field name="name">of.sale.order.layout.category.tree</field>
+        <field name="model">of.sale.order.layout.category</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Lignes de section">
+                <field name="sequence_name"/>
+                <field name="name"/>
+                <field name="parent_id"/>
+                <field name="order_line_count"/>
+                <field name="cout" widget="monetary"/>
+                <field name="prix_vente" widget="monetary"/>
+                <field name="pc_prix_vente"/>
+                <field name="invoice_status"/>
+            </tree>
+        </field>
+    </record>
+
     <!-- Configuration modèle de devis : action et menu -->
     <record id="action_sale_quotation_template" model="ir.actions.act_window">
         <field name="name">Modèle de devis</field>
@@ -223,6 +258,9 @@
         <field name="groups_id" eval="[(4, ref('of_sale_quote_template.group_of_advanced_sale_layout_category'))]"/>
         <field name="priority">30</field>
         <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_layout_category_invoicing" string="Facturer par section" type="object" attrs="{'invisible': [('invoice_status', '!=', 'to invoice')]}"/>
+            </xpath>
             <xpath expr="//field[@name='order_line']" position="attributes">
                 <attribute name="context">{'hide_sale': context.get('hide_sale'), 'category_ids': of_layout_category_ids}</attribute>
             </xpath>
@@ -236,9 +274,13 @@
                 <field name="of_quote_line_id" invisible="1"/>
                 <field name="of_layout_category_id" domain="[('id', 'in', get_m2m_ids(context.get('category_ids', [[]])))]"/>
             </xpath>
+            <xpath expr="//notebook/page[1]/field[@name='order_line']/form//field[@name='invoice_status']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
             <xpath expr="//notebook/page[1]/field[@name='order_line']/tree/field[@name='layout_category_id']" position="after">
                 <field name="of_quote_line_id" invisible="1"/>
                 <field name="of_layout_category_id" domain="[('id', 'in', get_m2m_ids(context.get('category_ids', [[]])))]"/>
+                <field name="invoice_status"/>
             </xpath>
             <xpath expr="//notebook/page[1]" position="before">
                 <page string="Sections">
@@ -258,6 +300,7 @@
                             <field name="cout" widget="monetary"/>
                             <field name="prix_vente" widget="monetary"/>
                             <field name="pc_prix_vente"/>
+                            <field name="invoice_status"/>
                             <button icon="fa-files-o" name="action_duplicate" type="object" help="Dupliquer cette ligne"/>
                             <button icon="fa-arrows" name="action_move" type="object" help="Déplacer cette ligne"/>
                             <button icon="fa-plus" name="action_add" type="object" help="Ajouter une sous section à cette ligne"/>
@@ -274,6 +317,7 @@
                                         <field name="cout"/>
                                         <field name="prix_vente"/>
                                         <field name="pc_prix_vente"/>
+                                        <field name="invoice_status"/>
                                     </group>
                                 </group>
                                 <notebook>
@@ -285,6 +329,37 @@
                         </form>
                     </field>
                 </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Vue formulaire facture pour les sections avancées-->
+    <record id="of_sale_quote_template_account_invoice_form" model="ir.ui.view">
+        <field name="name">of.sale.quote.template.account.invoice.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="sale.account_invoice_form"/>
+        <field name="groups_id" eval="[(4, ref('of_sale_quote_template.group_of_advanced_sale_layout_category'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='layout_category_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='layout_category_id']" position="after">
+                <field name="of_layout_category_id" readonly="True"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_quote_template_account_invoice_line_form" model="ir.ui.view">
+        <field name="name">of.sale.quote.template.account.invoice.line.form</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="sale.account_invoice_line_form"/>
+        <field name="groups_id" eval="[(4, ref('of_sale_quote_template.group_of_advanced_sale_layout_category'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='layout_category_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='layout_category_id']" position="after">
+                <field name="of_layout_category_id" readonly="True"/>
             </xpath>
         </field>
     </record>
