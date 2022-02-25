@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_layout_category_invoicing_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.layout.category.invoicing.wizard.view.form</field>
+        <field name="model">of.layout.category.invoicing.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Facturer par section">
+                <group>
+                    <field name="order_id" invisible="1"/>
+                    <field name="layout_category_ids" domain="[('order_id', '=', order_id), ('invoice_status', '=', 'to_invoice')]" options="{'no_create': True, 'no_edit': True}">
+                        <tree>
+                            <field name="sequence_name"/>
+                            <field name="name"/>
+                            <field name="parent_id"/>
+                            <field name="order_line_without_child_count"/>
+                            <field name="invoice_status_without_child"/>
+                        </tree>
+                    </field>
+                </group>
+                <footer>
+                    <button type="object" name="action_done" string="Valider" class="oe_highlight"/>
+                    <button string="Annuler" class="oe_link" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

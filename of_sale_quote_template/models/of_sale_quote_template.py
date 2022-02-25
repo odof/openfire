@@ -115,8 +115,6 @@ class SaleQuoteTemplate(models.Model):
                     [('quote_id', '=', quote.id), ('id', 'child_of', layout_category.id)]))
                 sequence = sequence + number_of_child
 
-
-
     @api.multi
     def action_add(self):
         wizard_form = self.env.ref('of_sale_quote_template.of_layout_category_add_wizard_form_view')
@@ -451,17 +449,39 @@ class OfSaleOrderLayoutCategory(models.Model):
     name = fields.Char(string=u"Libellé", required=True)
     depth = fields.Integer(string=u"Profondeur", compute='_compute_depth')
     parent_id = fields.Many2one(
-        'of.sale.order.layout.category', string=u"Parent", domain=lambda self: self._get_domain_parent_id())
-    quote_section_line_id = fields.Many2one('of.sale.quote.template.layout.category', string=u"Ligne d'origine")
-    order_id = fields.Many2one('sale.order', string=u"Bon de commande", ondelete='cascade')
+        comodel_name='of.sale.order.layout.category',
+        string=u"Parent", domain=lambda self: self._get_domain_parent_id())
+    quote_section_line_id = fields.Many2one(
+        comodel_name='of.sale.quote.template.layout.category', string=u"Ligne d'origine")
+    order_id = fields.Many2one(comodel_name='sale.order', string=u"Bon de commande", ondelete='cascade')
     cout = fields.Float(string=u"Coût", digits=dp.get_precision('Product Price'), compute='_compute_product_ids')
     prix_vente = fields.Float(
         string=u"Prix de vente", digits=dp.get_precision('Product Price'), compute='_compute_product_ids')
     pc_prix_vente = fields.Float(
         string=u"% Prix de vente", digits=dp.get_precision('Product Price'), compute='_compute_product_ids')
-    order_line_ids = fields.Many2many('sale.order.line', string=u"Lignes de commande", compute='_compute_product_ids')
+    product_ids = fields.Many2many(comodel_name='product.product', string=u"Articles", compute='_compute_product_ids')
+
+    # Lignes de commande qui comptent également les lignes de commande des sections enfants
     order_line_count = fields.Integer(string=u"Lignes de commande", compute='_compute_product_ids')
-    product_ids = fields.Many2many('product.product', string=u"Articles", compute='_compute_product_ids')
+    order_line_ids = fields.Many2many(
+        comodel_name='sale.order.line', string=u"Lignes de commande", compute='_compute_product_ids')
+    invoice_status = fields.Selection(
+        selection=[('no', u"Rien à facturer"),
+                   ('to invoice', u"À facturer"),
+                   ('partially invoiced', u"Partiellement facturé"),
+                   ('invoiced', u"Entièrement facturé")],
+        compute='_compute_invoice_status', string=u"État de facturation", readonly=True, default='no')
+
+    # Lignes de commande qui ne comptent que les lignes de commande de la section
+    order_line_without_child_count = fields.Integer(string=u"Lignes de commande", compute='_compute_product_ids')
+    order_line_without_child_ids = fields.Many2many(
+        comodel_name='sale.order.line', string=u"Lignes de commande", compute='_compute_product_ids')
+    invoice_status_without_child = fields.Selection(
+        selection=[('no', u"Rien à facturer"),
+                   ('to invoice', u"À facturer"),
+                   ('partially invoiced', u"Partiellement facturé"),
+                   ('invoiced', u"Entièrement facturé")],
+        compute='_compute_invoice_status_without_child', string=u"État de facturation", readonly=True, default='no')
 
     @api.multi
     def name_get(self):
@@ -494,7 +514,7 @@ class OfSaleOrderLayoutCategory(models.Model):
     def _compute_product_ids(self):
         order_line_obj = self.env['sale.order.line']
         for line in self:
-            # On prend toutes les lignes enfants pour le calcul du cout, de prix_vente, pc_prix_vente
+            # On prend toutes les lignes enfants, notamment pour le calcul du cout, de prix_vente, pc_prix_vente
             order_lines = order_line_obj.search(
                 [('order_id', '=', line.order_id.id), ('of_layout_category_id', 'child_of', line.id)])
             line.cout = sum(order_lines.mapped('purchase_price'))
@@ -504,10 +524,48 @@ class OfSaleOrderLayoutCategory(models.Model):
             line.order_line_ids = [(6, 0, order_lines.ids)]
             line.order_line_count = len(order_lines.ids)
 
-            # On filtre les enfants indirects pour les produits de ligne de section
+            # On filtre les enfants indirects pour les produits de ligne de section et la facturation par section
             order_lines_category_only = order_lines.search([('of_layout_category_id', '=', line.id)])
+            line.order_line_without_child_ids = [(6, 0, order_lines_category_only.ids)]
+            line.order_line_without_child_count = len(order_lines_category_only.ids)
             product_ids = order_lines_category_only.mapped('product_id')
             line.product_ids = [(6, 0, product_ids.ids)]
+
+    @api.depends('order_line_ids.invoice_status', 'order_id.state')
+    def _compute_invoice_status(self):
+        for category in self:
+            line_invoice_status = category.order_line_ids.mapped('invoice_status')
+
+            if category.order_id.state not in ('sale', 'done'):
+                category.invoice_status = 'no'
+            elif not line_invoice_status:
+                category.invoice_status = 'invoiced'
+            elif all(invoice_status == 'to invoice' for invoice_status in line_invoice_status):
+                category.invoice_status = 'to invoice'
+            elif all(invoice_status == 'invoiced' for invoice_status in line_invoice_status):
+                category.invoice_status = 'invoiced'
+            elif any(invoice_status == 'invoiced' for invoice_status in line_invoice_status):
+                category.invoice_status = 'partially invoiced'
+            else:
+                category.invoice_status = 'no'
+
+    @api.depends('order_line_ids.invoice_status', 'order_id.state')
+    def _compute_invoice_status_without_child(self):
+        for category in self:
+            line_invoice_status = category.order_line_without_child_ids.mapped('invoice_status')
+
+            if category.order_id.state not in ('sale', 'done'):
+                category.invoice_status_without_child = 'no'
+            elif not line_invoice_status:
+                category.invoice_status_without_child = 'invoiced'
+            elif all(invoice_status == 'to invoice' for invoice_status in line_invoice_status):
+                category.invoice_status_without_child = 'to invoice'
+            elif all(invoice_status == 'invoiced' for invoice_status in line_invoice_status):
+                category.invoice_status_without_child = 'invoiced'
+            elif any(invoice_status == 'invoiced' for invoice_status in line_invoice_status):
+                category.invoice_status_without_child = 'partially invoiced'
+            else:
+                category.invoice_status_without_child = 'no'
 
     @api.multi
     def action_wizard_products(self):
@@ -891,6 +949,26 @@ class SaleOrder(models.Model):
             'view_type': 'form',
             'view_mode': 'form',
             'res_model': 'of.layout.category.add.wizard',
+            'views': [(wizard_form.id, 'form')],
+            'view_id': wizard_form.id,
+            'target': 'new',
+            'context': ctx,
+        }
+
+    @api.multi
+    def action_layout_category_invoicing(self):
+        wizard_form = self.env.ref('of_sale_quote_template.of_layout_category_invoicing_wizard_view_form')
+
+        ctx = dict(
+            default_order_id=self.id,
+            default_layout_category_ids=self.of_layout_category_ids.filtered(
+                lambda c: c.invoice_status_without_child in ['to invoice', 'partially invoiced']).ids,
+        )
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'of.layout.category.invoicing.wizard',
             'views': [(wizard_form.id, 'form')],
             'view_id': wizard_form.id,
             'target': 'new',
