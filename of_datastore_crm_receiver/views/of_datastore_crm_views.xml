@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Connecteur CRM -->
 
-    <!-- Connecteur Achat -->
-
-    <record id="of_datastore_purchase_form_view" model="ir.ui.view">
-        <field name="name">of.datastore.purchase.form.view</field>
-        <field name="model">of.datastore.purchase</field>
+    <record id="of_datastore_crm_receiver_form_view" model="ir.ui.view">
+        <field name="name">of.datastore.crm.receiver.form.view</field>
+        <field name="model">of.datastore.crm.receiver</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
             <form>
                 <sheet>
                     <group>
                         <group>
-                            <field name="partner_id"/>
                             <field name="datastore_id"/>
                             <field name="active"/>
                         </group>
@@ -31,28 +29,27 @@
         </field>
     </record>
 
-    <record id="of_datastore_purchase_tree_view" model="ir.ui.view">
-        <field name="name">of.datastore.purchase.tree.view</field>
-        <field name="model">of.datastore.purchase</field>
+    <record id="of_datastore_crm_receiver_tree_view" model="ir.ui.view">
+        <field name="name">of.datastore.crm.receiver.tree.view</field>
+        <field name="model">of.datastore.crm.receiver</field>
         <field name="type">tree</field>
         <field name="arch" type="xml">
             <tree colors="gray:active == False">
                 <field name="active" invisible="1"/>
-                <field name="partner_id"/>
                 <field name="db_name"/>
             </tree>
         </field>
     </record>
 
-    <record id="of_datastore_purchase_action" model="ir.actions.act_window">
-        <field name="name">Connecteurs achat</field>
-        <field name="res_model">of.datastore.purchase</field>
+    <record id="of_datastore_crm_receiver_action" model="ir.actions.act_window">
+        <field name="name">Connecteurs CRM</field>
+        <field name="res_model">of.datastore.crm.receiver</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
-        <field name="view_id" ref="of_datastore_purchase_tree_view"/>
+        <field name="view_id" ref="of_datastore_crm_receiver_tree_view"/>
         <field name="context">{'active_test':False}</field>
     </record>
 
-    <menuitem name="Connecteurs achat" id="of_datastore_purchase_menu" parent="of_datastore_connector.of_datastore_connector_menu" sequence="1" action="of_datastore_purchase_action"/>
+    <menuitem name="Connecteurs CRM" id="of_datastore_crm_receiver_menu" parent="of_datastore_connector.of_datastore_connector_menu" groups="base.group_system" action="of_datastore_crm_receiver_action"/>
 
 </odoo>
