@@ -68,10 +68,21 @@
         </field>
     </record>
 
+    <record id="of_project_task_planning_pivot_view" model="ir.ui.view">
+        <field name="name">of.project.task.planning.pivot.view</field>
+        <field name="model">of.project.task.planning</field>
+        <field name="arch" type="xml">
+            <pivot string="Activités planifiées">
+                <field name="period_id" type="row"/>
+                <field name="duration" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
     <record id="of_project_task_planning_action" model="ir.actions.act_window">
         <field name="name">Activités planifiées</field>
         <field name="res_model">of.project.task.planning</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,form,pivot</field>
         <field name="search_view_id" ref="of_project_task_planning_search_view"/>
         <field name="context">{'search_default_my_activities': 1,
                                'search_default_incoming': 1,

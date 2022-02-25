@@ -11,7 +11,7 @@ class OFProjectTaskPlanning(models.Model):
         selection=[('to_validate', u"À valider"), ('validated', u"Validé")], string=u"État", default='validated')
     task_id = fields.Many2one(comodel_name='project.task', string=u"Tâche", required=True, ondelete='cascade')
     project_id = fields.Many2one(
-        comodel_name='project.project', related='task_id.project_id', string=u"Projet", readonly=True)
+        comodel_name='project.project', related='task_id.project_id', string=u"Projet", readonly=True, store=True)
     task_stage_id = fields.Many2one(
         comodel_name='project.task.type', related='task_id.stage_id', string=u"Étape de la tâche", readonly=True)
     type_id = fields.Many2one(comodel_name='of.project.task.planning.type', string=u"Type", required=True)
