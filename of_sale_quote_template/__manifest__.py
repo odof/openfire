@@ -32,6 +32,7 @@ Si une ligne d'article n'a pas pu être ajoutée, le champ 'Note d'insertion' ap
         'security/ir.model.access.csv',
         'wizards/of_select_product_wizard_views.xml',
         'wizards/of_layout_category_wizard_views.xml',
+        'wizards/of_layout_category_invoicing_wizard_views.xml',
         'views/of_sale_quote_template_views.xml',
         'views/sale_config_settings_views.xml',
         'views/of_sale_quote_template_templates.xml',
