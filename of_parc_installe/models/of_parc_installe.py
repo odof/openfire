@@ -449,7 +449,7 @@ class ProjectIssue(models.Model):
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    of_parc_installe_ids = fields.Many2many('of.parc.installe', string=u'Parcs installés')
+    of_parc_installe_ids = fields.Many2many('of.parc.installe', string=u'Parcs installés', copy=False)
     of_parc_count = fields.Integer(compute='_compute_parc_count')
 
     @api.multi
