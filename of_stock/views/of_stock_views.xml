@@ -244,6 +244,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="sequence" widget="handle"/>
+                <field name="active" invisible="1"/>
                 <field name="default_code"/>
                 <field name="name"/>
                 <field name="categ_id"/>
