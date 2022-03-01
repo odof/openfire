@@ -136,6 +136,14 @@
                             * Les données saisies dans ce champ seront visualisées dans planning d'intervention et imprimées dans la fiche d'intervention.
                         </div>
                      </page>
+                     <page string="Impression" name="print">
+                         <separator string="Impression spécifique" colspan="4"/>
+                         <separator string="Kits" colspan="4"/>
+                         <group string="Options d'impression">
+                             <field name="of_price_printing"/>
+                             <field name="of_apply_on_invoice"/>
+                         </group>
+                     </page>
                 </xpath>
                 <!-- Ajout option Documents joints -->
                 <xpath expr="//page//group[@name='technical']" position="after">

@@ -219,6 +219,10 @@ class SaleOrder(models.Model):
     of_delivered = fields.Boolean(string=u"Livrée", compute="_compute_delivered", store=True)
     of_allow_quote_addition = fields.Boolean(
         string=u"Permet l'ajout de devis complémentaires", compute='_compute_of_allow_quote_addition')
+    of_price_printing = fields.Selection([
+        ('order_line', u'Prix par ligne de commande'),
+    ], string=u"Impressions des prix", default='order_line', required=True)
+    of_apply_on_invoice = fields.Boolean(string=u"Appliquer aux factures", default=True)
 
     @api.depends('company_id')
     def _compute_of_allow_quote_addition(self):
