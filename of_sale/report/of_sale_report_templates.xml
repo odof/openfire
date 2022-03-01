@@ -131,12 +131,12 @@
                             </t>
                             <th name="descr" style="width: 60%">Description</th>
                             <th name="quant" class="text-right">Quantity</th>
-                            <th name="price_unit_ht" class="text-right" groups="sale.group_show_price_subtotal">Prix/U&amp;nbsp;HT</th> <!-- HT ou les 2 -->
-                            <th name="price_unit_ttc" class="text-right" groups="sale.group_show_price_total">Prix/U&amp;nbsp;TTC</th> <!-- TTC ou les 2 -->
-                            <th name="disc" t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">Disc.(%)</th>
-                            <th name="taxe" class="text-right">Taxes</th>
-                            <th name="price_ht" class="text-right" groups="sale.group_show_price_subtotal">Prix&amp;nbsp;HT</th>
-                            <th name="price_total" class="text-right price_tax_included" groups="sale.group_show_price_total">Prix&amp;nbsp;TTC</th>
+                            <th name="price_unit_ht" class="text-right" groups="sale.group_show_price_subtotal" t-att-style="'' if doc.of_price_printing == 'order_line' else 'display:none;'">Prix/U&amp;nbsp;HT</th> <!-- HT ou les 2 -->
+                            <th name="price_unit_ttc" class="text-right" groups="sale.group_show_price_total" t-att-style="'' if doc.of_price_printing == 'order_line' else 'display:none;'">Prix/U&amp;nbsp;TTC</th> <!-- TTC ou les 2 -->
+                            <th name="disc" t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line" t-att-style="'' if doc.of_price_printing == 'order_line' else 'display:none;'">Disc.(%)</th>
+                            <th name="taxe" class="text-right" t-att-style="'' if doc.of_price_printing == 'order_line' else 'display:none;'">Taxes</th>
+                            <th name="price_ht" class="text-right" groups="sale.group_show_price_subtotal" t-att-style="'' if doc.of_price_printing == 'order_line' else 'display:none;'">Prix&amp;nbsp;HT</th>
+                            <th name="price_total" class="text-right price_tax_included" groups="sale.group_show_price_total" t-att-style="'' if doc.of_price_printing == 'order_line' else 'display:none;'">Prix&amp;nbsp;TTC</th>
                         </tr>
                    </thead>
                    <tbody class="sale_tbody">
@@ -181,26 +181,26 @@
                                         <span t-esc="(str(l.product_uom_qty)).rstrip('0').rstrip('.').replace('.', ',')"/>
                                         <span t-field="l.product_uom" groups="product.group_uom"/>
                                     </td>
-                                    <td name="price_unit_ht" class="text-right" groups="sale.group_show_price_subtotal">
+                                    <td name="price_unit_ht" class="text-right" groups="sale.group_show_price_subtotal" t-att-style="'' if doc.of_price_printing == 'order_line' else 'display:none;'">
                                         <span t-field="l.of_price_unit_ht" t-options='{"widget": "monetary",
                                             "display_currency": doc.pricelist_id.currency_id}'/>
                                     </td>
-                                    <td name="price_unit_ttc" class="text-right" groups="sale.group_show_price_total">
+                                    <td name="price_unit_ttc" class="text-right" groups="sale.group_show_price_total" t-att-style="'' if doc.of_price_printing == 'order_line' else 'display:none;'">
                                         <span t-field="l.of_price_unit_ttc" t-options='{"widget": "monetary",
                                             "display_currency": doc.pricelist_id.currency_id}'/>
                                     </td>
                                     <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line"
-                                        name="disc">
+                                        name="disc" t-att-style="'' if doc.of_price_printing == 'order_line' else 'display:none;'">
                                         <span t-field="l.discount"/>
                                     </td>
-                                    <td class="text-right" name="taxe">
+                                    <td class="text-right" name="taxe" t-att-style="'' if doc.of_price_printing == 'order_line' else 'display:none;'">
                                         <span t-esc="', '.join(map(lambda x: (x.description or x.name), l.tax_id))"/>
                                     </td>
-                                    <td class="text-right" groups="sale.group_show_price_subtotal" name="price_ht">
+                                    <td class="text-right" groups="sale.group_show_price_subtotal" name="price_ht" t-att-style="'' if doc.of_price_printing == 'order_line' else 'display:none;'">
                                         <span t-field="l.price_subtotal"
                                             t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
                                     </td>
-                                    <td class="text-right" groups="sale.group_show_price_total" name="price_total">
+                                    <td class="text-right" groups="sale.group_show_price_total" name="price_total" t-att-style="'' if doc.of_price_printing == 'order_line' else 'display:none;'">
                                         <span t-field="l.price_total"
                                             t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
                                     </td>
@@ -227,7 +227,7 @@
                 </t>
             </t>
 
-            <div class="row" name="total">
+            <div class="row" name="total" t-att-style="'' if doc.of_price_printing == 'order_line' else 'display:none;'">
                 <div name="subdivision" class="col-xs-4 pull-right">
                     <table class="table table-condensed">
                         <!-- Affichage des paiements et autres groupes de sous-totaux -->
@@ -487,12 +487,12 @@ Sinon :
                         <th name="descr" style="width: 60%">Description</th>
                         <th name="source" class="hidden">Doc Source</th>
                         <th name="quant" class="text-right">Quantité</th>
-                        <th name="price_unit_ht" class="text-right" groups="sale.group_show_price_subtotal">Prix/U&amp;nbsp;HT</th> <!-- HT ou les 2 -->
-                        <th name="price_unit_ttc" class="text-right" groups="sale.group_show_price_total">Prix/U&amp;nbsp;TTC</th> <!-- TTC ou les 2 -->
-                        <th name="disc" t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">Réduc.(%)</th>
-                        <th name="taxe" class="text-right">TVA</th>
-                        <th name="price_ht" class="text-right" groups="sale.group_show_price_subtotal">Prix&amp;nbsp;HT</th>
-                        <th name="price_total" class="text-right price_tax_included" groups="sale.group_show_price_total">Prix&amp;nbsp;TTC</th>
+                        <th name="price_unit_ht" class="text-right" groups="sale.group_show_price_subtotal" t-att-style="'' if o.of_price_printing == 'order_line' else 'display:none;'">Prix/U&amp;nbsp;HT</th> <!-- HT ou les 2 -->
+                        <th name="price_unit_ttc" class="text-right" groups="sale.group_show_price_total" t-att-style="'' if o.of_price_printing == 'order_line' else 'display:none;'">Prix/U&amp;nbsp;TTC</th> <!-- TTC ou les 2 -->
+                        <th name="disc" t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line" t-att-style="'' if o.of_price_printing == 'order_line' else 'display:none;'">Réduc.(%)</th>
+                        <th name="taxe" class="text-right" t-att-style="'' if o.of_price_printing == 'order_line' else 'display:none;'">TVA</th>
+                        <th name="price_ht" class="text-right" groups="sale.group_show_price_subtotal" t-att-style="'' if o.of_price_printing == 'order_line' else 'display:none;'">Prix&amp;nbsp;HT</th>
+                        <th name="price_total" class="text-right price_tax_included" groups="sale.group_show_price_total" t-att-style="'' if o.of_price_printing == 'order_line' else 'display:none;'">Prix&amp;nbsp;TTC</th>
                     </tr>
                 </thead>
                 <tbody class="invoice_tbody">
@@ -525,25 +525,25 @@ Sinon :
                                     <span t-esc="(str(l.quantity)).rstrip('0').rstrip('.').replace('.', ',')"/>
                                     <span t-field="l.uom_id"  groups="product.group_uom"/>
                                 </td>
-                                <td name="price_unit_ht" class="text-right" groups="sale.group_show_price_subtotal">
+                                <td name="price_unit_ht" class="text-right" groups="sale.group_show_price_subtotal" t-att-style="'' if o.of_price_printing == 'order_line' else 'display:none;'">
                                     <span t-field="l.of_price_unit_ht" t-options="{'precision':2,
                                                 'widget': 'monetary', 'display_currency': o.currency_id}"/>
                                 </td>
-                                <td name="price_unit_ttc" class="text-right" groups="sale.group_show_price_total">
+                                <td name="price_unit_ttc" class="text-right" groups="sale.group_show_price_total" t-att-style="'' if o.of_price_printing == 'order_line' else 'display:none;'">
                                     <span t-field="l.of_price_unit_ttc" t-options="{'precision':2,
                                                 'widget': 'monetary', 'display_currency': o.currency_id}"/>
                                 </td>
-                                <td name="disc" t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
+                                <td name="disc" t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line" t-att-style="'' if o.of_price_printing == 'order_line' else 'display:none;'">
                                     <span t-field="l.discount"/>
                                 </td>
-                                <td name="taxe" class="text-right">
+                                <td name="taxe" class="text-right" t-att-style="'' if o.of_price_printing == 'order_line' else 'display:none;'">
                                     <span t-esc="', '.join(map(lambda x: x.description or x.name, l.invoice_line_tax_ids))"/>
                                 </td>
-                                <td name="price_ht" class="text-right" groups="sale.group_show_price_subtotal">
+                                <td name="price_ht" class="text-right" groups="sale.group_show_price_subtotal" t-att-style="'' if o.of_price_printing == 'order_line' else 'display:none;'">
                                     <span t-field="l.price_subtotal"
                                         t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                                 </td>
-                                <td name="price_total" class="text-right" groups="sale.group_show_price_total">
+                                <td name="price_total" class="text-right" groups="sale.group_show_price_total" t-att-style="'' if o.of_price_printing == 'order_line' else 'display:none;'">
                                     <span t-field="l.price_total"
                                         t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                                 </td>

@@ -283,6 +283,9 @@
                 <field name="of_layout_category_id" domain="[('id', 'in', get_m2m_ids(context.get('category_ids', [[]])))]"/>
                 <field name="invoice_status"/>
             </xpath>
+            <xpath expr="//field[@name='of_price_printing']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
             <xpath expr="//notebook/page[1]" position="before">
                 <page string="Sections">
                     <button icon="fa-plus" name="action_add" type="object" class="pull-right"/>
@@ -346,6 +349,18 @@
             </xpath>
             <xpath expr="//field[@name='layout_category_id']" position="after">
                 <field name="of_layout_category_id" readonly="True"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_account_invoice_view_form" model="ir.ui.view">
+        <field name="name">of.sale.quote.template.account.invoice.view.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="of_sale.of_account_invoice_view_form"/>
+        <field name="groups_id" eval="[(4, ref('of_sale_quote_template.group_of_advanced_sale_layout_category'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_price_printing']" position="attributes">
+                <attribute name="invisible">0</attribute>
             </xpath>
         </field>
     </record>
