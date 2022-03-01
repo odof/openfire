@@ -136,6 +136,14 @@
                             * Les données saisies dans ce champ seront visualisées dans planning d'intervention et imprimées dans la fiche d'intervention.
                         </div>
                      </page>
+                     <page string="Impression" name="print">
+                         <group>
+                             <group string="Options d'impression">
+                                 <field name="of_price_printing" invisible="1"/>
+                                 <field name="of_apply_on_invoice"/>
+                             </group>
+                         </group>
+                     </page>
                 </xpath>
                 <!-- Ajout option Documents joints -->
                 <xpath expr="//page//group[@name='technical']" position="after">
@@ -553,6 +561,9 @@
             </xpath>
             <xpath expr="//page[@name='other_info']/group/group[last()]" position="inside">
                 <field name="of_mail_template_ids" widget="many2many_tags"/>
+            </xpath>
+            <xpath expr="//page[@name='other_info']/group/group[last()]" position="inside">
+                <field name="of_price_printing" invisible="1"/>
             </xpath>
         </field>
     </record>

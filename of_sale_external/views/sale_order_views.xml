@@ -7,7 +7,7 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='docs']" position="after">
+            <xpath expr="//page[@name='print']/group" position="inside">
                 <group string="Impression spécifique" name="specific">
                     <field name="of_specific_title"/>
                     <field name="of_specific_date"/>
