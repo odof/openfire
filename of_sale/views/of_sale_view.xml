@@ -137,11 +137,11 @@
                         </div>
                      </page>
                      <page string="Impression" name="print">
-                         <separator string="Impression spécifique" colspan="4"/>
-                         <separator string="Kits" colspan="4"/>
-                         <group string="Options d'impression">
-                             <field name="of_price_printing" invisible="1"/>
-                             <field name="of_apply_on_invoice"/>
+                         <group>
+                             <group string="Options d'impression">
+                                 <field name="of_price_printing" invisible="1"/>
+                                 <field name="of_apply_on_invoice"/>
+                             </group>
                          </group>
                      </page>
                 </xpath>

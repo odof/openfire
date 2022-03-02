@@ -310,7 +310,7 @@
                 <!-- Permet de mettre de la couleur lors d'un problème de montant -->
                 <field name="of_difference" invisible="1"/>
             </xpath>
-            <xpath expr="//page//group[@name='technical']" position="after">
+            <xpath expr="//page[@name='print']/group" position="inside">
                 <group string="Kit" name='kit'>
                     <span colspan="2" attrs="{'invisible': [('of_contains_kit','!=',False)]}">Cette commande ne contient pas de kit</span>
                     <group attrs="{'invisible': [('of_contains_kit','=',False)]}" colspan="2">
