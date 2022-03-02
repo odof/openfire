@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <template id="of_report_saleorder_document"  inherit_id="sale.report_saleorder_document">
+        <xpath expr="//table[@name='order_lines_layouted']/tbody/t/t[2]/tr" position="attributes">
+            <attribute name="t-att-style">'' if doc.of_price_printing in ['order_line', 'without_any_price'] else 'display:none;'</attribute>
+        </xpath>
+    </template>
+
     <template id="report_of_liste_choix_document" inherit_id="sale.report_saleorder_document" primary="True">
         <xpath expr="//table[@name='order_lines_layouted']/thead/tr/th[3]" position="attributes">
             <attribute name="style">display: none;</attribute>

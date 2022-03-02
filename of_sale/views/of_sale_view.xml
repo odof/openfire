@@ -140,7 +140,7 @@
                          <separator string="Impression spécifique" colspan="4"/>
                          <separator string="Kits" colspan="4"/>
                          <group string="Options d'impression">
-                             <field name="of_price_printing"/>
+                             <field name="of_price_printing" invisible="1"/>
                              <field name="of_apply_on_invoice"/>
                          </group>
                      </page>
@@ -559,6 +559,9 @@
             </xpath>
             <xpath expr="//page[@name='other_info']/group/group[last()]" position="inside">
                 <field name="of_mail_template_ids" widget="many2many_tags"/>
+            </xpath>
+            <xpath expr="//page[@name='other_info']/group/group[last()]" position="inside">
+                <field name="of_price_printing" invisible="1"/>
             </xpath>
         </field>
     </record>

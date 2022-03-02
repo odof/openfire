@@ -17,6 +17,7 @@ Gestion des listes de choix
     "category": "OpenFire",
     "data": [
         'report/of_liste_choix_views.xml',
+        'views/of_liste_choix_views.xml',
     ],
     'installable': True,
     'application': False,
