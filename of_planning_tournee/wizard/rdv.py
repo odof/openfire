@@ -528,7 +528,7 @@ class OfTourneeRdv(models.TransientModel):
             interventions = intervention_obj.search([('employee_ids', 'in', employees_dispo),
                                                      ('date', '<=', date_recherche_str),
                                                      ('date_deadline', '>=', date_recherche_str),
-                                                     ('state', 'in', ('draft', 'confirm', 'done', 'unfinished')),
+                                                     ('state', 'not in', ('cancel', 'postponed')),
                                                      ], order='date')
 
             employee_intervention_dates = {employee_id: [] for employee_id in employees_dispo}
