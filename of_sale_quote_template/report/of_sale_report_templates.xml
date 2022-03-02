@@ -2,10 +2,10 @@
 <odoo>
 
     <template id="of_report_saleorder_document"  inherit_id="sale.report_saleorder_document">
-        <xpath expr="//table[@name='order_lines_layouted']/tbody/t/t[1]/tr/td" position="attributes">
+        <xpath expr="//table[@name='order_lines_layouted']//td[1]" position="attributes">
             <attribute name="t-att-style">'background-color: ' + layout_category['color'] + ';color: ' + doc.get_color_font() + '; font-weight:  bold; border-bottom: 1px solid black;'</attribute>
         </xpath>
-        <xpath expr="//table[@name='order_lines_layouted']/tbody/t/t[1]/tr/td/t" position="replace">
+        <xpath expr="//table[@name='order_lines_layouted']//td[1]/t" position="replace">
             <t t-raw="layout_category['name']"/>
         </xpath>
         <xpath expr="//table[@name='order_lines_layouted']/tbody/t/t[2]/tr" position="attributes">
