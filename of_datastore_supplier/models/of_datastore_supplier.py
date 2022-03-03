@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+import odoo.addons.decimal_precision as dp
 
 
 class OfProductBrand(models.Model):
@@ -34,6 +35,9 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     of_stock_informations = fields.Text(string="Informations de stock")
+    prochain_tarif = fields.Float(
+        string=u"Prochain tarif", digits=dp.get_precision('Product Price'), default=0.0)
+    date_prochain_tarif = fields.Date(string=u"Date du prochain tarif")
 
     @api.multi
     def of_datastore_get_quantities(self):

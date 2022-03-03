@@ -1272,8 +1272,9 @@ class ProductTemplate(models.Model):
     # ce champ va permettre de faire une recherche sur le tarif centralisé
     of_datastore_supplier_id = fields.Many2one('of.datastore.supplier', related='brand_id.datastore_supplier_id')
     of_datastore_has_link = fields.Boolean(_compute='_compute_of_datastore_has_link')
-    prochain_tarif = fields.Float('Prochain tarif', digits=dp.get_precision('Product Price'), default=0.0)
-    date_prochain_tarif = fields.Date(string="Date du prochain tarif")
+    prochain_tarif = fields.Float(
+        string=u"Prochain tarif", digits=dp.get_precision('Product Price'), default=0.0, readonly=True)
+    date_prochain_tarif = fields.Date(string=u"Date du prochain tarif", readonly=True)
     # Booléen utilisé par afficher ou non le bouton 'Voir stock fournisseur'
     of_datastore_stock = fields.Boolean(string=u"Stock centralisé", compute='_compute_of_datastore_stock')
 

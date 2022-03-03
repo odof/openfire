@@ -37,6 +37,10 @@
                 <separator string="Informations de stock"/>
                 <field name="of_stock_informations" nolabel="1"/>
             </xpath>
+            <xpath expr="//field[@name='of_seller_remise']" position="after">
+                <field name="prochain_tarif" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="date_prochain_tarif"/>
+            </xpath>
         </field>
     </record>
 
