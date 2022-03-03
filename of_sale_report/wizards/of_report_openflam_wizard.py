@@ -68,6 +68,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
         # color_light_gray = '#C0C0C0'
         color_lighter_gray = '#DDDDDD'
         color_light_blue = '#66FFFF'
+        color_light_yellow = '#FFFB1C'
         color_red = '#800000'
 
         style_text_border = workbook.add_format({
@@ -119,6 +120,15 @@ class OFRapportOpenflamWizard(models.TransientModel):
             'bg_color': color_light_blue,
         })
 
+        style_text_title_border_yellow = workbook.add_format({
+            'valign': 'vcenter',
+            'align': 'center',
+            'border': 1,
+            'bold': True,
+            'font_size': 10,
+            'bg_color': color_light_yellow,
+        })
+
         style_text_title_border_red = workbook.add_format({
             'valign': 'vcenter',
             'align': 'center',
@@ -163,6 +173,14 @@ class OFRapportOpenflamWizard(models.TransientModel):
             'num_format': '#,##0.00',
             'font_size': 8,
             'border': True,
+        })
+
+        style_number_border_yellow = workbook.add_format({
+            'valign': 'vcenter',
+            'num_format': '#,##0.00',
+            'font_size': 8,
+            'border': True,
+            'bg_color': color_light_yellow,
         })
 
         style_number_border_percent = workbook.add_format({
@@ -220,6 +238,16 @@ class OFRapportOpenflamWizard(models.TransientModel):
             'num_format': '#,##0.00',
         })
 
+        style_number_title_border_yellow = workbook.add_format({
+            'valign': 'vcenter',
+            'align': 'right',
+            'border': 1,
+            'bold': True,
+            'font_size': 10,
+            'bg_color': color_light_yellow,
+            'num_format': '#,##0.00',
+        })
+
         style_number_total_border = workbook.add_format({
             'valign': 'vcenter',
             'align': 'right',
@@ -236,18 +264,21 @@ class OFRapportOpenflamWizard(models.TransientModel):
             'text_bold_border': style_text_bold_border,
             'text_title_border': style_text_title_border,
             'text_title_border_blue': style_text_title_border_blue,
+            'text_title_border_yellow': style_text_title_border_yellow,
             'text_title_border_blue_left': style_text_title_border_blue_left,
             'text_title_border_red': style_text_title_border_red,
             'text_title_ita_border': style_text_title_ita_border,
             'text_title_border_wrap': style_text_title_border_wrap,
             'text_total_border': style_text_total_border,
             'number_border': style_number_border,
+            'number_border_yellow': style_number_border_yellow,
             'number_border_percent': style_number_border_percent,
             'number_bold_border': style_number_bold_border,
             'number_title_border': style_number_title_border,
             'number_title_border_blue': style_number_title_border_blue,
             'number_title_border_blue_percent': style_number_title_border_blue_percent,
             'number_title_border_red': style_number_title_border_red,
+            'number_title_border_yellow': style_number_title_border_yellow,
             'number_total_border': style_number_total_border,
         }
 
@@ -981,15 +1012,17 @@ class OFRapportOpenflamWizard(models.TransientModel):
         worksheet.set_margins(left=0.35, right=0.35, top=0.2, bottom=0.2)
 
         # --- Initialisation des colonnes ---
-        worksheet.set_column(0, 0, 20)  # Largeur colonne 'Paiements'
+        worksheet.set_column(0, 0, 12)  # Largeur colonne 'Date'
         worksheet.set_column(1, 1, 20)  # Largeur colonne 'Partenaire'
-        worksheet.set_column(2, 2, 20)  # Largeur colonne 'Date'
-        worksheet.set_column(3, 3, 26)  # Largeur colonne 'taxe 1'
-        worksheet.set_column(4, 4, 26)  # Largeur colonne 'taxe 2'
-        worksheet.set_column(5, 5, 26)  # Largeur colonne 'taxe 3'
-        worksheet.set_column(6, 6, 26)  # Largeur colonne 'taxe 4'
-        worksheet.set_column(7, 7, 26)  # Largeur colonne 'taxe 5'
-        worksheet.set_column(8, 8, 26)  # Largeur colonne 'taxe 6'
+        worksheet.set_column(2, 2, 20)  # Largeur colonne 'Paiements'
+        worksheet.set_column(3, 3, 16)  # Largeur colonne 'Factures'
+        worksheet.set_column(4, 4, 10)  # Largeur colonne 'Montant'
+        worksheet.set_column(5, 5, 10)  # Largeur colonne 'taxe 1'
+        worksheet.set_column(6, 6, 10)  # Largeur colonne 'taxe 2'
+        worksheet.set_column(7, 7, 10)  # Largeur colonne 'taxe 3'
+        worksheet.set_column(8, 8, 10)  # Largeur colonne 'taxe 4'
+        worksheet.set_column(9, 9, 10)  # Largeur colonne 'taxe 5'
+        worksheet.set_column(10, 10, 10)  # Largeur colonne 'taxe 6'
 
         # --- Entête ---
         worksheet.merge_range(0, 0, 0, 2, 'Nom du fichier', styles['text_title_ita_border'])
@@ -1004,6 +1037,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
         payment_obj = self.env['account.payment']
         aml_obj = self.env['account.move.line']
         move_line_obj = self.env['account.move.line']
+        tax_obj = self.env['account.tax']
         domain = [('partner_type', '=', 'customer')]
         if self.type_filtre_date == 'period':
             domain += [('payment_date', '>=', self.period_n.date_start), ('payment_date', '<=', self.period_n.date_end)]
@@ -1019,12 +1053,14 @@ class OFRapportOpenflamWizard(models.TransientModel):
         for company in companies:
             # Vérification par société
             payment_filtered = payments.filtered(lambda p: p.company_id == company)
-            display[company] = {'payments': {}, 'tax_account_used': {}, 'undefined_payments': []}
+            display[company] = {'payments': {}, 'tax_account_used': {}, 'undefined_payments': [], 'taxes': []}
             display_company = display[company]
             payments_dict = display_company['payments']
             tax_account_used_dict = display_company['tax_account_used']
             undefined_payments_list = display_company['undefined_payments']
-            tax_column = 3
+            tax_accounts = []
+            tax_column = 5
+            tax_column_increment = 3  # 3 colonnes par taxes : HT, TAXE, TTC
 
             for payment in payment_filtered:
                 affectations = []
@@ -1060,15 +1096,27 @@ class OFRapportOpenflamWizard(models.TransientModel):
                         tax_move_lines = invoice_move.line_ids.filtered(lambda l: l.account_id.id in tax_accounts_ids)
                         for tax_move_line in tax_move_lines:
                             account = tax_move_line.account_id
-                            if account not in tax_account_used_dict:
-                                tax_account_used_dict[account] = tax_column
-                                tax_column += 1
+                            if account not in tax_accounts:
+                                tax_accounts.append(account)
                             if account not in payment_dict:
-                                payment_dict[account] = 0.0
-                            payment_dict[account] -= tax_move_line.balance * percent
+                                payment_dict[account] = {"ht": 0.0, "taxe": 0.0}
+                            payment_dict[account]["taxe"] -= tax_move_line.balance * percent
+                            tax = tax_move_line.tax_line_id
+                            move_lines_linked = invoice_move.line_ids.filtered(
+                                lambda ml: tax.amount in [t.amount for t in ml.tax_ids])
+                            if move_lines_linked:
+                                amount_move_lines_linked = 0.0
+                                for ml_linked in move_lines_linked:
+                                    amount_move_lines_linked -= ml_linked.balance * percent
+                                payment_dict[account]["ht"] += amount_move_lines_linked
                 else:
                     # On conserve les paiements non intégralement lettrés pour les signaler a l'utilisateur
                     undefined_payments_list.append(payment)
+            sorted_accounts = sorted(
+                tax_accounts, key=lambda a: tax_obj.search([('account_id', '=', a.id)], limit=1).amount)
+            for account in sorted_accounts:
+                tax_account_used_dict[account] = tax_column
+                tax_column += tax_column_increment
 
         for company in display.keys():
             # Affichage par société
@@ -1077,37 +1125,64 @@ class OFRapportOpenflamWizard(models.TransientModel):
             tax_account_used_dict = display_company['tax_account_used']
             undefined_payments_list = display_company['undefined_payments']
             line_number += 1
-            worksheet.merge_range(line_number, 0, line_number, 2, company.name, styles['text_title_border_red'])
+            worksheet.merge_range(line_number, 0, line_number, 4, company.name, styles['text_title_border_red'])
             line_number += 1
 
-            worksheet.write(line_number, 0, "Paiements", styles['text_title_border'])
+            worksheet.write(line_number, 0, "Date", styles['text_title_border'])
             worksheet.write(line_number, 1, "Partenaire", styles['text_title_border'])
-            worksheet.write(line_number, 2, "Date", styles['text_title_border'])
+            worksheet.write(line_number, 2, "Paiements", styles['text_title_border'])
+            worksheet.write(line_number, 3, "Factures", styles['text_title_border'])
+            worksheet.write(line_number, 4, "Montant", styles['text_title_border'])
 
             # Création des colonnes de taxes
             for tax in tax_account_used_dict.keys():
+                worksheet.merge_range(
+                    line_number-1, tax_account_used_dict[tax],
+                    line_number-1, tax_account_used_dict[tax]+2,
+                    "%s-%s" % (tax.code, tax.name), styles['text_title_ita_border'])
                 worksheet.write(
-                    line_number, tax_account_used_dict[tax], "%s-%s" % (tax.code, tax.name),
-                    styles['text_title_border'])
-                if tax_account_used_dict[tax] > 8:
-                    worksheet.set_column(tax_account_used_dict[tax], tax_account_used_dict[tax], 26)
+                    line_number, tax_account_used_dict[tax], "HT", styles['text_title_border'])
+                worksheet.write(
+                    line_number, tax_account_used_dict[tax]+1, "TVA",
+                    styles['text_title_border_yellow'])
+                worksheet.write(
+                    line_number, tax_account_used_dict[tax]+2, "TTC", styles['text_title_border'])
+                if any([col_num > 8 for col_num in xrange(tax_account_used_dict[tax], tax_account_used_dict[tax]+3)]):
+                    worksheet.set_column(tax_account_used_dict[tax], tax_account_used_dict[tax], 10)
+                    worksheet.set_column(tax_account_used_dict[tax], tax_account_used_dict[tax]+1, 10)
+                    worksheet.set_column(tax_account_used_dict[tax], tax_account_used_dict[tax]+2, 10)
             line_number += 1
             line_keep = line_number
             # Ajout des paiements et des montants par compte
             for payment, tax_dict in payments_sorted:
-                worksheet.write(line_number, 0, "%s" % payment.name, styles['text_title_border'])
+                worksheet.write(line_number, 0, "%s" % payment.payment_date, styles['text_title_border'])
                 worksheet.write(line_number, 1, "%s" % payment.partner_id.name, styles['text_title_border'])
-                worksheet.write(line_number, 2, "%s" % payment.payment_date, styles['text_title_border'])
+                worksheet.write(line_number, 2, "%s" % payment.name, styles['text_title_border'])
+                invoices = payment.invoice_ids.mapped('move_name')
+                worksheet.write(
+                    line_number, 3, "%s" % invoices and ", ".join(invoices) or "", styles['text_title_border'])
+                worksheet.write(line_number, 4, payment.amount, styles['number_title_border'])
                 for tax in tax_account_used_dict.keys():
                     column = tax_account_used_dict[tax]
                     worksheet.write(
-                        line_number, column, tax_dict[tax] if tax in tax_dict else "", styles['number_border'])
+                        line_number, column, tax_dict[tax]["ht"] if tax in tax_dict else "", styles['number_border'])
+                    worksheet.write(
+                        line_number, column+1, tax_dict[tax]["taxe"] if tax in tax_dict else "",
+                        styles['number_border_yellow'])
+                    worksheet.write(
+                        line_number, column+2,
+                        '=SUM(%s:%s)' % (
+                            xl_rowcol_to_cell(line_number, column),
+                            xl_rowcol_to_cell(line_number, column+1)),
+                        styles['number_border'])
                 line_number += 1
 
             # Ligne du total
             worksheet.write(line_number, 0, "Total", styles['text_title_border'])
             worksheet.write(line_number, 1, "", styles['text_title_border'])
             worksheet.write(line_number, 2, "", styles['text_title_border'])
+            worksheet.write(line_number, 3, "", styles['text_title_border'])
+            worksheet.write(line_number, 4, "", styles['text_title_border'])
             for tax in tax_account_used_dict.keys():
                 tax_column = tax_account_used_dict[tax]
                 worksheet.write(
@@ -1116,12 +1191,24 @@ class OFRapportOpenflamWizard(models.TransientModel):
                         xl_rowcol_to_cell(line_keep, tax_column),
                         xl_rowcol_to_cell(line_number - 1, tax_column)),
                     styles['number_title_border'])
+                worksheet.write(
+                    line_number, tax_column+1,
+                    '=SUM(%s:%s)' % (
+                        xl_rowcol_to_cell(line_keep, tax_column+1),
+                        xl_rowcol_to_cell(line_number - 1, tax_column+1)),
+                    styles['number_title_border_yellow'])
+                worksheet.write(
+                    line_number, tax_column+2,
+                    '=SUM(%s:%s)' % (
+                        xl_rowcol_to_cell(line_keep, tax_column+2),
+                        xl_rowcol_to_cell(line_number - 1, tax_column+2)),
+                    styles['number_title_border'])
             line_number += 2
 
             # Si des paiements sont présent dans la liste, on les affiches à la fin
             if undefined_payments_list:
                 worksheet.merge_range(
-                    line_number, 0, line_number, 2, u"Les paiements suivants ne sont pas complètement lettrés",
+                    line_number, 0, line_number, 4, u"Les paiements suivants ne sont pas complètement lettrés",
                     styles['text_title_ita_border'])
                 line_number += 1
                 while undefined_payments_list:
@@ -1129,6 +1216,8 @@ class OFRapportOpenflamWizard(models.TransientModel):
                     worksheet.write(line_number, 0, "%s" % payment.name, styles['text_title_border'])
                     worksheet.write(line_number, 1, "%s" % payment.partner_id.name, styles['text_title_border'])
                     worksheet.write(line_number, 2, "%s" % payment.payment_date, styles['text_title_border'])
+                    worksheet.write(line_number, 3, "%s" % "", styles['text_title_border'])
+                    worksheet.write(line_number, 4, "%s" % payment.amount, styles['text_title_border'])
                     line_number += 1
                 line_number += 1
 
