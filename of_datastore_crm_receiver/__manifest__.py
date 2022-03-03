@@ -23,6 +23,7 @@ Ce module nécessite l'installation de openerplib sur le serveur : sudo easy_ins
         'of_datastore_crm_stage',
     ],
     'data': [
+        'security/ir.model.access.csv',
         'data/of_datastore_crm_data.xml',
         'views/crm_views.xml',
         'views/of_datastore_crm_views.xml',
