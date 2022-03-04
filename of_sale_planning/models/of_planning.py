@@ -4,8 +4,7 @@ from odoo import models, fields, api
 
 
 class OFPlanningIntervention(models.Model):
-    _name = 'of.planning.intervention'
-    _inherit = ['of.planning.intervention', 'of.crm.stage.auto.update']
+    _inherit = 'of.planning.intervention'
 
     @api.onchange('address_id')
     def _onchange_address_id_warning(self):

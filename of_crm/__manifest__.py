@@ -51,7 +51,8 @@ Workflow CRM
         'of_utm',
         'of_service',
         'of_sale_report',
-        'of_utils'
+        'of_utils',
+        'of_account_margin',
     ],
     'data': [
         'data/data.xml',
