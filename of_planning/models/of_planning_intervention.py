@@ -975,13 +975,13 @@ class OfPlanningIntervention(models.Model):
             else:
                 rdv.invoice_status = 'no'
 
-    @api.depends('line_ids', 'line_ids.procurement_ids')
+    @api.depends('procurement_group_id')
     def _compute_pickings(self):
+        # Faire même calcul que pour les sale.order
         for rdv in self:
-            if rdv.line_ids and rdv.line_ids.mapped('procurement_ids'):
-                pickings = rdv.line_ids.mapped('procurement_ids').mapped('move_ids').mapped('picking_id')
-                rdv.picking_ids = pickings
-                rdv.delivery_count = len(pickings)
+            rdv.picking_ids = rdv.procurement_group_id and \
+                              self.env['stock.picking'].search([('group_id', '=', rdv.procurement_group_id.id)]) or []
+            rdv.delivery_count = len(rdv.picking_ids)
 
     @api.depends('partner_id', 'address_id')
     def _compute_historique_rdv_ids(self):
