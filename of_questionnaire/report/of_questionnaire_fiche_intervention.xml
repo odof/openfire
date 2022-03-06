@@ -52,22 +52,31 @@
                         <strong>Questionnaire d'intervention</strong>
                     </div>
                 </div>
-                <t t-set="first" t-value="True"/>
                 <div class="row"
-                     style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-top: 2px solid black;">
-                    <t t-foreach="o.question_ids.filtered(lambda q: q.answer_type not in ['photo', 'drawing'])" t-as="question">
+                     style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
+                    <t t-set="lines" t-value="o.question_ids and o._filter_answers_category(o.question_ids.filtered(lambda q: q.type == 'intervention'))"/>
+                    <t t-foreach="lines" t-as="q">
                         <div class="col-xs-12" style="display: table; padding: 0px;">
-                            <div style="display: table-cell;" t-attf-style="#{'' if first else 'border-top: 1px solid lightgray;'}">
-                                <!-- Questions -->
-                                <div class="h5" style="padding: 0px 16px;">
-                                    <strong><span t-field="question.name"/><span>&amp;nbsp;:</span></strong>
-                                    <span t-field="question.definitive_answer"/>
+                            <div style="display: table-cell;">
+                                <div class="h5" style="padding: 7px 16px; margin-bottom: 5px; background-color: lightgray; border-bottom: 1px solid lightgray;">
+                                    <strong><span t-esc="q[0]"/></strong>
+                                </div>
+                            </div>
+                        </div>
+                        <t t-set="first" t-value="True"/>
+                        <t t-foreach="q[1][1]" t-as="question">
+                            <div class="col-xs-12" style="display: table; padding: 0px;">
+                                <div style="display: table-cell;" t-attf-style="#{'' if first else 'border-top: 1px solid lightgray;'}">
+                                    <div class="h5" style="padding: 0px 16px;">
+                                        <strong><span t-esc="question[0]"/><span>&amp;nbsp;:</span></strong>
+                                        <span t-esc="question[1]"/>
+                                    </div>
                                 </div>
                             </div>
                             <t t-if="first">
                                 <t t-set="first" t-value="False"/>
                             </t>
-                        </div>
+                        </t>
                     </t>
                 </div>
             </div>
