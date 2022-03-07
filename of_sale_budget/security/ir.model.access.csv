@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_sale_order_budget_group_user,of.sale.order.budget.rule.user,model_of_sale_order_budget,base.group_user,1,1,1,1
+access_of_sale_order_indirect_cost_group_user,of.sale.order.indirect.cost.rule.user,model_of_sale_order_indirect_cost,base.group_user,1,1,1,1
+access_of_sale_order_labor_cost_group_user,of.sale.order.labor.cost.rule.user,model_of_sale_order_labor_cost,base.group_user,1,1,1,1

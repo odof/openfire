@@ -10,6 +10,8 @@ class OFSaleConfiguration(models.TransientModel):
         string=u"(OF) Activer les sections avancées sur les devis",
         implied_group='of_sale_quote_template.group_of_advanced_sale_layout_category',
         group='base.group_user')
+    module_of_sale_budget = fields.Boolean(
+        string=u"(OF) Gestion du budget", help="Installe le module Ventes / Budget")
 
     @api.multi
     def execute(self):
