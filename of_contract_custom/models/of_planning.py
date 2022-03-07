@@ -52,6 +52,10 @@ class OfService(models.Model):
     _name = 'of.service'
     _inherit = ['of.service', 'mail.thread']
 
+    @api.model
+    def get_intervention_states(self):
+        return self.env['of.planning.intervention']._fields['state'].selection
+
     partner_code_magasin = fields.Char(string="Code magasin", related="partner_id.of_code_magasin", readonly=True)
     supplier_id = fields.Many2one(comodel_name='res.partner', string="Prestataire", domain="[('supplier','=',True)]")
     contract_id = fields.Many2one(comodel_name='of.contract', string="Contrat")
@@ -61,6 +65,9 @@ class OfService(models.Model):
     )
     contract_message = fields.Char(string="Infos SAV du contrat", compute="_compute_contract_message")
     transformed = fields.Boolean(string=u"Transfomé en contrat")
+    last_intervention_state = fields.Selection(
+        selection=lambda r: r.get_intervention_states(), string=u"État du dernier RDV",
+        compute='_compute_last_intervention_state')
 
     # @api.depends
 
@@ -74,6 +81,15 @@ class OfService(models.Model):
                     service.contract_message = "%s SAV restant(s) pour cette ligne de contrat" % count
                 elif service.type_id.id == sav_type.id and service.contract_line_id:
                     service.contract_message = "Cette ligne de contrat n'utilise pas l'option SAV"
+
+    @api.depends('intervention_ids.state')
+    def _compute_last_intervention_state(self):
+        for record in self:
+            rdvs = record.intervention_ids.filtered(lambda r: r.state not in ['cancel, postponed'])
+            if rdvs:
+                record.last_intervention_state = rdvs[-1].state
+            elif record.intervention_ids:
+                record.last_intervention_state = record.intervention_ids[-1].state
 
     # @api.onchange
 
