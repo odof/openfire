@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_order_view_order_form" model="ir.ui.view">
+        <field name="name">of.sale.order.view.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Budget">
+                    <button icon="fa-refresh" class="btn btn-lg oe_link" name="action_of_budget_ids" type="object" style ="position: absolute; left: 125px; margin-top: 22px;"/>
+                    <group string="Budget">
+                        <field name="of_budget_ids" mode="tree" options="{'reload_on_button': true}" nolabel="1" context="{'default_order_id': active_id}"/>
+                    </group>
+                    <group string="Frais indirects">
+                        <field name="of_indirect_cost_ids" mode="tree" options="{'reload_on_button': true}" nolabel="1" context="{'default_order_id': active_id}"/>
+                    </group>
+                    <group string="Frais de main d'oeuvre">
+                        <field name="of_labor_cost_ids" mode="tree" options="{'reload_on_button': true}" nolabel="1" context="{'default_order_id': active_id}"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_order_budget_view_tree" model="ir.ui.view">
+        <field name="name">of.sale.order.budget.view.tree</field>
+        <field name="model">of.sale.order.budget</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom" create="false" delete="false" >
+                <field name="name"/>
+                <field name="cost" sum="Total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="coeff"/>
+                <field name="total_cost" sum="Total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="margin_coeff"/>
+                <field name="sale_price" sum="Total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="notes"/>
+                <field name="order_id" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_sale_order_budget_view_form" model="ir.ui.view">
+        <field name="name">of.sale.order.budget.view.form</field>
+        <field name="model">of.sale.order.budget</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <label for="name" class="oe_edit_only"/>
+                    <h1>
+                        <field name="name" />
+                    </h1>
+                    <group>
+                        <group>
+                            <field name="cost" sum="Total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="total_cost" sum="Total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="sale_price" sum="Total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="order_id" invisible="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="coeff"/>
+                            <field name="margin_coeff"/>
+                            <field name="notes"/>
+                            <field name="order_id" invisible="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sale_order_indirect_cost_view_tree" model="ir.ui.view">
+        <field name="name">of.sale.order.indirect.cost.view.tree</field>
+        <field name="model">of.sale.order.indirect.cost</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="product_id"/>
+                <field name="product_uom_qty"/>
+                <field name="product_uom_id"/>
+                <field name="unit_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="total_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="notes"/>
+                <field name="order_id" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_sale_order_indirect_cost_view_form" model="ir.ui.view">
+        <field name="name">of.sale.order.indirect.cost.view.form</field>
+        <field name="model">of.sale.order.indirect.cost</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <label for="product_id" class="oe_edit_only"/>
+                    <h1>
+                        <field name="product_id"/>
+                    </h1>
+                    <group>
+                        <group>
+                            <field name="product_uom_qty"/>
+                            <field name="product_uom_id"/>
+                        </group>
+                        <group>
+                            <field name="unit_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="total_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="notes"/>
+                            <field name="order_id" invisible="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sale_order_labor_cost_view_tree" model="ir.ui.view">
+        <field name="name">of.sale.order.labor.cost.view.tree</field>
+        <field name="model">of.sale.order.labor.cost</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="hour_worksite_id"/>
+                <field name="type"/>
+                <field name="product_uom_qty" widget="float_time" attrs="{'readonly': [('type','=','computed')]}"/>
+                <field name="hourly_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="total_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="notes"/>
+                <field name="order_id" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_sale_order_labor_cost_view_form" model="ir.ui.view">
+        <field name="name">of.sale.order.labor.cost.view.form</field>
+        <field name="model">of.sale.order.labor.cost</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <label for="hour_worksite_id" class="oe_edit_only"/>
+                    <h1>
+                        <field name="hour_worksite_id"/>
+                    </h1>
+                    <group>
+                        <group>
+                            <field name="hourly_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="product_uom_qty" widget="float_time" attrs="{'readonly': [('type','=','computed')]}"/>
+                            <field name="total_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                        <group>
+                            <field name="type"/>
+                            <field name="notes"/>
+                            <field name="order_id" invisible="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sale_order_hour_worksite_view_tree" model="ir.ui.view">
+        <field name="name">of.sale.order.hour.worksite.view.tree</field>
+        <field name="model">of.sale.order.hour.worksite</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="type"/>
+                <field name="hourly_cost"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_sale_order_hour_worksite_action" model="ir.actions.act_window">
+        <field name="name">Heures chantier</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.sale.order.hour.worksite</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="Heures chantier" id="of_sale_order_hour_worksite_menu" parent="sale.prod_config_main" action="of_sale_order_hour_worksite_action"/>
+
+</odoo>
