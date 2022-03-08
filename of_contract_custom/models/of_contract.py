@@ -63,6 +63,8 @@ class OfContract(models.Model):
     name = fields.Char(string="Nom", required=False, compute="_compute_name", store=True)
     reference = fields.Char(string=u"Référence", required=True)
     partner_id = fields.Many2one("res.partner", string="Client payeur", required=True)
+    department_id = fields.Many2one(
+        'res.country.department', related='partner_id.department_id', string=u"Département", readonly=True, store=True)
     category_ids = fields.Many2many(
         'res.partner.category', related="partner_id.category_id", string=u"Étiquettes client")
     pricelist_id = fields.Many2one('product.pricelist', string='Liste de prix')
@@ -94,11 +96,11 @@ class OfContract(models.Model):
     fiscal_position_id = fields.Many2one(
         'account.fiscal.position', string="Position fiscale", domain="[('company_id', '=', company_id)]")
     next_subtotal = fields.Monetary(
-        string="Prochain montant HT", compute='_compute_next_total', currency_field='company_currency_id')
+        string="Prochain montant HT", compute='_compute_next_total', currency_field='company_currency_id', store=True)
     next_taxes = fields.Monetary(
-        string="Taxes ", compute='_compute_next_total', currency_field='company_currency_id')
+        string="Taxes ", compute='_compute_next_total', currency_field='company_currency_id', store=True)
     next_total = fields.Monetary(
-        string="Prochain Total", compute='_compute_next_total', currency_field='company_currency_id')
+        string="Prochain Total", compute='_compute_next_total', currency_field='company_currency_id', store=True)
     company_currency_id = fields.Many2one(
         'res.currency', related='company_id.currency_id', string="Company Currency", readonly=True)
 
