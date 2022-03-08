@@ -453,6 +453,7 @@ class OfSaleOrderLayoutCategory(models.Model):
     quote_section_line_id = fields.Many2one(
         comodel_name='of.sale.quote.template.layout.category', string=u"Ligne d'origine")
     order_id = fields.Many2one(comodel_name='sale.order', string=u"Bon de commande", ondelete='cascade')
+    currency_id = fields.Many2one('res.currency', related='order_id.currency_id', store=True, readonly=True)
     cout = fields.Float(string=u"Coût", digits=dp.get_precision('Product Price'), compute='_compute_product_ids')
     prix_vente = fields.Float(
         string=u"Prix de vente", digits=dp.get_precision('Product Price'), compute='_compute_product_ids')
@@ -1081,6 +1082,47 @@ class SaleOrder(models.Model):
         if self.of_layout_category_ids:
             invoice_vals['of_layout_category_ids'] = [(6, 0, self.of_layout_category_ids.ids)]
         return invoice_vals
+
+    @api.multi
+    def button_gestion_prix(self):
+        res = super(SaleOrder, self).button_gestion_prix()
+
+        remise = self.env['of.sale.order.gestion.prix'].browse(res['res_id'])
+
+        layout_category_vals = []
+        # Création des lignes de section qui ont des lignes de commande
+        for category in self.of_layout_category_ids.filtered('order_line_without_child_ids'):
+            values = {
+                'layout_category_id': category.id,
+                'order_line_ids': [(6, 0, category.order_line_without_child_ids.ids)],
+                'state': 'included',
+                'pc_sale_price': category.pc_prix_vente,
+                'simulated_price_subtotal': sum(category.order_line_without_child_ids.mapped('price_subtotal')),
+                'simulated_price_total': sum(category.order_line_without_child_ids.mapped('price_total')),
+            }
+            layout_category_vals.append((0, 0, values))
+
+        order_lines_without_category = self.order_line.filtered(lambda sol: not sol.of_layout_category_id)
+        # Création d'une ligne si des lignes de commande n'ont pas de section
+        if order_lines_without_category:
+            if self.amount_untaxed:
+                values = {
+                    'layout_category_id': False,
+                    'order_line_ids': [(6, 0, order_lines_without_category.ids)],
+                    'state': 'included',
+                    'pc_sale_price': (sum(order_lines_without_category.mapped('price_subtotal')) /
+                                      self.amount_untaxed) * 100,
+                    'simulated_price_subtotal': sum(order_lines_without_category.mapped('price_subtotal')),
+                    'simulated_price_total': sum(order_lines_without_category.mapped('price_total'))
+                }
+                layout_category_vals.append((0, 0, values))
+
+        remise.write({
+            'layout_category_ids': layout_category_vals,
+        })
+
+        return res
+
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'

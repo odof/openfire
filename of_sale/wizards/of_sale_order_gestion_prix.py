@@ -43,9 +43,7 @@ class GestionPrix(models.TransientModel):
         selection=_get_selection_mode_calcul, default='prix_ttc_cible', string=u"Mode de calcul",
         help=u"Détermine comment est calculée la remise sur les lignes sélectionnées du devis"
     )
-    line_ids = fields.One2many(
-        'of.sale.order.gestion.prix.line', 'wizard_id', string=u'Lignes impactées', readonly=True
-    )
+    line_ids = fields.One2many('of.sale.order.gestion.prix.line', 'wizard_id', string=u'Lignes impactées')
     valeur = fields.Float(string='Valeur', digits=dp.get_precision('Sale Price'))
 
     marge_initiale = fields.Monetary(string='marge initiale', related='order_id.margin', related_sudo=False)
@@ -222,18 +220,29 @@ class GestionPrix(models.TransientModel):
         cur = order.pricelist_id.currency_id
         round_tax = self.env.user.company_id.tax_calculation_rounding_method != 'round_globally'
 
-        lines_select = self.line_ids.filtered(lambda line: line.is_selected and line.order_line_id.price_unit)
+        lines_select = self.line_ids.filtered(lambda line: line.state == 'included' and line.order_line_id.price_unit)
         if not lines_select:
             # Toutes les lignes sélectionnées ont un prix unitaire à 0
-            lines_select = self.line_ids.filtered(lambda line: line.is_selected)
+            lines_select = self.line_ids.filtered(lambda line: line.state == 'included')
+
         nb_select = len(lines_select)
-        lines_nonselect = self.line_ids - lines_select
+        lines_forced = self.line_ids.filtered(lambda line: line.state == 'forced')
+        lines_excluded = self.line_ids - lines_select - lines_forced
 
-        # Les totaux des lignes non sélectionnées sont gardés en précison standard
-        total_ht_nonselect = sum(lines_nonselect.mapped('order_line_id').mapped('price_subtotal'))
-        total_ttc_nonselect = sum(lines_nonselect.mapped('prix_total_ttc'))
+        # Les totaux des lignes non sélectionnées sont gardés en précision standard
+        total_ht_excluded = sum(lines_excluded.mapped('order_line_id').mapped('price_subtotal'))
+        total_ttc_excluded = sum(lines_excluded.mapped('prix_total_ttc'))
 
-        # Les totaux des lignes sélectionnées sont calculés en précison maximale
+        # Les totaux des lignes forcées sont gardés en précision standard
+        for lf in lines_forced:
+            lf.prix_total_ttc_simul = lf.prix_total_ttc * (lf.prix_total_ht_simul / lf.prix_total_ht)
+        total_ht_forced = sum(lines_forced.mapped('prix_total_ht_simul'))
+        total_ttc_forced = sum(lines_forced.mapped('prix_total_ttc_simul'))
+
+        total_ht_nonselect = total_ht_excluded + total_ht_forced
+        total_ttc_nonselect = total_ttc_excluded + total_ttc_forced
+
+        # Les totaux des lignes sélectionnées sont calculés en précision maximale
         total_ttc_select = total_ht_select = 0.0
         line_taxes = {}
         for line in lines_select.with_context(round=False):
@@ -243,7 +252,7 @@ class GestionPrix(models.TransientModel):
             taxes = order_line.tax_id.compute_all(
                 price, order_line.currency_id, order_line.product_uom_qty, product=order_line.product_id,
                 partner=order_line.order_id.partner_id)
-            if line.is_selected:
+            if line.state == 'included':
                 total_ttc_select += taxes['total_included']
                 total_ht_select += taxes['total_excluded']
                 line_taxes[line.id] = taxes
@@ -350,9 +359,14 @@ class GestionPrix(models.TransientModel):
             line.prix_total_ht_simul = taxes['total_excluded']
             line.prix_total_ttc_simul = taxes['total_included']
 
-        for line in lines_nonselect:
+        for line in lines_excluded:
             line.prix_total_ht_simul = line.order_line_id.price_subtotal
             line.prix_total_ttc_simul = line.order_line_id.price_total
+
+        for line in lines_forced:
+            line_vals = {'price_unit': line.prix_total_ht_simul}
+            vals = {line.order_line_id: line_vals}
+            values.update(vals)
 
         # Pour une simulation, le travail s'arrête ici
         if simuler:
@@ -371,12 +385,12 @@ class GestionPrix(models.TransientModel):
 
     @api.multi
     def bouton_inclure_tout(self):
-        self.line_ids.filtered(lambda l: not l.is_selected and not l.product_forbidden_discount).\
-            write({'is_selected': True})
+        self.line_ids.filtered(lambda l: not l.state == 'included' and not l.product_forbidden_discount).\
+            write({'state': 'included'})
 
     @api.multi
     def bouton_exclure_tout(self):
-        self.line_ids.filtered('is_selected').write({'is_selected': False})
+        self.line_ids.filtered(lambda l: l.state == 'included').write({'state': 'excluded'})
 
     def toggle_view(self):
         """ Permet de basculer entre la vue vendeur/client
@@ -390,7 +404,7 @@ class GestionPrix(models.TransientModel):
     @api.multi
     def get_lines(self):
         self.ensure_one()
-        return self.line_ids.filtered('is_selected')
+        return self.line_ids.filtered(lambda l: l.state == 'included')
 
     @api.model
     def of_get_report_name(self, docs):
@@ -408,7 +422,7 @@ class GestionPrix(models.TransientModel):
             ])
 
     def get_recap(self):
-        order_lines = self.line_ids.filtered('is_selected').mapped('order_line_id')
+        order_lines = self.line_ids.filtered(lambda l: l.state == 'included').mapped('order_line_id')
         order_lines_product = order_lines.filtered(lambda l: l.product_id.type != 'service')
         order_lines_service = order_lines.filtered(lambda l: l.product_id.type == 'service')
         currency_symbol = self.currency_id.symbol
@@ -434,8 +448,9 @@ class GestionPrixLine(models.TransientModel):
     _description = u"Sélection des produits d'un devis/bon de commande"
 
     # @todo: Déselectionner les lignes dont la quantité ou le prix valent 0
-    is_selected = fields.Boolean(string='Est sélectionné')
-    text_selected = fields.Char(string=u"État", compute='_compute_text_selected')
+    state = fields.Selection(
+        selection=[('excluded', u"Exclus"), ('included', u"Inclus"), ('forced', u"Forcé")],
+        string=u"État", required=True, default='included')
     wizard_id = fields.Many2one('of.sale.order.gestion.prix', required=True, ondelete='cascade')
     order_line_id = fields.Many2one(
         'sale.order.line', string="Article", required=True, readonly=True, ondelete='cascade'
@@ -458,20 +473,14 @@ class GestionPrixLine(models.TransientModel):
     )
     remise = fields.Float(related='order_line_id.discount', readonly=True)
 
-    prix_total_ttc_simul = fields.Float(string=u"Prix total TTC simulé", readonly=True)
-    prix_total_ht_simul = fields.Float(string=u"Prix total HT simulé", readonly=True)
+    prix_total_ttc_simul = fields.Float(string=u"Prix total TTC simulé", compute='_compute_prix_total_ttc_simul')
+    prix_total_ht_simul = fields.Float(string=u"Prix total HT simulé")
     marge = fields.Float(string=u"Marge HT", compute='_compute_marge_simul')
     pc_marge = fields.Float(string=u"% Marge", compute='_compute_marge_simul')
     of_client_view = fields.Boolean(string='Vue client/vendeur', related="wizard_id.of_client_view")
 
     product_forbidden_discount = fields.Boolean(
         related='order_line_id.product_id.of_forbidden_discount', string=u"Remise interdite pour ce produit")
-
-    @api.depends('is_selected')
-    def _compute_text_selected(self):
-        text = ('exclus', 'inclus')
-        for line in self:
-            line.text_selected = text[line.is_selected]
 
     @api.depends('order_line_id')
     def _compute_cout(self):
@@ -486,12 +495,43 @@ class GestionPrixLine(models.TransientModel):
             vente = line.prix_total_ht_simul
 
             line.marge = vente - achat
-            line.pc_marge = 100 * (1 - achat / vente) if vente else -100
+            if vente:
+                line.pc_marge = 100 * (1 - achat / vente)
 
-    @api.multi
-    def button_inverse(self):
+    @api.depends('prix_total_ht_simul', 'prix_total_ht')
+    def _compute_prix_total_ttc_simul(self):
         for line in self:
-            line.is_selected = not line.is_selected
+            if line.prix_total_ht:
+                factor = line.prix_total_ht_simul / line.prix_total_ht
+                line.prix_total_ttc_simul = line.prix_total_ttc * factor
+
+    @api.onchange('pc_marge')
+    def _onchange_pc_marge(self):
+        if self.env.context.get("skip_onchange"):
+            # Do not skip next onchange
+            self.env.context = self.with_context(skip_onchange=False).env.context
+        else:
+            for line in self:
+                # La marge ne peut pas être supérieure ou égale à 100%, sauf si le cout est nul
+                if line.cout == 0:
+                    pc_marge_max = 100
+                else:
+                    pc_marge_max = 99.99
+                if line.pc_marge > pc_marge_max:
+                    line.pc_marge = pc_marge_max
+
+                self.env.context = self.with_context(skip_onchange=True).env.context
+                line.prix_total_ht_simul = line.cout and line.cout * (100 / (100 - line.pc_marge))
+
+    @api.onchange('prix_total_ht_simul')
+    def _onchange_prix_total_ht_simul(self):
+        if self.env.context.get("skip_onchange"):
+            # Do not skip next onchange
+            self.env.context = self.with_context(skip_onchange=False).env.context
+        else:
+            for line in self:
+                self.env.context = self.with_context(skip_onchange=True).env.context
+                line.pc_marge = 100 * (1 - line.cout / line.prix_total_ht_simul) if line.prix_total_ht_simul else -100
 
 
 class SaleOrder(models.Model):
@@ -507,8 +547,10 @@ class SaleOrder(models.Model):
         for line in self.order_line:
             values = {
                 'order_line_id': line.id,
-                'is_selected': not line.of_product_forbidden_discount
-                               and bool(line.product_uom_qty and line.price_unit),
+                'state': 'included' if
+                not line.of_product_forbidden_discount
+                and bool(line.product_uom_qty and line.price_unit)
+                else 'excluded',
                 'prix_total_ht_simul': line.price_subtotal,
                 'prix_total_ttc_simul': line.price_total,
             }
