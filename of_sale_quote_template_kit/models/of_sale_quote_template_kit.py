@@ -37,8 +37,6 @@ class OfSaleorderKitLine(models.Model):
 
 class SaleQuoteLine(models.Model):
     _inherit = "sale.quote.line"
-    _description = u"Lignes de modèle de devis"
-    _order = 'sequence, id'
 
     @api.model
     def _auto_init(self):

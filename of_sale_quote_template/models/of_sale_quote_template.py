@@ -146,7 +146,7 @@ class SaleQuoteTemplate(models.Model):
 class SaleQuoteLine(models.Model):
     _name = "sale.quote.line"
     _description = u"Lignes de modèle de devis"
-    _order = 'sequence, id'
+    _order = 'layout_category_id, sequence, id'
 
     sequence = fields.Integer(
         u'Sequence', help=u"Permet de donner un ordre à l'affiche des lignes du devis du modèle.", default=10)
