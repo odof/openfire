@@ -467,11 +467,11 @@ class OfService(models.Model):
 
     @api.depends('address_id.intervention_address_ids', 'partner_id.intervention_address_ids')
     def _compute_historique_interv_ids(self):
+        interv_obj = self.env['of.planning.intervention']
         for service in self:
-            if service.address_id:
-                service.historique_interv_ids = service.address_id.intervention_address_ids
-            else:
-                service.historique_interv_ids = service.partner_id.intervention_address_ids
+            partner = service.address_id or service.partner_id
+            if partner:
+                service.historique_interv_ids = interv_obj.search([('address_id', '=', partner.id)])
 
     @api.depends()
     def _compute_spec_date(self):
