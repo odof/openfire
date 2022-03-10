@@ -35,17 +35,19 @@ class Report(models.Model):
                 os.close(fd)
                 file_paths = [order_pdf]
 
-                for mail_data in mails_data:
-                    fd, mail_pdf = tempfile.mkstemp()
-                    os.write(fd, base64.b64decode(mail_data))
-                    os.close(fd)
-                    file_paths.append(mail_pdf)
+                if mails_data:
+                    for mail_data in mails_data:
+                        fd, mail_pdf = tempfile.mkstemp()
+                        os.write(fd, base64.b64decode(mail_data))
+                        os.close(fd)
+                        file_paths.append(mail_pdf)
 
-                for attachment in product_attachments:
-                    fd, attachment_pdf = tempfile.mkstemp()
-                    os.write(fd, base64.b64decode(attachment.datas))
-                    os.close(fd)
-                    file_paths.append(attachment_pdf)
+                if product_attachments:
+                    for attachment in product_attachments:
+                        fd, attachment_pdf = tempfile.mkstemp()
+                        os.write(fd, base64.b64decode(attachment.datas))
+                        os.close(fd)
+                        file_paths.append(attachment_pdf)
 
                 result_file_path = self.env['report']._merge_pdf(file_paths)
                 try:
