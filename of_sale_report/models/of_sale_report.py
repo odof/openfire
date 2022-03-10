@@ -42,9 +42,19 @@ class OFSaleConfiguration(models.TransientModel):
         string=u"(OF) Type de rapports", required=True, default='tous',
         help=u"Donne l'accès aux rapport sur mesure")
 
+    of_sale_order_installation_date_control = fields.Boolean(
+        string=u"(OF) Contrôle de date de pose",
+        help=u"Activer le contrôle de date de pose à la validation des commandes")
+
     @api.multi
     def set_of_rapport_sur_mesure_defaults(self):
         return self.env['ir.values'].sudo().set_default('sale.config.settings', 'of_rapport_sur_mesure', self.of_rapport_sur_mesure)
+
+    @api.multi
+    def set_of_sale_order_installation_date_control(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_sale_order_installation_date_control',
+            self.of_sale_order_installation_date_control)
 
 
 class AccountMove(models.Model):

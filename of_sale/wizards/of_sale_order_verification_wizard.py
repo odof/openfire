@@ -16,32 +16,33 @@ class OfSaleOrderVerification(models.TransientModel):
     @api.model
     def do_verification(self, order):
         """ À surcharger pour ajouter les différentes vérifications """
-        # Vérification de la marge sur catégorie de l'article principal
-        sale_responsible = self.env.user.has_group('sales_team.group_sale_manager')
-        context = self.env.context.copy()
-        skipped_types = context.get('skipped_types', [])
-        if 'margin' not in skipped_types and not context.get('no_verif_margin', False):
-            article_principal = order.order_line.filtered('of_article_principal')
-            if article_principal and article_principal[0].product_id.categ_id.of_taux_marge and \
-               int(order.of_marge_pc) < article_principal[0].product_id.categ_id.of_taux_marge:
-                # les " et ' risque de faire planter le js, on les remplace par des espaces à la fin.
-                message = (u"Le montant de marge de la commande %s est de %.2f%% alors que la catégorie %s de "
-                           u"l'article principal %s %s une marge minimum de %s%%" % (
-                              order.name,
-                              order.of_marge_pc,
-                              article_principal[0].product_id.categ_id.name,
-                              article_principal[0].product_id.display_name,
-                              sale_responsible and u"demande" or u"requiert",
-                              article_principal[0].product_id.categ_id.of_taux_marge)
-                           ).replace('"', ' ').replace("'", " ")
-                skipped_types.append('margin')
-                context.update({
-                    'default_type': 'margin',
-                    'default_message': message,
-                    'default_order_id': order.id,
-                    'skipped_types': skipped_types,
-                })
-                return self.action_return(context, self.need_interrupt(order))
+        if self.env['ir.values'].get_default('sale.config.settings', 'of_sale_order_margin_control'):
+            # Vérification de la marge sur catégorie de l'article principal
+            sale_responsible = self.env.user.has_group('sales_team.group_sale_manager')
+            context = self.env.context.copy()
+            skipped_types = context.get('skipped_types', [])
+            if 'margin' not in skipped_types and not context.get('no_verif_margin', False):
+                article_principal = order.order_line.filtered('of_article_principal')
+                if article_principal and article_principal[0].product_id.categ_id.of_taux_marge and \
+                   int(order.of_marge_pc) < article_principal[0].product_id.categ_id.of_taux_marge:
+                    # les " et ' risque de faire planter le js, on les remplace par des espaces à la fin.
+                    message = (u"Le montant de marge de la commande %s est de %.2f%% alors que la catégorie %s de "
+                               u"l'article principal %s %s une marge minimum de %s%%" % (
+                                  order.name,
+                                  order.of_marge_pc,
+                                  article_principal[0].product_id.categ_id.name,
+                                  article_principal[0].product_id.display_name,
+                                  sale_responsible and u"demande" or u"requiert",
+                                  article_principal[0].product_id.categ_id.of_taux_marge)
+                               ).replace('"', ' ').replace("'", " ")
+                    skipped_types.append('margin')
+                    context.update({
+                        'default_type': 'margin',
+                        'default_message': message,
+                        'default_order_id': order.id,
+                        'skipped_types': skipped_types,
+                    })
+                    return self.action_return(context, self.need_interrupt(order))
         return False, False
 
     @api.model

@@ -30,6 +30,13 @@
                     </div>
                 </group>
             </xpath>
+            <xpath expr="//div[@name='of_sale_order_margin_control']" position="after">
+                <label for="of_sale_order_installation_date_control"/>
+                <div name="of_sale_order_installation_date_control">
+                    <field name="of_sale_order_installation_date_control" class="oe_inline"/>
+                    <span>Activer le contrôle de date de pose à la validation des commandes</span>
+                </div>
+            </xpath>
         </field>
     </record>
 

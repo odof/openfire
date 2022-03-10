@@ -192,6 +192,9 @@ class OFSaleConfiguration(models.TransientModel):
         string=u"(OF) Propager les conditions de règlement dans la facture",
         help=u"Si décoché, les conditions de règlement ne sont pas propagées aux factures", default=True)
 
+    of_sale_order_margin_control = fields.Boolean(
+        string=u"(OF) Contrôle de marge", help=u"Activer le contrôle de marge à la validation des commandes")
+
     @api.multi
     def set_pdf_adresse_nom_parent_defaults(self):
         return self.env['ir.values'].sudo().set_default(
@@ -339,3 +342,8 @@ class OFSaleConfiguration(models.TransientModel):
     def set_of_propagate_payment_term(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_propagate_payment_term', self.of_propagate_payment_term)
+
+    @api.multi
+    def set_of_sale_order_margin_control(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_sale_order_margin_control', self.of_sale_order_margin_control)
