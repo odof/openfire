@@ -58,13 +58,13 @@
                     <attribute name="invisible">True</attribute>
                 </xpath>
                 <xpath expr="//button[@name='action_confirm'][1]" position="after">
-                    <button name="action_verification_confirm" states="sent" string="Confirm Sale" class="btn-primary o_sale_confirm" type="object" />
+                    <button name="action_verification_confirm" states="sent" string="Confirmer la vente" class="btn-primary o_sale_confirm" type="object" />
                 </xpath>
                 <xpath expr="//button[@name='action_confirm'][2]" position="attributes">
                     <attribute name="invisible">True</attribute>
                 </xpath>
                 <xpath expr="//button[@name='action_confirm'][2]" position="after">
-                    <button name="action_verification_confirm" states="draft" string="Confirm Sale" class="o_sale_confirm" type="object" />
+                    <button name="action_verification_confirm" states="draft" string="Confirmer la vente" class="o_sale_confirm" type="object" />
                 </xpath>
                 <xpath expr="//header" position="inside">
                     <button name="button_gestion_prix" type="object" string="Gestion prix"/>
