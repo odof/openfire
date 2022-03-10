@@ -25,6 +25,11 @@
                     <field name="group_of_order_line_option" class="oe_inline"/>
                     <span>Activer les options de ligne de commande</span>
                 </div>
+                <label for="of_sale_order_margin_control"/>
+                <div name="of_sale_order_margin_control">
+                    <field name="of_sale_order_margin_control" class="oe_inline"/>
+                    <span>Activer le contrôle de marge à la validation des commandes</span>
+                </div>
             </xpath>
             <xpath expr="//field[@name='default_invoice_policy']" position="after">
                 <field name="of_propagate_payment_term"/>

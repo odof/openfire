@@ -14,18 +14,19 @@ class OfSaleOrderVerification(models.TransientModel):
     @api.model
     def do_verification(self, order):
         action, interrupt = super(OfSaleOrderVerification, self).do_verification(order)
-        context = self.env.context.copy()
-        skipped_types = context.get('skipped_types', [])
-        if not (action or interrupt) and 'date_de_pose' not in skipped_types and \
-           not context.get('no_verif_date_de_pose', False) and not order.of_date_de_pose:
-            skipped_types.append('date_de_pose')
-            context.update({
-                'default_type': 'date_de_pose',
-                'default_message': False,
-                'default_order_id': order.id,
-                'skipped_types': skipped_types,
-            })
-            return self.action_return(context, self.need_interrupt(order))
+        if self.env['ir.values'].get_default('sale.config.settings', 'of_sale_order_installation_date_control'):
+            context = self.env.context.copy()
+            skipped_types = context.get('skipped_types', [])
+            if not (action or interrupt) and 'date_de_pose' not in skipped_types and \
+               not context.get('no_verif_date_de_pose', False) and not order.of_date_de_pose:
+                skipped_types.append('date_de_pose')
+                context.update({
+                    'default_type': 'date_de_pose',
+                    'default_message': False,
+                    'default_order_id': order.id,
+                    'skipped_types': skipped_types,
+                })
+                return self.action_return(context, self.need_interrupt(order))
         return action, interrupt
 
     @api.model
