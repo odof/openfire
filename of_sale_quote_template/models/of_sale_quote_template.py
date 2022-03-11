@@ -514,7 +514,6 @@ class OfSaleOrderLayoutCategory(models.Model):
         wizard_form = self.env.ref('of_sale_quote_template.of_select_order_product_wizard_from_view')
 
         ctx = dict(
-            default_type='order',
             default_order_id=self.order_id.id,
             default_order_layout_category_id=self.id,
             default_product_ids=self.product_ids.ids,
@@ -589,6 +588,7 @@ class OfSaleOrderLayoutCategory(models.Model):
 
         wizard_form = self.env.ref('of_sale_quote_template.of_layout_category_move_wizard_form_view')
         ctx = dict(
+            default_type='order',
             default_order_layout_category_id=self.id,
             default_order_id=self.order_id.id,
             default_order_parent_id=self.parent_id.id,
