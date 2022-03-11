@@ -530,12 +530,14 @@ class StockPicking(models.Model):
     def _compute_of_purchase_ids(self):
         purchase_order_obj = self.env['purchase.order']
         for picking in self:
+            purchases = purchase_order_obj
             if picking.sale_id:
-                picking.of_purchase_ids = purchase_order_obj.search([('sale_order_id', '=', picking.sale_id.id)])
-            elif picking.backorder_id:
-                picking.of_purchase_ids = picking.backorder_id.of_purchase_ids
-            else:
-                picking.of_purchase_ids = []
+                purchases |= purchase_order_obj.search([('sale_order_id', '=', picking.sale_id.id)])
+            if picking.backorder_id:
+                purchases |= picking.backorder_id.of_purchase_ids
+            purchases |= self.env['procurement.order'].search([('move_dest_id.picking_id', '=', picking.id)])\
+                .mapped('purchase_line_id').mapped('order_id')
+            picking.of_purchase_ids = purchases.ids
             picking.of_purchase_count = len(picking.of_purchase_ids)
 
     @api.multi
