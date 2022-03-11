@@ -67,11 +67,37 @@ ${'\\n' + object.description_sale}
     of_emission_poussiere = fields.Char(string=u"Émission de poussière", help=u"Exprimé en mg/Nm3 à 13% d'O2")
     of_emission_nox = fields.Char(string=u"Émission de NOx", help=u"Exprimé en mg/Nm3 à 13% d'O2")
     of_indice_i = fields.Char(string=u"Indice I")
+    of_efficacite_saison = fields.Float(string=u"% Efficacité énergétique saisonnière", digits=(2, 2))
     of_fonds_air_bois = fields.Boolean(string=u"Éligible Fonds Air Bois ?")
 
 
 class OfProductBrand(models.Model):
     _inherit = 'of.product.brand'
+
+    @api.model
+    def _auto_init(self):
+        module_self = self.env['ir.module.module'].search([('name', '=', 'of_product_chem')])
+        if module_self:
+            # installed_version est trompeur, il contient la version en cours d'installation
+            # on utilise donc latest version à la place
+            version = module_self.latest_version
+            if version < '10.0.2':
+                brands = self.search([])
+                # pour chaque marque on essaye d'insérer dans la description si possible, ou à la fin sinon
+                # seulement si l'ajout n'est pas déjà présent
+                for brand in brands:
+                    descr = brand.description_sale
+                    insert_index = descr.find(u'% if object.of_fonds_air_bois:')
+                    exist_index = descr.find(u'% if object.of_efficacite_saison:')
+                    to_add_str = u'''\n% if object.of_efficacite_saison:
+Efficacité énergétique saisonnière : ${object.of_efficacite_saison} %
+% endif
+'''
+                    if insert_index != -1 and exist_index == -1:
+                        brand.description_sale = u"%s%s%s" % (descr[:insert_index], to_add_str, descr[insert_index:])
+                    elif exist_index == -1:
+                        brand.description_sale = descr + to_add_str
+        super(OfProductBrand, self)._auto_init()
 
     @api.model
     def _default_description_sale(self):
@@ -104,6 +130,9 @@ Rendement : ${object.of_rendement} %
 % endif
 % if object.of_indice_i:
 Indice I : ${object.of_indice_i}
+% endif
+% if object.of_efficacite_saison:
+Efficacité énergétique saisonnière : ${object.of_efficacite_saison} %
 % endif
 % if object.of_fonds_air_bois:
 Éligible Fonds Air Bois
