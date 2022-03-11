@@ -1408,8 +1408,12 @@ class OFPlanningIntervention(models.Model):
     @api.multi
     def write(self, vals):
         state_interv = vals.get('state', False)
+        # avoir une prise en compte de l'état 'during', on pourra créer une fonction "get_planif_states"
+        # en cas d'ajout de nouveaux états pas planifiés
+        # permet de gérer le cas 'confirm' -> 'during' -> 'cancel'
         planif_avant = state_interv in ('unfinished', 'cancel', 'postponed') and \
-            self.filtered(lambda i: i.state in ('draft', 'confirm', 'done')) or False
+            self.filtered(lambda i: i.state not in ('unfinished', 'cancel', 'postponed')) or False
+        # les cas 'cancel' -> 'during' -> 'confirm' ne peut pas arriver cf fonction find_interventions de of_mobile
         pas_planif_avant = state_interv in ('draft', 'confirm') and \
             self.filtered(lambda i: i.state in ('unfinished', 'cancel', 'postponed')) or False
         fait = state_interv == 'done'
