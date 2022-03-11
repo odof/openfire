@@ -29,10 +29,13 @@
             <xpath expr="//field[@name='default_invoice_policy']" position="after">
                 <field name="group_of_sale_multiimage" widget="radio"/>
                 <field name="group_of_sale_print_attachment" widget="radio"/>
-                <label for="of_sale_print_multiimage_level" attrs="{'invisible': [('group_of_sale_multiimage', '!=', 1)]}"/>
-                <div name="of_sale_print_multiimage_level" attrs="{'invisible': [('group_of_sale_multiimage', '!=', 1)]}">
+                <label for="of_sale_print_multiimage_level"/>
+                <div name="of_sale_print_multiimage_level">
                     <field name="of_sale_print_multiimage_level" widget="radio"/>
-                    <span attrs="{'invisible': [('of_sale_print_multiimage_level', '!=', 1)]}">Une première image de l'article sera affichée à la ligne et le reste en annexe</span>
+                    <span attrs="{
+                        'invisible': ['|',
+                            ('of_sale_print_multiimage_level', '!=', 1),
+                            ('group_of_sale_multiimage', '=', 0)]}">Une première image de l'article sera affichée à la ligne et le tout en annexe</span>
                 </div>
                 <field name="group_of_sale_print_one_image" invisible="1"/>
                 <field name="group_of_sale_print_multiimage" invisible="1"/>

@@ -162,6 +162,10 @@
                                             <t t-if="l.product_id.image_small">
                                                 <img t-att-src="'data:image/png;base64,%s' % l.product_id.image_small" style="max-height: 48px;"/>
                                             </t>
+                                            <t t-if="not l.product_id.image_small and l.of_product_image_ids">
+                                                <t t-set="line_image" t-value="l.of_product_image_ids[0]"/>
+                                                <img t-att-src="'data:image/png;base64,%s' % line_image.image" style="max-height: 48px;"/>
+                                            </t>
                                         </td>
                                     </t>
                                     <td name="descr">
@@ -304,40 +308,23 @@
                     </table>
                 </div>
             </div>
-            <t groups="of_sale.group_of_sale_print_one_image">
-                <t t-set="any_image" t-value="any(doc.order_line.mapped('of_product_image_ids'))"/>
-                <div class="row" t-if="any_image">
-                    <div class="col-xs-12">
-                        <h4>Annexes</h4>
-                        <t t-foreach="doc.order_line" t-as="line">
-                            <t t-if="line.of_product_image_ids">
-                                <h5><em t-field="line.product_id.name"/></h5>
-                                <div class="row mb16">
-                                    <t t-foreach="line.of_product_image_ids" t-as="image">
-                                        <div t-if="image.image" class="col-xs-4">
-                                            <img class="img-responsive center-block" t-att-src="'data:image/png;base64,%s' % image.image" style="max-height: 150px;"/>
-                                            <p class="mt8 text-center" t-field="image.name"/>
-                                        </div>
-                                    </t>
-                                </div>
-                            </t>
-                        </t>
-                    </div>
-                </div>
-            </t>
-
-            <t groups="of_sale.group_of_sale_print_multiimage">
+            <t groups="of_sale.group_of_sale_print_one_image+of_sale.group_of_sale_multiimage,of_sale.group_of_sale_print_multiimage">
                 <t t-set="any_image" t-value="any(doc.order_line.mapped('of_product_image_ids')) or any(doc.order_line.mapped('product_id.image'))"/>
                 <div class="row" t-if="any_image">
                     <div class="col-xs-12">
                         <h4>Annexes</h4>
                         <t t-foreach="doc.order_line" t-as="line">
-                            <t t-if="line.of_product_image_ids or line.product_id.image">
+                            <div t-if="line.product_id.image or line.of_product_image_ids" style="page-break-inside: avoid;">
                                 <h5><em t-field="line.product_id.name"/></h5>
                                 <div class="row mb16">
                                     <div t-if="line.product_id.image" class="col-xs-4">
                                         <img class="img-responsive center-block" t-att-src="'data:image/png;base64,%s' % line.product_id.image" style="max-height: 150px;"/>
                                         <p class="mt8 text-center" t-field="line.product_id.name"/>
+                                    </div>
+                                    <div t-if="not line.product_id.image and line.of_product_image_ids" groups="!of_sale.group_of_sale_multiimage" class="col-xs-4">
+                                        <t t-set="line_image" t-value="line.of_product_image_ids[0]"/>
+                                        <img class="img-responsive center-block" t-att-src="'data:image/png;base64,%s' % line_image.image" style="max-height: 150px;"/>
+                                        <p class="mt8 text-center" t-field="line_image.name"/>
                                     </div>
                                     <t groups="of_sale.group_of_sale_multiimage">
                                         <t t-foreach="line.of_product_image_ids" t-as="image">
@@ -348,7 +335,7 @@
                                         </t>
                                     </t>
                                 </div>
-                            </t>
+                            </div>
                         </t>
                     </div>
                 </div>
