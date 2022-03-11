@@ -61,20 +61,24 @@ class OfService(models.Model):
         cr = self._cr
         cr.execute("SELECT value FROM ir_config_parameter WHERE key = 'of_service_compute_date_next'")
         values = cr.fetchall()
-        if not values:
+        if values:
+            all_services = self.search([])
+            cr.execute("DELETE FROM ir_config_parameter WHERE key = 'of_service_compute_date_next'")
+
+            # lors du passage au nouveau planning, il faut initialiser le champ date_fin_contrat
+            if values[0][0] == 'init_date_fin_contrat':
+                # On peuple le champ date_fin_contrat des services recurrents avec le champ date_fin
+                cr.execute("UPDATE of_service "
+                           "SET date_fin_contrat = date_fin "
+                           "WHERE recurrence = 't'")
+        else:
             cr.execute("SELECT id FROM of_service WHERE date_fin IS NULL or date_next > date_fin LIMIT 1")
-            if not cr.fetchall():
+            rows = cr.fetchall()
+            if not rows:
                 # Tout est en ordre, pas d'incohérence dans les dates
                 return
-        cr.execute("DELETE FROM ir_config_parameter WHERE key = 'of_service_compute_date_next'")
-        # lors du passage au nouveau planning, il faut initialiser le champ date_fin_contrat
-        if values and values[0][0] == 'init_date_fin_contrat':
-            # On peuple le champ date_fin_contrat des services recurrents avec le champ date_fin
-            cr.execute("UPDATE of_service "
-                       "SET date_fin_contrat = date_fin "
-                       "WHERE recurrence = 't'")
+            all_services = self.browse([r[0] for r in rows])
 
-        all_services = self.search([])
         services_avec_last = all_services.filtered(
             lambda s: (s.recurrence
                        and s.date_last
