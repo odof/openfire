@@ -18,8 +18,7 @@
                     <field name="of_worktop_configurator_internal_code"/>
                     <field name="of_worktop_configurator_discount_id"/>
                     <field name="of_delivery_floor"/>
-                    <field name="of_site_distance_id"/>
-                    <field name="of_manufacturer_metrics"/>
+                    <field name="of_site_service_id"/>
                     <field name="of_junction"/>
                 </group>
             </xpath>
@@ -46,13 +45,9 @@
                     <div name="of_website_worktop_configurator_extra_floor_product_id">
                         <field name="of_website_worktop_configurator_extra_floor_product_id" class="oe_inline"/>
                     </div>
-                    <label for="of_website_worktop_configurator_extra_distance_product_id"/>
-                    <div name="of_website_worktop_configurator_extra_distance_product_id">
-                        <field name="of_website_worktop_configurator_extra_distance_product_id" class="oe_inline"/>
-                    </div>
-                    <label for="of_website_worktop_configurator_extra_metrics_product_id"/>
-                    <div name="of_website_worktop_configurator_extra_metrics_product_id">
-                        <field name="of_website_worktop_configurator_extra_metrics_product_id" class="oe_inline"/>
+                    <label for="of_website_worktop_configurator_extra_service_product_id"/>
+                    <div name="of_website_worktop_configurator_extra_service_product_id">
+                        <field name="of_website_worktop_configurator_extra_service_product_id" class="oe_inline"/>
                     </div>
                     <label for="of_website_worktop_configurator_extra_junction_product_id"/>
                     <div name="of_website_worktop_configurator_extra_junction_product_id">

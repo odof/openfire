@@ -29,28 +29,16 @@ class OFWorktopConfiguratorFinishing(models.Model):
 class OFWorktopConfiguratorColor(models.Model):
     _name = 'of.worktop.configurator.color'
     _description = u"Couleur pour le configurateur de plan de travail"
-    _order = 'sequence'
+    _order = 'name'
 
     name = fields.Char(string=u"Nom", required=True)
-    sequence = fields.Integer(string=u"Séquence")
     image_file = fields.Binary(string=u"Fichier image", attachment=True)
     image_filename = fields.Char(string=u"Nom du fichier image", size=64)
 
 
-class OFWorktopConfiguratorGroup(models.Model):
-    _name = 'of.worktop.configurator.group'
-    _description = u"Groupe pour le configurateur de plan de travail"
-    _order = 'sequence'
-
-    name = fields.Char(string=u"Nom", required=True)
-    sequence = fields.Integer(string=u"Séquence")
-    color_ids = fields.Many2many(comodel_name='of.worktop.configurator.color', string=u"Couleurs")
-    pricelist_ids = fields.Many2many(comodel_name='product.pricelist', string=u"Listes de prix")
-
-
 class OFWorktopConfiguratorThickness(models.Model):
     _name = 'of.worktop.configurator.thickness'
-    _description = u"Épaisseur pour le configurateur de plan de travail"
+    _description = u"Épaisseur & type de chant pour le configurateur de plan de travail"
     _order = 'sequence'
 
     name = fields.Char(string=u"Nom", required=True)
@@ -58,19 +46,44 @@ class OFWorktopConfiguratorThickness(models.Model):
     value = fields.Float(string=u"Valeur en cm", required=True)
 
 
-class OFWorktopConfiguratorEdgeType(models.Model):
-    _name = 'of.worktop.configurator.edge.type'
-    _description = u"Type de chant pour le configurateur de plan de travail"
+class OFWorktopConfiguratorService(models.Model):
+    _name = 'of.worktop.configurator.service'
+    _description = u"Prestation pour le configurateur de plan de travail"
     _order = 'sequence'
 
-    name = fields.Char(string=u"Nom", required=True)
-    sequence = fields.Integer(string=u"Séquence")
+    @api.model_cr_context
+    def _auto_init(self):
+        cr = self._cr
+        # Lors de la 1ère mise à jour après la refonte des prestations (févr. 2022), on migre les données existantes.
+        cr.execute("SELECT 1 FROM information_schema.columns "
+                   "WHERE table_name = 'of_worktop_configurator_service'")
+        existe_avant = bool(cr.fetchall())
 
+        res = super(OFWorktopConfiguratorService, self)._auto_init()
 
-class OFWorktopConfiguratorDistance(models.Model):
-    _name = 'of.worktop.configurator.distance'
-    _description = u"Distance pour le configurateur de plan de travail"
-    _order = 'sequence'
+        cr.execute("SELECT 1 FROM information_schema.columns "
+                   "WHERE table_name = 'of_worktop_configurator_service'")
+        existe_apres = bool(cr.fetchall())
+
+        # Si le modèle of_worktop_configurator_service n'existe pas avant et existe après la mise à jour,
+        # c'est qu'on est à la 1ère mise à jour après la refonte du modèle de prestation,
+        # on doit faire la migration des données.
+        if not existe_avant and existe_apres:
+            cr.execute("INSERT INTO of_worktop_configurator_service ("
+                       "    name, "
+                       "    sequence, "
+                       "    price, "
+                       "    blocking, "
+                       "    blocking_message"
+                       ") "
+                       "SELECT "
+                       "    name, "
+                       "    sequence, "
+                       "    price, "
+                       "    blocking, "
+                       "    blocking_message "
+                       "FROM of_worktop_configurator_distance")
+        return res
 
     name = fields.Char(string=u"Nom", required=True)
     sequence = fields.Integer(string=u"Séquence")
@@ -92,13 +105,15 @@ class OFWorktopConfiguratorDiscount(models.Model):
 class OFWorktopConfiguratorPrice(models.Model):
     _name = 'of.worktop.configurator.price'
     _description = u"Tarif pour le configurateur de plan de travail"
-    _order = 'material_id, finishing_id, group_id'
+    _order = 'material_id, finishing_id'
 
     material_id = fields.Many2one(comodel_name='of.worktop.configurator.material', string=u"Matériau", required=True)
     finishing_id = fields.Many2one(comodel_name='of.worktop.configurator.finishing', string=u"Finition", required=True)
-    group_id = fields.Many2one(comodel_name='of.worktop.configurator.group', string=u"Groupe", required=True)
-    thickness_id = fields.Many2one(comodel_name='of.worktop.configurator.thickness', string=u"Épaisseur", required=True)
+    color_ids = fields.Many2many(comodel_name='of.worktop.configurator.color', string=u"Couleurs", required=True)
+    thickness_id = fields.Many2one(
+        comodel_name='of.worktop.configurator.thickness', string=u"Épaisseur & type de chant", required=True)
     price = fields.Float(string=u"Tarif HT", digits=dp.get_precision('Product Price'))
+    pricelist_ids = fields.Many2many(comodel_name='product.pricelist', string=u"Listes de prix", required=True)
 
 
 class OFWorktopConfiguratorType(models.Model):
@@ -114,9 +129,6 @@ class OFWorktopConfiguratorType(models.Model):
     finishing_ids = fields.Many2many(
         comodel_name='of.worktop.configurator.finishing', relation='of_worktop_configurator_type_finishing_rel',
         column1='type_id', column2='finishing_id', string=u"Finitions", required=True)
-    group_ids = fields.Many2many(
-        comodel_name='of.worktop.configurator.group', relation='of_worktop_configurator_type_group_rel',
-        column1='type_id', column2='group_id', string=u"Groupes", required=True)
     product_id = fields.Many2one(comodel_name='product.product', string=u"Article", required=True)
     layout_category_id = fields.Many2one(comodel_name='sale.layout_category', string=u"Section")
     product_line_ids = fields.One2many(

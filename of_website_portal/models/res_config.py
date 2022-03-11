@@ -6,3 +6,12 @@ class SaleConfigSettings(models.TransientModel):
 
     group_show_price_subtotal = fields.Boolean(group='base.group_portal,base.group_user')
     group_show_price_total = fields.Boolean(group='base.group_portal,base.group_user')
+
+
+class WebsiteConfigSettings(models.TransientModel):
+    _inherit = 'website.config.settings'
+
+    group_of_validate_order_from_portal = fields.Boolean(
+        string='Activer la validation de commande depuis le portail',
+        implied_group='of_website_portal.group_of_validate_order_from_portal',
+        group='base.group_portal,base.group_user')
