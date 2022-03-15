@@ -778,6 +778,8 @@ class OfContractLine(models.Model):
 
     name = fields.Char(string="Nom", compute="_compute_name", store=True)
     partner_id = fields.Many2one('res.partner', related="contract_id.partner_id", string="Client payeur", readonly=True)
+    department_id = fields.Many2one(
+        'res.country.department', related='partner_id.department_id', string=u"Département", readonly=True, store=True)
     address_id = fields.Many2one('res.partner', string="Adresse d'intervention", required=True)
     partner_code_magasin = fields.Char(string="Code magasin", related="address_id.of_code_magasin", readonly=True)
     address_street = fields.Char(string="Rue", related="address_id.street", readonly=True)
