@@ -7,4 +7,8 @@
     <data-->
         <function model="crm.lead" name="_init_clients"/>
     </data>
+
+    <!-- Recalcul du reste à facturer des lignes de commandes avec remise, à supprimer dès passage en production -->
+    <function model="sale.order.line" name="_recompute_of_amount_to_invoice_with_discount"/>
+
 </odoo>
