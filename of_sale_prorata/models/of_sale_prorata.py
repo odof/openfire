@@ -89,7 +89,8 @@ class SaleOrder(models.Model):
     def of_button_situation(self):
         self.ensure_one()
         wizard_obj = self.env['of.wizard.situation']
-        product_situation_id = self.env['ir.values'].get_default('sale.config.settings', 'of_product_situation_id_setting')
+        product_situation_id = self.env['ir.values']\
+            .get_default('sale.config.settings', 'of_product_situation_id_setting')
         if not product_situation_id:
             raise UserError(u"Vous devez définir l'Article de situation dans la configuration des ventes.")
         situation_data = {
@@ -101,11 +102,12 @@ class SaleOrder(models.Model):
         wizard = wizard_obj.create(situation_data)
 
         action = {
-            'type'     : 'ir.actions.act_window',
+            'type': 'ir.actions.act_window',
             'view_type': 'form',
             'view_mode': 'form',
             'res_model': 'of.wizard.situation',
-            'res_id'   : wizard.id,
+            'res_id': wizard.id,
+            'target': 'current',
         }
         return action
 
@@ -140,18 +142,20 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    situation_ids = fields.One2many('of.sale.order.line.situation', 'order_line_id', string='Lignes de situation')
+    situation_ids = fields.One2many(
+        comodel_name='of.sale.order.line.situation', inverse_name='order_line_id', string=u"Lignes de situation")
 
 
 class SaleOrderLineSituation(models.Model):
     _name = 'of.sale.order.line.situation'
     _order = 'order_id DESC, order_line_id DESC, situation'
 
-    order_id = fields.Many2one('sale.order', related='order_line_id.order_id', readonly=True)
-    order_line_id = fields.Many2one('sale.order.line', string='Ligne de commande', readonly=True, required=True, ondelete='cascade')
-    situation = fields.Integer(string='Situation', required=True)
-    value = fields.Integer(u"Réalisation (%)")
-    invoice_line_id = fields.Many2one('account.invoice.line', string='Ligne de facture', readonly=True)
+    order_id = fields.Many2one(comodel_name='sale.order', related='order_line_id.order_id', readonly=True)
+    order_line_id = fields.Many2one(
+        comodel_name='sale.order.line', string=u"Ligne de commande", readonly=True, required=True, ondelete='cascade')
+    situation = fields.Integer(string=u"Situation", required=True)
+    value = fields.Float(string=u"Réalisation (%)")
+    invoice_line_id = fields.Many2one(comodel_name='account.invoice.line', string=u"Ligne de facture", readonly=True)
 
 
 class AccountInvoice(models.Model):

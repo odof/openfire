@@ -57,7 +57,7 @@
                     <t t-foreach="doc.situation_lines_layouted()" t-as="layout_category">
                         <t t-if="layout_category_size > 1" groups="sale.group_sale_layout">
                             <tr class="active">
-                                <td colspan="7" style="font-weight: bold; border-bottom: 1px solid black;">&amp;bull;
+                                <td colspan="7" t-att-style="'background-color: ' + layout_category['color'] + ';color: ' + doc.get_color_font() + '; font-weight:  bold; border-bottom: 1px solid black;'">
                                     <t t-raw="layout_category['name']"/>
                                 </td>
                             </tr>
