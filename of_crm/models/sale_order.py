@@ -221,10 +221,6 @@ class SaleOrderLine(models.Model):
             line.of_amount_to_invoice = (line.product_uom_qty - line.qty_invoiced) * line.price_unit * \
                 (1 - (line.discount or 0.0) / 100.0)
 
-    @api.model
-    def _recompute_of_amount_to_invoice_with_discount(self):
-        self.search([('discount', '!=', 0.0)])._compute_of_amount_to_invoice()
-
 
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
