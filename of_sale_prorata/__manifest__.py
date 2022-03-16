@@ -19,7 +19,7 @@ Il faut également créer un article de situation.
     'website': "www.openfire.fr",
     'depends': [
         'sale',
-        'of_sale'
+        'of_sale_quote_template',
     ],
     'category': "OpenFire",
     'license': "",

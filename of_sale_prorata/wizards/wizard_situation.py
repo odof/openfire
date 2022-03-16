@@ -295,6 +295,53 @@ class OfWizardSituation(models.TransientModel):
         return action
 
     @api.multi
+    def button_layout_category_situation(self):
+        self.ensure_one()
+        wizard_obj = self.env['of.wizard.situation.layout.category']
+        product_situation_id = self.env['ir.values']\
+            .get_default('sale.config.settings', 'of_product_situation_id_setting')
+        if not product_situation_id:
+            raise UserError(u"Vous devez définir l'Article de situation dans la configuration des ventes.")
+
+        wizard_lines_data = []
+
+        # Création d'une ligne de wizard par section
+        for layout_category in self.line_ids.mapped('of_layout_category_id'):
+            data = (0, 0, {
+                'of_layout_category_id': layout_category.id,
+                'situation_line_ids': [(6, 0, self.line_ids.filtered(
+                    lambda wsl: wsl.of_layout_category_id == layout_category).ids)]
+            })
+            wizard_lines_data.append(data)
+
+        # Création d'une ligne de wizard si des lignes de commande n'ont pas de section
+        situation_lines_without_category = self.line_ids.filtered(lambda wsl: not wsl.of_layout_category_id)
+        if situation_lines_without_category:
+            data = (0, 0, {
+                'of_layout_category_id': False,
+                'situation_line_ids': [(6, 0, situation_lines_without_category.ids)],
+            })
+            wizard_lines_data.append(data)
+
+        # Création du wizard
+        situation_data = {
+            'situation_id': self.id,
+            'order_id': self.order_id.id,
+            'layout_category_ids': wizard_lines_data,
+        }
+        wizard = wizard_obj.create(situation_data)
+
+        action = {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'of.wizard.situation.layout.category',
+            'res_id': wizard.id,
+            'target': 'new',
+        }
+        return action
+
+    @api.multi
     def situation_lines_layouted(self):
         self.ensure_one()
         report_groups = []
@@ -320,9 +367,14 @@ class OfWizardSituation(models.TransientModel):
                                 name = name[pos + 1:]
                         line.name = name.strip()
 
+                # On ajoute une section lorsque les sections avancées sont activées ou que la section a des lignes
+                if self.user_has_groups('of_sale_quote_template.group_of_advanced_sale_layout_category') or sit_lines:
                     report_groups.append({
                         'name': order_group['name'],
+                        'subtotal': order_group['subtotal'],
+                        'pagebreak': False,
                         'lines': sit_lines,
+                        'color': order_group['color']
                     })
         return report_groups
 
@@ -338,6 +390,9 @@ class OfWizardSituation(models.TransientModel):
     def of_get_report_date(self, docs):
         lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
         return date.today().strftime(lang.date_format)
+
+    def get_color_font(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'of_color_font') or "#000000"
 
 
 class OfWizardSituationLine(models.TransientModel):
@@ -391,6 +446,120 @@ class OfWizardSituationLine(models.TransientModel):
                     'situation': n,
                     'value': line.sit_val_n,
                 })
+
+    @api.onchange('sit_val_n')
+    def _onchange_sit_val_n(self):
+        for line in self:
+            if line.sit_val_suiv > 100:
+                line.sit_val_n = 100 - line.sit_val_prec
+
+
+class OfWizardSituationLayoutCategory(models.TransientModel):
+    _name = "of.wizard.situation.layout.category"
+
+    state = fields.Selection(selection=[('step1', u"Étape 1"), ('step2', u"Étape 2")], string=u"Étape", default='step1')
+    order_id = fields.Many2one(comodel_name='sale.order', string=u"Commande client")
+    situation_id = fields.Many2one(comodel_name='of.wizard.situation', string=u"Wizard", required=True)
+    layout_category_ids = fields.One2many(
+        comodel_name='of.wizard.situation.layout.category.line',
+        inverse_name='layout_category_situation_id', string=u"Lignes de situation par section")
+    type = fields.Selection(
+        selection=[
+            ('sit_val_n', u"Sit. n (%)"),
+            ('sit_val_suiv', u"Total n (%)"),
+        ], string=u"Type", default='sit_val_n')
+    value = fields.Float(string=u"Valeur")
+
+    @api.multi
+    def name_get(self):
+        return [(record.id, "Situation par section n°%i" % record.situation_id.prochaine_situation) for record in self]
+
+    @api.multi
+    def button_prefill(self):
+        self.ensure_one()
+        self.state = 'step2'
+        return {
+            'type': 'ir.actions.do_nothing'
+        }
+
+    @api.multi
+    def button_return(self):
+        self.ensure_one()
+        self.state = 'step1'
+        return {
+            'type': 'ir.actions.do_nothing'
+        }
+
+    def button_apply_prefill(self):
+        for layout_category in self.layout_category_ids:
+            if self.type == 'sit_val_n':
+                layout_category.sit_val_n = self.value
+            else:
+                layout_category.sit_val_n = max(self.value, layout_category.sit_val_prec) - layout_category.sit_val_prec
+            layout_category._onchange_sit_val_n()
+
+        self.state = 'step1'
+        return {
+            'type': 'ir.actions.do_nothing'
+        }
+
+    @api.multi
+    def button_apply(self):
+        for layout_category in self.layout_category_ids:
+            lines = layout_category.situation_line_ids
+            amount_to_complete = layout_category.price_subtotal * (layout_category.sit_val_n / 100)
+            lines_amount_due = sum(
+                line.price_subtotal - line.price_subtotal * (line.sit_val_prec / 100) for line in lines)
+
+            # Le facteur va déterminer quel pourcentage du montant restant dû de chaque ligne on va facturer
+            factor = amount_to_complete / lines_amount_due if lines_amount_due else 1
+            for line in lines:
+                line.sit_val_n = (100 - line.sit_val_prec) * factor if line.price_subtotal else 100 - line.sit_val_prec
+
+
+class OfWizardSituationLayoutCategoryLine(models.TransientModel):
+    _name = "of.wizard.situation.layout.category.line"
+
+    layout_category_situation_id = fields.Many2one(
+        comodel_name='of.wizard.situation.layout.category', string=u"Wizard", required=True, ondelete="cascade")
+    of_layout_category_id = fields.Many2one(
+        comodel_name='of.sale.order.layout.category', string=u"Ligne de section", readonly=True)
+    situation_line_ids = fields.Many2many(
+        comodel_name='of.wizard.situation.line', relation='of_wizard_situation_line_layout_category_situation_rel',
+        string=u"Lignes de situation", required=True)
+    situation_line_count = fields.Integer(string=u"Lignes de situation", compute='_compute_situation_line_count')
+
+    price_subtotal = fields.Float(compute='_compute_sit_vals', string="Prix HT")
+    price_total = fields.Float(compute='_compute_sit_vals', string="Prix TTC")
+
+    sit_val_n = fields.Float(string=u"Sit. n (%)")
+    sit_val_prec = fields.Float(compute='_compute_sit_vals', string=u"Total n-1 (%)")
+    sit_val_suiv = fields.Float(compute='_compute_sit_val_suiv', string=u"Total n (%)")
+
+    @api.depends('situation_line_ids')
+    def _compute_situation_line_count(self):
+        for layout_category in self:
+            layout_category.situation_line_count = len(layout_category.situation_line_ids)
+
+    @api.depends()
+    def _compute_sit_vals(self):
+        for layout_category in self:
+            amount_completed = 0.0
+            price_subtotal = 0.0
+            price_total = 0.0
+            for situation_line in layout_category.situation_line_ids:
+                price_subtotal += situation_line.price_subtotal
+                price_total += situation_line.price_total
+                amount_completed += situation_line.price_subtotal * (situation_line.sit_val_prec / 100)
+
+            layout_category.sit_val_prec = (amount_completed / price_subtotal) * 100 if price_subtotal else 0.0
+            layout_category.price_subtotal = price_subtotal
+            layout_category.price_total = price_total
+
+    @api.depends('sit_val_prec', 'sit_val_n')
+    def _compute_sit_val_suiv(self):
+        for layout_category in self:
+            layout_category.sit_val_suiv = layout_category.sit_val_prec + layout_category.sit_val_n
 
     @api.onchange('sit_val_n')
     def _onchange_sit_val_n(self):

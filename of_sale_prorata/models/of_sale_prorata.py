@@ -101,6 +101,7 @@ class SaleOrder(models.Model):
             'view_mode': 'form',
             'res_model': 'of.wizard.situation',
             'res_id': wizard.id,
+            'target': 'current',
         }
         return action
 
