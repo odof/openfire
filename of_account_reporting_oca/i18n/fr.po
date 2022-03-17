@@ -1,0 +1,33 @@
+#. module: account_financial_report_qweb
+#: model:ir.ui.menu,name:account_financial_report_qweb.menu_oca_reports
+msgid "OCA accounting reports"
+msgstr "Rapports comptables"
+
+#. module: account_financial_report_qweb
+#: code:addons/account_financial_report_qweb/report/journal_report_xlsx.py:21
+#: model:ir.ui.menu,name:account_financial_report_qweb.journal_report_wizard_menu
+#, python-format
+msgid "Journal Ledger"
+msgstr "Journal"
+
+#. module: account_financial_report_qweb
+#: code:addons/account_financial_report_qweb/report/open_items_xlsx.py:19
+#: model:ir.actions.act_window,name:account_financial_report_qweb.action_open_items_wizard
+#: model:ir.actions.client,name:account_financial_report_qweb.action_report_open_items
+#: model:ir.actions.report.xml,name:account_financial_report_qweb.action_report_open_items_html
+#: model:ir.actions.report.xml,name:account_financial_report_qweb.action_report_open_items_qweb
+#: model:ir.ui.menu,name:account_financial_report_qweb.menu_open_items_wizard
+#, python-format
+msgid "Open Items"
+msgstr "Écritures non lettrées"
+
+#. module: account_financial_report_qweb
+#: code:addons/account_financial_report_qweb/report/aged_partner_balance_xlsx.py:19
+#: model:ir.actions.act_window,name:account_financial_report_qweb.action_aged_partner_balance_wizard
+#: model:ir.actions.client,name:account_financial_report_qweb.action_report_aged_partner_balance
+#: model:ir.actions.report.xml,name:account_financial_report_qweb.action_report_aged_partner_balance_html
+#: model:ir.actions.report.xml,name:account_financial_report_qweb.action_report_aged_partner_balance_qweb
+#: model:ir.ui.menu,name:account_financial_report_qweb.menu_aged_partner_balance_wizard
+#, python-format
+msgid "Aged Partner Balance"
+msgstr "Balance âgée des tiers"
