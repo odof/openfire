@@ -8,6 +8,16 @@ import odoo.addons.decimal_precision as dp
 class StockMove(models.Model):
     _inherit = 'stock.move'
 
+    def _default_uom(self):
+        weight_uom_id = self.env.ref('product.product_uom_kgm', raise_if_not_found=False)
+        if not weight_uom_id:
+            uom_categ_id = self.env.ref('product.product_uom_categ_kgm').id
+            weight_uom_id = self.env['product.uom'].search([('category_id', '=', uom_categ_id), ('factor', '=', 1)],
+                                                           limit=1)
+        return weight_uom_id
+
+    weight_uom_id = fields.Many2one(default=lambda s: s._default_uom())
+
     @api.multi
     def action_confirm(self):
         """
