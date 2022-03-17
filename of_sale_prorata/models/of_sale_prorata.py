@@ -22,6 +22,7 @@ class SaleOrder(models.Model):
     of_prochaine_situation = fields.Integer(
         compute='_compute_of_prochaine_situation', string="Prochaine situation",
         help=u"Situation pour laquelle la prochaine facture sera générée")
+    of_last_situation = fields.Boolean(compute='_compute_of_last_situation', string=u"Dernière situation ?")
     of_nb_situations = fields.Integer(string="Nb. situations")
 
     @api.depends()
@@ -38,6 +39,11 @@ class SaleOrder(models.Model):
                             n += invoice.type == 'out_invoice' and 1 or -1
                             break
             order.of_prochaine_situation = n
+
+    @api.depends('of_prochaine_situation', 'of_nb_situations')
+    def _compute_of_last_situation(self):
+        for order in self:
+            order.of_last_situation = order.of_prochaine_situation == order.of_nb_situations
 
     @api.multi
     def action_invoice_create(self, grouped=False, final=False):
@@ -87,6 +93,7 @@ class SaleOrder(models.Model):
         if not product_situation_id:
             raise UserError(u"Vous devez définir l'Article de situation dans la configuration des ventes.")
         situation_data = {
+            'partner_id': self.partner_id.id,
             'order_id': self.id,
             'line_ids': [(0, 0, {'order_line_id': line.id}) for line in self.order_line
                          if line.product_uom_qty or line.situation_ids],
@@ -101,6 +108,29 @@ class SaleOrder(models.Model):
             'res_id'   : wizard.id,
         }
         return action
+
+    @api.multi
+    def of_button_last_situation(self):
+        self.ensure_one()
+        wizard_obj = self.env['of.wizard.situation']
+        product_situation_id = self.env['ir.values'].get_default('sale.config.settings', 'of_product_situation_id_setting')
+        if not product_situation_id:
+            raise UserError(u"Vous devez définir l'Article de situation dans la configuration des ventes.")
+        situation_data = {
+            'partner_id': self.partner_id.id,
+            'order_id': self.id,
+            'line_ids': [(0, 0, {'order_line_id': line.id}) for line in self.order_line
+                         if line.product_uom_qty or line.situation_ids],
+        }
+
+        # On crée le wizard et on met toutes les lignes à 100 pour la dernière facture de situation
+        wizard = wizard_obj.create(situation_data)
+        for line in wizard.line_ids:
+            line.sit_val_n = 100 - line.sit_val_prec
+        wizard.button_make_invoice()
+
+        # On crée la facture finale
+        return self.action_invoice_create(final=True)
 
 
 class SaleOrderLine(models.Model):
