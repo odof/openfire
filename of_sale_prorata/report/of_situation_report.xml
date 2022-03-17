@@ -14,7 +14,30 @@
     <t t-call="report.external_layout">
         <t t-set="doc" t-value="doc.with_context({'lang':doc.order_id.partner_id.lang})"/>
         <t t-set="order" t-value="doc.order_id"/>
+        <t t-set="pdf_telephone" t-value="order.pdf_afficher_telephone()"/>
+        <t t-set="pdf_mobile" t-value="order.pdf_afficher_mobile()"/>
+        <t t-set="pdf_fax" t-value="order.pdf_afficher_fax()"/>
+        <t t-set="pdf_email" t-value="order.pdf_afficher_email()"/>
         <div class="page">
+
+            <div name="invoice_address" class="row">
+                <div class="col-xs-5 col-xs-offset-7" style="font-size: large">
+                    <t t-set="the_address" t-value="doc.partner_id"/>
+                    <t t-if="order.pdf_afficher_nom_parent()">
+                        <t t-if="the_address.parent_id"><t t-set="the_address" t-value="the_address.parent_id"/></t>
+                    </t>
+                    <t t-if="the_address.title and order.pdf_afficher_civilite()"><span t-field="the_address.title"/></t>
+                    <t t-if="the_address.name"><span t-field="the_address.name"/></t>
+                    <t t-if="not the_address.name and the_address.parent_id"><span t-field="the_address.parent_id.name"/></t>
+                    <address t-field="doc.partner_id" t-options="{'widget': 'contact', 'fields': ['address'], 'no_marker': True}"/>
+                    <t t-if="doc.partner_id.phone and pdf_telephone % 2 == 1">Tél. <span t-field="doc.partner_id.phone"/><br/></t>
+                    <t t-if="doc.partner_id.mobile and pdf_mobile % 2 == 1">Tél. <span t-field="doc.partner_id.mobile"/><br/></t>
+                    <t t-if="doc.partner_id.fax and pdf_fax % 2 == 1">Fax <span t-field="doc.partner_id.fax"/><br/></t>
+                    <t t-if="doc.partner_id.email and pdf_email % 2 == 1"><span t-field="doc.partner_id.email"/><br/></t>
+                    <span t-if="doc.partner_id.vat">TIN: <span t-field="doc.partner_id.vat"/></span>
+                </div>
+            </div>
+
             <div class="oe_structure"/>
             <h2>Situation au <span t-field="doc.date_rapport_situation"/> - <span t-field="order.name"/></h2>
 
@@ -35,7 +58,7 @@
                         <t t-if="layout_category_size > 1" groups="sale.group_sale_layout">
                             <tr class="active">
                                 <td colspan="7" style="font-weight: bold; border-bottom: 1px solid black;">&amp;bull;
-                                    <t t-esc="layout_category['name']"/>
+                                    <t t-raw="layout_category['name']"/>
                                 </td>
                             </tr>
                         </t>

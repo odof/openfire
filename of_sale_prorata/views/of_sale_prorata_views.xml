@@ -8,8 +8,11 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
+                <field name="of_last_situation" invisible="1"/>
                 <button name="of_button_situation" type="object" string="Situation"
-                        attrs="{'invisible': [('of_nb_situations','=',0)]}"/>
+                        attrs="{'invisible': ['|', '|', ('of_nb_situations', '=', 0), ('invoice_status', '!=', 'to invoice'), ('of_last_situation', '=', True)]}"/>
+                <button name="of_button_last_situation" type="object" string="Générer facture finale"
+                        attrs="{'invisible': ['|', '|', ('of_nb_situations', '=', 0), ('invoice_status', '!=', 'to invoice'), ('of_last_situation', '=', False)]}"/>
             </xpath>
 
             <xpath expr="//group[@name='sale_pay']" position="inside">
