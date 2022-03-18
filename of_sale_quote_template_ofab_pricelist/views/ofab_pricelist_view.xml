@@ -4,7 +4,7 @@
     <record id="of_sale_quote_template_ofab_pricelist_view_order_form" model="ir.ui.view">
         <field name="name">of.sale.quote.template.ofab.pricelist.sale.order.form</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="inherit_id" ref="of_sale_quote_template.of_sale_quote_template_view_order_form"/>
         <field name="priority">40</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='order_line']" position="attributes">
