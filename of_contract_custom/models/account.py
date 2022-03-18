@@ -135,6 +135,11 @@ class OfAccountInvoice(models.Model):
                         categ['lines'].sort(key=lambda x: x.of_contract_line_id.code_de_ligne)
         return res
 
+    @api.multi
+    def of_get_printable_data(self):
+        res = super(OfAccountInvoice, self).of_get_printable_data()
+        return res
+
 
 class OfAccountInvoiceLine(models.Model):
     _inherit = "account.invoice.line"
