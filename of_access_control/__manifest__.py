@@ -6,11 +6,10 @@
     'license': "",
     'category': "OpenFire",
     'description': u"""
-Module de gestion des contrôles d'accès
-=======================================
+Module de modification des droits
+=================================
 
 - Modification des droits Odoo standards et OpenFire
-- Mise en place de la notion de profil utilisateur
 """,
     'website': "www.openfire.fr",
     'depends': [
@@ -20,11 +19,11 @@ Module de gestion des contrôles d'accès
         'of_service',
         'of_parc_installe',
         'of_sale',
+        'of_user_profile',
     ],
     'data': [
         'security/of_access_control_security.xml',
         'security/ir.model.access.csv',
-        'views/res_users_views.xml',
         'views/of_parc_installe_views.xml',
         'views/of_res_config_views.xml',
         'views/project_issue_views.xml',

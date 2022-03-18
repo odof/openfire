@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models, SUPERUSER_ID
-from odoo.exceptions import Warning
+from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 
 class ResUsers(models.Model):
@@ -22,8 +22,8 @@ class ResUsers(models.Model):
         comodel_name='ir.model.fields', string=u"Champs à mettre à jour",
         domain=[('model', 'in', ('res.users', 'res.partner')),
                 ('ttype', 'not in', ('one2many',)),
-                ('name', 'not in', ('of_is_user_profile', 'of_user_profile_id', 'of_user_ids', 'of_field_ids', 'view'))
-                ], default=_get_default_field_ids)
+                ('name', 'not in', ('of_is_user_profile', 'of_user_profile_id', 'of_user_ids', 'of_field_ids', 'view')),
+                ], default=lambda self: self._get_default_field_ids())
 
     _sql_constraints = [
         ('profile_without_profile_id',
@@ -42,27 +42,27 @@ class ResUsers(models.Model):
         if not self:
             return
         if len(self.mapped('of_user_profile_id')) != 1:
-            raise Warning(u"_update_from_profile accepte uniquement des utilisateurs liés au même profil !")
+            raise UserError(u"_update_from_profile accepte uniquement des utilisateurs liés au même profil !")
         user_profile = self[0].of_user_profile_id
         if not fields:
             fields = user_profile.of_field_ids.mapped('name')
         else:
             fields = set(fields) & set(user_profile.of_field_ids.mapped('name'))
-        if user_profile:
-            vals = {}
-            for field in fields:
-                value = getattr(user_profile, field)
-                field_type = self._fields[field].type
-                if field_type == 'many2one':
-                    vals[field] = value.id
-                elif field_type == 'many2many':
-                    vals[field] = [(6, 0, value.ids)]
-                elif field_type == 'one2many':
-                    raise Warning(u"_update_from_profile ne gère pas les champs One2many")
-                else:
-                    vals[field] = value
-            if vals:
-                self.write(vals)
+
+        vals = {}
+        for field in fields:
+            value = getattr(user_profile, field)
+            field_type = self._fields[field].type
+            if field_type == 'many2one':
+                vals[field] = value.id
+            elif field_type == 'many2many':
+                vals[field] = [(6, 0, value.ids)]
+            elif field_type == 'one2many':
+                raise UserError(u"_update_from_profile ne gère pas les champs One2many")
+            else:
+                vals[field] = value
+        if vals:
+            self.write(vals)
 
     @api.multi
     def _update_users_linked_to_profile(self, fields=None):
