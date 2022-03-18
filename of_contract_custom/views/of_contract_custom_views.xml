@@ -224,10 +224,11 @@
                                     <tree>
                                         <field name="spec_date"/>
                                         <field name="state"/>
+                                        <field name="last_intervention_state"/>
                                         <field name="address_id"/>
                                         <field name="last_attachment_id" invisible="1"/>
                                         <button name="button_open_of_planning_intervention" class="oe_link" type="object" string="Voir RDVs"/>
-                                        <button name="print_intervention_report" class="oe_link" type="object" string="Rapport(s)"/>
+<!--                                        <button name="print_intervention_report" class="oe_link" type="object" string="Rapport(s)"/>-->
                                     </tree>
                                 </field>
                             </group>
