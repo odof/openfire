@@ -13,4 +13,16 @@
         </field>
     </record>
 
+    <record id="of_account_invoice_view_form" model="ir.ui.view">
+        <field name="name">of.account.invoice.view.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="of_sale.of_account_invoice_view_form"/>
+        <field name="arch" type="xml">
+            <!-- A placer en dessous de document joint -->
+            <xpath expr="//field[@name='of_mail_template_ids']" position="after">
+                <field name="of_print_sequence" attrs="{'invisible': [('of_compute_contract_id', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>

@@ -9,6 +9,32 @@
             </div>
             <div t-if="o.of_contract_id" style="display: table-cell; width: 4px;"/>
         </xpath>
+        <xpath expr="//table[@name='invoice_line']/thead/tr/th[@name='regular_source']" position="after">
+            <t t-if="o.of_compute_contract_id">
+                <th name="code_magasin">Code</th>
+                <th name="city">Ville</th>
+            </t>
+        </xpath>
+        <xpath expr="//table[@name='invoice_line']/tbody//td[@name='regular_source']" position="after">
+            <t t-if="o.of_compute_contract_id">
+                <td name="regular_code_magasin" t-esc="l.of_contract_line_id.address_id.of_code_magasin or ''"/>
+                <td name="regular_city" t-esc="l.of_contract_line_id.address_id.city or ''"/>
+            </t>
+        </xpath>
     </template>
 
+    <template id="report_invoice_layouted" inherit_id="sale.report_invoice_layouted">
+        <xpath expr="//table[@name='invoice_line_layouted']/thead//th[@name='source']" position="after">
+            <t t-if="o.of_compute_contract_id">
+                <th name="code_magasin">Code</th>
+                <th name="city">Ville</th>
+            </t>
+        </xpath>
+        <xpath expr="//table[@name='invoice_line_layouted']/tbody//td[@name='source']" position="after">
+            <t t-if="o.of_compute_contract_id">
+                <td name="regular_code_magasin" t-esc="l.of_contract_line_id.address_id.of_code_magasin or ''"/>
+                <td name="regular_city" t-esc="l.of_contract_line_id.address_id.city or ''"/>
+            </t>
+        </xpath>
+    </template>
 </odoo>
