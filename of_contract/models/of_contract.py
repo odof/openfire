@@ -27,8 +27,9 @@ class AccountAnalyticAccount(models.Model):
 
                 taxes = line.product_id.taxes_id.filtered(lambda r: r.company_id == contract.company_id)
                 line.tax_id = fpos.map_tax(taxes, line.product_id, contract.partner_id) if fpos else taxes
+                price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
                 tax_amounts = line.tax_id.compute_all(
-                    line.price_unit, currency, line.quantity, product=line.product_id, partner=contract.partner_id)
+                    price, currency, line.quantity, product=line.product_id, partner=contract.partner_id)
 
                 if contract.company_id.tax_calculation_rounding_method != 'round_globally':
                     tax_amounts['total_excluded'] = currency.round(tax_amounts['total_excluded'])
@@ -41,6 +42,10 @@ class AccountAnalyticAccount(models.Model):
                 'of_amount_tax': currency.round(amount_total - amount_untaxed),
                 'of_amount_total': currency.round(amount_total),
             })
+
+    @api.model
+    def _recompute_of_amount_all(self):
+        self.search([('recurring_invoice_line_ids.discount', '!=', 0.0)])._compute_of_amount_all()
 
     @api.multi
     def _prepare_invoice(self):

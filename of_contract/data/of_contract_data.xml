@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Recalcul des montants totaux pour prise en compte des remises, à supprimer dès passage en production -->
+    <function model="account.analytic.account" name="_recompute_of_amount_all"/>
+
+</odoo>

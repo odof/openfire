@@ -19,6 +19,7 @@ Extension OpenFire du module contract de l'OCA
     ],
     "category": "OpenFire",
     "data": [
+        'data/of_contract_data.xml',
         'views/of_contract_views.xml',
         'wizards/of_contract_invoice_confirm.xml',
     ],
