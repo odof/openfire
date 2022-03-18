@@ -235,10 +235,16 @@ class OfDatastoreSupplierBrand(models.AbstractModel):
             if old_brand:
                 if new_brand_id != old_brand.id:
                     old_brand.write({'datastore_supplier_id': False, 'datastore_brand_id': False})
+                    # On vide le champ of_datastore_res_id des articles de la marque qui n'est plus liée au TC.
+                    old_brand.product_ids.write({'of_datastore_res_id': False})
+                    old_brand.product_variant_ids.write({'of_datastore_res_id': False})
                     old_brand = False
             if new_brand_id and not old_brand:
                 new_brand = brand_obj.browse(new_brand_id)
                 new_brand.write({'datastore_supplier_id': ds_supplier_id, 'datastore_brand_id': ds_brand_id})
+                # On vide le champ of_datastore_res_id des articles de la marque nouvellement liée au TC.
+                new_brand.product_ids.write({'of_datastore_res_id': False})
+                new_brand.product_variant_ids.write({'of_datastore_res_id': False})
         return True
 
 
@@ -473,7 +479,7 @@ class OfProductBrand(models.Model):
                 result = obj_obj.create(uom_data)
         else:
             if obj_obj._rec_name:
-                result = obj_obj.search([(self._rec_name, '=', res_name)])
+                result = obj_obj.search([(obj_obj._rec_name, '=', res_name)])
                 if len(result) != 1:
                     result = False
         match_dict[res_id] = result
