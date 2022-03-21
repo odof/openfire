@@ -426,6 +426,8 @@ class OfPlanningIntervention(models.Model):
     address_phone = fields.Char(related='address_id.phone', string=u"Téléphone", readonly=1)
     address_mobile = fields.Char(related='address_id.mobile', string=u"Mobile", readonly=1)
     secteur_id = fields.Many2one(related='address_id.of_secteur_tech_id', readonly=True)
+    department_id = fields.Many2one(
+        'res.country.department', related='address_id.department_id', string=u"Département", readonly=True, store=True)
     user_id = fields.Many2one('res.users', string="Utilisateur", default=lambda self: self.env.uid)
     company_id = fields.Many2one('res.company', string='Magasin', required=True, default=lambda s: s._default_company())
     name = fields.Char(string=u"Libellé", required=True)

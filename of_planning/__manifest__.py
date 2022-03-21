@@ -38,6 +38,7 @@ Inclut la gestion des équipes d'intervention.
         'of_utils',
         'of_base_location',  # secteurs
         'stock',
+        'l10n_fr_department',
     ],
     'data': [
         'security/of_planning_security.xml',

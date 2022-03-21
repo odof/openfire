@@ -51,7 +51,6 @@ Ligne d'indice :
         "of_project_issue",
         "of_base",
         "of_analytique",
-        "l10n_fr_department",
     ],
     "category": "OpenFire",
     "data": [

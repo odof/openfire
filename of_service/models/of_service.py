@@ -170,6 +170,8 @@ class OfService(models.Model):
     address_mobile = fields.Char(related='address_id.mobile', string=u"Mobile", readonly=1)
     secteur_tech_id = fields.Many2one(
         related='address_id.of_secteur_tech_id', readonly=True, search="_search_secteur_tech_id")
+    department_id = fields.Many2one(
+        'res.country.department', compute='_compute_department_id', string=u"Département", readonly=True, store=True)
     #tag_ids = fields.Many2many('of.service.tag', string=u"Étiquettes")
     tag_ids = fields.Many2many(
         string=u"Étiquettes", comodel_name='of.planning.tag', relation='of_service_of_planning_tag_rel',
@@ -508,6 +510,14 @@ class OfService(models.Model):
             intervention.price_subtotal = sum(intervention.line_ids.mapped('price_subtotal'))
             intervention.price_tax = sum(intervention.line_ids.mapped('price_tax'))
             intervention.price_total = sum(intervention.line_ids.mapped('price_total'))
+
+    @api.depends('partner_id.department_id', 'address_id.department_id')
+    def _compute_department_id(self):
+        for record in self:
+            if record.address_id:
+                record.department_id = record.address_id.department_id
+            elif record.partner_id:
+                record.department_id = record.partner_id.department_id
 
     # @api.onchange
 
