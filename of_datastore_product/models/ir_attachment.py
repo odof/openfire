@@ -27,7 +27,14 @@ class IrAttachment(models.Model):
                 if elem[0] == 'res_model':
                     res_model = elem[2]
                 elif elem[0] == 'res_id':
-                    res_id = int(elem[2])
+                    if isinstance(elem[2], (int, long)):
+                        res_id = elem[2]
+                    elif isinstance(elem[2], basestring):
+                        if elem[2].isdigit():
+                            res_id = int(elem[2])
+                        elif '-' in elem[2] and elem[2].split('-')[0].isdigit():
+                            # les events virtuels récurrents du calendrier ont un id de la forme <origin_id>-<xxxxxx>
+                            res_id = int(elem[2].split('-')[0])
         if res_model == 'product.template' and res_id:
             supplier_obj = self.env['of.datastore.supplier']
             ds_res_id = False
