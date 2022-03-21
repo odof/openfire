@@ -55,6 +55,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         code_to_match_dict = {
             convert_func[product.brand_id](product.default_code): product
             for product in product_obj.browse(product_ids)
+            if product.default_code
         }
         # Récupération des correspondances de la base centrale
         ds_product_new_ids = supplier.of_datastore_search(
