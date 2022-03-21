@@ -11,11 +11,13 @@ class SaleOrder(models.Model):
     of_submitted_worktop_configurator_order = fields.Boolean(string=u"Devis soumis issu du calculateur")
     of_worktop_configurator_internal_vendor = fields.Boolean(string=u"Réalisé par HM Déco")
     of_worktop_configurator_internal_code = fields.Char(string=u"Code interne", compute='_compute_internal_code')
+    of_worktop_configurator_margin = fields.Float(
+        string=u"Marge configurateur", compute='_compute_internal_code', digits=dp.get_precision('Product Price'))
     of_worktop_configurator_discount_id = fields.Many2one(
         comodel_name='of.worktop.configurator.discount', string=u"Remise")
-    of_delivery_floor = fields.Integer(string=u"Étage de livraison")
     of_site_service_id = fields.Many2one(
         comodel_name='of.worktop.configurator.service', string=u"Prestations du chantier")
+    of_delivery_floor = fields.Boolean(string=u"Supplément étage et accès difficile")
     of_junction = fields.Boolean(string=u"Raccordement")
 
     def _compute_internal_code(self):
@@ -29,6 +31,7 @@ class SaleOrder(models.Model):
             diff = sum(order.order_line.mapped(lambda l: l.price_unit * l.product_uom_qty)) - \
                 sum(order_lines.mapped(lambda l: l.of_no_coef_price * l.product_uom_qty))
             order.of_worktop_configurator_internal_code = u"CDI%05d" % int(diff)
+            order.of_worktop_configurator_margin = diff
 
     @api.multi
     @api.onchange('pricelist_id')
@@ -65,10 +68,32 @@ class SaleOrder(models.Model):
                         order_line._compute_tax_id()
         return True
 
+    @api.multi
+    def action_edit_online(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_url',
+            'name': "Modification en ligne",
+            'target': 'self',
+            'url': '/worktop_configurator/edit_online/%s' % str(self.id),
+        }
+
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
+    of_worktop_configurator_type_id = fields.Many2one(
+        comodel_name='of.worktop.configurator.type', string=u"Type de pièce")
+    of_worktop_configurator_material_id = fields.Many2one(
+        comodel_name='of.worktop.configurator.material', string=u"Matériau de la pièce")
+    of_worktop_configurator_finishing_id = fields.Many2one(
+        comodel_name='of.worktop.configurator.finishing', string=u"Finition de la pièce")
+    of_worktop_configurator_color_id = fields.Many2one(
+        comodel_name='of.worktop.configurator.color', string=u"Couleur de la pièce")
+    of_worktop_configurator_thickness_id = fields.Many2one(
+        comodel_name='of.worktop.configurator.thickness', string=u"Épaisseur & type de chant de la pièce")
+    of_worktop_configurator_length = fields.Float(string=u"Longueur de la pièce (cm)")
+    of_worktop_configurator_width = fields.Float(string=u"Largeur de la pièce (cm)")
     of_worktop_configurator_weight = fields.Float(string=u"Poids de la pièce (kg)")
     of_no_coef_price = fields.Float(
         string=u"Prix sans coefficient", required=True, digits=dp.get_precision('Product Price'), default=0.0)
@@ -103,8 +128,6 @@ class SaleOrderLine(models.Model):
 class SaleConfigSettings(models.TransientModel):
     _inherit = 'sale.config.settings'
 
-    of_website_worktop_configurator_fiscal_position_ids = fields.Many2many(
-        comodel_name='account.fiscal.position', string=u"(OF) Positions fiscales")
     of_website_worktop_configurator_payment_term_id = fields.Many2one(
         comodel_name='account.payment.term', string=u"(OF) Condition de règlement")
     of_website_worktop_configurator_extra_floor_product_id = fields.Many2one(
@@ -121,12 +144,6 @@ class SaleConfigSettings(models.TransientModel):
         comodel_name='sale.layout_category', string=u"(OF) Section de devis pour les accessoires et prestations")
     of_website_worktop_configurator_extra_layout_category_id = fields.Many2one(
         comodel_name='sale.layout_category', string=u"(OF) Section de devis pour les suppléments")
-
-    @api.multi
-    def set_of_website_worktop_configurator_fiscal_position_ids_defaults(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'of_website_worktop_configurator_fiscal_position_ids',
-            self.of_website_worktop_configurator_fiscal_position_ids.ids)
 
     @api.multi
     def set_of_website_worktop_configurator_payment_term_id_defaults(self):

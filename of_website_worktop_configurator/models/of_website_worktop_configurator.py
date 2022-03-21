@@ -90,6 +90,8 @@ class OFWorktopConfiguratorService(models.Model):
     price = fields.Float(string=u"Tarif")
     blocking = fields.Boolean(string=u"Bloquant")
     blocking_message = fields.Char(string=u"Message de blocage")
+    payment_term_id = fields.Many2one(comodel_name='account.payment.term', string=u"Conditions de règlement")
+    comment_template2_id = fields.Many2one(comodel_name='base.comment.template', string=u"Modèle de commentaire du bas")
 
 
 class OFWorktopConfiguratorDiscount(models.Model):
@@ -100,6 +102,7 @@ class OFWorktopConfiguratorDiscount(models.Model):
     name = fields.Char(string=u"Nom", required=True)
     sequence = fields.Integer(string=u"Séquence")
     value = fields.Float(string=u"Valeur", required=True, help=u"Valeur de la remise exprimée en pourcentage")
+    pricelist_ids = fields.Many2many(comodel_name='product.pricelist', string=u"Listes de prix", required=True)
 
 
 class OFWorktopConfiguratorPrice(models.Model):
@@ -150,3 +153,14 @@ class OFWorktopConfiguratorTypeProductLine(models.Model):
         related='product_id.product_tmpl_id.name', string=u"Nom de l'article", readonly=True, store=True)
     material_id = fields.Many2one(comodel_name='of.worktop.configurator.material', string=u"Matériau", required=True)
     price = fields.Float(string=u"Tarif")
+
+
+class OFWorktopConfiguratorTax(models.Model):
+    _name = 'of.worktop.configurator.tax'
+    _description = u"Position fiscale du configurateur"
+    _order = 'sequence'
+
+    sequence = fields.Integer(string=u"Séquence")
+    fiscal_position_id = fields.Many2one(
+        comodel_name='account.fiscal.position', string=u"Position fiscale", required=True, ondelete='cascade')
+    pricelist_ids = fields.Many2many(comodel_name='product.pricelist', string=u"Listes de prix", required=True)

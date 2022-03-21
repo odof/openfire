@@ -18,6 +18,7 @@ Module OpenFire pour la configuration de plan de travail depuis le site internet
         'of_sale',
         'ofab_pricelist',
         'of_website_portal',
+        'base_comment_template',
     ],
     'data': [
         'data/of_website_worktop_configurator_data.xml',

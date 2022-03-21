@@ -39,7 +39,7 @@
             </li>
             <li t-att-class="(step_number in (40, 50, 60) and 'text-primary') or 'text-muted'">
                 <t t-if="step_number&gt;60">
-                    <a href="/worktop_configurator/product_select" class="text-primary">
+                    <a href="/worktop_configurator/new_product" class="text-primary">
                         Configuration
                         <span class="chevron"/>
                     </a>
@@ -213,7 +213,7 @@
                                     <label class="control-label" for="invoicing_phone">
                                         Téléphone (si différent)
                                     </label>
-                                    <input type="tel" name="phone" class="form-control" t-att-value="invoicing_phone"/>
+                                    <input type="tel" name="invoicing_phone" class="form-control" t-att-value="invoicing_phone"/>
                                 </div>
                                 <div class="clearfix"/>
                                 <div t-attf-class="form-group #{error_dict.get('invoicing_street') and 'has-error' or ''} col-md-10 div_invoicing_street">
@@ -361,10 +361,11 @@
                             </div>
                             <div class="clearfix"/>
                             <div t-attf-class="form-group #{error_dict.get('delivery_floor') and 'has-error' or ''} col-md-5">
-                                <label class="control-label" for="delivery_floor">
-                                    Étage de livraison *
-                                </label>
-                                <input type="text" name="delivery_floor" class="form-control" t-att-value="delivery_floor"/>
+                                <label class="control-label" for="delivery_floor">Supplément étage et accès difficile *</label><br/>
+                                <input type="radio" name="delivery_floor" value="yes" style="margin-left: 20px;"
+                                       t-att-checked="delivery_floor == 'yes'"/> Oui<br/>
+                                <input type="radio" name="delivery_floor" value="no" style="margin-left: 20px;"
+                                       t-att-checked="delivery_floor == 'no'"/> Non
                             </div>
                             <div t-attf-class="form-group #{error_dict.get('site_service_id') and 'has-error' or ''} col-md-5">
                                 <label class="control-label" for="site_service">Choix prestation métré, livraison et pose *</label>
@@ -847,6 +848,8 @@
                             <t t-call="of_website_worktop_configurator.quote_lines"/>
                         </div>
                         <div class="col-md-3 col-md-offset-1">
+                            <a class="btn btn-info" groups="base.group_user"
+                               t-att-href="'/web%s#return_label=Website&amp;model=sale.order&amp;id=%s&amp;view_type=form&amp;action=sale.action_quotations' % ('?debug=1' if debug else '', quote.id)">Devis interne</a>
                             <h4 class="page-header">
                                 Informations Générales
                             </h4>
@@ -877,6 +880,12 @@
                                         Mettre à jour
                                     </button>
                                 </form>
+                            </div>
+                            <h4 class="page-header" groups="base.group_user">
+                                Professionnel
+                            </h4>
+                            <div groups="base.group_user">
+                                <t t-esc="vendor" t-options="dict(widget='contact', fields=['name'], no_marker=True)"/>
                             </div>
                             <h4 class="page-header">
                                 Adresse de chantier
@@ -915,7 +924,8 @@
                                     <input type="hidden" name="submitted" value="1"/>
                                     <button type="submit" class="btn btn-primary a-submit a-submit-disable a-submit-loading"
                                             name="action" value="submit">
-                                        Valider le devis
+                                        <span t-if="quote.state == 'draft'">Commander</span>
+                                        <span t-if="quote.state != 'draft'">Valider</span>
                                         <span class="fa fa-long-arrow-right"/>
                                     </button>
                                 </form>
@@ -935,12 +945,13 @@
                     <th></th>
                     <th width="130" class="text-center">Quantité</th>
                     <th width="100" class="text-center">Prix</th>
+                    <th class="text-center"></th>
                 </tr>
             </thead>
             <tbody>
                 <t t-foreach="quote.order_lines_layouted()[0]" t-as="layout_category">
                     <tr class="active">
-                        <td colspan="4" style="font-weight: bold; border-bottom: 1px solid black;">&amp;bull;
+                        <td colspan="5" style="font-weight: bold; border-bottom: 1px solid black;">&amp;bull;
                             <t t-esc="layout_category['name']"/>
                         </td>
                     </tr>
@@ -981,6 +992,16 @@
                                 <span t-field="line.price_subtotal" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'from_currency': quote.pricelist_id.currency_id, 'display_currency': website.currency_id}" groups="sale.group_show_price_subtotal" />
                                 <span t-field="line.price_total" style="white-space: nowrap;" t-options="{'widget': 'monetary', 'from_currency': quote.pricelist_id.currency_id, 'display_currency': website.currency_id}" groups="sale.group_show_price_total" />
                             </td>
+                            <td class="text-center">
+                                <form action="/worktop_configurator/edit_line" method="post" style="display:inline-block" t-if="line.of_worktop_configurator_material_id">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <input type="hidden" name="quote_id" t-att-value="quote.id"/>
+                                    <input type="hidden" name="quote_line_id" t-att-value="line.id"/>
+                                    <button type="submit" class="btn btn-link" title="Modifier cet article">
+                                        <span class="fa fa-edit"/>
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
                     </t>
                 </t>
@@ -1015,6 +1036,33 @@
                 </div>
             </t>
         </div>
+    </template>
+
+    <template id="of_portal_my_quotations" inherit_id="website_portal_sale.portal_my_quotations">
+        <xpath expr="//table/thead/tr" position="inside">
+            <th style="width: 5%;"/>
+            <th style="width: 5%;"/>
+        </xpath>
+        <xpath expr="//table/t/tr" position="inside">
+            <td>
+                <form t-att-action="'/worktop_configurator/edit_online/%s' % quotation.id" method="post" t-if="quotation.state == 'sent' and quotation.of_worktop_configurator_order">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <input type="hidden" name="quote_id" t-att-value="quotation.id"/>
+                    <button type="submit" class="btn btn-link" title="Modifier ce devis">
+                        <span class="fa fa-edit"/>
+                    </button>
+                </form>
+            </td>
+            <td>
+                <form action="/worktop_configurator/duplicate_quote" method="post" t-if="quotation.state == 'sent' and quotation.of_worktop_configurator_order">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <input type="hidden" name="quote_id" t-att-value="quotation.id"/>
+                    <button type="submit" class="btn btn-link" title="Dupliquer ce devis">
+                        <span class="fa fa-copy"/>
+                    </button>
+                </form>
+            </td>
+        </xpath>
     </template>
 
 </odoo>
