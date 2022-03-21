@@ -43,10 +43,6 @@ class AccountAnalyticAccount(models.Model):
                 'of_amount_total': currency.round(amount_total),
             })
 
-    @api.model
-    def _recompute_of_amount_all(self):
-        self.search([('recurring_invoice_line_ids.discount', '!=', 0.0)])._compute_of_amount_all()
-
     @api.multi
     def _prepare_invoice(self):
         res = super(AccountAnalyticAccount, self)._prepare_invoice()
