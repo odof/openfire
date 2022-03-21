@@ -52,18 +52,22 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         # --- Matching des références avec la base centrale ---
         # Conversion des références article (référence locale -> référence cherchée sur base centrale)
         convert_func = supplier.get_product_code_convert_func(from_datastore=False)
-        code_to_match_dict = {convert_func[product.brand_id](product.default_code): product
-                              for product in product_obj.browse(product_ids)}
+        code_to_match_dict = {
+            convert_func[product.brand_id](product.default_code): product
+            for product in product_obj.browse(product_ids)
+        }
         # Récupération des correspondances de la base centrale
-        ds_product_new_ids = supplier.of_datastore_search(ds_product_obj, [('default_code', 'in', code_to_match_dict.keys())])
+        ds_product_new_ids = supplier.of_datastore_search(
+            ds_product_obj, [('default_code', 'in', code_to_match_dict.keys())])
         if ds_product_new_ids:
             for ds_product_data in supplier.of_datastore_read(ds_product_obj, ds_product_new_ids, ['default_code']):
                 product = code_to_match_dict[ds_product_data['default_code']]
 
                 product_ids.remove(product.id)
                 if ds_product_data['id'] in id_match:
-                    raise ValidationError(_('Two products try to reference the same centralized product : [%s] [%s]') %
-                                          (product.default_code, id_match[ds_product_data['id']].default_code))
+                    raise ValidationError(
+                        _('Two products try to reference the same centralized product : [%s] [%s]') %
+                        (product.default_code, id_match[ds_product_data['id']].default_code))
                 product.of_datastore_res_id = ds_product_data['id']
                 id_match[ds_product_data['id']] = product
         return ds_product_new_ids
@@ -80,18 +84,25 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         supplier_value = supplier.id * DATASTORE_IND
         # Détection des articles non liés à la base centrale.
         no_match_ids = [product.id for product in products if not product.of_datastore_res_id]
-        id_match = {product.of_datastore_res_id: product
-                    for product in products if product.of_datastore_res_id}
+        id_match = {
+            product.of_datastore_res_id: product
+            for product in products if product.of_datastore_res_id
+        }
 
         # Certaines références ont pu être supprimées de la base centrale
         client = supplier.of_datastore_connect()
         ds_product_obj = supplier.of_datastore_get_model(client, 'product.product')
-        ds_product_ids = supplier.with_context(active_test=False).of_datastore_search(ds_product_obj, [('id', 'in', id_match.keys())])
+        ds_product_ids = supplier.with_context(active_test=False)\
+                                 .of_datastore_search(ds_product_obj, [('id', 'in', id_match.keys())])
 
         # Articles dont le lien existait mais dont la cible n'existe plus
-        unmatched_ids = [id_match[ds_product_id].id for ds_product_id in id_match if ds_product_id not in ds_product_ids]
+        unmatched_ids = [
+            id_match[ds_product_id].id
+            for ds_product_id in id_match
+            if ds_product_id not in ds_product_ids]
         no_match_ids += unmatched_ids
 
+        # Attention : La fonction _update_links modifie directement no_match_ids et id_match
         ds_product_new_ids = self._update_links(supplier, client, no_match_ids, id_match)
         ds_product_ids += ds_product_new_ids
 
@@ -115,10 +126,11 @@ class OfDatastoreUpdateProduct(models.TransientModel):
             else:
                 product = id_match.pop(ds_product_data['of_datastore_res_id'])
 
-            # Mise a jour produits actifs/inactifs
+            # Mise à jour produits actifs/inactifs
             if ds_product_data['active']:
                 if product.purchase_ok:
-                    # On ne réactive que les articles qui ne peuvent pas être achetés pour éviter de réactiver un article désactivé manuellement
+                    # On ne réactive que les articles qui ne peuvent pas être achetés
+                    # pour éviter de réactiver un article désactivé manuellement
                     del ds_product_data['active']
                 else:
                     ds_product_data['purchase_ok'] = True
@@ -152,7 +164,8 @@ class OfDatastoreUpdateProduct(models.TransientModel):
 
             if ds_product_data.get('seller_ids'):
                 # La fonction _of_read_datastore renvoie un seller_ids de la forme [(5, ), (0, 0, {...})]
-                # Cela pose un problème de performance, car le (5, ) appelle la fonction unlink(), qui vide toutes les valeurs en cache
+                # Cela pose un problème de performance, car le (5, ) appelle la fonction unlink(),
+                # laquelle vide toutes les valeurs en cache
                 # On retire donc le code (5, ) et on remplace au besoin le (0, ) par un (1, )
                 old_sellers = ds_product_data['seller_ids']
                 sellers = ds_product_data['seller_ids'] = []
@@ -175,12 +188,15 @@ class OfDatastoreUpdateProduct(models.TransientModel):
                                 # Plusieurs fournisseurs sans possibilité de choisir... on en crée un autre !
                                 sellers.append(seller)
                     else:
-                        raise ValidationError(_(u"Mise à jour de tarif : type de renvoi de fournisseur non prévu\ncode: %s") % (old_sellers, ))
+                        raise ValidationError(
+                            _(u"Mise à jour de tarif : type de renvoi de fournisseur non prévu\ncode: %s")
+                            % (old_sellers, ))
             if ds_product_data:
                 # L'appel write() est reporté après tous les calculs.
                 # En effet, write() vide certaines données en cache
-                #   (les données qui sont compute =True et store=False, e.g. of_datastore_has_link, of_seller_price, etc.)
-                # Lorsqu'Odoo recalcule ces données, il le fait, à chaque itération, sur la totalité des articles (ds_product_ids),
+                #   (les données qui sont compute=True et store=False, e.g. of_datastore_has_link, of_seller_price, ...)
+                # Lorsqu'Odoo recalcule ces données, il le fait, à chaque itération,
+                #   sur la totalité des articles (ds_product_ids),
                 #   ce qui provoque un temps de calcul en O(n²) au lieu de O(n)
                 products_write_data[product] = ds_product_data
         for product, product_data in products_write_data.iteritems():
@@ -188,7 +204,9 @@ class OfDatastoreUpdateProduct(models.TransientModel):
 
         # Mise à jour du paramètre active des product.template
         # Activation
-        product_template_obj.search([('active', '=', False), ('product_variant_ids.active', '=', True)]).write({'active': True})
+        product_template_obj.search(
+            [('active', '=', False), ('product_variant_ids.active', '=', True)]
+        ).write({'active': True})
         # Désactivation des modèles d'articles qui n'ont pas au moins un article (variante) actif.
         active_templates = product_template_obj.search([('active', '=', True)])
         active_product_templates = product_obj.search([('active', '=', True)]).mapped('product_tmpl_id')
@@ -220,9 +238,8 @@ class OfDatastoreUpdateProduct(models.TransientModel):
             datastore_products = {
                 # Récupération de tous les articles même inactifs de la marque.
                 # On appelle product_obj.browse pour conserver le context d'origine et éviter des recalculs de cache.
-                supplier: product_obj.browse((supplier.brand_ids & brands)
-                                             .with_context(active_test=False)
-                                             .mapped('product_variant_ids').ids)
+                supplier: product_obj.browse(
+                    (supplier.brand_ids & brands).with_context(active_test=False).mapped('product_variant_ids').ids)
                 for supplier in suppliers}
             _logger.info(u"OF TC : Début de mise à jour de marque : %s", ', '.join(brands.mapped('name')))
 
@@ -247,7 +264,8 @@ class OfDatastoreUpdateProduct(models.TransientModel):
 
             products = model_obj.browse(to_update)
             if active_model == 'product.template':
-                products = product_obj.with_context(active_test=False).search([('product_tmpl_id', 'in', products._ids)])
+                products = product_obj.with_context(active_test=False)\
+                                      .search([('product_tmpl_id', 'in', products._ids)])
                 # Retrait du contexte active_test
                 products = product_obj.browse(products._ids)
             for product in products:
@@ -276,15 +294,17 @@ class OfDatastoreUpdateProduct(models.TransientModel):
             model_obj = self.env['product.product']
             unwanted_ids = []
             for brand in brands:
-                unwanted_ids += model_obj.search([('brand_id', '=', brand.id),
-                                                  ('of_datastore_res_id', '!=', False)]).mapped('of_datastore_res_id')
+                unwanted_ids += model_obj.search(
+                    [('brand_id', '=', brand.id),
+                     ('of_datastore_res_id', '!=', False)]).mapped('of_datastore_res_id')
 
             for brand in brands:
                 supplier = brand.datastore_supplier_id
                 supplier_value = supplier.id * DATASTORE_IND
                 client = supplier.of_datastore_connect()
                 ds_product_obj = supplier.of_datastore_get_model(client, 'product.product')
-                ds_product_ids = supplier.of_datastore_search(ds_product_obj, [('brand_id', '=', brand.datastore_brand_id), ('id', 'not in', unwanted_ids)])
+                ds_product_ids = supplier.of_datastore_search(
+                    ds_product_obj, [('brand_id', '=', brand.datastore_brand_id), ('id', 'not in', unwanted_ids)])
                 ds_product_ids = [-(ds_product_id + supplier_value) for ds_product_id in ds_product_ids]
                 to_create += ds_product_ids
 
@@ -293,8 +313,9 @@ class OfDatastoreUpdateProduct(models.TransientModel):
             notes.append(_('Created products : %s') % (len(to_create)))
 
         if active_model == 'of.product.brand':
-            _logger.info(u"OF TC : Fin de mise à jour de marque : %s ; Up=%s, Lnk=%s, Unlk=%s, Nolk=%s",
-                         ', '.join(brands.mapped('name')), updt_cnt, link_cnt, unlk_cnt, nolk_cnt)
+            _logger.info(
+                u"OF TC : Fin de mise à jour de marque : %s ; Up=%s, Lnk=%s, Unlk=%s, Nolk=%s",
+                ', '.join(brands.mapped('name')), updt_cnt, link_cnt, unlk_cnt, nolk_cnt)
 
         if updt_cnt:
             notes.append(_('Updated products : %s') % (updt_cnt))
@@ -305,7 +326,8 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         if nolk_cnt:
             notes.append(_('Products not updated because not linked : %s') % (nolk_cnt))
 
-        notes[0] = _('Products update ended : %s') % (fields.Datetime().convert_to_display_name(fields.Datetime.now(), self))
+        notes[0] = (_('Products update ended : %s')
+                    % (fields.Datetime().convert_to_display_name(fields.Datetime.now(), self)))
         note = "\n".join(notes + notes_warning)
 
         return self.env['of.popup.wizard'].popup_return(note, titre=_('Import/update notes'))
