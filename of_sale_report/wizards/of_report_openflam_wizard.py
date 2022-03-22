@@ -1035,8 +1035,6 @@ class OFRapportOpenflamWizard(models.TransientModel):
         # --- Ajout des lignes ---
         line_number = 3
         payment_obj = self.env['account.payment']
-        aml_obj = self.env['account.move.line']
-        move_line_obj = self.env['account.move.line']
         tax_obj = self.env['account.tax']
         domain = [('partner_type', '=', 'customer')]
         if self.type_filtre_date == 'period':
@@ -1047,7 +1045,8 @@ class OFRapportOpenflamWizard(models.TransientModel):
         if self.company_ids:
             domain += [('company_id', 'in', self.company_ids._ids)]
         payments = payment_obj.search(domain, order='payment_date')
-        tax_accounts_ids = self.env['account.tax'].search([('type_tax_use', '=', 'sale')]).mapped('account_id')._ids
+        # Les comptes de taxe sont triés par ordre de montant
+        sorted_accounts = tax_obj.search([('type_tax_use', '=', 'sale')], order='amount').mapped('account_id')
 
         display = {}
         for company in companies:
@@ -1058,22 +1057,16 @@ class OFRapportOpenflamWizard(models.TransientModel):
             payments_dict = display_company['payments']
             tax_account_used_dict = display_company['tax_account_used']
             undefined_payments_list = display_company['undefined_payments']
-            tax_accounts = []
+            tax_accounts = self.env['account.account']
             tax_column = 5
             tax_column_increment = 3  # 3 colonnes par taxes : HT, TAXE, TTC
 
             for payment in payment_filtered:
                 affectations = []
-                aml = aml_obj.search([('payment_id', '=', payment.id)])
-                partner_invoice_line_ids = []
-                credit = 0.0
-                for line in aml.filtered(lambda l: l.account_id.user_type_id.type == 'receivable'):
-                    credit += line.credit
-                    partner_invoice_line_ids.extend(
-                        filter(None, [rp.credit_move_id.id for rp in line.matched_credit_ids]))
-                    partner_invoice_line_ids.extend(
-                        filter(None, [rp.debit_move_id.id for rp in line.matched_debit_ids]))
-                invoice_move_lines = move_line_obj.browse(list(set(partner_invoice_line_ids)))
+                aml = payment.move_line_ids.filtered(lambda l: l.account_id.user_type_id.type == 'receivable')
+                invoice_move_lines = aml.mapped('matched_credit_ids').mapped('credit_move_id')
+                invoice_move_lines |= aml.mapped('matched_debit_ids').mapped('debit_move_id')
+                credit = sum(aml.mapped('credit'))
                 reconciles = invoice_move_lines.mapped('matched_credit_ids')\
                                                .filtered(lambda r: r.credit_move_id.id in aml._ids)
                 total = 0.0
@@ -1090,14 +1083,11 @@ class OFRapportOpenflamWizard(models.TransientModel):
                         invoice_partner_amount = \
                             sum(invoice_partner_lines.mapped('debit')) - sum(invoice_partner_lines.mapped('credit'))
                         percent = amount / invoice_partner_amount
-                        if payment not in payments_dict:
-                            payments_dict[payment] = {}
-                        payment_dict = payments_dict[payment]
-                        tax_move_lines = invoice_move.line_ids.filtered(lambda l: l.account_id.id in tax_accounts_ids)
+                        payment_dict = payments_dict.setdefault(payment, {})
+                        tax_move_lines = invoice_move.line_ids.filtered(lambda l: l.account_id in sorted_accounts)
                         for tax_move_line in tax_move_lines:
                             account = tax_move_line.account_id
-                            if account not in tax_accounts:
-                                tax_accounts.append(account)
+                            tax_accounts |= account
                             if account not in payment_dict:
                                 payment_dict[account] = {"ht": 0.0, "taxe": 0.0}
                             payment_dict[account]["taxe"] -= tax_move_line.balance * percent
@@ -1105,16 +1095,11 @@ class OFRapportOpenflamWizard(models.TransientModel):
                             move_lines_linked = invoice_move.line_ids.filtered(
                                 lambda ml: tax.amount in [t.amount for t in ml.tax_ids])
                             if move_lines_linked:
-                                amount_move_lines_linked = 0.0
-                                for ml_linked in move_lines_linked:
-                                    amount_move_lines_linked -= ml_linked.balance * percent
-                                payment_dict[account]["ht"] += amount_move_lines_linked
+                                payment_dict[account]["ht"] -= percent * sum(move_lines_linked.mapped('balance'))
                 else:
                     # On conserve les paiements non intégralement lettrés pour les signaler a l'utilisateur
                     undefined_payments_list.append(payment)
-            sorted_accounts = sorted(
-                tax_accounts, key=lambda a: tax_obj.search([('account_id', '=', a.id)], limit=1).amount)
-            for account in sorted_accounts:
+            for account in sorted_accounts & tax_accounts:
                 tax_account_used_dict[account] = tax_column
                 tax_column += tax_column_increment
 
