@@ -11,8 +11,7 @@
                         <strong>Questionnaire d'intervention</strong>
                     </div>
                 </div>
-                <div class="row"
-                     style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
+                <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; padding: 0px 16px;">
                     <t t-set="lines" t-value="o.question_ids and o._filter_answers_category(o.question_ids.filtered(lambda q: q.type == 'intervention'))"/>
                     <t t-foreach="lines" t-as="q">
                         <div class="col-xs-12" style="display: table; padding: 0px;">
