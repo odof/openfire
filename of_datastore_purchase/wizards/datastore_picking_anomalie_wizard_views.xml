@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_datastore_picking_anomalie_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.datastore.picking.anomalie.wizard.view.form</field>
+        <field name="model">of.datastore.picking.anomalie.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="picking_id" invisible="1"/>
+                <span>
+                    <p>
+                        Renseignez un message d'anomalie.<br/>
+                    </p>
+                </span>
+                <field name="text"/>
+                <footer>
+                    <button string="Envoyer" name="button_send" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
