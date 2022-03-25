@@ -259,7 +259,8 @@
         <field name="priority">30</field>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="action_layout_category_invoicing" string="Facturer par section" type="object" attrs="{'invisible': [('invoice_status', '!=', 'to invoice')]}"/>
+                <field name="of_layout_category_invoice_status" invisible="1"/>
+                <button name="action_layout_category_invoicing" string="Facturer par section" type="object" attrs="{'invisible': [('of_layout_category_invoice_status', 'not in', ['to invoice', 'partially invoiced'])]}"/>
             </xpath>
             <xpath expr="//field[@name='order_line']" position="attributes">
                 <attribute name="context">{'hide_sale': context.get('hide_sale'), 'category_ids': of_layout_category_ids}</attribute>

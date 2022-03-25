@@ -9,8 +9,8 @@ class OFLayoutCategoryInvoicingWizard(models.TransientModel):
 
     order_id = fields.Many2one(comodel_name='sale.order', string=u'Commande', required=True)
     layout_category_ids = fields.Many2many(
-        comodel_name='of.sale.order.layout.category',
-        relation='of_layout_category_invoicing_layout_category_rel', string=u'Lignes de section', required=True)
+        comodel_name='of.sale.order.layout.category', string=u"Lignes de section",
+        relation='of_layout_category_invoicing_layout_category_rel', required=True)
 
     def action_done(self):
         invoice_vals = self.order_id._prepare_invoice()

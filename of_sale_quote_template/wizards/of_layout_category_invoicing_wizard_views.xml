@@ -8,7 +8,7 @@
             <form string="Facturer par section">
                 <group>
                     <field name="order_id" invisible="1"/>
-                    <field name="layout_category_ids" domain="[('order_id', '=', order_id), ('invoice_status', '=', 'to_invoice')]" options="{'no_create': True, 'no_edit': True}">
+                    <field name="layout_category_ids" domain="[('id', 'in', layout_category_ids_domain)]" options="{'no_create': True, 'no_edit': True}">
                         <tree>
                             <field name="sequence_name"/>
                             <field name="name"/>
