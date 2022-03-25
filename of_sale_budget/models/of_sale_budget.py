@@ -17,7 +17,8 @@ class OFSaleOrderBudget(models.Model):
             ('labor_cost', u"Frais de main d'oeuvre"),
         ], string=u"Désignation", required=True, readonly=True)
     order_id = fields.Many2one(comodel_name='sale.order', string=u"Commande", required=True, readonly=True)
-    currency_id = fields.Many2one('res.currency', related='order_id.currency_id', store=True, readonly=True)
+    currency_id = fields.Many2one(
+        comodel_name='res.currency', related='order_id.currency_id', store=True, readonly=True)
     cost = fields.Float(string=u"Coût", digits=dp.get_precision('Product Price'), readonly=True)
     total_cost = fields.Float(
         string=u"Coût total", digits=dp.get_precision('Product Price'), compute='_compute_total_cost')
@@ -79,13 +80,28 @@ class OFSaleOrderLaborCost(models.Model):
     total_cost = fields.Float(string=u"Coût", digits=dp.get_precision('Product Price'), compute='_compute_total_cost')
     hourly_cost = fields.Float(
         string=u"Coût horaire", digits=dp.get_precision('Product Price'))
-    product_uom_qty = fields.Float(string=u"Qté", required=True, default=1.0)
+    product_uom_qty = fields.Float(
+        string=u"Qté", required=True, compute='_compute_product_uom_qty', inverse='_inverse_product_uom_qty')
+    inverse_product_uom_qty = fields.Float(string=u"Qté", required=True, default=1.0)
     notes = fields.Char(string=u"Notes")
 
     @api.depends('hourly_cost', 'product_uom_qty')
     def _compute_total_cost(self):
         for cost in self:
             cost.total_cost = cost.hourly_cost * cost.product_uom_qty
+
+    @api.depends('order_id.order_line.of_duration', 'inverse_product_uom_qty')
+    def _compute_product_uom_qty(self):
+        for cost in self:
+            if cost.type == 'computed':
+                cost.product_uom_qty = sum(cost.order_id.order_line.mapped('of_duration'))
+            else:
+                cost.product_uom_qty = cost.inverse_product_uom_qty
+
+    def _inverse_product_uom_qty(self):
+        for cost in self:
+            if cost.type == 'manual':
+                cost.inverse_product_uom_qty = cost.product_uom_qty
 
     @api.onchange('hour_worksite_id')
     def _onchange_hour_worksite_id(self):
@@ -124,13 +140,6 @@ class SaleOrder(models.Model):
     of_labor_cost_ids = fields.One2many(
         comodel_name='of.sale.order.labor.cost', inverse_name='order_id',
         string=u"Frais de main d’oeuvre")
-
-    @api.onchange('order_line', 'of_labor_cost_ids')
-    def _onchange_update_labor_cost(self):
-        for order in self:
-            computed_line = order.of_labor_cost_ids.filtered(lambda line: line.type == 'computed')
-            if computed_line:
-                computed_line.product_uom_qty = sum(order.order_line.mapped('of_duration'))
 
     def action_of_budget_ids(self):
         """Met à jour l'onglet Budget"""

@@ -129,6 +129,7 @@
             <tree editable="bottom">
                 <field name="hour_worksite_id"/>
                 <field name="type"/>
+                <field name="inverse_product_uom_qty" invisible="1"/>
                 <field name="product_uom_qty" widget="float_time" attrs="{'readonly': [('type','=','computed')]}"/>
                 <field name="hourly_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                 <field name="total_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
@@ -153,6 +154,7 @@
                     <group>
                         <group>
                             <field name="hourly_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="inverse_product_uom_qty" invisible="1"/>
                             <field name="product_uom_qty" widget="float_time" attrs="{'readonly': [('type','=','computed')]}"/>
                             <field name="total_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                         </group>
