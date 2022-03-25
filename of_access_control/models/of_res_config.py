@@ -12,7 +12,7 @@ class OfInterventionSettings(models.TransientModel):
     @api.multi
     def set_activate_rules_defaults(self):
         return self.env['ir.values'].sudo().set_default(
-                'of.intervention.settings', 'activate_rules', self.activate_rules)
+            'of.intervention.settings', 'activate_rules', self.activate_rules)
 
     @api.multi
     def set_company_choice_defaults(self):

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="user_profile_distributor" model="res.users" context="{'no_reset_password': True}">
+        <field name="name">Distributeur</field>
+        <field name="login">profil_distributeur</field>
+        <field name="of_is_user_profile">True</field>
+        <field name="active" eval="False"/>
+    </record>
+
+</odoo>

@@ -27,12 +27,12 @@ class ProductTemplate(models.Model):
     of_uom_po_id_display2 = fields.Many2one(related='uom_po_id', readonly=True)
 
     # Champs ajoutés pour openImport et affichage dans formulaire produit
-    of_seller_pp_ht = fields.Float(related="seller_ids.pp_ht")
-    of_seller_price = fields.Float(related="seller_ids.price", string="Prix d'achat")
-    of_seller_remise = fields.Float(related="seller_ids.remise")
-    of_seller_product_code = fields.Char(related="seller_ids.product_code")
-    of_seller_product_name = fields.Char(related="seller_ids.product_name")
-    of_seller_product_category_name = fields.Char(related="seller_ids.of_product_category_name")
+    of_seller_pp_ht = fields.Float(related="seller_ids.pp_ht", related_sudo=False)
+    of_seller_price = fields.Float(related="seller_ids.price", string="Prix d'achat", related_sudo=False)
+    of_seller_remise = fields.Float(related="seller_ids.remise", related_sudo=False)
+    of_seller_product_code = fields.Char(related="seller_ids.product_code", related_sudo=False)
+    of_seller_product_name = fields.Char(related="seller_ids.product_name", related_sudo=False)
+    of_seller_product_category_name = fields.Char(related="seller_ids.of_product_category_name", related_sudo=False)
     of_seller_delay = fields.Integer(related="seller_ids.delay")
 
     of_tag_ids = fields.Many2many(

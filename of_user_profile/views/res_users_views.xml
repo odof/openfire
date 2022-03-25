@@ -64,8 +64,7 @@
         <field name="view_type">form</field>
         <field name="view_id" ref="base.view_users_tree"/>
         <field name="search_view_id" ref="base.view_users_search"/>
-        <field name="domain">[('of_user_profile', '=', True)]</field>
-        <field name="domain" eval="[('of_is_user_profile', '=', True)]"/>
+        <field name="domain">[('of_is_user_profile', '=', True)]</field>
         <field name="context">{'active_test': False, 'default_active': False, 'default_of_is_user_profile': True, 'of_is_user_profile': True}</field>
     </record>
 
