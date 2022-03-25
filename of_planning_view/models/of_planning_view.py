@@ -373,7 +373,7 @@ class OfPlanningIntervention(models.Model):
                     [('employee_ids', 'in', employee_id),
                      ('date_prompt', '<=', date_current_str),
                      ('date_deadline_prompt', '>=', date_current_str),
-                     ('state', 'in', ('draft', 'confirm', 'done'))],
+                     ('state', 'not in', ('cancel', 'postponed'))],
                     order='date')
                 intervention_liste = []
                 # Journée entièrement libre
