@@ -53,6 +53,20 @@ class OFReportFile(models.Model):
         return record
 
     @api.multi
+    def write(self, vals):
+        res = super(OFReportFile, self).write(vals)
+        if 'name' in vals or 'model_id' in vals:
+            # Mise à jour du rapport correspondant
+            for record in self:
+                record.corresponding_report_id.write({
+                    'name': record.name,
+                    'model': record.model_id.model,
+                })
+                record.corresponding_report_id.unlink_action()
+                record.corresponding_report_id.create_action()
+        return res
+
+    @api.multi
     def unlink(self):
         for report_file in self:
             report_file.corresponding_report_id.unlink()
