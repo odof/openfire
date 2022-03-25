@@ -329,8 +329,10 @@
                     </div>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/form" position="inside">
-                    <label for="of_product_image_ids" groups="of_sale.group_of_sale_print_multiimage,of_sale.group_of_sale_print_one_image"/>
-                    <field name="of_product_image_ids" mode="kanban" context="{'default_name': name, 'default_product_tmpl_id': product_tmpl_id or active_id}" groups="of_sale.group_of_sale_print_multiimage,of_sale.group_of_sale_print_one_image">
+                    <label for="of_product_image_ids"
+                           groups="of_sale.group_of_sale_multiimage+of_sale.group_of_sale_print_multiimage,of_sale.group_of_sale_multiimage+of_sale.group_of_sale_print_one_image"/>
+                    <field name="of_product_image_ids" mode="kanban" context="{'default_name': name, 'default_product_tmpl_id': product_tmpl_id or active_id}"
+                           groups="of_sale.group_of_sale_multiimage+of_sale.group_of_sale_print_multiimage,of_sale.group_of_sale_multiimage+of_sale.group_of_sale_print_one_image">
                         <kanban string="Product Images">
                             <field name="name"/>
                             <field name="image" />
@@ -351,7 +353,7 @@
                     </field>
                     <field name="of_product_attachment_computed" invisible="1"/>
                     <label for="of_product_attachment_ids" groups="of_sale.group_of_sale_print_attachment"/>
-                    <field name="of_product_attachment_ids" widget="many2many_tags" groups="of_sale.group_of_sale_print_attachment"
+                    <field name="of_product_attachment_ids" widget="many2many_tags" groups="of_sale.group_of_sale_print_attachment" options="{'no_create': True}"
                            domain="[('id', 'in', of_product_attachment_computed and of_product_attachment_computed[0] and of_product_attachment_computed[0][2] or False)]"/>
                 </xpath>
 

@@ -297,11 +297,6 @@ class OFSaleConfiguration(models.TransientModel):
         self.group_of_sale_print_one_image = self.of_sale_print_multiimage_level == 1
         self.group_of_sale_print_multiimage = self.of_sale_print_multiimage_level == 2
 
-    @api.onchange('group_of_sale_multiimage')
-    def onchange_group_of_sale_multiimage(self):
-        if not self.group_of_sale_multiimage:
-            self.of_sale_print_multiimage_level = 0
-
     @api.onchange('sale_show_tax')
     def _onchange_sale_tax(self):
         # Erase and replace parent function
