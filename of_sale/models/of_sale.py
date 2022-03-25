@@ -666,7 +666,8 @@ class SaleOrder(models.Model):
             self = self.with_context(company_id=self.company_id.id)
         invoice_vals = super(SaleOrder, self)._prepare_invoice()
         invoice_vals["of_date_vt"] = self.of_date_vt
-        invoice_vals["of_price_printing"] = self.of_price_printing
+        if self.of_apply_on_invoice:
+            invoice_vals["of_price_printing"] = self.of_price_printing
         return invoice_vals
 
     @api.multi
