@@ -1284,18 +1284,19 @@ class OfPlanningInterventionTemplate(models.Model):
                 args + [['type_id', '=', type_id], ['type_id', '!=', False]],
                 operator,
                 limit) or []
-            limit = limit - len(res)
-            res += super(OfPlanningInterventionTemplate, self).name_search(
-                name,
-                args + [['type_id', '=', False]],
-                operator,
-                limit) or []
-            limit = limit - len(res)
-            res += super(OfPlanningInterventionTemplate, self).name_search(
-                name,
-                args + [['type_id', '!=', type_id], ['type_id', '!=', False]],
-                operator,
-                limit) or []
+            # Attention : tester la nouvelle valeur limit. Limit = 0 revient au même que limit = None
+            if not limit or len(res) < limit:
+                res += super(OfPlanningInterventionTemplate, self).name_search(
+                    name,
+                    args + [['type_id', '=', False]],
+                    operator,
+                    limit and limit - len(res)) or []
+            if not limit or len(res) < limit:
+                res += super(OfPlanningInterventionTemplate, self).name_search(
+                    name,
+                    args + [['type_id', '!=', type_id], ['type_id', '!=', False]],
+                    operator,
+                    limit and limit - len(res)) or []
             return res
         return super(OfPlanningInterventionTemplate, self).name_search(name, args, operator, limit)
 
