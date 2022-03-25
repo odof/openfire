@@ -717,6 +717,13 @@ class SaleOrder(models.Model):
         string=u"Note d'insertion", help=u"Cette note disparaitra lorsque le devis sera sauvegardé.",)
     of_layout_category_ids = fields.One2many(
         'of.sale.order.layout.category', 'order_id', string=u"Liste de section", copy=True)
+    of_layout_category_invoice_status = fields.Selection(
+        selection=[('no', u"Rien à facturer"),
+                   ('to invoice', u"À facturer"),
+                   ('partially invoiced', u"Partiellement facturé"),
+                   ('invoiced', u"Entièrement facturé")],
+        compute='_compute_of_layout_category_invoice_status', string=u"État de facturation des lignes de section",
+        readonly=True)
 
     # Onchange nécessaire, car lors de la suppression d'une ligne de section, cette ligne de section est toujours
     # renseignée dans les lignes de commande. Du coup, Odoo bloque sur la sauvegarde.
@@ -889,6 +896,24 @@ class SaleOrder(models.Model):
                     [('order_id', '=', order.id), ('id', 'child_of', layout_category.id)]))
                 sequence = sequence + number_of_child
 
+    @api.depends('of_layout_category_ids.invoice_status', 'state')
+    def _compute_of_layout_category_invoice_status(self):
+        for order in self:
+            category_invoice_status = order.of_layout_category_ids.mapped('invoice_status_without_child')
+
+            if order.state not in ('sale', 'done'):
+                order.of_layout_category_invoice_status = 'no'
+            elif not category_invoice_status:
+                order.of_layout_category_invoice_status = 'invoiced'
+            elif all(invoice_status == 'to invoice' for invoice_status in category_invoice_status):
+                order.of_layout_category_invoice_status = 'to invoice'
+            elif all(invoice_status == 'invoiced' for invoice_status in category_invoice_status):
+                order.of_layout_category_invoice_status = 'invoiced'
+            elif any(invoice_status == 'invoiced' for invoice_status in category_invoice_status):
+                order.of_layout_category_invoice_status = 'partially invoiced'
+            else:
+                order.of_layout_category_invoice_status = 'no'
+
     def load_sections(self):
         template = self.of_template_id.with_context(lang=self.partner_id.lang)
         order_line_obj = self.env['sale.order.line']
@@ -958,11 +983,13 @@ class SaleOrder(models.Model):
     @api.multi
     def action_layout_category_invoicing(self):
         wizard_form = self.env.ref('of_sale_quote_template.of_layout_category_invoicing_wizard_view_form')
+        of_layout_category_ids = self.of_layout_category_ids.filtered(
+            lambda c: c.invoice_status_without_child in ['to invoice', 'partially invoiced'])
 
         ctx = dict(
             default_order_id=self.id,
-            default_layout_category_ids=self.of_layout_category_ids.filtered(
-                lambda c: c.invoice_status_without_child in ['to invoice', 'partially invoiced']).ids,
+            default_layout_category_ids=of_layout_category_ids.ids,
+            layout_category_ids_domain=of_layout_category_ids.ids,
         )
         return {
             'type': 'ir.actions.act_window',
