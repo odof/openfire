@@ -243,11 +243,22 @@
         </field>
     </record>
 
+    <record id="of_contract_view_pivot" model="ir.ui.view">
+        <field name="name">of.contract.view.pivot</field>
+        <field name="model">of.contract</field>
+        <field name="arch" type="xml">
+            <pivot string="Contrats">
+                <field name="partner_id" type="row"/>
+                <field name="next_total" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
     <record id="action_contract" model="ir.actions.act_window">
         <field name="name">Contrats</field>
         <field name="res_model">of.contract</field>
         <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,form,pivot</field>
         <field name="view_id" ref="of_contract_tree_view"/>
         <field name="search_view_id" ref="of_contract_search_view"/>
         <field name="context">{'form_readonly': '[(&quot;active&quot;,&quot;=&quot;,False)]'}</field>
@@ -751,11 +762,22 @@
         </field>
     </record>
 
+    <record id="of_contract_line_view_pivot" model="ir.ui.view">
+        <field name="name">of.contract_line.view.pivot</field>
+        <field name="model">of.contract.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Contrats">
+                <field name="address_id" type="row"/>
+                <field name="amount_total" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
     <record id="action_contract_lines" model="ir.actions.act_window">
         <field name="name">Lignes de contrats</field>
         <field name="res_model">of.contract.line</field>
         <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,form,pivot</field>
         <field name="view_id" ref="of_contract_line_tree_view"/>
         <field name="context">{'form_readonly': '[("state","in",["validated","cancel"])]', 'create': False}</field>
     </record>
