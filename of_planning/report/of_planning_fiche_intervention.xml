@@ -234,14 +234,14 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div t-if="template.fi_rdv_description and o.cleantext_description" name="fi_rdv_desc">
+                                <div t-if="template.fi_rdv_description and o.description" name="fi_rdv_desc">
                                     <div name="title_rdv_description" class="row h4 mb4">
                                         <div class="col-xs-12"><strong>Description</strong></div>
                                     </div>
                                     <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; margin-bottom: 12px;">
-                                        <div t-if="template.fi_rdv_description and o.cleantext_description" name="fi_rdv_description">
+                                        <div t-if="template.fi_rdv_description and o.description" name="fi_rdv_description">
                                             <div class="h5" style="padding: 0px 16px;">
-                                                <div style="padding-top: 4px" t-field="o.cleantext_description" />
+                                                <div style="padding-top: 4px" t-field="o.description" />
                                             </div>
                                         </div>
                                     </div>
@@ -280,7 +280,7 @@
                                                             <span t-field="interv.tache_id.name"/>
                                                         </td>
                                                         <td class="text-center">
-                                                            <span t-field="interv.cleantext_description"/>
+                                                            <span t-field="interv.description"/>
                                                         </td>
                                                     </tr>
                                                 </t>

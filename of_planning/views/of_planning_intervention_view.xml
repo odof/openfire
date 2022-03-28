@@ -84,7 +84,7 @@
                             <field name="duree" string="Durée" widget="float_time"/>
                             <field name="state"/>
                             <field name="name" string="Libellé"/>
-                            <field name="cleantext_description" string="Description"/>
+                            <field name="description" string="Description"/>
                         </tree>
                     </field>
                     <field name="intervention_address_ids" colspan="4" nolabel="1" attrs="{'invisible': [('parent_id','=', False)]}"
@@ -97,7 +97,7 @@
                             <field name="duree" string="Durée" widget="float_time"/>
                             <field name="state"/>
                             <field name="name" string="Libellé"/>
-                            <field name="cleantext_description" string="Description"/>
+                            <field name="description" string="Description"/>
                             <field name="category_id"/>
                         </tree>
                     </field>
@@ -362,11 +362,9 @@
                                 </group>
                                 <group colspan="2" name="misc" string="Divers">
                                 </group>
-                                <field name="description" nolabel="1" witget="html" colspan="2"
-                                       help="Ce champ sera imprimé dans la fiche d'intervention."/>
-                                <div class="oe_edit_only" style="margin-top: -20px; padding-top: 0px" name="div_infos_description">
-                                    * Les données saisies dans ce champ seront imprimées dans la fiche d'intervention.
-                                </div>
+                                <field name="description" nolabel="1" colspan="2"/>
+                                <h4 name="old_desc_title">Ancienne description</h4>
+                                <field name="old_description" nolabel="1" colspan="2"/>
                                 <!-- Notes client -->
                                 <group attrs="{'invisible':[('of_notes_client','=',False)]}">
                                     <separator string="Notes client" colspan="2"/>
@@ -473,7 +471,7 @@
                 <field name="company_id"/>
                 <field name="state"/>
                 <field name="tag_ids" widget="many2many_tags"/>
-                <field name="cleantext_description" string="Description"/>
+                <field name="description" string="Description"/>
             </tree>
         </field>
     </record>
