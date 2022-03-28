@@ -14,7 +14,9 @@ class OfProductBrand(models.Model):
 
     datastore_location_id = fields.Many2one(
         comodel_name='stock.location', string="Diffuser le stock", domain="[('usage', '=', 'internal')]")
-    datastore_stock_user_ids = fields.Many2many(comodel_name='res.users', string="Restreindre par client")
+    datastore_stock_user_ids = fields.Many2many(
+        comodel_name='res.users', string="Restreindre par client",
+        context={'of_distributor_test': False, 'search_default_of_distributor': True})
 
     @api.model
     def of_access_stocks(self, brand_id):

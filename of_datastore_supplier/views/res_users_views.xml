@@ -6,9 +6,6 @@
         <field name="model">res.users</field>
         <field name="inherit_id" ref="base.view_users_search"/>
         <field name="arch" type="xml">
-            <!--xpath expr="//filter[@name='no_share']" position="attributes">
-                <attribute name="domain">[('share','=',False),('of_is_distributor','=',False)]</attribute>
-            </xpath-->
             <xpath expr="//filter[@name='no_share']" position="after">
                 <filter name="of_distributor" string="Distributeurs" domain="[('of_is_distributor','=',True)]"/>
             </xpath>
