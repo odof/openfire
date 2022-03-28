@@ -202,7 +202,7 @@
                                     <span t-field="interv.tache_id.name"/>
                                 </td>
                                 <td class="text-center">
-                                    <span t-field="interv.cleantext_description"/>
+                                    <span t-field="interv.description"/>
                                 </td>
                             </tr>
                         </t>
