@@ -82,7 +82,7 @@ class OfProductBrand(models.Model):
             # on utilise donc latest version à la place
             version = module_self.latest_version
             if version < '10.0.2':
-                brands = self.search([])
+                brands = self.search([('description_sale', '!=', False)])
                 # pour chaque marque on essaye d'insérer dans la description si possible, ou à la fin sinon
                 # seulement si l'ajout n'est pas déjà présent
                 for brand in brands:
