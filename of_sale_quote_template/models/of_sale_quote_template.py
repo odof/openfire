@@ -657,8 +657,6 @@ class SaleOrder(models.Model):
         states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
     of_note_insertion = fields.Text(
         string=u"Note d'insertion", help=u"Cette note disparaitra lorsque le devis sera sauvegardé.",)
-    of_layout_category_template_id = fields.Many2one(
-        'of.sale.layout.category.template', string=u"Modèle de liste de section")
     of_layout_category_ids = fields.One2many(
         'of.sale.order.layout.category', 'order_id', string=u"Liste de section", copy=True)
 
