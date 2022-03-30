@@ -104,12 +104,10 @@ class GestionPrix(models.TransientModel):
                 for record in self]
 
     def bouton_simuler(self):
-        lines_select = self.line_ids.filtered(lambda line: line.state == 'included' and line.order_line_id.price_unit)
-        self.calculer(lines_select, True)
+        self.calculer(True)
 
     def bouton_valider(self):
-        lines_select = self.line_ids.filtered(lambda line: line.state == 'included' and line.order_line_id.price_unit)
-        self.calculer(lines_select, False)
+        self.calculer(False)
 
     def bouton_annuler(self):
         return {'type': 'ir.actions.client', 'tag': 'history_back'}
@@ -202,7 +200,7 @@ class GestionPrix(models.TransientModel):
             line.write(vals)
 
     @api.multi
-    def calculer(self, lines_select, simuler=False):
+    def calculer(self, simuler=False):
         """
         Calcule les nouveaux prix des articles sélectionnés en fonction de la méthode de calcul choisie.
         """
@@ -212,9 +210,11 @@ class GestionPrix(models.TransientModel):
         cur = order.pricelist_id.currency_id
         round_tax = self.env.user.company_id.tax_calculation_rounding_method != 'round_globally'
 
+        lines_select = self.line_ids.filtered(lambda line: line.state == 'included' and line.order_line_id.price_unit)
         if not lines_select:
             # Toutes les lignes sélectionnées ont un prix unitaire à 0
             lines_select = self.line_ids.filtered(lambda line: line.state == 'included')
+
         nb_select = len(lines_select)
         lines_forced = self.line_ids.filtered(lambda line: line.state == 'forced')
         lines_excluded = self.line_ids - lines_select - lines_forced

@@ -7,18 +7,6 @@
         <field name="inherit_id" ref="of_sale.of_view_sale_order_gestion_prix"/>
         <field name="groups_id" eval="[(4, ref('of_sale_quote_template.group_of_advanced_sale_layout_category'))]"/>
         <field name="arch" type="xml">
-            <xpath expr="//header/button[@name='bouton_simuler']" position="attributes">
-                <attribute name="attrs">{'invisible': [('calculation_basis', '!=', 'order_line')]}</attribute>
-            </xpath>
-            <xpath expr="//header/button[@name='bouton_simuler']" position="after">
-                <button name="bouton_simuler_section" class="oe_highlight" string="Simuler" type="object" invisible="context.get('invoice_status') == 'invoiced'" attrs="{'invisible': [('calculation_basis', '!=', 'layout_category')]}"/>
-            </xpath>
-            <xpath expr="//header/button[@name='bouton_valider']" position="attributes">
-                <attribute name="attrs">{'invisible': [('calculation_basis', '!=', 'order_line')]}</attribute>
-            </xpath>
-            <xpath expr="//header/button[@name='bouton_valider']" position="after">
-                <button name="bouton_valider_section" class="oe_highlight" string="Appliquer au devis/bon de commande (non réversible)" type="object" confirm="Confirmez-vous l'application des nouveaux prix calculés au devis/bon de commande (non réversible) ?" invisible="context.get('invoice_status') == 'invoiced'" attrs="{'invisible': [('calculation_basis', '!=', 'layout_category')]}"/>
-            </xpath>
             <xpath expr="//field[@name='methode_remise']" position="before">
                 <field name="calculation_basis"/>
             </xpath>
