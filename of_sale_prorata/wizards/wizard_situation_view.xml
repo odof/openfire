@@ -115,7 +115,8 @@
                 <footer>
                     <button name="button_apply" type="object" string="Appliquer" class="oe_highlight" states="step1"/>
                     <button special="cancel" string="Cancel" states="step1"/>
-                    <button name="button_apply_prefill" type="object" string="Appliquer" class="oe_highlight" attrs="{'invisible': ['|', '|', '|', ('value', '&gt;', 100), ('value', '&lt;', 0), ('state', '!=', 'step2'), ('type', '=', False)]}"/>
+                    <button name="button_apply_prefill" type="object" string="Appliquer" class="oe_highlight"
+                            attrs="{'invisible': ['|', '|', '|', ('value', '&gt;', 100), ('value', '&lt;', 0), ('state', '!=', 'step2'), ('type', '=', False)]}"/>
                     <button name="button_return" type="object" string="Retour" states="step2"/>
                 </footer>
             </form>
