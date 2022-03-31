@@ -79,7 +79,7 @@
         </record>
 
         <menuitem action="of_action_payment_bank_deposit_form" id="of_menu_action_payment_bank_deposit_form"
-            parent="account.menu_finance_receivables" sequence="30" groups="account.group_account_user"/>
+            parent="account.menu_finance_receivables" sequence="30" groups="account.group_account_invoice"/>
 
         <!-- Payments -->
 
