@@ -213,7 +213,7 @@
     </record>
 
     <menuitem action="of_action_paiement_edi" id="of_menu_paiement_edi"
-              parent="account.menu_finance_receivables" sequence="50" groups="account.group_account_manager,account.group_account_user"/>
+              parent="account.menu_finance_receivables" sequence="50" groups="account.group_account_manager,account.group_account_invoice"/>
 
     <!-- Ajout action prélèvements SEPA, LCR par EDI dans vue formulaire factures -->
     <act_window
@@ -226,6 +226,6 @@
             view_type="form"
             view_id="of_paiement_edi_form"
             target="current"
-            groups="account.group_account_manager,account.group_account_user" />
+            groups="account.group_account_manager,account.group_account_invoice" />
 
 </odoo>
