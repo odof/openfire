@@ -58,6 +58,7 @@ Ajout d'un modèle servant de log interne :
         'security/ir.model.access.csv',
         'views/of_base_view.xml',
         'views/of_log_message_views.xml',
+        'views/mail_views.xml',
         'views/templates.xml',
         'wizard/base_module_upgrade_view.xml',
         'wizard/of_popup_wizard_view.xml',

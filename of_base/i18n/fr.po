@@ -56,3 +56,55 @@ msgstr ""
 "même si une société est définie pour le client.\n"
 "* Non coché : Chaque société ne peut voir que ses clients (clients pour lesquels la société est "
 "définie). Les clients non reliés à une société sont visibles par toutes les sociétés."
+
+#. module: of_base
+#: selection:mail.compose.message,of_state:0
+#: selection:mail.message,of_state:0
+msgid "Outgoing"
+msgstr "Sortant"
+
+#. module: of_base
+#: selection:mail.compose.message,of_state:0
+#: selection:mail.message,of_state:0
+msgid "Received"
+msgstr "Reçu"
+
+#. module: of_base
+#: selection:mail.compose.message,of_state:0
+#: selection:mail.message,of_state:0
+msgid "Sent"
+msgstr "Envoyé"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_mail_compose_message_of_state
+#: model:ir.model.fields,field_description:of_base.field_mail_mail_of_state
+#: model:ir.model.fields,field_description:of_base.field_mail_message_of_state
+msgid "Status"
+msgstr "État"
+
+#. module: of_base
+#: selection:mail.compose.message,of_state:0
+#: selection:mail.message,of_state:0
+msgid "Delivery Failed"
+msgstr "Échec de l'envoi"
+
+#. module: of_base
+#: selection:mail.compose.message,of_state:0
+#: selection:mail.message,of_state:0
+msgid "Cancelled"
+msgstr "Annulé"
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_mail_compose_message_of_failure_reason
+#: model:ir.model.fields,help:of_base.field_mail_mail_of_failure_reason
+#: model:ir.model.fields,help:of_base.field_mail_message_of_failure_reason
+msgid "Failure reason. This is usually the exception thrown by the email server, stored to ease the debugging of mailing issues."
+msgstr "Raison de l'échec. Ceci est souvent l'exception envoyée par le serveur de messagerie, stockée pour faciliter le débogage des mails d'incidents."
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_mail_compose_message_of_failure_reason
+#: model:ir.model.fields,field_description:of_base.field_mail_mail_of_failure_reason
+#: model:ir.model.fields,field_description:of_base.field_mail_message_of_failure_reason
+#: model:ir.ui.view,arch_db:of_base.of_view_message_form
+msgid "Failure Reason"
+msgstr "Raison de l'échec"

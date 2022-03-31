@@ -1,0 +1,85 @@
+<odoo>
+
+    <!-- Ajouter des champs à la liste des courriels -->
+    <record id="of_view_mail_mail_tree" model="ir.ui.view">
+        <field name="name">of.mail.mail.tree</field>
+        <field name="model">mail.mail</field>
+        <field name="inherit_id" ref="mail.view_mail_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='recipient_ids']" position="replace"/>
+            <xpath expr="//field[@name='subject']" position="after">
+                <field name="email_from"/>
+                <field name="email_to"/>
+                <field name="recipient_ids"/>
+            </xpath>
+            <xpath expr="//field[@name='state']" position="attributes">
+                <attribute name="invisible" eval="false"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Attribut invisible pour n'être visible que sur les actions et non le bouton envoyer par email -->
+    <record model="ir.ui.view" id="of_base_email_compose_message_wizard_form">
+        <field name="name">mail.compose.message.form</field>
+        <field name="model">mail.compose.message</field>
+        <field name="inherit_id" ref="mail.email_compose_message_wizard_form"/>
+        <field name="groups_id" eval="[(4,ref('base.group_user'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='body']" position="before">
+                <field name="of_computed_body" options="{'style-inline': true}" attrs="{'invisible':[('composition_mode', '!=', 'mass_mail')]}"/>
+            </xpath>
+            <xpath expr="//footer/button[@special='cancel']" position="after">
+                <button string="(Re)calculer le champ texte" name="button_reload_computed_body" type="object"  class="btn-primary" attrs="{'invisible':[('composition_mode', '!=', 'mass_mail')]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="of_base_email_template_form">
+        <field name="name">of.base.email.template.form</field>
+        <field name="model">mail.template</field>
+        <field name="inherit_id" ref="mail.email_template_form"/>
+        <field name="arch" type="xml">
+            <!-- Autoriser l'ajout/retrait d'action contextuelle aux utilisateurs qui ont accès aux modèles de mails -->
+            <xpath expr="//button[@name='create_action']" position="attributes">
+                <attribute name="groups"/>
+            </xpath>
+            <xpath expr="//button[@name='unlink_action']" position="attributes">
+                <attribute name="groups"/>
+            </xpath>
+            <xpath expr="//field[@name='email_from']" position="after">
+                <field name="of_copie_expediteur"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_view_message_form" model="ir.ui.view">
+        <field name="name">of.view.message.form</field>
+        <field name="model">mail.message</field>
+        <field name="inherit_id" ref="mail.view_message_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header attrs="{'invisible': [('of_state', '=', False)]}">
+                    <field name="of_state" widget="statusbar"/>
+                </header>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Failure Reason" attrs="{'invisible': [('of_state', '!=', 'exception')]}">
+                    <field name="of_failure_reason"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_view_message_search" model="ir.ui.view">
+        <field name="name">of.view.message.search</field>
+        <field name="model">mail.message</field>
+        <field name="inherit_id" ref="mail.view_message_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[last()]" position="after">
+                <separator/>
+                <filter string="Erreur d'envoi" name="failure" domain="[('of_state', '=', 'exception')]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

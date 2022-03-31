@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import re
-
 from lxml import etree
 from lxml.builder import E
 
@@ -102,7 +100,7 @@ def _update_user_groups_view(self):
             # hide groups in categories 'Hidden' and 'Extra' (except for group_no_one)
             attrs = {}
             if app.xml_id in (
-            'base.module_category_hidden', 'base.module_category_extra', 'base.module_category_usability'):
+                    'base.module_category_hidden', 'base.module_category_extra', 'base.module_category_usability'):
                 # MODIF OF
                 attrs['groups'] = 'of_base.of_group_root_only'
                 # FIN DE MODIF OF
@@ -161,39 +159,8 @@ def onchange_parent_id(self):
     # OPENFIRE : On avait ici un remplacement de l'adresse par celle du parent
     return result
 
+
 Partner.onchange_parent_id = onchange_parent_id
-
-
-class IrMailServer(models.Model):
-    _inherit = 'ir.mail_server'
-
-    @api.model
-    def send_email(self, message, mail_server_id=None, smtp_server=None, smtp_port=None,
-                   smtp_user=None, smtp_password=None, smtp_encryption=None, smtp_debug=False):
-        if not mail_server_id and not smtp_server:
-            # Recherche de serveur de mails par pertinence
-            email_from = dict(message._headers).get('From', False)
-            if email_from:
-                re_match = re.search(r' <(.*?)>', email_from)
-                if re_match:
-                    # email_from de la forme "nom <prefix@domain>". On extrait l'adresse.
-                    email_from = re_match.groups()[0]
-                email_from = email_from.strip()
-                email_split = email_from.split('@')
-                if len(email_split) == 2:
-                    prefix, domain = email_split
-                    servers = self.sudo().search([('smtp_host', '=like', '%' + domain)], order='sequence')
-                    if not servers:
-                        servers = self.sudo().search([], order='sequence')
-                    if len(servers) > 1:
-                        servers = self.sudo().search(
-                            [('id', 'in', servers.ids), ('smtp_user', 'in', (prefix, email_from))],
-                            order='sequence', limit=1
-                        ) or servers
-                    mail_server_id = servers[:1].id
-        return super(IrMailServer, self).send_email(
-            message, mail_server_id=mail_server_id, smtp_server=smtp_server, smtp_port=smtp_port,
-            smtp_user=smtp_user, smtp_password=smtp_password, smtp_encryption=smtp_encryption, smtp_debug=smtp_debug)
 
 
 class IrModelFields(models.Model):
@@ -228,7 +195,8 @@ class OfReadGroup(models.AbstractModel):
 
         self._apply_ir_rules(query, 'read')
         for gb in groupby_fields:
-            assert gb in fields, "Fields in 'groupby' must appear in the list of fields to read (perhaps it's missing in the list view?)"
+            assert gb in fields, "Fields in 'groupby' must appear in the list of fields to " \
+                                 "read (perhaps it's missing in the list view?)"
             assert gb in self._fields, "Unknown field %r in 'groupby'" % gb
             gb_field = self._fields[gb].base_field
             # Modification OpenFire : Un champ custom peut ne pas être présent en base de données
@@ -304,7 +272,8 @@ class OfReadGroup(models.AbstractModel):
                 for d in fetched_data:
                     d[gb_field] = gb_dict.get(d[gb_field], False)
 
-        data = map(lambda r: {k: self._read_group_prepare_data(k, v, groupby_dict) for k, v in r.iteritems()}, fetched_data)
+        data = map(
+            lambda r: {k: self._read_group_prepare_data(k, v, groupby_dict) for k, v in r.iteritems()}, fetched_data)
         result = [self._read_group_format_result(d, annotated_groupbys, groupby, domain) for d in data]
         if lazy:
             # Right now, read_group only fill results in lazy mode (by default).
@@ -395,8 +364,10 @@ class ResUsers(models.Model):
     @api.model
     @tools.ormcache('self._uid')
     def context_get(self):
-        # Pour désactiver l'envoi des notifications par courriel des changements d'affectation des commandes et factures.
-        # On met par défaut dans le contexte des utilisateurs la valeur mail_auto_subscribe_no_notify qui inhibe l'envoi des notifications dans la fonction _message_auto_subscribe_notify() de /addons/mail/models.mail_thread.py.
+        # Pour désactiver l'envoi des notifications par courriel des changements d'affectation des commandes
+        # et factures. On met par défaut dans le contexte des utilisateurs la valeur mail_auto_subscribe_no_notify
+        # qui inhibe l'envoi des notifications dans la fonction _message_auto_subscribe_notify()
+        # de /addons/mail/models.mail_thread.py.
         result = super(ResUsers, self).context_get()
         result['mail_auto_subscribe_no_notify'] = 1
         return result
@@ -445,44 +416,6 @@ class Module(models.Model):
         }
 
 
-class MailComposer(models.TransientModel):
-    _inherit = 'mail.compose.message'
-
-    # Store True pour éviter le recalcul lors de l'appui sur n'importe quel bouton.
-    of_computed_body = fields.Html(string=u'Contenu calculé', compute='_compute_of_computed_body', sanitize_style=True, strip_classes=True, store=True)
-
-    # Calcul des champs dans mail, mail_compose_message.py : render_message()
-    @api.depends()
-    def _compute_of_computed_body(self):
-        for composer in self:
-            composer.of_computed_body = composer.render_message([composer.res_id])[composer.res_id]['body']
-
-    @api.multi
-    def button_reload_computed_body(self):
-        self._compute_of_computed_body()
-        return {"type": "ir.actions.do_nothing"}
-
-    # Permet à l'auteur du mail de le recevoir en copie si le paramètre du modèle est vrai.
-    @api.multi
-    def send_mail_action(self):
-        res = super(MailComposer, self.with_context(mail_notify_author=self.template_id and self.template_id.of_copie_expediteur)).send_mail_action()
-        return res
-
-
-class MailTemplate(models.Model):
-    _inherit = 'mail.template'
-
-    of_copie_expediteur = fields.Boolean(string=u"Copie du mail à l'expéditeur")
-
-    @api.multi
-    def create_action(self):
-        return super(MailTemplate, self.sudo()).create_action()
-
-    @api.multi
-    def unlink_action(self):
-        return super(MailTemplate, self.sudo()).unlink_action()
-
-
 class ResCompany(models.Model):
     _inherit = "res.company"
 
@@ -524,7 +457,8 @@ class BaseConfigSettings(models.TransientModel):
     @api.model_cr_context
     def _auto_init(self):
         super(BaseConfigSettings, self)._auto_init()
-        if not self.env['ir.values'].search([('name', '=', 'of_affichage_ville'), ('model', '=', 'base.config.settings')]):
+        if not self.env['ir.values'].search(
+                [('name', '=', 'of_affichage_ville'), ('model', '=', 'base.config.settings')]):
             self.env['ir.values'].sudo().set_default('base.config.settings', 'of_affichage_ville', True)
 
     of_affichage_ville = fields.Boolean(
@@ -541,7 +475,8 @@ class BaseConfigSettings(models.TransientModel):
 
     @api.multi
     def set_of_affichage_ville_defaults(self):
-        return self.env['ir.values'].sudo().set_default('base.config.settings', 'of_affichage_ville', self.of_affichage_ville)
+        return self.env['ir.values'].sudo().set_default(
+            'base.config.settings', 'of_affichage_ville', self.of_affichage_ville)
 
     @api.model
     def get_default_company_share_partner(self, fields):
@@ -571,14 +506,16 @@ class OFFormReadonly(models.AbstractModel):
             if view_type == 'form':  # Applies only for form view
                 for node in doc.xpath("//field"):  # All the view fields to readonly
                     modifiers = node.get('modifiers', {})
-                    if modifiers and isinstance(modifiers, basestring) :
+                    if modifiers and isinstance(modifiers, basestring):
                         modifiers = json.loads(modifiers)
                     if modifiers and isinstance(modifiers, dict) and 'readonly' in modifiers and \
                        isinstance(modifiers.get('readonly', None), bool) and modifiers.get('readonly'):
                         continue
-                    elif modifiers and isinstance(modifiers, dict) and 'readonly' in modifiers and isinstance(modifiers.get('readonly', None), list):
+                    elif modifiers and isinstance(modifiers, dict) and 'readonly' in modifiers and isinstance(
+                            modifiers.get('readonly', None), list):
                         modifiers['readonly'] = ['|'] + modifiers['readonly'] + safe_eval(read_only_domain)
-                    elif modifiers and isinstance(modifiers, dict) and 'readonly' in modifiers and isinstance(modifiers.get('readonly', None), list):
+                    elif modifiers and isinstance(modifiers, dict) and 'readonly' in modifiers and isinstance(
+                            modifiers.get('readonly', None), list):
                         if modifiers.get('readonly'):  # gère le cas attrs="{'readonly': 1}"
                             continue
                         else:  # gère le cas attrs="{'readonly': 0}"
@@ -594,9 +531,11 @@ class OFFormReadonly(models.AbstractModel):
                     if attrs and isinstance(attrs, dict) and 'readonly' in attrs and \
                        isinstance(attrs.get('readonly', None), bool) and attrs.get('readonly'):
                         continue
-                    elif attrs and isinstance(attrs, dict) and 'readonly' in attrs and isinstance(attrs.get('readonly', None), list):
+                    elif attrs and isinstance(attrs, dict) and 'readonly' in attrs and isinstance(
+                            attrs.get('readonly', None), list):
                         attrs['readonly'] = ['|'] + attrs['readonly'] + safe_eval(read_only_domain)
-                    elif attrs and isinstance(attrs, dict) and 'readonly' in attrs and isinstance(attrs.get('readonly', None), int):
+                    elif attrs and isinstance(attrs, dict) and 'readonly' in attrs and isinstance(
+                            attrs.get('readonly', None), int):
                         if attrs.get('readonly'):  # gère le cas attrs="{'readonly': 1}"
                             continue
                         else:  # gère le cas attrs="{'readonly': 0}"
