@@ -508,7 +508,7 @@ class OfWizardSituationLayoutCategory(models.TransientModel):
                 line.price_subtotal - line.price_subtotal * (line.sit_val_prec / 100) for line in lines)
 
             # Le facteur va déterminer quel pourcentage du montant restant dû de chaque ligne on va facturer
-            factor = amount_to_complete / lines_amount_due
+            factor = amount_to_complete / lines_amount_due if lines_amount_due else 1
             for line in lines:
                 line.sit_val_n = (100 - line.sit_val_prec) * factor if line.price_subtotal else 100 - line.sit_val_prec
 
