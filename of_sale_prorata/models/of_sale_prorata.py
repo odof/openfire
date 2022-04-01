@@ -1,33 +1,26 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-import odoo.addons.decimal_precision as dp
+
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    @api.model
-    def _get_default_of_product_prorata_id(self, cr, uid, context):
-        product_obj = self.env['product.product']
-        products = product_obj.search([('default_code', 'ilike', 'prorata')])
-        if not products:
-            products = product_obj.search([('name', 'ilike', 'prorata')])
-        return products and products[0] or False
-
-    of_prorata_percent = fields.Float(string='Compte prorata(%)', digits=(4, 5))
+    of_prorata_percent = fields.Float(string=u"Compte prorata(%)", digits=(4, 5))
     of_retenue_garantie_pct = fields.Float(
-        string='Ret. garantie(%)', digits=(4, 5),
+        string=u"Ret. garantie(%)", digits=(4, 5),
         help=u"Retenue calculée depuis le montant total de la commande")
     of_prochaine_situation = fields.Integer(
-        compute='_compute_of_prochaine_situation', string="Prochaine situation",
+        compute='_compute_of_prochaine_situation', string=u"Prochaine situation",
         help=u"Situation pour laquelle la prochaine facture sera générée")
     of_last_situation = fields.Boolean(compute='_compute_of_last_situation', string=u"Dernière situation ?")
-    of_nb_situations = fields.Integer(string="Nb. situations")
+    of_nb_situations = fields.Integer(string=u"Nb. situations")
 
     @api.depends()
     def _compute_of_prochaine_situation(self):
-        product_situation_id = self.env['ir.values'].get_default('sale.config.settings', 'of_product_situation_id_setting')
+        product_situation_id = self.env['ir.values'].get_default(
+            'sale.config.settings', 'of_product_situation_id_setting')
         for order in self:
             n = 1
             if product_situation_id:
@@ -73,7 +66,8 @@ class SaleOrder(models.Model):
 
                 tax = line.tax_id
                 amount_tax.setdefault(tax, 0.0)
-                taxes = tax.compute_all(line.price_subtotal, cur, 1.0, product=line.product_id, partner=order.partner_shipping_id)
+                taxes = tax.compute_all(
+                    line.price_subtotal, cur, 1.0, product=line.product_id, partner=order.partner_shipping_id)
                 if round_globally:
                     price_tax = sum(t.get('amount', 0.0) for t in taxes.get('taxes', []))
                 else:
@@ -89,9 +83,10 @@ class SaleOrder(models.Model):
     def of_button_situation(self):
         self.ensure_one()
         wizard_obj = self.env['of.wizard.situation']
-        product_situation_id = self.env['ir.values'].get_default('sale.config.settings', 'of_product_situation_id_setting')
+        product_situation_id = self.env['ir.values']\
+            .get_default('sale.config.settings', 'of_product_situation_id_setting')
         if not product_situation_id:
-            raise UserError(u"Vous devez définir l'Article de situation dans la configuration des ventes.")
+            raise UserError(_(u"Vous devez définir l'Article de situation dans la configuration des ventes."))
         situation_data = {
             'partner_id': self.partner_id.id,
             'order_id': self.id,
@@ -101,11 +96,11 @@ class SaleOrder(models.Model):
         wizard = wizard_obj.create(situation_data)
 
         action = {
-            'type'     : 'ir.actions.act_window',
+            'type': 'ir.actions.act_window',
             'view_type': 'form',
             'view_mode': 'form',
             'res_model': 'of.wizard.situation',
-            'res_id'   : wizard.id,
+            'res_id': wizard.id,
         }
         return action
 
@@ -113,9 +108,10 @@ class SaleOrder(models.Model):
     def of_button_last_situation(self):
         self.ensure_one()
         wizard_obj = self.env['of.wizard.situation']
-        product_situation_id = self.env['ir.values'].get_default('sale.config.settings', 'of_product_situation_id_setting')
+        product_situation_id = self.env['ir.values'].get_default(
+            'sale.config.settings', 'of_product_situation_id_setting')
         if not product_situation_id:
-            raise UserError(u"Vous devez définir l'Article de situation dans la configuration des ventes.")
+            raise UserError(_(u"Vous devez définir l'article de situation dans la configuration des ventes."))
         situation_data = {
             'partner_id': self.partner_id.id,
             'order_id': self.id,
@@ -136,18 +132,20 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    situation_ids = fields.One2many('of.sale.order.line.situation', 'order_line_id', string='Lignes de situation')
+    situation_ids = fields.One2many(
+        comodel_name='of.sale.order.line.situation', inverse_name='order_line_id', string=u"Lignes de situation")
 
 
 class SaleOrderLineSituation(models.Model):
     _name = 'of.sale.order.line.situation'
     _order = 'order_id DESC, order_line_id DESC, situation'
 
-    order_id = fields.Many2one('sale.order', related='order_line_id.order_id', readonly=True)
-    order_line_id = fields.Many2one('sale.order.line', string='Ligne de commande', readonly=True, required=True, ondelete='cascade')
-    situation = fields.Integer(string='Situation', required=True)
-    value = fields.Integer(u"Réalisation (%)")
-    invoice_line_id = fields.Many2one('account.invoice.line', string='Ligne de facture', readonly=True)
+    order_id = fields.Many2one(comodel_name='sale.order', related='order_line_id.order_id', readonly=True)
+    order_line_id = fields.Many2one(
+        comodel_name='sale.order.line', string=u"Ligne de commande", readonly=True, required=True, ondelete='cascade')
+    situation = fields.Integer(string=u"Situation", required=True)
+    value = fields.Float(string=u"Réalisation (%)")
+    invoice_line_id = fields.Many2one(comodel_name='account.invoice.line', string=u"Ligne de facture", readonly=True)
 
 
 class AccountInvoice(models.Model):
@@ -165,11 +163,13 @@ class AccountInvoice(models.Model):
 
         product_retenue_id = self.env['ir.values'].get_default('sale.config.settings', 'of_product_retenue_id_setting')
         if not product_retenue_id:
-            raise UserError("Vous devez renseigner un article de retenue de garantie dans la configuration des ventes")
+            raise UserError(_(
+                u"Vous devez renseigner un article de retenue de garantie dans la configuration des ventes"))
         product_retenue = self.env['product.product'].browse(product_retenue_id)
 
         # Normalement le compte devrait toujours être le 411700 et la taxe devrait toujours être à 0
-        account = invoice_line_obj.get_invoice_line_account('in_invoice', product_retenue, self.fiscal_position_id, self.company_id)
+        account = invoice_line_obj.get_invoice_line_account(
+            'in_invoice', product_retenue, self.fiscal_position_id, self.company_id)
         taxes = self.company_id._of_filter_taxes(product_retenue.taxes_id)
         taxes = self.fiscal_position_id.map_tax(taxes, product_retenue, self.partner_id)
         amount = self.currency_id.round(base_amount * retenue_garantie_pct * -0.01)
@@ -216,7 +216,8 @@ class AccountInvoice(models.Model):
         if not pct:
             return
         if base_amount is False:
-            product_retenue_id = self.env['ir.values'].get_default('sale.config.settings', 'of_product_retenue_id_setting')
+            product_retenue_id = self.env['ir.values'].get_default(
+                'sale.config.settings', 'of_product_retenue_id_setting')
             if product_retenue_id:
                 # La retenue de garantie ne doit pas impacter le calcul du prorata
                 lines = self.invoice_line_ids.filtered(lambda line: line.product_id.id != product_retenue_id)
@@ -229,7 +230,7 @@ class AccountInvoice(models.Model):
         invoice_line_obj = self.env['account.invoice.line']
         product_prorata_id = self.env['ir.values'].get_default('sale.config.settings', 'of_product_prorata_id_setting')
         if not product_prorata_id:
-            raise UserError("Vous devez renseigner un article de prorata dans la configuration des ventes")
+            raise UserError(_(u"Vous devez renseigner un article de prorata dans la configuration des ventes"))
         product_prorata = self.env['product.product'].browse(product_prorata_id)
 
         product_prorata_name = product_prorata.name_get()[0][1]
@@ -256,7 +257,8 @@ class AccountInvoice(models.Model):
         })
 
         # --- Création de la ligne de facture ---
-        account = invoice_line_obj.get_invoice_line_account('in_invoice', product_prorata, self.fiscal_position_id, self.company_id)
+        account = invoice_line_obj.get_invoice_line_account(
+            'in_invoice', product_prorata, self.fiscal_position_id, self.company_id)
 
         # Si le module of_account_tax est installé, on calcule le compte comptable en fonction des taxes
         if hasattr(taxes, 'map_account'):
@@ -299,10 +301,10 @@ class Company(models.Model):
     _inherit = 'res.company'
 
     of_journal_situation_id = fields.Many2one(
-        'account.journal', compute='compute_of_journal_situation_id', string='Journal de situation')
+        comodel_name='account.journal', compute='_compute_of_journal_situation_id', string=u"Journal de situation")
 
     @api.depends()
-    def compute_of_journal_situation_id(self):
+    def _compute_of_journal_situation_id(self):
         journal_obj = self.env['account.journal']
         for company in self:
             journal = journal_obj.search([('company_id', '=', company.id),
@@ -318,17 +320,17 @@ class OFSaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'
 
     of_product_prorata_id_setting = fields.Many2one(
-        'product.product',
+        comodel_name='product.product',
         string=u"(OF) Article de prorata",
         help=u"Article utilisé pour le compte de prorata")
 
     of_product_situation_id_setting = fields.Many2one(
-        'product.product',
+        comodel_name='product.product',
         string=u"(OF) Article de situation",
         help=u"Article utilisé pour les factures de situation")
 
     of_product_retenue_id_setting = fields.Many2one(
-        'product.product',
+        comodel_name='product.product',
         string=u"(OF) Article de retenue de garantie",
         help=u"Article utilisé pour la retenue de garantie")
 

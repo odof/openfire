@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, api
+
+
 class SaleAdvancePaymentInv(models.TransientModel):
     _inherit = "sale.advance.payment.inv"
 
