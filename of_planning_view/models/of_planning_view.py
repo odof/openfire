@@ -77,10 +77,9 @@ class OfPlanningIntervention(models.Model):
 
     @api.depends('description')
     def _compute_tooltip_description(self):
-        cleanr = re.compile('<.*?>')
         for rdv in self:
-            cleantext = re.sub(cleanr, '', rdv.description or '')
-            rdv.tooltip_description = cleantext[:400]
+            description = rdv.description or ''
+            rdv.tooltip_description = description[:400]
 
     @api.model
     def get_creneaux_dispo(self, employee_id, date, intervention_heures, creneaux_travailles,

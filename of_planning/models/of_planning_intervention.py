@@ -8,7 +8,7 @@ import requests
 import urllib
 import base64
 
-from odoo import api, models, fields, _
+from odoo import api, models, fields, _, tools
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import config, DEFAULT_SERVER_DATETIME_FORMAT, float_is_zero
 from odoo.tools.float_utils import float_compare
@@ -355,8 +355,11 @@ class OfPlanningIntervention(models.Model):
 
     @api.model_cr_context
     def _auto_init(self):
+        cr = self._cr
+        cr.execute("SELECT * FROM information_schema.columns WHERE table_name = '%s' "
+                   "AND column_name = 'old_description'" % (self._table,))
+        exists = cr.fetchall()
         res = super(OfPlanningIntervention, self)._auto_init()
-        cr = self.env.cr
         cr.execute('SELECT id FROM of_planning_intervention WHERE warehouse_id IS NULL',)
         fetch = cr.fetchall()
         if fetch:
@@ -366,6 +369,11 @@ class OfPlanningIntervention(models.Model):
                        "FROM stock_warehouse sw "
                        "WHERE sw.company_id = ofp.company_id "
                        "  AND ofp.id IN %s", (tuple(ids),))
+        if not exists:
+            records_to_update = self.search([('description', '!=', False)])
+            for rec in records_to_update:
+                rec.old_description = rec.description
+                rec.description = tools.html2plaintext('<div>' + rec.description + '</div>')
         return res
 
     # Domain #
@@ -474,7 +482,8 @@ class OfPlanningIntervention(models.Model):
         domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")
 
     # Onglet Description
-    description = fields.Html(string="Description")
+    description = fields.Text(string="Description")
+    old_description = fields.Html(string=u"Ancienne description", readonly=True)
 
     # Onglet Notes
     of_notes_intervention = fields.Html(related='order_id.of_notes_intervention', readonly=True)
@@ -511,8 +520,6 @@ class OfPlanningIntervention(models.Model):
     category_id = fields.Many2one(related='tache_id.category_id', string=u"Catégorie d'employé")
     # pour faire des stats sur comment sont créés les RDVs
     origin_interface = fields.Char(string=u"Origine création", default=u"Manuelle")
-    # cleantext: afficher les champs Html dans des vues liste sans les balises html exple: <p> description </p>
-    cleantext_description = fields.Text(compute='_compute_cleantext_description')
     cleantext_intervention = fields.Text(compute='_compute_cleantext_intervention', store=True)
     interv_before_id = fields.Many2one(
         'of.planning.intervention', compute="_compute_interventions_before_after", store=True)
@@ -784,13 +791,6 @@ class OfPlanningIntervention(models.Model):
         for interv in self:
             tz = interv.employee_ids and interv.employee_ids[0].of_tz or 'GMT'
             interv.tz_offset = datetime.now(pytz.timezone(tz)).strftime('%z')
-
-    @api.depends('description')
-    def _compute_cleantext_description(self):
-        cleanr = re.compile('<.*?>')
-        for interv in self:
-            cleantext = re.sub(cleanr, '', interv.description or '')
-            interv.cleantext_description = cleantext
 
     @api.depends('order_id.of_notes_intervention')
     def _compute_cleantext_intervention(self):
