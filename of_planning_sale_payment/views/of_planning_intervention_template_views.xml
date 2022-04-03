@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_intervention_template_view_form" model="ir.ui.view">
+        <field name="name">of.planning.intervention.template.view.form</field>
+        <field name="model">of.planning.intervention.template</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_template_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//label[@for='fi_order_of_notes_intervention']" position="before">
+                <label for="fi_order_restant_du" style="font-weight: normal !important"/>
+                <div>
+                    <field name="fi_order_restant_du" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_order', '=', False)]}"/>
+                </div>
+            </xpath>
+            <xpath expr="//label[@for='ri_order_of_notes_intervention']" position="before">
+                <label for="ri_order_restant_du" style="font-weight: normal !important"/>
+                <div>
+                    <field name="ri_order_restant_du" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_order', '=', False)]}"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

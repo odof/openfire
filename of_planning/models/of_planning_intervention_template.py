@@ -103,6 +103,7 @@ class OfPlanningInterventionTemplate(models.Model):
     fi_rdv_tache_id = fields.Boolean(string=u"Tâche")
     fi_rdv_date = fields.Boolean(string=u"Date de début")
     fi_rdv_duree = fields.Boolean(string=u"Durée")
+    fi_rdv_team_id = fields.Boolean(string=u"Équipe")
     fi_rdv_employee_ids = fields.Boolean(string="Intervenant(s)")
     fi_rdv_company_id = fields.Boolean(string=u"Société")
     fi_rdv_lib = fields.Boolean(string=u"Libellé")
@@ -121,7 +122,6 @@ class OfPlanningInterventionTemplate(models.Model):
     fi_order_user_id = fields.Boolean(string="Vendeur")
     fi_order_of_date_vt = fields.Boolean(string="Date VT")
     fi_order_totals = fields.Boolean(string="Totaux")
-    fi_order_restant_du = fields.Boolean(string=u"Restant dû")
     fi_order_of_notes_intervention = fields.Boolean(string="Notes d'intervention")
 
 
@@ -160,6 +160,7 @@ class OfPlanningInterventionTemplate(models.Model):
     ri_rdv_tache_id = fields.Boolean(string=u"Tâche")
     ri_rdv_date = fields.Boolean(string=u"Date de début")
     ri_rdv_duree = fields.Boolean(string=u"Durée")
+    ri_rdv_team_id = fields.Boolean(string=u"Équipe")
     ri_rdv_employee_ids = fields.Boolean(string="Intervenant(s)")
     ri_rdv_company_id = fields.Boolean(string=u"Société")
     ri_rdv_lib = fields.Boolean(string=u"Libellé")
@@ -178,7 +179,6 @@ class OfPlanningInterventionTemplate(models.Model):
     ri_order_user_id = fields.Boolean(string="Vendeur")
     ri_order_of_date_vt = fields.Boolean(string="Date VT")
     ri_order_totals = fields.Boolean(string="Totaux")
-    ri_order_restant_du = fields.Boolean(string=u"Restant dû")
     ri_order_of_notes_intervention = fields.Boolean(string="Notes d'intervention")
 
     # Produits et travaux (lignes de commande)

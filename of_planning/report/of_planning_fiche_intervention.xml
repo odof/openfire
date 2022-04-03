@@ -163,6 +163,14 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div t-if="template.fi_rdv_team_id and o.equipe_id" name="fi_rdv_team_id">
+                                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                                <t t-set="previous_separator" t-value="True"/>
+                                                <div class="h5" style="padding: 0px 16px;">
+                                                    <span>Équipe&amp;nbsp;:</span>
+                                                    <span t-field="o.equipe_id.name"/>
+                                                </div>
+                                            </div>
                                             <div t-if="template.fi_rdv_employee_ids and o.employee_ids" name="fi_rdv_employee_ids">
                                                 <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
                                                 <t t-set="previous_separator" t-value="True"/>
@@ -224,10 +232,10 @@
                                                 <div class="h5" style="padding: 0px 16px;">
                                                     <div><strong>Contact</strong></div>
                                                     <t t-if="o.address_id">
-                                                        <div style="padding-top: 4px" t-field="o.address_id" t-field-options="{'widget': 'contact', 'fields': ['name', 'phone', 'mobile']}"/>
+                                                        <div style="padding-top: 4px" t-field="o.address_id" t-field-options="{'widget': 'contact', 'fields': ['name', 'phone', 'mobile', 'email']}"/>
                                                     </t>
                                                     <t t-elif="order.partner_shipping_id">
-                                                        <div style="padding-top: 4px" t-field="order.partner_shipping_id" t-field-options="{'widget': 'contact', 'fields': ['name', 'phone', 'mobile']}"/>
+                                                        <div style="padding-top: 4px" t-field="order.partner_shipping_id" t-field-options="{'widget': 'contact', 'fields': ['name', 'phone', 'mobile', 'email']}"/>
                                                     </t>
                                                 </div>
                                             </div>
@@ -302,7 +310,7 @@
                                     <div class="col-xs-12" style="display: table; padding: 0px;">
                                         <t t-set="previous_separator" t-value="False"/>
                                         <div t-if="(template.fi_order_name and order.name) or (template.fi_order_confirmation_date and order.confirmation_date) or (template.fi_order_user_id and order.user_id and order.user_id.name) or (template.fi_order_of_date_vt and order.of_date_vt)"
-                                             t-attf-style="#{'width: 50%; display: table-cell;' if (template.fi_order_totals or template.fi_order_restant_du) else 'display: table-cell;'}">
+                                             t-attf-style="#{'width: 50%; display: table-cell;' if template.fi_order_totals else 'display: table-cell;'}">
                                             <div t-if="template.fi_order_name and order.name" name="fi_order_name">
                                                 <t t-set="previous_separator" t-value="True"/>
                                                 <div class="h5" style="padding: 0px 16px;">
@@ -347,7 +355,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div t-if="template.fi_order_totals or template.fi_order_restant_du"
+                                        <div t-if="template.fi_order_totals"
                                              t-attf-style="#{'width: 50%; border-left: 1px solid lightgray; display: table-cell; vertical-align: middle;' if ((template.fi_order_name and order.name) or (template.fi_order_confirmation_date and order.confirmation_date) or (template.fi_order_user_id and order.user_id and order.user_id.name) or (template.fi_order_of_date_vt and order.of_date_vt)) else 'display: table-cell; vertical-align: middle;'}">
                                             <div name="order_amounts"
                                                  t-attf-style="#{'padding: 8px 0px; margin: auto;' if ((template.fi_order_name and order.name) or (template.fi_order_confirmation_date and order.confirmation_date) or (template.fi_order_user_id and order.user_id and order.user_id.name) or (template.fi_order_of_date_vt and order.of_date_vt)) else 'padding: 8px 0px; width: 50%; margin: auto;'}">
@@ -381,35 +389,12 @@
                                                             <span t-field="order.amount_total" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
                                                         </td>
                                                     </tr>
-                                                    <t t-if="template.fi_order_restant_du">
-                                                        <!-- Paiements -->
-                                                        <t t-foreach="order.payment_ids" t-as="paiement">
-                                                            <tr>
-                                                                <td>
-                                                                    <span>Payé par </span><span t-field="paiement.of_payment_mode_id.name"/>
-                                                                </td>
-                                                                <td class="text-right">
-                                                                    <span t-field="paiement.amount" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
-                                                                </td>
-                                                            </tr>
-                                                        </t>
-                                                        <!-- Restant dû -->
-                                                        <tr>
-                                                            <td style="border-top: 2px solid gray !important;">
-                                                                <strong>Restant dû :</strong>
-                                                            </td>
-                                                            <td class="text-right" style="border-top: 2px solid gray !important;">
-                                                                <span t-esc="order.amount_total - sum(order.payment_ids.mapped('amount'))"
-                                                                      t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
-                                                            </td>
-                                                        </tr>
-                                                    </t>
                                                 </table>
                                             </div>
                                         </div>
                                     </div>
                                     <div t-if="template.fi_order_of_notes_intervention and order.of_notes_intervention" name="fi_order_of_notes_intervention" class="col-xs-12" style="display: table; padding: 0px;"
-                                         t-attf-style="#{'display: table; padding: 0px; border-top: 1px solid lightgray;' if previous_separator or template.fi_order_totals or template.fi_order_restant_du else 'display: table; padding: 0px;'}">
+                                         t-attf-style="#{'display: table; padding: 0px; border-top: 1px solid lightgray;' if previous_separator or template.fi_order_totals else 'display: table; padding: 0px;'}">
                                         <div style="display: table-cell; padding: 0px 16px;" class="h5">
                                             <div>
                                                 <span t-field="order.of_notes_intervention"/>
@@ -620,8 +605,7 @@
                                         <strong>Mentions légales</strong>
                                     </div>
                                 </div>
-                                <div class="row"
-                                     style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%;">
+                                <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; padding: 0px 16px;">
                                     <div class="col-xs-12" style="display: table; padding: 0px;">
                                         <div style="display: table-cell;">
                                             <div class="h5" style="padding: 0px 16px;">
@@ -641,8 +625,7 @@
                                                 <strong>Signature technicien</strong>
                                             </div>
                                         </div>
-                                        <div class="row"
-                                             style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
+                                        <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; padding: 0px 16px;">
                                             <div class="col-xs-12" style="display: table; padding: 0px;">
                                                 <div style="display: table-cell;">
                                                     <!-- Signature technicien -->
@@ -665,8 +648,7 @@
                                                 <strong>Signature client</strong>
                                             </div>
                                         </div>
-                                        <div class="row"
-                                             style="border: 1px solid lightgray; margin-bottom: 12px; width: 100%; border-radius: 10px;">
+                                        <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; padding: 0px 16px;">
                                             <div class="col-xs-12" style="display: table; padding: 0px;">
                                                 <div style="display: table-cell;">
                                                     <!-- Signature client -->

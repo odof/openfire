@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <template id="of_planning_fiche2_intervention_report_template" inherit_id="of_planning.of_planning_fiche2_intervention_report_template">
+        <xpath expr="//div[@t-if='(template.fi_order_name and order.name) or (template.fi_order_confirmation_date and order.confirmation_date) or (template.fi_order_user_id and order.user_id and order.user_id.name) or (template.fi_order_of_date_vt and order.of_date_vt)']" position="attributes">
+            <attribute name="t-attf-style">#{'width: 50%; display: table-cell;' if (template.fi_order_totals or template.fi_order_restant_du) else 'display: table-cell;'}</attribute>
+        </xpath>
+        <xpath expr="//div[@t-if='template.fi_order_totals']" position="attributes">
+            <attribute name="t-if">template.fi_order_totals or template.fi_order_restant_du</attribute>
+        </xpath>
+        <xpath expr="//div[@name='fi_order_of_notes_intervention']" position="attributes">
+            <attribute name="t-attf-style">#{'display: table; padding: 0px; border-top: 1px solid lightgray;' if previous_separator or template.fi_order_totals or template.fi_order_restant_du else 'display: table; padding: 0px;'}</attribute>
+        </xpath>
+        <xpath expr="//div[@name='order_amounts']/table" position="inside">
+            <t t-if="template.fi_order_restant_du">
+                <!-- Paiements -->
+                <t t-foreach="order.payment_ids" t-as="paiement">
+                    <tr>
+                        <td>
+                            <span>Payé par </span><span t-field="paiement.of_payment_mode_id.name"/>
+                        </td>
+                        <td class="text-right">
+                            <span t-field="paiement.amount" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                        </td>
+                    </tr>
+                </t>
+                <!-- Restant dû -->
+                <tr>
+                    <td style="border-top: 2px solid gray !important;">
+                        <strong>Restant dû :</strong>
+                    </td>
+                    <td class="text-right" style="border-top: 2px solid gray !important;">
+                        <span t-esc="order.amount_total - sum(order.payment_ids.mapped('amount'))"
+                              t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                    </td>
+                </tr>
+            </t>
+        </xpath>
+    </template>
+
+</odoo>
