@@ -42,6 +42,7 @@ class PurchaseOrder(models.Model):
         ('no', u'Non reçue'),
         ('received', u'Reçue'),
         ], string=u"État de réception", compute='_compute_of_reception_state', compute_sudo=True, store=True)
+    of_delivery_force = fields.Datetime(string=u"Forcer date prévue")
 
     @api.depends('order_line.move_ids', 'order_line.move_ids.picking_id.state')
     def _compute_of_reception_state(self):
@@ -93,6 +94,11 @@ class PurchaseOrder(models.Model):
         else:
             result['context']['default_company_id'] = self.invoice_ids[0].company_id.id
         return result
+
+    @api.multi
+    def action_set_date_planned(self):
+        for order in self:
+            order.order_line.update({'date_planned': order.of_delivery_force})
 
 
 class PurchaseOrderLine(models.Model):

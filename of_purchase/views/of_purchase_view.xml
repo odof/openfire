@@ -22,7 +22,13 @@
                 <xpath expr="//field[@name='partner_ref']" position="after">
                     <field name="of_user_id"/>
                 </xpath>
-
+                <xpath expr="//notebook/page[2]//field[@name='date_planned']" position="replace">
+                    <field name="of_delivery_force" class="oe_edit_only" attrs="{'readonly': [('state', 'not in', ('draft', 'sent'))]}"/>
+                </xpath>
+                <xpath expr="//notebook/page[2]//label[@for='date_planned']" position="replace">
+                    <field name="date_planned" readonly="1"/>
+                    <label for="of_delivery_force" class="oe_edit_only"/>
+                </xpath>
                 <xpath expr="//field[@name='order_line']/tree" position="inside">
                     <field name="of_total_stock_qty" groups="of_purchase.group_purchase_order_line_display_stock_info+purchase.group_purchase_manager"/>
                     <field name="of_available_stock_qty" groups="of_purchase.group_purchase_order_line_display_stock_info+purchase.group_purchase_manager"/>
