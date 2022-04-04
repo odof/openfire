@@ -375,7 +375,7 @@ class OfContract(models.Model):
             if current_period_id and vals.get('current_period_id', current_period_id) != current_period_id:
                 vals['type'] = 1
         # Générer la nouvelle période si elle n'existe pas
-        if 'recurring_next_date' in vals:
+        if 'recurring_next_date' in vals and vals.get('recurring_next_date'):
             next_date = vals.get('recurring_next_date')
             for contract in self:
                 if contract.period_ids and not contract.period_ids.filtered(lambda p: p.date_start <= next_date <= p.date_end):
@@ -390,19 +390,28 @@ class OfContract(models.Model):
         self.ensure_one()
         period_obj = self.env['of.contract.period']
         date_start = date_start or self.date_start
+        max_date = fields.Date.from_string(fields.Date.today()) + relativedelta(years=11, month=1, day=1)
         numbers = self.period_ids.mapped('number')
         base = numbers and max(numbers) or 1
         ds = fields.Date.from_string(date_start)
+        if ds >= max_date:
+            return
         for i in xrange(base, base+10):
             date_end = ds + relativedelta(months=self.period, days=-1)
-            vals = {
-                'contract_id': self.id,
-                'number': i,
-                'date_start': fields.Date.to_string(ds),
-                'date_end': fields.Date.to_string(date_end)
-            }
+            date_start = fields.Date.to_string(ds)
+            date_end_str = fields.Date.to_string(date_end)
+            # if par sécurité, on devrait toujours créer mais ça ne coûte rien de vérifier. Évite un doublon inutile
+            if not self.period_ids.filtered(lambda p: p.date_start == date_start and p.date_end == date_end_str):
+                vals = {
+                    'contract_id': self.id,
+                    'number': i,
+                    'date_start': fields.Date.to_string(ds),
+                    'date_end': fields.Date.to_string(date_end)
+                }
+                period_obj.create(vals)
             ds = ds + relativedelta(months=self.period)
-            period_obj.create(vals)
+            if ds >= max_date:
+                break
 
     @api.multi
     def action_view_intervention(self):
