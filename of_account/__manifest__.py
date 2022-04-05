@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "OpenFire / Comptabilité",
-    'version': "10.0.1.0.0",
+    'version': "10.0.2.0.0",
     'author': "OpenFire",
     'license': '',
     'website': "www.openfire.fr",
@@ -31,6 +31,7 @@ Module de comptabilité OpenFire.
     'demo_xml': [],
     'data': [
         'views/of_account_view.xml',
+        'views/partner_views.xml',
         'wizards/wizard_edit_export_view.xml'
     ],
     'installable': True,
