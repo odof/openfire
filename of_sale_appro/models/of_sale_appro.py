@@ -39,18 +39,14 @@ class StockMove(models.Model):
         super(StockMove, self).action_assign(no_prepare=no_prepare)
         waiting_moves = self.filtered(lambda m: m.state in ['waiting'])
         moves_to_restart = self.env['stock.move']
+        procurement_obj = self.env['procurement.order']
         if waiting_moves:
             for move in waiting_moves:
-                ancestors = move.find_move_ancestors()
-                found = False
-                for ancestor in ancestors:
-                    for quant in ancestor.quant_ids:
-                        if move.id in quant.history_ids.ids or quant.location_id.id == ancestor.location_dest_id.id:
-                            found = True
-                            break
-                    if found:
-                        break
-                if not found:
+                # Si un mouvement est dans l'état "En attente d'un autre mouvement" cela signifie qu'il devrait y avoir
+                # au moins un procurement.order non terminé/annulé avec comme mouvement de destination notre mouvement
+                # Si ce n'est pas le cas c'est qu'il va être nécessaire de relancer l'approvisionnement
+                procs = procurement_obj.search([('move_dest_id', '=', move.id), ('state', '!=', ['cancel', 'done'])])
+                if not procs:
                     moves_to_restart |= move
         moves_to_restart.write({'state': 'confirmed'})
 
