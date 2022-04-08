@@ -206,6 +206,7 @@
                 <field name="cout" widget="monetary"/>
                 <field name="prix_vente" widget="monetary"/>
                 <field name="pc_prix_vente"/>
+                <field name="invoice_status"/>
             </tree>
         </field>
     </record>
@@ -257,6 +258,10 @@
         <field name="groups_id" eval="[(4, ref('of_sale_quote_template.group_of_advanced_sale_layout_category'))]"/>
         <field name="priority">30</field>
         <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="of_layout_category_invoice_status" invisible="1"/>
+                <button name="action_layout_category_invoicing" string="Facturer par section" type="object" attrs="{'invisible': [('of_layout_category_invoice_status', 'not in', ['to invoice', 'partially invoiced'])]}"/>
+            </xpath>
             <xpath expr="//field[@name='order_line']" position="attributes">
                 <attribute name="context">{'hide_sale': context.get('hide_sale'), 'category_ids': of_layout_category_ids}</attribute>
             </xpath>
@@ -270,9 +275,13 @@
                 <field name="of_quote_line_id" invisible="1"/>
                 <field name="of_layout_category_id" domain="[('id', 'in', get_m2m_ids(context.get('category_ids', [[]])))]"/>
             </xpath>
+            <xpath expr="//notebook/page[1]/field[@name='order_line']/form//field[@name='invoice_status']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
             <xpath expr="//notebook/page[1]/field[@name='order_line']/tree/field[@name='layout_category_id']" position="after">
                 <field name="of_quote_line_id" invisible="1"/>
                 <field name="of_layout_category_id" domain="[('id', 'in', get_m2m_ids(context.get('category_ids', [[]])))]"/>
+                <field name="invoice_status"/>
             </xpath>
             <xpath expr="//notebook/page[1]" position="before">
                 <page string="Sections">
@@ -292,6 +301,7 @@
                             <field name="cout" widget="monetary"/>
                             <field name="prix_vente" widget="monetary"/>
                             <field name="pc_prix_vente"/>
+                            <field name="invoice_status"/>
                             <button icon="fa-files-o" name="action_duplicate" type="object" help="Dupliquer cette ligne"/>
                             <button icon="fa-arrows" name="action_move" type="object" help="Déplacer cette ligne"/>
                             <button icon="fa-plus" name="action_add" type="object" help="Ajouter une sous section à cette ligne"/>
@@ -308,6 +318,7 @@
                                         <field name="cout"/>
                                         <field name="prix_vente"/>
                                         <field name="pc_prix_vente"/>
+                                        <field name="invoice_status"/>
                                     </group>
                                 </group>
                                 <notebook>
