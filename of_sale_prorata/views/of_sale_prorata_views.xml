@@ -8,15 +8,19 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="of_button_situation" type="object" string="Situation"
-                        attrs="{'invisible': [('of_nb_situations','=',0)]}"/>
+                <field name="of_last_situation" invisible="1"/>
+                <button name="of_button_situation" type="object" string="Situation n°"
+                        attrs="{'invisible': ['|', '|', ('of_nb_situations', '=', 0), ('invoice_status', '!=', 'to invoice'), ('of_last_situation', '=', True)]}">
+                    <field name="of_prochaine_situation"/>
+                </button>
+                <button name="of_button_last_situation" type="object" string="Générer facture finale"
+                        attrs="{'invisible': ['|', '|', ('of_nb_situations', '=', 0), ('invoice_status', '!=', 'to invoice'), ('of_last_situation', '=', False)]}"/>
             </xpath>
 
             <xpath expr="//group[@name='sale_pay']" position="inside">
                 <field name="of_prorata_percent"/>
                 <field name="of_retenue_garantie_pct"/>
                 <field name="of_nb_situations"/>
-                <field name="of_prochaine_situation"/>
             </xpath>
         </field>
     </record>

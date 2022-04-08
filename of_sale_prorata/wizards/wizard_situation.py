@@ -6,10 +6,13 @@ from odoo.exceptions import UserError
 import odoo.addons.decimal_precision as dp
 from datetime import date
 import time
+import base64
+
 
 class OfWizardSituation(models.TransientModel):
     _name = "of.wizard.situation"
 
+    partner_id = fields.Many2one('res.partner', string='Client')
     order_id = fields.Many2one('sale.order', string='Commande client')
     line_ids = fields.One2many('of.wizard.situation.line', 'situation_id', string='Lignes de situation')
 
@@ -111,6 +114,22 @@ class OfWizardSituation(models.TransientModel):
         return result
 
     @api.multi
+    def action_prefill(self):
+        self.ensure_one()
+        context = {
+            'default_situation_id': self.id,
+        }
+        action = {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'of.wizard.situation.prefill',
+            'target': 'new',
+            'context': context,
+        }
+        return action
+
+    @api.multi
     def action_make_invoice(self):
         """ Génère la prochaine facture de situation.
         @return: Factures générées
@@ -118,6 +137,7 @@ class OfWizardSituation(models.TransientModel):
         self.ensure_one()
         order_line_obj = self.env['sale.order.line']
         invoice_line_obj = self.env['account.invoice.line']
+        report_obj = self.env['report']
         order = self.order_id
         situation_number = self.prochaine_situation
 
@@ -130,6 +150,10 @@ class OfWizardSituation(models.TransientModel):
         for line in self.line_ids:
             if line.sit_val_suiv > 100:
                 raise UserError(u"Le total des situations ne doit pas dépasser 100%%.\n\n%s" % line.order_line_id.name)
+
+        # --- Génération du rapport de situation ---
+        pdf = report_obj.sudo().get_pdf([self.id], 'of_sale_prorata.of_report_situation')
+        filename = _('Rapport de situation n°%s') % situation_number
 
         # --- Création de la facture ---
         invoice = self.env['account.invoice'].with_context(company_id=order.company_id.id).create({
@@ -218,11 +242,23 @@ class OfWizardSituation(models.TransientModel):
             if line.invoice_lines.mapped('invoice_id') in acompte_invoices and line.qty_to_invoice < 0:
                 line.invoice_line_create(invoice.id, line.qty_to_invoice)
 
+        # --- Stockage du rapport de situation sur la facture ---
+        self.env['ir.attachment'].create({
+            'name': filename,
+            'type': 'binary',
+            'datas': base64.encodestring(pdf),
+            'res_model': 'account.invoice',
+            'res_id': invoice.id,
+            'mimetype': 'application/x-pdf',
+            'datas_fname': "%s.pdf" % filename,
+        })
+
         invoice.compute_taxes()
         if invoice.amount_total < 0:
             raise UserError(u"Vous ne pouvez pas générer une facture de situation d'un montant négatif")
-        # Alternative possible : mettre ce texte dans les notes de haut de page du module OCA/sale_reporting/sale_comment_template
-        invoice.name = u"Situation de travaux n°%s" % (situation_number, )
+        # Alternative possible : mettre ce texte dans les notes de haut de page
+        # du module OCA/sale_reporting/sale_comment_template
+        invoice.name = u"Situation de travaux n°%s" % situation_number
         invoice.message_post_with_view(
             'mail.message_origin_link',
             values={'self': invoice, 'origin': order},
@@ -249,6 +285,21 @@ class OfWizardSituation(models.TransientModel):
                 sit_lines = [order_line_situation[order_line] for order_line in order_group['lines']
                              if order_line in order_line_situation]
                 if sit_lines:
+                    # inhiber l'affichage de la référence
+                    afficher_ref = self.env['ir.values']\
+                        .get_default('sale.config.settings', 'pdf_display_product_ref_setting')
+
+                    for line in sit_lines:
+                        order_id = line.order_line_id.order_id
+                        self = self.with_context(lang=order_id.partner_id.lang, partner=order_id.partner_id.id)
+
+                        name = line.order_line_id.name
+                        if not afficher_ref and name.startswith("["):
+                            pos = name.find(']')
+                            if pos != -1:
+                                name = name[pos + 1:]
+                        line.name = name.strip()
+
                     report_groups.append({
                         'name': order_group['name'],
                         'lines': sit_lines,
@@ -268,6 +319,7 @@ class OfWizardSituation(models.TransientModel):
         lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
         return date.today().strftime(lang.date_format)
 
+
 class OfWizardSituationLine(models.TransientModel):
     _name = "of.wizard.situation.line"
     _inherits = {'sale.order.line': 'order_line_id'}
@@ -277,9 +329,9 @@ class OfWizardSituationLine(models.TransientModel):
     order_line_id = fields.Many2one('sale.order.line', "Ligne de commande", required=True, ondelete="cascade")
     layout_category_id = fields.Many2one('sale.layout_category', related='order_line_id.layout_category_id', readonly=True)
 
-    sit_val_n = fields.Integer(compute='_compute_sit_vals', inverse='_inverse_sit_val_n', string="Sit. n (%)")
-    sit_val_prec = fields.Integer(compute='_compute_sit_vals', string="Total n-1 (%)")
-    sit_val_suiv = fields.Integer(compute='_compute_sit_val_suiv', string="Total n (%)")
+    sit_val_n = fields.Float(compute='_compute_sit_vals', inverse='_inverse_sit_val_n', string="Sit. n (%)")
+    sit_val_prec = fields.Float(compute='_compute_sit_vals', string="Total n-1 (%)")
+    sit_val_suiv = fields.Float(compute='_compute_sit_val_suiv', string="Total n (%)")
 
     @api.depends('order_line_id.name')
     def _compute_name(self):
@@ -314,3 +366,30 @@ class OfWizardSituationLine(models.TransientModel):
                     'situation': n,
                     'value': line.sit_val_n,
                 })
+
+    @api.onchange('sit_val_n')
+    def _onchange_sit_val_n(self):
+        for line in self:
+            if line.sit_val_suiv > 100:
+                line.sit_val_n = 100 - line.sit_val_prec
+
+
+class OfWizardSituationPrefill(models.TransientModel):
+    _name = "of.wizard.situation.prefill"
+
+    situation_id = fields.Many2one(comodel_name='of.wizard.situation', string=u"Wizard", required=True)
+    type = fields.Selection(
+        selection=[
+            ('sit_val_n', u"Sit. n (%)"),
+            ('sit_val_suiv', u"Total n (%)"),
+        ], string=u"Type", required=True, default='sit_val_n')
+    value = fields.Float(string=u"Valeur", required=True)
+
+    @api.multi
+    def button_apply(self):
+        for line in self.situation_id.line_ids:
+            if self.type == 'sit_val_n':
+                line.sit_val_n = self.value
+            else:
+                line.sit_val_n = max(self.value, line.sit_val_prec) - line.sit_val_prec
+            line._onchange_sit_val_n()
