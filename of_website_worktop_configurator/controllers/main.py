@@ -44,10 +44,13 @@ class OFWebsiteWorktopConfigurator(http.Controller):
     @http.route(['/worktop_configurator'], type='http', auth='user', website=True)
     def worktop_configurator(self, **kw):
         current_step = 'new'
+
+        # On vide les variables de session
+        self._empty_session()
+
         redirection = self.get_redirection(current_step)
         if redirection:
             return redirection
-
         return request.redirect('/worktop_configurator/vendor_select')
 
     @http.route(['/worktop_configurator/vendor_select'], type='http', auth='user', website=True)
@@ -79,6 +82,7 @@ class OFWebsiteWorktopConfigurator(http.Controller):
                 # On teste si le devis a déjà été généré pour MAJ (cas d'un retour arrière dans le process)
                 if request.session.get('worktop_quote_id'):
                     quote = request.env['sale.order'].sudo().browse(request.session['worktop_quote_id'])
+
                     if quote.partner_id.id != request.session['vendor_address_id']:
                         pricelist = request.env['res.partner'].browse(request.session['vendor_address_id']).\
                             commercial_partner_id.property_product_pricelist or request.env.ref('product.list0', False)
@@ -146,36 +150,46 @@ class OFWebsiteWorktopConfigurator(http.Controller):
                         error['invoicing_country_id'] = True
 
             if not error:
+                vals = {}
                 # Adresse de chantier
+                # Si l'adresse de chantier existe déjà et n'est pas déjà présente
+                # en adresse de livraison d'une autre commande
+                new_address = False
                 if request.session.get('customer_address_id'):
-                    self._update_customer_address(request.session['customer_address_id'])
-                else:
+                    new_address = self._update_customer_address(request.session['customer_address_id'])
+                if not request.session.get('customer_address_id') or new_address:
                     customer_address_id = self._create_customer_address()
                     request.session['customer_address_id'] = customer_address_id
+                    vals['partner_shipping_id'] = customer_address_id
 
                 # Adresse de facturation
                 request.session['invoicing_recipient'] = values.get('invoicing_recipient')
                 if values.get('invoicing_recipient') == 'customer' or not request.env.user.has_group('base.group_user'):
                     request.session['different_invoicing_address'] = values['different_invoicing_address']
                     if values.get('different_invoicing_address') == 'yes':
+                        if request.session.get('customer_invoicing_address_id') == \
+                                request.session.get('customer_address_id'):
+                            request.session.pop('customer_invoicing_address_id', None)
+                        new_address = False
                         if request.session.get('customer_invoicing_address_id'):
-                            self._update_invoicing_address(request.session['customer_invoicing_address_id'])
-                        else:
+                            new_address = self._update_invoicing_address(
+                                request.session['customer_invoicing_address_id'])
+                        if not request.session.get('customer_invoicing_address_id') or new_address:
                             invoicing_address_id = self._create_invoicing_address(
                                 request.session['customer_address_id'])
                             request.session['customer_invoicing_address_id'] = invoicing_address_id
+                            vals['partner_invoice_id'] = invoicing_address_id
                 else:
                     request.session.pop('different_invoicing_address', None)
                     if values.get('create_vendor_address') == 'yes':
                         invoicing_address_id = self._create_invoicing_address(request.session['vendor_address_id'])
                         request.session['vendor_invoicing_address_id'] = invoicing_address_id
                     elif values.get('update_vendor_address') == 'yes':
-                        self._update_invoicing_address(request.session['vendor_invoicing_address_id'])
+                        self._update_invoicing_address(request.session['vendor_invoicing_address_id'], vendor=True)
 
                 # Si le devis a déjà été généré, on met à jour l'adresse de facturation si besoin
                 if request.session.get('worktop_quote_id'):
                     quote = request.env['sale.order'].sudo().browse(request.session['worktop_quote_id'])
-                    vals = {}
                     if values.get('invoicing_recipient') == 'vendor' and \
                             quote.partner_invoice_id.id != request.session['vendor_invoicing_address_id']:
                         vals['partner_invoice_id'] = request.session['vendor_invoicing_address_id']
@@ -281,12 +295,6 @@ class OFWebsiteWorktopConfigurator(http.Controller):
                 error['junction'] = True
             # Contrôle de l'étage
             error_message = []
-            if values.get('delivery_floor'):
-                try:
-                    int(values['delivery_floor'])
-                except ValueError:
-                    error['delivery_floor'] = True
-                    error_message.append(u"L'étage indiqué ne correspond pas à un nombre valide.")
             # Contrôle de la prestation bloquante
             if values.get('site_service_id'):
                 site_service = request.env['of.worktop.configurator.service'].browse(int(values['site_service_id']))
@@ -315,14 +323,20 @@ class OFWebsiteWorktopConfigurator(http.Controller):
 
         values['ref'] = values.get('ref') or quote.client_order_ref
         values['delivery_expected_date'] = values.get('delivery_expected_date') or quote.of_date_de_pose
-        values['delivery_floor'] = values.get('delivery_floor') or quote.of_delivery_floor or \
-            quote.of_delivery_floor == 0 and '0'
+        values['delivery_floor'] = values.get('delivery_floor') or (
+                quote and (quote.of_delivery_floor and 'yes' or 'no'))
         values['junction'] = values.get('junction') or (quote and (quote.of_junction and 'yes' or 'no'))
+
+        # On restreint les positions fiscales en fonction de la liste de prix
+        pricelist = request.env['res.partner'].browse(
+            request.session['vendor_address_id']).commercial_partner_id.property_product_pricelist or request.env.ref(
+            'product.list0', False)
         values['fiscal_pos'] = values.get('fiscal_pos_id') and \
-            request.env['account.fiscal.position'].browse(int(values['fiscal_pos_id'])) or quote.fiscal_position_id
-        fiscal_pos_ids = request.env['ir.values'].sudo().get_default(
-            'sale.config.settings', 'of_website_worktop_configurator_fiscal_position_ids')
-        values['fiscal_pos_list'] = request.env['account.fiscal.position'].browse(fiscal_pos_ids)
+            request.env['account.fiscal.position'].sudo().browse(int(values['fiscal_pos_id'])) or \
+            quote.fiscal_position_id
+        values['fiscal_pos_list'] = request.env['of.worktop.configurator.tax'].sudo().search(
+            [('pricelist_ids', 'in', pricelist.id)]).mapped('fiscal_position_id')
+
         values['site_service'] = values.get('site_service_id') and \
             request.env['of.worktop.configurator.service'].browse(int(values['site_service_id'])) or \
             quote.of_site_service_id
@@ -428,8 +442,8 @@ class OFWebsiteWorktopConfigurator(http.Controller):
         values['finishing_list'] = product_type.finishing_ids
         values['color_id'] = values.get('color_id') or request.session.get('color_id')
         values['color_list'] = request.env['of.worktop.configurator.color'].search([])
-        values['length'] = values.get('length') or request.session.get('length')
-        values['width'] = values.get('width') or request.session.get('width')
+        values['length'] = round(values.get('length'), 2) if values.get('length') else request.session.get('length')
+        values['width'] = round(values.get('width'), 2) if values.get('width') else request.session.get('width')
         values['thickness_id'] = values.get('thickness_id') or request.session.get('thickness_id')
         values['thickness_list'] = request.env['of.worktop.configurator.thickness'].search([])
         values['type_name'] = product_type.name
@@ -548,22 +562,7 @@ class OFWebsiteWorktopConfigurator(http.Controller):
                 quote.message_subscribe(partner_ids=responsibles.ids + [quote.partner_id.id])
 
                 # On vide les variables de session
-                request.session.pop('vendor_address_id', None)
-                request.session.pop('customer_address_id', None)
-                request.session.pop('invoicing_recipient', None)
-                request.session.pop('different_invoicing_address', None)
-                request.session.pop('customer_invoicing_address_id', None)
-                request.session.pop('vendor_invoicing_address_id', None)
-                request.session.pop('worktop_quote_id', None)
-                request.session.pop('product_type_id', None)
-                request.session.pop('product_price', None)
-                request.session.pop('worktop_quote_line_id', None)
-                request.session.pop('material_id', None)
-                request.session.pop('finishing_id', None)
-                request.session.pop('color_id', None)
-                request.session.pop('thickness_id', None)
-                request.session.pop('length', None)
-                request.session.pop('width', None)
+                self._empty_session()
 
                 # On redirige vers le portail
                 return request.redirect('/my/home')
@@ -572,10 +571,16 @@ class OFWebsiteWorktopConfigurator(http.Controller):
         values['step_number'] = STEP_NAME_NUMBER.get(current_step, 0)
         quote = request.env['sale.order'].sudo().browse(request.session['worktop_quote_id'])
         values['quote'] = quote
+        vendor = request.env['res.partner'].sudo().browse(request.session['vendor_address_id'])
+        values['vendor'] = vendor
+
+        # On restreint les remises en fonction de la liste de prix
+        pricelist = vendor.commercial_partner_id.property_product_pricelist or request.env.ref('product.list0', False)
         values['discount'] = values.get('discount_id') and \
             request.env['of.worktop.configurator.discount'].browse(int(values['discount_id'])) or \
             quote.of_worktop_configurator_discount_id
-        values['discount_list'] = request.env['of.worktop.configurator.discount'].search([])
+        values['discount_list'] = request.env['of.worktop.configurator.discount'].search(
+            [('pricelist_ids', 'in', pricelist.id)])
 
         return request.render('of_website_worktop_configurator.worktop_configurator_quote_summary', values)
 
@@ -585,12 +590,19 @@ class OFWebsiteWorktopConfigurator(http.Controller):
         request.session.pop('product_type_id', None)
         request.session.pop('product_price', None)
         request.session.pop('worktop_quote_line_id', None)
-        request.session.pop('material_id', None)
-        request.session.pop('finishing_id', None)
-        request.session.pop('color_id', None)
         request.session.pop('thickness_id', None)
         request.session.pop('length', None)
         request.session.pop('width', None)
+
+        # Si les infos de matériaux ne sont pas en session, on essaye de récupérer celles de la dernière pièce créée
+        if not request.session.get('material_id') and request.session.get('worktop_quote_id'):
+            quote = request.env['sale.order'].sudo().browse(request.session['worktop_quote_id'])
+            quote_lines = quote.order_line.filtered(lambda l: l.of_worktop_configurator_type_id)
+            if quote_lines:
+                last_line = quote_lines.sorted(key='id', reverse=True)[0]
+                request.session['material_id'] = last_line.of_worktop_configurator_material_id.id
+                request.session['finishing_id'] = last_line.of_worktop_configurator_finishing_id.id
+                request.session['color_id'] = last_line.of_worktop_configurator_color_id.id
 
         # On redirige vers la page de sélection des types de pièce
         return request.redirect('/worktop_configurator/product_select')
@@ -700,6 +712,80 @@ class OFWebsiteWorktopConfigurator(http.Controller):
 
         return {'price': price, 'total_price': total_price}
 
+    @http.route(['/worktop_configurator/edit_online/<int:quote_id>'], type='http', auth='user', website=True)
+    def worktop_configurator_edit_online(self, quote_id, **kw):
+        values = kw
+        quote = request.env['sale.order'].browse(quote_id)
+
+        # On vide les variables de session
+        self._empty_session()
+
+        # On remplit les variables de session
+        request.session['worktop_quote_id'] = quote.id
+        request.session['customer_address_id'] = quote.partner_shipping_id.id
+        request.session['different_invoicing_address'] = \
+            'yes' if quote.partner_invoice_id.id != quote.partner_shipping_id.id else 'no'
+
+        vendor = quote.partner_id
+        request.session['vendor_address_id'] = vendor.id
+        top_vendor = vendor.parent_id if vendor.parent_id else vendor
+
+        if quote.partner_invoice_id in top_vendor.child_ids:
+            request.session['invoicing_recipient'] = 'vendor'
+            request.session['vendor_invoicing_address_id'] = quote.partner_invoice_id.id
+        else:
+            request.session['invoicing_recipient'] = 'customer'
+            request.session['customer_invoicing_address_id'] = quote.partner_invoice_id.id
+
+        if 'debug' in values:
+            return request.redirect('/worktop_configurator/quote_summary?debug=1')
+        else:
+            return request.redirect('/worktop_configurator/quote_summary')
+
+    @http.route(['/worktop_configurator/edit_line'], type='http', auth='user', website=True)
+    def worktop_configurator_edit_line(self, **kw):
+        values = kw
+        quote_line = request.env['sale.order.line'].browse(int(values['quote_line_id']))
+
+        request.session['worktop_quote_line_id'] = quote_line.id
+        request.session['product_type_id'] = quote_line.of_worktop_configurator_type_id.id
+        request.session['material_id'] = quote_line.of_worktop_configurator_material_id.id
+        request.session['finishing_id'] = quote_line.of_worktop_configurator_finishing_id.id
+        request.session['color_id'] = quote_line.of_worktop_configurator_color_id.id
+        request.session['thickness_id'] = quote_line.of_worktop_configurator_thickness_id.id
+        request.session['length'] = quote_line.of_worktop_configurator_length
+        request.session['width'] = quote_line.of_worktop_configurator_width
+        request.session['product_price'] = quote_line.price_subtotal
+        return request.redirect('/worktop_configurator/product_details')
+
+    @http.route(['/worktop_configurator/duplicate_quote'], type='http', auth='user', website=True)
+    def worktop_configurator_duplicate_quote(self, **kw):
+        values = kw
+        quote = request.env['sale.order'].sudo().browse(int(values['quote_id']))
+        quote_copy = quote.copy()
+        # On conserve la référence client dans le nouveau devis (champ défini en copy=False)
+        quote_copy.client_order_ref = quote.client_order_ref
+
+        return request.redirect('/worktop_configurator/edit_online/%s' % quote_copy.id)
+
+    def _empty_session(self):
+        request.session.pop('vendor_address_id', None)
+        request.session.pop('customer_address_id', None)
+        request.session.pop('invoicing_recipient', None)
+        request.session.pop('different_invoicing_address', None)
+        request.session.pop('customer_invoicing_address_id', None)
+        request.session.pop('vendor_invoicing_address_id', None)
+        request.session.pop('worktop_quote_id', None)
+        request.session.pop('product_type_id', None)
+        request.session.pop('product_price', None)
+        request.session.pop('worktop_quote_line_id', None)
+        request.session.pop('material_id', None)
+        request.session.pop('finishing_id', None)
+        request.session.pop('color_id', None)
+        request.session.pop('thickness_id', None)
+        request.session.pop('length', None)
+        request.session.pop('width', None)
+
     def _create_customer_address(self):
         partner_obj = request.env['res.partner'].sudo()
         params = request.params
@@ -723,13 +809,13 @@ class OFWebsiteWorktopConfigurator(http.Controller):
         address = request.env['res.partner'].sudo().browse(address_id)
         if params.get('name') and params['name'] != address.name:
             vals['name'] = params['name']
-        if params.get('phone') != address.phone:
+        if params.get('phone') != (address.phone or ''):
             vals['phone'] = params.get('phone')
-        if params.get('email') != address.email:
+        if params.get('email') != (address.email or ''):
             vals['email'] = params.get('email')
         if params.get('street') and params['street'] != address.street:
             vals['street'] = params['street']
-        if params.get('street2') != address.street2:
+        if params.get('street2') != (address.street2 or ''):
             vals['street2'] = params.get('street2')
         if params.get('zip') and params['zip'] != address.zip:
             vals['zip'] = params['zip']
@@ -738,7 +824,13 @@ class OFWebsiteWorktopConfigurator(http.Controller):
         if params.get('country_id') and int(params['country_id']) != address.country_id.id:
             vals['country_id'] = int(params['country_id'])
         if vals:
-            address.write(vals)
+            if request.env['sale.order'].sudo().search_count(
+                    [('partner_shipping_id', '=', request.session.get('customer_address_id'))]) <= 1:
+                address.write(vals)
+                return False
+            else:
+                return True
+        return False
 
     def _create_invoicing_address(self, parent_id):
         partner_obj = request.env['res.partner'].sudo()
@@ -758,19 +850,25 @@ class OFWebsiteWorktopConfigurator(http.Controller):
         partner = partner_obj.create(vals)
         return partner.id
 
-    def _update_invoicing_address(self, address_id):
+    def _update_invoicing_address(self, address_id, vendor=False):
         params = request.params
         vals = {}
         address = request.env['res.partner'].sudo().browse(address_id)
-        if params.get('invoicing_name') != address.name:
+
+        # Cas d'une modification de l'adresse de chantier qui provoque la création d'un nouveau contact
+        # On doit donc recréer une nouvelle adresse de facturation rattachée au nouveau contact livraison
+        if not vendor and address.parent_id.id != request.session['customer_address_id']:
+            return True
+
+        if params.get('invoicing_name') != (address.name or ''):
             vals['name'] = params.get('invoicing_name')
-        if params.get('invoicing_phone') != address.phone:
+        if params.get('invoicing_phone') != (address.phone or ''):
             vals['phone'] = params.get('invoicing_phone')
-        if params.get('invoicing_email') != address.email:
+        if params.get('invoicing_email') != (address.email or ''):
             vals['email'] = params.get('invoicing_email')
         if params.get('invoicing_street') and params['invoicing_street'] != address.street:
             vals['street'] = params['invoicing_street']
-        if params.get('invoicing_street2') != address.street2:
+        if params.get('invoicing_street2') != (address.street2 or ''):
             vals['street2'] = params.get('invoicing_street2')
         if params.get('invoicing_zip') and params['invoicing_zip'] != address.zip:
             vals['zip'] = params['invoicing_zip']
@@ -779,13 +877,20 @@ class OFWebsiteWorktopConfigurator(http.Controller):
         if params.get('invoicing_country_id') and int(params['invoicing_country_id']) != address.country_id.id:
             vals['country_id'] = int(params['invoicing_country_id'])
         if vals:
-            address.write(vals)
+            if vendor or request.env['sale.order'].sudo().search_count(
+                    [('partner_invoice_id', '=', request.session.get('customer_invoicing_address_id'))]) <= 1:
+                address.write(vals)
+                return False
+            else:
+                return True
+        return False
 
     def _create_quote(self):
         sale_order_obj = request.env['sale.order'].sudo()
         params = request.params
 
         # Adresse de livraison
+        vendor_address_id = request.session.get('vendor_address_id')
         invoicing_address_id = request.session.get('vendor_invoicing_address_id')
         if request.session.get('invoicing_recipient') == 'customer' or \
                 not request.env.user.has_group('base.group_user'):
@@ -799,26 +904,32 @@ class OFWebsiteWorktopConfigurator(http.Controller):
             [('company_id', '=', request.website.company_id.id)], limit=1)
 
         # Liste de prix
-        pricelist = request.env['res.partner'].browse(request.session['vendor_address_id']).\
+        pricelist = request.env['res.partner'].browse(vendor_address_id).\
             commercial_partner_id.property_product_pricelist or request.env.ref('product.list0', False)
 
+        # Prestation
+        service = request.env['of.worktop.configurator.service'].sudo().browse(
+            params.get('site_service_id') and int(params['site_service_id']))
+
         # Condition de règlement
-        payment_term_id = request.env['ir.values'].sudo().get_default(
-            'sale.config.settings', 'of_website_worktop_configurator_payment_term_id')
+        if service.payment_term_id:
+            payment_term_id = service.payment_term_id.id
+        else:
+            payment_term_id = request.env['ir.values'].sudo().get_default(
+                'sale.config.settings', 'of_website_worktop_configurator_payment_term_id')
 
         # Vendeur
         related_user = request.env['res.users'].sudo().search(
-            [('partner_id', '=', request.session.get('vendor_address_id'))])
+            [('partner_id', '=', vendor_address_id)])
         if not related_user:
             related_user = request.env.user
 
         vals = {
-            'partner_id': request.session.get('vendor_address_id'),
+            'partner_id': vendor_address_id,
             'partner_invoice_id': invoicing_address_id,
             'partner_shipping_id': request.session.get('customer_address_id'),
             'of_worktop_configurator_order': True,
             'fiscal_position_id': params.get('fiscal_pos_id') and int(params['fiscal_pos_id']),
-            'payment_term_id': payment_term_id,
             'company_id': request.website.company_id.id,
             'warehouse_id': warehouse.id,
             'pricelist_id': pricelist.id,
@@ -826,10 +937,12 @@ class OFWebsiteWorktopConfigurator(http.Controller):
             'of_worktop_configurator_internal_vendor': request.env.user.has_group('base.group_user'),
             'client_order_ref': params.get('ref'),
             'of_date_de_pose': params.get('delivery_expected_date'),
-            'of_delivery_floor': params.get('delivery_floor') and int(params['delivery_floor']),
-            'of_site_service_id': params.get('site_service_id') and int(params['site_service_id']),
-            'of_junction': params.get('junction') and params['junction'] == 'yes'
-            or False,
+            'of_delivery_floor': params.get('delivery_floor') and params['delivery_floor'] == 'yes' or False,
+            'of_site_service_id': service.id,
+            'note2': service.comment_template2_id.get_value(
+                vendor_address_id).encode('utf-8') if service.comment_template2_id else False,
+            'payment_term_id': payment_term_id,
+            'of_junction': params.get('junction') and params['junction'] == 'yes' or False,
         }
         quote = sale_order_obj.create(vals)
 
@@ -837,7 +950,7 @@ class OFWebsiteWorktopConfigurator(http.Controller):
         extra_layout_category_id = request.env['ir.values'].sudo().get_default(
             'sale.config.settings', 'of_website_worktop_configurator_extra_layout_category_id')
 
-        if quote.of_delivery_floor != 0:
+        if quote.of_delivery_floor:
             extra_floor_product_id = request.env['ir.values'].sudo().get_default(
                 'sale.config.settings', 'of_website_worktop_configurator_extra_floor_product_id')
             if extra_floor_product_id:
@@ -880,6 +993,9 @@ class OFWebsiteWorktopConfigurator(http.Controller):
         params = request.params
         vals = {}
         quote = request.env['sale.order'].sudo().browse(quote_id)
+        delivery_floor = params.get('delivery_floor') and params['delivery_floor'] == 'yes' or False
+        service = request.env['of.worktop.configurator.service'].sudo().browse(
+            params.get('site_service_id') and int(params['site_service_id']))
         junction = params.get('junction') and params['junction'] == 'yes' or False
         extra_layout_category_id = request.env['ir.values'].sudo().get_default(
             'sale.config.settings', 'of_website_worktop_configurator_extra_layout_category_id')
@@ -890,11 +1006,11 @@ class OFWebsiteWorktopConfigurator(http.Controller):
             vals['client_order_ref'] = params.get('ref')
         if params.get('delivery_expected_date') != quote.of_date_de_pose:
             vals['of_date_de_pose'] = params.get('delivery_expected_date')
-        if params.get('delivery_floor') and int(params['delivery_floor']) != quote.of_delivery_floor:
-            vals['of_delivery_floor'] = int(params['delivery_floor'])
+        if delivery_floor != quote.of_delivery_floor:
+            vals['of_delivery_floor'] = delivery_floor
             extra_floor_product_id = request.env['ir.values'].sudo().get_default(
                 'sale.config.settings', 'of_website_worktop_configurator_extra_floor_product_id')
-            if quote.of_delivery_floor == 0 and extra_floor_product_id:
+            if not quote.of_delivery_floor and extra_floor_product_id:
                 line_vals = quote._website_product_id_change(quote.id, extra_floor_product_id, qty=1)
                 line_vals['name'] = quote._get_line_description(quote.id, extra_floor_product_id)
                 line_vals['layout_category_id'] = extra_layout_category_id
@@ -902,20 +1018,26 @@ class OFWebsiteWorktopConfigurator(http.Controller):
                 quote_line.of_no_coef_price = quote_line.price_unit
                 quote_line.price_unit = quote_line.price_unit * quote_line.get_pricelist_coef()
                 quote_line._compute_tax_id()
-            elif int(params['delivery_floor']) == 0 and extra_floor_product_id:
+            elif not delivery_floor and extra_floor_product_id:
                 quote.order_line.filtered(lambda l: l.product_id.id == extra_floor_product_id).unlink()
-        if params.get('site_service_id') and int(params['site_service_id']) != quote.of_site_service_id.id:
-            vals['of_site_service_id'] = int(params['site_service_id'])
+        if service != quote.of_site_service_id:
+            vals['of_site_service_id'] = service.id
             extra_service_product_id = request.env['ir.values'].sudo().get_default(
                 'sale.config.settings', 'of_website_worktop_configurator_extra_service_product_id')
             if extra_service_product_id:
-                site_service = request.env['of.worktop.configurator.service'].browse(int(params['site_service_id']))
                 quote_line = quote.order_line.filtered(lambda l: l.product_id.id == extra_service_product_id)
-                quote_line.of_no_coef_price = site_service.price
-                quote_line.price_unit = site_service.price * quote_line.get_pricelist_coef()
+                quote_line.of_no_coef_price = service.price
+                quote_line.price_unit = service.price * quote_line.get_pricelist_coef()
                 quote_line.name = quote._get_line_description(quote.id, extra_service_product_id)
-                quote_line.name += u"\n%s" % site_service.name
+                quote_line.name += u"\n%s" % service.name
                 quote_line._compute_tax_id()
+            if service.payment_term_id:
+                vals['payment_term_id'] = service.payment_term_id.id
+            else:
+                vals['payment_term_id'] = request.env['ir.values'].sudo().get_default(
+                    'sale.config.settings', 'of_website_worktop_configurator_payment_term_id')
+            vals['note2'] = service.comment_template2_id.get_value(quote.partner_id.id).encode('utf-8') \
+                if service.comment_template2_id else False
         if junction != quote.of_junction:
             vals['of_junction'] = junction
             extra_junction_product_id = request.env['ir.values'].sudo().get_default(
@@ -945,8 +1067,8 @@ class OFWebsiteWorktopConfigurator(http.Controller):
              ('color_ids', 'in', int(params['color_id'])),
              ('pricelist_ids', 'in', pricelist.id or False),
              ('thickness_id', '=', int(params['thickness_id']))], limit=1)
-        length = float(params['length'])
-        width = float(params['width'])
+        length = round(float(params['length'].replace(',', '.')), 2)
+        width = round(float(params['width'].replace(',', '.')), 2)
         material = request.env['of.worktop.configurator.material'].browse(int(params['material_id']))
         return self._compute_product_price(config_price, length, width, material)
 
@@ -992,6 +1114,9 @@ class OFWebsiteWorktopConfigurator(http.Controller):
         quote = request.env['sale.order'].sudo().browse(request.session['worktop_quote_id'])
         product_type = request.env['of.worktop.configurator.type'].browse(request.session['product_type_id'])
 
+        length = round(float(params['length'].replace(',', '.')), 2)
+        width = round(float(params['width'].replace(',', '.')), 2)
+
         request.session['material_id'] = int(params['material_id'])
         material = request.env['of.worktop.configurator.material'].browse(int(params['material_id']))
         request.session['finishing_id'] = int(params['finishing_id'])
@@ -1000,8 +1125,8 @@ class OFWebsiteWorktopConfigurator(http.Controller):
         color = request.env['of.worktop.configurator.color'].browse(int(params['color_id']))
         request.session['thickness_id'] = int(params['thickness_id'])
         thickness = request.env['of.worktop.configurator.thickness'].browse(int(params['thickness_id']))
-        request.session['length'] = float(params['length'])
-        request.session['width'] = float(params['width'])
+        request.session['length'] = length
+        request.session['width'] = width
 
         vals = quote._website_product_id_change(quote.id, product_type.product_id.id, qty=1)
         vals['layout_category_id'] = product_type.layout_category_id.id
@@ -1011,11 +1136,18 @@ class OFWebsiteWorktopConfigurator(http.Controller):
         vals['name'] += u"\nMatériau : %s" % material.name
         vals['name'] += u"\nFinition : %s" % finishing.name
         vals['name'] += u"\nCouleur : %s" % color.name
-        vals['name'] += u"\nLongueur : %s" % params['length']
-        vals['name'] += u"\nLargeur : %s" % params['width']
+        vals['name'] += u"\nLongueur : %s" % length
+        vals['name'] += u"\nLargeur : %s" % width
         vals['name'] += u"\nÉpaisseur & type de chant : %s" % thickness.name
+        vals['of_worktop_configurator_type_id'] = product_type.id
+        vals['of_worktop_configurator_material_id'] = material.id
+        vals['of_worktop_configurator_finishing_id'] = finishing.id
+        vals['of_worktop_configurator_color_id'] = color.id
+        vals['of_worktop_configurator_thickness_id'] = thickness.id
+        vals['of_worktop_configurator_length'] = length
+        vals['of_worktop_configurator_width'] = width
         # Weight
-        weight = float(params['length']) * float(params['width']) * thickness.value * material.unit_weight
+        weight = length * width * thickness.value * material.unit_weight
         vals['of_worktop_configurator_weight'] = weight
 
         quote_line = request.env['sale.order.line'].sudo().create(vals)
@@ -1028,13 +1160,17 @@ class OFWebsiteWorktopConfigurator(http.Controller):
         params = request.params
         vals = {}
         quote_line = request.env['sale.order.line'].sudo().browse(quote_line_id)
+        product_type = request.env['of.worktop.configurator.type'].browse(request.session['product_type_id'])
+
+        length = round(float(params['length'].replace(',', '.')), 2)
+        width = round(float(params['width'].replace(',', '.')), 2)
 
         if int(params['material_id']) != request.session['material_id'] or \
                 int(params['finishing_id']) != request.session['finishing_id'] or \
                 int(params['color_id']) != request.session['color_id'] or \
                 int(params['thickness_id']) != request.session['thickness_id'] or \
-                float(params['length']) != request.session['length'] or \
-                float(params['width']) != request.session['width']:
+                length != request.session['length'] or \
+                width != request.session['width']:
             request.session['material_id'] = int(params['material_id'])
             material = request.env['of.worktop.configurator.material'].browse(int(params['material_id']))
             request.session['finishing_id'] = int(params['finishing_id'])
@@ -1043,8 +1179,8 @@ class OFWebsiteWorktopConfigurator(http.Controller):
             color = request.env['of.worktop.configurator.color'].browse(int(params['color_id']))
             request.session['thickness_id'] = int(params['thickness_id'])
             thickness = request.env['of.worktop.configurator.thickness'].browse(int(params['thickness_id']))
-            request.session['length'] = float(params['length'])
-            request.session['width'] = float(params['width'])
+            request.session['length'] = length
+            request.session['width'] = width
 
             request.session['product_price'] = self._get_product_price()
             vals['price_unit'] = request.session['product_price']
@@ -1052,11 +1188,18 @@ class OFWebsiteWorktopConfigurator(http.Controller):
             vals['name'] += u"\nMatériau : %s" % material.name
             vals['name'] += u"\nFinition : %s" % finishing.name
             vals['name'] += u"\nCouleur : %s" % color.name
-            vals['name'] += u"\nLongueur : %s" % params['length']
-            vals['name'] += u"\nLargeur : %s" % params['width']
+            vals['name'] += u"\nLongueur : %s" % length
+            vals['name'] += u"\nLargeur : %s" % width
             vals['name'] += u"\nÉpaisseur & type de chant: %s" % thickness.name
+            vals['of_worktop_configurator_type_id'] = product_type.id
+            vals['of_worktop_configurator_material_id'] = material.id
+            vals['of_worktop_configurator_finishing_id'] = finishing.id
+            vals['of_worktop_configurator_color_id'] = color.id
+            vals['of_worktop_configurator_thickness_id'] = thickness.id
+            vals['of_worktop_configurator_length'] = length
+            vals['of_worktop_configurator_width'] = width
             # Weight
-            weight = float(params['length']) * float(params['width']) * thickness.value * material.unit_weight
+            weight = length * width * thickness.value * material.unit_weight
             vals['of_worktop_configurator_weight'] = weight
 
             quote_line.write(vals)
@@ -1106,3 +1249,6 @@ class OFWebsiteWorktopConfigurator(http.Controller):
                 quote_line.of_no_coef_price = quote_line.price_unit
                 quote_line.price_unit = quote_line.price_unit * quote_line.get_pricelist_coef()
                 quote_line._compute_tax_id()
+
+        # On recalcule l'échéancier
+        quote.of_echeance_line_ids = quote._of_compute_echeances()

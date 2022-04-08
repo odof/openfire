@@ -99,6 +99,8 @@
                 <field name="sequence"/>
                 <field name="name"/>
                 <field name="price"/>
+                <field name="payment_term_id"/>
+                <field name="comment_template2_id" context="{'default_position': 'after_lines'}" domain="[('position','=','after_lines')]"/>
                 <field name="blocking"/>
                 <field name="blocking_message" attrs="{'required': [('blocking', '=', True)]}"/>
             </tree>
@@ -123,6 +125,7 @@
                 <field name="sequence"/>
                 <field name="name"/>
                 <field name="value"/>
+                <field name="pricelist_ids" widget="many2many_tags"/>
             </tree>
         </field>
     </record>
@@ -229,6 +232,28 @@
         <field name="view_id" ref="of_worktop_configurator_type_tree_view"/>
     </record>
 
+    <!-- OF Worktop Configurator Tax Views -->
+
+    <record id="of_worktop_configurator_tax_tree_view" model="ir.ui.view">
+        <field name="name">of.worktop.configurator.tax.tree.view</field>
+        <field name="model">of.worktop.configurator.tax</field>
+        <field name="arch" type="xml">
+            <tree editable="top">
+                <field name="sequence" widget="handle"/>
+                <field name="fiscal_position_id"/>
+                <field name="pricelist_ids" widget="many2many_tags"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_worktop_configurator_tax_action" model="ir.actions.act_window">
+        <field name="name">TVA</field>
+        <field name="res_model">of.worktop.configurator.tax</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_worktop_configurator_tax_tree_view"/>
+    </record>
+
     <!-- Menus -->
 
     <!-- Menus -->
@@ -256,5 +281,7 @@
               parent="of_worktop_configurator_menu" sequence="70"/>
     <menuitem id="of_worktop_configurator_discount_menu" name="Remises" action="of_worktop_configurator_discount_action"
               parent="of_worktop_configurator_menu" sequence="80"/>
+    <menuitem id="of_worktop_configurator_tax_menu" name="TVA" action="of_worktop_configurator_tax_action"
+              parent="of_worktop_configurator_menu" sequence="90"/>
 
 </odoo>

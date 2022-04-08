@@ -7,6 +7,9 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_confirm'][2]" position="after">
+                <button name="action_edit_online" string="Modification en ligne" class="oe_highlight" type="object" attrs="{'invisible': ['|', ('of_worktop_configurator_order', '!=', True), ('state', '!=', 'sent')]}"/>
+            </xpath>
             <xpath expr="//sheet/group/group[1]" position="inside">
                 <field name="of_worktop_configurator_order" readonly="True"/>
                 <field name="of_submitted_worktop_configurator_order" string="Devis soumis" readonly="True"
@@ -33,10 +36,6 @@
         <field name="arch" type="xml">
             <div id="main" position="inside">
                 <group string="Calculateur" name="website_worktop_configurator">
-                    <label for="of_website_worktop_configurator_fiscal_position_ids"/>
-                    <div name="of_website_worktop_configurator_fiscal_position_ids">
-                        <field name="of_website_worktop_configurator_fiscal_position_ids" class="oe_inline" widget="many2many_tags"/>
-                    </div>
                     <label for="of_website_worktop_configurator_payment_term_id"/>
                     <div name="of_website_worktop_configurator_payment_term_id">
                         <field name="of_website_worktop_configurator_payment_term_id" class="oe_inline"/>
