@@ -219,6 +219,6 @@
         </field>
     </record>
 
-    <menuitem name="C.P.Connector" id="menu_of_datastore_supplier" parent="of_datastore_connector.of_datastore_connector_menu" sequence="1" action="of_datastore_supplier_action"/>
+    <menuitem name="C.P.Connector" id="menu_of_datastore_supplier" parent="of_base.of_connector_menu" sequence="1" action="of_datastore_supplier_action"/>
 
 </odoo>
