@@ -92,6 +92,82 @@
         </field>
     </record>
 
+    <record id="view_of_wizard_situation_layout_category_form" model="ir.ui.view">
+        <field name="name">of.wizard.situation.layout.category.form</field>
+        <field name="model">of.wizard.situation.layout.category</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <field name="state" invisible="1"/>
+                    <field name="order_id" invisible="1"/>
+                    <group states="step1" col="1">
+                        <separator name="separator_layout_category_ids" string="Lignes de situation par section"/>
+                        <button string="Pré-remplir" name="button_prefill" type="object" class="pull-right"/>
+                        <field name="layout_category_ids" nolabel="1" mode="tree" options="{'reload_on_button': True}"/>
+                    </group>
+                    <group states="step2">
+                        <field name="type" attrs="{'required': [('state', '=', 'step2')]}"/>
+                        <field name="value" attrs="{'required': [('state', '=', 'step2')]}"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="button_apply" type="object" string="Appliquer" class="oe_highlight" states="step1"/>
+                    <button special="cancel" string="Annuler" states="step1"/>
+                    <button name="button_apply_prefill" type="object" string="Appliquer" class="oe_highlight"
+                            attrs="{'invisible': ['|', '|', '|', ('value', '&gt;', 100), ('value', '&lt;', 0), ('state', '!=', 'step2'), ('type', '=', False)]}"/>
+                    <button name="button_return" type="object" string="Retour" states="step2"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_of_wizard_situation_layout_category_line_tree" model="ir.ui.view">
+        <field name="name">of.wizard.situation.layout.category.line.tree</field>
+        <field name="model">of.wizard.situation.layout.category.line</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom" create="false">
+                <field name="of_layout_category_id"/>
+                <field name="situation_line_count"/>
+                <field name="price_subtotal" sum="Total"/>
+                <field name="price_total" sum="Total"/>
+                <field name="sit_val_prec"/>
+                <field name="sit_val_n"/>
+                <field name="sit_val_suiv"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_of_wizard_situation_form_group_layout_category" model="ir.ui.view">
+        <field name="name">of.wizard.situation.form.group.layout.category</field>
+        <field name="model">of.wizard.situation</field>
+        <field name="inherit_id" ref="view_of_wizard_situation_form"/>
+        <field name="groups_id" eval="[(4, ref('of_sale_quote_template.group_of_advanced_sale_layout_category'))]"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="button_layout_category_situation" string="Situation par section" type="object"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_of_wizard_situation_line_tree_group_layout_category" model="ir.ui.view">
+        <field name="name">of.wizard.situation.line.tree.group.layout.category</field>
+        <field name="model">of.wizard.situation.line</field>
+        <field name="inherit_id" ref="view_of_wizard_situation_line_tree"/>
+        <field name="groups_id" eval="[(4, ref('of_sale_quote_template.group_of_advanced_sale_layout_category'))]"/>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='layout_category_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='layout_category_id']" position="after">
+                <field name="of_layout_category_id"/>
+            </xpath>
+        </field>
+    </record>
+
     <record id="of_wizard_situation_prefill_view_form" model="ir.ui.view">
         <field name="name">of.wizard.situation.prefill.form</field>
         <field name="model">of.wizard.situation.prefill</field>
