@@ -27,6 +27,7 @@
                 </div>
             </xpath>
             <xpath expr="//field[@name='default_invoice_policy']" position="after">
+                <field name="of_propagate_payment_term"/>
                 <field name="group_of_sale_multiimage" widget="radio"/>
                 <field name="group_of_sale_print_attachment" widget="radio"/>
                 <label for="of_sale_print_multiimage_level"/>

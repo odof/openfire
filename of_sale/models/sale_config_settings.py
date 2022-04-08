@@ -9,8 +9,9 @@ class OFSaleConfiguration(models.TransientModel):
     @api.model
     def _auto_init(self):
         """
-        Certain paramètres d'affichage sont passés de Booléen à Sélection.
-        Cette fonction est appelée à chaque mise à jour mais ne fait quelque chose que la première fois qu'elle est appelée.
+        Certains paramètres d'affichage sont passés de Booléen à Sélection.
+        Cette fonction est appelée à chaque mise à jour, mais ne fait quelque chose
+        que la première fois qu'elle est appelée.
         """
         set_value = False
         # Cette fonction n'a encore jamais été appelée
@@ -37,6 +38,10 @@ class OFSaleConfiguration(models.TransientModel):
             if not self.env['ir.values'].get_default('sale.config.settings', 'of_color_font'):
                 self.env['ir.values'].sudo().set_default('sale.config.settings', 'of_color_font', "#000000")
             self.env['ir.values'].sudo().set_default('sale.config.settings', 'bool_vers_selection_fait', True)
+
+        if not self.env['ir.values'].search(
+                [('name', '=', 'of_propagate_payment_term'), ('model', '=', 'sale.config.settings')]):
+            self.env['ir.values'].sudo().set_default('sale.config.settings', 'of_propagate_payment_term', True)
 
     of_deposit_product_categ_id_setting = fields.Many2one(
         'product.category',
@@ -177,6 +182,10 @@ class OFSaleConfiguration(models.TransientModel):
 
     of_pdf_taxes_display = fields.Boolean(
         string=u"(OF) Détails des taxes", help=u"Afficher le tableau de détail des taxes dans les rapports PDF")
+
+    of_propagate_payment_term = fields.Boolean(
+        string=u"(OF) Propager les conditions de règlement dans la facture",
+        help=u"Si décoché, les conditions de règlement ne sont pas propagées aux factures", default=True)
 
     @api.multi
     def set_pdf_adresse_nom_parent_defaults(self):
@@ -320,3 +329,8 @@ class OFSaleConfiguration(models.TransientModel):
     def set_of_pdf_taxes_display(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_pdf_taxes_display', self.of_pdf_taxes_display)
+
+    @api.multi
+    def set_of_propagate_payment_term(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_propagate_payment_term', self.of_propagate_payment_term)
