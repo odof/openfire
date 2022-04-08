@@ -22,6 +22,7 @@ Ce module apporte une personnalisation des produits :
     'data': [
         'views/of_product_views.xml',
         'security/ir.model.access.csv',
+        'security/of_product_security.xml',
     ],
     'installable': True,
 }
