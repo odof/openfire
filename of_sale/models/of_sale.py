@@ -219,6 +219,10 @@ class SaleOrder(models.Model):
     of_delivered = fields.Boolean(string=u"Livrée", compute="_compute_delivered", store=True)
     of_allow_quote_addition = fields.Boolean(
         string=u"Permet l'ajout de devis complémentaires", compute='_compute_of_allow_quote_addition')
+    of_price_printing = fields.Selection([
+        ('order_line', u'Prix par ligne de commande'),
+    ], string=u"Impressions des prix", default='order_line', required=True)
+    of_apply_on_invoice = fields.Boolean(string=u"Appliquer aux factures", default=True)
 
     @api.depends('company_id')
     def _compute_of_allow_quote_addition(self):
@@ -662,6 +666,8 @@ class SaleOrder(models.Model):
             self = self.with_context(company_id=self.company_id.id)
         invoice_vals = super(SaleOrder, self)._prepare_invoice()
         invoice_vals["of_date_vt"] = self.of_date_vt
+        if self.of_apply_on_invoice:
+            invoice_vals["of_price_printing"] = self.of_price_printing
         return invoice_vals
 
     @api.multi
@@ -1392,6 +1398,9 @@ class AccountInvoice(models.Model):
     of_waiting_delivery = fields.Boolean(string="Livraison en attente", compute="_compute_of_picking_ids")
     of_picking_ids = fields.Many2many('stock.picking', compute='_compute_of_picking_ids')
     of_picking_count = fields.Integer(string="Bon de livraisons", compute='_compute_of_picking_ids')
+    of_price_printing = fields.Selection([
+        ('order_line', u'Prix par ligne de commande'),
+    ], string=u"Impressions des prix", default='order_line', required=True)
 
     @api.depends('invoice_line_ids')
     def _compute_of_sale_order_ids(self):

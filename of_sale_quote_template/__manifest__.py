@@ -36,6 +36,7 @@ Si une ligne d'article n'a pas pu être ajoutée, le champ 'Note d'insertion' ap
         'views/of_sale_quote_template_views.xml',
         'views/sale_config_settings_views.xml',
         'views/of_sale_quote_template_templates.xml',
+        'report/of_sale_report_templates.xml',
     ],
     'installable': True,
     'application': False,

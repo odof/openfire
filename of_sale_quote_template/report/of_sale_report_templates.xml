@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="of_report_saleorder_document"  inherit_id="sale.report_saleorder_document">
+        <xpath expr="//table[@name='order_lines_layouted']//td[1]" position="attributes">
+            <attribute name="t-att-style">'background-color: ' + layout_category['color'] + ';color: ' + doc.get_color_font() + '; font-weight:  bold; border-bottom: 1px solid black;'</attribute>
+        </xpath>
+        <xpath expr="//table[@name='order_lines_layouted']//td[1]/t" position="replace">
+            <t t-raw="layout_category['name']"/>
+        </xpath>
+        <xpath expr="//table[@name='order_lines_layouted']/tbody/t/t[2]/tr" position="attributes">
+            <attribute name="t-att-style">'' if doc.of_price_printing in ['order_line', 'layout_category_with_products'] else 'display:none;'</attribute>
+        </xpath>
+        <xpath expr="//div[@name='total']" position="attributes">
+            <attribute name="t-att-style">'' if doc.of_price_printing in ['order_line', 'layout_category_with_products'] else 'display:none;'</attribute>
+        </xpath>
+    </template>
+
+    <template id="of_report_invoice_layouted"  inherit_id="sale.report_invoice_layouted">
+        <xpath expr="//table[@name='invoice_line_layouted']/tbody/t/t[1]/tr/td" position="attributes">
+            <attribute name="t-att-style">'background-color: ' + layout_category['color'] + ';color: ' + o.get_color_font() + '; font-weight:  bold; border-bottom: 1px solid black;'</attribute>
+        </xpath>
+        <xpath expr="//table[@name='invoice_line_layouted']/tbody/t/t[1]/tr/td/t" position="replace">
+            <t t-raw="layout_category['name']"/>
+        </xpath>
+        <xpath expr="//table[@name='invoice_line_layouted']/tbody/t/t[2]/tr" position="attributes">
+            <attribute name="t-att-style">'' if o.of_price_printing in ['order_line', 'layout_category_with_products'] else 'display:none;'</attribute>
+        </xpath>
+        <xpath expr="//div[@name='subdivision']" position="attributes">
+            <attribute name="t-att-style">'' if o.of_price_printing in ['order_line', 'layout_category_with_products'] else 'display:none;'</attribute>
+        </xpath>
+    </template>
+
+</odoo>

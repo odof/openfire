@@ -7,7 +7,6 @@ import odoo.addons.decimal_precision as dp
 # La classe sale.order provient du module Odoo 11 website_quote/models/sale_order.py.
 # Tout les champs qui ne commencent pas par of_ sont les champs déjà existants dans Odoo 11
 
-
 class SaleQuoteTemplate(models.Model):
     _name = "sale.quote.template"
     _description = u"Modèle de devis"
@@ -706,6 +705,16 @@ class OfSaleOrderLayoutCategory(models.Model):
                 [('order_id', '=', self.order_id.id), ('id', 'child_of', layout_category.id)])
             sequence = sequence + number_of_child
 
+    def get_color(self, model):
+        """Prend la couleur dans la configuration et l'éclaircit en fonction de la profondeur d'une section"""
+        model_obj = self.env[model]
+        hex_color = model_obj.get_color_section()
+        rgb_hex = [hex_color[x:x + 2] for x in [1, 3, 5]]
+        new_rgb_int = [int(hex_value, 16) + ((self.depth - 2) * 35) for hex_value in rgb_hex]
+        new_rgb_int = [min([255, max([0, i])]) for i in new_rgb_int]  # make sure new values are between 0 and 255
+        # hex() produces "0x88", we want just "88"
+        return "#" + "".join([hex(i)[2:] for i in new_rgb_int])
+
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -724,6 +733,10 @@ class SaleOrder(models.Model):
                    ('invoiced', u"Entièrement facturé")],
         compute='_compute_of_layout_category_invoice_status', string=u"État de facturation des lignes de section",
         readonly=True)
+    of_price_printing = fields.Selection(selection_add=[
+        ('layout_category', u'Prix par sections'),
+        ('layout_category_with_products', u'Prix par sections avec articles'),
+    ])
 
     # Onchange nécessaire, car lors de la suppression d'une ligne de section, cette ligne de section est toujours
     # renseignée dans les lignes de commande. Du coup, Odoo bloque sur la sauvegarde.
@@ -1018,8 +1031,7 @@ class SaleOrder(models.Model):
             for index, layout_category in enumerate(of_layout_category_ids_sorted):
                 new_dict[index] = {
                     'layout_category': layout_category,
-                    'order_lines': self.order_line.filtered(
-                        lambda line: line.of_layout_category_id.id == layout_category.id),
+                    'order_lines': self.order_line.search([('of_layout_category_id', '=', layout_category.id)])
                 }
 
             # On récupère les lignes de commande qui n'ont pas de lignes de section associées
@@ -1041,15 +1053,18 @@ class SaleOrder(models.Model):
                     report_pages.append([])
                 # Append category to current report page
                 report_pages[-1].append({
-                    'name': category and "%s - %s" % (category.sequence_name, category.name) or _('Uncategorized'),
-                    'subtotal': category and category.prix_vente if len(list(lines)) > 1 else False,
+                    'name': category and "%s%s - %s" % ('&#160;' * 3 * category.depth, category.sequence_name, category.name) or _('Uncategorized'),
+                    'subtotal': category and category.prix_vente if len(list(lines)) else 0.0,
                     'pagebreak': False,
-                    'lines': list(lines)
+                    'lines': list(lines),
+                    'color': category and category.get_color('sale.order') or self.get_color_section()
                 })
 
         # Si les sections avancées ne sont pas configurées, on appelle le super()
         else:
             report_pages = super(SaleOrder, self).order_lines_layouted()
+            for pages in report_pages[0]:
+                pages['color'] = self.get_color_section()
 
         return report_pages
 
@@ -1113,6 +1128,10 @@ class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
     of_layout_category_ids = fields.Many2many('of.sale.order.layout.category', string=u"Liste de section", copy=True)
+    of_price_printing = fields.Selection(selection_add=[
+        ('layout_category', u'Prix par sections'),
+        ('layout_category_with_products', u'Prix par sections avec articles'),
+    ])
 
     @api.multi
     def order_lines_layouted(self):
@@ -1130,8 +1149,8 @@ class AccountInvoice(models.Model):
             for index, layout_category in enumerate(of_layout_category_ids_sorted):
                 new_dict[index] = {
                     'layout_category': layout_category,
-                    'invoice_line_ids': self.invoice_line_ids.filtered(
-                        lambda line: line.of_layout_category_id.id == layout_category.id),
+                    'invoice_line_ids': self.invoice_line_ids.search(
+                        [('of_layout_category_id', '=', layout_category.id)]),
                 }
 
             # On récupère les lignes de facture qui n'ont pas de lignes de section associées
@@ -1153,15 +1172,18 @@ class AccountInvoice(models.Model):
                     report_pages.append([])
                 # Append category to current report page
                 report_pages[-1].append({
-                    'name': category and "%s - %s" % (category.sequence_name, category.name) or _('Uncategorized'),
-                    'subtotal': category and category.prix_vente if len(list(lines)) > 1 else False,
+                    'name': category and "%s%s - %s" % ('&#160;' * 3 * category.depth, category.sequence_name, category.name) or _('Uncategorized'),
+                    'subtotal': category and category.prix_vente if len(list(lines)) else 0.0,
                     'pagebreak': False,
-                    'lines': list(lines)
+                    'lines': list(lines),
+                    'color': category and category.get_color('account.invoice') or self.get_color_section()
                 })
 
         # Si les sections avancées ne sont pas configurées, on appelle le super()
         else:
             report_pages = super(AccountInvoice, self).order_lines_layouted()
+            for pages in report_pages[0]:
+                pages['color'] = self.get_color_section()
 
         return report_pages
 
@@ -1190,6 +1212,7 @@ class AccountInvoice(models.Model):
             result['lines_layouted'] = report_pages
 
         return result
+
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
