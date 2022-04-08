@@ -12,7 +12,7 @@ class SaleReport(models.Model):
     of_diff_qty_delivered = fields.Float(u"Δ% qté liv.", compute="_compute_dummy")
     of_confirmation_date = fields.Datetime('Date de confirmation', readonly=True)
     of_date_livraison = fields.Datetime('Date de livraison', readonly=True)
-    of_montant_livre = fields.Float(string=u"Montant livré", readonly=True)
+    of_montant_livre = fields.Integer(string=u"Montant livré", readonly=True)
 
     @api.depends()
     def _compute_dummy(self):

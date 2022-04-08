@@ -30,50 +30,50 @@ class OFSaleMarginRegulator(models.Model):
     main_product_brand_id = fields.Many2one(comodel_name='of.product.brand', string=u"Marque de l'article principal")
     main_product_categ_id = fields.Many2one(comodel_name='product.category', string=u"Catégorie de l'article principal")
 
-    presale_cost = fields.Float(string=u"Prix de revient à la confirmation", readonly=True)
-    presale_price = fields.Float(string=u"Prix de vente à la confirmation", readonly=True)
-    presale_price_variation = fields.Float(string=u"Variation de prix à la confirmation", readonly=True)
-    presale_margin = fields.Float(string=u"Marge à la confirmation (€)", readonly=True)
+    presale_cost = fields.Integer(string=u"Prix de revient à la confirmation", readonly=True)
+    presale_price = fields.Integer(string=u"Prix de vente à la confirmation", readonly=True)
+    presale_price_variation = fields.Integer(string=u"Variation de prix à la confirmation", readonly=True)
+    presale_margin = fields.Integer(string=u"Marge à la confirmation (€)", readonly=True)
     presale_margin_perc = fields.Char(
         string=u"Marge à la confirmation (%)", compute='_compute_presale_margin_perc', compute_sudo=True, readonly=True)
 
-    sale_cost = fields.Float(string=u"Prix de revient à l'enregistrement", readonly=True)
-    sale_price = fields.Float(string=u"Prix de vente à l'enregistrement", readonly=True)
-    sale_price_variation = fields.Float(string=u"Variation de prix à l'enregistrement", readonly=True)
-    sale_margin = fields.Float(string=u"Marge à l'enregistrement (€)", readonly=True)
+    sale_cost = fields.Integer(string=u"Prix de revient à l'enregistrement", readonly=True)
+    sale_price = fields.Integer(string=u"Prix de vente à l'enregistrement", readonly=True)
+    sale_price_variation = fields.Integer(string=u"Variation de prix à l'enregistrement", readonly=True)
+    sale_margin = fields.Integer(string=u"Marge à l'enregistrement (€)", readonly=True)
     sale_margin_perc = fields.Char(
         string=u"Marge à l'enregistrement (%)", compute='_compute_sale_margin_perc', compute_sudo=True, readonly=True)
 
-    delivered_cost = fields.Float(string=u"Coût livré", readonly=True)
-    invoiced_total = fields.Float(string=u"Total HT facturé", readonly=True)
+    delivered_cost = fields.Integer(string=u"Coût livré", readonly=True)
+    invoiced_total = fields.Integer(string=u"Total HT facturé", readonly=True)
 
-    ordered_real_margin = fields.Float(
+    ordered_real_margin = fields.Integer(
         string=u"Marge réelle sur commandé (€)", compute='_compute_ordered_real_margin', compute_sudo=True,
         readonly=True)
     ordered_real_margin_perc = fields.Char(
         string=u"Marge réelle sur commandé (%)", compute='_compute_ordered_real_margin_perc', compute_sudo=True,
         readonly=True)
-    invoiced_real_margin = fields.Float(
+    invoiced_real_margin = fields.Integer(
         string=u"Marge réelle sur facturé (€)", compute='_compute_invoiced_real_margin', compute_sudo=True,
         readonly=True)
     invoiced_real_margin_perc = fields.Char(
         string=u"Marge réelle sur facturé (%)", compute='_compute_invoiced_real_margin_perc', compute_sudo=True,
         readonly=True)
 
-    presale_price_sale_price_gap = fields.Float(
+    presale_price_sale_price_gap = fields.Integer(
         string=u"Écart CA à la confirmation / CA à l'enregistrement (€)",
         compute='_compute_presale_price_sale_price_gap', compute_sudo=True, readonly=True)
-    presale_margin_sale_margin_gap = fields.Float(
+    presale_margin_sale_margin_gap = fields.Integer(
         string=u"Écart Marge à la confirmation / Marge à l'enregistrement (€)",
         compute='_compute_presale_margin_sale_margin_gap', compute_sudo=True, readonly=True)
 
-    ordered_real_sale_margin_gap = fields.Float(
+    ordered_real_sale_margin_gap = fields.Integer(
         string=u"Écart Marge réelle commandée / Marge à l'enregistrement (€)",
         compute='_compute_ordered_real_sale_margin_gap', compute_sudo=True, readonly=True)
     ordered_real_sale_margin_gap_perc = fields.Char(
         string=u"Écart Marge réelle commandée / Marge à l'enregistrement (%)",
         compute='_compute_ordered_real_sale_margin_gap_perc', compute_sudo=True, readonly=True)
-    invoiced_real_sale_margin_gap = fields.Float(
+    invoiced_real_sale_margin_gap = fields.Integer(
         string=u"Écart Marge réelle facturée / Marge à l'enregistrement (€)",
         compute='_compute_invoiced_real_sale_margin_gap', compute_sudo=True, readonly=True)
     invoiced_real_sale_margin_gap_perc = fields.Char(

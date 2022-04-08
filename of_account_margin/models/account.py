@@ -66,7 +66,7 @@ class AccountInvoiceLine(models.Model):
 class AccountInvoiceReport(models.Model):
     _inherit = 'account.invoice.report'
 
-    of_margin = fields.Float(string=u"Marge", readonly=True)
+    of_margin = fields.Integer(string=u"Marge", readonly=True)
     of_margin_perc = fields.Char(string=u"Marge %", compute='_compute_of_margin_perc')
     of_invoice_number = fields.Char(string=u"Numéro de facture", readonly=True)
     of_invoice_origin = fields.Char(string=u"Origine", readonly=True)

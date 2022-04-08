@@ -6,7 +6,7 @@ from odoo import api, fields, models
 class SaleReport(models.Model):
     _inherit = "sale.report"
 
-    of_total_price_variation = fields.Float(string=u"Variation de prix totale", readonly=True)
+    of_total_price_variation = fields.Integer(string=u"Variation de prix totale", readonly=True)
 
     def _select(self):
         res = super(SaleReport, self)._select()

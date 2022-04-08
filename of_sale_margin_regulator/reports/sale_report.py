@@ -6,8 +6,8 @@ from odoo import api, fields, models
 class SaleReport(models.Model):
     _inherit = 'sale.report'
 
-    of_presale_margin = fields.Float(string=u"Marge à la confirmation", readonly=True)
-    of_sale_price = fields.Float(string=u"CA à la validation", readonly=True)
+    of_presale_margin = fields.Integer(string=u"Marge à la confirmation", readonly=True)
+    of_sale_price = fields.Integer(string=u"CA à la validation", readonly=True)
 
     def _select(self):
         res = super(SaleReport, self)._select()

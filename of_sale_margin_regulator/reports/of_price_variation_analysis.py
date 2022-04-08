@@ -32,19 +32,19 @@ class OFPriceVariationAnalysis(models.Model):
     product_brand_id = fields.Many2one(comodel_name='of.product.brand', string=u"Marque de l'article")
     product_categ_id = fields.Many2one(comodel_name='product.category', string=u"Catégorie de l'article")
 
-    presale_price = fields.Float(string=u"Prix de vente à la confirmation", readonly=True)
-    presale_price_variation = fields.Float(string=u"Variation de prix à la confirmation", readonly=True)
-    presale_margin = fields.Float(string=u"Marge à la confirmation (€)", readonly=True)
-    presale_margin_variation = fields.Float(string=u"Variation de marge à la confirmation", readonly=True)
+    presale_price = fields.Integer(string=u"Prix de vente à la confirmation", readonly=True)
+    presale_price_variation = fields.Integer(string=u"Variation de prix à la confirmation", readonly=True)
+    presale_margin = fields.Integer(string=u"Marge à la confirmation (€)", readonly=True)
+    presale_margin_variation = fields.Integer(string=u"Variation de marge à la confirmation", readonly=True)
     presale_price_variation_rate = fields.Float(
         string=u"Taux de remise à la confirmation (%)", compute='_compute_presale_price_variation_rate',
         compute_sudo=True,
         readonly=True)
 
-    sale_price = fields.Float(string=u"Prix de vente à l'enregistrement", readonly=True)
-    sale_price_variation = fields.Float(string=u"Variation de prix à l'enregistrement", readonly=True)
-    sale_margin = fields.Float(string=u"Marge à l'enregistrement (€)", readonly=True)
-    sale_margin_variation = fields.Float(string=u"Variation de marge à l'enregistrement", readonly=True)
+    sale_price = fields.Integer(string=u"Prix de vente à l'enregistrement", readonly=True)
+    sale_price_variation = fields.Integer(string=u"Variation de prix à l'enregistrement", readonly=True)
+    sale_margin = fields.Integer(string=u"Marge à l'enregistrement (€)", readonly=True)
+    sale_margin_variation = fields.Integer(string=u"Variation de marge à l'enregistrement", readonly=True)
     sale_price_variation_rate = fields.Float(
         string=u"Taux de remise à l'enregistrement (%)", compute='_compute_sale_price_variation_rate',
         compute_sudo=True,
