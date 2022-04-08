@@ -13,6 +13,11 @@
                     <field name="group_of_advanced_sale_layout_category" class="oe_inline"/>
                     <span>Ajoute l'onglet Sections sur les devis</span>
                 </div>
+                <label for="module_of_sale_budget"/>
+                <div name="module_of_sale_budget">
+                    <field name="module_of_sale_budget" class="oe_inline"/>
+                    <span>Activer la gestion du budget et des heures chantier dans les devis</span>
+                </div>
             </xpath>
         </field>
     </record>
