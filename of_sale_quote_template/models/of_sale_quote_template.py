@@ -1020,6 +1020,7 @@ class SaleOrder(models.Model):
         """ Surcharge de la fonction de mise en page des lignes de commande groupées par section"""
         self.ensure_one()
         report_pages = [[]]
+        section_color = self.get_color_section()
 
         # Si les sections avancées sont configurées
         if self.user_has_groups('of_sale_quote_template.group_of_advanced_sale_layout_category') \
@@ -1057,14 +1058,15 @@ class SaleOrder(models.Model):
                     'subtotal': category and category.prix_vente if len(list(lines)) else 0.0,
                     'pagebreak': False,
                     'lines': list(lines),
-                    'color': category and category.get_color('sale.order') or self.get_color_section()
+                    'color': category and category.get_color('sale.order') or section_color
                 })
 
         # Si les sections avancées ne sont pas configurées, on appelle le super()
         else:
             report_pages = super(SaleOrder, self).order_lines_layouted()
-            for pages in report_pages[0]:
-                pages['color'] = self.get_color_section()
+            for page in report_pages:
+                for group in page:
+                    group['color'] = section_color
 
         return report_pages
 
@@ -1138,6 +1140,7 @@ class AccountInvoice(models.Model):
         """ Surcharge de la fonction de mise en page des lignes de facture groupées par section"""
         self.ensure_one()
         report_pages = [[]]
+        section_color = self.get_color_section()
 
         # Si les sections avancées sont configurées
         if self.user_has_groups('of_sale_quote_template.group_of_advanced_sale_layout_category') \
@@ -1176,14 +1179,15 @@ class AccountInvoice(models.Model):
                     'subtotal': category and category.prix_vente if len(list(lines)) else 0.0,
                     'pagebreak': False,
                     'lines': list(lines),
-                    'color': category and category.get_color('account.invoice') or self.get_color_section()
+                    'color': category and category.get_color('account.invoice') or section_color
                 })
 
         # Si les sections avancées ne sont pas configurées, on appelle le super()
         else:
             report_pages = super(AccountInvoice, self).order_lines_layouted()
-            for pages in report_pages[0]:
-                pages['color'] = self.get_color_section()
+            for page in report_pages:
+                for group in page:
+                    group['color'] = section_color
 
         return report_pages
 
