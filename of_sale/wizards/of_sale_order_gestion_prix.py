@@ -15,17 +15,17 @@ from odoo.addons.mail.models.mail_template import format_amount
 
 
 class GestionPrix(models.TransientModel):
-    """
+    u"""
     Ce wizard permet l'application d'une remise globale sur les articles, ainsi que le choix d'un prix TTC.
     Il permet également de remettre les articles au prix de vente standard
     Il permet également la visualisation de la marge commerciale ligne par ligne
 
     """
     _name = 'of.sale.order.gestion.prix'
-    _description = 'Gestion des prix'
+    _description = "Gestion des prix"
 
     def _get_selection_mode_calcul(self):
-        """Renvoit les possibilités de mode de calcul en fonction du droit d'afficher les marges."""
+        u"""Renvoie les possibilités de mode de calcul en fonction du droit d'afficher les marges."""
         liste = [
             ('prix_ttc_cible', 'montant total TTC cible'),
             ('montant_ttc', u'montant TTC à déduire'),
@@ -101,9 +101,12 @@ class GestionPrix(models.TransientModel):
 
     @api.multi
     def name_get(self):
-        return [(record.id, "Gestion prix %s %s" % (record.order_id.state == 'draft' and 'devis' or 'commande',
-                                                    record.order_id.name))
-                for record in self]
+        return [
+            (record.id,
+             "Gestion prix %s %s" % (
+                 record.order_id.state == 'draft' and 'devis' or 'commande',
+                 record.order_id.name))
+            for record in self]
 
     def bouton_simuler(self):
         self.calculer(True)
@@ -111,12 +114,15 @@ class GestionPrix(models.TransientModel):
     def bouton_valider(self):
         self.calculer(False)
 
+    @api.model
     def bouton_annuler(self):
         return {'type': 'ir.actions.client', 'tag': 'history_back'}
 
     @api.model
     def _calcule_vals_ligne(self, order_line, to_distribute, total, currency, rounding, line_rounding):
         """
+        Cette fonction calcule le nouveau montant à allouer à la ligne de commande passée en paramètre.
+        Elle retourne un dictionnaire des valeurs à modifier sur cette ligne.
         @param order_line: Ligne de commande dont on veut ajuster le prix
         @param to_distribute: Montant restant à distribuer
         @param total: Montant actuel cumulé des lignes de commande non encore recalculées
@@ -127,8 +133,9 @@ class GestionPrix(models.TransientModel):
         if to_distribute == 0.0:
             line_vals = {'price_unit': 0.0}
             taxes = order_line.tax_id.with_context(base_values=(0.0, 0.0, 0.0))
-            taxes = taxes.compute_all(0.0, currency, order_line.product_uom_qty,
-                                      product=order_line.product_id, partner=order_line.order_id.partner_id)
+            taxes = taxes.compute_all(
+                0.0, currency, order_line.product_uom_qty, product=order_line.product_id,
+                partner=order_line.order_id.partner_id)
         else:
             # Prix HT unitaire final de la ligne
             taxes = order_line.tax_id
@@ -162,8 +169,9 @@ class GestionPrix(models.TransientModel):
                 # Recalcul des taxes pour l'affichage de la simulation
                 price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
                 taxes = order_line.tax_id.with_context(base_values=(price, price, price))
-                taxes = taxes.compute_all(price, currency, order_line.product_uom_qty,
-                                          product=order_line.product_id, partner=order_line.order_id.partner_id)
+                taxes = taxes.compute_all(
+                    price, currency, order_line.product_uom_qty, product=order_line.product_id,
+                    partner=order_line.order_id.partner_id)
             line_vals = {'price_unit': price_unit}
         return {order_line: line_vals}, taxes
 
@@ -174,8 +182,9 @@ class GestionPrix(models.TransientModel):
         if line_rounding:
             price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
             taxes = order_line.tax_id.with_context(base_values=(price, price, price), round=False)
-            taxes = taxes.compute_all(price, order_line.currency_id, order_line.product_uom_qty,
-                                      product=order_line.product_id, partner=order_line.order_id.partner_id)
+            taxes = taxes.compute_all(
+                price, order_line.currency_id, order_line.product_uom_qty, product=order_line.product_id,
+                partner=order_line.order_id.partner_id)
 
             # On arrondit les montants par ligne
             montant = taxes[line_rounding['field']]
@@ -186,8 +195,9 @@ class GestionPrix(models.TransientModel):
         # Calcul des taxes pour l'affichage de la simulation
         price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
         taxes = order_line.tax_id.with_context(base_values=(price, price, price))
-        taxes = taxes.compute_all(price, order_line.currency_id, order_line.product_uom_qty,
-                                  product=order_line.product_id, partner=order_line.order_id.partner_id)
+        taxes = taxes.compute_all(
+            price, order_line.currency_id, order_line.product_uom_qty, product=order_line.product_id,
+            partner=order_line.order_id.partner_id)
         return {order_line: {'price_unit': price_unit}}, taxes
 
     @api.model
@@ -230,8 +240,9 @@ class GestionPrix(models.TransientModel):
             # Calcul manuel des taxes avec context['round']==False pour conserver la précision des calculs
             order_line = line.order_line_id
             price = order_line.price_unit * (1 - (order_line.discount or 0.0) / 100.0)
-            taxes = order_line.tax_id.compute_all(price, order_line.currency_id, order_line.product_uom_qty,
-                                                  product=order_line.product_id, partner=order_line.order_id.partner_id)
+            taxes = order_line.tax_id.compute_all(
+                price, order_line.currency_id, order_line.product_uom_qty, product=order_line.product_id,
+                partner=order_line.order_id.partner_id)
             if line.is_selected:
                 total_ttc_select += taxes['total_included']
                 total_ht_select += taxes['total_excluded']
@@ -315,13 +326,14 @@ class GestionPrix(models.TransientModel):
             if self.methode_remise == 'reset':
                 vals, taxes = self._calcule_reset_vals_ligne(order_line, line_rounding=line_rounding)
             else:
-                vals, taxes = self._calcule_vals_ligne(order_line,
-                                                       to_distribute,
-                                                       total_select,
-                                                       currency=cur,
-                                                       # On arrondit toutes les lignes sauf la dernière
-                                                       rounding=line != lines_select[-1],
-                                                       line_rounding=line_rounding)
+                vals, taxes = self._calcule_vals_ligne(
+                    order_line,
+                    to_distribute,
+                    total_select,
+                    currency=cur,
+                    # On arrondit toutes les lignes sauf la dernière
+                    rounding=line != lines_select[-1],
+                    line_rounding=line_rounding)
             # Recalcul de 'total_excluded' et 'total_included' sans les arrondis
             if not round_tax:
                 amount_tax = sum(tax['amount'] for tax in taxes['taxes'])
