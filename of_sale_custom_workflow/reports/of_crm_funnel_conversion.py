@@ -810,24 +810,46 @@ class OFCRMFunnelConversion4(models.Model):
         return res
 
     @api.model
-    def export_to_excel_and_send(self):
-        # Récupèration du filtre par défaut
-        default_filter = self.env['ir.filters'].search(
-            [('model_id', '=', self._name), ('user_id', '=', False), ('is_default', '=', True)], limit=1)
-        if default_filter:
+    def export_to_excel_and_send(self, args):
+        # Export vers Excel
+        attachment_ids = self.export_to_excel(args)
+
+        # Envoi du mail
+        email_template = self.env['ir.model.data'].get_object(
+            'of_sale_custom_workflow', 'of_sale_custom_workflow_daily_followup_email_template')
+        if email_template:
+            mail = self.env['mail.mail'].create({
+                'email_from': email_template.email_from,
+                'email_to': email_template.email_to,
+                'subject': email_template.subject,
+                'body_html': email_template.body_html,
+                'attachment_ids': [(6, 0, attachment_ids)]
+            })
+            mail.send()
+
+    def export_to_excel(self, args):
+        attachment_ids = []
+        if not args:
+            favorite_filters = self.env['ir.filters'].search(
+                [('model_id', '=', self._name), ('user_id', '=', False), ('is_default', '=', True)], limit=1)
+        else:
+            favorite_filters = self.env['ir.filters'].search([('model_id', '=', self._name), ('id', 'in', args)])
+
+        for filter in favorite_filters:
             # Calcul des données de la vue pivot
-            context = literal_eval(default_filter.context)
+            context = literal_eval(filter.context)
             groupby_param = []
             data = dict()
             eval_context = {'date': date, 'relativedelta': relativedelta, 'context_today': date.today}
             data['TOTAL_DATA'] = self.read_group(
-                domain=safe_eval(default_filter.domain, eval_context), fields=context['pivot_measures'], groupby=[],
+                domain=safe_eval(filter.domain, eval_context), fields=context['pivot_measures'], groupby=[],
                 lazy=False)
             for groupby in context['pivot_row_groupby']:
                 groupby_param.append(groupby)
+                field_param = [(':' in groupby and groupby.split(':')[0] or groupby) for groupby in groupby_param]
                 data[groupby] = self.read_group(
-                    domain=safe_eval(default_filter.domain, eval_context),
-                    fields=context['pivot_measures'] + groupby_param, groupby=groupby_param, lazy=False)
+                    domain=safe_eval(filter.domain, eval_context),
+                    fields=context['pivot_measures'] + field_param, groupby=groupby_param, lazy=False)
 
             # Création du fichier Excel
 
@@ -840,7 +862,7 @@ class OFCRMFunnelConversion4(models.Model):
 
             # Initialisation des colonnes
             worksheet.set_column(0, 0, 23)
-            worksheet.set_column(1, len(literal_eval(default_filter.context)['pivot_measures']), 10)
+            worksheet.set_column(1, len(literal_eval(filter.context)['pivot_measures']), 10)
 
             # Styles
             title_style = workbook.add_format({
@@ -933,7 +955,7 @@ class OFCRMFunnelConversion4(models.Model):
 
             def write_row(rdata, line_num, style):
                 column_num = 1
-                for m in literal_eval(default_filter.context)['pivot_measures']:
+                for m in literal_eval(filter.context)['pivot_measures']:
                     f = self.env['ir.model.fields'].search([('model', '=', self._name), ('name', '=', m)], limit=1)
                     if f:
                         worksheet.write(line_num, column_num, rdata.get(m), style)
@@ -947,7 +969,7 @@ class OFCRMFunnelConversion4(models.Model):
             line_number = 2
             worksheet.set_row(line_number, 50)
             i = 1
-            for measure in literal_eval(default_filter.context)['pivot_measures']:
+            for measure in literal_eval(filter.context)['pivot_measures']:
                 field = self.env['ir.model.fields'].search(
                     [('model', '=', self._name), ('name', '=', measure)], limit=1)
                 if field:
@@ -987,17 +1009,24 @@ class OFCRMFunnelConversion4(models.Model):
                                 header_style = odd_line_header_style
                                 data_style = odd_column_categ_style
 
+                            data_name = child_row_data[groupby_list[groupby_index + 1]]
+
+                            if data_name:
+                                if type(data_name) == tuple:
+                                    line_name = data_name[1]
+                                elif type(data_name) == bool:
+                                    line_name = str(data_name)
+                                else:
+                                    line_name = data_name
+                            else:
+                                line_name = u"Indéfini"
+
                             worksheet.write(
-                                line_number_param[0], 0,
-                                ('    ' * (groupby_index + 2)) + (child_row_data[groupby_list[groupby_index + 1]] and
-                                                                  child_row_data[groupby_list[groupby_index + 1]][1] or
-                                                                  u"Indéfini"),
-                                header_style)
+                                line_number_param[0], 0, ('    ' * (groupby_index + 2)) + line_name, header_style)
                             write_row(child_row_data, line_number_param[0], data_style)
                             line_number_param[0] += 1
                             new_domain_param = domain_param.copy()
-                            new_domain_param[groupby_list[groupby_index + 1]] = \
-                                child_row_data[groupby_list[groupby_index + 1]]
+                            new_domain_param[groupby_list[groupby_index + 1]] = data_name
                             write_children(data_param, groupby_list[groupby_index + 1], new_domain_param)
 
             for row_data in data.get(groupby_list[0]):
@@ -1020,19 +1049,9 @@ class OFCRMFunnelConversion4(models.Model):
             fp.seek(0)
             file_data = fp.read()
             fp.close()
+            file_name = '%s_%s.xlsx' % (filter.name, date.today().strftime('%Y%m%d'))
+            attachment = self.env['ir.attachment'].create(
+                {'name': file_name, 'datas_fname': file_name, 'datas': base64.b64encode(file_data)})
+            attachment_ids.append(attachment.id)
 
-            # Envoi du mail
-            email_template = self.env['ir.model.data'].get_object(
-                'of_sale_custom_workflow', 'of_sale_custom_workflow_daily_followup_email_template')
-            if email_template:
-                file_name = 'suivi_quotidien_%s.xlsx' % date.today().strftime('%Y%m%d')
-                mail = self.env['mail.mail'].create({
-                    'email_from': email_template.email_from,
-                    'email_to': email_template.email_to,
-                    'subject': email_template.subject,
-                    'body_html': email_template.body_html,
-                    'attachment_ids': [(0, 0, {'name': file_name,
-                                               'datas_fname': file_name,
-                                               'datas': base64.b64encode(file_data)})]
-                })
-                mail.send()
+        return attachment_ids

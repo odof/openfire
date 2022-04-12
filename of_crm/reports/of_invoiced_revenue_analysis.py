@@ -397,29 +397,30 @@ class OfInvoicedRevenueAnalysis(models.Model):
 
     @api.model
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
-        if 'invoiced_total' not in fields:
-            fields.append('invoiced_total')
-        if 'invoiced_turnover_budget' not in fields:
-            fields.append('invoiced_turnover_budget')
-        if 'previous_invoiced_total' not in fields:
-            fields.append('previous_invoiced_total')
-        if 'amount_to_invoice' not in fields:
-            fields.append('amount_to_invoice')
-        if 'margin_total' not in fields:
-            fields.append('margin_total')
+        fields_copy = fields
+        if 'invoiced_total' not in fields_copy:
+            fields_copy.append('invoiced_total')
+        if 'invoiced_turnover_budget' not in fields_copy:
+            fields_copy.append('invoiced_turnover_budget')
+        if 'previous_invoiced_total' not in fields_copy:
+            fields_copy.append('previous_invoiced_total')
+        if 'amount_to_invoice' not in fields_copy:
+            fields_copy.append('amount_to_invoice')
+        if 'margin_total' not in fields_copy:
+            fields_copy.append('margin_total')
 
         res = super(OfInvoicedRevenueAnalysis, self).read_group(
-            domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
+            domain, fields_copy, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
 
         for line in res:
-            if 'margin_perc' in fields:
+            if 'margin_perc' in fields_copy:
                 if 'margin_total' in line and line['margin_total'] is not None and line.get('invoiced_total', False):
                     line['margin_perc'] = \
                         ('%.2f' % (round(100.0 * line['margin_total'] / line['invoiced_total'], 2))).\
                         replace('.', ',')
                 else:
                     line['margin_perc'] = "N/E"
-            if 'invoiced_turnover_budget_gap' in fields:
+            if 'invoiced_turnover_budget_gap' in fields_copy:
                 if 'invoiced_total' in line and line['invoiced_total'] is not None and \
                         'amount_to_invoice' in line and line['amount_to_invoice'] is not None and \
                         'invoiced_turnover_budget' in line and line['invoiced_turnover_budget'] is not None:
@@ -427,7 +428,7 @@ class OfInvoicedRevenueAnalysis(models.Model):
                     line['invoiced_turnover_budget_gap'] = '{:,.2f}'.format(value).replace(',', ' ').replace('.', ',')
                 else:
                     line['invoiced_turnover_budget_gap'] = "N/E"
-            if 'invoiced_total_comparison' in fields:
+            if 'invoiced_total_comparison' in fields_copy:
                 if 'invoiced_total' in line and line['invoiced_total'] is not None and \
                         line.get('previous_invoiced_total', False):
                     line['invoiced_total_comparison'] = \
@@ -435,7 +436,7 @@ class OfInvoicedRevenueAnalysis(models.Model):
                         replace('.', ',')
                 else:
                     line['invoiced_total_comparison'] = "N/E"
-            if 'invoiced_turnover_budget_comparison' in fields:
+            if 'invoiced_turnover_budget_comparison' in fields_copy:
                 if 'invoiced_total' in line and line['invoiced_total'] is not None and \
                         line.get('invoiced_turnover_budget', False):
                     line['invoiced_turnover_budget_comparison'] = \
