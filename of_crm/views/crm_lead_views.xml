@@ -424,9 +424,12 @@
                         <!-- Onglets -->
                         <notebook colspan="4">
 
-                            <!-- Suivi -->
-                            <page string="Suivi" >
+                            <!-- Notes -->
+                            <page string="Notes" >
+                                <separator string="Description"/>
                                 <field name="description" widget="html"/>
+                                <separator string="Autres infos"/>
+                                <field name="of_infos_compl" nolabel="1" widget="html"/>
                             </page>
 
                             <!-- Contact -->
@@ -485,11 +488,6 @@
                                         </group>
                                     </form>
                                 </field>
-                            </page>
-
-                            <!-- Autres infos -->
-                            <page name="infos_compl" string="Autres infos">
-                                <field name="of_infos_compl" nolabel="1" widget="html"/>
                             </page>
                         </notebook>
                         <footer>
@@ -744,14 +742,12 @@
                                 </field>
                             </page>
 
-                            <!-- Autres infos -->
-                            <page name="infos_compl" string="Autres infos">
-                                <field name="of_infos_compl" nolabel="1" widget="html"/>
-                            </page>
-
-                            <!-- Suivi -->
-                            <page string="Suivi" >
+                            <!-- Notes -->
+                            <page string="Notes" >
+                                <separator string="Description"/>
                                 <field name="description" widget="html"/>
+                                <separator string="Autres infos"/>
+                                <field name="of_infos_compl" nolabel="1" widget="html"/>
                             </page>
                         </notebook>
                     </sheet>
