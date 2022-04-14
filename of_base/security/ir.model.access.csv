@@ -1,3 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_of_res_partner_phone_user,access_of_res_partner_phone_user,model_of_res_partner_phone,base.group_user,1,1,1,1
 access_of_log_message_user,access_of_log_message_user,model_of_log_message,base.group_user,1,0,1,0
+access_res_company_root,res_company root,base.model_res_company,of_base.of_group_root_only,1,1,1,1
+base.access_res_company_group_erp_manager,res_company group_erp_manager,base.model_res_company,base.group_system,1,1,0,0
