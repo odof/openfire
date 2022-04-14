@@ -3,6 +3,7 @@
 from odoo import api, fields, models
 import odoo.addons.decimal_precision as dp
 from odoo.exceptions import UserError
+from odoo.tools import float_compare
 
 # Fonction toute faite pour le formatage de valeur monétaire
 from odoo.addons.mail.models.mail_template import format_amount
@@ -116,98 +117,14 @@ class GestionPrix(models.TransientModel):
     def bouton_annuler(self):
         return {'type': 'ir.actions.client', 'tag': 'history_back'}
 
-    @api.model
-    def _calcule_vals_ligne(self, order_line, to_distribute, total, currency, rounding, line_rounding):
-        """
-        Cette fonction calcule le nouveau montant à allouer à la ligne de commande passée en paramètre.
-        Elle retourne un dictionnaire des valeurs à modifier sur cette ligne.
-        @param order_line: Ligne de commande dont on veut ajuster le prix
-        @param to_distribute: Montant restant à distribuer
-        @param total: Montant actuel cumulé des lignes de commande non encore recalculées
-        @param rounding: Booleen déterminant si le prix unitaire doit être arrondi
-        @param line_rounding: Règle d'arrondi sur le montant total de la ligne
-               {'field': self.arrondi_mode, 'precision': int(self.arrondi_prec)} ou False
-        """
-        if to_distribute == 0.0:
-            line_vals = {'price_unit': 0.0}
-            taxes = order_line.tax_id.with_context(base_values=(0.0, 0.0, 0.0))
-            taxes = taxes.compute_all(
-                0.0, currency, order_line.product_uom_qty, product=order_line.product_id,
-                partner=order_line.order_id.partner_id)
-        else:
-            # Prix HT unitaire final de la ligne
-            taxes = order_line.tax_id
-            if total == 0.0:  # Permet de gérer les lignes de remises avec montant HT initial de 0
-                if self._context.get('pc_marge'):  # Dans le cas d'un calcul de % de marge on part du montant HT
-                    taxes_percentage = 0.0
-                else:  # Dans tout les autres cas, on part du montant TTC
-                    taxes_percentage = sum(taxes.mapped('amount')) / 100
-                price_unit = (order_line.price_unit or 1.0) * to_distribute / (1 + taxes_percentage)
-            else:
-                price_unit = (order_line.price_unit or 1.0) * to_distribute / total
-            if rounding:
-                price_unit = currency.round(price_unit)
-
-            # Ces deux lignes sont copiées depuis la fonction sale_order_line._compute_amount() d module sale
-            price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
-            taxes = taxes.with_context(base_values=(price, price, price)).compute_all(
-                price, currency, order_line.product_uom_qty, product=order_line.product_id,
-                partner=order_line.order_id.partner_id
-            )
-
-            if line_rounding:
-                # On arrondit les montants par ligne
-                montant = taxes['base']
-                if line_rounding['field'] == 'total_included':
-                    montant += sum(tax['amount'] for tax in taxes['taxes'])
-
-                montant_arrondi = round(montant, line_rounding['precision'])
-                ratio = montant_arrondi / montant
-                price_unit *= ratio
-                # Recalcul des taxes pour l'affichage de la simulation
-                price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
-                taxes = order_line.tax_id.with_context(base_values=(price, price, price))
-                taxes = taxes.compute_all(
-                    price, currency, order_line.product_uom_qty, product=order_line.product_id,
-                    partner=order_line.order_id.partner_id)
-            line_vals = {'price_unit': price_unit}
-        return {order_line: line_vals}, taxes
-
-    @api.model
-    def _calcule_reset_vals_ligne(self, order_line, line_rounding):
-        # Appel à of_get_price_unit() pour recalculer le prix unitaire
-        price_unit = order_line.of_get_price_unit()
-        if line_rounding:
-            price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
-            taxes = order_line.tax_id.with_context(base_values=(price, price, price), round=False)
-            taxes = taxes.compute_all(
-                price, order_line.currency_id, order_line.product_uom_qty, product=order_line.product_id,
-                partner=order_line.order_id.partner_id)
-
-            # On arrondit les montants par ligne
-            montant = taxes[line_rounding['field']]
-            montant_arrondi = round(montant, line_rounding['precision'])
-            ratio = montant_arrondi / montant
-            price_unit *= ratio
-
-        # Calcul des taxes pour l'affichage de la simulation
-        price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
-        taxes = order_line.tax_id.with_context(base_values=(price, price, price))
-        taxes = taxes.compute_all(
-            price, order_line.currency_id, order_line.product_uom_qty, product=order_line.product_id,
-            partner=order_line.order_id.partner_id)
-        return {order_line: {'price_unit': price_unit}}, taxes
-
-    @api.model
-    def _get_ordered_lines(self, lines):
-        # On applique les nouveaux prix sur les lignes dans l'ordre décroissant de quantité vendue.
-        # Cela permet d'ajuster plus facilement le prix sur les dernières lignes
-        return lines.sorted('quantity', reverse=True)
-
     @api.multi
     def _appliquer(self, values):
         for line, vals in values.iteritems():
             line.write(vals)
+
+    @api.multi
+    def _calculer(self, total, mode, currency, line_rounding):
+        return self.line_ids.distribute_amount(total, mode, currency, line_rounding)
 
     @api.multi
     def calculer(self, simuler=False):
@@ -216,157 +133,78 @@ class GestionPrix(models.TransientModel):
         """
         self.ensure_one()
 
-        order = self.order_id
-        cur = order.pricelist_id.currency_id
-        round_tax = self.env.user.company_id.tax_calculation_rounding_method != 'round_globally'
-
-        lines_select = self.line_ids.filtered(lambda line: line.state == 'included' and line.order_line_id.price_unit)
-        if not lines_select:
-            # Toutes les lignes sélectionnées ont un prix unitaire à 0
-            lines_select = self.line_ids.filtered(lambda line: line.state == 'included')
-
-        nb_select = len(lines_select)
-        lines_forced = self.line_ids.filtered(lambda line: line.state == 'forced')
-        lines_excluded = self.line_ids - lines_select - lines_forced
-
-        # Les totaux des lignes non sélectionnées sont gardés en précision standard
-        total_ht_excluded = sum(lines_excluded.mapped('order_line_id').mapped('price_subtotal'))
-        total_ttc_excluded = sum(lines_excluded.mapped('prix_total_ttc'))
-
-        # Les totaux des lignes forcées sont gardés en précision standard
-        for lf in lines_forced:
-            lf.prix_total_ttc_simul = lf.prix_total_ttc * (lf.prix_total_ht_simul / lf.prix_total_ht)
-        total_ht_forced = sum(lines_forced.mapped('prix_total_ht_simul'))
-        total_ttc_forced = sum(lines_forced.mapped('prix_total_ttc_simul'))
-
-        total_ht_nonselect = total_ht_excluded + total_ht_forced
-        total_ttc_nonselect = total_ttc_excluded + total_ttc_forced
-
-        # Les totaux des lignes sélectionnées sont calculés en précision maximale
-        total_ttc_select = total_ht_select = 0.0
-        line_taxes = {}
-        for line in lines_select.with_context(round=False):
-            # Calcul manuel des taxes avec context['round']==False pour conserver la précision des calculs
-            order_line = line.order_line_id
-            price = order_line.price_unit * (1 - (order_line.discount or 0.0) / 100.0)
-            taxes = order_line.tax_id.compute_all(
-                price, order_line.currency_id, order_line.product_uom_qty, product=order_line.product_id,
-                partner=order_line.order_id.partner_id)
-            if line.state == 'included':
-                total_ttc_select += taxes['total_included']
-                total_ht_select += taxes['total_excluded']
-                line_taxes[line.id] = taxes
-
         # On récupère les données du wizard et vérifie les données saisies par l'utilisateur
         if self.methode_remise == 'prix_ttc_cible':
             if self.valeur <= 0:
-                raise UserError(u"(Erreur #RG105)\nVous devez saisir un montant total TTC cible.")
+                raise UserError(u"(Erreur #RG205)\nVous devez saisir un montant total TTC cible.")
         elif self.methode_remise == 'prix_ht_cible':
             if self.valeur <= 0:
                 raise UserError(u"(Erreur #RG105)\nVous devez saisir un montant total HT cible.")
         elif self.methode_remise == 'montant_ttc':
             if not self.valeur:
-                raise UserError(u"(Erreur #RG115)\nVous devez saisir un montant TTC à déduire.")
+                raise UserError(u"(Erreur #RG210)\nVous devez saisir un montant TTC à déduire.")
             if self.valeur > self.montant_total_ttc_initial:
                 raise UserError(
-                    u"(Erreur #RG120)\n"
+                    u"(Erreur #RG215)\n"
                     u"Le montant TTC à déduire est supérieur au montant total TTC des articles"
-                    u"sur lesquels s'appliquent la remise.")
+                    u"sur lesquels s'applique la remise.")
         elif self.methode_remise == 'montant_ht':
             if not self.valeur:
-                raise UserError(u"(Erreur #RG115)\nVous devez saisir un montant HT à déduire.")
+                raise UserError(u"(Erreur #RG110)\nVous devez saisir un montant HT à déduire.")
             if self.valeur > self.montant_total_ht_initial:
                 raise UserError(
-                    u"(Erreur #RG120)\n"
+                    u"(Erreur #RG115)\n"
                     u"Le montant HT à déduire est supérieur au montant total HT des articles"
-                    u"sur lesquels s'appliquent la remise.")
+                    u"sur lesquels s'applique la remise.")
         elif self.methode_remise == 'pc':
             if not 0 < self.valeur <= 100:
                 raise UserError(
-                    u"(Erreur #RG125)\nLe pourcentage de remise doit être supérieur à 0 et inférieur ou égal à 100.")
+                    u"(Erreur #RG305)\nLe pourcentage de remise doit être supérieur à 0 et inférieur ou égal à 100.")
         elif self.methode_remise == 'pc_marge':
             if self.valeur >= 100:
-                raise UserError(u"(Erreur #RG130)\nLe pourcentage de marge doit être inférieur à 100.")
+                raise UserError(u"(Erreur #RG405)\nLe pourcentage de marge doit être inférieur à 100.")
         elif self.methode_remise == 'reset':
             pass
         else:
             return False
 
-        total_select = total_ttc_select
-        tax_field = 'total_included'
-
-        # On détermine le montant TTC cible en fonction de la méthode de calcul choisie
-        if self.methode_remise == 'prix_ttc_cible':
-            total = self.valeur - total_ttc_nonselect
-        elif self.methode_remise == 'prix_ht_cible':
-            total = self.valeur - total_ht_nonselect
-            total_select = total_ht_select
-        elif self.methode_remise == 'montant_ttc':
-            total = total_ttc_select - self.valeur
-        elif self.methode_remise == 'montant_ht':
-            total = total_ht_select - self.valeur
-            total_select = total_ht_select
-        elif self.methode_remise == 'pc':
-            total = total_ttc_select * (1 - self.valeur / 100.0)
-        elif self.methode_remise == 'pc_marge':
-            # Attention : dans ce cas particulier le total est HT
-            total = (100 * order.of_total_cout) / (100.0 - self.valeur) - total_ht_nonselect
-            total_select = total_ht_select
-            tax_field = 'total_excluded'
-            self = self.with_context(pc_marge=True)
-        else:
-            total = False
-
-        # On applique les nouveaux prix sur les lignes dans l'ordre décroissant de quantité vendue.
-        # Cela permet d'ajuster plus facilement le prix sur les dernières lignes
-        lines_select = self._get_ordered_lines(lines_select)
-
-        values = {}
-        to_distribute = total
+        # Paramètre d'arrondi
         if self.arrondi_mode == 'no':
             line_rounding = False
         else:
             if not self.arrondi_prec:
-                raise UserError("Vous devez sélectionner la précision de l'arrondi")
+                raise UserError(u"Vous devez sélectionner la précision de l'arrondi")
             line_rounding = {'field': self.arrondi_mode, 'precision': int(self.arrondi_prec)}
 
-        for line in lines_select:
-            order_line = line.order_line_id
-            if self.methode_remise == 'reset':
-                vals, taxes = self._calcule_reset_vals_ligne(order_line, line_rounding=line_rounding)
-            else:
-                vals, taxes = self._calcule_vals_ligne(
-                    order_line,
-                    to_distribute,
-                    total_select,
-                    currency=cur,
-                    # On arrondit toutes les lignes sauf la dernière
-                    rounding=line != lines_select[-1],
-                    line_rounding=line_rounding)
-            # Recalcul de 'total_excluded' et 'total_included' sans les arrondis
-            if not round_tax:
-                amount_tax = sum(tax['amount'] for tax in taxes['taxes'])
-                taxes.update({'total_excluded': taxes['base'], 'total_included': taxes['base'] + amount_tax})
+        # On détermine le montant TTC cible en fonction de la méthode de calcul choisie
+        order = self.order_id
+        # tax_field = 'total_included'
+        if self.methode_remise == 'prix_ttc_cible':
+            mode = 'ttc'
+            total = self.valeur
+        elif self.methode_remise == 'prix_ht_cible':
+            mode = 'ht'
+            total = self.valeur
+        elif self.methode_remise == 'montant_ttc':
+            mode = 'ttc'
+            total = order.amount_total - self.valeur
+        elif self.methode_remise == 'montant_ht':
+            mode = 'ht'
+            total = order.amount_untaxed - self.valeur
+        elif self.methode_remise == 'pc':
+            mode = 'ttc'
+            total = order.amount_total * (1 - self.valeur / 100.0)
+        elif self.methode_remise == 'pc_marge':
+            mode = 'ht'
+            total = (100 * order.of_total_cout) / (100.0 - self.valeur)
+            # tax_field = 'total_excluded'
+            self = self.with_context(pc_marge=True)
+        else:
+            mode = 'reset'
+            total = False
 
-            if self.methode_remise != 'reset':
-                to_distribute -= taxes[tax_field]
-                total_select -= line_taxes[line.id][tax_field]
-                nb_select -= 1
-
-            values.update(vals)
-
-            # Mise à jour du prix simulé dans la ligne du wizard
-            line.prix_total_ht_simul = taxes['total_excluded']
-            line.prix_total_ttc_simul = taxes['total_included']
-
-        for line in lines_excluded:
-            line.prix_total_ht_simul = line.order_line_id.price_subtotal
-            line.prix_total_ttc_simul = line.order_line_id.price_total
-
-        for line in lines_forced:
-            line_vals = {'price_unit': line.prix_total_ht_simul}
-            vals = {line.order_line_id: line_vals}
-            values.update(vals)
+        cur = order.pricelist_id.currency_id
+        values = self._calculer(total, mode, cur, line_rounding)
 
         # Pour une simulation, le travail s'arrête ici
         if simuler:
@@ -507,31 +345,219 @@ class GestionPrixLine(models.TransientModel):
 
     @api.onchange('pc_marge')
     def _onchange_pc_marge(self):
-        if self.env.context.get("skip_onchange"):
-            # Do not skip next onchange
-            self.env.context = self.with_context(skip_onchange=False).env.context
-        else:
-            for line in self:
-                # La marge ne peut pas être supérieure ou égale à 100%, sauf si le cout est nul
-                if line.cout == 0:
-                    pc_marge_max = 100
-                else:
-                    pc_marge_max = 99.99
-                if line.pc_marge > pc_marge_max:
-                    line.pc_marge = pc_marge_max
+        for line in self:
+            # La marge ne peut pas être supérieure ou égale à 100%, sauf si le cout est nul
+            if line.cout == 0:
+                pc_marge_max = 100
+            else:
+                pc_marge_max = 99.99
+            if line.pc_marge > pc_marge_max:
+                line.pc_marge = pc_marge_max
 
-                self.env.context = self.with_context(skip_onchange=True).env.context
+            pc_marge = 100 * (1 - line.cout / line.prix_total_ht_simul) if line.prix_total_ht_simul else -100
+            if float_compare(pc_marge, line.pc_marge, precision_rounding=0.01):
                 line.prix_total_ht_simul = line.cout and line.cout * (100 / (100 - line.pc_marge))
 
     @api.onchange('prix_total_ht_simul')
     def _onchange_prix_total_ht_simul(self):
-        if self.env.context.get("skip_onchange"):
-            # Do not skip next onchange
-            self.env.context = self.with_context(skip_onchange=False).env.context
-        else:
-            for line in self:
-                self.env.context = self.with_context(skip_onchange=True).env.context
+        for line in self:
+            total_ht = line.cout and line.cout * (100 / (100 - line.pc_marge))
+            if float_compare(total_ht, line.prix_total_ht_simul, precision_rounding=0.01):
                 line.pc_marge = 100 * (1 - line.cout / line.prix_total_ht_simul) if line.prix_total_ht_simul else -100
+
+    @api.multi
+    def get_distributed_amount(self, to_distribute, total, currency, rounding, line_rounding):
+        """
+        Cette fonction calcule le nouveau montant à allouer à la ligne de commande passée en paramètre.
+        Elle retourne un dictionnaire des valeurs à modifier sur cette ligne.
+        @param order_line: Ligne de commande dont on veut ajuster le prix
+        @param to_distribute: Montant restant à distribuer
+        @param total: Montant actuel cumulé des lignes de commande non encore recalculées
+        @param rounding: Booleen déterminant si le prix unitaire doit être arrondi
+        @param line_rounding: Règle d'arrondi sur le montant total de la ligne
+               {'field': self.arrondi_mode, 'precision': int(self.arrondi_prec)} ou False
+        """
+        self.ensure_one()
+        order_line = self.order_line_id
+        if to_distribute == 0.0:
+            line_vals = {'price_unit': 0.0}
+            taxes = order_line.tax_id.with_context(base_values=(0.0, 0.0, 0.0))
+            taxes = taxes.compute_all(
+                0.0, currency, order_line.product_uom_qty, product=order_line.product_id,
+                partner=order_line.order_id.partner_id)
+        else:
+            # Prix HT unitaire final de la ligne
+            taxes = order_line.tax_id
+            if total == 0.0:  # Permet de gérer les lignes de remises avec montant HT initial de 0
+                if self._context.get('pc_marge'):  # Dans le cas d'un calcul de % de marge on part du montant HT
+                    taxes_percentage = 0.0
+                else:  # Dans tout les autres cas, on part du montant TTC
+                    taxes_percentage = sum(taxes.mapped('amount')) / 100
+                price_unit = (order_line.price_unit or 1.0) * to_distribute / (1 + taxes_percentage)
+            else:
+                price_unit = (order_line.price_unit or 1.0) * to_distribute / total
+            if rounding:
+                price_unit = currency.round(price_unit)
+
+            # Ces deux lignes sont copiées depuis la fonction sale_order_line._compute_amount() d module sale
+            price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
+            taxes = taxes.with_context(base_values=(price, price, price)).compute_all(
+                price, currency, order_line.product_uom_qty, product=order_line.product_id,
+                partner=order_line.order_id.partner_id
+            )
+
+            if line_rounding:
+                # On arrondit les montants par ligne
+                montant = taxes['base']
+                if line_rounding['field'] == 'total_included':
+                    montant += sum(tax['amount'] for tax in taxes['taxes'])
+
+                montant_arrondi = round(montant, line_rounding['precision'])
+                ratio = montant_arrondi / montant
+                price_unit *= ratio
+                # Recalcul des taxes pour l'affichage de la simulation
+                price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
+                taxes = order_line.tax_id.with_context(base_values=(price, price, price))
+                taxes = taxes.compute_all(
+                    price, currency, order_line.product_uom_qty, product=order_line.product_id,
+                    partner=order_line.order_id.partner_id)
+            line_vals = {'price_unit': price_unit}
+        return {order_line: line_vals}, taxes
+
+    @api.multi
+    def get_reset_amount(self, line_rounding):
+        self.ensure_one()
+        order_line = self.order_line_id
+        # Appel à of_get_price_unit() pour recalculer le prix unitaire
+        price_unit = order_line.of_get_price_unit()
+        if line_rounding:
+            price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
+            taxes = order_line.tax_id.with_context(base_values=(price, price, price), round=False)
+            taxes = taxes.compute_all(
+                price, order_line.currency_id, order_line.product_uom_qty, product=order_line.product_id,
+                partner=order_line.order_id.partner_id)
+
+            # On arrondit les montants par ligne
+            montant = taxes[line_rounding['field']]
+            montant_arrondi = round(montant, line_rounding['precision'])
+            ratio = montant_arrondi / montant
+            price_unit *= ratio
+
+        # Calcul des taxes pour l'affichage de la simulation
+        price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
+        taxes = order_line.tax_id.with_context(base_values=(price, price, price))
+        taxes = taxes.compute_all(
+            price, order_line.currency_id, order_line.product_uom_qty, product=order_line.product_id,
+            partner=order_line.order_id.partner_id)
+        return {order_line: {'price_unit': price_unit}}, taxes
+
+    @api.multi
+    def get_sorted(self):
+        # On applique les nouveaux prix sur les lignes dans l'ordre décroissant de quantité vendue.
+        # Cela permet d'ajuster plus facilement le prix sur les dernières lignes
+        return self.sorted('quantity', reverse=True)
+
+    @api.multi
+    def distribute_amount(self, to_distribute, mode, currency, line_rounding):
+        u"""
+        Fonction de distribution d'un montant sur les différentes lignes du wizard.
+        Cette fonction modifie directement les lignes du wizard et retourne les valeurs à modifier
+        sur le bon de commande
+        :param to_distribute: Montant à distribuer
+        :param mode: Type de manipulation. Peut être 'ht', 'ttc' ou 'reset'
+        :param currency: Monnaie utilisée
+        :param line_rounding: Règle d'arrondi sur le montant total de la ligne
+               {'field': wizard.arrondi_mode, 'precision': int(wizard.arrondi_prec)} ou False
+        """
+        round_tax = self.env.user.company_id.tax_calculation_rounding_method != 'round_globally'
+
+        lines_select = self.filtered(lambda line: line.state == 'included')
+        if mode != 'reset':
+            lines_select = lines_select.filtered(lambda line: line.order_line_id.price_unit) or lines_select
+        lines_forced = self.filtered(lambda line: line.state == 'forced')
+        lines_excluded = self - lines_select - lines_forced
+
+        # Les totaux des lignes non sélectionnées sont gardés en précision standard
+        if mode == 'ht':
+            total_excluded = sum(lines_excluded.mapped('order_line_id').mapped('price_subtotal'))
+            tax_field = 'total_excluded'
+        else:
+            total_excluded = sum(lines_excluded.mapped('prix_total_ttc'))
+            tax_field = 'total_included'
+
+        values = {}
+
+        # Les totaux des lignes forcées sont gardés en précision standard
+        total_forced = 0
+        for lf in lines_forced:
+            vals, taxes = lf.get_distributed_amount(
+                lf.prix_total_ht_simul,
+                lf.prix_total_ht,
+                currency=currency,
+                rounding=True,
+                line_rounding=False)
+
+            if not round_tax:
+                amount_tax = sum(tax['amount'] for tax in taxes['taxes'])
+                taxes.update({'total_excluded': taxes['base'], 'total_included': taxes['base'] + amount_tax})
+
+            values.update(vals)
+
+            # Mise à jour du prix simulé dans la ligne du wizard
+            lf.prix_total_ht_simul = taxes['total_excluded']
+            lf.prix_total_ttc_simul = taxes['total_included']
+            total_forced += taxes[tax_field]
+
+        total_nonselect = total_excluded + total_forced
+
+        # Les totaux des lignes sélectionnées sont calculés en précision maximale
+        total_select = 0.0
+        line_taxes = {}
+        for line in lines_select.with_context(round=False):
+            # Calcul manuel des taxes avec context['round']==False pour conserver la précision des calculs
+            order_line = line.order_line_id
+            price = order_line.price_unit * (1 - (order_line.discount or 0.0) / 100.0)
+            taxes = order_line.tax_id.compute_all(
+                price, order_line.currency_id, order_line.product_uom_qty, product=order_line.product_id,
+                partner=order_line.order_id.partner_id)
+            total_select += taxes[tax_field]
+            line_taxes[line.id] = taxes
+
+        # On applique les nouveaux prix sur les lignes dans l'ordre décroissant de quantité vendue.
+        # Cela permet d'ajuster plus facilement le prix sur les dernières lignes
+        lines_select = lines_select.get_sorted()
+
+        to_distribute -= total_nonselect
+        for line in lines_select:
+            if mode == 'reset':
+                vals, taxes = line.get_reset_amount(line_rounding=line_rounding)
+            else:
+                vals, taxes = line.get_distributed_amount(
+                    to_distribute,
+                    total_select,
+                    currency=currency,
+                    # On arrondit toutes les lignes sauf la dernière
+                    rounding=line != lines_select[-1],
+                    line_rounding=line_rounding)
+            # Recalcul de 'total_excluded' et 'total_included' sans les arrondis
+            if not round_tax:
+                amount_tax = sum(tax['amount'] for tax in taxes['taxes'])
+                taxes.update({'total_excluded': taxes['base'], 'total_included': taxes['base'] + amount_tax})
+
+            if mode != 'reset':
+                to_distribute -= taxes[tax_field]
+                total_select -= line_taxes[line.id][tax_field]
+
+            values.update(vals)
+
+            # Mise à jour du prix simulé dans la ligne du wizard
+            line.prix_total_ht_simul = taxes['total_excluded']
+            line.prix_total_ttc_simul = taxes['total_included']
+
+        for line in lines_excluded:
+            line.prix_total_ht_simul = line.order_line_id.price_subtotal
+            line.prix_total_ttc_simul = line.order_line_id.price_total
+        return values
 
 
 class SaleOrder(models.Model):

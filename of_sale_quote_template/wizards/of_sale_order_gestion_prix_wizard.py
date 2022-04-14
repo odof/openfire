@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models
+from odoo.exceptions import UserError
+from odoo.tools import float_compare
 
 
 class GestionPrix(models.TransientModel):
     _inherit = 'of.sale.order.gestion.prix'
 
-    calculation_basis = fields.Selection(selection=[
-        ('order_line', u"Articles"),
-        ('layout_category', u"Sections")
-    ], string=u"Base de calcul", required=True, default='order_line')
+    calculation_basis = fields.Selection(
+        selection=[
+            ('order_line', u"Articles"),
+            ('layout_category', u"Sections")
+        ], string=u"Base de calcul", required=True, default='order_line')
     layout_category_ids = fields.One2many(
         comodel_name='of.sale.order.gestion.prix.layout.category',
         inverse_name='wizard_id', string=u'Sections impactées')
@@ -25,57 +28,41 @@ class GestionPrix(models.TransientModel):
         self.layout_category_ids.write({'state': 'excluded'})
 
     @api.multi
-    def calculer(self, simuler=False):
-        if self.calculation_basis == 'layout_category':
-            lines_discountable = self.line_ids.filtered(lambda line: not line.product_forbidden_discount)
+    def _calculer(self, total, mode, currency, line_rounding):
+        if self.calculation_basis != 'layout_category':
+            return super(GestionPrix, self)._calculer(total, mode, currency, line_rounding)
+        values = {}
+        # Si on fonctionne par section, il n'y a pas de montant forcé par ligne de commande
+        self.line_ids.filtered(lambda l: not l.state == 'included' and not l.product_forbidden_discount)\
+            .write({'state': 'included'})
 
-            # On prépare les lignes de commande du wizard pour le calcul
-            categories_included = self.layout_category_ids.filtered(lambda line: line.state == 'included')
-            order_lines_included = categories_included.mapped('order_line_ids').filtered(lambda sol: sol.price_unit)
-            lines_included = lines_discountable.filtered(lambda line: line.order_line_id.id in order_lines_included.ids)
-
-            # Pour les catégories forcées, on doit en plus calculer le prix total TTC simulé
-            categories_forced = self.layout_category_ids.filtered(lambda line: line.state == 'forced')
-            order_lines_forced = categories_forced.mapped('order_line_ids').filtered(lambda sol: sol.price_unit)
-            lines_forced = lines_discountable.filtered(lambda line: line.order_line_id.id in order_lines_forced.ids)
-
-            for category in categories_forced:
-                category_price_forced = category.simulated_price_subtotal
-                category_order_lines_forced = category.mapped('order_line_ids')
-                category_lines_forced = lines_forced.filtered(
-                    lambda line: line.order_line_id.id in category_order_lines_forced.ids)
-                lines_forced_price = sum(category_lines_forced.mapped('prix_total_ht'))
-                factor = category_price_forced / lines_forced_price if lines_forced_price else 1
-                for lf in category_lines_forced:
-                    lf.write({
-                        'state': 'forced',
-                        'prix_total_ht_simul': lf.prix_total_ht * factor,
-                    })
-
-            lines_excluded = self.line_ids - lines_included - lines_forced
-            lines_included.write({'state': 'included'})
-            lines_excluded.write({'state': 'excluded'})
-            lines_forced.write({'state': 'forced'})
-
-        super(GestionPrix, self).calculer(simuler)
-
-        # On met à jour les informations dans les lignes de section du wizard
-        for category in self.layout_category_ids:
-            lines = self.line_ids.filtered(lambda line: line.order_line_id.id in category.order_line_ids.ids)
-
-            # Dans le cas ou tous les états d'une catégorie sont identiques, on assigne cet état à la catégorie
-            states = lines.mapped('state')
-            if all(state == states[0] for state in states):
-                category.state = states[0]
-            elif 'included' in states:
-                category.state = 'included'
+        price_field = 'simulated_price_subtotal' if mode == 'ht' else 'simulated_price_total'
+        for category in self.layout_category_ids.filtered(lambda categ: categ.state != 'included'):
+            if category.state == 'forced':
+                values.update(
+                    category.line_ids.distribute_amount(
+                        category.simulated_price_subtotal, 'ht', currency, line_rounding))
             else:
-                category.state = 'excluded'
+                for line in category.line_ids:
+                    line.prix_total_ht_simul = line.order_line_id.price_subtotal
+                    line.prix_total_ttc_simul = line.order_line_id.price_total
 
-            category.simulated_price_subtotal = sum(lines.mapped('prix_total_ht_simul'))
-            category.simulated_price_total = sum(lines.mapped('prix_total_ttc_simul'))
-            category.pc_sale_price = (category.simulated_price_subtotal / self.montant_total_ht_simul) * 100 \
-                if self.montant_total_ht_simul else -100
+            category.simulated_price_subtotal = sum(category.line_ids.mapped('prix_total_ht_simul'))
+            category.simulated_price_total = sum(category.line_ids.mapped('prix_total_ttc_simul'))
+            total -= category[price_field]
+        if total < 0:
+            raise UserError(u"(Erreur #RG405)\nLe montant forcé dépasse le montant total à distribuer")
+
+        included_categories = self.layout_category_ids.filtered(lambda categ: categ.state == 'included')
+        values.update(
+            included_categories.mapped('line_ids').distribute_amount(total, mode, currency, line_rounding)
+        )
+        for category in included_categories:
+            category.write({
+                'simulated_price_subtotal': sum(category.line_ids.mapped('prix_total_ht_simul')),
+                'simulated_price_total': sum(category.line_ids.mapped('prix_total_ttc_simul')),
+            })
+        return values
 
 
 class GestionPrixLayoutCategory(models.TransientModel):
@@ -87,7 +74,10 @@ class GestionPrixLayoutCategory(models.TransientModel):
     wizard_id = fields.Many2one(comodel_name='of.sale.order.gestion.prix', required=True, ondelete='cascade')
     layout_category_id = fields.Many2one(
         comodel_name='of.sale.order.layout.category', string=u"Section", readonly=True, ondelete='cascade')
-    order_line_ids = fields.Many2many(comodel_name='sale.order.line', string=u"Lignes de commande")
+    line_ids = fields.Many2many(
+        comodel_name='of.sale.order.gestion.prix.line',
+        relation='of_sale_order_gestion_prix_layout_category_line_rel',
+        string=u"Lignes impactées")
     currency_id = fields.Many2one(related='layout_category_id.currency_id')
 
     cost = fields.Float(string=u"Coût", compute='_compute_price')
@@ -105,14 +95,15 @@ class GestionPrixLayoutCategory(models.TransientModel):
 
     of_client_view = fields.Boolean(string=u"Vue client/vendeur", related="wizard_id.of_client_view")
 
-    @api.depends('order_line_ids')
+    @api.depends('line_ids')
     def _compute_price(self):
-        for line in self:
-            line.price_reduce_taxexcl = sum(line.order_line_ids.mapped('price_reduce_taxexcl'))
-            line.price_reduce_taxinc = sum(line.order_line_ids.mapped('price_reduce_taxinc'))
-            line.price_subtotal = sum(line.order_line_ids.mapped('price_subtotal'))
-            line.price_total = sum(line.order_line_ids.mapped('price_total'))
-            line.cost = sum(map(lambda sol: sol.purchase_price * sol.product_uom_qty, line.order_line_ids))
+        for categ in self:
+            order_lines = categ.line_ids.mapped('order_line_id')
+            categ.price_reduce_taxexcl = sum(order_lines.mapped('price_reduce_taxexcl'))
+            categ.price_reduce_taxinc = sum(order_lines.mapped('price_reduce_taxinc'))
+            categ.price_subtotal = sum(order_lines.mapped('price_subtotal'))
+            categ.price_total = sum(order_lines.mapped('price_total'))
+            categ.cost = sum(sol.purchase_price * sol.product_uom_qty for sol in order_lines)
 
     @api.depends('cost', 'simulated_price_subtotal')
     def _compute_marge(self):
@@ -126,10 +117,16 @@ class GestionPrixLayoutCategory(models.TransientModel):
     @api.onchange('pc_margin')
     def _onchange_pc_margin(self):
         for line in self:
-            # La marge ne peut pas être supérieure ou égale à 100%
-            line.pc_margin = min(line.pc_margin, 99.99)
-            if line.state == 'included':
-                line.simulated_price_subtotal = line.cost / ((100 - line.pc_margin) / 100) \
-                    if line.pc_margin != 100 else line.cost
+            # La marge ne peut pas être supérieure ou égale à 100%, sauf si le cout est nul
+            if line.cost == 0:
+                pc_margin_max = 100
+            else:
+                pc_margin_max = 99.99
+            if line.pc_margin > pc_margin_max:
+                line.pc_margin = pc_margin_max
+
+            pc_margin = 100 * (1 - line.cost / line.simulated_price_subtotal) if line.simulated_price_subtotal else -100
+            if float_compare(pc_margin, line.pc_margin, precision_rounding=0.01):
+                line.simulated_price_subtotal = line.cost and line.cost * (100 / (100 - line.pc_margin))
                 factor = line.simulated_price_subtotal / line.price_subtotal if line.price_subtotal else 1
                 line.simulated_price_total = line.price_total * factor

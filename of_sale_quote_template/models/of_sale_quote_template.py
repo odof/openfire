@@ -1089,36 +1089,30 @@ class SaleOrder(models.Model):
 
         remise = self.env['of.sale.order.gestion.prix'].browse(res['res_id'])
 
+        categ_prec_id = -1
         layout_category_vals = []
-        # Création des lignes de section qui ont des lignes de commande
-        for category in self.of_layout_category_ids.filtered('order_line_without_child_ids'):
-            values = {
-                'layout_category_id': category.id,
-                'order_line_ids': [(6, 0, category.order_line_without_child_ids.ids)],
-                'state': 'included',
-                'pc_sale_price': category.pc_prix_vente,
-                'simulated_price_subtotal': sum(category.order_line_without_child_ids.mapped('price_subtotal')),
-                'simulated_price_total': sum(category.order_line_without_child_ids.mapped('price_total')),
-            }
-            layout_category_vals.append((0, 0, values))
-
-        order_lines_without_category = self.order_line.filtered(lambda sol: not sol.of_layout_category_id)
-        # Création d'une ligne si des lignes de commande n'ont pas de section
-        if order_lines_without_category:
-            if self.amount_untaxed:
-                values = {
-                    'layout_category_id': False,
-                    'order_line_ids': [(6, 0, order_lines_without_category.ids)],
+        for remise_line in remise.line_ids:
+            if remise_line.order_line_id.of_layout_category_id.id != categ_prec_id:
+                category = remise_line.order_line_id.of_layout_category_id
+                categ_prec_id = category.id
+                layout_category_vals.append({
+                    'layout_category_id': category.id,
+                    'line_ids': [(6, 0, [remise_line.id])],
                     'state': 'included',
-                    'pc_sale_price': (sum(order_lines_without_category.mapped('price_subtotal')) /
-                                      self.amount_untaxed) * 100,
-                    'simulated_price_subtotal': sum(order_lines_without_category.mapped('price_subtotal')),
-                    'simulated_price_total': sum(order_lines_without_category.mapped('price_total'))
-                }
-                layout_category_vals.append((0, 0, values))
+                    'simulated_price_subtotal': remise_line.order_line_id.price_subtotal,
+                    'simulated_price_total': remise_line.order_line_id.price_total,
+                })
+            else:
+                vals = layout_category_vals[-1]
+                vals['line_ids'][0][2].append(remise_line.id)
+                vals['simulated_price_subtotal'] += remise_line.order_line_id.price_subtotal
+                vals['simulated_price_total'] += remise_line.order_line_id.price_total
+        if self.amount_untaxed:
+            for vals in layout_category_vals:
+                vals['pc_sale_price'] = 100.0 * vals['simulated_price_subtotal'] / self.amount_untaxed
 
         remise.write({
-            'layout_category_ids': layout_category_vals,
+            'layout_category_ids': [(0, 0, vals) for vals in layout_category_vals],
         })
 
         return res

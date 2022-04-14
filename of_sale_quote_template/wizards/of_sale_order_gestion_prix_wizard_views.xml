@@ -16,7 +16,7 @@
             <xpath expr="//field[@name='line_ids']" position="after">
                 <field name="layout_category_ids" attrs="{'invisible': [('calculation_basis', '!=', 'layout_category')]}">
                     <tree string="Lignes de section" colors="green:state=='included';grey:state!='included';" editable="bottom" create="false">
-                        <field name="order_line_ids" invisible="1"/>
+                        <field name="line_ids" invisible="1"/>
                         <field name="state" invisible="context.get('invoice_status') == 'invoiced'"/>
                         <field name="layout_category_id"/>
                         <field name="cost" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
