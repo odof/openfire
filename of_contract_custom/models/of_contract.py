@@ -1244,6 +1244,20 @@ class OfContractLine(models.Model):
         fields_allowed = self.get_write_allowed_fields()
         if 'contract_id' in vals:  # On ne doit pas changer de contrat après la création
             del vals['contract_id']
+        cr = self.env.cr
+        if len(self) == 1:
+            keys_to_delete = []
+            fields = self._fields
+            for key, val in vals.iteritems():
+                if not fields[key].store:
+                    keys_to_delete.append(key)
+                    continue
+                cr.execute("SELECT %s FROM of_contract_line WHERE id = %%s" % key, (self.id,))
+                db_value = cr.fetchone()[0] or False  # on ne veut pas de None
+                if val == db_value:
+                    keys_to_delete.append(key)
+            for key in keys_to_delete:
+                del vals[key]
         if not self._context.get('no_verification'):
             for line in self:
                 if line.state == 'validated' and any([key not in fields_allowed for key in vals.keys()]):
