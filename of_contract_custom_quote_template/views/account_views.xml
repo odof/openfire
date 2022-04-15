@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="of_account_invoice_view_form" model="ir.ui.view">
+        <field name="name">of.account.invoice.view.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="of_contract_custom.of_account_invoice_view_form"/>
+        <field name="groups_id" eval="[(4, ref('of_sale_quote_template.group_of_advanced_sale_layout_category'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_print_sequence']" position="replace"/>
+            <xpath expr="//field[@name='of_price_printing']" position="after">
+                <field name="of_print_sequence" attrs="{'invisible': [('of_compute_contract_id', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

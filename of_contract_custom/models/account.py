@@ -22,6 +22,11 @@ class OfAccountInvoice(models.Model):
         help="Ce champ, s'il est rempli manuellement, n'aura pas d'incidence sur le contrat.")
     of_contract_period = fields.Char(string=u"Période du contrat", compute='_compute_of_contract_period')
     of_intervention_id = fields.Many2one('of.planning.intervention', string="RDV d'intervention")
+    of_print_sequence = fields.Selection(selection=[
+        ('standard', "Standard"),
+        ('code', "Code magasin du site d'intervention"),
+        ('city', "Ville du site d'intervention"),
+        ], string=u"Séquence d'impression", default='standard')
 
     @api.depends('of_contract_id')
     def _compute_contract_id(self):
@@ -115,6 +120,20 @@ class OfAccountInvoice(models.Model):
                         result[i][2][name] = False
 
         return result
+
+    @api.multi
+    def order_lines_layouted(self):
+        res = super(OfAccountInvoice, self).order_lines_layouted()
+        for page in res:
+            for categ in page:
+                if categ['lines'] and self.of_compute_contract_id:
+                    if self.of_print_sequence == 'code':
+                        categ['lines'].sort(key=lambda x: x.of_contract_line_id.address_id.of_code_magasin)
+                    elif self.of_print_sequence == 'city':
+                        categ['lines'].sort(key=lambda x: (x.of_contract_line_id.address_id.city or "").upper())
+                    else:
+                        categ['lines'].sort(key=lambda x: x.of_contract_line_id.code_de_ligne)
+        return res
 
 
 class OfAccountInvoiceLine(models.Model):
