@@ -407,6 +407,9 @@ class OfPlanningIntervention(models.Model):
     order_id = fields.Many2one(
         "sale.order", string=u"Commande",
         domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")
+    order_amount_total = fields.Monetary(string="Total CC", readonly=True, compute='_compute_order_amounts')
+    order_still_due = fields.Monetary(string=u"Restant dû CC", readonly=True, compute='_compute_order_amounts')
+    picking_amount_total = fields.Monetary(string="Total BL", readonly=True, compute='_compute_picking_amounts')
 
     # Onglet Description
     description = fields.Text(string="Description")
@@ -890,6 +893,25 @@ class OfPlanningIntervention(models.Model):
             else:
                 continue
             interv.historique_rdv_ids = interventions.filtered(lambda i: interv.date_date > i.date_date)
+
+    @api.depends('order_id')
+    def _compute_order_amounts(self):
+        for rdv in self:
+            if rdv.order_id:
+                total = rdv.order_id.amount_total
+                still_due = total
+                rdv.order_amount_total = total
+                lines = rdv.order_id.order_line
+                payments = rdv.order_id._of_get_printable_payments(lines)  # sous la forme (lib, amount)
+                for _, amount in payments:
+                    still_due -= amount
+                rdv.order_still_due = still_due
+
+    @api.depends('picking_ids')
+    def _compute_picking_amounts(self):
+        for rdv in self:
+            if rdv.picking_id:
+                rdv.picking_amount_total = rdv.picking_id.get_sale_value()
 
     # Search #
 
