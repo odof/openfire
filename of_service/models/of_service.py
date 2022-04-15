@@ -543,6 +543,9 @@ class OfService(models.Model):
                 self.company_id = self.address_id.company_id.id
             elif company_choice == 'contact' and self.partner_id.company_id:
                 self.company_id = self.partner_id.company_id.id
+            # en mode contact avec un contact sans société, ou en mode user
+            else:
+                self.company_id = self.env.user.company_id
 
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
