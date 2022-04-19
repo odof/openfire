@@ -23,6 +23,42 @@ class OfService(models.Model):
 
     @api.model_cr_context
     def _auto_init(self):
+        module_self = self.env['ir.module.module'].search(
+            [('name', '=', 'of_service'), ('state', 'in', ['installed', 'to upgrade', 'to install'])])
+        if module_self:
+            # installed_version est trompeur, il contient la version en cours d'installation
+            # on utilise donc latest version à la place
+            version = module_self.latest_version
+            if version < '10.0.2':
+                # à partir de cette version, le champ company_id est obligatoire,
+                # on veut donc le remplir partout ou c'est possible
+                cr = self.env.cr
+                cr.execute("""
+-- update DI qui ont un RDV
+UPDATE of_service os
+SET company_id = opi.company_id
+FROM of_planning_intervention opi
+WHERE os.id = opi.service_id AND os.company_id IS NULL;
+
+-- update DI qui ont une commande
+UPDATE of_service os
+SET company_id = so.company_id
+FROM sale_order so
+WHERE os.order_id = so.id AND os.company_id IS NULL AND so.company_id IS NOT NULL;
+
+-- update DI dont l'adresse a une société
+UPDATE of_service os
+SET company_id = rp.company_id
+FROM res_partner rp
+WHERE os.address_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT NULL;
+
+-- update DI dont le partenaire a une société
+UPDATE of_service os
+SET company_id = rp.company_id
+FROM res_partner rp
+WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT NULL;
+                        """)
+
         cr = self._cr
         # Lors de la 1ère mise à jour après la refonte des planning (sept. 2019), on migre les données existantes.
         cr.execute("SELECT 1 FROM information_schema.columns "
@@ -180,7 +216,7 @@ class OfService(models.Model):
     tag_ids = fields.Many2many(
         string=u"Étiquettes", comodel_name='of.planning.tag', relation='of_service_of_planning_tag_rel',
         column1='service_id', column2='tag_id')
-    company_id = fields.Many2one('res.company', string=u"Société")
+    company_id = fields.Many2one('res.company', string=u"Société", required=True)
 
     # Rubrique Origine
     origin = fields.Char(string="Origine")
@@ -1155,9 +1191,15 @@ class OfServiceLine(models.Model):
         Calcule le montant de la ligne.
         """
         for line in self:
+            company = line.service_id.company_id
+            # arrondir est le fonctionnement par défaut
+            with_round = not company or company.tax_calculation_rounding_method != 'round_globally'
             price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-            taxes = line.taxe_ids.compute_all(price, line.currency_id, line.qty,
-                                              product=line.product_id, partner=line.service_id.address_id)
+            taxes = line.taxe_ids.with_context(round=with_round).compute_all(
+                price, line.currency_id, line.qty, product=line.product_id, partner=line.service_id.address_id)
+            if not with_round:
+                # on fait une troncature ici, car le "update" arrondi automatiquement
+                taxes['total_included'] = int(taxes['total_included'] * 100) / 100.0
             line.update({
                 'price_tax': taxes['total_included'] - taxes['total_excluded'],
                 'price_total': taxes['total_included'],
