@@ -39,9 +39,6 @@
                     <field name="of_client_receveur_count" widget="statinfo" string="Clients receveurs"/>
                 </button>
             </xpath>
-            <xpath expr="//field[@name='ref']" position="after">
-                <field name="of_code_magasin"/>
-            </xpath>
         </field>
     </record>
 
