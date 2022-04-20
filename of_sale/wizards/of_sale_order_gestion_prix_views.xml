@@ -23,6 +23,7 @@
                     </button>
                 </div>
                 <group invisible="context.get('invoice_status') == 'invoiced'">
+                    <field name="order_id" invisible="1"/>
                     <field name="methode_remise" required="1"/>
                     <field name="valeur"
                            attrs="{'invisible':[('methode_remise','not in',('prix_ttc_cible','prix_ht_cible','montant_ttc','montant_ht','pc','pc_marge'))],

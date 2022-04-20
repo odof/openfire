@@ -1091,7 +1091,10 @@ class SaleOrder(models.Model):
 
         categ_prec_id = -1
         layout_category_vals = []
-        for remise_line in remise.line_ids:
+        for remise_line in remise.line_ids.sorted(
+                key=lambda l: (not l.order_line_id.of_layout_category_id,
+                               l.order_line_id.of_layout_category_id.sequence,
+                               l.order_line_id.of_layout_category_id.id)):
             if remise_line.order_line_id.of_layout_category_id.id != categ_prec_id:
                 category = remise_line.order_line_id.of_layout_category_id
                 categ_prec_id = category.id
