@@ -29,10 +29,11 @@
                 <page name="paiement" string="Paiement" groups="of_service_mode_paiement.group_of_intervention_sepa">
                     <group>
                         <group>
+                            <field name="payment_term_id"/>
                             <field name="validite_sepa"/>
                             <field name="date_verification_sepa"/>
+                            <field name="deadline_count"/>
                             <field name="paiements_non_lettres_count"/>
-                            <field name="payment_term_id"/>
                         </group>
                         <group>
                             <field name="montant_dernier_prelevement"/>
@@ -51,9 +52,9 @@
         <field name="inherit_id" ref="of_service.view_of_service_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//search/separator[last()]" position="after">
-                <filter name="non_verifie" string="Non vérifié" domain="[('validite_sepa','=','non_verifie')]"/>
-                <filter name="non_valide" string="Non valide" domain="[('validite_sepa','=','non_valide')]"/>
-                <filter name="valide" string="Valide" domain="[('validite_sepa','=','valide')]"/>
+                <filter name="non_verifie" string="SEPA non vérifié" domain="[('validite_sepa','=','non_verifie')]"/>
+                <filter name="non_valide" string="SEPA non valide" domain="[('validite_sepa','=','non_valide')]"/>
+                <filter name="valide" string="SEPA valide" domain="[('validite_sepa','=','valide')]"/>
                 <separator/>
             </xpath>
         </field>
