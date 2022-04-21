@@ -16,6 +16,7 @@ class OfService(models.Model):
     prelevements_ids = fields.One2many(
         'of.paiement.edi', string=u"Nombre de prélèvement", compute='_compute_prelevements')
     prelevements_count = fields.Integer(u"Nombre de prélèvement", compute='_compute_prelevements')
+    deadline_count = fields.Integer(string=u"Nombre d'échéance")
 
     payment_term_id = fields.Many2one('account.payment.term', string=u"Conditions de règlement")
     montant_dernier_prelevement = fields.Float(u"Montant du dernier prélèvement", compute='_compute_prelevements')
