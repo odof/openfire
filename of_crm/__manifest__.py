@@ -63,6 +63,7 @@ Workflow CRM
         'views/of_sale_objective_views.xml',
         'views/of_crm_templates.xml',
         'reports/of_crm_fiche_rdv_report_view.xml',
+        'reports/crm_opportunity_report_views.xml',
         'data/data.xml',
     ],
     'qweb': [
