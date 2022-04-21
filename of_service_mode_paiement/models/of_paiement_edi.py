@@ -63,10 +63,10 @@ class OfPaiementEdi(models.Model):
         self.aff_bouton_paiement = False
 
     edi_service_line_ids = fields.One2many(
-        'of.paiement.edi.service.line', 'edi_id', string=u"DI sélectionnées à payer",
+        comodel_name='of.paiement.edi.service.line', inverse_name='edi_id', string=u"DI sélectionnées à payer",
         copy=False, default=_default_edi_service_line_ids)
     type_source = fields.Selection(
-        [('account.invoice', u"Facture"), ('of.service', u"Demande d'intervention")],
+        selection=[('account.invoice', u"Facture"), ('of.service', u"Demande d'intervention")],
         string=u"Type de source", default=_default_type_source)
     mode_calcul = fields.Selection(
         selection=[('fixe', u"Montant fixe"), ('pc', u"% du montant TTC"), ('echeance', u"Prélèvement à l'échéance")],
@@ -856,8 +856,9 @@ class OfPaiementEdiServiceLine(models.Model):
     _description = u"Demande d'intervention à payer par EDI"
 
     service_id = fields.Many2one(
-        'of.service', string=u"Demande d'intervention", required=True, domain="[('state','not in',['cancel']')]")
-    edi_id = fields.Many2one('of.paiement.edi', 'EDI')
+        comodel_name='of.service', string=u"Demande d'intervention",
+        required=True, domain="[('state','not in',['cancel']')]")
+    edi_id = fields.Many2one(comodel_name='of.paiement.edi', string=u"EDI")
 
     partner = fields.Char(string=u'Partenaire', related='service_id.partner_id.name', readonly=True)
     currency_id = fields.Many2one(related='service_id.currency_id')
@@ -866,7 +867,7 @@ class OfPaiementEdiServiceLine(models.Model):
 
     pc_prelevement = fields.Float(string=u'% du montant TTC de la DI à prélever')
     methode_calcul_montant = fields.Selection(
-        [('fixe', u'montant fixe'), ('pc', u'% du montant TTC de la DI')],
+        selection=[('fixe', u"montant fixe"), ('pc', u"% du montant TTC de la DI")],
         string=u"Mode calcul du montant à prélever", required=True,
         help=u"Détermine comment est calculée le montant à prélever")
 
