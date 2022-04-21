@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import fields, models, api, tools
+from odoo import fields, models, api, tools, _
 
 
 class OFCRMFunnelConversion(models.Model):
@@ -38,6 +38,26 @@ class OFCRMFunnelConversion(models.Model):
         string=u"Taux de concrétisation € (%)", compute='_compute_order_amount_rate', compute_sudo=True, readonly=True)
     sales_total_comparison = fields.Char(
         string=u"Comparaison N-1 (%)", compute='_compute_sales_total_comparison', compute_sudo=True, readonly=True)
+
+    my_company = fields.Boolean(
+        string=u"Est mon magasin ?", compute='_get_is_my_company', search='_search_is_my_company')
+
+    @api.model
+    def _search_is_my_company(self, operator, value):
+        if operator != '=' or not value:
+            raise ValueError(_("Unsupported search operator"))
+        req = """SELECT id
+            FROM of_crm_funnel_conversion
+            WHERE
+            company_id = %s"""
+        self.env.cr.execute(
+            req, (self.env.user.company_id.id,))
+        lead_ids = [r[0] for r in self.env.cr.fetchall()]
+        return [('id', 'in', lead_ids)]
+
+    def _get_is_my_company(self):
+        for rec in self:
+            rec.my_company = self.env.user.company_id == rec.company_id
 
     def init(self):
         tools.drop_view_if_exists(self._cr, 'of_crm_funnel_conversion')
@@ -257,6 +277,26 @@ class OFCRMFunnelConversion2(models.Model):
     previous_sales_total = fields.Float(string=u"CA commandé N-1", readonly=True)
     sales_total_comparison = fields.Char(
         string=u"Comparaison N-1 (%)", compute='_compute_sales_total_comparison', compute_sudo=True, readonly=True)
+
+    my_company = fields.Boolean(
+        string=u"Est mon magasin ?", compute='_get_is_my_company', search='_search_is_my_company')
+
+    @api.model
+    def _search_is_my_company(self, operator, value):
+        if operator != '=' or not value:
+            raise ValueError(_("Unsupported search operator"))
+        req = """SELECT id
+            FROM of_crm_funnel_conversion2
+            WHERE
+            company_id = %s"""
+        self.env.cr.execute(
+            req, (self.env.user.company_id.id,))
+        lead_ids = [r[0] for r in self.env.cr.fetchall()]
+        return [('id', 'in', lead_ids)]
+
+    def _get_is_my_company(self):
+        for rec in self:
+            rec.my_company = self.env.user.company_id == rec.company_id
 
     def init(self):
         tools.drop_view_if_exists(self._cr, 'of_crm_funnel_conversion2')

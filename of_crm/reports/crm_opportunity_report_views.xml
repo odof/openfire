@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="crm_opportunity_report_view_search" model="ir.ui.view">
+        <field name="name">of.crm.opportunity.report.select</field>
+        <field name="model">crm.opportunity.report</field>
+        <field name="inherit_id" ref="crm.crm_opportunity_report_view_search" />
+        <field name="arch" type="xml">
+            <xpath expr="//search/filter[1]" position="before">
+                <filter string="Mon magasin" name="my_company" domain="[('of_my_company', '=', True)]"/>
+                <separator/>
+                <filter string="Mois en cours" name="this_month"
+                        domain="[('create_date', '&gt;=', context_today().strftime('%Y-%m-01')),
+                                 ('create_date', '&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-01'))]"/>
+                <filter string="Mois précédent" name="previous_month"
+                        domain="[('create_date', '&gt;=', (context_today() + relativedelta(months=-1)).strftime('%Y-%m-01')),
+                                 ('create_date', '&lt;', context_today().strftime('%Y-%m-01'))]"/>
+                <filter string="Année en cours" name="this_year"
+                        domain="[('create_date', '&gt;=', context_today().strftime('%Y-01-01')),
+                                 ('create_date', '&lt;', (context_today() + relativedelta(day=1,years=1)).strftime('%Y-01-01'))]"/>
+                <filter string="Cumul à date - Mensuel" name="monthly_accumulation"
+                        domain="[('create_date', u'&gt;=', context_today().strftime('%Y-%m-01')),
+                                 ('create_date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Cumul à date - Annuel" name="yearly_accumulation"
+                        domain="[('create_date', '&gt;=', context_today().strftime('%Y-01-01')),
+                                 ('create_date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

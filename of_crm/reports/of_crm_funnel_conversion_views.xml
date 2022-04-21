@@ -61,18 +61,24 @@
                 <search>
                     <field name="company_id"/>
                     <field name="vendor_id"/>
+                    <filter string="Mon magasin" name="my_company" domain="[('my_company', '=', True)]"/>
+                    <separator/>
                     <filter string="Mois en cours" name="this_month"
                             domain="[('date', u'&gt;=', context_today().strftime('%Y-%m-01')),
                                      ('date', u'&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d'))]"/>
                     <filter string="Mois précédent" name="previous_month"
                             domain="[('date', u'&gt;=', (context_today() - relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
                                      ('date', u'&lt;', context_today().strftime('%Y-%m-01'))]"/>
-                    <filter string="Cumul à date - Annuel" name="cumul"
-                            domain="[('date', u'&gt;=', context_today().strftime('%Y-01-01')),
-                                     ('date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
-                    <filter string="Cumul à date - Mensuel" name="cumul"
+                    <filter string="Année en cours" name="this_year"
+                            domain="[('date', '&gt;=', context_today().strftime('%Y-01-01')),
+                                    ('date', '&lt;', (context_today() + relativedelta(day=1,years=1)).strftime('%Y-01-01'))]"/>
+                    <filter string="Cumul à date - Mensuel" name="monthly_accumulation"
                             domain="[('date', u'&gt;=', context_today().strftime('%Y-%m-01')),
                                      ('date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <filter string="Cumul à date - Annuel" name="yearly_accumulation"
+                            domain="[('date', u'&gt;=', context_today().strftime('%Y-01-01')),
+                                     ('date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <separator/>
                 </search>
             </field>
         </record>
@@ -132,18 +138,24 @@
                 <search>
                     <field name="company_id"/>
                     <field name="vendor_id"/>
+                    <filter string="Mon magasin" name="my_company" domain="[('my_company', '=', True)]"/>
+                    <separator/>
                     <filter string="Mois en cours" name="this_month"
                             domain="[('date', u'&gt;=', context_today().strftime('%Y-%m-01')),
                                      ('date', u'&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d'))]"/>
                     <filter string="Mois précédent" name="previous_month"
                             domain="[('date', u'&gt;=', (context_today() - relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
                                      ('date', u'&lt;', context_today().strftime('%Y-%m-01'))]"/>
-                    <filter string="Cumul à date - Annuel" name="cumul"
-                            domain="[('date', u'&gt;=', context_today().strftime('%Y-01-01')),
-                                     ('date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
-                    <filter string="Cumul à date - Mensuel" name="cumul"
+                    <filter string="Année en cours" name="this_year"
+                            domain="[('date', '&gt;=', context_today().strftime('%Y-01-01')),
+                                    ('date', '&lt;', (context_today() + relativedelta(day=1,years=1)).strftime('%Y-01-01'))]"/>
+                    <filter string="Cumul à date - Mensuel" name="monthly_accumulation"
                             domain="[('date', u'&gt;=', context_today().strftime('%Y-%m-01')),
                                      ('date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <filter string="Cumul à date - Annuel" name="yearly_accumulation"
+                            domain="[('date', u'&gt;=', context_today().strftime('%Y-01-01')),
+                                     ('date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <separator/>
                 </search>
             </field>
         </record>
