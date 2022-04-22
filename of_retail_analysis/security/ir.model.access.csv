@@ -5,3 +5,5 @@ access_of_res_company_sector_user,access.of.res.company.sector.user,model_of_res
 access_of_res_company_sector_manager,access.of.res.company.sector.manager,model_of_res_company_sector,base.group_system,1,1,1,1
 access_of_res_company_sales_group_user,access.of.res.company.sales.group.user,model_of_res_company_sales_group,base.group_user,1,0,0,0
 access_of_res_company_sales_group_manager,access.of.res.company.sales.group.manager,model_of_res_company_sales_group,base.group_system,1,1,1,1
+access_of_res_company_management_group_user,access.of.res.company.management.group.user,model_of_res_company_management_group,base.group_user,1,0,0,0
+access_of_res_company_management_group_manager,access.of.res.company.management.group.manager,model_of_res_company_management_group,base.group_system,1,1,1,1

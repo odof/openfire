@@ -9,6 +9,8 @@ class ResCompany(models.Model):
     of_company_type_id = fields.Many2one(comodel_name='of.res.company.type', string=u"Type")
     of_company_sector_id = fields.Many2one(comodel_name='of.res.company.sector', string=u"Secteur")
     of_company_sales_group_id = fields.Many2one(comodel_name='of.res.company.sales.group', string=u"Groupe Ventes")
+    of_company_management_group_id = fields.Many2one(
+        comodel_name='of.res.company.management.group', string=u"Groupe Gestion")
 
 
 class OFResCompanyType(models.Model):
@@ -59,7 +61,16 @@ class OFResCompanySector(models.Model):
 
 class OFResCompanySalesGroup(models.Model):
     _name = 'of.res.company.sales.group'
-    _description = u"Goupe Ventes de société"
+    _description = u"Groupe Ventes de société"
+    _order = 'sequence, name'
+
+    sequence = fields.Integer(string=u"Séquence")
+    name = fields.Char(string=u"Nom")
+
+
+class OFResCompanyManagementGroup(models.Model):
+    _name = 'of.res.company.management.group'
+    _description = u"Groupe Gestion de société"
     _order = 'sequence, name'
 
     sequence = fields.Integer(string=u"Séquence")

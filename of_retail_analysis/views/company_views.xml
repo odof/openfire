@@ -13,6 +13,7 @@
                     <field name="of_company_type_id"/>
                     <field name="of_company_sector_id"/>
                     <field name="of_company_sales_group_id"/>
+                    <field name="of_company_management_group_id"/>
                 </group>
             </xpath>
         </field>
@@ -128,5 +129,42 @@
 
     <menuitem id="of_retail_analysis_of_res_company_sales_group_menu" name="Groupes Ventes de société" parent="base.menu_users"
               action="of_retail_analysis_of_res_company_sales_group_action" sequence="25" groups="base.group_system"/>
+
+    <!-- OF Res Company Management Group Views -->
+
+    <record id="of_retail_analysis_of_res_company_management_group_form_view" model="ir.ui.view">
+        <field name="name">of.retail.analysis.of.res.company.management.group.form.view</field>
+        <field name="model">of.res.company.management.group</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="sequence"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_retail_analysis_of_res_company_management_group_tree_view" model="ir.ui.view">
+        <field name="name">of.retail.analysis.of.res.company.management.group.tree.view</field>
+        <field name="model">of.res.company.management.group</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_retail_analysis_of_res_company_management_group_action" model="ir.actions.act_window">
+        <field name="name">Groupes Gestion de société</field>
+        <field name="res_model">of.res.company.management.group</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="of_retail_analysis_of_res_company_management_group_menu" name="Groupes Gestion de société" parent="base.menu_users"
+              action="of_retail_analysis_of_res_company_management_group_action" sequence="30" groups="base.group_system"/>
 
 </odoo>

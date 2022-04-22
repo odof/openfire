@@ -14,8 +14,12 @@ class OFPriceVariationAnalysis(models.Model):
     order_id = fields.Many2one(comodel_name='sale.order', string=u"Commande", readonly=True)
     company_id = fields.Many2one(comodel_name='res.company', string=u"Société", readonly=True)
     company_type_id = fields.Many2one(comodel_name='of.res.company.type', string=u"Type de société", readonly=True)
-    company_sector_id = fields.Many2one(comodel_name='of.res.company.sector', string=u"Secteur de société", readonly=True)
-    company_sales_group_id = fields.Many2one(comodel_name='of.res.company.sales.group', string=u"Groupe Ventes de société", readonly=True)
+    company_sector_id = fields.Many2one(
+        comodel_name='of.res.company.sector', string=u"Secteur de société", readonly=True)
+    company_sales_group_id = fields.Many2one(
+        comodel_name='of.res.company.sales.group', string=u"Groupe Ventes de société", readonly=True)
+    company_management_group_id = fields.Many2one(
+        comodel_name='of.res.company.management.group', string=u"Groupe Gestion de société", readonly=True)
     user_id = fields.Many2one(comodel_name='res.users', string=u"Vendeur", readonly=True)
     partner_id = fields.Many2one(comodel_name='res.partner', string=u"Partenaire", readonly=True)
     order_date = fields.Date(string=u"Date de commande", readonly=True)
@@ -125,6 +129,7 @@ class OFPriceVariationAnalysis(models.Model):
             ,           RC.of_company_type_id                                       AS company_type_id
             ,           RC.of_company_sector_id                                     AS company_sector_id
             ,           RC.of_company_sales_group_id                                AS company_sales_group_id
+            ,           RC.of_company_management_group_id                           AS company_management_group_id
             ,           SO.user_id
             ,           SO.partner_id
             ,           SO.date_order::timestamp::date                              AS order_date

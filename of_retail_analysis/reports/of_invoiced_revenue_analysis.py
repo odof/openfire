@@ -14,6 +14,8 @@ class OfInvoicedRevenueAnalysis(models.Model):
         comodel_name='of.res.company.sector', string=u"Secteur de société", readonly=True)
     company_sales_group_id = fields.Many2one(
         comodel_name='of.res.company.sales.group', string=u"Groupe Ventes de société", readonly=True)
+    company_management_group_id = fields.Many2one(
+        comodel_name='of.res.company.management.group', string=u"Groupe Gestion de société", readonly=True)
 
     def _select(self):
         select_str = super(OfInvoicedRevenueAnalysis, self)._select()
@@ -21,6 +23,7 @@ class OfInvoicedRevenueAnalysis(models.Model):
             ,           RC.of_company_type_id                           AS company_type_id
             ,           RC.of_company_sector_id                         AS company_sector_id
             ,           RC.of_company_sales_group_id                    AS company_sales_group_id
+            ,           RC.of_company_management_group_id               AS company_management_group_id
         """
         return select_str
 
@@ -44,5 +47,6 @@ class OfInvoicedRevenueAnalysis(models.Model):
             ,           RC.of_company_type_id
             ,           RC.of_company_sector_id
             ,           RC.of_company_sales_group_id
+            ,           RC.of_company_management_group_id
         """
         return group_by_str

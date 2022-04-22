@@ -11,22 +11,26 @@ class AccountInvoiceReport(models.Model):
         comodel_name='of.res.company.sector', string=u"Secteur de société", readonly=True)
     of_company_sales_group_id = fields.Many2one(
         comodel_name='of.res.company.sales.group', string=u"Groupe Ventes de société", readonly=True)
+    of_company_management_group_id = fields.Many2one(
+        comodel_name='of.res.company.management.group', string=u"Groupe Gestion de société", readonly=True)
 
     def _select(self):
         res = super(AccountInvoiceReport, self)._select()
         res += """
-            , sub.of_company_type_id        AS of_company_type_id
-            , sub.of_company_sector_id      AS of_company_sector_id
-            , sub.of_company_sales_group_id AS of_company_sales_group_id
+            , sub.of_company_type_id                AS of_company_type_id
+            , sub.of_company_sector_id              AS of_company_sector_id
+            , sub.of_company_sales_group_id         AS of_company_sales_group_id
+            , sub.of_company_management_group_id    AS of_company_management_group_id
         """
         return res
 
     def _sub_select(self):
         res = super(AccountInvoiceReport, self)._sub_select()
         res += """
-            , RC.of_company_type_id         AS of_company_type_id
-            , RC.of_company_sector_id       AS of_company_sector_id
-            , RC.of_company_sales_group_id  AS of_company_sales_group_id
+            , RC.of_company_type_id             AS of_company_type_id
+            , RC.of_company_sector_id           AS of_company_sector_id
+            , RC.of_company_sales_group_id      AS of_company_sales_group_id
+            , RC.of_company_management_group_id AS of_company_management_group_id
         """
         return res
 
@@ -43,5 +47,6 @@ class AccountInvoiceReport(models.Model):
             , RC.of_company_type_id
             , RC.of_company_sector_id
             , RC.of_company_sales_group_id
+            , RC.of_company_management_group_id
         """
         return res
