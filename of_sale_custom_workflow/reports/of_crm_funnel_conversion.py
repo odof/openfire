@@ -600,7 +600,7 @@ class OFCRMFunnelConversion4(models.Model):
     def _compute_quotation_cart(self):
         for rec in self:
             if rec.quotation_nb != 0:
-                rec.quotation_cart = '%.2f' % (rec.total_turnover / rec.quotation_nb)
+                rec.quotation_cart = '%.0f' % (rec.total_turnover / rec.quotation_nb)
             else:
                 rec.quotation_cart = "N/E"
 
@@ -608,7 +608,7 @@ class OFCRMFunnelConversion4(models.Model):
     def _compute_sale_cart(self):
         for rec in self:
             if rec.order_nb != 0:
-                rec.sale_cart = '%.2f' % (rec.total_turnover / rec.order_nb)
+                rec.sale_cart = '%.0f' % (rec.total_turnover / rec.order_nb)
             else:
                 rec.sale_cart = "N/E"
 
@@ -616,7 +616,7 @@ class OFCRMFunnelConversion4(models.Model):
     def _compute_lost_cart(self):
         for rec in self:
             if rec.lost_quotation_nb != 0:
-                rec.lost_cart = '%.2f' % (rec.lost_turnover / rec.lost_quotation_nb)
+                rec.lost_cart = '%.0f' % (rec.lost_turnover / rec.lost_quotation_nb)
             else:
                 rec.lost_cart = "N/E"
 
@@ -717,20 +717,20 @@ class OFCRMFunnelConversion4(models.Model):
                     line['turnover_rate'] = "N/E"
             if 'quotation_cart' in fields_copy:
                 if 'total_turnover' in line and line['total_turnover'] is not None and line.get('quotation_nb', False):
-                    line['quotation_cart'] = ('%.2f' % (round(line['total_turnover'] / line['quotation_nb'], 2))).\
+                    line['quotation_cart'] = ('%.0f' % (round(line['total_turnover'] / line['quotation_nb'], 2))).\
                         replace('.', ',')
                 else:
                     line['quotation_cart'] = "N/E"
             if 'sale_cart' in fields_copy:
                 if 'total_turnover' in line and line['total_turnover'] is not None and line.get('order_nb', False):
-                    line['sale_cart'] = ('%.2f' % (round(line['total_turnover'] / line['order_nb'], 2))).\
+                    line['sale_cart'] = ('%.0f' % (round(line['total_turnover'] / line['order_nb'], 2))).\
                         replace('.', ',')
                 else:
                     line['sale_cart'] = "N/E"
             if 'lost_cart' in fields_copy:
                 if 'lost_turnover' in line and line['lost_turnover'] is not None and \
                         line.get('lost_quotation_nb', False):
-                    line['lost_cart'] = ('%.2f' % (round(line['lost_turnover'] / line['lost_quotation_nb'], 2))).\
+                    line['lost_cart'] = ('%.0f' % (round(line['lost_turnover'] / line['lost_quotation_nb'], 2))).\
                         replace('.', ',')
                 else:
                     line['lost_cart'] = "N/E"
