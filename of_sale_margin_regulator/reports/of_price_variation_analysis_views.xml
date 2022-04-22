@@ -28,6 +28,7 @@
                 <field name="company_type_id"/>
                 <field name="company_sector_id"/>
                 <field name="company_sales_group_id"/>
+                <field name="company_management_group_id"/>
                 <field name="user_id"/>
                 <field name="partner_id"/>
                 <field name="order_id"/>
