@@ -1258,7 +1258,7 @@ class OfContractLine(models.Model):
             keys_to_delete = []
             fields = self._fields
             for key, val in vals.iteritems():
-                if not fields[key].store:
+                if not fields[key].store or fields[key].type.endswith('2many'):
                     keys_to_delete.append(key)
                     continue
                 cr.execute("SELECT %s FROM of_contract_line WHERE id = %%s" % key, (self.id,))
