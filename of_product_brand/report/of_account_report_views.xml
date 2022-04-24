@@ -9,6 +9,25 @@
             <xpath expr="//group[@expand='1']/separator" position="before">
                 <field string="Marque" name="of_brand_id" context="{'group_by' : 'of_brand_id'}"/>
             </xpath>
+            <xpath expr="//filter[@name='thisyear']" position="replace">
+                <filter string="Mon magasin" name="my_company" domain="[('of_my_company', '=', True)]"/>
+                <separator/>
+                <filter string="Mois en cours" name="this_month"
+                        domain="[('date', '&gt;=', context_today().strftime('%Y-%m-01')),
+                                 ('date', '&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-01'))]"/>
+                <filter string="Mois précédent" name="previous_month"
+                        domain="[('date', '&gt;=', (context_today() + relativedelta(months=-1)).strftime('%Y-%m-01')),
+                                 ('date', '&lt;', context_today().strftime('%Y-%m-01'))]"/>
+                <filter string="Année en cours" name="this_year"
+                        domain="[('date', '&gt;=', context_today().strftime('%Y-01-01')),
+                                 ('date', '&lt;', (context_today() + relativedelta(day=1,years=1)).strftime('%Y-01-01'))]"/>
+                <filter string="Cumul à date - Mensuel" name="monthly_accumulation"
+                        domain="[('date', u'&gt;=', context_today().strftime('%Y-%m-01')),
+                                 ('date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Cumul à date - Annuel" name="yearly_accumulation"
+                        domain="[('date', u'&gt;=', context_today().strftime('%Y-01-01')),
+                                 ('date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+            </xpath>
         </field>
     </record>
 
