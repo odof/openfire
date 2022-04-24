@@ -309,4 +309,6 @@
         </field>
     </record>
 
+    <menuitem name="Connecteurs" id="of_connector_menu" parent="base.menu_administration" groups="base.group_system"/>
+
 </odoo>

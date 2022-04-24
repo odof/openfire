@@ -50,6 +50,6 @@
         <field name="context">{'active_test':False}</field>
     </record>
 
-    <menuitem name="Connecteurs CRM" id="of_datastore_crm_receiver_menu" parent="of_datastore_connector.of_datastore_connector_menu" groups="base.group_system" action="of_datastore_crm_receiver_action"/>
+    <menuitem name="Connecteurs CRM" id="of_datastore_crm_receiver_menu" parent="of_base.of_connector_menu" groups="base.group_system" action="of_datastore_crm_receiver_action"/>
 
 </odoo>

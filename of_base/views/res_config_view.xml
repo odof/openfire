@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- *************************** Vues ***************************-->
+
+    <record id="of_connector_config_settings_view" model="ir.ui.view">
+        <field name="name">of.connecteur.config.settings.view</field>
+        <field name="model">of.connector.config.settings</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Configuration des connecteurs">
+                <header>
+                    <button string="Appliquer" type="object" name="execute" class="oe_highlight" confirm="Êtes-vous sûr de valider les modifications?"/>
+                    <button string="Annuler" type="object" name="cancel" class="oe_link" special="cancel"/>
+                </header>
+                <group name="main">
+                    <field name="company_id" invisible="1"/>
+                </group>
+                <group string="Marketing / CRM" name="crm" invisible="1">
+                </group>
+                <group string="Achats" name="purchase" invisible="1">
+                </group>
+                <group string="Comptabilité" name="accounting" invisible="1">
+                </group>
+            </form>
+        </field>
+    </record>
+
+<!-- *************************** Actions ***************************-->
+
+    <record id="of_connector_config_settings_action" model="ir.actions.act_window">
+        <field name="name">Configuration</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.connector.config.settings</field>
+        <field name="view_id" ref="of_connector_config_settings_view"/>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+    </record>
+
+<!-- *************************** Menus ***************************-->
+
+    <menuitem id="of_connector_config_settings_menu" name="Configuration" parent="of_base.of_connector_menu" sequence="100" action="of_connector_config_settings_action"/>
+
+</odoo>

@@ -12,7 +12,9 @@ Module OpenFire de connexion à une base Odoo.
 
 Ajout d'une classe abstraite permettant de se connecter à une autre base odoo.
 """,
-    'depends': [],
+    'depends': [
+        'of_base'
+    ],
     'external_dependencies': {
         'python': [
             'openerplib'
@@ -20,8 +22,6 @@ Ajout d'une classe abstraite permettant de se connecter à une autre base odoo.
     },
     'init_xml': [],
     'demo_xml': [],
-    'data': [
-        'views/of_datastore_connector_views.xml',
-    ],
+    'data': [],
     'installable': True,
 }
