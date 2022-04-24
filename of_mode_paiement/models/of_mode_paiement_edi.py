@@ -224,6 +224,11 @@ class OfPaiementEdi(models.Model):
         # Teste si au moins une facture sélectionnée
         if not self.edi_line_ids:
             raise UserError(u"Erreur ! (#ED105)\n\nVous devez sélectionner au moins une facture.")
+        # Teste si certaines lignes ont un montant à 0
+        error_lines = self.edi_line_ids.filtered(lambda l: not l.montant_prelevement)
+        if error_lines:
+            raise UserError(u"Erreur !\n\nLes Factures suivantes n'ont pas de montant à prélever :\n\n- " +
+                            u"\n- ".join(error_lines.mapped(lambda l: l.invoice_id.number)))
 
         # On vérifie qu'il s'agit bien de factures ouvertes non payées
         for edi in self.edi_line_ids:

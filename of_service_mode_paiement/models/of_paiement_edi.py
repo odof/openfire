@@ -63,13 +63,13 @@ class OfPaiementEdi(models.Model):
         self.aff_bouton_paiement = False
 
     edi_service_line_ids = fields.One2many(
-        'of.paiement.edi.service.line', 'edi_id', string=u"DI sélectionnées à payer",
+        comodel_name='of.paiement.edi.service.line', inverse_name='edi_id', string=u"DI sélectionnées à payer",
         copy=False, default=_default_edi_service_line_ids)
     type_source = fields.Selection(
-        [('account.invoice', u"Facture"), ('of.service', u"Demande d'intervention")],
+        selection=[('account.invoice', u"Facture"), ('of.service', u"Demande d'intervention")],
         string=u"Type de source", default=_default_type_source)
     mode_calcul = fields.Selection(
-        [('fixe', u'Montant fixe'), ('pc', u'% du montant TTC')],
+        selection=[('fixe', u"Montant fixe"), ('pc', u"% du montant TTC"), ('echeance', u"Prélèvement à l'échéance")],
         default=_default_mode_calcul, string=u"Mode calcul du montant à prélever",
         required=True, help=u"Détermine comment est calculée le montant à prélever")
     montant_a_prelever = fields.Float(string=u"Montant à prélever", digits=(16, 2))
@@ -77,6 +77,8 @@ class OfPaiementEdi(models.Model):
 
     @api.multi
     def action_compute_edi_service_line_ids(self):
+        show_warning = False
+        message = u"Les DI suivantes n'ont pas d'échéance de définie :\n\n"
         for edi_line in self.edi_service_line_ids:
             if self.mode_calcul == 'fixe':
                 edi_line.methode_calcul_montant = 'fixe'
@@ -84,6 +86,14 @@ class OfPaiementEdi(models.Model):
             elif self.mode_calcul == 'pc':
                 edi_line.methode_calcul_montant = 'pc'
                 edi_line.pc_prelevement = self.pourcentage_a_prelever
+            elif self.mode_calcul == 'echeance':
+                edi_line.methode_calcul_montant = 'pc'
+                if not edi_line.service_id.deadline_count:
+                    show_warning = True
+                    message += u"- %s\n" % edi_line.service_id.name
+                    edi_line.pc_prelevement = 0.
+                else:
+                    edi_line.pc_prelevement = 100. / edi_line.service_id.deadline_count
             edi_line.onchange_montant_prelevement()
         for edi_line in self.edi_line_ids:
             if self.mode_calcul == 'fixe':
@@ -92,7 +102,12 @@ class OfPaiementEdi(models.Model):
             elif self.mode_calcul == 'pc':
                 edi_line.methode_calcul_montant = 'pc'
                 edi_line.pc_prelevement = self.pourcentage_a_prelever
+            elif self.mode_calcul == 'echeance':
+                edi_line.methode_calcul_montant = 'pc'
+                edi_line.pc_prelevement = 100
             edi_line.onchange_montant_prelevement()
+        if show_warning:
+            return self.env['of.popup.wizard'].popup_return(titre=u"Attention !", message=message)
 
     @api.multi
     def action_paiement_lcr_service(self):
@@ -113,6 +128,11 @@ class OfPaiementEdi(models.Model):
         # Teste si au moins une DI sélectionnée
         if not self.edi_service_line_ids:
             raise UserError(u"Erreur ! (#ED105)\n\nVous devez sélectionner au moins une demande d'intervention.")
+        # Teste si certaines lignes ont un montant à 0
+        error_lines = self.edi_service_line_ids.filtered(lambda l: not l.montant_prelevement)
+        if error_lines:
+            raise UserError(u"Erreur !\n\nLes DI suivantes n'ont pas de montant à prélever :\n\n- " +
+                            u"\n- ".join(error_lines.mapped(lambda l: l.service_id.name)))
         # On récupère le mode de paiement et génère le fichier EDI
         if type_paiement == "LCR":
             self.genere_fichier_lcr_service(self.edi_service_line_ids)
@@ -836,8 +856,9 @@ class OfPaiementEdiServiceLine(models.Model):
     _description = u"Demande d'intervention à payer par EDI"
 
     service_id = fields.Many2one(
-        'of.service', string=u"Demande d'intervention", required=True, domain="[('state','not in',['cancel']')]")
-    edi_id = fields.Many2one('of.paiement.edi', 'EDI')
+        comodel_name='of.service', string=u"Demande d'intervention",
+        required=True, domain="[('state','not in',['cancel']')]")
+    edi_id = fields.Many2one(comodel_name='of.paiement.edi', string=u"EDI")
 
     partner = fields.Char(string=u'Partenaire', related='service_id.partner_id.name', readonly=True)
     currency_id = fields.Many2one(related='service_id.currency_id')
@@ -846,7 +867,7 @@ class OfPaiementEdiServiceLine(models.Model):
 
     pc_prelevement = fields.Float(string=u'% du montant TTC de la DI à prélever')
     methode_calcul_montant = fields.Selection(
-        [('fixe', u'montant fixe'), ('pc', u'% du montant TTC de la DI')],
+        selection=[('fixe', u"montant fixe"), ('pc', u"% du montant TTC de la DI")],
         string=u"Mode calcul du montant à prélever", required=True,
         help=u"Détermine comment est calculée le montant à prélever")
 
@@ -858,7 +879,7 @@ class OfPaiementEdiServiceLine(models.Model):
 
     @api.onchange('methode_calcul_montant', 'pc_prelevement', 'montant_prelevement', 'service_id')
     def onchange_montant_prelevement(self):
-        if self.methode_calcul_montant == 'pc':
+        if self.methode_calcul_montant in ['pc', 'echeance']:
             pc = self.pc_prelevement
             if pc > 100:
                 pc = 100

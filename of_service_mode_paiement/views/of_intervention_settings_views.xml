@@ -6,11 +6,10 @@
         <field name="model">of.intervention.settings</field>
         <field name="inherit_id" ref="of_planning.view_of_intervention_settings"/>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='intervention']" position="inside">
-                <label for="group_of_intervention_sepa"/>
+            <xpath expr="//group[@name='intervention']/div[@name='general_config']" position="inside">
                 <div>
-                    <field name="group_of_intervention_sepa"/>
-                    <span>Gérer les prélèvements SEPA depuis les Demandes d'intervention</span>
+                    <field name="group_of_intervention_sepa" class="oe_inline" style="vertical-align: middle;"/>
+                    <label string="Gérer les prélèvements SEPA depuis les Demandes d'intervention" style="vertical-align: middle;"/>
                 </div>
             </xpath>
         </field>

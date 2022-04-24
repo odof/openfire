@@ -7,20 +7,23 @@ class OfService(models.Model):
     _inherit = 'of.service'
 
     validite_sepa = fields.Selection(
-        [("non_verifie", u"Non vérifiée"), ("non_valide", u"Non valide"), ("valide", u"Valide")],
+        selection=[("non_verifie", u"Non vérifiée"), ("non_valide", u"Non valide"), ("valide", u"Valide")],
         string=u"Validité du SEPA", readonly=True, required=True, default="non_verifie")
-    date_verification_sepa = fields.Date(u'Date de vérification', readonly=True)
-    paiements_non_lettres_count = fields.Integer(u"Nombre de paiement non lettré", compute='_compute_paiements')
-    paiements_ids = fields.One2many('account.payment', string=u"Nombre de paiement", compute='_compute_paiements')
-    paiements_count = fields.Integer(u"Nombre de paiement", compute='_compute_paiements')
+    date_verification_sepa = fields.Date(string=u'Date de vérification', readonly=True)
+    paiements_non_lettres_count = fields.Integer(string=u"Nombre de paiement non lettré", compute='_compute_paiements')
+    paiements_ids = fields.One2many(
+        comodel_name='account.payment', string=u"Nombre de paiement", compute='_compute_paiements')
+    paiements_count = fields.Integer(string=u"Nombre de paiement", compute='_compute_paiements')
     prelevements_ids = fields.One2many(
-        'of.paiement.edi', string=u"Nombre de prélèvement", compute='_compute_prelevements')
-    prelevements_count = fields.Integer(u"Nombre de prélèvement", compute='_compute_prelevements')
+        comodel_name='of.paiement.edi', string=u"Prélèvements", compute='_compute_prelevements')
+    prelevements_count = fields.Integer(string=u"Nombre de prélèvement", compute='_compute_prelevements')
+    deadline_count = fields.Integer(string=u"Nombre d'échéance")
 
-    payment_term_id = fields.Many2one('account.payment.term', string=u"Conditions de règlement")
-    montant_dernier_prelevement = fields.Float(u"Montant du dernier prélèvement", compute='_compute_prelevements')
-    date_dernier_prelevement = fields.Date(u"Date du dernier prélèvement")
-    date_previsionnelle_prochaine_facture = fields.Date(u"Date prévisionnelle de prochaine facture")
+    payment_term_id = fields.Many2one(comodel_name='account.payment.term', string=u"Conditions de règlement")
+    montant_dernier_prelevement = fields.Float(
+        string=u"Montant du dernier prélèvement", compute='_compute_prelevements')
+    date_dernier_prelevement = fields.Date(string=u"Date du dernier prélèvement")
+    date_previsionnelle_prochaine_facture = fields.Date(string=u"Date prévisionnelle de prochaine facture")
 
     def _compute_paiements(self):
         paiements_ids = self.env['account.payment'].search([('service_ids', 'in', self.ids)])
