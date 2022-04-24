@@ -112,7 +112,7 @@
                         <group col="2" colspan="2" string="Informations clients" name="refs">
                             <field name="automatic_sequence" invisible="1"/>
                             <field name="reference" class="oe_inline" placeholder="e.g. Project XYZ" attrs="{'readonly': [('automatic_sequence', '=', True)], 'required': [('automatic_sequence', '=', False)]}"/>
-                            <field name="partner_id" attrs="{'readonly': [('invoice_count', '>', 0)]}"/>
+                            <field name="partner_id"/>
                             <field name="category_ids" widget="many2many_tags"/>
                             <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                             <field name="date_souscription" attrs="{'readonly': [('invoice_count','>',0)]}"/>
