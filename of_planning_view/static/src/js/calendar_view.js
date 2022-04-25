@@ -97,7 +97,6 @@ CalendarView.include({
                     // ne montrer que les filtres (à droite) qui passent le filtrage par société et type de planning
                     if (self.attendee_mode == 'tech' && a['of_est_intervenant'] ||
                       self.attendee_mode == 'com' && a['of_est_commercial'] || self.attendee_mode == 'comtech') {
-                            //self.now_filter_ids.push(a['id']);
                             filter_item.is_visible = true;
                     }
                 };
@@ -296,9 +295,9 @@ CalendarView.include({
      */
     apply_extra_filters: function() {
         if (this.model == 'of.planning.intervention'){
+            this.now_filter_ids = []
             for (var i in this.all_filters) {
                 this.all_filters[i].is_visible = false;
-                this.now_filter_ids = []
 
                 if (this.attendee_mode == "tech" && this.all_filters[i].est_intervenant
                   || this.attendee_mode == "com" && this.all_filters[i].est_commercial

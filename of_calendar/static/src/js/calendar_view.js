@@ -503,7 +503,7 @@ CalendarView.include({
                             var new_filter_added = false;
                             _.each(events, function (e) {
                                 var key,val = null;
-                                var is_visible;
+                                var is_visible, is_checked;
 
                                 if (self.attendee_multiple) {
                                     _.each(e[self.color_field], function (a) {
@@ -523,7 +523,8 @@ CalendarView.include({
                                             new_filter_added = true
                                         }
                                         is_visible = self.all_filters[self.res_ids_indexes[key]].is_visible;
-                                        if (! _.contains(self.now_filter_ids, key) && is_visible) {
+                                        is_checked = self.all_filters[self.res_ids_indexes[key]].is_checked;
+                                        if (! _.contains(self.now_filter_ids, key) && is_visible && is_checked) {
                                             self.now_filter_ids.push(key);
                                         }
                                     });
@@ -550,7 +551,8 @@ CalendarView.include({
                                         new_filter_added = true
                                     }
                                     is_visible = self.all_filters[self.res_ids_indexes[key]].is_visible;
-                                    if (! _.contains(self.now_filter_ids, key) && is_visible) {
+                                    is_checked = self.all_filters[self.res_ids_indexes[key]].is_checked;
+                                    if (! _.contains(self.now_filter_ids, key) && is_visible && is_checked) {
                                         self.now_filter_ids.push(key);
                                     }
                                 }
