@@ -282,7 +282,7 @@
                         </group>
                         <group name="where" string="Où" class="of_grey_background">
                             <group colspan="2">
-                                <field name="partner_id" invisible="1"/>
+                                <field name="partner_id"/>
                                 <label for="address_id"/>
                             <div class="o_address_format">
                                 <div><field name="address_id" domain="[('customer','=',True)]"/></div>
