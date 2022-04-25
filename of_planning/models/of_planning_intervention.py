@@ -1997,17 +1997,18 @@ class OfPlanningInterventionLine(models.Model):
         for tax in taxes:
             line_account = tax.map_account(line_account)
 
+        line_name = self.name or product.name_get()[0][1]
         return {
-            'name':                     product.name_get()[0][1],
-            'account_id':               line_account.id,
-            'price_unit':               self.price_unit,
-            'quantity':                 self.qty_invoiceable,
-            'discount':                 0.0,
-            'uom_id':                   product.uom_id.id,
-            'product_id':               product.id,
-            'invoice_line_tax_ids':     [(6, 0, taxes._ids)],
-            'of_intervention_line_id':  self.id,
-            }, ""
+            'name': line_name,
+            'account_id': line_account.id,
+            'price_unit': self.price_unit,
+            'quantity': self.qty_invoiceable,
+            'discount': 0.0,
+            'uom_id': product.uom_id.id,
+            'product_id': product.id,
+            'invoice_line_tax_ids': [(6, 0, taxes._ids)],
+            'of_intervention_line_id': self.id
+        }, ""
 
     @api.multi
     def update_vals(self):
