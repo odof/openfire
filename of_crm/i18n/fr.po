@@ -33,3 +33,8 @@ msgstr "Canal"
 #: model:ir.ui.view,arch_db:crm.view_crm_case_opportunities_filter
 msgid "Source"
 msgstr "Source"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
+msgid "Archived"
+msgstr "Archivée"

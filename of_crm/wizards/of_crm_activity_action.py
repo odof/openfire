@@ -24,10 +24,12 @@ class OFCRMActivityAction(models.TransientModel):
     def action_realize(self):
         self.ensure_one()
         # Création d'un message
+        description = self.activity_id.description and '<p><em>%s</em></p>' % '<br/>'.join(
+            self.activity_id.description.split('\n')) or ''
         body_html = "<div><b>%(title)s</b> : %(activity)s</div>%(description)s%(report)s" % {
             'title': u"Activité réalisée",
             'activity': self.activity_id.type_id.name,
-            'description': self.activity_id.description and '<p><em>%s</em></p>' % '<br/>'.join(self.activity_id.description.split('\n')) or '',
+            'description': description,
             'report': "<p><em> => %s</em></p>" % '<br/>'.join(self.note.split('\n')),
         }
         self.activity_id.opportunity_id.message_post(
@@ -39,14 +41,19 @@ class OFCRMActivityAction(models.TransientModel):
     def action_cancel(self):
         self.ensure_one()
         # Création d'un message
+        description = self.activity_id.description and '<p><em>%s</em></p>' % '<br/>'.join(
+            self.activity_id.description.split('\n')) or ''
         body_html = "<div><b>%(title)s</b> : %(activity)s</div>%(description)s%(cancel_reason)s" % {
             'title': u"Activité annulée",
             'activity': self.activity_id.type_id.name,
-            'description': self.activity_id.description and '<p><em>%s</em></p>' % '<br/>'.join(self.activity_id.description.split('\n')) or '',
+            'description': description,
             'cancel_reason': "<p><em> => %s</em></p>" % '<br/>'.join(self.note.split('\n')),
         }
         self.activity_id.opportunity_id.message_post(
             body_html, subject=self.activity_id.title, subtype_id=self.activity_id.type_id.subtype_id.id)
-        self.activity_id.write({'state': 'canceled', 'cancel_reason': self.note})
+        self.activity_id.write({
+            'active': False,
+            'state': 'canceled',
+            'cancel_reason': self.note
+        })
         return True
-
