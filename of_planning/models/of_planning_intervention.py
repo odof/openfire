@@ -484,6 +484,7 @@ class OfPlanningIntervention(models.Model):
     # Onglet Description
     description = fields.Text(string="Description")
     old_description = fields.Html(string=u"Ancienne description", readonly=True)
+    description_interne = fields.Text(string=u"Description interne")
 
     # Onglet Notes
     of_notes_intervention = fields.Html(related='order_id.of_notes_intervention', readonly=True)
