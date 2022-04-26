@@ -137,7 +137,7 @@ class OFParcInstalle(models.Model):
             non_revendeurs = self.mapped('revendeur_id').filtered(lambda p: not p.of_revendeur)
             non_revendeurs.write({'of_revendeur': True})
         if vals.get('installateur_id'):
-            non_installateurs  = self.mapped('installateur_id').filtered(lambda p: not p.of_installateur)
+            non_installateurs = self.mapped('installateur_id').filtered(lambda p: not p.of_installateur)
             non_installateurs.write({'of_installateur': True})
         return res
 
@@ -541,7 +541,8 @@ class StockSettings(models.TransientModel):
 
     of_parc_installe_auto = fields.Boolean(
         string=u"(OF) Création automatique du parc installé",
-        help=u"Créer automatiquement le parc installé lors de la confirmation du BL si un numéro de série est renseigné.")
+        help=u"Créer automatiquement le parc installé lors de la confirmation du BL si un numéro de série "
+        u"est renseigné.")
 
     @api.multi
     def set_of_parc_installe_auto_defaults(self):
