@@ -148,9 +148,11 @@ class OFParcInstalle(models.Model):
         du contact précédées d'une puce.
         Permet dans une DI de proposer les appareils d'une adresse différente entre parenthèses.
         """
+        if self._context.get('simple_display'):
+            return super(OFParcInstalle, self).name_get()
+        result = []
         client_id = self._context.get('partner_id_no_serie_puce')
         if client_id:
-            result = []
             for record in self:
                 result.append((
                     record.id,
@@ -158,15 +160,18 @@ class OFParcInstalle(models.Model):
                     + (record.name or u"(N° non renseigné)")
                     + " - " + record.client_id.display_name))
             return result
-        address_id = self._context.get('address_prio_id')
-        if address_id:
-            result = []
-            for parc in self:
-                parc_address = parc.site_adresse_id or parc.client_id
-                meme = parc_address and parc_address.id == address_id
-                result.append((parc.id, "%s%s%s" % ('' if meme else '(', parc.name, '' if meme else ')')))
-            return result
-        return super(OFParcInstalle, self).name_get()
+
+        for record in self:
+            serial_number = '%s - ' % record.name if record.name else ''
+            product_name = record.product_id.name
+            partner_name = record.client_id.display_name
+            record_name = '%s%s - %s' % (
+                serial_number,
+                product_name,
+                partner_name,
+            )
+            result.append((record.id, record_name))
+        return result
 
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):

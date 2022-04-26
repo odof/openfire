@@ -26,6 +26,10 @@ except ImportError:
 NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
 
 
+def get_selection_label(self, object, field_name, field_value):
+    return _(dict(self.env[object].fields_get(allfields=[field_name])[field_name]['selection'])[field_value])
+
+
 @api.onchange('product_uom', 'product_uom_qty')
 def product_uom_change(self):
     u"""Copie de la fonction parente avec retrait de l'affectation du prix unitaire"""
@@ -237,6 +241,22 @@ class SaleOrder(models.Model):
         ('order_line', u'Prix par ligne de commande'),
     ], string=u"Impressions des prix", default='order_line', required=True)
     of_apply_on_invoice = fields.Boolean(string=u"Appliquer aux factures", default=True)
+
+    @api.multi
+    @api.depends('name', 'date', 'state')
+    def name_get(self):
+        if not self._context.get('extended_display'):
+            return super(SaleOrder, self).name_get()
+        result = []
+        date_format = '%d/%m/%Y' if self.env.user.lang == 'fr_FR' else DEFAULT_SERVER_DATE_FORMAT
+        for record in self:
+            date_order = fields.Date.from_string(record.date_order).strftime(date_format)
+            order_state = get_selection_label(self, self._name, 'state', self.state)
+            record_name = "%s - %s - %s" % (
+                record.name, order_state, date_order
+            )
+            result.append((record.id, record_name))
+        return result
 
     @api.depends('company_id')
     def _compute_of_allow_quote_addition(self):
