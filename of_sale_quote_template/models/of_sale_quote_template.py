@@ -7,6 +7,7 @@ import odoo.addons.decimal_precision as dp
 # La classe sale.order provient du module Odoo 11 website_quote/models/sale_order.py.
 # Tout les champs qui ne commencent pas par of_ sont les champs déjà existants dans Odoo 11
 
+
 class SaleQuoteTemplate(models.Model):
     _name = "sale.quote.template"
     _description = u"Modèle de devis"
@@ -174,8 +175,21 @@ class SaleQuoteLine(models.Model):
         (code Odoo v11)
         """
         self.ensure_one()
+        result = {}
         domain = {'product_uom_id': [('category_id', 'ilike', '')]}
         if self.product_id:
+            warning = {}
+            if self.product_id.sale_line_warn != 'no-message':
+                title = _("Warning for %s") % self.product_id.name
+                message = self.product_id.sale_line_warn_msg
+                warning['title'] = title
+                warning['message'] = message
+                result = {'warning': warning}
+                if self.product_id.sale_line_warn == 'block':
+                    # rollback
+                    self.product_id = self._origin and self._origin.product_id or False
+                    return result
+
             name = self.product_id.name_get()[0][1]
             if self.product_id.description_sale:
                 name += '\n' + self.product_id.description_sale
@@ -186,7 +200,8 @@ class SaleQuoteLine(models.Model):
                 if self.product_id.categ_id.of_layout_id:
                     self.layout_category_id = self.product_id.categ_id.of_layout_id
             domain = {'product_uom_id': [('category_id', '=', self.product_id.uom_id.category_id.id)]}
-        return {'domain': domain}
+        result['domain'] = domain
+        return result
 
     @api.onchange('product_uom_id')
     def _onchange_product_uom(self):
@@ -844,6 +859,9 @@ class SaleOrder(models.Model):
         else:
             order_lines = order_line_obj
         inactif = False  # Permet de savoir si il y a un article inactif
+        product_obj = self.env['product.product']
+        product_warn_ids = product_obj
+        product_block_ids = product_obj
         for line in template.quote_line:
             discount = 0
             if not line.of_active:
@@ -857,14 +875,19 @@ class SaleOrder(models.Model):
                 else:
                     price = line.price_unit
 
-                data = self._get_data_from_template(line, price, discount)
-                if self.pricelist_id:
-                    data.update(self.env['sale.order.line']._get_purchase_price(self.pricelist_id, line.product_id, line.product_uom_id, fields.Date.context_today(self)))
-                new_line = order_line_obj._new_line_for_template(data)
-                if self.env.user.has_group('sale.group_sale_layout'):
-                    if not new_line.layout_category_id and new_line.product_id.categ_id.of_layout_id:
-                        new_line.layout_category_id = new_line.product_id.categ_id.of_layout_id
-                order_lines += new_line
+                if line.product_id.sale_line_warn == 'block':
+                    product_block_ids |= line.product_id
+                else:
+                    if line.product_id.sale_line_warn == 'warning':
+                        product_warn_ids |= line.product_id
+                    data = self._get_data_from_template(line, price, discount)
+                    if self.pricelist_id:
+                        data.update(self.env['sale.order.line']._get_purchase_price(self.pricelist_id, line.product_id, line.product_uom_id, fields.Date.context_today(self)))
+                    new_line = order_line_obj._new_line_for_template(data)
+                    if self.env.user.has_group('sale.group_sale_layout'):
+                        if not new_line.layout_category_id and new_line.product_id.categ_id.of_layout_id:
+                            new_line.layout_category_id = new_line.product_id.categ_id.of_layout_id
+                    order_lines += new_line
 
         self.order_line = order_lines
         self._compute_prices_from_template()
@@ -886,6 +909,28 @@ class SaleOrder(models.Model):
         self.of_mail_template_ids = docs
         if inactif:  # @TODO : voir si peut être fait avec une fenêtre en javascript.
             self.of_note_insertion = u"Un ou plusieurs articles du modèle ne sont plus utilisés ou ne peuvent être vendus et n'ont donc pas été importés."
+        title = u""
+        warning = {}
+        if product_warn_ids and product_block_ids:
+            title = u"Avertissement(s) et message(s) bloquant(s)"
+        elif product_warn_ids:
+            title = u"Avertissement(s)"
+        elif product_block_ids:
+            title = u"Message(s) bloquant(s)"
+        if title:
+            warning['title'] = title
+            message = u""
+            if product_warn_ids:
+                message += u"Article(s) ayant un avertissement:\n"
+                for product_warn in product_warn_ids:
+                    message += u" - %s : %s\n" % (product_warn.name, product_warn.sale_line_warn_msg)
+            if product_block_ids:
+                message += u"Article(s) ayant un message bloquant (non ajoutés au devis):"
+                for product_block in product_block_ids:
+                    message += u"\n - %s : %s" % (product_block.name, product_block.sale_line_warn_msg)
+            warning['message'] = message
+            return {'warning': warning}
+        return
 
     def compute_of_layout_category_ids(self):
         order_layout_category_obj = self.env['of.sale.order.layout.category']
