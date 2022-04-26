@@ -8,6 +8,8 @@
         <field name="model">of.questionnaire</field>
         <field name="arch" type="xml">
             <search string="Recherche">
+                <field name="name"/>
+                <field name="type"/>
                 <group>
                     <filter string="Intervention" name="type_intervention" domain="[('type','=','intervention')]"/>
                     <filter string="Équipement" name="type_product" domain="[('type','=','product')]"/>
@@ -76,6 +78,14 @@
         <field name="model">of.questionnaire.line</field>
         <field name="arch" type="xml">
             <search string="Recherche">
+                <field name="name"/>
+                <field name="type"/>
+                <field name="category_id"/>
+                <field name="print_mode"/>
+                <field name="answer_type"/>
+                <field name="answer_ids"/>
+                <field name="id_code"/>
+                <field name="condition"/>
                 <group>
                     <filter string="Intervention" name="type_intervention" domain="[('type','=','intervention')]"/>
                     <filter string="Équipement" name="type_product" domain="[('type','=','product')]"/>
