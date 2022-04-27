@@ -1783,6 +1783,8 @@ class OfContractProduct(models.Model):
         fpos = self.line_id.fiscal_position_id
         company = self.line_id.contract_id.company_id
         account = self.env['account.invoice.line'].get_invoice_line_account(type, product, fpos, company)
+        for tax in self.tax_ids:
+            account = tax.map_account(account)
         invoice_line_new._onchange_product_id()
         invoice_line_vals = invoice_line_new._convert_to_write(invoice_line_new._cache)
         # Get other invoice line values from product onchange

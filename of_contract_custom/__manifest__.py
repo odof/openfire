@@ -47,6 +47,7 @@ Ligne d'indice :
     "depends": [
         "of_service_parc_installe",
         "of_account",
+        "of_account_tax",
         "of_planning_tournee",
         "of_project_issue",
         "of_base",
