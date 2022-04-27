@@ -9,6 +9,10 @@ class AccountInvoice(models.Model):
 
     of_margin = fields.Float(compute='_compute_of_margin', string=u"Marge", digits=dp.get_precision('Product Price'))
     of_margin_perc = fields.Float(compute='_compute_of_margin', string=u"Marge %")
+    of_margin_down_payment_excluded = fields.Float(
+        compute='_compute_of_margin', string=u"Marge hors acompte (en €)", digits=dp.get_precision('Product Price'))
+    of_margin_down_payment_excluded_perc = fields.Float(
+        compute='_compute_of_margin', string=u"Marge hors acompte (en %)")
 
     @api.depends('invoice_line_ids')
     def _compute_of_margin(self):
@@ -17,6 +21,17 @@ class AccountInvoice(models.Model):
                 invoice.of_margin = sum(invoice.invoice_line_ids.mapped('of_margin'))
                 cost = invoice.amount_untaxed - invoice.of_margin
                 invoice.of_margin_perc = 100 * (1 - cost / invoice.amount_untaxed) if invoice.amount_untaxed else -100
+
+                acompte_categ_id = self.env['ir.values'].get_default(
+                    'sale.config.settings', 'of_deposit_product_categ_id_setting')
+                down_payment_margin = sum(
+                    invoice.invoice_line_ids.filtered(
+                        lambda ail: ail.product_id.categ_id.id == acompte_categ_id).mapped('of_margin'))
+                invoice.of_margin_down_payment_excluded = sum(
+                    invoice.invoice_line_ids.mapped('of_margin')) - down_payment_margin
+                invoice.of_margin_down_payment_excluded_perc = 100 * (
+                        1 - cost / (invoice.amount_untaxed - down_payment_margin))\
+                    if (invoice.amount_untaxed - down_payment_margin) else -100
 
 
 class AccountInvoiceLine(models.Model):
@@ -41,7 +56,7 @@ class AccountInvoiceLine(models.Model):
                 sale_qty = line.sale_line_ids.product_uom_qty
                 if sale_qty and purchase_qty < sale_qty:
                     cost = ((purchase_cost * purchase_qty) +
-                            (line.product_id.standard_price * (sale_qty - purchase_qty))) / sale_qty
+                            (line.sale_line_ids.purchase_price * (sale_qty - purchase_qty))) / sale_qty
                 else:
                     cost = purchase_cost
             else:
