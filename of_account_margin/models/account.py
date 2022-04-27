@@ -9,6 +9,10 @@ class AccountInvoice(models.Model):
 
     of_margin = fields.Float(compute='_compute_of_margin', string=u"Marge", digits=dp.get_precision('Product Price'))
     of_margin_perc = fields.Float(compute='_compute_of_margin', string=u"Marge %")
+    of_margin_down_payment_excluded = fields.Float(
+        compute='_compute_of_margin', string=u"Marge hors acompte (en €)", digits=dp.get_precision('Product Price'))
+    of_margin_down_payment_excluded_perc = fields.Float(
+        compute='_compute_of_margin', string=u"Marge hors acompte (en %)")
 
     @api.depends('invoice_line_ids')
     def _compute_of_margin(self):
@@ -17,6 +21,15 @@ class AccountInvoice(models.Model):
                 invoice.of_margin = sum(invoice.invoice_line_ids.mapped('of_margin'))
                 cost = invoice.amount_untaxed - invoice.of_margin
                 invoice.of_margin_perc = 100 * (1 - cost / invoice.amount_untaxed) if invoice.amount_untaxed else -100
+
+                down_payment_margin = sum(
+                    invoice.invoice_line_ids.filtered(
+                        lambda ail: ail.product_id == self.env.ref('__export__.product_product_1')).mapped('of_margin'))
+                invoice.of_margin_down_payment_excluded = sum(
+                    invoice.invoice_line_ids.mapped('of_margin')) - down_payment_margin
+                invoice.of_margin_down_payment_excluded_perc = 100 * (
+                        1 - cost / (invoice.amount_untaxed - down_payment_margin))\
+                    if (invoice.amount_untaxed - down_payment_margin) else -100
 
 
 class AccountInvoiceLine(models.Model):
@@ -31,7 +44,9 @@ class AccountInvoiceLine(models.Model):
     @api.depends('product_id')
     def _compute_of_unit_cost(self):
         for line in self:
+            # Pour les lignes de commandes qui ne concernent pas les kits
             if len(line.sale_line_ids) == 1 and not line.sale_line_ids.of_is_kit:
+                # Pour les lignes de commandes d'achat
                 purchase_lines = line.sale_line_ids.procurement_ids.mapped('move_ids').mapped('move_orig_ids'). \
                     mapped('purchase_line_id')
                 purchase_price = sum(purchase_lines.mapped('price_subtotal'))
@@ -39,9 +54,10 @@ class AccountInvoiceLine(models.Model):
                 purchase_cost = purchase_price / purchase_qty if purchase_qty else 0.0
                 purchase_cost *= line.product_id.property_of_purchase_coeff
                 sale_qty = line.sale_line_ids.product_uom_qty
+                # Si pas suffisamment de lignes de commandes d'achat, on prend les lignes de commandes
                 if sale_qty and purchase_qty < sale_qty:
                     cost = ((purchase_cost * purchase_qty) +
-                            (line.product_id.standard_price * (sale_qty - purchase_qty))) / sale_qty
+                            (line.sale_line_ids[0].price_subtotal * (sale_qty - purchase_qty))) / sale_qty
                 else:
                     cost = purchase_cost
             else:
