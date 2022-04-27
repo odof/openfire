@@ -114,7 +114,7 @@ odoo.define('list_editor.main', function (require) {
             // make invisible
             self.fields_view.arch.children.forEach(function (item) {
                 var name = item.attrs.name;
-                if (view['visible_columns'].indexOf(name) === -1) {
+                if (item.tag != 'button' && view['visible_columns'].indexOf(name) === -1) {
                     self.make_invisible_column(item);
                 }
             });
