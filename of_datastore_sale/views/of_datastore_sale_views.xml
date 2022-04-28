@@ -52,6 +52,6 @@
         <field name="context">{'active_test': False}</field>
     </record>
 
-    <menuitem name="Connecteurs vente" id="of_datastore_sale_menu" parent="of_datastore_connector.of_datastore_connector_menu" sequence="10" action="of_datastore_sale_action"/>
+    <menuitem name="Connecteurs vente" id="of_datastore_sale_menu" parent="of_base.of_connector_menu" sequence="10" action="of_datastore_sale_action"/>
 
 </odoo>
