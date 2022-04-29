@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+
+    <record id="of_group_planning_intervention_recurring" model="res.groups">
+        <field name="name">Gérer les RDVs réguliers</field>
+    </record>
+
+</odoo>

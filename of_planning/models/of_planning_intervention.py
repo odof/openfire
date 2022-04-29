@@ -15,8 +15,7 @@ from odoo.tools.float_utils import float_compare
 from odoo.tools.safe_eval import safe_eval
 
 import odoo.addons.decimal_precision as dp
-from odoo.addons.of_utils.models.of_utils import se_chevauchent, float_2_heures_minutes, heures_minutes_2_float, \
-    compare_date, hours_to_strs
+from odoo.addons.of_utils.models.of_utils import se_chevauchent, float_2_heures_minutes, compare_date, hours_to_strs
 try:
     import simplejson as json
 except ImportError:
@@ -470,7 +469,7 @@ class OfPlanningIntervention(models.Model):
     # les fonctions de calcul et de recherche des 2 champs suivants sont héritées dans of_mobile
     date_prompt = fields.Datetime(string=u"Date de début", compute="_compute_date_prompt", search="_search_date_prompt")
     date_deadline_prompt = fields.Datetime(
-        string="Date de fin", compute="_compute_date_prompt", search="_search_date_deadline_prompt"
+        string=u"Date de fin", compute="_compute_date_deadline_prompt", search="_search_date_deadline_prompt"
     )
     duree_prompt = fields.Float(
         string=u"Durée affichée", compute="_compute_duree_prompt", search="_search_duree_prompt"
@@ -739,8 +738,11 @@ class OfPlanningIntervention(models.Model):
     def _compute_date_prompt(self):
         for intervention in self:
             intervention.date_prompt = intervention.date
+
+    @api.depends('date_deadline')
+    def _compute_date_deadline_prompt(self):
+        for intervention in self:
             intervention.date_deadline_prompt = intervention.date_deadline
-            intervention.duree_prompt = intervention.duree
 
     @api.depends('duree')
     def _compute_duree_prompt(self):
@@ -1772,8 +1774,8 @@ class OfPlanningIntervention(models.Model):
                 domain = [
                     # /!\ conserver .ids : ._ids est un tuple et génère une erreur à l'évaluation
                     ('employee_ids', 'in', interv.employee_ids.ids),
-                    ('date', '<', interv.date_deadline),
-                    ('date_deadline', '>', interv.date),
+                    ('date_prompt', '<', interv.date_deadline),
+                    ('date_deadline_prompt', '>', interv.date),
                     ('id', '!=', interv.id),
                     ('state', 'not in', ('cancel', 'postponed')),
                     ]
