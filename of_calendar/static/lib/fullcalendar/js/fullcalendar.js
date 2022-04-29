@@ -2849,9 +2849,12 @@ function AgendaView(element, calendar, viewName) {
     var daySelectionMousedown = t.daySelectionMousedown;
     var slotSegHtml = t.slotSegHtml;
     var cellToDate = t.cellToDate;
+    var cellToAttendeeID = t.cellToAttendeeID;
     var dateToCell = t.dateToCell;
     var rangeToSegments = t.rangeToSegments;
     var formatDate = calendar.formatDate;
+    var haveAttendeeEvent = t.haveAttendeeEvent;
+    var getNbAttendeeCol = t.getNbAttendeeCol;
 
 
     // locals
@@ -3379,24 +3382,29 @@ function AgendaView(element, calendar, viewName) {
     // TODO: should be consolidated with BasicView's methods
 
 
-    function renderDayOverlay(overlayStart, overlayEnd, refreshCoordinateGrid) { // overlayEnd is exclusive
-
+    function renderDayOverlay(overlayStart, overlayEnd, refreshCoordinateGrid, modeDay=false) {
         if (refreshCoordinateGrid) {
             coordinateGrid.build();
         }
-
-        var segments = rangeToSegments(overlayStart, overlayEnd);
-
-        for (var i=0; i<segments.length; i++) {
-            var segment = segments[i];
+        if (modeDay) {
             dayBind(
-                renderCellOverlay(
-                    segment.row,
-                    segment.leftCol,
-                    segment.row,
-                    segment.rightCol
-                )
+                renderCellOverlay(0, overlayStart, 0, overlayEnd)
             );
+        }else{
+            // overlayEnd is exclusive here
+            var segments = rangeToSegments(overlayStart, overlayEnd);
+
+            for (var i=0; i<segments.length; i++) {
+                var segment = segments[i];
+                dayBind(
+                    renderCellOverlay(
+                        segment.row,
+                        segment.leftCol,
+                        segment.row,
+                        segment.rightCol
+                    )
+                );
+            }
         }
     }
 
@@ -3432,18 +3440,43 @@ function AgendaView(element, calendar, viewName) {
     -----------------------------------------------------------------------------*/
 
 
-    coordinateGrid = new CoordinateGrid(function(rows, cols) {
-        var e, n, p;
+    coordinateGrid = new CoordinateGrid(function(rows, cols, modeDay=false) {
+        var e, n, p, w;
+        var nbAttendeeCol = getNbAttendeeCol();
+        var isModeDay = colCnt == 1 && haveAttendeeEvent();
         dayHeadCells.each(function(i, _e) {
             e = $(_e);
             n = e.offset().left;
-            if (i) {
-                p[1] = n;
+
+            if (isModeDay) {
+                // in mode day, we build the grid according to attendee columns
+                w = e.outerWidth();
+                for (var j=0; j<nbAttendeeCol; j++) {
+                    if (j) {
+                        // at this point p is still cols[i-1]
+                        p[1] = n;
+                    }
+
+                    p = [n];
+                    n += (w / nbAttendeeCol);
+                    cols[j] = p;
+                }
+            }else{
+                if (i) {
+                    // at this point p is still cols[i-1]
+                    p[1] = n;
+                }
+                p = [n];
+                cols[i] = p;
             }
-            p = [n];
-            cols[i] = p;
         });
-        p[1] = n + e.outerWidth();
+        // at this point p is cols[-1]
+        if (isModeDay) {
+            p[1] = n;
+        }else{
+            p[1] = n + e.outerWidth();
+        }
+
         if (opt('allDaySlot')) {
             e = allDayRow;
             n = e.offset().top;
@@ -3496,12 +3529,18 @@ function AgendaView(element, calendar, viewName) {
 
 
     function getIsCellAllDay(cell) {
-        return opt('allDaySlot') && !cell.row;
+        return opt('allDaySlot') && !(cell && cell.row);
     }
 
 
-    function realCellToDate(cell) { // ugh "real" ... but blame it on our abuse of the "cell" system
-        var d = cellToDate(0, cell.col);
+    function realCellToDate(cell, isModeDay=false) { // ugh "real" ... but blame it on our abuse of the "cell" system
+        var col;
+        if (isModeDay) {
+            col = 0;
+        }else{
+            col = cell.col
+        }
+        var d = cellToDate(0, col);
         var slotIndex = cell.row;
         if (opt('allDaySlot')) {
             slotIndex--;
@@ -3566,23 +3605,31 @@ function AgendaView(element, calendar, viewName) {
     }
 
 
-    function renderSelection(startDate, endDate, allDay) { // only for all-day
+    function renderSelection(start, end, allDay, modeDay=false) { // only for all-day
+        // in mode day, start and end are col indexes
+        // in other modes, start and end are dates
         if (allDay) {
             if (opt('allDaySlot')) {
-                renderDayOverlay(startDate, addDays(cloneDate(endDate), 1), true);
+                if (modeDay) {
+                    renderDayOverlay(start, end, true, modeDay=true);
+                }else{
+                    renderDayOverlay(start, addDays(cloneDate(end), 1), true, modeDay=false);
+                }
             }
         }else{
-            renderSlotSelection(startDate, endDate);
+            renderSlotSelection(start, end);
         }
     }
 
-
-    function renderSlotSelection(startDate, endDate) {
+    function renderSlotSelection(startDate, endDate, col=null) {
         var helperOption = opt('selectHelper');
         coordinateGrid.build();
         if (helperOption) {
-            var col = dateToCell(startDate).col;
-            if (col >= 0 && col < colCnt) { // only works when times are on same day
+            if (col == null) {
+                var col = dateToCell(startDate).col;
+            }
+            var colCount = haveAttendeeEvent() && getNbAttendeeCol() || colCnt;
+            if (col >= 0 && col < colCount) { // only works when times are on same day
                 var rect = coordinateGrid.rect(0, col, 0, col, slotContainer); // only for horizontal coords
                 var top = timePosition(startDate, startDate);
                 var bottom = timePosition(startDate, endDate);
@@ -3641,29 +3688,35 @@ function AgendaView(element, calendar, viewName) {
         if (ev.which == 1 && opt('selectable')) { // ev.which==1 means left mouse button
             unselect(ev);
             var dates;
+            var isModeDay = getNbAttendeeCol() && haveAttendeeEvent();
             hoverListener.start(function(cell, origCell) {
                 clearSelection();
                 if (cell && cell.col == origCell.col && !getIsCellAllDay(cell)) {
-                    var d1 = realCellToDate(origCell);
-                    var d2 = realCellToDate(cell);
+                    var d1 = realCellToDate(origCell, isModeDay);
+                    var d2 = realCellToDate(cell, isModeDay);
                     dates = [
                         d1,
                         addMinutes(cloneDate(d1), snapMinutes), // calculate minutes depending on selection slot minutes
                         d2,
                         addMinutes(cloneDate(d2), snapMinutes)
                     ].sort(dateCompare);
-                    renderSlotSelection(dates[0], dates[3]);
+                    renderSlotSelection(dates[0], dates[3], col=origCell.col);
                 }else{
                     dates = null;
                 }
             }, ev);
             $(document).one('mouseup', function(ev) {
-                hoverListener.stop();
+                var cell = hoverListener.stop();
+                var attendees = [];
+                if (isModeDay) {
+                    var attendeeID = cellToAttendeeID(0, cell.col);
+                    attendees.push(attendeeID);
+                }
                 if (dates) {
                     if (+dates[0] == +dates[1]) {
                         reportDayClick(dates[0], false, ev);
                     }
-                    reportSelection(dates[0], dates[3], false, ev);
+                    reportSelection(dates[0], dates[3], false, ev, attendees=attendees);
                 }
             });
         }
@@ -3742,6 +3795,7 @@ function AgendaEventRenderer() {
     var colContentLeft = t.colContentLeft;
     var colContentRight = t.colContentRight;
     var cellToDate = t.cellToDate;
+    var cellToAttendeeID = t.cellToAttendeeID;
     var getNbAttendeeCol = t.getNbAttendeeCol;
     var getColCnt = t.getColCnt;
     var getColWidth = t.getColWidth;
@@ -4171,8 +4225,15 @@ function AgendaEventRenderer() {
         var snapHeight = getSnapHeight();
         var snapMinutes = getSnapMinutes();
         var minMinute = getMinMinute();
+
+        var isModeDay = getColCnt() == 1 && haveAttendeeEvent();
+        var attendeeColCnt = getNbAttendeeCol();
+        var attendeeColWidth = colWidth / attendeeColCnt;
+        var actualWidth = isModeDay ? attendeeColWidth : colWidth
+        var origAttendeeID;
+        var newAttendeeID;
         eventElement.draggable({
-            opacity: opt('dragOpacity', 'month'), // use whatever the month view was using
+            opacity: opt('dragOpacity'),
             revertDuration: opt('dragRevertDuration'),
             start: function(ev, ui) {
                 trigger('eventDragStart', eventElement, event, ev, ui);
@@ -4182,22 +4243,32 @@ function AgendaEventRenderer() {
                     clearOverlays();
                     if (cell) {
                         revert = false;
-                        var origDate = cellToDate(0, origCell.col);
-                        var date = cellToDate(0, cell.col);
-                        dayDelta = dayDiff(date, origDate);
+                        origAttendeeID = cellToAttendeeID(0, origCell.col);
+                        newAttendeeID = cellToAttendeeID(0, cell.col);
+                        if (isModeDay) {
+                            dayDelta = 0
+                        }else{
+                            var origDate = cellToDate(0, origCell.col);
+                            var date = cellToDate(0, cell.col);
+                            dayDelta = dayDiff(date, origDate);
+                        }
                         if (!cell.row) {
                             // on full-days
-                            renderDayOverlay(
-                                addDays(cloneDate(event.start), dayDelta),
-                                addDays(exclEndDay(event), dayDelta)
-                            );
+                            if (isModeDay) {
+                                renderDayOverlay(cell.col, cell.col, false, modeDay=true);
+                            }else{
+                                renderDayOverlay(
+                                    addDays(cloneDate(event.start), dayDelta),
+                                    addDays(exclEndDay(event), dayDelta)
+                                );
+                            }
                             resetElement();
                         }else{
                             // mouse is over bottom slots
                             if (isStart) {
                                 if (allDay) {
                                     // convert event to temporary slot-event
-                                    eventElement.width(colWidth - 10); // don't use entire width
+                                    eventElement.width(actualWidth - 10); // don't use entire width
                                     setOuterHeight(
                                         eventElement,
                                         snapHeight * Math.round(
@@ -4205,14 +4276,17 @@ function AgendaEventRenderer() {
                                                 snapMinutes
                                         )
                                     );
-                                    eventElement.draggable('option', 'grid', [colWidth, 1]);
+                                    eventElement.draggable('option', 'grid', [actualWidth, 1]);
                                     allDay = false;
                                 }
                             }else{
                                 revert = true;
                             }
                         }
-                        revert = revert || (allDay && !dayDelta);
+                        if (allDay && (isModeDay && origAttendeeID == newAttendeeID || !isModeDay && !dayDelta)) {
+                            revert = true;
+                        }
+
                     }else{
                         resetElement();
                         revert = true;
@@ -4238,7 +4312,7 @@ function AgendaEventRenderer() {
                             + minMinute
                             - (event.start.getHours() * 60 + event.start.getMinutes());
                     }
-                    eventDrop(this, event, dayDelta, minuteDelta, allDay, ev, ui);
+                    eventDrop(this, event, dayDelta, minuteDelta, allDay, ev, ui, origAttendeeID, newAttendeeID);
                 }
             }
         });
@@ -4260,43 +4334,52 @@ function AgendaEventRenderer() {
         var coordinateGrid = t.getCoordinateGrid();
         var colCnt = getColCnt();
         var colWidth = getColWidth();
+        var isModeDay = colCnt == 1 && haveAttendeeEvent();
+        var attendeeColCnt = getNbAttendeeCol();
+        var attendeeColWidth = colWidth / attendeeColCnt;
+        var actualWidth = isModeDay ? attendeeColWidth : colWidth
+
         var snapHeight = getSnapHeight();
         var snapMinutes = getSnapMinutes();
 
         // states
         var origPosition; // original position of the element, not the mouse
         var origCell;
+        var origAttendeeID;
         var isInBounds, prevIsInBounds;
         var isAllDay, prevIsAllDay;
-        var colDelta, prevColDelta;
+        var colDelta, prevColDelta, attendeeColDelta;
         var dayDelta; // derived from colDelta
+        var newAttendeeID;  // derived from colDelta
         var minuteDelta, prevMinuteDelta;
 
         eventElement.draggable({
             scroll: false,
-            grid: [ colWidth, snapHeight ],
-            axis: colCnt==1 ? 'y' : false,
+            grid: [ actualWidth, snapHeight ],
+            axis: (colCnt==1 && !haveAttendeeEvent()) ? 'y' : false,
             opacity: opt('dragOpacity'),
             revertDuration: opt('dragRevertDuration'),
             start: function(ev, ui) {
-
                 trigger('eventDragStart', eventElement, event, ev, ui);
                 hideEvents(event, eventElement);
+                $('.tooltip').hide();
 
                 coordinateGrid.build();
 
                 // initialize states
                 origPosition = eventElement.position();
                 origCell = coordinateGrid.cell(ev.pageX, ev.pageY);
+                origAttendeeID = cellToAttendeeID(0, origCell.col);
+                newAttendeeID = null;
                 isInBounds = prevIsInBounds = true;
                 isAllDay = prevIsAllDay = getIsCellAllDay(origCell);
-                colDelta = prevColDelta = 0;
+                colDelta = prevColDelta = attendeeColDelta = 0;
                 dayDelta = 0;
                 minuteDelta = prevMinuteDelta = 0;
 
             },
             drag: function(ev, ui) {
-
+                $('.tooltip').hide();
                 // NOTE: this `cell` value is only useful for determining in-bounds and all-day.
                 // Bad for anything else due to the discrepancy between the mouse position and the
                 // element position while snapping. (problem revealed in PR #55)
@@ -4309,10 +4392,10 @@ function AgendaEventRenderer() {
                 isInBounds = !!cell;
                 if (isInBounds) {
                     isAllDay = getIsCellAllDay(cell);
-
                     // calculate column delta
-                    colDelta = Math.round((ui.position.left - origPosition.left) / colWidth);
-                    if (colDelta != prevColDelta) {
+                    colDelta = Math.round((ui.position.left - origPosition.left) / actualWidth);
+                    // no day delta when mode day.
+                    if (colDelta != prevColDelta && !isModeDay) {
                         // calculate the day delta based off of the original clicked column and the column delta
                         var origDate = cellToDate(0, origCell.col);
                         var col = origCell.col + colDelta;
@@ -4320,6 +4403,14 @@ function AgendaEventRenderer() {
                         col = Math.min(colCnt-1, col);
                         var date = cellToDate(0, col);
                         dayDelta = dayDiff(date, origDate);
+                    }else if (origAttendeeID != null && colDelta != prevColDelta) {
+                        // origAttendeeID == null means that there are no attendee columns,
+                        // and therefore no new attendee id to be calculated
+                        var col = origCell.col + colDelta;
+                        col = Math.max(0, col);
+                        col = Math.min(attendeeColCnt-1, col);
+                        newAttendeeID = cellToAttendeeID(0, col);
+                        attendeeColDelta = colDelta;
                     }
 
                     // calculate minute delta (only if over slots)
@@ -4354,8 +4445,10 @@ function AgendaEventRenderer() {
                 clearOverlays();
                 trigger('eventDragStop', eventElement, event, ev, ui);
 
-                if (isInBounds && (isAllDay || dayDelta || minuteDelta)) { // changed!
-                    eventDrop(this, event, dayDelta, isAllDay ? 0 : minuteDelta, isAllDay, ev, ui);
+                if (isInBounds && (isAllDay || dayDelta || minuteDelta || attendeeColDelta)) { // changed!
+                    eventDrop(
+                        this, event, dayDelta, isAllDay ? 0 : minuteDelta, isAllDay, ev, ui,
+                        origAttendeeID, newAttendeeID);
                 }
                 else { // either no change or out-of-bounds (draggable has already reverted)
 
@@ -4385,15 +4478,20 @@ function AgendaEventRenderer() {
                 if (isAllDay) {
                     timeElement.hide();
                     eventElement.draggable('option', 'grid', null); // disable grid snapping
-                    renderDayOverlay(
-                        addDays(cloneDate(event.start), dayDelta),
-                        addDays(exclEndDay(event), dayDelta)
-                    );
+                    if (isModeDay) {
+                        renderDayOverlay(origCell.col + colDelta, origCell.col + colDelta, false, modeDay=true);
+                    }else{
+                        renderDayOverlay(
+                            addDays(cloneDate(event.start), dayDelta),
+                            addDays(exclEndDay(event), dayDelta)
+                        );
+                    }
                 }
                 else {
                     updateTimeText(minuteDelta);
                     timeElement.css('display', ''); // show() was causing display=inline
-                    eventElement.draggable('option', 'grid', [colWidth, snapHeight]); // re-enable grid snapping
+                    eventElement.draggable('option', 'grid', [actualWidth, snapHeight]); // re-enable grid snapping
+                    $('.tooltip').hide();
                 }
             }
         }
@@ -4722,6 +4820,8 @@ function View(element, calendar, viewName) {
     var defaultEventEnd = t.defaultEventEnd;
     var normalizeEvent = calendar.normalizeEvent; // in EventManager
     var reportEventChange = calendar.reportEventChange;
+    var haveAttendeeEvent = t.haveAttendeeEvent;
+    var getColCnt = t.getColCnt;
 
 
     // locals
@@ -4925,10 +5025,10 @@ function View(element, calendar, viewName) {
     ---------------------------------------------------------------------------------*/
 
 
-    function eventDrop(e, event, dayDelta, minuteDelta, allDay, ev, ui) {
+    function eventDrop(e, event, dayDelta, minuteDelta, allDay, ev, ui, oldAttendeeID=null, newAttendeeID=null) {
         var oldAllDay = event.allDay;
         var eventId = event._id;
-        moveEvents(eventsByID[eventId], dayDelta, minuteDelta, allDay);
+        moveEvents(eventsByID[eventId], dayDelta, minuteDelta, allDay, oldAttendeeID, newAttendeeID);
         trigger(
             'eventDrop',
             e,
@@ -4938,7 +5038,7 @@ function View(element, calendar, viewName) {
             allDay,
             function() {
                 // TODO: investigate cases where this inverse technique might not work
-                moveEvents(eventsByID[eventId], -dayDelta, -minuteDelta, oldAllDay);
+                moveEvents(eventsByID[eventId], -dayDelta, -minuteDelta, oldAllDay, newAttendeeID, oldAttendeeID);
                 reportEventChange(eventId);
             },
             ev,
@@ -4974,10 +5074,22 @@ function View(element, calendar, viewName) {
     ---------------------------------------------------------------------------------*/
 
 
-    function moveEvents(events, dayDelta, minuteDelta, allDay) {
+    function moveEvents(events, dayDelta, minuteDelta, allDay, oldAttendeeID=null, newAttendeeID=null) {
         minuteDelta = minuteDelta || 0;
+        var oldAttendeeCol, newAttendeeCol;
+        var oldAttendeeID, newAttendeeID;
         for (var e, len=events.length, i=0; i<len; i++) {
             e = events[i];
+            // event was moved from one attendee column to another
+            if (oldAttendeeID > 0 && newAttendeeID > 0) {
+                // only change attendees if the new attendee is not already part of the event
+                if (!e.attendees.includes(newAttendeeID)) {
+                    var indexOldAttendee = e.attendees.indexOf(oldAttendeeID)
+                    e.attendees.splice(indexOldAttendee,1);
+                    e.attendees.push(newAttendeeID);
+                }
+            }
+
             if (allDay !== undefined) {
                 e.allDay = allDay;
             }
@@ -5034,6 +5146,7 @@ function View(element, calendar, viewName) {
     t.cellToDate = cellToDate;
     t.cellToCellOffset = cellToCellOffset;
     t.cellOffsetToDayOffset = cellOffsetToDayOffset;
+    t.cellToAttendeeID = cellToAttendeeID;
     t.dayOffsetToDate = dayOffsetToDate;
     t.rangeToSegments = rangeToSegments;
 
@@ -5117,12 +5230,26 @@ function View(element, calendar, viewName) {
         return date;
     }
 
+    /**
+     *  cell -> attendeeID. Current implementation only works in mode day with attendee columns
+     */
+    function cellToAttendeeID() {
+        // when we go from mode day to mode week, for some reason the attendee event data isn't cleared
+        // so we also check view mode. colCnt == 1 means mode day.
+        if (getNbAttendeeCol() == 0 || getColCnt() != 1) {
+            return null;
+        }
+        var cellOffset = cellToCellOffset.apply(null, arguments);
+        var attendeeID = cellOffsetToAttendeeID(cellOffset);
+        return attendeeID;
+    }
+
     // cell -> cell offset
     // Possible arguments:
     // - row, col
     // - { row:#, col:# }
     function cellToCellOffset(row, col) {
-        var colCnt = t.getColCnt();
+        var colCnt = getNbAttendeeCol() || t.getColCnt();
 
         // rtl variables. wish we could pre-populate these. but where?
         var dis = isRTL ? -1 : 1;
@@ -5133,8 +5260,12 @@ function View(element, calendar, viewName) {
             row = row.row;
         }
         var cellOffset = row * colCnt + (col * dis + dit); // column, adjusted for RTL (dis & dit)
-
         return cellOffset;
+    }
+
+    function cellOffsetToAttendeeID(cellOffset) {
+        attendee_evt = attendeeEventElementCouples[cellOffset]
+        return attendee_evt.event.actual_id;
     }
 
     // cell offset -> day offset
@@ -5568,6 +5699,7 @@ function DayEventRenderer() {
     var cellToDate = t.cellToDate;
     var cellToCellOffset = t.cellToCellOffset;
     var cellOffsetToDayOffset = t.cellOffsetToDayOffset;
+    var cellToAttendeeID = t.cellToAttendeeID;
     var dateToDayOffset = t.dateToDayOffset;
     var dayOffsetToCellOffset = t.dayOffsetToCellOffset;
     var haveAttendeeEvent = t.haveAttendeeEvent;
@@ -6384,6 +6516,7 @@ function SelectionManager() {
     var defaultSelectionEnd = t.defaultSelectionEnd;
     var renderSelection = t.renderSelection;
     var clearSelection = t.clearSelection;
+    var getNbAttendeeCol = t.getNbAttendeeCol;
 
 
     // locals
@@ -6424,14 +6557,16 @@ function SelectionManager() {
     }
 
 
-    function reportSelection(startDate, endDate, allDay, ev) {
+    function reportSelection(startDate, endDate, allDay, ev, attendees=[]) {
         selected = true;
-        trigger('select', null, startDate, endDate, allDay, ev);
+        trigger('select', null, startDate, endDate, allDay, attendees, ev);
     }
 
 
     function daySelectionMousedown(ev) { // not really a generic manager method, oh well
         var cellToDate = t.cellToDate;
+        var cellToAttendeeID = t.cellToAttendeeID;
+        var haveAttendeeEvent = t.haveAttendeeEvent;
         var getIsCellAllDay = t.getIsCellAllDay;
         var hoverListener = t.getHoverListener();
         var reportDayClick = t.reportDayClick; // this is hacky and sort of weird
@@ -6439,9 +6574,19 @@ function SelectionManager() {
             unselect(ev);
             var _mousedownElement = this;
             var dates;
+            var isModeDay = getNbAttendeeCol() && haveAttendeeEvent();
+            var originalCell;
             hoverListener.start(function(cell, origCell) { // TODO: maybe put cellToDate/getIsCellAllDay info in cell
                 clearSelection();
-                if (cell && getIsCellAllDay(cell)) {
+                // get origCell out of the hoverlistener scope
+                originalCell = origCell;
+                // in mode day cells do not influence the date
+                if (cell && getIsCellAllDay(cell) && isModeDay) {
+                    var leftCol = Math.min(originalCell.col, cell.col);
+                    var rightCol = Math.max(originalCell.col, cell.col);
+                    dates = [ cellToDate(0,0), cellToDate(0,0) ];
+                    renderSelection(leftCol, rightCol, true, modeDay=true);
+                }else if (cell && getIsCellAllDay(cell)) {
                     dates = [ cellToDate(origCell), cellToDate(cell) ].sort(dateCompare);
                     renderSelection(dates[0], dates[1], true);
                 }else{
@@ -6449,12 +6594,23 @@ function SelectionManager() {
                 }
             }, ev);
             $(document).one('mouseup', function(ev) {
-                hoverListener.stop();
+                var cell = hoverListener.stop();
+                var attendees = [];
+                if (isModeDay) {
+                    var leftCol = Math.min(originalCell.col, cell.col);
+                    var rightCol = Math.max(originalCell.col, cell.col);
+                    var attendeeID;
+                    for (var i=leftCol; i<=rightCol; i++) {
+                        attendeeID = cellToAttendeeID(0, i);
+                        attendees.push(attendeeID);
+                    }
+                }
+
                 if (dates) {
                     if (+dates[0] == +dates[1]) {
                         reportDayClick(dates[0], true, ev);
                     }
-                    reportSelection(dates[0], dates[1], true, ev);
+                    reportSelection(dates[0], dates[1], true, ev, attendees=attendees);
                 }
             });
         }
@@ -6504,20 +6660,32 @@ function OverlayManager() {
 
 ;;
 
+/**
+ *  buildFunc parameters is itself a function that will be called inside this.build,
+ *  in order to initialise this.rows and this.cols
+ *  why do we want the build function to be variable you ask? the grid is not the same in basic view and agenda view :)
+ */
 function CoordinateGrid(buildFunc) {
 
     var t = this;
+    var getColCnt = t.getColCnt;
+    var haveAttendeeEvent = t.haveAttendeeEvent;
     var rows;
     var cols;
 
-
+    /**
+     *  inits this.rows and this.cols using the function defined as parameter.
+     *  needs to be called before any other function defined in this scope
+     */
     t.build = function() {
         rows = [];
         cols = [];
         buildFunc(rows, cols);
     };
 
-
+    /**
+     *  returns the cell coordinates given the mouse position. returns null if the mouse isn't hover the grid
+     */
     t.cell = function(x, y) {
         var rowCnt = rows.length;
         var colCnt = cols.length;
@@ -6536,7 +6704,6 @@ function CoordinateGrid(buildFunc) {
         }
         return (r>=0 && c>=0) ? { row:r, col:c } : null;
     };
-
 
     t.rect = function(row0, col0, row1, col1, originElement) { // row1,col1 is inclusive
         var origin = originElement.offset();
