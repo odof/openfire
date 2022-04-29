@@ -40,7 +40,7 @@ project_issue.access_project_issue_user,project.issue.user,project_issue.model_p
 access_project_issue_responsible,project.issue.responsible,project_issue.model_project_issue,of_group_project_responsible,1,1,1,1
 of_project_issue.access_of_project_issue_categorie_user,of.project.issue.categorie,of_project_issue.model_of_project_issue_categorie,base.group_user,1,0,0,0
 
-base.access_res_company_group_erp_manager,res_company group_erp_manager,base.model_res_company,base.group_system,1,1,1,1
+base.access_res_company_group_erp_manager,res_company group_erp_manager,base.model_res_company,base.group_system,1,1,0,0
 
 access_res_users_group_erp_user,res_users group_erp_user,base.model_res_users,of_group_erp_user,1,1,0,0
 base.access_res_users_group_erp_manager,res_users group_erp_manager,base.model_res_users,base.group_system,1,1,1,1
