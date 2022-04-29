@@ -425,8 +425,8 @@ class OfPlanningIntervention(models.Model):
     employee_main_id = fields.Many2one(
         'hr.employee', string=u"Employé principal", compute="_compute_employee_main_id",
         search="_search_employee_main_id", store=True)
-    partner_id = fields.Many2one('res.partner', string="Client", compute='_compute_partner_id', store=True)
-    address_id = fields.Many2one('res.partner', string="Adresse", track_visibility='onchange')
+    partner_id = fields.Many2one(comodel_name='res.partner', string=u"Client", ondelete='restrict')
+    address_id = fields.Many2one(comodel_name='res.partner', string=u"Adresse", track_visibility='onchange')
     address_street = fields.Char(related='address_id.street', string=u"Rue", readonly=1)
     address_street2 = fields.Char(related='address_id.street2', string=u"Rue 2", readonly=1)
     address_city = fields.Char(related='address_id.city', string="Ville", oldname="partner_city", readonly=1)
@@ -576,15 +576,6 @@ class OfPlanningIntervention(models.Model):
         for interv in self:
             if interv.employee_ids:
                 interv.employee_main_id = interv.employee_ids[0]
-
-    @api.depends('address_id', 'address_id.parent_id')
-    def _compute_partner_id(self):
-        for interv in self:
-            partner = interv.address_id or False
-            if partner:
-                while partner.parent_id:
-                    partner = partner.parent_id
-            interv.partner_id = partner and partner.id
 
     @api.depends('date', 'date_deadline_forcee', 'date_deadline')
     def _compute_jour(self):
@@ -1093,6 +1084,13 @@ class OfPlanningIntervention(models.Model):
             # Affecter les employés
             self.employee_ids = [(5, 0, 0)] + [(4, id_emp, 0) for id_emp in self.equipe_id.employee_ids._ids]
 
+    @api.onchange('partner_id')
+    def _onchange_partner_id(self):
+        self.ensure_one()
+        if self.partner_id and not self.address_id:
+            addresses = self.partner_id.address_get(['delivery'])
+            self.address_id = addresses['delivery']
+
     @api.onchange('address_id')
     def _onchange_address_id(self):
         name = False
@@ -1110,8 +1108,16 @@ class OfPlanningIntervention(models.Model):
                 'of.intervention.settings', 'company_choice') or 'contact'
             if company_choice == 'contact' and self.address_id.company_id:
                 self.company_id = address.company_id.id
+            elif company_choice == 'contact' and self.partner_id and self.partner_id.company_id:
+                self.company_id = self.partner_id.company_id.id
+            # en mode contact avec un contact sans société, ou en mode user
             else:
                 self.company_id = self.env.user.company_id.id
+            if not self.partner_id:
+                if address.parent_id:
+                    address = address.parent_id
+                invoice_address_id = address.address_get(['invoice'])['invoice']
+                self.partner_id = invoice_address_id
         else:
             self.company_id = self.env.user.company_id.id
         self.onchange_company_id()  # forcer l'appel
@@ -1746,8 +1752,15 @@ class OfPlanningIntervention(models.Model):
 
         partner = self.partner_id
         if not partner:
-            return (False,
-                    msg_erreur % (self.name, u'Pas de partenaire défini'))
+            if self.address_id:
+                if self.address_id.parent_id:
+                    invoice_address_id = self.address_id.parent_id.address_get(['invoice'])['invoice']
+                else:
+                    invoice_address_id = self.address_id.address_get(['invoice'])['invoice']
+                partner = self.env['res.partner'].browse(invoice_address_id)
+            else:
+                return (False,
+                        msg_erreur % (self.name, u'Pas de partenaire défini'))
         pricelist = partner.property_product_pricelist
         lines_data, error = self._prepare_invoice_lines()
         if error:

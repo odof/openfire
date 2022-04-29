@@ -528,9 +528,9 @@ class OfService(models.Model):
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
         self.ensure_one()
-        if self.partner_id:
-            addresses = self.partner_id.address_get(['delivery', 'invoice', 'contact'])
-            self.address_id = addresses['delivery'] or addresses['invoice'] or addresses['contact']
+        if self.partner_id and not self.address_id:
+            addresses = self.partner_id.address_get(['delivery'])
+            self.address_id = addresses['delivery']
 
     @api.onchange('address_id')
     def _onchange_address_id(self):
@@ -546,6 +546,12 @@ class OfService(models.Model):
             # en mode contact avec un contact sans société, ou en mode user
             else:
                 self.company_id = self.env.user.company_id
+            if not self.partner_id:
+                address = self.address_id
+                if address.parent_id:
+                    address = address.parent_id
+                invoice_address_id = address.address_get(['invoice'])['invoice']
+                self.partner_id = invoice_address_id
 
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
