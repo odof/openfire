@@ -39,6 +39,12 @@
 
 <!-- *************************** Menus ***************************-->
 
-    <menuitem id="of_connector_config_settings_menu" name="Configuration" parent="of_base.of_connector_menu" sequence="100" action="of_connector_config_settings_action"/>
+    <record id="of_connector_config_settings_menu" model="ir.ui.menu">
+        <field name="name">Configuration</field>
+        <field name="parent_id" ref="of_base.of_connector_menu"/>
+        <field name="action" ref="of_connector_config_settings_action"/>
+        <field name="active" eval="False"/>
+        <field name="sequence" eval="100"/>
+    </record>
 
 </odoo>
