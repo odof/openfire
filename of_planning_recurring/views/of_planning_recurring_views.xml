@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+
+    <!-- Intervention config wizard -->
+    <record id="view_of_intervention_settings" model="ir.ui.view">
+        <field name="name">view.of.intervention.settings.recurring</field>
+        <field name="model">of.intervention.settings</field>
+        <field name="inherit_id" ref="of_planning.view_of_intervention_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='intervention']" position="inside">
+                <label for="group_of_group_planning_intervention_recurring" string="(OF) RDVs réguliers"/>
+                <div name="group_of_group_planning_intervention_recurring">
+                    <field name="group_of_group_planning_intervention_recurring" class="oe_inline"/>
+                    <span> Activer la gestion des RDVs réguliers.</span>
+                    <br/>
+                    <i class="oe_grey">/!\ ce paramètre est partagé entre toutes les sociétés</i>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

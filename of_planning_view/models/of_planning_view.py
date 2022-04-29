@@ -5,6 +5,7 @@ from odoo.tools.float_utils import float_compare
 from odoo import models, fields, api
 from odoo.addons.of_utils.models.of_utils import se_chevauchent, hours_to_strs
 from odoo.exceptions import ValidationError
+from odoo.addons.calendar.models.calendar import calendar_id2real_id
 import re
 
 import pytz
@@ -383,7 +384,10 @@ class OfPlanningIntervention(models.Model):
                 jour_fin_dt = tz.localize(datetime.strptime(date_current_str+" 23:59:00", "%Y-%m-%d %H:%M:%S"))
                 for intervention in interventions:
                     intervention_heures = [intervention]
-                    for intervention_heure in (intervention.date_prompt, intervention.date_deadline_prompt):
+                    # read est détourné dans of_planning pour renvoyer les dates de l'occurence concernée
+                    # dans le cas des RDV recurrents
+                    data = intervention.read(['date_prompt', 'date_deadline_prompt'])[0]
+                    for intervention_heure in (data['date_prompt'], data['date_deadline_prompt']):
                         # Conversion des dates de début et de fin en nombres flottants et à l'heure locale
                         intervention_locale_dt = fields.Datetime.context_timestamp(
                             self, fields.Datetime.from_string(intervention_heure))
