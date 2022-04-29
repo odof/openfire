@@ -631,6 +631,25 @@ Tous les articles seront considérés comme disponibles et marqués comme livré
         </field>
     </record>
 
+    <!-- 2 vues sont nécessaire car elles sont séparées dans le module account -->
+    <record id="of_view_partner_buttons_form" model="ir.ui.view">
+        <field name="name">of.view.partner.buttons.form</field>
+        <field name="model">res.partner</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="sale.res_partner_view_buttons"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='internal_notes']//group[@groups='sale.group_warning_sale']"
+                   position="replace">
+            </xpath>
+            <xpath expr="//page[@name='internal_notes']//div[@name='of_is_account_warn']" position="before">
+                <div name="of_is_sale_warn">
+                    <field name="of_is_sale_warn" nolabel="1" class="oe_inline"/>
+                    commandes de vente
+                </div>
+            </xpath>
+        </field>
+    </record>
+
 <!--##############################################################################-->
 <!--########################### ______ Utilisateurs ______ ###########################-->
 <!--##############################################################################-->

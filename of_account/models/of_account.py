@@ -1,11 +1,85 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError,  ValidationError
 from odoo.models import regex_order
+from odoo.addons.account.models.account_invoice import AccountInvoice
 from odoo.tools.float_utils import float_compare
 
 NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
+
+
+@api.onchange('partner_id', 'company_id')
+def _onchange_partner_id(self):
+    u"""OpenFire edit : split this function in 2 to isolate the warning part and allow inheritance"""
+    account_id = False
+    payment_term_id = False
+    fiscal_position = False
+    company_id = self.company_id.id
+    p = self.partner_id if not company_id else self.partner_id.with_context(force_company=company_id)
+    res = {}
+    type = self.type
+    if p:
+        rec_account = p.property_account_receivable_id
+        pay_account = p.property_account_payable_id
+        if not rec_account and not pay_account:
+            action = self.env.ref('account.action_account_config')
+            msg = _('Cannot find a chart of accounts for this company, You should configure it. \n'
+                    'Please go to Account Configuration.')
+            raise RedirectWarning(msg, action.id, _('Go to the configuration panel'))
+
+        if type in ('in_invoice', 'in_refund'):
+            account_id = pay_account.id
+            payment_term_id = p.property_supplier_payment_term_id.id
+        else:
+            account_id = rec_account.id
+            payment_term_id = p.property_payment_term_id.id
+
+        delivery_partner_id = self.get_delivery_partner_id()
+        fiscal_position = self.env['account.fiscal.position'].get_fiscal_position(
+            self.partner_id.id, delivery_id=delivery_partner_id)
+
+    # OpenFire edit : old block was here
+
+    self.account_id = account_id
+    self.payment_term_id = payment_term_id
+    self.date_due = False
+    self.fiscal_position_id = fiscal_position
+
+    if type in ('in_invoice', 'out_refund'):
+        bank_ids = p.commercial_partner_id.bank_ids
+        bank_id = bank_ids[0].id if bank_ids else False
+        self.partner_bank_id = bank_id
+        res['domain'] = {'partner_bank_id': [('id', 'in', bank_ids.ids)]}
+
+    return res
+
+
+@api.onchange('partner_id')
+def _onchange_partner_id_warning(self):
+    u"""OpenFire Made from the splitting of _onchange_partner_id to allow inheritance"""
+    res = {}
+    p = self.partner_id
+    if p:
+        # If partner has no warning, check its company
+        if p.invoice_warn == 'no-message' and p.parent_id:
+            p = p.parent_id
+        if p.invoice_warn != 'no-message':
+            # Block if partner only has warning but parent company is blocked
+            if p.invoice_warn != 'block' and p.parent_id and p.parent_id.invoice_warn == 'block':
+                p = p.parent_id
+            warning = {
+                'title': _("Warning for %s") % p.name,
+                'message': p.invoice_warn_msg
+            }
+            res['warning'] = warning
+            if p.invoice_warn == 'block':
+                self.partner_id = False
+    return res
+
+
+AccountInvoice._onchange_partner_id = _onchange_partner_id
+AccountInvoice._onchange_partner_id_warning = _onchange_partner_id_warning
 
 
 class AccountAccount(models.Model):
@@ -73,6 +147,19 @@ class AccountInvoice(models.Model):
     of_partner_phone = fields.Char(related='partner_id.phone', string=u"Téléphone du partenaire", readonly=True)
     of_partner_mobile = fields.Char(related='partner_id.mobile', string=u"Mobile du partenaire", readonly=True)
     of_partner_email = fields.Char(related='partner_id.email', string=u"Courriel du partenaire", readonly=True)
+
+    @api.onchange('partner_id')
+    def _onchange_partner_id_warning(self):
+        partner = self.partner_id
+
+        # If partner has no warning, check its parents
+        # invoice_warn is shared between different objects
+        if not partner.of_is_account_warn and partner.parent_id:
+            partner = partner.parent_id
+
+        if partner.of_is_account_warn and partner.invoice_warn != 'no-message':
+            return super(AccountInvoice, self)._onchange_partner_id_warning()
+        return
 
     # Date d'échéance des factures
     # Surcharge de la méthode pour permettre la comparaison avec le paramètrage du mode de calcul

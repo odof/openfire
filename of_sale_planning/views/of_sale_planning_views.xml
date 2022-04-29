@@ -84,4 +84,19 @@
         </field>
     </record>
 
+    <record id="of_view_partner_inh_planning_form" model="ir.ui.view">
+        <field name="name">of.view.partner.inh.planning.form</field>
+        <field name="model">res.partner</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="of_sale.of_view_partner_buttons_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='internal_notes']//div[@name='of_is_sale_warn']" position="before">
+                <div name="of_is_planning_warn">
+                    <field name="of_is_planning_warn" nolabel="1" class="oe_inline"/>
+                    interventions
+                </div>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>

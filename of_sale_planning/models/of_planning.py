@@ -7,6 +7,35 @@ class OFPlanningIntervention(models.Model):
     _name = 'of.planning.intervention'
     _inherit = ['of.planning.intervention', 'of.crm.stage.auto.update']
 
+    @api.onchange('address_id')
+    def _onchange_address_id_warning(self):
+        if not self.address_id:
+            return
+        warning = {}
+        partner = self.address_id
+
+        # If partner has no warning, check its parents
+        # invoice_warn is shared between different objects
+        while not partner.of_is_planning_warn and partner.parent_id:
+            partner = partner.parent_id
+
+        if partner.of_is_planning_warn and partner.invoice_warn != 'no-message':
+            # Block if partner only has warning but parent company is blocked
+            if partner.invoice_warn != 'block' and partner.parent_id and partner.parent_id.invoice_warn == 'block':
+                partner = partner.parent_id
+            title = u"Warning for %s" % partner.name
+            message = partner.invoice_warn_msg
+            warning = {
+                    'title': title,
+                    'message': message,
+            }
+            if partner.invoice_warn == 'block':
+                self.update({'partner_id': False, 'address_id': False,})
+                return {'warning': warning}
+
+        if warning:
+            return {'warning': warning}
+
     @api.model
     def create(self, vals):
         rec = super(OFPlanningIntervention, self).create(vals).sudo()

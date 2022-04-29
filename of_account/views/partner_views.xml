@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_view_partner_inh_account_form" model="ir.ui.view">
+        <field name="name">of.view.partner.inh.account.form</field>
+        <field name="model">res.partner</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="account.partner_view_buttons"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='internal_notes']//group[@groups='account.group_warning_account']"
+                   position="replace">
+                <group>
+                    <group name="warnings">
+                        <separator string="Avertissements" colspan="2"/>
+                        <label for="of_is_account_warn" string="Objet(s)" name="label_warn"/>
+                        <div name="of_is_warn">
+                            <div name="of_is_account_warn">
+                                <field name="of_is_account_warn" nolabel="1" class="oe_inline"/>
+                                factures
+                            </div>
+                        </div>
+                        <field name="of_warn_block" string="Bloquant" attrs="{'invisible': [('of_is_warn', '=', False)]}"/>
+                        <label string="Message" for="invoice_warn_msg" colspan="2"
+                               attrs="{'invisible': [('of_is_warn', '=', False)]}"/>
+                        <field name="invoice_warn_msg" colspan="2" nolabel="1"
+                                attrs="{'required':[('invoice_warn','!=','no-message')],
+                                        'readonly':[('invoice_warn','=','no-message')],
+                                        'invisible': [('of_is_warn', '=', False)]}"/>
+                        <field name="of_is_warn" invisible="1"/>
+                        <field name="invoice_warn" invisible="1"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+
+</odoo>
