@@ -23,6 +23,7 @@
                     </button>
                 </div>
                 <group invisible="context.get('invoice_status') == 'invoiced'">
+                    <field name="order_id" invisible="1"/>
                     <field name="methode_remise" required="1"/>
                     <field name="valeur"
                            attrs="{'invisible':[('methode_remise','not in',('prix_ttc_cible','prix_ht_cible','montant_ttc','montant_ht','pc','pc_marge'))],
@@ -39,18 +40,15 @@
                 </group>
 
                 <field name="line_ids">
-                    <tree string="Lignes de commande" colors="green:is_selected==True;grey:is_selected==False;">
-                        <field name="is_selected" invisible="1"/>
+                    <tree string="Lignes de commande" colors="green:state=='included';grey:state!='included';" editable="bottom" create="false">
                         <field name="product_forbidden_discount" invisible="1"/>
-                        <button name="button_inverse" string="Inverser" type="object" icon="fa-refresh" invisible="context.get('invoice_status') == 'invoiced'"
-                                attrs="{'invisible': [('product_forbidden_discount', '=', True)]}"/>
-                        <field name="text_selected" invisible="context.get('invoice_status') == 'invoiced'"/>
+                        <field name="state" invisible="context.get('invoice_status') == 'invoiced'" attrs="{'readonly': [('product_forbidden_discount', '=', True)]}"/>
                         <field name="order_line_id"/>
                         <field name="cout" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
                         <field name="prix_total_ht"/>
-                        <field name="prix_total_ht_simul"/>
+                        <field name="prix_total_ht_simul" attrs="{'readonly': [('state', '!=', 'forced')]}"/>
                         <field name="marge" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
-                        <field name="pc_marge" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                        <field name="pc_marge" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)], 'readonly': ['|', ('state', '!=', 'forced'), ('cout', '=', 0)]}"/>
                         <field name="prix_total_ttc"/>
                         <field name="prix_total_ttc_simul"/>
                         <field name="of_client_view" invisible="1"/>

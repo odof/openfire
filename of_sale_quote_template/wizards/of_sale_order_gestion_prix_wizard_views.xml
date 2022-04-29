@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_view_sale_order_gestion_prix" model="ir.ui.view">
+        <field name="name">Gestion des prix</field>
+        <field name="model">of.sale.order.gestion.prix</field>
+        <field name="inherit_id" ref="of_sale.of_view_sale_order_gestion_prix"/>
+        <field name="groups_id" eval="[(4, ref('of_sale_quote_template.group_of_advanced_sale_layout_category'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='methode_remise']" position="before">
+                <field name="calculation_basis"/>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']" position="attributes">
+                <attribute name="attrs">{'invisible': [('calculation_basis', '!=', 'order_line')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']" position="after">
+                <field name="layout_category_ids" attrs="{'invisible': [('calculation_basis', '!=', 'layout_category')]}">
+                    <tree string="Lignes de section" colors="green:state=='included';grey:state!='included';" editable="bottom" create="false">
+                        <field name="line_ids" invisible="1"/>
+                        <field name="state" invisible="context.get('invoice_status') == 'invoiced'"/>
+                        <field name="layout_category_id"/>
+                        <field name="cost" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                        <field name="price_subtotal"/>
+                        <field name="simulated_price_subtotal" attrs="{'readonly': [('state', '!=', 'forced')]}"/>
+                        <field name="pc_sale_price"/>
+                        <field name="margin" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                        <field name="pc_margin" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)], 'readonly': ['|', ('state', '!=', 'forced'), ('cost', '=', 0)]}"/>
+                        <field name="price_total"/>
+                        <field name="simulated_price_total"/>
+                        <field name="of_client_view" invisible="1"/>
+                    </tree>
+                </field>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

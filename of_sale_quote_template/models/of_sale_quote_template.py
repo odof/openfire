@@ -453,6 +453,7 @@ class OfSaleOrderLayoutCategory(models.Model):
     quote_section_line_id = fields.Many2one(
         comodel_name='of.sale.quote.template.layout.category', string=u"Ligne d'origine")
     order_id = fields.Many2one(comodel_name='sale.order', string=u"Bon de commande", ondelete='cascade')
+    currency_id = fields.Many2one('res.currency', related='order_id.currency_id', store=True, readonly=True)
     cout = fields.Float(string=u"Coût", digits=dp.get_precision('Product Price'), compute='_compute_product_ids')
     prix_vente = fields.Float(
         string=u"Prix de vente", digits=dp.get_precision('Product Price'), compute='_compute_product_ids')
@@ -1081,6 +1082,44 @@ class SaleOrder(models.Model):
         if self.of_layout_category_ids:
             invoice_vals['of_layout_category_ids'] = [(6, 0, self.of_layout_category_ids.ids)]
         return invoice_vals
+
+    @api.multi
+    def button_gestion_prix(self):
+        res = super(SaleOrder, self).button_gestion_prix()
+
+        remise = self.env['of.sale.order.gestion.prix'].browse(res['res_id'])
+
+        categ_prec_id = -1
+        layout_category_vals = []
+        for remise_line in remise.line_ids.sorted(
+                key=lambda l: (not l.order_line_id.of_layout_category_id,
+                               l.order_line_id.of_layout_category_id.sequence,
+                               l.order_line_id.of_layout_category_id.id)):
+            if remise_line.order_line_id.of_layout_category_id.id != categ_prec_id:
+                category = remise_line.order_line_id.of_layout_category_id
+                categ_prec_id = category.id
+                layout_category_vals.append({
+                    'layout_category_id': category.id,
+                    'line_ids': [(6, 0, [remise_line.id])],
+                    'state': 'included',
+                    'simulated_price_subtotal': remise_line.order_line_id.price_subtotal,
+                    'simulated_price_total': remise_line.order_line_id.price_total,
+                })
+            else:
+                vals = layout_category_vals[-1]
+                vals['line_ids'][0][2].append(remise_line.id)
+                vals['simulated_price_subtotal'] += remise_line.order_line_id.price_subtotal
+                vals['simulated_price_total'] += remise_line.order_line_id.price_total
+        if self.amount_untaxed:
+            for vals in layout_category_vals:
+                vals['pc_sale_price'] = 100.0 * vals['simulated_price_subtotal'] / self.amount_untaxed
+
+        remise.write({
+            'layout_category_ids': [(0, 0, vals) for vals in layout_category_vals],
+        })
+
+        return res
+
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
