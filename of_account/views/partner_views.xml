@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="of_view_partner_inh_account_form" model="ir.ui.view">
-        <field name="name">of.view.partner.inh.account.form</field>
+    <!-- 2 vues sont nécessaires, car account.partner_view_buttons est restreinte au groupe facturation -->
+    <record id="of_partner_form_view" model="ir.ui.view">
+        <field name="name">of.partner.view.inh.account</field>
         <field name="model">res.partner</field>
-        <field name="type">form</field>
-        <field name="inherit_id" ref="account.partner_view_buttons"/>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <!-- priorité forcée à 17 pour être inférieure à celle de "account.partner_view_buttons", forcée à 20
+            de même, of_sale.of_view_partner_buttons_form doit passer après cette vue
+            et sa parente sale.res_partner_view_buttons a aussi une priorité de 20 -->
+        <field name="priority" eval="17"/>
         <field name="arch" type="xml">
-            <xpath expr="//page[@name='internal_notes']//group[@groups='account.group_warning_account']"
-                   position="replace">
+            <xpath expr="//page[@name='internal_notes']" position="inside">
                 <group>
                     <group name="warnings">
                         <separator string="Avertissements" colspan="2"/>
                         <label for="of_is_account_warn" string="Objet(s)" name="label_warn"/>
                         <div name="of_is_warn">
                             <div name="of_is_account_warn">
-                                <field name="of_is_account_warn" nolabel="1" class="oe_inline"/>
+                                <field name="of_is_account_warn" nolabel="1" class="oe_inline" readonly="1"/>
                                 factures
                             </div>
                         </div>
@@ -34,5 +37,19 @@
         </field>
     </record>
 
+    <record id="of_view_partner_inh_account_form" model="ir.ui.view">
+        <field name="name">of.view.partner.inh.account.form</field>
+        <field name="model">res.partner</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="account.partner_view_buttons"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='internal_notes']//group[@groups='account.group_warning_account']"
+                   position="replace">
+            </xpath>
+            <xpath expr="//field[@name='of_is_account_warn']" position="attributes">
+                <attribute name="readonly">0</attribute>
+            </xpath>
+        </field>
+    </record>
 
 </odoo>
