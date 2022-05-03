@@ -275,6 +275,18 @@ class SaleOrder(models.Model):
         for order in self:
             order.of_fixed_invoice_date = order.of_invoice_date_prev
 
+    def _of_get_max_or_min_seq_by_layout(self, what='max'):
+        self.ensure_one()
+        lines_with_layout = self.order_line.filtered(lambda l: l.layout_category_id)
+        seq_by_layout = {}.fromkeys(lines_with_layout.mapped('layout_category_id').ids, 0)
+        for layout_id in seq_by_layout:
+            if what == 'max':
+                seq = max(lines_with_layout.filtered(lambda l: l.layout_category_id.id == layout_id).mapped('sequence'))
+            else:
+                seq = min(lines_with_layout.filtered(lambda l: l.layout_category_id.id == layout_id).mapped('sequence'))
+            seq_by_layout[layout_id] = seq
+        return seq_by_layout
+
     @api.multi
     def of_get_taxes_values(self):
         tax_grouped = {}
@@ -1174,11 +1186,13 @@ class SaleOrderLine(models.Model):
         Au moment de la sauvegarde de la commande, les images articles ne sont pas toujours sauvegardées
         car renseignées par un onchange et affichage en vue en kanban, du coup on surcharge le create
         """
+        if vals.get('layout_category_id') and 'sequence' not in vals:
+            order = self.env['sale.order'].browse(vals['order_id'])
+            max_sequence = order._of_get_max_or_min_seq_by_layout().get(vals['layout_category_id'], 0)
+            vals['sequence'] = max_sequence + 1
         res = super(SaleOrderLine, self).create(vals)
-
         if 'of_product_image_ids' in vals.keys() and vals['of_product_image_ids'] and not res.of_product_image_ids:
             res.with_context(already_tried=True).of_product_image_ids = vals['of_product_image_ids']
-
         return res
 
     @api.multi
@@ -1202,6 +1216,18 @@ class SaleOrderLine(models.Model):
         if 'already_tried' not in self._context:
             if 'of_product_image_ids' in vals.keys() and vals['of_product_image_ids'] and not self.of_product_image_ids:
                 self.with_context(already_tried=True).of_product_image_ids = vals['of_product_image_ids']
+
+        if vals.get('layout_category_id') and 'sequence' not in vals:
+            new_layout = self.env['sale.layout_category'].browse(vals['layout_category_id'])
+            for line in self:
+                old_layout = line.layout_category_id
+                order = line.order_id
+                if old_layout.sequence < new_layout.sequence:
+                    sequence = order._of_get_max_or_min_seq_by_layout('min').get(vals['layout_category_id'], 0)
+                    vals['sequence'] = sequence - 1
+                else:
+                    sequence = order._of_get_max_or_min_seq_by_layout().get(vals['layout_category_id'], 0)
+                    vals['sequence'] = sequence + 1
 
         return super(SaleOrderLine, self).write(vals)
 
