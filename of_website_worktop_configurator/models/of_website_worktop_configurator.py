@@ -51,40 +51,6 @@ class OFWorktopConfiguratorService(models.Model):
     _description = u"Prestation pour le configurateur de plan de travail"
     _order = 'sequence'
 
-    @api.model_cr_context
-    def _auto_init(self):
-        cr = self._cr
-        # Lors de la 1ère mise à jour après la refonte des prestations (févr. 2022), on migre les données existantes.
-        cr.execute("SELECT 1 FROM information_schema.columns "
-                   "WHERE table_name = 'of_worktop_configurator_service'")
-        existe_avant = bool(cr.fetchall())
-
-        res = super(OFWorktopConfiguratorService, self)._auto_init()
-
-        cr.execute("SELECT 1 FROM information_schema.columns "
-                   "WHERE table_name = 'of_worktop_configurator_service'")
-        existe_apres = bool(cr.fetchall())
-
-        # Si le modèle of_worktop_configurator_service n'existe pas avant et existe après la mise à jour,
-        # c'est qu'on est à la 1ère mise à jour après la refonte du modèle de prestation,
-        # on doit faire la migration des données.
-        if not existe_avant and existe_apres:
-            cr.execute("INSERT INTO of_worktop_configurator_service ("
-                       "    name, "
-                       "    sequence, "
-                       "    price, "
-                       "    blocking, "
-                       "    blocking_message"
-                       ") "
-                       "SELECT "
-                       "    name, "
-                       "    sequence, "
-                       "    price, "
-                       "    blocking, "
-                       "    blocking_message "
-                       "FROM of_worktop_configurator_distance")
-        return res
-
     name = fields.Char(string=u"Nom", required=True)
     sequence = fields.Integer(string=u"Séquence")
     price = fields.Float(string=u"Tarif")
