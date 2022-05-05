@@ -87,12 +87,14 @@ Droits utilisateurs:
         "sale",
         "sale_margin",
         "sale_crm",
-        "of_utils"
+        "of_utils",
+        "res_config_settings_enterprise_remove",
     ],
     'external_dependancies': {
         'python': ['pdfminer', 'pypdftk', 'pyPdf'],
     },
     'data': [
+        'data/assets.xml',
         'security/of_sale_security.xml',
         'security/ir.model.access.csv',
         'views/of_sale_view.xml',
@@ -106,6 +108,7 @@ Droits utilisateurs:
         'wizards/of_sale_order_confirmation_views.xml',
         'wizards/of_sale_order_add_quote_views.xml',
         'wizards/of_sale_order_verification_views.xml',
+        'wizards/sale_set_printing_params_view.xml',
     ],
     'installable': True,
     'application': False,

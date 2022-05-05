@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-15 10:57+0000\n"
-"PO-Revision-Date: 2020-10-15 10:57+0000\n"
+"POT-Creation-Date: 2022-05-05 14:04+0000\n"
+"PO-Revision-Date: 2022-05-05 14:04+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -15,12 +15,385 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
 
-#. module: purchase
-#: model:ir.ui.view,arch_db:purchase.purchase_order_form
-msgid "Lock"
-msgstr "Terminer"
+#. module: of_purchase
+#: model:ir.model.fields,field_description:of_purchase.field_sale_config_settings_of_recalcul_pa
+msgid "(OF) Automatic recalculation of purchase prices on order lines"
+msgstr "(OF) Recalcul auto des prix d'achats sur lignes de commande"
 
-#. module: purchase
-#: selection:purchase.order,state:0
-msgid "Locked"
-msgstr "Terminé"
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_purchase_view_sale_config_settings
+msgid "(OF) Automatic purchase price calculation"
+msgstr "(OF) Calcul auto prix d'achat"
+
+#. module: of_purchase
+#: model:ir.model.fields,field_description:of_purchase.field_purchase_config_settings_of_date_purchase_order
+msgid "(OF) Date des commandes fournisseur"
+msgstr "(OF) Date des commandes fournisseur"
+
+#. module: of_purchase
+#: model:ir.model.fields,field_description:of_purchase.field_purchase_config_settings_of_description_as_order_setting
+msgid "(OF) Description articles"
+msgstr "(OF) Description articles"
+
+#. module: of_purchase
+#: model:ir.model.fields,field_description:of_purchase.field_purchase_config_settings_group_purchase_order_line_display_stock_info
+msgid "(OF) Informations de stock"
+msgstr "(OF) Informations de stock"
+
+#. module: of_purchase
+#: model:ir.model.fields,help:of_purchase.field_stock_picking_of_location_usage
+msgid "* Vendor Location: Virtual location representing the source location for products coming from your vendors\n"
+"* View: Virtual location used to create a hierarchical structures for your warehouse, aggregating its child locations ; can't directly contain products\n"
+"* Internal Location: Physical locations inside your own warehouses,\n"
+"* Customer Location: Virtual location representing the destination location for products sent to your customers\n"
+"* Inventory Loss: Virtual location serving as counterpart for inventory operations used to correct stock levels (Physical inventories)\n"
+"* Procurement: Virtual location serving as temporary counterpart for procurement operations when the source (vendor or production) is not known yet. This location should be empty when the procurement scheduler has finished running.\n"
+"* Production: Virtual counterpart location for production operations: this location consumes the raw material and produces finished products\n"
+"* Transit Location: Counterpart location that should be used in inter-companies or inter-warehouses operations"
+msgstr "* Vendor Location: Virtual location representing the source location for products coming from your vendors\n"
+"* View: Virtual location used to create a hierarchical structures for your warehouse, aggregating its child locations ; can't directly contain products\n"
+"* Internal Location: Physical locations inside your own warehouses,\n"
+"* Customer Location: Virtual location representing the destination location for products sent to your customers\n"
+"* Inventory Loss: Virtual location serving as counterpart for inventory operations used to correct stock levels (Physical inventories)\n"
+"* Procurement: Virtual location serving as temporary counterpart for procurement operations when the source (vendor or production) is not known yet. This location should be empty when the procurement scheduler has finished running.\n"
+"* Production: Virtual counterpart location for production operations: this location consumes the raw material and produces finished products\n"
+"* Transit Location: Counterpart location that should be used in inter-companies or inter-warehouses operations"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_purchase_open_picking_view_partner
+msgid "<span class=\"o_stat_text\">Réceptions</span>"
+msgstr "<span class=\"o_stat_text\">Réceptions</span>"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_view_purchase_configuration
+msgid "<span>Afficher les informations de stock au niveau des lignes de commande</span>"
+msgstr "<span>Afficher les informations de stock au niveau des lignes de commande</span>"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_report_purchaseorder_document
+msgid "<span>Bon de commande</span>"
+msgstr "<span>Bon de commande</span>"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_report_purchasequotation_document
+msgid "<span>Demande de prix</span>"
+msgstr "<span>Demande de prix</span>"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_purchase_view_sale_config_settings
+msgid "<span>Recompute the purchase price of the order lines based on the linked purchase order</span>"
+msgstr "<span>Recalculer le prix d'achat des lignes de commandes en fonction de la commande fournisseur liée</span>"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_report_purchaseorder_document
+#: model:ir.ui.view,arch_db:of_purchase.of_report_purchasequotation_document
+msgid "<strong>Adresse de livraison&amp;nbsp;:</strong>"
+msgstr "<strong>Adresse de livraison&amp;nbsp;:</strong>"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_report_purchaseorder_document
+#: model:ir.ui.view,arch_db:of_purchase.of_report_purchasequotation_document
+msgid "<strong>Contremarque&amp;nbsp;:</strong>"
+msgstr "<strong>Contremarque&amp;nbsp;:</strong>"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_report_purchaseorder_document
+#: model:ir.ui.view,arch_db:of_purchase.of_report_purchasequotation_document
+msgid "<strong>Date prévue :</strong>"
+msgstr "<strong>Date prévue :</strong>"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_report_purchaseorder_document
+#: model:ir.ui.view,arch_db:of_purchase.of_report_purchasequotation_document
+msgid "<strong>Livraison attendue&amp;nbsp;:</strong>"
+msgstr "<strong>Livraison attendue&amp;nbsp;:</strong>"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_report_purchaseorder_document
+#: model:ir.ui.view,arch_db:of_purchase.of_report_purchasequotation_document
+msgid "<strong>Nos références&amp;nbsp;: </strong>"
+msgstr "<strong>Nos références&amp;nbsp;: </strong>"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_report_purchaseorder_document
+#: model:ir.ui.view,arch_db:of_purchase.of_report_purchasequotation_document
+msgid "<strong>Réf. commande client&amp;nbsp;:</strong>"
+msgstr "<strong>Réf. commande client&amp;nbsp;:</strong>"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_report_purchaseorder_document
+#: model:ir.ui.view,arch_db:of_purchase.of_report_purchasequotation_document
+msgid "<strong>Réf. fournisseur&amp;nbsp;:</strong>"
+msgstr "<strong>Réf. fournisseur&amp;nbsp;:</strong>"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_report_purchaseorder_document
+msgid "<strong>TVA</strong>"
+msgstr "<strong>TVA</strong>"
+
+#. module: of_purchase
+#: model:ir.actions.act_window,name:of_purchase.of_purchase_open_achats
+#: model:ir.model.fields,field_description:of_purchase.field_sale_order_purchase_ids
+#: model:ir.ui.view,arch_db:of_purchase.of_purchase_button_achats_view
+msgid "Achats"
+msgstr "Achats"
+
+#. module: of_purchase
+#: model:ir.model.fields,help:of_purchase.field_purchase_config_settings_group_purchase_order_line_display_stock_info
+#: model:res.groups,comment:of_purchase.group_purchase_order_line_display_stock_info
+msgid "Affiche les informations de stock au niveau des lignes de commande"
+msgstr "Affiche les informations de stock au niveau des lignes de commande"
+
+#. module: of_purchase
+#: model:ir.model.fields,field_description:of_purchase.field_purchase_order_of_sent
+msgid "CF envoyée"
+msgstr "CF envoyée"
+
+#. module: of_purchase
+#: model:ir.model.fields,help:of_purchase.field_purchase_config_settings_of_description_as_order_setting
+msgid "Choisissez le type de description affiché dans la commande fournisseur.\n"
+"Cela affecte également les documents imprimables."
+msgstr "Choisissez le type de description affiché dans la commande fournisseur.\n"
+"Cela affecte également les documents imprimables."
+
+#. module: of_purchase
+#: model:ir.model.fields,field_description:of_purchase.field_purchase_order_customer_id
+#: model:ir.model.fields,field_description:of_purchase.field_stock_picking_of_customer_id
+#: model:ir.ui.view,arch_db:of_purchase.of_view_purchase_order_customer_filter
+msgid "Client"
+msgstr "Client"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_purchase_view_picking_search
+#: model:ir.ui.view,arch_db:of_purchase.of_purchase_view_picking_tree
+msgid "Client final"
+msgstr "Client final"
+
+#. module: of_purchase
+#: model:ir.model.fields,field_description:of_purchase.field_product_product_property_of_purchase_coeff
+msgid "Coefficient d'achat"
+msgstr "Coefficient d'achat"
+
+#. module: of_purchase
+#: model:ir.model.fields,field_description:of_purchase.field_purchase_order_sale_order_id
+msgid "Commande d'origine"
+msgstr "Commande d'origine"
+
+#. module: of_purchase
+#: model:ir.actions.report.xml,name:of_purchase.of_action_report_purchase_order_sans_prix
+msgid "Commande sans prix"
+msgstr "Commande sans prix"
+
+#. module: of_purchase
+#: model:ir.model.fields,field_description:of_purchase.field_purchase_order_of_project_id
+msgid "Compte analytique"
+msgstr "Compte analytique"
+
+#. module: of_purchase
+#: selection:purchase.config.settings,of_date_purchase_order:0
+msgid "Date du jour"
+msgstr "Date du jour"
+
+#. module: of_purchase
+#: selection:purchase.config.settings,of_description_as_order_setting:0
+msgid "Description article telle que saisie dans le catalogue"
+msgstr "Description article telle que saisie dans le catalogue"
+
+#. module: of_purchase
+#: selection:purchase.config.settings,of_description_as_order_setting:0
+msgid "Description article telle que saisie dans le devis"
+msgstr "Description article telle que saisie dans le devis"
+
+#. module: of_purchase
+#: model:ir.model.fields,field_description:of_purchase.field_purchase_order_of_delivery_force
+msgid "Forcer date prévue"
+msgstr "Forcer date prévue"
+
+#. module: of_purchase
+#: model:ir.model,name:of_purchase.model_product_supplierinfo
+msgid "Information about a product vendor"
+msgstr "Information sur le vendeur de l'article"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_purchase_order_customer_form
+msgid "Informations de Stock"
+msgstr "Informations de Stock"
+
+#. module: of_purchase
+#: model:res.groups,name:of_purchase.group_purchase_order_line_display_stock_info
+msgid "Lignes de commande d'achat - Affichage des informations de stock"
+msgstr "Lignes de commande d'achat - Affichage des informations de stock"
+
+#. module: of_purchase
+#: model:ir.model.fields,field_description:of_purchase.field_purchase_order_delivery_expected
+#: model:ir.model.fields,field_description:of_purchase.field_sale_order_delivery_expected
+msgid "Livraison attendue"
+msgstr "Livraison attendue"
+
+#. module: of_purchase
+#: model:ir.model.fields,field_description:of_purchase.field_stock_picking_of_location_usage
+msgid "Location Type"
+msgstr "Type d'emplacement"
+
+#. module: of_purchase
+#: code:addons/of_purchase/models/of_purchase.py:245
+#, python-format
+msgid "No vendor associated to product %s. Please set one to fix this procurement."
+msgstr "Pas de fournisseur associé à l'article %s. Veuillez en ajouter un pour corriger cet approvisionnement. "
+
+#. module: of_purchase
+#: selection:purchase.order,of_reception_state:0
+msgid "Non reçue"
+msgstr "Non reçue"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_view_purchase_order_customer_filter
+msgid "Non reçues"
+msgstr "Non reçues"
+
+#. module: of_purchase
+#: model:ir.model,name:of_purchase.model_res_partner
+msgid "Partner"
+msgstr "Partenaire"
+
+#. module: of_purchase
+#: model:ir.model,name:of_purchase.model_procurement_order
+msgid "Procurement"
+msgstr "Approvisionnement"
+
+#. module: of_purchase
+#: model:ir.model,name:of_purchase.model_product_product
+msgid "Product"
+msgstr "Article"
+
+#. module: of_purchase
+#: model:ir.model,name:of_purchase.model_purchase_order
+msgid "Purchase Order"
+msgstr "Commande fournisseur"
+
+#. module: of_purchase
+#: model:ir.model,name:of_purchase.model_purchase_order_line
+msgid "Purchase Order Line"
+msgstr "Ligne de commande d'achat"
+
+#. module: of_purchase
+#: model:ir.model.fields,field_description:of_purchase.field_sale_order_purchase_count
+msgid "Purchase count"
+msgstr "Purchase count"
+
+#. module: of_purchase
+#: model:ir.model.fields,field_description:of_purchase.field_purchase_order_line_of_reserved_qty
+msgid "Qté(s) réservée(s)"
+msgstr "Qté(s) réservée(s)"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_purchase_order_customer_form
+msgid "Recalcul prix de revient"
+msgstr "Recalcul prix de revient"
+
+#. module: of_purchase
+#: model:ir.model.fields,field_description:of_purchase.field_purchase_order_of_user_id
+#: model:ir.model.fields,field_description:of_purchase.field_sale_order_of_user_id
+#: model:ir.model.fields,field_description:of_purchase.field_stock_picking_of_user_id
+msgid "Responsable technique"
+msgstr "Responsable technique"
+
+#. module: of_purchase
+#: selection:purchase.order,of_reception_state:0
+msgid "Reçue"
+msgstr "Reçue"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_view_purchase_order_customer_filter
+msgid "Reçues"
+msgstr "Reçues"
+
+#. module: of_purchase
+#: model:ir.actions.act_window,name:of_purchase.of_purchase_open_picking
+#: model:ir.model.fields,field_description:of_purchase.field_res_partner_of_br_count
+#: model:ir.model.fields,field_description:of_purchase.field_res_users_of_br_count
+msgid "Réceptions"
+msgstr "Réceptions"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_view_purchase_order_customer_filter
+msgid "Référence fournisseur"
+msgstr "Référence fournisseur"
+
+#. module: of_purchase
+#: model:ir.model,name:of_purchase.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_purchase
+#: model:ir.model.fields,help:of_purchase.field_purchase_order_line_of_theoretical_stock_qty
+msgid "Si une règle de stock est définie pour l'article avec une date limite de prévision, le stock théorique est calculé à cette date ; sinon le stock théorique calculé est le stock théorique global de l'article"
+msgstr "Si une règle de stock est définie pour l'article avec une date limite de prévision, le stock théorique est calculé à cette date ; sinon le stock théorique calculé est le stock théorique global de l'article"
+
+#. module: of_purchase
+#: selection:purchase.config.settings,of_date_purchase_order:0
+msgid "Standard"
+msgstr "Standard"
+
+#. module: of_purchase
+#: model:ir.model,name:of_purchase.model_stock_move
+msgid "Stock Move"
+msgstr "Mouvement de stock"
+
+#. module: of_purchase
+#: model:ir.model.fields,field_description:of_purchase.field_purchase_order_line_of_available_stock_qty
+msgid "Stock dispo."
+msgstr "Stock dispo."
+
+#. module: of_purchase
+#: model:ir.model.fields,field_description:of_purchase.field_purchase_order_line_of_theoretical_stock_qty
+msgid "Stock théo."
+msgstr "Stock théo."
+
+#. module: of_purchase
+#: model:ir.model.fields,field_description:of_purchase.field_purchase_order_line_of_total_stock_qty
+msgid "Stock total"
+msgstr "Stock total"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_report_purchaseorder_document
+msgid "TVA"
+msgstr "TVA"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_report_purchaseorder_document
+#: model:ir.ui.view,arch_db:of_purchase.of_report_purchasequotation_document
+msgid "TVA:"
+msgstr "TVA :"
+
+#. module: of_purchase
+#: code:addons/of_purchase/models/of_purchase.py:294
+#, python-format
+msgid "This purchase order has been created from: <a href=# data-oe-model=procurement.order data-oe-id=%d>%s</a>"
+msgstr "Ce bon de commande achat a été créé à partir de : <a href=# data-oe-model=procurement.order data-oe-id=%d>%s</a>"
+
+#. module: of_purchase
+#: code:addons/of_purchase/models/of_purchase.py:308
+#, python-format
+msgid "This purchase order has been modified from: <a href=# data-oe-model=procurement.order data-oe-id=%d>%s</a>"
+msgstr "Ce bon de commande achat a été modifié depuis : <a href=# data-oe-model=procurement.order data-oe-id=%d>%s</a>"
+
+#. module: of_purchase
+#: model:ir.model,name:of_purchase.model_stock_picking
+msgid "Transfer"
+msgstr "Transfert"
+
+#. module: of_purchase
+#: model:ir.model,name:of_purchase.model_purchase_config_settings
+msgid "purchase.config.settings"
+msgstr "purchase.config.settings"
+
+#. module: of_purchase
+#: model:ir.model,name:of_purchase.model_sale_config_settings
+msgid "sale.config.settings"
+msgstr "sale.config.settings"
+
+#. module: of_purchase
+#: model:ir.model.fields,field_description:of_purchase.field_purchase_order_of_reception_state
+msgid "État de réception"
+msgstr "État de réception"

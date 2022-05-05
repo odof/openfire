@@ -73,9 +73,9 @@
         <field name="name">ofab.pricelist.sale.config.settings.form.view</field>
         <field name="model">sale.config.settings</field>
         <field name="type">form</field>
-        <field name="inherit_id" ref="sale.view_sales_config"/>
+        <field name="inherit_id" ref="of_sale.of_sale_view_sale_config_settings"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='group_product_pricelist']/.." position="after">
+            <xpath expr="//field[@name='group_discount_per_so_line']" position="before">
                 <field name="of_coef_method" widget="radio"/>
             </xpath>
         </field>

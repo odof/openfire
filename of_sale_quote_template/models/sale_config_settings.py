@@ -7,11 +7,11 @@ class OFSaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'
 
     group_of_advanced_sale_layout_category = fields.Boolean(
-        string=u"(OF) Activer les sections avancées sur les devis",
+        string="(OF) Advanced Sections",
         implied_group='of_sale_quote_template.group_of_advanced_sale_layout_category',
         group='base.group_user')
     module_of_sale_budget = fields.Boolean(
-        string=u"(OF) Gestion du budget", help="Installe le module Ventes / Budget")
+        string=u"(OF) Budget management", help="Installs the Sales / Budget module")
     of_quote_template = fields.Selection(
         [('add', u'Ajoute les lignes de commande du modèle au devis'),
          ('replace', u'Remplace les lignes de commande du devis par celles du modèle')],
@@ -30,8 +30,5 @@ class OFSaleConfiguration(models.TransientModel):
         """ On désactive le menu des sections standards quand on active les sections avancées"""
         res = super(OFSaleConfiguration, self).execute()
         menu_id = self.env.ref('sale.Report_configuration')
-        if self.group_of_advanced_sale_layout_category:
-            menu_id.active = False
-        else:
-            menu_id.active = True
+        menu_id.active = not self.group_of_advanced_sale_layout_category
         return res

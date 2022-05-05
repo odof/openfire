@@ -39,20 +39,4 @@
         </field>
     </record>
 
-    <!-- Sale Config Settings Form View -->
-    <record id="of_sale_order_dates_sale_config_settings_form_view" model="ir.ui.view">
-        <field name="name">of.sale.order.dates.sale.config.settings.form.view</field>
-        <field name="model">sale.config.settings</field>
-        <field name="inherit_id" ref="of_sale.of_sale_view_sale_config_settings"/>
-        <field name="arch" type="xml">
-            <xpath expr="//div[@name='pdf_masquer_pastille_payment_term']" position="after">
-                <label string="(OF) Semaine demandée" for="of_pdf_display_requested_week"/>
-                <div name="of_pdf_display_requested_week">
-                    <field name="of_pdf_display_requested_week" class="oe_inline"/>
-                    <span>Afficher la semaine demandée dans les rapports PDF</span>
-                </div>
-            </xpath>
-        </field>
-    </record>
-
 </odoo>

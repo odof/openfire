@@ -18,6 +18,7 @@ Ce module surcharge le module standard Dates sur Commandes de Vente
     'data': [
         'reports/sale_report_templates.xml',
         'views/sale_views.xml',
+        'wizards/sale_set_printing_params_view.xml',
     ],
     'installable': True,
     'application': False,

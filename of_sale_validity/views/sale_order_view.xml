@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sales_config" model="ir.ui.view">
+        <field name="name">sale.validity.view.sales.config</field>
+        <field name="model">sale.config.settings</field>
+        <field name="inherit_id" ref="sale_validity.view_sales_config"/>
+        <field name="arch" type="xml">
+            <xpath expr="//label[@for='default_sale_order_validity_days']" position="replace"/>
+            <xpath expr="//div[@name='validity_days']" position="replace"/>
+        </field>
+    </record>
+
+    <record id="of_sale_sale_validity_view_sales_config" model="ir.ui.view">
+        <field name="name">of.sale.sale.validity.view.sales.config</field>
+        <field name="model">sale.config.settings</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_sale_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='field_parameters']" position="inside">
+                <label for="default_sale_order_validity_days"/>
+                <div name="validity_days">
+                    <field name="default_sale_order_validity_days" class="oe_inline"/>
+                    <label string=" days"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
