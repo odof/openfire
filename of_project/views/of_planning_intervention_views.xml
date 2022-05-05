@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_intervention_view_form" model="ir.ui.view">
+        <field name="name">of.project.sale.order.of.planning.intervention.view.form</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='picking_id']" position="after">
+                <field name="task_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_planning_intervention_filter" model="ir.ui.view">
+        <field name="name">of.project.sale.order.of.planning.intervention.filter</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_id']" position="after">
+                <field name="task_id"/>
+            </xpath>
+        </field>
+    </record>
+
+<!--     Action pour afficher liste d'interventions-->
+    <record id="of_project_open_interventions" model="ir.actions.act_window">
+        <field name="name">RDVs</field>
+        <field name="res_model">of.planning.intervention</field>
+        <field name="domain">[]</field> <!-- Force empty -->
+        <field name="view_type">form</field>
+        <field name="view_mode">calendar,tree,form,pivot</field>
+        <field name="view_id" ref="of_planning.of_planning_intervention_view_calendar_with_jump"/>
+        <field name="search_view_id" ref="of_planning.of_planning_intervention_filter"/>
+    </record>
+
+</odoo>

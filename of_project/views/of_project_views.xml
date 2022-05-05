@@ -50,6 +50,7 @@
                 <field name="partner_id"/>
                 <field name="of_sale_id"/>
                 <field name="description"/>
+                <field name="of_planned_hours"/>
             </xpath>
             <xpath expr="//div[@class='o_kanban_card_content o_visible']" position="before">
                 <div>
@@ -66,6 +67,9 @@
                     <a name="get_sale_order_action" type="object">
                         <field name="of_sale_id"/>
                     </a>
+                </div>
+                <div name="of_planned_hours">
+                    Durée Prévue :<field name="of_planned_hours" widget="float_time"/>
                 </div>
                 <div name="description" t-if="record.description.raw_value" style="max-height:310px;overflow:hidden;text-overflow:ellipsis;">
                     <t t-raw="record.description.raw_value"/>
@@ -155,11 +159,30 @@
         </field>
     </record>
 
+    <act_window
+        id="action_view_rdv_intervention_wizard_task"
+        name="Planifier une intervention"
+        res_model="of.tournee.rdv"
+        src_model="project.task"
+        view_mode="form"
+        view_id="of_planning_tournee.view_rdv_intervention_wizard"
+        key2="client_action_multi"
+        target="new"
+        groups="of_planning.of_group_planning_intervention_lecture_siens"/>
+
     <record id="of_project_project_task_form_view" model="ir.ui.view">
         <field name="name">of_project.project.task.form.view</field>
         <field name="model">project.task</field>
         <field name="inherit_id" ref="project.view_task_form2"/>
         <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="%(action_view_rdv_intervention_wizard_task)d" string="Planifier Intervention" type="action" groups="of_project.group_of_planning_project"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" name="action_view_interventions" type="object" icon="fa-calendar">
+                    <field string="RDV(s)" name="of_intervention_count" widget="statinfo"/>
+                </button>
+            </xpath>
             <xpath expr="//field[@name='user_id']" position="after">
                 <field name="of_member_ids" invisible="1"/>
                 <field name="of_participant_ids" widget="many2many_tags" domain="of_member_ids and [('id', 'in', of_member_ids[0][2])] or []"/>
@@ -187,6 +210,32 @@
                                        ('date_end', '=', False)]"/>
                 <filter string="A venir" name="next_week"
                         domain="[('date_start', '>=', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!--*****************************************************************************************-->
+    <!--*********************************** Project Task Type ***********************************-->
+    <!--*****************************************************************************************-->
+
+    <record id="task_type_edit" model="ir.ui.view">
+        <field name="name">of_project.task.type.edit</field>
+        <field name="model">project.task.type</field>
+        <field name="inherit_id" ref="project.task_type_edit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='mail_template_id']" position="after">
+                <field name="of_visible_if_empty"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="task_type_tree" model="ir.ui.view">
+        <field name="name">of_project.task.type.tree</field>
+        <field name="model">project.task.type</field>
+        <field name="inherit_id" ref="project.task_type_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='fold']" position="after">
+                <field name="of_visible_if_empty"/>
             </xpath>
         </field>
     </record>

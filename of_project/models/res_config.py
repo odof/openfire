@@ -10,6 +10,12 @@ class ProjectConfiguration(models.TransientModel):
         [('none', "Aucun"), ('of_stage_id', u"Étapes assignées manuellement"), ('of_state', u"État calculé")],
         string="Regroupement Kanban des projets", required=True
     )
+    group_of_planning_project = fields.Boolean(
+        string=u"(OF) Planification d’intervention",
+        implied_group='of_project.group_of_planning_project',
+        help=u"Activer la planification d’interventions dans la tâche")
+    module_of_project_sale = fields.Boolean(
+        string=u"(OF) Création automatique", help="Créer un projet à la validation d’une commande")
 
     @api.model
     def get_default_of_kanban_group(self, fields):

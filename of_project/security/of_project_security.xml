@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Active la planification d’interventions dans la tâche -->
+    <record id="group_of_planning_project" model="res.groups">
+        <field name="name">(OF) Planification d’intervention projets</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="comment">Active la planification d’interventions dans la tâche</field>
+    </record>
+
+</odoo>
