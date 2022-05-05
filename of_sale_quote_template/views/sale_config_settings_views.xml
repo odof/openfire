@@ -5,19 +5,19 @@
     <record id="of_sale_quote_template_view_sale_config_settings" model="ir.ui.view">
         <field name="name">of salequote template settings</field>
         <field name="model">sale.config.settings</field>
-        <field name="inherit_id" ref="sale.view_sales_config"/>
+        <field name="inherit_id" ref="of_sale.of_sale_view_sale_config_settings"/>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='quotations_sales']" position="inside">
+            <xpath expr="//div[@id='group_of_order_line_option']" position="after">
                 <field name="of_quote_template" widget="radio"/>
                 <label for="group_of_advanced_sale_layout_category"/>
                 <div name="group_of_advanced_sale_layout_category">
                     <field name="group_of_advanced_sale_layout_category" class="oe_inline"/>
-                    <span>Ajoute l'onglet Sections sur les devis</span>
+                    <span>Add advanced sections on quotes</span>
                 </div>
                 <label for="module_of_sale_budget"/>
                 <div name="module_of_sale_budget">
                     <field name="module_of_sale_budget" class="oe_inline"/>
-                    <span>Activer la gestion du budget et des heures chantier dans les devis</span>
+                    <span>Activate the management of the budget and construction hours in the quotations</span>
                 </div>
             </xpath>
         </field>

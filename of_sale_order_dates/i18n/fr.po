@@ -1,0 +1,68 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_sale_order_dates
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-07-26 14:02+0000\n"
+"PO-Revision-Date: 2022-07-26 14:02+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_sale_order_dates
+#: model:ir.model.fields,field_description:of_sale_order_dates.field_of_sale_wizard_set_printing_params_of_pdf_display_requested_week
+msgid "(OF) Afficher pastille 'Semaine demandée'"
+msgstr "(OF) Afficher pastille 'Semaine demandée'"
+
+#. module: of_sale_order_dates
+#: model:ir.ui.view,arch_db:of_sale_order_dates.wizard_sales_set_printing_params_view_form
+msgid "(OF) Semaine demandée"
+msgstr "(OF) Semaine demandée"
+
+#. module: of_sale_order_dates
+#: model:ir.ui.view,arch_db:of_sale_order_dates.wizard_sales_set_printing_params_view_form
+msgid "<span>Afficher la semaine demandée dans les rapports PDF</span>"
+msgstr "<span>Afficher la semaine demandée dans les rapports PDF</span>"
+
+#. module: of_sale_order_dates
+#: model:ir.ui.view,arch_db:of_sale_order_dates.of_sale_order_dates_report_saleorder_document
+msgid "<strong>Semaine demandée&amp;nbsp;:</strong>"
+msgstr "<strong>Semaine demandée&amp;nbsp;:</strong>"
+
+#. module: of_sale_order_dates
+#: model:ir.model.fields,help:of_sale_order_dates.field_of_sale_wizard_set_printing_params_of_pdf_display_requested_week
+msgid "Afficher la pastille 'Semaine demandée' dans les rapports PDF ?"
+msgstr "Afficher la pastille 'Semaine demandée' dans les rapports PDF ?"
+
+#. module: of_sale_order_dates
+#: model:ir.model,name:of_sale_order_dates.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_sale_order_dates
+#: model:ir.model,name:of_sale_order_dates.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de bons de commande"
+
+#. module: of_sale_order_dates
+#: model:ir.model.fields,field_description:of_sale_order_dates.field_of_wizard_situation_line_of_order_requested_week
+#: model:ir.model.fields,field_description:of_sale_order_dates.field_sale_order_line_of_order_requested_week
+#: model:ir.model.fields,field_description:of_sale_order_dates.field_sale_order_of_requested_week
+msgid "Semaine demandée"
+msgstr "Semaine demandée"
+
+#. module: of_sale_order_dates
+#: model:ir.model,name:of_sale_order_dates.model_of_sale_wizard_set_printing_params
+msgid "of.sale.wizard.set.printing.params"
+msgstr "of.sale.wizard.set.printing.params"
+
+#. module: of_sale_order_dates
+#: model:ir.model,name:of_sale_order_dates.model_sale_config_settings
+msgid "sale.config.settings"
+msgstr "sale.config.settings"

@@ -202,27 +202,57 @@
     </record>
 
     <!-- Sale config wizard -->
-    <record id="view_of_sale_stock_sale_config_settings" model="ir.ui.view">
+    <record id="view_of_sales_config_inherit_sale_stock" model="ir.ui.view">
+        <field name="name">of sale settings sale_stock</field>
+        <field name="model">sale.config.settings</field>
+        <field name="inherit_id" ref="sale_stock.view_sales_config_inherit_sale_stock"/>
+        <field name="arch" type="xml">
+            <!-- The default group "Shipping" has no attr name... So we are trying to get it by his position and his child -->
+            <xpath expr="//group[position() > 8]/field[@name='default_picking_policy']/.." position="replace"/>
+            <!-- Replace field to move them in the view "view_of_sale_stock_sale_config_settings_of_sale" bellow -->
+            <xpath expr="//group[@name='quotations_sales']/field[@name='group_mrp_properties']" position="replace"/>
+            <xpath expr="//group[@name='quotations_sales']/field[@name='group_route_so_lines']" position="replace"/>
+            <xpath expr="//group[@name='quotations_sales']/label[@for='module_sale_order_dates']" position="replace"/>
+            <xpath expr="//group[@name='quotations_sales']//field[@name='module_sale_order_dates']/.." position="replace"/>
+            <xpath expr="//group[@name='customers']//field[@name='security_lead']" position="replace"/>
+        </field>
+    </record>
+    <record id="view_of_sale_stock_sale_config_settings_of_sale" model="ir.ui.view">
         <field name="name">of sale settings</field>
         <field name="model">sale.config.settings</field>
-        <field name="inherit_id" ref="sale.view_sales_config"/>
+        <field name="inherit_id" ref="of_sale.of_sale_view_sale_config_settings"/>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='quotations_sales']" position="inside">
-                <label for="of_inclure_service_bl"/>
-                <div name="of_inclure_service_bl">
-                    <field name="of_inclure_service_bl" class="oe_inline"/>
-                    <span>Inclure les articles de type 'service' dans les bons de livraisons</span>
-                </div>
-                <label for="group_sale_order_line_display_stock_info"/>
-                <div name="group_sale_order_line_display_stock_info">
-                    <field name="group_sale_order_line_display_stock_info" class="oe_inline"/>
-                    <span>Afficher les informations de stock au niveau des lignes de commande</span>
-                </div>
+            <xpath expr="//div[@id='of_allow_quote_addition']" position="after">
                 <label for="group_sale_order_line_display_menu_info"/>
                 <div name="group_sale_order_line_display_menu_info">
                     <field name="group_sale_order_line_display_menu_info" class="oe_inline"/>
-                    <span>Afficher le menu lignes de commande depuis le menu ventes</span>
+                    <span>Show the order lines menu from sales menu</span>
                 </div>
+            </xpath>
+            <xpath expr="//group[@name='purchase_stock']/div[@name='stock_warning_setting']" position="after">
+                <label for="group_sale_order_line_display_stock_info"/>
+                <div name="group_sale_order_line_display_stock_info">
+                    <field name="group_sale_order_line_display_stock_info" class="oe_inline"/>
+                    <span>View stock information at the order lines level</span>
+                </div>
+            </xpath>
+            <xpath expr="//group[@name='purchase_stock']/div[last()]" position="after">
+                <label for="of_inclure_service_bl"/>
+                <div name="of_inclure_service_bl">
+                    <field name="of_inclure_service_bl" class="oe_inline"/>
+                    <span>Include 'service' type items in delivery notes</span>
+                </div>
+                <field name="group_route_so_lines" widget="radio"/>
+                <label for="module_sale_order_dates"/>
+                <div>
+                    <field name="module_sale_order_dates" class="oe_inline" widget="radio"/>
+                </div>
+                <field name="security_lead"/>
+                <field name="module_delivery" widget="radio"/>
+                <field name="default_picking_policy" widget="radio"/>
+            </xpath>
+            <xpath expr="//group[@name='manufacturing']" position="inside">
+                <field name="group_mrp_properties" widget="radio" groups="base.group_no_one"/>
             </xpath>
         </field>
     </record>

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-26 13:17+0000\n"
-"PO-Revision-Date: 2017-10-26 13:17+0000\n"
+"POT-Creation-Date: 2022-05-05 14:56+0000\n"
+"PO-Revision-Date: 2022-05-05 14:56+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,9 +16,93 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_stock_config_settings_group_description_BL_variant
+msgid "(OF) Description articles"
+msgstr "(OF) Description articles"
+
+#. module: of_sale_stock
+#: model:res.groups,name:of_sale_stock.group_of_inventory_real_value
+msgid "(OF) Inventaire - Valeur réelle des mouvements"
+msgstr "(OF) Inventaire - Valeur réelle des mouvements"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_stock_config_settings_group_of_inventory_real_value
+msgid "(OF) Méthode de valorisation de l'inventaire"
+msgstr "(OF) Méthode de valorisation de l'inventaire"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_config_settings_group_sale_order_line_display_menu_info
+msgid "(OF) Order lines"
+msgstr "(OF) Lignes de commande"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_stock_move_of_ordered_qty
+msgid "(OF) Quantité commandée"
+msgstr "(OF) Quantité commandée"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_config_settings_of_inclure_service_bl
+msgid "(OF) Service type items"
+msgstr "(OF) Articles de type service"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_config_settings_of_stock_warning_setting
+msgid "(OF) Stock Warnings"
+msgstr "(OF) Avertissements de stock"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_config_settings_group_sale_order_line_display_stock_info
+msgid "(OF) Stock information"
+msgstr "(OF) Informations de stock"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_rapport_gestion_stock_view_form
+msgid "(Re)générer le document"
+msgstr "(Re)générer le document"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,help:of_sale_stock.field_stock_pack_operation_move_state
+msgid "* New: When the stock move is created and not yet confirmed.\n"
+"* Waiting Another Move: This state can be seen when a move is waiting for another one, for example in a chained flow.\n"
+"* Waiting Availability: This state is reached when the procurement resolution is not straight forward. It may need the scheduler to run, a component to be manufactured...\n"
+"* Available: When products are reserved, it is set to 'Available'.\n"
+"* Done: When the shipment is processed, the state is 'Done'."
+msgstr "* Nouveau : lorsque le mouvement de stock a été créé mais n'est pas encore confirmé.\n"
+"* En attente d'un autre mouvement : cet état signifie qu'un mouvement est en attente d'un autre mouvement, par exemple dans le cas d'un flux à enchaînements.\n"
+"* En attente de disponibilité : cet état signifie que l'approvisionnement ne peut pas se faire directement. Il est peut-être nécessaire d'exécuter le planificateur ou de fabriquer un composant, par exemple.\n"
+"* Disponible : lorsqu'un produit est réservé, son état passe à « Disponible ».\n"
+"* Terminé : lorsque l'envoi a été traité, son état passe à « Terminé »"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.view_of_sale_stock_sale_config_settings_of_sale
+msgid "<span>Include 'service' type items in delivery notes</span>"
+msgstr "<span>Inclure les articles de type 'service' dans les bons de livraisons</span>"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.view_of_sale_stock_sale_config_settings_of_sale
+msgid "<span>Show the order lines menu from sales menu</span>"
+msgstr "<span>Afficher le menu lignes de commande depuis le menu ventes</span>"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.view_of_sale_stock_sale_config_settings_of_sale
+msgid "<span>View stock information at the order lines level</span>"
+msgstr "<span>Afficher les informations de stock au niveau des lignes de commande</span>"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_report_deliveryslip
+msgid "<strong style=\"padding-left: 6px;\">Notes</strong>"
+msgstr "<strong style=\"padding-left: 6px;\">Notes</strong>"
+
+#. module: of_sale_stock
 #: model:ir.ui.view,arch_db:of_sale_stock.of_report_inventory_valued
 msgid "<strong>Date</strong>"
 msgstr "<strong>Date</strong>"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_report_deliveryslip
+#: model:ir.ui.view,arch_db:of_sale_stock.of_report_picking
+msgid "<strong>Description</strong>"
+msgstr "<strong>Description</strong>"
 
 #. module: of_sale_stock
 #: model:ir.ui.view,arch_db:of_sale_stock.of_report_inventory_valued
@@ -61,9 +145,279 @@ msgid "<strong>Value</strong>"
 msgstr "<strong>Valeur</strong>"
 
 #. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_report_picking
+msgid "<strong>État</strong>"
+msgstr "<strong>État</strong>"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,help:of_sale_stock.field_sale_order_line_of_product_type
+msgid "A stockable product is a product for which you manage stock. The \"Inventory\" app has to be installed.\n"
+"A consumable product, on the other hand, is a product for which stock is not managed.\n"
+"A service is a non-material product you provide.\n"
+"A digital content is a non-material product you sell online. The files attached to the products are the one that are sold on the e-commerce such as e-books, music, pictures,... The \"Digital Product\" module has to be installed."
+msgstr "Un produit « stockable » est un produit pour lequel vous désirez gérer le stock. L'application « Inventaire » doit être installée.\n"
+"Un produit « consommable », en revanche, est un produit non géré en stock.\n"
+"Un service est un bien immatériel que vous fournissez ou achetez.\n"
+"Un contenu numérique est un bien immatériel que vous vendez en ligne. Les fichier liés aux produits sont ceux vendu sur la boutique en ligne (livres électronique, musique, photos, …). Le module « Produits numériques » doit être installé."
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_stock_picking_of_purchase_count
+#: model:ir.ui.view,arch_db:of_sale_stock.of_sale_stock_view_picking_form
+msgid "Achats"
+msgstr "Achats"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_stock_picking_of_purchase_ids
+msgid "Achats associés à cette livraison"
+msgstr "Achats associés à cette livraison"
+
+#. module: of_sale_stock
+#: model:res.groups,comment:of_sale_stock.group_sale_order_line_display_menu_info
+msgid "Affiche le menu lignes de commande depuis le menu ventes"
+msgstr "Affiche le menu lignes de commande depuis le menu ventes"
+
+#. module: of_sale_stock
+#: model:res.groups,comment:of_sale_stock.group_sale_order_line_display_stock_info
+msgid "Affiche les informations de stock au niveau des lignes de commande"
+msgstr "Affiche les informations de stock au niveau des lignes de commande"
+
+#. module: of_sale_stock
+#: selection:stock.config.settings,group_description_BL_variant:0
+msgid "Afficher l'article et sa description dans le bon de livraison"
+msgstr "Afficher l'article et sa description dans le bon de livraison"
+
+#. module: of_sale_stock
+#: selection:stock.config.settings,group_description_BL_variant:0
+msgid "Afficher uniquement l'article dans le bon de livraison"
+msgstr "Afficher uniquement l'article dans le bon de livraison"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_sale_stock_view_picking_form
+msgid "Ajouter une note qui figurera sur le bon de livraison"
+msgstr "Ajouter une note qui figurera sur le bon de livraison"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_delivery_division_wizard_form_view
+#: model:ir.ui.view,arch_db:of_sale_stock.of_rapport_gestion_stock_view_form
+msgid "Annuler"
+msgstr "Annuler"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_sale_stock_sale_order_line_search_view
+#: selection:sale.order.line,of_stock_moves_state:0
+msgid "Annulé"
+msgstr "Annulé"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_delivery_division_wizard_line_product_id
+msgid "Article"
+msgstr "Article"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_rapport_gestion_stock_wizard_product_ids
+msgid "Articles"
+msgstr "Articles"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_rapport_gestion_stock_wizard_active_product
+msgid "Articles actifs"
+msgstr "Articles actifs"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,help:of_sale_stock.field_of_rapport_gestion_stock_wizard_active_product
+msgid "Articles en stock ou présents dans un BL/BR en cours"
+msgstr "Articles en stock ou présents dans un BL/BR en cours"
+
+#. module: of_sale_stock
+#: model:ir.model,name:of_sale_stock.model_of_delivery_division_wizard
+msgid "Assistant de division de bon de transfert"
+msgstr "Assistant de division de bon de transfert"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_sale_stock_sale_order_line_search_view
+#: selection:sale.order.line,of_stock_moves_state:0
+msgid "Attente de disponibilité"
+msgstr "Attente de disponibilité"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_delivery_division_wizard_picking_id
+msgid "Bon de transfert à diviser"
+msgstr "Bon de transfert à diviser"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_rapport_gestion_stock_wizard_categ_ids
+msgid "Catégories"
+msgstr "Catégories"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,help:of_sale_stock.field_stock_config_settings_group_description_BL_variant
+msgid "Choisissez si la description de l'article s'affichée dans le bon de livraison.\n"
+"Cela affecte également les documents imprimables."
+msgstr "Choisissez si la description de l'article s'affichée dans le bon de livraison.\n"
+"Cela affecte également les documents imprimables."
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_sale_stock_sale_order_line_search_view
+msgid "Commande validée"
+msgstr "Commande validée"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_delivery_division_wizard_create_uid
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_delivery_division_wizard_line_create_uid
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_rapport_gestion_stock_wizard_create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_delivery_division_wizard_create_date
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_delivery_division_wizard_line_create_date
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_rapport_gestion_stock_wizard_create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: of_sale_stock
 #: model:ir.model.fields,field_description:of_sale_stock.field_stock_inventory_line_currency_id
 msgid "Currency"
 msgstr "Devise"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_stock_picking_client_order_ref
+msgid "Customer Reference"
+msgstr "Référence client"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_order_of_picking_min_date
+msgid "Date bon de livraison"
+msgstr "Date bon de livraison"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_rapport_gestion_stock_wizard_date_stock
+msgid "Date stock"
+msgstr "Date stock"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_order_of_picking_date_done
+msgid "Date transfert bon de livraison"
+msgstr "Date transfert bon de livraison"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_stock_pack_operation_move_name
+#: model:ir.ui.view,arch_db:of_sale_stock.of_specific_delivery_report_document_inh_sale_stock
+msgid "Description"
+msgstr "Description"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_delivery_division_wizard_display_name
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_delivery_division_wizard_line_display_name
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_rapport_gestion_stock_wizard_display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,help:of_sale_stock.field_sale_config_settings_group_sale_order_line_display_stock_info
+msgid "Displays stock information at the order lines level"
+msgstr "Affiche les informations de stock au niveau des lignes de commande"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,help:of_sale_stock.field_sale_config_settings_group_sale_order_line_display_menu_info
+msgid "Displays the order lines menu from the sales menu"
+msgstr "Affiche le menu lignes de commande depuis le menu ventes"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_sale_stock_sale_order_line_search_view
+#: selection:sale.order.line,of_stock_moves_state:0
+msgid "Disponible"
+msgstr "Disponible"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_delivery_division_wizard_form_view
+#: model:ir.ui.view,arch_db:of_sale_stock.of_sale_stock_view_picking_form
+msgid "Diviser"
+msgstr "Diviser"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_delivery_division_wizard_line_wizard_id
+msgid "Division du Bon de transfert"
+msgstr "Division du Bon de transfert"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_order_line_of_supplier_delivery_delay
+msgid "Délai de livraison"
+msgstr "Délai de livraison"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_rapport_gestion_stock_wizard_location_ids
+msgid "Emplacement"
+msgstr "Emplacement"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_sale_stock_sale_order_line_search_view
+#: selection:sale.order.line,of_stock_moves_state:0
+msgid "En attente de réception"
+msgstr "En attente de réception"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_sale_stock_sale_order_line_search_view
+#: selection:sale.order.line,of_stock_moves_state:0
+msgid "Fait"
+msgstr "Fait"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_rapport_gestion_stock_wizard_file
+msgid "Fichier"
+msgstr "Fichier"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_order_line_of_has_reordering_rule
+msgid "Gérer sur règle de stock"
+msgstr "Gérer sur règle de stock"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_delivery_division_wizard_id
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_delivery_division_wizard_line_id
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_rapport_gestion_stock_wizard_id
+msgid "ID"
+msgstr "ID"
+
+#. module: of_sale_stock
+#: model:ir.actions.act_window,name:of_sale_stock.action_of_rapport_gestion_stock
+msgid "Impression liste articles"
+msgstr "Impression liste articles"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_rapport_gestion_stock_view_form
+msgid "Imprimer liste article"
+msgstr "Imprimer liste article"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,help:of_sale_stock.field_sale_config_settings_of_inclure_service_bl
+msgid "Include 'service' type items in delivery notes"
+msgstr "Inclure les articles de type 'service' dans les bons de livraison"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_sale_stock_view_order_form
+msgid "Informations de Stock"
+msgstr "Informations de Stock"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_sale_stock_sale_order_line_form_view
+msgid "Informations sur l'article"
+msgstr "Informations sur l'article"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_sale_stock_sale_order_line_form_view
+msgid "Informations sur la commande"
+msgstr "Informations sur la commande"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_sale_stock_sale_order_line_form_view
+msgid "Informations sur le stock"
+msgstr "Informations sur le stock"
+
+#. module: of_sale_stock
+#: model:ir.model,name:of_sale_stock.model_stock_inventory
+msgid "Inventory"
+msgstr "Inventaire"
 
 #. module: of_sale_stock
 #: model:ir.model,name:of_sale_stock.model_stock_inventory_line
@@ -71,9 +425,295 @@ msgid "Inventory Line"
 msgstr "Ligne d'inventaire"
 
 #. module: of_sale_stock
+#: model:ir.model.fields,help:of_sale_stock.field_sale_order_line_of_has_reordering_rule
+msgid "L'article dispose de règles de réapprovisionnement."
+msgstr "L'article dispose de règles de réapprovisionnement."
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_delivery_division_wizard___last_update
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_delivery_division_wizard_line___last_update
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_rapport_gestion_stock_wizard___last_update
+msgid "Last Modified on"
+msgstr "Dernière Modification le"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_delivery_division_wizard_line_write_uid
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_delivery_division_wizard_write_uid
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_rapport_gestion_stock_wizard_write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_delivery_division_wizard_line_write_date
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_delivery_division_wizard_write_date
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_rapport_gestion_stock_wizard_write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: of_sale_stock
+#: model:ir.model,name:of_sale_stock.model_of_delivery_division_wizard_line
+msgid "Ligne de l'assistant de division des Bon de transfert"
+msgstr "Ligne de l'assistant de division des Bon de transfert"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_delivery_division_wizard_line_move_id
+msgid "Ligne du Bon de transfert"
+msgstr "Ligne du Bon de transfert"
+
+#. module: of_sale_stock
+#: model:ir.actions.act_window,name:of_sale_stock.of_sale_stock_sale_order_line_action
+#: model:ir.ui.menu,name:of_sale_stock.of_sale_stock_sale_order_line_menu
+#: model:ir.ui.view,arch_db:of_sale_stock.of_sale_stock_res_partner_form_view
+msgid "Lignes de commande"
+msgstr "Lignes de commande"
+
+#. module: of_sale_stock
+#: model:res.groups,name:of_sale_stock.group_sale_order_line_display_stock_info
+msgid "Lignes de commande - Affichage des informations de stock"
+msgstr "Lignes de commande - Affichage des informations de stock"
+
+#. module: of_sale_stock
+#: model:res.groups,name:of_sale_stock.group_sale_order_line_display_menu_info
+msgid "Lignes de commande - Affichage du menu lignes de commande"
+msgstr "Lignes de commande - Affichage du menu lignes de commande"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_delivery_division_wizard_line_ids
+msgid "Lignes à diviser"
+msgstr "Lignes à diviser"
+
+#. module: of_sale_stock
+#: model:res.groups,name:of_sale_stock.group_description_BL_variant
+msgid "Manage View BL Variants"
+msgstr "Manage View BL Variants"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_rapport_gestion_stock_wizard_brand_ids
+msgid "Marques"
+msgstr "Marques"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_stock_pack_operation_move_id
+msgid "Move_id"
+msgstr "Move_id"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_rapport_gestion_stock_wizard_file_name
+msgid "Nom du fichier"
+msgstr "Nom du fichier"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_res_partner_of_sale_order_lines_count
+#: model:ir.model.fields,field_description:of_sale_stock.field_res_users_of_sale_order_lines_count
+msgid "Nombre de lignes de commande"
+msgstr "Nombre de lignes de commande"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_stock_picking_of_note_operations
+msgid "Notes Operations"
+msgstr "Notes Operations"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_sale_stock_sale_order_line_search_view
+#: selection:sale.order.line,of_stock_moves_state:0
+msgid "Nouveau"
+msgstr "Nouveau"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_rapport_gestion_stock_wizard_prix
+msgid "PV"
+msgstr "PV"
+
+#. module: of_sale_stock
+#: model:ir.model,name:of_sale_stock.model_stock_pack_operation
+msgid "Packing Operation"
+msgstr "Colisage"
+
+#. module: of_sale_stock
+#: model:ir.model,name:of_sale_stock.model_res_partner
+msgid "Partner"
+msgstr "Partenaire"
+
+#. module: of_sale_stock
+#: model:res.groups,comment:of_sale_stock.group_of_inventory_real_value
+msgid "Permet d'afficher la valeur réelle des mouvements dans les ajustements de stock (Quants)"
+msgstr "Permet d'afficher la valeur réelle des mouvements dans les ajustements de stock (Quants)"
+
+#. module: of_sale_stock
+#: selection:stock.config.settings,group_of_inventory_real_value:0
+msgid "Prix de revient de l'article"
+msgstr "Prix de revient de l'article"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,help:of_sale_stock.field_of_rapport_gestion_stock_wizard_prix
+msgid "Prix de vente minimum"
+msgstr "Prix de vente minimum"
+
+#. module: of_sale_stock
+#: model:ir.model,name:of_sale_stock.model_procurement_order
+msgid "Procurement"
+msgstr "Approvisionnement"
+
+#. module: of_sale_stock
+#: model:ir.model,name:of_sale_stock.model_product_product
+msgid "Product"
+msgstr "Article"
+
+#. module: of_sale_stock
+#: model:ir.model,name:of_sale_stock.model_product_template
+msgid "Product Template"
+msgstr "Modèle d'article"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_sale_stock_sale_order_line_search_view
+msgid "Produit stockable"
+msgstr "Produit stockable"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_product_product_of_qty_unreserved
+#: model:ir.model.fields,field_description:of_sale_stock.field_product_template_of_qty_unreserved
+msgid "Qté non réservée"
+msgstr "Qté non réservée"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_sale_stock_sale_order_line_form_view
+msgid "Qté(s) commandée(s)"
+msgstr "Qté(s) commandée(s)"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_order_line_of_reserved_qty
+msgid "Qté(s) réservée(s)"
+msgstr "Qté(s) réservée(s)"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_delivery_division_wizard_line_product_uom_qty
+msgid "Quantité initiale"
+msgstr "Quantité initiale"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_of_delivery_division_wizard_line_qty_to_divide
+msgid "Quantité à diviser"
+msgstr "Quantité à diviser"
+
+#. module: of_sale_stock
+#: model:ir.ui.menu,name:of_sale_stock.menu_of_sale_stock_report
+msgid "Rapport gestion stock"
+msgstr "Rapport gestion stock"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_order_of_route_id
+msgid "Route"
+msgstr "Route"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_order_line_of_client_order_ref
+msgid "Référence Client"
+msgstr "Référence Client"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_view_stock_picking_form
+msgid "Référence commande client"
+msgstr "Référence commande client"
+
+#. module: of_sale_stock
+#: model:ir.model,name:of_sale_stock.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_sale_stock
+#: model:ir.model,name:of_sale_stock.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de bons de commande"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_order_line_of_picking_min_week
+msgid "Sem. de livraison prévue"
+msgstr "Sem. de livraison prévue"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_order_line_of_receipt_min_week
+msgid "Sem. de réception prévue"
+msgstr "Sem. de réception prévue"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_stock_picking_of_min_week
+msgid "Semaine prévue"
+msgstr "Semaine prévue"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,help:of_sale_stock.field_sale_config_settings_of_stock_warning_setting
+msgid "Show stock warning messages ?"
+msgstr "Afficher les messages d'avertissement de stock ?"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,help:of_sale_stock.field_sale_order_line_of_theoretical_stock_qty
+msgid "Si une règle de stock est définie pour l'article avec une date limite de prévision, le stock théorique est calculé à cette date ; sinon le stock théorique calculé est le stock théorique global de l'article"
+msgstr "Si une règle de stock est définie pour l'article avec une date limite de prévision, le stock théorique est calculé à cette date ; sinon le stock théorique calculé est le stock théorique global de l'article"
+
+#. module: of_sale_stock
 #: model:ir.ui.view,arch_db:of_sale_stock.of_report_inventory_valued
 msgid "Stock Inventory Valued"
 msgstr "Inventaire de stock Valorisé"
+
+#. module: of_sale_stock
+#: model:ir.model,name:of_sale_stock.model_stock_move
+msgid "Stock Move"
+msgstr "Mouvement de stock"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_order_line_of_available_stock_qty
+msgid "Stock dispo."
+msgstr "Stock dispo."
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_order_line_of_theoretical_stock_qty
+msgid "Stock théo."
+msgstr "Stock théo."
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_order_line_of_total_stock_qty
+msgid "Stock total"
+msgstr "Stock total"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,help:of_sale_stock.field_of_delivery_division_wizard_line_product_uom_qty
+msgid "This is the quantity of products from an inventory point of view. For moves in the state 'done', this is the quantity of products that were actually moved. For other moves, this is the quantity of product that is planned to be moved. Lowering this quantity does not generate a backorder. Changing this quantity on assigned moves affects the product reservation, and should be done with care."
+msgstr "Ceci est la quantité de produits depuis le point de vue de l'inventaire. Pour les mouvements dans l'état \"Terminé\", c'est la quantité de produits qui a été effectivement déplacée. Pour les autres mouvements, c'est la quantité de produits qu'il est prévu de déplacer. Abaisser cette quantité ne génère pas de reliquat. La modification de cette quantité sur les mouvements assignés affecte la réservation de marchandise, et doit être faite avec soin."
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_sale_stock_view_inventory_form
+msgid "Total"
+msgstr "Total"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_report_deliveryslip
+msgid "Toutes les lignes de ce bon de livraison sont annulées."
+msgstr "Toutes les lignes de ce bon de livraison sont annulées."
+
+#. module: of_sale_stock
+#: model:ir.model,name:of_sale_stock.model_stock_picking
+msgid "Transfer"
+msgstr "Transfert"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_order_line_of_product_type
+msgid "Type d'article"
+msgstr "Type d'article"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_rapport_gestion_stock_view_form
+msgid "Télécharger"
+msgstr "Télécharger"
+
+#. module: of_sale_stock
+#: selection:stock.config.settings,group_of_inventory_real_value:0
+msgid "Valeur réelle des mouvements (Quants)"
+msgstr "Valeur réelle des mouvements (Quants)"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_stock_inventory_line_product_value_unit
+msgid "Valeur unitaire"
+msgstr "Valeur unitaire"
 
 #. module: of_sale_stock
 #: model:ir.model.fields,field_description:of_sale_stock.field_stock_inventory_line_product_value
@@ -86,7 +726,31 @@ msgid "Valued Inventory"
 msgstr "Inventaire Valorisé"
 
 #. module: of_sale_stock
+#: model:ir.model,name:of_sale_stock.model_of_rapport_gestion_stock_wizard
+msgid "of.rapport.gestion.stock.wizard"
+msgstr "of.rapport.gestion.stock.wizard"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_rapport_gestion_stock_view_form
+msgid "ou"
+msgstr "ou"
+
+#. module: of_sale_stock
 #: model:ir.model,name:of_sale_stock.model_sale_config_settings
 msgid "sale.config.settings"
 msgstr "sale.config.settings"
 
+#. module: of_sale_stock
+#: model:ir.model,name:of_sale_stock.model_stock_config_settings
+msgid "stock.config.settings"
+msgstr "stock.config.settings"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_stock_pack_operation_move_state
+msgid "État"
+msgstr "État"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_order_line_of_stock_moves_state
+msgid "État de suivi"
+msgstr "État de suivi"
