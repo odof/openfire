@@ -288,16 +288,16 @@ class OfInvoicedRevenueAnalysis(models.Model):
             ,       AI.company_id       AS company_id
             ,       AI.user_id          AS vendor_id
             ,       AI.partner_id       AS partner_id
-            ,       NULL                AS product_id
-            ,       NULL                AS product_categ_id
-            ,       NULL                AS product_brand_id
+            ,       PP.id               AS product_id
+            ,       PT.categ_id         AS product_categ_id
+            ,       PT.brand_id         AS product_brand_id
             ,       0                   AS invoiced_turnover_budget
             ,       0                   AS invoiced_total
             ,       CASE
                         WHEN AI.type = 'out_invoice' THEN
-                            AI.amount_untaxed
+                            AIL.price_subtotal
                         ELSE
-                            -AI.amount_untaxed
+                            -AIL.price_subtotal
                     END                 AS previous_invoiced_total
             ,       0                   AS margin_total
             ,       0                   AS amount_to_invoice
@@ -308,12 +308,19 @@ class OfInvoicedRevenueAnalysis(models.Model):
     def _sub_from_account_invoice_n_1(self):
         sub_from_account_invoice_n_1_str = """
             FROM    account_invoice         AI
+            ,       account_invoice_line    AIL
+            ,       product_product         PP
+            ,       product_template        PT
         """
         return sub_from_account_invoice_n_1_str
 
     def _sub_where_account_invoice_n_1(self):
         sub_where_account_invoice_n_1_str = """
-            WHERE   AI.state           IN ('open', 'paid')
+            WHERE   AI.state            IN ('open', 'paid')
+            AND     AI.type             IN ('out_invoice', 'out_refund')
+            AND     AIL.invoice_id      = AI.id
+            AND     PP.id               = AIL.product_id
+            AND     PT.id               = PP.product_tmpl_id
         """
         return sub_where_account_invoice_n_1_str
 
