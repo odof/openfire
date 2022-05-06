@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="product_template_form_view" model="ir.ui.view">
+        <field name="name">of.product.tree.product.template.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='categ_id']" position="after">
+                <field name="of_product_search_category_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_template_search_view" model="ir.ui.view">
+        <field name="name">of.product.tree.product.template.search.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='categ_id']" position="after">
+                <field name="of_product_search_category_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_template_search_view_superbar" model="ir.ui.view">
+        <field name="name">of.product.tree.product.template.search.view.ztree</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="app_product_superbar.product_template_search_view_superbar"/>
+        <field name="arch" type="xml">
+            <xpath expr="//superbar/field[@name='categ_id']" position="after">
+                <field name="of_product_search_category_id" widget="ztree_search" model="of.product.search.category" domain="[]" parent_key="parent_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_product_search_category_view_form" model="ir.ui.view">
+        <field name="name">of.product.search.category.view.form</field>
+        <field name="model">of.product.search.category</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button"
+                            name="%(product.product_template_action_all)d"
+                            icon="fa-th-list"
+                            type="action"
+                            context="{'search_default_of_product_search_category_id': active_id}">
+                            <div class="o_form_field o_stat_info">
+                                <span class="o_stat_value"><field name="product_count"/></span>
+                                <span class="o_stat_text"> Products</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group name="first" col="4">
+                        <field name="parent_id"/>
+                        <field name="type"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_product_search_category_view_tree" model="ir.ui.view">
+        <field name="name">of.product.search.category.view.tree</field>
+        <field name="model">of.product.search.category</field>
+        <field name="priority">1</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="display_name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_product_search_category_view_search" model="ir.ui.view">
+        <field name="name">of.product.search.category.view.search</field>
+        <field name="model">of.product.search.category</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="parent_id"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_product_search_category_action" model="ir.actions.act_window">
+        <field name="name">Catégorie de recherche</field>
+        <field name="res_model">of.product.search.category</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form,tree</field>
+        <field name="search_view_id" ref="of_product_search_category_view_search"/>
+        <field name="view_id" ref="of_product_search_category_view_tree"/>
+    </record>
+
+    <menuitem id="of_product_search_category_menu" name="Catégorie de recherche" parent="sale.prod_config_main" action="of_product_search_category_action" sequence="2"/>
+
+</odoo>
