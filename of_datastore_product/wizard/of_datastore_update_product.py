@@ -58,7 +58,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
             if product.default_code
         }
         # Récupération des correspondances de la base centrale
-        ds_product_new_ids = supplier.of_datastore_search(
+        ds_product_new_ids = supplier.with_context(active_test=False).of_datastore_search(
             ds_product_obj, [('default_code', 'in', code_to_match_dict.keys())])
         if ds_product_new_ids:
             for ds_product_data in supplier.of_datastore_read(ds_product_obj, ds_product_new_ids, ['default_code']):

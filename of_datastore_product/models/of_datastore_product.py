@@ -1450,10 +1450,11 @@ class ProductProduct(models.Model):
             # Ce cas peut se produire dans un object de type commande, si plusieurs lignes ont la meme reference
             supplier = self.env['of.datastore.supplier'].browse(-self.id / DATASTORE_IND)
 
-            result = self_obj.search([('brand_id', 'in', supplier.brand_ids._ids),
-                                      ('of_datastore_res_id', '=', (-self.id) % DATASTORE_IND)])
+            result = self_obj.with_context(active_test=False).search(
+                [('brand_id', 'in', supplier.brand_ids._ids),
+                 ('of_datastore_res_id', '=', (-self.id) % DATASTORE_IND)])
             if result:
-                return result
+                return self_obj.browse(result._ids)
 
         # L'import d'articles via le tarif centralisé fait abstraction des droits de l'utilisateur.
         # En effets, les articles distants sont utilisables comme si ils étaient déjà présents sur la base.
