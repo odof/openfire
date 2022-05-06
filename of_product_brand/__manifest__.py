@@ -23,6 +23,7 @@ OpenFire module to manage products brand
         'wizards/of_product_brand_add_products.xml',
         'views/of_product_brand_view.xml',
         'report/of_sale_report_view.xml',
+        'report/of_purchase_report_views.xml',
         'report/of_account_report_views.xml',
     ],
     "installable": True,
