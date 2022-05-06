@@ -138,6 +138,8 @@
                 <filter string="Réalisée" name="done" domain="[('state', '=', 'done')]"/>
                 <filter string="Annulée" name="canceled" domain="[('state', '=', 'canceled')]"/>
                 <separator/>
+                <filter string="Archived" name="archived" domain="[('active', '=', False)]"/>
+                <separator/>
                 <filter string="Mes activités" name="my_activities"
                         domain="[('vendor_id', '=', uid)]"/>
                 <separator/>
