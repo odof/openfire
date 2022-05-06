@@ -1246,7 +1246,7 @@ class OfServiceLine(models.Model):
             'order_line_id': self.saleorder_line_id and self.saleorder_line_id.id or False,
         }
         if self.taxe_ids:
-            res['tax_ids'] = [(6, 0, self.taxe_ids._ids)]
+            res['taxe_ids'] = [(6, 0, self.taxe_ids._ids)]
         return res
 
     @api.multi

@@ -890,10 +890,11 @@ class OfPlanningIntervention(models.Model):
                  'line_ids.price_total',
                  )
     def _compute_amount(self):
+        # Calcul repris de la fonction définie pour les bons de commande client dans le module of_sale
         for intervention in self:
             intervention.price_subtotal = sum(intervention.line_ids.mapped('price_subtotal'))
-            intervention.price_tax = sum(intervention.line_ids.mapped('price_tax'))
-            intervention.price_total = sum(intervention.line_ids.mapped('price_total'))
+            intervention.price_tax = sum(tax['amount'] for tax in intervention.get_taxes_values().itervalues())
+            intervention.price_total = intervention.price_subtotal + intervention.price_tax
 
     @api.depends('line_ids', 'line_ids.invoice_line_ids', 'order_id', 'order_id.invoice_ids')
     def _compute_invoice_ids(self):
@@ -1535,6 +1536,35 @@ class OfPlanningIntervention(models.Model):
     # Autres
 
     @api.multi
+    def get_taxes_values(self):
+        self.ensure_one()
+        tax_grouped = {}
+        round_curr = self.currency_id.round
+        for line in self.line_ids:
+            price_unit = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
+
+            taxes = line.taxe_ids.compute_all(
+                price_unit, self.currency_id, line.qty,
+                product=line.product_id, partner=self.address_id)['taxes']
+            for val in taxes:
+                key = val['account_id']
+
+                if key not in tax_grouped:
+                    tax_grouped[key] = {
+                        'tax_id': val['id'],
+                        'amount': val['amount'],
+                        'base': round_curr(val['base'])
+                    }
+                else:
+                    tax_grouped[key]['amount'] += val['amount']
+                    tax_grouped[key]['base'] += round_curr(val['base'])
+
+        for values in tax_grouped.itervalues():
+            values['base'] = round_curr(values['base'])
+            values['amount'] = round_curr(values['amount'])
+        return tax_grouped
+
+    @api.multi
     def get_interv_prec_suiv(self, employee_id):
         """Renvoie l'intervention précédente à celle-ci pour l'employé donné
         (différent potentiellement de interv_before_id pour les interventions à plusieurs employés)"""
@@ -1894,7 +1924,6 @@ class OfPlanningIntervention(models.Model):
                     'lines': picking.pack_operation_product_ids,
                     })
         return pickings_layouted
-
 
 
 class OfPlanningInterventionLine(models.Model):
