@@ -807,7 +807,7 @@ CalendarView.include({
                     allDay: all_day,
                 });
                 // prefill attendees in the event to be created
-                if (self.attendee_people && attendees) {
+                if (self.attendee_people && attendees && attendees.length) {
                     if (self.fields[self.attendee_people].type == "many2many") {
                         data_template[self.attendee_people] = attendees;
                     }else{
