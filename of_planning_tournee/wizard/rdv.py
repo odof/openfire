@@ -228,7 +228,7 @@ class OfTourneeRdv(models.TransientModel):
                 # Si il n'y a pas d'a_programmer, on affecte creer_recurrence en fonction de la tâche
                 vals['creer_recurrence'] = self.tache_id.recurrence
 
-            if self.tache_id.duree:
+            if not self.duree and self.tache_id.duree:
                 vals['duree'] = self.tache_id.duree
 
             employees = []
