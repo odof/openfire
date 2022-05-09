@@ -1475,18 +1475,17 @@ class OfContractLine(models.Model):
                 if len(line.service_ids.filtered(lambda s: date_service <= s.date_next < month_service_end)) >= round(ratio):
                     continue
                 service_vals = {
-                    'type_id'         : type.id,
-                    'partner_id'      : line.partner_id.id,
-                    'address_id'      : line.address_id.id,
-                    'tache_id'        : line.tache_id.id,
-                    'recurrence'      : False,
-                    # 'contract_id'     : line.id,
-                    'contract_id'     : line.contract_id.id,
+                    'type_id': type.id,
+                    'partner_id': line.partner_id.id,
+                    'address_id': line.address_id.id,
+                    'tache_id': line.tache_id.id,
+                    'recurrence': False,
+                    'contract_id': line.contract_id.id,
                     'contract_line_id': line.id,
-                    'note'            : line.notes,
-                    # 'supplier_id'     : line.supplier_id.id or False,
-                    'company_id'      : line.company_id.id,
-                    }
+                    'note': line.notes,
+                    'supplier_id': line.supplier_id.id or False,
+                    'company_id': line.company_id.id,
+                }
                 new_service = service_obj.new(service_vals)
                 new_service._onchange_tache_id()
                 new_service.update({'date_next': date_service})
