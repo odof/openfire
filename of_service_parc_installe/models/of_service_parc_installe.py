@@ -108,7 +108,7 @@ class OfPlanningIntervention(models.Model):
 
     @api.depends('partner_id', 'address_id', 'parc_installe_id')
     def _compute_historique_rdv_ids(self):
-        # l'historique du parc installé se trouvent dans un autre champs
+        # l'historique du parc installé se trouve dans un autre champ
         for interv in self:
             if interv.address_id:
                 interventions = interv.address_id.intervention_address_ids
@@ -116,9 +116,11 @@ class OfPlanningIntervention(models.Model):
                 interventions = interv.partner_id.intervention_partner_ids
             else:
                 continue
-            interv.historique_rdv_ids = interventions.filtered(
-                lambda i: interv.date_date > i.date_date and
-                (not interv.parc_installe_id or interv.parc_installe_id != i.parc_installe_id))
+            interv.historique_rdv_ids = self.search([
+                ('id', 'in', interventions.ids),
+                ('date_date', '<', interv.date_date),
+                '|', ('parc_installe_id', '=', False), ('parc_installe_id', '!=', interv.parc_installe_id.id)
+            ])
 
     @api.depends('parc_installe_id')
     def _compute_historique_parc_ids(self):
