@@ -113,7 +113,7 @@ class GestionPrix(models.TransientModel):
     def bouton_valider(self):
         self.calculer(False)
 
-    @api.model
+    @api.multi
     def bouton_annuler(self):
         return {'type': 'ir.actions.client', 'tag': 'history_back'}
 
