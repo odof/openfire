@@ -1617,7 +1617,7 @@ class OfPlanningIntervention(models.Model):
         current_date_utc_dt = pytz.utc.localize(fields.Datetime.from_string(date_used))
         current_date_local_dt = current_date_utc_dt.astimezone(tz)
         current_date_local_str = fields.Date.to_string(current_date_local_dt)
-        employee_used = self.env['hr.employee'].browse(employee_eval or self.employee_ids)
+        employee_used = self.env['hr.employee'].browse(employee_eval) or self.employee_ids
         horaires_du_jour = employee_used.get_horaires_date(current_date_local_str)
         # si mode vaut 'start' ou 'both', on calcul le datetime de début de journée
         if mode != 'end':
