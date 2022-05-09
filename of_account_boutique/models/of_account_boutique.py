@@ -15,7 +15,8 @@ class AccountInvoice(models.Model):
 
     of_boutique = fields.Boolean(string="Est une vente en boutique", default=False)
     of_procurement_group_id = fields.Many2one('procurement.group', 'Procurement Group', copy=False)
-    of_warehouse_id = fields.Many2one('stock.warehouse', string=u"Entrepôt", default=lambda s: s._default_warehouse_id())
+    of_warehouse_id = fields.Many2one(
+        'stock.warehouse', string=u"Entrepôt", default=lambda s: s._default_warehouse_id())
     of_route_id = fields.Many2one('stock.location.route', string="Route")
 
     @api.multi
@@ -30,18 +31,16 @@ class AccountInvoice(models.Model):
             pickings = invoice.of_sale_order_ids.mapped('picking_ids')
             invoice.of_picking_ids = pickings
             if invoice.of_procurement_group_id:
-                invoice.of_picking_ids |= self.env['stock.picking'].search(
-                                            [('group_id', '=', invoice.of_procurement_group_id.id)])
+                invoice.of_picking_ids |= self.env['stock.picking'].search([
+                    ('group_id', '=', invoice.of_procurement_group_id.id)])
             invoice.of_picking_count = len(invoice.of_picking_ids)
-            invoice.of_waiting_delivery = invoice.of_picking_ids\
-                                                 .filtered(lambda p: p.state not in ['draft', 'cancel', 'done'])\
-                                                 and True or False
+            invoice.of_waiting_delivery = invoice.of_picking_ids.filtered(
+                lambda p: p.state not in ['draft', 'cancel', 'done']) and True or False
 
     def _prepare_procurement_group(self):
         return {
             'name': self.move_name,
-            'partner_id': self.partner_shipping_id and self.partner_shipping_id.id or
-                          self.partner_id.id
+            'partner_id': self.partner_shipping_id and self.partner_shipping_id.id or self.partner_id.id
         }
 
     @api.multi
@@ -79,7 +78,20 @@ class AccountInvoice(models.Model):
         if vals.get('of_boutique'):
             partner = self.env['res.partner'].browse(vals['partner_id'])
             vals.update({'name': 'Facture boutique - %s' % partner.name})
+        if 'of_route_id' in vals:
+            # only updates lines whitout a route to not override a rule set manually on the line
+            for line in filter(
+                    lambda lvals: lvals and lvals[2] and not lvals[2]['of_route_id'], vals['invoice_line_ids']):
+                line[2]['of_route_id'] = vals['of_route_id']
         return super(AccountInvoice, self).create(vals)
+
+    def write(self, vals):
+        res = super(AccountInvoice, self).write(vals)
+        if 'of_route_id' in vals:
+            # only updates lines whitout a route to not override a rule set manually on the line
+            self.mapped('invoice_line_ids').filtered(
+                lambda line: not line.of_route_id)._of_sync_route_id_from_invoice()
+        return res
 
 
 class AccountInvoiceLine(models.Model):
@@ -96,21 +108,25 @@ class AccountInvoiceLine(models.Model):
         self.ensure_one()
         warehouse_id = self.invoice_id.of_warehouse_id
         return {
-            'name'           : self.name,
-            'origin'         : self.invoice_id.name,
-            'date_planned'   : fields.Datetime.now(),
-            'product_id'     : self.product_id.id,
-            'product_qty'    : self.quantity,
-            'product_uom'    : self.uom_id.id,
-            'company_id'     : self.invoice_id.company_id.id,
-            'group_id'       : group_id,
-            'location_id'    : self.invoice_id.partner_shipping_id and\
-                               self.invoice_id.partner_shipping_id.property_stock_customer.id or\
-                               self.invoice_id.partner_id.property_stock_customer.id,
-            'route_ids'      : self.of_route_id and [(4, self.of_route_id.id)] or [],
-            'warehouse_id'   : warehouse_id and warehouse_id.id or False,
+            'name': self.name,
+            'origin': self.invoice_id.name,
+            'date_planned': fields.Datetime.now(),
+            'product_id': self.product_id.id,
+            'product_qty': self.quantity,
+            'product_uom': self.uom_id.id,
+            'company_id': self.invoice_id.company_id.id,
+            'group_id': group_id,
+            'location_id': self.invoice_id.partner_shipping_id and
+            self.invoice_id.partner_shipping_id.property_stock_customer.id or
+            self.invoice_id.partner_id.property_stock_customer.id,
+            'route_ids': self.of_route_id and [(4, self.of_route_id.id)] or [],
+            'warehouse_id': warehouse_id and warehouse_id.id or False,
             'partner_dest_id': self.invoice_id.partner_id.id,
-            }
+        }
+
+    def _of_sync_route_id_from_invoice(self):
+        for line in self:
+            line.of_route_id = line.invoice_id.of_route_id
 
     @api.multi
     def _action_procurement_create(self):
@@ -129,8 +145,8 @@ class AccountInvoiceLine(models.Model):
             vals = line._prepare_invoice_line_procurement(group_id=line.invoice_id.of_procurement_group_id.id)
             vals['product_qty'] = line.quantity
             new_proc = self.env["procurement.order"].with_context(procurement_autorun_defer=True).create(vals)
-            new_proc.message_post_with_view('mail.message_origin_link',
-                values={'self': new_proc, 'origin': line.invoice_id},
+            new_proc.message_post_with_view(
+                'mail.message_origin_link', values={'self': new_proc, 'origin': line.invoice_id},
                 subtype_id=self.env.ref('mail.mt_note').id)
             new_procs += new_proc
         new_procs.run()
