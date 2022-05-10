@@ -85,10 +85,12 @@ class AccountInvoice(models.Model):
         """
         self.journal_id = self.with_context(company_id=self.company_id.id).default_get(['journal_id'])['journal_id']
 
+
 class AccountInvoiceLine(models.Model):
     _name = 'account.invoice.line'
     _inherit = ['account.invoice.line', 'of.readgroup']
 
+    of_default_code = fields.Char(string=u"Référence interne", related='product_id.default_code', readonly=True)
     of_product_categ_id = fields.Many2one(
         'product.category', related='product_id.categ_id', string=u"Catégorie d'article",
         readonly=True, store=True, index=True

@@ -25,6 +25,10 @@ class AccountInvoiceLine(models.Model):
     of_unit_cost = fields.Float(
         compute='_compute_of_unit_cost', inverse='_set_of_unit_cost', string=u"Coût unitaire",
         digits=dp.get_precision('Product Price'), store=True)
+    of_cost = fields.Float(
+        compute='_compute_of_cost', string=u"Coût", digits=dp.get_precision('Product Price'))
+    of_purchase_price = fields.Float(
+        compute='_compute_of_unit_cost', string=u"Prix d'achat", digits=dp.get_precision('Product Price'))
     of_margin = fields.Float(
         compute='_compute_of_margin', string=u"Marge", digits=dp.get_precision('Product Price'), store=True)
 
@@ -47,12 +51,20 @@ class AccountInvoiceLine(models.Model):
             else:
                 if line.product_id.of_is_kit:
                     cost = line.product_id.cost_comps
+                    purchase_price = line.product_id.cost_comps
                 else:
                     cost = line.product_id.standard_price
+                    purchase_price = line.product_id.standard_price
             line.of_unit_cost = cost
+            line.of_purchase_price = purchase_price
 
     def _set_of_unit_cost(self):
         pass
+
+    @api.depends('product_id', 'of_unit_cost', 'quantity')
+    def _compute_of_cost(self):
+        for line in self:
+            line.of_cost = line.of_unit_cost * line.quantity
 
     @api.depends('price_subtotal', 'of_unit_cost', 'quantity')
     def _compute_of_margin(self):

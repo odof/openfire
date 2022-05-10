@@ -257,7 +257,6 @@
             <field name="inherit_id" ref="sale_margin.sale_margin_sale_order_line_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='order_line']/tree//field[@name='purchase_price']" position="attributes">
-                    <attribute name="groups">-base.group_user, of_sale.of_group_sale_marge_manager</attribute>
                     <attribute name="attrs">{'invisible': [('of_client_view', '=', True)]}</attribute>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/tree//field[@name='purchase_price']" position="after">
