@@ -23,6 +23,11 @@ class ProductTemplate(models.Model):
         string='Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_compo_price_n_cost',
         help="Sum of the costs of all components necessary for 1 unit of this kit"
     )
+    seller_price_comps = fields.Monetary(
+        string='Compo Purchase price/Kit', digits=dp.get_precision('Product Price'),
+        compute='_compute_compo_price_n_cost',
+        help="Sum of the purchase prices of all components necessary for 1 unit of this kit"
+    )
 
     of_price_used = fields.Monetary(
         string='Used Price', digits=dp.get_precision('Product Price'), compute='_compute_of_price_used',
@@ -96,15 +101,18 @@ class ProductTemplate(models.Model):
     @api.depends('kit_line_ids')
     def _compute_compo_price_n_cost(self):
         for product_tmpl in self:
-            price = cost = 0.0
+            price = cost = purchase_price = 0.0
             if product_tmpl.of_is_kit:
                 for line in product_tmpl.kit_line_ids:
                     price += line.product_id.uom_id._compute_price(line.product_id.list_price,
                                                                    line.product_uom_id) * line.product_qty
                     cost += line.product_id.uom_id._compute_price(line.product_id.standard_price,
                                                                   line.product_uom_id) * line.product_qty
+                    purchase_price += line.product_id.uom_id._compute_price(
+                        line.product_id.of_seller_price, line.product_uom_id) * line.product_qty
             product_tmpl.price_comps = price
             product_tmpl.cost_comps = cost
+            product_tmpl.seller_price_comps = purchase_price
 
     @api.multi
     @api.depends('kit_line_ids')

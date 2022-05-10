@@ -23,35 +23,47 @@ class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
     of_unit_cost = fields.Float(
-        compute='_compute_of_unit_cost', inverse='_set_of_unit_cost', string=u"Coût unitaire",
+        compute='_compute_of_cost', inverse='_set_of_cost', string=u"Coût",
+        digits=dp.get_precision('Product Price'), store=True)
+    of_purchase_price = fields.Float(
+        compute='_compute_of_cost', inverse='_set_of_cost', string=u"Prix d'achat",
         digits=dp.get_precision('Product Price'), store=True)
     of_margin = fields.Float(
         compute='_compute_of_margin', string=u"Marge", digits=dp.get_precision('Product Price'), store=True)
 
     @api.depends('product_id')
-    def _compute_of_unit_cost(self):
+    def _compute_of_cost(self):
         for line in self:
             if len(line.sale_line_ids) == 1 and not line.sale_line_ids.of_is_kit:
                 purchase_lines = line.sale_line_ids.procurement_ids.mapped('move_ids').mapped('move_orig_ids'). \
                     mapped('purchase_line_id')
-                purchase_price = sum(purchase_lines.mapped('price_subtotal'))
+                purchase_price_subtotal = sum(purchase_lines.mapped('price_subtotal'))
                 purchase_qty = sum(purchase_lines.mapped('product_qty'))
-                purchase_cost = purchase_price / purchase_qty if purchase_qty else 0.0
-                purchase_cost *= line.product_id.property_of_purchase_coeff
+                purchase_unit_price = purchase_price_subtotal / purchase_qty if purchase_qty else 0.0
+                purchase_cost = purchase_unit_price * line.product_id.property_of_purchase_coeff
                 sale_qty = line.sale_line_ids.product_uom_qty
                 if sale_qty and purchase_qty < sale_qty:
                     cost = ((purchase_cost * purchase_qty) +
                             (line.product_id.standard_price * (sale_qty - purchase_qty))) / sale_qty
+                    purchase_price = ((purchase_unit_price * purchase_qty) +
+                                      (line.product_id.of_seller_price * (sale_qty - purchase_qty))) / sale_qty
                 else:
                     cost = purchase_cost
+                    purchase_price = purchase_unit_price
+            elif len(line.sale_line_ids) == 1 and line.sale_line_ids.of_is_kit:
+                cost = line.sale_line_ids.purchase_price
+                purchase_price = line.sale_line_ids.of_seller_price
             else:
                 if line.product_id.of_is_kit:
                     cost = line.product_id.cost_comps
+                    purchase_price = line.product_id.seller_price_comps
                 else:
                     cost = line.product_id.standard_price
+                    purchase_price = line.product_id.of_seller_price
             line.of_unit_cost = cost
+            line.of_purchase_price = purchase_price
 
-    def _set_of_unit_cost(self):
+    def _set_of_cost(self):
         pass
 
     @api.depends('price_subtotal', 'of_unit_cost', 'quantity')

@@ -17,6 +17,7 @@ Module de gestion des contrôles d'accès
         'of_crm',
         'of_planning',
         'of_sale',
+        'of_account_margin',
     ],
     'data': [
         'security/of_access_control_security.xml',
@@ -24,6 +25,7 @@ Module de gestion des contrôles d'accès
         'views/res_users_views.xml',
         'views/stock_views.xml',
         'views/sale_views.xml',
+        'views/account_views.xml',
         'views/menus.xml',
     ],
     'qweb': [
