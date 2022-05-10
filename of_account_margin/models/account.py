@@ -22,14 +22,18 @@ class AccountInvoice(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
-    of_purchase_price_unit = fields.Float(
-        compute='_compute_of_purchase_price_unit', inverse='_set_of_purchase_price_unit',
-        string=u"Prix d'achat unitaire", digits=dp.get_precision('Product Price'), store=True)
+    of_unit_cost = fields.Float(
+        compute='_compute_of_unit_cost', inverse='_set_of_unit_cost', string=u"Coût unitaire",
+        digits=dp.get_precision('Product Price'), store=True)
+    of_cost = fields.Float(
+        compute='_compute_of_cost', string=u"Coût", digits=dp.get_precision('Product Price'))
+    of_purchase_price = fields.Float(
+        compute='_compute_of_unit_cost', string=u"Prix d'achat", digits=dp.get_precision('Product Price'))
     of_margin = fields.Float(
         compute='_compute_of_margin', string=u"Marge", digits=dp.get_precision('Product Price'), store=True)
 
     @api.depends('product_id')
-    def _compute_of_purchase_price_unit(self):
+    def _compute_of_unit_cost(self):
         for line in self:
             if len(line.sale_line_ids) == 1 and not line.sale_line_ids.of_is_kit:
                 purchase_lines = line.sale_line_ids.procurement_ids.mapped('move_ids').mapped('move_orig_ids'). \
@@ -47,20 +51,28 @@ class AccountInvoiceLine(models.Model):
             else:
                 if line.product_id.of_is_kit:
                     cost = line.product_id.cost_comps
+                    purchase_price = line.product_id.cost_comps
                 else:
                     cost = line.product_id.standard_price
-            line.of_purchase_price_unit = cost
+                    purchase_price = line.product_id.standard_price
+            line.of_unit_cost = cost
+            line.of_purchase_price = purchase_price
 
-    def _set_of_purchase_price_unit(self):
+    def _set_of_unit_cost(self):
         pass
 
-    @api.depends('price_subtotal', 'of_purchase_price_unit', 'quantity')
+    @api.depends('product_id', 'of_unit_cost', 'quantity')
+    def _compute_of_cost(self):
+        for line in self:
+            line.of_cost = line.of_unit_cost * line.quantity
+
+    @api.depends('price_subtotal', 'of_unit_cost', 'quantity')
     def _compute_of_margin(self):
         for line in self:
             if line.invoice_id.type == 'out_invoice':
-                line.of_margin = line.price_subtotal - (line.of_purchase_price_unit * line.quantity)
+                line.of_margin = line.price_subtotal - (line.of_unit_cost * line.quantity)
             elif line.invoice_id.type == 'out_refund':
-                line.of_margin = -(line.price_subtotal - (line.of_purchase_price_unit * line.quantity))
+                line.of_margin = -(line.price_subtotal - (line.of_unit_cost * line.quantity))
 
 
 class AccountInvoiceReport(models.Model):

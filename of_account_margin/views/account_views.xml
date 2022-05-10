@@ -12,6 +12,24 @@
                     <field name="of_margin_perc" groups="of_sale.of_group_sale_marge_manager"/>
                 </group>
             </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='price_unit']" position="before">
+                <field name="of_unit_cost"/>
+                <field name="of_cost"/>
+                <field name="of_purchase_price"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_invoice_line_form" model="ir.ui.view">
+        <field name="name">of.account.margin.view.invoice.line.form.</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="account.view_invoice_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='price_unit']" position="before">
+                <field name="of_unit_cost"/>
+                <field name="of_cost"/>
+                <field name="of_purchase_price"/>
+            </xpath>
         </field>
     </record>
 
