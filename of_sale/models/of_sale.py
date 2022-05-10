@@ -1195,13 +1195,14 @@ class SaleOrderLine(models.Model):
             locked_invoice_lines = line.mapped('invoice_lines').filtered(lambda l: l.of_is_locked)
             if locked_invoice_lines and blocked and not force:
                 raise UserError(u"""Cette ligne ne peut être modifiée : %s""" % line.name)
-        return super(SaleOrderLine, self).write(vals)
 
-        # Au moment de la sauvegarde de la commande, les images articles ne sont pas toujours sauvegardées
-        # car renseignées par un onchange et affichage en vue en kanban, du coup on surcharge le write
+        # Au moment de la sauvegarde de la commande, les images articles ne sont pas toujours sauvegardées, car
+        # renseignées par un onchange et affichage en vue en kanban. Du coup, on surcharge le write
         if 'already_tried' not in self._context:
             if 'of_product_image_ids' in vals.keys() and vals['of_product_image_ids'] and not self.of_product_image_ids:
                 self.with_context(already_tried=True).of_product_image_ids = vals['of_product_image_ids']
+
+        return super(SaleOrderLine, self).write(vals)
 
     @api.multi
     def _additionnal_tax_verifications(self):
