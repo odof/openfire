@@ -9,6 +9,8 @@
             <xpath expr="//page[@name='other_info']//field[@name='origin']" position="after">
                 <field name="of_contract_id" invisible="1" readonly="1"/>
                 <field name="of_compute_contract_id" attrs="{'readonly': [('of_contract_id','!=',False)]}" domain="[('partner_id', 'child_of', partner_id)]"/>
+                <!-- Le readonly permet de modifier manuellement la valeur générée -->
+                <field name="of_contract_period" readonly="0" attrs="{'invisible': [('of_compute_contract_id','=',False)]}"/>
             </xpath>
         </field>
     </record>

@@ -20,7 +20,7 @@ class OfAccountInvoice(models.Model):
     of_compute_contract_id = fields.Many2one(
         'of.contract', string="Contrat", compute='_compute_contract_id', inverse='_inverse_contract_id',
         help="Ce champ, s'il est rempli manuellement, n'aura pas d'incidence sur le contrat.")
-    of_contract_period = fields.Char(string=u"Période du contrat", compute='_compute_of_contract_period')
+    of_contract_period = fields.Char(string=u"Période du contrat", compute='_compute_of_contract_period', store=True)
     of_intervention_id = fields.Many2one('of.planning.intervention', string="RDV d'intervention")
     of_print_sequence = fields.Selection(selection=[
         ('standard', "Standard"),
@@ -38,11 +38,11 @@ class OfAccountInvoice(models.Model):
         for invoice in self:
             invoice.of_contract_id = invoice.of_compute_contract_id
 
-    @api.depends('of_contract_id', 'date_invoice', 'of_intervention_id')
+    @api.depends('of_contract_id', 'of_intervention_id')
     def _compute_of_contract_period(self):
         lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
         for invoice in self:
-            if invoice.of_contract_id and invoice.date_invoice:
+            if invoice.of_contract_id:
                 contractual_lines = invoice.invoice_line_ids.filtered('of_contract_line_id')
                 if not contractual_lines:
                     continue
@@ -54,8 +54,11 @@ class OfAccountInvoice(models.Model):
                              for code in contractual_lines.mapped('of_contract_line_id').mapped('frequency_type'))):
                     continue
                 base_date = contractual_lines[0].of_contract_supposed_date
+                # La valeur du contrat devrais être utilisée dans la majorité des lignes et donc la plus fiable
                 recurring_invoicing_payment = invoice.of_contract_id.recurring_invoicing_payment_id
-                recurring_rule_type = invoice.of_contract_id.recurring_rule_type
+                # Pour passer ici il faut que toutes les lignes utilisent la même fréquence mais celle du contrat
+                # peut avoir été changée donc prendre celle de la première ligne
+                recurring_rule_type = contractual_lines[0].of_contract_line_id.frequency_type
                 months = month_correspondance[recurring_rule_type]
                 if recurring_invoicing_payment.code == 'pre-paid':
                     if not months and invoice.of_intervention_id:
