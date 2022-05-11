@@ -1549,6 +1549,7 @@ class OfPlanningIntervention(models.Model):
             for val in taxes:
                 key = val['account_id']
 
+                val['amount'] += val['base'] - round_curr(val['base'])
                 if key not in tax_grouped:
                     tax_grouped[key] = {
                         'tax_id': val['id'],
