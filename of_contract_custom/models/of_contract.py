@@ -1447,6 +1447,23 @@ class OfContractLine(models.Model):
         return lines
 
     @api.multi
+    def _prepare_service_values(self):
+        self.ensure_one()
+        ttype = self.env.ref('of_service.of_service_type_maintenance')
+        return {
+            'type_id': ttype.id,
+            'partner_id': self.partner_id.id,
+            'address_id': self.address_id.id,
+            'tache_id': self.tache_id.id,
+            'recurrence': False,
+            'contract_id': self.contract_id.id,
+            'contract_line_id': self.id,
+            'note': self.notes,
+            'supplier_id': self.supplier_id.id or False,
+            'company_id': self.company_id.id,
+        }
+
+    @api.multi
     def _auto_cancel(self):
         """Passe l'état de la ligne à "Annulée" si elle n'a pas de date de prochaine facturation et a un avenant"""
         for line in self:
@@ -1456,11 +1473,10 @@ class OfContractLine(models.Model):
     @api.multi
     def _generate_services(self):
         """ Génération des demandes d'interventions """
-        service_obj = self.with_context(bloquer_recurrence=True).env['of.service']
-        type = self.env.ref('of_service.of_service_type_maintenance')
+        Service = self.with_context(bloquer_recurrence=True).env['of.service']
         li = [(line, line.current_period_id) for line in self]
         for line, period in li:
-            if not period or not line.state == 'validated':
+            if not period or line.state != 'validated':
                 continue
             services = self.env['of.service']
             months = line.mois_reference_ids
@@ -1471,39 +1487,29 @@ class OfContractLine(models.Model):
                 continue
             date_start_da = fields.Date.from_string(period.date_start)
             for i in xrange(0, nbr_intervs):
-                if len(line.service_ids.filtered(lambda s: period.date_start <= s.date_next
-                                                           < period.date_end)) >= nbr_intervs:
+                if len(line.service_ids.filtered(
+                        lambda s: period.date_start <= s.date_next < period.date_end)) >= nbr_intervs:
                     break
                 month = months[int(i/ratio)]
                 num_mois = month.numero
-                service_da = date_start_da + relativedelta(years=int(date_start_da.month > num_mois),
-                                                           month=num_mois, day=1)
+                service_da = date_start_da + relativedelta(
+                    years=int(date_start_da.month > num_mois), month=num_mois, day=1)
                 date_service = fields.Date.to_string(service_da)
                 month_service_end = fields.Date.to_string(service_da + relativedelta(months=1))
                 if line.date_end and date_service > line.date_end:
                     break
-                if len(line.service_ids.filtered(lambda s: date_service <= s.date_next < month_service_end)) >= round(ratio):
+                if len(line.service_ids.filtered(
+                        lambda s: date_service <= s.date_next < month_service_end)) >= round(ratio):
                     continue
-                service_vals = {
-                    'type_id': type.id,
-                    'partner_id': line.partner_id.id,
-                    'address_id': line.address_id.id,
-                    'tache_id': line.tache_id.id,
-                    'recurrence': False,
-                    'contract_id': line.contract_id.id,
-                    'contract_line_id': line.id,
-                    'note': line.notes,
-                    'supplier_id': line.supplier_id.id or False,
-                    'company_id': line.company_id.id,
-                }
-                new_service = service_obj.new(service_vals)
+
+                new_service = Service.new(line._prepare_service_values())
                 new_service._onchange_tache_id()
                 new_service.update({'date_next': date_service})
                 new_service._onchange_date_next()
                 if line.parc_installe_id:
                     new_service.update({'parc_installe_id': line.parc_installe_id.id})
                 new_service_vals = new_service._convert_to_write(new_service._cache)
-                new_service = service_obj.create(new_service_vals)
+                new_service = Service.create(new_service_vals)
                 services |= new_service
             if services:
                 services.button_valider()

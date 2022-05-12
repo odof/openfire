@@ -758,9 +758,25 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
             'context': ctx,
         }
 
+    @api.multi
+    def _prepare_sale_order_values(self):
+        self.ensure_one()
+        Sale = self.env['sale.order']
+        # utilisation de new() pour trigger les onchanges facilement
+        sale_order_new = Sale.new({
+            'partner_id': self.partner_id.id,
+            'origin': self.number,
+        })
+        sale_order_new.onchange_partner_id()
+        sale_order_new.update({'fiscal_position_id': self.fiscal_position_id.id})
+        return sale_order_new._convert_to_write(sale_order_new._cache)
+
     @api.model
     def make_sale_order(self):
         self.ensure_one()
+
+        Sale = self.env['sale.order']
+        SaleLine = self.env['sale.order.line']
 
         # Ne pas créer de commande si la DI n'est pas validée
         if self.base_state != 'calculated':
@@ -789,17 +805,8 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
             'type': 'ir.actions.act_window',
             'target': 'current',
         }
-        sale_obj = self.env['sale.order']
-        so_line_obj = self.env['sale.order.line']
-        # utilisation de new() pour trigger les onchanges facilement
-        sale_order_new = sale_obj.new({
-            'partner_id': self.partner_id.id,
-            'origin': self.number,
-        })
-        sale_order_new.onchange_partner_id()
-        sale_order_new.update({'fiscal_position_id': self.fiscal_position_id.id})
-        order_values = sale_order_new._convert_to_write(sale_order_new._cache)
-        sale_order = sale_obj.create(order_values)
+        order_values = self._prepare_sale_order_values()
+        sale_order = Sale.create(order_values)
         lines_to_create = []
         # Récupération des lignes de commandes
         for line in self.line_ids.filtered(lambda l: not l.saleorder_line_id):
@@ -808,7 +815,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
         sale_order.write({'order_line': lines_to_create})
         # Connecter les lignes à leur ligne de commande correspondante
         for line in self.line_ids.filtered(lambda l: not l.saleorder_line_id):
-            line.saleorder_line_id = so_line_obj.search([('of_service_line_id', '=', line.id)], limit=1)
+            line.saleorder_line_id = SaleLine.search([('of_service_line_id', '=', line.id)], limit=1)
         # Renvoyer la commande créée
         res['res_id'] = sale_order.id
 
