@@ -1,17 +1,16 @@
 # -*- encoding: utf-8 -*-
 
+import math
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import WEEKLY
-import math
-
+import odoo.addons.decimal_precision as dp
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError
 from odoo.tools import float_compare
 from odoo.tools.safe_eval import safe_eval
-
-import odoo.addons.decimal_precision as dp
-from odoo.addons.of_utils.models.of_utils import format_date, se_chevauchent
+from odoo.addons.of_utils.models.of_utils import se_chevauchent
+from odoo.addons.of_utils.models.of_utils import format_date
 
 
 class OfService(models.Model):
@@ -1092,7 +1091,9 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
             return relativedelta(years=interval, day=1)  # 1er du mois
 
     @api.multi
-    def get_action_view_intervention_context(self, action_context={}):
+    def get_action_view_intervention_context(self, action_context=None):
+        if action_context is None:
+            action_context = {}
         action_context.update({
             'default_partner_id': self.partner_id.id,
             'default_address_id': self.address_id and self.address_id.id or self.partner_id.id,
@@ -1106,7 +1107,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
             'default_fiscal_position_id': self.fiscal_position_id and self.fiscal_position_id.id or False,
             'default_template_id': self.template_id and self.template_id.id or False,
             'default_employee_ids': [(6, 0, [emp.id for emp in self.employee_ids])],
-            })
+        })
         if self.intervention_ids:
             action_context['force_date_start'] = self.intervention_ids[-1].date_date
             action_context['search_default_service_id'] = self.id
