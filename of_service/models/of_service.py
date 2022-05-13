@@ -770,7 +770,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
         sale_order_new.update({'fiscal_position_id': self.fiscal_position_id.id})
         return sale_order_new._convert_to_write(sale_order_new._cache)
 
-    @api.model
+    @api.multi
     def make_sale_order(self):
         self.ensure_one()
 
@@ -808,7 +808,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
         sale_order = Sale.create(order_values)
         lines_to_create = []
         # Récupération des lignes de commandes
-        for line in self.line_ids.filtered(lambda l: not l.saleorder_line_id):
+        for line in self.orderable_lines():
             line_vals = line.prepare_so_line_vals(sale_order)
             lines_to_create.append((0, 0, line_vals))
         sale_order.write({'order_line': lines_to_create})
@@ -819,6 +819,12 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
         res['res_id'] = sale_order.id
 
         return res
+
+    @api.multi
+    def orderable_lines(self):
+        """ Fonction à surcharger si on veut retirer des lignes lors de la création de commande"""
+        self.ensure_one()
+        return self.line_ids.filtered(lambda l: not l.saleorder_line_id)
 
     @api.multi
     def button_open_of_planning_intervention(self):

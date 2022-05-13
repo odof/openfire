@@ -180,11 +180,24 @@ class OfService(models.Model):
             else:
                 vals_line['interv_frequency_nbr'] = 1
                 vals_line['interv_frequency'] = 'year'
-            print vals_contract
             new_contract = contract_obj.create(vals_contract)
             vals_line['contract_id'] = new_contract.id
             contract_line_obj.create(vals_line)
             service.transformed = True
+
+
+class OFServiceLine(models.Model):
+    _inherit = 'of.service.line'
+
+    of_contract_line_id = fields.Many2one(comodel_name='of.contract.line', string="Ligne de contrat")
+    of_contract_product_id = fields.Many2one(comodel_name='of.contract.product', string="Article de contrat")
+
+    @api.multi
+    def prepare_intervention_line_vals(self):
+        vals = super(OFServiceLine, self).prepare_intervention_line_vals()
+        vals['of_contract_line_id'] = self.of_contract_line_id and self.of_contract_line_id.id or False
+        vals['of_contract_product_id'] = self.of_contract_product_id and self.of_contract_product_id.id or False
+        return vals
 
 
 class OfPlanningIntervention(models.Model):
@@ -215,3 +228,37 @@ class OfPlanningIntervention(models.Model):
         if self.service_id:
             self.contract_line_id = self.service_id.contract_line_id
             self.contract_id = self.service_id.contract_id
+
+    @api.multi
+    def _prepare_invoice(self):
+        vals, message = super(OfPlanningIntervention, self)._prepare_invoice()
+        # message n'est rempli que si il y a une erreur
+        if not message:
+            contracts = self.line_ids.mapped('of_contract_line_id').mapped('contract_id')
+            if len(contracts) == 1:
+                vals['of_contract_id'] = contracts.id
+        return vals, message
+
+
+class OFPlanningInterventionLine(models.Model):
+    _inherit = 'of.planning.intervention.line'
+
+    of_contract_line_id = fields.Many2one(comodel_name='of.contract.line', string="Ligne de contrat")
+    of_contract_product_id = fields.Many2one(comodel_name='of.contract.product', string="Article de contrat")
+
+    @api.multi
+    def orderable_lines(self):
+        lines = super(OFPlanningInterventionLine, self).orderable_lines()
+        if self._context.get('keep_contract_lines'):
+            return lines
+        return lines.filtered(lambda l: not l.of_contract_line_id)
+
+    @api.multi
+    def _prepare_invoice_line(self):
+        vals, message = super(OFPlanningInterventionLine, self)._prepare_invoice_line()
+        # message n'est rempli que si il y a une erreur
+        if not message:
+            vals['of_contract_line_id'] = self.of_contract_line_id and self.of_contract_line_id.id or False
+            vals['of_contract_supposed_date'] = self.of_contract_line_id and self.of_contract_line_id.next_date or False
+            vals['of_contract_product_id'] = self.of_contract_product_id and self.of_contract_product_id.id or False
+        return vals, message
