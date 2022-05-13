@@ -1,17 +1,16 @@
 # -*- encoding: utf-8 -*-
 
-from odoo import api, models, fields, _
-from datetime import date
-from datetime import timedelta
+from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import WEEKLY
-from odoo.tools.safe_eval import safe_eval
-from odoo.exceptions import UserError
-from odoo.addons.of_utils.models.of_utils import se_chevauchent
-from odoo.addons.of_utils.models.of_utils import format_date
-import odoo.addons.decimal_precision as dp
-
 import math
+
+from odoo import api, models, fields, _
+from odoo.exceptions import UserError
+from odoo.tools.safe_eval import safe_eval
+
+import odoo.addons.decimal_precision as dp
+from odoo.addons.of_utils.models.of_utils import format_date, se_chevauchent
 
 
 class OfService(models.Model):
@@ -212,7 +211,6 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
         related='address_id.of_secteur_tech_id', readonly=True, search="_search_secteur_tech_id")
     department_id = fields.Many2one(
         'res.country.department', compute='_compute_department_id', string=u"Département", readonly=True, store=True)
-    #tag_ids = fields.Many2many('of.service.tag', string=u"Étiquettes")
     tag_ids = fields.Many2many(
         string=u"Étiquettes", comodel_name='of.planning.tag', relation='of_service_of_planning_tag_rel',
         column1='service_id', column2='tag_id')
@@ -235,7 +233,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
     date_next_last = fields.Date('Prochaine planif (svg)', help=u"Champ pour conserver une possibilité de rollback")
     date_fin = fields.Date(
         string=u"Date de fin de planification",
-        help=u"Date à partir de laquelle l'intervention devient en retard de planifiaction")
+        help=u"Date à partir de laquelle l'intervention devient en retard de planification")
     date_fin_contrat = fields.Date(u"Date de fin de contrat")
     jour_ids = fields.Many2many(
         'of.jours', 'service_jours', 'service_id', 'jour_id', string='Jours',
@@ -376,6 +374,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
                 service.state_ponc = service_state
             service.state = service_state
 
+    @api.model
     def _search_state_ponc(self, operator, operand):
         services = self.search([])
         res = safe_eval("services.filtered(lambda s: s.state_ponc %s %s)" % (operator, operand), {'services': services})
@@ -406,13 +405,13 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
                 service.date_last = False
 
             if service.recurrence and service.date_next:
-                # On cherche la durée planifiée pour l'occurence en cours.
+                # On cherche la durée planifiée pour l'occurrence en cours.
                 # Il nous faut savoir quelle est l'occurrence en cours
-                date_next_ref_str = service.get_date_proche(fields.Date.today())  # début d'occurence en cours
-                date_fin_ref_str = service.get_fin_date(date_next_ref_str)  # fin d'occurence en cours
+                date_next_ref_str = service.get_date_proche(fields.Date.today())  # début d'occurrence en cours
+                date_fin_ref_str = service.get_fin_date(date_next_ref_str)  # fin d'occurrence en cours
                 date_next_ref_da = fields.Date.from_string(date_next_ref_str)
                 date_fin_ref_da = fields.Date.from_string(date_fin_ref_str)
-                # RDVs pris en avance. Récupération de date de fin de l'occurence précédente pour connaitre l'écart
+                # RDVs pris en avance. Récupération de date de fin de l'occurrence précédente pour connaître l'écart
                 #   entre les deux et le couper en deux.
                 # tous les RDVs de la 1ere moitié sont des RDVs en retard de l'occurrence précédente
                 #   et ne sont pas a prendre en compte dans la durée planifiée
@@ -445,8 +444,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
     @api.depends('date_next', 'date_fin')
     def _compute_alert_dates(self):
         for service in self:
-            service.alert_dates = service.date_next and service.date_fin \
-                                       and service.date_next > service.date_fin
+            service.alert_dates = service.date_next and service.date_fin and service.date_next > service.date_fin
 
     @api.multi
     @api.depends('state')
@@ -526,7 +524,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
                 service.spec_date = u"Prévue le %s" % format_date(service.intervention_ids[-1].date_date, lang)
             else:
                 service.spec_date = u"Prévue entre %s et %s" % (
-                format_date(service.date_next, lang), format_date(service.date_fin, lang))
+                    format_date(service.date_next, lang), format_date(service.date_fin, lang))
 
     @api.depends()
     def _compute_last_attachment_id(self):
@@ -962,7 +960,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
         else:
             date_eval_da = date_eval
         date_eval_mois_int = date_eval_da.month
-        if date_eval_mois_int in mois_ints:  # la date est déja sur un mois autorisé
+        if date_eval_mois_int in mois_ints:  # la date est déjà sur un mois autorisé
             if return_string:
                 return fields.Date.to_string(date(year=date_eval_da.year, month=date_eval_mois_int, day=1))
             return date(year=date_eval_da.year, month=date_eval_mois_int, day=1)
