@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import json
 from odoo import models, fields, api
 from odoo.tools import float_compare
-import json
 
 
 class AccountInvoice(models.Model):
@@ -19,7 +19,7 @@ class AccountInvoice(models.Model):
         if view:
             view.write({
                 'active': self.env['ir.values'].get_default('account.config.settings', 'of_validate_pickings') in (2, 3)
-                })
+            })
 
     of_date_vt = fields.Date(string="Date visite technique")
     of_sale_order_ids = fields.Many2many('sale.order', compute="_compute_of_sale_order_ids", string="Bons de commande")
@@ -34,7 +34,7 @@ class AccountInvoice(models.Model):
     of_picking_count = fields.Integer(string="Bon de livraisons", compute='_compute_of_picking_ids')
     of_price_printing = fields.Selection([
         ('order_line', u'Prix par ligne de commande'),
-        ], string=u"Impressions des prix", default='order_line', required=True)
+    ], string=u"Impressions des prix", default='order_line', required=True)
 
     @api.depends('invoice_line_ids')
     def _compute_of_sale_order_ids(self):
@@ -65,7 +65,7 @@ class AccountInvoice(models.Model):
             invoices = invoice | order_lines.mapped('invoice_lines').mapped('invoice_id')
             invoice.of_residual = sum(invoices.mapped('residual'))
             invoice.of_residual_equal = invoice.state == 'draft' or \
-                                        float_compare(invoice.of_residual, invoice.residual, 2) == 0
+                float_compare(invoice.of_residual, invoice.residual, 2) == 0
 
     @api.depends('invoice_line_ids', 'invoice_line_ids.of_is_locked')
     def _compute_of_is_locked(self):
@@ -84,8 +84,8 @@ class AccountInvoice(models.Model):
         for invoice in self:
             pickings = invoice.of_sale_order_ids.mapped('picking_ids')
             if pickings:
-                invoice.of_waiting_delivery = pickings.filtered(lambda p: p.state not in ['draft', 'cancel', 'done']) \
-                                              and True or False
+                invoice.of_waiting_delivery = pickings.filtered(
+                    lambda p: p.state not in ['draft', 'cancel', 'done']) and True or False
                 invoice.of_picking_ids = pickings
                 invoice.of_picking_count = len(pickings)
 
@@ -324,7 +324,7 @@ class AccountInvoiceLine(models.Model):
         locked_product_ids = self.get_locked_product_ids()
         for invoice_line in self:
             if invoice_line.product_id.categ_id.id not in locked_category_ids and \
-                    invoice_line.product_id.id not in locked_product_ids:
+               invoice_line.product_id.id not in locked_product_ids:
                 invoice_line.of_is_locked = False
             else:
                 invoice_line.of_is_locked = True
@@ -337,7 +337,7 @@ class AccountInvoiceLine(models.Model):
         product = self.product_id.with_context(
             lang=self.invoice_id.partner_id.lang,
             partner=self.invoice_id.partner_id.id,
-            )
+        )
         if product and product.description_fabricant and afficher:
             self.name += '\n' + product.description_fabricant
         return res
@@ -350,29 +350,15 @@ class AccountInvoiceLine(models.Model):
             'discount': 'discount',
             'of_discount_formula': 'of_discount_formula',
             'invoice_line_tax_ids': 'tax_id'
-            }
+        }
         res = super(AccountInvoiceLine, self).write(vals)
         if res:
             for line in self.filtered('of_is_locked'):
                 if line.invoice_id.invoice_line_ids.filtered('of_is_locked') == line.invoice_id.invoice_line_ids \
-                        and len(line.sale_line_ids) == 1 and line.sale_line_ids.invoice_lines == line:
+                   and len(line.sale_line_ids) == 1 and line.sale_line_ids.invoice_lines == line:
                     sync = [x for x in fields_to_sync.keys() if x in vals.keys()]
                     vals_order_line = {}
                     for field in sync:
                         vals_order_line[fields_to_sync[field]] = vals[field]
                     line.sale_line_ids.with_context(force_price=True).write(vals_order_line)
         return res
-
-
-class AccountPaymentTermLine(models.Model):
-    _inherit = "account.payment.term.line"
-
-    @api.model
-    def _get_of_option_date(self):
-        result = super(AccountPaymentTermLine, self)._get_of_option_date()
-        for i in xrange(len(result)):
-            if result[i][0] == 'invoice':
-                i += 1
-                break
-        return result[:i] + [('order', 'Date de commande')] + result[i:]
-
