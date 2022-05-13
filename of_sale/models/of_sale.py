@@ -343,8 +343,17 @@ class SaleOrder(models.Model):
 
     @api.onchange('partner_id')
     def onchange_partner_id(self):
+        fiscal_position = self.fiscal_position_id
+        payment_term = self.payment_term_id
+
         super(SaleOrder, self).onchange_partner_id()
         self.of_invoice_policy = self.partner_id and self.partner_id.of_invoice_policy or False
+
+        # Si la nouvelle valeur est vide, on remet l'ancienne
+        if fiscal_position != self.fiscal_position_id and not self.fiscal_position_id:
+            self.fiscal_position_id = fiscal_position.id,
+        if payment_term != self.payment_term_id and not self.payment_term_id:
+            self.payment_term_id = payment_term.id,
 
         # Adresses par défaut
         if self.partner_id:
@@ -362,6 +371,16 @@ class SaleOrder(models.Model):
                     if len(default_shipping_address) > 1:
                         default_shipping_address = default_shipping_address[0]
                     self.partner_shipping_id = default_shipping_address
+
+    @api.multi
+    @api.onchange('partner_shipping_id', 'partner_id')
+    def onchange_partner_shipping_id(self):
+        fiscal_position = self.fiscal_position_id
+        super(SaleOrder, self).onchange_partner_shipping_id()
+        # Si la nouvelle valeur est vide, on remet l'ancienne
+        if fiscal_position != self.fiscal_position_id and not self.fiscal_position_id:
+            self.fiscal_position_id = fiscal_position.id,
+        return {}
 
     @api.onchange('partner_id')
     def onchange_partner_id_warning(self):
