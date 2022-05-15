@@ -25,20 +25,6 @@ class OfPlanningIntervention(models.Model):
                     ('date', '=', intervention.date[:10])])
                 intervention.tournee_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in tournees._ids]
 
-    # @api.onchange
-
-    @api.onchange('address_id')
-    def _onchange_address_id(self):
-        super(OfPlanningIntervention, self)._onchange_address_id()
-        if self.address_id and self.tache_id:
-            self._calc_new_description()
-
-    @api.onchange('tache_id')
-    def _onchange_tache_id(self):
-        super(OfPlanningIntervention, self)._onchange_tache_id()
-        if self.partner_id and self.tache_id:
-            self._calc_new_description()
-
     # Héritages
 
     @api.model
@@ -166,19 +152,6 @@ class OfPlanningIntervention(models.Model):
              ('is_bloque', '=', False), ('is_confirme', '=', False),
              ('address_depart_id', '=', False), ('address_retour_id', '=', False), ('secteur_id', '=', False)])
         return tournees_unlink.unlink()
-
-    @api.multi
-    def _calc_new_description(self):
-        """Ajoute la tache et les notes du service à la description"""
-        self.ensure_one()
-        if self.service_id:
-            infos = (
-                self.tache_id.name,
-                self.service_id.note
-            )
-            description = self.description or ""
-            res = [info for info in infos if (info and info not in description)]
-            self.description = description + " ".join(res)
 
 
 class OfPlanningEquipe(models.Model):  #@todo: vérifier si nécessaire

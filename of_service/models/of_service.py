@@ -1101,7 +1101,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
             'default_address_id': self.address_id and self.address_id.id or self.partner_id.id,
             'default_tache_id': self.tache_id and self.tache_id.id or False,
             'default_duree': self.duree,
-            'default_description': self.note,
+            'default_description_interne': self.note,
             'default_service_id': self.id,
             'create': self.base_state == 'calculated',
             'edit': self.base_state == 'calculated',
@@ -1468,6 +1468,16 @@ class OFPlanningIntervention(models.Model):
                 for line in self.service_id.line_ids:
                     line_vals.append((0, 0, line.prepare_intervention_line_vals()))
                 self.line_ids = line_vals
+            # self._origin contient les valeurs de l'enregistrement en BDD
+            if self._origin and self._origin.service_id \
+                    and (self._origin.service_id.note or u"") in (self._origin.description_interne or u""):
+                # Si la description de l'ancienne DI est encore présente, la retirer
+                descritab = self._origin.description_interne.split(self._origin.service_id.note or u"")
+                self.description_interne = u"\n".join(descritab)
+            descriterne = self.description_interne or u""
+            if self.service_id.note and self.service_id.note not in descriterne:
+                # si la description de la nouvelle DI n'est pas déjà présente, la rajouter
+                self.description_interne = descriterne + self.service_id.note
 
     # Héritages
 
