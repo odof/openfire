@@ -78,8 +78,33 @@ def _onchange_partner_id_warning(self):
     return res
 
 
+@api.multi
+def get_taxes_values(self):
+    """OpenFire : fix wrong taxes calculation with global rounding when using included taxes"""
+    tax_grouped = {}
+    round_curr = self.currency_id.round
+    for line in self.invoice_line_ids:
+        price_unit = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
+        taxes = line.invoice_line_tax_ids.compute_all(price_unit, self.currency_id, line.quantity, line.product_id, self.partner_id)['taxes']
+        for tax in taxes:
+            val = self._prepare_tax_line_vals(line, tax)
+            key = self.env['account.tax'].browse(tax['id']).get_grouping_key(val)
+
+            # Modification OF : Ce qu'on retire au HT, on l'ajoute à la taxe
+            val['amount'] += val['base'] - round_curr(val['base'])
+            # Fin de modification
+            if key not in tax_grouped:
+                tax_grouped[key] = val
+                tax_grouped[key]['base'] = round_curr(val['base'])
+            else:
+                tax_grouped[key]['amount'] += val['amount']
+                tax_grouped[key]['base'] += round_curr(val['base'])
+    return tax_grouped
+
+
 AccountInvoice._onchange_partner_id = _onchange_partner_id
 AccountInvoice._onchange_partner_id_warning = _onchange_partner_id_warning
+AccountInvoice.get_taxes_values = get_taxes_values
 
 
 class AccountAccount(models.Model):

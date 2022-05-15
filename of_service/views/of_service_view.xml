@@ -321,6 +321,8 @@
                 <field name="color" invisible="1"/>
                 <field name="active" invisible="1"/>
                 <field name="partner_id"/>
+                <field name="number"/>
+                <field name="titre"/>
                 <field name="address_zip"/>
                 <field name="address_city"/>
                 <field name="tache_id"/>
@@ -424,6 +426,8 @@
                 <field name="date_next" filter_domain="[('date_next','&lt;=',self)]"
                       string="Prochaine planification min" context="{'date_next_max': self}"/>
                 <field name="partner_id"/>
+                <field name="number"/>
+                <field name="titre"/>
                 <field name="address_id"/>
                 <field name="address_zip" string="CP"/>
                 <field name="tache_id"/>
