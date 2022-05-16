@@ -650,7 +650,7 @@ CalendarView.include({
             self.on_event_after_all_render();
         };
         fc.select = function (start_date, end_date, all_day, _js_event, _view) {
-            if (self.options.action.context.inhiber_create) {
+            if (self.options.action && self.options.action.context && self.options.action.context.inhiber_create) {
                 Dialog.alert(self.$el, self.options.action.context.inhiber_message);  // inhiber création
                 self.$calendar.fullCalendar('unselect');
             }else{
