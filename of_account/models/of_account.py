@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError,  ValidationError
+from odoo.exceptions import UserError, ValidationError, RedirectWarning
 from odoo.models import regex_order
 from odoo.addons.account.models.account_invoice import AccountInvoice
 from odoo.tools.float_utils import float_compare
