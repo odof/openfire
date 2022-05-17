@@ -8,13 +8,10 @@ from odoo.addons.sale.models.sale import SaleOrder as SO
 from odoo.tools import float_compare, float_is_zero, DEFAULT_SERVER_DATE_FORMAT
 from odoo.exceptions import UserError
 from odoo.models import regex_order
+from odoo.addons.of_utils.models.of_utils import get_selection_label
 
 
 NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
-
-
-def get_selection_label(self, object, field_name, field_value):
-    return _(dict(self.env[object].fields_get(allfields=[field_name])[field_name]['selection'])[field_value])
 
 
 @api.onchange('product_uom', 'product_uom_qty')

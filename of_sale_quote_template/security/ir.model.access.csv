@@ -6,3 +6,5 @@ access_sale_quote_line_group_salesman,sale.quote.line.rule.user,model_sale_quote
 access_of_sale_order_layout_category_group_salesman,of.sale.order.layout.category.rule.user,model_of_sale_order_layout_category,sales_team.group_sale_salesman,1,1,1,1
 access_of_sale_quote_template_layout_category_group_system,of.sale.quote.template.layout.category.rule.user,model_of_sale_quote_template_layout_category,sales_team.group_sale_manager,1,1,1,1
 access_of_sale_quote_template_layout_category_group_salesman,of.sale.quote.template.layout.category.rule.user,model_of_sale_quote_template_layout_category,sales_team.group_sale_salesman,1,0,0,0
+access_of_sale_quote_tmpl_activity_manager,of.sale.quote.tmpl.activity.manager,model_of_sale_quote_tmpl_activity,sales_team.group_sale_manager,1,1,1,1
+access_of_sale_quote_tmpl_activity_user,of.sale.quote.tmpl.activity.user,model_of_sale_quote_tmpl_activity,sales_team.group_sale_salesman,1,0,0,0

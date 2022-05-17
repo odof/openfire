@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-08 12:55+0000\n"
-"PO-Revision-Date: 2020-06-08 12:55+0000\n"
+"POT-Creation-Date: 2022-06-02 14:11+0000\n"
+"PO-Revision-Date: 2022-06-02 14:11+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -15,26 +15,2633 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
 
-#. module: crm
-#: model:ir.model.fields,field_description:crm.field_crm_lead_date_deadline
-msgid "Expected Closing"
-msgstr "Date décision"
+#. module: of_crm
+#: model:ir.model.fields,help:of_crm.field_crm_lead_of_customer_state
+#: model:ir.model.fields,help:of_crm.field_res_partner_of_customer_state
+#: model:ir.model.fields,help:of_crm.field_res_users_of_customer_state
+msgid "\n"
+"Champ uniquement utile pour les partenaires clients.\n"
+"Un client est considéré comme prospect tant qu'il n'a ni commande confirmée ni facture validée.\n"
+"Ce champ se met à jour automatiquement sur confirmation de commande et sur validation de facture\n"
+"    "
+msgstr "\n"
+"Champ uniquement utile pour les partenaires clients.\n"
+"Un client est considéré comme prospect tant qu'il n'a ni commande confirmée ni facture validée.\n"
+"Ce champ se met à jour automatiquement sur confirmation de commande et sur validation de facture\n"
+"    "
 
-#. module: crm
-#: model:ir.model.fields,field_description:crm.field_crm_opportunity_report_medium_id
-#: model:ir.ui.view,arch_db:crm.view_crm_case_leads_filter
-#: model:ir.ui.view,arch_db:crm.view_crm_case_opportunities_filter
-msgid "Medium"
-msgstr "Canal"
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_sale_config_settings_of_sale_order_start_state
+msgid "(OF) État de départ des commandes"
+msgstr "(OF) État de départ des commandes"
 
-#. module: crm
-#: model:ir.model.fields,field_description:crm.field_crm_opportunity_report_source_id
-#: model:ir.ui.view,arch_db:crm.view_crm_case_leads_filter
-#: model:ir.ui.view,arch_db:crm.view_crm_case_opportunities_filter
-msgid "Source"
-msgstr "Source"
+#. module: of_crm
+#: selection:of.sale.objective,year:0
+msgid "2020"
+msgstr "2020"
+
+#. module: of_crm
+#: selection:of.sale.objective,year:0
+msgid "2021"
+msgstr "2021"
+
+#. module: of_crm
+#: selection:of.sale.objective,year:0
+msgid "2022"
+msgstr "2022"
+
+#. module: of_crm
+#: selection:of.sale.objective,year:0
+msgid "2023"
+msgstr "2023"
+
+#. module: of_crm
+#: selection:of.sale.objective,year:0
+msgid "2024"
+msgstr "2024"
+
+#. module: of_crm
+#: selection:of.sale.objective,year:0
+msgid "2025"
+msgstr "2025"
+
+#. module: of_crm
+#: selection:of.sale.objective,year:0
+msgid "2026"
+msgstr "2026"
+
+#. module: of_crm
+#: selection:of.sale.objective,year:0
+msgid "2027"
+msgstr "2027"
+
+#. module: of_crm
+#: selection:of.sale.objective,year:0
+msgid "2028"
+msgstr "2028"
+
+#. module: of_crm
+#: selection:of.sale.objective,year:0
+msgid "2029"
+msgstr "2029"
+
+#. module: of_crm
+#: selection:of.sale.objective,year:0
+msgid "2030"
+msgstr "2030"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:91
+#, python-format
+msgid "3 exp. closing"
+msgstr "3 clôture prévue"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:137
+#, python-format
+msgid "35,029.39€"
+msgstr "35,029.39€"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:124
+#, python-format
+msgid "78,140.03€"
+msgstr "78,140.03€"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:169
+#, python-format
+msgid "80.000€"
+msgstr "80.000€"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_map_view
+msgid "<br/>\n"
+"                                Précision:"
+msgstr "<br/>\n"
+"                                Précision:"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span class=\"fa fa fa-square-o\"/> <span>Autres&amp;nbsp;: </span>"
+msgstr "<span class=\"fa fa fa-square-o\"/> <span>Autres&amp;nbsp;: </span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span class=\"fa fa fa-square-o\"/><span> Commande</span>"
+msgstr "<span class=\"fa fa fa-square-o\"/><span> Commande</span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span class=\"fa fa fa-square-o\"/><span> Devis</span>"
+msgstr "<span class=\"fa fa fa-square-o\"/><span> Devis</span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span class=\"fa fa fa-square-o\"/><span> Refus</span>"
+msgstr "<span class=\"fa fa fa-square-o\"/><span> Refus</span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+msgid "<span class=\"o_stat_text\" attrs=\"{'invisible': [('meeting_count', '&lt;', 2)]}\"> Réunions</span>\n"
+"                                        <span class=\"o_stat_text\" attrs=\"{'invisible': [('meeting_count', '&gt;', 1)]}\"> Réunion</span>"
+msgstr "<span class=\"o_stat_text\" attrs=\"{'invisible': [('meeting_count', '&lt;', 2)]}\"> Réunions</span>\n"
+"                                        <span class=\"o_stat_text\" attrs=\"{'invisible': [('meeting_count', '&gt;', 1)]}\"> Réunion</span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+msgid "<span class=\"o_stat_text\"> Devis</span>"
+msgstr "<span class=\"o_stat_text\"> Devis</span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+msgid "<span class=\"o_stat_text\"> Ordres</span>"
+msgstr "<span class=\"o_stat_text\"> Ordres</span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_map_view
+msgid "<span class=\"of_ws\"/>\n"
+"                                    Indeterminée"
+msgstr "<span class=\"of_ws\"/>\n"
+"                                    Indeterminée"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span style=\"padding-left: 14px\">Origine&amp;nbsp;: </span>"
+msgstr "<span style=\"padding-left: 14px\">Origine&amp;nbsp;: </span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span style=\"padding-left: 16px\">Lieu&amp;nbsp;: </span>\n"
+"                                        <span style=\"padding-left: 16px\" class=\"fa fa fa-square-o\"/> <span>Adresse Principale</span>\n"
+"                                        <span style=\"padding-left: 16px\" class=\"fa fa fa-square-o\"/> <span>Adresse Secondaire</span>\n"
+"                                        <span style=\"padding-left: 16px\" class=\"fa fa fa-square-o\"/> <span>Adresse Projet</span>\n"
+"                                        <span style=\"padding-left: 16px\" class=\"fa fa fa-square-o\"/> <span>Magasin</span>"
+msgstr "<span style=\"padding-left: 16px\">Lieu&amp;nbsp;: </span>\n"
+"                                        <span style=\"padding-left: 16px\" class=\"fa fa fa-square-o\"/> <span>Adresse Principale</span>\n"
+"                                        <span style=\"padding-left: 16px\" class=\"fa fa fa-square-o\"/> <span>Adresse Secondaire</span>\n"
+"                                        <span style=\"padding-left: 16px\" class=\"fa fa fa-square-o\"/> <span>Adresse Projet</span>\n"
+"                                        <span style=\"padding-left: 16px\" class=\"fa fa fa-square-o\"/> <span>Magasin</span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span style=\"padding-right: 2px\">TVA réduite&amp;nbsp;: </span>\n"
+"                                        <span class=\"fa fa fa-square-o\"/> Oui\n"
+"                                        <span class=\"fa fa fa-square-o\" style=\"padding-left: 6px\"/> Non"
+msgstr "<span style=\"padding-right: 2px\">TVA réduite&amp;nbsp;: </span>\n"
+"                                        <span class=\"fa fa fa-square-o\"/> Oui\n"
+"                                        <span class=\"fa fa fa-square-o\" style=\"padding-left: 6px\"/> Non"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span>&amp;nbsp;:</span>"
+msgstr "<span>&amp;nbsp;:</span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span><strong>Activité prévue&amp;nbsp;: </strong></span>"
+msgstr "<span><strong>Activité prévue&amp;nbsp;: </strong></span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span>Apporté par&amp;nbsp;: </span>"
+msgstr "<span>Apporté par&amp;nbsp;: </span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span>Autres infos&amp;nbsp;: </span>"
+msgstr "<span>Autres infos&amp;nbsp;: </span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span>Budget&amp;nbsp;: </span>"
+msgstr "<span>Budget&amp;nbsp;: </span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span>Campagne&amp;nbsp;: </span>"
+msgstr "<span>Campagne&amp;nbsp;: </span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span>Canal&amp;nbsp;: </span>"
+msgstr "<span>Canal&amp;nbsp;: </span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span>Commercial&amp;nbsp;: </span>"
+msgstr "<span>Commercial&amp;nbsp;: </span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span>Date du projet&amp;nbsp;: </span>"
+msgstr "<span>Date du projet&amp;nbsp;: </span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span>Date&amp;nbsp;: </span><span style=\"padding-left: 25%\">Heure&amp;nbsp;: </span><span style=\"padding-left: 25%\">Durée&amp;nbsp;: </span>"
+msgstr "<span>Date&amp;nbsp;: </span><span style=\"padding-left: 25%\">Heure&amp;nbsp;: </span><span style=\"padding-left: 25%\">Durée&amp;nbsp;: </span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span>Description&amp;nbsp;: </span>"
+msgstr "<span>Description&amp;nbsp;: </span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span>Modèle&amp;nbsp;: </span>"
+msgstr "<span>Modèle&amp;nbsp;: </span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span>Probabilité&amp;nbsp;: </span>"
+msgstr "<span>Probabilité&amp;nbsp;: </span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span>Prospecteur&amp;nbsp;: </span>"
+msgstr "<span>Prospecteur&amp;nbsp;: </span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_internal_layout
+msgid "<span>Réf&amp;nbsp;:</span>"
+msgstr "<span>Réf&amp;nbsp;:</span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span>Référence&amp;nbsp;: </span>"
+msgstr "<span>Référence&amp;nbsp;: </span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span>Société&amp;nbsp;: </span>"
+msgstr "<span>Société&amp;nbsp;: </span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span>Étape&amp;nbsp;: </span>"
+msgstr "<span>Étape&amp;nbsp;: </span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span>Étiquettes&amp;nbsp;: </span>"
+msgstr "<span>Étiquettes&amp;nbsp;: </span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<span>Évaluation&amp;nbsp;: </span>"
+msgstr "<span>Évaluation&amp;nbsp;: </span>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<strong>Actions suivantes</strong>"
+msgstr "<strong>Actions suivantes</strong>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<strong>Commentaires</strong>"
+msgstr "<strong>Commentaires</strong>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<strong>Compte rendu</strong>"
+msgstr "<strong>Compte rendu</strong>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<strong>Projet</strong>"
+msgstr "<strong>Projet</strong>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<strong>Prospect</strong>"
+msgstr "<strong>Prospect</strong>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<strong>Rendez-vous</strong>"
+msgstr "<strong>Rendez-vous</strong>"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "<strong>Suivi</strong>"
+msgstr "<strong>Suivi</strong>"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_active
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_active
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_select_active
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_modele_active
+msgid "Actif"
+msgstr "Actif"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_res_company_crm_suivi
+msgid "Actions Co suivies"
+msgstr "Actions Co suivies"
+
+#. module: of_crm
+#: model:ir.actions.act_window,name:of_crm.of_sale_activity_action
+#: model:ir.model.fields,field_description:of_crm.field_sale_order_of_sale_activity_ids
+#: model:ir.ui.menu,name:of_crm.of_sale_activity_menu
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_order_form
+#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_search
+#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_tree
+msgid "Activities"
+msgstr "Activités"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:114
+#, python-format
+msgid "Activities Done"
+msgstr "Activités terminées"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_add_attachment_activity_sale_activity_id
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_order_form
+#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_form
+msgid "Activity"
+msgstr "Activité"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_add_attachment_activity_activity_file
+msgid "Activity file"
+msgstr "Fichier"
+
+#. module: of_crm
+#: code:addons/of_crm/models/of_sale_activity.py:58
+#, python-format
+msgid "Activity status change %s : %s -> %s"
+msgstr "Changement d'état de l'activité %s : %s -> %s"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_type_id
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_activity_id
+#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_search
+msgid "Activity type"
+msgstr "Type d'activité"
+
+#. module: of_crm
+#: model:ir.actions.act_window,name:of_crm.of_crm_activity_schedule_action
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_action_activity_id
+#: model:ir.ui.view,arch_db:of_crm.of_crm_lead_view_tree_activity
+msgid "Activité"
+msgstr "Activité"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_is_late
+msgid "Activité en retard"
+msgstr "Activité en retard"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_next_action_activity_id
+msgid "Activité nécessitant la prochaine action"
+msgstr "Activité nécessitant la prochaine action"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_stage_of_manual_activity_id
+msgid "Activité à créer en cas de mise à jour manuelle"
+msgstr "Activité à créer en cas de mise à jour manuelle"
+
+#. module: of_crm
+#: model:ir.actions.act_window,name:of_crm.of_crm_activity_action
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_activity_ids
+#: model:ir.ui.menu,name:of_crm.of_crm_activity_menu
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+msgid "Activités"
+msgstr "Activités"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
+msgid "Activités de la semaine"
+msgstr "Activités de la semaine"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
+msgid "Activités du jour"
+msgstr "Activités du jour"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
+msgid "Activités en retard"
+msgstr "Activités en retard"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_of_add_attachment_activity
+msgid "Add an attachment to the Sale linked to an activity"
+msgstr "Ajouter une pièce jointe à la Commande liée à une activité"
+
+#. module: of_crm
+#: model:ir.actions.act_window,name:of_crm.of_add_attachment_activity_action
+msgid "Add attachment"
+msgstr "Ajouter une pièce jointe"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_order_form
+#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_form
+#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_tree
+msgid "Add attachments"
+msgstr "Télécharger"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Adresse"
+msgstr "Adresse"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Adresse suite..."
+msgstr "Adresse suite..."
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Adresse..."
+msgstr "Adresse..."
+
+#. module: of_crm
+#: code:addons/of_crm/models/of_sale_activity.py:71
+#, python-format
+msgid "An attachment is required to complete the activity"
+msgstr "Une pièce jointe est requise pour terminer l'activité"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_team_kanban_view
+msgid "Analyse des activités"
+msgstr "Analyse des activités"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_action_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_from_opportunity_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_tree_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: selection:of.crm.activity.action,type:0
+msgid "Annuler"
+msgstr "Annuler"
+
+#. module: of_crm
+#: model:ir.actions.act_window,name:of_crm.of_crm_activity_action_cancel_action
+msgid "Annuler une activité"
+msgstr "Annuler une activité"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
+#: selection:of.crm.activity,state:0
+msgid "Annulée"
+msgstr "Annulée"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_year
+msgid "Année"
+msgstr "Année"
+
+#. module: of_crm
+#: selection:of.sale.objective,month:0
+msgid "Août"
+msgstr "Août"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_referred_id
+#: model:ir.model.fields,field_description:of_crm.field_sale_order_of_referred_id
+msgid "Apporté par"
+msgstr "Apporté par"
 
 #. module: of_crm
 #: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
 msgid "Archived"
-msgstr "Archivée"
+msgstr "Archivé"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_select_view_filter
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_view_filter
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_modele_view_filter
+msgid "Archivé"
+msgstr "Archivé"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_activity_of_user_id
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_user_id
+#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_search
+msgid "Assigned to"
+msgstr "Assigné à"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_add_attachment_activity_form_view
+msgid "Attachment"
+msgstr "Pièce jointe"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_select_attr_id
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_attr_id
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_select_view_filter
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_view_filter
+msgid "Attribut"
+msgstr "Attribut"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_view_form
+msgid "Attribut de Projet"
+msgstr "Attribut de Projet"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_modele_attr_ids
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_select_view_filter
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_modele_view_filter
+msgid "Attributs"
+msgstr "Attributs"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_view_tree
+msgid "Attributs de Projet"
+msgstr "Attributs de Projet"
+
+#. module: of_crm
+#: model:ir.actions.act_window,name:of_crm.of_crm_projet_attr_action
+#: model:ir.ui.menu,name:of_crm.of_crm_projet_attr_menu
+msgid "Attributs de Projets"
+msgstr "Attributs de Projets"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "Aucun rendez-vous planifié."
+msgstr "Aucun rendez-vous planifié."
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_user_id
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
+msgid "Auteur"
+msgstr "Auteur"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_activity_of_automatic_recompute
+msgid "Automatic recompute"
+msgstr "Recalcul automatique"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_stage_form
+msgid "Automatisation de l'étape"
+msgstr "Automatisation de l'étape"
+
+#. module: of_crm
+#: selection:res.partner,of_customer_state:0
+msgid "Autre"
+msgstr "Autre"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_infos_compl
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Autres infos"
+msgstr "Autres infos"
+
+#. module: of_crm
+#: selection:of.sale.objective,month:0
+msgid "Avril"
+msgstr "Avril"
+
+#. module: of_crm
+#: selection:crm.stage,of_auto_model_name:0
+msgid "Bon de commande"
+msgstr "Bon de commande"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_view_filter
+msgid "Booléen"
+msgstr "Booléen"
+
+#. module: of_crm
+#: selection:of.crm.projet.attr,type:0
+#: selection:of.crm.projet.line,type:0
+msgid "Booléen (Oui/Non)"
+msgstr "Booléen (Oui/Non)"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_sale_order_of_main_product_brand_id
+msgid "Brand of the main product"
+msgstr "Marque de l'article principal"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_lead_view_tree_activity
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Budget"
+msgstr "Budget"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_sales_total
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_sales_total
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_line_ordered_turnover
+msgid "CA commandé"
+msgstr "CA commandé"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_previous_sales_total
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_previous_sales_total
+msgid "CA commandé N-1"
+msgstr "CA commandé N-1"
+
+#. module: of_crm
+#: model:ir.ui.menu,name:of_crm.of_crm_crm_menu
+msgid "CRM"
+msgstr "CRM"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_crm_activity
+msgid "CRM Activity"
+msgstr "Activité de \"Gestion de la relation client\""
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_res_users_campaign_id
+msgid "Campagne"
+msgstr "Campagne"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_res_partner_of_lead_campaign_id
+#: model:ir.model.fields,field_description:of_crm.field_res_users_of_lead_campaign_id
+msgid "Campaign"
+msgstr "Campagne"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_res_users_medium_id
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Canal"
+msgstr "Canal"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_order_form
+#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_form
+#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_tree
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_sale_view_sales_order_filter
+#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_search
+#: selection:of.sale.activity,state:0
+#: selection:sale.order,of_activities_state:0
+msgid "Cancelled"
+msgstr "Annulé"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_stage_of_auto_field_id
+msgid "Champ"
+msgstr "Champ"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_utm_medium
+msgid "Channels"
+msgstr "Canaux"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_view_filter
+#: selection:of.crm.projet.attr,type:0
+#: selection:of.crm.projet.line,type:0
+msgid "Choix Unique"
+msgstr "Choix Unique"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "City completion"
+msgstr "Complétion par ville"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_zip_id
+msgid "City/Location"
+msgstr "Ville/location"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Civilité"
+msgstr "Civilité"
+
+#. module: of_crm
+#: model:ir.actions.act_window,help:of_crm.of_crm_action_prospect_form
+msgid "Click to add a contact in your address book."
+msgstr "Cliquez pour ajouter un contact dans le carnet d'adresses."
+
+#. module: of_crm
+#: model:ir.actions.act_window,help:of_crm.of_crm_projet_attr_select_action
+msgid "Click to define a new attribute value."
+msgstr "Cliquez pour définir une nouvelle valeur d'attribut."
+
+#. module: of_crm
+#: model:ir.actions.act_window,help:of_crm.of_crm_projet_attr_action
+msgid "Click to define a new attribute."
+msgstr "Cliquez pour définir un nouvel attribut."
+
+#. module: of_crm
+#: model:ir.actions.act_window,help:of_crm.of_crm_projet_modele_action
+msgid "Click to define a new project modele."
+msgstr "Cliquez pour définir un nouveau modèle de projet."
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:148
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:152
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:161
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:165
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:174
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:178
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:182
+#, python-format
+msgid "Click to set"
+msgstr "Cliquer pour valider"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_partner_id
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_kanban_view_leads
+msgid "Client"
+msgstr "Client"
+
+#. module: of_crm
+#: selection:res.partner,of_customer_state:0
+msgid "Client signé"
+msgstr "Client signé"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_res_partner_filter
+msgid "Clients signés"
+msgstr "Clients signés"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "Clôture&amp;nbsp;:"
+msgstr "Clôture&amp;nbsp;:"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_stage_of_auto_comparison_code
+msgid "Code de comparaison"
+msgstr "Code de comparaison"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Code postal"
+msgstr "Code postal"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_followup_tag_color
+msgid "Color"
+msgstr "Couleur"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_sale_config_settings_group_quotation_sale_order_state
+#: model:res.groups,name:of_crm.group_quotation_sale_order_state
+msgid "Commandes créés à l'étape Devis"
+msgstr "Commandes créés à l'étape Devis"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_sale_config_settings_group_estimation_sale_order_state
+#: model:res.groups,name:of_crm.group_estimation_sale_order_state
+msgid "Commandes créés à l'étape Estimation"
+msgstr "Commandes créés à l'étape Estimation"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_vendor_id
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Commercial"
+msgstr "Commercial"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_res_company
+msgid "Companies"
+msgstr "Sociétés"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_sales_total_comparison
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_sales_total_comparison
+msgid "Comparaison N-1 (%)"
+msgstr "Comparaison N-1 (%)"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_sales_objective_comparison
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_sales_objective_comparison
+msgid "Comparaison Objectif (%)"
+msgstr "Comparaison Objectif (%)"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_order_form
+#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_form
+#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_tree
+msgid "Complete"
+msgstr "Terminer"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_project_id
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_project_id
+msgid "Compte analytique"
+msgstr "Compte analytique"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_report
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_action_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_from_opportunity_form_view
+msgid "Compte-rendu"
+msgstr "Compte-rendu"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_activity_of_compute_date
+#: model:ir.model.fields,field_description:of_crm.field_crm_activity_of_compute_date_both
+#: model:ir.model.fields,field_description:of_crm.field_crm_activity_of_compute_date_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_activity_of_compute_date_sale
+msgid "Compute Date"
+msgstr "Date de calcul"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_order_form
+msgid "Confirmer l'estimation"
+msgstr "Confirmer l'estimation"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_check_duplications
+msgid "Contrôle de doublons ?"
+msgstr "Contrôle de doublons ?"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_color_bg
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_of_color_bg
+msgid "Couleur de fond"
+msgstr "Couleur de fond"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_color_ft
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_of_color_ft
+msgid "Couleur de texte"
+msgstr "Couleur de texte"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_color_map
+msgid "Couleur du marqueur"
+msgstr "Couleur du marqueur"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_email
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Courriel"
+msgstr "Courriel"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_of_compose_mail
+msgid "Courrier"
+msgstr "Courrier"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Create"
+msgstr "Créer"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:215
+#, python-format
+msgid "Create a few opportunities in it."
+msgstr "Ajoutez y quelques opportunités."
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_add_attachment_activity_create_uid
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_action_create_uid
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_create_uid
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_create_uid
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_select_create_uid
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_create_uid
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_modele_create_uid
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_create_uid
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_followup_tag_create_uid
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_create_uid
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_line_create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_add_attachment_activity_create_date
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_action_create_date
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_create_date
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_create_date
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_select_create_date
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_create_date
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_modele_create_date
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_create_date
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_followup_tag_create_date
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_create_date
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_line_create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "Creation&amp;nbsp;:"
+msgstr "Creation&amp;nbsp;:"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_view_crm_case_opportunities_filter
+msgid "Créé cette semaine"
+msgstr "Créé cette semaine"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_funnel_conversion2_search_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_funnel_conversion_search_view
+msgid "Cumul à date - Annuel"
+msgstr "Cumul à date - Annuel"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_funnel_conversion2_search_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_funnel_conversion_search_view
+msgid "Cumul à date - Mensuel"
+msgstr "Cumul à date - Mensuel"
+
+#. module: of_crm
+#: code:addons/of_crm/models/crm_activity.py:77
+#, python-format
+msgid "Customer Order confirmation date"
+msgstr "Date de confirmation de CC"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_date
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_date
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_date
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_tree_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_lead_view_tree_activity
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_view_filter
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+#: selection:of.crm.projet.attr,type:0
+#: selection:of.crm.projet.line,type:0
+msgid "Date"
+msgstr "Date "
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_lead_view_tree_activity
+msgid "Date Projet"
+msgstr "Date Projet"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_date_cloture
+msgid "Date de clôture"
+msgstr "Date de clôture"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Date de création"
+msgstr "Date de création"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_date_action
+msgid "Date de la prochaine action"
+msgstr "Date de la prochaine action"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_date_prospection
+msgid "Date de prospection"
+msgstr "Date de prospection"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_action_date
+msgid "Date de réalisation"
+msgstr "Date de réalisation"
+
+#. module: of_crm
+#: code:addons/of_crm/models/crm_activity.py:78
+#: code:addons/of_crm/models/crm_activity.py:87
+#: code:addons/of_crm/models/crm_activity.py:95
+#, python-format
+msgid "Date of the day"
+msgstr "Date du jour"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_date_projet
+msgid "Date projet"
+msgstr "Date projet"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Dates"
+msgstr "Dates"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_date_deadline
+#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_search
+msgid "Deadline date"
+msgstr "Date d'échéance"
+
+#. module: of_crm
+#: code:addons/of_crm/models/crm_activity.py:89
+#, python-format
+msgid "Decision date"
+msgstr "Date décision"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:crm.field_crm_activity_days
+msgid "Delay"
+msgstr "Délai"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Dernières modifications"
+msgstr "Dernières modifications"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_description
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_description
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_select_description
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_description
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_from_opportunity_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "Description"
+msgstr "Description"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Description du Projet"
+msgstr "Description du Projet"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_quotation_sale_order_search_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_sale_order_search_view
+msgid "Devis"
+msgstr "Devis"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_sale_order_of_sent_quotation
+msgid "Devis envoyé"
+msgstr "Devis envoyé"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_sale_order_search_view
+msgid "Devis envoyés"
+msgstr "Devis envoyés"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_add_attachment_activity_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Discard"
+msgstr "Annuler"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_add_attachment_activity_display_name
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_action_display_name
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_display_name
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_display_name
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_display_name
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_display_name
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_select_display_name
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_display_name
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_modele_display_name
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_stage_auto_update_display_name
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_display_name
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_followup_tag_display_name
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_display_name
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_line_display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_order_form
+msgid "Divers"
+msgstr "Divers"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_sale_view_sales_order_filter
+#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_search
+#: selection:of.sale.activity,state:0
+#: selection:sale.order,of_activities_state:0
+msgid "Done"
+msgstr "Fait"
+
+#. module: of_crm
+#: selection:of.sale.objective,month:0
+msgid "Décembre"
+msgstr "Décembre"
+
+#. module: of_crm
+#: model:ir.model.fields,help:of_crm.field_of_crm_activity_email
+msgid "Email address of the contact"
+msgstr "Adresse courriel du contact"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_mail_compose_message
+msgid "Email composition wizard"
+msgstr "Assistant de composition de courriel"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_hr_employee
+msgid "Employee"
+msgstr "Employé"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_line_view_form
+msgid "Entrée de Projet"
+msgstr "Entrée de Projet"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_projet_line_ids
+msgid "Entrées"
+msgstr "Entrées"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_line_view_tree
+msgid "Entrées de Projet"
+msgstr "Entrées de Projet"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_is_company
+msgid "Est une société"
+msgstr "Est une société"
+
+#. module: of_crm
+#: code:addons/of_crm/models/crm_activity.py:80
+#, python-format
+msgid "Estimated installation date"
+msgstr "Date de pose prévisionnelle"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_sale_order_search_view
+msgid "Estimations"
+msgstr "Estimations"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_calendar_event
+msgid "Event"
+msgstr "Évènement"
+
+#. module: of_crm
+#: model:ir.actions.report.xml,name:of_crm.of_fiche_rdv_report
+#: model:ir.ui.view,arch_db:of_crm.of_internal_layout
+msgid "Fiche RDV"
+msgstr "Fiche RDV"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_add_attachment_activity_activity_filename
+msgid "Filename"
+msgstr "Nom du fichier"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_order_form
+msgid "Follow-up"
+msgstr "Suivi"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_sale_order_of_notes
+#: model:ir.ui.view,arch_db:of_crm.of_crm_of_sale_view_order_form
+msgid "Follow-up notes"
+msgstr "Notes de suivi"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_sale_order_of_sale_followup_tag_ids
+msgid "Follow-up tags"
+msgstr "Étiquettes de suivi"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_sale_order_of_force_laying_date
+msgid "Force laying date"
+msgstr "Forcer la date de pose"
+
+#. module: of_crm
+#: selection:of.sale.objective,month:0
+msgid "Février"
+msgstr "Février"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+msgid "Gagné"
+msgstr "Gagné"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_geo_lat
+msgid "Geo Lat"
+msgstr "Géo Lat"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_geo_lng
+msgid "Geo Lng"
+msgstr "Géo Lng"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:214
+#, python-format
+msgid "Great sales journeys start with a clean pipeline."
+msgstr "Une bonne journée commence par un pipeline de ventes bien organisé."
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_crm_activity_view_search
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_select_view_filter
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_view_filter
+#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_search
+msgid "Group By"
+msgstr "Grouper par"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Géolocalisation"
+msgstr "Géolocalisation"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:213
+#, python-format
+msgid "Hi there!"
+msgstr "Bonjour!"
+
+#. module: of_crm
+#: selection:sale.order,of_priority:0
+msgid "High"
+msgstr "Haute"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_add_attachment_activity_id
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_action_id
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_id
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_id
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_id
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_id
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_select_id
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_id
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_modele_id
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_stage_auto_update_id
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_id
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_followup_tag_id
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_id
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_line_id
+msgid "ID"
+msgstr "ID"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_sale_view_sales_order_filter
+msgid "In Progress"
+msgstr "En cours"
+
+#. module: of_crm
+#: selection:sale.order,of_activities_state:0
+msgid "In progress"
+msgstr "En cours"
+
+#. module: of_crm
+#: model:ir.model.fields,help:of_crm.field_hr_employee_sale_objective
+msgid "Indique si des objectifs de ventes doivent être définis pour cet employé"
+msgstr "Indique si des objectifs de ventes doivent être définis pour cet employé"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_sale_order_of_info
+msgid "Info"
+msgstr "Info"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "Intérêt&amp;nbsp;:"
+msgstr "Intérêt&amp;nbsp;:"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_account_invoice
+msgid "Invoice"
+msgstr "Facture"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:140
+#, python-format
+msgid "Invoiced"
+msgstr "Facturé"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_account_invoice_report
+msgid "Invoices Statistics"
+msgstr "Statistiques des factures"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_is_overdue
+msgid "Is overdue activity ?"
+msgstr "L'activité est-elle en retard ?"
+
+#. module: of_crm
+#: selection:of.sale.objective,month:0
+msgid "Janvier"
+msgstr "Janvier"
+
+#. module: of_crm
+#: selection:of.sale.objective,month:0
+msgid "Juillet"
+msgstr "Juillet"
+
+#. module: of_crm
+#: selection:of.sale.objective,month:0
+msgid "Juin"
+msgstr "Juin"
+
+#. module: of_crm
+#: model:res.groups,comment:of_crm.group_quotation_sale_order_state
+msgid "L'étape de départ du workflow des commandes de vente est \"Devis\""
+msgstr "L'étape de départ du workflow des commandes de vente est \"Devis\""
+
+#. module: of_crm
+#: model:res.groups,comment:of_crm.group_estimation_sale_order_state
+msgid "L'étape de départ du workflow des commandes de vente est \"Estimation\""
+msgstr "L'étape de départ du workflow des commandes de vente est \"Estimation\""
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_add_attachment_activity___last_update
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity___last_update
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_action___last_update
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2___last_update
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion___last_update
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr___last_update
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_select___last_update
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line___last_update
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_modele___last_update
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_stage_auto_update___last_update
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity___last_update
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_followup_tag___last_update
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_objective___last_update
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_line___last_update
+msgid "Last Modified on"
+msgstr "Dernière Modification le"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:188
+#, python-format
+msgid "Last Month"
+msgstr "Le mois dernier"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_add_attachment_activity_write_uid
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_action_write_uid
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_write_uid
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_select_write_uid
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_write_uid
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_write_uid
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_modele_write_uid
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_write_uid
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_followup_tag_write_uid
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_line_write_uid
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_add_attachment_activity_write_date
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_action_write_date
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_write_date
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_select_write_date
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_write_date
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_write_date
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_modele_write_date
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_write_date
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_followup_tag_write_date
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_line_write_date
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_sale_view_sales_order_filter
+#: selection:sale.order,of_activities_state:0
+msgid "Late"
+msgstr "En retard"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_sale_order_of_laying_week
+msgid "Laying week"
+msgstr "Semaine de pose"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_crm_lead
+msgid "Lead/Opportunity"
+msgstr "Piste/opportunité"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_calendar_view_leads
+msgid "Leads Generation"
+msgstr "Génération de pistes"
+
+#. module: of_crm
+#: selection:sale.config.settings,of_sale_order_start_state:0
+msgid "Les commandes sont créées à l'étape initiale Devis"
+msgstr "Les commandes sont créées à l'étape initiale Devis"
+
+#. module: of_crm
+#: selection:sale.config.settings,of_sale_order_start_state:0
+msgid "Les commandes sont créées à l'étape initiale Estimation"
+msgstr "Les commandes sont créées à l'étape initiale Estimation"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_name
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_select_name
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_name
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_modele_name
+msgid "Libellé"
+msgstr "Libellé"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_title_action
+msgid "Libellé de la prochaine action"
+msgstr "Libellé de la prochaine action"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "Lieu"
+msgstr "Lieu"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_of_sale_objective_line
+msgid "Ligne d'objectif mensuel de ventes"
+msgstr "Ligne d'objectif mensuel de ventes"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_objective_line_ids
+msgid "Lignes d'objectif"
+msgstr "Lignes d'objectif"
+
+#. module: of_crm
+#: model:ir.model.fields,help:of_crm.field_of_crm_activity_partner_id
+msgid "Linked partner (optional). Usually created when converting the lead."
+msgstr "Partenaire associé (optionnel). Habituellement il est créé lors de la conversion d'une piste."
+
+#. module: of_crm
+#: model:ir.model.fields,help:of_crm.field_of_crm_projet_modele_attr_ids
+msgid "Liste des attributs de ce modèle. Ils seront copiés dans la fiche projet si ce modèle est sélectionné."
+msgstr "Liste des attributs de ce modèle. Ils seront copiés dans la fiche projet si ce modèle est sélectionné."
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_activity_of_load_attachment
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_load_attachment
+msgid "Load an attachment"
+msgstr "Charger une pièce jointe"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_crm_activity_log
+msgid "Log an Activity"
+msgstr "Enregistrer une Activité"
+
+#. module: of_crm
+#: selection:sale.order,of_priority:0
+msgid "Low"
+msgstr "Basse"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_company_id
+msgid "Magasin"
+msgstr "Magasin"
+
+#. module: of_crm
+#: selection:of.sale.objective,month:0
+msgid "Mai"
+msgstr "Mai"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_activity_of_mandatory
+msgid "Mandatory"
+msgstr "Obligatoire"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_sale_order_of_manual_laying_date
+msgid "Manual laying date"
+msgstr "Date de pose (manuelle)"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_map_view
+msgid "Map"
+msgstr "Carte"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_order_margin_percent
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_order_margin_percent
+msgid "Marge % commandé"
+msgstr "Marge % commandé"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_order_margin
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_order_margin
+msgid "Marge € commandé"
+msgstr "Marge € commandé"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_partner_form
+msgid "Marketing"
+msgstr "Marketing"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_view_crm_case_opportunities_filter
+msgid "Marque"
+msgstr "Marque"
+
+#. module: of_crm
+#: selection:of.sale.objective,month:0
+msgid "Mars"
+msgstr "Mars"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_res_partner_of_lead_medium_id
+#: model:ir.model.fields,field_description:of_crm.field_res_users_of_lead_medium_id
+msgid "Medium"
+msgstr "Canal"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:25
+#, python-format
+msgid "Meetings"
+msgstr "Rendez-vous"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
+msgid "Mes activités"
+msgstr "Mes activités"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_next_activity_name
+msgid "Message Type"
+msgstr "Type de message"
+
+#. module: of_crm
+#: model:ir.model.fields,help:of_crm.field_crm_lead_next_activity_name
+msgid "Message subtype gives a more precise type on the message, especially for system notifications. For example, it can be a notification related to a new record (New), or to a stage change in a process (Stage change). Message subtypes allow to precisely tune the notifications the user want to receive on its wall."
+msgstr "Un sous-type de message précise le type du message, en particulier pour les notifications système. Par exemple, il pourrait s'agir d'une notification relative à un nouvel enregistrement (Nouveau), ou à un changement d'étape dans un processus (Changement d'étape). Les sous-types de messages permettent d'ajuster plus finement les notifications que l'utilisateur désire recevoir sur son mur."
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_mobile
+msgid "Mobile"
+msgstr "Mobile"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_view_crm_case_opportunities_filter
+msgid "Modifié cette semaine"
+msgstr "Modifié cette semaine"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_stage_of_auto_model_name
+msgid "Modèle"
+msgstr "Modèle"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "Modèle&amp;nbsp;:"
+msgstr "Modèle&amp;nbsp;:"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_view_filter
+msgid "Modèles"
+msgstr "Modèles"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_modele_view_tree
+msgid "Modèles de Projet"
+msgstr "Modèles de Projet"
+
+#. module: of_crm
+#: model:ir.actions.act_window,name:of_crm.of_crm_projet_modele_action
+#: model:ir.ui.menu,name:of_crm.of_crm_projet_modele_menu
+msgid "Modèles de Projets"
+msgstr "Modèles de Projets"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_modele_view_filter
+msgid "Modèles de projet"
+msgstr "Modèles de projet"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_month
+msgid "Mois"
+msgstr "Mois"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_funnel_conversion2_search_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_funnel_conversion_search_view
+msgid "Mois en cours"
+msgstr "Mois en cours"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_funnel_conversion2_search_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_funnel_conversion_search_view
+msgid "Mois précédent"
+msgstr "Mois précédent"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "Montant HT&amp;nbsp;: <span style=\"padding-left: 100px\">%</span>"
+msgstr "Montant HT&amp;nbsp;: <span style=\"padding-left: 100px\">%</span>"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_quotation_amount
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_quotation_amount
+msgid "Montant devis"
+msgstr "Montant devis"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "Motif&amp;nbsp;:"
+msgstr "Motif&amp;nbsp;:"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:42
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:44
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:216
+#, python-format
+msgid "My Pipeline"
+msgstr "Mon Pipeline"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_followup_tag_name
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_intervention_count
+msgid "Nb de RDVs d'intervention"
+msgstr "Nb de RDVs d'intervention"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_res_partner_of_sale_order_quot_count
+#: model:ir.model.fields,field_description:of_crm.field_res_users_of_sale_order_quot_count
+msgid "Nb dev+cmd"
+msgstr "Nb dev+cmd"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_res_partner_of_quotations_count
+#: model:ir.model.fields,field_description:of_crm.field_res_users_of_quotations_count
+msgid "Nb devis"
+msgstr "Nb devis"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:50
+#, python-format
+msgid "Next 7 days"
+msgstr "Les 7 jours prochains"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:38
+#, python-format
+msgid "Next Actions"
+msgstr "Actions suivantes"
+
+#. module: of_crm
+#: model:ir.model.fields,help:of_crm.field_crm_lead_precision
+msgid "Niveau de précision de la géolocalisation.\n"
+"bas: à la ville.\n"
+"moyen: au village\n"
+"haut: à la rue / au voisinage\n"
+"très haut: au numéro de rue\n"
+""
+msgstr "Niveau de précision de la géolocalisation.\n"
+"bas: à la ville.\n"
+"moyen: au village\n"
+"haut: à la rue / au voisinage\n"
+"très haut: au numéro de rue\n"
+""
+
+#. module: of_crm
+#: model:ir.model.fields,help:of_crm.field_crm_lead_of_referred_id
+#: model:ir.model.fields,help:of_crm.field_sale_order_of_referred_id
+msgid "Nom de l'apporteur d'affaire"
+msgstr "Nom de l'apporteur d'affaire"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Nom du Client"
+msgstr "Nom du Client"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_activity_nb
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_activity_nb
+msgid "Nombre d'activités"
+msgstr "Nombre d'activités"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_opportunity_nb
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_opportunity_nb
+msgid "Nombre d'opportunités"
+msgstr "Nombre d'opportunités"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_order_nb
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_order_nb
+msgid "Nombre de commandes"
+msgstr "Nombre de commandes"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_quotation_nb
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_quotation_nb
+msgid "Nombre de devis"
+msgstr "Nombre de devis"
+
+#. module: of_crm
+#: selection:sale.order,of_priority:0
+msgid "Normal"
+msgstr "Normal"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_action_note
+msgid "Note"
+msgstr "Note"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Notes"
+msgstr "Notes"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_description_projet
+msgid "Notes de projet"
+msgstr "Notes de projet"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+msgid "Nouvelle activité"
+msgstr "Nouvelle activité"
+
+#. module: of_crm
+#: selection:of.sale.objective,month:0
+msgid "Novembre"
+msgstr "Novembre"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_of_crm_activity
+msgid "OF Activité de CRM"
+msgstr "OF Activité de CRM"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_activity_of_object
+#: model:ir.ui.view,arch_db:of_crm.of_crm_crm_activity_view_search
+msgid "Object"
+msgstr "Objet"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_ordered_turnover_objective
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_ordered_turnover_objective
+msgid "Objectif CA commandé"
+msgstr "Objectif CA commandé"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_line_objective_id
+msgid "Objectif mensuel associé"
+msgstr "Objectif mensuel associé"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_of_sale_objective
+msgid "Objectif mensuel de ventes"
+msgstr "Objectif mensuel de ventes"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_hr_employee_sale_objective
+msgid "Objectifs de ventes"
+msgstr "Objectifs de ventes"
+
+#. module: of_crm
+#: model:ir.actions.act_window,name:of_crm.of_crm_of_sale_objective_action
+#: model:ir.ui.menu,name:of_crm.of_crm_of_sale_objective_menu
+msgid "Objectifs mensuels"
+msgstr "Objectifs mensuels"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "Objet&amp;nbsp;:"
+msgstr "Objet&amp;nbsp;:"
+
+#. module: of_crm
+#: selection:of.sale.objective,month:0
+msgid "Octobre"
+msgstr "Octobre"
+
+#. module: of_crm
+#: model:ir.actions.act_window,help:of_crm.of_crm_action_prospect_form
+msgid "Odoo helps you easily track all activities related to\n"
+"                a prospect: discussions, history of business opportunities,\n"
+"                documents, etc."
+msgstr "Odoo helps you easily track all activities related to\n"
+"                a prospect: discussions, history of business opportunities,\n"
+"                documents, etc."
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_of_sale_activity
+msgid "OF Sale Activity"
+msgstr "Activité de la commande"
+
+#. module: of_crm
+#: code:addons/of_crm/models/crm_activity.py:105
+#, python-format
+msgid "Opportunity"
+msgstr "Opportunité"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_opportunity_id
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_lead_id
+#: model:ir.model.fields,field_description:of_crm.field_of_planning_intervention_opportunity_id
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+msgid "Opportunité"
+msgstr "Opportunité"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_stage_auto_update_opportunity_id
+msgid "Opportunité associée"
+msgstr "Opportunité associée"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "Option de retrait&amp;nbsp;: oui"
+msgstr "Option de retrait&amp;nbsp;: oui"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Options"
+msgstr "Options"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_add_attachment_activity_order_id
+#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_search
+msgid "Order"
+msgstr "Commande"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_of_sale_followup_tag
+#: model:ir.ui.view,arch_db:of_crm.of_sale_followup_tag_form_view
+msgid "Order tracking label"
+msgstr "Étiquette du suivi commande"
+
+#. module: of_crm
+#: model:ir.actions.act_window,name:of_crm.of_sale_followup_tag_action
+#: model:ir.ui.menu,name:of_crm.of_sale_followup_config_tag
+#: model:ir.ui.view,arch_db:of_crm.of_sale_followup_tag_tree_view
+msgid "Kanban Sub-steps"
+msgstr "Sous-étapes Kanban"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_quotation_cart
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_quotation_cart
+msgid "Panier devis"
+msgstr "Panier devis"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_order_cart
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_order_cart
+msgid "Panier moyen"
+msgstr "Panier moyen"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_opportunity_cart
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_opportunity_cart
+msgid "Panier opportunité"
+msgstr "Panier opportunité"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Parrainage"
+msgstr "Parrainage"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_res_partner
+msgid "Partner"
+msgstr "Partenaire"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_res_partner_category
+msgid "Partner Tags"
+msgstr "Étiquettes du partenaire"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Pays"
+msgstr "Pays"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+msgid "Perdu"
+msgstr "Perdu"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:102
+#, python-format
+msgid "Performance"
+msgstr "Performance"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_order_form
+#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_form
+#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_tree
+msgid "Plan"
+msgstr "Planifier"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
+#: selection:of.crm.activity,state:0
+msgid "Planifiée"
+msgstr "Planifiée"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_search
+#: selection:of.sale.activity,state:0
+msgid "Planned"
+msgstr "Planifié"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_of_planning_intervention
+msgid "Planning d'intervention OpenFire"
+msgstr "Planning d'intervention OpenFire"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_precision
+msgid "Precision"
+msgstr "Precision"
+
+#. module: of_crm
+#: model:ir.model.fields,help:of_crm.field_crm_activity_of_mandatory
+msgid "Prevent the confirmation of an order if the activity is not carried out"
+msgstr "Empêcher la confirmation d'une commande si l'activité n’est pas réalisée"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_sale_order_of_priority
+msgid "Priority"
+msgstr "Priorité"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_stage_probability
+msgid "Probability (%)"
+msgstr "Probabilité (%)"
+
+#. module: of_crm
+#: model:ir.actions.act_window,name:of_crm.of_crm_next_activities_action
+msgid "Prochaines activités"
+msgstr "Prochaines activités"
+
+#. module: of_crm
+#: code:addons/of_crm/models/crm_activity.py:88
+#, python-format
+msgid "Project date"
+msgstr "Date projet"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_modele_id
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_modele_view_form
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+#: model:ir.ui.view,arch_db:of_crm.of_view_crm_case_leads_filter
+#: model:ir.ui.view,arch_db:of_crm.of_view_crm_case_opportunities_filter
+msgid "Projet"
+msgstr "Projet"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_modele_ids
+#: model:ir.ui.menu,name:of_crm.of_crm_menu_projet_config
+msgid "Projets"
+msgstr "Projets"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_kanban_view_leads
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_partner_form
+#: selection:res.partner,of_customer_state:0
+msgid "Prospect"
+msgstr "Prospect"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_account_invoice_of_canvasser_id
+#: model:ir.model.fields,field_description:of_crm.field_account_invoice_report_of_canvasser_id
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_prospecteur_id
+#: model:ir.model.fields,field_description:of_crm.field_res_partner_of_prospecteur_id
+#: model:ir.model.fields,field_description:of_crm.field_res_users_of_prospecteur_id
+#: model:ir.model.fields,field_description:of_crm.field_sale_order_of_canvasser_id
+#: model:ir.model.fields,field_description:of_crm.field_sale_report_of_canvasser_id
+msgid "Prospecteur"
+msgstr "Prospecteur"
+
+#. module: of_crm
+#: model:ir.actions.act_window,name:of_crm.of_crm_action_prospect_form
+#: model:ir.ui.menu,name:of_crm.of_crm_menu_prospect_form
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_res_partner_filter
+msgid "Prospects"
+msgstr "Prospects"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Qualification et Suivi"
+msgstr "Qualification et Suivi"
+
+#. module: of_crm
+#: selection:crm.stage,of_auto_model_name:0
+msgid "RDV d'intervention"
+msgstr "RDV d'intervention"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+msgid "RDV(s) Tech"
+msgstr "RDV(s) Tech"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_intervention_ids
+msgid "RDVs d'intervention"
+msgstr "RDVs d'intervention"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_cancel_reason
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_action_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_from_opportunity_form_view
+msgid "Raison d'annulation"
+msgstr "Raison d'annulation"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_view_filter
+msgid "Recherche d'attributs de projets"
+msgstr "Recherche d'attributs de projets"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_select_view_filter
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_modele_view_filter
+msgid "Recherche de valeurs d'attributs de projets"
+msgstr "Recherche de valeurs d'attributs de projets"
+
+#. module: of_crm
+#: code:addons/of_crm/models/crm_activity.py:79
+#, python-format
+msgid "Reference installation date"
+msgstr "Date de pose de référence"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_sale_order_of_reference_laying_date
+msgid "Reference laying date"
+msgstr "Date de pose de référence"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_report
+msgid "Report"
+msgstr "Rapport"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_sale_order_line_of_amount_to_invoice
+msgid "Reste à facturer en €"
+msgstr "Reste à facturer en €"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_from_opportunity_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_tree_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: selection:of.crm.activity.action,type:0
+msgid "Réaliser"
+msgstr "Réaliser"
+
+#. module: of_crm
+#: model:ir.actions.act_window,name:of_crm.of_crm_activity_action_realize_action
+msgid "Réaliser une activité"
+msgstr "Réaliser une activité"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
+#: selection:of.crm.activity,state:0
+msgid "Réalisée"
+msgstr "Réalisée"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_ref
+msgid "Référence"
+msgstr "Référence"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_title
+#: model:ir.ui.view,arch_db:of_crm.of_crm_lead_view_tree_activity
+msgid "Résumé"
+msgstr "Résumé"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_meeting_ids
+msgid "Réunions"
+msgstr "Réunions"
+
+#. module: of_crm
+#: code:addons/of_crm/models/crm_activity.py:106
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_order_id
+#, python-format
+msgid "Sale Order"
+msgstr "Bon de commande"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de bons de commande"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_sale_report
+msgid "Sales Orders Statistics"
+msgstr "Statistiques sur les commandes de ventes"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_crm_team
+msgid "Sales Team"
+msgstr "Équipe commerciale"
+
+#. module: of_crm
+#: selection:of.sale.objective,month:0
+msgid "Septembre"
+msgstr "Septembre"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_sequence
+msgid "Sequence"
+msgstr "Séquence"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_activity_of_short_name
+msgid "Short Name"
+msgstr "Nom court"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_company_id
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_company_id
+msgid "Société"
+msgstr "Société"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_res_partner_of_lead_source_id
+#: model:ir.model.fields,field_description:of_crm.field_res_users_of_lead_source_id
+#: model:ir.model.fields,field_description:of_crm.field_res_users_source_id
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Source"
+msgstr "Origine"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_crm_stage
+msgid "Stage of case"
+msgstr "Etape de cas"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_state
+#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_search
+msgid "State"
+msgstr "État"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_sale_order_of_activities_state
+msgid "Status of activities"
+msgstr "État des activités"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_description_rapport
+msgid "Suivi bis"
+msgstr "Suivi bis"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
+msgid "Sujet"
+msgstr "Sujet"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_summary
+msgid "Summary"
+msgstr "Résumé"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_select_sequence
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_sequence
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_sequence
+msgid "Séquence"
+msgstr "Séquence"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:146
+#, python-format
+msgid "Target"
+msgstr "Target"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_order_rate1
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_order_rate1
+msgid "Taux de concrétisation (%)"
+msgstr "Taux de concrétisation (%)"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_order_amount_rate
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_order_amount_rate
+msgid "Taux de concrétisation € (%)"
+msgstr "Taux de concrétisation € (%)"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_quotation_rate
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_quotation_rate
+msgid "Taux de devis (%)"
+msgstr "Taux de devis (%)"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_order_rate2
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_order_rate2
+msgid "Taux de transformation (%)"
+msgstr "Taux de transformation (%)"
+
+#. module: of_crm
+#: code:addons/of_crm/models/crm_activity.py:81
+#, python-format
+msgid "Technical visit date"
+msgstr "Date visite technique"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_view_filter
+#: selection:of.crm.projet.attr,type:0
+#: selection:of.crm.projet.line,type:0
+msgid "Texte Court"
+msgstr "Texte Court"
+
+#. module: of_crm
+#: selection:of.crm.projet.attr,type:0
+#: selection:of.crm.projet.line,type:0
+msgid "Texte Long"
+msgstr "Texte Long"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:102
+#, python-format
+msgid "This Month"
+msgstr "Ce mois"
+
+#. module: of_crm
+#: model:ir.model.fields,help:of_crm.field_res_users_campaign_id
+msgid "This is a name that helps you keep track of your different campaign efforts Ex: Fall_Drive, Christmas_Special"
+msgstr "C'est le nom qui vous permet de conserver la trace de vos campagnes. Par exemple : Commercialisation_Automne, Spécial_Noël"
+
+#. module: of_crm
+#: model:ir.model.fields,help:of_crm.field_res_users_medium_id
+msgid "This is the method of delivery.Ex: Postcard, Email, or Banner Ad"
+msgstr "Ceci est le mode de transmission. Ex: carte postale, courriel, bannière publicitaire"
+
+#. module: of_crm
+#: model:ir.model.fields,help:of_crm.field_res_users_source_id
+msgid "This is the source of the link Ex:Search Engine, another domain,or name of email list"
+msgstr "Ceci est la source du lien. Ex: moteur de recherche, autre domaine, ou nom d'une liste de courriel"
+
+#. module: of_crm
+#: model:ir.model.fields,help:of_crm.field_crm_lead_stage_probability
+msgid "This percentage depicts the default/average probability of the Case for this stage to be a success"
+msgstr "Ce pourcentage désigne la probabilité moyenne/par défaut que ce cas à ce niveau devienne un succès"
+
+#. module: of_crm
+#: sql_constraint:of.sale.followup.tag:0
+msgid "This tag name already exists !"
+msgstr "Ce nom d'étiquette existe déjà !"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:29
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:61
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:76
+#, python-format
+msgid "To Activities"
+msgstr "Voir les activités"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:105
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:189
+#, python-format
+msgid "To Activity Report"
+msgstr "Voir l'analyse des activités"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:16
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:51
+#, python-format
+msgid "To Calendar"
+msgstr "Voir le calendrier"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:131
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:199
+#, python-format
+msgid "To Invoice Report"
+msgstr "Voir l'analyse des factures"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:86
+#, python-format
+msgid "To Opportunities"
+msgstr "Voir les opportunités"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:118
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:194
+#, python-format
+msgid "To Opportunity Report"
+msgstr "Voir l'analyse des opportunités"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:13
+#, python-format
+msgid "To do"
+msgstr "À faire"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:13
+#, python-format
+msgid "Today"
+msgstr "Aujourd'hui"
+
+#. module: of_crm
+#: model:ir.actions.act_window,name:of_crm.of_crm_funnel_conversion_action
+msgid "Tunnel de conversion (qualitatif)"
+msgstr "Tunnel de conversion (qualitatif)"
+
+#. module: of_crm
+#: model:ir.actions.act_window,name:of_crm.of_crm_funnel_conversion2_action
+msgid "Tunnel de conversion (quantitatif)"
+msgstr "Tunnel de conversion (quantitatif)"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_funnel_conversion_pivot_view
+msgid "Tunnel de conversion 1"
+msgstr "Tunnel de conversion 1"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_funnel_conversion2_pivot_view
+msgid "Tunnel de conversion 2"
+msgstr "Tunnel de conversion 2"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_of_crm_funnel_conversion
+msgid "Tunnel de conversion CRM 1"
+msgstr "Tunnel de conversion CRM 1"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_of_crm_funnel_conversion2
+msgid "Tunnel de conversion CRM 2"
+msgstr "Tunnel de conversion CRM 2"
+
+#. module: of_crm
+#: model:ir.ui.menu,name:of_crm.of_crm_funnel_conversion_menu
+msgid "Tunnel quali"
+msgstr "Tunnel quali"
+
+#. module: of_crm
+#: model:ir.ui.menu,name:of_crm.of_crm_funnel_conversion2_menu
+msgid "Tunnel quanti"
+msgstr "Tunnel quanti"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_type
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_type
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_view_filter
+msgid "Type"
+msgstr "Type"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_action_type
+msgid "Type d'action"
+msgstr "Type d'action"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
+msgid "Type d'activité"
+msgstr "Type d'activité"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_phone
+msgid "Téléphone"
+msgstr "Téléphone"
+
+#. module: of_crm
+#: sql_constraint:of.sale.objective.line:0
+msgid "Un même employé ne peut avoir deux objectifs pour le même mois !"
+msgstr "Un même employé ne peut avoir deux objectifs pour le même mois !"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_uploaded_attachment_id
+msgid "Uploaded attachment"
+msgstr "Pièce jointe téléchargée"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_val_bool
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_val_char
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_val_date
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_val_select_id
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_val_text
+msgid "Valeur"
+msgstr "Valeur"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_select_view_form
+msgid "Valeur d'attribut de Projet"
+msgstr "Valeur d'attribut de Projet"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_val_bool_default
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_val_char_default
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_val_select_id_default
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_val_text_default
+msgid "Valeur par Défaut"
+msgstr "Valeur par Défaut"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_selection_ids
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_select_view_filter
+msgid "Valeurs"
+msgstr "Valeurs"
+
+#. module: of_crm
+#: model:ir.ui.menu,name:of_crm.of_crm_projet_attr_select_menu
+msgid "Valeurs d'Attributs"
+msgstr "Valeurs d'Attributs"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_select_view_tree
+msgid "Valeurs d'attributs de Projets"
+msgstr "Valeurs d'attributs de Projets"
+
+#. module: of_crm
+#: model:ir.actions.act_window,name:of_crm.of_crm_projet_attr_select_action
+msgid "Valeurs d'attributs de projets"
+msgstr "Valeurs d'attributs de projets"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_add_attachment_activity_form_view
+msgid "Validate"
+msgstr "Valider"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_action_form_view
+msgid "Valider"
+msgstr "Valider"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_vendor_id
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_vendor_id
+#: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_line_employee_id
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
+msgid "Vendeur"
+msgstr "Vendeur"
+
+#. module: of_crm
+#: selection:sale.order,of_priority:0
+msgid "Very High"
+msgstr "Très haute"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
+msgid "Ville"
+msgstr "Ville"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_website
+msgid "Website"
+msgstr "Site Web"
+
+#. module: of_crm
+#: model:ir.model.fields,help:of_crm.field_crm_lead_of_website
+msgid "Website of Partner or Company"
+msgstr "Site Web pour les Partenaires ou les Sociétés"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:127
+#, python-format
+msgid "Won in Opportunities"
+msgstr "Nombre d'opportunités gagnées"
+
+#. module: of_crm
+#: code:addons/of_crm/models/sale_order.py:322
+#, python-format
+msgid "You cannot confirm the Order until the mandatory activities are completed.\n"
+"Please check the following activities :\n"
+"%s"
+msgstr "Vous ne pouvez pas confirmer la commande tant que les activités obligatoires ne sont pas terminées.\n"
+"Veuillez vérifier les activités suivantes :\n"
+"%s"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_res_company_crm_suivi_notes
+msgid "avec les notes"
+msgstr "avec les notes"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:89
+#, python-format
+msgid "exp. closing"
+msgstr "clôture prévue"
+
+#. module: of_crm
+#: model:ir.model.fields,help:of_crm.field_crm_lead_geo_lat
+msgid "latitude field"
+msgstr "champ de latitude"
+
+#. module: of_crm
+#: model:ir.model.fields,help:of_crm.field_crm_lead_geo_lng
+msgid "longitude field"
+msgstr "champ de longitude"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_type_var_name
+msgid "nom de la variable de valeur"
+msgstr "nom de la variable de valeur"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_of_crm_activity_action
+msgid "of.crm.activity.action"
+msgstr "of.crm.activity.action"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_of_crm_projet_attr
+msgid "of.crm.projet.attr"
+msgstr "of.crm.projet.attr"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_of_crm_projet_attr_select
+msgid "of.crm.projet.attr.select"
+msgstr "of.crm.projet.attr.select"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_of_crm_projet_line
+msgid "of.crm.projet.line"
+msgstr "of.crm.projet.line"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_of_crm_projet_modele
+msgid "of.crm.projet.modele"
+msgstr "of.crm.projet.modele"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_of_crm_stage_auto_update
+msgid "of.crm.stage.auto.update"
+msgstr "of.crm.stage.auto.update"
+
+#. module: of_crm
+#. openerp-web
+#: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:79
+#, python-format
+msgid "overdue"
+msgstr "en retard"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_res_partner_kanban_view
+msgid "prospect"
+msgstr "prospect"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_sale_config_settings
+msgid "sale.config.settings"
+msgstr "sale.config.settings"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_utm_mixin
+msgid "utm.mixin"
+msgstr "utm.mixin"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_customer_state
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_state
+#: model:ir.model.fields,field_description:of_crm.field_res_partner_of_customer_state
+#: model:ir.model.fields,field_description:of_crm.field_res_users_of_customer_state
+msgid "État"
+msgstr "État"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_account_invoice_report_of_partner_tags
+msgid "Étiquettes du partenaire"
+msgstr "Étiquettes du partenaire"

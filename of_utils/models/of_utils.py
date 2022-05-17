@@ -1,12 +1,20 @@
 # -*- coding: utf-8 -*-
 
-from math import asin, sin, cos, sqrt, radians
-from datetime import datetime, date
 import re
 import unicodedata
-
-from odoo import models, fields
+from math import asin, sin, cos, sqrt, radians
+from odoo import models, fields, _
 from odoo.tools.safe_eval import safe_eval
+
+
+def get_selection_label(self, object, field_name, field_value):
+    """Get a translation of the displayed string value from a selection field for a given model
+    :param object: Model of the field selection
+    :param field_name: Name of the field in the model
+    :param field_value: Selection value of the field
+    :return: The translated string value of the selection field if the translation exist (else the original value)
+    """
+    return _(dict(self.env[object].fields_get(allfields=[field_name])[field_name]['selection'])[field_value])
 
 
 def arrondi_sup(val, mult):

@@ -11,7 +11,81 @@
         <field name="inherit_id" ref="sale.view_sale_order_kanban"/>
         <field name="arch" type="xml">
             <xpath expr="//kanban" position="attributes">
+                <attribute name="default_order">of_priority desc, date_order desc, id desc</attribute>
                 <attribute name="default_group_by">of_kanban_step_id</attribute>
+                <attribute name="class">o_kanban_dashboard of_followup_kanban</attribute>
+            </xpath>
+            <xpath expr="//kanban/field[@name='currency_id']" position="after">
+                <field name="amount_untaxed"/>
+                <field name="of_priority"/>
+                <field name="of_sale_followup_tag_ids"/>
+                <field name="user_id"/>
+                <field name="of_main_product_brand_id"/>
+                <field name="of_laying_week"/>
+                <field name="invoice_status"/>
+                <field name="of_nbr_overdue_activities"/>
+                <field name="of_overdue_activities"/>
+                <field name="of_notes_display"/>
+                <field name="of_info_display"/>
+                <field name="of_activities_state"/>
+            </xpath>
+            <xpath expr="//templates/t[@t-name='kanban-box']" position="replace">
+                <t t-name="kanban-box">
+                    <div class="oe_kanban_global_click">
+                        <div class="of_followup_kanban_main">
+                            <div class="o_kanban_card_content">
+                                <div class="o_kanban_tags_section">
+                                    <field name="of_sale_followup_tag_ids"/>
+                                </div>
+                                <div style="margin-left: 5px; margin-bottom: 25px;">
+                                    <h4>
+                                        <b><field name="name"/></b> - <field name="partner_id"/><br/>
+                                    </h4>
+                                    <span><b><field name="user_id"/> / <field name="of_main_product_brand_id" /></b></span>
+                                    <span><b>Sem. de pose : <field name="of_laying_week"/></b></span>
+                                    <br/>
+                                    <ul t-if="record.of_notes_display">
+                                        <t t-value="JSON.parse(record.of_notes_display.raw_value)" t-set="notes_lines"/>
+                                        <t t-foreach="notes_lines" t-as="note_line">
+                                            <li><i><t t-esc="note_line"/></i></li>
+                                        </t>
+                                    </ul>
+                                    <br/>
+                                    <ul t-if="record.of_info_display">
+                                        <t t-value="JSON.parse(record.of_info_display.raw_value)" t-set="info_lines"/>
+                                        <t t-foreach="info_lines" t-as="info_line">
+                                            <li><i><t t-esc="info_line"/></i></li>
+                                        </t>
+                                    </ul>
+                                </div>
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="of_priority" widget="priority"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="of_followup_kanban_boxes">
+                            <div class="of_followup_kanban_box">
+                                <field name="of_activities_state" class="oe_inline"/>
+                                <field t-if="record.of_activities_state.raw_value == 'late'" name="of_nbr_overdue_activities" class="oe_inline"/>
+                            </div>
+                            <div t-att-class="'of_followup_kanban_color_' + (record.of_activities_state.raw_value or '0') + ' of_followup_kanban_box'">
+                                <ul t-if="record.of_activities_state.raw_value == 'late'">
+                                    <t t-value="JSON.parse(record.of_overdue_activities.raw_value)" t-set="of_overdue_activities"/>
+                                    <t t-foreach="of_overdue_activities" t-as="overdue_activity">
+                                        <li><t t-esc="overdue_activity"/></li>
+                                    </t>
+                                </ul>
+                            </div>
+                            <div class="of_followup_kanban_box">
+                                <field name="amount_untaxed"/> HT
+                                <field name="amount_total"/> TTC
+                            </div>
+                            <div class="of_followup_kanban_box">
+                                <field name="invoice_status"/>
+                            </div>
+                        </div>
+                    </div>
+                </t>
             </xpath>
         </field>
     </record>

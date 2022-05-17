@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_quote_tmpl_activity_view_form" model="ir.ui.view">
+        <field name="name">of.sale.quote.tmpl.activity.view.form</field>
+        <field name="model">of.sale.quote.tmpl.activity</field>
+        <field name="arch" type="xml">
+            <form string="Activity">
+                <sheet>
+                    <group>
+                        <field name="activity_id"/>
+                        <field name="compute_date"/>
+                        <field name="description"/>
+                        <field name="days"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sale_quote_tmpl_activity_view_tree" model="ir.ui.view">
+        <field name="name">of.sale.quote.tmpl.activity.view.tree</field>
+        <field name="model">of.sale.quote.tmpl.activity</field>
+        <field name="arch" type="xml">
+            <tree string="Activities">
+                <field name="sequence" widget="handle"/>
+                <field name="activity_id"/>
+                <field name="compute_date"/>
+                <field name="description"/>
+                <field name="days"/>
+            </tree>
+        </field>
+    </record>
+
+</odoo>

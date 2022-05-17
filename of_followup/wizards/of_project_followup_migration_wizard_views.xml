@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_project_followup_migration_wizard_form_view" model="ir.ui.view">
+        <field name="name">of.project.followup.migration.wizard.form.view</field>
+        <field name="model">of.followup.project.migration.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Follow-up migration">
+                <group>
+                    <span colspan="2">Do you want to start the migration of the project follow-ups?</span>
+                </group>
+                <footer>
+                    <button string="Start the migration" name="action_start_migration" type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

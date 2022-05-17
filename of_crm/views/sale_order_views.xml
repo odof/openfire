@@ -12,6 +12,9 @@
                 <xpath expr="//button[@name='print_quotation'][1]" position="after">
                     <button name="action_confirm_estimation" string="Confirmer l'estimation" type="object" states="draft" class="btn-primary"/>
                 </xpath>
+                <xpath expr="//div[hasclass('oe_title')]/h1" position="inside">
+                    <field name="of_priority" widget="priority"/>
+                </xpath>
                 <xpath expr="//sheet/group/group[1]" position="inside">
                     <field name="of_sent_quotation"/>
                 </xpath>
@@ -39,6 +42,66 @@
                 <xpath expr="//group[@name='technical']/field[@name='opportunity_id']" position="attributes">
                     <attribute name="groups">sales_team.group_sale_salesman</attribute>
                 </xpath>
+                <xpath expr="//page[@name='notes']" position="after">
+                    <page string="Follow-up" name="followup">
+                        <group name="followup_tags">
+                            <field name="of_sale_followup_tag_ids" widget="many2many_tags"/>
+                        </group>
+                        <group name="activities">
+                            <group>
+                                <field name="of_activities_state" />
+                            </group>
+                            <group colspan="4">
+                                <field name="of_sale_activity_ids" context="{'default_user_id': user_id'}" nolabel="1">
+                                    <form string="Activity">
+                                        <header>
+                                            <field name="load_attachment" invisible="1"/>
+                                            <field name="uploaded_attachment_id" invisible="1"/>
+                                            <button name="action_add_attachment" class="btn btn-sm" type="object" string="Add attachments" 
+                                                attrs="{'invisible': ['|', ('load_attachment', '=', False), ('uploaded_attachment_id', '!=', False)]}"/>
+                                            <button string="Plan" name="action_plan" type="object" states="cancelled,done"/>
+                                            <button string="Complete" name="action_complete" type="object" class="oe_highlight" states="planned"/>
+                                            <button string="Cancel" name="action_cancel" type="object" states="planned"/>
+                                            <field name="state" widget="statusbar"/>
+                                        </header>
+                                        <sheet>
+                                            <group>
+                                                <field name="is_overdue" invisible="1"/>
+                                                <field name="activity_id"/>
+                                                <field name="sequence"/>
+                                                <field name="summary"/>
+                                                <field name="user_id"/>
+                                                <field name="date_deadline"/>
+                                                <field name="description"/>
+                                                <field name="report"/>
+                                            </group>
+                                        </sheet>
+                                    </form>
+                                    <tree string="Activities" decoration-danger="is_overdue">
+                                        <field name="is_overdue" invisible="1"/>
+                                        <field name="load_attachment" invisible="1"/>
+                                        <field name="uploaded_attachment_id" invisible="1"/>
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="summary"/>
+                                        <field name="activity_id"/>
+                                        <field name="date_deadline"/>
+                                        <field name="user_id"/>
+                                        <field name="state"/>
+                                        <button name="action_add_attachment" icon="fa-upload" type="object" string="Add attachments"
+                                            attrs="{'invisible': ['|', ('load_attachment', '=', False), ('uploaded_attachment_id', '!=', False)]}"
+                                            context="{'close_and_reload': True'}"/>
+                                        <button name="action_plan" icon="fa-undo" type="object" string="Plan"
+                                            attrs="{'invisible': [('state', '=', 'planned')]}" context="{'close_and_reload': True'}"/>
+                                        <button name="action_complete" icon="fa-check" type="object" string="Complete" 
+                                            attrs="{'invisible': [('state', '!=', 'planned')]}" context="{'close_and_reload': True'}"/>
+                                        <button name="action_cancel" icon="fa-close" type="object" string="Cancel" 
+                                            attrs="{'invisible': [('state', '!=', 'planned')]}" context="{'close_and_reload': True'}"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </group>
+                     </page>
+                </xpath>
                 <!-- Ajout champ "Apporté par" dans devis/commande -->
                 <xpath expr="//group[@name='technical']" position="after">
                     <group string="Divers" name="Misc">
@@ -47,6 +110,20 @@
                 </xpath>
                 <xpath expr="//field[@name='user_id']" position="after">
                     <field name="of_canvasser_id"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_crm_of_sale_report_view_order_form_inherit_sale_stock" model="ir.ui.view">
+            <field name="name">of.crm.of.sale.order.form.sale.stock</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="of_sale_report.of_sale_report_view_order_form_inherit_sale_stock"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='of_date_de_pose']" position="after">
+                    <field name="of_reference_laying_date" attrs="{'invisible': [('of_force_laying_date', '!=', False)]}"/>
+                    <field name="of_manual_laying_date" attrs="{'invisible': [('of_force_laying_date', '=', False)]}"/>
+                    <field name="of_force_laying_date"/>
+                    <field name="of_laying_week"/>
                 </xpath>
             </field>
         </record>
@@ -78,6 +155,21 @@
             </field>
         </record>
 
+        <record id="of_crm_sale_view_sales_order_filter" model="ir.ui.view">
+            <field name="name">of.crm.sale.view.sales.order.filter</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='message_needaction']" position="after">
+                    <separator/>
+                    <filter string="In Progress" name="in_progress" domain="[('of_activities_state', '=', 'in_progress')]"/>
+                    <filter string="Late" name="late" domain="[('of_activities_state', '=', 'late')]"/>
+                    <filter string="Done" name="done" domain="[('of_activities_state', '=', 'done')]"/>
+                    <filter string="Cancelled" name="cancelled" domain="[('of_activities_state', '=', 'cancelled')]"/>
+                </xpath>
+            </field>
+        </record>
+
         <record id="of_crm_quotation_sale_order_search_view" model="ir.ui.view">
             <field name="name">of.crm.quotation.sale.order.quotation.form.view</field>
             <field name="model">sale.order</field>
@@ -88,6 +180,22 @@
                     <filter string="Devis" name="draft" domain="[('state', '=', 'sent')]"/>
                 </xpath>
                 <xpath expr="//filter[@name='quotation']" position="replace"/>
+            </field>
+        </record>
+
+        <record id="of_crm_of_sale_view_order_form" model="ir.ui.view">
+            <field name="name">of.crm.of.sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='customer_notes']" position="after">
+                    <group col="4" colspan="4" name="followup_notes" string="Follow-up notes">
+                        <field name="of_notes" nolabel="1"/>
+                    </group>
+                </xpath>
+                <xpath expr="//field[@name='payment_term_id']" position="after">
+                        <field name="of_info"/>
+                </xpath>
             </field>
         </record>
 

@@ -12,11 +12,11 @@
 ##############################################################################
 
 {
-    'name' : u"OpenFire / Ventes - vue kanban",
-    'version' : "10.0.1.0.0",
+    'name': u"OpenFire / Ventes - vue kanban",
+    'version': "10.0.1.0.0",
     'license': '',
-    'author' : "OpenFire",
-    'website' : "www.openfire.fr",
+    'author': "OpenFire",
+    'website': "www.openfire.fr",
     'category': "Module OpenFlam",
     'summary': u"Personnalisation des ventes OpenFire",
     'description': u"""
@@ -27,13 +27,14 @@ Module OpenFire / Ventes - vue kanban
 Modification de la vue kanban des devis/commandes + ajout d'un champ étapes kanban
 
 """,
-    'depends' : [
-        "sale",
+    'depends': [
+        'sale',
+        'of_crm'
     ],
     'external_dependancies': {
         'python': ['pdfminer', 'pypdftk', 'pyPdf'],
     },
-    'data' : [
+    'data': [
         'security/ir.model.access.csv',
         'views/of_sale_kanban_view.xml',
         'data/of_sale_kanban_data.xml',

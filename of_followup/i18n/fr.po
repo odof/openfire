@@ -1,0 +1,46 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_followup
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-06-02 17:27+0000\n"
+"PO-Revision-Date: 2022-06-02 17:27+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_followup
+#: model:ir.ui.view,arch_db:of_followup.of_project_followup_migration_wizard_form_view
+msgid "<span colspan=\"2\">Do you want to start the migration of the project follow-ups?</span>"
+msgstr "<span colspan=\"2\">Vous souhaitez démarrer la migration des suivis de projet ?</span>"
+
+#. module: of_followup
+#: model:ir.ui.view,arch_db:of_followup.of_project_followup_migration_wizard_form_view
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: of_followup
+#: model:ir.ui.view,arch_db:of_followup.view_sales_config_settings_followup
+msgid "Follow-up"
+msgstr "Suivi"
+
+#. module: of_followup
+#: model:ir.ui.view,arch_db:of_followup.of_project_followup_migration_wizard_form_view
+msgid "Follow-up migration"
+msgstr "Migration suivi de projet"
+
+#. module: of_followup
+#: model:ir.ui.view,arch_db:of_followup.view_sales_config_settings_followup
+msgid "Migrate the follow-ups"
+msgstr "Migrer les suivis"
+
+#. module: of_followup
+#: model:ir.ui.view,arch_db:of_followup.of_project_followup_migration_wizard_form_view
+msgid "Start the migration"
+msgstr "Démarrer la migration"

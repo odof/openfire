@@ -1,7 +1,15 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime, timedelta
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 
-from odoo import models, fields, api
-from odoo.tools.safe_eval import safe_eval
+
+AVAILABLE_PRIORITIES = [
+    ('0', 'Normal'),
+    ('1', 'Low'),
+    ('2', 'High'),
+    ('3', 'Very High'),
+]
 
 
 class SaleOrder(models.Model):
@@ -85,6 +93,108 @@ class SaleOrder(models.Model):
     ], default=_default_state)
     of_sent_quotation = fields.Boolean(string=u"Devis envoyé")
     of_canvasser_id = fields.Many2one(comodel_name='res.users', string=u"Prospecteur")
+    of_sale_activity_ids = fields.One2many(
+        comodel_name='of.sale.activity', inverse_name='order_id', string='Activities', copy=True)
+    of_activities_state = fields.Selection(selection=[
+        ('in_progress', 'In progress'),
+        ('late', 'Late'),
+        ('done', 'Done'),
+        ('cancelled', 'Cancelled')], string='Status of activities', compute='_compute_of_activities_state', store=True)
+    # Follow-up fields
+    of_sale_followup_tag_ids = fields.Many2many(
+        comodel_name='of.sale.followup.tag', relation='sale_order_followup_tag_rel', column1='order_id',
+        column2='tag_id', string='Follow-up tags')
+    of_priority = fields.Selection(selection=AVAILABLE_PRIORITIES, string='Priority', index=True, default='0')
+    of_notes = fields.Text(string='Follow-up notes')
+    of_info = fields.Char(string='Info')
+    of_reference_laying_date = fields.Date(
+        compute='_compute_of_reference_laying_date', string='Reference laying date', store=True)
+    of_force_laying_date = fields.Boolean(string='Force laying date')
+    of_manual_laying_date = fields.Date(string='Manual laying date')
+    of_laying_week = fields.Char(compute='_compute_of_reference_laying_date', string="Laying week", store=True)
+    of_main_product_brand_id = fields.Many2one(
+        comodel_name='of.product.brand', compute='_of_compute_main_product_brand_id',
+        string="Brand of the main product", store=True)
+
+    @api.multi
+    @api.depends('of_force_laying_date', 'of_manual_laying_date', 'intervention_ids',
+                 'intervention_ids.date', 'intervention_ids.type_id')
+    def _compute_of_reference_laying_date(self):
+        for rec in self:
+            laying_date = False
+            if rec.of_force_laying_date:
+                laying_date = rec.of_manual_laying_date
+            elif rec.intervention_ids:
+                installation_type = self.env.ref('of_service.of_service_type_installation')
+                inter_installation = rec.intervention_ids.filtered(lambda i: i.type_id == installation_type)
+                future_installation = inter_installation.filtered(lambda i: i.date > fields.Datetime.now())
+                # by default Interventions are sorted by date (_order = 'date')
+                if future_installation:
+                    laying_date = future_installation[0].date_date
+                elif inter_installation:
+                    laying_date = inter_installation[-1].date_date or False
+            rec.of_reference_laying_date = laying_date
+            if laying_date:
+                date_laying_week = datetime.strptime(laying_date, "%Y-%m-%d").date()
+                laying_week = date_laying_week.isocalendar()[1]
+                rec.of_laying_week = "%s - S%02d" % (date_laying_week.year, laying_week)
+            else:
+                rec.of_laying_week = u"Non programmée"
+
+    @api.multi
+    @api.depends('of_sale_activity_ids', 'of_sale_activity_ids.state', 'of_sale_activity_ids.date_deadline')
+    def _compute_of_activities_state(self):
+        for sale in self:
+            if not sale.of_sale_activity_ids:
+                sale.of_activities_state = False
+                continue
+
+            activities_state = 'in_progress'
+            activities = sale.of_sale_activity_ids
+            states = activities.mapped('state')
+            if all(map(lambda s: s == 'cancelled', states)):
+                activities_state = 'cancelled'
+            elif all(map(lambda s: s in ('done', 'cancelled'), states)):
+                activities_state = 'done'
+            elif sale._of_get_overdue_activities():
+                activities_state = 'late'
+            sale.of_activities_state = activities_state
+
+    @api.multi
+    @api.depends(
+        'order_line', 'order_line.of_article_principal', 'order_line.product_id', 'order_line.product_id.brand_id')
+    def _of_compute_main_product_brand_id(self):
+        for rec in self:
+            main_product_lines = rec.order_line.filtered(lambda l: l.of_article_principal)
+            if main_product_lines:
+                rec.of_main_product_brand_id = main_product_lines[0].product_id.brand_id
+
+    @api.multi
+    def _of_update_deadline_date_activities(self, activity_fields=None):
+        """Recomputes the deadline date of activities linked to the Sale.
+        :param activity_fields: The list of fields that are updated to filter activities to update
+        :type activity_fields: list
+        """
+        if activity_fields is None:
+            activity_fields = []
+
+        field_name = {
+            'confirmation_date': 'confirmation_date',
+            'of_reference_laying_date': 'reference_install_date',
+            'of_force_laying_date': 'reference_install_date',
+            'of_manual_laying_date': 'reference_install_date',
+            'of_date_de_pose': 'estimated_install_date',
+            'of_date_vt': 'technical_visit_date'
+        }
+        activities_filter = [field_name.get(af) for af in activity_fields if field_name.get(af)]
+        for order in self:
+            for sale_activity in order.of_sale_activity_ids.filtered(
+                    lambda sa:
+                    sa.state == 'planned' and sa.activity_id and
+                    sa.activity_id.of_compute_date in activities_filter and
+                    sa.activity_id.of_automatic_recompute):
+                sale_activity.date_deadline = self._of_get_sale_activity_date_deadline(
+                    order, sale_activity.activity_id)
 
     @api.onchange('partner_id')
     def onchange_partner_id(self):
@@ -104,6 +214,47 @@ class SaleOrder(models.Model):
                 self.user_id = self.opportunity_id.user_id
             if self.opportunity_id.of_prospecteur_id and self.state != 'sale':
                 self.of_canvasser_id = self.opportunity_id.of_prospecteur_id
+
+    @api.multi
+    def _of_get_overdue_activities(self):
+        self.ensure_one()
+        return self.of_sale_activity_ids.filtered(lambda a: a.is_overdue)
+
+    def _of_get_fields_recompute_auto_activities(self):
+        """Helper function to return the list of fields that will trigger the recompute
+        the deadline date of activities"""
+        return [
+            'date_order', 'of_reference_laying_date', 'of_date_de_pose', 'of_date_vt', 'of_force_laying_date',
+            'of_manual_laying_date']
+
+    @api.model
+    def _of_get_sale_activity_date_deadline(self, order, activity, days=False, compute_date=False):
+        if not order or not activity:
+            return False
+        if not days:
+            days = activity.days
+        if not compute_date:
+            compute_date = activity.of_compute_date
+        # dict to translate the value of the field selection into attribute's name of the model
+        field_name = {
+            'confirmation_date': 'confirmation_date',
+            'reference_install_date': 'of_reference_laying_date',
+            'estimated_install_date': 'of_date_de_pose',
+            'technical_visit_date': 'of_date_vt'
+        }
+        order_field = field_name.get(compute_date)
+        if order_field:
+            # take the manual date if required
+            if order_field == 'of_reference_laying_date' and order.of_force_laying_date:
+                order_field = 'of_manual_laying_date'
+            ddate = getattr(order, order_field)
+            ddate = fields.Date.from_string(ddate)
+        else:
+            ddate = fields.Date.today()
+        if ddate:
+            delta = timedelta(days=days)
+            return ddate + delta
+        return False
 
     @api.model
     def create(self, vals):
@@ -131,6 +282,14 @@ class SaleOrder(models.Model):
             lead = self.env['crm.lead'].browse(vals['opportunity_id'])
             # on connecte la commande aux RDV plutôt que l'inverse car plus facile de toucher un M2O qu'un O2M
             lead.of_intervention_ids.write({'order_id': order.id})
+
+        # Check if the dict of values contains fields that will trigger the recompute of the deadline date of
+        # the activities.
+        activity_fields = filter(
+            lambda f: f, [f in self._of_get_fields_recompute_auto_activities() and f for f in vals.keys()])
+        if activity_fields:
+            order._of_update_deadline_date_activities(activity_fields)
+
         return order
 
     @api.multi
@@ -138,19 +297,40 @@ class SaleOrder(models.Model):
         start_state = self.env['ir.values'].get_default('sale.config.settings', 'of_sale_order_start_state')
         if values.get('state', False) == 'draft' and start_state == 'quotation':
             values.update(state='sent')
-        res =  super(SaleOrder, self).write(values)
+        res = super(SaleOrder, self).write(values)
         if values.get('opportunity_id') and len(self) == 1:
             lead = self.env['crm.lead'].browse(values['opportunity_id'])
             # on connecte la commande aux RDV plutôt que l'inverse car plus facile de toucher un M2O qu'un O2M
             lead.of_intervention_ids.write({'order_id': self.id})
-
         return res
+
+    @api.multi
+    def _write(self, values):
+        res = super(SaleOrder, self)._write(values)
+        # Low level implementation to ensure that we will update the activities deadline date after the computed fields.
+        # Check if the dict of values contains fields that will trigger the recompute of the deadline date of
+        # the activities.
+        activity_fields = filter(
+            lambda f: f, [f in self._of_get_fields_recompute_auto_activities() and f for f in values.keys()])
+        if activity_fields:
+            self._of_update_deadline_date_activities(activity_fields)
+        return res
+
+    def _of_not_done_mandatory_activities(self):
+        return self.mapped('of_sale_activity_ids').filtered(
+            lambda sa: sa.activity_id and sa.activity_id.of_mandatory and sa.state == 'planned').mapped('summary')
 
     @api.multi
     def action_confirm(self):
         """
         Un prospect devient signé sur confirmation de commande
         """
+        mandatory_activities = self._of_not_done_mandatory_activities()
+        if mandatory_activities:
+            raise ValidationError(_(
+                'You cannot confirm the Order until the mandatory activities are completed.\n'
+                'Please check the following activities :\n%s') % (''.join(map(
+                    lambda ma: ma and '- %s\n' % ma, mandatory_activities))))
         res = super(SaleOrder, self).action_confirm()
         partners = self.env['res.partner']
         for order in self:
@@ -207,6 +387,11 @@ class SaleOrder(models.Model):
         invoice_vals = super(SaleOrder, self)._prepare_invoice()
         invoice_vals['of_canvasser_id'] = self.of_canvasser_id.id
         return invoice_vals
+
+    @api.model
+    def cron_recompute_activities_state(self):
+        for order in self.search([]):
+            order._compute_of_activities_state()
 
 
 class SaleOrderLine(models.Model):

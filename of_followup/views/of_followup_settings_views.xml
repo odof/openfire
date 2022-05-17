@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_sales_config_settings_followup" model="ir.ui.view">
+        <field name="name">of.followup.project.settings.form.view</field>
+        <field name="model">sale.config.settings</field>
+        <field name="inherit_id" ref="sale.view_sales_config"/>
+        <field name="groups_id" eval="[(6, 0, [ref('of_base.of_group_root_only')])]"/>
+        <field name="arch" type="xml">
+            <div id="main" position="inside">
+                <group string="Follow-up" name="followup">
+                    <button name="action_open_followup_migration_wizard" string="Migrate the follow-ups" type="object"
+                        class="btn-primary"/>
+                </group>
+            </div>
+        </field>
+    </record>
+
+</odoo>

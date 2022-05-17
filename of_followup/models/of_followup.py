@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime, date, timedelta
 import json
-
+import logging
+from datetime import datetime, date, timedelta
 from odoo import api, fields, models
 from odoo.addons.muk_dms.models import dms_base
+
+logger = logging.getLogger('FOLLOW-UP')
 
 AVAILABLE_PRIORITIES = [
     ('0', u'Normale'),
@@ -19,6 +21,190 @@ class OFFollowupProject(models.Model):
     _inherit = 'mail.thread'
     _description = "Suivi des projets"
     _order = "priority desc, reference_laying_date, id desc"
+
+    def _get_order_values(self, project, mapping_project_stages, mapping_project_tags, default_of_kanban_step_id):
+        """Helper that return a dict of values to write on a Sale depending of the Project followup"""
+        otag_ids = False
+        if project.tag_ids:
+            otag_ids = [(6, 0, [mapping_project_tags[pt.id] for pt in project.tag_ids])]
+        return {
+            'of_priority': project.priority,
+            'of_notes': project.notes,
+            'of_info': project.info,
+            'of_manual_laying_date': project.manual_laying_date,
+            'of_laying_week': project.laying_week,
+            'of_reference_laying_date': project.reference_laying_date,
+            'of_force_laying_date': project.force_laying_date,
+            'of_sale_followup_tag_ids': otag_ids,
+            'of_kanban_step_id': mapping_project_stages.get(project.stage_id.id, default_of_kanban_step_id)
+        }
+
+    def _followup_data_migration(self):
+        """
+        Migration of the Project followup data into the new fields of the linked Order.
+        Migration of Project followup task and other stuff in the CRM activities, CRM tags, etc.
+        """
+
+        cr = self._cr
+        # Follow-up data migration
+        IRConfig = self.env['ir.config_parameter']
+        logger.info('_followup_data_migration START')
+        if not IRConfig.get_param('of.followup.migration', False):
+            self = self.with_context(lang='fr_FR')
+            CRMActivity = self.env['crm.activity']
+            FollowupProjectTmpl = self.env['of.followup.project.template']
+            FollowupTask = self.env['of.followup.task']
+            FollowupTaskType = self.env['of.followup.task.type']
+            SaleQuoteTmpl = self.env['sale.quote.template']
+            FollowupProject = self.env['of.followup.project']
+            SaleFollowupTag = self.env['of.sale.followup.tag']
+            FollowupProjectTag = self.env['of.followup.project.tag']
+            FollowupProjectStage = self.env['of.followup.project.stage']
+            SaleOrderKanban = self.env['of.sale.order.kanban']
+
+            # of.followup.project.tag -> of.sale.followup.tag
+            logger.info('    of.followup.project.tag -> of.sale.followup.tag')
+            project_tags = FollowupProjectTag.search([])
+            mapping_project_tags = {ptag.id: SaleFollowupTag.create(
+                {'name': ptag.name, 'color': ptag.color}).id for ptag in project_tags}
+
+            # of.followup.project.stage -> of.sale.order.kanban
+            logger.info('    of.followup.project.stage -> of.sale.order.kanban')
+            project_stages = FollowupProjectStage.search([])
+            mapping_project_stages = {pstage.id: SaleOrderKanban.create(
+                {'name': pstage.name}).id for pstage in project_stages}
+            default_of_kanban_step_id = mapping_project_stages[
+                self.env.ref('of_followup.of_followup_project_stage_new').id]
+
+            # of.followup.task.type -> crm.activity (loaded via data XML) so we build a data mapping dict
+            logger.info('    of.followup.task.type -> crm.activity')
+            task_type_planif_id = self.env.ref('of_followup.of_followup_task_type_planif').id
+            task_type_vt_id = self.env.ref('of_followup.of_followup_task_type_vt').id
+            followup_type_values = FollowupTaskType.with_context(active_test=False).search_read(
+                ['|', ('predefined_task', '=', 'False'), ('id', 'in', [task_type_planif_id, task_type_vt_id])],
+                ['name', 'short_name'])
+            mapping_task_type = {}
+            for data in followup_type_values:
+                act_id = CRMActivity.create(
+                    {'name': data['name'], 'of_short_name': data['short_name'], 'of_object': 'sale_order'}).id
+                k = '%s,%s' % (data['id'], data['short_name'])
+                mapping_task_type[k] = act_id
+
+            # of.followup.task -> of.sale.activity
+            logger.info('    of.followup.task -> of.sale.activity')
+            # get the tasks ids
+            tasks_query = "SELECT DISTINCT(OFT.id) " \
+                "FROM of_followup_task OFT " \
+                "INNER JOIN of_followup_project OFP ON OFP.id = OFT.project_id " \
+                "INNER JOIN sale_order SO ON OFP.order_id = SO.id " \
+                "INNER JOIN of_followup_task_type OFTT ON OFTT.id = OFT.type_id " \
+                "WHERE SO.state != 'done'  AND OFP.state != 'done' AND OFTT.predefined_task IS NOT TRUE;"
+            cr.execute(tasks_query)
+            tasks_ids = cr.fetchall()
+            tasks_ids = map(lambda t: t[0], tasks_ids)
+            # create sales activities from followup tasks and prepare orders data from the project linked to the task
+            project_data = {}
+            for task in FollowupTask.browse(tasks_ids):
+                project = task.project_id
+                type_id = task.type_id.id
+                short_name = task.type_id.short_name
+                k = '%s,%s' % (type_id, short_name)
+                activity_state = 'planned'  # default value
+                if task.state_id.final_state:
+                    activity_state = 'done'
+                if project:
+                    if not project_data.get(project):
+                        project_data[project] = {'of_sale_activity_ids': []}
+                    # the field 'activity_id' is required, to avoid the IntegryError if the activity doesn't exist we
+                    # will set "Planif" as default
+
+                    # try to preload the deadline date
+                    date_deadline = False
+                    if project.reference_laying_date:
+                        stage_code_tr = {
+                            's': 0,
+                            's+': 1,
+                            's-2': -2,
+                            's-4': -4,
+                            's-6': -6,
+                            's-8': -8
+                        }
+                        reference_laying_date = datetime.strptime(project.reference_laying_date, '%Y-%m-%d')
+                        task_stage = task.state_id.stage_id
+                        if task_stage and stage_code_tr.get(task_stage.code):
+                            days_nbr = stage_code_tr.get(task_stage.code) * 7
+                            date_deadline = reference_laying_date + timedelta(days=days_nbr)
+                            # take the start day of the week for this date
+                            start_date = date_deadline - timedelta(days=date_deadline.weekday())
+                            date_deadline = start_date.strftime('%Y-%m-%d %H:%M:%S')
+
+                    if mapping_task_type.get(k):
+                        project_data[project]['of_sale_activity_ids'].append((0, 0, {
+                            'sequence': task.sequence,
+                            'summary': task.name,
+                            'date_deadline': date_deadline,
+                            'activity_id': mapping_task_type.get(k),
+                            'state': activity_state
+                        }))
+
+            # of.followup.project -> sale.order
+            logger.info('    of.followup.project -> sale.order')
+            done_project_ids = []
+            for project, data in project_data.items():
+                values = self._get_order_values(
+                    project, mapping_project_stages, mapping_project_tags, default_of_kanban_step_id)
+                values.update(data)
+                project.order_id.write(values)
+                done_project_ids.append(project.id)
+
+            if done_project_ids:
+                # other projets that aren't yet migrated from the followup tasks
+                projects_query = "SELECT DISTINCT(OFP.id) " \
+                    "FROM of_followup_project OFP " \
+                    "INNER JOIN sale_order SO ON OFP.order_id = SO.id " \
+                    "WHERE SO.state != 'done' AND OFP.state != 'done' AND OFP.id NOT IN %s;"
+                cr.execute(projects_query, (tuple(done_project_ids),))
+            else:
+                projects_query = "SELECT DISTINCT(OFP.id) " \
+                    "FROM of_followup_project OFP " \
+                    "INNER JOIN sale_order SO ON OFP.order_id = SO.id " \
+                    "WHERE SO.state != 'done' AND OFP.state != 'done';"
+                cr.execute(projects_query)
+            project_ids = cr.fetchall()
+            project_ids = map(lambda p: p[0], project_ids)
+            followup_projects = FollowupProject.browse(project_ids)
+            for project in followup_projects:
+                order = project.order_id
+                order.write(
+                    self._get_order_values(
+                        project, mapping_project_stages, mapping_project_tags, default_of_kanban_step_id))
+
+            # of.followup.project.template -> sale.quote.template
+            logger.info('    of.followup.project.template -> sale.quote.template')
+            project_templates = FollowupProjectTmpl.search([])
+            for template in project_templates:
+                order_template = {
+                    'name': template.name,
+                    'of_sale_quote_tmpl_activity_ids': []
+                }
+                for task in template.task_ids.filtered(
+                        lambda t: t.type_id and (
+                                not task.type_id.predefined_task or
+                                task.type_id.id in [task_type_planif_id, task_type_vt_id])):
+                    type_id = task.type_id.id
+                    short_name = task.type_id.short_name
+                    k = '%s,%s' % (type_id, short_name)
+                    if mapping_task_type.get(k):
+                        order_template['of_sale_quote_tmpl_activity_ids'].append(
+                            (0, 0, {
+                                'activity_id': mapping_task_type.get(k)
+                            })
+                        )
+                SaleQuoteTmpl.create(order_template)
+            IRConfig.set_param('of.followup.migration', 'True')
+            # Deactivate view to hide migration button
+            self.env.ref('of_followup.view_sales_config_settings_followup').active = False
+        logger.info('_followup_data_migration END')
 
     stage_id = fields.Many2one(
         compute='_compute_stage_id', comodel_name='of.followup.project.stage', string=u"Etape de suivi", store=True,
@@ -216,8 +402,8 @@ class OFFollowupProject(models.Model):
                             alerts |= self.env.ref('of_followup.of_followup_project_alert_date')
                     else:
                         interventions = rec.order_id.intervention_ids.filtered(
-                            lambda i: i.tache_id.tache_categ_id.id in planif_planning_tache_categs.ids
-                                and i.state != 'cancel')
+                            lambda i:
+                            i.tache_id.tache_categ_id.id in planif_planning_tache_categs.ids and i.state != 'cancel')
                         if interventions:
                             intervention = interventions[-1]
                             if intervention.date_date != rec.manual_laying_date:
@@ -936,7 +1122,8 @@ class OFFollowupProjectTemplate(models.Model):
     _description = "Modèle de suivi des projets"
 
     name = fields.Char(string=u"Nom", required=True)
-    task_ids = fields.One2many(comodel_name='of.followup.project.tmpl.task', inverse_name='template_id', string=u"Tâches")
+    task_ids = fields.One2many(
+        comodel_name='of.followup.project.tmpl.task', inverse_name='template_id', string=u"Tâches")
     default = fields.Boolean(string=u"Modèle par défaut")
 
 
@@ -1042,7 +1229,7 @@ class SaleOrder(models.Model):
     def action_confirm(self):
         super(SaleOrder, self).action_confirm()
         for order in self:
-            order.with_context(auto_followup=True, followup_creator_id=self.env.user.id).sudo().\
+            order.with_context(auto_followup=True, followup_creator_id=self.env.user.id).sudo(). \
                 action_followup_project()
         return True
 

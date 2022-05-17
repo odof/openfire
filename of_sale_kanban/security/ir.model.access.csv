@@ -1,2 +1,3 @@
 "id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
-"access_of_sale_order_kanban","of.sale.order.kanban","model_of_sale_order_kanban","base.group_user",1,1,1,1
+"access_of_sale_order_kanban","of.sale.order.kanban","model_of_sale_order_kanban","base.group_user",1,0,0,0
+"access_of_sale_order_kanban_manager","access.of.sale.order.kanban.manager","model_of_sale_order_kanban",sales_team.group_sale_manager,1,1,1,1

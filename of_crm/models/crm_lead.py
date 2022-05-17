@@ -263,6 +263,33 @@ class CrmLead(models.Model):
             res['geo_lng'] = partner.geo_lng
         return res
 
+    def _of_get_fields_recompute_auto_activities(self):
+        """Helper function to return the list of fields that will trigger the recompute
+        the deadline date of activities"""
+        return ['of_date_projet', 'date_deadline']
+
+    @api.multi
+    def _of_update_deadline_date_activities(self, activity_fields=None):
+        """Recomputes the deadline date of activities linked to the Sale.
+        :param activity_fields: The list of fields that are updated to filter activities to update
+        :type activity_fields: list
+        """
+        if activity_fields is None:
+            activity_fields = []
+
+        field_name = {
+            'of_date_projet': 'project_date',
+            'date_deadline': 'decision_date'
+        }
+        activities_filter = [field_name.get(af) for af in activity_fields if field_name.get(af)]
+        for crm in self:
+            for crm_activity in crm.of_activity_ids.filtered(
+                    lambda ca:
+                    ca.state == 'planned' and ca.type_id and
+                    ca.type_id.of_compute_date in activities_filter and
+                    ca.type_id.of_automatic_recompute):
+                crm_activity.date = crm_activity._of_get_crm_activity_date_deadline()
+
     @api.model
     def create(self, vals):
         if not vals.get('partner_id'):
@@ -278,6 +305,14 @@ class CrmLead(models.Model):
             vals['partner_id'] = partner.id
             vals['of_check_duplications'] = True
         lead = super(CrmLead, self).create(vals)
+
+        # Check if the dict of values contains fields that will trigger the recompute of the deadline date of
+        # the activities.
+        activity_fields = filter(
+            lambda f: f, [f in self._of_get_fields_recompute_auto_activities() and f for f in vals.keys()])
+        if activity_fields:
+            lead._of_update_deadline_date_activities(activity_fields)
+
         return lead
 
     @api.multi
@@ -285,7 +320,7 @@ class CrmLead(models.Model):
         partner_vals = False
         if len(self._ids) == 1 and vals.get('partner_id', self.partner_id):
             vals, partner_vals = self._of_extract_partner_values(vals)
-        super(CrmLead, self).write(vals)
+        res = super(CrmLead, self).write(vals)
         if partner_vals:
             self.partner_id.write(partner_vals)
         if vals.get('stage_id') and not self._context.get('crm_stage_auto_update'):
@@ -304,8 +339,13 @@ class CrmLead(models.Model):
                     )
         if 'active' in vals:
             self.mapped('of_activity_ids').write({'active': vals['active']})
-
-        return True
+        # Check if the dict of values contains fields that will trigger the recompute of the deadline date of
+        # the activities.
+        activity_fields = filter(
+            lambda f: f, [f in self._of_get_fields_recompute_auto_activities() and f for f in vals.keys()])
+        if activity_fields:
+            self._of_update_deadline_date_activities(activity_fields)
+        return res
 
     # Recherche du code postal en mode préfixe
     @api.model
@@ -313,7 +353,7 @@ class CrmLead(models.Model):
         pos = 0
         while pos < len(args):
             if args[pos][0] == 'zip' and args[pos][1] in ('like', 'ilike') and args[pos][2]:
-                args[pos] = ('zip', '=like', args[pos][2]+'%')
+                args[pos] = ('zip', '=like', args[pos][2] + '%')
             pos += 1
         return super(CrmLead, self).search(args, offset=offset, limit=limit, order=order, count=count)
 
@@ -505,7 +545,9 @@ class OFCRMActivity(models.Model):
     active = fields.Boolean(string='Actif', default=True)
     title = fields.Char(string=u"Résumé", required=True, track_visibility="always")
     opportunity_id = fields.Many2one(comodel_name='crm.lead', string=u"Opportunité", required=True, ondelete='cascade')
-    type_id = fields.Many2one(comodel_name='crm.activity', string=u"Activité", required=True)
+    type_id = fields.Many2one(
+        comodel_name='crm.activity', string="Activity type", required=True,
+        domain=['|', ('of_object', '=', 'opportunity'), ('of_object', '=', False)])
     date = fields.Datetime(string=u"Date", required=True, track_visibility="always")
     state = fields.Selection(
         selection=[('planned', u"Planifiée"),
@@ -551,10 +593,13 @@ class OFCRMActivity(models.Model):
 
     @api.onchange('type_id')
     def _onchange_type_id(self):
-        if self.type_id and not self.title:
-            self.title = self.type_id.name
-        if self.type_id and self.type_id.days:
-            self.date = fields.Datetime.to_string(datetime.now() + timedelta(days=self.type_id.days))
+        if self.type_id:
+            if not self.title:
+                self.title = self.type_id.name
+            self.date = self._of_get_crm_activity_date_deadline()
+            self.description = self.type_id.description
+            if self.type_id.of_user_id:
+                self.vendor_id = self.type_id.of_user_id
 
     @api.multi
     def _compute_custom_colors(self):
@@ -565,6 +610,30 @@ class OFCRMActivity(models.Model):
             else:
                 activity.of_color_ft = "#0D0D0D"
                 activity.of_color_bg = "#F0F0F0"
+
+    @api.multi
+    def _of_get_crm_activity_date_deadline(self):
+        self.ensure_one()
+
+        if not self.type_id:
+            return False
+
+        compute_date = self.type_id.of_compute_date
+        days = self.type_id.days
+        field_name = {
+            'project_date': 'of_date_projet',
+            'decision_date': 'date_deadline'
+        }
+        crm_field = field_name.get(compute_date)
+        if crm_field:
+            ddate = getattr(self.opportunity_id, crm_field)
+            ddate = fields.Datetime.from_string(ddate)
+        else:
+            ddate = datetime.now()
+        if ddate:
+            delta = timedelta(days=days)
+            return ddate + delta
+        return False
 
     @api.multi
     def message_track(self, tracked_fields, initial_values):

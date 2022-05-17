@@ -4,7 +4,7 @@
     <record id="of_sale_planning_sale_order_form_view" model="ir.ui.view">
         <field name="name">of.sale.planning.sale.order.form.view</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="of_sale_report.of_sale_report_view_order_form_inherit_sale_stock"/>
+        <field name="inherit_id" ref="of_crm.of_crm_of_sale_report_view_order_form_inherit_sale_stock"/>
         <field name="arch" type="xml">
             <!-- Ajout du temps de pose prévisionnel sur les lignes de commande -->
             <xpath expr="//field[@name='order_line']/form/group/group[2]" position="inside">
@@ -16,6 +16,10 @@
             </xpath>
             <!-- Ajout onglet Chantier -->
             <xpath expr="//field[@name='of_date_de_pose']" position="replace"/>
+            <xpath expr="//field[@name='of_reference_laying_date']" position="replace"/>
+            <xpath expr="//field[@name='of_manual_laying_date']" position="replace"/>
+            <xpath expr="//field[@name='of_force_laying_date']" position="replace"/>
+            <xpath expr="//field[@name='of_laying_week']" position="replace"/>
             <xpath expr="//page[@name='notes']/separator[last()]" position="replace"/>
             <xpath expr="//page[@name='notes']/field[@name='of_notes_intervention']" position="replace"/>
             <xpath expr="//page[@name='notes']/div[last()]" position="replace"/>
@@ -30,6 +34,10 @@
                                 <span> h</span>
                             </div>
                             <field name="of_date_de_pose"/>
+                            <field name="of_reference_laying_date" attrs="{'invisible': [('of_force_laying_date', '!=', False)]}"/>
+                            <field name="of_manual_laying_date" attrs="{'invisible': [('of_force_laying_date', '=', False)]}"/>
+                            <field name="of_force_laying_date"/>
+                            <field name="of_laying_week"/>
                         </group>
                         <separator string="Notes intervention" colspan="2"/>
                         <field name="of_notes_intervention"  nolabel="1" widget="html"

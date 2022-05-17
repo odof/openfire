@@ -31,6 +31,8 @@ class SaleQuoteTemplate(models.Model):
     property_of_fiscal_position_id = fields.Many2one(
         'account.fiscal.position', string="Position fiscale", company_dependent=True)
     of_payment_term_id = fields.Many2one('account.payment.term', string="Conditions de règlement")
+    of_sale_quote_tmpl_activity_ids = fields.One2many(
+        comodel_name='of.sale.quote.tmpl.activity', inverse_name='template_id', string='Activities')
 
     @api.multi
     def copy(self, default=None):
@@ -104,7 +106,7 @@ class SaleQuoteTemplate(models.Model):
                 [('quote_id', '=', quote.id), ('parent_id', '=', False)]).sorted('sequence')
             for index, layout_category in enumerate(of_layout_category_ids):
                 layout_category.sequence = sequence
-                layout_category.sequence_name = str(index+1)
+                layout_category.sequence_name = str(index + 1)
 
                 # On calcul les séquences des sections enfants
                 layout_category.compute_childs_sequence_name()
@@ -278,7 +280,7 @@ class OfSaleQuoteTemplateLayoutCategory(models.Model):
 
         for index, line in enumerate(lines):
             line.sequence = sequence
-            line.sequence_name = str(index+1)
+            line.sequence_name = str(index + 1)
 
             # On calcule les séquences des sections enfants
             line.compute_childs_sequence_name()
@@ -337,7 +339,7 @@ class OfSaleQuoteTemplateLayoutCategory(models.Model):
 
         for index, layout_category in enumerate(of_layout_category_ids):
             layout_category.sequence = sequence
-            layout_category.sequence_name = u"%s.%s" % (self.sequence_name, str(index+1))
+            layout_category.sequence_name = u"%s.%s" % (self.sequence_name, str(index + 1))
 
             # On calcule les séquences des sections enfants
             layout_category.compute_childs_sequence_name()
@@ -712,7 +714,7 @@ class OfSaleOrderLayoutCategory(models.Model):
 
         for index, layout_category in enumerate(of_layout_category_ids):
             layout_category.sequence = sequence
-            layout_category.sequence_name = u"%s.%s" % (self.sequence_name, str(index+1))
+            layout_category.sequence_name = u"%s.%s" % (self.sequence_name, str(index + 1))
 
             # On calcule les séquences des sections enfants
             layout_category.compute_childs_sequence_name()
@@ -853,24 +855,26 @@ class SaleOrder(models.Model):
         if not self.of_template_id:
             return
         template = self.of_template_id.with_context(lang=self.partner_id.lang)
-        order_line_obj = self.env['sale.order.line']
+        OrderLine = self.env['sale.order.line']
+        OFSaleActivity = self.env['of.sale.activity']
 
         regime = self.env['ir.values'].get_default('sale.config.settings', 'of_quote_template')
         if regime == 'add':
             order_lines = self.order_line
         else:
-            order_lines = order_line_obj
+            order_lines = OrderLine
         inactif = False  # Permet de savoir si il y a un article inactif
-        product_obj = self.env['product.product']
-        product_warn_ids = product_obj
-        product_block_ids = product_obj
+        Product = self.env['product.product']
+        product_warn_ids = Product
+        product_block_ids = Product
         for line in template.quote_line:
             discount = 0
             if not line.of_active:
                 inactif = True
             else:
                 if self.pricelist_id:
-                    price = self.pricelist_id.with_context(uom=line.product_uom_id.id).get_product_price(line.product_id, 1, False)
+                    price = self.pricelist_id.with_context(uom=line.product_uom_id.id).get_product_price(
+                        line.product_id, 1, False)
                     if self.pricelist_id.discount_policy == 'without_discount' and line.price_unit:
                         discount = (line.price_unit - price) / line.price_unit * 100
                         price = line.price_unit
@@ -884,8 +888,9 @@ class SaleOrder(models.Model):
                         product_warn_ids |= line.product_id
                     data = self._get_data_from_template(line, price, discount)
                     if self.pricelist_id:
-                        data.update(self.env['sale.order.line']._get_purchase_price(self.pricelist_id, line.product_id, line.product_uom_id, fields.Date.context_today(self)))
-                    new_line = order_line_obj._new_line_for_template(data)
+                        data.update(OrderLine._get_purchase_price(
+                            self.pricelist_id, line.product_id, line.product_uom_id, fields.Date.context_today(self)))
+                    new_line = OrderLine._new_line_for_template(data)
                     if self.env.user.has_group('sale.group_sale_layout'):
                         if not new_line.layout_category_id and new_line.product_id.categ_id.of_layout_id:
                             new_line.layout_category_id = new_line.product_id.categ_id.of_layout_id
@@ -893,6 +898,14 @@ class SaleOrder(models.Model):
 
         self.order_line = order_lines
         self._compute_prices_from_template()
+
+        # add activities from the template
+        if template.of_sale_quote_tmpl_activity_ids:
+            sale_activities = OFSaleActivity
+            for activity in template.of_sale_quote_tmpl_activity_ids:
+                sale_activity = OFSaleActivity.new(activity._get_sale_activity_values(self))
+                sale_activities |= sale_activity
+            self.of_sale_activity_ids = sale_activities
 
         if template.note:
             self.note = template.note
@@ -910,7 +923,8 @@ class SaleOrder(models.Model):
             docs.append((4, doc.id))
         self.of_mail_template_ids = docs
         if inactif:  # @TODO : voir si peut être fait avec une fenêtre en javascript.
-            self.of_note_insertion = u"Un ou plusieurs articles du modèle ne sont plus utilisés ou ne peuvent être vendus et n'ont donc pas été importés."
+            self.of_note_insertion = u"Un ou plusieurs articles du modèle ne sont plus utilisés ou ne peuvent " \
+                u"être vendus et n'ont donc pas été importés."
         title = u""
         warning = {}
         if product_warn_ids and product_block_ids:
@@ -945,7 +959,7 @@ class SaleOrder(models.Model):
                 [('order_id', '=', order.id), ('parent_id', '=', False)]).sorted('sequence')
             for index, layout_category in enumerate(of_layout_category_ids):
                 layout_category.sequence = sequence
-                layout_category.sequence_name = str(index+1)
+                layout_category.sequence_name = str(index + 1)
 
                 # On calcul les séquences des sections enfants
                 layout_category.compute_childs_sequence_name()
@@ -977,7 +991,6 @@ class SaleOrder(models.Model):
     def load_sections(self):
         template = self.of_template_id.with_context(lang=self.partner_id.lang)
         order_line_obj = self.env['sale.order.line']
-        quote_line_obj = self.env['sale.quote.line']
         order_layout_category_obj = self.env['of.sale.order.layout.category']
         template_layout_category_obj = self.env['of.sale.quote.template.layout.category']
 
@@ -1101,7 +1114,8 @@ class SaleOrder(models.Model):
                     report_pages.append([])
                 # Append category to current report page
                 report_pages[-1].append({
-                    'name': category and "%s%s - %s" % ('&#160;' * 3 * category.depth, category.sequence_name, category.name) or _('Uncategorized'),
+                    'name': category and "%s%s - %s" % (
+                        '&#160;' * 3 * category.depth, category.sequence_name, category.name) or _('Uncategorized'),
                     'subtotal': category and category.prix_vente if len(list(lines)) else 0.0,
                     'pagebreak': False,
                     'lines': list(lines),
@@ -1260,7 +1274,8 @@ class AccountInvoice(models.Model):
                     report_pages.append([])
                 # Append category to current report page
                 report_pages[-1].append({
-                    'name': category and "%s%s - %s" % ('&#160;' * 3 * category.depth, category.sequence_name, category.name) or _('Uncategorized'),
+                    'name': category and "%s%s - %s" % (
+                        '&#160;' * 3 * category.depth, category.sequence_name, category.name) or _('Uncategorized'),
                     'subtotal': category and category.prix_vente if len(list(lines)) else 0.0,
                     'pagebreak': False,
                     'lines': list(lines),

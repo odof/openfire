@@ -49,14 +49,19 @@ Workflow CRM
         'of_base_location',
         'of_planning',
         'of_utm',
+        'of_service',
+        'of_sale_report',
+        'of_utils'
     ],
     'data': [
+        'data/data.xml',
         'security/ir.model.access.csv',
         'security/of_crm_security.xml',
-        'wizards/of_crm_activity_action_views.xml',
         'reports/of_crm_funnel_conversion_views.xml',
         'reports/sale_report_views.xml',
         'reports/account_invoice_report_views.xml',
+        'views/crm_activity_views.xml',
+        'views/of_sale_activity_views.xml',
         'views/crm_lead_views.xml',
         'views/sale_order_views.xml',
         'views/partner_views.xml',
@@ -64,8 +69,10 @@ Workflow CRM
         'views/of_planning_intervention_views.xml',
         'views/of_sale_objective_views.xml',
         'views/of_crm_templates.xml',
-        'reports/of_crm_fiche_rdv_report_view.xml',
-        'data/data.xml',
+        'views/of_sale_followup_tag_views.xml',
+        'wizards/of_add_attachment_activity_views.xml',
+        'wizards/of_crm_activity_action_views.xml',
+        'reports/of_crm_fiche_rdv_report_view.xml'
     ],
     'qweb': [
         'static/src/xml/of_sales_team_dashboard.xml',
