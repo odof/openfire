@@ -590,6 +590,25 @@ class StockPicking(models.Model):
             else:
                 picking.of_min_week = ""
 
+    @api.multi
+    def get_sale_value(self):
+        self.ensure_one()
+
+        amount = 0.0
+        kit_line_ids = []
+        for line in self.move_lines:
+            if line.procurement_id.sale_line_id:
+                amount += line.procurement_id.sale_line_id.of_price_unit_ttc * line.product_uom_qty
+            elif line.procurement_id.of_sale_comp_id and \
+                    line.procurement_id.of_sale_comp_id.kit_id.order_line_id.id not in kit_line_ids:
+                amount += line.procurement_id.of_sale_comp_id.kit_id.order_line_id.price_total
+                kit_line_ids.append(line.procurement_id.of_sale_comp_id.kit_id.order_line_id.id)
+
+        if amount:
+            currency = self.move_lines.mapped('procurement_id').mapped('sale_line_id').mapped('order_id')[0].currency_id
+            return currency.round(amount)
+        return amount
+
 
 class PackOperation(models.Model):
     _inherit = "stock.pack.operation"
