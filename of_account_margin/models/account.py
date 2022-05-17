@@ -9,6 +9,9 @@ class AccountInvoice(models.Model):
 
     of_margin = fields.Float(compute='_compute_of_margin', string=u"Marge", digits=dp.get_precision('Product Price'))
     of_margin_perc = fields.Float(compute='_compute_of_margin', string=u"Marge %")
+    of_margin_deposit_excl = fields.Float(
+        compute='_compute_of_margin', string=u"Marge hors acompte (en €)", digits=dp.get_precision('Product Price'))
+    of_margin_deposit_excl_perc = fields.Float(compute='_compute_of_margin', string=u"Marge hors acompte (en %)")
 
     @api.depends('invoice_line_ids')
     def _compute_of_margin(self):
@@ -17,6 +20,17 @@ class AccountInvoice(models.Model):
                 invoice.of_margin = sum(invoice.invoice_line_ids.mapped('of_margin'))
                 cost = invoice.amount_untaxed - invoice.of_margin
                 invoice.of_margin_perc = 100 * (1 - cost / invoice.amount_untaxed) if invoice.amount_untaxed else -100
+
+                # Acompte exclus
+                deposit_categ_id = self.env['ir.values'].get_default(
+                    'sale.config.settings', 'of_deposit_product_categ_id_setting')
+                lines_deposit_excl = invoice.invoice_line_ids.filtered(
+                    lambda l: l.product_id.categ_id.id != deposit_categ_id)
+                invoice.of_margin_deposit_excl = sum(lines_deposit_excl.mapped('of_margin'))
+                amount_untaxed_deposit_excl = sum(lines_deposit_excl.mapped('price_subtotal'))
+                cost_deposit_excl = amount_untaxed_deposit_excl - invoice.of_margin_deposit_excl
+                invoice.of_margin_deposit_excl_perc = 100 * (1 - cost_deposit_excl / amount_untaxed_deposit_excl) \
+                    if amount_untaxed_deposit_excl else -100
 
 
 class AccountInvoiceLine(models.Model):
@@ -55,9 +69,9 @@ class AccountInvoiceLine(models.Model):
                 sale_qty = line.sale_line_ids.product_uom_qty
                 if sale_qty and purchase_qty < sale_qty:
                     cost = ((purchase_cost * purchase_qty) +
-                            (line.product_id.standard_price * (sale_qty - purchase_qty))) / sale_qty
+                            (line.sale_line_ids.purchase_price * (sale_qty - purchase_qty))) / sale_qty
                     purchase_price = ((purchase_unit_price * purchase_qty) +
-                                      (line.product_id.of_seller_price * (sale_qty - purchase_qty))) / sale_qty
+                                      (line.sale_line_ids.of_seller_price * (sale_qty - purchase_qty))) / sale_qty
                 else:
                     cost = purchase_cost
                     purchase_price = purchase_unit_price

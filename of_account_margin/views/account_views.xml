@@ -10,6 +10,8 @@
                 <group attrs="{'invisible': [('type', 'not in', ['out_invoice', 'out_refund'])]}">
                     <field name="of_margin" groups="of_sale.of_group_sale_marge_manager" widget="monetary"/>
                     <field name="of_margin_perc" groups="of_sale.of_group_sale_marge_manager"/>
+                    <field name="of_margin_deposit_excl" groups="of_sale.of_group_sale_marge_manager" widget="monetary"/>
+                    <field name="of_margin_deposit_excl_perc" groups="of_sale.of_group_sale_marge_manager"/>
                 </group>
             </xpath>
             <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='price_unit']" position="after">
