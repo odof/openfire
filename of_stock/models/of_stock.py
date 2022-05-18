@@ -339,6 +339,7 @@ class Inventory(models.Model):
     of_option = fields.Boolean('Peut forcer la date', compute="_compute_of_option")
     category_child_ids = fields.Many2many(
         string=u"Catégories filles", comodel_name='product.category', compute='_compute_category_child_ids')
+    of_performance_mode = fields.Boolean(string=u"Mode performance")
 
     @api.depends('company_id')
     def _compute_of_option(self):
@@ -371,6 +372,8 @@ class Inventory(models.Model):
 
     @api.multi
     def action_done(self):
+        if self.of_performance_mode:
+            self.toggle_mode()
         inventory_date = self.env['ir.values'].get_default('stock.config.settings', 'of_forcer_date_inventaire')
         self = self.with_context(inventory_date=inventory_date)
         if self._uid != SUPERUSER_ID:
@@ -447,6 +450,10 @@ class Inventory(models.Model):
     @api.multi
     def action_control(self):
         self.ensure_one()
+
+        if self.of_performance_mode:
+            self.toggle_mode()
+
         title = u"ATTENTION !!!\n\nCertaines lignes de l'inventaire vont empêcher sa validation.\n\n" \
                 u"Voici une liste d'erreurs bloquantes :\n\n"
         message = u""
@@ -487,6 +494,16 @@ class Inventory(models.Model):
         else:
             raise UserError(u"Tout semble correct.")
 
+    @api.multi
+    def toggle_mode(self):
+        for record in self:
+            record.of_performance_mode = not record.of_performance_mode
+            # On provoque le recalcul des champs quand on repasse en mode normal
+            if not record.of_performance_mode:
+                for line in record.line_ids:
+                    line._compute_theoretical_qty()
+                    line._onchange_product_info()
+
 
 class InventoryLine(models.Model):
     _inherit = "stock.inventory.line"
@@ -506,8 +523,8 @@ class InventoryLine(models.Model):
 
     of_note = fields.Text(string="Notes")
     of_theoretical_qty = fields.Float(string=u"Quantité théorique")
-    of_product_lot_serial_management = fields.Boolean(
-        related='product_id.of_lot_serial_management', string=u"Géré par lot/num. de série", readonly=True, store=True)
+    of_product_lot_serial_management = fields.Boolean(string=u"Géré par lot/num. de série")
+    of_product_lot_serial_management_copy = fields.Boolean(string=u"Géré par lot/num. de série (champ technique)")
     of_inventory_gap = fields.Float(string=u"Écart d'inventaire", compute='_compute_of_inventory_gap', store=True)
 
     @api.depends('of_theoretical_qty', 'product_qty')
@@ -531,6 +548,8 @@ class InventoryLine(models.Model):
 
     @api.onchange('product_id', 'product_qty')
     def _onchange_product_id_or_qty(self):
+        if self.product_id and self.product_id.tracking != 'none':
+            self.of_product_lot_serial_management = self.of_product_lot_serial_management_copy = True
         qty = self.product_qty
         if self.product_id and self.product_id.tracking == 'serial' and \
                 float_compare(qty, 0.0, 0) and float_compare(qty, 1.0, 0):
@@ -545,8 +564,16 @@ class InventoryLine(models.Model):
 
     @api.model
     def create(self, values):
+        if 'of_product_lot_serial_management_copy' in values:
+            values.update({'of_product_lot_serial_management': values.get('of_product_lot_serial_management_copy')})
         # Retrait de la contrainte sur les lignes d'inventaire
         return super(InventoryLine, self.with_context(of_inventory_line_check_double=False)).create(values)
+
+    @api.multi
+    def write(self, vals):
+        if 'of_product_lot_serial_management_copy' in vals:
+            vals.update({'of_product_lot_serial_management': vals.get('of_product_lot_serial_management_copy')})
+        return super(InventoryLine, self).write(vals)
 
     @api.model
     def _of_get_groupby_params(self):
@@ -631,6 +658,8 @@ class InventoryLine(models.Model):
     @api.depends('location_id', 'product_id', 'package_id', 'product_uom_id', 'company_id', 'prod_lot_id', 'partner_id',
                  'inventory_id.date')
     def _compute_theoretical_qty(self):
+        if self.inventory_id.of_performance_mode:
+            return
         if not self.env['ir.values'].get_default('stock.config.settings', 'of_forcer_date_inventaire'):
             return super(InventoryLine, self)._compute_theoretical_qty()
         theoretical_qty = self.of_get_stock_history()[0]
@@ -642,6 +671,8 @@ class InventoryLine(models.Model):
         'location_id', 'product_id', 'package_id', 'product_uom_id', 'company_id', 'prod_lot_id', 'partner_id',
         'inventory_id.date')
     def _onchange_product_info(self):
+        if self[0].inventory_id.of_performance_mode:
+            return
         for line in self:
             # Dans un onchange, l'appel d'un champ compute force son recalcul même s'il est stored.
             self.of_theoretical_qty = line.theoretical_qty

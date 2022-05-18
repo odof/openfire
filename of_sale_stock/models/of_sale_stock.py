@@ -133,6 +133,16 @@ class StockInventory(models.Model):
                 vals['product_value_unit'] = product.standard_price
         return res
 
+    @api.multi
+    def toggle_mode(self):
+        super(StockInventory, self).toggle_mode()
+        for record in self:
+            # On provoque le recalcul des champs quand on repasse en mode normal
+            if not record.of_performance_mode:
+                for line in record.line_ids:
+                    line._compute_product_value()
+                    line._onchange_product_id()
+
 
 class StockInventoryLine(models.Model):
     _inherit = "stock.inventory.line"
@@ -157,6 +167,8 @@ class StockInventoryLine(models.Model):
 
     @api.depends('product_value_unit', 'product_qty')
     def _compute_product_value(self):
+        if self[0].inventory_id.of_performance_mode:
+            return
         if self.env.user.has_group('of_sale_stock.group_of_inventory_real_value'):
             if not self.env['ir.values'].get_default('stock.config.settings', 'of_forcer_date_inventaire'):
                 for line in self:
@@ -170,6 +182,8 @@ class StockInventoryLine(models.Model):
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
+        if self.inventory_id.of_performance_mode:
+            return
         if self.product_id:
             self.product_value_unit = self.product_id.standard_price
         else:

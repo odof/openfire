@@ -9,6 +9,13 @@
             <xpath expr="//header/button[@name='action_done']" position="after">
                 <button name="action_control" states="confirm" string="Contrôler" type="object" class="oe_highlight" groups="stock.group_stock_manager"/>
             </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="toggle_mode" type="object" class="oe_stat_button" icon="fa-dashboard">
+                    <field name="of_performance_mode" widget="boolean_button"
+                           options="{'terminology': {'string_true': 'Mode performance',
+                                                     'string_false': 'Mode normal'}}"/>
+                </button>
+            </xpath>
             <button name="reset_real_qty" position="attributes">
                 <attribute name="confirm">Voulez-vous réellement mettre les quantités à zéro ?</attribute>
             </button>
@@ -39,7 +46,8 @@
                 <field name="of_note"/>
             </xpath>
             <xpath expr="//notebook//field[@name='line_ids']/tree/field[@name='prod_lot_id']" position="before">
-                <field name="of_product_lot_serial_management"/>
+                <field name="of_product_lot_serial_management_copy" invisible="1"/>
+                <field name="of_product_lot_serial_management" readonly="1"/>
             </xpath>
             <xpath expr="//notebook//field[@name='line_ids']/tree/field[@name='prod_lot_id']" position="attributes">
                 <attribute name="attrs">{'required': [('of_product_lot_serial_management', '=', True)]}</attribute>
