@@ -294,7 +294,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
         compute='_compute_historique_interv_ids',
         help=u"Historique des RDVs du parc installé. Si pas de parc installé, historique de l'adresse")
     template_id = fields.Many2one(comodel_name='of.planning.intervention.template', string=u"Modèle d'intervention")
-    number = fields.Char(String=u"Numéro", copy=False)
+    number = fields.Char(string=u"Numéro", copy=False)
     titre = fields.Char(string=u"Titre")
     priority = fields.Selection(
         [
