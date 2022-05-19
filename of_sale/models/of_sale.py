@@ -603,6 +603,7 @@ class SaleOrder(models.Model):
                 tax = tax_obj.browse(tax_val['id'])
                 key = tax.get_grouping_key(val)
 
+                val['amount'] += val['base'] - round_curr(val['base'])
                 if key not in tax_grouped:
                     tax_grouped[key] = val
                     tax_grouped[key]['name'] = tax.description or tax.name
