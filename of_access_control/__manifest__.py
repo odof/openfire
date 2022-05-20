@@ -18,6 +18,7 @@ Module de modification des droits
         'of_followup',
         'of_service',
         'of_parc_installe',
+        'of_questionnaire',
         'of_sale',
         'of_user_profile',
     ],

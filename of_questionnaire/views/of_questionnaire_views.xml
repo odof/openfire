@@ -217,12 +217,31 @@
         </field>
     </record>
 
+    <record id="of_questionnaire_line_reponse_view_tree" model="ir.ui.view">
+        <field name="name">of.questionnaire.line.reponse.view.tree</field>
+        <field name="model">of.questionnaire.line.reponse</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="sequence"/>
+            </tree>
+        </field>
+    </record>
+
     <record id="action_of_questionnaire_line" model="ir.actions.act_window">
         <field name="name">Questions</field>
         <field name="res_model">of.questionnaire.line</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="of_questionnaire.of_questionnaire_line_view_tree"/>
+    </record>
+
+    <record id="action_of_questionnaire_line_reponse" model="ir.actions.act_window">
+        <field name="name">Réponses</field>
+        <field name="res_model">of.questionnaire.line.reponse</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_questionnaire.of_questionnaire_line_reponse_view_tree"/>
     </record>
 
 <!-- *************************** Catégorie de question ***************************-->
@@ -265,17 +284,36 @@
         <field name="view_id" ref="of_questionnaire.of_questionnaire_line_category_view_tree"/>
     </record>
 
-<!-- *************************** Questions ***************************-->
+<!-- *************************** Réponses ***************************-->
 
     <record id="of_questionnaire_line_reponse_view_form" model="ir.ui.view">
         <field name="name">of.questionnaire.line.reponse.view.form</field>
         <field name="model">of.questionnaire.line.reponse</field>
         <field name="arch" type="xml">
             <form>
-                <field name="name"/>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object"
+                                class="oe_stat_button" icon="fa-archive"
+                                confirm="Êtes-vous sûr de vouloir archiver/activer cette réponse ?">
+                            <field name="active" widget="boolean_button"
+                                options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label class="oe_edit_only" for="name"/>
+                        <h1><field name="name" placeholder="Nom de la Réponse"/></h1>
+                    </div>
+                    <group>
+                        <group string="Infos">
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                </sheet>
             </form>
         </field>
     </record>
+
 
 <!-- *************************** Questions d'intervention ***************************-->
 
@@ -398,6 +436,7 @@
     <menuitem name="Questionnaires" id="menu_of_questionnaire" parent="of_questionnaire.menu_of_questionnaire_config" sequence="10" action="action_of_questionnaire"/>
     <menuitem name="Catégorie de question" id="menu_of_questionnaire_line_category" parent="of_questionnaire.menu_of_questionnaire_config" sequence="20" action="action_of_questionnaire_line_category"/>
     <menuitem name="Questions" id="menu_of_questionnaire_line" parent="of_questionnaire.menu_of_questionnaire_config" sequence="30" action="action_of_questionnaire_line"/>
+    <menuitem name="Réponses" id="menu_of_questionnaire_line_reponse" parent="of_questionnaire.menu_of_questionnaire_config" sequence="40" action="action_of_questionnaire_line_reponse"/>
 
 <!-- *************************** Interventions ***************************-->
 
