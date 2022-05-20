@@ -938,6 +938,9 @@ class OfDatastoreCentralized(models.AbstractModel):
                 # --- Champs spéciaux ---
                 vals['of_datastore_has_link'] = bool(product)
 
+                # Dans certains cas on ne veut pas de mise à jour du coût des articles
+                vals.pop('standard_price', False)
+
                 # Prix d'achat/vente
                 vals.update(brand.compute_product_price(
                     vals['of_seller_pp_ht'], categ_name, obj_dict['uom_id'], obj_dict['uom_po_id'], product=product,
@@ -949,7 +952,8 @@ class OfDatastoreCentralized(models.AbstractModel):
                         (vals['of_seller_pp_ht'] - vals['of_seller_price']) * 100 / vals['of_seller_pp_ht']
                 if 'marge' in fields_to_read:
                     vals['marge'] =\
-                        vals['list_price'] and (vals['list_price'] - vals['standard_price']) * 100 / vals['list_price']
+                        vals['list_price'] and\
+                        (vals['list_price'] - vals.get('standard_price', 0)) * 100 / vals['list_price']
 
                 # Suppression des valeurs non voulues
                 # Suppression désactivée ... après tout, c'est calculé maintenant, autant le garder en cache
