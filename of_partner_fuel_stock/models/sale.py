@@ -6,6 +6,13 @@ from odoo import models, fields, api
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    def _get_data_from_template(self, line, price, discount):
+        values = super(SaleOrder, self)._get_data_from_template(line, price, discount)
+        values.update({
+            'of_storage': line.of_storage,
+        })
+        return values
+
     @api.multi
     def action_confirm(self):
         """
