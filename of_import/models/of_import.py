@@ -284,9 +284,12 @@ class OFProductBrand(models.Model):
             'fr_d': product and product.of_misc_costs or 0,
         }
 
-        price_fields = (('of_import_remise', 'remise', 'la remise'),
-                        ('of_import_price', 'list_price', 'le prix de vente HT'),
-                        ('of_import_cout', 'standard_price', u'le coût'))
+        price_fields = [
+            ('of_import_remise', 'remise', 'la remise'),
+            ('of_import_price', 'list_price', 'le prix de vente HT'),
+        ]
+        if not product or product.cost_method == 'standard':
+            price_fields.append(('of_import_cout', 'standard_price', u'le coût'))
         values = {}
         for config_field, product_field, text in price_fields:
             for obj in (product, categ_config, self):
