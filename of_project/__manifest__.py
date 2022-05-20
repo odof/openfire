@@ -37,6 +37,8 @@ Modifications
     'depends': [
         'hr_timesheet',
         'of_base',
+        'of_planning',
+        'of_planning_tournee',
         'project',
         'project_timeline',
         'project_task_category',
@@ -53,10 +55,12 @@ Modifications
         ],
     'data': [
         'security/ir.model.access.csv',
+        'security/of_project_security.xml',
         'views/of_project_views.xml',
         'views/of_sale_views.xml',
         'views/res_partner_views.xml',
         'views/res_config_views.xml',
+        'views/of_planning_intervention_views.xml',
     ],
     'installable': True,
     'application': False,

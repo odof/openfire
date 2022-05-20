@@ -4,6 +4,7 @@ from odoo import models, fields, api
 from datetime import datetime
 import json
 from odoo import SUPERUSER_ID
+from odoo.tools.safe_eval import safe_eval
 
 
 class OfProjectStage(models.Model):
@@ -40,6 +41,7 @@ class Project(models.Model):
     of_tag_ids = fields.Many2many(comodel_name='project.tags', string=u"Étiquettes")
     of_task_total_priority = fields.Integer(
         string=u"Priorité totale des tâches", compute='_compute_of_task_total_priority', store=True)
+    of_planned_hours = fields.Float(string=u"Durée Prévue", compute='_compute_planned_hours')
 
     @api.depends('task_ids', 'task_ids.stage_id', 'task_ids.stage_id.state')
     def _compute_of_state(self):
@@ -79,6 +81,11 @@ class Project(models.Model):
         """
         for project in self:
             project.of_task_total_priority = sum(project.task_ids.mapped(lambda t: int(t.priority)))
+
+    @api.depends('task_ids', 'task_ids.planned_hours')
+    def _compute_planned_hours(self):
+        for project in self:
+            project.of_planned_hours = sum(project.task_ids.mapped('planned_hours'))
 
     @api.onchange('of_sale_id')
     def _onchange_of_sale_id(self):
@@ -124,14 +131,35 @@ class ProjectTask(models.Model):
     of_participant_ids = fields.Many2many('res.users', string=u"Participants")
     of_dependencies = fields.Text(string=u"Dépendances", compute='_compute_of_dependencies')
     of_participants = fields.Text(string=u"Participants", compute='_compute_of_participants')
+    of_intervention_count = fields.Integer(string=u"RDV", compute='_compute_of_intervention_ids')
+    of_intervention_ids = fields.One2many(
+        comodel_name='of.planning.intervention', inverse_name='task_id',
+        string=u"RDV", compute='_compute_of_intervention_ids')
+
+    @api.multi
+    def action_view_interventions(self):
+        action = self.env.ref('of_project.of_project_open_interventions').read()[0]
+        if len(self._ids) == 1:
+            context = safe_eval(action['context'])
+            context.update({
+                'default_address_id': self.partner_id and self.partner_id.id or False,
+                'default_task_id': self.id,
+            })
+            if self.of_intervention_ids:
+                context['force_date_start'] = self.of_intervention_ids[-1].date_date
+                context['search_default_task_id'] = self.id
+            action['context'] = str(context)
+        action = self.mapped('of_intervention_ids').get_action_views(self, action)
+        return action
 
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
-        # On modifie la fonction _read_group_stage_ids pour enlever le search_domain = [('id', 'in', stages.ids)]
-        # Car on veut les étapes kanban, y compris celles qui n'ont pas de tâche
-        search_domain = []
+        # On modifie la fonction _read_group_stage_ids pour ajouter les étapes qui doivent être visibles mêmes si vides
+        visible_stages = self.env['project.task.type'].search([('of_visible_if_empty', '=', True)])
+        stages += visible_stages
+        search_domain = [('id', 'in', stages.ids)]
         if 'default_project_id' in self.env.context:
-            search_domain = [('project_ids', '=', self.env.context['default_project_id'])]
+            search_domain = ['|', ('project_ids', '=', self.env.context['default_project_id'])] + search_domain
 
         stage_ids = stages._search(search_domain, order=order, access_rights_uid=SUPERUSER_ID)
         return stages.browse(stage_ids)
@@ -151,6 +179,14 @@ class ProjectTask(models.Model):
             for dependency in task.dependency_task_ids:
                 dependencies.append({'id': dependency.id, 'name': dependency.code})
             task.of_dependencies = json.dumps(dependencies) if dependencies else False
+
+    @api.depends()
+    def _compute_of_intervention_ids(self):
+        """ Calcule du nombre de RDVs d'interventions liées à la tâche """
+        intervention_obj = self.env['of.planning.intervention']
+        for task in self:
+            task.of_intervention_ids = intervention_obj.search([('task_id', '=', task.id)])
+            task.of_intervention_count = len(task.of_intervention_ids)
 
     @api.multi
     def name_get(self):
@@ -188,3 +224,48 @@ class ProjectTask(models.Model):
                 'context': self._context,
             }
             return action
+
+    @api.model
+    def create(self, vals):
+        res = super(ProjectTask, self).create(vals)
+        if 'of_participant_ids' in vals or 'user_id' in vals:
+            user_obj = self.env['res.users']
+            user_ids = []
+            if 'of_participant_ids' in vals and vals['of_participant_ids'][0][2]:
+                user_ids += vals['of_participant_ids'][0][2]
+            if 'user_id' in vals and vals['user_id']:
+                user_ids += [vals['user_id']]
+            users = user_obj.browse(user_ids)
+            if users:
+                for task in res:
+                    if any(user.id not in task.project_id.members.ids for user in users):
+                        task.project_id.members = [(6, 0, task.project_id.members.ids + users.ids)]
+        return res
+
+    @api.multi
+    def write(self, vals):
+        if 'stage_id' in vals:
+            stage = self.env['project.task.type'].browse(vals['stage_id'])
+            if stage.state == 'done':
+                vals.update({'date_end': datetime.now()})
+        if 'of_participant_ids' in vals or 'user_id' in vals:
+            user_obj = self.env['res.users']
+            user_ids = []
+            if 'of_participant_ids' in vals and vals['of_participant_ids'][0][2]:
+                user_ids += vals['of_participant_ids'][0][2]
+            if 'user_id' in vals and vals['user_id']:
+                user_ids += [vals['user_id']]
+            users = user_obj.browse(user_ids)
+            if users:
+                for task in self:
+                    if any(user.id not in task.project_id.members.ids for user in users):
+                        task.project_id.members = [(6, 0, task.project_id.members.ids + users.ids)]
+        return super(ProjectTask, self).write(vals)
+
+
+class ProjectTaskType(models.Model):
+    _inherit = 'project.task.type'
+
+    of_visible_if_empty = fields.Boolean(
+        string=u"Visible même si vide", default=True,
+        help=u"La colonne de cette étape n'est pas affichée si elle est vide")

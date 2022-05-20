@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_rdv_intervention_wizard" model="ir.ui.view">
+        <field name="name">of.project.sale.order.view.rdv.intervention.wizard</field>
+        <field name="model">of.tournee.rdv</field>
+        <field name="inherit_id" ref="of_planning_tournee.view_rdv_intervention_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='service_id']" position="before">
+                <field name="task_id" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
