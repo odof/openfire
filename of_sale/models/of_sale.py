@@ -3,6 +3,7 @@
 from odoo import models, fields, api, _
 import odoo.addons.decimal_precision as dp
 from odoo.addons.sale.models.sale import SaleOrderLine as SOL
+from odoo.addons.sale.models.sale import SaleOrder as SO
 from odoo.tools import float_compare, float_is_zero
 from odoo.exceptions import UserError
 from odoo.models import regex_order
@@ -38,6 +39,19 @@ def product_uom_change(self):
 
 
 SOL.product_uom_change = product_uom_change
+
+
+@api.onchange('fiscal_position_id')
+def _compute_tax_id(self):
+    """
+    La fonction est appelée compute mais est en réalité un onchange. Surcharge pour ne pas réaffecter les taxes
+    sur des lignes ayant déjà été facturées
+    """
+    for order in self:
+        order.order_line.filtered(lambda l: not l.invoice_lines)._compute_tax_id()
+
+
+SO._compute_tax_id = _compute_tax_id
 
 
 class OfDocumentsJoints(models.AbstractModel):

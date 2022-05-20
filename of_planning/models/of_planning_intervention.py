@@ -1273,6 +1273,15 @@ class OfPlanningIntervention(models.Model):
             else:
                 self.fiscal_position_id = False
 
+    @api.onchange('fiscal_position_id')
+    def _onchange_fiscal_position_id(self):
+        """
+        Modification des taxes affectées aux ligne de l'intervention lors du changement de position fiscale.
+        Exceptions pour les lignes déjà facturées ou liées à une commande, celles-ci doivent concerver leurs taxes.
+        """
+        if self.fiscal_position_id:
+            self.line_ids.filtered(lambda l: not l.order_line_id and not l.invoice_line_ids)._compute_tax_id()
+
     # Héritages
 
     @api.multi
@@ -2064,6 +2073,13 @@ class OfPlanningInterventionLine(models.Model):
                 line.invoice_status = 'invoiced'
             else:
                 line.invoice_status = 'no'
+
+    @api.multi
+    def _compute_tax_id(self):
+        for line in self:
+            fpos = line.intervention_id.fiscal_position_id
+            taxes = line.company_id._of_filter_taxes(line.product_id.taxes_id)
+            line.taxe_ids = fpos and fpos.map_tax(taxes, line.product_id, line.intervention_id.address_id) or taxes
 
     @api.model
     def create(self, vals):
