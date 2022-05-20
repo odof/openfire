@@ -608,7 +608,8 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
                 })
                 self.line_ids |= new_line
                 self.line_ids.compute_taxes()
-        self.duree = self.tache_id.duree
+            if not self.duree:
+                self.duree = self.tache_id.duree
         self.date_fin = self.get_fin_date()
 
     @api.onchange('date_next')

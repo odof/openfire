@@ -1179,7 +1179,7 @@ class OfPlanningIntervention(models.Model):
         if self.tache_id:
             tache_accounting = self.tache_id.sudo().with_context(
                 force_company=self.company_id.id or self.env.user.company_id.id)
-            if self.tache_id.duree and not self._context.get('of_inhiber_maj_duree'):
+            if not self.duree and self.tache_id.duree and not self._context.get('of_inhiber_maj_duree'):
                 self.duree = self.tache_id.duree
             # on change la position fiscale par celle de la tache
             # si celle présente n'est pas sur la société du RDV ou si il n'y en a pas
