@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_account_bank_reconciliation_multicompany_rule" model="ir.rule">
+        <field name="name">OF Account bank reconciliation company rule</field>
+        <field name="model_id" ref="of_account_bank_reconciliation.model_of_account_bank_reconciliation"/>
+        <field name="global" eval="True"/>
+        <!--règle demandée-->
+        <!--Si entité comptable (société) : voir rapprochements bancaires des sociétés / magasins enfants-->
+        <!--Si entité non comptable (magasin) : voir rapprochements affectées à ma société comptable de rattachement-->
+        <field name="domain_force">['|',('company_id','=',False),('company_id',user.company_id.accounting_company_id.id == user.company_id.id and 'child_of' or 'in',[user.company_id.accounting_company_id.id])]</field>
+    </record>
+
+</odoo>
