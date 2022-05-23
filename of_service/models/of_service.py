@@ -1,17 +1,17 @@
 # -*- encoding: utf-8 -*-
 
-from odoo import api, models, fields, _
-from datetime import date
-from datetime import timedelta
+from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import WEEKLY
-from odoo.tools.safe_eval import safe_eval
-from odoo.exceptions import UserError
-from odoo.addons.of_utils.models.of_utils import se_chevauchent
-from odoo.addons.of_utils.models.of_utils import format_date
-import odoo.addons.decimal_precision as dp
-
 import math
+
+from odoo import api, models, fields, _
+from odoo.exceptions import UserError
+from odoo.tools import float_compare
+from odoo.tools.safe_eval import safe_eval
+
+import odoo.addons.decimal_precision as dp
+from odoo.addons.of_utils.models.of_utils import format_date, se_chevauchent
 
 
 class OfService(models.Model):
@@ -158,7 +158,7 @@ class OfService(models.Model):
          ('done', u'Fait'),  # intervention(s) et durée restante == 0 et date de fin dépassée
          ('during', u"RDV en cours"),
          ('cancel', u'Annulée')],  # manuellement décidé
-        u'État', compute="_compute_state_poncrec", search="_search_state_ponc")
+        u'État', compute='_compute_state_poncrec', store=True)
     intervention_ids = fields.One2many('of.planning.intervention', 'service_id', string="RDVs Tech")
     intervention_count = fields.Integer(string='Nombre de RDVs', compute='_compute_intervention_count')
 
@@ -173,8 +173,7 @@ class OfService(models.Model):
     address_phone = fields.Char(related='address_id.phone', string=u"Téléphone", readonly=1)
     address_mobile = fields.Char(related='address_id.mobile', string=u"Mobile", readonly=1)
     secteur_tech_id = fields.Many2one(
-        related='address_id.of_secteur_tech_id', readonly=True, search="_search_secteur_tech_id")
-    #tag_ids = fields.Many2many('of.service.tag', string=u"Étiquettes")
+        related='address_id.of_secteur_tech_id', readonly=True)
     tag_ids = fields.Many2many(
         string=u"Étiquettes", comodel_name='of.planning.tag', relation='of_service_of_planning_tag_rel',
         column1='service_id', column2='tag_id')
@@ -190,14 +189,14 @@ class OfService(models.Model):
     tache_id = fields.Many2one('of.planning.tache', string=u'Tâche', required=True)
     tache_categ_id = fields.Many2one(related="tache_id.tache_categ_id", readonly=True)
     duree = fields.Float(string=u"Durée estimée")
-    duree_planif = fields.Float(string=u"Durée planifiée", compute="_compute_durees")
-    duree_restante = fields.Float(string=u"Durée restante", compute="_compute_durees", search='_search_duree_restante')
+    duree_planif = fields.Float(string=u"Durée planifiée", compute='_compute_durees', store=True)
+    duree_restante = fields.Float(string=u"Durée restante", compute='_compute_durees', store=True)
     date_next = fields.Date(
         string="Prochaine planif", help=u"Date à partir de laquelle programmer le prochain RDV", required=True)
     date_next_last = fields.Date('Prochaine planif (svg)', help=u"Champ pour conserver une possibilité de rollback")
     date_fin = fields.Date(
         string=u"Date de fin de planification",
-        help=u"Date à partir de laquelle l'intervention devient en retard de planifiaction")
+        help=u"Date à partir de laquelle l'intervention devient en retard de planification")
     date_fin_contrat = fields.Date(u"Date de fin de contrat")
     jour_ids = fields.Many2many(
         'of.jours', 'service_jours', 'service_id', 'jour_id', string='Jours',
@@ -231,7 +230,7 @@ class OfService(models.Model):
     tache_name = fields.Char(related="tache_id.name", readonly=True)  # Vue Map
     color = fields.Char(compute='_compute_color', string='Couleur', store=False)  # Vue Map, Liste
     date_last = fields.Date(
-        string=u'Dernier RDV', compute='_compute_durees', search='_search_last_date',
+        string=u'Dernier RDV', compute='_compute_durees', store=True,
         help=u"Date du dernier RDV en date. Ne prend pas en compte les RDVs annulés ni reportés")  # Vue liste
 
     # Champs de recherche
@@ -321,18 +320,15 @@ class OfService(models.Model):
             service.name = tache_name + " " + partner_name + " " + address_zip
 
     @api.multi
-    @api.depends('date_next', 'date_fin_contrat', 'duree', 'base_state', 'recurrence', 'intervention_ids')
+    @api.depends(
+        'date_next', 'date_fin_contrat', 'duree', 'base_state', 'recurrence', 'date_last', 'date_fin', 'duree_restante')
     def _compute_state_poncrec(self):
         for service in self:
             service_state = service.get_state_poncrec_date(fields.Date.context_today(self), to_plan_avance=True)
-            if not service.recurrence:
+            if not service.recurrence and service.state_ponc != service_state:
                 service.state_ponc = service_state
-            service.state = service_state
-
-    def _search_state_ponc(self, operator, operand):
-        services = self.search([])
-        res = safe_eval("services.filtered(lambda s: s.state_ponc %s %s)" % (operator, operand), {'services': services})
-        return [('id', 'in', res.ids)]
+            if service.state != service_state:
+                service.state = service_state
 
     @api.depends('intervention_ids')
     @api.multi
@@ -341,31 +337,31 @@ class OfService(models.Model):
             service.intervention_count = len(service.intervention_ids.filtered(
                 lambda r: r.state in ('draft', 'confirm', 'done')))
 
-    def _search_secteur_tech_id(self, operator, operand):
-        services = self.search([])
-        res = safe_eval("services.filtered(lambda s: s.secteur_tech_id %s %.2f)" % (operator, operand),
-                        {'services': services})
-        return [('id', 'in', res.ids)]
-
     @api.multi
-    @api.depends('duree', 'intervention_ids', 'recurrence', 'intervention_ids.state', 'date_next')
+    @api.depends(
+        'duree', 'intervention_ids', 'recurrence', 'intervention_ids.state', 'date_next', 'mois_ids', 'duree_planif',
+        'tache_id', 'tache_id.fourchette_planif')
     def _compute_durees(self):
         for service in self:
+            # Dans cette fonction, les affectations sont très coûteuses, car elles impliquent un grand nombre de
+            # recalculs. On n'affectera donc les valeurs que si elles diffèrent de ce celle stockée en DB.
+            date_last_old = service.date_last
+            duree_planif_old = service.duree_planif
+            duree_restante_old = service.duree_restante
             # ne pas prendre les interventions annulées / reportées / non terminées
             plannings = service.intervention_ids.filtered(lambda p: p.state in ('draft', 'confirm', 'done'))
-            if plannings:
-                service.date_last = plannings.sorted('date', reverse=True)[0].date_date
-            else:
-                service.date_last = False
+            date_last = plannings and plannings.sorted('date', reverse=True)[0].date_date or False
+            if date_last != date_last_old:
+                service.date_last = date_last
 
             if service.recurrence and service.date_next:
-                # On cherche la durée planifiée pour l'occurence en cours.
+                # On cherche la durée planifiée pour l'occurrence en cours.
                 # Il nous faut savoir quelle est l'occurrence en cours
-                date_next_ref_str = service.get_date_proche(fields.Date.today())  # début d'occurence en cours
-                date_fin_ref_str = service.get_fin_date(date_next_ref_str)  # fin d'occurence en cours
+                date_next_ref_str = service.get_date_proche(fields.Date.today())  # début d'occurrence en cours
+                date_fin_ref_str = service.get_fin_date(date_next_ref_str)  # fin d'occurrence en cours
                 date_next_ref_da = fields.Date.from_string(date_next_ref_str)
                 date_fin_ref_da = fields.Date.from_string(date_fin_ref_str)
-                # RDVs pris en avance. Récupération de date de fin de l'occurence précédente pour connaitre l'écart
+                # RDVs pris en avance. Récupération de date de fin de l'occurrence précédente pour connaître l'écart
                 #   entre les deux et le couper en deux.
                 # tous les RDVs de la 1ere moitié sont des RDVs en retard de l'occurrence précédente
                 #   et ne sont pas a prendre en compte dans la durée planifiée
@@ -386,8 +382,12 @@ class OfService(models.Model):
                 # Sélection des RDVs de l'occurrence en cours
                 plannings = plannings.filtered(lambda p: date_avance_str <= p.date_date < date_retard_str)
 
-            service.duree_planif = sum(plannings.mapped('duree'))
-            service.duree_restante = service.duree > service.duree_planif and service.duree - service.duree_planif or 0
+            duree_planif = sum(plannings.mapped('duree'))
+            if float_compare(duree_planif, duree_planif_old, 5):
+                service.duree_planif = duree_planif
+            duree_restante = service.duree > service.duree_planif and service.duree - service.duree_planif or 0
+            if float_compare(duree_restante, duree_restante_old, 5):
+                service.duree_restante = duree_restante
 
     def _search_duree_restante(self, operator, operand):
         services = self.search([])
@@ -398,8 +398,7 @@ class OfService(models.Model):
     @api.depends('date_next', 'date_fin')
     def _compute_alert_dates(self):
         for service in self:
-            service.alert_dates = service.date_next and service.date_fin \
-                                       and service.date_next > service.date_fin
+            service.alert_dates = service.date_next and service.date_fin and service.date_next > service.date_fin
 
     @api.multi
     @api.depends('state')
@@ -479,7 +478,7 @@ class OfService(models.Model):
                 service.spec_date = u"Prévue le %s" % format_date(service.intervention_ids[-1].date_date, lang)
             else:
                 service.spec_date = u"Prévue entre %s et %s" % (
-                format_date(service.date_next, lang), format_date(service.date_fin, lang))
+                    format_date(service.date_next, lang), format_date(service.date_fin, lang))
 
     @api.depends()
     def _compute_last_attachment_id(self):
@@ -782,8 +781,10 @@ class OfService(models.Model):
         services = self.search([('base_state', '=', False)])
         for service in services:
             service.base_state = 'calculated'
-        services = self.search([('base_state', '=', 'calculated')])
-        services._compute_state_poncrec()
+        services_recur = self.search([('base_state', '=', 'calculated'), ('recurrence', '=', True)])
+        services_recur._compute_durees()
+        services_ponc = self.search([('base_state', '=', 'calculated'), ('recurrence', '=', False)])
+        services_ponc._compute_state_poncrec()
 
     @api.multi
     def filter_state_poncrec_date(self, date_eval=fields.Date.today(), state_list=('to_plan', 'part_planned', 'late')):
@@ -881,7 +882,7 @@ class OfService(models.Model):
         else:
             date_eval_da = date_eval
         date_eval_mois_int = date_eval_da.month
-        if date_eval_mois_int in mois_ints:  # la date est déja sur un mois autorisé
+        if date_eval_mois_int in mois_ints:  # la date est déjà sur un mois autorisé
             if return_string:
                 return fields.Date.to_string(date(year=date_eval_da.year, month=date_eval_mois_int, day=1))
             return date(year=date_eval_da.year, month=date_eval_mois_int, day=1)
@@ -1210,7 +1211,8 @@ class OFServiceTag(models.Model):
         exists = len(cr.fetchall())
         res = super(OFServiceTag, self)._auto_init()
         if not exists:
-            # Créer les étiquettes de planning. Attention au doublons! Ne pas créer si il y a une étiquette planning du même nom
+            # Créer les étiquettes de planning. Attention aux doublons!
+            # Ne pas créer s'il y a une étiquette planning du même nom
             cr.execute("INSERT INTO of_planning_tag "
                        "(name, color, active, create_uid, write_uid, create_date, write_date) "
                        "SELECT st.name, st.color, st.active, st.create_uid, st.write_uid, st.create_date, st.write_date"
