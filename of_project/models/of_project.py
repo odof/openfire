@@ -231,7 +231,7 @@ class ProjectTask(models.Model):
         if 'of_participant_ids' in vals or 'user_id' in vals:
             user_obj = self.env['res.users']
             user_ids = []
-            if 'of_participant_ids' in vals and vals['of_participant_ids'][0][2]:
+            if vals.get('of_participant_ids') and vals['of_participant_ids'][0][2]:
                 user_ids += vals['of_participant_ids'][0][2]
             if 'user_id' in vals and vals['user_id']:
                 user_ids += [vals['user_id']]
@@ -251,7 +251,7 @@ class ProjectTask(models.Model):
         if 'of_participant_ids' in vals or 'user_id' in vals:
             user_obj = self.env['res.users']
             user_ids = []
-            if 'of_participant_ids' in vals and vals['of_participant_ids'][0][2]:
+            if vals.get('of_participant_ids') and vals['of_participant_ids'][0][2]:
                 user_ids += vals['of_participant_ids'][0][2]
             if 'user_id' in vals and vals['user_id']:
                 user_ids += [vals['user_id']]
