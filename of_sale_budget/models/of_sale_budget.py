@@ -16,7 +16,8 @@ class OFSaleOrderBudget(models.Model):
             ('indirect_cost', u"Frais indirects"),
             ('labor_cost', u"Frais de main d'oeuvre"),
         ], string=u"Désignation", required=True, readonly=True)
-    order_id = fields.Many2one(comodel_name='sale.order', string=u"Commande", required=True, readonly=True)
+    order_id = fields.Many2one(
+        comodel_name='sale.order', string=u"Commande", required=True, readonly=True, ondelete='cascade')
     currency_id = fields.Many2one(
         comodel_name='res.currency', related='order_id.currency_id', store=True, readonly=True)
     cost = fields.Float(string=u"Coût", digits=dp.get_precision('Product Price'), readonly=True)
@@ -44,7 +45,8 @@ class OFSaleOrderIndirectCost(models.Model):
     _description = u"Tableau des frais indirects"
 
     product_id = fields.Many2one(comodel_name='product.product', string=u"Désignation", required=True)
-    order_id = fields.Many2one(comodel_name='sale.order', string=u"Commande", required=True, readonly=True)
+    order_id = fields.Many2one(
+        comodel_name='sale.order', string=u"Commande", required=True, readonly=True, ondelete='cascade')
     currency_id = fields.Many2one('res.currency', related='order_id.currency_id', store=True, readonly=True)
     unit_cost = fields.Float(
         string=u"Coût unitaire", digits=dp.get_precision('Product Price'),
@@ -72,7 +74,7 @@ class OFSaleOrderLaborCost(models.Model):
     _description = u"Tableau des frais de main d’oeuvre"
 
     hour_worksite_id = fields.Many2one(comodel_name='of.sale.order.hour.worksite', string=u"Désignation", required=True)
-    order_id = fields.Many2one(comodel_name='sale.order', string=u"Commande")
+    order_id = fields.Many2one(comodel_name='sale.order', string=u"Commande", ondelete='cascade')
     currency_id = fields.Many2one('res.currency', related='order_id.currency_id', store=True, readonly=True)
     type = fields.Selection(
         selection=[('computed', u"Calculé"), ('manual', u"Manuel")],
