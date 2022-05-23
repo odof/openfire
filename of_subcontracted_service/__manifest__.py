@@ -12,27 +12,26 @@
 ##############################################################################
 
 {
-    'name': u"OpenFire / Ventes / Budget",
+    'name': u"OpenFire / Sous-traitance",
     'version': "10.0.1.0.0",
     'license': '',
     'author': "OpenFire",
     'website': "www.openfire.fr",
     'category': "OpenFire",
-    'summary': u"Gestion du budget OpenFire",
+    'summary': u"Gestion de la sous-traitance OpenFire",
     'description': u"""
-Module OpenFire / Ventes / Budget
-=================================
+Module OpenFire / Sous-traitance
+================================
 
+- Ajoute la notion de sous-traitance sur les lignes de commande
 """,
     'depends': [
-        'of_subcontracted_service',
-        'of_sale_quote_template',
-        'of_sale_planning',
+        'subcontracted_service',
+        'of_sale',
+        'of_sale_stock',
     ],
     'data': [
-        'security/ir.model.access.csv',
-        'data/of_sale_budget_data.xml',
-        'views/of_sale_budget_views.xml',
+        'views/of_sale_views.xml',
     ],
     'installable': True,
     'application': False,
