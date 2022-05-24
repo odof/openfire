@@ -111,7 +111,6 @@ class AccountInvoice(models.Model):
         return "type in ('out_invoice', 'out_refund') and [('of_is_shop','=',True)] or []"
 
 
-
 class AccountAccount(models.Model):
     _inherit = 'account.account'
 
@@ -177,14 +176,22 @@ class Property(models.Model):
 
     @api.model
     def set_multi(self, name, model, values, default_value=None):
-        # Si self.env.context contient 'force_company', il faut le modifier par la société comptable.
-        self._cr.execute("SELECT id FROM ir_model_fields WHERE name=%s AND model=%s", (name, model))
-        field_id = self._cr.fetchone()[0]
-        company_id = self.env.context.get('force_company')\
-            or self.env['res.company']._company_default_get(model, field_id).id
-        company = self.env['res.company'].browse(company_id)
-        self = self.with_context(force_company=company.accounting_company_id.id)
-        return super(Property, self).set_multi(name, model, values, default_value=default_value)
+        company_obj = self.env['res.company']
+        if getattr(self.env[model]._fields[name], 'of_unify_companies', False):
+            # Le champ doit être uniformisé sur toutes les sociétés.
+            # C'est un champ company_dependent qui n'est plus company_dependent...
+            companies = company_obj.sudo().search([])
+        else:
+            # On récupère la société à utiliser.
+            self._cr.execute("SELECT id FROM ir_model_fields WHERE name=%s AND model=%s", (name, model))
+            field_id = self._cr.fetchone()[0]
+            company_id = self.env.context.get('force_company')\
+                or company_obj._company_default_get(model, field_id).id
+            companies = company_obj.browse(company_id)
+        # Au final, l'application se fera sur la société comptable des sociétés sélectionnées
+        for company in companies.mapped('accounting_company_id'):
+            self_comp = self.with_context(force_company=company.id)
+            super(Property, self_comp).set_multi(name, model, values, default_value=default_value)
 
 
 class SaleOrder(models.Model):
