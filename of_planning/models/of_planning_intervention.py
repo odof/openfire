@@ -221,6 +221,11 @@ class OfPlanningTache(models.Model):
 
     name = fields.Char(u"Libellé", size=64, required=True)
     description = fields.Text("Description")
+    affichage = fields.Selection([
+        ('hide', u"Ne pas afficher"),
+        ('internal_description', u"Dans la description interne"),
+        ('external_description', u"Dans la description externe"),
+    ], string=u"Affichage description", default='internal_description')
     verr = fields.Boolean(u"Verrouillé")
     product_id = fields.Many2one('product.product', "Produit")
     fiscal_position_id = fields.Many2one(
@@ -1196,6 +1201,16 @@ class OfPlanningIntervention(models.Model):
                     })
                 self.line_ids.compute_taxes()
             self.flexible = self.tache_id.flexible
+            # affichage de la description de la tâche
+            if self.tache_id.description:
+                if self.tache_id.affichage == 'internal_description':
+                    description_interne = self.description_interne + "\n" if self.description_interne else ''
+                    description_interne += self.tache_id.description
+                    self.description_interne = description_interne
+                elif self.tache_id.affichage == 'external_description':
+                    description = self.description + "\n" if self.description else ''
+                    description += self.tache_id.description
+                    self.description = description
 
     @api.onchange('all_day', 'date', 'employee_ids')
     def _onchange_all_day(self):

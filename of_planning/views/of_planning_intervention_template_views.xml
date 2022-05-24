@@ -84,6 +84,10 @@
                                     <div>
                                         <field name="fi_rdv_tache_id" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
                                     </div>
+                                    <label for="fi_rdv_description_tache" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="fi_rdv_description_tache" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
+                                    </div>
                                     <label for="fi_rdv_date" style="font-weight: normal !important"/>
                                     <div>
                                         <field name="fi_rdv_date" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
@@ -242,6 +246,10 @@
                                     <label for="ri_rdv_tache_id" style="font-weight: normal !important"/>
                                     <div>
                                         <field name="ri_rdv_tache_id" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
+                                    </div>
+                                    <label for="ri_rdv_description_tache" style="font-weight: normal !important"/>
+                                    <div>
+                                        <field name="ri_rdv_description_tache" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
                                     </div>
                                     <label for="ri_rdv_date" style="font-weight: normal !important"/>
                                     <div>

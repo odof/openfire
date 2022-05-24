@@ -344,6 +344,14 @@
                                                </t>
                                             </t>
                                         </div>
+                                        <div class="h5" style="padding: 0px 16px;">
+                                           <span>Description de la Tâche&amp;nbsp;:</span>
+                                           <t t-if="o.employee_ids">
+                                               <t t-if="o.tache_id.description">
+                                                   <strong><span t-field="o.tache_id.description"/></strong>
+                                               </t>
+                                            </t>
+                                        </div>
                                         <div style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
                                         <div class="h5" style="padding: 0px 16px;">
                                             <div>
