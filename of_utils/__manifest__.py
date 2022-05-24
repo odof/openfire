@@ -19,6 +19,9 @@ Module OpenFire d'utilitaires.
         ],
         "init_xml": [],
         "demo_xml": [],
+        'qweb': [
+            'static/src/xml/*.xml',
+        ],
         "data": [
             'security/ir.model.access.csv',
             'views/of_utils_templates.xml',

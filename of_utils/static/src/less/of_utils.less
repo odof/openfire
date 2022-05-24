@@ -5,9 +5,16 @@
 .of_table_fix_head thead th {
     position: sticky;
     top: 0;
-    background-color: @odoo-view-background-color;
     border-bottom: 2px solid #ddd;
-    z-index: 1000;
+    z-index: 4;
+}
+
+.of_thead_ovbc_color thead th {
+    background-color: @odoo-view-background-color;
+}
+
+.of_thead_obl_color thead th {
+    background-color: @odoo-brand-lightsecondary;
 }
 
 .of_pulse {
