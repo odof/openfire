@@ -18,6 +18,10 @@ class ProductTemplate(models.Model):
     categ_id = fields.Many2one(default=lambda self: self._get_default_category_id())
     # Retrait de la société par défaut
     company_id = fields.Many2one(default=False)
+    # Uniformisation de la méthode de coût sur les sociétés (effectif si of_base_multicompany est installé)
+    # Normalement inutile car la modification de cette valeur est inhibée par Odoo (cf commit af9d21b3) pour préférer
+    # une gestion directement depuis les catégories d'articles
+    property_cost_method = fields.Selection(of_unify_companies=True)
 
     # Ajout de la catégorie d'udm pour permettre de filtrer les udms d'achat autorisées
     of_uom_category_id = fields.Many2one(related='uom_id.category_id', readonly=True)
@@ -171,6 +175,8 @@ class ProductCategory(models.Model):
             'stock.location.route', 'stock_location_route_categ', 'categ_id', 'route_id', 'Routes',
             domain=[('product_categ_selectable', '=', True)], copy=True)
     of_layout_id = fields.Many2one('sale.layout_category', string="Section")
+    # Uniformisation de la méthode de coût sur les sociétés (effectif si of_base_multicompany est installé)
+    property_cost_method = fields.Selection(of_unify_companies=True)
 
     @api.multi
     def copy_data(self, default=None):
