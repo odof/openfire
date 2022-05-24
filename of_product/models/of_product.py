@@ -87,6 +87,8 @@ class ProductTemplate(models.Model):
 class ProductProduct(models.Model):
     _inherit = "product.product"
 
+    standard_price = fields.Float(of_unify_companies=True)
+
     @api.model
     def _add_missing_default_values(self, values):
         # Mettre la référence produit (default_code) du template par défaut lors de la création d'une variante.
@@ -95,36 +97,12 @@ class ProductProduct(models.Model):
         return super(ProductProduct, self)._add_missing_default_values(values)
 
     @api.multi
-    def of_propage_cout(self, cout):
+    def _set_standard_price(self, value):
         # Le coût (standard_price) est défini sur l'ensemble des sociétés.
-        # Si le module of_base_multicompany est installé, il est inutile de le diffuser sur les sociétés "magasins"
+        # Il en va donc de même pour l'historique des prix
         companies = self.env['res.company'].search(['|', ('chart_template_id', '!=', False), ('parent_id', '=', False)])
-        self_sudo = self.sudo()
-        values = {product.id: cout for product in self}
         for company in companies:
-            self_comp = self_sudo.with_context(force_company=company.id)
-            self_comp.env['ir.property'].set_multi('standard_price', 'product.product', values)
-            self_comp._set_standard_price(cout)
-
-    @api.model
-    def create(self, vals):
-        propage_cout = 'standard_price' in vals
-        if propage_cout:
-            cout = vals.pop('standard_price')
-        product = super(ProductProduct, self).create(vals)
-        if propage_cout:
-            product.of_propage_cout(cout)
-        return product
-
-    @api.multi
-    def write(self, vals):
-        propage_cout = 'standard_price' in vals
-        if propage_cout:
-            cout = vals.pop('standard_price')
-        super(ProductProduct, self).write(vals)
-        if propage_cout:
-            self.of_propage_cout(cout)
-        return True
+            super(ProductProduct, self.with_context(force_company=company.id))._set_standard_price(value)
 
 
 class ProductSupplierInfo(models.Model):

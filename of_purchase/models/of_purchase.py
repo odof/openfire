@@ -521,9 +521,9 @@ INSERT INTO ir_property (
     property_of_purchase_coeff = fields.Float(string="Coefficient d'achat", company_dependent=True)
 
     @api.multi
-    def of_propage_cout(self, cout):
-        super(ProductProduct, self).of_propage_cout(cout)
-        self.of_purchase_coeff_cost_propagation(cout)
+    def _set_standard_price(self, value):
+        super(ProductProduct, self)._set_standard_price(value)
+        self.of_purchase_coeff_cost_propagation(value)
 
     @api.multi
     def of_purchase_coeff_cost_propagation(self, cost):
