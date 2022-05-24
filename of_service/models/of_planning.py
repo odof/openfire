@@ -155,6 +155,16 @@ class OFPlanningIntervention(models.Model):
                 for line in self.service_id.line_ids:
                     line_vals.append((0, 0, line.prepare_intervention_line_vals()))
                 self.line_ids = line_vals
+            # self._origin contient les valeurs de l'enregistrement en BDD
+            if hasattr(self, '_origin') and self._origin.service_id \
+                    and (self._origin.service_id.note or u"") in (self._origin.description_interne or u""):
+                # Si la description de l'ancienne DI est encore présente, la retirer
+                descritab = self._origin.description_interne.split(self._origin.service_id.note or u"")
+                self.description_interne = u"\n".join(descritab)
+            descriterne = self.description_interne or u""
+            if self.service_id.note and self.service_id.note not in descriterne:
+                # si la description de la nouvelle DI n'est pas déjà présente, la rajouter
+                self.description_interne = descriterne + self.service_id.note
 
     # Héritages
 
