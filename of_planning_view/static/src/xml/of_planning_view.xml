@@ -70,7 +70,7 @@
 
     <!-- Table -->
     <t t-name="PlanningView.table">
-        <table class="of_planning_table of_table_fix_head">
+        <table class="of_planning_table of_table_fix_head of_thead_ovbc_color">
             <thead>
                 <tr>
                     <th class="of_planning_column_head">
