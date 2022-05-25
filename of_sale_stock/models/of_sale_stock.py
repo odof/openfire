@@ -605,7 +605,12 @@ class StockPicking(models.Model):
                 kit_line_ids.append(line.procurement_id.of_sale_comp_id.kit_id.order_line_id.id)
 
         if amount:
-            currency = self.move_lines.mapped('procurement_id').mapped('sale_line_id').mapped('order_id')[0].currency_id
+            order = self.move_lines.mapped('procurement_id').mapped('sale_line_id').mapped('order_id')
+            if order:
+                currency = order[0].currency_id
+            else:
+                currency = self.move_lines.mapped('procurement_id').mapped('of_sale_comp_id').mapped('kit_id').\
+                    mapped('order_line_id').mapped('order_id')[0].currency_id
             return currency.round(amount)
         return amount
 
