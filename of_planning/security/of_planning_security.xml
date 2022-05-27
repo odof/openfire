@@ -85,5 +85,15 @@
             <field name="groups" eval="[(4, ref('of_planning.of_group_planning_intervention_modification_tout'))]"/>
         </record>
 
+        <!-- Deletion access rules -->
+        <record id="of_planning_intervention_done_deletion" model="ir.rule">
+            <field name="name">Suppression RDV réalisé</field>
+            <field ref="model_of_planning_intervention" name="model_id"/>
+            <field name="domain_force">[('state', '!=', 'done')]</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+        </record>
+
     </data>
 </odoo>
