@@ -1253,20 +1253,30 @@ class OfContractLine(models.Model):
         fields_allowed = self.get_write_allowed_fields()
         if 'contract_id' in vals:  # On ne doit pas changer de contrat après la création
             del vals['contract_id']
-        cr = self.env.cr
         if len(self) == 1:
+            # Dans certains cas, la modification de la date de fin du contrat peut faire en sorte de renvoyer tous
+            # les champs des lignes de contrats même si ils n'ont pas été modifiés.
+            # vals contient la liste des champs de la vue tree.
+            # Ce bout de code a pour but de retirer les valeurs non modifiées pour éviter un blocage du write dû à
+            # la modification de champ non autorisés après la validation d'une ligne.
             keys_to_delete = []
-            fields = self._fields
+            fields_list = self._fields
+            fields_to_check = []
             for key, val in vals.iteritems():
-                if not fields[key].store or fields[key].type.endswith('2many'):
+                if not fields_list[key].store and not fields_list[key].type.endswith('2many'):
                     keys_to_delete.append(key)
-                    continue
-                cr.execute("SELECT %s FROM of_contract_line WHERE id = %%s" % key, (self.id,))
-                db_value = cr.fetchone()[0] or False  # on ne veut pas de None
-                if val == db_value:
-                    keys_to_delete.append(key)
+                elif fields_list[key].type.endswith('2many'):
+                    continue  # la vérification des x2many ne devrait pas être faite ici, il faut ignorer ces champs
+                else:
+                    fields_to_check.append(key)
             for key in keys_to_delete:
                 del vals[key]
+            for field_name in fields_to_check:
+                val = vals[field_name]  # nouvelle valeur
+                self_val = self[field_name]  # valeur actuelle
+                if val == self_val or (isinstance(self_val, models.Model) and self_val.id == val):
+                    del vals[field_name]
+
         if not self._context.get('no_verification'):
             for line in self:
                 if line.state == 'validated' and any([key not in fields_allowed for key in vals.keys()]):
