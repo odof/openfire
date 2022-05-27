@@ -15,10 +15,12 @@ Permet le pointage des écritures bancaires.
     "website": "www.openfire.fr",
     "depends": [
         "account",
+        "of_base_multicompany",
     ],
     "data": [
         'views/of_account_bank_reconciliation_views.xml',
         'security/ir.model.access.csv',
+        'security/of_account_bank_reconciliation_security.xml',
     ],
     'installable': True,
     'application': False,
