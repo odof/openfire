@@ -14,15 +14,16 @@ Module d'état de stock de combustible pour les clients
     'depends': [
         'of_base',
         'of_external',
-        'of_sale',
+        'of_sale_quote_template',
         'stock',
-        'product',
+        'product'
     ],
     'data': [
         'reports/external_report_templates.xml',
         'reports/stock_report_templates.xml',
         'security/ir.model.access.csv',
         'views/of_partner_fuel_stock_views.xml',
+        'views/sale_quote_template_view.xml',
         'views/product_views.xml',
         'views/sale_views.xml',
         'views/stock_views.xml',

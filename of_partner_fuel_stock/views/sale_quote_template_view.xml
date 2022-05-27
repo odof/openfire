@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Configuration modèle de devis : vue formulaire -->
+    <record id="of_partner_fuel_sale_quote_template_view_form" model="ir.ui.view">
+        <field name="name">of.partner.fuel.sale.quote.template.form</field>
+        <field name="model">sale.quote.template</field>
+        <field name="inherit_id" ref="of_sale_quote_template.view_sale_quote_template_form"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='quote_line']//field[@name='of_article_principal']" position="after">
+                <field name="of_storage"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
