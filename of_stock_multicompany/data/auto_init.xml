@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <function
+                id="auto_init_stock_warehouse_multi_company"
+                model="stock.warehouse"
+                name="_auto_init_stock_multicompany">
+        </function>
+
+    </data>
+</odoo>

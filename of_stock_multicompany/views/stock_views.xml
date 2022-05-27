@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Stock Picking Form View -->
+    <record id="of_stock_multicompany_stock_picking_form_view" model="ir.ui.view">
+        <field name="name">of.stock.multicompany.stock.picking.form.view</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='location_id']" position="attributes">
+                <attribute name="domain">['|', ('company_id', 'parent_of', company_id), ('company_id', '=', False)]</attribute>
+            </xpath>
+            <xpath expr="//field[@name='location_dest_id']" position="attributes">
+                <attribute name="domain">['|', ('company_id', 'parent_of', company_id), ('company_id', '=', False)]</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

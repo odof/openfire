@@ -145,6 +145,24 @@
         </field>
     </record>
 
+    <record id="of_stock_view_company_form" model="ir.ui.view">
+        <field name="name">of.stock.company.form</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="of_base.of_base_view_company_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//notebook//page[@name='advanced_settings']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
+            <xpath expr="//notebook//page[@name='advanced_settings']/group[@name='advanced_settings_group_2']" position="inside">
+                <group name="stock" colspan="2">
+                    <separator string="Stock" colspan="2"/>
+                    <field name="of_default_warehouse_id"/>
+                    <field name="of_is_stock_owner"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
     <record id="of_stock_view_stock_config_settings_form" model="ir.ui.view">
         <field name="name">of.sale.stock.config.settings.form</field>
         <field name="model">stock.config.settings</field>

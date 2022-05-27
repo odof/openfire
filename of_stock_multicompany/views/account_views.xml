@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Facture boutique -->
+    <record id="of_stock_multicompany_account_invoice_boutique_form_view" model="ir.ui.view">
+        <field name="name">of.stock.multicompany.account.invoice.boutique.form.view</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="of_account_boutique.of_account_boutique_invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_warehouse_id']" position="attributes">
+                <attribute name="attrs">{'invisible': [('of_boutique', '=', False)], 'required': [('of_boutique', '=', True)]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
