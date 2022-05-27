@@ -148,7 +148,7 @@ class OfService(models.Model):
          # si au moins un RDV est à l'état 'during' et a un RDV
          ('during', u"RDV en cours"),
          ('cancel', u'Annulée')],  # manuellement décidé
-        u'État de planification', compute="_compute_state_poncrec", store=True, track_visibility='onchange')
+        u'État de planification', compute="_compute_state_poncrec", store=True)
     state_ponc = fields.Selection(
         [('draft', u'Brouillon'),  # état par défaut
          ('to_plan', u'À planifier'),  # pas d'intervention
@@ -778,13 +778,9 @@ class OfService(models.Model):
         Force le recalcul de l'état des demandes d'intervention.
         Est lancé tous les matins, pour que le changement de date du jour soit pris en compte.
         """
-        services = self.search([('base_state', '=', False)])
-        for service in services:
-            service.base_state = 'calculated'
-        services_recur = self.search([('base_state', '=', 'calculated'), ('recurrence', '=', True)])
-        services_recur._compute_durees()
-        services_ponc = self.search([('base_state', '=', 'calculated'), ('recurrence', '=', False)])
-        services_ponc._compute_state_poncrec()
+        self.search([('base_state', '=', False)]).write({'base_state': 'calculated'})
+        self.search([('base_state', '=', 'calculated'), ('recurrence', '=', True)])._compute_durees()
+        self.search([('base_state', '=', 'calculated')])._compute_state_poncrec()
 
     @api.multi
     def filter_state_poncrec_date(self, date_eval=fields.Date.today(), state_list=('to_plan', 'part_planned', 'late')):
