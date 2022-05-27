@@ -371,8 +371,8 @@ class Inventory(models.Model):
 
     @api.multi
     def action_done(self):
-        self = self.with_context(
-            inventory_date=self.env['ir.values'].get_default('stock.config.settings', 'of_forcer_date_inventaire'))
+        inventory_date = self.env['ir.values'].get_default('stock.config.settings', 'of_forcer_date_inventaire')
+        self = self.with_context(inventory_date=inventory_date)
         if self._uid != SUPERUSER_ID:
             negative = next((line for line in self.mapped('line_ids') if
                              line.product_qty < 0 and line.product_qty != line.theoretical_qty), False)
@@ -381,7 +381,11 @@ class Inventory(models.Model):
                                 (negative.product_id.name, negative.product_qty))
         self.action_check()
         self.write({'state': 'done'})
-        self.post_inventory()
+        if inventory_date:
+            for inv in self:
+                inv.with_context(default_datetime=inv.date).post_inventory()
+        else:
+            self.post_inventory()
         return True
 
     @api.multi
