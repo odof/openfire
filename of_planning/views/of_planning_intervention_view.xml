@@ -782,6 +782,9 @@
                         <group colspan="2">
                             <field name="description" attrs="{'readonly':[('verr', '=', True)]}"/>
                         </group>
+                        <group>
+                            <field name="affichage"/>
+                        </group>
                         <field name="verr" invisible="1"/>
                     </group>
                 </sheet>

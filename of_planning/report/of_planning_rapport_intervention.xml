@@ -94,6 +94,16 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div t-if="template.ri_rdv_description_tache and o.tache_id and o.tache_id.description" name="ri_rdv_description_tache">
+                                                <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                                <t t-set="previous_separator" t-value="True"/>
+                                                <div class="h5" style="padding: 0px 16px;">
+                                                    <div>
+                                                        <span>Description de la Tâche&amp;nbsp;:</span>
+                                                        <strong><span t-field="o.tache_id.description"/></strong>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <div t-if="template.ri_rdv_date and o.date" name="ri_rdv_date">
                                                 <div t-if="previous_separator" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
                                                 <t t-set="previous_separator" t-value="True"/>
