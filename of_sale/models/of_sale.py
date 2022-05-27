@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
-
-from odoo import models, fields, api, _
-import odoo.addons.decimal_precision as dp
-from odoo.addons.sale.models.sale import SaleOrderLine as SOL
-from odoo.addons.sale.models.sale import SaleOrder as SO
-from odoo.tools import float_compare, float_is_zero
-from odoo.exceptions import UserError
-from odoo.models import regex_order
 import os
 import base64
 import tempfile
 import itertools
 import json
+from odoo import models, fields, api, _
+import odoo.addons.decimal_precision as dp
+from odoo.addons.sale.models.sale import SaleOrderLine as SOL
+from odoo.addons.sale.models.sale import SaleOrder as SO
+from odoo.tools import float_compare, float_is_zero, DEFAULT_SERVER_DATE_FORMAT
+from odoo.exceptions import UserError
+from odoo.models import regex_order
 
 try:
     import pyPdf
@@ -24,6 +23,10 @@ except ImportError:
     pypdftk = None
 
 NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
+
+
+def get_selection_label(self, object, field_name, field_value):
+    return _(dict(self.env[object].fields_get(allfields=[field_name])[field_name]['selection'])[field_value])
 
 
 @api.onchange('product_uom', 'product_uom_qty')
@@ -217,8 +220,7 @@ class SaleOrder(models.Model):
         u"Les échéances ont besoin d'être recalculées", compute="_compute_of_echeances_modified")
     of_force_invoice_status = fields.Selection([
         ('invoiced', 'Fully Invoiced'),
-        ('no', 'Nothing to Invoice')
-        ], string=u"Forcer état de facturation",
+        ('no', 'Nothing to Invoice')], string=u"Forcer état de facturation",
         help=u"Permet de forcer l'état de facturation de la commande.\n"
              u"Utile pour les commandes facturées qui refusent de changer d'état "
              u"(e.g. une ligne a été supprimée dans la facture).", copy=False
@@ -237,6 +239,22 @@ class SaleOrder(models.Model):
         ('order_line', u'Prix par ligne de commande'),
     ], string=u"Impressions des prix", default='order_line', required=True)
     of_apply_on_invoice = fields.Boolean(string=u"Appliquer aux factures", default=True)
+
+    @api.multi
+    @api.depends('name', 'date', 'state')
+    def name_get(self):
+        if not self._context.get('extended_display'):
+            return super(SaleOrder, self).name_get()
+        result = []
+        date_format = '%d/%m/%Y' if self.env.user.lang == 'fr_FR' else DEFAULT_SERVER_DATE_FORMAT
+        for record in self:
+            date_order = fields.Date.from_string(record.date_order).strftime(date_format)
+            order_state = get_selection_label(self, self._name, 'state', self.state)
+            record_name = "%s - %s - %s" % (
+                record.name, order_state, date_order
+            )
+            result.append((record.id, record_name))
+        return result
 
     @api.depends('company_id')
     def _compute_of_allow_quote_addition(self):
@@ -811,7 +829,7 @@ class SaleOrder(models.Model):
                         'name': tax.description,
                         'amount': val['amount'],
                         'base': round_curr(val['base'])
-                        })
+                    })
         for values in tax_grouped:
             values['base'] = round_curr(values['base'])
             values['amount'] = round_curr(values['amount'])
@@ -841,7 +859,8 @@ class Report(models.Model):
                 os.close(fd)
                 file_paths.append(mail_pdf)
 
-            if report_name == 'sale.report_saleorder' and self.user_has_groups('of_sale.group_of_sale_print_attachment'):
+            if report_name == 'sale.report_saleorder' and \
+                    self.user_has_groups('of_sale.group_of_sale_print_attachment'):
                 for attachment in model.order_line.mapped('of_product_attachment_ids'):
                     fd, attachment_pdf = tempfile.mkstemp()
                     os.write(fd, base64.b64decode(attachment.datas))
@@ -991,15 +1010,15 @@ class SaleOrderLine(models.Model):
             # On récupère toutes les PJ pdf du modèle d'article et de ses variantes
             domain = [
                 '&',
-                    '|',
-                        '&',
-                            ('res_model', '=', 'product.template'),
-                            ('res_id', '=', line.product_id.product_tmpl_id.id),
-                        '&',
-                            ('res_model', '=', 'product.product'),
-                            ('res_id', 'in', product_ids.ids),
-                    ('mimetype', '=', 'application/pdf')
-                ]
+                '|',
+                '&',
+                ('res_model', '=', 'product.template'),
+                ('res_id', '=', line.product_id.product_tmpl_id.id),
+                '&',
+                ('res_model', '=', 'product.product'),
+                ('res_id', 'in', product_ids.ids),
+                ('mimetype', '=', 'application/pdf')
+            ]
             attachment_ids = attachment_obj.search(domain)
             line.of_product_attachment_computed = attachment_ids
 
@@ -1022,8 +1041,8 @@ class SaleOrderLine(models.Model):
     def _compute_of_invoice_policy(self):
         for line in self:
             line.of_invoice_policy = line.order_id.of_invoice_policy \
-                                     or line.order_partner_id.of_invoice_policy or line.product_id.invoice_policy \
-                                     or self.env['ir.values'].get_default('product_template', 'invoice_policy')
+                or line.order_partner_id.of_invoice_policy or line.product_id.invoice_policy \
+                or self.env['ir.values'].get_default('product_template', 'invoice_policy')
 
     @api.depends('of_invoice_policy',
                  'order_id', 'order_id.of_fixed_invoice_date',
@@ -1528,7 +1547,7 @@ class AccountInvoice(models.Model):
             pickings = invoice.of_sale_order_ids.mapped('picking_ids')
             if pickings:
                 invoice.of_waiting_delivery = pickings.filtered(lambda p: p.state not in ['draft', 'cancel', 'done'])\
-                                              and True or False
+                    and True or False
                 invoice.of_picking_ids = pickings
                 invoice.of_picking_count = len(pickings)
 
@@ -1753,11 +1772,9 @@ class AccountConfigSettings(models.TransientModel):
         string="(OF) Couleur police titre section", help=u"Choisissez une couleur pour les titres de section",
         default="#000000")
     of_validate_pickings = fields.Selection([
-            (1, u"Ne pas gérer les BL depuis la facture"),
-            (2, u"Gérer les BL après la validation de la facture"),
-            (3, u"Valider les BL au moment de la validation de la facture")],
-        string="(OF) Validation des BL",
-        default=1)
+        (1, u"Ne pas gérer les BL depuis la facture"),
+        (2, u"Gérer les BL après la validation de la facture"),
+        (3, u"Valider les BL au moment de la validation de la facture")], string="(OF) Validation des BL", default=1)
 
     @api.multi
     def set_pdf_vt_pastille_defaults(self):
