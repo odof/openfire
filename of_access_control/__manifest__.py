@@ -21,6 +21,7 @@ Module de modification des droits
         'of_questionnaire',
         'of_sale',
         'of_user_profile',
+        'of_account_margin',
     ],
     'data': [
         'security/of_access_control_security.xml',
@@ -30,6 +31,7 @@ Module de modification des droits
         'views/project_issue_views.xml',
         'views/stock_views.xml',
         'views/sale_views.xml',
+        'views/account_views.xml',
         'views/menus.xml',
     ],
     'qweb': [

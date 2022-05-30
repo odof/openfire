@@ -822,3 +822,14 @@ msgstr "A supprimer?"
 msgid "total quantity equal to quantity per kit times number of kits."
 msgstr "Quantité totale du composant. Égale à la quantité par kit multipliée par le nombre de kit."
 
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_product_product_seller_price_comps
+#: model:ir.model.fields,field_description:of_kit.field_product_template_seller_price_comps
+msgid "Compo Purchase price/Kit"
+msgstr "Prix d'achat compos/Kit"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_product_product_seller_price_comps
+#: model:ir.model.fields,help:of_kit.field_product_template_seller_price_comps
+msgid "Sum of the purchase prices of all components necessary for 1 unit of this kit"
+msgstr "Somme des prix d'achat des composants requis pour une unité de ce kit"

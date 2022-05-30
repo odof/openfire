@@ -248,6 +248,7 @@ class AccountInvoiceLine(models.Model):
     _name = 'account.invoice.line'
     _inherit = ['account.invoice.line', 'of.readgroup']
 
+    of_product_default_code = fields.Char(related='product_id.default_code', string=u"Référence article", readonly=True)
     of_product_categ_id = fields.Many2one(
         'product.category', related='product_id.categ_id', string=u"Catégorie d'article",
         readonly=True, store=True, index=True
