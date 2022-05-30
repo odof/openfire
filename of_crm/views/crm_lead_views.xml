@@ -220,7 +220,7 @@
             <field name="context">{'search_default_opportunity_id': active_id, 'default_opportunity_id': active_id, 'hide_sale': True, 'search_default_draft': 1, 'search_default_sent': 1}</field>
         </record>
         <record id="sale_crm.sale_action_quotations"  model="ir.actions.act_window">
-            <field name="context">{'search_default_opportunity_id': active_id, 'default_opportunity_id': active_id, 'hide_sale': True, 'search_default_draft': 1, 'search_default_sent': 1}</field>
+            <field name="context">{'search_default_opportunity_id': active_id, 'default_opportunity_id': active_id, 'hide_sale': True, 'search_default_draft': 0, 'search_default_sent': 0}</field>
         </record>
 
         <!-- CRM Lead Form View  -->
