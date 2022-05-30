@@ -249,7 +249,7 @@ class SaleOrder(models.Model):
         date_format = '%d/%m/%Y' if self.env.user.lang == 'fr_FR' else DEFAULT_SERVER_DATE_FORMAT
         for record in self:
             date_order = fields.Date.from_string(record.date_order).strftime(date_format)
-            order_state = get_selection_label(self, self._name, 'state', self.state)
+            order_state = get_selection_label(self, record._name, 'state', record.state)
             record_name = "%s - %s - %s" % (
                 record.name, order_state, date_order
             )
