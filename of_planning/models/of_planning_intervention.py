@@ -1275,10 +1275,7 @@ class OfPlanningIntervention(models.Model):
     def onchange_company_id(self):
         if self.company_id:
             company_id = self.company_id.id
-            warehouse_id = self.env['stock.warehouse'].search([('company_id', '=', company_id)], limit=1)
-            if not warehouse_id:
-                warehouse_id = self.env['stock.warehouse'].search([], limit=1)
-            self.warehouse_id = warehouse_id.of_default_warehouse_id
+            self.warehouse_id = self.company_id.of_default_warehouse_id
             template_accounting = self.template_id.sudo().with_context(force_company=company_id)
             tache_accounting = self.tache_id.sudo().with_context(force_company=company_id)
             # La société a changé, dans tous les cas on change la position fiscale
