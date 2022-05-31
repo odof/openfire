@@ -226,6 +226,11 @@
                 <xpath expr="//field[@name='partner_type']" position="attributes">
                     <attribute name="nolabel">0</attribute>
                 </xpath>
+            <xpath expr="//field[@name='payment_type']" position="attributes">
+                <attribute name="attrs">{'readonly': ['|','|', ('state', '!=', 'draft'), '&amp;', ('payment_type', 'in',
+                    'outbound'), ('partner_type', 'in', 'customer'), '&amp;', ('payment_type', 'in', 'inbound'),
+                    ('partner_type', 'in', 'supplier')]}</attribute>
+            </xpath>
                 <xpath expr="//field[@name='partner_id']" position="attributes">
                     <attribute name="nolabel">0</attribute>
                 </xpath>
