@@ -16,11 +16,11 @@ class BetterZip(models.Model):
             args = []
         if name and operator == 'ilike':
             tab = name.strip().split(' ')
-            zips = self.search([('name', '=like', tab[0]+'%')])
+            zips = self.search([('name', '=like', tab[0] + '%')])
             if zips:
                 name = ' '.join(tab[1:])
             elif len(tab) > 1:
-                zips = self.search([('name', '=like', tab[-1]+'%')])
+                zips = self.search([('name', '=like', tab[-1] + '%')])
                 if zips:
                     name = ' '.join(tab[:-1])
 
@@ -53,6 +53,15 @@ class ResPartner(models.Model):
         if self.of_secteur_com_id and self.of_secteur_com_id.type == 'tech_com':
             self.of_secteur_tech_id = self.of_secteur_com_id.id
 
+    @api.onchange('zip')
+    def _onchange_zip(self):
+        self.ensure_one()
+        if self.zip and self.env['ir.values'].get_default('of.intervention.settings', 'automatic_areas'):
+            self.of_secteur_com_id = self.env['of.secteur'].get_secteur_from_cp(self.zip).filtered(
+                lambda sec: sec.type in ('com', 'tech_com'))
+            self.of_secteur_tech_id = self.env['of.secteur'].get_secteur_from_cp(self.zip).filtered(
+                lambda sec: sec.type in ('tech', 'tech_com'))
+
 
 class OfSecteur(models.Model):
     _name = "of.secteur"
@@ -62,8 +71,7 @@ class OfSecteur(models.Model):
     type = fields.Selection(
         [('tech', 'Technique'),
          ('com', 'Commercial'),
-         ('tech_com', 'Technique et commercial'),
-        ], string="type de secteur", required=True, default='tech_com')
+         ('tech_com', 'Technique et commercial')], string="type de secteur", required=True, default='tech_com')
     zip_range_ids = fields.One2many('of.secteur.zip.range', 'secteur_id', string=u'Codes postaux')
     active = fields.Boolean(string='Actif', default=True)
     partner_count = fields.Integer(string=u"Nombre de partenaires", compute='_compute_partner_count')
@@ -85,7 +93,8 @@ class OfSecteur(models.Model):
         if len(self) == 1:
             zip_range_ids = self.env['of.secteur.zip.range']
             for zip_range in self.zip_range_ids:
-                under_zip_range_ids = zip_range_obj.search([('cp_min', '<=', zip_range.cp_max), ('cp_max', '>=', zip_range.cp_min)])
+                under_zip_range_ids = zip_range_obj.search([
+                    ('cp_min', '<=', zip_range.cp_max), ('cp_max', '>=', zip_range.cp_min)])
                 for under_zip_range_id in under_zip_range_ids:
                     if under_zip_range_id.secteur_id.type in types:
                         zip_range_ids |= under_zip_range_id
@@ -95,7 +104,8 @@ class OfSecteur(models.Model):
             for secteur in self:
                 zip_range_ids = self.env['of.secteur.zip.range']
                 for zip_range in secteur.zip_range_ids:
-                    under_zip_range_ids = zip_range_obj.search([('cp_min', '<=', zip_range.cp_max), ('cp_max', '>=', zip_range.cp_min)])
+                    under_zip_range_ids = zip_range_obj.search([
+                        ('cp_min', '<=', zip_range.cp_max), ('cp_max', '>=', zip_range.cp_min)])
                     for under_zip_range_id in under_zip_range_ids:
                         if under_zip_range_id.secteur_id.type in types:
                             zip_range_ids |= under_zip_range_id

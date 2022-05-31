@@ -22,7 +22,8 @@ Pour faire l'import, aller dans Configuration -> Technique -> Cities/Locations M
     ],
     'data': [
         'views/of_better_zip_view.xml',
-        'wizard/of_res_partner_assign_area_wizard_views.xml',
+        'wizards/of_secteur_update_delete_wizard_views.xml',
+        'wizards/of_res_partner_assign_area_wizard_views.xml',
         'security/ir.model.access.csv',
     ],
     'installable': True,

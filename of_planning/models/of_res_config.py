@@ -51,6 +51,12 @@ class OfInterventionSettings(models.TransientModel):
         ], string=u"(OF) Création dans", required=True,
         help=u"Pour la création des RDVs, demandes d'interventions, SAV et parcs installés."
     )
+
+    automatic_areas = fields.Boolean(
+        string=u"(OF) Affecte automatiquement un secteur à la création d'un contact",
+        help=u"Si vous cochez cette case, les secteurs seront affectés "
+             u"automatiquement à la création du contact")
+
     do_deliveries = fields.Selection(selection=[
         (0, 'Ne pas utiliser les bons de livraisons depuis les RDV'),
         (1, 'Utiliser les bons de livraisons depuis les RDV'),
@@ -122,3 +128,8 @@ class OfInterventionSettings(models.TransientModel):
     def set_do_deliveries_defaults(self):
         return self.env['ir.values'].sudo().set_default(
                 'of.intervention.settings', 'do_deliveries', self.do_deliveries)
+
+    @api.multi
+    def set_areas_automatically(self):
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings', 'automatic_areas', self.automatic_areas)
