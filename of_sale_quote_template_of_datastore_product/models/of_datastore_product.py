@@ -11,13 +11,3 @@ class SaleQuoteLine(models.Model):
 class OfSaleQuoteTemplateLayoutCategory(models.Model):
     _name = 'of.sale.quote.template.layout.category'
     _inherit = ['of.sale.quote.template.layout.category', 'of.datastore.product.reference']
-
-
-class OfSelectProductWizard(models.TransientModel):
-    _name = 'of.select.product.wizard'
-    _inherit = ['of.select.product.wizard', 'of.datastore.product.reference']
-
-
-class OfSelectOrderProductWizard(models.TransientModel):
-    _name = 'of.select.order.product.wizard'
-    _inherit = ['of.select.order.product.wizard', 'of.datastore.product.reference']

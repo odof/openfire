@@ -107,4 +107,23 @@
         </field>
     </record>
 
+    <record id="of_sale_quote_template_view_order_form" model="ir.ui.view">
+        <field name="name">of.sale.planning.of.sale.quote.template.view.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="of_sale_quote_template.of_sale_quote_template_view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_layout_category_ids']/tree/field[@name='cout']" position="after">
+                <field name="of_duration" widget="float_time"/>
+            </xpath>
+            <xpath expr="//field[@name='of_layout_category_ids']/form//field[@name='cout']" position="after">
+                <label for="of_duration"/>
+                <div>
+                    <field name="of_duration" class="oe_inline" widget="float_time"/>
+                    <span> h</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>

@@ -108,6 +108,17 @@ class SaleOrderLine(models.Model):
         return new_line
 
 
+class OFSaleOrderLayoutCategory(models.Model):
+    _inherit = 'of.sale.order.layout.category'
+
+    of_duration = fields.Float(string=u"Heures", compute='_compute_of_duration')
+
+    @api.multi
+    def _compute_of_duration(self):
+        for line in self:
+            line.of_duration = sum(line.order_line_ids.mapped('of_duration'))
+
+
 class SaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'
 
