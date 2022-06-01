@@ -81,7 +81,8 @@ class AccountInvoice(models.Model):
         if 'of_route_id' in vals:
             # only updates lines whitout a route to not override a rule set manually on the line
             for line in filter(
-                    lambda lvals: lvals and lvals[2] and not lvals[2]['of_route_id'], vals['invoice_line_ids']):
+                    lambda lvals: lvals and lvals[2] and not lvals[2].get('of_route_id'),
+                    vals['invoice_line_ids']):
                 line[2]['of_route_id'] = vals['of_route_id']
         return super(AccountInvoice, self).create(vals)
 
