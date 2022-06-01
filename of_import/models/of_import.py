@@ -2,7 +2,6 @@
 
 import csv
 import datetime
-import io
 import itertools
 import logging
 import time
@@ -47,7 +46,7 @@ SELECT_EXTENSIONS = [
     ('xls', 'MS-Excel'),
     ('xlsx', 'MS-Excel-10'),
     ('ods', 'LibreOffice'),
-    ]
+]
 
 CODE_IMPORT_ERREUR = -1
 CODE_IMPORT_AVERT = -2
@@ -210,26 +209,30 @@ class OFProductBrand(models.Model):
 
     @api.multi
     def _inverse_product_config_ids(self):
-        product_obj = self.env['product.template']
-        fields_list = self.get_config_field_list()
-        deleted = product_obj.browse()
-        for brand in self:
-            for line in brand.product_config_ids:
-                if line[0] == 4:
-                    # pas de modification
-                    pass
+        # This inverse function is here to allow the modification of the O2M
+        pass
+
+    @api.multi
+    def write(self, vals):
+        res = super(OFProductBrand, self).write(vals)
+        if vals.get('product_config_ids'):
+            Product = self.env['product.template']
+            fields_list = self.get_config_field_list()
+            deleted_product_ids = []
+            for line in vals['product_config_ids']:
+                # For the value "line[0] == 4" no modification allowed here and we don't want to update the Product.
+                # For the value "line[0] == 0" we will do nothing because we are assuming that nobody would create
+                # a Product here.
                 if line[0] in (2, 3):
                     # Suppression de ligne = annulation des règles de calcul
-                    deleted |= line[1]
+                    deleted_product_ids.append(line[1])
                 if line[0] == 1:
-                    # Ajout ou modification d'une ligne = définition des ègles de calcul
-                    product_obj.browse(line[1]).write(
+                    # Ajout ou modification d'une ligne = définition des règles de calcul
+                    Product.browse(line[1]).write(
                         {field: line[2][field] for field in fields_list if field in line[2]})
-                if line[0] == 0:
-                    # Qui irait créer un article depuis cet endroit?
-                    pass
-        if deleted:
-            deleted.write(dict.fromkeys(fields_list, False))
+            if deleted_product_ids:
+                Product.browse(deleted_product_ids).write(dict.fromkeys(fields_list, False))
+        return res
 
     @api.model
     def compute_remise(self, *remises):
@@ -568,7 +571,7 @@ class OfImport(models.Model):
                 return file_encoding
             else:
                 raise UserError(u'Encodage non reconnu.')
-        except:
+        except Exception:
             raise UserError(u'Erreur : encodage non reconnu.')
 
     @api.depends('file')
@@ -658,15 +661,6 @@ class OfImport(models.Model):
     @api.multi
     def _read_ods(self):
         raise UserError(u"Pour l'instant, il n'est pas possible d'importer des fichiers OpenOffice.")
-
-        """ Read file content using ODSReader custom lib """
-        doc = odf_ods_reader.ODSReader(file=io.BytesIO(self.file))
-
-        return (
-            row
-            for row in doc.getFirstSheet()
-            if any(x for x in row if x.strip())
-            )
 
     # MS OFFICE
     @api.multi
@@ -1020,7 +1014,7 @@ class OfImport(models.Model):
                     except ValueError:
                         erreur(u"Ligne %s : champ %s (%s) n'est pas un id (nombre entier) alors que le champ relation "
                                u"(après le /) est un id. %s non importé."
-                               % (i,  champs_odoo[champ_fichier_sansrel]['description'], champ_fichier,
+                               % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier,
                                   model_data['nom_objet'].capitalize()))
 
     #
@@ -1749,11 +1743,11 @@ class OfImport(models.Model):
         for champ_fichier in champs_fichier:
 
             # Récupération du champ relation si est indiqué (dans le nom du champ après un /)
-            champ_relation = champ_fichier[champ_fichier.rfind('/')+1 or len(champ_fichier):].strip()
+            champ_relation = champ_fichier[champ_fichier.rfind('/') + 1 or len(champ_fichier):].strip()
 
             if champ_relation:
                 # On le retire du nom du champ.
-                champ_fichier = champ_fichier[:-len(champ_relation)-1].strip()
+                champ_fichier = champ_fichier[:-len(champ_relation) - 1].strip()
 
             if champ_fichier in doublons:
                 doublons[champ_fichier] = doublons[champ_fichier] + 1

@@ -70,10 +70,10 @@ class OfProductBrand(models.Model):
     @api.multi
     def write(self, vals):
         previous_code = self and self.code
-        super(OfProductBrand, self).write(vals)
+        res = super(OfProductBrand, self).write(vals)
         if 'use_prefix' in vals or (self.use_prefix and 'code' in vals):
             self.update_products_default_code(remove_previous_prefix=previous_code)
-        return True
+        return res
 
     @api.multi
     def update_products_default_code(self, products=False, remove_previous_prefix=False):
@@ -89,7 +89,8 @@ class OfProductBrand(models.Model):
             if products is False:
                 products = self.with_context(active_test=False).product_variant_ids
             product_prefix = self.code + "_"
-        if remove_previous_prefix and isinstance(remove_previous_prefix, basestring) and not remove_previous_prefix.endswith('_'):
+        if remove_previous_prefix and isinstance(remove_previous_prefix, basestring) and \
+                not remove_previous_prefix.endswith('_'):
             remove_previous_prefix += '_'
         for product in products:
             # update_products_default_code() can be called from onchange, when default_code is not already filled
@@ -101,7 +102,7 @@ class OfProductBrand(models.Model):
                 else:
                     # This part is dangerous as it may erase a part of the product default_code
                     ind = default_code.find("_")
-                    default_code = default_code[ind+1:]
+                    default_code = default_code[ind + 1:]
             if self and default_code.startswith(product_prefix) != self.use_prefix:
                 if self.use_prefix:
                     default_code = product_prefix + default_code
