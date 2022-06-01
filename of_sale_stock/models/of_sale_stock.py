@@ -16,7 +16,6 @@ def action_assign(self, no_prepare=False):
     main_domain = {}
 
     Quant = self.env['stock.quant']
-    Uom = self.env['product.uom']
     moves_to_assign = self.env['stock.move']
     moves_to_do = self.env['stock.move']
     operations = self.env['stock.pack.operation']
@@ -175,7 +174,6 @@ class StockInventoryLine(models.Model):
             self.product_value_unit = self.product_id.standard_price
         else:
             self.product_value_unit = 0.0
-
 
 
 class SaleConfiguration(models.TransientModel):

@@ -33,6 +33,11 @@ class SaleOrder(models.Model):
             for line in self.order_line:
                 line.route_id = self.of_route_id.id
 
+    @api.onchange('company_id')
+    def _onchange_company_id(self):
+        if self.company_id:
+            self.warehouse_id = self.company_id.of_default_warehouse_id
+
     @api.model
     def _search_of_picking_min_date(self, operator, value):
         pickings = self.env['stock.picking'].search([('min_date', operator, value)])
