@@ -723,6 +723,12 @@ class OfPlanningIntervention(models.Model):
                 date_courante_deb_dt = tz.localize(datetime.strptime(date_courante_str, "%Y-%m-%d"))
                 # Calcul de la nouvelle date
                 date_deadline_locale_dt = date_courante_deb_dt + timedelta(hours=heure_courante)
+                # Avec l'imprécision des durées, il est nécessaire de faire un arrondi à la seconde
+                # Les microsecondes seront sinon perdues au formatage en string, plus bas
+                # (ça peut provoquer des erreurs)
+                date_deadline_locale_dt += timedelta(
+                    seconds=date_deadline_locale_dt.microsecond > 500000,
+                    microseconds=-date_deadline_locale_dt.microsecond)
                 # Conversion en UTC
                 date_deadline_utc_dt = date_deadline_locale_dt - date_deadline_locale_dt.tzinfo._utcoffset
                 date_deadline_str = date_deadline_utc_dt.strftime("%Y-%m-%d %H:%M:%S")

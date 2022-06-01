@@ -557,8 +557,12 @@ class OfPlanifCreneau(models.TransientModel):
 
         service = self.selected_id.service_id
         date_da = fields.Date.from_string(self.date_creneau)
-        date_propos_dt = datetime.combine(date_da, datetime.min.time()) + timedelta(
-            hours=self.heure_debut_rdv)  # datetime naive
+        td = timedelta(hours=self.heure_debut_rdv)  # datetime naive
+        # Avec l'imprécision des durées, il est nécessaire de faire un arrondi à la seconde
+        # Les microsecondes seront sinon perdues au formatage en string, plus bas
+        # (ça peut provoquer des erreurs)
+        td += timedelta(seconds=td.microseconds > 500000, microseconds=-td.microseconds)
+        date_propos_dt = datetime.combine(date_da, datetime.min.time()) + td
         date_propos_dt = tz.localize(date_propos_dt, is_dst=None).astimezone(pytz.utc)  # datetime utc
         employee_ids = [self.employee_id.id] + self.employee_other_ids.ids
 
