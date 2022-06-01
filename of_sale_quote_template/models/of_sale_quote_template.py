@@ -248,7 +248,7 @@ class OfSaleQuoteTemplateLayoutCategory(models.Model):
 
     @api.depends('parent_id')
     def _compute_depth(self):
-        for category in self:
+        for category in self.sorted('sequence'):
             if category.parent_id:
                 category.depth = 1 + category.parent_id.depth
             else:
@@ -519,7 +519,7 @@ class OfSaleOrderLayoutCategory(models.Model):
 
     @api.depends('parent_id')
     def _compute_depth(self):
-        for category in self:
+        for category in self.sorted('sequence'):
             if category.parent_id:
                 category.depth = 1 + category.parent_id.depth
             else:
