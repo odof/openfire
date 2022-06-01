@@ -1473,6 +1473,22 @@ class ProductProduct(models.Model):
             result += self_obj.create(product_data)
         return result
 
+    @api.multi
+    def write(self, vals):
+        # Archivage des règles de réappro quand les articles sont archivés depuis le TC
+        if 'active' in vals and not vals['active'] and self._context.get('from_tc'):
+            self.mapped('orderpoint_ids').filtered('active').write({'active': False})
+        res = super(ProductProduct, self).write(vals)
+        # Un article archivé via le TC pouvait avoir des règles de réappro.
+        # Lors de l'archivage depuis le TC on passe aussi le champ purchase_ok à False permettant de réactivé les règles
+        # de réappro en même temps que l'article si le champ est à False
+        if 'active' in vals and vals['active']:
+            for product in self.with_context(active_test=False):
+                orderpoints = product.orderpoint_ids.filtered(lambda r: not r.active)
+                if orderpoints and not product.purchase_ok:
+                    orderpoints.write({'active': True})
+        return res
+
 
 class ProductSupplierInfo(models.Model):
     _inherit = 'product.supplierinfo'
