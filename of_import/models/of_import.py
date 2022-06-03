@@ -257,7 +257,7 @@ class OFProductBrand(models.Model):
 
     @api.multi
     def compute_product_price(self, pp_ht, categ_name, uom, uom_po, product=None, price=None, remise=None,
-                              based_on_price=False):
+                              based_on_price=False, other_vals={}):
         """
         @param categ_name: Nom de la catégorie de produit telle que donnée par le fournisseur
         @param product: Objet product.template si existant sur la base actuellement
@@ -276,12 +276,12 @@ class OFProductBrand(models.Model):
             'udm_ratio': udm_ratio,
 
             # Structure de prix
-            'tr_a': product and product.of_purchase_transport or 0,
-            'tr_v': product and product.of_sale_transport or 0,
-            'coef': product and product.of_sale_coeff or 0,
-            'fr_l': product and product.of_other_logistic_costs or 0,
-            'taxe': product and product.of_misc_taxes or 0,
-            'fr_d': product and product.of_misc_costs or 0,
+            'tr_a': other_vals.get('of_purchase_transport', product and product.of_purchase_transport or 0),
+            'tr_v': other_vals.get('of_sale_transport', product and product.of_sale_transport or 0),
+            'coef': other_vals.get('of_sale_coeff', product and product.of_sale_coeff or 0),
+            'fr_l': other_vals.get('of_other_logistic_costs', product and product.of_other_logistic_costs or 0),
+            'taxe': other_vals.get('of_misc_taxes', product and product.of_misc_taxes or 0),
+            'fr_d': other_vals.get('of_misc_costs', product and product.of_misc_costs or 0),
         }
 
         price_fields = [
@@ -901,6 +901,10 @@ class OfImport(models.Model):
                 valeurs['categ_id'] = brand.compute_product_categ(supplier_categ, product=res_objet).id
 
             # Calcul des prix d'achat/vente en fonction des règles de calcul et du prix public ht
+            misc_val_fields = (
+                'of_misc_costs', 'of_misc_taxes',  'of_other_logistic_costs', 'of_purchase_transport',
+                'of_sale_coeff', 'of_sale_transport',
+            )
             if 'list_price' in valeurs and brand:
                 valeurs.setdefault('of_seller_pp_ht', valeurs['list_price'])
                 valeurs.update(brand.compute_product_price(
@@ -911,7 +915,9 @@ class OfImport(models.Model):
                     product=res_objet,
                     price=valeurs.get('of_seller_price'),
                     remise=valeurs.get('of_seller_remise'),
-                    based_on_price=valeurs.get('of_is_net_price')))
+                    based_on_price=valeurs.get('of_is_net_price'),
+                    other_vals={key: valeurs.get(key, 0) for key in misc_val_fields if key in champs_fichier}))
+
         elif self.type_import == 'of.product.kit.line':
             if 'product_uom_id' not in valeurs:
                 product_id = valeurs.get('product_id')
