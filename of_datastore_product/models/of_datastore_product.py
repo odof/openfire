@@ -1322,7 +1322,7 @@ class ProductTemplate(models.Model):
 
     @api.model
     def _of_datastore_is_computed_field(self, field_name):
-        if field_name == 'default_code':
+        if field_name in ('default_code', 'standard_price'):
             return False
         return super(ProductTemplate, self)._of_datastore_is_computed_field(field_name)
 
