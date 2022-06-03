@@ -257,7 +257,7 @@ class OFProductBrand(models.Model):
 
     @api.multi
     def compute_product_price(self, pp_ht, categ_name, uom, uom_po, product=None, price=None, remise=None,
-                              based_on_price=False, other_vals={}):
+                              cost=None, based_on_price=False, other_vals={}):
         """
         @param categ_name: Nom de la catégorie de produit telle que donnée par le fournisseur
         @param product: Objet product.template si existant sur la base actuellement
@@ -272,6 +272,7 @@ class OFProductBrand(models.Model):
         eval_dict = {
             'ppht': pp_ht,
             'pa': price,
+            'pr': cost,
             'cumul': self.compute_remise,
             'udm_ratio': udm_ratio,
 
@@ -288,7 +289,8 @@ class OFProductBrand(models.Model):
             ('of_import_remise', 'remise', 'la remise'),
             ('of_import_price', 'list_price', 'le prix de vente HT'),
         ]
-        if not product or product.cost_method == 'standard':
+        if not product or product.id < 0 or product.cost_method == 'standard':
+            # On ne calcule pas le coût des articles qui utilisent le coût réel ou le coût moyen
             price_fields.append(('of_import_cout', 'standard_price', u'le coût'))
         values = {}
         for config_field, product_field, text in price_fields:
@@ -296,9 +298,6 @@ class OFProductBrand(models.Model):
                 if obj and obj[config_field]:
                     if product_field == 'list_price' and obj[config_field].strip() == 'pv':
                         # On ne fait rien, le prix de vente est conservé
-                        break
-                    if product_field == 'standard_price' and obj[config_field].strip() == 'pr':
-                        # On ne fait rien, le prix de revient est importé
                         break
                     value = safe_eval(obj[config_field], eval_dict)
                     if product_field == 'remise':
@@ -357,7 +356,7 @@ class OFProductBrand(models.Model):
 
     @api.multi
     def compute_product_values(self, pp_ht, categ_name, uom_id, uom_po_id, product=None, price=None, remise=None,
-                               based_on_price=False):
+                               cost=None, based_on_price=False):
         self.ensure_one()
 
         categ = self.compute_product_categ(categ_name, product=product)
@@ -365,7 +364,7 @@ class OFProductBrand(models.Model):
             raise UserError(u"Impossible de trouver la catégorie de produits correspondant à \"%s\"" % (categ_name, ))
 
         values = self.compute_product_price(
-            pp_ht, categ_name, uom_id, uom_po_id, product=product, price=price, remise=remise,
+            pp_ht, categ_name, uom_id, uom_po_id, product=product, price=price, remise=remise, cost=cost,
             based_on_price=based_on_price)
         values['categ_id'] = categ.id
         return values
@@ -409,6 +408,7 @@ class ProductTemplate(models.Model):
                         product.uom_po_id,
                         product,
                         seller.price,
+                        product.standard_price,
                         based_on_price=product.of_is_net_price,
                     )
                     values = {key: val for key, val in values.iteritems()
@@ -915,6 +915,7 @@ class OfImport(models.Model):
                     product=res_objet,
                     price=valeurs.get('of_seller_price'),
                     remise=valeurs.get('of_seller_remise'),
+                    cost=valeurs.pop('standard_price', 0),
                     based_on_price=valeurs.get('of_is_net_price'),
                     other_vals={key: valeurs.get(key, 0) for key in misc_val_fields if key in champs_fichier}))
 
