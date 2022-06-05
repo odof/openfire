@@ -87,6 +87,7 @@ Droits utilisateurs:
         "sale",
         "sale_margin",
         "sale_crm",
+        "account_invoice_merge",
     ],
     'external_dependancies': {
         'python': ['pdfminer', 'pypdftk', 'pyPdf'],

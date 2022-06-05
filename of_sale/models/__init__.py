@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
 
 from . import of_sale
-from . import sale_config_settings
+from . import res_config
+from . import account_invoice
