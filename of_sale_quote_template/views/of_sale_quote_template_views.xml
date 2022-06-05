@@ -93,6 +93,9 @@
                                 <field name="of_note2" nolabel="1" colspan="2"/>
                             </group>
                         </page>
+                        <page name="activities" string="Activities">
+                            <field name="of_sale_quote_tmpl_activity_ids" nolabel="1"/>
+                        </page>
                     </notebook>
                     <field name="note" nolabel="1"
                            placeholder="Définissez les conditions générales par défaut dans les paramètres de votre société"/>

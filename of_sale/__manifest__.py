@@ -12,11 +12,11 @@
 ##############################################################################
 
 {
-    'name' : u"OpenFire / Ventes",
-    'version' : "10.0.2.0.0",
+    'name': u"OpenFire / Ventes",
+    'version': "10.0.2.0.0",
     'license': '',
-    'author' : "OpenFire",
-    'website' : "www.openfire.fr",
+    'author': "OpenFire",
+    'website': "www.openfire.fr",
     'category': "Module OpenFlam",
     'summary': u"Personnalisation des ventes OpenFire",
     'description': u"""
@@ -76,7 +76,7 @@ Droits utilisateurs:
 
 - Rendre visible les menus "Étiquettes de contact" et "Catégories d'articles" sans le mode développeur.
 """,
-    'depends' : [
+    'depends': [
         "of_account_invoice_report",  # définition des paramètres d'adresse dans les rapports
         "of_account_tax",  # of_sale ajoute les modifications de of_account_tax dans la creation de facture d'acompte
         #"of_base", <- par of_base_location
@@ -88,11 +88,12 @@ Droits utilisateurs:
         "sale_margin",
         "sale_crm",
         "account_invoice_merge",
+        "of_utils"
     ],
     'external_dependancies': {
         'python': ['pdfminer', 'pypdftk', 'pyPdf'],
     },
-    'data' : [
+    'data': [
         'security/of_sale_security.xml',
         'security/ir.model.access.csv',
         'views/of_sale_view.xml',

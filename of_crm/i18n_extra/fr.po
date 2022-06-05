@@ -1,0 +1,10 @@
+#. module: crm
+#: model:ir.actions.act_window,name:crm.crm_activity_action
+#: model:ir.ui.menu,name:crm.crm_activity_menu
+msgid "Activity types"
+msgstr "Types d'activité"
+
+#. module: crm
+#: model:ir.model.fields,field_description:crm.field_crm_activity_days
+msgid "Delay"
+msgstr "Délai"

@@ -18,3 +18,11 @@ access_of_sale_objective_user,of.sale.objective.user,model_of_sale_objective,bas
 access_of_sale_objective_manager,of.sale.objective.manager,model_of_sale_objective,sales_team.group_sale_manager,1,1,1,1
 access_of_sale_objective_line_user,of.sale.objective.line.user,model_of_sale_objective_line,base.group_user,1,0,0,0
 access_of_sale_objective_line_manager,of.sale.objective.line.manager,model_of_sale_objective_line,sales_team.group_sale_manager,1,1,1,1
+access_of_sale_activity_manager,access.of.sale.activity.manager,model_of_sale_activity,sales_team.group_sale_manager,1,1,1,1
+access_of_sale_activity_user_my,access.of.sale.activity.user.my,model_of_sale_activity,sales_team.group_sale_salesman,1,1,1,0
+access_of_sale_activity_user,access.of.sale.activity.user,model_of_sale_activity,base.group_user,1,0,0,0
+access_of_sale_followup_tag_manager,access.of.sale.followup.tag.manager,model_of_sale_followup_tag,sales_team.group_sale_manager,1,1,1,1
+access_of_sale_followup_tag_my,access.of.sale.followup.tag.my,model_of_sale_followup_tag,sales_team.group_sale_salesman,1,0,0,0
+access_of_sale_followup_tag_user,access.of.sale.followup.tag.user,model_of_sale_followup_tag,base.group_user,1,0,0,0
+access_crm_activity_my,access.crm.activity.my,crm.model_crm_activity,sales_team.group_sale_salesman,1,0,0,0
+access_crm_activity_user,access.crm.activity.user,crm.model_crm_activity,base.group_user,1,0,0,0

@@ -1,32 +1,17 @@
 # -*- coding: utf-8 -*-
-import os
-import base64
-import tempfile
+
 import itertools
 import json
 from odoo import models, fields, api, _
-import odoo.addons.decimal_precision as dp
 from odoo.addons.sale.models.sale import SaleOrderLine as SOL
 from odoo.addons.sale.models.sale import SaleOrder as SO
 from odoo.tools import float_compare, float_is_zero, DEFAULT_SERVER_DATE_FORMAT
 from odoo.exceptions import UserError
 from odoo.models import regex_order
+from odoo.addons.of_utils.models.of_utils import get_selection_label
 
-try:
-    import pyPdf
-except ImportError:
-    pyPdf = None
-
-try:
-    import pypdftk
-except ImportError:
-    pypdftk = None
 
 NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
-
-
-def get_selection_label(self, object, field_name, field_value):
-    return _(dict(self.env[object].fields_get(allfields=[field_name])[field_name]['selection'])[field_value])
 
 
 @api.onchange('product_uom', 'product_uom_qty')
@@ -55,67 +40,6 @@ def _compute_tax_id(self):
 
 
 SO._compute_tax_id = _compute_tax_id
-
-
-class OfDocumentsJoints(models.AbstractModel):
-    """ Classe abstraite qui permet d'ajouter les documents joints.
-    Elle doit être surchargée pour ajouter d'autres rapports dans la fonction _allowed_reports
-    et être en héritage pour la classe sur laquelle on veut ajouter la fonctionnalité.
-    """
-    _name = 'of.documents.joints'
-
-    of_mail_template_ids = fields.Many2many(
-        "of.mail.template", string="Documents joints",
-        help=u"Intégrer des documents pdf au devis/bon de commande (exemple : CGV)"
-    )
-
-    @api.model
-    def _allowed_reports(self):
-        """
-        Fonction qui affecte un nom de rapport à un modèle.
-        Si le nom de rapport imprimé n'est pas dans la liste de clés du dictionnaire,
-        alors les documents joints ne seront pas imprimés.
-        :return: {'nom_du_rapport' : modèle.concerné'}
-        """
-        return {'sale.report_saleorder': 'sale.order', 'account.report_invoice': 'account.invoice'}
-
-    @api.multi
-    def _detect_doc_joint(self):
-        """
-        Cette fonction retourne les données des documents à joindre au fichier pdf du devis/commande au format binaire.
-        Le document retourné correspond au fichier pdf joint au modéle de courrier.
-        @todo: Permettre l'utilisation de courriers classiques et le remplissage des champs.
-        :return: liste des documents à ajouter à la suite du rapport
-        """
-        self.ensure_one()
-        compose_mail_obj = self.env['of.compose.mail']
-        attachment_obj = self.env['ir.attachment']
-        data = []
-        for mail_template in self.of_mail_template_ids:
-            if mail_template.file:
-                # Utilisation des documents pdf fournis
-                if not mail_template.chp_ids:
-                    data.append(mail_template.file)
-                    continue
-                # Calcul des champs remplis sur le modèle de courrier
-                attachment = attachment_obj.search([('res_model', '=', mail_template._name),
-                                                    ('res_field', '=', 'file'),
-                                                    ('res_id', '=', mail_template.id)])
-                datas = dict(compose_mail_obj.eval_champs(self, mail_template.chp_ids))
-                file_path = attachment_obj._full_path(attachment.store_fname)
-                fd, generated_pdf = tempfile.mkstemp(prefix='doc_joint_', suffix='.pdf')
-                try:
-                    pypdftk.fill_form(file_path, datas, out_file=generated_pdf, flatten=not mail_template.fillable)
-                    with open(generated_pdf, "rb") as encode:
-                        encoded_file = base64.b64encode(encode.read())
-                finally:
-                    os.close(fd)
-                    try:
-                        os.remove(generated_pdf)
-                    except Exception:
-                        pass
-                data.append(encoded_file)
-        return data
 
 
 class SaleOrder(models.Model):
@@ -836,84 +760,6 @@ class SaleOrder(models.Model):
         return tax_grouped
 
 
-class Report(models.Model):
-    _inherit = "report"
-
-    @api.model
-    def get_pdf(self, docids, report_name, html=None, data=None):
-        result = super(Report, self).get_pdf(docids, report_name, html=html, data=data)
-        allowed_reports = self.env['of.documents.joints']._allowed_reports()
-        if report_name in allowed_reports:
-            # On ajoute au besoin les documents joint
-            model = self.env[allowed_reports[report_name]].browse(docids)[0]
-            fd, order_pdf = tempfile.mkstemp()
-            os.write(fd, result)
-            os.close(fd)
-            file_paths = [order_pdf]
-
-            mails_data = model._detect_doc_joint()
-
-            for mail_data in mails_data:
-                fd, mail_pdf = tempfile.mkstemp()
-                os.write(fd, base64.b64decode(mail_data))
-                os.close(fd)
-                file_paths.append(mail_pdf)
-
-            if report_name == 'sale.report_saleorder' and \
-                    self.user_has_groups('of_sale.group_of_sale_print_attachment'):
-                for attachment in model.order_line.mapped('of_product_attachment_ids'):
-                    fd, attachment_pdf = tempfile.mkstemp()
-                    os.write(fd, base64.b64decode(attachment.datas))
-                    os.close(fd)
-                    file_paths.append(attachment_pdf)
-
-            if file_paths:
-                result_file_path = self.env['report']._merge_pdf(file_paths)
-                try:
-                    result_file = file(result_file_path, "rb")
-                    result = result_file.read()
-                    result_file.close()
-                    for file_path in file_paths:
-                        os.remove(file_path)
-                    os.remove(result_file_path)
-                except Exception:
-                    pass
-
-        return result
-
-
-class OFInvoiceReportTotalGroup(models.Model):
-    _inherit = 'of.invoice.report.total.group'
-    _description = "Impression des totaux de factures et commandes de vente"
-
-    @api.multi
-    def filter_lines(self, lines, invoices=None):
-        self.ensure_one()
-        if not self.is_group_paiements():
-            return super(OFInvoiceReportTotalGroup, self).filter_lines(lines, invoices=invoices)
-        # Retour des lignes dont l'article correspond à un groupe de rapport de facture
-        #   et dont la ligne de commande associée a une date antérieure
-        #   (seul un paiement d'une facture antérieure doit figurer sur une facture)
-        if lines._name == 'account.invoice.line':
-            allowed_order_lines = invoices.mapped('invoice_line_ids').mapped('sale_line_ids')
-            lines = lines.filtered(lambda l: ((l.product_id in self.product_ids
-                                               or l.product_id.categ_id in self.categ_ids)
-                                              and l.sale_line_ids
-                                              and l.sale_line_ids in allowed_order_lines))
-            # Si une facture d'acompte possède plusieurs lignes, il est impératif de les gérer de la même façon
-            invoices = lines.mapped('invoice_id')
-            sale_lines = lines.mapped('sale_line_ids')
-            for sale_line in sale_lines:
-                sale_line_invoices = sale_line.invoice_lines.mapped('invoice_id')
-                for sale_line2 in sale_line.order_id.order_line:
-                    if sale_line2 != sale_line and sale_line2.invoice_lines.mapped('invoice_id') == sale_line_invoices:
-                        lines |= sale_line2.invoice_lines.filtered(lambda l: l.invoice_id in invoices)
-            return lines
-        else:
-            return lines.filtered(lambda l: (l.product_id in self.product_ids or
-                                             l.product_id.categ_id in self.categ_ids))
-
-
 class SaleOrderLine(models.Model):
     _name = 'sale.order.line'
     _inherit = ['sale.order.line', 'of.readgroup']
@@ -1380,154 +1226,10 @@ class SaleOrderLine(models.Model):
         return res
 
 
-class Company(models.Model):
-    _inherit = 'res.company'
-
-    afficher_descr_fab = fields.Selection(
-        [
-            ('non', 'Ne pas afficher'),
-            ('devis', 'Dans les devis'),
-            ('factures', 'Dans les factures'),
-            ('devis_factures', 'Dans les devis et les factures'),
-        ], string="afficher descr. fabricant", default='devis_factures',
-        help=u"La description du fabricant d'un article sera ajoutée à la description de l'article dans les documents."
-    )
-
-
-class OFSaleEcheance(models.Model):
-    _name = "of.sale.echeance"
-    _order = "order_id, sequence, id"
-
-    name = fields.Char(string="Nom", required=True, default=u"Échéance")
-    order_id = fields.Many2one("sale.order", string="Commande")
-    currency_id = fields.Many2one(related="order_id.currency_id", readonly=True)  # TODO ADAPT SALE
-    amount = fields.Monetary(string="Montant", currency_field='currency_id')
-    percent = fields.Float(string=u"Pourcentage", digits=dp.get_precision('Product Price'))
-    last = fields.Boolean(string=u"Dernière Échéance", compute="_compute_last")
-
-    sequence = fields.Integer(default=10, help="Gives the sequence order when displaying a list of payment term lines.")
-    date = fields.Date(string='Date')
-
-    @api.multi
-    def _compute_last(self):
-        for order in self.mapped('order_id'):
-            for echeance in order.of_echeance_line_ids:
-                echeance.last = echeance == order.of_echeance_line_ids[-1]
-
-    @api.onchange("amount")
-    def _onchange_amount(self):
-        """Met à jour le pourcentage en fonction du montant"""
-        order_amount = self._context.get('order_amount', self.order_id.amount_total)
-        # Test: si le nouveau montant est calculé depuis le pourcentage, on ne le recalcule pas
-        test_amount = order_amount * self.percent / 100
-        if float_compare(self.amount, test_amount, precision_rounding=.01):
-            self.percent = self.amount * 100 / order_amount if order_amount else 0
-
-    @api.onchange("percent")
-    def _onchange_percent(self):
-        """Met à jour le montant en fonction du pourcentage"""
-        order_amount = self._context.get('order_amount', self.order_id.amount_total)
-        # Test: si le nouveau pourcentage est calculé depuis le montant, on ne le recalcule pas
-        test_percent = self.amount * 100 / order_amount if order_amount else 0
-        if float_compare(self.percent, test_percent, precision_rounding=.01):
-            self.amount = order_amount * self.percent / 100
-
-
 class SaleLayoutCategory(models.Model):
     _inherit = 'sale.layout_category'
 
     active = fields.Boolean(string="Active", default=True)
-
-
-class ResPartner(models.Model):
-    _inherit = 'res.partner'
-
-    @api.model
-    def _auto_init(self):
-        module_self = self.env['ir.module.module'].search([('name', '=', 'of_sale')])
-        partner_sale_warn_ids = []
-        partner_sale_block_ids = []
-        if module_self:
-            # installed_version est trompeur, il contient la version en cours d'installation
-            # on utilise donc latest version à la place
-            version = module_self.latest_version
-            if version < '10.0.2':
-                cr = self.env.cr
-                cr.execute("SELECT id FROM res_partner WHERE sale_warn != 'no-message'")
-                # cr.execute n'accepte pas les listes en paramètre
-                partner_sale_warn_ids = tuple([row[0] for row in cr.fetchall()])
-                cr.execute("SELECT id FROM res_partner WHERE sale_warn = 'block'")
-                partner_sale_block_ids = tuple([row[0] for row in cr.fetchall()])
-        super(ResPartner, self)._auto_init()
-        if partner_sale_warn_ids:
-            cr.execute("UPDATE res_partner SET of_is_sale_warn = 't' WHERE id in %s", (partner_sale_warn_ids,))
-            cr.execute("UPDATE res_partner SET of_is_warn = 't' WHERE id in %s", (partner_sale_warn_ids,))
-            cr.execute(
-                "UPDATE res_partner SET invoice_warn_msg = sale_warn_msg "
-                "WHERE (invoice_warn_msg IS NULL OR invoice_warn_msg = '') and id in %s",
-                (partner_sale_warn_ids,))
-        if partner_sale_block_ids:
-            cr.execute("UPDATE res_partner SET of_warn_block = 't' WHERE id in %s", (partner_sale_block_ids,))
-
-    # invoice_warn et invoice_warn_msg sont désormais partagés entre factures, ventes et interventions
-    sale_warn = fields.Selection(related='invoice_warn', readonly=True)
-    sale_warn_msg = fields.Text(related='invoice_warn_msg', readonly=True)
-    of_is_sale_warn = fields.Boolean(string=u"Avertissement ventes")
-    of_invoice_policy = fields.Selection(
-        [('order', u'Quantités commandées'), ('delivery', u'Quantités livrées')],
-        string="Politique de facturation")
-
-    @api.depends('of_is_sale_warn')
-    def _compute_of_is_warn(self):
-        has_warn = self.filtered('of_is_sale_warn')
-        # `has_warn.of_is_warn = True` ne fonctionne pas car expected singleton
-        for partner in has_warn:
-            partner.of_is_warn = True
-        partners_left = self - has_warn
-        super(ResPartner, partners_left)._compute_of_is_warn()
-
-
-class ProductCategory(models.Model):
-    _inherit = 'product.category'
-
-    of_article_principal = fields.Boolean(string="Article principal",
-                                          help=u"Les articles de cette catégorie seront considérés comme articles"
-                                               u" principaux sur les commandes / factures clients")
-
-
-class ProductPricelist(models.Model):
-    _inherit = 'product.pricelist'
-
-    @api.multi
-    def of_is_quantity_dependent(self, product_id, date_eval=fields.Date.today()):
-        u"""
-            :param: product_id Produit évalué
-            :param: date_eval Date d'évaluation de la liste de prix
-            :return: True si le produit évalué est contenu dans cette liste et que son prix dépend de la quantité
-        """
-        self.ensure_one()
-        product = self.env['product.product'].browse(product_id)
-        for item in self.item_ids:
-            if item.min_quantity and item.min_quantity > 1:
-                # une date de début pour cet item et la date d'évaluation antérieure à cette date de début
-                if item.date_start and date_eval < item.date_start:
-                    continue
-                # une date de fin pour cet item et la date d'évaluation postérieure à cette date de fin
-                if item.date_end and date_eval > item.date_end:
-                    continue
-                # l'item s'applique sur une catégorie d'article différente de celle de l'article évalué
-                if item.applied_on == '2_product_category' and item.categ_id \
-                        and item.categ_id != product.product_tmpl_id.categ_id:
-                    continue
-                # l'item s'applique sur un article différent de l'article évalué
-                if item.applied_on == '1_product' and item.product_tmpl_id \
-                        and item.product_tmpl_id != product.product_tmpl_id:
-                    continue
-                # l'item s'applique sur une variante différente de la variante évaluée
-                if item.applied_on == '0_product_variant' and item.product_id and item.product_id != product:
-                    continue
-                return True
-        return False
 
 
 class OFOrderLineOption(models.Model):
@@ -1546,119 +1248,3 @@ class OFOrderLineOption(models.Model):
                    ('percent', u"Pourcentage")], string=u"Type de modification du prix de vente")
     sale_price_update_value = fields.Float(string=u"Valeur de modification du prix de vente")
     description_update = fields.Text(string=u"Description de la ligne de commande")
-
-
-class ProcurementOrder(models.Model):
-    _inherit = 'procurement.order'
-
-    @api.multi
-    def _prepare_purchase_order_line(self, po, supplier):
-        res = super(ProcurementOrder, self)._prepare_purchase_order_line(po, supplier)
-
-        # Prise en compte de l'option de ligne de commande
-        sale_line = self.sale_line_id
-        if not sale_line:
-            sale_line = self.move_dest_id.procurement_id.sale_line_id
-        if sale_line and sale_line.of_order_line_option_id:
-            option = sale_line.of_order_line_option_id
-            res['of_order_line_option_id'] = option.id
-            if option.purchase_price_update and res['price_unit']:
-                if option.purchase_price_update_type == 'fixed':
-                    res['price_unit'] = res['price_unit'] + option.purchase_price_update_value
-                elif option.purchase_price_update_type == 'percent':
-                    res['price_unit'] = res['price_unit'] + (res['price_unit'] *
-                                                             (option.purchase_price_update_value / 100))
-                res['price_unit'] = po.currency_id.round(res['price_unit'])
-
-        return res
-
-
-class PurchaseOrderLine(models.Model):
-    _inherit = 'purchase.order.line'
-
-    of_order_line_option_id = fields.Many2one(comodel_name='of.order.line.option', string=u"Option")
-
-    @api.onchange('of_order_line_option_id')
-    def _onchange_of_order_line_option_id(self):
-        if self.of_order_line_option_id and self.product_id:
-            option = self.of_order_line_option_id
-            if option.purchase_price_update and self.price_unit:
-                if option.purchase_price_update_type == 'fixed':
-                    self.price_unit = self.price_unit + option.purchase_price_update_value
-                elif option.purchase_price_update_type == 'percent':
-                    self.price_unit = self.price_unit + (self.price_unit * (option.purchase_price_update_value / 100))
-                self.price_unit = self.order_id.currency_id.round(self.price_unit)
-            self.name = self.name + "\n%s" % option.description_update
-
-
-class ProductTemplate(models.Model):
-    _inherit = 'product.template'
-
-    of_product_image_ids = fields.One2many('of.product.image', 'product_tmpl_id', string=u'Images')
-
-    @api.multi
-    def action_view_sales(self):
-        self.ensure_one()
-        action = self.env.ref('sale.action_product_sale_list')
-        product_ids = self.with_context(active_test=False).product_variant_ids.ids
-
-        return {
-            'name': action.name,
-            'help': action.help,
-            'type': action.type,
-            'view_type': action.view_type,
-            'view_mode': action.view_mode,
-            'target': action.target,
-            'context': "{'default_product_id': " + str(product_ids[0]) + "}",
-            'res_model': action.res_model,
-            'domain': [('product_id.product_tmpl_id', '=', self.id)],
-        }
-
-
-class ProductProduct(models.Model):
-    _inherit = 'product.product'
-
-    @api.multi
-    def _sales_count(self):
-        r = {}
-        domain = [
-            ('product_id', 'in', self.ids),
-        ]
-        for group in self.env['sale.report'].read_group(domain, ['product_id', 'product_uom_qty'], ['product_id']):
-            r[group['product_id'][0]] = group['product_uom_qty']
-        for product in self:
-            product.sales_count = r.get(product.id, 0)
-        return r
-
-    @api.multi
-    def write(self, values):
-        res = super(ProductProduct, self).write(values)
-        # Si une variante est archivée, on regarde si d'autres variantes sont encore active,
-        # sinon, on archive aussi le modèle d'article
-        # no rebound dans le context pour éviter une boucle infinie : archiver un template archive ses variantes
-        if 'active' in values and not values['active'] and res and not self._context.get('of_no_rebound'):
-            to_deactivate = self.env['product.template']
-            for product in self:
-                variants = self.search_count([('product_tmpl_id', '=', product.product_tmpl_id.id)])
-                if not variants:
-                    to_deactivate |= product.product_tmpl_id
-            to_deactivate.with_context(of_no_rebound=True).write({'active': False})
-        # Si une variante est désarchivée, on regarde si son template est actif
-        # sinon, on active aussi le modèle d'article
-        # no rebound dans le context pour éviter une boucle infinie : activer un template active ses variantes
-        if 'active' in values and values['active'] and res and not self._context.get('of_no_rebound'):
-            to_activate = self.env['product.template']
-            for product in self:
-                if not product.product_tmpl_id.active:
-                    to_activate |= product.product_tmpl_id
-            to_activate.with_context(of_no_rebound=True).write({'active': True})
-        return res
-
-
-class OfProductImage(models.Model):
-    _name = 'of.product.image'
-    _description = 'Product Images'
-
-    name = fields.Char('Name')
-    image = fields.Binary('Image', attachment=True)
-    product_tmpl_id = fields.Many2one('product.template', 'Related Product', copy=True)

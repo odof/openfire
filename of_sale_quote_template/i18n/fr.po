@@ -1,0 +1,907 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_sale_quote_template
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-23 13:16+0000\n"
+"PO-Revision-Date: 2022-05-23 13:16+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_pc_margin
+msgid "% Marge"
+msgstr "% Marge"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_pc_sale_price
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_pc_prix_vente
+msgid "% Prix de vente"
+msgstr "% Prix de vente"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_config_settings_group_of_advanced_sale_layout_category
+msgid "(OF) Activer les sections avancées sur les devis"
+msgstr "(OF) Activer les sections avancées sur les devis"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_config_settings_module_of_sale_budget
+msgid "(OF) Gestion du budget"
+msgstr "(OF) Gestion du budget"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_config_settings_of_quote_template
+msgid "(OF) Modèle de devis"
+msgstr "(OF) Modèle de devis"
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_layout_category_add_wizard_form_view
+msgid "<span attrs=\"{'invisible': [('display_button', '!=', False)]}\">Le nombre de sections doit être supérieur au nombre actuel de sous section.</span>"
+msgstr "<span attrs=\"{'invisible': [('display_button', '!=', False)]}\">Le nombre de sections doit être supérieur au nombre actuel de sous section.</span>"
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_sale_quote_template_view_sale_config_settings
+msgid "<span>Activer la gestion du budget et des heures chantier dans les devis</span>"
+msgstr "<span>Activer la gestion du budget et des heures chantier dans les devis</span>"
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_sale_quote_template_view_sale_config_settings
+msgid "<span>Ajoute l'onglet Sections sur les devis</span>"
+msgstr "<span>Ajoute l'onglet Sections sur les devis</span>"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_active
+msgid "Active"
+msgstr "Actif"
+
+#. module: of_sale_quote_template
+#: model:res.groups,name:of_sale_quote_template.group_of_advanced_sale_layout_category
+msgid "Activer les sections avancées sur les devis"
+msgstr "Activer les sections avancées sur les devis"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_of_sale_quote_tmpl_activity_ids
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_sale_quote_tmpl_activity_view_tree
+#: model:ir.ui.view,arch_db:of_sale_quote_template.view_sale_quote_template_form
+msgid "Activities"
+msgstr "Activités"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity_activity_id
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_sale_quote_tmpl_activity_view_form
+msgid "Activity"
+msgstr "Activité"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_add_wizard_display_button
+msgid "Afficher bouton de validation"
+msgstr "Afficher bouton de validation"
+
+#. module: of_sale_quote_template
+#: model:res.groups,comment:of_sale_quote_template.group_of_advanced_sale_layout_category
+msgid "Ajoute l'onglet Sections sur les devis"
+msgstr "Ajoute l'onglet Sections sur les devis"
+
+#. module: of_sale_quote_template
+#: selection:sale.config.settings,of_quote_template:0
+msgid "Ajoute les lignes de commande du modèle au devis"
+msgstr "Ajoute les lignes de commande du modèle au devis"
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_sale_quote_template_view_order_form
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_sale_quote_template_view_sale_quote_template_form
+msgid "Ajouter une sous section à cette ligne"
+msgstr "Ajouter une sous section à cette ligne"
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_layout_category_add_wizard_form_view
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_layout_category_duplicate_wizard_form_view
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_layout_category_invoicing_wizard_view_form
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_layout_category_move_wizard_form_view
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_select_order_product_wizard_from_view
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_select_product_wizard_from_view
+msgid "Annuler"
+msgstr "Annuler"
+
+#. module: of_sale_quote_template
+#: model:ir.actions.act_window,help:of_sale_quote_template.action_sale_quotation_template
+msgid "Appuyer ici pour créer votre modèle."
+msgstr "Appuyer ici pour créer votre modèle."
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.view_sale_quote_template_search
+msgid "Archivé"
+msgstr "Archivé"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_of_active
+msgid "Article actif"
+msgstr "Article actif"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_of_article_principal
+msgid "Article principal"
+msgstr "Article principal"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_product_ids
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_order_product_wizard_product_ids
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_product_wizard_product_ids
+#: selection:of.sale.order.gestion.prix,calculation_basis:0
+msgid "Articles"
+msgstr "Articles"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_calculation_basis
+msgid "Base de calcul"
+msgstr "Base de calcul"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_order_id
+msgid "Bon de commande"
+msgstr "Bon de commande"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,help:of_sale_quote_template.field_sale_config_settings_of_quote_template
+msgid "Ceci ne modifie que le fonctionnement des lignes de commandes du modèle.Les autres informations (ex: position fiscale) ne sont pas impactées par ce paramètre et seront toujours remplacées par celles du dernier modèle choisi"
+msgstr "Ceci ne modifie que le fonctionnement des lignes de commandes du modèle.Les autres informations (ex: position fiscale) ne sont pas impactées par ce paramètre et seront toujours remplacées par celles du dernier modèle choisi"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,help:of_sale_quote_template.field_sale_quote_line_of_article_principal
+msgid "Cet article est l'article principal de la commande"
+msgstr "Cet article est l'article principal de la commande"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,help:of_sale_quote_template.field_sale_order_of_note_insertion
+msgid "Cette note disparaitra lorsque le devis sera sauvegardé."
+msgstr "Cette note disparaitra lorsque le devis sera sauvegardé."
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.sale_order_form_quote
+msgid "Charger les sections"
+msgstr "Charger les sections"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_add_wizard_order_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_duplicate_wizard_order_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_invoicing_wizard_order_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_move_wizard_order_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_order_product_wizard_order_id
+msgid "Commande"
+msgstr "Commande"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_of_note2
+msgid "Commentaire du bas"
+msgstr "Commentaire du bas"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_of_note1
+msgid "Commentaire du haut"
+msgstr "Commentaire du haut"
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.view_sale_quote_template_form
+msgid "Commentaires"
+msgstr "Commentaires"
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.view_sale_quote_template_form
+msgid "Commentaires du bas"
+msgstr "Commentaires du bas"
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.view_sale_quote_template_form
+msgid "Commentaires du haut"
+msgstr "Commentaires du haut"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_product_ids
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_sale_quote_template_view_sale_quote_template_form
+#: model:ir.ui.view,arch_db:of_sale_quote_template.view_of_sale_quote_template_layout_category_tree
+msgid "Composants"
+msgstr "Composants"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity_compute_date
+msgid "Compute Date"
+msgstr "Date de calcul"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_of_payment_term_id
+msgid "Conditions de règlement"
+msgstr "Conditions de règlement"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_cost
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_cout
+msgid "Coût"
+msgstr "Coût"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_add_wizard_create_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_duplicate_wizard_create_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_invoicing_wizard_create_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_move_wizard_create_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_create_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_create_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_create_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity_create_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_order_product_wizard_create_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_product_wizard_create_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_create_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_add_wizard_create_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_duplicate_wizard_create_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_invoicing_wizard_create_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_move_wizard_create_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_create_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_create_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_create_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity_create_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_order_product_wizard_create_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_product_wizard_create_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_create_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_currency_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_currency_id
+msgid "Currency"
+msgstr "Devise"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity_days
+msgid "Delay"
+msgstr "Délai"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity_description
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_name
+#: model:ir.ui.view,arch_db:of_sale_quote_template.view_sale_quote_template_form
+msgid "Description"
+msgstr "Description"
+
+#. module: of_sale_quote_template
+#: selection:of.layout.category.add.wizard,type:0
+#: selection:of.layout.category.duplicate.wizard,type:0
+#: selection:of.layout.category.move.wizard,type:0
+msgid "Devis/Commande"
+msgstr "Devis/Commande"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_add_wizard_display_name
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_duplicate_wizard_display_name
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_invoicing_wizard_display_name
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_move_wizard_display_name
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_display_name
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_display_name
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_display_name
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity_display_name
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_order_product_wizard_display_name
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_product_wizard_display_name
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_display_name
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_of_mail_template_ids
+#: model:ir.ui.view,arch_db:of_sale_quote_template.view_sale_quote_template_form
+msgid "Documents joints"
+msgstr "Documents joints"
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_sale_quote_template_view_order_form
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_sale_quote_template_view_sale_quote_template_form
+msgid "Dupliquer cette ligne"
+msgstr "Dupliquer cette ligne"
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.view_sale_quote_template_form
+msgid "Définissez les conditions générales par défaut dans les paramètres de votre société"
+msgstr "Définissez les conditions générales par défaut dans les paramètres de votre société"
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_sale_quote_template_view_order_form
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_sale_quote_template_view_sale_quote_template_form
+msgid "Déplacer cette ligne"
+msgstr "Déplacer cette ligne"
+
+#. module: of_sale_quote_template
+#: selection:of.sale.order.layout.category,invoice_status:0
+#: selection:of.sale.order.layout.category,invoice_status_without_child:0
+#: selection:sale.order,of_layout_category_invoice_status:0
+msgid "Entièrement facturé"
+msgstr "Entièrement facturé"
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.view_sale_quote_template_form
+msgid "Est l'article principal"
+msgstr "Est l'article principal"
+
+#. module: of_sale_quote_template
+#: selection:of.sale.order.gestion.prix.layout.category,state:0
+msgid "Exclus"
+msgstr "Exclus"
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_layout_category_invoicing_wizard_view_form
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_sale_quote_template_view_order_form
+msgid "Facturer par section"
+msgstr "Facturer par section"
+
+#. module: of_sale_quote_template
+#: selection:of.sale.order.gestion.prix.layout.category,state:0
+msgid "Forcé"
+msgstr "Forcé"
+
+#. module: of_sale_quote_template
+#: model:ir.model,name:of_sale_quote_template.model_of_sale_order_gestion_prix
+msgid "Gestion des prix"
+msgstr "Gestion des prix"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_add_wizard_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_duplicate_wizard_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_invoicing_wizard_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_move_wizard_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_order_product_wizard_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_product_wizard_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_id
+msgid "ID"
+msgstr "ID"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_duplicate_wizard_inclure_sous_sections
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_move_wizard_inclure_sous_sections
+msgid "Inclure les sous-sections"
+msgstr "Inclure les sous-sections"
+
+#. module: of_sale_quote_template
+#: selection:of.sale.order.gestion.prix.layout.category,state:0
+msgid "Inclus"
+msgstr "Inclus"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,help:of_sale_quote_template.field_sale_config_settings_module_of_sale_budget
+msgid "Installe le module Ventes / Budget"
+msgstr "Installe le module Ventes / Budget"
+
+#. module: of_sale_quote_template
+#: model:ir.model,name:of_sale_quote_template.model_account_invoice
+msgid "Invoice"
+msgstr "Facture"
+
+#. module: of_sale_quote_template
+#: model:ir.model,name:of_sale_quote_template.model_account_invoice_line
+msgid "Invoice Line"
+msgstr "Ligne de facture"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_add_wizard___last_update
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_duplicate_wizard___last_update
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_invoicing_wizard___last_update
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_move_wizard___last_update
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category___last_update
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category___last_update
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category___last_update
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity___last_update
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_order_product_wizard___last_update
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_product_wizard___last_update
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line___last_update
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template___last_update
+msgid "Last Modified on"
+msgstr "Dernière Modification le"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_add_wizard_write_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_duplicate_wizard_write_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_invoicing_wizard_write_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_move_wizard_write_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_write_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_write_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_write_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity_write_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_order_product_wizard_write_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_product_wizard_write_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_write_uid
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_add_wizard_write_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_duplicate_wizard_write_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_invoicing_wizard_write_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_move_wizard_write_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_write_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_write_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_write_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity_write_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_order_product_wizard_write_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_product_wizard_write_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_write_date
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_name
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_name
+msgid "Libellé"
+msgstr "Libellé"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_quote_section_line_id
+msgid "Ligne d'origine"
+msgstr "Ligne d'origine"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_order_line_of_quote_line_id
+msgid "Ligne de modèle de devis"
+msgstr "Ligne de modèle de devis"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_account_invoice_line_of_layout_category_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_add_wizard_order_layout_category_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_add_wizard_quote_layout_category_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_duplicate_wizard_order_layout_category_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_duplicate_wizard_quote_layout_category_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_move_wizard_order_layout_category_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_move_wizard_quote_layout_category_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_order_product_wizard_order_layout_category_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_product_wizard_quote_template_layout_category_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_order_line_of_layout_category_id
+msgid "Ligne de section"
+msgstr "Ligne de section"
+
+#. module: of_sale_quote_template
+#: model:ir.model,name:of_sale_quote_template.model_of_sale_order_layout_category
+#: model:ir.model,name:of_sale_quote_template.model_of_sale_quote_template_layout_category
+msgid "Ligne de sections"
+msgstr "Ligne de sections"
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_sale_quote_template_view_sale_quote_template_form
+msgid "Lignes d'article"
+msgstr "Lignes d'article"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_order_line_count
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_order_line_ids
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_order_line_without_child_count
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_order_line_without_child_ids
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_quote_line_count
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_quote_line_ids
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_sale_quote_template_view_order_form
+#: model:ir.ui.view,arch_db:of_sale_quote_template.view_sale_quote_template_form
+msgid "Lignes de commande"
+msgstr "Lignes de commande"
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.view_sale_quote_template_form
+msgid "Lignes de commande du modèle de devis"
+msgstr "Lignes de commande du modèle de devis"
+
+#. module: of_sale_quote_template
+#: model:ir.model,name:of_sale_quote_template.model_sale_quote_line
+msgid "Lignes de modèle de devis"
+msgstr "Lignes de modèle de devis"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_invoicing_wizard_layout_category_ids
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_view_sale_order_gestion_prix
+#: model:ir.ui.view,arch_db:of_sale_quote_template.view_of_sale_order_layout_category_tree
+msgid "Lignes de section"
+msgstr "Lignes de section"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_quote_line
+msgid "Lignes du modèle"
+msgstr "Lignes du modèle"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_line_ids
+msgid "Lignes impactées"
+msgstr "Lignes impactées"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_account_invoice_of_layout_category_ids
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_order_of_layout_category_ids
+msgid "Liste de section"
+msgstr "Liste de section"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_margin
+msgid "Marge HT"
+msgstr "Marge HT"
+
+#. module: of_sale_quote_template
+#: model:ir.actions.act_window,name:of_sale_quote_template.action_sale_quotation_template
+#: model:ir.model,name:of_sale_quote_template.model_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_add_wizard_quote_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_duplicate_wizard_quote_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_move_wizard_quote_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_quote_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_product_wizard_quote_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_order_of_template_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_quote_id
+#: model:ir.ui.view,arch_db:of_sale_quote_template.view_sale_quote_template_form
+#: model:ir.ui.view,arch_db:of_sale_quote_template.view_sale_quote_template_tree
+#: selection:of.layout.category.add.wizard,type:0
+#: selection:of.layout.category.duplicate.wizard,type:0
+#: selection:of.layout.category.move.wizard,type:0
+msgid "Modèle de devis"
+msgstr "Modèle de devis"
+
+#. module: of_sale_quote_template
+#: model:ir.ui.menu,name:of_sale_quote_template.menu_sale_quote_template
+msgid "Modèles de devis"
+msgstr "Modèles de devis"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_duplicate_wizard_name
+msgid "Nom de la section"
+msgstr "Nom de la section"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_name
+msgid "Nom du modèle"
+msgstr "Nom du modèle"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_add_wizard_section_number
+msgid "Nombre de section"
+msgstr "Nombre de section"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_add_wizard_min_section_number
+msgid "Nombre de section minimum"
+msgstr "Nombre de section minimum"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_order_of_note_insertion
+msgid "Note d'insertion"
+msgstr "Note d'insertion"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_note
+msgid "Notes"
+msgstr "Notes"
+
+#. module: of_sale_quote_template
+#: model:ir.model,name:of_sale_quote_template.model_of_sale_quote_tmpl_activity
+msgid "OF Sale Quote Template Activity"
+msgstr "OF Sale Quote Template Activity"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_duplicate_wizard_order_parent_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_duplicate_wizard_quote_parent_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_move_wizard_order_parent_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_move_wizard_quote_parent_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_parent_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_parent_id
+msgid "Parent"
+msgstr "Parent"
+
+#. module: of_sale_quote_template
+#: selection:of.sale.order.layout.category,invoice_status:0
+#: selection:of.sale.order.layout.category,invoice_status_without_child:0
+#: selection:sale.order,of_layout_category_invoice_status:0
+msgid "Partiellement facturé"
+msgstr "Partiellement facturé"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,help:of_sale_quote_template.field_sale_quote_line_sequence
+msgid "Permet de donner un ordre à l'affiche des lignes du devis du modèle."
+msgstr "Permet de donner un ordre à l'affiche des lignes du devis du modèle."
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_move_wizard_position
+msgid "Position de la ligne"
+msgstr "Position de la ligne"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_property_of_fiscal_position_id
+msgid "Position fiscale"
+msgstr "Position fiscale"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_move_wizard_previous_position
+msgid "Position précédente"
+msgstr "Position précédente"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_prix_vente
+msgid "Prix de vente"
+msgstr "Prix de vente"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_price_subtotal
+msgid "Prix total HT initial"
+msgstr "Prix total HT initial"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_simulated_price_subtotal
+msgid "Prix total HT simulé"
+msgstr "Prix total HT simulé"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_price_total
+msgid "Prix total TTC initial"
+msgstr "Prix total TTC initial"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_simulated_price_total
+msgid "Prix total TTC simulé"
+msgstr "Prix total TTC simulé"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_price_reduce_taxexcl
+msgid "Prix unit. HT initial"
+msgstr "Prix unit. HT initial"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_price_reduce_taxinc
+msgid "Prix unit. TTC initial"
+msgstr "Prix unit. TTC initial"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_price_unit
+msgid "Prix unitaire"
+msgstr "Prix unitaire"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_product_id
+msgid "Produit"
+msgstr "Produit"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_depth
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_depth
+msgid "Profondeur"
+msgstr "Profondeur"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_product_uom_qty
+msgid "Quantité"
+msgstr "Quantité"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_discount
+msgid "Remise (%)"
+msgstr "Remise (%)"
+
+#. module: of_sale_quote_template
+#: selection:sale.config.settings,of_quote_template:0
+msgid "Remplace les lignes de commande du devis par celles du modèle"
+msgstr "Remplace les lignes de commande du devis par celles du modèle"
+
+#. module: of_sale_quote_template
+#: selection:of.sale.order.layout.category,invoice_status:0
+#: selection:of.sale.order.layout.category,invoice_status_without_child:0
+#: selection:sale.order,of_layout_category_invoice_status:0
+msgid "Rien à facturer"
+msgstr "Rien à facturer"
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_sale_quote_template_view_order_form
+msgid "Sale Layout Category"
+msgstr "Sale Layout Category"
+
+#. module: of_sale_quote_template
+#: model:ir.model,name:of_sale_quote_template.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_sale_quote_template
+#: model:ir.model,name:of_sale_quote_template.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de bons de commande"
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.view_sale_quote_template_search
+msgid "Search Quotation Template"
+msgstr "Search Quotation Template"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_layout_category_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_layout_category_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_of_layout_category_id
+msgid "Section"
+msgstr "Section"
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_sale_quote_template_view_order_form
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_sale_quote_template_view_sale_quote_template_form
+#: model:ir.ui.view,arch_db:of_sale_quote_template.view_of_sale_quote_template_layout_category_tree
+#: selection:of.sale.order.gestion.prix,calculation_basis:0
+msgid "Sections"
+msgstr "Sections"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_of_section_line_ids
+msgid "Sections du modèle"
+msgstr "Sections du modèle"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_ids
+msgid "Sections impactées"
+msgstr "Sections impactées"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_sequence
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_sequence
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity_sequence
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_sequence
+msgid "Sequence"
+msgstr "Séquence"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,help:of_sale_quote_template.field_sale_quote_template_active
+msgid "Si archivé, ne sera pas visible dans les listes de modèles de devis sauf avec l'utilisation d'un filtre (permet de ne pas supprimer le modèle)"
+msgstr "Si archivé, ne sera pas visible dans les listes de modèles de devis sauf avec l'utilisation d'un filtre (permet de ne pas supprimer le modèle)"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_sequence_name
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_sequence_name
+msgid "Séquence"
+msgstr "Séquence"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity_template_id
+msgid "Template"
+msgstr "Modèle"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_add_wizard_type
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_duplicate_wizard_type
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_move_wizard_type
+msgid "Type"
+msgstr "Type"
+
+#. module: of_sale_quote_template
+#: code:addons/of_sale_quote_template/models/of_sale_quote_template.py:1117
+#: code:addons/of_sale_quote_template/models/of_sale_quote_template.py:1277
+#, python-format
+msgid "Uncategorized"
+msgstr "Sans catégorie"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,help:of_sale_quote_template.field_sale_quote_template_quote_line
+msgid "Une ligne rouge signifie que l'article utilisé ne peut pas être vendu ou qu'il est désactivé."
+msgstr "Une ligne rouge signifie que l'article utilisé ne peut pas être vendu ou qu'il est désactivé."
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_product_uom_id
+msgid "Unité de mesure"
+msgstr "Unité de mesure"
+
+#. module: of_sale_quote_template
+#: model:ir.actions.act_window,help:of_sale_quote_template.action_sale_quotation_template
+msgid "Utiliser des modèles pour créer des devis professionnels en quelques minutes."
+msgstr "Utiliser des modèles pour créer des devis professionnels en quelques minutes."
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_of_comment_template1_id
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_of_comment_template2_id
+msgid "Utiliser un modèle"
+msgstr "Utiliser un modèle"
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_layout_category_add_wizard_form_view
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_layout_category_duplicate_wizard_form_view
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_layout_category_invoicing_wizard_view_form
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_layout_category_move_wizard_form_view
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_select_order_product_wizard_from_view
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_select_product_wizard_from_view
+msgid "Valider"
+msgstr "Valider"
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_layout_category_duplicate_wizard_form_view
+msgid "Vous allez dupliquer la section et tous les composants qui la composent."
+msgstr "Vous allez dupliquer la section et tous les composants qui la composent."
+
+#. module: of_sale_quote_template
+#: model:ir.ui.view,arch_db:of_sale_quote_template.of_layout_category_duplicate_wizard_form_view
+msgid "Vous allez dupliquer la section et toutes les lignes de commande qui la composent."
+msgstr "Vous allez dupliquer la section et toutes les lignes de commande qui la composent."
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_of_client_view
+msgid "Vue client/vendeur"
+msgstr "Vue client/vendeur"
+
+#. module: of_sale_quote_template
+#: code:addons/of_sale_quote_template/models/of_sale_quote_template.py:185
+#, python-format
+msgid "Warning for %s"
+msgstr "Avertissement pour %s"
+
+#. module: of_sale_quote_template
+#: model:ir.model,name:of_sale_quote_template.model_of_layout_category_add_wizard
+msgid "Wizard d'ajout de ligne de section"
+msgstr "Wizard d'ajout de ligne de section"
+
+#. module: of_sale_quote_template
+#: model:ir.model,name:of_sale_quote_template.model_of_layout_category_duplicate_wizard
+msgid "Wizard de duplication de ligne de section"
+msgstr "Wizard de duplication de ligne de section"
+
+#. module: of_sale_quote_template
+#: model:ir.model,name:of_sale_quote_template.model_of_layout_category_move_wizard
+msgid "Wizard de déplacement de ligne de section"
+msgstr "Wizard de déplacement de ligne de section"
+
+#. module: of_sale_quote_template
+#: model:ir.model,name:of_sale_quote_template.model_of_layout_category_invoicing_wizard
+msgid "Wizard de facturation par sections"
+msgstr "Wizard de facturation par sections"
+
+#. module: of_sale_quote_template
+#: model:ir.model,name:of_sale_quote_template.model_of_select_order_product_wizard
+msgid "Wizard de sélection d'articles pour section sur devis/commande"
+msgstr "Wizard de sélection d'articles pour section sur devis/commande"
+
+#. module: of_sale_quote_template
+#: model:ir.model,name:of_sale_quote_template.model_of_select_product_wizard
+msgid "Wizard de sélection d'articles pour section sur modèle de devis"
+msgstr "Wizard de sélection d'articles pour section sur modèle de devis"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_wizard_id
+msgid "Wizard id"
+msgstr "Wizard id"
+
+#. module: of_sale_quote_template
+#: model:ir.model,name:of_sale_quote_template.model_of_sale_order_gestion_prix_layout_category
+msgid "of.sale.order.gestion.prix.layout.category"
+msgstr "of.sale.order.gestion.prix.layout.category"
+
+#. module: of_sale_quote_template
+#: model:ir.model,name:of_sale_quote_template.model_sale_config_settings
+msgid "sale.config.settings"
+msgstr "sale.config.settings"
+
+#. module: of_sale_quote_template
+#: selection:of.sale.order.layout.category,invoice_status:0
+#: selection:of.sale.order.layout.category,invoice_status_without_child:0
+#: selection:sale.order,of_layout_category_invoice_status:0
+msgid "À facturer"
+msgstr "À facturer"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_gestion_prix_layout_category_state
+msgid "État"
+msgstr "État"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_invoice_status
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_invoice_status_without_child
+msgid "État de facturation"
+msgstr "État de facturation"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_order_of_layout_category_invoice_status
+msgid "État de facturation des lignes de section"
+msgstr "État de facturation des lignes de section"

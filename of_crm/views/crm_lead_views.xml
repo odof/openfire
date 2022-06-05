@@ -977,6 +977,10 @@
             </field>
         </record>
 
+        <record id="crm.crm_activity_action" model="ir.actions.act_window">
+            <field name="name">Activity types</field>
+        </record>
+
         <!-- Menus -->
 
         <record id="crm.crm_lead_menu_activities" model="ir.ui.menu">
@@ -992,6 +996,10 @@
         <record id="crm.menu_crm_opportunities" model="ir.ui.menu">
             <field name="parent_id" ref="of_crm.of_crm_crm_menu"/>
             <field name="sequence" eval="20"/>
+        </record>
+
+        <record id="crm.crm_activity_menu" model="ir.ui.menu">
+            <field name="name">Activity types</field>
         </record>
 
         <menuitem id="of_crm_activity_menu" name="Activités" parent="of_crm.of_crm_crm_menu"

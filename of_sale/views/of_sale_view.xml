@@ -123,7 +123,7 @@
                 <xpath expr="//notebook" position="inside">
                      <page string="Notes" name="notes">
                         <!-- Notes client -->
-                        <group attrs="{'invisible':[('of_notes_client','=',False)]}">
+                        <group name="customer_notes" attrs="{'invisible':[('of_notes_client','=',False)]}">
                             <separator string="Notes client" colspan="4"/>
                             <field name="of_notes_client" colspan="4" nolabel="1" readonly="1"
                                 help="Ces notes proviennent de la fiche client sous la rubrique 'Notes internes'. Ils sont uniquement modifiables dans la fiche client."/>

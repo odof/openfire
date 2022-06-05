@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <menuitem id="of_followup_project_menu" name="Suivi" parent="sales_team.menu_sales" sequence="14" action="of_followup_project_action"/>
+    <menuitem id="of_followup_project_menu" name="Suivi" parent="sales_team.menu_sales" sequence="17" action="of_followup_project_action"/>
 
     <menuitem id="of_followup_project_config_menu" name="Suivi" parent="sales_team.menu_sale_config" sequence="7"/>
     <menuitem id="of_followup_project_config_template" name="Modèles de suivi" parent="of_followup_project_config_menu" sequence="10" action="of_followup_project_template_action"/>

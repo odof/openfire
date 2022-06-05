@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-
-from odoo import models, fields, api, _
-import odoo.addons.decimal_precision as dp
+import json
+from odoo import models, fields, api
 
 
 class OfSaleOrderKanban(models.Model):
@@ -16,8 +15,15 @@ class SaleOrder(models.Model):
 
     of_kanban_step_id = fields.Many2one(
         comodel_name='of.sale.order.kanban', string=u"Étape kanban",
-        default=lambda s: s.env.ref('of_sale.of_sale_order_kanban_new', raise_if_not_found=False)
+        default=lambda s: s.env.ref('of_sale.of_sale_order_kanban_new', raise_if_not_found=False),
+        group_expand='_read_group_kanban_step_ids', track_visibility='onchange'
     )
+    # fields used for the kanban view
+    of_notes_display = fields.Text(string='Notes for display', compute='_of_compute_values_to_display')
+    of_info_display = fields.Text(string='Infos for display', compute='_of_compute_values_to_display')
+    of_nbr_overdue_activities = fields.Char(
+        string="Number of overdue activities", compute='_of_compute_values_to_display')
+    of_overdue_activities = fields.Text(string="Overdue activities", compute='_of_compute_values_to_display')
 
     @api.model
     def function_set_kanban_step_id(self):
@@ -25,3 +31,29 @@ class SaleOrder(models.Model):
         if step:
             self._cr.execute('UPDATE sale_order SET of_kanban_step_id = %s', (step.id,))
 
+    @api.multi
+    def _of_compute_values_to_display(self):
+        for rec in self:
+            # notes and information
+            list_notes = rec.of_notes.split('\n') if rec.of_notes else []
+            list_info = rec.of_info.split('\n') if rec.of_info else []
+            rec.of_notes_display = json.dumps(list_notes) if list_notes else False
+            rec.of_info_display = json.dumps(list_info) if list_info else False
+
+            # activities
+            overdue_activities = rec._of_get_overdue_activities()
+            activities = []
+            for activity in overdue_activities:
+                if len(activities) < 3:
+                    activities.append(activity.activity_id.of_short_name)
+                else:
+                    activities.append("...")
+                    break
+            rec.of_overdue_activities = json.dumps(activities) if activities else False
+            rec.of_nbr_overdue_activities = "(%s/%s)" % (
+                len(overdue_activities), len(rec.of_sale_activity_ids))
+
+    @api.model
+    def _read_group_kanban_step_ids(self, stages, domain, order):
+        kanban_step_ids = self.env['of.sale.order.kanban'].search([])
+        return kanban_step_ids
