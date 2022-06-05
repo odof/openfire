@@ -167,14 +167,14 @@ class SaleOrder(models.Model):
         purchase_budget_line = budget_lines.filtered(lambda line: line.name == 'purchase')
         if purchase_budget_line:
             purchase_order_lines = self.order_line.filtered(
-                lambda sol: sol.product_id.property_subcontracted_service is False)
+                lambda sol: sol.product_id.type != 'service' or sol.product_id.property_subcontracted_service is False)
             purchase_budget_line.cost = sum(map(
                 lambda x: x.product_uom_qty * x.purchase_price, purchase_order_lines))
 
         outsourcing_budget_line = budget_lines.filtered(lambda line: line.name == 'outsourcing')
         if outsourcing_budget_line:
             outsourcing_order_lines = self.order_line.filtered(
-                lambda sol: sol.product_id.property_subcontracted_service is True)
+                lambda sol: sol.product_id.type == 'service' and sol.product_id.property_subcontracted_service is True)
             outsourcing_budget_line.cost = sum(map(
                 lambda x: x.product_uom_qty * x.purchase_price, outsourcing_order_lines))
 
