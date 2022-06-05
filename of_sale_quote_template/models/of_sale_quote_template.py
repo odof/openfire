@@ -503,9 +503,10 @@ class OfSaleOrderLayoutCategory(models.Model):
         res = []
         for category in self:
             if category.parent_id:
-                name = " %s / %s" % (category.parent_id.name_get_recursive(), category.name)
+                name = " %s - %s / %s" % (
+                    category.sequence_name, category.parent_id.name_get_recursive(), category.name)
             else:
-                name = category.name
+                name = " %s - %s" % (category.sequence_name, category.name)
             res.append((category.id, name))
 
         return res
