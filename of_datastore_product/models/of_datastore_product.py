@@ -938,13 +938,12 @@ class OfDatastoreCentralized(models.AbstractModel):
                 # --- Champs spéciaux ---
                 vals['of_datastore_has_link'] = bool(product)
 
-                # Dans certains cas on ne veut pas de mise à jour du coût des articles
-                vals.pop('standard_price', False)
-
                 # Prix d'achat/vente
+                # Note: On retire 'standard_price' de vals car dans certains cas on ne veut pas le mettre à jour
                 vals.update(brand.compute_product_price(
                     vals['of_seller_pp_ht'], categ_name, obj_dict['uom_id'], obj_dict['uom_po_id'], product=product,
-                    price=vals['of_seller_price'], remise=None, based_on_price=vals['of_is_net_price']))
+                    price=vals['of_seller_price'], remise=None, cost=vals.pop('standard_price', None),
+                    based_on_price=vals['of_is_net_price']))
                 # Calcul de la marge et de la remise
                 if 'of_seller_remise' in fields_to_read:
                     vals['of_seller_remise'] =\
@@ -1323,7 +1322,7 @@ class ProductTemplate(models.Model):
 
     @api.model
     def _of_datastore_is_computed_field(self, field_name):
-        if field_name == 'default_code':
+        if field_name in ('default_code', 'standard_price'):
             return False
         return super(ProductTemplate, self)._of_datastore_is_computed_field(field_name)
 
