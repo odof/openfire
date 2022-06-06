@@ -209,7 +209,7 @@
 
                             <t t-if="(layout_category_size > 1 or page_size > 1) and layout_category['subtotal']" groups="sale.group_sale_layout">
                                 <tr class="text-right">
-                                    <td colspan="6">
+                                    <td colspan="7">
                                         <strong>Subtotal&amp;nbsp;: </strong>
                                         <t t-set="subtotal" t-value="sum(line.price_subtotal for line in layout_category['lines'])" groups="sale.group_show_price_subtotal"/>
                                         <t t-set="subtotal" t-value="sum(line.price_total for line in layout_category['lines'])" groups="sale.group_show_price_total"/>
@@ -552,7 +552,7 @@ Sinon :
 
                         <t t-if="(layout_category_size > 1 or page_size > 1) and layout_category['subtotal']" groups="sale.group_sale_layout">
                             <tr class="text-right">
-                                <td colspan="6">
+                                <td colspan="7">
                                     <strong>Sous-total: </strong>
                                     <t t-set="subtotal" t-value="sum(line.price_subtotal for line in layout_category['lines'])" groups="sale.group_show_price_subtotal"/>
                                     <t t-set="subtotal" t-value="sum(line.price_total for line in layout_category['lines'])" groups="sale.group_show_price_total"/>
