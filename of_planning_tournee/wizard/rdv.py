@@ -151,7 +151,7 @@ class OfTourneeRdv(models.TransientModel):
     res_line_id = fields.Many2one("of.tournee.rdv.line", string=u"Créneau Sélectionné")
 
     name = fields.Char(string=u"Libellé", size=64, required=False)
-    description = fields.Html(string="Description")
+    description = fields.Text(string="Description")
     employee_id = fields.Many2one('hr.employee', string=u"Intervenant")
     date_propos = fields.Datetime(string=u"RDV Début")
     date_propos_hour = fields.Float(string=u"Heure de début", digits=(12, 5))
@@ -1007,7 +1007,7 @@ class OfTourneeRdvLine(models.TransientModel):
     allday = fields.Boolean('All Day', default=False)
     selected = fields.Boolean(u'Créneau sélectionné', default=False)
     selected_hour = fields.Float(string='Heure du RDV', digits=(2, 2))
-    selected_description = fields.Html(string="Description", related="wizard_id.description")
+    selected_description = fields.Text(string="Description", related="wizard_id.description")
 
     geo_lat = fields.Float(
         string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo",

@@ -178,7 +178,7 @@
                         <field name="selected_hour" widget="float_time"/>
                     </group>
                     <label for="selected_description" colspan="2" attrs="{'invisible':['|',('intervention_id','!=',False),('selected','!=',True)]}"/>
-                    <field name="selected_description" nolabel="1" colspan="2" widget="html" attrs="{'invisible':['|',('intervention_id','!=',False),('selected','!=',True)]}"/>
+                    <field name="selected_description" nolabel="1" colspan="2" attrs="{'invisible':['|',('intervention_id','!=',False),('selected','!=',True)]}"/>
                 </group>
                 <div attrs="{'invisible':[('allday','!=',True)]}">
                     Ce créneau est virtuel. Il existe seulement pour montrer les limites de la recherche.
