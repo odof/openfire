@@ -268,7 +268,9 @@ class OfPlanningIntervention(models.Model):
             self = self.with_context(tz='Europe/Paris')
         intervention_obj = self.env['of.planning.intervention'].with_context(tz=self._context.get('tz'))
         tz = pytz.timezone(self._context['tz'])
-        tz_offset = datetime.now(tz).strftime('%z')
+        # avec les heures hiver/été, le tz_offset peut varier pour une même timezone, on prend donc la date de début
+        # en tant que référence (c'est un lundi)
+        tz_offset = tz.localize(fields.Datetime.from_string(date_start)).strftime('%z')
 
         # durée minimale pour qu'un créneau libre soit consiféré comme disponible
         duree_min = self.env['ir.values'].get_default("of.intervention.settings", "duree_min_creneaux_dispo") or 0.5
