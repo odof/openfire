@@ -250,7 +250,7 @@ class SaleOrder(models.Model):
             ddate = getattr(order, order_field)
             ddate = fields.Date.from_string(ddate)
         else:
-            ddate = fields.Date.today()
+            ddate = fields.Date.from_string(fields.Date.today())
         if ddate:
             delta = timedelta(days=days)
             return ddate + delta
