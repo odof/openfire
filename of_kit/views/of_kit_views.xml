@@ -482,10 +482,6 @@
         <field name="model">account.invoice</field>
         <field name="inherit_id" ref="account.invoice_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='invoice_line_ids']/tree" position="attributes">
-                <!-- Edition des lignes de facture par formulaire -->
-                <attribute name="editable"/>
-            </xpath>
             <xpath expr="//page[@name='other_info']//field[@name='name']" position="after">
                 <field name="of_contains_kit"/>
                 <field name="of_kit_display_mode" attrs="{'invisible': [('of_contains_kit','=',False)]}"/>
