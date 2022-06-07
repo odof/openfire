@@ -39,7 +39,7 @@
         id="stock.action_report_picking"
         model="stock.picking"
         report_type="qweb-pdf"
-        name="of_sale_stock.report_of_picking_preparation"
+        name="stock.report_picking"
         file="of_sale_stock.report_of_picking_preparation"
     />
 
