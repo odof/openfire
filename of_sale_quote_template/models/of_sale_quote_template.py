@@ -586,6 +586,14 @@ class OfSaleOrderLayoutCategory(models.Model):
                 category.invoice_status_without_child = 'no'
 
     @api.multi
+    def write(self, vals):
+        res = super(OfSaleOrderLayoutCategory, self).write(vals)
+        # Si on modifie un parent sans passer par le wizard de déplacement, on met à jour les séquences
+        if vals.get('parent_id'):
+            self.mapped('order_id').compute_of_layout_category_ids()
+        return res
+
+    @api.multi
     def action_wizard_products(self):
         wizard_form = self.env.ref('of_sale_quote_template.of_select_order_product_wizard_from_view')
 
