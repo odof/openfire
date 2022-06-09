@@ -10,6 +10,7 @@
                 <attribute name="invisible">0</attribute>
             </xpath>
             <xpath expr="//page[@name='marketing']/group" position="inside">
+                <newline/>
                 <group name="referree" string="Données Filleul">
                     <field name="of_referred_id" attrs="{'required': [('of_referred_date', '!=', False)]}" context="{'of_referred': True}"/>
                     <field name="of_referred_date" attrs="{'required': [('of_referred_id', '!=', False)]}"/>

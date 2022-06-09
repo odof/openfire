@@ -29,7 +29,7 @@ class UtmMixin(models.AbstractModel):
 
     campaign_id = fields.Many2one(string=u"Campagne")
     medium_id = fields.Many2one(string=u"Canal")
-    source_id = fields.Many2one(string=u"Source", domain="[('medium_id', '=', medium_id)]")
+    source_id = fields.Many2one(string=u"Origine", domain="[('medium_id', '=', medium_id)]")
 
     @api.onchange('medium_id')
     def _onchange_medium_id(self):

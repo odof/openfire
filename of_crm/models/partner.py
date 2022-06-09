@@ -95,9 +95,10 @@ Ce champ se met à jour automatiquement sur confirmation de commande et sur vali
     of_quotations_count = fields.Integer(compute='_compute_of_quotations_count', string='Nb devis')
     of_sale_order_quot_count = fields.Integer(compute='_compute_of_sale_order_quot_count', string='Nb dev+cmd')
 
-    of_lead_campaign_id = fields.Many2one('utm.campaign', 'Campaign', compute='_compute_of_lead_utm')
-    of_lead_source_id = fields.Many2one('utm.source', 'Source', compute='_compute_of_lead_utm')
-    of_lead_medium_id = fields.Many2one('utm.medium', 'Medium', compute='_compute_of_lead_utm')
+    of_lead_campaign_id = fields.Many2one(
+        comodel_name='utm.campaign', string=u"Campagne", compute='_compute_of_lead_utm')
+    of_lead_medium_id = fields.Many2one(comodel_name='utm.medium', string=u"Canal", compute='_compute_of_lead_utm')
+    of_lead_source_id = fields.Many2one(comodel_name='utm.source', string=u"Origine", compute='_compute_of_lead_utm')
 
     def _compute_of_quotations_count(self):
         self.of_compute_sale_orders_count('of_quotations_count', [('state', 'in', ['draft', 'sent'])])

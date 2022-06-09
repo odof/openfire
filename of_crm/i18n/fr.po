@@ -2196,10 +2196,14 @@ msgstr "Société"
 #: model:ir.model.fields,field_description:of_crm.field_res_partner_of_lead_source_id
 #: model:ir.model.fields,field_description:of_crm.field_res_users_of_lead_source_id
 #: model:ir.model.fields,field_description:of_crm.field_res_users_source_id
+msgid "Source"
+msgstr "Origine"
+
+#. module: of_crm
 #: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
 #: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
 msgid "Source"
-msgstr "Origine"
+msgstr "Source"
 
 #. module: of_crm
 #: model:ir.model,name:of_crm.model_crm_stage
