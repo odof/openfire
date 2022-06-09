@@ -313,10 +313,10 @@ class StockPicking(models.Model):
             'target': 'new',
             }
 
-    @api.depends('move_lines.date_expected')
+    @api.depends('min_date')
     def _compute_of_min_week(self):
         for picking in self:
-            min_date = min(picking.move_lines.mapped('date_expected') or [False])
+            min_date = picking.min_date
             if min_date:
                 min_year = fields.Date.from_string(min_date).year
                 min_week = datetime.strptime(min_date, "%Y-%m-%d %H:%M:%S").date().isocalendar()[1]

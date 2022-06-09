@@ -38,6 +38,7 @@ Module de lien entre of_sale et of_planning permettant la facturation sur quanti
     },
     'data': [
         'views/of_sale_planning_views.xml',
+        'views/stock_views.xml',
     ],
     'installable': True,
     'application': False,
