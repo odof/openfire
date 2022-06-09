@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_stock_picking_form_view" model="ir.ui.view">
+        <field name="name">of.stock.picking.form.view</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="of_intervention_ids" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_stock_config_settings_form_view" model="ir.ui.view">
+        <field name="name">of.stock.config.settings.form.view</field>
+        <field name="model">stock.config.settings</field>
+        <field name="inherit_id" ref="of_stock.of_stock_view_stock_config_settings_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='of_forcer_date_move']" position="after">
+                <field name="of_picking_min_date_compute_method" widget="radio"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
