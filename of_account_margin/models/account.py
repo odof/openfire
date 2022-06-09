@@ -39,12 +39,21 @@ class AccountInvoiceLine(models.Model):
     @api.model_cr_context
     def _auto_init(self):
         cr = self._cr
+
+        cr.execute("SELECT * FROM information_schema.columns WHERE table_name = '%s' "
+                   "AND column_name = 'of_unit_cost'" % (self._table,))
+        exists = cr.fetchall()
+        # On crée la colonne manuellement pour éviter le calcul sur toutes les lignes existantes (trop long)
+        if not exists:
+            cr.execute("ALTER TABLE account_invoice_line ADD COLUMN of_unit_cost numeric;")
+
         cr.execute("SELECT * FROM information_schema.columns WHERE table_name = '%s' "
                    "AND column_name = 'of_purchase_price'" % (self._table,))
         exists = cr.fetchall()
-        # On crée la colonne manuellement pour éviter la calcul sur toutes les lignes existantes (trop long)
+        # On crée la colonne manuellement pour éviter le calcul sur toutes les lignes existantes (trop long)
         if not exists:
             cr.execute("ALTER TABLE account_invoice_line ADD COLUMN of_purchase_price numeric;")
+
         return super(AccountInvoiceLine, self)._auto_init()
 
     of_unit_cost = fields.Float(
