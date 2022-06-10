@@ -38,6 +38,9 @@
                             <i class="oe_grey">/!\ ce paramètre est partagé entre toutes les sociétés</i>
                         </div>
                     </group>
+                    <group name="secteurs" string="Secteurs">
+                        <field name="automatic_areas"/>
+                    </group>
                     <group name="deliveries" string="Bons de livraisons">
                         <field name="do_deliveries" widget="radio"/>
                     </group>

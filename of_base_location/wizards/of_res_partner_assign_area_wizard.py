@@ -31,3 +31,19 @@ class OFResPartnerAssignAreaWizard(models.TransientModel):
         elif self.area_type == 'tech_com':
             self.partner_ids.write({'of_secteur_tech_id': self.area_id.id, 'of_secteur_com_id': self.area_id.id})
         return True
+
+
+class OFResPartnerUpdateAreaWizard(models.TransientModel):
+    _name = 'of.res.partner.update.area.wizard'
+    _description = u"Assistant permettant l'affectation automatique des secteurs aux partenaires"
+
+    @api.multi
+    def button_validate(self):
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', []) or []
+
+        for record in self.env['res.partner'].browse(active_ids):
+            record.of_secteur_com_id = record.env['of.secteur'].get_secteur_from_cp(record.zip).filtered(
+                lambda sec: sec.type in ('com', 'tech_com'))
+            record.of_secteur_tech_id = record.env['of.secteur'].get_secteur_from_cp(record.zip).filtered(
+                lambda sec: sec.type in ('tech', 'tech_com'))

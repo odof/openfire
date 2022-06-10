@@ -2,6 +2,7 @@
 
 from odoo import api, models
 
+
 class BetterZipGeonamesImport(models.TransientModel):
     _inherit = 'better.zip.geonames.import'
 
