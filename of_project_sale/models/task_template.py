@@ -15,5 +15,5 @@ class OFProjectTaskTemplate(models.Model):
 
     name = fields.Char(string=u"Nom", required=True)
     duration = fields.Float(string=u"Durée", digits=(6, 2))
-    product_tmpl_id = fields.Many2one(comodel_name='product.template', string=u"Article", required=True, index=True)
+    product_tmpl_id = fields.Many2one(comodel_name='product.template', string=u"Article", index=True)
     planning_tache_id = fields.Many2one(comodel_name='of.planning.tache', string=u"Tâche du RDV")
