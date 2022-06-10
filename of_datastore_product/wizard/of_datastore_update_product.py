@@ -210,10 +210,6 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         product_template_obj.search(
             [('active', '=', False), ('product_variant_ids.active', '=', True)]
         ).write({'active': True})
-        # Désactivation des modèles d'articles qui n'ont pas au moins un article (variante) actif.
-        active_templates = product_template_obj.search([('active', '=', True)])
-        active_product_templates = product_obj.search([('active', '=', True)]).mapped('product_tmpl_id')
-        (active_templates - active_product_templates).write({'active': False})
 
         return len(no_match_ids), len(unmatched_ids), len(ds_product_ids), len(ds_product_new_ids)
 
