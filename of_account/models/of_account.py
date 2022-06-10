@@ -150,10 +150,37 @@ def _get_outstanding_info_JSON(self):
             self.has_outstanding = True
 
 
+def group_lines(self, iml, line):
+    """Merge account move lines (and hence analytic lines) if invoice line hashcodes are equals"""
+    if self.journal_id.group_invoice_lines:
+        line2 = {}
+        for x, y, l in line:
+            tmp = self.inv_line_characteristic_hashcode(l)
+            if tmp in line2:
+                am = line2[tmp]['debit'] - line2[tmp]['credit'] + (l['debit'] - l['credit'])
+                line2[tmp]['debit'] = (am > 0) and am or 0.0
+                line2[tmp]['credit'] = (am < 0) and -am or 0.0
+                line2[tmp]['amount_currency'] += l['amount_currency']
+                line2[tmp]['analytic_line_ids'] += l['analytic_line_ids']
+                qty = l.get('quantity')
+                if qty:
+                    line2[tmp]['quantity'] = line2[tmp].get('quantity', 0.0) + qty
+                # Modification OF
+                line2[tmp]['date_maturity'] = max(line2[tmp]['date_maturity'], l['date_maturity'])
+                # Fin de modification
+            else:
+                line2[tmp] = l
+        line = []
+        for key, val in line2.items():
+            line.append((0, 0, val))
+    return line
+
+
 AccountInvoice._onchange_partner_id = _onchange_partner_id
 AccountInvoice._onchange_partner_id_warning = _onchange_partner_id_warning
 AccountInvoice.get_taxes_values = get_taxes_values
 AccountInvoice._get_outstanding_info_JSON = _get_outstanding_info_JSON
+AccountInvoice.group_lines = group_lines
 
 
 class AccountAccount(models.Model):
@@ -400,6 +427,16 @@ class AccountInvoice(models.Model):
         Recalcul auto du journal par défaut en fonction de la société.
         """
         self.journal_id = self.with_context(company_id=self.company_id.id).default_get(['journal_id'])['journal_id']
+
+    def inv_line_characteristic_hashcode(self, invoice_line):
+        """
+        En cas de regroupement des écritures par compte, on fusionne les écritures du compte de tiers
+        même si elles ont une échéance différente.
+        """
+        res = super(AccountInvoice, self).inv_line_characteristic_hashcode(invoice_line)
+        if self.journal_id.group_method == 'account' and invoice_line.get('date_maturity'):
+            res = res.replace("-" + invoice_line['date_maturity'], "", 1)
+        return res
 
 
 class AccountInvoiceLine(models.Model):
