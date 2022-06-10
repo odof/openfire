@@ -1,7 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_of_mode_paiement_edi_manager,of_mode_paiement.edi.manager,model_of_paiement_edi,account.group_account_manager,1,1,1,1
-access_of_mode_paiement_edi_user,of_mode_paiement_edi.user,model_of_paiement_edi,account.group_account_user,1,1,1,1
+access_of_mode_paiement_edi_user,of_mode_paiement_edi.user,model_of_paiement_edi,account.group_account_invoice,1,1,1,1
 access_of_paiement_edi_all_user,access.of.paiement.edi.all.user,model_of_paiement_edi,base.group_user,1,0,0,0
 access_of_mode_paiement_edi_line_manager,of_mode_paiement.edi.manager,model_of_paiement_edi_line,account.group_account_manager,1,1,1,1
-access_of_mode_paiement_edi_line_user,of_mode_paiement_edi.user,model_of_paiement_edi_line,account.group_account_user,1,1,1,1
+access_of_mode_paiement_edi_line_user,of_mode_paiement_edi.user,model_of_paiement_edi_line,account.group_account_invoice,1,1,1,1
 access_of_paiement_edi_line_all_user,access.of.paiement.edi.line.all.user,model_of_paiement_edi_line,base.group_user,1,0,0,0

@@ -148,7 +148,7 @@
                         <field name="aff_bouton_paiement" invisible="1"/>
                         <field name="aff_bouton_genere_fich" invisible="1"/>
                         <field name="type_paiement" invisible="1"/>
-                        <field name="journal_id" invisible="1"/>
+                        <field name="journal_id" invisible="1" readonly="1"/>
                         <group col="4">
                             <field name="mode_paiement_id" domain="[('journal_type','=','bank')]" widget="selection" attrs="{'readonly':[('aff_bouton_genere_fich','=',False)]}"/>
                             <field name="date_remise" attrs="{'readonly':[('aff_bouton_genere_fich','=',False)]}"/>
@@ -213,7 +213,7 @@
     </record>
 
     <menuitem action="of_action_paiement_edi" id="of_menu_paiement_edi"
-              parent="account.menu_finance_receivables" sequence="50" groups="account.group_account_manager,account.group_account_user"/>
+              parent="account.menu_finance_receivables" sequence="50" groups="account.group_account_manager,account.group_account_invoice"/>
 
     <!-- Ajout action prélèvements SEPA, LCR par EDI dans vue formulaire factures -->
     <act_window
@@ -226,6 +226,6 @@
             view_type="form"
             view_id="of_paiement_edi_form"
             target="current"
-            groups="account.group_account_manager,account.group_account_user" />
+            groups="account.group_account_manager,account.group_account_invoice" />
 
 </odoo>
