@@ -28,7 +28,7 @@
         name="Modifier les comptes comptables"
         res_model="of.wizard.invoice.edit.accounts"
         src_model="account.invoice"
-        groups="account.group_account_manager"
+        groups="account.group_account_user"
         view_mode="form"
         view_type="form"
         view_id="view_of_wizard_invoice_edit_accounts"
