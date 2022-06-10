@@ -224,7 +224,7 @@ class SaleOrder(models.Model):
         """Helper function to return the list of fields that will trigger the recompute
         the deadline date of activities"""
         return [
-            'date_order', 'of_reference_laying_date', 'of_date_de_pose', 'of_date_vt', 'of_force_laying_date',
+            'confirmation_date', 'of_reference_laying_date', 'of_date_de_pose', 'of_date_vt', 'of_force_laying_date',
             'of_manual_laying_date']
 
     @api.model
