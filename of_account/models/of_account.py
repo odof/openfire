@@ -235,6 +235,8 @@ class AccountInvoice(models.Model):
     def action_invoice_open(self):
         """Mettre le libellé des écritures comptables d'une facture avec nom client (30 1er caractères) + no facture"""
         self._check_journal_company()  # Ajout de vérification de la société du journal
+        if self.filtered(lambda inv: inv.state != 'open' and inv.amount_total < 0):
+            raise UserError(_(u"Vous ne pouvez pas valider une facture dont le montant total est négatif"))
         res = super(AccountInvoice, self).action_invoice_open()
         for invoice in self:
             ref = ((invoice.partner_id.name or invoice.partner_id.parent_id.name or '')[:30]
