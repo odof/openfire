@@ -2,8 +2,6 @@
 
 from odoo import models, fields, api
 
-from odoo.addons.mail.models.mail_template import format_date
-
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -156,7 +154,7 @@ class ResPartner(models.Model):
     @api.depends('of_payment_ids')
     def _compute_payment_total(self):
         for partner in self:
-            partner.of_payment_total = sum(partner.of_payment_ids.mapped('amount'))
+            partner.of_payment_total = sum(partner.of_payment_ids.mapped('of_amount_total'))
 
     @api.multi
     def action_view_payments(self):
