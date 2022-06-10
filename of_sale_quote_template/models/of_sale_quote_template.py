@@ -287,6 +287,14 @@ class OfSaleQuoteTemplateLayoutCategory(models.Model):
             sequence = sequence + number_of_child
 
     @api.multi
+    def write(self, vals):
+        res = super(OfSaleQuoteTemplateLayoutCategory, self).write(vals)
+        # Si on modifie un parent sans passer par le wizard de déplacement, on met à jour les séquences
+        if vals.get('parent_id'):
+            self.mapped('quote_id').compute_of_section_line_ids()
+        return res
+
+    @api.multi
     def action_wizard_products(self):
         wizard_form = self.env.ref('of_sale_quote_template.view_of_sale_quote_template_layout_category_form')
 
@@ -471,13 +479,13 @@ class OfSaleOrderLayoutCategory(models.Model):
                   ('cancel', u"Annulé")], string=u"Etat", related='order_id.state')
     currency_id = fields.Many2one('res.currency', related='order_id.currency_id', store=True, readonly=True)
     cout = fields.Float(
-        string=u"Coût", digits=dp.get_precision('Product Price'), compute='_compute_order_line_without_child_ids')
+        string=u"Coût", digits=dp.get_precision('Product Price'), compute='_compute_order_line_ids')
     prix_vente = fields.Float(
         string=u"Prix de vente", digits=dp.get_precision('Product Price'),
-        compute='_compute_order_line_without_child_ids')
+        compute='_compute_order_line_ids')
     pc_prix_vente = fields.Float(
         string=u"% Prix de vente", digits=dp.get_precision('Product Price'),
-        compute='_compute_order_line_without_child_ids')
+        compute='_compute_order_line_ids')
     # product_ids = fields.Many2many(comodel_name='product.product', string=u"Articles", compute='_compute_product_ids')
 
     # Lignes de commande qui comptent également les lignes de commande des sections enfants
@@ -585,6 +593,15 @@ class OfSaleOrderLayoutCategory(models.Model):
                 category.invoice_status_without_child = 'partially invoiced'
             else:
                 category.invoice_status_without_child = 'no'
+
+    @api.multi
+    def write(self, vals):
+        res = super(OfSaleOrderLayoutCategory, self).write(vals)
+        # Si on modifie un parent sans passer par le wizard de déplacement, on met à jour les séquences
+        if vals.get('parent_id'):
+            self.mapped('order_id').compute_of_layout_category_ids()
+        return res
+
 
     @api.multi
     def action_wizard_order_lines(self):

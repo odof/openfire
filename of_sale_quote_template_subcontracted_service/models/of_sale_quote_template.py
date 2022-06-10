@@ -18,5 +18,5 @@ class OFSaleOrderLayoutCategory(models.Model):
     def _compute_price_subcontracted_service(self):
         for category in self:
             category.price_subcontracted_service = sum(category.order_line_ids.filtered(
-                lambda l: l.of_property_subcontracted_service).mapped(
+                lambda l: l.of_subcontracted_service).mapped(
                 lambda l: l.product_uom_qty * l.price_subtotal))
