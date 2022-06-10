@@ -106,6 +106,9 @@ class AccountPayment(models.Model):
     # Champ Categories (Tags)
     of_tag_ids = fields.Many2many('of.payment.tags', string=u'Catégorie', help=u"Sélectionnez la catégorie de paiement")
 
+    # Surcharge pour modification du domain, dans le cas de multi company
+    writeoff_account_id = fields.Many2one(domain="[('deprecated', '=', False), ('company_id', '=', company_id)]")
+
     @api.multi
     def get_payment_mode_display(self):
         self.ensure_one()
@@ -121,7 +124,6 @@ class AccountPayment(models.Model):
             result = _('Paid on %s') % format_date(self.env, self.payment_date)
 
         return result
-
 
 class OFPaymentTags(models.Model):
     """ Tags of payment / Catégorie de paiement """
