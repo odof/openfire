@@ -480,6 +480,20 @@ class CrmLead(models.Model):
                 del new_vals[field_name]  # take value out of new vals
         return new_vals, partner_vals
 
+    @api.depends('order_ids')
+    def _compute_sale_amount_total(self):
+        for lead in self:
+            total = 0.0
+            nbr = 0
+            company_currency = lead.company_currency or self.env.user.company_id.currency_id
+            for order in lead.order_ids:
+                if order.state in ('draft', 'sent', 'sale', 'done'):
+                    nbr += 1
+                if order.state not in ('draft', 'sent', 'cancel'):
+                    total += order.currency_id.compute(order.amount_untaxed, company_currency)
+            lead.sale_amount_total = total
+            lead.sale_number = nbr
+
 
 class CrmTeam(models.Model):
     _inherit = 'crm.team'
