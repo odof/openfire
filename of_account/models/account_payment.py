@@ -7,6 +7,16 @@ class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
     of_expected_deposit_date = fields.Date(string=u"Date de remise prévue")
+    of_amount_total = fields.Monetary(
+        string=u"Total", store=True, compute='_compute_of_amount_total',
+        help=u"Montant Total dans la devise du paiement, négatif pour les règlements sortants.")
+
+    @api.multi
+    @api.depends('amount', 'currency_id', 'company_id', 'payment_date', 'payment_type')
+    def _compute_of_amount_total(self):
+        for rec in self:
+            sign = -1 if rec.payment_type in ['outbound'] else 1
+            rec.of_amount_total = rec.amount * sign
 
     @api.multi
     def button_invoices(self):
@@ -39,14 +49,3 @@ class AccountPayment(models.Model):
         res['ref'] = ((self.partner_id.name or self.partner_id.parent_id.name or '')[:30]
                       + " " + (self.communication or '')).strip()
         return res
-
-    @api.multi
-    @api.depends('amount', 'currency_id', 'company_id', 'payment_date', 'payment_type')
-    def _compute_of_amount_total(self):
-        for rec in self:
-            sign = -1 if rec.payment_type in ['outbound'] else 1
-            rec.of_amount_total = rec.amount * sign
-
-    of_amount_total = fields.Monetary(
-        string='Total', currency_field='currency_id', store=True, compute='_compute_of_amount_total',
-        help="Montant Total dans la devise du paiement, négatif pour les règlements sortants.")

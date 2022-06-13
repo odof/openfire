@@ -45,7 +45,20 @@
                             <field name="payment_ids" colspan="4" nolabel="1" widget="many2many"
                                    options="{'not_delete':True}"
                                    attrs="{'readonly': [('state', '!=', 'draft')]}"
-                                   domain="['|', ('of_deposit_id','=',False), ('of_deposit_id','=',id)]"/>
+                                   domain="['|', ('of_deposit_id','=',False), ('of_deposit_id','=',id)]">
+                                <tree decoration-info="state=='draft'" decoration-muted="state=='reconciled'" edit="false">
+                                    <field name="payment_date"/>
+                                    <field name="name"/>
+                                    <field name="journal_id"/>
+                                    <field name="payment_method_id"/>
+                                    <field name="partner_id" string="Vendor"/>
+                                    <field name="amount" sum="Amount"/>
+                                    <field name="company_id" groups="base.group_multi_company"/>
+                                    <field name="state"/>
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="partner_type" invisible="1"/>
+                                </tree>
+                            </field>
                         </group>
                     </sheet>
                 </form>
