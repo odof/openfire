@@ -185,6 +185,13 @@ class OfService(models.Model):
             contract_line_obj.create(vals_line)
             service.transformed = True
 
+    @api.multi
+    def orderable_lines(self):
+        lines = super(OfService, self).orderable_lines()
+        if self._context.get('keep_contract_lines'):
+            return lines
+        return lines.filtered(lambda l: not l.of_contract_line_id)
+
 
 class OFServiceLine(models.Model):
     _inherit = 'of.service.line'
@@ -245,13 +252,6 @@ class OFPlanningInterventionLine(models.Model):
 
     of_contract_line_id = fields.Many2one(comodel_name='of.contract.line', string="Ligne de contrat")
     of_contract_product_id = fields.Many2one(comodel_name='of.contract.product', string="Article de contrat")
-
-    @api.multi
-    def orderable_lines(self):
-        lines = super(OFPlanningInterventionLine, self).orderable_lines()
-        if self._context.get('keep_contract_lines'):
-            return lines
-        return lines.filtered(lambda l: not l.of_contract_line_id)
 
     @api.multi
     def _prepare_invoice_line(self):
