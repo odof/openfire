@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-23 13:16+0000\n"
-"PO-Revision-Date: 2022-05-23 13:16+0000\n"
+"POT-Creation-Date: 2022-06-14 14:05+0000\n"
+"PO-Revision-Date: 2022-06-14 14:05+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -74,10 +74,14 @@ msgid "Activities"
 msgstr "Activités"
 
 #. module: of_sale_quote_template
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity_activity_id
 #: model:ir.ui.view,arch_db:of_sale_quote_template.of_sale_quote_tmpl_activity_view_form
 msgid "Activity"
 msgstr "Activité"
+
+#. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity_activity_id
+msgid "Activity type"
+msgstr "Type d'activité"
 
 #. module: of_sale_quote_template
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_add_wizard_display_button
@@ -105,8 +109,6 @@ msgstr "Ajouter une sous section à cette ligne"
 #: model:ir.ui.view,arch_db:of_sale_quote_template.of_layout_category_duplicate_wizard_form_view
 #: model:ir.ui.view,arch_db:of_sale_quote_template.of_layout_category_invoicing_wizard_view_form
 #: model:ir.ui.view,arch_db:of_sale_quote_template.of_layout_category_move_wizard_form_view
-#: model:ir.ui.view,arch_db:of_sale_quote_template.of_select_order_product_wizard_from_view
-#: model:ir.ui.view,arch_db:of_sale_quote_template.of_select_product_wizard_from_view
 msgid "Annuler"
 msgstr "Annuler"
 
@@ -131,9 +133,6 @@ msgid "Article principal"
 msgstr "Article principal"
 
 #. module: of_sale_quote_template
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_product_ids
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_order_product_wizard_product_ids
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_product_wizard_product_ids
 #: selection:of.sale.order.gestion.prix,calculation_basis:0
 msgid "Articles"
 msgstr "Articles"
@@ -173,7 +172,6 @@ msgstr "Charger les sections"
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_duplicate_wizard_order_id
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_invoicing_wizard_order_id
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_move_wizard_order_id
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_order_product_wizard_order_id
 msgid "Commande"
 msgstr "Commande"
 
@@ -203,7 +201,6 @@ msgid "Commentaires du haut"
 msgstr "Commentaires du haut"
 
 #. module: of_sale_quote_template
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_product_ids
 #: model:ir.ui.view,arch_db:of_sale_quote_template.of_sale_quote_template_view_sale_quote_template_form
 #: model:ir.ui.view,arch_db:of_sale_quote_template.view_of_sale_quote_template_layout_category_tree
 msgid "Composants"
@@ -234,8 +231,6 @@ msgstr "Coût"
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_create_uid
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_create_uid
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity_create_uid
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_order_product_wizard_create_uid
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_product_wizard_create_uid
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_create_uid
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_create_uid
 msgid "Created by"
@@ -250,8 +245,6 @@ msgstr "Créé par"
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_create_date
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_create_date
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity_create_date
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_order_product_wizard_create_date
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_product_wizard_create_date
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_create_date
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_create_date
 msgid "Created on"
@@ -291,8 +284,6 @@ msgstr "Devis/Commande"
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_display_name
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_display_name
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity_display_name
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_order_product_wizard_display_name
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_product_wizard_display_name
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_display_name
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_display_name
 msgid "Display Name"
@@ -334,6 +325,11 @@ msgid "Est l'article principal"
 msgstr "Est l'article principal"
 
 #. module: of_sale_quote_template
+#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_state
+msgid "Etat"
+msgstr "État"
+
+#. module: of_sale_quote_template
 #: selection:of.sale.order.gestion.prix.layout.category,state:0
 msgid "Exclus"
 msgstr "Exclus"
@@ -363,8 +359,6 @@ msgstr "Gestion des prix"
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_id
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_id
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity_id
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_order_product_wizard_id
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_product_wizard_id
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_id
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_id
 msgid "ID"
@@ -405,8 +399,6 @@ msgstr "Ligne de facture"
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category___last_update
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category___last_update
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity___last_update
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_order_product_wizard___last_update
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_product_wizard___last_update
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line___last_update
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template___last_update
 msgid "Last Modified on"
@@ -421,8 +413,6 @@ msgstr "Dernière Modification le"
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_write_uid
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_write_uid
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity_write_uid
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_order_product_wizard_write_uid
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_product_wizard_write_uid
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_write_uid
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_write_uid
 msgid "Last Updated by"
@@ -437,8 +427,6 @@ msgstr "Dernière mise à jour par"
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_order_layout_category_write_date
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_write_date
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_tmpl_activity_write_date
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_order_product_wizard_write_date
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_product_wizard_write_date
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_write_date
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_template_write_date
 msgid "Last Updated on"
@@ -468,8 +456,6 @@ msgstr "Ligne de modèle de devis"
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_duplicate_wizard_quote_layout_category_id
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_move_wizard_order_layout_category_id
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_move_wizard_quote_layout_category_id
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_order_product_wizard_order_layout_category_id
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_product_wizard_quote_template_layout_category_id
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_order_line_of_layout_category_id
 msgid "Ligne de section"
 msgstr "Ligne de section"
@@ -542,7 +528,6 @@ msgstr "Marge HT"
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_duplicate_wizard_quote_id
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_layout_category_move_wizard_quote_id
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_of_sale_quote_template_layout_category_quote_id
-#: model:ir.model.fields,field_description:of_sale_quote_template.field_of_select_product_wizard_quote_id
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_order_of_template_id
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_quote_line_quote_id
 #: model:ir.ui.view,arch_db:of_sale_quote_template.view_sale_quote_template_form
@@ -733,6 +718,8 @@ msgstr "Section"
 #. module: of_sale_quote_template
 #: model:ir.ui.view,arch_db:of_sale_quote_template.of_sale_quote_template_view_order_form
 #: model:ir.ui.view,arch_db:of_sale_quote_template.of_sale_quote_template_view_sale_quote_template_form
+#: model:ir.ui.view,arch_db:of_sale_quote_template.view_of_sale_order_layout_category_form
+#: model:ir.ui.view,arch_db:of_sale_quote_template.view_of_sale_quote_template_layout_category_form
 #: model:ir.ui.view,arch_db:of_sale_quote_template.view_of_sale_quote_template_layout_category_tree
 #: selection:of.sale.order.gestion.prix,calculation_basis:0
 msgid "Sections"
@@ -780,8 +767,8 @@ msgid "Type"
 msgstr "Type"
 
 #. module: of_sale_quote_template
-#: code:addons/of_sale_quote_template/models/of_sale_quote_template.py:1117
-#: code:addons/of_sale_quote_template/models/of_sale_quote_template.py:1277
+#: code:addons/of_sale_quote_template/models/of_sale_quote_template.py:1135
+#: code:addons/of_sale_quote_template/models/of_sale_quote_template.py:1295
 #, python-format
 msgid "Uncategorized"
 msgstr "Sans catégorie"
@@ -812,8 +799,6 @@ msgstr "Utiliser un modèle"
 #: model:ir.ui.view,arch_db:of_sale_quote_template.of_layout_category_duplicate_wizard_form_view
 #: model:ir.ui.view,arch_db:of_sale_quote_template.of_layout_category_invoicing_wizard_view_form
 #: model:ir.ui.view,arch_db:of_sale_quote_template.of_layout_category_move_wizard_form_view
-#: model:ir.ui.view,arch_db:of_sale_quote_template.of_select_order_product_wizard_from_view
-#: model:ir.ui.view,arch_db:of_sale_quote_template.of_select_product_wizard_from_view
 msgid "Valider"
 msgstr "Valider"
 

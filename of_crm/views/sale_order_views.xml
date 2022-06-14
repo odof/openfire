@@ -52,7 +52,7 @@
                                 <field name="of_activities_state" />
                             </group>
                             <group colspan="4">
-                                <field name="of_sale_activity_ids" context="{'default_user_id': user_id'}" nolabel="1">
+                                <field name="of_sale_activity_ids" nolabel="1">
                                     <form string="Activity">
                                         <header>
                                             <field name="load_attachment" invisible="1"/>
