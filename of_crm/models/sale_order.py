@@ -106,7 +106,7 @@ class SaleOrder(models.Model):
         column2='tag_id', string='Follow-up tags')
     of_priority = fields.Selection(selection=AVAILABLE_PRIORITIES, string='Priority', index=True, default='0')
     of_notes = fields.Text(string='Follow-up notes')
-    of_info = fields.Char(string='Info')
+    of_info = fields.Text(string='Info')
     of_reference_laying_date = fields.Date(
         compute='_compute_of_reference_laying_date', string='Reference laying date', store=True)
     of_force_laying_date = fields.Boolean(string='Force laying date')
@@ -178,14 +178,7 @@ class SaleOrder(models.Model):
         if activity_fields is None:
             activity_fields = []
 
-        field_name = {
-            'confirmation_date': 'confirmation_date',
-            'of_reference_laying_date': 'reference_install_date',
-            'of_force_laying_date': 'reference_install_date',
-            'of_manual_laying_date': 'reference_install_date',
-            'of_date_de_pose': 'estimated_install_date',
-            'of_date_vt': 'technical_visit_date'
-        }
+        field_name = self._get_date_fields_mapping_order_to_activity()
         activities_filter = [field_name.get(af) for af in activity_fields if field_name.get(af)]
         for order in self:
             for sale_activity in order.of_sale_activity_ids.filtered(
@@ -195,6 +188,24 @@ class SaleOrder(models.Model):
                     sa.activity_id.of_automatic_recompute):
                 sale_activity.date_deadline = self._of_get_sale_activity_date_deadline(
                     order, sale_activity.activity_id)
+
+    def _get_date_fields_mapping_order_to_activity(self):
+        return {
+            'confirmation_date': 'confirmation_date',
+            'of_reference_laying_date': 'reference_install_date',
+            'of_force_laying_date': 'reference_install_date',
+            'of_manual_laying_date': 'reference_install_date',
+            'of_date_de_pose': 'estimated_install_date',
+            'of_date_vt': 'technical_visit_date'
+        }
+
+    def _get_date_fields_mapping_activity_to_order(self):
+        return {
+            'confirmation_date': 'confirmation_date',
+            'reference_install_date': 'of_reference_laying_date',
+            'estimated_install_date': 'of_date_de_pose',
+            'technical_visit_date': 'of_date_vt'
+        }
 
     @api.onchange('partner_id')
     def onchange_partner_id(self):
@@ -228,6 +239,22 @@ class SaleOrder(models.Model):
             'of_manual_laying_date']
 
     @api.model
+    def _of_get_sale_activity_user_id(self, order, activity):
+        if not order or not activity:
+            return False
+        if activity.of_user_assignement == 'canvasser':
+            return order.of_canvasser_id.id
+        elif activity.of_user_assignement == 'creator':
+            return order.create_uid.id or order.env.user.id
+        elif activity.of_user_assignement == 'responsible':
+            return order.of_user_id.id
+        elif activity.of_user_assignement == 'salesman':
+            return order.user_id.id
+        elif activity.of_user_assignement == 'specific_user':
+            return activity.of_user_id.id
+        return False
+
+    @api.model
     def _of_get_sale_activity_date_deadline(self, order, activity, days=False, compute_date=False):
         if not order or not activity:
             return False
@@ -236,12 +263,7 @@ class SaleOrder(models.Model):
         if not compute_date:
             compute_date = activity.of_compute_date
         # dict to translate the value of the field selection into attribute's name of the model
-        field_name = {
-            'confirmation_date': 'confirmation_date',
-            'reference_install_date': 'of_reference_laying_date',
-            'estimated_install_date': 'of_date_de_pose',
-            'technical_visit_date': 'of_date_vt'
-        }
+        field_name = self._get_date_fields_mapping_activity_to_order()
         order_field = field_name.get(compute_date)
         if order_field:
             # take the manual date if required

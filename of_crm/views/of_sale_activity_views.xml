@@ -71,6 +71,8 @@
                 <filter name="planned" string="Planned" domain="[('state', '=', 'planned')]" />
                 <filter name="cancelled" string="Cancelled" domain="[('state', '=', 'cancelled')]" />
                 <filter name="done" string="Done" domain="[('state', '=', 'done')]" />
+                <filter name="late" string="Late" 
+                    domain="[('state', '=', 'planned'), ('date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]" />
                 <group expand="0" string="Group By">
                     <filter string="Order" domain="[]" context="{'group_by':'order_id'}"/>
                     <filter string="Assigned to" domain="[]" context="{'group_by':'user_id'}"/>

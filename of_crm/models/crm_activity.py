@@ -27,7 +27,8 @@ class CRMActivity(models.Model):
         return res
 
     days = fields.Integer(string='Delay')  # change the standard string
-    of_user_id = fields.Many2one(comodel_name='res.users', string="Assigned to", index=True)
+    of_user_assignement = fields.Selection(selection='_get_of_user_assignement', string='User assignment')
+    of_user_id = fields.Many2one(comodel_name='res.users', string="Assigned to")
     of_short_name = fields.Char(string='Short Name', required=True)
     of_object = fields.Selection(selection='_get_of_object_selection', string='Object')
     of_compute_date = fields.Selection(
@@ -53,6 +54,18 @@ class CRMActivity(models.Model):
             'domain': domain
         }
 
+    @api.onchange('of_object')
+    def _onchange_of_object(self):
+        if self.of_object != 'sale_order':
+            self.of_user_assignement = False
+        else:
+            self.of_user_id = False
+
+    @api.onchange('of_user_assignement')
+    def _onchange_of_user_assignement(self):
+        if self.of_user_assignement != 'specific_user':
+            self.of_user_id = False
+
     @api.onchange('of_compute_date')
     def _onchange_of_compute_date(self):
         self.of_automatic_recompute = self.of_compute_date not in ['today_date', False] and \
@@ -68,6 +81,16 @@ class CRMActivity(models.Model):
                 rec.of_compute_date = rec.of_compute_date_sale
             else:
                 rec.of_compute_date = rec.of_compute_date_both
+
+    @api.model
+    def _get_of_user_assignement(self):
+        return [
+            ('salesman', _('Salesman')),
+            ('canvasser', _('Canvasser')),
+            ('creator', _('Creator')),
+            ('responsible', _('Responsible')),
+            ('specific_user', _('Specific user'))
+        ]
 
     @api.model
     def _get_of_compute_date_selection_sale(self):

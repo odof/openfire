@@ -6,14 +6,24 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-18 13:30+0000\n"
-"PO-Revision-Date: 2022-05-18 13:30+0000\n"
+"POT-Creation-Date: 2022-06-22 09:58+0000\n"
+"PO-Revision-Date: 2022-06-22 09:58+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: of_sale_kanban
+#: model:ir.ui.view,arch_db:of_sale_kanban.of_sale_view_sale_order_kanban
+msgid "&amp;nbsp;HT"
+msgstr "&amp;nbsp;HT"
+
+#. module: of_sale_kanban
+#: model:ir.ui.view,arch_db:of_sale_kanban.of_sale_view_sale_order_kanban
+msgid "&amp;nbsp;TTC"
+msgstr "&amp;nbsp;TTC"
 
 #. module: of_sale_kanban
 #: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban_create_uid
@@ -29,11 +39,6 @@ msgstr "Créé le"
 #: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban_display_name
 msgid "Display Name"
 msgstr "Nom affiché"
-
-#. module: of_sale_kanban
-#: model:ir.ui.view,arch_db:of_sale_kanban.of_sale_view_sale_order_kanban
-msgid "HT"
-msgstr "HT"
 
 #. module: of_sale_kanban
 #: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban_id
@@ -91,9 +96,9 @@ msgid "Sem. de pose :"
 msgstr "Sem. de pose :"
 
 #. module: of_sale_kanban
-#: model:ir.ui.view,arch_db:of_sale_kanban.of_sale_view_sale_order_kanban
-msgid "TTC"
-msgstr "TTC"
+#: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban_sequence
+msgid "Sequence"
+msgstr "Séquence"
 
 #. module: of_sale_kanban
 #: model:ir.model.fields,field_description:of_sale_kanban.field_sale_order_of_kanban_step_id
