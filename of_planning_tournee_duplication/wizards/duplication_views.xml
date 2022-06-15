@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_tournee_duplication_wizard_form" model="ir.ui.view">
+        <field name="name">Duplication de RDV d'interventions</field>
+        <field name="model">of.intervention.duplication</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Duplication de RDVs">
+                <script>
+                    $(document).ready(function(){
+                    // élargir le pop-up
+                    $(".modal-dialog").width('80%');
+                    });
+                </script>
+                <group>
+                    <group string="RDV à dupliquer" name="dup">
+                        <field name="dup_date_start"/>
+                        <field name="dup_date_end"/>
+                        <field name="dup_tache_ids" widget="many2many_tags"/>
+                    </group>
+                    <group string="RDV à créer" name="new">
+                        <field name="new_date_start"/>
+                        <field name="new_state"/>
+                        <field name="computation_done" invisible="1"/>
+                    </group>
+                    <field name="line_ids" nolabel="1" attrs="{'invisible': [('computation_done', '=', False)]}">
+                        <tree colors="red:raison_alerte!='none'" create="false" editable="bottom">
+                            <field name="intervention_id" invisible="1"/>
+                            <field name="partner_id"/>
+                            <field name="address_id"/>
+                            <field name="already_duplicated"/>
+                            <field name="date"/>
+                            <field name="new_date"/>
+                            <field name="tz" invisible="1"/>
+                            <field name="date_deadline" invisible="1"/>
+                            <field name="employee_ids" widget="many2many_tags"/>
+                            <field name="raison_alerte"/>
+                        </tree>
+                    </field>
+                </group>
+                <footer>
+                    <button name="button_calculer" string="Calculer" type="object" class="btn-primary"/>
+                    <button name="button_create" string="Dupliquer" type="object" class="btn-primary" attrs="{'invisible': [('computation_done', '=', False)]}"/>
+                    <button special="cancel" string="Annuler" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_planning_tournee_duplication_wizard_action" model="ir.actions.act_window">
+        <field name="name">Duplication de RDV</field>
+        <field name="res_model">of.intervention.duplication</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_of_planning_tournee_duplication" name="Duplication RDV" parent="of_planning.menu_of_planning_intervention" action="of_planning_tournee_duplication_wizard_action" sequence="80"/>
+
+</odoo>
