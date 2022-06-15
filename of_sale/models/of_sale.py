@@ -812,10 +812,13 @@ class SaleOrderLine(models.Model):
     of_date_tarif = fields.Date(string="Date du tarif", related="product_id.date_tarif", readonly=True)
     of_obsolete = fields.Boolean(string=u"Article obsolète", related="product_id.of_obsolete", readonly=True)
     of_product_image_ids = fields.Many2many('of.product.image', string='Images')
-    of_product_attachment_computed = fields.Many2many(
-        "ir.attachment", string="Documents joints",
-        compute='_compute_of_product_attachment_computed')
     of_product_attachment_ids = fields.Many2many("ir.attachment", string="Documents joints")
+    # Champ servant au calcul du domain de of_product_attachment_ids
+    of_product_attachment_computed_ids = fields.Many2many(
+        "ir.attachment", string="Documents joints",
+        compute='_compute_of_product_attachment_computed_ids')
+    # A supprimer après la prochaine màj
+    of_product_attachment_computed = fields.Boolean(compute=lambda s: None)
 
     @api.model_cr_context
     def _auto_init(self):
@@ -846,7 +849,7 @@ class SaleOrderLine(models.Model):
                 line.of_marge_pc = 0.0
 
     @api.depends('product_id')
-    def _compute_of_product_attachment_computed(self):
+    def _compute_of_product_attachment_computed_ids(self):
         product_obj = self.env['product.product']
         attachment_obj = self.env['ir.attachment']
         for line in self:
@@ -866,7 +869,7 @@ class SaleOrderLine(models.Model):
                 ('mimetype', '=', 'application/pdf')
             ]
             attachment_ids = attachment_obj.search(domain)
-            line.of_product_attachment_computed = attachment_ids
+            line.of_product_attachment_computed_ids = attachment_ids
 
     @api.depends('price_unit', 'order_id.currency_id', 'order_id.partner_shipping_id', 'product_id',
                  'price_subtotal', 'product_uom_qty')
@@ -979,7 +982,7 @@ class SaleOrderLine(models.Model):
                     res['domain']['of_product_image_ids'] = [('id', 'in', of_product_image_ids.ids)]
             if self.env.user.has_group('of_sale.group_of_sale_print_attachment'):
                 attachment_ids = self.env['ir.attachment'].search(
-                    [('id', 'in', self.of_product_attachment_computed.ids)])
+                    [('id', 'in', self.of_product_attachment_computed_ids.ids)])
                 self.of_product_attachment_ids = attachment_ids
 
         return res
