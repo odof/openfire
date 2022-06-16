@@ -2,6 +2,17 @@
 from odoo import models, fields, api
 
 
+class ProductTemplate(models.Model):
+    _inherit = 'product.template'
+
+    @api.multi
+    def _purchase_count(self):
+        for template in self:
+            template.purchase_count = sum(
+                p.purchase_count for p in template.with_context(active_test=False).product_variant_ids)
+        return True
+
+
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
