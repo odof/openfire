@@ -390,7 +390,7 @@ class SaleOrder(models.Model):
 
     @api.model
     def cron_recompute_activities_state(self):
-        for order in self.search([]):
+        for order in self.search([('of_sale_activity_ids', '!=', False)]):
             order._compute_of_activities_state()
 
 
