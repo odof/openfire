@@ -15,6 +15,9 @@
                     <field name="of_sent"/>
                     <field name="sale_order_id"/>
                     <field name="customer_id"/>
+                    <field name="customer_shipping_id" invisible="1"/>
+                    <field name="customer_shipping_city" invisible="1"/>
+                    <field name="customer_shipping_zip" invisible="1"/>
                 </xpath>
                 <xpath expr="//label[@for='date_planned']" position="before">
                     <field name="delivery_expected"/>
@@ -75,6 +78,9 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='date_order']" position="before">
                     <field name="customer_id"/>
+                    <field name="customer_shipping_id" invisible="1"/>
+                    <field name="customer_shipping_city"/>
+                    <field name="customer_shipping_zip"/>
                 </xpath>
                 <xpath expr="//field[@name='date_planned']" position="attributes">
                     <attribute name="invisible">1</attribute>
@@ -192,10 +198,18 @@
         <field name="model">stock.picking</field>
         <field name="inherit_id" ref="stock.view_picking_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="partner_shipping_id" invisible="1"/>
+                <field name="partner_shipping_city" invisible="1"/>
+                <field name="partner_shipping_zip" invisible="1"/>
+            </xpath>
             <xpath expr="//field[@name='origin']" position="after">
                 <field name="of_user_id"/>
                 <field name="of_location_usage" invisible="1"/>
                 <field name="of_customer_id" attrs="{'invisible': [('of_location_usage', '!=', 'supplier')]}"/>
+                <field name="of_customer_shipping_id" invisible="1"/>
+                <field name="of_customer_shipping_city" invisible="1"/>
+                <field name="of_customer_shipping_zip" invisible="1"/>
             </xpath>
         </field>
     </record>
@@ -217,7 +231,13 @@
         <field name="inherit_id" ref="stock.vpicktree"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="partner_shipping_id" invisible="1"/>
+                <field name="partner_shipping_city" string="Ville"/>
+                <field name="partner_shipping_zip" string="Code Postal"/>
                 <field name="of_customer_id" string="Client final"/>
+                <field name="of_customer_shipping_id" invisible="1"/>
+                <field name="of_customer_shipping_city" string="Ville"/>
+                <field name="of_customer_shipping_zip" string="Code Postal"/>
             </xpath>
         </field>
     </record>
