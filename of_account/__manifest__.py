@@ -35,7 +35,7 @@ Module de comptabilité OpenFire.
         'views/of_account_view.xml',
         'views/partner_views.xml',
         'wizards/wizard_edit_export_view.xml',
-        'wizards/wizard_of_invoice_edit_accounts_view.xml',
+        'wizards/wizard_of_invoice_edit_open_view.xml',
         'wizards/wizard_of_invoice_writeoff_view.xml',
     ],
     'qweb': [

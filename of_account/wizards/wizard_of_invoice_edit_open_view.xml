@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="view_of_wizard_invoice_edit_accounts" model="ir.ui.view">
-        <field name="name">of.wizard.invoice.edit.accounts.form</field>
-        <field name="model">of.wizard.invoice.edit.accounts</field>
+    <record id="view_of_wizard_invoice_edit_open" model="ir.ui.view">
+        <field name="name">of.wizard.invoice.edit.open.form</field>
+        <field name="model">of.wizard.invoice.edit.open</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
             <form>
@@ -24,14 +24,14 @@
          </field>
     </record>
 
-    <act_window id="action_of_wizard_invoice_edit_accounts"
+    <act_window id="action_of_wizard_invoice_edit_open"
         name="Modifier les comptes comptables"
-        res_model="of.wizard.invoice.edit.accounts"
+        res_model="of.wizard.invoice.edit.open"
         src_model="account.invoice"
         groups="account.group_account_user"
         view_mode="form"
         view_type="form"
-        view_id="view_of_wizard_invoice_edit_accounts"
+        view_id="view_of_wizard_invoice_edit_open"
         target="new"/>
 
 </odoo>

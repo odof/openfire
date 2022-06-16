@@ -4,14 +4,21 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 
 
-class OfWizardInvoiceEditAccounts(models.TransientModel):
-    _name = 'of.wizard.invoice.edit.accounts'
+class OfWizardInvoiceEditOpen(models.TransientModel):
+    _name = 'of.wizard.invoice.edit.open'
 
-    line_ids = fields.One2many('of.wizard.invoice.edit.accounts.line', 'wizard_id')
+    invoice_id = fields.Many2one(
+        'account.invoice', string="Facture", required=True, default=lambda s: s.env.context.get('active_id'))
+    inv_account_id = fields.Many2one('account.account', related='invoice_id.account_id')
+    inv_date_due = fields.Date(related='invoice_id.date_due')
+    line_ids = fields.One2many('of.wizard.invoice.edit.open.line', 'wizard_id')
+    inv_name = fields.Char(related='invoice_id.name')
+    inv_partner_shipping_id = fields.Many2one('res.partner', related='invoice_id.partner_shipping_id')
+    inv_user_id = fields.Many2one('res.partner', related='invoice_id.user_id')
 
     @api.model
     def default_get(self, fields_list):
-        result = super(OfWizardInvoiceEditAccounts, self).default_get(fields_list)
+        result = super(OfWizardInvoiceEditOpen, self).default_get(fields_list)
         if 'line_ids' in fields_list:
             invoice = self.env['account.invoice'].browse(self._context['active_ids'])
             result['line_ids'] = [
@@ -67,11 +74,21 @@ class OfWizardInvoiceEditAccounts(models.TransientModel):
         # On revalide la pièce, ce qui peut aussi lancer d'autres recalculs, comme les lignes analytiques
         invoice.move_id.post()
 
+        @api.multi
+        def write(vals):
+            for field in vals:
+                if field.name.startswith('inv_'):
+                    new_val = vals['field_name']
+                    old_val = self[:1].invoice_id[field[4:]]
+                    if new_val == old_val:
+                        del vals[field]
+            return super(OfWizardInvoiceEditOpen, self).write(vals)
 
-class OfWizardInvoiceEditAccountsLine(models.TransientModel):
-    _name = 'of.wizard.invoice.edit.accounts.line'
 
-    wizard_id = fields.Many2one('of.wizard.invoice.edit.accounts')
+class OfWizardInvoiceEditOpenLine(models.TransientModel):
+    _name = 'of.wizard.invoice.edit.open.line'
+
+    wizard_id = fields.Many2one('of.wizard.invoice.edit.open')
     invoice_line_id = fields.Many2one('account.invoice.line', string="Ligne de facture", readonly=True)
     account_id = fields.Many2one('account.account', string="Compte")
     quantity = fields.Float(string=u"Quantité", readonly=True)
