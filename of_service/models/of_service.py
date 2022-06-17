@@ -1111,6 +1111,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
             'default_address_id': self.address_id and self.address_id.id or self.partner_id.id,
             'default_tache_id': self.tache_id and self.tache_id.id or False,
             'default_duree': self.duree,
+            'default_tag_ids': [(6, 0, [tag.id for tag in self.tag_ids])],
             'default_description_interne': self.note,
             'default_service_id': self.id,
             'create': self.base_state == 'calculated',
