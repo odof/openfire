@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="email_compose_message_wizard_form" model="ir.ui.view">
+        <field name="name">of.document.mail.compose.message.form</field>
+        <field name="model">mail.compose.message</field>
+        <field name="inherit_id" ref="mail.email_compose_message_wizard_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='template_id']/.." position="after">
+                <group>
+                    <field name="of_dms_directory_ids" widget="many2many_tags" invisible="1"/>
+                    <field name="of_dms_file_ids" widget="many2many_tags" domain="[('directory', 'child_of', of_dms_directory_ids and of_dms_directory_ids[0] and of_dms_directory_ids[0][2] or [])]"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

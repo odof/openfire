@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import api, fields, models
 
@@ -16,20 +17,19 @@ class Partner(models.Model):
             if not partner_dir:
                 self.of_dms_file_count = 0
             else:
-                self.of_dms_file_count = self.env['muk_dms.file'].search([('directory', '=', partner_dir.id)],
-                                                                         count=True)
+                self.of_dms_file_count = self.env['muk_dms.file'].search([
+                    ('directory', 'child_of', partner_dir.id)], count=True)
 
     @api.multi
     def action_view_dms_files(self):
         self.ensure_one()
         if self.of_dms_file_count:
-            partner_dir = self.env['muk_dms.directory']\
-                .search([('of_partner_id', '=', self.commercial_partner_id.id)])
+            partner_dir = self.env['muk_dms.directory'].search([('of_partner_id', '=', self.commercial_partner_id.id)])
             action = self.env.ref('muk_dms.action_dms_file').read()[0]
             action['views'] = [(self.env.ref('muk_dms.view_dms_file_tree').id, 'tree'),
                                (self.env.ref('muk_dms.view_dms_file_kanban').id, 'kanban'),
                                (self.env.ref('muk_dms.view_dms_file_form').id, 'form')]
-            action['domain'] = [('directory', '=', partner_dir.id)]
+            action['domain'] = [('directory', 'child_of', partner_dir.id)]
             return action
 
     @api.multi
