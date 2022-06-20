@@ -89,6 +89,29 @@ class Directory(dms_base.DMSModel):
         return object_dir
 
 
+    @api.model
+    def of_get_object_directory(self, partner_dir, categ):
+        """
+        Récupère le sous dossier du partenaire en fonction du nom ou le crée si nécessaire.
+        :param partner: Partenaire dont on cherche le sous dossier
+        :param categ: Catégorie dont on cherche le dossier
+        :return: Sous dossier du partenaire
+        """
+        default_settings = self.env.ref('of_document.default_settings')
+        data = default_settings.of_subdirectory_ids.search([('data_ids', 'in', categ.ids)], limit=1)
+        object_dir = self.search([
+            ('name', '=', data.name),
+            ('parent_directory', '=', partner_dir.id),
+        ], limit=1)
+        if not object_dir:
+            # Create object directory
+            object_dir = self.create({
+                'name': data.name,
+                'parent_directory': partner_dir.id,
+            })
+        return object_dir
+
+
 class File(dms_base.DMSModel):
     _name = 'muk_dms.file'
     _inherit = ['muk_dms.file', 'mail.thread']
