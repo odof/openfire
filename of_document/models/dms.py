@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import unidecode
 import itertools
+import unidecode
 from collections import defaultdict
 
 from odoo import models, fields, api, SUPERUSER_ID
@@ -41,7 +42,7 @@ class Directory(dms_base.DMSModel):
         if partner_first_char.isalpha():
             try:
                 parent_dir = self.env.ref('of_document.' + partner_first_char + '_partner_directory')
-            except:
+            except Exception:
                 parent_dir = self.env.ref('of_document.other_partner_directory')
         else:
             parent_dir = self.env.ref('of_document.other_partner_directory')
@@ -54,16 +55,38 @@ class Directory(dms_base.DMSModel):
         :param partner: Partenaire dont on cherche le dossier
         :return: Dossier du partenaire
         """
-        dms_dir_obj = self.env['muk_dms.directory']
         top_partner = partner.commercial_partner_id
-        top_partner_dir = dms_dir_obj.search([('of_partner_id', '=', top_partner.id)])
+        top_partner_dir = self.search([('of_partner_id', '=', top_partner.id)], limit=1)
         if not top_partner_dir:
             parent_dir = self.of_get_partner_parent_directory(top_partner)
             # Create partner directory
-            top_partner_dir = dms_dir_obj.create({'name': top_partner.name,
-                                                  'parent_directory': parent_dir.id,
-                                                  'of_partner_id': top_partner.id})
+            top_partner_dir = self.create({
+                'name': top_partner.name,
+                'parent_directory': parent_dir.id,
+                'of_partner_id': top_partner.id})
         return top_partner_dir
+
+    @api.model
+    def of_get_object_directory(self, partner_dir, categ):
+        """
+        Récupère le sous dossier du partenaire en fonction du nom ou le crée si nécessaire.
+        :param partner: Partenaire dont on cherche le sous dossier
+        :param categ: Catégorie dont on cherche le dossier
+        :return: Sous dossier du partenaire
+        """
+        default_settings = self.env.ref('of_document.default_settings')
+        data = default_settings.of_subdirectory_ids.search([('data_ids', 'in', categ.ids)], limit=1)
+        object_dir = self.search([
+            ('name', '=', data.name),
+            ('parent_directory', '=', partner_dir.id),
+        ], limit=1)
+        if not object_dir:
+            # Create object directory
+            object_dir = self.create({
+                'name': data.name,
+                'parent_directory': partner_dir.id,
+            })
+        return object_dir
 
 
 class File(dms_base.DMSModel):
@@ -72,8 +95,11 @@ class File(dms_base.DMSModel):
 
     @api.model
     def _init_files(self):
+        default_settings = self.env.ref('of_document.default_settings')
+        data_ids = default_settings.of_subdirectory_ids.mapped('data_ids')
+        dms_dir_obj = self.env['muk_dms.directory']
+        ir_attachment_obj = self.env['ir.attachment']
         for partner in self.env['res.partner'].search([]):
-
             objects = [('of_document.res_partner_file_category', partner)]
             for obj_name in ('sale.order', 'purchase.order', 'crm.lead', 'project.issue', 'of.service',
                              'of.planning.intervention'):
@@ -92,27 +118,51 @@ class File(dms_base.DMSModel):
             objects.append(('of_document.stock_picking_in_file_category',
                             self.env['stock.picking'].search([('partner_id', '=', partner.id),
                                                               ('picking_type_id.code', '=', 'incoming')])))
+
             partner_dir = False
             for categ, obj in objects:
-                attachments = self.env['ir.attachment'].\
-                    search([('res_model', '=', obj._name), ('res_id', 'in', obj.ids)])
+                attachments = ir_attachment_obj.search([('res_model', '=', obj._name), ('res_id', 'in', obj.ids)])
                 if not attachments:
                     continue
 
                 if not partner_dir:
-                    partner_dir = self.env['muk_dms.directory'].of_get_partner_directory(partner)
+                    partner_dir = dms_dir_obj.of_get_partner_directory(partner)
 
                 categ = self.env.ref(categ)
+                object_dir = False
+                if categ in data_ids:
+                    try:
+                        object_dir = dms_dir_obj.of_get_object_directory(partner_dir, categ)
+                    except Exception:
+                        continue
+
                 for attachment in attachments:
-                    self.create({'name': attachment.name,
-                                 'directory': partner_dir.id,
-                                 'of_file_type': 'related',
-                                 'of_related_model': obj._name,
-                                 'of_related_id': attachment.res_id,
-                                 'of_attachment_id': attachment.id,
-                                 'of_attachment_partner_id': partner.id,
-                                 'size': attachment.file_size,
-                                 'of_category_id': categ.id})
+                    att = self.search([
+                        ('of_related_model', '=', obj._name),
+                        ('of_related_id', '=', attachment.res_id),
+                        ('of_attachment_id', '=', attachment.id),
+                        ('of_attachment_partner_id', '=', partner.id),
+                    ], limit=1)
+                    if not att:
+                        self.create({
+                            'name': attachment.name,
+                            'directory': object_dir.id if object_dir else partner_dir.id,
+                            'of_file_type': 'related',
+                            'of_related_model': obj._name,
+                            'of_related_id': attachment.res_id,
+                            'of_attachment_id': attachment.id,
+                            'of_attachment_partner_id': partner.id,
+                            'size': attachment.file_size,
+                            'of_category_id': categ.id
+                        })
+                    else:
+                        att.write({
+                            'name': attachment.name,
+                            'directory': object_dir.id if object_dir else partner_dir.id,
+                            'of_file_type': 'related',
+                            'size': attachment.file_size,
+                            'of_category_id': categ.id
+                        })
 
     of_file_type = fields.Selection(
         selection=[('normal', u"Fichier normal"), ('related', u"Fichier lié")], string=u"Type de fichier",
@@ -312,3 +362,28 @@ class FileTag(models.Model):
 
     name = fields.Char(string=u"Nom", required=True)
     color = fields.Integer(string=u"Couleur")
+
+
+class MukDmsDirectoryTemplate(models.Model):
+    _name = 'of.muk.dms.directory.template'
+    _description = u"Modèle de répertoire"
+
+    name = fields.Char(string=u"Titre")
+    data_ids = fields.Many2many(comodel_name='of.document.file.category', string=u"Objet(s)")
+    parent_id = fields.Many2one(comodel_name='of.muk.dms.directory.template', string=u"Répertoire parent")
+    muk_setting_id = fields.Many2one(comodel_name='muk_dms.settings', string=u"Paramètre Muk")
+
+
+class Settings(dms_base.DMSModel):
+    _inherit = 'muk_dms.settings'
+
+    of_default_template = fields.Boolean(
+        string=u"Modèle par défaut",
+        help=u"Permet de définir s’il s’agit du modèle par "
+             u"défaut qui s’applique à la création d’un nouveau répertoire ")
+    of_source_directory_id = fields.Many2one(comodel_name='muk_dms.directory', string=u"Répertoire source")
+    of_subdirectory_ids = fields.One2many(
+        comodel_name='of.muk.dms.directory.template', inverse_name='muk_setting_id', string=u"Sous-répertoires")
+
+    def action_init_files(self):
+        self.env['muk_dms.file']._init_files()

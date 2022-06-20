@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
     'name': u"OpenFire / Gestion électronique des documents",
-    'version': "10.0.1.0.0",
-    'author': "OpenFire",
-    'website': "http://www.openfire.fr",
+    'version': '10.0.1.0.0',
+    'license': 'AGPL-3',
+    'author': u"OpenFire",
+    'website': u"http://www.openfire.fr",
     'category': u"Gestion électronique des documents",
     'description': u"""
 Module OpenFire pour la gestion électronique des documents
@@ -52,6 +54,7 @@ Module basé sur les modules Muk DMS avec les ajouts/modifications suivantes :
         'views/dms_views.xml',
         'views/partner_views.xml',
         'views/of_document_templates.xml',
+        'wizards/mail_compose.xml',
     ],
     'installable': True,
     'application': True,

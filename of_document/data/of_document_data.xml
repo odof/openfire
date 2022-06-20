@@ -224,6 +224,62 @@
             <field name="name">RDV d'intervention</field>
         </record>
 
+        <record id="of_muk_dms_directory_template_sale_order" model="of.muk.dms.directory.template">
+            <field name="name">Commande(s) Clients</field>
+            <field name="parent_id" eval="False"/>
+            <field name="data_ids" eval="[(4, ref('of_document.sale_order_file_category'))]"/>
+            <field name="muk_setting_id" eval="ref('of_document.default_settings')"/>
+        </record>
+
+        <record id="of_muk_dms_directory_template_purchase_order" model="of.muk.dms.directory.template">
+            <field name="name">Commande(s) Fournisseurs</field>
+            <field name="parent_id" eval="False"/>
+            <field name="data_ids" eval="[(4, ref('of_document.purchase_order_file_category'))]"/>
+            <field name="muk_setting_id" eval="ref('of_document.default_settings')"/>
+        </record>
+
+        <record id="of_muk_dms_directory_template_account_invoice_out" model="of.muk.dms.directory.template">
+            <field name="name">Facture(s) et avoir(s) clients</field>
+            <field name="parent_id" eval="False"/>
+            <field name="data_ids" eval="[(4, ref('of_document.account_invoice_out_file_category'))]"/>
+            <field name="muk_setting_id" eval="ref('of_document.default_settings')"/>
+        </record>
+
+        <record id="of_muk_dms_directory_template_account_invoice_in" model="of.muk.dms.directory.template">
+            <field name="name">Facture(s) et avoir(s) fournisseurs</field>
+            <field name="parent_id" eval="False"/>
+            <field name="data_ids" eval="[(4, ref('of_document.account_invoice_in_file_category'))]"/>
+            <field name="muk_setting_id" eval="ref('of_document.default_settings')"/>
+        </record>
+
+        <record id="of_muk_dms_directory_template_stock_picking_out" model="of.muk.dms.directory.template">
+            <field name="name">Bon(s) de livraison</field>
+            <field name="parent_id" eval="False"/>
+            <field name="data_ids" eval="[(4, ref('of_document.stock_picking_out_file_category'))]"/>
+            <field name="muk_setting_id" eval="ref('of_document.default_settings')"/>
+        </record>
+
+        <record id="of_muk_dms_directory_template_stock_picking_in" model="of.muk.dms.directory.template">
+            <field name="name">Bon(s) de réception</field>
+            <field name="parent_id" eval="False"/>
+            <field name="data_ids" eval="[(4, ref('of_document.stock_picking_in_file_category'))]"/>
+            <field name="muk_setting_id" eval="ref('of_document.default_settings')"/>
+        </record>
+
+        <record id="of_muk_dms_directory_template_of_service" model="of.muk.dms.directory.template">
+            <field name="name">Demande d’intervention</field>
+            <field name="parent_id" eval="False"/>
+            <field name="data_ids" eval="[(4, ref('of_document.of_service_file_category'))]"/>
+            <field name="muk_setting_id" eval="ref('of_document.default_settings')"/>
+        </record>
+
+        <record id="of_muk_dms_directory_template_of_planning_intervention" model="of.muk.dms.directory.template">
+            <field name="name">RDV d'intervention</field>
+            <field name="parent_id" eval="False"/>
+            <field name="data_ids" eval="[(4, ref('of_document.of_planning_intervention_file_category'))]"/>
+            <field name="muk_setting_id" eval="ref('of_document.default_settings')"/>
+        </record>
+
         <!-- File initialization at module installation -->
         <function model="muk_dms.file" name="_init_files"/>
 
