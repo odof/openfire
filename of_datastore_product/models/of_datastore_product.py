@@ -1662,3 +1662,8 @@ class PurchaseOrderLine(models.Model):
 class StockInventoryLine(models.Model):
     _name = 'stock.inventory.line'
     _inherit = ['stock.inventory.line', 'of.datastore.product.reference']
+
+
+class OFParcInstalle(models.Model):
+    _name = 'of.parc.installe'
+    _inherit = ['of.parc.installe', 'of.datastore.product.reference']

@@ -48,6 +48,7 @@ Ce module nécessite l'installation de openerplib sur le serveur : sudo easy_ins
         'of_import',
         'of_kit',
         'of_utils',
+        'of_parc_installe',
     ],
     'data': [
         'wizard/of_datastore_import_brand.xml',
