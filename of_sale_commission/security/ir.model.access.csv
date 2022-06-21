@@ -1,10 +1,10 @@
 "id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
-"access_of_sale_regcommi","of.sale.regcommi","model_of_sale_regcommi","account.group_account_user",1,0,0,0
-"access_of_sale_profcommi_user","of.sale.profcommi.user","model_of_sale_profcommi","account.group_account_user",1,0,0,0
+"access_of_sale_regcommi","of.sale.regcommi","model_of_sale_regcommi","base.group_user",1,0,0,0
+"access_of_sale_profcommi_user","of.sale.profcommi.user","model_of_sale_profcommi","base.group_user",1,0,0,0
 "access_of_sale_profcommi_manager","of.sale.profcommi.manager","model_of_sale_profcommi","account.group_account_manager",1,1,1,1
 "access_of_sale_profcommi_line_user","of.sale.profcommi.line.user","model_of_sale_profcommi_line","base.group_user",1,0,0,0
 "access_of_sale_profcommi_line_manager","of.sale.profcommi.line.manager","model_of_sale_profcommi_line","account.group_account_manager",1,1,1,1
-"access_of_sale_commi_user","of.sale.commi.user","model_of_sale_commi","account.group_account_user",1,0,0,0
+"access_of_sale_commi_user","of.sale.commi.user","model_of_sale_commi","base.group_user",1,0,0,0
 "access_of_sale_commi_manager","of.sale.commi.manager","model_of_sale_commi","account.group_account_manager",1,1,1,1
 "access_of_sale_commi_line_user","of.sale.commi.line.user","model_of_sale_commi_line","base.group_user",1,0,0,0
 "access_of_sale_commi_line_manager","of.sale.commi.line.manager","model_of_sale_commi_line","account.group_account_manager",1,1,1,1

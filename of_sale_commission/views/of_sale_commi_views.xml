@@ -216,11 +216,11 @@
         <field name="name">of.sale.commi.order.form</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
-        <field name="groups_id" eval="[(6, 0, [ref('account.group_account_user')])]"/>
+        <field name="groups_id" eval="[(5,)]"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']/button[@name='action_view_invoice']" position="after">
                 <button class="oe_stat_button" name="action_view_commissions" type="object" icon="fa-money"
-                    attrs="{'invisible': [('state', 'in', ('draft', 'sent'))]}">
+                    attrs="{'invisible': ['|', ('state', 'in', ('draft', 'sent')), ('of_client_view', '=', True)]}">
                     <field string="Commissions" name="of_nb_commis" widget="statinfo"/>
                 </button>
             </xpath>
@@ -232,7 +232,7 @@
         <field name="name">of.sale.commi.invoice.form</field>
         <field name="model">account.invoice</field>
         <field name="inherit_id" ref="of_account.of_account_invoice_form"/>
-        <field name="groups_id" eval="[(6, 0, [ref('account.group_account_user')])]"/>
+        <field name="groups_id" eval="[(5,)]"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button class="oe_stat_button" name="action_view_commissions" type="object" icon="fa-money">
