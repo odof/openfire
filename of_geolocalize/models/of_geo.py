@@ -197,6 +197,7 @@ class ResPartner(models.Model):
 
         # Partenaires à géocoder.
         to_geocode = self.env['res.partner']
+        to_reset = self.env['res.partner']
 
         # Change coordinates but not geocoding (geo data manual entry)
         if ('geo_lat' in vals or 'geo_lng' in vals) and 'geocoding' not in vals:
@@ -221,19 +222,34 @@ class ResPartner(models.Model):
                             if key in vals and partner[key].id != vals[key]:
                                 to_geocode |= partner
                                 break
-            else:  # if config gecoding on write False, set as not tried
-                vals['geocoding'] = "not_tried"
-                vals['geocodeur'] = "unknown"
-                vals['geo_lat'] = 0
-                vals['geo_lng'] = 0
-                vals['precision'] = "not_tried"
-                vals['date_last_localization'] = fields.Datetime.context_timestamp(self, fields.datetime.now())
+            else:  # if config gecoding on write False, set as not tried only if the address has changed
+                for partner in self:
+                    for key in ('street', 'street2', 'zip', 'city'):
+                        # au moins un champ d'adresse a effectivement été modifié
+                        if key in vals and partner[key] != vals[key]:
+                            to_reset |= partner
+                            break
+                    else:
+                        # Champs M2O
+                        for key in ('state_id', 'country_id'):
+                            if key in vals and partner[key].id != vals[key]:
+                                to_reset |= partner
+                                break
 
         result = super(ResPartner, self).write(vals)
 
         # DO GEOCODING AUTOMATIC (through wizard)
         if to_geocode:
             to_geocode.geo_code()
+        if to_reset:
+            to_reset.write({
+                'geocoding': "not_tried",
+                'geocodeur': "unknown",
+                'geo_lat': 0,
+                'geo_lng': 0,
+                'precision': "not_tried",
+                'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
+            })
         return result
 
 
