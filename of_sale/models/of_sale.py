@@ -995,7 +995,9 @@ class SaleOrderLine(models.Model):
             if self.product_id.categ_id:
                 self.of_article_principal = self.product_id.categ_id.of_article_principal
             if self.env.user.has_group('sale.group_sale_layout'):
-                if self.product_id.categ_id.of_layout_id:
+                if self.product_id.of_layout_category_id:
+                    self.layout_category_id = product.of_layout_category_id
+                elif self.product_id.categ_id.of_layout_id:
                     self.layout_category_id = self.product_id.categ_id.of_layout_id
             if self.env.user.has_group('of_sale.group_of_sale_multiimage'):
                 if self.product_id.product_tmpl_id.of_product_image_ids:
