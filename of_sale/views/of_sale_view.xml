@@ -455,6 +455,9 @@
                 <xpath expr="//group[@name='group_general']/span" position="attributes">
                     <attribute name="groups">of_sale.of_group_sale_marge_manager</attribute>
                 </xpath>
+                <xpath expr="//field[@name='categ_id']" position="after">
+                    <field name="of_layout_category_id" options="{'no_open': True}"/>
+                </xpath>
                 <xpath expr="//notebook[last()]" position="inside">
                     <page string="Images" name="of_sale_multiimage" groups="of_sale.group_of_sale_multiimage">
                         <field name="of_product_image_ids" mode="kanban" context="{'default_name': name, 'default_product_tmpl_id': active_id}" >
