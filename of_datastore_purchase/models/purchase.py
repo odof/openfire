@@ -167,7 +167,9 @@ class PurchaseOrder(models.Model):
                         'tax_id': [(6, 0, line_tax_ids)],
                         }
                     )
-                datastore_purchase.of_datastore_create(ds_sale_order_line_obj, values)
+                ds_order_line_id = datastore_purchase.of_datastore_create(ds_sale_order_line_obj, values)
+                datastore_purchase.of_datastore_func(
+                    ds_sale_order_line_obj, 'connector_force_compute_values', [ds_order_line_id], [])
 
             # On ajoute un message dans le mail thread
             self.message_post(body=u"%s transmise via commande directe." %
@@ -197,6 +199,7 @@ class PurchaseOrder(models.Model):
             'user_id': base_vals.get('user_id'),
             'warehouse_id': base_vals.get('warehouse_id'),
             'requested_date': self.date_planned,
+            'delivery_expected': self.delivery_expected,
             'note': self.notes,
             'of_datastore_order': True,
             'origin': self.name or '',

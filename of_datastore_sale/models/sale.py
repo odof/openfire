@@ -30,6 +30,12 @@ class SaleOrderLine(models.Model):
 
     of_datastore_line_id = fields.Integer(string=u"ID ligne de commande base client", copy=False)
 
+    def connector_force_compute_values(self):
+        """Permet l'appel de méthodes privées via xmlrpc pour forcer le calcul de certains champs"""
+        self._compute_tax_id()
+        self._onchange_discount()
+        return True
+
 
 class SaleConfigSettings(models.TransientModel):
     _inherit = 'sale.config.settings'
