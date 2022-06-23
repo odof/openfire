@@ -59,6 +59,12 @@ def _get_inventory_lines_values(self):
         domain += ' AND product_id = ANY (%s)'
         args += (categ_products.ids,)
         products_to_filter |= categ_products
+    # OF case 6 : Filter on multiple product categories
+    if self.of_category_ids:
+        categ_products = Product.search([('categ_id', 'in', self.of_category_ids._ids)])
+        domain += ' AND product_id = ANY (%s)'
+        args += (categ_products.ids,)
+        products_to_filter |= categ_products
     if hasattr(self, 'of_option') and self.of_option:
         domain += ' AND in_date <= %s'
         args += (self.date, )
@@ -340,6 +346,11 @@ class Inventory(models.Model):
     category_child_ids = fields.Many2many(
         string=u"Catégories filles", comodel_name='product.category', compute='_compute_category_child_ids')
     of_performance_mode = fields.Boolean(string=u"Mode performance")
+    of_category_ids = fields.Many2many(
+        comodel_name='product.category', string='Inventoried Categories', readonly=True,
+        states={'draft': [('readonly', False)]},
+        help="Specify Product Category to focus your inventory on a particular Category."
+    )
 
     @api.depends('company_id')
     def _compute_of_option(self):
@@ -503,6 +514,13 @@ class Inventory(models.Model):
                 for line in record.line_ids:
                     line._compute_theoretical_qty()
                     line._onchange_product_info()
+
+    @api.model
+    def _selection_filter(self):
+        filters = super(Inventory, self)._selection_filter()
+        index = filters.index(('category', _('One product category')))
+        filters.insert(index+1, ('categories', u"Plusieurs catégories d'articles"))
+        return filters
 
 
 class InventoryLine(models.Model):
