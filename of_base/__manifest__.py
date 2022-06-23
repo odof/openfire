@@ -65,6 +65,11 @@ Ajout d'un modèle servant de log interne :
         'wizard/of_popup_wizard_view.xml',
         'wizard/of_res_partner_check_duplications_views.xml',
     ],
+    'external_dependencies': {
+        'python': [
+            'schwifty',  # version 2.0.0 pour python 2.7
+        ],
+    },
     'installable': True,
     'application': False,
     'auto_install': False,
