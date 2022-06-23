@@ -49,5 +49,14 @@
             <field name="category_id" ref="base.module_category_hidden"/>
         </record>
 
+        <!-- Modification of the purchase price in the Order lines-->
+        <record id="group_of_can_modify_sale_purchase_price" model="res.groups">
+            <field name="name">(OF) Modifier le coût dans les lignes de commande</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
+        <record id="sales_team.group_sale_manager" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('of_sale.group_of_can_modify_sale_purchase_price'))]"/>
+        </record>
+
     </data>
 </openerp>
