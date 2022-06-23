@@ -6,7 +6,9 @@
     <record id="of_group_sale_responsible" model="res.groups">
         <field name="name">Responsable</field>
         <field name="category_id" ref="base.module_category_sales_management"/>
-        <field name="implied_ids" eval="[(4, ref('sales_team.group_sale_salesman_all_leads'))]"/>
+        <field name="implied_ids" eval="[
+            (4, ref('sales_team.group_sale_salesman_all_leads')),
+            (4, ref('of_sale.group_of_can_modify_sale_purchase_price'))]"/>
     </record>
 
     <record id="sales_team.group_sale_manager" model="res.groups">
