@@ -1510,7 +1510,7 @@ class OfContractLine(models.Model):
                     new_service.update({'parc_installe_id': line.parc_installe_id.id})
                 new_service_vals = new_service._convert_to_write(new_service._cache)
                 lines = []
-                for product_line in self.contract_product_ids:
+                for product_line in line.contract_product_ids:
                     qty = product_line.qty_per_period / nbr_intervs
                     lines.append((0, 0, {
                         'qty': qty,
@@ -1519,12 +1519,12 @@ class OfContractLine(models.Model):
                         'price_unit': product_line.price_unit,
                         'discount': product_line.discount,
                         'taxe_ids': [(4, tax.id) for tax in product_line.tax_ids],
-                        'of_contract_line_id': self.id,
+                        'of_contract_line_id': line.id,
                         'of_contract_product_id': product_line.id,
                     }))
                 new_service_vals['line_ids'] = lines
-                if self.fiscal_position_id:
-                    new_service_vals['fiscal_position_id'] = self.fiscal_position_id.id
+                if line.fiscal_position_id:
+                    new_service_vals['fiscal_position_id'] = line.fiscal_position_id.id
                 new_service = Service.create(new_service_vals)
                 services |= new_service
             if services:
