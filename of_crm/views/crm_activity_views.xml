@@ -11,7 +11,8 @@
                 <h4><field name="of_short_name"/></h4>
             </xpath>
             <xpath expr="//field[@name='team_id']" position="after">
-                <field name="of_user_id"/>
+                <field name="of_user_assignement" attrs="{'invisible':[('of_object', '!=', 'sale_order')]}"/>
+                <field name="of_user_id"  attrs="{'required':[('of_user_assignement', '=', 'specific_user')], 'invisible':[('of_object', '=', 'sale_order'),('of_user_assignement', '!=', 'specific_user')]}" />
             </xpath>
             <xpath expr="//field[@name='team_id']" position="before">
                 <field name="of_object"/>

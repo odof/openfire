@@ -39,8 +39,16 @@
                                 </div>
                                 <div style="margin-left: 5px; margin-bottom: 25px;">
                                     <h4>
-                                        <b><field name="name"/></b> - <field name="partner_id"/><br/>
+                                        <b><field name="name"/></b> - <field name="partner_id"/>
                                     </h4>
+                                    <table style="width: 100%;">
+                                        <tbody>
+                                            <tr>
+                                                <td><div id="amount_untaxed" style="display: flex;" groups="sale.group_show_price_subtotal"><field name="amount_untaxed"/>&amp;nbsp;HT</div></td>
+                                                <td><div id="amount_total" style="display: flex;" groups="sale.group_show_price_total"><field style="padding-left: 7px;" name="amount_total"/>&amp;nbsp;TTC</div></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                     <span><b><field name="user_id"/> / <field name="of_main_product_brand_id" /></b></span>
                                     <span><b>Sem. de pose : <field name="of_laying_week"/></b></span>
                                     <br/>
@@ -77,10 +85,6 @@
                                 </ul>
                             </div>
                             <div class="of_followup_kanban_box">
-                                <field name="amount_untaxed"/> HT
-                                <field name="amount_total"/> TTC
-                            </div>
-                            <div class="of_followup_kanban_box">
                                 <field name="invoice_status"/>
                             </div>
                         </div>
@@ -108,6 +112,7 @@
         <field name="model">of.sale.order.kanban</field>
         <field name="arch" type="xml">
             <tree string="Étapes kanban" editable="top">
+                <field name="sequence" widget="handle"/>
                 <field name="name"/>
             </tree>
         </field>

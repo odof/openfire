@@ -27,19 +27,19 @@ class OFSaleActivity(models.Model):
         ('cancelled', 'Cancelled')], string='State', index=True, required=True, default='planned')
     is_overdue = fields.Boolean(string='Is overdue activity ?', compute='_compute_is_overdue')
     load_attachment = fields.Boolean(string='Load an attachment')
-    uploaded_attachment_id = fields.Many2one(
-        comodel_name='ir.attachment', string='Uploaded attachment', ondelete='SET NULL')
-    user_id = fields.Many2one(comodel_name='res.users', string='Assigned to', ondelete='SET NULL', index=True)
+    uploaded_attachment_id = fields.Many2one(comodel_name='ir.attachment', string='Uploaded attachment')
+    user_id = fields.Many2one(comodel_name='res.users', string='Assigned to', index=True)
 
     @api.onchange('activity_id')
     def _onchange_activity_id(self):
         if self.activity_id:
-            self.date_deadline = self.env['sale.order']._of_get_sale_activity_date_deadline(
+            order_obj = self.env['sale.order']
+            self.date_deadline = order_obj._of_get_sale_activity_date_deadline(
                 self.order_id, self.activity_id)
             self.description = self.activity_id.description
             self.summary = self.activity_id.of_short_name
             self.load_attachment = self.activity_id.of_load_attachment
-            user_id = self.activity_id.of_user_id
+            user_id = order_obj._of_get_sale_activity_user_id(self.order_id, self.activity_id)
             if user_id:
                 self.user_id = user_id
 

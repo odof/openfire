@@ -12,7 +12,7 @@ class OFSaleQuoteTemplateActivity(models.Model):
         comodel_name='sale.quote.template', string='Template', index=True, required=True, ondelete='cascade')
     sequence = fields.Integer(string='Sequence', default=1)
     activity_id = fields.Many2one(
-        comodel_name='crm.activity', string='Activity', index=True, required=True,
+        comodel_name='crm.activity', string='Activity type', index=True, required=True,
         domain=['|', ('of_object', '=', 'sale_order'), ('of_object', '=', False)])
     description = fields.Text(string='Description')
     compute_date = fields.Selection(selection='_get_compute_date_selection', string='Compute Date')
@@ -25,10 +25,10 @@ class OFSaleQuoteTemplateActivity(models.Model):
     @api.multi
     def _get_sale_activity_values(self, order):
         self.ensure_one()
-        date_deadline = self.env['sale.order']._of_get_sale_activity_date_deadline(
+        order_obj = self.env['sale.order']
+        date_deadline = order_obj._of_get_sale_activity_date_deadline(
             order, self.activity_id, self.days, self.compute_date)
-        user_id = self.activity_id.of_user_id and self.activity_id.of_user_id.id or order.user_id and \
-            order.user_id.id or self.env.users.id
+        user_id = order_obj._of_get_sale_activity_user_id(order, self.activity_id)
         return {
             'activity_id': self.activity_id,
             'description': self.description,
