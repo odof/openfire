@@ -244,7 +244,7 @@
         <t t-call="website_portal.portal_layout">
             <h3 class="page-header">Vos livraisons</h3>
             <t t-if="not deliveries">
-                <p>Il n'y a actuellement pas de contrats pour votre compte.</p>
+                <p>Il n'y a actuellement pas de livraisons pour votre compte.</p>
             </t>
             <t t-if="deliveries">
                 <table class="table table-hover o_my_status_table" id="delivery_table">
@@ -278,6 +278,41 @@
                                 <t t-if="delivery.state == 'done'"  t-set="color" t-value="'text-success'"/>
                                 <t t-if="delivery.state == 'cancel'"  t-set="color" t-value="'text-danger'"/>
                                 <span t-field="delivery.state" t-att-class="color"/>
+                            </td>
+                        </tr>
+                    </t>
+                </table>
+                <div t-if="pager" class="o_portal_pager text-center">
+                    <t t-call="website.pager" />
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- Portail - Documents -->
+    <template id="of_website_portal_portal_my_documents" name="OF My Documents">
+        <t t-call="website_portal.portal_layout">
+            <h3 class="page-header">Vos Documents</h3>
+            <t t-if="not documents">
+                <p>Il n'y a actuellement pas de document pour votre compte.</p>
+            </t>
+            <t t-if="documents">
+                <table class="table table-hover o_my_status_table" id="document_table">
+                    <thead>
+                        <tr class="active">
+                            <th>Document</th>
+                            <th>Catégorie</th>
+                        </tr>
+                    </thead>
+                    <t t-foreach="documents" t-as="document">
+                        <tr>
+                            <td>
+                                <a t-attf-href="{{document.of_website_url}}" t-att-title="document.display_name">
+                                    <span t-esc="document.display_name"/>
+                                </a>
+                            </td>
+                            <td>
+                                <span t-esc="document.of_category_id.name if document.of_category_id else 'Sans catégorie'"/>
                             </td>
                         </tr>
                     </t>

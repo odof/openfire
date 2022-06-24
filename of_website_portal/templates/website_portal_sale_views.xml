@@ -40,6 +40,9 @@
             <li groups="base.group_portal,base.group_user">
                 <a href="/my/deliveries">Livraisons</a>
             </li>
+            <li groups="base.group_portal,base.group_user">
+                <a href="/my/documents">Mes documents</a>
+            </li>
         </xpath>
     </template>
 
@@ -65,6 +68,9 @@
                         </t>
                     </small>
                 </a>
+            </h3>
+            <h3 class="page-header" groups="base.group_portal,base.group_user">
+                <a href="/my/documents">Vos documents</a>
             </h3>
         </xpath>
     </template>
