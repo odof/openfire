@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
 import odoo.addons.decimal_precision as dp
-from odoo.tools.float_utils import float_compare, float_round
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from odoo import models, fields, api, _
+from odoo.tools.float_utils import float_round
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class SaleOrder(models.Model):
@@ -33,23 +33,28 @@ class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
     customer_id = fields.Many2one('res.partner', string='Client')
-    sale_order_id = fields.Many2one('sale.order', string="Commande d'origine")
+    customer_shipping_id = fields.Many2one(comodel_name='res.partner', string=u"Adresse de Livraison du Client")
+    customer_shipping_city = fields.Char(
+        related='customer_shipping_id.city', string=u"Ville", store=True, readonly=True)
+    customer_shipping_zip = fields.Char(
+        related='customer_shipping_id.zip', string=u"Code Postal", store=True, readonly=True)
+    sale_order_id = fields.Many2one('sale.order', string=u"Commande d'origine")
     delivery_expected = fields.Char(string='Livraison attendue', states={'done': [('readonly', True)]})
     of_sent = fields.Boolean(string=u"CF envoyée")
     of_project_id = fields.Many2one(comodel_name='account.analytic.account', string=u"Compte analytique")
     of_user_id = fields.Many2one(comodel_name='res.users', string="Responsable technique")
     of_reception_state = fields.Selection(selection=[
         ('no', u'Non reçue'),
-        ('received', u'Reçue'),
-        ], string=u"État de réception", compute='_compute_of_reception_state', compute_sudo=True, store=True)
+        ('received', u'Reçue')], string=u"État de réception", compute='_compute_of_reception_state',
+        compute_sudo=True, store=True)
     of_delivery_force = fields.Datetime(string=u"Forcer date prévue")
 
     @api.depends('order_line.move_ids', 'order_line.move_ids.picking_id.state')
     def _compute_of_reception_state(self):
         for order in self:
-            if order.picking_ids and all([state == 'done' for state in order.picking_ids.filtered(
-                        lambda p: p.state not in ['cancel']
-                    ).mapped('state')]):
+            if order.picking_ids and all(
+                    [state == 'done' for state in order.picking_ids.filtered(
+                        lambda p: p.state not in ['cancel']).mapped('state')]):
                 order.of_reception_state = 'received'
             else:
                 order.of_reception_state = 'no'
@@ -63,7 +68,14 @@ class PurchaseOrder(models.Model):
     @api.model
     def _prepare_picking(self):
         values = super(PurchaseOrder, self)._prepare_picking()
-        return isinstance(values, dict) and values.update({'of_customer_id': self.customer_id.id}) or values
+        values['of_customer_id'] = self.customer_id.id
+        if self.partner_id:
+            addresses = self.partner_id.address_get(['delivery'])
+            values['partner_shipping_id'] = addresses['delivery']
+        if self.customer_id:
+            addresses = self.customer_id.address_get(['delivery'])
+            values['of_customer_shipping_id'] = addresses['delivery']
+        return values
 
     @api.multi
     def button_confirm(self):
@@ -99,6 +111,12 @@ class PurchaseOrder(models.Model):
     def action_set_date_planned(self):
         for order in self:
             order.order_line.update({'date_planned': order.of_delivery_force})
+
+    @api.onchange('customer_id')
+    def _onchange_customer_id(self):
+        self.ensure_one()
+        addresses = self.customer_id.address_get(['delivery'])
+        self.customer_shipping_id = addresses['delivery']
 
 
 class PurchaseOrderLine(models.Model):
@@ -183,6 +201,9 @@ class ProcurementOrder(models.Model):
         sale_order = self.env['sale.order'].browse(self._context.get('purchase_sale_order_id', False))
 
         res['customer_id'] = self._context.get('purchase_customer_id', False) or sale_order.partner_id.id
+        if res['customer_id']:
+            addresses = self.env['res.partner'].browse(res['customer_id']).address_get(['delivery'])
+            res['customer_shipping_id'] = addresses['delivery']
         res['sale_order_id'] = sale_order.id
         res['delivery_expected'] = sale_order.delivery_expected
         res['of_project_id'] = sale_order.project_id.id
@@ -368,8 +389,7 @@ class OFPurchaseConfiguration(models.TransientModel):
 
     of_date_purchase_order = fields.Selection([
         (0, 'Standard'),
-        (1, 'Date du jour'),
-        ], string="(OF) Date des commandes fournisseur")
+        (1, 'Date du jour')], string="(OF) Date des commandes fournisseur")
 
     @api.multi
     def set_description_as_order_defaults(self):
@@ -386,9 +406,31 @@ class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
     of_customer_id = fields.Many2one('res.partner', string="Client")
+    of_customer_shipping_id = fields.Many2one('res.partner', string=u"Adresse de Livraison du Client")
+    of_customer_shipping_city = fields.Char(
+        related='of_customer_shipping_id.city', string=u"Ville", store=True, readonly=True)
+    of_customer_shipping_zip = fields.Char(
+        related='of_customer_shipping_id.zip', string=u"Code Postal", store=True, readonly=True)
+    partner_shipping_id = fields.Many2one('res.partner', string=u"Adresse de Livraison du Partenaire")
+    partner_shipping_city = fields.Char(
+        related='partner_shipping_id.city', string=u"Ville", store=True, readonly=True)
+    partner_shipping_zip = fields.Char(
+        related='partner_shipping_id.zip', string=u"Code Postal", store=True, readonly=True)
     # Permet de cacher le champ of_customer_id si pas sur BR
     of_location_usage = fields.Selection(related="location_id.usage")
     of_user_id = fields.Many2one(comodel_name='res.users', string="Responsable technique")
+
+    @api.onchange('of_customer_id')
+    def _onchange_of_customer_id(self):
+        self.ensure_one()
+        addresses = self.of_customer_id.address_get(['delivery'])
+        self.of_customer_shipping_id = addresses['delivery']
+
+    @api.onchange('partner_id')
+    def _onchange_partner_id(self):
+        self.ensure_one()
+        addresses = self.partner_id.address_get(['delivery'])
+        self.partner_shipping_id = addresses['delivery']
 
 
 class StockMove(models.Model):
@@ -448,7 +490,7 @@ class SaleConfigSettings(models.TransientModel):
     @api.multi
     def set_of_recalcul_pa_defaults(self):
         return self.env['ir.values'].sudo().set_default(
-                'sale.config.settings', 'of_recalcul_pa', self.of_recalcul_pa)
+            'sale.config.settings', 'of_recalcul_pa', self.of_recalcul_pa)
 
 
 class ProductProduct(models.Model):
