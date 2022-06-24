@@ -28,9 +28,9 @@ class GestionPrix(models.TransientModel):
         self.layout_category_ids.write({'state': 'excluded'})
 
     @api.multi
-    def _calculer(self, total, mode, currency, line_rounding):
+    def _calculer(self, total, mode, currency, cost_prorata, line_rounding):
         if self.calculation_basis != 'layout_category':
-            return super(GestionPrix, self)._calculer(total, mode, currency, line_rounding)
+            return super(GestionPrix, self)._calculer(total, mode, currency, cost_prorata, line_rounding)
         values = {}
         # Si on fonctionne par section, il n'y a pas de montant forcé par ligne de commande
         self.line_ids.filtered(lambda l: not l.state == 'included' and not l.product_forbidden_discount)\
@@ -41,7 +41,7 @@ class GestionPrix(models.TransientModel):
             if category.state == 'forced':
                 values.update(
                     category.line_ids.distribute_amount(
-                        category.simulated_price_subtotal, 'ht', currency, line_rounding))
+                        category.simulated_price_subtotal, 'ht', currency, cost_prorata, line_rounding))
             else:
                 for line in category.line_ids:
                     line.prix_total_ht_simul = line.order_line_id.price_subtotal
@@ -55,7 +55,7 @@ class GestionPrix(models.TransientModel):
 
         included_categories = self.layout_category_ids.filtered(lambda categ: categ.state == 'included')
         values.update(
-            included_categories.mapped('line_ids').distribute_amount(total, mode, currency, line_rounding)
+            included_categories.mapped('line_ids').distribute_amount(total, mode, currency, cost_prorata, line_rounding)
         )
         for category in included_categories:
             category.write({
