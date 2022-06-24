@@ -62,6 +62,13 @@ class ProductTemplate(models.Model):
     of_product_image_ids = fields.One2many('of.product.image', 'product_tmpl_id', string=u'Images')
 
     @api.multi
+    @api.depends('product_variant_ids.sales_count')
+    def _sales_count(self):
+        for product in self:
+            product.sales_count = sum(
+                p.sales_count for p in product.with_context(active_test=False).product_variant_ids)
+
+    @api.multi
     def action_view_sales(self):
         self.ensure_one()
         action = self.env.ref('sale.action_product_sale_list')
