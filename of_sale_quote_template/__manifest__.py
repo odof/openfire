@@ -27,6 +27,7 @@ Si une ligne d'article n'a pas pu être ajoutée, le champ 'Note d'insertion' ap
     "depends": [
         "of_sale",
         "of_crm",
+        "account_invoice_merge",
     ],
     "data": [
         'security/of_sale_security.xml',

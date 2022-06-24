@@ -87,7 +87,6 @@ Droits utilisateurs:
         "sale",
         "sale_margin",
         "sale_crm",
-        "account_invoice_merge",
         "of_utils"
     ],
     'external_dependancies': {

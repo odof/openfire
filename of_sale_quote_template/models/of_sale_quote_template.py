@@ -1341,3 +1341,10 @@ class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
     of_layout_category_id = fields.Many2one('of.sale.order.layout.category', string=u"Ligne de section")
+
+    @api.multi
+    def get_merge_columns(self):
+        data = super(AccountInvoiceLine, self).get_merge_columns()
+        if 'of_layout_category_id' in data:
+            del data['of_layout_category_id']
+        return data

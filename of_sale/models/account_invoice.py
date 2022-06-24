@@ -284,12 +284,6 @@ class AccountInvoice(models.Model):
     def pdf_vt_pastille(self):
         return self.env['ir.values'].get_default('account.config.settings', 'pdf_vt_pastille')
 
-    @api.model
-    def _get_invoice_line_key_cols(self):
-        field_list = super(AccountInvoice, self)._get_invoice_line_key_cols()
-        field_list.append('layout_category_id')
-        return field_list
-
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
