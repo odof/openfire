@@ -28,6 +28,7 @@
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_saleorder"
                                 type="object"
+                                context="{'default_partner_id': partner_id}"
                                 class="oe_stat_button"
                                 icon="fa-usd">
                             <field name="saleorder_count" widget="statinfo" string="Ventes"/>
