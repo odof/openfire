@@ -25,7 +25,7 @@ class GestionPrixLine(models.TransientModel):
                     else 1),
             reverse=True)
 
-    def get_distributed_amount(self, to_distribute, total, currency, rounding, line_rounding,
+    def get_distributed_amount(self, to_distribute, total, currency, cost_prorata, rounding, line_rounding,
                                kit_lines_price_unit=False):
         self.ensure_one()
         order_line = self.order_line_id
@@ -33,7 +33,10 @@ class GestionPrixLine(models.TransientModel):
             # Le calcul du prix doit se faire sur les composants
 
             kit_lines = order_line.kit_id.kit_line_ids.sorted('qty_per_kit', reverse=True)
-            to_distribute = total and order_line.price_unit * to_distribute / total
+            if cost_prorata:
+                to_distribute = total and order_line.purchase_price * to_distribute / total
+            else:
+                to_distribute = total and order_line.price_unit * to_distribute / total
 
             if kit_lines_price_unit:
                 total = sum(
@@ -90,7 +93,7 @@ class GestionPrixLine(models.TransientModel):
             return values, taxes
         else:
             return super(GestionPrixLine, self).get_distributed_amount(
-                to_distribute, total, currency, rounding, line_rounding)
+                to_distribute, total, currency, cost_prorata, rounding, line_rounding)
 
     @api.multi
     def get_reset_amount(self, line_rounding):

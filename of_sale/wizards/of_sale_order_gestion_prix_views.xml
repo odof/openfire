@@ -36,6 +36,7 @@
                                attrs="{'invisible':['|', ('methode_remise','=',False), ('arrondi_mode','=','no')],
                                        'required': [('methode_remise','!=',False), ('arrondi_mode','in',('total_excluded', 'total_included'))]}"/>
                     </div>
+                    <field name="cost_prorata" attrs="{'invisible':[('methode_remise', 'not in', ['prix_ttc_cible', 'prix_ht_cible', 'montant_ttc', 'montant_ht'])]}"/>
                     <field name="afficher_remise"/>
                 </group>
 

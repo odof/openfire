@@ -84,6 +84,7 @@ class GestionPrix(models.TransientModel):
             ('0', u"Arrondir à l'euro le plus proche"),
             ('1', u"Arrondir aux 10 centimes les plus proches"),
         ], string=u"Précision d'arrondi", default='0')
+    cost_prorata = fields.Boolean(string=u"Prorata au coût")
     of_client_view = fields.Boolean(string='Vue client/vendeur', related="order_id.of_client_view")
 
     @api.depends('line_ids.prix_total_ttc_simul', 'line_ids.prix_total_ht_simul')
@@ -123,8 +124,8 @@ class GestionPrix(models.TransientModel):
             line.write(vals)
 
     @api.multi
-    def _calculer(self, total, mode, currency, line_rounding):
-        return self.line_ids.distribute_amount(total, mode, currency, line_rounding)
+    def _calculer(self, total, mode, currency, cost_prorata, line_rounding):
+        return self.line_ids.distribute_amount(total, mode, currency, cost_prorata, line_rounding)
 
     @api.multi
     def calculer(self, simuler=False):
@@ -204,7 +205,9 @@ class GestionPrix(models.TransientModel):
             total = False
 
         cur = order.pricelist_id.currency_id
-        values = self._calculer(total, mode, cur, line_rounding)
+        cost_prorata = self.cost_prorata and self.methode_remise in [
+            'prix_ttc_cible', 'prix_ht_cible', 'montant_ttc', 'montant_ht']
+        values = self._calculer(total, mode, cur, cost_prorata, line_rounding)
 
         # Pour une simulation, le travail s'arrête ici
         if simuler:
@@ -367,13 +370,15 @@ class GestionPrixLine(models.TransientModel):
                 line.pc_marge = 100 * (1 - line.cout / line.prix_total_ht_simul) if line.prix_total_ht_simul else -100
 
     @api.multi
-    def get_distributed_amount(self, to_distribute, total, currency, rounding, line_rounding):
+    def get_distributed_amount(self, to_distribute, total, currency, cost_prorata, rounding, line_rounding):
         """
         Cette fonction calcule le nouveau montant à allouer à la ligne de commande passée en paramètre.
         Elle retourne un dictionnaire des valeurs à modifier sur cette ligne.
         @param order_line: Ligne de commande dont on veut ajuster le prix
         @param to_distribute: Montant restant à distribuer
         @param total: Montant actuel cumulé des lignes de commande non encore recalculées
+        @param currency: Monnaie utilisée
+        @param cost_prorata: La base de calcul pour le prorata. Basé sur le coût si True, sur le prix de vente sinon
         @param rounding: Booleen déterminant si le prix unitaire doit être arrondi
         @param line_rounding: Règle d'arrondi sur le montant total de la ligne
                {'field': self.arrondi_mode, 'precision': int(self.arrondi_prec)} ou False
@@ -394,9 +399,15 @@ class GestionPrixLine(models.TransientModel):
                     taxes_percentage = 0.0
                 else:  # Dans tout les autres cas, on part du montant TTC
                     taxes_percentage = sum(taxes.mapped('amount')) / 100
-                price_unit = (order_line.price_unit or 1.0) * to_distribute / (1 + taxes_percentage)
+                if cost_prorata:
+                    price_unit = (order_line.purchase_price or 1.0) * to_distribute / (1 + taxes_percentage)
+                else:
+                    price_unit = (order_line.price_unit or 1.0) * to_distribute / (1 + taxes_percentage)
             else:
-                price_unit = (order_line.price_unit or 1.0) * to_distribute / total
+                if cost_prorata:
+                    price_unit = (order_line.purchase_price or 1.0) * to_distribute / total
+                else:
+                    price_unit = (order_line.price_unit or 1.0) * to_distribute / total
             if rounding:
                 price_unit = currency.round(price_unit)
 
@@ -469,7 +480,7 @@ class GestionPrixLine(models.TransientModel):
         return self.sorted('quantity', reverse=True)
 
     @api.multi
-    def distribute_amount(self, to_distribute, mode, currency, line_rounding):
+    def distribute_amount(self, to_distribute, mode, currency, cost_prorata, line_rounding):
         u"""
         Fonction de distribution d'un montant sur les différentes lignes du wizard.
         Cette fonction modifie directement les lignes du wizard et retourne les valeurs à modifier
@@ -477,6 +488,7 @@ class GestionPrixLine(models.TransientModel):
         :param to_distribute: Montant à distribuer
         :param mode: Type de manipulation. Peut être 'ht', 'ttc' ou 'reset'
         :param currency: Monnaie utilisée
+        :param cost_prorata: La base de calcul pour le prorata. Basé sur le coût si True, sur le prix de vente sinon
         :param line_rounding: Règle d'arrondi sur le montant total de la ligne
                {'field': wizard.arrondi_mode, 'precision': int(wizard.arrondi_prec)} ou False
         """
@@ -503,8 +515,9 @@ class GestionPrixLine(models.TransientModel):
         for lf in lines_forced:
             vals, taxes = lf.get_distributed_amount(
                 lf.prix_total_ht_simul,
-                lf.prix_total_ht,
+                lf.cout if cost_prorata else lf.prix_total_ht,
                 currency=currency,
+                cost_prorata=cost_prorata,
                 rounding=True,
                 line_rounding=False)
 
@@ -527,7 +540,10 @@ class GestionPrixLine(models.TransientModel):
         for line in lines_select.with_context(round=False):
             # Calcul manuel des taxes avec context['round']==False pour conserver la précision des calculs
             order_line = line.order_line_id
-            price = order_line.price_unit * (1 - (order_line.discount or 0.0) / 100.0)
+            if cost_prorata:
+                price = order_line.purchase_price * (1 - (order_line.discount or 0.0) / 100.0)
+            else:
+                price = order_line.price_unit * (1 - (order_line.discount or 0.0) / 100.0)
             taxes = order_line.tax_id.compute_all(
                 price, order_line.currency_id, order_line.product_uom_qty, product=order_line.product_id,
                 partner=order_line.order_id.partner_id)
@@ -547,6 +563,7 @@ class GestionPrixLine(models.TransientModel):
                     to_distribute,
                     total_select,
                     currency=currency,
+                    cost_prorata=cost_prorata,
                     # On arrondit toutes les lignes sauf la dernière
                     rounding=line != lines_select[-1],
                     line_rounding=line_rounding)
