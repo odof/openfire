@@ -37,6 +37,9 @@ class ResPartner(models.Model):
         # `has_warn.of_is_warn = True` ne fonctionne pas car expected singleton
         for partner in has_warn:
             partner.of_is_warn = True
+        no_warn = self - has_warn
+        for partner in no_warn:
+            partner.of_is_warn = False
 
     @api.depends('of_warn_block', 'of_is_warn')
     def _compute_invoice_warn(self):
