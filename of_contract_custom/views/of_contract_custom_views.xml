@@ -25,7 +25,7 @@
             <search>
                 <filter string="Archivé" name="inactive" domain="[('active', '=', False)]"/>
                 <filter string="À venir" name="upcoming" domain="[('date_start', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
-                <filter string="En cours" name="in_progress" domain="[('date_start', '&lt;=', context_today().strftime('%Y-%m-%d')), ('date_end','&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="En cours" name="in_progress" domain="['&amp;', '&amp;',('line_ids.state', '=', 'validated'),('date_start', '&lt;=', context_today().strftime('%Y-%m-%d')), '|', ('date_end','=', False), ('date_end', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
                 <filter string="Inactif" name="inactive" domain="[('date_end', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
                 <separator/>
                 <filter string="À facturer" name="to_invoice" domain="[('is_invoiceable', '=', True), ('recurring_next_date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
