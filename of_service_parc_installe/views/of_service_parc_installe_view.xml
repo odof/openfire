@@ -32,7 +32,7 @@
             <xpath expr="//page[@name='description']" position="after">
                 <page name="parc" string="Produit installé">
                     <group string="Produit installé" groups="project.group_project_user" colspan="2">
-                        <field name="parc_installe_id" context="{'address_prio_id': address_id or partner_id}"/>
+                        <field name="parc_installe_id" context="{'address_prio_id': address_id or partner_id, 'default_client_id': partner_id}"/>
                         <field name="parc_installe_product_id"/>
                         <field name="parc_installe_site_adresse_id"/>
                         <field name="parc_type_garantie"
@@ -122,7 +122,7 @@
             <xpath expr="//notebook/page[@name='infos']" position="after">
                 <page name="parc_installe" string="Produit installé" groups="project.group_project_user">
                     <group>
-                        <field name="parc_installe_id"/>
+                        <field name="parc_installe_id" context="{'default_client_id': partner_id}"/>
                     </group>
                 </page>
             </xpath>
