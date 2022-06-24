@@ -10,7 +10,7 @@
                     <field name="default_visible_columns" invisible="1"/>
                     <field name="fields_sequence" invisible="1"/>
                     <field name="model_id" required="1" readonly="1"/>
-                    <field name="visible_fields" widget="my_many2many_tags" required="1"/>
+                    <field name="visible_fields" widget="my_many2many_tags" required="1" options="{'no_create': True}"/>
                 </group>
                 <group>
                     <group>
