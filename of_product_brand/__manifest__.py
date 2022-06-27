@@ -19,6 +19,7 @@ OpenFire module to manage products brand
     "init_xml": [],
     "demo_xml": [],
     "data": [
+        'data/of_product_brand_data.xml',
         'security/ir.model.access.csv',
         'wizards/of_product_brand_add_products.xml',
         'views/of_product_brand_view.xml',

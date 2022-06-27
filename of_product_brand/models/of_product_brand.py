@@ -116,10 +116,38 @@ class OfProductBrand(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    brand_id = fields.Many2one('of.product.brand', string='Brand', required=True, index=True)
+    @api.model_cr_context
+    def _auto_init(self):
+        # À supprimer
+        cr = self._cr
+        cr.execute("SELECT 1 FROM ir_model_data WHERE module='of_product_brand' AND name='main_brand'")
+        if not cr.fetchall():
+            cr.execute("SELECT 1 FROM information_schema.tables WHERE table_name = '%s'" % (self._table,))
+            if cr.fetchall():
+                cr.execute(
+                    "INSERT INTO ir_model_data(create_uid, create_date, module, name, model, res_id, noupdate) "
+                    "SELECT %s, (now() at time zone 'UTC'), 'of_product_brand', 'main_brand', 'of.product.brand',"
+                    "       b.id, true "
+                    "FROM product_template AS t "
+                    "INNER JOIN of_product_brand AS b ON b.id = t.brand_id "
+                    "WHERE t.type = 'service' "
+                    "GROUP BY b.id "
+                    "ORDER BY count(*) DESC, b.id "
+                    "LIMIT 1",
+                    (self.env.uid, )
+                )
+        return super(ProductTemplate, self)._auto_init()
+
+    brand_id = fields.Many2one(
+        'of.product.brand', string='Brand', required=True, index=True,
+        default=lambda s: s._default_brand_id())
     of_seller_name = fields.Many2one(related="seller_ids.name")
     of_previous_brand_id = fields.Many2one('of.product.brand', compute='_compute_of_previous_brand_id')
     seller_ids = fields.One2many('product.supplierinfo', 'product_tmpl_id', 'Vendors', copy=True)
+
+    @api.model
+    def _default_brand_id(self):
+        return self.env.ref('of_product_brand.main_brand', raise_if_not_found=False)
 
     # dependancy on default_code to prevent recomputing it before _onchange_brand_id call
     @api.depends('default_code')
