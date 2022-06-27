@@ -1169,11 +1169,17 @@ class OfPlanningIntervention(models.Model):
         if self.state == "draft" and template and not self._context.get('of_import_service_lines'):
             if template.tache_id:
                 self.tache_id = template.tache_id
-            # on change la position fiscale par celle du modèle
-            # si celle présente n'est pas sur la société du RDV ou si il n'y en a pas
-            # ET qu'il n'y a pas de lien vers une commande
+            # On change la position fiscale par celle du modèle si celle présente n'est pas sur la même société
+            # comptable que le RDV ou si il n'y en a pas ET qu'il n'y a pas de lien vers une commande
+            change_fiscal_pos = False
+            if self.fiscal_position_id:
+                comp_accounting_company = getattr(self.company_id, 'accounting_company_id', self.company_id)
+                fiscal_accounting_company = getattr(
+                    self.fiscal_position_id.company_id, 'accounting_company_id', self.fiscal_position_id.company_id)
+                if comp_accounting_company != fiscal_accounting_company:
+                    change_fiscal_pos = True
             if template_accounting.fiscal_position_id and not self.lien_commande and \
-                    (not self.fiscal_position_id or self.fiscal_position_id.company_id.id != self.company_id.id):
+                    (not self.fiscal_position_id or change_fiscal_pos):
                 self.fiscal_position_id = template_accounting.fiscal_position_id
             if self.line_ids:
                 new_lines = self.line_ids
@@ -1193,10 +1199,16 @@ class OfPlanningIntervention(models.Model):
                 force_company=self.company_id.id or self.env.user.company_id.id)
             if not self.duree and self.tache_id.duree and not self._context.get('of_inhiber_maj_duree'):
                 self.duree = self.tache_id.duree
-            # on change la position fiscale par celle de la tache
-            # si celle présente n'est pas sur la société du RDV ou si il n'y en a pas
-            if tache_accounting.fiscal_position_id and \
-                    (not self.fiscal_position_id or self.fiscal_position_id.company_id.id != self.company_id.id):
+            # On change la position fiscale par celle de la tache si celle présente n'est pas sur la même société
+            # comptable que le RDV ou si il n'y en a pas
+            change_fiscal_pos = False
+            if self.fiscal_position_id:
+                comp_accounting_company = getattr(self.company_id, 'accounting_company_id', self.company_id)
+                fiscal_accounting_company = getattr(
+                    self.fiscal_position_id.company_id, 'accounting_company_id', self.fiscal_position_id.company_id)
+                if comp_accounting_company != fiscal_accounting_company:
+                    change_fiscal_pos = True
+            if tache_accounting.fiscal_position_id and (not self.fiscal_position_id or change_fiscal_pos):
                 self.fiscal_position_id = tache_accounting.fiscal_position_id
             if self.tache_id.product_id:
                 self.line_ids.new({
@@ -1282,15 +1294,23 @@ class OfPlanningIntervention(models.Model):
         if self.company_id:
             company_id = self.company_id.id
             self.warehouse_id = self.company_id.of_default_warehouse_id
-            template_accounting = self.template_id.sudo().with_context(force_company=company_id)
-            tache_accounting = self.tache_id.sudo().with_context(force_company=company_id)
-            # La société a changé, dans tous les cas on change la position fiscale
-            if template_accounting.fiscal_position_id:
-                self.fiscal_position_id = template_accounting.fiscal_position_id
-            elif tache_accounting.fiscal_position_id:
-                self.fiscal_position_id = tache_accounting.fiscal_position_id
-            else:
-                self.fiscal_position_id = False
+            # La société a changé, si elle ne correspond pas à la position fiscale, on modifie cette dernière
+            change_fiscal_pos = False
+            if self.fiscal_position_id:
+                comp_accounting_company = getattr(self.company_id, 'accounting_company_id', self.company_id)
+                fiscal_accounting_company = getattr(
+                    self.fiscal_position_id.company_id, 'accounting_company_id', self.fiscal_position_id.company_id)
+                if comp_accounting_company != fiscal_accounting_company:
+                    change_fiscal_pos = True
+            if change_fiscal_pos or not self.fiscal_position_id:
+                template_accounting = self.template_id.sudo().with_context(force_company=company_id)
+                tache_accounting = self.tache_id.sudo().with_context(force_company=company_id)
+                if template_accounting.fiscal_position_id:
+                    self.fiscal_position_id = template_accounting.fiscal_position_id
+                elif tache_accounting.fiscal_position_id:
+                    self.fiscal_position_id = tache_accounting.fiscal_position_id
+                elif self.fiscal_position_id:
+                    self.fiscal_position_id = False
 
     @api.onchange('fiscal_position_id')
     def _onchange_fiscal_position_id(self):
