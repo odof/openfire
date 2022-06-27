@@ -1279,7 +1279,7 @@ class OfPlanningIntervention(models.Model):
 
     @api.onchange('company_id')
     def onchange_company_id(self):
-        if self.company_id and not self.fiscal_position_id:
+        if self.company_id:
             company_id = self.company_id.id
             self.warehouse_id = self.company_id.of_default_warehouse_id
             template_accounting = self.template_id.sudo().with_context(force_company=company_id)
