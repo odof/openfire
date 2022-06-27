@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+
+    <!-- Marque de la société -->
+    <record id="main_brand" model="of.product.brand">
+        <field name="name">Mon Entreprise</field>
+        <field name="code">MON</field>
+        <field name="partner_id" ref="base.main_partner"/>
+        <field name="of_import_categ_id" ref="product.product_category_all"/>
+    </record>
+
+</odoo>

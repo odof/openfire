@@ -80,6 +80,17 @@ class ProductTemplate(models.Model):
 
     @api.model
     def create(self, vals):
+        if not vals.get('categ_id'):
+            # Récupération de la catégorie par défaut, basée sur la fonction _get_default_category_id du module product
+            # Ceci afin d'éviter des erreurs à l'installation de modules qui veulent créer des articles sans préciser
+            # leur catégorie
+            categ_id = self._context.get('categ_id') or self._context.get('default_categ_id')
+            if not categ_id:
+                category = self.env.ref('product.product_category_all', raise_if_not_found=False)
+                categ_id = category and category.type == 'normal' and category.id
+            if categ_id:
+                vals['categ_id'] = categ_id
+
         # On désactive le log dans le RSE pour gagner du temps lors d'import d'articles
         return super(ProductTemplate, self.with_context(mail_create_nolog=True)).create(vals)
 
