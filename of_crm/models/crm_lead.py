@@ -83,8 +83,8 @@ class CrmLead(models.Model):
     # @TODO: implémenter la maj automatique de la date de cloture en fonction du passage de probabilité à 0 ou 100
     of_date_cloture = fields.Date(string=u"Date de clôture")
     of_infos_compl = fields.Html(string="Autres infos")
-    geo_lat = fields.Float(related="partner_id.geo_lat")
-    geo_lng = fields.Float(related="partner_id.geo_lng")
+    geo_lat = fields.Float(related="partner_id.geo_lat", readonly=True)
+    geo_lng = fields.Float(related="partner_id.geo_lng", readonly=True)
     precision = fields.Selection(related='partner_id.precision')
     stage_probability = fields.Float(related="stage_id.probability", readonly=True)
 
@@ -259,8 +259,6 @@ class CrmLead(models.Model):
             partner = self.env['res.partner'].browse(partner_id)
 
             res['of_website'] = partner.website
-            res['geo_lat'] = partner.geo_lat
-            res['geo_lng'] = partner.geo_lng
         return res
 
     def _of_get_fields_recompute_auto_activities(self):
