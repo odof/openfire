@@ -14,6 +14,7 @@ class OfWizardSituation(models.TransientModel):
 
     partner_id = fields.Many2one(comodel_name='res.partner', string=u"Client")
     order_id = fields.Many2one(comodel_name='sale.order', string=u"Commande client")
+    company_id = fields.Many2one(comodel_name='res.company', string=u"Société")
     line_ids = fields.One2many(
         comodel_name='of.wizard.situation.line', inverse_name='situation_id', string=u"Lignes de situation")
 
