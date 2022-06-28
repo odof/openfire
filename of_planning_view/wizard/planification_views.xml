@@ -50,7 +50,7 @@
                     </group>
                     <group colspan="3" string="Description" attrs="{'invisible':[('proposition_ids', '=', [])]}">
                         <label for="description_rdv" style="font-weight: bold!important"/>
-                        <field name="description_rdv" nolabel="1" colspan="2" widget="html"/>
+                        <field name="description_rdv" nolabel="1" colspan="2"/>
                     </group>
                     <group colspan="6" col="1" name="propositions" string="Propositions"
                       attrs="{'invisible': [('proposition_ids', '=', [])]}">
@@ -283,7 +283,7 @@
                         <field name="tache_name"/>
                     </group>
                     <group colspan="2" string="Description" attrs="{'invisible':[('selected','!=',True)]}">
-                        <field name="description_rdv" nolabel="1" colspan="2" widget="html"/>
+                        <field name="description_rdv" nolabel="1" colspan="2"/>
                     </group>
                     <field name="service_id" invisible="1"/>
                 </group>
