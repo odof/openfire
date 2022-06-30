@@ -1594,7 +1594,7 @@ class OfContractLine(models.Model):
         period = self.contract_id.period_ids.filtered(lambda p: p.date_start <= date <= p.date_end)
         if not period:
             return
-        for product_line in self.contract_product_ids:
+        for product_line in self.contract_product_ids.filtered('previous_product_id'):
             line = product_line.previous_product_id
             qty_invoiced = line._get_quantity_invoiced_on_period(period)
 
