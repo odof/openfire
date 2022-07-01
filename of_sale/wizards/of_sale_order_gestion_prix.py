@@ -67,6 +67,8 @@ class GestionPrix(models.TransientModel):
         string=u'Total TTC simulé', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
     montant_total_ht_simul = fields.Monetary(
         string=u'Total HT simulé', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
+    cout_total_ht_simul = fields.Monetary(
+        string=u'Coût Total HT simulé', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
     afficher_remise = fields.Boolean(
         string='Afficher dans notes',
         help=u"Affiche le montant de la remise effectuée dans les notes du devis/de la commande.")
@@ -87,17 +89,18 @@ class GestionPrix(models.TransientModel):
     cost_prorata = fields.Boolean(string=u"Prorata au coût")
     of_client_view = fields.Boolean(string='Vue client/vendeur', related="order_id.of_client_view")
 
-    @api.depends('line_ids.prix_total_ttc_simul', 'line_ids.prix_total_ht_simul')
+    @api.depends('line_ids.prix_total_ttc_simul', 'line_ids.prix_total_ht_simul', 'line_ids.cout_total_ht_simul')
     def _compute_montant_simul(self):
         for wizard in self:
             lines = wizard.line_ids
-            total_achat = wizard.order_id.of_total_cout
+            total_achat = sum(lines.mapped('cout_total_ht_simul'))
             total_vente = sum(lines.mapped('prix_total_ht_simul'))
 
             wizard.marge_simul = total_vente - total_achat
             wizard.pc_marge_simul = 100 * (1 - total_achat / total_vente) if total_vente else -100
             wizard.montant_total_ttc_simul = sum(lines.mapped('prix_total_ttc_simul'))
             wizard.montant_total_ht_simul = sum(lines.mapped('prix_total_ht_simul'))
+            wizard.cout_total_ht_simul = sum(lines.mapped('cout_total_ht_simul'))
 
     @api.multi
     def name_get(self):
@@ -299,7 +302,7 @@ class GestionPrixLine(models.TransientModel):
     currency_id = fields.Many2one(related='order_line_id.currency_id')
     quantity = fields.Float(string=u"Quantité", related='order_line_id.product_uom_qty', readonly=True)
 
-    cout = fields.Monetary(u'Coût', compute='_compute_cout')
+    cout_total_ht = fields.Monetary(u'Coût total HT initial', compute='_compute_cout_total_ht')
     prix_unit_ht = fields.Monetary(
         string='Prix unit. HT initial', related='order_line_id.price_reduce_taxexcl', readonly=True
     )
@@ -316,6 +319,7 @@ class GestionPrixLine(models.TransientModel):
 
     prix_total_ttc_simul = fields.Float(string=u"Prix total TTC simulé", compute='_compute_prix_total_ttc_simul')
     prix_total_ht_simul = fields.Float(string=u"Prix total HT simulé")
+    cout_total_ht_simul = fields.Float(string=u"Coût total HT simulé", readonly=True)
     marge = fields.Float(string=u"Marge HT", compute='_compute_marge_simul')
     pc_marge = fields.Float(string=u"% Marge", compute='_compute_marge_simul')
     of_client_view = fields.Boolean(string='Vue client/vendeur', related="wizard_id.of_client_view")
@@ -325,15 +329,15 @@ class GestionPrixLine(models.TransientModel):
         readonly=True)
 
     @api.depends('order_line_id')
-    def _compute_cout(self):
+    def _compute_cout_total_ht(self):
         for line in self:
             order_line = line.order_line_id
-            line.cout = order_line.purchase_price * order_line.product_uom_qty
+            line.cout_total_ht = order_line.purchase_price * order_line.product_uom_qty
 
-    @api.depends('prix_total_ht_simul')
+    @api.depends('prix_total_ht_simul', 'cout_total_ht_simul')
     def _compute_marge_simul(self):
         for line in self:
-            achat = line.cout
+            achat = line.cout_total_ht_simul
             vente = line.prix_total_ht_simul
 
             line.marge = vente - achat
@@ -351,23 +355,26 @@ class GestionPrixLine(models.TransientModel):
     def _onchange_pc_marge(self):
         for line in self:
             # La marge ne peut pas être supérieure ou égale à 100%, sauf si le cout est nul
-            if line.cout == 0:
+            if line.cout_total_ht == 0:
                 pc_marge_max = 100
             else:
                 pc_marge_max = 99.99
             if line.pc_marge > pc_marge_max:
                 line.pc_marge = pc_marge_max
 
-            pc_marge = 100 * (1 - line.cout / line.prix_total_ht_simul) if line.prix_total_ht_simul else -100
+            pc_marge = 100 * (1 - line.cout_total_ht_simul / line.prix_total_ht_simul) if line.prix_total_ht_simul else\
+                -100
             if float_compare(pc_marge, line.pc_marge, precision_rounding=0.01):
-                line.prix_total_ht_simul = line.cout and line.cout * (100 / (100 - line.pc_marge))
+                line.prix_total_ht_simul = line.cout_total_ht_simul and line.cout_total_ht_simul *\
+                                           (100 / (100 - line.pc_marge))
 
     @api.onchange('prix_total_ht_simul')
     def _onchange_prix_total_ht_simul(self):
         for line in self:
-            total_ht = line.cout and line.cout * (100 / (100 - line.pc_marge))
+            total_ht = line.cout_total_ht_simul and line.cout_total_ht_simul * (100 / (100 - line.pc_marge))
             if float_compare(total_ht, line.prix_total_ht_simul, precision_rounding=0.01):
-                line.pc_marge = 100 * (1 - line.cout / line.prix_total_ht_simul) if line.prix_total_ht_simul else -100
+                line.pc_marge = 100 * (1 - line.cout_total_ht_simul / line.prix_total_ht_simul)\
+                    if line.prix_total_ht_simul else -100
 
     @api.multi
     def get_distributed_amount(self, to_distribute, total, currency, cost_prorata, rounding, line_rounding):
@@ -469,9 +476,14 @@ class GestionPrixLine(models.TransientModel):
             partner=order_line.order_id.partner_id)
 
         new_price_variation = -price_unit * (order_line.discount or 0.0) / 100.0
-        return {order_line: {'price_unit': price_unit,
-                             'of_price_management_variation': 0.0,
-                             'of_unit_price_variation': new_price_variation}}, taxes
+        return (
+            {order_line: {
+                'price_unit': price_unit,
+                'of_price_management_variation': 0.0,
+                'of_unit_price_variation': new_price_variation,
+                'purchase_price': order_line.product_id.standard_price,
+             }},
+            taxes)
 
     @api.multi
     def get_sorted(self):
@@ -558,6 +570,7 @@ class GestionPrixLine(models.TransientModel):
         for line in lines_select:
             if mode == 'reset':
                 vals, taxes = line.get_reset_amount(line_rounding=line_rounding)
+                line.cout_total_ht_simul = line.order_line_id.product_id.standard_price
             else:
                 vals, taxes = line.get_distributed_amount(
                     to_distribute,
@@ -605,6 +618,7 @@ class SaleOrder(models.Model):
                 not line.of_product_forbidden_discount
                 and bool(line.product_uom_qty and line.price_unit)
                 else 'excluded',
+                'cout_total_ht_simul': line.purchase_price,
                 'prix_total_ht_simul': line.price_subtotal,
                 'prix_total_ttc_simul': line.price_total,
             }

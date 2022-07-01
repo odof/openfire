@@ -45,11 +45,12 @@
                         <field name="product_forbidden_discount" invisible="1"/>
                         <field name="state" invisible="context.get('invoice_status') == 'invoiced'" attrs="{'readonly': [('product_forbidden_discount', '=', True)]}"/>
                         <field name="order_line_id"/>
-                        <field name="cout" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                        <field name="cout_total_ht" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                        <field name="cout_total_ht_simul" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
                         <field name="prix_total_ht"/>
                         <field name="prix_total_ht_simul" attrs="{'readonly': [('state', '!=', 'forced')]}"/>
                         <field name="marge" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
-                        <field name="pc_marge" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)], 'readonly': ['|', ('state', '!=', 'forced'), ('cout', '=', 0)]}"/>
+                        <field name="pc_marge" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)], 'readonly': ['|', ('state', '!=', 'forced'), ('cout_total_ht', '=', 0)]}"/>
                         <field name="prix_total_ttc"/>
                         <field name="prix_total_ttc_simul"/>
                         <field name="of_client_view" invisible="1"/>
