@@ -12,8 +12,8 @@ class OfSaleOrderKanban(models.Model):
     def _auto_init(self):
         res = super(OfSaleOrderKanban, self)._auto_init()
         ir_config_obj = self.env['ir.config_parameter']
-        kanban_new_id = self.env.ref('of_sale_kanban.of_sale_order_kanban_new').id
-        existing_kanban = self.search([('id', '!=', kanban_new_id)])
+        kanban_new = self.env.ref('of_sale_kanban.of_sale_order_kanban_new', raise_if_not_found=False)
+        existing_kanban = self.search(kanban_new and [('id', '!=', kanban_new.id)] or [])
         if not ir_config_obj.get_param('of.sale.order.kanban.data.loaded') and not existing_kanban:
             for name in [
                     u'Validation technique', u'Approvisionnement', u'Prêt à poser',
