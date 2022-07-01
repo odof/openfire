@@ -212,8 +212,8 @@ odoo.define('of_website_planning_booking.map_localisation', function (require) {
     var website = require('website.website');
     var ajax = require('web.ajax');
 
-    if (!$('.div_map').length) {
-        return $.Deferred().reject("DOM doesn't contain '.div_map'");
+    if (!$('.div_map_planning_booking').length) {
+        return $.Deferred().reject("DOM doesn't contain '.div_map_planning_booking'");
     }
 
     var infoWindow = new google.maps.InfoWindow();

@@ -506,7 +506,7 @@
                         Nous verrons ça ensemble au moment de vous rappeler pour valider le rendez-vous.</span></b>
                     <div class="clearfix" />
                     <br/>
-                    <div class="col-md-10 div_map">
+                    <div class="col-md-10 div_map_planning_booking">
                         <script>
                             var map_data = <t t-raw="map_lat_lng"/>;
                         </script>
