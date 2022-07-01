@@ -8,3 +8,4 @@ from . import account
 from . import partner
 from . import of_better_zip
 from . import config_settings
+from . import of_contract_template

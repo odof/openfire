@@ -36,7 +36,7 @@
                 <field name="category_ids"/>
                 <field name="reference"/>
                 <field name="recurring_invoicing_payment_id"/>
-                <field name="recurring_rule_type"/>
+                <field name="frequency"/>
                 <field name="company_id" groups="base.group_multi_company"/>
                 <separator/>
             </search>
@@ -50,7 +50,7 @@
             <tree>
                 <field name="name"/>
                 <field name="partner_id"/>
-                <field name="recurring_rule_type"/>
+                <field name="frequency"/>
                 <field name="recurring_invoicing_payment_id"/>
                 <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
             </tree>
@@ -68,8 +68,9 @@
                     <button name="recurring_create_invoice" type="object" class="btn-primary" string="Créer les factures"
                             attrs="{'invisible': [('is_invoiceable', '=', False)]}"
                             groups="of_contract_custom.group_of_contract_custom_modification"/>
+                    <button name="select_template" type="object" class="btn-primary" string="Choisir modèle"/>
                     <button name="button_renew" type="object" class="btn-primary" string="Renouveler"
-                            attrs="{'invisible': ['|', ('is_invoiceable', '!=', False), ('renewal', '=', True)]}"
+                            attrs="{'invisible': ['|', ('is_invoiceable', '!=', False), ('renewal', '=', True), ('state','!=','upcoming')]}"
                             groups="of_contract_custom.group_of_contract_custom_modification"
                             confirm="Les demandes d'interventions seront générées dans la journée, voulez-vous continuer ?"/>
                     <button name="valider_lignes_contrat" type="object" class="btn-primary" string="Activer les lignes"
@@ -86,11 +87,11 @@
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <field name="invoice_ids" invisible="1"/>
-                        <button class="oe_stat_button" type="object" name="action_view_services" icon="fa-calendar" string="Planification"/>
+                        <button class="oe_stat_button" type="object" name="action_view_services" icon="fa-calendar" string="Planification" attrs="{'invisible': [('ctype','!=','maintenance')]}"/>
                         <button class="oe_stat_button" type="object" name="action_view_invoice" icon="fa-pencil-square-o">
                             <field name="invoice_count" widget="statinfo" string="Factures"/>
                         </button>
-                        <button class="oe_stat_button" type="object" name="action_view_intervention" icon="fa-calendar">
+                        <button class="oe_stat_button" type="object" name="action_view_intervention" icon="fa-calendar" attrs="{'invisible': [('ctype','!=','maintenance')]}">
                             <field name="intervention_count" widget="statinfo" string="RDVs"/>
                         </button>
                         <button name="toggle_active" type="object"
@@ -106,34 +107,16 @@
                             <field name="name" class="oe_inline"/>
                         </h1>
                         <field name="type" widget="radio" options="{'horizontal': true}" style="margin-right: 5px"/>
-                        <field name="contract_type" widget="radio" attrs="{'readonly': [('invoice_count','>',0)]}" options="{'horizontal': true}"/>
+                        <field name="ctype" widget="radio" attrs="{'readonly': [('invoice_count','>',0)]}" options="{'horizontal': true}" style="margin-right: 5px"/>
                     </div>
                     <group col="4">
-                        <group col="2" colspan="2" string="Informations clients" name="refs">
+                        <group col="4" colspan="4" string="Informations clients" name="refs">
                             <field name="automatic_sequence" invisible="1"/>
                             <field name="reference" class="oe_inline" placeholder="e.g. Project XYZ" attrs="{'readonly': [('automatic_sequence', '=', True)], 'required': [('automatic_sequence', '=', False)]}"/>
                             <field name="partner_id"/>
                             <field name="category_ids" widget="many2many_tags"/>
                             <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                             <field name="date_souscription" attrs="{'readonly': [('invoice_count','>',0)]}"/>
-                        </group>
-                        <group col="2" colspan="2" string="Facturation" name="facturation">
-                            <label for="recurring_invoicing_payment_id"/>
-                            <div name="invoicing">
-                                <field name="recurring_rule_type" nolabel="1" class="oe_inline" style="margin-right: 5px"/>
-                                <field name="recurring_invoicing_payment_id" nolabel="1" class="oe_inline"
-                                       options="{'no_create': True, 'no_open': True}"
-                                       domain="[('code', 'in', recurring_rule_type == 'date' and ('date', 'post-paid') or ('pre-paid', 'post-paid'))]"/>
-                            </div>
-                            <field name="journal_id" attrs="{'readonly': [('invoice_count','>',0)]}" options="{'no_create': True}"/>
-                            <field name="fiscal_position_id" options="{'no_create': True}"/>
-                            <field name="account_analytic_id" options="{'no_create': True}"
-                                   groups="analytic.group_analytic_accounting"/>
-                            <field name="payment_term_id" attrs="{'invisible': [('contract_type','=','simple')]}"/>
-                            <field name="grouped" attrs="{'invisible': [('contract_type','=','simple')]}"/>
-                            <field name="recurring_next_date"/>
-                            <field name="revision" attrs="{'invisible': [('contract_type','=','simple')]}"/>
-                            <field name="pricelist_id" invisible="1"/>
                         </group>
                         <group col="2" colspan="2" string="Validité" name="validity">
                             <field name="current_period_id"/>
@@ -153,10 +136,30 @@
                             <div>
                                 <field name="period"/> mois
                             </div>
-                        </group>
-                        <group col="2" colspan="2" string="Renouvellement" name="renewal">
+                            <field name="recurring_next_date"/>
                             <field name="renewal"/>
-                            <field name="use_index" invisible="0"/>
+                            <field name="use_index"/>
+                        </group>
+                        <group col="2" colspan="2" string="Facturation" name="facturation">
+                            <field name="contract_type" attrs="{'readonly': [('invoice_count','>',0)]}"/>
+                            <field name="grouped" attrs="{'invisible': [('contract_type','=','simple')]}"/>
+                            <label for="recurring_invoicing_payment_id"/>
+                            <div name="invoicing">
+                                <span  style="margin-right: 5px">Répéter chaque</span>
+                                <field name="frequency_amount" nolabel="1" class="oe_inline" style="margin-right: 5px"/>
+                                <field name="frequency" nolabel="1" class="oe_inline" style="margin-right: 5px"/>
+                                <field name="recurring_invoicing_payment_id" nolabel="1" class="oe_inline"
+                                       options="{'no_create': True, 'no_open': True}"
+                                       attrs="{'required': [('ctype', '=', 'maintenance')]}"
+                                       domain="[('code', 'in', frequency == 'date' and ('date', 'post-paid') or ('pre-paid', 'post-paid'))]"/>
+                            </div>
+                            <field name="journal_id" attrs="{'readonly': [('invoice_count','>',0)]}" options="{'no_create': True}"/>
+                            <field name="fiscal_position_id" options="{'no_create': True}"/>
+                            <field name="payment_term_id" attrs="{'invisible': [('contract_type','=','simple')]}"/>
+                            <field name="account_analytic_id" options="{'no_create': True}"
+                                   groups="analytic.group_analytic_accounting"/>
+                            <field name="revision" attrs="{'invisible': [('contract_type','=','simple')]}"/>
+                            <field name="pricelist_id" invisible="1"/>
                         </group>
                     </group>
                     <notebook>
@@ -176,7 +179,8 @@
                                                  'default_partner_id': partner_id,
                                                  'default_company_id': company_id,
                                                  'default_recurring_invoicing_payment_id': recurring_invoicing_payment_id,
-                                                 'default_frequency_type': recurring_rule_type,
+                                                 'default_frequency': frequency,
+                                                 'default_frequency_amount': frequency_amount,
                                                  'default_recurrence': True,
                                                  'default_fiscal_position_id': fiscal_position_id,
                                                  'default_date_start': invoice_ids and recurring_next_date or False,
@@ -184,6 +188,8 @@
                                                  'default_use_index': use_index,
                                                  'default_revision': revision,
                                                  'default_grouped': grouped,
+                                                 'default_ctype': ctype,
+                                                 'default_first_invoicing': date_start,
                                                  'form_readonly': '[(&quot;state&quot;,&quot;in&quot;,[&quot;validated&quot;,&quot;cancel&quot;])]'}">
                                 </field>
                                 <field name="line_ids_rel" mode="tree" nolabel="1" colspan="2"
@@ -194,7 +200,8 @@
                                                  'default_partner_id': partner_id,
                                                  'default_company_id': company_id,
                                                  'default_recurring_invoicing_payment_id': recurring_invoicing_payment_id,
-                                                 'default_frequency_type': recurring_rule_type,
+                                                 'default_frequency': frequency,
+                                                 'default_frequency_amount': frequency_amount,
                                                  'default_recurrence': True,
                                                  'default_fiscal_position_id': fiscal_position_id,
                                                  'default_date_start': invoice_ids and recurring_next_date or False,
@@ -202,6 +209,8 @@
                                                  'default_use_index': use_index,
                                                  'default_revision': revision,
                                                  'default_grouped': grouped,
+                                                 'default_ctype': ctype,
+                                                 'default_first_invoicing': date_start,
                                                  'form_readonly': '[(&quot;state&quot;,&quot;in&quot;,[&quot;validated&quot;,&quot;cancel&quot;])]'}">
                                 </field>
                             </group>
@@ -430,6 +439,7 @@
                             <span>Ligne </span>
                             <i> <field name="code_de_ligne" nolabel="1" class="oe_inline" readonly="1"/></i>
                         </b></h1>
+                        <field name="ctype" widget="radio" readonly="1" options="{'horizontal': true}" style="margin-right: 5px"/>
                         <div attrs="{'invisible': [('warning_planif', '=', False)]}">
                             <b>
                                 <i class="of_red">
@@ -443,7 +453,7 @@
                         </div>
                     </div>
                     <group col="4">
-                        <group col="2" colspan="2" name="refs" string="Informations client">
+                        <group col="2" colspan="2" name="refs" string="Informations client" >
                             <label for="address_id" />
                             <div class="o_address_format">
                                 <field name="address_id"  class="o_address_street"/>
@@ -459,6 +469,7 @@
                         <group col="2" colspan="2" name="description" string="Description">
                             <field name="type"/>
                             <field name="date_start" invisible="1"/>
+                            <field name="first_invoicing"/>
                             <field name="date_contract_start"/>
                             <field name="date_contract_end" readonly="1"/>
                             <field name="line_origine_id"/>
@@ -485,10 +496,16 @@
                                     <field name="is_invoiceable" invisible="1"/>
                                 </group>
                                 <group col="2" colspan="2" attrs="{'invisible': [('afficher_facturation', '=', False)]}">
-                                    <field name="frequency_type" class="oe_inline"/>
-                                    <field name="recurring_invoicing_payment_id"
-                                           options="{'no_create': True, 'no_open': True}"
-                                           domain="[('code', 'in', frequency_type == 'date' and ('date', 'post-paid') or ('pre-paid', 'post-paid'))]"/>
+                                    <label for="frequency"/>
+                                    <div name="invoicing">
+                                        <span  style="margin-right: 5px">Répéter chaque</span>
+                                        <field name="frequency_amount" nolabel="1" class="oe_inline" style="margin-right: 5px"/>
+                                        <field name="frequency" nolabel="1" class="oe_inline" style="margin-right: 5px"/>
+                                        <field name="recurring_invoicing_payment_id" nolabel="1" class="oe_inline"
+                                               options="{'no_create': True, 'no_open': True}"
+                                               attrs="{'required': [('ctype', '=', 'maintenance')]}"
+                                               domain="[('code', 'in', frequency == 'date' and ('date', 'post-paid') or ('pre-paid', 'post-paid'))]"/>
+                                    </div>
                                     <field name="fiscal_position_id" attrs="{'form_readonly_exception': True}"/>
                                     <field name="revision" attrs="{'form_readonly_exception': True}"/>
                                 </group>
@@ -497,6 +514,7 @@
                                        context="{'form_view_ref': 'of_contract_custom.of_contract_custom_contract_product_view_form'}">
                                     <tree>
                                         <field name="product_id"/>
+                                        <field name="layout_category_id"/>
                                         <field name="price_unit"/>
                                         <field name="purchase_price"/>
                                         <field name="quantity"/>
@@ -517,21 +535,21 @@
                                 <field name="amount_total" class="oe_subtotal_footer_separator"/>
                             </group>
                         </page>
-                        <page name="planification" string="Planification">
+                        <page name="planification" string="Planification" attrs="{'invisible': [('ctype','!=','maintenance')]}">
                             <group col="4">
                                 <group colspan="2" name="planif" string="Planification">
                                     <field name="warning_planif" invisible="1"/>
                                     <field name="intervention_template_id"/>
-                                    <field name="tache_id"/>
+                                    <field name="tache_id" attrs="{'required': [('ctype','=','maintenance')]}"/>
                                     <label for="interv_frequency_nbr" string="Fréquence"/>
                                     <div name="interv_frequency">
                                         <span>Répéter </span>
-                                        <field name="interv_frequency_nbr" nolabel="1" class="oe_inline"/>
+                                        <field name="interv_frequency_nbr" nolabel="1" class="oe_inline" attrs="{'required': [('ctype','=','maintenance')]}"/>
                                         <span> fois tous les </span>
-                                        <field name="interv_frequency" nolabel="1" class="oe_inline"/>
+                                        <field name="interv_frequency" nolabel="1" class="oe_inline" attrs="{'required': [('ctype','=','maintenance')]}"/>
                                     </div>
                                     <field name="mois_reference_ids" widget="many2many_tags"
-                                           attrs="{'form_readonly_exception': True}"/>
+                                           attrs="{'form_readonly_exception': True, 'required': [('ctype','=','maintenance')]}" />
                                     <field name="nbr_interv"/>
                                 </group>
                                 <group colspan="2" name="sav" string="Sav">
@@ -543,7 +561,7 @@
                                 <field name="notes" nolabel="1" colspan="4" attrs="{'form_readonly_exception': True}"/>
                             </group>
                         </page>
-                        <page name="parc_installe" string="Équipement" groups="project.group_project_user" >
+                        <page name="parc_installe" string="Équipement" groups="project.group_project_user" attrs="{'invisible': [('ctype','!=','maintenance')]}">
                             <group name="parc" string="Produit installé" colspan="2">
                                 <field name="parc_installe_id"/>
                                 <field name="parc_installe_product_id"/>
@@ -554,7 +572,7 @@
                                 <field name="note" colspan="2" nolabel="1"/>
                             </group>
                         </page>
-                        <page name="services" string="Suivi">
+                        <page name="services" string="Suivi" attrs="{'invisible': [('ctype','!=','maintenance')]}">
                             <group>
                                 <field name="service_ids" nolabel="1" readonly="1">
                                     <tree>
@@ -604,6 +622,7 @@
                             <span>Ligne </span>
                             <i> <field name="code_de_ligne" nolabel="1" class="oe_inline" readonly="1"/></i>
                         </b></h1>
+                        <field name="ctype" widget="radio" readonly="1" options="{'horizontal': true}" style="margin-right: 5px"/>
                         <div attrs="{'invisible': [('warning_planif', '=', False)]}">
                             <b>
                                 <i class="of_red">
@@ -630,7 +649,7 @@
                             <field name="partner_id"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
-                        <group col="2" colspan="2" name="description" string="Description" invisible="1">
+                        <group col="2" colspan="2" name="description" string="Description">
                             <field name="type"/>
                             <field name="date_start"/>
                             <field name="date_contract_start"/>
@@ -649,21 +668,21 @@
                         </group>
                     </group>
                     <notebook>
-                        <page name="planification" string="Planification">
+                        <page name="planification" string="Planification" attrs="{'invisible': [('ctype','!=','maintenance')]}">
                             <group col="4">
                                 <group colspan="2" name="planif" string="Planification">
                                     <field name="warning_planif" invisible="1"/>
                                     <field name="intervention_template_id"/>
-                                    <field name="tache_id"/>
+                                    <field name="tache_id" attrs="{'required': [('ctype','=','maintenance')]}"/>
                                     <label for="interv_frequency_nbr" string="Fréquence"/>
                                     <div name="interv_frequency">
                                         <span>Répéter </span>
-                                        <field name="interv_frequency_nbr" nolabel="1" class="oe_inline"/>
+                                        <field name="interv_frequency_nbr" nolabel="1" class="oe_inline" attrs="{'required': [('ctype','=','maintenance')]}"/>
                                         <span> fois tous les </span>
-                                        <field name="interv_frequency" nolabel="1" class="oe_inline"/>
+                                        <field name="interv_frequency" nolabel="1" class="oe_inline" attrs="{'required': [('ctype','=','maintenance')]}"/>
                                     </div>
                                     <field name="mois_reference_ids" widget="many2many_tags"
-                                           attrs="{'form_readonly_exception': True}"/>
+                                           attrs="{'form_readonly_exception': True, 'required': [('ctype','=','maintenance')]}" />
                                     <field name="nbr_interv"/>
                                 </group>
                                 <group colspan="2" name="sav" string="Sav">
@@ -685,10 +704,16 @@
                                     <field name="is_invoiceable"/>
                                 </group>
                                 <group col="2" colspan="2" invisible="1">
-                                    <field name="frequency_type" class="oe_inline"/>
-                                    <field name="recurring_invoicing_payment_id"
-                                           options="{'no_create': True, 'no_open': True}"
-                                           domain="[('code', 'in', frequency_type == 'date' and ('date', 'post-paid') or ('pre-paid', 'post-paid'))]"/>
+                                    <label for="frequency"/>
+                                    <div name="invoicing">
+                                        <span  style="margin-right: 5px">Répéter chaque</span>
+                                        <field name="frequency_amount" nolabel="1" class="oe_inline" style="margin-right: 5px"/>
+                                        <field name="frequency" nolabel="1" class="oe_inline" style="margin-right: 5px"/>
+                                        <field name="recurring_invoicing_payment_id" nolabel="1" class="oe_inline"
+                                               options="{'no_create': True, 'no_open': True}"
+                                               attrs="{'required': [('ctype', '=', 'maintenance')]}"
+                                               domain="[('code', 'in', frequency == 'date' and ('date', 'post-paid') or ('pre-paid', 'post-paid'))]"/>
+                                    </div>
                                     <field name="fiscal_position_id" attrs="{'form_readonly_exception': True}"/>
                                     <field name="revision" attrs="{'form_readonly_exception': True}"/>
                                 </group>
@@ -699,6 +724,7 @@
                                         <field name="product_id"/>
                                         <field name="purchase_price" invisible="1"/>
                                         <field name="name"/>
+                                        <field name="layout_category_id"/>
                                         <field name="quantity"/>
                                         <field name="price_unit"/>
                                         <field name="uom_id" groups="product.group_uom" class="oe_inline oe_no_button"/>
@@ -719,7 +745,7 @@
                                 <field name="amount_total" class="oe_subtotal_footer_separator"/>
                             </group>
                         </page>
-                        <page name="parc_installe" string="Équipement" groups="project.group_project_user" >
+                        <page name="parc_installe" string="Équipement" groups="project.group_project_user" attrs="{'invisible': [('ctype','!=','maintenance')]}">
                             <group name="parc" string="Produit installé" colspan="2">
                                 <field name="parc_installe_id"/>
                                 <field name="parc_installe_product_id"/>
@@ -730,7 +756,7 @@
                                 <field name="note" colspan="2" nolabel="1"/>
                             </group>
                         </page>
-                        <page name="services" string="Suivi">
+                        <page name="services" string="Suivi" attrs="{'invisible': [('ctype','!=','maintenance')]}">
                             <group>
                                 <field name="service_ids" nolabel="1" readonly="1">
                                     <tree>
@@ -797,6 +823,7 @@
                 <group>
                     <group>
                         <field name="product_id"/>
+                        <field name="layout_category_id"/>
                         <field name="price_unit"/>
                         <field name="purchase_price"/>
                         <label for="product_uom_qty" string="Quantité"/>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_contract_form_view" model="ir.ui.view">
+        <field name="name">Contrat</field>
+        <field name="model">of.contract</field>
+        <field name="inherit_id" ref="of_contract_custom.of_contract_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='line_ids']" position="attributes">
+                <attribute name="context" remove="'default_date_start': invoice_ids and recurring_next_date or False,"/>
+                <attribute name="context" remove="}" separator="}"/>
+                <attribute name="context" add=",'default_date_start': invoice_ids and recurring_next_date or ctype == 'subscription' and date_start or False}"/>
+            </xpath>
+            <xpath expr="//field[@name='line_ids_rel']" position="attributes">
+                <attribute name="context" remove="'default_date_start': invoice_ids and recurring_next_date or False,"/>
+                <attribute name="context" remove="}" separator="}"/>
+                <attribute name="context" add=",'default_date_start': invoice_ids and recurring_next_date or ctype == 'subscription' and date_start or False}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_contract_line_view_form" model="ir.ui.view">
+        <field name="name">Ligne de contrat</field>
+        <field name="model">of.contract.line</field>
+        <field name="inherit_id" ref="of_contract_custom.of_contract_line_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_start']" position="attributes">
+                <attribute name="invisible">0</attribute>
+                <attribute name="attrs">{'invisible': [('ctype','!=','subscription')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date_contract_start']" position="attributes">
+                <attribute name="invisible">1</attribute>
+                <attribute name="attrs">{'invisible': [('ctype','!=','maintenance')]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_contract_line_view_form_simplified" model="ir.ui.view">
+        <field name="name">Ligne de contrat</field>
+        <field name="model">of.contract.line</field>
+        <field name="inherit_id" ref="of_contract_custom.of_contract_line_view_form_simplified"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_start']" position="attributes">
+                <attribute name="invisible">0</attribute>
+                <attribute name="attrs">{'invisible': [('ctype','!=','subscription')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date_contract_start']" position="attributes">
+                <attribute name="invisible">1</attribute>
+                <attribute name="attrs">{'invisible': [('ctype','!=','maintenance')]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

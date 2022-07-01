@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_order_form" model="ir.ui.view">
+        <field name="name">Sale Order</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='sale_pay']" position="inside">
+                <field name="of_subscription" invisible="1"/>
+                <field name="of_contract_template_id"
+                       attrs="{'invisible': [('of_subscription','=',False)], 'required' : [('of_subscription','=',True)]}"
+                       domain="[('ctype','=','subscription')]"
+                />
+                <field name="of_contract_id"
+                       attrs="{'invisible': [('of_subscription','=',False)]}"
+                       domain="[('partner_id','=',partner_id)]"
+                />
+            </xpath>
+            <xpath expr="//field[@name='order_line']" position="attributes">
+                <attribute name="context" remove="}" separator="}"/>
+                <attribute name="context" add=",'of_contract_template_id': of_contract_template_id}"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//label[@for='analytic_tag_ids']" position="before">
+                <label for="of_subscription"/>
+                <div>
+                    <field name="of_subscription" class="oe_inline"/>
+                </div>
+                <label for="of_contract_line_template_id"/>
+                <div>
+                    <field name="of_contract_line_template_id" class="oe_inline"
+                           domain="context.get('of_contract_template_id') and [('template_id', '=', context.get('of_contract_template_id'))] or [('ctype','=','subscription')]"
+                    />
+                </div>
+                <label for="of_date_mis"/>
+                <div>
+                    <field name="of_date_mis" class="oe_inline"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

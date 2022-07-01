@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_contract_template_search_view" model="ir.ui.view">
+        <field name="name">of_contract_template_search_view</field>
+        <field name="model">of.contract.template</field>
+        <field name="arch" type="xml">
+            <search>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_contract_template_tree_view" model="ir.ui.view">
+        <field name="name">of_contract_template_tree_view</field>
+        <field name="model">of.contract.template</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_contract_template_form_view" model="ir.ui.view">
+        <field name="name">of_contract_form_view</field>
+        <field name="model">of.contract.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" class="oe_inline"/>
+                        </h1>
+                        <field name="ctype" widget="radio" options="{'horizontal': true}" style="margin-right: 5px"/>
+                    </div>
+                    <group col="4">
+                        <group colspan="2" string="Validité">
+                            <label for="jour_debut" string="Date de début"/>
+                            <div name="date_debut">
+                                <field name="jour_debut" nolabel="1" class="oe_inline"/>
+                                <field name="mois_id" nolabel="1" class="oe_inline" widget="selection"/>
+                            </div>
+                            <label for="frequency"/>
+                            <div name="invoicing">
+                                <span  style="margin-right: 5px">Répéter chaque</span>
+                                <field name="frequency_amount" nolabel="1" class="oe_inline" style="margin-right: 5px"/>
+                                <field name="frequency" nolabel="1" class="oe_inline" style="margin-right: 5px"/>
+                            </div>
+                            <field name="renewal"/>
+                            <field name="use_index"/>
+                        </group>
+                        <group colspan="2" string="Facturation">
+                            <field name="contract_type"/>
+                            <field name="grouped"/>
+                            <field name="prorata"/>
+                            <field name="journal_id"/>
+                            <field name="property_fiscal_position_id"/>
+                            <field name="payment_term_id"/>
+                        </group>
+
+                    </group>
+                    <notebook>
+                        <page name="lignes" string="Lignes de contrat">
+                            <group string="Lignes de contrat">
+                                <field name="line_ids" mode="tree" nolabel="1" colspan="2"
+                                       options="{'reload_on_button': True}"
+                                       context="{'form_view_ref': 'of_contract_custom.of_contract_line_template_view_form',
+                                                 'tree_view_ref': 'of_contract_custom.of_contract_line_template_tree_view_simplified',
+                                                 'default_property_fiscal_position_id': property_fiscal_position_id,
+                                                 'default_use_index': use_index,
+                                                 'default_jour_debut': jour_debut,
+                                                 'default_mois_id': mois_id,
+                                                 'default_frequency_amount': frequency_amount,
+                                                 'default_frequency': frequency,
+                                                 'default_ctype': ctype}">
+                                </field>
+                            </group>
+                        </page>
+                        <page name="commentaires" string="Commentaires">
+                            <group name="comments" string="Commentaires" col="2">
+                                <field name="commentaires" nolabel="1" colspan="2"/>
+                                <field name="of_mail_template_ids" widget="many2many_tags" colspan="2"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_contract_template" model="ir.actions.act_window">
+        <field name="name">Contrats</field>
+        <field name="res_model">of.contract.template</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form,pivot</field>
+        <field name="view_id" ref="of_contract_template_tree_view"/>
+        <field name="search_view_id" ref="of_contract_template_search_view"/>
+    </record>
+
+    <menuitem name="Modèles de contrat" id="menu_contract_custom_template_sale" parent="of_contract_custom.menu_config_contrat" sequence="150" action="of_contract_custom.action_contract_template" groups="of_contract_custom.group_of_contract_custom_lecture"/>
+
+    <record id="of_contract_line_template_tree_view" model="ir.ui.view">
+        <field name="name">of_contract_line_template_tree_view</field>
+        <field name="model">of.contract.line.template</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_contract_line_template_tree_view_simplified" model="ir.ui.view">
+        <field name="name">of_contract_line_template_tree_view_simplified</field>
+        <field name="model">of.contract.line.template</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="contract_type" invisible="1"/>
+                <field name="name"/>
+                <field name="tache_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_contract_line_template_view_form" model="ir.ui.view">
+        <field name="name">Modèle de ligne de contrat</field>
+        <field name="model">of.contract.line.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                </header>
+                <sheet>
+                    <div class="of_title">
+                        <h1><b>
+                            <span>Ligne </span>
+                            <i> <field name="name" nolabel="1" class="oe_inline"/></i>
+                        </b></h1>
+                    </div>
+                    <group col="4">
+                        <group col="2" colspan="2" name="invoicing" string="Facturation">
+                            <field name="ctype" invisible="1"/>
+                            <label for="jour_debut" string="Date de début"/>
+                            <div name="date_debut">
+                                <field name="jour_debut" nolabel="1" class="oe_inline"/>
+                                <field name="mois_id" nolabel="1" class="oe_inline" widget="selection"/>
+                            </div>
+                            <label for="frequency"/>
+                            <div name="invoicing">
+                                <span  style="margin-right: 5px">Répéter chaque</span>
+                                <field name="frequency_amount" nolabel="1" class="oe_inline" style="margin-right: 5px"/>
+                                <field name="frequency" nolabel="1" class="oe_inline" style="margin-right: 5px"/>
+                            </div>
+                            <field name="grouped"/>
+                            <field name="property_fiscal_position_id"/>
+                        </group>
+                        <group col="2" colspan="2" name="planification" string="Planification" attrs="{'invisible': [('ctype','!=','maintenance')]}">
+                            <field name="tache_id" attrs="{'required': [('ctype', '=', 'maintenance')]}"/>
+                            <label for="interv_frequency_nbr" string="Fréquence"/>
+                            <div name="interv_frequency">
+                                <span>Répéter </span>
+                                <field name="interv_frequency_nbr" nolabel="1" class="oe_inline" attrs="{'required': [('ctype', '=', 'maintenance')]}"/>
+                                <span> fois tous les </span>
+                                <field name="interv_frequency" nolabel="1" class="oe_inline" attrs="{'required': [('ctype', '=', 'maintenance')]}"/>
+                            </div>
+                            <field name="mois_reference_ids" widget="many2many_tags" attrs="{'required': [('ctype', '=', 'maintenance')]}"/>
+                            <field name="nbr_interv"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="article" string="Articles">
+                            <group>
+                                <field name="product_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="product_id" required="1"/>
+                                        <field name="price_unit"/>
+                                        <field name="purchase_price"/>
+                                        <field name="quantity"/>
+                                        <field name="uom_id" groups="product.group_uom"/>
+                                        <field name="discount"/>
+                                        <field name="tax_ids" widget="many2many_tags"/>
+                                        <field name="amount_subtotal"/>
+                                        <field name="amount_taxes"/>
+                                        <field name="amount_total"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+</odoo>

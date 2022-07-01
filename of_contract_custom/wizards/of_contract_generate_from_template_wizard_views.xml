@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_contract_generate_from_template_wizard_view_form" model="ir.ui.view">
+        <field name="name">Sélection du modèle de contrat</field>
+        <field name="model">of.contract.generate.from.template.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Sélection du modèle de contrat">
+                <group>
+                    <field name="contract_id" readonly="1"/>
+                    <field name="contract_template_id"/>
+                </group>
+                <footer>
+                    <button string="Confirmer" name="button_confirm" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

@@ -8,26 +8,18 @@ from dateutil.relativedelta import relativedelta
 class OfPlanningPlannification(models.AbstractModel):
     _name = 'of.planning.plannification'
 
-    # @api.model_cr_context
-    # def _auto_init(self):
-    #     cr = self._cr
-    #
-    #
-    #     res = super(OfPlanningPlannification, self)._auto_init()
-    #     return res
-
     nbr_interv = fields.Integer(
         required=False, compute='_compute_nbr_interv', string="Nombre de visites",
         help=u"Nombre de RDV d'interventions dans l'année", store=True)
-    interv_frequency_nbr = fields.Integer(string=u"Interval de fréquence (RDV)", required=True)
+    interv_frequency_nbr = fields.Integer(string=u"Interval de fréquence (RDV)",)
     interv_frequency = fields.Selection(selection=[
         ('month', 'Mois'),
         ('year', 'Ans'),
-        ], string=u"Type de fréquence (RDV)", required=True)
-    mois_reference_ids = fields.Many2many(comodel_name='of.mois', string=u"Mois de visite", required=True)
+        ], string=u"Type de fréquence (RDV)")
+    mois_reference_ids = fields.Many2many(comodel_name='of.mois', string=u"Mois de visite")
     intervention_template_id = fields.Many2one(
         comodel_name='of.planning.intervention.template', string=u"Modèle d'intervention")
-    tache_id = fields.Many2one(comodel_name='of.planning.tache', string=u"Tâche", required=True)
+    tache_id = fields.Many2one(comodel_name='of.planning.tache', string=u"Tâche")
 
     @api.multi
     def _generate_services(self):

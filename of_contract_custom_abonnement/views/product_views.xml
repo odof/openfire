@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="product_template_form_view_invoice_policy" model="ir.ui.view">
+        <field name="name">Product template</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="sale.product_template_form_view_invoice_policy"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_policy']" position="after">
+                <field name="of_subscription"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
