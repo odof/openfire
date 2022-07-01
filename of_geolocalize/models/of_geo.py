@@ -196,7 +196,7 @@ class ResPartner(models.Model):
         res_geocoding_on_write = self.env['ir.config_parameter'].get_param('geocoding_on_write') == 'yes'
 
         # Partenaires à géocoder.
-        to_geocode = self.env['res.partner']
+        to_update = self.env['res.partner']
 
         # Change coordinates but not geocoding (geo data manual entry)
         if ('geo_lat' in vals or 'geo_lng' in vals) and 'geocoding' not in vals:
@@ -208,32 +208,35 @@ class ResPartner(models.Model):
             any(field in vals for field in ('street', 'street2', 'zip', 'city', 'state_id', 'country_id')) and
             not any(field in vals for field in ('geocoding', 'geocodeur', 'date_last_localization', 'precision'))
         ):
-            if res_geocoding_on_write:  # Do geocoding automatic
-                for partner in self:
-                    for key in ('street', 'street2', 'zip', 'city'):
-                        # au moins un champ d'adresse a effectivement été modifié
-                        if key in vals and partner[key] != vals[key]:
-                            to_geocode |= partner
+            for partner in self:
+                for key in ('street', 'street2', 'zip', 'city'):
+                    # au moins un champ d'adresse a effectivement été modifié
+                    if key in vals and partner[key] != vals[key]:
+                        to_update |= partner
+                        break
+                else:
+                    # Champs M2O
+                    for key in ('state_id', 'country_id'):
+                        if key in vals and partner[key].id != vals[key]:
+                            to_update |= partner
                             break
-                    else:
-                        # Champs M2O
-                        for key in ('state_id', 'country_id'):
-                            if key in vals and partner[key].id != vals[key]:
-                                to_geocode |= partner
-                                break
-            else:  # if config gecoding on write False, set as not tried
-                vals['geocoding'] = "not_tried"
-                vals['geocodeur'] = "unknown"
-                vals['geo_lat'] = 0
-                vals['geo_lng'] = 0
-                vals['precision'] = "not_tried"
-                vals['date_last_localization'] = fields.Datetime.context_timestamp(self, fields.datetime.now())
 
         result = super(ResPartner, self).write(vals)
 
         # DO GEOCODING AUTOMATIC (through wizard)
-        if to_geocode:
-            to_geocode.geo_code()
+        if to_update:
+            if res_geocoding_on_write:  # Do geocoding automatic
+                to_update.geo_code()
+            else:  # if config gecoding on write False, set as not tried
+                vals = {
+                    'geocoding': 'not_tried',
+                    'geocodeur': 'unknown',
+                    'geo_lat': 0,
+                    'geo_lng': 0,
+                    'precision': 'not_tried',
+                    'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
+                }
+                to_update.write(vals)
         return result
 
 
