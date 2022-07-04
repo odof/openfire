@@ -527,7 +527,7 @@ class GestionPrixLine(models.TransientModel):
         for lf in lines_forced:
             vals, taxes = lf.get_distributed_amount(
                 lf.prix_total_ht_simul,
-                lf.cout if cost_prorata else lf.prix_total_ht,
+                lf.cout_total_ht if cost_prorata else lf.prix_total_ht,
                 currency=currency,
                 cost_prorata=cost_prorata,
                 rounding=True,
