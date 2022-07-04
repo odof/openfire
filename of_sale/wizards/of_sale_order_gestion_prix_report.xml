@@ -72,8 +72,8 @@
                                               t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                     </td>
                                     <td class="text-right" name="cout">
-                                        <span t-field="line.cout" t-options='{"widget": "monetary",
-                                                        "display_currency": doc.currency_id}'/>
+                                        <span t-field="line.cout_total_ht"
+                                              t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                     </td>
                                     <td class="text-right" name="pt_ht">
                                         <span t-field="line.prix_total_ht"
