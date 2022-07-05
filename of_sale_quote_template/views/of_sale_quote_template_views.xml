@@ -139,8 +139,8 @@
                             <field name="sequence_name"/>
                             <field name="name"/>
                             <field name="parent_id" domain="[('quote_id', '=', quote_id), '!', ('id', 'child_of', id)]" options="{'no_create': True, 'no_edit': True}"/>
-                            <field name="quote_line_count" string="Composants"/>
-                            <button string="Composants" name="action_wizard_products" type="object" class="oe_highlight"/>
+                            <field name="quote_line_count" string="Lignes de commande"/>
+                            <button string="Lignes de commande" name="action_wizard_products" type="object" class="oe_highlight"/>
                             <button icon="fa-files-o" name="action_duplicate" type="object" help="Dupliquer cette ligne"/>
                             <button icon="fa-arrows" name="action_move" type="object" help="Déplacer cette ligne"/>
                             <button icon="fa-plus" name="action_add" type="object" help="Ajouter une sous section à cette ligne"/>
