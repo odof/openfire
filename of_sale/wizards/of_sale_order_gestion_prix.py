@@ -570,7 +570,7 @@ class GestionPrixLine(models.TransientModel):
         for line in lines_select:
             if mode == 'reset':
                 vals, taxes = line.get_reset_amount(line_rounding=line_rounding)
-                line.cout_total_ht_simul = line.order_line_id.product_id.standard_price
+                line.cout_total_ht_simul = line.order_line_id.product_id.standard_price * line.product_uom_qty
             else:
                 vals, taxes = line.get_distributed_amount(
                     to_distribute,
@@ -618,7 +618,7 @@ class SaleOrder(models.Model):
                 not line.of_product_forbidden_discount
                 and bool(line.product_uom_qty and line.price_unit)
                 else 'excluded',
-                'cout_total_ht_simul': line.purchase_price,
+                'cout_total_ht_simul': line.purchase_price * line.product_uom_qty,
                 'prix_total_ht_simul': line.price_subtotal,
                 'prix_total_ttc_simul': line.price_total,
             }
