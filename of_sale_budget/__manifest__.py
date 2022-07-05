@@ -25,8 +25,7 @@ Module OpenFire / Ventes / Budget
 
 """,
     'depends': [
-        'of_subcontracted_service',
-        'of_sale_quote_template',
+        'of_sale_quote_template_subcontracted_service',
         'of_sale_planning',
     ],
     'data': [
