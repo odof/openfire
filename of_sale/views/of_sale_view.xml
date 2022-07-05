@@ -362,10 +362,14 @@
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="priority">100</field>
             <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/form//field[@name='of_price_unit_display']" position="replace"/>
                 <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="replace">
                     <label for="price_unit"/>
                     <div>
-                        <field name="price_unit" class="oe_inline" style="max-width: 150px;"/>
+                        <field name="price_unit" class="oe_inline" style="max-width: 150px;"
+                               attrs="{'invisible': [('of_product_forbidden_discount', '=', True)]}"/>
+                        <field name="of_price_unit_display" class="oe_inline" style="max-width: 150px;"
+                               attrs="{'invisible': [('of_product_forbidden_discount', '=', False)]}"/>
                         (<field name="of_date_tarif" class="oe_inline"/>
                         <span attrs="{'invisible': [('of_date_tarif', '!=', False)]}">Non daté</span>)
                         <br/>
