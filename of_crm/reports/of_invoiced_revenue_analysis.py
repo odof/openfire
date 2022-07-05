@@ -26,6 +26,9 @@ class OfInvoicedRevenueAnalysis(models.Model):
     previous_invoiced_total = fields.Float(string=u"CA facturé N-1", readonly=True)
     amount_to_invoice = fields.Float(string=u"CA à facturer prévisionnel", readonly=True)
 
+    amount_to_invoice_intervention = fields.Float(string=u"Reste à facturer planifié", readonly=True)
+    amount_to_invoice_service = fields.Float(string=u"Reste à facturer non planifié", readonly=True)
+
     margin_total = fields.Float(string=u"Marge facturé", readonly=True)
     margin_perc = fields.Char(
         string=u"Marge facturé (%)", compute='_compute_margin_perc', compute_sudo=True, readonly=True)
@@ -72,7 +75,7 @@ class OfInvoicedRevenueAnalysis(models.Model):
     def _compute_invoiced_turnover_budget_gap(self):
         for rec in self:
             rec.invoiced_turnover_budget_gap = \
-                '%.2f' % ((rec.invoiced_total + rec.amount_to_invoice) - rec.invoiced_turnover_budget)
+                '%.0f' % ((rec.invoiced_total + rec.amount_to_invoice) - rec.invoiced_turnover_budget)
 
     @api.multi
     def _compute_invoiced_total_comparison(self):
@@ -119,6 +122,8 @@ class OfInvoicedRevenueAnalysis(models.Model):
             ,           SUM(T.previous_invoiced_total)                  AS previous_invoiced_total
             ,           SUM(T.margin_total)                             AS margin_total
             ,           SUM(T.amount_to_invoice)                        AS amount_to_invoice
+            ,           SUM(T.amount_to_invoice_intervention)           AS amount_to_invoice_intervention
+            ,           SUM(T.amount_to_invoice_service)                AS amount_to_invoice_service
             ,           SUM(T.residual)                                 AS residual
         """
         return select_str
@@ -131,6 +136,14 @@ class OfInvoicedRevenueAnalysis(models.Model):
 
     def _sub_from(self):
         sub_from_str = """
+            %s
+            %s
+            %s
+        UNION ALL
+            %s
+            %s
+            %s
+        UNION ALL
             %s
             %s
             %s
@@ -164,7 +177,13 @@ class OfInvoicedRevenueAnalysis(models.Model):
                self._sub_where_account_invoice_n_1(),
                self._sub_select_sale_order_line(),
                self._sub_from_sale_order_line(),
-               self._sub_where_sale_order_line())
+               self._sub_where_sale_order_line(),
+               self._sub_select_intervention(),
+               self._sub_from_intervention(),
+               self._sub_where_intervention(),
+               self._sub_select_service(),
+               self._sub_from_service(),
+               self._sub_where_service())
         return sub_from_str
 
     def _sub_select_account_invoice(self):
@@ -182,6 +201,8 @@ class OfInvoicedRevenueAnalysis(models.Model):
             ,       0                                           AS previous_invoiced_total
             ,       0                                           AS margin_total
             ,       0                                           AS amount_to_invoice
+            ,       0                                           AS amount_to_invoice_intervention
+            ,       0                                           AS amount_to_invoice_service
             ,       AI.residual_signed                          AS residual
         """
         return sub_select_account_invoice_str
@@ -219,6 +240,8 @@ class OfInvoicedRevenueAnalysis(models.Model):
             ,       0                       AS previous_invoiced_total
             ,       AIL.of_margin           AS margin_total
             ,       0                       AS amount_to_invoice
+            ,       0                       AS amount_to_invoice_intervention
+            ,       0                       AS amount_to_invoice_service
             ,       0                       AS residual
         """
         return sub_select_account_invoice_line_str
@@ -257,6 +280,8 @@ class OfInvoicedRevenueAnalysis(models.Model):
             ,       0                                           AS previous_invoiced_total
             ,       0                                           AS margin_total
             ,       0                                           AS amount_to_invoice
+            ,       0                                           AS amount_to_invoice_intervention
+            ,       0                                           AS amount_to_invoice_service
             ,       0                                           AS residual
         """
         return sub_select_objective_str
@@ -301,6 +326,8 @@ class OfInvoicedRevenueAnalysis(models.Model):
                     END                 AS previous_invoiced_total
             ,       0                   AS margin_total
             ,       0                   AS amount_to_invoice
+            ,       0                   AS amount_to_invoice_intervention
+            ,       0                   AS amount_to_invoice_service
             ,       0                   AS residual
         """
         return sub_select_account_invoice_n_1_str
@@ -361,6 +388,8 @@ class OfInvoicedRevenueAnalysis(models.Model):
             ,       0                                                               AS previous_invoiced_total
             ,       0                                                               AS margin_total
             ,       SOL.of_amount_to_invoice                                        AS amount_to_invoice
+            ,       0                                                               AS amount_to_invoice_intervention
+            ,       0                                                               AS amount_to_invoice_service
             ,       0                                                               AS residual
         """
         return sub_select_sale_order_line_str
@@ -384,6 +413,89 @@ class OfInvoicedRevenueAnalysis(models.Model):
             AND     PP.product_tmpl_id          = PT.id
         """
         return sub_where_sale_order_line_str
+
+    def _sub_select_intervention(self):
+        sub_select_intervention_str = """
+            SELECT  50000000 + OPIL.id                          AS id
+            ,       OPI.date                                    AS date
+            ,       OPI.company_id                              AS company_id
+            ,       OPI.user_id                                 AS vendor_id
+            ,       OPI.partner_id                              AS partner_id
+            ,       PP.id                                       AS product_id
+            ,       PT.categ_id                                 AS product_categ_id
+            ,       PT.brand_id                                 AS product_brand_id
+            ,       0                                           AS invoiced_turnover_budget
+            ,       0                                           AS invoiced_total
+            ,       0                                           AS previous_invoiced_total
+            ,       0                                           AS margin_total
+            ,       0                                           AS amount_to_invoice
+            ,       OPIL.price_subtotal                         AS amount_to_invoice_intervention
+            ,       0                                           AS amount_to_invoice_service
+            ,       0                                           AS residual
+        """
+        return sub_select_intervention_str
+
+    def _sub_from_intervention(self):
+        sub_from_intervention_str = """
+            FROM    of_planning_intervention        OPI
+            ,       of_planning_intervention_line   OPIL
+            ,       product_product                 PP
+            ,       product_template                PT
+        """
+        return sub_from_intervention_str
+
+    def _sub_where_intervention(self):
+        sub_where_intervention_str = """
+            WHERE   OPIL.invoice_status         = 'to invoice'
+            AND     OPIL.price_subtotal         != 0
+            AND     OPI.id                      = OPIL.intervention_id
+            AND     OPI.type_id                 = %s
+            AND     PP.id                       = OPIL.product_id
+            AND     PP.product_tmpl_id          = PT.id
+        """ % self.env.ref('of_service.of_service_type_maintenance').id
+        return sub_where_intervention_str
+
+    def _sub_select_service(self):
+        sub_select_service_str = """
+            SELECT  60000000 + OSL.id                           AS id
+            ,       OS.date_next                                AS date
+            ,       OS.company_id                               AS company_id
+            ,       OS.user_id                                  AS vendor_id
+            ,       OS.partner_id                               AS partner_id
+            ,       PP.id                                       AS product_id
+            ,       PT.categ_id                                 AS product_categ_id
+            ,       PT.brand_id                                 AS product_brand_id
+            ,       0                                           AS invoiced_turnover_budget
+            ,       0                                           AS invoiced_total
+            ,       0                                           AS previous_invoiced_total
+            ,       0                                           AS margin_total
+            ,       0                                           AS amount_to_invoice
+            ,       0                                           AS amount_to_invoice_intervention
+            ,       OSL.price_subtotal                          AS amount_to_invoice_service
+            ,       0                                           AS residual
+        """
+        return sub_select_service_str
+
+    def _sub_from_service(self):
+        sub_from_service_str = """
+            FROM    of_service          OS
+            ,       of_service_line     OSL
+            ,       product_product     PP
+            ,       product_template    PT
+        """
+        return sub_from_service_str
+
+    def _sub_where_service(self):
+        sub_where_service_str = """
+            WHERE   OSL.price_subtotal          != 0
+            AND     OSL.saleorder_line_id       IS NULL
+            AND     OS.id                       = OSL.service_id
+            AND     OS.base_state               = 'calculated'
+            AND     OS.type_id                  = %s
+            AND     PP.id                       = OSL.product_id
+            AND     PP.product_tmpl_id          = PT.id
+        """ % self.env.ref('of_service.of_service_type_maintenance').id
+        return sub_where_service_str
 
     def _where(self):
         where_str = """
@@ -432,7 +544,7 @@ class OfInvoicedRevenueAnalysis(models.Model):
                         'amount_to_invoice' in line and line['amount_to_invoice'] is not None and \
                         'invoiced_turnover_budget' in line and line['invoiced_turnover_budget'] is not None:
                     value = (line['invoiced_total'] + line['amount_to_invoice']) - line['invoiced_turnover_budget']
-                    line['invoiced_turnover_budget_gap'] = '{:,.2f}'.format(value).replace(',', ' ').replace('.', ',')
+                    line['invoiced_turnover_budget_gap'] = '{:,.0f}'.format(value).replace(',', ' ').replace('.', ',')
                 else:
                     line['invoiced_turnover_budget_gap'] = "N/E"
             if 'invoiced_total_comparison' in fields_copy:

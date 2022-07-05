@@ -12,6 +12,8 @@
                 <field name="previous_invoiced_total" type="measure"/>
                 <field name="margin_perc" type="measure"/>
                 <field name="amount_to_invoice" type="measure"/>
+                <field name="amount_to_invoice_intervention" type="measure"/>
+                <field name="amount_to_invoice_service" type="measure"/>
                 <field name="residual" type="measure"/>
                 <field name="invoiced_total_comparison" type="measure"/>
                 <field name="invoiced_turnover_budget_comparison" type="measure"/>
