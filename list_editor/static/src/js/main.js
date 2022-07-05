@@ -17,7 +17,7 @@ odoo.define('list_editor.main', function (require) {
 
             if (key) {
                 new Model('list.editor').call('get_list_view', [key]).then(function (res) {
-                    if (res) {
+                    if (res && !self.ViewManager.el.classList.contains('of_disable_list_editor')) {
                         self.replace_view(res);
                     }
                     _super_reload_content.apply(self).then(function () {

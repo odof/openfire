@@ -205,7 +205,8 @@
                     <field name="id" invisible="1"/>
                     <field name="quote_id" invisible="1"/>
                     <label for="quote_line_ids"/>
-                    <field name="quote_line_ids" nolabel="1" context="{'default_quote_id': quote_id, 'default_of_layout_category_id': id}">
+                    <field name="quote_line_ids" nolabel="1" class="of_disable_list_editor"
+                           context="{'default_quote_id': quote_id, 'default_of_layout_category_id': id}">
                         <tree editable="bottom">
                             <field name="quote_id" invisible="1"/>
                             <field name="product_id"/>
@@ -251,7 +252,8 @@
                     <field name="id" invisible="1"/>
                     <field name="order_id" invisible="1"/>
                     <label for="order_line_without_child_ids"/>
-                    <field name="order_line_without_child_ids" nolabel="1" context="{'default_order_id': order_id, 'default_of_layout_category_id': id}">
+                    <field name="order_line_without_child_ids" nolabel="1" class="of_disable_list_editor"
+                           context="{'default_order_id': order_id, 'default_of_layout_category_id': id}">
                         <tree editable="bottom">
                             <field name="order_id" invisible="1"/>
                             <field name="product_id"/>
