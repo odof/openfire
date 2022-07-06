@@ -570,7 +570,8 @@ class GestionPrixLine(models.TransientModel):
         for line in lines_select:
             if mode == 'reset':
                 vals, taxes = line.get_reset_amount(line_rounding=line_rounding)
-                line.cout_total_ht_simul = line.order_line_id.product_id.standard_price * line.product_uom_qty
+                line.cout_total_ht_simul = \
+                    line.order_line_id.product_id.standard_price * line.order_line_id.product_uom_qty
             else:
                 vals, taxes = line.get_distributed_amount(
                     to_distribute,
