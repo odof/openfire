@@ -96,7 +96,8 @@ class OFSaleOrderLaborCost(models.Model):
     def _compute_product_uom_qty(self):
         for cost in self:
             if cost.type == 'computed':
-                cost.product_uom_qty = sum(cost.order_id.order_line.mapped('of_duration'))
+                cost.product_uom_qty = sum(
+                    cost.order_id.order_line.mapped(lambda rec: rec.product_uom_qty * rec.of_duration))
             else:
                 cost.product_uom_qty = cost.inverse_product_uom_qty
 
