@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_sales_config" model="ir.ui.view">
+        <field name="name">sale settings</field>
+        <field name="model">sale.config.settings</field>
+        <field name="inherit_id" ref="sale.view_sales_config"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@id='sale']/label[@for='id']" position="before">
+                <label for="of_theoretical_cost"/>
+                <div>
+                    <field name="of_theoretical_cost" class="oe_inline"/>
+                    <span>Prends le coût théorique de l'article au lieu de son prix de vente</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

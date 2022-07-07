@@ -117,6 +117,9 @@ Cette action irréversible recalculera la catégorie, le prix d'achat et le prix
             <xpath expr="//field[@name='purchase_ok']" position="after">
                 <field name="of_is_net_price" readonly="1"/>
             </xpath>
+            <xpath expr="//div[@name='standard_price_uom']" position="after">
+                <field name="of_theoretical_cost" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+            </xpath>
         </field>
     </record>
         <!-- ################## Vues import tarif ##################-->

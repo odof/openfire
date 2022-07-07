@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import csv
 import datetime
@@ -13,6 +14,7 @@ from odoo.tools.translate import _
 from odoo.tools.safe_eval import safe_eval
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.exceptions import except_orm, UserError, ValidationError
+import odoo.addons.decimal_precision as dp
 
 try:
     from cStringIO import StringIO
@@ -291,6 +293,7 @@ class OFProductBrand(models.Model):
         price_fields = [
             ('of_import_remise', 'remise', 'la remise'),
             ('of_import_price', 'list_price', 'le prix de vente HT'),
+            ('of_import_cout', 'of_theoretical_cost', u'le coût théorique'),
         ]
         if not product or product.id < 0 or product.cost_method == 'standard' or \
                 product.categ_id.of_import_update_standard_price:
@@ -392,6 +395,8 @@ class ProductTemplate(models.Model):
              u"prix d'achat donné par le fournisseur.\n"
              u"Sinon, ils sont pasés sur le prix public hors taxe."
     )
+    of_theoretical_cost = fields.Float(
+        string=u"Coût théorique", digits=dp.get_precision('Product Price'), readonly=True)
 
     @api.multi
     def of_action_update_from_brand(self):
