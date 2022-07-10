@@ -1065,7 +1065,7 @@ PlanningView.Row = Widget.extend({
     /**
      *  col_index optionnel, garder undefined pour rendre toutes les colonnes
      */
-    render: function (col_index) {
+    render: function (col_index, reload=false) {
         var self = this;
 
         var le_model = new Model("of.planning.intervention");
@@ -1081,56 +1081,57 @@ PlanningView.Row = Widget.extend({
                 self.zero_horaire = true;
             }else{  // ajouter les créneaux dispos aux colonnes
                 self.zero_horaire = false;
-                var max_time = self.view.max_time, event, record;
-                for (var i=0; i<self.column_nb; i++) {  // parcourir les colonnes
-                    options = {col_offset: i};
-                    if (isNullOrUndef(col_index) || i==col_index) {
-
-                        for (var j=0; j<self.creneaux_dispo[i].length; j++) {  // parcourir les créneaux dispos
-                            le_creneau = new PlanningCreneauDispo(self, self.view, self.creneaux_dispo[i][j], options);
-                            self.columns[i].push(le_creneau);
-                            // définition de compareFunction ici car elle utilise la variable i
-                            // contournement de l'argument compareFunction de la fonction sort de Array
-                            // qui n'accepte que 2 paramètre
-                            function compareFunction(recA, recB) {
-                                var heure_debut_a = recA.heure_debut,
-                                    heure_debut_b = recB.heure_debut;
-                                if (!isNullOrUndef(recA.hours_cols)) {  // si recA est sur plusieurs jours
-                                    heure_debut_a = recA.hours_cols[i].heure_debut;
-                                }
-                                if (!isNullOrUndef(recB.hours_cols)) {  // si recB est sur plusieurs jours
-                                    heure_debut_b = recB.hours_cols[i].heure_debut;
-                                }
-                                return heure_debut_a - heure_debut_b;
-                            }
-                            self.columns[i].sort(compareFunction);  // ordonner les enregistrements de la colonne
-                        }
-                        if (self.view.mode_calendar) {
-                            var current_max = self.view.min_time, heure_debut;
-                            for (var ic=0; ic<self.columns[i].length; ic++) {
-                                event = self.columns[i][ic];
-
-                                if (!isNullOrUndef(event['hours_cols']) && event['hours_cols'][i]) {
-                                    heure_debut = event['hours_cols'][i].heure_debut
-                                }else{
-                                    heure_debut = event.heure_debut;
-                                }
-                                if (heure_debut > current_max) {
-                                    record = {heure_debut: current_max, heure_fin: heure_debut}
-                                    le_creneau = new PlanningCreneauIndispo(self, self.view, record, options);
-                                    self.columns[i].splice(ic, 0, le_creneau);
-                                    ic++;
-                                }
-                                if (!isNullOrUndef(event['hours_cols']) && event['hours_cols'][i]) {
-                                    current_max = event['hours_cols'][i].heure_fin;
-                                }else{
-                                    current_max = event.heure_fin;
-                                }
-                            }
-                            if (current_max < max_time) {
-                                record = {heure_debut: current_max, heure_fin: max_time}
-                                le_creneau = new PlanningCreneauIndispo(self, self.view, record, options);
+                if (!reload) {
+                    var max_time = self.view.max_time, event, record;
+                    for (var i=0; i<self.column_nb; i++) {  // parcourir les colonnes
+                        options = {col_offset: i};
+                        if (isNullOrUndef(col_index) || i==col_index) {
+                            for (var j=0; j<self.creneaux_dispo[i].length; j++) {  // parcourir les créneaux dispos
+                                le_creneau = new PlanningCreneauDispo(self, self.view, self.creneaux_dispo[i][j], options);
                                 self.columns[i].push(le_creneau);
+                                // définition de compareFunction ici car elle utilise la variable i
+                                // contournement de l'argument compareFunction de la fonction sort de Array
+                                // qui n'accepte que 2 paramètre
+                                function compareFunction(recA, recB) {
+                                    var heure_debut_a = recA.heure_debut,
+                                        heure_debut_b = recB.heure_debut;
+                                    if (!isNullOrUndef(recA.hours_cols)) {  // si recA est sur plusieurs jours
+                                        heure_debut_a = recA.hours_cols[i].heure_debut;
+                                    }
+                                    if (!isNullOrUndef(recB.hours_cols)) {  // si recB est sur plusieurs jours
+                                        heure_debut_b = recB.hours_cols[i].heure_debut;
+                                    }
+                                    return heure_debut_a - heure_debut_b;
+                                }
+                                self.columns[i].sort(compareFunction);  // ordonner les enregistrements de la colonne
+                            }
+                            if (self.view.mode_calendar) {
+                                var current_max = self.view.min_time, heure_debut;
+                                for (var ic=0; ic<self.columns[i].length; ic++) {
+                                    event = self.columns[i][ic];
+
+                                    if (!isNullOrUndef(event['hours_cols']) && event['hours_cols'][i]) {
+                                        heure_debut = event['hours_cols'][i].heure_debut
+                                    }else{
+                                        heure_debut = event.heure_debut;
+                                    }
+                                    if (heure_debut > current_max) {
+                                        record = {heure_debut: current_max, heure_fin: heure_debut}
+                                        le_creneau = new PlanningCreneauIndispo(self, self.view, record, options);
+                                        self.columns[i].splice(ic, 0, le_creneau);
+                                        ic++;
+                                    }
+                                    if (!isNullOrUndef(event['hours_cols']) && event['hours_cols'][i]) {
+                                        current_max = event['hours_cols'][i].heure_fin;
+                                    }else{
+                                        current_max = event.heure_fin;
+                                    }
+                                }
+                                if (current_max < max_time) {
+                                    record = {heure_debut: current_max, heure_fin: max_time}
+                                    le_creneau = new PlanningCreneauIndispo(self, self.view, record, options);
+                                    self.columns[i].push(le_creneau);
+                                }
                             }
                         }
                     }
@@ -1411,6 +1412,7 @@ var PlanningCreneauDispo = Widget.extend({
     init: function(row, view, record, options) {
         this._super(row);
         this.row = row;
+        this.creneau_type = "dispo";
         this.view = view;
         this.options = options;
         this.col_offset = options.col_offset;
@@ -1467,16 +1469,21 @@ var PlanningCreneauDispo = Widget.extend({
     /**
      *  génère le rendu visuel du créneau et l'attache à la colonne correspondante
      */
-    render: function(col_index) {
+    render: function(col_index=null, reload=false) {
         var self = this;
         if (isNullOrUndef(col_index)) {
             col_index = self.col_offset;
         }
-        return self.$el.html(qweb.render('PlanningView.creneau_dispo', {"creneau": self, "col_index": col_index})).promise()
+        if (reload) {
+            return self.row.render(col_index, true);
+        }else{
+            return self.$el.html(qweb.render('PlanningView.creneau_dispo', {"creneau": self, "col_index": col_index})).promise()
             .then(function (){
                 var td_id = "of_planning_td_" + self.row.res_id + "_" + col_index;
                 self.$el.appendTo("#" + td_id);
             })
+        }
+
     },
     /**
      *  récupère le secteur dans la BDD puis re-génère le rendu
@@ -1490,15 +1497,21 @@ var PlanningCreneauDispo = Widget.extend({
             .all()
             .then(function (result){
                 if (result.length == 1) {
-                    if (!result[0].secteur_id) {
-                        self.secteur_id = false;
-                        self.secteur_str = "";
-                    }else{
-                        self.secteur_id = result[0].secteur_id[0];
-                        self.secteur_str = result[0].secteur_id[1];
+                    var i = self.col_offset, creneau;
+                    for (var j=0; j<self.row.columns[i].length; j++) {
+                        creneau = self.row.columns[i][j];
+                        if (creneau.creneau_type == "dispo") {
+                            if (!result[0].secteur_id) {
+                                creneau.secteur_id = false;
+                                creneau.secteur_str = "";
+                            }else{
+                                creneau.secteur_id = result[0].secteur_id[0];
+                                creneau.secteur_str = result[0].secteur_id[1];
+                            }
+                        }
                     }
                 }
-                return self.render();
+                return self.render(null,true);
             });
     },
     /**
@@ -1647,6 +1660,7 @@ var PlanningCreneauIndispo = Widget.extend({
     init: function(row, view, record, options) {
         this._super(row);
         this.row = row;
+        this.creneau_type = "indispo";
         this.view = view;
         this.options = options;
         this.col_offset = options.col_offset;
@@ -1709,6 +1723,7 @@ var PlanningRecord = Widget.extend({
         this.id = record.id;
         this._super(row);
         this.row = row;
+        this.creneau_type = "intervention";
         this.view = view;
         this.options = options;
         this.day_span = options.day_span;
