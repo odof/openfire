@@ -89,6 +89,7 @@ class SaleOrder(models.Model):
             raise UserError(_(u"Vous devez définir l'Article de situation dans la configuration des ventes."))
         situation_data = {
             'partner_id': self.partner_id.id,
+            'company_id': self.company_id.id,
             'order_id': self.id,
             'line_ids': [(0, 0, {'order_line_id': line.id}) for line in self.order_line
                          if line.product_uom_qty or line.situation_ids],
@@ -115,6 +116,7 @@ class SaleOrder(models.Model):
             raise UserError(_(u"Vous devez définir l'article de situation dans la configuration des ventes."))
         situation_data = {
             'partner_id': self.partner_id.id,
+            'company_id': self.company_id.id,
             'order_id': self.id,
             'line_ids': [(0, 0, {'order_line_id': line.id}) for line in self.order_line
                          if line.product_uom_qty or line.situation_ids],
