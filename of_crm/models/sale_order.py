@@ -41,6 +41,10 @@ class SaleOrder(models.Model):
                 "AND column_name = 'of_canvasser_id'" % self._table)
             new_canvasser_field = not bool(cr.fetchall())
 
+        # migrate the value of the selection field for the activities state: 'cancelled' -> 'canceled'
+        cr.execute('SELECT id FROM sale_order WHERE of_activities_state = %s', ('cancelled',))
+        orders_to_update = cr.fetchall()
+
         res = super(SaleOrder, self)._auto_init()
 
         if new_workflow:
@@ -60,6 +64,10 @@ class SaleOrder(models.Model):
                 "LEFT JOIN crm_lead CL ON (CL.id = SO2.opportunity_id) "
                 "WHERE SO.id = SO2.id" % (self._table, self._table))
 
+        if orders_to_update:
+            # update the Sales Order with the correct value 'canceled'
+            order_ids = [order_id[0] for order_id in orders_to_update]
+            cr.execute("UPDATE sale_order SET of_activities_state = 'canceled' WHERE id IN %s", (tuple(order_ids),))
         return res
 
     @api.model
@@ -93,13 +101,14 @@ class SaleOrder(models.Model):
     ], default=_default_state)
     of_sent_quotation = fields.Boolean(string=u"Devis envoyé")
     of_canvasser_id = fields.Many2one(comodel_name='res.users', string=u"Prospecteur")
-    of_sale_activity_ids = fields.One2many(
-        comodel_name='of.sale.activity', inverse_name='order_id', string='Activities', copy=True)
+    of_crm_activity_ids = fields.One2many(
+        comodel_name='of.crm.activity', inverse_name='order_id', string='Activities', copy=True,
+        context={'active_test': False})
     of_activities_state = fields.Selection(selection=[
         ('in_progress', 'In progress'),
         ('late', 'Late'),
         ('done', 'Done'),
-        ('cancelled', 'Cancelled')], string='Status of activities', compute='_compute_of_activities_state', store=True)
+        ('canceled', 'Canceled')], string='Status of activities', compute='_compute_of_activities_state', store=True)
     # Follow-up fields
     of_sale_followup_tag_ids = fields.Many2many(
         comodel_name='of.sale.followup.tag', relation='sale_order_followup_tag_rel', column1='order_id',
@@ -142,19 +151,19 @@ class SaleOrder(models.Model):
                 rec.of_laying_week = u"Non programmée"
 
     @api.multi
-    @api.depends('of_sale_activity_ids', 'of_sale_activity_ids.state', 'of_sale_activity_ids.date_deadline')
+    @api.depends('of_crm_activity_ids', 'of_crm_activity_ids.state', 'of_crm_activity_ids.date')
     def _compute_of_activities_state(self):
         for sale in self:
-            if not sale.of_sale_activity_ids:
+            activities = sale.of_crm_activity_ids
+            if not activities:
                 sale.of_activities_state = False
                 continue
 
             activities_state = 'in_progress'
-            activities = sale.of_sale_activity_ids
             states = activities.mapped('state')
-            if all(map(lambda s: s == 'cancelled', states)):
-                activities_state = 'cancelled'
-            elif all(map(lambda s: s in ('done', 'cancelled'), states)):
+            if all(map(lambda s: s == 'canceled', states)):
+                activities_state = 'canceled'
+            elif all(map(lambda s: s in ('done', 'canceled'), states)):
                 activities_state = 'done'
             elif sale._of_get_overdue_activities():
                 activities_state = 'late'
@@ -181,13 +190,13 @@ class SaleOrder(models.Model):
         field_name = self._get_date_fields_mapping_order_to_activity()
         activities_filter = [field_name.get(af) for af in activity_fields if field_name.get(af)]
         for order in self:
-            for sale_activity in order.of_sale_activity_ids.filtered(
+            for crm_activity in order.of_crm_activity_ids.filtered(
                     lambda sa:
-                    sa.state == 'planned' and sa.activity_id and
-                    sa.activity_id.of_compute_date in activities_filter and
-                    sa.activity_id.of_automatic_recompute):
-                sale_activity.date_deadline = self._of_get_sale_activity_date_deadline(
-                    order, sale_activity.activity_id)
+                    sa.state == 'planned' and sa.type_id and
+                    sa.type_id.of_compute_date in activities_filter and
+                    sa.type_id.of_automatic_recompute):
+                crm_activity.deadline_date = self._of_get_sale_activity_date_deadline(
+                    order, crm_activity.type_id)
 
     def _get_date_fields_mapping_order_to_activity(self):
         return {
@@ -229,7 +238,7 @@ class SaleOrder(models.Model):
     @api.multi
     def _of_get_overdue_activities(self):
         self.ensure_one()
-        return self.of_sale_activity_ids.filtered(lambda a: a.is_overdue)
+        return self.of_crm_activity_ids.filtered(lambda a: a.is_late)
 
     def _of_get_fields_recompute_auto_activities(self):
         """Helper function to return the list of fields that will trigger the recompute
@@ -339,8 +348,8 @@ class SaleOrder(models.Model):
         return res
 
     def _of_not_done_mandatory_activities(self):
-        return self.mapped('of_sale_activity_ids').filtered(
-            lambda sa: sa.activity_id and sa.activity_id.of_mandatory and sa.state == 'planned').mapped('summary')
+        return self.mapped('of_crm_activity_ids').filtered(
+            lambda act: act.type_id and act.type_id.of_mandatory and act.state == 'planned').mapped('title')
 
     @api.multi
     def action_confirm(self):
@@ -412,7 +421,7 @@ class SaleOrder(models.Model):
 
     @api.model
     def cron_recompute_activities_state(self):
-        for order in self.search([('of_sale_activity_ids', '!=', False)]):
+        for order in self.search([('of_crm_activity_ids', '!=', False)]):
             order._compute_of_activities_state()
 
 

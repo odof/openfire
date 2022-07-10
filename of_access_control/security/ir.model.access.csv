@@ -91,7 +91,5 @@ of_calendar.access_of_horaire_creneau_manager,of.horaire.creneau.manager,of_cale
 of_calendar.access_of_horaire_modele_manager,of.horaire.modele.manager,of_calendar.model_of_horaire_modele,of_group_planning_intervention_manager,1,1,1,1
 access_of_horaire_modele_responsible,of.horaire.modele.responsible,of_calendar.model_of_horaire_modele,of_group_planning_intervention_responsible,1,0,0,0
 
-access_of_sale_activity_responsible,access.of.sale.activity.responsible,of_crm.model_of_sale_activity,of_access_control.of_group_sale_responsible,1,1,1,1
-
 of_crm.access_of_sale_objective_manager,of.sale.objective.manager,of_crm.model_of_sale_objective,of_group_project_responsible,1,1,1,1
 of_crm.access_of_sale_objective_line_manager,of.sale.objective.line.manager,of_crm.model_of_sale_objective_line,of_group_project_responsible,1,1,1,1

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-23 08:31+0000\n"
-"PO-Revision-Date: 2022-06-23 08:31+0000\n"
+"POT-Creation-Date: 2022-07-05 08:23+0000\n"
+"PO-Revision-Date: 2022-07-05 08:23+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -370,12 +370,10 @@ msgid "Actions Co suivies"
 msgstr "Actions Co suivies"
 
 #. module: of_crm
-#: model:ir.actions.act_window,name:of_crm.of_sale_activity_action
-#: model:ir.model.fields,field_description:of_crm.field_sale_order_of_sale_activity_ids
-#: model:ir.ui.menu,name:of_crm.of_sale_activity_menu
+#: model:ir.model.fields,field_description:of_crm.field_sale_order_of_crm_activity_ids
+#: model:ir.ui.menu,name:of_crm.of_crm_activity_menu
+#: model:ir.ui.menu,name:of_crm.of_crm_activity_sale_menu
 #: model:ir.ui.view,arch_db:of_crm.of_crm_view_order_form
-#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_search
-#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_tree
 msgid "Activities"
 msgstr "Activités"
 
@@ -387,9 +385,17 @@ msgid "Activities Done"
 msgstr "Activités terminées"
 
 #. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_add_attachment_activity_sale_activity_id
-#: model:ir.ui.view,arch_db:of_crm.of_crm_view_order_form
-#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_form
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
+msgid "Activities of the day"
+msgstr "Activités du jour"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
+msgid "Activities of the week"
+msgstr "Activités de la semaine"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_add_attachment_activity_activity_id
 msgid "Activity"
 msgstr "Activité"
 
@@ -399,15 +405,8 @@ msgid "Activity file"
 msgstr "Fichier"
 
 #. module: of_crm
-#: code:addons/of_crm/models/of_sale_activity.py:59
-#, python-format
-msgid "Activity status change %s : %s -> %s"
-msgstr "Changement d'état de l'activité %s : %s -> %s"
-
-#. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_type_id
-#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_activity_id
-#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_search
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
 msgid "Activity type"
 msgstr "Type d'activité"
 
@@ -435,26 +434,11 @@ msgstr "Activité à créer en cas de mise à jour manuelle"
 
 #. module: of_crm
 #: model:ir.actions.act_window,name:of_crm.of_crm_activity_action
+#: model:ir.actions.act_window,name:of_crm.of_crm_activity_sale_action
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_activity_ids
-#: model:ir.ui.menu,name:of_crm.of_crm_activity_menu
 #: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
 msgid "Activités"
 msgstr "Activités"
-
-#. module: of_crm
-#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
-msgid "Activités de la semaine"
-msgstr "Activités de la semaine"
-
-#. module: of_crm
-#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
-msgid "Activités du jour"
-msgstr "Activités du jour"
-
-#. module: of_crm
-#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
-msgid "Activités en retard"
-msgstr "Activités en retard"
 
 #. module: of_crm
 #: model:ir.model,name:of_crm.model_of_add_attachment_activity
@@ -467,9 +451,13 @@ msgid "Add attachment"
 msgstr "Ajouter une pièce jointe"
 
 #. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_from_opportunity_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_from_sale_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_sale_tree_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_tree_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
 #: model:ir.ui.view,arch_db:of_crm.of_crm_view_order_form
-#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_form
-#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_tree
 msgid "Add attachments"
 msgstr "Télécharger"
 
@@ -504,7 +492,7 @@ msgid "Affichage du tunnel de conversion quantitatif"
 msgstr "Affichage du tunnel de conversion quantitatif"
 
 #. module: of_crm
-#: code:addons/of_crm/models/of_sale_activity.py:72
+#: code:addons/of_crm/models/of_crm_activity.py:230
 #, python-format
 msgid "An attachment is required to complete the activity"
 msgstr "Une pièce jointe est requise pour terminer l'activité"
@@ -525,8 +513,10 @@ msgstr "Analyse des activités"
 #: model:ir.ui.view,arch_db:of_crm.of_crm_activity_action_form_view
 #: model:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
 #: model:ir.ui.view,arch_db:of_crm.of_crm_activity_from_opportunity_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_from_sale_form_view
 #: model:ir.ui.view,arch_db:of_crm.of_crm_activity_tree_view
 #: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_order_form
 #: selection:of.crm.activity.action,type:0
 msgid "Annuler"
 msgstr "Annuler"
@@ -537,7 +527,6 @@ msgid "Annuler une activité"
 msgstr "Annuler une activité"
 
 #. module: of_crm
-#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
 #: selection:of.crm.activity,state:0
 msgid "Annulée"
 msgstr "Annulée"
@@ -585,8 +574,10 @@ msgstr "Article"
 
 #. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_activity_of_user_id
-#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_user_id
-#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_search
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_from_sale_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_view_order_form
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_sale_tree_view
 msgid "Assigned to"
 msgstr "Assigné à"
 
@@ -633,7 +624,6 @@ msgstr "Aucun rendez-vous planifié."
 
 #. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_user_id
-#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
 msgid "Auteur"
 msgstr "Auteur"
 
@@ -646,6 +636,11 @@ msgstr "Auteur de la réponse"
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_answer_orig_user_id
 msgid "Auteur réponse d'origine"
 msgstr "Auteur réponse d'origine"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
+msgid "Author"
+msgstr "Auteur"
 
 #. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_activity_of_automatic_recompute
@@ -743,6 +738,7 @@ msgstr "CA à facturer prévisionnel"
 
 #. module: of_crm
 #: model:ir.ui.menu,name:of_crm.of_crm_crm_menu
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
 msgid "CRM"
 msgstr "CRM"
 
@@ -773,22 +769,19 @@ msgid "Canal"
 msgstr "Canal"
 
 #. module: of_crm
-#: model:ir.ui.view,arch_db:of_crm.of_crm_view_order_form
-#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_form
-#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_tree
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_sale_tree_view
 msgid "Cancel"
 msgstr "Annuler"
 
 #. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
 #: model:ir.ui.view,arch_db:of_crm.of_crm_sale_view_sales_order_filter
-#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_search
-#: selection:of.sale.activity,state:0
 #: selection:sale.order,of_activities_state:0
-msgid "Cancelled"
+msgid "Canceled"
 msgstr "Annulé"
 
 #. module: of_crm
-#: code:addons/of_crm/models/crm_activity.py:87
+#: code:addons/of_crm/models/crm_activity.py:89
 #, python-format
 msgid "Canvasser"
 msgstr "Prospecteur"
@@ -945,9 +938,9 @@ msgid "Comparaison Objectif (%)"
 msgstr "Comparaison Objectif (%)"
 
 #. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_from_sale_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_sale_tree_view
 #: model:ir.ui.view,arch_db:of_crm.of_crm_view_order_form
-#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_form
-#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_tree
 msgid "Complete"
 msgstr "Terminer"
 
@@ -962,6 +955,7 @@ msgstr "Compte analytique"
 #: model:ir.ui.view,arch_db:of_crm.of_crm_activity_action_form_view
 #: model:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
 #: model:ir.ui.view,arch_db:of_crm.of_crm_activity_from_opportunity_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_from_sale_form_view
 msgid "Compte-rendu"
 msgstr "Compte-rendu"
 
@@ -1033,7 +1027,6 @@ msgstr "Ajoutez y quelques opportunités."
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_select_create_uid
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_create_uid
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_modele_create_uid
-#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_create_uid
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_followup_tag_create_uid
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_create_uid
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_line_create_uid
@@ -1048,7 +1041,6 @@ msgstr "Créé par"
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_select_create_date
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_create_date
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_modele_create_date
-#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_create_date
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_followup_tag_create_date
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_create_date
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_line_create_date
@@ -1061,7 +1053,7 @@ msgid "Creation&amp;nbsp;:"
 msgstr "Creation&amp;nbsp;:"
 
 #. module: of_crm
-#: code:addons/of_crm/models/crm_activity.py:88
+#: code:addons/of_crm/models/crm_activity.py:90
 #, python-format
 msgid "Creator"
 msgstr "Créateur"
@@ -1088,13 +1080,12 @@ msgid "Cumul à date - Mensuel"
 msgstr "Cumul à date - Mensuel"
 
 #. module: of_crm
-#: code:addons/of_crm/models/crm_activity.py:96
+#: code:addons/of_crm/models/crm_activity.py:98
 #, python-format
 msgid "Customer Order confirmation date"
 msgstr "Date de confirmation de CC"
 
 #. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_date
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_date
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_date
 #: model:ir.model.fields,field_description:of_crm.field_of_invoiced_revenue_analysis_date
@@ -1105,7 +1096,7 @@ msgstr "Date de confirmation de CC"
 #: selection:of.crm.projet.attr,type:0
 #: selection:of.crm.projet.line,type:0
 msgid "Date"
-msgstr "Date "
+msgstr "Date"
 
 #. module: of_crm
 #: model:ir.ui.view,arch_db:of_crm.of_crm_lead_view_tree_activity
@@ -1150,9 +1141,9 @@ msgid "Date objectif"
 msgstr "Date objectif"
 
 #. module: of_crm
-#: code:addons/of_crm/models/crm_activity.py:97
-#: code:addons/of_crm/models/crm_activity.py:106
-#: code:addons/of_crm/models/crm_activity.py:114
+#: code:addons/of_crm/models/crm_activity.py:99
+#: code:addons/of_crm/models/crm_activity.py:108
+#: code:addons/of_crm/models/crm_activity.py:116
 #, python-format
 msgid "Date of the day"
 msgstr "Date du jour"
@@ -1174,13 +1165,22 @@ msgid "Dates"
 msgstr "Dates"
 
 #. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_date_deadline
-#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_search
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_date
+msgid "Planned date"
+msgstr "Date prévue"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_deadline_date
 msgid "Deadline date"
 msgstr "Date d'échéance"
 
 #. module: of_crm
-#: code:addons/of_crm/models/crm_activity.py:108
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_done_date
+msgid "Done date"
+msgstr "Date de réalisation"
+
+#. module: of_crm
+#: code:addons/of_crm/models/crm_activity.py:110
 #, python-format
 msgid "Decision date"
 msgstr "Date décision"
@@ -1200,9 +1200,9 @@ msgstr "Dernières modifications"
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_description
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_description
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_select_description
-#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_description
 #: model:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
 #: model:ir.ui.view,arch_db:of_crm.of_crm_activity_from_opportunity_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_from_sale_form_view
 #: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
 #: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
 #: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
@@ -1249,7 +1249,6 @@ msgstr "Annuler"
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_modele_display_name
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_stage_auto_update_display_name
 #: model:ir.model.fields,field_description:of_crm.field_of_invoiced_revenue_analysis_display_name
-#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_display_name
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_followup_tag_display_name
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_display_name
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_line_display_name
@@ -1264,9 +1263,8 @@ msgid "Divers"
 msgstr "Divers"
 
 #. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
 #: model:ir.ui.view,arch_db:of_crm.of_crm_sale_view_sales_order_filter
-#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_search
-#: selection:of.sale.activity,state:0
 #: selection:sale.order,of_activities_state:0
 msgid "Done"
 msgstr "Fait"
@@ -1322,7 +1320,7 @@ msgid "Est une société"
 msgstr "Est une société"
 
 #. module: of_crm
-#: code:addons/of_crm/models/crm_activity.py:99
+#: code:addons/of_crm/models/crm_activity.py:101
 #, python-format
 msgid "Estimated installation date"
 msgstr "Date de pose prévisionnelle"
@@ -1401,7 +1399,6 @@ msgstr "Une bonne journée commence par un pipeline de ventes bien organisé."
 #: model:ir.ui.view,arch_db:of_crm.of_crm_crm_activity_view_search
 #: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_select_view_filter
 #: model:ir.ui.view,arch_db:of_crm.of_crm_projet_attr_view_filter
-#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_search
 msgid "Group By"
 msgstr "Grouper par"
 
@@ -1435,7 +1432,6 @@ msgstr "Haute"
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_modele_id
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_stage_auto_update_id
 #: model:ir.model.fields,field_description:of_crm.field_of_invoiced_revenue_analysis_id
-#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_id
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_followup_tag_id
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_id
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_line_id
@@ -1485,11 +1481,6 @@ msgid "Invoices Statistics"
 msgstr "Statistiques des factures"
 
 #. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_is_overdue
-msgid "Is overdue activity ?"
-msgstr "L'activité est-elle en retard ?"
-
-#. module: of_crm
 #: selection:of.sale.objective,month:0
 msgid "Janvier"
 msgstr "Janvier"
@@ -1526,7 +1517,6 @@ msgstr "L'étape de départ du workflow des commandes de vente est \"Estimation\
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_modele___last_update
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_stage_auto_update___last_update
 #: model:ir.model.fields,field_description:of_crm.field_of_invoiced_revenue_analysis___last_update
-#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity___last_update
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_followup_tag___last_update
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_objective___last_update
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_line___last_update
@@ -1548,7 +1538,6 @@ msgstr "Le mois dernier"
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_write_uid
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_write_uid
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_modele_write_uid
-#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_write_uid
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_followup_tag_write_uid
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_line_write_uid
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_write_uid
@@ -1563,7 +1552,6 @@ msgstr "Dernière mise à jour par"
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_write_date
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_write_date
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_modele_write_date
-#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_write_date
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_followup_tag_write_date
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_line_write_date
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_write_date
@@ -1572,7 +1560,6 @@ msgstr "Dernière mise à jour le"
 
 #. module: of_crm
 #: model:ir.ui.view,arch_db:of_crm.of_crm_sale_view_sales_order_filter
-#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_search
 #: selection:sale.order,of_activities_state:0
 msgid "Late"
 msgstr "En retard"
@@ -1581,6 +1568,11 @@ msgstr "En retard"
 #: model:ir.model.fields,field_description:of_crm.field_sale_order_of_laying_week
 msgid "Laying week"
 msgstr "Semaine de pose"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_of_add_attachment_activity_lead_id
+msgid "Lead"
+msgstr "Piste"
 
 #. module: of_crm
 #: model:ir.model,name:of_crm.model_crm_lead
@@ -1652,7 +1644,7 @@ msgstr "Liste des attributs de ce modèle. Ils seront copiés dans la fiche proj
 
 #. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_activity_of_load_attachment
-#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_load_attachment
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_load_attachment
 msgid "Load an attachment"
 msgstr "Charger une pièce jointe"
 
@@ -1736,22 +1728,11 @@ msgid "Mars"
 msgstr "Mars"
 
 #. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_res_partner_of_lead_medium_id
-#: model:ir.model.fields,field_description:of_crm.field_res_users_of_lead_medium_id
-msgid "Medium"
-msgstr "Canal"
-
-#. module: of_crm
 #. openerp-web
 #: code:addons/of_crm/static/src/xml/of_sales_team_dashboard.xml:25
 #, python-format
 msgid "Meetings"
 msgstr "Rendez-vous"
-
-#. module: of_crm
-#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
-msgid "Mes activités"
-msgstr "Mes activités"
 
 #. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead_next_activity_name
@@ -1862,6 +1843,11 @@ msgstr "Motif&amp;nbsp;:"
 #, python-format
 msgid "My Pipeline"
 msgstr "Mon Pipeline"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
+msgid "My activities"
+msgstr "Mes activités"
 
 #. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_followup_tag_name
@@ -1983,13 +1969,8 @@ msgstr "Novembre"
 
 #. module: of_crm
 #: model:ir.model,name:of_crm.model_of_crm_activity
-msgid "OF Activité de CRM"
-msgstr "OF Activité de CRM"
-
-#. module: of_crm
-#: model:ir.model,name:of_crm.model_of_sale_activity
-msgid "OF Sale Activity"
-msgstr "Activité de la commande"
+msgid "OF Activité de CRM/Ventes"
+msgstr "OF Activité de CRM/Ventes"
 
 #. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_activity_of_object
@@ -2044,7 +2025,9 @@ msgstr "Odoo helps you easily track all activities related to\n"
 "                documents, etc."
 
 #. module: of_crm
-#: code:addons/of_crm/models/crm_activity.py:124
+#: code:addons/of_crm/models/crm_activity.py:126
+#: code:addons/of_crm/models/of_crm_activity.py:199
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
 #, python-format
 msgid "Opportunity"
 msgstr "Opportunité"
@@ -2053,7 +2036,6 @@ msgstr "Opportunité"
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_opportunity_id
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_lead_id
 #: model:ir.model.fields,field_description:of_crm.field_of_planning_intervention_opportunity_id
-#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
 #: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
 msgid "Opportunité"
 msgstr "Opportunité"
@@ -2076,7 +2058,7 @@ msgstr "Options"
 
 #. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_of_add_attachment_activity_order_id
-#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_search
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
 msgid "Order"
 msgstr "Commande"
 
@@ -2094,11 +2076,19 @@ msgid "Order tracking labels"
 msgstr "Étiquettes du suivi commande"
 
 #. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_res_partner_of_lead_source_id
-#: model:ir.model.fields,field_description:of_crm.field_res_users_of_lead_source_id
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_origin
+msgid "Origin"
+msgstr "Origine"
+
+#. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_res_users_source_id
 msgid "Origine"
 msgstr "Origine"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
+msgid "Overdue activities"
+msgstr "Activités en retard"
 
 #. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_quotation_cart
@@ -2163,21 +2153,22 @@ msgid "Permet d'indiquer quelle est l'étape associée à la perte d'opportunit�
 msgstr "Permet d'indiquer quelle est l'étape associée à la perte d'opportunité pour des besoins d'analyse"
 
 #. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_from_opportunity_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_from_sale_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_sale_tree_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_tree_view
 #: model:ir.ui.view,arch_db:of_crm.of_crm_view_order_form
-#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_form
-#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_tree
 msgid "Plan"
 msgstr "Planifier"
 
 #. module: of_crm
-#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
 #: selection:of.crm.activity,state:0
 msgid "Planifiée"
 msgstr "Planifiée"
 
 #. module: of_crm
-#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_search
-#: selection:of.sale.activity,state:0
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
 msgid "Planned"
 msgstr "Planifié"
 
@@ -2212,7 +2203,7 @@ msgid "Prochaines activités"
 msgstr "Prochaines activités"
 
 #. module: of_crm
-#: code:addons/of_crm/models/crm_activity.py:107
+#: code:addons/of_crm/models/crm_activity.py:109
 #, python-format
 msgid "Project date"
 msgstr "Date projet"
@@ -2296,6 +2287,7 @@ msgstr "RDVs d'intervention"
 #: model:ir.ui.view,arch_db:of_crm.of_crm_activity_action_form_view
 #: model:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
 #: model:ir.ui.view,arch_db:of_crm.of_crm_activity_from_opportunity_form_view
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_from_sale_form_view
 msgid "Raison d'annulation"
 msgstr "Raison d'annulation"
 
@@ -2311,7 +2303,7 @@ msgid "Recherche de valeurs d'attributs de projets"
 msgstr "Recherche de valeurs d'attributs de projets"
 
 #. module: of_crm
-#: code:addons/of_crm/models/crm_activity.py:98
+#: code:addons/of_crm/models/crm_activity.py:100
 #, python-format
 msgid "Reference installation date"
 msgstr "Date de pose de référence"
@@ -2322,12 +2314,7 @@ msgid "Reference laying date"
 msgstr "Date de pose de référence"
 
 #. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_report
-msgid "Report"
-msgstr "Rapport"
-
-#. module: of_crm
-#: code:addons/of_crm/models/crm_activity.py:89
+#: code:addons/of_crm/models/crm_activity.py:91
 #, python-format
 msgid "Responsible"
 msgstr "Responsable"
@@ -2352,7 +2339,6 @@ msgid "Réaliser une activité"
 msgstr "Réaliser une activité"
 
 #. module: of_crm
-#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
 #: selection:of.crm.activity,state:0
 msgid "Réalisée"
 msgstr "Réalisée"
@@ -2388,11 +2374,17 @@ msgid "Réunions"
 msgstr "Réunions"
 
 #. module: of_crm
-#: code:addons/of_crm/models/crm_activity.py:125
-#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_order_id
+#: code:addons/of_crm/models/crm_activity.py:127
+#: code:addons/of_crm/models/of_crm_activity.py:200
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_order_id
 #, python-format
 msgid "Sale Order"
 msgstr "Bon de commande"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
+msgid "Sales"
+msgstr "Ventes"
 
 #. module: of_crm
 #: model:ir.model,name:of_crm.model_sale_order
@@ -2415,9 +2407,14 @@ msgid "Sales Team"
 msgstr "Équipe commerciale"
 
 #. module: of_crm
-#: code:addons/of_crm/models/crm_activity.py:86
+#: code:addons/of_crm/models/crm_activity.py:88
 #, python-format
 msgid "Salesman"
+msgstr "Vendeur"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
+msgid "Salesperson"
 msgstr "Vendeur"
 
 #. module: of_crm
@@ -2426,7 +2423,7 @@ msgid "Septembre"
 msgstr "Septembre"
 
 #. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_sequence
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_sequence
 msgid "Sequence"
 msgstr "Séquence"
 
@@ -2452,7 +2449,7 @@ msgid "Source"
 msgstr "Origine"
 
 #. module: of_crm
-#: code:addons/of_crm/models/crm_activity.py:90
+#: code:addons/of_crm/models/crm_activity.py:92
 #, python-format
 msgid "Specific user"
 msgstr "Utilisateur spécifique"
@@ -2461,12 +2458,6 @@ msgstr "Utilisateur spécifique"
 #: model:ir.model,name:of_crm.model_crm_stage
 msgid "Stage of case"
 msgstr "Etape de cas"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_state
-#: model:ir.ui.view,arch_db:of_crm.of_sale_activity_view_search
-msgid "State"
-msgstr "État"
 
 #. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_sale_order_of_activities_state
@@ -2482,11 +2473,6 @@ msgstr "Suivi bis"
 #: model:ir.ui.view,arch_db:of_crm.of_fiche_rdv_report_template
 msgid "Sujet"
 msgstr "Sujet"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_summary
-msgid "Summary"
-msgstr "Résumé"
 
 #. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_attr_select_sequence
@@ -2527,7 +2513,7 @@ msgid "Taux de transformation (%)"
 msgstr "Taux de transformation (%)"
 
 #. module: of_crm
-#: code:addons/of_crm/models/crm_activity.py:100
+#: code:addons/of_crm/models/crm_activity.py:102
 #, python-format
 msgid "Technical visit date"
 msgstr "Date visite technique"
@@ -2724,11 +2710,6 @@ msgid "Type d'action"
 msgstr "Type d'action"
 
 #. module: of_crm
-#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
-msgid "Type d'activité"
-msgstr "Type d'activité"
-
-#. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_phone
 msgid "Téléphone"
 msgstr "Téléphone"
@@ -2748,7 +2729,7 @@ msgid "Unsupported search operator"
 msgstr "Opérateur de recherche non pris en charge"
 
 #. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_sale_activity_uploaded_attachment_id
+#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_uploaded_attachment_id
 msgid "Uploaded attachment"
 msgstr "Pièce jointe téléchargée"
 
@@ -2806,7 +2787,6 @@ msgstr "Valider"
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_vendor_id
 #: model:ir.model.fields,field_description:of_crm.field_of_invoiced_revenue_analysis_vendor_id
 #: model:ir.model.fields,field_description:of_crm.field_of_sale_objective_line_employee_id
-#: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
 msgid "Vendeur"
 msgstr "Vendeur"
 
@@ -2839,7 +2819,7 @@ msgid "Won in Opportunities"
 msgstr "Nombre d'opportunités gagnées"
 
 #. module: of_crm
-#: code:addons/of_crm/models/sale_order.py:352
+#: code:addons/of_crm/models/sale_order.py:361
 #, python-format
 msgid "You cannot confirm the Order until the mandatory activities are completed.\n"
 "Please check the following activities :\n"
@@ -2944,3 +2924,9 @@ msgstr "État"
 #: model:ir.model.fields,field_description:of_crm.field_account_invoice_report_of_partner_tags
 msgid "Étiquettes du partenaire"
 msgstr "Étiquettes du partenaire"
+
+#. module: of_crm
+#: code:addons/of_crm/models/of_crm_activity.py:248
+#, python-format
+msgid "Activity status change %s : %s -> %s"
+msgstr "Changement d'état de l'activité %s : %s -> %s"
