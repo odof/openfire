@@ -199,7 +199,9 @@ class SaleQuoteLine(models.Model):
             self.price_unit = self.product_id.lst_price
             self.product_uom_id = self.product_id.uom_id.id
             if self.env.user.has_group('sale.group_sale_layout'):
-                if self.product_id.categ_id.of_layout_id:
+                if self.product_id.of_layout_category_id:
+                    self.layout_category_id = self.product_id.of_layout_category_id
+                elif self.product_id.categ_id.of_layout_id:
                     self.layout_category_id = self.product_id.categ_id.of_layout_id
             domain = {'product_uom_id': [('category_id', '=', self.product_id.uom_id.category_id.id)]}
         result['domain'] = domain
