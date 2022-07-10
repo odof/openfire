@@ -604,7 +604,6 @@ class OfSaleOrderLayoutCategory(models.Model):
             self.mapped('order_id').compute_of_layout_category_ids()
         return res
 
-
     @api.multi
     def action_wizard_order_lines(self):
         wizard_form = self.env.ref('of_sale_quote_template.view_of_sale_order_layout_category_form')
@@ -874,18 +873,15 @@ class SaleOrder(models.Model):
         if not self.of_template_id:
             return
         template = self.of_template_id.with_context(lang=self.partner_id.lang)
-        OrderLine = self.env['sale.order.line']
-        OFSaleActivity = self.env['of.sale.activity']
+        order_line_obj = self.env['sale.order.line']
+        of_crm_activity_obj = self.env['of.crm.activity']
 
         regime = self.env['ir.values'].get_default('sale.config.settings', 'of_quote_template')
-        if regime == 'add':
-            order_lines = self.order_line
-        else:
-            order_lines = OrderLine
+        order_lines = self.order_line if regime == 'add' else order_line_obj
         inactif = False  # Permet de savoir si il y a un article inactif
-        Product = self.env['product.product']
-        product_warn_ids = Product
-        product_block_ids = Product
+        product_obj = self.env['product.product']
+        product_warn_ids = product_obj
+        product_block_ids = product_obj
         for line in template.quote_line:
             discount = 0
             if not line.of_active:
@@ -907,11 +903,11 @@ class SaleOrder(models.Model):
                         product_warn_ids |= line.product_id
                     data = self._get_data_from_template(line, price, discount)
                     if self.pricelist_id:
-                        data.update(OrderLine._get_purchase_price(
+                        data.update(order_line_obj._get_purchase_price(
                             self.pricelist_id, line.product_id, line.product_uom_id, fields.Date.context_today(self)))
-                        data.update(OrderLine._get_of_seller_price(
+                        data.update(order_line_obj._get_of_seller_price(
                             self.pricelist_id, line.product_id, line.product_uom_id, fields.Date.context_today(self)))
-                    new_line = OrderLine._new_line_for_template(data)
+                    new_line = order_line_obj._new_line_for_template(data)
                     if self.env.user.has_group('sale.group_sale_layout'):
                         if not new_line.layout_category_id and new_line.product_id.categ_id.of_layout_id:
                             new_line.layout_category_id = new_line.product_id.categ_id.of_layout_id
@@ -922,11 +918,11 @@ class SaleOrder(models.Model):
 
         # add activities from the template
         if template.of_sale_quote_tmpl_activity_ids:
-            sale_activities = OFSaleActivity
+            crm_activities = of_crm_activity_obj
             for activity in template.of_sale_quote_tmpl_activity_ids:
-                sale_activity = OFSaleActivity.new(activity._get_sale_activity_values(self))
-                sale_activities |= sale_activity
-            self.of_sale_activity_ids = sale_activities
+                crm_activity = of_crm_activity_obj.new(activity._get_sale_activity_values(self))
+                crm_activities |= crm_activity
+            self.of_crm_activity_ids = crm_activities
 
         if template.note:
             self.note = template.note

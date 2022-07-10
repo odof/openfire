@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+    <record id="group_of_followup_project_not_migrated" model="res.groups">
+        <field name="name">Groupe spécial / Suivi de projet non migré</field>
+        <field name="comment">Groupe spécial OpenFire : retiré à tout le monde après la migration du suivi de projet.
+            Permet de cacher certains éléments du suivi de projet</field>
+    </record>
+
     <data noupdate="1">
 
         <record model="ir.rule" id="of_followup_project_comp_rule">

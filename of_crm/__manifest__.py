@@ -2,10 +2,11 @@
 
 {
     'name': "OpenFire / CRM",
-    'version': "10.0.1.0.0",
+    'version': "10.0.1.1.0",
     'author': "OpenFire",
     'website': "http://openfire.fr",
     'category': 'Customer Relationship Management',
+    'license': "AGPL-3",
     'description': u"""
 Module OpenFire pour le CRM Odoo
 ================================
@@ -64,7 +65,6 @@ Workflow CRM
         'reports/of_invoiced_revenue_analysis.xml',
         'reports/crm_opportunity_report_views.xml',
         'views/crm_activity_views.xml',
-        'views/of_sale_activity_views.xml',
         'views/crm_lead_views.xml',
         'views/sale_order_views.xml',
         'views/partner_views.xml',

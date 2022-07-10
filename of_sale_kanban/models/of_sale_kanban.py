@@ -62,13 +62,13 @@ class SaleOrder(models.Model):
             activities = []
             for activity in overdue_activities:
                 if len(activities) < 3:
-                    activities.append(activity.activity_id.of_short_name)
+                    activities.append(activity.type_id.of_short_name)
                 else:
                     activities.append("...")
                     break
             rec.of_overdue_activities = json.dumps(activities) if activities else False
             rec.of_nbr_overdue_activities = "(%s/%s)" % (
-                len(overdue_activities), len(rec.of_sale_activity_ids))
+                len(overdue_activities), len(rec.of_crm_activity_ids))
 
     @api.model
     def _read_group_kanban_step_ids(self, stages, domain, order):

@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <menuitem id="of_followup_project_menu" name="Suivi" parent="sales_team.menu_sales" sequence="17" action="of_followup_project_action"/>
+    <menuitem id="of_followup_project_menu" name="Suivi" parent="sales_team.menu_sales" sequence="17"
+              action="of_followup_project_action" groups="of_followup.group_of_followup_project_not_migrated"/>
 
-    <menuitem id="of_followup_project_config_menu" name="Suivi" parent="sales_team.menu_sale_config" sequence="7"/>
-    <menuitem id="of_followup_project_config_template" name="Modèles de suivi" parent="of_followup_project_config_menu" sequence="10" action="of_followup_project_template_action"/>
-    <menuitem id="of_followup_project_config_task_type" name="Types de tâches" parent="of_followup_project_config_menu" sequence="20" action="of_followup_task_type_action"/>
-    <menuitem id="of_followup_project_config_tag" name="Étiquettes" parent="of_followup_project_config_menu" sequence="30" action="of_followup_project_tag_action"/>
-    <menuitem id="of_followup_project_config_stage" name="Étapes du suivi" parent="of_followup_project_config_menu" sequence="40" action="of_followup_project_stage_action"/>
+    <menuitem id="of_followup_project_config_menu" name="Suivi" parent="sales_team.menu_sale_config" sequence="7"
+              groups="of_followup.group_of_followup_project_not_migrated"/>
+    <menuitem id="of_followup_project_config_template" name="Modèles de suivi" parent="of_followup_project_config_menu"
+              sequence="10" action="of_followup_project_template_action" groups="of_followup.group_of_followup_project_not_migrated"/>
+    <menuitem id="of_followup_project_config_task_type" name="Types de tâches" parent="of_followup_project_config_menu"
+              sequence="20" action="of_followup_task_type_action" groups="of_followup.group_of_followup_project_not_migrated"/>
+    <menuitem id="of_followup_project_config_tag" name="Étiquettes" parent="of_followup_project_config_menu"
+              sequence="30" action="of_followup_project_tag_action" groups="of_followup.group_of_followup_project_not_migrated"/>
+    <menuitem id="of_followup_project_config_stage" name="Étapes du suivi" parent="of_followup_project_config_menu"
+              sequence="40" action="of_followup_project_stage_action" groups="of_followup.group_of_followup_project_not_migrated"/>
 
 </odoo>

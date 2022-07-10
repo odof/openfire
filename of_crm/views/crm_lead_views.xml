@@ -8,11 +8,16 @@
         <field name="model">of.crm.activity</field>
         <field name="arch" type="xml">
             <form>
+                <field name="load_attachment" invisible="1"/>
+                <field name="uploaded_attachment_id" invisible="1"/>
                 <header>
-                    <button name="%(of_crm.of_crm_activity_action_realize_action)d" string="Réaliser"
-                        type="action" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'planned')]}"/>
-                    <button name="%(of_crm.of_crm_activity_action_cancel_action)d" string="Annuler"
-                        type="action" class="btn-link" attrs="{'invisible': [('state', '!=', 'planned')]}"/>
+                    <button name="action_add_attachment" icon="fa-upload" type="object" string="Add attachments" 
+                        attrs="{'invisible': ['|', ('load_attachment', '=', False), ('uploaded_attachment_id', '!=', False)]}"/>
+                    <button string="Plan" name="action_plan" type="object" states="cancelled,done"/>
+                    <button name="action_complete" string="Réaliser" type="object" class="oe_highlight"
+                            attrs="{'invisible': [('state', '!=', 'planned')]}"/>
+                    <button name="action_cancel" string="Annuler" type="object" class="btn-link"
+                            attrs="{'invisible': [('state', '!=', 'planned')]}"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
@@ -24,27 +29,34 @@
                     </div>
                     <group>
                         <group>
+                            <field name="origin" invisible="1"/>
+                            <field name="order_id" attrs="{'invisible':[('origin', '!=', 'sale_order')], 'required':[('origin', '=', 'sale_order')]}" />
+                            <field name="opportunity_id" attrs="{'invisible':[('origin', '!=', 'opportunity')], 'required':[('origin', '=', 'opportunity')]}"/>
                             <field name="type_id"/>
                             <field name="title"/>
-                            <field name="opportunity_id"/>
-                            <field name="partner_id" context="{'show_address': 1'}" options="{'always_reload': True}"/>
-                            <field name="phone" widget="phone"/>
-                            <field name="mobile" widget="phone"/>
-                            <field name="email" string="Courriel" widget="email"/>
+                            <field name="partner_id" context="{'show_address': 1'}" options="{'always_reload': True}"
+                                   attrs="{'invisible':[('origin', '!=', 'opportunity')]}"/>
+                            <field name="phone" widget="phone" attrs="{'invisible':[('origin', '!=', 'opportunity')]}"/>
+                            <field name="mobile" widget="phone" attrs="{'invisible':[('origin', '!=', 'opportunity')]}"/>
+                            <field name="email" string="Courriel" widget="email" attrs="{'invisible':[('origin', '!=', 'opportunity')]}"/>
                         </group>
                         <group>
-                            <field name="date"/>
-                            <field name="user_id"/>
-                            <field name="vendor_id"/>
                             <field name="is_late" invisible="1"/>
+                            <field name="date" attrs="{'required':[('origin', '=', 'opportunity')]}"/>
+                            <field name="deadline_date"/>
+                            <field name="done_date" attrs="{'invisible':[('state', '!=', 'done')]}"/>
+                            <field name="user_id"/>
+                            <label for="vendor_id" string="Commercial" attrs="{'invisible':[('origin', '!=', 'opportunity')]}"/>
+                            <label for="vendor_id" string="Assigné à" attrs="{'invisible':[('origin', '!=', 'sale_order')]}"/>
+                            <field name="vendor_id" nolabel="1" attrs="{'required':[('origin', '=', 'opportunity')]}"/>
                         </group>
                         <group string="Description" colspan="4">
                             <field name="description" nolabel="1"/>
                         </group>
-                        <group string="Compte-rendu" colspan="4" attrs="{'invisible': [('state', '!=', 'done')]}">
+                        <group string="Compte-rendu" colspan="4">
                             <field name="report" nolabel="1"/>
                         </group>
-                        <group string="Raison d'annulation" colspan="4" attrs="{'invisible': [('state', '!=', 'canceled')]}">
+                        <group string="Raison d'annulation" colspan="4">
                             <field name="cancel_reason" nolabel="1"/>
                         </group>
                     </group>
@@ -53,16 +65,23 @@
         </field>
     </record>
 
+    <!-- This form view is used for the O2M in the Lead -->
     <record id="of_crm_activity_from_opportunity_form_view" model="ir.ui.view">
         <field name="name">of.crm.activity.form.view</field>
         <field name="model">of.crm.activity</field>
+        <field name="priority" eval="20"/>
         <field name="arch" type="xml">
             <form>
+                <field name="load_attachment" invisible="1"/>
+                <field name="uploaded_attachment_id" invisible="1"/>
                 <header>
-                    <button name="%(of_crm.of_crm_activity_action_realize_action)d" string="Réaliser"
-                        type="action" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'planned')]}"/>
-                    <button name="%(of_crm.of_crm_activity_action_cancel_action)d" string="Annuler"
-                        type="action" class="btn-link" attrs="{'invisible': [('state', '!=', 'planned')]}"/>
+                    <button name="action_add_attachment" icon="fa-upload" type="object" string="Add attachments" 
+                        attrs="{'invisible': ['|', ('load_attachment', '=', False), ('uploaded_attachment_id', '!=', False)]}"/>
+                    <button string="Plan" name="action_plan" type="object" states="cancelled,done"/>
+                    <button name="action_complete" string="Réaliser" type="object" class="oe_highlight"
+                            attrs="{'invisible': [('state', '!=', 'planned')]}"/>
+                    <button name="action_cancel" string="Annuler" type="object" class="btn-link"
+                            attrs="{'invisible': [('state', '!=', 'planned')]}"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
@@ -76,21 +95,73 @@
                         <field name="opportunity_id" invisible="1"/>
                         <field name="is_late" invisible="1"/>
                         <group>
-                            <field name="type_id"/>
+                            <field name="type_id" domain="['|', ('of_object', '=', 'opportunity'), ('of_object', '=', False)]"/>
                             <field name="title"/>
                         </group>
                         <group>
-                            <field name="date"/>
+                            <field name="origin" invisible="1"/>
+                            <field name="date" required="1"/>
                             <field name="user_id"/>
-                            <field name="vendor_id"/>
+                            <field name="vendor_id" required="1"/>
                         </group>
                         <group string="Description" colspan="4">
                             <field name="description" nolabel="1"/>
                         </group>
-                        <group string="Compte-rendu" colspan="4" attrs="{'invisible': [('state', '!=', 'done')]}">
+                        <group string="Compte-rendu" colspan="4">
                             <field name="report" nolabel="1"/>
                         </group>
-                        <group string="Raison d'annulation" colspan="4" attrs="{'invisible': [('state', '!=', 'canceled')]}">
+                        <group string="Raison d'annulation" colspan="4">
+                            <field name="cancel_reason" nolabel="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- This form view is used for the O2M in the Sale -->
+    <record id="of_crm_activity_from_sale_form_view" model="ir.ui.view">
+        <field name="name">of.crm.activity.sale.form.view</field>
+        <field name="model">of.crm.activity</field>
+        <field name="priority" eval="20"/>
+        <field name="arch" type="xml">
+            <form>
+                <field name="load_attachment" invisible="1"/>
+                <field name="uploaded_attachment_id" invisible="1"/>
+                <header>
+                    <button name="action_add_attachment" icon="fa-upload" type="object" string="Add attachments"  attrs="{'invisible': ['|', ('load_attachment', '=', False), ('uploaded_attachment_id', '!=', False)]}"/>
+                    <button name="action_plan" string="Plan" type="object" states="cancelled,done"/>
+                    <button name="action_complete" string="Complete" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'planned')]}"/>
+                    <button name="action_cancel" string="Annuler" type="object" class="btn-link" attrs="{'invisible': [('state', '!=', 'planned')]}"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"
+                                   options="{&quot;terminology&quot;: &quot;archive&quot;}"/>
+                        </button>
+                    </div>
+                    <group>
+                        <field name="order_id" invisible="1"/>
+                        <field name="is_late" invisible="1"/>
+                        <group>
+                            <field name="type_id" domain="['|', ('of_object', '=', 'sale_order'), ('of_object', '=', False)]"/>
+                            <field name="title"/>
+                        </group>
+                        <group>
+                            <field name="origin" invisible="1"/>
+                            <field name="deadline_date"/>
+                            <field name="user_id"/>
+                            <field name="vendor_id" string="Assigned to"/>
+                        </group>
+                        <group string="Description" colspan="4">
+                            <field name="description" nolabel="1"/>
+                        </group>
+                        <group string="Compte-rendu" colspan="4">
+                            <field name="report" nolabel="1"/>
+                        </group>
+                        <group string="Raison d'annulation" colspan="4">
                             <field name="cancel_reason" nolabel="1"/>
                         </group>
                     </group>
@@ -105,6 +176,8 @@
         <field name="arch" type="xml">
             <tree decoration-muted="state=='canceled'" decoration-danger="is_late">
                 <field name="is_late" invisible="1"/>
+                <field name="load_attachment" invisible="1"/>
+                <field name="uploaded_attachment_id" invisible="1"/>
                 <field name="partner_id"/>
                 <field name="opportunity_id"/>
                 <field name="title"/>
@@ -113,10 +186,45 @@
                 <field name="user_id"/>
                 <field name="vendor_id"/>
                 <field name="state"/>
-                <button name="%(of_crm.of_crm_activity_action_realize_action)d" type="action"
-                        string="Réaliser" icon="fa-check" attrs="{'invisible': [('state', '!=', 'planned')]}"/>
-                <button name="%(of_crm.of_crm_activity_action_cancel_action)d" type="action"
-                        string="Annuler" icon="fa-close" attrs="{'invisible': [('state', '!=', 'planned')]}"/>
+                <button name="action_add_attachment" icon="fa-upload" type="object" string="Add attachments" 
+                    attrs="{'invisible': ['|', ('load_attachment', '=', False), ('uploaded_attachment_id', '!=', False)]}"/>
+                <button name="action_plan" icon="fa-undo" type="object" string="Plan" 
+                    attrs="{'invisible': [('state', '=', 'planned')]}"/>
+                <button name="action_complete" type="object" string="Réaliser" icon="fa-check"
+                        attrs="{'invisible': [('state', '!=', 'planned')]}"/>
+                <button name="action_cancel" type="object" string="Annuler" icon="fa-close"
+                        attrs="{'invisible': [('state', '!=', 'planned')]}"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Tree view for the CRM activities of Sales Order -->
+    <record id="of_crm_activity_sale_tree_view" model="ir.ui.view">
+        <field name="name">of.crm.activity.sale.tree.view</field>
+        <field name="model">of.crm.activity</field>
+        <field name="arch" type="xml">
+            <tree decoration-muted="state=='canceled'" decoration-danger="is_late">
+                <field name="is_late" invisible="1"/>
+                <field name="load_attachment" invisible="1"/>
+                <field name="uploaded_attachment_id" invisible="1"/>
+                <field name="order_id"/>
+                <field name="title"/>
+                <field name="type_id"/>
+                <field name="date"/>
+                <field name="deadline_date"/>
+                <field name="done_date"/>
+                <field name="user_id"/>
+                <field name="vendor_id" string="Assigned to"/>
+                <field name="report"/>
+                <field name="state"/>
+                <button name="action_add_attachment" icon="fa-upload" type="object" string="Add attachments" 
+                    attrs="{'invisible': ['|', ('load_attachment', '=', False), ('uploaded_attachment_id', '!=', False)]}"/>
+                <button name="action_plan" icon="fa-undo" type="object" string="Plan" 
+                    attrs="{'invisible': [('state', '=', 'planned')]}"/>
+                <button name="action_complete" type="object" string="Complete" icon="fa-check"
+                        attrs="{'invisible': [('state', '!=', 'planned')]}"/>
+                <button name="action_cancel" type="object" string="Cancel" icon="fa-close"
+                        attrs="{'invisible': [('state', '!=', 'planned')]}"/>
             </tree>
         </field>
     </record>
@@ -128,33 +236,37 @@
             <search>
                 <field name="partner_id"/>
                 <field name="opportunity_id"/>
+                <field name="order_id"/>
                 <field name="title"/>
                 <field name="type_id"/>
                 <field name="date"/>
                 <field name="user_id"/>
                 <field name="vendor_id"/>
                 <separator/>
-                <filter string="Planifiée" name="planned" domain="[('state', '=', 'planned')]"/>
-                <filter string="Réalisée" name="done" domain="[('state', '=', 'done')]"/>
-                <filter string="Annulée" name="canceled" domain="[('state', '=', 'canceled')]"/>
+                <filter string="Planned" name="planned" domain="[('state', '=', 'planned')]"/>
+                <filter string="Done" name="done" domain="[('state', '=', 'done')]"/>
+                <filter string="Canceled" name="canceled" domain="[('active', '=', False), ('state', '=', 'canceled')]"/>
                 <separator/>
                 <filter string="Archived" name="archived" domain="[('active', '=', False)]"/>
                 <separator/>
-                <filter string="Mes activités" name="my_activities"
-                        domain="[('vendor_id', '=', uid)]"/>
+                <filter string="My activities" name="my_activities" domain="[('vendor_id', '=', uid)]"/>
                 <separator/>
-                <filter string="Activités du jour" name="today"
+                <filter string="CRM" name="crm_activities" domain="[('origin', '=', 'opportunity')]"/>
+                <filter string="Sales" name="sale_activities" domain="[('origin', '=', 'sale_order')]"/>
+                <separator/>
+                <filter string="Activities of the day" name="today"
                         domain="[('date', '&gt;=', current_date),
                                  ('date', '&lt;', (context_today() + datetime.timedelta(days=1)).strftime('%Y-%m-%d'))]"/>
-                <filter string="Activités de la semaine" name="this_week"
+                <filter string="Activities of the week" name="this_week"
                         domain="[('date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
                                  ('date', '&lt;', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
-                <filter string="Activités en retard" name="overdue" domain="[('is_late', '=', True)]"/>
+                <filter string="Overdue activities" name="overdue" domain="[('is_late', '=', True)]"/>
                 <group expand="0" string="Group By" colspan="16">
-                    <filter string="Opportunité" context="{'group_by':'opportunity_id'}"/>
-                    <filter string="Type d'activité" context="{'group_by':'type_id'}"/>
-                    <filter string="Auteur" context="{'group_by':'user_id'}"/>
-                    <filter string="Vendeur" context="{'group_by':'vendor_id'}"/>
+                    <filter string="Opportunity" context="{'group_by':'opportunity_id'}"/>
+                    <filter string="Order" domain="[]" context="{'group_by':'order_id'}"/>
+                    <filter string="Activity type" context="{'group_by':'type_id'}"/>
+                    <filter string="Author" context="{'group_by':'user_id'}"/>
+                    <filter string="Assigned to" domain="[]" context="{'group_by':'vendor_id'}"/>
                 </group>
             </search>
         </field>
@@ -182,7 +294,17 @@
         <field name="view_mode">tree,form,calendar</field>
         <field name="view_id" ref="of_crm_activity_tree_view"/>
         <field name="search_view_id" ref="of_crm_activity_search_view"/>
-        <field name="context">{'form_view_ref':'of_crm.of_crm_activity_form_view'}</field>
+        <field name="context">{'default_origin': 'opportunity', 'search_default_crm_activities': 1, 'active_test': False}</field>
+    </record>
+
+    <record id="of_crm_activity_sale_action" model="ir.actions.act_window">
+        <field name="name">Activités</field>
+        <field name="res_model">of.crm.activity</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form,calendar</field>
+        <field name="view_id" ref="of_crm_activity_sale_tree_view"/>
+        <field name="search_view_id" ref="of_crm_activity_search_view"/>
+        <field name="context">{'default_origin': 'sale_order', 'search_default_sale_activities': 1, 'active_test': False}</field>
     </record>
 
     <record id="of_crm_activity_schedule_action" model="ir.actions.act_window">
@@ -190,6 +312,7 @@
         <field name="res_model">of.crm.activity</field>
         <field name="view_mode">form</field>
         <field name="view_id" ref="of_crm_activity_from_opportunity_form_view"/>
+        <field name="context">{'default_origin': 'opportunity'}</field>
     </record>
 
     <record id="of_crm_next_activities_action" model="ir.actions.act_window">
@@ -200,9 +323,10 @@
         <field name="search_view_id" ref="of_crm_activity_search_view"/>
         <field name="context">{
                 'form_view_ref':'of_crm.of_crm_activity_form_view',
+                'default_origin': 'opportunity',
                 'default_vendor_id': uid,
                 'search_default_my_activities': 1,
-                'search_default_planned': 1
+                'search_default_planned': 1,
             }
         </field>
     </record>
@@ -529,7 +653,7 @@
                 <!-- Bouton Nouvelle activité -->
                 <xpath expr="//button[1]" position="after">
                     <button string="Nouvelle activité" name="%(of_crm_activity_schedule_action)d" type="action" class="oe_highlight"
-                        context="{'default_opportunity_id': active_id}"/>
+                        context="{'default_opportunity_id': active_id, 'default_origin': 'opportunity'}"/>
                 </xpath>
                 <xpath expr="//form//header//button[@type='action'][@class='btn-link'][1]" position="replace"/>
                 <xpath expr="//form//header//button[@name='action_set_won']" position="attributes">
@@ -682,20 +806,27 @@
                             <page string="Activités">
                                 <field name="of_activity_ids"
                                        context="{'default_opportunity_id': active_id,
-                                                 'form_view_ref':'of_crm.of_crm_activity_from_opportunity_form_view'}">
+                                       'default_origin': 'opportunity',
+                                       'close_and_reload': True,
+                                       'form_view_ref':'of_crm.of_crm_activity_from_opportunity_form_view'}">
                                     <tree decoration-muted="state=='canceled' or not active" decoration-danger="is_late">
+                                        <field name="origin" invisible="1"/>
                                         <field name="is_late" invisible="1"/>
                                         <field name="active" invisible="1"/>
+                                        <field name="load_attachment" invisible="1"/>
+                                        <field name="uploaded_attachment_id" invisible="1"/>
                                         <field name="title"/>
                                         <field name="type_id"/>
                                         <field name="date"/>
                                         <field name="user_id"/>
                                         <field name="vendor_id"/>
                                         <field name="state"/>
-                                        <button name="%(of_crm.of_crm_activity_action_realize_action)d" type="action"
-                                                string="Réaliser" icon="fa-check" attrs="{'invisible': [('state', '!=', 'planned')]}"/>
-                                        <button name="%(of_crm.of_crm_activity_action_cancel_action)d" type="action"
-                                                string="Annuler" icon="fa-close" attrs="{'invisible': [('state', '!=', 'planned')]}"/>
+                                        <button name="action_add_attachment" icon="fa-upload" type="object" string="Add attachments" 
+                                                attrs="{'invisible': ['|', ('load_attachment', '=', False), ('uploaded_attachment_id', '!=', False)]}"/>
+                                        <button name="action_complete" type="object" string="Réaliser" icon="fa-check"
+                                                attrs="{'invisible': [('state', '!=', 'planned')]}"/>
+                                        <button name="action_cancel" type="object" string="Annuler" icon="fa-close"
+                                                attrs="{'invisible': [('state', '!=', 'planned')]}"/>
                                     </tree>
                                 </field>
                             </page>
@@ -1034,8 +1165,9 @@
             <field name="name">Activity types</field>
         </record>
 
-        <menuitem id="of_crm_activity_menu" name="Activités" parent="of_crm.of_crm_crm_menu"
-                  sequence="30" action="of_crm_activity_action"/>
+        <menuitem id="of_crm_activity_menu" name="Activities" parent="of_crm.of_crm_crm_menu" sequence="30" action="of_crm_activity_action"/>
+        <menuitem id="of_crm_activity_sale_menu" name="Activities" action="of_crm_activity_sale_action" parent="sales_team.menu_sales" sequence="15"/>
+
 
 <!-- #######################################################################################
                                       CALENDAR EVENT
