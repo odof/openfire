@@ -412,6 +412,23 @@
             </field>
         </record>
 
+        <record id="of_sale_order_manager2_form_view" model="ir.ui.view">
+            <field name="name">of.sale.order.manager2.form.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="of_sale.of_sale_obsolete_sale_order_form_view"/>
+            <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+            <field name="arch" type="xml">
+                <!-- Permettre la modification direct du prix pour les remises interdites -->
+                <xpath expr="//field[@name='price_unit']" position="attributes">
+                    <attribute name="attrs"/>
+                </xpath>
+                <xpath expr="//field[@name='of_price_unit_display']" position="attributes">
+                    <attribute name="attrs"/>
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+
         <record id="of_sale_echeance_form" model="ir.ui.view">
             <field name="name">of.sale.echeance.form</field>
             <field name="model">of.sale.echeance</field>

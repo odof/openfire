@@ -75,4 +75,8 @@
         </field>
     </record>
 
+    <record id="of_sale.of_sale_order_manager2_form_view" model="ir.ui.view">
+        <field name="groups_id" eval="[(6, 0, [ref('of_access_control.of_group_sale_responsible')])]"/>
+    </record>
+
 </odoo>

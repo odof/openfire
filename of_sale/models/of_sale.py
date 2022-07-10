@@ -799,7 +799,7 @@ class SaleOrderLine(models.Model):
         'res.partner.category', compute=lambda *a, **k: {}, search='_search_of_gb_partner_tag_id',
         string="Étiquette client", of_custom_groupby=True
     )
-    of_price_unit_display = fields.Float(related='product_id.list_price', string=u"Prix unitaire", readonly=True)
+    of_price_unit_display = fields.Float(related='price_unit', string=u"Prix unitaire", readonly=True)
     of_product_forbidden_discount = fields.Boolean(string=u"Remise interdite pour cet article")
 
     of_price_unit_ht = fields.Float(
