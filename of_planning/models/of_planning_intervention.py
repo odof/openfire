@@ -2265,9 +2265,9 @@ class ResPartner(models.Model):
     _inherit = "res.partner"
 
     intervention_partner_ids = fields.One2many(
-        'of.planning.intervention', string="Interventions client", compute="_compute_interventions")
+        comodel_name='of.planning.intervention', string="Interventions client", inverse_name='partner_id')
     intervention_address_ids = fields.One2many(
-        'of.planning.intervention', string="Interventions adresse", compute="_compute_interventions")
+        comodel_name='of.planning.intervention', string="Interventions adresse", inverse_name='address_id')
     intervention_ids = fields.Many2many(
         'of.planning.intervention', string=u"Interventions", compute="_compute_interventions")
     intervention_count = fields.Integer(string="Nb d'interventions", compute='_compute_interventions')
@@ -2276,8 +2276,6 @@ class ResPartner(models.Model):
     def _compute_interventions(self):
         interv_obj = self.sudo().env['of.planning.intervention']
         for partner in self:
-            partner.intervention_partner_ids = interv_obj.search([('partner_id', '=', partner.id)])
-            partner.intervention_address_ids = interv_obj.search([('address_id', '=', partner.id)])
             intervention_ids = interv_obj.search(
                 ['|',
                     ('partner_id', 'child_of', partner.id),
