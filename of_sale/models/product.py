@@ -60,6 +60,8 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     of_product_image_ids = fields.One2many('of.product.image', 'product_tmpl_id', string=u'Images')
+    of_layout_category_id = fields.Many2one(
+        comodel_name='sale.layout_category', string=u"Section", groups='sale.group_sale_layout')
 
     @api.multi
     @api.depends('product_variant_ids.sales_count')

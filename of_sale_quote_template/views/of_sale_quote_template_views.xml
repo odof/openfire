@@ -443,6 +443,17 @@
         </field>
     </record>
 
+    <record id="of_sale_product_form_view" model="ir.ui.view">
+        <field name="name">of.sale.quote.template.product.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="of_sale.of_sale_product_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_layout_category_id']" position="attributes">
+                <attribute name="groups">!of_sale_quote_template.group_of_advanced_sale_layout_category</attribute>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Sale config wizard -->
     <record id="of_sale_quote_template_view_sale_config_settings" model="ir.ui.view">
         <field name="name">of sale settings</field>
