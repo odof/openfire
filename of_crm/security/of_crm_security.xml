@@ -27,16 +27,6 @@
 
     <function name="_init_crm_funnel_conversion_group" model="sale.config.settings"/>
 
-    <!-- Fonction qui permet de passer 2 ir.rule à noupdate = False pour permettre leur suppression
-         A SUPPRIMER APRES APPLICATION -->
-    <function name="write" model="ir.model.data">
-        <function name="search" model="ir.model.data">
-            <value eval="[('module', '=', 'of_crm'), ('name', 'in', ['of_sale_activity_salesman_rule', 'of_sale_activity_manager_rule'])]"/>
-        </function>
-        <!--Set noupdate to False-->
-        <value eval="{'noupdate': False}" />
-    </function>
-
     <data noupdate="1">
 
         <record id="of_crm_crm_lead_comp_rule" model="ir.rule">

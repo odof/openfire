@@ -22,11 +22,34 @@ class OFFollowupProject(models.Model):
     _description = "Suivi des projets"
     _order = "priority desc, reference_laying_date, id desc"
 
-    def _get_order_values(self, project, mapping_project_stages, mapping_project_tags, default_of_kanban_step_id):
+    @api.model
+    def _init_group_of_followup_project_not_migrated(self):
+        # On utilise une fonction déclenchée par le XML plutôt qu'un auto_init, car au moment de l'auto_init le groupe
+        # n'existe pas encore.
+        # Si la migration n'a pas été faite, ajouter le groupe group_of_followup_project_not_migrated à
+        # tous les utilisateurs
+        if not self.env['ir.config_parameter'].sudo().get_param('of.followup.migration', False):
+            group_not_migrated = self.env.ref('of_followup.group_of_followup_project_not_migrated')
+            group_user = self.env.ref('base.group_user')
+            if group_not_migrated not in group_user.implied_ids:
+                group_user.write({'implied_ids': [(4, group_not_migrated.id)]})
+
+    def _get_order_values(
+            self, project, mapping_project_tags, default_of_kanban_step_id, done_of_kanban_step_id,
+            in_progress_of_kanban_step_id):
         """Helper that return a dict of values to write on a Sale depending of the Project followup"""
-        otag_ids = False
+        otag_ids = []
         if project.tag_ids:
-            otag_ids = [(6, 0, [mapping_project_tags[pt.id] for pt in project.tag_ids])]
+            otag_ids = [mapping_project_tags[pt.id] for pt in project.tag_ids]
+
+        kanban_step_id = in_progress_of_kanban_step_id
+        if project.state in ('done', 'cancel'):
+            kanban_step_id = done_of_kanban_step_id
+        elif not project.reference_laying_date:
+            kanban_step_id = default_of_kanban_step_id
+        if not kanban_step_id:
+            kanban_step_id = default_of_kanban_step_id
+
         return {
             'of_priority': project.priority,
             'of_notes': project.notes,
@@ -36,75 +59,107 @@ class OFFollowupProject(models.Model):
             'of_reference_laying_date': project.reference_laying_date,
             'of_force_laying_date': project.force_laying_date,
             'of_sale_followup_tag_ids': otag_ids,
-            'of_kanban_step_id': mapping_project_stages.get(project.stage_id.id, default_of_kanban_step_id)
+            'of_kanban_step_id': kanban_step_id
         }
+
+    def _update_tables_from_sale_values(self, order_values_to_upd):
+        def _get_sql_set_string(values):
+            order_obj = self.env['sale.order']
+            sql_set_str = ""
+            len_values = len(values)
+            for i, (k, v) in enumerate(values.items(), 1):
+                separator = ', ' if i < len_values else ' '
+                if not v and order_obj._fields[k].type in ['char', 'text', 'selection', 'date']:
+                    sql_set_str += "%s = %s%s" % (k, 'NULL', separator)
+                elif v and (order_obj._fields[k].type in ['char', 'text'] or isinstance(v, (str, unicode))):
+                    sql_set_str += "%s = '%s'%s" % (k, v.replace("'", "''"), separator)
+                else:
+                    sql_set_str += "%s = %s%s" % (k, v, separator)
+            return sql_set_str
+
+        for order_id, order_values in order_values_to_upd.items():
+            followup_tags_ids = order_values.pop('of_sale_followup_tag_ids')
+            activities = order_values.pop('of_crm_activity_ids') if 'of_crm_activity_ids' in order_values else []
+            order_upd_sql = "UPDATE sale_order " \
+                "SET %s" \
+                "WHERE id = %s" % (_get_sql_set_string(order_values), order_id)
+            # update the columns of the sale_order
+            self._cr.execute(order_upd_sql)
+            # insert the tags in the relation table of the M2M
+            for tag_id in followup_tags_ids:
+                self._cr.execute(
+                    'INSERT INTO sale_order_followup_tag_rel (order_id, tag_id) VALUES (%s, %s)',
+                    (order_id, tag_id)
+                )
+            # insert the activities linked to the Sale in their table
+            for activity in activities:
+                self._cr.execute(
+                    'INSERT INTO "of_crm_activity" ("create_uid", "uploaded_attachment_id", "type_id", '
+                    '"user_id", "vendor_id", "description", "deadline_date", "sequence", "order_id", '
+                    '"title", "write_uid", "state", "write_date", "report", "create_date", "load_attachment", '
+                    '"origin", "active") VALUES '
+                    '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now(), %s, now(), %s, %s, %s);',
+                    (
+                        activity['create_uid'], None, activity['activity_id'], activity['create_uid'],
+                        activity['vendor_id'], activity['summary'], activity['date_deadline'] or None,
+                        activity['sequence'], order_id, activity['summary'] or None, activity['write_uid'],
+                        activity['state'], None, False, 'sale_order', True
+                    )
+                )
 
     def _followup_data_migration(self):
         """
         Migration of the Project followup data into the new fields of the linked Order.
         Migration of Project followup task and other stuff in the CRM activities, CRM tags, etc.
         """
-
         cr = self._cr
         # Follow-up data migration
-        IRConfig = self.env['ir.config_parameter']
+        ir_config_obj = self.env['ir.config_parameter']
         logger.info('_followup_data_migration START')
-        if not IRConfig.get_param('of.followup.migration', False):
+        if not ir_config_obj.get_param('of.followup.migration', False):
             self = self.with_context(lang='fr_FR')
-            CRMActivity = self.env['crm.activity']
-            FollowupProjectTmpl = self.env['of.followup.project.template']
-            FollowupTask = self.env['of.followup.task']
-            FollowupTaskType = self.env['of.followup.task.type']
-            SaleQuoteTmpl = self.env['sale.quote.template']
-            FollowupProject = self.env['of.followup.project']
-            SaleFollowupTag = self.env['of.sale.followup.tag']
-            FollowupProjectTag = self.env['of.followup.project.tag']
-            FollowupProjectStage = self.env['of.followup.project.stage']
-            SaleOrderKanban = self.env['of.sale.order.kanban']
+            crm_activity_obj = self.env['crm.activity']
+            followup_task_obj = self.env['of.followup.task']
+            followup_task_type_obj = self.env['of.followup.task.type']
+            followup_project_obj = self.env['of.followup.project']
+            sale_followup_tag_obj = self.env['of.sale.followup.tag']
+            followup_project_tag_obj = self.env['of.followup.project.tag']
+            sale_order_kanban_obj = self.env['of.sale.order.kanban']
 
             # of.followup.project.tag -> of.sale.followup.tag
             logger.info('    of.followup.project.tag -> of.sale.followup.tag')
-            project_tags = FollowupProjectTag.search([])
-            mapping_project_tags = {ptag.id: SaleFollowupTag.create(
+            project_tags = followup_project_tag_obj.search([])
+            mapping_project_tags = {ptag.id: sale_followup_tag_obj.create(
                 {'name': ptag.name, 'color': ptag.color}).id for ptag in project_tags}
-
-            # of.followup.project.stage -> of.sale.order.kanban
-            logger.info('    of.followup.project.stage -> of.sale.order.kanban')
-            project_stages = FollowupProjectStage.search([])
-            mapping_project_stages = {pstage.id: SaleOrderKanban.create(
-                {'name': pstage.name}).id for pstage in project_stages}
-            default_of_kanban_step_id = mapping_project_stages[
-                self.env.ref('of_followup.of_followup_project_stage_new').id]
 
             # of.followup.task.type -> crm.activity (loaded via data XML) so we build a data mapping dict
             logger.info('    of.followup.task.type -> crm.activity')
             task_type_planif_id = self.env.ref('of_followup.of_followup_task_type_planif').id
             task_type_vt_id = self.env.ref('of_followup.of_followup_task_type_vt').id
-            followup_type_values = FollowupTaskType.with_context(active_test=False).search_read(
-                ['|', ('predefined_task', '=', 'False'), ('id', 'in', [task_type_planif_id, task_type_vt_id])],
+            followup_type_values = followup_task_type_obj.with_context(active_test=False).search_read(
+                ['|', ('predefined_task', '=', False), ('id', 'in', [task_type_planif_id, task_type_vt_id])],
                 ['name', 'short_name'])
             mapping_task_type = {}
             for data in followup_type_values:
-                act_id = CRMActivity.create(
+                act_id = crm_activity_obj.create(
                     {'name': data['name'], 'of_short_name': data['short_name'], 'of_object': 'sale_order'}).id
                 k = '%s,%s' % (data['id'], data['short_name'])
                 mapping_task_type[k] = act_id
 
-            # of.followup.task -> of.sale.activity
-            logger.info('    of.followup.task -> of.sale.activity')
+            # of.followup.task -> of.crm.activity
+            logger.info('    of.followup.task -> of.crm.activity')
             # get the tasks ids
             tasks_query = "SELECT DISTINCT(OFT.id) " \
                 "FROM of_followup_task OFT " \
                 "INNER JOIN of_followup_project OFP ON OFP.id = OFT.project_id " \
-                "INNER JOIN sale_order SO ON OFP.order_id = SO.id " \
                 "INNER JOIN of_followup_task_type OFTT ON OFTT.id = OFT.type_id " \
-                "WHERE SO.state != 'done'  AND OFP.state != 'done' AND OFTT.predefined_task IS NOT TRUE;"
-            cr.execute(tasks_query)
+                "WHERE OFTT.predefined_task IS NOT TRUE OR OFT.type_id IN %s;"
+            cr.execute(tasks_query, (tuple([task_type_planif_id, task_type_vt_id]),))
             tasks_ids = cr.fetchall()
             tasks_ids = map(lambda t: t[0], tasks_ids)
             # create sales activities from followup tasks and prepare orders data from the project linked to the task
             project_data = {}
-            for task in FollowupTask.browse(tasks_ids):
+            for task in followup_task_obj.browse(tasks_ids):
                 project = task.project_id
                 type_id = task.type_id.id
                 short_name = task.type_id.short_name
@@ -114,11 +169,9 @@ class OFFollowupProject(models.Model):
                     activity_state = 'done'
                 if project:
                     if not project_data.get(project):
-                        project_data[project] = {'of_sale_activity_ids': []}
-                    # the field 'activity_id' is required, to avoid the IntegryError if the activity doesn't exist we
-                    # will set "Planif" as default
+                        project_data[project] = {'of_crm_activity_ids': []}
 
-                    # try to preload the deadline date
+                    # try to preload the deadline date dependings on the current follow-up's stage
                     date_deadline = False
                     if project.reference_laying_date:
                         stage_code_tr = {
@@ -136,74 +189,70 @@ class OFFollowupProject(models.Model):
                             date_deadline = reference_laying_date + timedelta(days=days_nbr)
                             # take the start day of the week for this date
                             start_date = date_deadline - timedelta(days=date_deadline.weekday())
-                            date_deadline = start_date.strftime('%Y-%m-%d %H:%M:%S')
+                            date_deadline = start_date.strftime('%Y-%m-%d')
 
                     if mapping_task_type.get(k):
-                        project_data[project]['of_sale_activity_ids'].append((0, 0, {
+                        project_data[project]['of_crm_activity_ids'].append({
                             'sequence': task.sequence,
                             'summary': task.name,
                             'date_deadline': date_deadline,
                             'activity_id': mapping_task_type.get(k),
-                            'state': activity_state
-                        }))
+                            'state': activity_state,
+                            'user_id': task.project_id.user_id.id or None,
+                            'vendor_id': task.project_id.vendor_id.id or None,
+                            'create_uid': task.create_uid.id or None,
+                            'write_uid': task.write_uid.id or None
+                        })
 
+            order_values_to_upd = {}
             # of.followup.project -> sale.order
             logger.info('    of.followup.project -> sale.order')
             done_project_ids = []
+            default_of_kanban_step_id = self.env.ref('of_sale_kanban.of_sale_order_kanban_new').id
+            done_of_kanban_step_id = sale_order_kanban_obj.search([('name', '=', u"Terminé")]).id
+            in_progress_of_kanban_step_id = sale_order_kanban_obj.search([('name', '=', u"En cours")]).id
+
             for project, data in project_data.items():
                 values = self._get_order_values(
-                    project, mapping_project_stages, mapping_project_tags, default_of_kanban_step_id)
+                    project, mapping_project_tags, default_of_kanban_step_id, done_of_kanban_step_id,
+                    in_progress_of_kanban_step_id)
                 values.update(data)
-                project.order_id.write(values)
+                order_values_to_upd[project.order_id.id] = values
                 done_project_ids.append(project.id)
 
+            # other projets that aren't yet migrated from the followup tasks
             if done_project_ids:
-                # other projets that aren't yet migrated from the followup tasks
                 projects_query = "SELECT DISTINCT(OFP.id) " \
                     "FROM of_followup_project OFP " \
-                    "INNER JOIN sale_order SO ON OFP.order_id = SO.id " \
-                    "WHERE SO.state != 'done' AND OFP.state != 'done' AND OFP.id NOT IN %s;"
+                    "WHERE OFP.id NOT IN %s;"
                 cr.execute(projects_query, (tuple(done_project_ids),))
             else:
-                projects_query = "SELECT DISTINCT(OFP.id) " \
-                    "FROM of_followup_project OFP " \
-                    "INNER JOIN sale_order SO ON OFP.order_id = SO.id " \
-                    "WHERE SO.state != 'done' AND OFP.state != 'done';"
+                projects_query = "SELECT DISTINCT(OFP.id) FROM of_followup_project OFP;"
                 cr.execute(projects_query)
             project_ids = cr.fetchall()
             project_ids = map(lambda p: p[0], project_ids)
-            followup_projects = FollowupProject.browse(project_ids)
+            followup_projects = followup_project_obj.browse(project_ids)
             for project in followup_projects:
-                order = project.order_id
-                order.write(
-                    self._get_order_values(
-                        project, mapping_project_stages, mapping_project_tags, default_of_kanban_step_id))
+                values = self._get_order_values(
+                    project, mapping_project_tags, default_of_kanban_step_id, done_of_kanban_step_id,
+                    in_progress_of_kanban_step_id)
+                order_values_to_upd[project.order_id.id] = values
+            self._update_tables_from_sale_values(order_values_to_upd)
 
-            # of.followup.project.template -> sale.quote.template
-            logger.info('    of.followup.project.template -> sale.quote.template')
-            project_templates = FollowupProjectTmpl.search([])
-            for template in project_templates:
-                order_template = {
-                    'name': template.name,
-                    'of_sale_quote_tmpl_activity_ids': []
-                }
-                for task in template.task_ids.filtered(
-                        lambda t: t.type_id and (
-                                not task.type_id.predefined_task or
-                                task.type_id.id in [task_type_planif_id, task_type_vt_id])):
-                    type_id = task.type_id.id
-                    short_name = task.type_id.short_name
-                    k = '%s,%s' % (type_id, short_name)
-                    if mapping_task_type.get(k):
-                        order_template['of_sale_quote_tmpl_activity_ids'].append(
-                            (0, 0, {
-                                'activity_id': mapping_task_type.get(k)
-                            })
-                        )
-                SaleQuoteTmpl.create(order_template)
-            IRConfig.set_param('of.followup.migration', 'True')
+            # recompute follow-up fields
+            logger.info('    recompute follow-up fields')
+            order_ids = order_values_to_upd.keys()
+            orders = self.env['sale.order'].browse(order_ids)
+            orders._compute_of_activities_state()
+            # set the migration as done
+            ir_config_obj.set_param('of.followup.migration', 'True')
             # Deactivate view to hide migration button
             self.env.ref('of_followup.view_sales_config_settings_followup').active = False
+            # Retirer le groupe group_of_followup_project_not_migrated pour masquer les différents éléments du suivi
+            group_not_migrated = self.env.ref('of_followup.group_of_followup_project_not_migrated')
+            group_user = self.env.ref('base.group_user')
+            if group_not_migrated in group_user.implied_ids:
+                group_user.write({'implied_ids': [(3, group_not_migrated.id)]})
         logger.info('_followup_data_migration END')
 
     stage_id = fields.Many2one(
@@ -624,7 +673,7 @@ class OFFollowupProject(models.Model):
         for followup in self:
             for task in followup.other_task_ids:
                 states = self.env['of.followup.task.type.state'].search(
-                        [('task_type_id', '=', task.type_id.id), ('sequence', '>', task.state_id.sequence)])
+                    [('task_type_id', '=', task.type_id.id), ('sequence', '>', task.state_id.sequence)])
                 if states:
                     task.state_id = states[-1].id
 
@@ -1206,8 +1255,9 @@ class SaleOrder(models.Model):
     def action_followup_project(self):
         self.ensure_one()
         followup_project_obj = self.env['of.followup.project']
+        ir_config_obj = self.env['ir.config_parameter']
         followup_project = followup_project_obj.search([('order_id', '=', self.id)])
-        if not followup_project:
+        if not followup_project and not ir_config_obj.get_param('of.followup.migration', False):
             template = self.env['of.followup.project.template'].search([('default', '=', True)])
             values = {
                 'order_id': self.id,
@@ -1243,7 +1293,7 @@ class SaleOrder(models.Model):
                 }
         else:
 
-            if self._context.get('auto_followup'):
+            if self._context.get('auto_followup') or ir_config_obj.get_param('of.followup.migration', False):
                 return True
             else:
                 return {
@@ -1257,7 +1307,9 @@ class SaleOrder(models.Model):
     @api.multi
     def action_confirm(self):
         super(SaleOrder, self).action_confirm()
-        if not self._context.get('order_cancellation', False):
+        ir_config_obj = self.env['ir.config_parameter']
+        if not self._context.get('order_cancellation', False) and \
+                not ir_config_obj.get_param('of.followup.migration', False):
             for order in self:
                 order.with_context(auto_followup=True, followup_creator_id=self.env.user.id).sudo().\
                     action_followup_project()

@@ -23,9 +23,9 @@ Mise en place d'un workflow de suivi de l'avancé des dossiers une fois le bon d
         'web_widget_color',
     ],
     'data': [
+        'security/of_followup_security.xml',
         'data/of_followup_data.xml',
         'security/ir.model.access.csv',
-        'security/of_followup_security.xml',
         'views/of_followup_views.xml',
         'views/menus.xml',
         'views/of_followup_settings_views.xml',

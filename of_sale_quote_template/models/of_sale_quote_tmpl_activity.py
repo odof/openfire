@@ -30,13 +30,18 @@ class OFSaleQuoteTemplateActivity(models.Model):
             order, self.activity_id, self.days, self.compute_date)
         user_id = order_obj._of_get_sale_activity_user_id(order, self.activity_id)
         return {
-            'activity_id': self.activity_id,
+            'type_id': self.activity_id.id,
             'description': self.description,
-            'date_deadline': date_deadline,
-            'summary': self.activity_id.of_short_name,
+            'deadline_date': date_deadline,
+            'title': self.activity_id.of_short_name,
             'state': 'planned',
             'sequence': self.sequence,
-            'user_id': user_id
+            'vendor_id': user_id,
+            'user_id': self.env.user.id,
+            'load_attachment': self.activity_id.of_load_attachment,
+            'order_id': order.id,
+            'origin': 'sale_order',
+            'active': True
         }
 
     @api.onchange('activity_id')

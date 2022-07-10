@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api, SUPERUSER_ID
-from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
-from odoo.tools.safe_eval import safe_eval
-
+import time
 from datetime import datetime
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
-import time
-import pytz
-import logging
-
-_logger = logging.getLogger(__name__)
+from odoo import models, fields, api
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
+from odoo.tools.safe_eval import safe_eval
 
 
 class CrmLead(models.Model):
@@ -268,7 +264,7 @@ class CrmLead(models.Model):
 
     @api.multi
     def _of_update_deadline_date_activities(self, activity_fields=None):
-        """Recomputes the deadline date of activities linked to the Sale.
+        """Recomputes the deadline date of activities linked to the Opportunity.
         :param activity_fields: The list of fields that are updated to filter activities to update
         :type activity_fields: list
         """
@@ -286,7 +282,7 @@ class CrmLead(models.Model):
                     ca.state == 'planned' and ca.type_id and
                     ca.type_id.of_compute_date in activities_filter and
                     ca.type_id.of_automatic_recompute):
-                crm_activity.date = crm_activity._of_get_crm_activity_date_deadline()
+                crm_activity.deadline_date = crm_activity._of_get_crm_activity_date_deadline()
 
     @api.model
     def create(self, vals):
@@ -520,149 +516,6 @@ class CRMStage(models.Model):
     of_auto_comparison_code = fields.Char(string=u"Code de comparaison")
     of_manual_activity_id = fields.Many2one(
         comodel_name='crm.activity', string=u"Activité à créer en cas de mise à jour manuelle")
-
-
-class OFCRMActivity(models.Model):
-    _name = 'of.crm.activity'
-    _inherit = ['mail.thread']
-    _description = "OF Activité de CRM"
-    _rec_name = 'title'
-    _order = 'date desc'
-
-    @api.model_cr_context
-    def _auto_init(self):
-        """
-        On récupère les prochaines activités programmées
-        """
-        cr = self._cr
-        cr.execute("SELECT * FROM information_schema.tables WHERE table_name = '%s'" % (self._table,))
-        exists = bool(cr.fetchall())
-        res = super(OFCRMActivity, self)._auto_init()
-        if not exists:
-            tz = pytz.timezone('Europe/Paris')
-            opportunities = self.env['crm.lead'].search([('next_activity_id', '!=', False)])
-            for opportunity in opportunities:
-                self.create({'opportunity_id': opportunity.id,
-                             'title': opportunity.next_activity_id.name,
-                             'type_id': opportunity.next_activity_id.id,
-                             'date': tz.localize(fields.Datetime.
-                                                 from_string((opportunity.date_action or fields.Date.today()) +
-                                                             ' 09:00:00')).astimezone(pytz.utc),
-                             'description': opportunity.title_action,
-                             'user_id': SUPERUSER_ID,
-                             'vendor_id': opportunity.user_id and opportunity.user_id.id or SUPERUSER_ID,
-                             'state': 'planned'})
-        return res
-
-    active = fields.Boolean(string='Actif', default=True)
-    title = fields.Char(string=u"Résumé", required=True, track_visibility="always")
-    opportunity_id = fields.Many2one(comodel_name='crm.lead', string=u"Opportunité", required=True, ondelete='cascade')
-    type_id = fields.Many2one(
-        comodel_name='crm.activity', string="Activity type", required=True,
-        domain=['|', ('of_object', '=', 'opportunity'), ('of_object', '=', False)])
-    date = fields.Datetime(string=u"Date", required=True, track_visibility="always")
-    state = fields.Selection(
-        selection=[('planned', u"Planifiée"),
-                   ('done', u"Réalisée"),
-                   ('canceled', u"Annulée")], string=u"État", required=True, default='planned',
-        track_visibility="onchange")
-    user_id = fields.Many2one(
-        comodel_name='res.users', string=u"Auteur", required=True, default=lambda self: self.env.user)
-    vendor_id = fields.Many2one(comodel_name='res.users', string=u"Commercial", required=True)
-    description = fields.Text(string=u"Description")
-    report = fields.Text(string=u"Compte-rendu", track_visibility="onchange")
-    cancel_reason = fields.Text(string=u"Raison d'annulation", track_visibility="onchange")
-    partner_id = fields.Many2one(related='opportunity_id.partner_id', string=u"Client", readonly=True)
-    phone = fields.Char(related='opportunity_id.phone', string=u"Téléphone", readonly=True)
-    mobile = fields.Char(related='opportunity_id.mobile', string=u"Mobile", readonly=True)
-    email = fields.Char(related='opportunity_id.email_from', string=u"Courriel", readonly=True)
-    is_late = fields.Boolean(string=u"Activité en retard", compute="_compute_is_late", search="_search_is_late")
-    # Couleurs
-    of_color_ft = fields.Char(string=u"Couleur de texte", compute='_compute_custom_colors')
-    of_color_bg = fields.Char(string=u"Couleur de fond", compute='_compute_custom_colors')
-
-    @api.multi
-    def _compute_is_late(self):
-        for activity in self:
-            if activity.state == 'planned' and activity.date < fields.Datetime.now():
-                activity.is_late = True
-            else:
-                activity.is_late = False
-
-    @api.model
-    def _search_is_late(self, operator, value):
-        late_activities = self.env['of.crm.activity'].search(
-            [('state', '=', 'planned'), ('date', '<', fields.Datetime.now())])
-        if operator == '=':
-            return [('id', 'in', late_activities.ids)]
-        else:
-            return [('id', 'not in', late_activities.ids)]
-
-    @api.onchange('opportunity_id')
-    def _onchange_opportunity_id(self):
-        if self.opportunity_id:
-            self.vendor_id = self.opportunity_id.user_id
-
-    @api.onchange('type_id')
-    def _onchange_type_id(self):
-        if self.type_id:
-            if not self.title:
-                self.title = self.type_id.name
-            self.date = self._of_get_crm_activity_date_deadline()
-            self.description = self.type_id.description
-            if self.type_id.of_user_id:
-                self.vendor_id = self.type_id.of_user_id
-
-    @api.multi
-    def _compute_custom_colors(self):
-        for activity in self:
-            if activity.vendor_id:
-                activity.of_color_ft = activity.vendor_id.of_color_ft
-                activity.of_color_bg = activity.vendor_id.of_color_bg
-            else:
-                activity.of_color_ft = "#0D0D0D"
-                activity.of_color_bg = "#F0F0F0"
-
-    @api.multi
-    def _of_get_crm_activity_date_deadline(self):
-        self.ensure_one()
-
-        if not self.type_id:
-            return False
-
-        compute_date = self.type_id.of_compute_date
-        days = self.type_id.days
-        field_name = {
-            'project_date': 'of_date_projet',
-            'decision_date': 'date_deadline'
-        }
-        crm_field = field_name.get(compute_date)
-        if crm_field:
-            ddate = getattr(self.opportunity_id, crm_field)
-            ddate = fields.Datetime.from_string(ddate)
-        else:
-            ddate = datetime.now()
-        if ddate:
-            delta = timedelta(days=days)
-            return ddate + delta
-        return False
-
-    @api.multi
-    def message_track(self, tracked_fields, initial_values):
-        return super(OFCRMActivity, self.with_context(to_lead=True)).message_track(tracked_fields, initial_values)
-
-    @api.multi
-    def message_post(self, body='', subject=None, message_type='notification',
-                     subtype=None, parent_id=False, attachments=None,
-                     content_subtype='html', **kwargs):
-        self.ensure_one()
-        if self.opportunity_id and self._context.get("to_lead"):
-            self.opportunity_id.message_post(body=body, subject=subject, message_type=message_type,
-                                             subtype=subtype, parent_id=parent_id, attachments=attachments,
-                                             content_subtype=content_subtype, **kwargs)
-        return super(OFCRMActivity, self).message_post(body=body, subject=subject, message_type=message_type,
-                                                       subtype=subtype, parent_id=parent_id, attachments=attachments,
-                                                       content_subtype=content_subtype, **kwargs)
 
 
 class CalendarEvent(models.Model):
