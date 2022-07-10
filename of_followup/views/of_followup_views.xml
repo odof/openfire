@@ -609,6 +609,7 @@
         <field name="name">of.followup.sale.order.form.view</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+        <field name="groups_id" eval="[(6, 0, [ref('of_followup.group_of_followup_project_not_migrated')])]"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='button_gestion_prix']" position="after">
                 <field name="of_followup_project_id" invisible="1"/>
@@ -629,6 +630,7 @@
         <field name="name">of.followup.quotation.search.view</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.sale_order_view_search_inherit_quotation"/>
+        <field name="groups_id" eval="[(6, 0, [ref('of_followup.group_of_followup_project_not_migrated')])]"/>
         <field name="arch" type="xml">
             <xpath expr="//separator[2]" position="after">
                 <filter name='wo_followup' string="Sans suivi" domain="[('of_followup_project_id', '=', False)]"/>
@@ -641,6 +643,7 @@
         <field name="name">of.followup.sale.order.search.view</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="of_sale.of_sale_order_view_search_inherit_sale"/>
+        <field name="groups_id" eval="[(6, 0, [ref('of_followup.group_of_followup_project_not_migrated')])]"/>
         <field name="arch" type="xml">
             <xpath expr="//separator[3]" position="after">
                 <filter name='wo_followup' string="Sans suivi" domain="[('of_followup_project_id', '=', False)]"/>

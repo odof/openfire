@@ -57,16 +57,6 @@
         <field name="implied_ids" eval="[(4, ref('of_group_stock_responsible'))]"/>
     </record>
 
-    <!-- Fonction qui permet de passer 1 ir.rule à noupdate = False pour permettre sa suppression
-         A SUPPRIMER APRES APPLICATION -->
-    <function name="write" model="ir.model.data">
-        <function name="search" model="ir.model.data">
-            <value eval="[('module', '=', 'of_access_control'), ('name', '=', 'of_sale_activity_responsible_rule')]"/>
-        </function>
-        <!--Set noupdate to False-->
-        <value eval="{'noupdate': False}" />
-    </function>
-
     <data noupdate="1">
 
         <!-- CRM Lead -->

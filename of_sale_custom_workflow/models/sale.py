@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
+from odoo import models, fields, api
 
 
 class SaleOrder(models.Model):
@@ -51,7 +51,9 @@ class SaleOrder(models.Model):
         for order in self:
             order.state = 'presale'
             order.of_custom_confirmation_date = fields.Datetime.now()
-            if not self._context.get('order_cancellation', False):
+            ir_config_obj = self.env['ir.config_parameter']
+            if not self._context.get('order_cancellation', False) and \
+                    not ir_config_obj.get_param('of.followup.migration', False):
                 order.with_context(auto_followup=True, followup_creator_id=self.env.user.id).sudo().\
                     action_followup_project()
         return True

@@ -352,4 +352,9 @@ Vous en souhaitant bonne réception.<br/>
         </record>
 
     </data>
+
+     <!-- Ajouter le groupe group_of_followup_project_not_migrated aux utilisateurs qui ne l'ont pas, si besoin
+          A supprimer quand tout le monde aura migré le suivi de projet -->
+    <function name="_init_group_of_followup_project_not_migrated" model="of.followup.project"/>
+
 </odoo>
