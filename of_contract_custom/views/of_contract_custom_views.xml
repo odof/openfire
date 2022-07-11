@@ -53,6 +53,7 @@
                 <field name="recurring_rule_type"/>
                 <field name="recurring_invoicing_payment_id"/>
                 <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                <field name="intervention_sites"/>
             </tree>
         </field>
     </record>
