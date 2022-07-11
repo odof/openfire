@@ -821,9 +821,12 @@ class OfTourneeRdv(models.TransientModel):
             maxi = self.max_recherche
             for employee in employees:
                 employee = sudo and employee.sudo() or employee
-                creneaux = wizard_line_obj.search([('wizard_id', '=', self.id),
-                                                   ('date', '=', date_courante),
-                                                   ('employee_id', '=', employee.id)], order="debut_dt")
+                # Ne pas prendre en compte les lignes allday qui ne sont pas liées à un RDV (jours fériés)
+                creneaux = wizard_line_obj.search([
+                    ('wizard_id', '=', self.id),
+                    ('date', '=', date_courante),
+                    ('employee_id', '=', employee.id),
+                    '|', ('allday', '=', False), ('intervention_id', '!=', False)], order="debut_dt")
                 if len(creneaux) == 0:
                     continue
                 if not sudo:
