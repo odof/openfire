@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
     'name': u"OpenFire / Prise de RDV en ligne",
-    'version': "10.0.1.0.0",
-    'author': "OpenFire",
-    'category': "OpenFire",
+    'version': '10.0.1.0.0',
+    'author': u"OpenFire",
+    'category': u"OpenFire",
     'summary': u"Prise de RDV en ligne",
-    'license': 'LGPL-3',
+    'license': 'AGPL-3',
     'description': u"""
 Module OpenFire pour la prise de RDV en ligne depuis le site internet
 =====================================================================
@@ -15,7 +16,7 @@ Fonctionnalités additionnelles :
 ------------------------------
     - Ajout de la liste des parcs installés sur le portail utilisateur.
 """,
-    'website': "www.openfire.fr",
+    'website': u"www.openfire.fr",
     'depends': [
         'of_planning_view',
         'of_website_portal',
