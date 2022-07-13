@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import logging
 import json
@@ -1010,7 +1011,13 @@ class OFWebsitePlanningBooking(http.Controller):
             'duree': tache.duree,
             'company_id': request.website.company_id.id,
             'state': 'draft',
+            'fiscal_position_id': tache.fiscal_position_id.id or False,
             'verif_dispo': True,
+            'line_ids': tache.product_id and [(0, 0, {'product_id': tache.product_id.id,
+                                                      'qty': 1,
+                                                      'price_unit': tache.product_id.lst_price,
+                                                      'name': tache.product_id.name,
+                                                      })] or False,
             'origin_interface': u"Portail web",
             'website_create': True,
             'description': description,
@@ -1049,6 +1056,8 @@ class OFWebsitePlanningBooking(http.Controller):
             try:
                 intervention = interv_obj.create(vals)
                 intervention = intervention.with_context(from_portal=True)
+                if intervention.line_ids:
+                    intervention.line_ids.compute_taxes()
                 # mettre à jour le nom du RDV
                 intervention._onchange_address_id()
                 created = True
