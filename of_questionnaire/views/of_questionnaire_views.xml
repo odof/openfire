@@ -443,6 +443,8 @@
     <record id="of_questionnaire_of_planning_intervention_view_form" model="ir.ui.view">
         <field name="name">of.questionnaire.of.planning.intervention.view.form</field>
         <field name="model">of.planning.intervention</field>
+        <!-- priorité forcée à 19 pour passer avant of_planning_recurring -->
+        <field name="priority">19</field>
         <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">

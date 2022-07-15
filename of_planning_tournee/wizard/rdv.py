@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, models, fields
-from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 from datetime import datetime, timedelta, date
 from dateutil.relativedelta import relativedelta
 import pytz
-from odoo.exceptions import UserError
-from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
-from odoo.addons.of_utils.models.of_utils import distance_points, hours_to_strs
-
-
 import urllib
 import requests
 import logging
 
-from odoo.tools import config
+from odoo import api, models, fields
+from odoo.exceptions import UserError
+from odoo.tools import config, DEFAULT_SERVER_DATE_FORMAT
 from odoo.tools.float_utils import float_compare
+
+from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
+from odoo.addons.of_utils.models.of_utils import distance_points, hours_to_strs
+from odoo.addons.calendar.models.calendar import calendar_id2real_id
 
 _logger = logging.getLogger(__name__)
 
@@ -534,7 +533,10 @@ class OfTourneeRdv(models.TransientModel):
             employee_intervention_dates = {employee_id: [] for employee_id in employees_dispo}
             for intervention in interventions:
                 intervention_dates = [intervention]
-                for intervention_date in (intervention.date, intervention.date_deadline):
+                # read est détourné dans of_planning_recurring pour renvoyer les dates de l'occurence concernée
+                # dans le cas des RDV recurrents
+                data = intervention.read(['date_prompt', 'date_deadline_prompt'])[0]
+                for intervention_date in (data['date_prompt'], data['date_deadline_prompt']):
                     # Conversion des dates de début et de fin en nombre flottant et à l'heure locale
                     date_intervention_locale_dt = fields.Datetime.context_timestamp(
                         self, fields.Datetime.from_string(intervention_date))
@@ -666,7 +668,7 @@ class OfTourneeRdv(models.TransientModel):
                         'description': description,
                         'wizard_id': self.id,
                         'employee_id': employee.id,
-                        'intervention_id': intervention.id,
+                        'intervention_id': calendar_id2real_id(intervention.id),
                         'name': intervention.name,
                         'disponible': False,
                     })

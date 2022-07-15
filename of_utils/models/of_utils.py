@@ -83,7 +83,7 @@ def float_2_heures_minutes(flo):
 
 
 def heures_minutes_2_float(heures, minutes):
-    return heures + minutes / 60
+    return heures + minutes / 60.0
 
 
 def compare_date(date1, date2, compare="==", isdatetime=False):

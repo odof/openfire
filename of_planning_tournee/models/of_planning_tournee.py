@@ -2,6 +2,7 @@
 
 from odoo import api, models, fields
 from odoo.exceptions import ValidationError
+from datetime import timedelta
 
 
 class OfPlanningIntervention(models.Model):
@@ -13,12 +14,11 @@ class OfPlanningIntervention(models.Model):
 
     # @api.depends
 
-    @api.multi
     @api.depends('employee_ids', 'date', 'tournee_ids.date', 'tournee_ids.employee_id', 'state')
     def _compute_tournee_ids(self):
         tournee_obj = self.env['of.planning.tournee']
         for intervention in self:
-            if intervention.employee_ids and intervention.date\
+            if intervention.employee_ids and intervention.date \
                     and intervention.state in ('draft', 'confirm', 'done', 'unfinished'):
                 tournees = tournee_obj.search([
                     ('employee_id', 'in', intervention.employee_ids.ids),
@@ -49,33 +49,33 @@ class OfPlanningIntervention(models.Model):
             raise ValidationError(u'Un des intervenants a déjà une tournée bloquée à cette date.')
 
         intervention = super(OfPlanningIntervention, self).create(vals)
-        if len(planning_tournees) != len(employee_ids):  # Une ou plusieurs tournées n'ont pas encore été créées.
-            intervention.create_tournees()
-            intervention._recompute_todo(self._fields['tournee_ids'])
+        # La vérif de nécessité de création de tournée est faite directement dans la fonction create_tournees
+        intervention.create_tournees()
+        intervention._recompute_todo(self._fields['tournee_ids'])
         return intervention
 
     @api.multi
     def write(self, vals):
         intervention_sudo_obj = self.env['of.planning.intervention'].sudo()
         old_data = {}
-        if 'date' in vals or 'employee_ids' in vals or 'state' in vals:
-            if 'date' in vals or 'employee_ids' in vals:
-                if self.mapped('tournee_ids').filtered('is_bloque'):
-                    raise ValidationError(u"La tournée d'un des intervenants est bloquée")
+        recompute_tournee_fields = self.get_recompute_tournee_fields()
+        if any(field_name in vals for field_name in recompute_tournee_fields):
+            if self.mapped('tournee_ids').filtered('is_bloque'):
+                raise ValidationError(u"La tournée d'un des intervenants est bloquée")
 
             # Vérification des tournées à supprimer
             for intervention in self:
-                employee_ids = old_data.setdefault(intervention.date_date, set())
-                employee_ids |= set(intervention.employee_ids.ids)
+                for date_tournee in intervention.get_date_tournees():
+                    employee_ids = old_data.setdefault(date_tournee, set())
+                    employee_ids |= set(intervention.employee_ids.ids)
 
         res = super(OfPlanningIntervention, self).write(vals)
 
         if old_data:
-            if 'date' in vals or 'employee_ids' in vals:
-                if self.mapped('tournee_ids').filtered('is_bloque'):
-                    raise ValidationError(u"Un des intervenants a déjà une tournée bloquée sur ce créneau")
-            for date, employee_ids in old_data.iteritems():
-                intervention_sudo_obj.remove_tournees(date, employee_ids)
+            if ('date' in vals or 'employee_ids' in vals) and self.mapped('tournee_ids').filtered('is_bloque'):
+                raise ValidationError(u"Un des intervenants a déjà une tournée bloquée sur ce créneau")
+            for date_eval, employee_ids in old_data.iteritems():
+                intervention_sudo_obj.remove_tournees([date_eval], employee_ids)
 
         for intervention in self:
             # La vérif de nécessité de création de tournée est faite directement dans la fonction create_tournees
@@ -86,14 +86,34 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def unlink(self):
-        interventions = [(intervention.date_date, intervention.employee_ids.ids) for intervention in self]
+        interventions = [(intervention.get_date_tournees(), intervention.employee_ids.ids) for intervention in self]
         super(OfPlanningIntervention, self).unlink()
-        for date, employee_ids in interventions:
+        for date_list, employee_ids in interventions:
             # la vérif de nécessité de suppression de tournée est faite directement dans la fonction remove_tournee
-            self.sudo().remove_tournees(date, employee_ids)
+            self.sudo().remove_tournees(date_list, employee_ids)
         return True
 
     # Autres
+
+    @api.model
+    def get_recompute_tournee_fields(self):
+        return ['date', 'employee_ids', 'state']
+
+    @api.multi
+    def get_date_tournees(self):
+        self.ensure_one()
+        res = []
+        date_deb_str = self.date_date
+        date_fin_str = fields.Date.to_string(fields.Date.from_string(self.date_deadline))
+        res.append(date_deb_str)
+        # intervention sur plusieurs jours, prendre toutes les dates intermédiaires
+        if date_fin_str != date_deb_str:
+            date_fin_da = fields.Date.from_string(self.date_deadline)
+            date_current_da = fields.Date.from_string(date_deb_str) + timedelta(days=1)
+            while date_current_da <= date_fin_da:
+                res.append(fields.Date.to_string(date_current_da))
+                date_current_da += timedelta(days=1)
+        return res
 
     @api.multi
     def create_tournees(self):
@@ -107,50 +127,53 @@ class OfPlanningIntervention(models.Model):
         if self.state in ('cancel', 'postponed'):
             return res
         tournee_obj = self.env['of.planning.tournee']
-        date_intervention = self.date_date
+        dates_eval = self.get_date_tournees()
         address = self.address_id
 
         for employee in self.employee_ids:
-            tournee = tournee_obj.search([('date', '=', date_intervention), ('employee_id', '=', employee.id)], limit=1)
-            if not tournee:
-                tournee_data = {
-                    'date'       : date_intervention,
-                    'employee_id': employee.id,
-                    'secteur_id' : address.of_secteur_tech_id.id,
-                    'epi_lat'    : address.geo_lat,
-                    'epi_lon'    : address.geo_lng,
-                    'is_bloque'  : False,
-                    'is_confirme': False
-                }
-                res.append(tournee_obj.create(tournee_data))
-            elif tournee.secteur_id != address.of_secteur_tech_id:
-                tournee.secteur_id = address.of_secteur_tech_id
+            for date_eval in dates_eval:
+                tournee = tournee_obj.search([('date', '=', date_eval), ('employee_id', '=', employee.id)], limit=1)
+                if not tournee:
+                    tournee_data = {
+                        'date': date_eval,
+                        'employee_id': employee.id,
+                        'secteur_id': address.of_secteur_tech_id.id,
+                        'epi_lat': address.geo_lat,
+                        'epi_lon': address.geo_lng,
+                        'is_bloque': False,
+                        'is_confirme': False
+                    }
+                    res.append(tournee_obj.create(tournee_data))
+                elif tournee.secteur_id != address.of_secteur_tech_id:
+                    tournee.secteur_id = address.of_secteur_tech_id
         return res
 
     @api.model
-    def remove_tournees(self, date, employee_ids):
+    def remove_tournees(self, date_list, employee_ids):
         """
         Vérifie le tournées des employés renseignés à une date et supprime celle qui n'ont aucun RDV.
-        :param date: date à vérifier
+        :param date_list: liste de dates au format string à vérifier
         :param employee_ids: list des ids des employés à vérifier
         :return: True
         """
-        date = date and date[:10] or date.strftime('%Y-%m-%d')
         planning_tournee_obj = self.env['of.planning.tournee']
-        employees_tournees_unlink_ids = []
-        for employee_id in employee_ids:
-            planning_intervention = self.search([
-                ('date_date', '=', date),
-                ('state', 'in', ('draft', 'confirm', 'done', 'unfinished')),
-                ('employee_ids', 'in', employee_id)], limit=1)
-            if not planning_intervention:
-                # Il n'existe plus de plannings pour la tournee, on la supprime
-                employees_tournees_unlink_ids.append(employee_id)
+        tournees_unlink = self.env['of.planning.tournee']
+        for date_eval in date_list:
+            employees_tournees_unlink_ids = []
+            for employee_id in employee_ids:
+                planning_intervention = self.search([
+                    ('date_date', '<=', date_eval),
+                    ('date_deadline', '>=', date_eval),
+                    ('state', 'in', ('draft', 'confirm', 'done', 'unfinished')),
+                    ('employee_ids', 'in', employee_id)], limit=1)
+                if not planning_intervention:
+                    # Il n'existe plus de plannings pour la tournee, on la supprime
+                    employees_tournees_unlink_ids.append(employee_id)
 
-        tournees_unlink = planning_tournee_obj.search(
-            [('date', '=', date), ('employee_id', 'in', employees_tournees_unlink_ids),
-             ('is_bloque', '=', False), ('is_confirme', '=', False),
-             ('address_depart_id', '=', False), ('address_retour_id', '=', False), ('secteur_id', '=', False)])
+            tournees_unlink |= planning_tournee_obj.search(
+                [('date', '=', date_eval), ('employee_id', 'in', employees_tournees_unlink_ids),
+                 ('is_bloque', '=', False), ('is_confirme', '=', False),
+                 ('address_depart_id', '=', False), ('address_retour_id', '=', False), ('secteur_id', '=', False)])
         return tournees_unlink.unlink()
 
 

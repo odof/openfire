@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+
+    <record id="of_planning_intervention_view_form" model="ir.ui.view">
+        <field name="name">of.planning.intervention.view.form</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
+        <field name="priority">20</field>
+        <field name="groups_id" eval="[(6,0,[ref('of_planning_recurring.of_group_planning_intervention_recurring')])]"/>
+        <field name="arch" type="xml">
+            <!-- Épurer la vue pour les RDV réguliers : beaucoup d'infos inutiles et poluantes .
+                 Rendre les champs liés à la recurrence readonly, modifiables en passant par le bouton d'édition -->
+            <xpath expr="//field[@name='employee_ids']" position="attributes">
+                <attribute name="attrs">{'readonly': [('recurrency', '=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='employee_ids']" position="after">
+                <div attrs="{'invisible': [('recurrency', '=', False)]}" class="oe_grey">
+                    <i>Pour modifier les participants, éditez les règles de récurrence</i>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="attrs">{'invisible': [('recurrency', '=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='secteur_id']" position="attributes">
+                <attribute name="attrs">{'readonly': [('recurrency', '=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='secteur_id']" position="attributes">
+                <attribute name="attrs">{'invisible': [('type_id', '=', %(of_planning_recurring.of_service_type_misc)d)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='service_id']" position="attributes">
+                <attribute name="attrs">{'invisible': [('type_id', '=', %(of_planning_recurring.of_service_type_misc)d)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='type_id']" position="attributes">
+                <attribute name="attrs">{'readonly': ['|', ('service_id', '!=', False), ('recurrency', '=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='all_day']" position="attributes">
+                <attribute name="attrs">{'invisible': [('recurrency','=',True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='all_day']" position="before">
+                <label for="recurrency" attrs="{'invisible': [('type_id', 'not in', (False, %(of_planning_recurring.of_service_type_misc)d))]}"/>
+                <div attrs="{'invisible': [('type_id', 'not in', (False, %(of_planning_recurring.of_service_type_misc)d))]}">
+                    <field name="recurrency" class="oe_inline" nolable="1" readonly="1"/>
+                    <button type="object" name="action_edit_recurrency" class="oe_link oe_inline"
+                            string="Éditer les règles de récurrence"
+                            help="Cliquer ici pour modifier les règles de récurrence."/>
+                </div>
+                <field name="rrule_display" attrs="{'invisible': [('recurrency', '=', False)]}"/>
+                <field name="date_prompt" class="oe_inline" widget="date" string="Occurence du"
+                       attrs="{'invisible': [('recurrency', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//label[@name='debut_label']" position="attributes">
+                <attribute name="attrs">{'invisible': [('recurrency', '=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//div[@name='debut_value']" position="attributes">
+                <attribute name="attrs">{'invisible': [('recurrency', '=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//label[@name='fin_label']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('forcer_dates', '=', True), ('recurrency', '=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//div[@name='fin_value']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('forcer_dates', '=', True), ('recurrency', '=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//label[@name='fin_force_label']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|',('forcer_dates', '=', False),('recurrency', '=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//div[@name='fin_force_value']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|',('forcer_dates', '=', False),('recurrency', '=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='forcer_dates']" position="attributes">
+                <attribute name="attrs">{'readonly': [('id', '!=', False), ('recurrency','=',True)], 'invisible': [('recurrency','=',True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='verif_dispo']" position="attributes">
+                <attribute name="attrs">{'invisible': [('recurrency','=',True)]}</attribute>
+            </xpath>
+            <xpath expr="//group[@name='origin']" position="attributes">
+                <attribute name="attrs">{'invisible': [('type_id', '=', %(of_planning_recurring.of_service_type_misc)d)]}</attribute>
+            </xpath>
+            <xpath expr="//group[@name='misc']" position="attributes">
+                <attribute name="attrs">{'invisible': [('type_id', '=', %(of_planning_recurring.of_service_type_misc)d)]}</attribute>
+            </xpath>
+            <xpath expr="//page[@name='facturation']" position="attributes">
+                <attribute name="attrs">{'invisible': [('type_id', '=', %(of_planning_recurring.of_service_type_misc)d)]}</attribute>
+            </xpath>
+            <xpath expr="//page[@name='parc_installe']" position="attributes">
+                <attribute name="attrs">{'invisible': [('type_id', '=', %(of_planning_recurring.of_service_type_misc)d)]}</attribute>
+            </xpath>
+            <xpath expr="//page[@name='questionnaire']" position="attributes">
+                <attribute name="attrs">{'invisible': [('type_id', '=', %(of_planning_recurring.of_service_type_misc)d)]}</attribute>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Récurrence" invisible="1">
+                    <!-- tout est invisible, mais j'ai gardé l'ergo au cas où on veuille revenir sur l'idée de l'onglet -->
+                    <group attrs="{'invisible': ['|', ('recurrency', '=', False), ('id', '=', False)]}" class="oe_edit_only" colspan="2" groups="of_planning_recurring.of_group_planning_intervention_recurring">
+                        <div colspan="2" class='alert alert-warning'> Cet évènement est lié à une récurrence.<br/>
+                            Si vous le modifiez, toutes les occurences seront affectées.<br/>
+                            <button type="object" name="action_detach_recurring_event" class="oe_link"
+                                    string="Modifier seulement cette ocurrence"
+                                    help="Cliquer ici pour détacher cette occurence des autres.
+                                          À utiliser pour appliquer des modifications exceptionnelles."/>
+                            <button type="object" name="action_cut_recurring_event" class="oe_link"
+                                    string="Modifier cette ocurrence et les suivantes (mais pas les précédentes)"
+                                    help="Cliquer ici pour séparer les précédentes occurences de celle-ci et des suivantes.
+                                          À utiliser pour appliquer des modifications durables sans changer les RDVs précédents."/>
+
+                        </div>
+                        <field name="id" attrs="{'invisible': True}" nolabel="1"/>
+                        <field name="rrule" invisible="1" readonly="0" nolabel="1"/>
+                        <field name="recurrent_id" invisible="1" nolabel="1" colspan="2"/>
+                    </group>
+                    <group colspan="2" attrs="{'invisible': [('recurrency', '=', False)]}">
+                        <label for="interval"/>
+                        <div>
+                            <field name="interval" nolabel="1" class="oe_inline of_ws" attrs="{'required': [('recurrency', '=', True)]}" style="width: 40%"/>
+                            <field name="rrule_type" nolabel="1" class="oe_inline" attrs="{'required': [('recurrency', '=', True)]}"/>
+                        </div>
+                        <label string="Jusqu'à" for="end_type"/>
+                        <div>
+                            <field name="end_type" nolabel="1" class="oe_inline of_ws" attrs="{'required': [('recurrency', '=', True)]}"/>
+                            <field name="count" nolabel="1" class="oe_inline of_ws" attrs="{'invisible': [('end_type', '!=', 'count')], 'required': [('recurrency', '=', True)]}"/>
+                            <field name="final_date" nolabel="1" class="oe_inline" attrs="{'invisible': [('end_type', '!=', 'end_date')], 'required': [('end_type', '=', 'end_date')]}"/>
+                        </div>
+                    </group>
+                    <group attrs="{'invisible': ['|', ('rrule_type', '!=', 'weekly'), ('recurrency', '=', False)]}"
+                           name="weekdays" colspan="2">
+                        <field name="jour_ids" widget="many2many_tags"/>
+                        <field name="mo"/>
+                        <field name="tu"/>
+                        <field name="we"/>
+                        <field name="th"/>
+                        <field name="fr"/>
+                        <field name="sa"/>
+                        <field name="su"/>
+                    </group>
+                    <group attrs="{'invisible': ['|', ('rrule_type', '!=', 'monthly'), ('recurrency', '=', False)]}"
+                           colspan="2">
+                        <label string="Choix du jour" for="month_by"/>
+                        <div class="o_row">
+                            <field name="month_by" attrs="{'required': [('rrule_type', '=', 'monthly')]}"/>
+                            <field name="day"
+                                attrs="{'required': [('month_by', '=', 'date'), ('rrule_type', '=', 'monthly')],
+                                        'invisible': [('month_by', '!=', 'date')]}"/>
+                            <field name="byday" string="Le"
+                                attrs="{'required': [('month_by', '=', 'day'), ('rrule_type', '=', 'monthly')],
+                                        'invisible': [('month_by', '!=', 'day')]}"/>
+                            <field name="week_list" nolabel="1"
+                                attrs="{'required': [('month_by', '=', 'day'), ('rrule_type', '=', 'monthly')],
+                                        'invisible': [('month_by', '!=', 'day')]}"/>
+                        </div>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

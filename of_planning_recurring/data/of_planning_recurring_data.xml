@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo noupdate="1">
+
+    <!--#############################################################################################################
+        ####        O F . S E R V I C E . T Y P E
+        #############################################################################################################-->
+
+    <record id="of_service_type_misc" model="of.service.type">
+        <field name="name">Divers</field>
+        <field name="dispo_service">False</field>
+        <field name="active">False</field>
+    </record>
+
+</odoo>
