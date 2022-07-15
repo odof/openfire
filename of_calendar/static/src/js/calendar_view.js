@@ -822,7 +822,17 @@ CalendarView.include({
             if (event["id"] < 0) {
                 Dialog.alert(
                     self.$el,
-                    "Le drag and drop (glisser/déposer) n'est pas possible pour les créneaux dispos"
+                    "Le drag and drop (glisser/déposer) n'est pas possible ni pour les créneaux dispos, " +
+                    "ni pour les jours fériés."
+                );
+                _revertFunc();
+                return
+            }
+            // inhiber le drag and drop pour les évènement régulier
+            if (typeof(event["id"]) == "string") {
+                Dialog.alert(
+                    self.$el,
+                    "Le drag and drop (glisser/déposer) n'est pas possible pour les évènements réguliers."
                 );
                 _revertFunc();
                 return

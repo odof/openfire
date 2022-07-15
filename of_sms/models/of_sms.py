@@ -495,8 +495,7 @@ class OFSMSConfiguration(models.TransientModel):
 
 
 class OFPlanningIntervention(models.Model):
-    _name = "of.planning.intervention"
-    _inherit = ["of.planning.intervention", 'mail.thread']
+    _inherit = 'of.planning.intervention'
 
     of_envoye_par_sms_client = fields.Boolean(string=u"SMS client envoyé ?", default=False)
 

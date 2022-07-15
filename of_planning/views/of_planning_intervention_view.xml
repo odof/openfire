@@ -256,7 +256,7 @@
                     <field name="alert_hors_creneau" invisible="1"/>
                     <field name="alert_incapable" invisible="1"/>
                     <field name="alert_coherence_date" invisible="1"/>
-                    <group>
+                    <group name="main">
                         <group>
                             <field name="template_id" attrs="{'readonly': [('number', '!=', False), ('state', 'not in', ('draft', 'cancel'))]}"/>
                             <field name="flexible" attrs="{'readonly': [('state','in',['done'])]}" groups="of_planning.of_group_planning_intervention_flexibility"/>
@@ -309,13 +309,13 @@
                         <group name="when" string="Quand" class="of_grey_background">
                             <group colspan="2">
                                 <field name="all_day"/>
-                                <label for="date"/>
-                                <div>
+                                <label name="debut_label" for="date"/>
+                                <div name="debut_value">
                                     <field name="jour" class="oe_inline of_ws"/>
                                     <field name="date" class="oe_inline"/>
                                 </div>
-                                <label for="date_deadline" attrs="{'invisible': [('forcer_dates', '=', True)]}"/>
-                                <div attrs="{'invisible': [('forcer_dates', '=', True)]}">
+                                <label name="fin_label" for="date_deadline" attrs="{'invisible': [('forcer_dates', '=', True)]}"/>
+                                <div name="fin_value" attrs="{'invisible': [('forcer_dates', '=', True)]}">
                                     <field name="jour_fin" class="oe_inline of_ws"
                                            attrs="{'invisible': [('alert_hors_creneau', '=', True)]}"/>
                                     <field name="date_deadline" class="oe_inline"
@@ -325,8 +325,9 @@
                                     </div>
                                 </div>
                                 <field name="horaire_du_jour" attrs="{'invisible': [('alert_hors_creneau', '=', False)]}"/>
-                                <label for="date_deadline_forcee" attrs="{'invisible': [('forcer_dates', '=', False)]}"/>
-                                <div attrs="{'invisible': [('forcer_dates', '=', False)]}">
+                                <label name="fin_force_label" for="date_deadline_forcee"
+                                       attrs="{'invisible': [('forcer_dates', '=', False)]}"/>
+                                <div name="fin_force_value" attrs="{'invisible': [('forcer_dates', '=', False)]}">
                                     <field name="jour_fin_force" class="oe_inline of_ws"/>
                                     <field name="date_deadline_forcee" class="oe_inline"
                                            attrs="{'required': [('forcer_dates', '=', True)]}"/>
@@ -430,10 +431,6 @@
                                 </div>
                                 <field name="price_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                             </group>
-                        </page>
-
-                        <page name="recap" string="Compte rendu" invisible="1">
-                            <group/>
                         </page>
                     </notebook>
                 </sheet>

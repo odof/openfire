@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
+<odoo>
+
+    <record id="of_update_rec_rules_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.update.rec.rules.wizard.view.form</field>
+        <field name="model">of.update.rec.rules.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group string="Récurrence" name="recurrency" colspan="2">
+                        <group colspan="2">
+                            <field name="recurrency"/>
+                        </group>
+                        <group attrs="{'invisible': [('recurrency', '=', False)]}" colspan="2">
+                            <label for="interval"/>
+                            <div>
+                                <field name="interval" nolabel="1" class="oe_inline of_ws" attrs="{'required': [('recurrency', '=', True)]}" style="width: 40%"/>
+                                <field name="rrule_type" nolabel="1" class="oe_inline" attrs="{'required': [('recurrency', '=', True)]}"/>
+                            </div>
+                            <label for="jour_ids" string="Les" attrs="{'invisible': [('rrule_type', '!=', 'weekly')]}"/>
+                            <field name="jour_ids" nolabel="1" widget="many2many_tags" readonly="0"
+                                   attrs="{'invisible': [('rrule_type', '!=', 'weekly')]}"/>
+
+                            <label string="Choix du jour" for="month_by" attrs="{'invisible': [('rrule_type', '!=', 'monthly')]}"/>
+                            <div class="o_row">
+                                <field name="month_by"
+                                       attrs="{'required': [('rrule_type', '=', 'monthly')], 'invisible': [('rrule_type', '!=', 'monthly')]}"/>
+                                <field name="day"
+                                    attrs="{'required': [('month_by', '=', 'date'), ('rrule_type', '=', 'monthly')],
+                                            'invisible': ['|', ('rrule_type', '!=', 'monthly'), ('month_by', '!=', 'date')]}"/>
+                                <field name="byday" string="Le"
+                                    attrs="{'required': [('month_by', '=', 'day'), ('rrule_type', '=', 'monthly')],
+                                            'invisible': ['|', ('rrule_type', '!=', 'monthly'), ('month_by', '!=', 'day')]}"/>
+                                <field name="week_list" nolabel="1"
+                                    attrs="{'required': [('month_by', '=', 'day'), ('rrule_type', '=', 'monthly')],
+                                            'invisible': ['|', ('rrule_type', '!=', 'monthly'), ('month_by', '!=', 'day')]}"/>
+                            </div>
+
+                            <field name="rec_start_date"/>
+                            <label string="Jusqu'à" for="end_type"/>
+                            <div>
+                                <field name="end_type" nolabel="1" class="oe_inline of_ws" attrs="{'required': [('recurrency', '=', True)]}"/>
+                                <field name="count" nolabel="1" class="oe_inline of_ws" attrs="{'invisible': [('end_type', '!=', 'count')], 'required': [('recurrency', '=', True)]}"/>
+                                <field name="final_date" nolabel="1" class="oe_inline" attrs="{'invisible': [('end_type', '!=', 'end_date')], 'required': [('end_type', '=', 'end_date')]}"/>
+                                <span attrs="{'invisible': [('end_type', '=', 'end_date')]}">
+                                    (<field name="rec_stop_date" nolabel="1" class="oe_inline"/>)
+                                </span>
+                            </div>
+                        </group>
+                    </group>
+                    <group colspan="2" name="intervention" string="Intervention">
+                        <field name="employee_ids" widget="many2many_tags"/>
+                        <field name="all_day"/>
+                        <label for="start_hour" string="Heures" attrs="{'invisible': [('all_day', '=', True)]}"/>
+                        <div attrs="{'invisible': [('all_day', '=', True)]}">
+                            <field name="start_hour" nolabel="1" class="oe_inline of_ws" widget="float_time"
+                                   attrs="{'required': [('recurrency', '=', True)]}"/>
+                            -
+                            <field name="end_hour" nolabel="1" class="oe_inline" widget="float_time"
+                                   attrs="{'required': [('recurrency', '=', True)]}"/>
+                            <div attrs="{'invisible': [('alert_coherence_hours', '=', False)]}"
+                                 class="of_red">
+                                <i class="fa fa-warning of_ws"/>
+                                l'heure de fin doit être supérieure à l'heure de début
+                            </div>
+                        </div>
+                        <field name="date_occurence" string="Occurence du"/>
+                    </group>
+
+                    <group name="weekdays" colspan="2" invisible="1">
+                        <field name="mo"/>
+                        <field name="tu"/>
+                        <field name="we"/>
+                        <field name="th"/>
+                        <field name="fr"/>
+                        <field name="sa"/>
+                        <field name="su"/>
+                    </group>
+
+                    <group colspan="2" invisible="1">
+                        <field name="occurence_id_str"/>
+                        <field name="is_rule_modified"/>
+                        <field name="is_start_modified"/>
+                        <field name="interv_origin_id" nolabel="1" class="oe_inline"/> -
+                        <field name="date"/>
+                        <field name="date_deadline"/>
+                        <field name="duration"/>
+                        <field name="duration_computed"/>
+                        <field name="recurrency_origin"/>
+                        <field name="rrule" readonly="0" nolabel="1"/>
+                        <field name="recurrent_id" nolabel="1" colspan="2"/>
+                        <field name="alert_coherence_hours"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="button_make_rec" string="Créer la récurrence" type="object" colspan="4" class="btn-primary"
+                        attrs="{'invisible': ['|', ('recurrency_origin', '=', True), ('recurrency', '=', False)]}"
+                        help="Les différentes occurences apparaitront dans le planning."/>
+                    <button name="button_undo_rec" string="Supprimer la récurrence" type="object" colspan="4" class="btn-primary"
+                        attrs="{'invisible': ['|', ('is_rule_modified', '=', False), ('recurrency', '=', True)]}"
+                        help="Les modification éventuelles d'heures et d'intervenants seront bien prises en compte"/>
+                    <b attrs="{'invisible': ['|', '|', ('recurrency', '=', False), ('recurrency_origin', '=', False), ('alert_coherence_hours', '=', True)]}" class="of_ws">
+                        Appliquer à
+                    </b>
+                    <button name="button_edit_all" string="Toutes les occurences" type="object" colspan="4" class="btn-primary"
+                        attrs="{'invisible': ['|', '|', ('recurrency', '=', False), ('recurrency_origin', '=', False), ('alert_coherence_hours', '=', True)]}"
+                        help="Les RDVs liés à cette récurrence seront recalculés dans les planning, depuis le début."/>
+                    <button name="button_edit_this_and_next" string="Cette occurence et les suivantes" type="object" colspan="4" class="btn-primary"
+                        attrs="{'invisible': ['|', '|', '|', ('is_start_modified', '=', True), ('recurrency', '=', False), ('recurrency_origin', '=', False), ('alert_coherence_hours', '=', True)]}"
+                        help="Les RDVs liés à cette récurrence seront recalculés dans les planning, à partir de cette occurence."/>
+                    <button name="button_edit_this" string="Uniquement cette occurence" type="object" colspan="4" class="btn-primary"
+                        attrs="{'invisible': ['|', '|', '|', '|', ('is_start_modified', '=', True), ('is_rule_modified', '=', True), ('recurrency', '=', False), ('recurrency_origin', '=', False), ('alert_coherence_hours', '=', True)]}"
+                        help="Ce RDV sera détaché des autres RDVs de la récurrence."/>
+                    <button name="button_edit_this_disabled" string="Uniquement cette occurence" colspan="4" type="object" class="btn-default disabled"
+                        attrs="{'invisible': ['|', '|', '|', '|', ('is_start_modified', '=', True), ('is_rule_modified', '!=', True), ('recurrency', '=', False), ('recurrency_origin', '=', False), ('alert_coherence_hours', '=', True)]}"
+                        help="Il n'as pas possible de modifier seulement cette occurence si les règles de récurrence ont changé."/>
+                    <button string="Annuler" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

@@ -11,7 +11,6 @@
      - RDV pour les clients
      - Recherche géolocalisée des clients (Adresse Livraison)""",
     "depends": [
-        'of_planning',
         'of_service',
         'of_geolocalize',
         'of_map_view',
