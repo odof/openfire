@@ -454,6 +454,7 @@
                             </div>
                             <field name="partner_code_magasin"/>
                             <field name="partner_id"/>
+                            <field name="contract_id"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                         <group col="2" colspan="2" name="description" string="Description">
