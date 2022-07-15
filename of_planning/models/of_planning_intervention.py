@@ -1016,12 +1016,11 @@ class OfPlanningIntervention(models.Model):
         for rdv in self:
             if rdv.order_id:
                 total = rdv.order_id.amount_total
-                still_due = total
+                if hasattr(rdv.order_id, 'payment_ids'):
+                    still_due = total - sum(rdv.order_id.payment_ids.mapped('of_amount_total'))
+                else:
+                    still_due = 0.0
                 rdv.order_amount_total = total
-                lines = rdv.order_id.order_line
-                payments = rdv.order_id._of_get_printable_payments(lines)  # sous la forme (lib, amount)
-                for _, amount in payments:
-                    still_due -= amount
                 rdv.order_still_due = still_due
 
     @api.depends('picking_ids')
