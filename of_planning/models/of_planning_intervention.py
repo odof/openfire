@@ -485,9 +485,9 @@ class OfPlanningIntervention(models.Model):
     order_id = fields.Many2one(
         "sale.order", string=u"Commande",
         domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")
-    order_amount_total = fields.Monetary(string="Total CC", readonly=True, compute='_compute_order_amounts')
+    order_amount_total = fields.Monetary(string=u"Montant CC", readonly=True, compute='_compute_order_amounts')
     order_still_due = fields.Monetary(string=u"Restant dû CC", readonly=True, compute='_compute_order_amounts')
-    picking_amount_total = fields.Monetary(string="Total BL", readonly=True, compute='_compute_picking_amounts')
+    picking_amount_total = fields.Monetary(string=u"Montant BL lié", readonly=True, compute='_compute_picking_amounts')
 
     # Onglet Description
     description = fields.Text(string="Description")
@@ -1023,7 +1023,7 @@ class OfPlanningIntervention(models.Model):
                 rdv.order_amount_total = total
                 rdv.order_still_due = still_due
 
-    @api.depends('picking_ids')
+    @api.depends('picking_id')
     def _compute_picking_amounts(self):
         for rdv in self:
             if rdv.picking_id:
