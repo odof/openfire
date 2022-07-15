@@ -102,7 +102,10 @@
                 <xpath expr="//field[@name='order_line']/form/group/group[2]" position="inside">
                     <field name="of_article_principal" string="Est l'article principal"/>
                 </xpath>
-
+                <xpath expr="//field[@name='order_line']//form//field[@name='product_id']" position="attributes">
+                    <attribute name="context" remove="}" separator="}"/>
+                    <attribute name="context" add="'search_default_brand_id': of_brand_id,}"/>
+                </xpath>
                 <!-- Gestion de la remise interdite -->
                 <xpath expr="//field[@name='order_line']//form//field[@name='product_id']" position="after">
                     <field name="of_product_forbidden_discount" groups="sales_team.group_sale_manager"/>
