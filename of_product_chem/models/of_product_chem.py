@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import api, fields, models
 
@@ -66,6 +67,7 @@ ${'\\n' + object.description_sale}
     of_emission_co = fields.Char(string=u"Émission de CO", help=u"Exprimé en % à 13% d'O2")
     of_emission_poussiere = fields.Char(string=u"Émission de poussière", help=u"Exprimé en mg/Nm3 à 13% d'O2")
     of_emission_nox = fields.Char(string=u"Émission de NOx", help=u"Exprimé en mg/Nm3 à 13% d'O2")
+    of_cog_emission = fields.Char(string=u"Émission de COG", help=u"Exprimé en mg/m3")
     of_indice_i = fields.Char(string=u"Indice I")
     of_efficacite_saison = fields.Float(string=u"% Efficacité énergétique saisonnière", digits=(2, 2))
     of_fonds_air_bois = fields.Boolean(string=u"Éligible Fonds Air Bois ?")
@@ -91,6 +93,22 @@ class OfProductBrand(models.Model):
                     exist_index = descr.find(u'% if object.of_efficacite_saison:')
                     to_add_str = u'''\n% if object.of_efficacite_saison:
 Efficacité énergétique saisonnière : ${object.of_efficacite_saison} %
+% endif
+'''
+                    if insert_index != -1 and exist_index == -1:
+                        brand.description_sale = u"%s%s%s" % (descr[:insert_index], to_add_str, descr[insert_index:])
+                    elif exist_index == -1:
+                        brand.description_sale = descr + to_add_str
+            if version < '10.0.3':
+                brands = self.search([('description_sale', '!=', False)])
+                # pour chaque marque, on essaye d'insérer dans la description si possible, ou à la fin sinon
+                # seulement si l'ajout n'est pas déjà présent
+                for brand in brands:
+                    descr = brand.description_sale
+                    insert_index = descr.find(u'% if object.of_indice_i:')
+                    exist_index = descr.find(u'% if object.of_cog_emission:')
+                    to_add_str = u'''% if object.of_cog_emission:
+Émission de COG : ${object.of_cog_emission} mg/m3
 % endif
 '''
                     if insert_index != -1 and exist_index == -1:
@@ -127,6 +145,9 @@ Rendement : ${object.of_rendement} %
 % endif
 % if object.of_emission_nox:
 Émission de NOx : ${object.of_emission_nox} mg/Nm3 à 13% d'O2
+% endif
+% if object.of_cog_emission:
+Émission de COG : ${object.of_cog_emission} mg/m3
 % endif
 % if object.of_indice_i:
 Indice I : ${object.of_indice_i}
