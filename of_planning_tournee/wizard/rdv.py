@@ -18,13 +18,19 @@ from odoo.addons.calendar.models.calendar import calendar_id2real_id
 
 _logger = logging.getLogger(__name__)
 
+AM_LIMIT_FLOAT = 12.0
+
 SEARCH_MODES = [
     ('distance_a', u'Distance Aller (km)'),
     ('distance_r', u'Distance Retour (km)'),
     ('distance_ar', u'Distance Aller/Retour (km)'),
+    ('distance_a_or_r', u'Distance Aller ou Retour (km)'),
+    ('distance_a_am_r_pm', u'Distance Aller si matin / Retour si après-midi (km)'),
     ('duree_a', u'Durée Aller (min)'),
     ('duree_r', u'Durée Retour (min)'),
     ('duree_ar', u'Durée Aller/Retour (min)'),
+    ('duree_a_or_r', u'Durée Aller ou Retour (min)'),
+    ('duree_a_am_r_pm', u'Durée Aller si matin / Retour si après-midi (min)'),
 ]
 
 """
@@ -931,30 +937,31 @@ class OfTourneeRdv(models.TransientModel):
                             duree_dispo = sum([c.date_flo_deadline - c.date_flo for c in crens])
 
                             if crens[0].disponible:
-                                if mode_recherche == 'distance_a':
-                                    vals['distance_utile'] = vals['dist_prec']
-                                    vals['duree_utile'] = vals['duree_prec']
+                                if mode_recherche.startswith('distance_'):
                                     val_utile = 'distance_utile'
-                                elif mode_recherche == 'distance_r':
-                                    vals['distance_utile'] = vals['dist_suiv']
-                                    vals['duree_utile'] = vals['duree_suiv']
-                                    val_utile = 'distance_utile'
-                                elif mode_recherche == 'distance_ar':
-                                    vals['distance_utile'] = vals['distance']
-                                    vals['duree_utile'] = vals['duree']
-                                    val_utile = 'distance_utile'
-                                elif mode_recherche == 'duree_a':
-                                    vals['duree_utile'] = vals['duree_prec']
-                                    vals['distance_utile'] = vals['dist_prec']
-                                    val_utile = 'duree_utile'
-                                elif mode_recherche == 'duree_r':
-                                    vals['duree_utile'] = vals['duree_suiv']
-                                    vals['distance_utile'] = vals['dist_suiv']
-                                    val_utile = 'duree_utile'
                                 else:
-                                    vals['duree_utile'] = vals['duree']
-                                    vals['distance_utile'] = vals['distance']
                                     val_utile = 'duree_utile'
+
+                                if mode_recherche in ['distance_a', 'duree_a']:
+                                    vals['distance_utile'] = vals['dist_prec']
+                                    vals['duree_utile'] = vals['duree_prec']
+                                elif mode_recherche in ['distance_r', 'duree_r']:
+                                    vals['distance_utile'] = vals['dist_suiv']
+                                    vals['duree_utile'] = vals['duree_suiv']
+                                elif mode_recherche in ['distance_ar', 'duree_ar']:
+                                    vals['distance_utile'] = vals['distance']
+                                    vals['duree_utile'] = vals['duree']
+                                elif mode_recherche in ['distance_a_or_r', 'duree_a_or_r']:
+                                    vals['distance_utile'] = min(vals['dist_prec'], vals['dist_suiv'])
+                                    vals['duree_utile'] = min(vals['duree_prec'], vals['duree_suiv'])
+                                elif mode_recherche in ['distance_a_am_r_pm', 'duree_a_am_r_pm']:
+                                    if crens[0].date_flo <= AM_LIMIT_FLOAT:  # one way, if morning
+                                        vals['distance_utile'] = vals['dist_prec']
+                                        vals['duree_utile'] = vals['duree_prec']
+                                    else:  # return, if afternoon
+                                        vals['distance_utile'] = vals['dist_suiv']
+                                        vals['duree_utile'] = vals['duree_suiv']
+
                                 # Créneau plus loin que la recherche accepte
                                 if vals[val_utile] > maxi:
                                     vals['force_color'] = "#FF0000"
