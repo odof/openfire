@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 
 
@@ -63,7 +63,6 @@ class OfInterventionSettings(models.TransientModel):
         ], string="(OF) BL d'intervention")
     group_of_group_planning_intervention_flexibility = fields.Boolean(
         string=u"Flexibilité des RDV", implied_group='of_planning.of_group_planning_intervention_flexibility')
-
 
     @api.multi
     def set_calendar_min_time_defaults(self):

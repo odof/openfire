@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Vue vide, à supprimer après l'application en production -->
-    <record id="of_tournee_planning_intervention_view_form" model="ir.ui.view">
-        <field name="name">of.planning.intervention.form</field>
-        <field name="model">of.planning.intervention</field>
-        <field name="active" eval="False"/>
-        <field name="arch" type="xml">
-            <form/>
-        </field>
-    </record>
-
     <record id="of_planning_tournee_view_form" model="ir.ui.view">
         <field name="name">of.planning.tournee.form</field>
         <field name="model">of.planning.tournee</field>
@@ -37,6 +27,11 @@
                     <field name="epi_lon" attrs="{'required': [('is_bloque', '=', False)]}"/>
                     <separator colspan="4" string="Documents"/>
                 </group>
+                <notebook>
+                    <page name="intervention_map" string="Map">
+                        <field name="intervention_map_ids" mode="map" nolabel="1" context="{'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_map_view', 'active_tour_id': active_id}"/>
+                    </page>
+                </notebook>
             </form>
         </field>
     </record>
@@ -77,6 +72,7 @@
              </search>
         </field>
     </record>
+
 
     <record id="action_of_planning_tournee_tree" model="ir.actions.act_window">
         <field name="name">Préparation des tournées</field>

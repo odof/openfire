@@ -88,14 +88,24 @@ var MapView = View.extend({
         this.qweb = new QWeb(session.debug, {_s: session.origin}, false);
 
         this._model = new Model(this.dataset.model);
-
+        this.min_width = this.fields_view.arch.attrs.min_width;
+        this.min_height = this.fields_view.arch.attrs.min_height;
         this.lat_field = this.fields_view.arch.attrs.latitude_field;
         this.lng_field = this.fields_view.arch.attrs.longitude_field;
+        this.tour_number = this.fields_view.arch.attrs.number_field;
+        this.first_address = this.fields_view.arch.attrs.is_first_field;
+        this.last_address = this.fields_view.arch.attrs.is_last_field;
+        this.hide_pager = this.fields_view.arch.attrs.hide_pager || '0';
         this.name = "" + this.fields_view.arch.attrs.string;
         this.legend_context = JSON.parse(this.fields_view.arch.attrs.legend_context || "{}");
         this.fields = this.fields_view.fields;
         this.fields_keys = _.keys(this.fields_view.fields);
-
+        if (this.dataset.get_context().__eval_context.__contexts[1].intervention_to_preview) {
+            // This is the data of the intervention to plan, we want to display it on the map with a fake record marker.
+            this.intervention_to_preview = JSON.parse(this.dataset.get_context().__eval_context.__contexts[1].intervention_to_preview);
+        } else {
+            this.intervention_to_preview = false;
+        }
         this.grouped = undefined;  // later implementation
         this.group_by_field = undefined;  // later implementation
         this.default_group_by = this.fields_view.arch.attrs.default_group_by;  // later implementation
@@ -136,7 +146,12 @@ var MapView = View.extend({
         this.record_options = {};
         this.record_options.latitude_field = this.lat_field;
         this.record_options.longitude_field = this.lng_field;
+        this.record_options.number_field = this.tour_number;
+        this.record_options.intervention_to_preview = this.intervention_to_preview;
+        this.record_options.is_first_field = this.first_address;
+        this.record_options.is_last_field = this.last_address;
         this.record_options.color_field = this.fields_view.arch.attrs.color_field;
+        this.record_options.connect_markers = this.fields_view.arch.attrs.connect_markers || '0';
     },
     init_displayer_options: function() {
         this.displayer_options = {};
@@ -144,9 +159,10 @@ var MapView = View.extend({
         this.displayer_options.legends = [];
         this.displayer_options.context = this.legend_context;
         if (this.fields_view.arch.attrs.color_field) {
+            var legend_method = this.fields_view.arch.attrs.force_legend_method || 'get_color_map';
             var legend_color = {
                 name: 'legend_color',
-                method: 'get_color_map',
+                method: legend_method,
                 template: 'MapView.legend.colors'
             };
             this.displayer_options.legends.push(legend_color);
@@ -319,7 +335,8 @@ var MapView = View.extend({
                         self.map.reset_layer_groups();
                     })
                     .then(function() {
-                        if (self.records.length) {
+                        if (self.records.length || self.record_options.intervention_to_preview !== undefined) {
+                            // if there is no records to display but there is an intervention to preview, display it
                             self.map.add_layer_group(self.records,self.record_options);
                             self.map.nocontent_displayer.do_hide();
                         }else{
@@ -469,7 +486,12 @@ var MapView = View.extend({
         if (this.dataset.select_id(event.data.id)) {
             this.do_switch_view('form', options);
         } else {
-            this.do_warn("Map: could not find id#" + event.data.id);
+            // We are using a fake record marker to display the intervention to plan on the map with the other reals
+            // intervention on the Tour. So there is a fake id on the record that is not in the dataset.
+            // We don't want to display the warning message in this case.
+            if (event.target.options.intervention_to_preview === undefined || event.target.options.intervention_to_preview.id != event.data.id) {
+                this.do_warn("Map: could not find id#" + event.data.id);
+            }
         }
     },
     /**
@@ -688,7 +710,10 @@ MapView.Map = Widget.extend({
             var v = self.view;
             v.do_search(v.domain,v.context,v.group_by);
         });
-        
+        // when the map is loaded and attached to the container, if needed we will hide the pager above the map.
+        if (self.view.hide_pager == '1') {
+            self.view.ViewManager.$el.find('.o_x2m_control_panel').addClass('o_hidden');
+        }
     },
     /**
      *  adds a layer group to the map's list of layer groups.
@@ -969,17 +994,25 @@ MapView.LayerGroup = Widget.extend({
                 console.log("undefined record at index ",i);
                 return;
             }
-            var lat, lng, marker, icon, id;
+            var lat, lng, marker, icon, id, number, first_address, last_address;
             lat = this.records[i][this.options.latitude_field];
             lng = this.records[i][this.options.longitude_field];
-
+            number = this.records[i][this.options.number_field] || false;
+            first_address = this.records[i][this.options.is_first_field] || false;
+            last_address = this.records[i][this.options.is_last_field] || false;
             if (this.options.custom_icon) {
                 var options = this.options.icon_options.unselected;
                 options['id'] = 'icon_'+this.records[i].id;
                 options["iconUrl"] = this.get_color_url(this.records[i]);
-
+                if (number && (!first_address && !last_address)) {
+                    options["prefix"] = '';
+                    options["glyph"] = number;
+                } else {
+                    // we dont want to display the number if it is the first or last address
+                    options["prefix"] = 'mdi';
+                    options["glyph"] = 'radiobox-blank';
+                }
                 icon = L.icon.glyph(options);
-
                 marker = new MapView.Marker([lat, lng],this,this.records[i],{icon:icon});
             }else{
                 marker = new MapView.Marker([lat, lng],this,this.records[i]);
@@ -1005,7 +1038,8 @@ MapView.LayerGroup = Widget.extend({
             this.the_layer.clearLayers();
         }
         this.the_layer = new L.LayerGroup();
-        var lat, lng, marker, icon, id;
+        var lat, lng, marker, icon, id, number, first_address, last_address, currentMarker;
+        const latlngs = [];
         for (var i=0; i<this.records.length; i++) {
             //console.log(this.records[i]);
             if (this.records[i] == undefined || this.records[i].rendered) {
@@ -1013,27 +1047,51 @@ MapView.LayerGroup = Widget.extend({
             }
             lat = this.records[i][this.options.latitude_field];
             lng = this.records[i][this.options.longitude_field];
-
+            latlngs.push([lat, lng]);
+            number = this.records[i][this.options.number_field] || false;
+            first_address = this.records[i][this.options.is_first_field] || false;
+            last_address = this.records[i][this.options.is_last_field] || false;
             if (this.options.custom_icon) {
                 var options = this.options.icon_options.unselected;
                 options['id'] = 'icon_'+this.records[i].id;
                 options["iconUrl"] = this.get_color_url(this.records[i]);
-
+                if (number && (!first_address && !last_address)) {
+                    options["prefix"] = '';
+                    options["glyph"] = number;
+                } else {
+                    // we dont want to display the number if it is the first or last address
+                    options["prefix"] = 'mdi';
+                    options["glyph"] = 'radiobox-blank';
+                }
                 icon = L.icon.glyph(options);
-
                 marker = new MapView.Marker([lat, lng],this,this.records[i],{icon:icon});
             }else{
                 marker = new MapView.Marker([lat, lng],this,this.records[i]);
             }
-                    
             this.the_layer.addLayer(marker);
             marker.set_ids_dict_ref();
             this.records[i]["rendered"] = true;
         }
-
+        // Add the current maker for the current service that we are trying to plan
+        if (this.options.intervention_to_preview){
+            var options = this.options.icon_options.unselected;
+            // this id is a negative value to avoid conflict with existing ids of real markers
+            options['id'] = 'icon_' + this.options.intervention_to_preview.id;
+            options["iconUrl"] = iconUrls["green"];
+            options["prefix"] = 'mdi';
+            options["glyph"] = 'radiobox-blank';
+            icon = L.icon.glyph(options);
+            currentMarker = this.options.intervention_to_preview;
+            marker = new MapView.Marker([currentMarker.geo_lat, currentMarker.geo_lng],this,currentMarker,{icon:icon});
+            this.the_layer.addLayer(marker);
+            marker.set_ids_dict_ref();
+        }
         if (this.options.auto_addTo) {
             this.the_layer.addTo(this.map.the_map);
             this.visible = true;
+            if (this.options.connect_markers == '1' && latlngs.length > 0) {
+                this.do_connect_dot(latlngs);  // Add simple lines between the markers on the map
+            }
             this.do_show_range(this.map.view.current_min-1,false,true,set_bounds);
         }
 
@@ -1114,6 +1172,10 @@ MapView.LayerGroup = Widget.extend({
                 found = true;
                 break;
             }
+        }
+        // If there is a fake marker, we need to check it too
+        if (this.options.intervention_to_preview != undefined && this.options.intervention_to_preview.id === id) {
+            found = true;
         }
         return found;
     },
@@ -1217,6 +1279,9 @@ MapView.LayerGroup = Widget.extend({
             this.do_show_range(0,i1);
             this.do_show_range(i2,this.records.length);
         }
+    },
+    do_connect_dot: function (latlngs) {
+        L.polyline(latlngs, {color: '#0066cc'}).addTo(this.map.the_map);
     },
     /**
      *  Override method from Widget.

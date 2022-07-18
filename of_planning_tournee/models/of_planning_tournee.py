@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-
 from odoo import api, models, fields
 from odoo.exceptions import ValidationError
 
 
 class OfPlanningTournee(models.Model):
     _name = "of.planning.tournee"
+    _inherit = 'of.map.view.mixin'
     _description = u"Tournée"
     _order = 'date DESC'
     _rec_name = 'date'
@@ -38,6 +38,7 @@ class OfPlanningTournee(models.Model):
     intervention_ids = fields.Many2many(
         'of.planning.intervention', 'of_planning_intervention_of_planning_tournee_rel', 'tournee_id', 'intervention_id',
         string='Interventions')
+    intervention_map_ids = fields.One2many('of.planning.intervention', compute="_compute_intervention_map_ids")
 
     _sql_constraints = [
         ('date_employee_uniq', 'unique (date,employee_id)',
@@ -90,8 +91,7 @@ class OfPlanningTournee(models.Model):
                 tournee.is_complet = True
                 continue
             start_end_list = [(0, horaires_emp[0][0])]  # liste des créneaux non-travaillés de l'employé
-            for i in range(1, nb_creneaux):
-                start_end_list.append((horaires_emp[i - 1][1], horaires_emp[i][0]))
+            start_end_list.extend((horaires_emp[i - 1][1], horaires_emp[i][0]) for i in range(1, nb_creneaux))
             start_end_list.append((horaires_emp[-1][1], 24))
             debut_journee = horaires_emp[0][0]
             fin_journee = horaires_emp[-1][1]
@@ -126,6 +126,13 @@ class OfPlanningTournee(models.Model):
                 if e > last_end:
                     last_end = e
             tournee.is_complet = is_complet
+
+    @api.depends('intervention_ids')
+    def _compute_intervention_map_ids(self):
+        for tour in self:
+            intervention_ids = [(6, 0, [inter.id for inter in tour.intervention_ids if inter.geo_lat != 0])]
+            tour.intervention_map_ids = intervention_ids
+        return True
 
     @api.onchange('zip_id')
     def _onchange_zip_id(self):
@@ -169,3 +176,14 @@ class OfPlanningTournee(models.Model):
                                             ('employee_ids', 'in', employee_id)]):
                     raise ValidationError(u'Il existe déjà des interventions dans la journée pour cet intervenant.')
         return super(OfPlanningTournee, self).write(vals)
+
+    @api.model
+    def get_color_map(self):
+        if self._context.get('active_tour_id'):
+            title = ""
+            # gold is easier to read than yellow on the legend with a white background
+            v0 = {'label': u"Départ", 'value': 'gold'}
+            v1 = {'label': u'Intervention', 'value': 'blue'}
+            v2 = {'label': u'Arrivée', 'value': 'red'}
+            return {"title": title, "values": (v0, v1, v2)}
+        return None

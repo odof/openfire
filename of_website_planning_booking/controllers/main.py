@@ -587,7 +587,6 @@ class OFWebsitePlanningBooking(http.Controller):
             }
             search_wizard = request.env['of.tournee.rdv'].create(wizard_vals)
             search_wizard._onchange_date_recherche_debut()
-            search_wizard._onchange_mode_recherche()
             request.session['rdv_search_wiz_id'] = search_wizard.id
             request.session['rdv_creneau_id'] = False
             compute = 'new'
