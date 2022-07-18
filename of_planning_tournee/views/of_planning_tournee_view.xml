@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Vue vide, à supprimer après l'application en production -->
-    <record id="of_tournee_planning_intervention_view_form" model="ir.ui.view">
-        <field name="name">of.planning.intervention.form</field>
-        <field name="model">of.planning.intervention</field>
-        <field name="active" eval="False"/>
-        <field name="arch" type="xml">
-            <form/>
-        </field>
-    </record>
-
     <record id="of_planning_tournee_view_form" model="ir.ui.view">
         <field name="name">of.planning.tournee.form</field>
         <field name="model">of.planning.tournee</field>
@@ -77,6 +67,7 @@
              </search>
         </field>
     </record>
+
 
     <record id="action_of_planning_tournee_tree" model="ir.actions.act_window">
         <field name="name">Préparation des tournées</field>

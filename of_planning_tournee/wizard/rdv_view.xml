@@ -1,26 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- There is a lot of views in this file. -->
+    <!-- The base form view just below is used and inherited in primary mode by the other views, -->
+    <!-- to easily display the same wizard depending on the source model that call it, some settings or during the use -->
+    <!-- of the the wizard by changind some search criteria. -->
+    <!-- Sometime we wants to display the time slots by date, sometime by distance, sometime by duration, -->
+    <!-- and sometime we don't want to display the next time slots available by date at all. -->
+
+    <!-- Base form view of the wizard -->
     <record id="view_rdv_intervention_wizard" model="ir.ui.view">
-        <field name="name">Planifier une intervention</field>
+        <field name="name">view.of.tournee.rdv.wizard.form</field>
         <field name="model">of.tournee.rdv</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
-            <form string="Trouver un créneau">
+            <form string="Plan an Intervention">
                 <script>
                     $(document).ready(function(){
                         // élargir le pop-up
                         $(".modal-dialog").width('80%');
                     });
                 </script>
-                <header>
-                    <button name="button_geocode" string="Géolocaliser" type="object" style="margin-bottom: 10px;"
-                      class="btn-primary" icon="fa-map-marker" help="Utiliser votre gécodeur par défaut pour tenter de géolocaliser l'adresse d'intervention"
-                      attrs="{'invisible': ['|','|',('geo_lat', '!=', 0.0),('geo_lng', '!=', 0.0),('geocode_retry','!=',False)]}"/>
-                </header>
-                <field name="geocode_retry" invisible="1"/>
-                <field name="zero_result" invisible="1"/>
-                <field name="zero_dispo" invisible="1"/>
+                <field name="service_id" invisible="1"/>
                 <field name="partner_id" invisible="1"/>
+                <field name="partner_address_id" invisible="1"/>
+                <field name="company_id" invisible="1"/>
+                <field name="zero_result" invisible="1"/>
                 <field name="res_line_id" invisible="1"/>
                 <field name="name" invisible="1"/>
                 <field name="employee_id" domain="[('id', 'in', context.get('employee_domain',[]))]" invisible="1"/>
@@ -32,66 +36,212 @@
                 <field name="geo_lat" invisible="1"/>
                 <field name="geo_lng" invisible="1"/>
                 <field name="precision" invisible="1"/>
-                <group colspan="4" col="4">
-                    <separator string="Informations" colspan="4"/>
-                    <group colspan="2" col="2">
-                        <field name="partner_address_id" string="Adresse" options="{'no_edit': True, 'no_open': True, 'no_create': True}"/>
-                        <div colspan="2" style="color:red;" attrs="{'invisible': ['|','|',('geo_lat', '!=', 0.0),('geo_lng', '!=', 0.0),('geocode_retry','!=',False)]}">
-                            <i>Cette adresse n'est pas géocodée. pour continuer la recherche vous pouvez la géocoder ou ignorer les données géographiques</i>
+                <field name="can_show_more" invisible="1"/>
+                <field name="map_line_id" invisible="1"/>
+                <field name="map_tour_id" invisible="1"/>
+                <field name="source_model" invisible="1"/>
+                <field name="additional_record" invisible="1"/>
+                <notebook>
+                    <page name="list_results" string="List">
+                        <div name="slots_lists" style="display: flex;">
+                            <group name="slots_by_distance_duration" string="Slots by distance / duration">
+                                <!-- by default this view displays time slots by distance, this field is replaced in the other primary views below -->
+                                <field name="by_distance_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
+                                    <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
+                                        <button name="action_view_tour" type="object" icon="fa-map-marker" help="Show Tour of the day for this employee on the map"/>
+                                        <field name="weekday"/>
+                                        <field name="date"/>
+                                        <field name="employee_id"/>
+                                        <field name="description" string="Créneau"/>
+                                        <field name="distance_utile" string="Distance"/>
+                                        <field name="duree_utile" string="Durée"/>
+                                        <button name="action_select_confirm_slot" type="object" icon="fa-check" help="Select and confirm this slot"/>
+                                        <field name="allday" invisible="1"/>
+                                        <field name="disponible" invisible="1"/>
+                                        <field name="selected" invisible="1"/>
+                                        <field name="tour_id" invisible="1"/>
+                                        <field name="map_preview" invisible="1"/>
+                                    </tree>
+                                </field>
+                            </group>
+                            <group name="slots_by_date" string="Slots by date" style="margin-left: 10px;">
+                                <field name="by_date_planning_tree_ids" mode="tree" colspan="2" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_date">
+                                    <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
+                                        <button name="action_view_tour" type="object" icon="fa-map-marker" help="Show Tour of the day for this employee on the map"/>
+                                        <field name="weekday"/>
+                                        <field name="date"/>
+                                        <field name="employee_id"/>
+                                        <field name="description" string="Créneau"/>
+                                        <field name="distance_utile" string="Distance"/>
+                                        <field name="duree_utile" string="Durée"/>
+                                        <button name="action_select_confirm_slot" type="object" icon="fa-check" help="Select and confirm this slot"/>
+                                        <field name="allday" invisible="1"/>
+                                        <field name="disponible" invisible="1"/>
+                                        <field name="selected" invisible="1"/>
+                                        <field name="map_preview" invisible="1"/>
+                                    </tree>
+                                </field>
+                            </group>
                         </div>
-                        <div colspan="2" style="color:red;" attrs="{'invisible': ['|','|',('geo_lat', '!=', 0.0),('geo_lng', '!=', 0.0),('geocode_retry','!=',True)]}">
-                            <i>Votre géocodeur par défaut n'a pas réussi à géolocaliser cette adresse. pour continuer la recherche vous pouvez ignorer les données géographiques</i>
+                        <group col="2" colspan="2">
+                            <field name="intervention_map_ids" mode="map" nolabel="1" context="{'form_view_ref':'of_planning_tournee.of_planning_intervention_view_form',  'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'additional_record': additional_record}"/>
+                        </group>
+                        <div style="float: left; font-size: x-small;font-weight: bold;">
+                            <field name="map_description_html"/>
                         </div>
-                        <field name="ignorer_geo" attrs="{'invisible': ['|',('geo_lat', '!=', 0.0),('geo_lng', '!=', 0.0)]}"/>
-                        <field name="company_id" options="{'no_create': True, 'no_open': True}"/>
-                    </group>
-                    <group col="2" colspan="2">
-                        <div class="o_address_format" colspan="2">
-                            <field name="partner_address_street" class="o_address_street"/>
-                            <field name="partner_address_street2" class="o_address_street"/>
-                            <field name="partner_address_city" class="o_address_city"/>
-                            <field name="partner_address_state_id" class="o_address_state" options='{"no_open": True}' context="{'country_id': country_id, 'zip': zip}"/>
-                            <field name="partner_address_zip" class="o_address_zip"/>
-                            <field name="partner_address_country_id" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
-                        </div>
-                    </group>
-                    <group col="2" colspan="2">
-                        <field name="service_id" string="Demande d'intervention"/>
-                        <field name="tache_id"/>
-                        <field name="flexible" groups="of_planning.of_group_planning_intervention_flexibility"/>
-                        <div attrs="{'invisible': [('flexible', '!=', True)]}" colspan="2">
-                            <span><i>Si un RDV flexible se trouve sur les créneaux que vous choisissez, il passera en statut Reporté</i></span>
-                        </div>
-                        <field name="creer_recurrence" attrs="{'invisible': [('service_id', '!=', False)]}"/>
-                        <field name="duree" widget="float_time"/>
-                        <field name="pre_employee_ids" widget="many2many_tags" context="{'tache_prio_id': tache_id}"/>
-                    </group>
-                    <group col="2" colspan="2">
-                        <field name="date_recherche_debut"/>
-                        <field name="date_recherche_fin"/>
-                        <field name="mode_recherche" attrs="{'invisible':[('ignorer_geo','!=',False)]}"/>
-                        <field name="max_recherche" attrs="{'invisible':[('ignorer_geo','!=',False)]}"/>
-                        <div colspan="2" col="1" attrs="{'invisible':[('ignorer_geo','!=',False)]}">
-                            <i colspan="1" class="oe_grey" attrs="{'invisible':[('mode_recherche','!=','distance')]}">
-                                La distance prise en compte est la distance totale (aller-retour).
-                            </i>
-                            <i colspan="1" class="oe_grey" attrs="{'invisible':[('mode_recherche','!=','duree')]}">
-                                La durée prise en compte est la durée totale (aller-retour).
-                            </i>
-                        </div>
-                    </group>
-                </group>
-                <notebook colspan="4">
-                    <page string="Calendrier" name="propositions" col="4" attrs="{'invisible':[('display_res','!=',True)]}">
-                        <separator string="Résultat" colspan="4" attrs="{'invisible':['|',('zero_dispo','!=',False),('zero_result','!=',False)]}"/>
-                        <separator string="Aucun résultat suffisament proche" colspan="4" attrs="{'invisible':[('zero_dispo','!=',True)]}"/>
-                        <separator string="Aucun résultat" colspan="4" attrs="{'invisible':[('zero_result','!=',True)]}"/>
+                    </page>
+                    <page name="calendar_results" string="Calendar">
+                        <group col="2" colspan="2">
+                            <field name="planning_ids" mode="calendar" colspan="4" nolabel="1" create="0">
+                                <calendar string="Calendrier" date_start="debut_dt" color="employee_cal_ids" date_stop="fin_dt" all_day="allday"
+                                        attendee_model="hr.employee" color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1"
+                                        dispo_field="disponible" jump_to="selected" display_states="1"
+                                        force_color_field="force_color" selected_field="selected" quick_add="0" draggable="0"
+                                        attendee="employee_cal_ids">
+                                    <field name="name"/>
+                                    <field name="distance_utile" suffix=" km"/>
+                                    <field name="duree_utile" suffix=" min"/>
+                                    <field name="state_int" invisible="1"/>
+                                    <field name="disponible" invisible="1"/>
+                                    <field name="force_color" invisible="1"/>
+                                    <field name="selected" invisible="1"/>
+                                    <field name="of_color_ft" invisible="1"/>
+                                    <field name="of_color_bg" invisible="1"/>
+                                    <field name="allday" invisible="1"/>
+                                    <field name="employee_id" invisible="1"/>
+                                </calendar>
+                            </field>
+                        </group>
+                    </page>
+                    <!-- This page should always be in last position -->
+                    <page name="search_criteria" string="Search criteria">
+                        <group col="2" colspan="2">
+                            <field name="pre_employee_ids" widget="many2many_tags" context="{'tache_prio_id': tache_id}"/>
+                            <field name="flexible" groups="of_planning.of_group_planning_intervention_flexibility"/>
+                            <div attrs="{'invisible': [('flexible', '!=', True)]}" colspan="2">
+                                <span><i>Si un RDV flexible se trouve sur les créneaux que vous choisissez, il passera en statut Reporté</i></span>
+                            </div>
+                            <field name="creer_recurrence" attrs="{'invisible': [('service_id', '!=', False)]}"/>
+                        </group>
+                        <group colspan="4" name="search_criteria">
+                            <group col="2">
+                                <field name="search_type"/>
+                                <field name="search_mode"/>
+                                <field name="tache_id"/>
+                                <field name="duree" widget="float_time"/>
+                            </group>
+                            <group col="2">
+                                <field name="search_period_in_days"/>
+                                <field name="date_recherche_debut"/>
+                                <field name="date_recherche_fin"/>
+                                <field name="days_ids" widget="many2many_tags"/>
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
+                <footer>
+                    <button name="button_calcul" string="Rechercher" type="object" colspan="4" class="btn-primary"
+                            attrs="{'invisible': [('date_propos','!=',False)]}"/>
+                    <button name="button_calcul" string="Rechercher" type="object" colspan="2" class="btn-default"
+                            attrs="{'invisible': [('date_propos','=',False)]}"/>
+                    <button name="action_show_more_results" string="More results" type="object" colspan="4" class="btn-default" attrs="{'invisible': [('can_show_more','=', False)]}"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Added a primary view to hide "by date" time slots -->
+    <record id="view_rdv_intervention_wo_date_wizard" model="ir.ui.view">
+        <field name="name">view.of.tournee.rdv.wo.date.wizard.form</field>
+        <field name="model">of.tournee.rdv</field>
+        <field name="type">form</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.view_rdv_intervention_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='slots_by_date']" position="replace"/>
+        </field>
+    </record>
+
+    <!-- Added a primary view to display "by duration" time slots instead of "by distance" time slots -->
+    <record id="view_rdv_intervention_by_duration_wizard" model="ir.ui.view">
+        <field name="name">view.of.tournee.rdv.by.duration.wizard.form</field>
+        <field name="model">of.tournee.rdv</field>
+        <field name="type">form</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.view_rdv_intervention_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='slots_by_distance_duration']//field[@name='by_distance_planning_tree_ids']" position="replace">
+                <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
+                    <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
+                        <button name="action_view_tour" type="object" icon="fa-map-marker" help="Show Tour of the day for this employee on the map"/>
+                        <field name="weekday"/>
+                        <field name="date"/>
+                        <field name="employee_id"/>
+                        <field name="description" string="Créneau"/>
+                        <field name="distance_utile" string="Distance"/>
+                        <field name="duree_utile" string="Durée"/>
+                        <button name="action_select_confirm_slot" type="object" icon="fa-check" help="Select and confirm this slot"/>
+                        <field name="allday" invisible="1"/>
+                        <field name="disponible" invisible="1"/>
+                        <field name="selected" invisible="1"/>
+                        <field name="tour_id" invisible="1"/>
+                        <field name="map_preview" invisible="1"/>
+                    </tree>
+                </field>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Added a primary view to display "by duration" time slots instead of "by distance" time slots and to hide "by date" time slots -->
+    <record id="view_rdv_intervention_by_duration_wo_date_wizard" model="ir.ui.view">
+        <field name="name">view.of.tournee.rdv.by.duration.wo.date.wizard.form</field>
+        <field name="model">of.tournee.rdv</field>
+        <field name="type">form</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.view_rdv_intervention_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='slots_by_date']" position="replace"/>
+            <xpath expr="//group[@name='slots_by_distance_duration']//field[@name='by_distance_planning_tree_ids']" position="replace">
+                <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
+                    <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
+                        <button name="action_view_tour" type="object" icon="fa-map-marker" help="Show Tour of the day for this employee on the map"/>
+                        <field name="weekday"/>
+                        <field name="date"/>
+                        <field name="employee_id"/>
+                        <field name="description" string="Créneau"/>
+                        <field name="distance_utile" string="Distance"/>
+                        <field name="duree_utile" string="Durée"/>
+                        <button name="action_select_confirm_slot" type="object" icon="fa-check" help="Select and confirm this slot"/>
+                        <field name="allday" invisible="1"/>
+                        <field name="disponible" invisible="1"/>
+                        <field name="selected" invisible="1"/>
+                        <field name="tour_id" invisible="1"/>
+                        <field name="map_preview" invisible="1"/>
+                    </tree>
+                </field>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Added a primary view to display the calendar tab in first position -->
+    <record id="view_rdv_intervention_calendar_1st_wizard" model="ir.ui.view">
+        <field name="name">view.of.tournee.rdv.calendar.1st.wizard.form</field>
+        <field name="model">of.tournee.rdv</field>
+        <field name="type">form</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.view_rdv_intervention_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook//page[@name='list_results']" position="replace"/>
+            <xpath expr="//notebook//page[@name='calendar_results']" position="replace"/>
+            <xpath expr="//notebook//page[@name='search_criteria']" position="before">
+                <page name="calendar_results" string="Calendar">
+                    <group col="2" colspan="2" attrs="{'invisible':[('display_res','=', False)]}">
                         <field name="planning_ids" mode="calendar" colspan="4" nolabel="1" create="0">
-                            <calendar string="Calendrier" date_start="debut_dt" color="employee_id" date_stop="fin_dt" all_day="allday"
-                                attendee_model="hr.employee" color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1"
-                                filters_radio="1" dispo_field="disponible" jump_to="selected" display_states="1"
-                                force_color_field="force_color" selected_field="selected" quick_add="0" draggable="0"
-                                      attendee="employee_id">
+                            <calendar string="Calendrier" date_start="debut_dt" color="employee_cal_ids" date_stop="fin_dt" all_day="allday"
+                                    attendee_model="hr.employee" color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1"
+                                    dispo_field="disponible" jump_to="selected" display_states="1"
+                                    force_color_field="force_color" selected_field="selected" quick_add="0" draggable="0"
+                                    attendee="employee_cal_ids">
                                 <field name="name"/>
                                 <field name="distance_utile" suffix=" km"/>
                                 <field name="duree_utile" suffix=" min"/>
@@ -101,43 +251,729 @@
                                 <field name="selected" invisible="1"/>
                                 <field name="of_color_ft" invisible="1"/>
                                 <field name="of_color_bg" invisible="1"/>
+                                <field name="allday" invisible="1"/>
+                                <field name="employee_id" invisible="1"/>
                             </calendar>
                         </field>
-                    </page>
-                    <page string="Liste" name="propositions_tree" col="4" attrs="{'invisible':[('display_res','!=',True)]}">
-                        <separator string="Résultat" colspan="4" attrs="{'invisible':['|',('zero_dispo','!=',False),('zero_result','!=',False)]}"/>
-                        <separator string="Aucun résultat suffisament proche" colspan="4" attrs="{'invisible':[('zero_dispo','!=',True)]}"/>
-                        <separator string="Aucun résultat" colspan="4" attrs="{'invisible':[('zero_result','!=',True)]}"/>
-                        <field name="planning_tree_ids" mode="tree" colspan="4" nolabel="1">
-                            <tree create="false" delete="false" colors="blue: selected==True;">
-                                <field name="allday" invisible="1"/>
-                                <field name="disponible" invisible="1"/>
-                                <field name="selected" invisible="1"/>
-                                <field name="date"/>
-                                <field name="employee_id"/>
-                                <field name="description" string="Créneau"/>
-                                <field name="distance_utile" string="Distance"/>
-                                <field name="duree_utile" string="Durée"/>
-                            </tree>
-                        </field>
-                    </page>
-                </notebook>
-
-                <footer>
-                    <button name="button_calcul" string="Rechercher" type="object" colspan="4" class="btn-primary"
-                            attrs="{'invisible': [('date_propos','!=',False)]}"/>
-                    <button name="button_calcul" string="Rechercher" type="object" colspan="2" class="btn-default"
-                            attrs="{'invisible': [('date_propos','=',False)]}"/>
-                    <button string="Confirmer RDV" name="button_confirm" type="object" class="btn-primary"
-                            attrs="{'invisible': ['|','|','|',('name','=',False),('employee_id','=',False),('date_propos','=',False),('date_propos_hour','=',False)]}"/>
-                    <button string="Annuler" class="btn-default" special="cancel"/>
-                </footer>
-            </form>
+                    </group>
+                </page>
+                <page name="list_results" string="List">
+                    <div name="slots_lists" style="display: flex;">
+                        <group string="Slots by distance / duration">
+                            <field name="by_distance_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
+                                <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
+                                    <button name="action_view_tour" type="object" icon="fa-map-marker" help="Show Tour of the day for this employee on the map"/>
+                                    <field name="weekday"/>
+                                    <field name="date"/>
+                                    <field name="employee_id"/>
+                                    <field name="description" string="Créneau"/>
+                                    <field name="distance_utile" string="Distance"/>
+                                    <field name="duree_utile" string="Durée"/>
+                                    <button name="action_select_confirm_slot" type="object" icon="fa-check" help="Select and confirm this slot"/>
+                                    <field name="allday" invisible="1"/>
+                                    <field name="disponible" invisible="1"/>
+                                    <field name="selected" invisible="1"/>
+                                    <field name="tour_id" invisible="1"/>
+                                    <field name="map_preview" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <group name="slots_by_date" string="Slots by date" style="margin-left: 10px;">
+                            <field name="by_date_planning_tree_ids" mode="tree" colspan="2" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_date">
+                                <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
+                                    <button name="action_view_tour" type="object" icon="fa-map-marker" help="Show Tour of the day for this employee on the map"/>
+                                    <field name="weekday"/>
+                                    <field name="date"/>
+                                    <field name="employee_id"/>
+                                    <field name="description" string="Créneau"/>
+                                    <field name="distance_utile" string="Distance"/>
+                                    <field name="duree_utile" string="Durée"/>
+                                    <button name="action_select_confirm_slot" type="object" icon="fa-check" help="Select and confirm this slot"/>
+                                    <field name="allday" invisible="1"/>
+                                    <field name="disponible" invisible="1"/>
+                                    <field name="selected" invisible="1"/>
+                                    <field name="map_preview" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </div>
+                    <group col="2" colspan="2">
+                        <field name="intervention_map_ids" mode="map" nolabel="1" context="{'form_view_ref':'of_planning_tournee.of_planning_intervention_view_form',  'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'additional_record': additional_record}"/>
+                    </group>
+                    <div style="float: left; font-size: x-small;font-weight: bold;">
+                        <field name="map_description_html"/>
+                    </div>
+                </page>
+            </xpath>
         </field>
     </record>
 
-    <record id="view_rdv_line_wizard" model="ir.ui.view">
-        <field name="name">ligne de rdv</field>
+    <!-- Added a primary view to display the calendar tab in first position, "by distance" time slots and without "by date" time slots -->
+    <record id="view_rdv_intervention_calendar_1st_wo_date_wizard" model="ir.ui.view">
+        <field name="name">view.of.tournee.rdv.calendar.1st.wo.date.wizard.form</field>
+        <field name="model">of.tournee.rdv</field>
+        <field name="type">form</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.view_rdv_intervention_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook//page[@name='list_results']" position="replace"/>
+            <xpath expr="//notebook//page[@name='calendar_results']" position="replace"/>
+            <xpath expr="//notebook//page[@name='search_criteria']" position="before">
+                <page name="calendar_results" string="Calendar">
+                    <group col="2" colspan="2" attrs="{'invisible':[('display_res','=', False)]}">
+                        <field name="planning_ids" mode="calendar" colspan="4" nolabel="1" create="0">
+                            <calendar string="Calendrier" date_start="debut_dt" color="employee_cal_ids" date_stop="fin_dt" all_day="allday"
+                                    attendee_model="hr.employee" color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1"
+                                    dispo_field="disponible" jump_to="selected" display_states="1"
+                                    force_color_field="force_color" selected_field="selected" quick_add="0" draggable="0"
+                                    attendee="employee_cal_ids">
+                                <field name="name"/>
+                                <field name="distance_utile" suffix=" km"/>
+                                <field name="duree_utile" suffix=" min"/>
+                                <field name="state_int" invisible="1"/>
+                                <field name="disponible" invisible="1"/>
+                                <field name="force_color" invisible="1"/>
+                                <field name="selected" invisible="1"/>
+                                <field name="of_color_ft" invisible="1"/>
+                                <field name="of_color_bg" invisible="1"/>
+                                <field name="allday" invisible="1"/>
+                                <field name="employee_id" invisible="1"/>
+                            </calendar>
+                        </field>
+                    </group>
+                </page>
+                <page name="list_results" string="List">
+                    <div name="slots_lists" style="display: flex;">
+                        <group string="Slots by distance / duration">
+                            <field name="by_distance_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
+                                <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
+                                    <button name="action_view_tour" type="object" icon="fa-map-marker" help="Show Tour of the day for this employee on the map"/>
+                                    <field name="weekday"/>
+                                    <field name="date"/>
+                                    <field name="employee_id"/>
+                                    <field name="description" string="Créneau"/>
+                                    <field name="distance_utile" string="Distance"/>
+                                    <field name="duree_utile" string="Durée"/>
+                                    <button name="action_select_confirm_slot" type="object" icon="fa-check" help="Select and confirm this slot"/>
+                                    <field name="allday" invisible="1"/>
+                                    <field name="disponible" invisible="1"/>
+                                    <field name="selected" invisible="1"/>
+                                    <field name="tour_id" invisible="1"/>
+                                    <field name="map_preview" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </div>
+                    <group col="2" colspan="2">
+                        <field name="intervention_map_ids" mode="map" nolabel="1" context="{'form_view_ref':'of_planning_tournee.of_planning_intervention_view_form',  'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'additional_record': additional_record}"/>
+                    </group>
+                    <div style="float: left; font-size: x-small;font-weight: bold;">
+                        <field name="map_description_html"/>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Added a primary view to display the calendar tab in first position, with "by duration" time slots instead of "by distance" time slots -->
+    <record id="view_rdv_intervention_calendar_1st_by_duration_wizard" model="ir.ui.view">
+        <field name="name">view.of.tournee.rdv.calendar.1st.by.duration.wizard.form</field>
+        <field name="model">of.tournee.rdv</field>
+        <field name="type">form</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.view_rdv_intervention_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook//page[@name='list_results']" position="replace"/>
+            <xpath expr="//notebook//page[@name='calendar_results']" position="replace"/>
+            <xpath expr="//notebook//page[@name='search_criteria']" position="before">
+                <page name="calendar_results" string="Calendar">
+                    <group col="2" colspan="2">
+                        <field name="planning_ids" mode="calendar" colspan="4" nolabel="1" create="0">
+                            <calendar string="Calendrier" date_start="debut_dt" color="employee_cal_ids" date_stop="fin_dt" all_day="allday"
+                                    attendee_model="hr.employee" color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1"
+                                    dispo_field="disponible" jump_to="selected" display_states="1"
+                                    force_color_field="force_color" selected_field="selected" quick_add="0" draggable="0"
+                                    attendee="employee_cal_ids">
+                                <field name="name"/>
+                                <field name="distance_utile" suffix=" km"/>
+                                <field name="duree_utile" suffix=" min"/>
+                                <field name="state_int" invisible="1"/>
+                                <field name="disponible" invisible="1"/>
+                                <field name="force_color" invisible="1"/>
+                                <field name="selected" invisible="1"/>
+                                <field name="of_color_ft" invisible="1"/>
+                                <field name="of_color_bg" invisible="1"/>
+                                <field name="allday" invisible="1"/>
+                                <field name="employee_id" invisible="1"/>
+                            </calendar>
+                        </field>
+                    </group>
+                </page>
+                <page name="list_results" string="List">
+                    <div name="slots_lists" style="display: flex;">
+                        <group string="Slots by distance / duration">
+                            <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
+                                <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
+                                    <button name="action_view_tour" type="object" icon="fa-map-marker" help="Show Tour of the day for this employee on the map"/>
+                                    <field name="weekday"/>
+                                    <field name="date"/>
+                                    <field name="employee_id"/>
+                                    <field name="description" string="Créneau"/>
+                                    <field name="distance_utile" string="Distance"/>
+                                    <field name="duree_utile" string="Durée"/>
+                                    <button name="action_select_confirm_slot" type="object" icon="fa-check" help="Select and confirm this slot"/>
+                                    <field name="allday" invisible="1"/>
+                                    <field name="disponible" invisible="1"/>
+                                    <field name="selected" invisible="1"/>
+                                    <field name="tour_id" invisible="1"/>
+                                    <field name="map_preview" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <group name="slots_by_date" string="Slots by date" style="margin-left: 10px;">
+                            <field name="by_date_planning_tree_ids" mode="tree" colspan="2" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_date">
+                                <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
+                                    <button name="action_view_tour" type="object" icon="fa-map-marker" help="Show Tour of the day for this employee on the map"/>
+                                    <field name="weekday"/>
+                                    <field name="date"/>
+                                    <field name="employee_id"/>
+                                    <field name="description" string="Créneau"/>
+                                    <field name="distance_utile" string="Distance"/>
+                                    <field name="duree_utile" string="Durée"/>
+                                    <button name="action_select_confirm_slot" type="object" icon="fa-check" help="Select and confirm this slot"/>
+                                    <field name="allday" invisible="1"/>
+                                    <field name="disponible" invisible="1"/>
+                                    <field name="selected" invisible="1"/>
+                                    <field name="map_preview" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </div>
+                    <group col="2" colspan="2">
+                        <field name="intervention_map_ids" mode="map" nolabel="1" context="{'form_view_ref':'of_planning_tournee.of_planning_intervention_view_form',  'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'additional_record': additional_record}"/>
+                    </group>
+                    <div style="float: left; font-size: x-small;font-weight: bold;">
+                        <field name="map_description_html"/>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Added a primary view to display the calendar tab in first position, "with the"by duration" time slots instead of "by distance" time slots and without "by date" time slots -->
+    <record id="view_rdv_intervention_calendar_1st_by_duration_wo_date_wizard" model="ir.ui.view">
+        <field name="name">view.of.tournee.rdv.calendar.1st.by.duration.wo.date.wizard.form</field>
+        <field name="model">of.tournee.rdv</field>
+        <field name="type">form</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.view_rdv_intervention_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook//page[@name='list_results']" position="replace"/>
+            <xpath expr="//notebook//page[@name='calendar_results']" position="replace"/>
+            <xpath expr="//notebook//page[@name='search_criteria']" position="before">
+                <page name="calendar_results" string="Calendar">
+                    <group col="2" colspan="2">
+                        <field name="planning_ids" mode="calendar" colspan="4" nolabel="1" create="0">
+                            <calendar string="Calendrier" date_start="debut_dt" color="employee_cal_ids" date_stop="fin_dt" all_day="allday"
+                                    attendee_model="hr.employee" color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1"
+                                    dispo_field="disponible" jump_to="selected" display_states="1"
+                                    force_color_field="force_color" selected_field="selected" quick_add="0" draggable="0"
+                                    attendee="employee_cal_ids">
+                                <field name="name"/>
+                                <field name="distance_utile" suffix=" km"/>
+                                <field name="duree_utile" suffix=" min"/>
+                                <field name="state_int" invisible="1"/>
+                                <field name="disponible" invisible="1"/>
+                                <field name="force_color" invisible="1"/>
+                                <field name="selected" invisible="1"/>
+                                <field name="of_color_ft" invisible="1"/>
+                                <field name="of_color_bg" invisible="1"/>
+                                <field name="allday" invisible="1"/>
+                                <field name="employee_id" invisible="1"/>
+                            </calendar>
+                        </field>
+                    </group>
+                </page>
+                <page name="list_results" string="List">
+                    <div name="slots_lists" style="display: flex;">
+                        <group string="Slots by distance / duration">
+                            <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
+                                <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
+                                    <button name="action_view_tour" type="object" icon="fa-map-marker" help="Show Tour of the day for this employee on the map"/>
+                                    <field name="weekday"/>
+                                    <field name="date"/>
+                                    <field name="employee_id"/>
+                                    <field name="description" string="Créneau"/>
+                                    <field name="distance_utile" string="Distance"/>
+                                    <field name="duree_utile" string="Durée"/>
+                                    <button name="action_select_confirm_slot" type="object" icon="fa-check" help="Select and confirm this slot"/>
+                                    <field name="allday" invisible="1"/>
+                                    <field name="disponible" invisible="1"/>
+                                    <field name="selected" invisible="1"/>
+                                    <field name="tour_id" invisible="1"/>
+                                    <field name="map_preview" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </div>
+                    <group col="2" colspan="2">
+                        <field name="intervention_map_ids" mode="map" nolabel="1" context="{'form_view_ref':'of_planning_tournee.of_planning_intervention_view_form',  'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'additional_record': additional_record}"/>
+                    </group>
+                    <div style="float: left; font-size: x-small;font-weight: bold;">
+                        <field name="map_description_html"/>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Views for the wizard called from Partner/Task/Issue forms-->
+    <!-- Views for the wizard called from Partner/Task/Issue forms-->
+    <!-- Views for the wizard called from Partner/Task/Issue forms-->
+    <record id="view_rdv_intervention_complete_form_wizard" model="ir.ui.view">
+        <field name="name">view.of.tournee.rdv.complete.form.wizard</field>
+        <field name="model">of.tournee.rdv</field>
+        <field name="type">form</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.view_rdv_intervention_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook//page[@name='calendar_results']" position="attributes">
+                <attribute name="attrs">{'invisible': [('display_res', '=', False)]}</attribute>
+            </xpath>
+            <xpath expr="//notebook//page[@name='list_results']" position="attributes">
+                <attribute name="attrs">{'invisible': [('display_res', '=', False)]}</attribute>
+            </xpath>
+            <xpath expr="//notebook//page[@name='search_criteria']" position="replace"/>
+            <!-- This page should always be in last position -->
+            <xpath expr="//notebook//page[last()]" position="after">
+                <page name="search_criteria" string="Search criteria">
+                    <group name="main">
+                        <group name="who" string="Who" class="of_grey_background">
+                            <group colspan="2">
+                                <field name="pre_employee_ids" widget="many2many_tags" context="{'tache_prio_id': tache_id}"/>
+                                <field name="partner_id" readonly="1"/>
+                            </group>
+                        </group>
+                        <group name="when" string="When" class="of_grey_background">
+                            <group colspan="2">
+                                <field name="search_period_in_days"/>
+                                <field name="date_recherche_debut"/>
+                                <field name="date_recherche_fin"/>
+                                <field name="days_ids" widget="many2many_tags"/>
+                            </group>
+                        </group>
+                        <group name="what" string="What" class="of_grey_background">
+                            <group colspan="2">
+                                <field name="service_id"/>
+                                <field name="tache_id"/>
+                                <field name="duree" widget="float_time"/>
+                            </group>
+                        </group>
+                        <group name="how" string="How" class="of_grey_background">
+                            <group colspan="2">
+                                <field name="flexible" groups="of_planning.of_group_planning_intervention_flexibility"/>
+                                <div attrs="{'invisible': [('flexible', '!=', True)]}" colspan="2">
+                                    <span><i>Si un RDV flexible se trouve sur les créneaux que vous choisissez, il passera en statut Reporté</i></span>
+                                </div>
+                                <field name="creer_recurrence" attrs="{'invisible': [('service_id', '!=', False)]}"/>
+                            </group>
+                            <group colspan="2">
+                                <field name="search_type"/>
+                                <field name="search_mode"/>
+                            </group>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Added a primary view to hide "by date" time slots -->
+    <record id="view_rdv_intervention_complete_wo_date_form_wizard" model="ir.ui.view">
+        <field name="name">view.of.tournee.rdv.complete.wo.date.form.wizard</field>
+        <field name="model">of.tournee.rdv</field>
+        <field name="type">form</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.view_rdv_intervention_complete_form_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='slots_by_date']" position="replace"/>
+        </field>
+    </record>
+
+    <!-- Added a primary view to display "by duration" time slots instead of "by distance" time slots -->
+    <record id="view_rdv_intervention_complete_form_by_duration_wizard" model="ir.ui.view">
+        <field name="name">view.of.tournee.rdv.complete.form.by.duration.wizard</field>
+        <field name="model">of.tournee.rdv</field>
+        <field name="type">form</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.view_rdv_intervention_complete_form_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='slots_by_distance_duration']//field[@name='by_distance_planning_tree_ids']" position="replace">
+                <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
+                    <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
+                        <button name="action_view_tour" type="object" icon="fa-map-marker" help="Show Tour of the day for this employee on the map"/>
+                        <field name="weekday"/>
+                        <field name="date"/>
+                        <field name="employee_id"/>
+                        <field name="description" string="Créneau"/>
+                        <field name="distance_utile" string="Distance"/>
+                        <field name="duree_utile" string="Durée"/>
+                        <button name="action_select_confirm_slot" type="object" icon="fa-check" help="Select and confirm this slot"/>
+                        <field name="allday" invisible="1"/>
+                        <field name="disponible" invisible="1"/>
+                        <field name="selected" invisible="1"/>
+                        <field name="tour_id" invisible="1"/>
+                        <field name="map_preview" invisible="1"/>
+                    </tree>
+                </field>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Added a primary view to display "by duration" time slots instead of "by distance" time slots and without "by date" time slots -->
+    <record id="view_rdv_intervention_complete_form_by_duration_wo_date_wizard" model="ir.ui.view">
+        <field name="name">view.of.tournee.rdv.complete.form.by.duration.wo.date.wizard</field>
+        <field name="model">of.tournee.rdv</field>
+        <field name="type">form</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.view_rdv_intervention_complete_form_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='slots_by_date']" position="replace"/>
+            <xpath expr="//group[@name='slots_by_distance_duration']//field[@name='by_distance_planning_tree_ids']" position="replace">
+                <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
+                    <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
+                        <button name="action_view_tour" type="object" icon="fa-map-marker" help="Show Tour of the day for this employee on the map"/>
+                        <field name="weekday"/>
+                        <field name="date"/>
+                        <field name="employee_id"/>
+                        <field name="description" string="Créneau"/>
+                        <field name="distance_utile" string="Distance"/>
+                        <field name="duree_utile" string="Durée"/>
+                        <button name="action_select_confirm_slot" type="object" icon="fa-check" help="Select and confirm this slot"/>
+                        <field name="allday" invisible="1"/>
+                        <field name="disponible" invisible="1"/>
+                        <field name="selected" invisible="1"/>
+                        <field name="tour_id" invisible="1"/>
+                        <field name="map_preview" invisible="1"/>
+                    </tree>
+                </field>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Added a primary view to display the calendar tab in first position -->
+    <record id="view_rdv_intervention_complete_form_calendar_1st_wizard" model="ir.ui.view">
+        <field name="name">view.of.tournee.rdv.complete.form.calendar.1st.wizard</field>
+        <field name="model">of.tournee.rdv</field>
+        <field name="type">form</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.view_rdv_intervention_complete_form_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook//page[@name='list_results']" position="replace"/>
+            <xpath expr="//notebook//page[@name='calendar_results']" position="replace"/>
+            <xpath expr="//notebook//page[last()]" position="before">
+                <page name="calendar_results" string="Calendar" attrs="{'invisible': [('display_res', '=', False)]}">
+                    <group col="2" colspan="2">
+                        <field name="planning_ids" mode="calendar" colspan="4" nolabel="1" create="0">
+                            <calendar string="Calendrier" date_start="debut_dt" color="employee_cal_ids" date_stop="fin_dt" all_day="allday"
+                                    attendee_model="hr.employee" color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1"
+                                    dispo_field="disponible" jump_to="selected" display_states="1"
+                                    force_color_field="force_color" selected_field="selected" quick_add="0" draggable="0"
+                                    attendee="employee_cal_ids">
+                                <field name="name"/>
+                                <field name="distance_utile" suffix=" km"/>
+                                <field name="duree_utile" suffix=" min"/>
+                                <field name="state_int" invisible="1"/>
+                                <field name="disponible" invisible="1"/>
+                                <field name="force_color" invisible="1"/>
+                                <field name="selected" invisible="1"/>
+                                <field name="of_color_ft" invisible="1"/>
+                                <field name="of_color_bg" invisible="1"/>
+                                <field name="allday" invisible="1"/>
+                                <field name="employee_id" invisible="1"/>
+                            </calendar>
+                        </field>
+                    </group>
+                </page>
+                <page name="list_results" string="List" attrs="{'invisible': [('display_res', '=', False)]}">
+                    <div name="slots_lists" style="display: flex;">
+                        <group string="Slots by distance / duration">
+                            <field name="by_distance_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
+                                <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
+                                    <button name="action_view_tour" type="object" icon="fa-map-marker" help="Show Tour of the day for this employee on the map"/>
+                                    <field name="weekday"/>
+                                    <field name="date"/>
+                                    <field name="employee_id"/>
+                                    <field name="description" string="Créneau"/>
+                                    <field name="distance_utile" string="Distance"/>
+                                    <field name="duree_utile" string="Durée"/>
+                                    <button name="action_select_confirm_slot" type="object" icon="fa-check" help="Select and confirm this slot"/>
+                                    <field name="allday" invisible="1"/>
+                                    <field name="disponible" invisible="1"/>
+                                    <field name="selected" invisible="1"/>
+                                    <field name="tour_id" invisible="1"/>
+                                    <field name="map_preview" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <group name="slots_by_date" string="Slots by date" style="margin-left: 10px;">
+                            <field name="by_date_planning_tree_ids" mode="tree" colspan="2" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_date">
+                                <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
+                                    <button name="action_view_tour" type="object" icon="fa-map-marker" help="Show Tour of the day for this employee on the map"/>
+                                    <field name="weekday"/>
+                                    <field name="date"/>
+                                    <field name="employee_id"/>
+                                    <field name="description" string="Créneau"/>
+                                    <field name="distance_utile" string="Distance"/>
+                                    <field name="duree_utile" string="Durée"/>
+                                    <button name="action_select_confirm_slot" type="object" icon="fa-check" help="Select and confirm this slot"/>
+                                    <field name="allday" invisible="1"/>
+                                    <field name="disponible" invisible="1"/>
+                                    <field name="selected" invisible="1"/>
+                                    <field name="map_preview" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </div>
+                    <group col="2" colspan="2">
+                        <field name="intervention_map_ids" mode="map" nolabel="1" context="{'form_view_ref':'of_planning_tournee.of_planning_intervention_view_form',  'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'additional_record': additional_record}"/>
+                    </group>
+                    <div style="float: left; font-size: x-small;font-weight: bold;">
+                        <field name="map_description_html"/>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Added a primary view to display the calendar tab in first position and without "by date" time slots -->
+    <record id="view_rdv_intervention_complete_form_calendar_1st_wo_date_wizard" model="ir.ui.view">
+        <field name="name">view.of.tournee.rdv.complete.form.calendar.1st.wo.date.wizard</field>
+        <field name="model">of.tournee.rdv</field>
+        <field name="type">form</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.view_rdv_intervention_complete_form_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook//page[@name='list_results']" position="replace"/>
+            <xpath expr="//notebook//page[@name='calendar_results']" position="replace"/>
+            <xpath expr="//notebook//page[last()]" position="before">
+                <page name="calendar_results" string="Calendar" attrs="{'invisible': [('display_res', '=', False)]}">
+                    <group col="2" colspan="2">
+                        <field name="planning_ids" mode="calendar" colspan="4" nolabel="1" create="0">
+                            <calendar string="Calendrier" date_start="debut_dt" color="employee_cal_ids" date_stop="fin_dt" all_day="allday"
+                                    attendee_model="hr.employee" color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1"
+                                    dispo_field="disponible" jump_to="selected" display_states="1"
+                                    force_color_field="force_color" selected_field="selected" quick_add="0" draggable="0"
+                                    attendee="employee_cal_ids">
+                                <field name="name"/>
+                                <field name="distance_utile" suffix=" km"/>
+                                <field name="duree_utile" suffix=" min"/>
+                                <field name="state_int" invisible="1"/>
+                                <field name="disponible" invisible="1"/>
+                                <field name="force_color" invisible="1"/>
+                                <field name="selected" invisible="1"/>
+                                <field name="of_color_ft" invisible="1"/>
+                                <field name="of_color_bg" invisible="1"/>
+                                <field name="allday" invisible="1"/>
+                                <field name="employee_id" invisible="1"/>
+                            </calendar>
+                        </field>
+                    </group>
+                </page>
+                <page name="list_results" string="List" attrs="{'invisible': [('display_res', '=', False)]}">
+                    <div name="slots_lists" style="display: flex;">
+                        <group string="Slots by distance / duration">
+                            <field name="by_distance_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
+                                <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
+                                    <button name="action_view_tour" type="object" icon="fa-map-marker" help="Show Tour of the day for this employee on the map"/>
+                                    <field name="weekday"/>
+                                    <field name="date"/>
+                                    <field name="employee_id"/>
+                                    <field name="description" string="Créneau"/>
+                                    <field name="distance_utile" string="Distance"/>
+                                    <field name="duree_utile" string="Durée"/>
+                                    <button name="action_select_confirm_slot" type="object" icon="fa-check" help="Select and confirm this slot"/>
+                                    <field name="allday" invisible="1"/>
+                                    <field name="disponible" invisible="1"/>
+                                    <field name="selected" invisible="1"/>
+                                    <field name="tour_id" invisible="1"/>
+                                    <field name="map_preview" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </div>
+                    <group col="2" colspan="2">
+                        <field name="intervention_map_ids" mode="map" nolabel="1" context="{'form_view_ref':'of_planning_tournee.of_planning_intervention_view_form',  'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'additional_record': additional_record}"/>
+                    </group>
+                    <div style="float: left; font-size: x-small;font-weight: bold;">
+                        <field name="map_description_html"/>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Added a primary view to display the calendar tab in first position, with "by duration" time slots instead of "by distance" time slots -->
+    <record id="view_rdv_intervention_complete_form_calendar_1st_by_duration_wizard" model="ir.ui.view">
+        <field name="name">view.of.tournee.rdv.complete.form.calendar.1st.by.duration.wizard</field>
+        <field name="model">of.tournee.rdv</field>
+        <field name="type">form</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.view_rdv_intervention_complete_form_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook//page[@name='list_results']" position="replace"/>
+            <xpath expr="//notebook//page[@name='calendar_results']" position="replace"/>
+            <xpath expr="//notebook//page[last()]" position="before">
+                <page name="calendar_results" string="Calendar" attrs="{'invisible': [('display_res', '=', False)]}">
+                    <group col="2" colspan="2">
+                        <field name="planning_ids" mode="calendar" colspan="4" nolabel="1" create="0">
+                            <calendar string="Calendrier" date_start="debut_dt" color="employee_cal_ids" date_stop="fin_dt" all_day="allday"
+                                    attendee_model="hr.employee" color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1"
+                                    dispo_field="disponible" jump_to="selected" display_states="1"
+                                    force_color_field="force_color" selected_field="selected" quick_add="0" draggable="0"
+                                    attendee="employee_cal_ids">
+                                <field name="name"/>
+                                <field name="distance_utile" suffix=" km"/>
+                                <field name="duree_utile" suffix=" min"/>
+                                <field name="state_int" invisible="1"/>
+                                <field name="disponible" invisible="1"/>
+                                <field name="force_color" invisible="1"/>
+                                <field name="selected" invisible="1"/>
+                                <field name="of_color_ft" invisible="1"/>
+                                <field name="of_color_bg" invisible="1"/>
+                                <field name="allday" invisible="1"/>
+                                <field name="employee_id" invisible="1"/>
+                            </calendar>
+                        </field>
+                    </group>
+                </page>
+                <page name="list_results" string="List" attrs="{'invisible': [('display_res', '=', False)]}">
+                    <div name="slots_lists" style="display: flex;">
+                        <group string="Slots by distance / duration">
+                            <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
+                                <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
+                                    <button name="action_view_tour" type="object" icon="fa-map-marker" help="Show Tour of the day for this employee on the map"/>
+                                    <field name="weekday"/>
+                                    <field name="date"/>
+                                    <field name="employee_id"/>
+                                    <field name="description" string="Créneau"/>
+                                    <field name="distance_utile" string="Distance"/>
+                                    <field name="duree_utile" string="Durée"/>
+                                    <button name="action_select_confirm_slot" type="object" icon="fa-check" help="Select and confirm this slot"/>
+                                    <field name="allday" invisible="1"/>
+                                    <field name="disponible" invisible="1"/>
+                                    <field name="selected" invisible="1"/>
+                                    <field name="tour_id" invisible="1"/>
+                                    <field name="map_preview" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <group name="slots_by_date" string="Slots by date" style="margin-left: 10px;">
+                            <field name="by_date_planning_tree_ids" mode="tree" colspan="2" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_date">
+                                <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
+                                    <button name="action_view_tour" type="object" icon="fa-map-marker" help="Show Tour of the day for this employee on the map"/>
+                                    <field name="weekday"/>
+                                    <field name="date"/>
+                                    <field name="employee_id"/>
+                                    <field name="description" string="Créneau"/>
+                                    <field name="distance_utile" string="Distance"/>
+                                    <field name="duree_utile" string="Durée"/>
+                                    <button name="action_select_confirm_slot" type="object" icon="fa-check" help="Select and confirm this slot"/>
+                                    <field name="allday" invisible="1"/>
+                                    <field name="disponible" invisible="1"/>
+                                    <field name="selected" invisible="1"/>
+                                    <field name="map_preview" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </div>
+                    <group col="2" colspan="2">
+                        <field name="intervention_map_ids" mode="map" nolabel="1" context="{'form_view_ref':'of_planning_tournee.of_planning_intervention_view_form',  'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'additional_record': additional_record}"/>
+                    </group>
+                    <div style="float: left; font-size: x-small;font-weight: bold;">
+                        <field name="map_description_html"/>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Added a primary view to display the calendar tabin first position, "by duration" time slots instead of "by distance" time slots and without "by date" time slots -->
+    <record id="view_rdv_intervention_complete_form_calendar_1st_by_duration_wo_date_wizard" model="ir.ui.view">
+        <field name="name">view.of.tournee.rdv.complete.form.calendar.1st.by.duration.wo.date.wizard</field>
+        <field name="model">of.tournee.rdv</field>
+        <field name="type">form</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.view_rdv_intervention_complete_form_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook//page[@name='list_results']" position="replace"/>
+            <xpath expr="//notebook//page[@name='calendar_results']" position="replace"/>
+            <xpath expr="//notebook//page[last()]" position="before">
+                <page name="calendar_results" string="Calendar" attrs="{'invisible': [('display_res', '=', False)]}">
+                    <group col="2" colspan="2">
+                        <field name="planning_ids" mode="calendar" colspan="4" nolabel="1" create="0">
+                            <calendar string="Calendrier" date_start="debut_dt" color="employee_cal_ids" date_stop="fin_dt" all_day="allday"
+                                    attendee_model="hr.employee" color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1"
+                                    dispo_field="disponible" jump_to="selected" display_states="1"
+                                    force_color_field="force_color" selected_field="selected" quick_add="0" draggable="0"
+                                    attendee="employee_cal_ids">
+                                <field name="name"/>
+                                <field name="distance_utile" suffix=" km"/>
+                                <field name="duree_utile" suffix=" min"/>
+                                <field name="state_int" invisible="1"/>
+                                <field name="disponible" invisible="1"/>
+                                <field name="force_color" invisible="1"/>
+                                <field name="selected" invisible="1"/>
+                                <field name="of_color_ft" invisible="1"/>
+                                <field name="of_color_bg" invisible="1"/>
+                                <field name="allday" invisible="1"/>
+                                <field name="employee_id" invisible="1"/>
+                            </calendar>
+                        </field>
+                    </group>
+                </page>
+                <page name="list_results" string="List" attrs="{'invisible': [('display_res', '=', False)]}">
+                    <div name="slots_lists" style="display: flex;">
+                        <group string="Slots by distance / duration">
+                            <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
+                                <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
+                                    <button name="action_view_tour" type="object" icon="fa-map-marker" help="Show Tour of the day for this employee on the map"/>
+                                    <field name="weekday"/>
+                                    <field name="date"/>
+                                    <field name="employee_id"/>
+                                    <field name="description" string="Créneau"/>
+                                    <field name="distance_utile" string="Distance"/>
+                                    <field name="duree_utile" string="Durée"/>
+                                    <button name="action_select_confirm_slot" type="object" icon="fa-check" help="Select and confirm this slot"/>
+                                    <field name="allday" invisible="1"/>
+                                    <field name="disponible" invisible="1"/>
+                                    <field name="selected" invisible="1"/>
+                                    <field name="tour_id" invisible="1"/>
+                                    <field name="map_preview" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </div>
+                    <group col="2" colspan="2">
+                        <field name="intervention_map_ids" mode="map" nolabel="1" context="{'form_view_ref':'of_planning_tournee.of_planning_intervention_view_form',  'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'additional_record': additional_record}"/>
+                    </group>
+                    <div style="float: left;">
+                        <field name="map_description_html"/>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    <!-- End for : Views for the wizard called from the Partner/Task/Issue form-->
+    <!-- End for : Views for the wizard called from the Partner/Task/Issue form-->
+    <!-- End for : Views for the wizard called from the Partner/Task/Issue form-->
+
+
+    <!-- Views for the lines of the wizard -->
+    <!-- Views for the lines of the wizard -->
+    <!-- Views for the lines of the wizard -->
+    <record id="view_simple_of_tournee_rdv_line_wizard" model="ir.ui.view">
+        <field name="name">view.simple.of.tournee.rdv.line.wizard</field>
         <field name="model">of.tournee.rdv.line</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
@@ -150,35 +986,20 @@
                     });
                 </script>
                 <field name="allday" invisible="1"/>
+                <field name="intervention_id" invisible="1" readonly="1"/>
+                <field name="selected" invisible="1" readonly="1"/>
                 <group attrs="{'invisible':['|', ('allday', '!=', False), ('date', '=', False)]}">
                     <group>
                         <field name="date" readonly="1"/>
                         <field name="description" readonly="1"/>
                         <field name="employee_id" readonly="1"/>
-                        <field name="intervention_id" readonly="1" attrs="{'invisible':[('intervention_id','=',False)]}"/>
-                        <field name="disponible" readonly="1"/>
                     </group>
                     <group>
-                        <field name="dist_prec" readonly="1"/>
-                        <field name="dist_suiv" readonly="1"/>
-                        <field name="distance" readonly="1"/>
+                        <field name="distance_utile" readonly="1"/>
+                        <field name="duree_utile" readonly="1"/>
                     </group>
-                    <group>
-                        <field name="geo_lat" readonly="1"/>
-                        <field name="geo_lng" readonly="1"/>
-                        <field name="precision" readonly="1"/>
-                    </group>
-                    <group>
-                        <field name="duree_prec" readonly="1"/>
-                        <field name="duree_suiv" readonly="1"/>
-                        <field name="duree" readonly="1"/>
-                    </group>
-                    <group attrs="{'invisible':['|',('intervention_id','!=',False),('selected','!=',True)]}" colspan="2" col="4">
-                        <field name="selected" invisible="1" readonly="1"/>
-                        <field name="selected_hour" widget="float_time"/>
-                    </group>
-                    <label for="selected_description" colspan="2" attrs="{'invisible':['|',('intervention_id','!=',False),('selected','!=',True)]}"/>
-                    <field name="selected_description" nolabel="1" colspan="2" attrs="{'invisible':['|',('intervention_id','!=',False),('selected','!=',True)]}"/>
+                    <label for="selected_description" colspan="2" attrs="{'invisible':[('intervention_id','!=',False)]}"/>
+                    <field name="selected_description" nolabel="1" colspan="2" attrs="{'invisible':[('intervention_id','!=',False)]}"/>
                 </group>
                 <div attrs="{'invisible':[('allday','!=',True)]}">
                     Ce créneau est virtuel. Il existe seulement pour montrer les limites de la recherche.
@@ -187,7 +1008,7 @@
                     Pour sélectionner ou voir les informations d'un créneau, veuillez cliquer dessus.
                 </div>
                 <footer attrs="{'invisible':[('date','=',False)]}">
-                    <button name="button_select" string="Sélectionner ce créneau" type="object" colspan="4" class="btn-primary"
+                    <button name="action_select_confirm_slot" string="Confirm this slot" type="object" colspan="4" class="btn-primary"
                         attrs="{'invisible': ['|','|',('allday','!=',False),('intervention_id','!=',False),('selected','!=',False)]}"/>
                     <button name="button_confirm" string="Confirmer le RDV" type="object" colspan="4" class="btn-primary"
                         attrs="{'invisible': [('selected','!=',True)]}"/>
@@ -196,17 +1017,47 @@
         </field>
     </record>
 
-    <act_window
-        name="Trouver un créneau"
-        res_model="of.tournee.rdv"
-        src_model="res.partner"
-        view_mode="form"
-        view_id="view_rdv_intervention_wizard"
-        id="action_view_rdv_intervention_wizard_client"
-        key2="client_action_multi"
-        target="new"
-        groups="of_planning.of_group_planning_intervention_lecture_siens"
-    />
+    <record id="view_simple_of_tournee_rdv_line_by_date_wizard" model="ir.ui.view">
+        <field name="name">view.simple.of.tournee.rdv.line.by.date.wizard</field>
+        <field name="model">of.tournee.rdv.line.by.date</field>
+        <field name="type">form</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.view_simple_of_tournee_rdv_line_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="string">Créneau par date</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_simple_of_tournee_rdv_line_by_distance_wizard" model="ir.ui.view">
+        <field name="name">view.simple.of.tournee.rdv.line.by.distance.wizard</field>
+        <field name="model">of.tournee.rdv.line.by.distance</field>
+        <field name="type">form</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.view_simple_of_tournee_rdv_line_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="string">Créneau par distance</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_simple_of_tournee_rdv_line_by_duration_wizard" model="ir.ui.view">
+        <field name="name">view.simple.of.tournee.rdv.line.by.duration.wizard</field>
+        <field name="model">of.tournee.rdv.line.by.duration</field>
+        <field name="type">form</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.view_simple_of_tournee_rdv_line_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="string">Créneau par durée</attribute>
+            </xpath>
+        </field>
+    </record>
+    <!-- End for : Views for the lines of the wizard -->
+    <!-- End for : Views for the lines of the wizard -->
+    <!-- End for : Views for the lines of the wizard -->
 
     <act_window
         name="Planifier une intervention"
@@ -226,7 +1077,7 @@
         <field name="inherit_id" ref="of_base.of_base_partner_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="%(action_view_rdv_intervention_wizard_client)d" string="Planifier Intervention" type="action"/>
+                <button name="action_open_wizard_plan_intervention" string="Plan Intervention" type="object"/>
             </xpath>
         </field>
     </record>
@@ -238,8 +1089,8 @@
         <field name="inherit_id" ref="of_service.view_of_service_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="%(action_view_rdv_intervention_wizard_service)d" string="Planifier Intervention"
-                        type="action" invisible="context.get('hide_bouton_planif')"
+                <button name="action_open_wizard_plan_intervention" string="Plan Intervention"
+                        type="object" invisible="context.get('hide_bouton_planif')"
                         attrs="{'invisible': [('base_state', '!=', 'calculated')]}"/>
             </xpath>
         </field>

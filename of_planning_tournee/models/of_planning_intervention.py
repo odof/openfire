@@ -10,6 +10,13 @@ class OfPlanningIntervention(models.Model):
     tournee_ids = fields.Many2many(
         'of.planning.tournee', 'of_planning_intervention_of_planning_tournee_rel', 'intervention_id', 'tournee_id',
         compute='_compute_tournee_ids', store=True, string='Planification')
+    map_color_tour = fields.Char(compute='_compute_tour_data', string='Color')
+    tour_number = fields.Char(compute='_compute_tour_data', string='Tour number')
+    # Time slots data
+    duration_one_way = fields.Float(string='Duration one way (min)')
+    distance_one_way = fields.Float(string='Distance one way (km)')
+    return_duration = fields.Float(string='Return duration (min)')
+    return_distance = fields.Float(string='Return distance (km)')
 
     # @api.depends
 
@@ -24,6 +31,27 @@ class OfPlanningIntervention(models.Model):
                     ('employee_id', 'in', intervention.employee_ids.ids),
                     ('date', '=', intervention.date[:10])])
                 intervention.tournee_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in tournees._ids]
+
+    @api.multi
+    def _compute_tour_data(self):
+        if self._context.get('active_tour_id'):
+            tour = self.env['of.planning.tournee'].browse(self._context.get('active_tour_id'))
+            address_dict = {}
+            for idx, inter in enumerate(tour.intervention_ids, 1):
+                if not address_dict.get(inter.address_id.id):
+                    address_dict[inter.address_id.id] = {inter: idx}
+                else:
+                    address_dict[inter.address_id.id][inter] = idx
+            for rec in self:
+                interventions_at_address = address_dict.get(rec.address_id.id)
+                tour_number = ', '.join(map(str, interventions_at_address.values()))
+                color = 'blue'
+                rec.map_color_tour = color
+                rec.tour_number = tour_number
+        else:
+            for rec in self:
+                rec.map_color_tour = False
+                rec.tour_number = False
 
     # Héritages
 
@@ -175,3 +203,11 @@ class OfPlanningIntervention(models.Model):
                  ('is_bloque', '=', False), ('is_confirme', '=', False),
                  ('address_depart_id', '=', False), ('address_retour_id', '=', False), ('secteur_id', '=', False)])
         return tournees_unlink.unlink()
+
+    @api.model
+    def custom_get_color_map(self):
+        title = ""
+        v0 = {'label': u"DI à planifier", 'value': 'green'}
+        # gold is easier to read than yellow on the legend with a white background
+        v1 = {'label': u'Intervention(s) de la tournée', 'value': 'blue'}
+        return {"title": title, "values": (v0, v1)}

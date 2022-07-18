@@ -20,7 +20,7 @@
 
     <!-- map container -->
     <div t-name="MapView" t-attf-id="#{widget.map_id or 'lf_map'}"
-         style="min-width: 500px; min-height: 500px; width: 100%; height: 100%; z-index:2;"/>
+        t-attf-style="min-width: #{widget.min_width or '500px'}; min-height: #{widget.min_height or '500px'}; width: 100%; height: 100%; z-index:2;"/>
 
 	<t t-name="MapView.record">
         <t t-raw="widget.content"/>

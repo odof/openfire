@@ -151,7 +151,6 @@ CalendarView.include({
             this.display_states = false;
         }
 
-        this.on_event_after_all_render = _.debounce(this.on_event_after_all_render, 300, true);
         this.res_ids_indexes = {}; // dictionnaire qui contient les indexes des filtres en fonction de leur id
         this.res_ids_attendee_columns = {};
         this.attendee_columns = [];
@@ -870,6 +869,15 @@ CalendarView.include({
             self.event_ids_attendees[event["id"]] = [];
         }
         fc.eventClick = function (event) { self.open_event(event); };
+        fc.eventRender = function (event, element, view) {
+            var etitle = event.title;
+            // Avoid to display the title with an 'undifined' value.
+            // Because if the event has no employee this is a virtual event and attendee_avatars is undifined here.
+            if (event.attendee_avatars != undefined) {
+                etitle += event.attendee_avatars;
+            }
+            element.find('.fc-event-title').html(etitle);
+        }
         return fc;
     },
     init_calendar: function() {
@@ -890,7 +898,10 @@ CalendarView.include({
      *  Jumps to first event rather than current day
      */
     on_event_after_all_render: function() {
+        // Cette fonction est appelée 2 fois quand une view est chargée dans un onglet qui n'est pas affiché en premier.
+        // Dans ce cas le do_search est appelé mais n'initialise aucun events. Et donc add_tooltip ne fait rien.
         var self = this;
+        var event;
         // only jump once, else we can't navigate through the calendar
         if (!isNullOrUndef(self.first_evt) && !self.first_jump && !!self.jump_to) {
             self.first_jump = true;
@@ -1307,13 +1318,15 @@ CalendarView.include({
             'start': moment(date_start).toString(),
             'end': moment(date_stop).toString(),
             'title': the_title,
-            'attendee_avatars': the_title_avatar,
             'allDay': (this.fields[this.date_start].type == 'date' || (this.all_day && evt[this.all_day]) || false),
             'id': evt.id,
             'attendees':attendees,
             'is_attendee_col': evt.is_attendee_col,
             'is_holiday': evt.ferie,  // fonctionnement ajouté dans fullcalendar pour l'affichage en mode jour
         };
+        if (evt.employee_id != false) {
+            r['attendee_avatars'] = the_title_avatar;
+        }
         for (var key in self["icons"]) {
             if (evt[key]) {
                 r.title = r.title + self["icons"][key];
