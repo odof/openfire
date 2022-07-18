@@ -1,37 +1,27 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime, timedelta, date
-from dateutil.relativedelta import relativedelta
-import pytz
-import urllib
+import json
 import requests
 import logging
-
-from odoo import api, models, fields
-from odoo.exceptions import UserError
-from odoo.tools import config, DEFAULT_SERVER_DATE_FORMAT
+import pytz
+import urllib
+from datetime import datetime, timedelta, date
+from dateutil.relativedelta import relativedelta
+from odoo import api, models, fields, _
+from odoo.exceptions import UserError, ValidationError
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
+from odoo.tools import config
 from odoo.tools.float_utils import float_compare
-
-from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
+from odoo.addons.of_planning_tournee.models.of_intervention_settings import SELECTION_SEARCH_TYPES
+from odoo.addons.of_planning_tournee.models.of_intervention_settings import SELECTION_SEARCH_MODES
 from odoo.addons.of_utils.models.of_utils import distance_points, hours_to_strs
+from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
 from odoo.addons.calendar.models.calendar import calendar_id2real_id
 
 _logger = logging.getLogger(__name__)
 
 AM_LIMIT_FLOAT = 12.0
 
-SEARCH_MODES = [
-    ('distance_a', u'Distance Aller (km)'),
-    ('distance_r', u'Distance Retour (km)'),
-    ('distance_ar', u'Distance Aller/Retour (km)'),
-    ('distance_a_or_r', u'Distance Aller ou Retour (km)'),
-    ('distance_a_am_r_pm', u'Distance Aller si matin / Retour si après-midi (km)'),
-    ('duree_a', u'Durée Aller (min)'),
-    ('duree_r', u'Durée Retour (min)'),
-    ('duree_ar', u'Durée Aller/Retour (min)'),
-    ('duree_a_or_r', u'Durée Aller ou Retour (min)'),
-    ('duree_a_am_r_pm', u'Durée Aller si matin / Retour si après-midi (min)'),
-]
 
 """
 bug description quand changement de tache ou service lié puis changé?
@@ -41,7 +31,7 @@ bug description quand changement de tache ou service lié puis changé?
 
 class OfTourneeRdv(models.TransientModel):
     _name = 'of.tournee.rdv'
-    _description = u'Prise de RDV dans les tournées'
+    _description = u"Prise de RDV dans les tournées"
 
     @api.model
     def default_get(self, fields=None):
@@ -73,30 +63,27 @@ class OfTourneeRdv(models.TransientModel):
                 service = service_obj.search([('partner_id', '=', partner.id)], limit=1)
             address = order.partner_shipping_id or order.partner_id
 
-        if address and not (address.geo_lat or address.geo_lng):
+        if address and not address.geo_lat and not address.geo_lng:
             address = partner_obj.search(['|', ('id', '=', partner.id), ('parent_id', '=', partner.id),
                                           '|', ('geo_lat', '!=', 0), ('geo_lng', '!=', 0)],
                                          limit=1) or address
 
+        res['source_model'] = active_model
         res['partner_id'] = partner and partner.id or False
         res['partner_address_id'] = address and address.id or False
         res['service_id'] = service and service.id or False
+        if service:
+            res['days_ids'] = [(6, 0, service.jour_ids.ids)]
         if service and service.date_next and service.date_next >= date.today().strftime(DEFAULT_SERVER_DATE_FORMAT):
             res['date_recherche_debut'] = service.date_next
-
-
-        # Allocation de société par défaut
-        # Pour les objets du planning, le choix de société se fait par un paramètre de config
-        # if not res.get('company_id'):
-        #     company_choice = self.env['ir.values'].get_default('of.intervention.settings', 'company_choice')
-        #     if company_choice == 'user':
-        #         res['company_id'] = self.env.user.company_id.id
-        #     elif res.get('partner_address_id') and address.company_id:
-        #         res['company_id'] = address.company_id.id
-        #     elif res.get('partner_id') and partner.company_id:
-        #         res['company_id'] = partner.company_id.id
-
+            res['date_recherche_fin'] = service.date_fin
         return res
+
+    @api.model
+    def _default_days(self):
+        # added sudo() to avoid access rights issues from the website (no access for of.planning.tournee)
+        days = self.env['of.jours'].sudo().search([('numero', 'in', (1, 2, 3, 4, 5))], order="numero")
+        return [day.id for day in days]
 
     @api.model
     def _default_company(self):
@@ -104,8 +91,33 @@ class OfTourneeRdv(models.TransientModel):
             return self.env['res.company']._company_default_get('of.tournee.rdv')
         return False
 
-    # Champs de recherche
+    @api.model
+    def _default_search_mode(self):
+        return self.env['ir.values'].get_default('of.intervention.settings', 'search_mode') or 'oneway_or_return'
 
+    @api.model
+    def _default_search_type(self):
+        return self.env['ir.values'].get_default('of.intervention.settings', 'search_type') or 'distance'
+
+    @api.model
+    def _default_slots_display_mode(self):
+        return self.env['ir.values'].get_default('of.intervention.settings', 'slots_display_mode') or 'list'
+
+    @api.model
+    def _default_show_next_available_time_slots(self):
+        return self.env['ir.values'].get_default('of.intervention.settings', 'show_next_available_time_slots')
+
+    @api.model
+    def _default_planning_task(self):
+        return self.env['ir.values'].get_default('of.intervention.settings', 'default_planning_task_id')
+
+    source_model = fields.Char(string="Source Model", readonly=True)
+    slots_display_mode = fields.Char(
+        string="Display mode", readonly=True, required=True, default=lambda s: s._default_slots_display_mode())
+    show_next_available_time_slots = fields.Boolean(
+        string="Display next time slots by date", readonly=True,
+        default=lambda s: s._default_show_next_available_time_slots())
+    # Champs de recherche
     partner_id = fields.Many2one(
         'res.partner', string="Client", required=True, readonly=True)
     partner_address_id = fields.Many2one(
@@ -114,7 +126,6 @@ class OfTourneeRdv(models.TransientModel):
     geo_lat = fields.Float(related='partner_address_id.geo_lat', readonly=True)
     geo_lng = fields.Float(related='partner_address_id.geo_lng', readonly=True)
     precision = fields.Selection(related='partner_address_id.precision', readonly=True)
-    geocode_retry = fields.Boolean(u"Geocodage retenté", compute="_compute_geocode_retry")
     ignorer_geo = fields.Boolean(u"Ignorer données géographiques")
     partner_address_street = fields.Char(related="partner_address_id.street", readonly=True)
     partner_address_street2 = fields.Char(related="partner_address_id.street2", readonly=True)
@@ -122,38 +133,59 @@ class OfTourneeRdv(models.TransientModel):
     partner_address_state_id = fields.Many2one(related="partner_address_id.state_id", readonly=True)
     partner_address_zip = fields.Char(related="partner_address_id.zip", readonly=True)
     partner_address_country_id = fields.Many2one(related="partner_address_id.country_id", readonly=True)
-    company_id = fields.Many2one('res.company', string='Magasin', required=True, default=lambda s: s._default_company())
-    service_id = fields.Many2one('of.service', string=u"Demande d'intervention", domain="[('partner_id', '=', partner_id)]")
-    tache_id = fields.Many2one('of.planning.tache', string=u"Tâche", required=True)
+    company_id = fields.Many2one(
+        comodel_name='res.company', string=u"Magasin", required=True, default=lambda s: s._default_company())
+    service_id = fields.Many2one(
+        comodel_name='of.service', string=u"Demande d'intervention", domain="[('partner_id', '=', partner_id)]")
+    tache_id = fields.Many2one(
+        comodel_name='of.planning.tache', string=u"Tâche", required=True, default=lambda s: s._default_planning_task())
     creer_recurrence = fields.Boolean(
         string=u"Créer récurrence?",
         help=u"Créera une intervention récurrente s'il n'en existe pas déjà une associée à ce RDV.")
     duree = fields.Float(string=u'Durée', required=True, digits=(12, 5))
     pre_employee_ids = fields.Many2many(
-        'hr.employee', string=u"Pré-sélection d'intervenants",
+        comodel_name='hr.employee', string=u"Intervenant(s)",
         domain="['|', ('of_tache_ids', 'in', tache_id), ('of_toutes_taches', '=', True)]",
         help=u"Pré-sélection des intervenants")
-
     date_recherche_debut = fields.Date(
         string=u"À partir du", required=True,
         default=lambda *a: (date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
     date_recherche_fin = fields.Date(
         string="Jusqu'au", required=True, default=lambda *a: (date.today() + timedelta(days=7)).strftime('%Y-%m-%d'))
-    mode_recherche = fields.Selection(SEARCH_MODES, string="Mode de recherche", required=True, default="distance_a")
-    max_recherche = fields.Float(string="Maximum")
+    search_type = fields.Selection(
+        selection=SELECTION_SEARCH_TYPES, string="Search type", required=True,
+        default=lambda s: s._default_search_type())
+    search_mode = fields.Selection(
+        selection=SELECTION_SEARCH_MODES, string="Search mode", required=True,
+        default=lambda s: s._default_search_mode())
+    search_period_in_days = fields.Integer(string="Search period (in days)", default=7, required=True)
+    days_ids = fields.Many2many(
+        comodel_name='of.jours', relation='wizard_plan_intervention_days_rel', column1='wizard_id',
+        column2='jour_id', string="Days", required=True, default=lambda s: s._default_days())
     orthodromique = fields.Boolean(string=u"Distances à vol d'oiseau")
 
     # Champs de résultat
-
     display_res = fields.Boolean(string=u"Voir Résultats", default=False)  # Utilisé pour attrs invisible des résultats
     zero_result = fields.Boolean(string="Recherche infructueuse", default=False, help=u"Aucun résultat")
-    zero_dispo = fields.Boolean(
-        string="Recherche infructueuse", default=False, help=u"Aucun résultat suffisamment proche")
+    can_show_more = fields.Boolean(string="Can show more", compute='_compute_can_show_more', store=True)
     planning_ids = fields.One2many('of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs')
-    planning_tree_ids = fields.One2many(
-        'of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs',
-        domain=[('intervention_id', '=', False), ('allday', '=', False)])
-    res_line_id = fields.Many2one("of.tournee.rdv.line", string=u"Créneau Sélectionné")
+    by_distance_planning_tree_ids = fields.One2many(
+        comodel_name='of.tournee.rdv.line.by.distance', inverse_name='wizard_id', string="Slots by distance",
+        domain=[('intervention_id', '=', False), ('allday', '=', False), ('hidden', '=', False)])
+    by_duration_planning_tree_ids = fields.One2many(
+        comodel_name='of.tournee.rdv.line.by.duration', inverse_name='wizard_id', string="Slots by duration",
+        domain=[('intervention_id', '=', False), ('allday', '=', False), ('hidden', '=', False)])
+    by_date_planning_tree_ids = fields.One2many(
+        comodel_name='of.tournee.rdv.line.by.date', inverse_name='wizard_id', string="Slots by date",
+        domain=[('intervention_id', '=', False), ('allday', '=', False), ('hidden', '=', False)])
+    res_line_id = fields.Many2one(comodel_name='of.tournee.rdv.line', string=u"Créneau Sélectionné")
+    map_line_id = fields.Many2one(comodel_name='of.tournee.rdv.line', string="Line selected for the map preview")
+    map_tour_id = fields.Many2one(comodel_name='of.planning.tournee', string="Tour")
+    additional_record = fields.Char(
+        string="Data for the additional record to preview", compute='_compute_additional_record')
+    map_description_html = fields.Html(string="Map description", compute='_compute_intervention_map_data')
+    intervention_map_ids = fields.One2many(
+        comodel_name='of.planning.intervention', compute='_compute_intervention_map_data', string="Interventions")
 
     name = fields.Char(string=u"Libellé", size=64, required=False)
     description = fields.Text(string="Description")
@@ -170,6 +202,133 @@ class OfTourneeRdv(models.TransientModel):
     flexible = fields.Boolean(
         string="Inclure les RDV flexibles", help=u"Afficher les créneaux des RDV flexibles comme étant libre")
 
+    @api.constrains('search_period_in_days')
+    def _check_search_period_in_days(self):
+        if self.search_period_in_days < 1 or self.search_period_in_days > 45:
+            raise ValidationError(_("The value of 'Search period (in days)' must be between 1 and 45"))
+
+    def _get_search_max_value(self):
+        return self.env['ir.values'].get_default('of.intervention.settings', 'number_of_results') or 30
+
+    @api.multi
+    def _get_wizard_form_view_id(self):
+        """Returns the right xml_id for the wizard form view depending on settings and search criteria.
+
+        If display_mode is 'list', first tab should be the one with time slots lists and tour map.
+        Second tab then is the one with calendar view.
+        If display_mode is 'calendar', calendar view tab should be in first position.
+
+        If in settings, option 'show_next_available_time_slots' is set to True, a second time slots list
+        should go next to the first one.
+        This second time slot list displays time slots ordered by date instead of proximity."""
+        self.ensure_one()
+        display_mode = self._default_slots_display_mode()
+        # simple form view is for when we come from 'of.service' model, complete form view is for other source models
+        if self.source_model == 'of.service':
+            return self._get_wizard_list_mode_form_view_id() if display_mode == 'list' else \
+                self._get_wizard_calendar_1st_mode_form_view_id()
+        elif display_mode == 'list':
+            return self._get_wizard_list_mode_complete_form_view_id()
+        else:
+            return self._get_wizard_calendar_1st_mode_complete_form_view_id()
+
+    @api.multi
+    def _get_wizard_list_mode_form_view_id(self):
+        """Get the correct form view id for the wizard in list mode.
+        """
+        self.ensure_one()
+        if self.show_next_available_time_slots:
+            # Display both time slot lists
+            return self.env.ref('of_planning_tournee.view_rdv_intervention_wizard').id \
+                if self.search_type == 'distance' else \
+                self.env.ref('of_planning_tournee.view_rdv_intervention_by_duration_wizard').id
+        else:
+            # Only display time slot list ordered by proximity
+            return self.env.ref('of_planning_tournee.view_rdv_intervention_wo_date_wizard').id \
+                if self.search_type == 'distance' else \
+                self.env.ref('of_planning_tournee.view_rdv_intervention_by_duration_wo_date_wizard').id
+
+    @api.multi
+    def _get_wizard_calendar_1st_mode_form_view_id(self):
+        """Get the correct form view id for the wizard in calendar 1st mode.
+        """
+        self.ensure_one()
+        if self.show_next_available_time_slots:
+            # Display calendar tab in first position, then time slots tab with both time slot lists
+            return self.env.ref('of_planning_tournee.view_rdv_intervention_calendar_1st_wizard').id \
+                if self.search_type == 'distance' else \
+                self.env.ref('of_planning_tournee.view_rdv_intervention_calendar_1st_by_duration_wizard').id
+        else:
+            # Display calendar tab in first position, then time slots tab without time slot list ordered by date
+            return self.env.ref(
+                'of_planning_tournee.view_rdv_intervention_calendar_1st_wo_date_wizard').id \
+                if self.search_type == 'distance' else \
+                self.env.ref('of_planning_tournee.view_rdv_intervention_calendar_1st_by_duration_wo_date_wizard').id
+
+    @api.multi
+    def _get_wizard_list_mode_complete_form_view_id(self):
+        """Get the correct complete form view id for the wizard in list mode.
+        """
+        self.ensure_one()
+        if self.show_next_available_time_slots:
+            # Display both time slot lists
+            return self.env.ref('of_planning_tournee.view_rdv_intervention_complete_form_wizard').id \
+                if self.search_type == 'distance' else \
+                self.env.ref('of_planning_tournee.view_rdv_intervention_complete_form_by_duration_wizard').id
+        else:
+            # Only display time slot list ordered by proximity
+            return self.env.ref(
+                'of_planning_tournee.view_rdv_intervention_complete_wo_date_form_wizard').id \
+                if self.search_type == 'distance' else \
+                self.env.ref('of_planning_tournee.view_rdv_intervention_complete_form_by_duration_wo_date_wizard').id
+
+    @api.multi
+    def _get_wizard_calendar_1st_mode_complete_form_view_id(self):
+        """Get the correct complete form view id for the wizard in calendar 1st mode.
+        """
+        self.ensure_one()
+        if self.show_next_available_time_slots:
+            # Display both time slot lists
+            return self.env.ref(
+                'of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_wizard').id \
+                if self.search_type == 'distance' else \
+                self.env.ref(
+                    'of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_by_duration_wizard').id
+        else:
+            # Only display time slot list ordered by proximity
+            return self.env.ref(
+                'of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_wo_date_wizard').id \
+                if self.search_type == 'distance' else \
+                self.env.ref(
+                'of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_by_duration_wo_date_wizard').id
+
+    def _get_hidden_lines(self, search_str=None):
+        if search_str is None:
+            search_str = 'distance_utile, debut_dt, employee_id' if self.search_type == 'distance' \
+                else 'duree_utile, debut_dt, employee_id'
+        by_date_lines_hidden = self.env['of.tournee.rdv.line.by.date'].search([
+            ('wizard_id', '=', self.id),
+            ('disponible', '=', True),
+            ('allday', '=', False),
+            ('intervention_id', '=', False),
+            ('hidden', '=', True),
+        ], order=search_str)
+        by_distance_lines_hidden = self.env['of.tournee.rdv.line.by.distance'].search([
+            ('wizard_id', '=', self.id),
+            ('disponible', '=', True),
+            ('allday', '=', False),
+            ('intervention_id', '=', False),
+            ('hidden', '=', True),
+        ], order=search_str)
+        by_duration_lines_hidden = self.env['of.tournee.rdv.line.by.duration'].search([
+            ('wizard_id', '=', self.id),
+            ('disponible', '=', True),
+            ('allday', '=', False),
+            ('intervention_id', '=', False),
+            ('hidden', '=', True),
+        ], order=search_str)
+        return by_date_lines_hidden, by_distance_lines_hidden, by_duration_lines_hidden
+
     # @api.depends
 
     @api.depends('partner_address_id', 'partner_address_id.geocoding', 'partner_address_id.precision')
@@ -184,7 +343,68 @@ class OfTourneeRdv(models.TransientModel):
             else:
                 wizard.geocode_retry = True
 
+    @api.depends(
+        'by_distance_planning_tree_ids.hidden', 'by_duration_planning_tree_ids.hidden',
+        'by_date_planning_tree_ids.hidden')
+    def _compute_can_show_more(self):
+        for wizard in self:
+            by_date_lines_hidden, by_distance_lines_hidden, by_duration_lines_hidden = wizard._get_hidden_lines()
+            wizard.can_show_more = bool(by_date_lines_hidden or by_distance_lines_hidden or by_duration_lines_hidden)
+
+    @api.depends('geo_lat', 'geo_lng', 'service_id', 'service_id.geo_lat', 'service_id.geo_lng')
+    def _compute_additional_record(self):
+        """Builds a dict to display an additional record on the map, containing information about the field operation
+        to be planned.
+        """
+        for wizard in self:
+            date_preview = \
+                wizard.map_line_id.debut_dt and \
+                fields.Datetime.from_string(wizard.map_line_id.debut_dt).strftime('%Y-%m-%d %H:%M:%S') or False
+            wizard.additional_record = json.dumps({
+                'id': wizard.service_id.id * -1,  # Negative id to avoid conflict with real interventions on the map
+                'map_color_tour': 'green',
+                'address_city': wizard.partner_address_city,
+                'partner_name': wizard.partner_id.name,
+                'tour_number': False,
+                'geo_lng': wizard.geo_lng,
+                'partner_phone': False,
+                'geo_lat': wizard.geo_lat,
+                'partner_mobile': False,
+                'tache_name': wizard.tache_id.name,
+                'date': date_preview,
+                'address_zip': wizard.partner_address_zip,
+                'rendered': True
+            })
+
+    @api.depends('res_line_id', 'map_tour_id', 'map_line_id')
+    def _compute_intervention_map_data(self):
+        # added sudo() to avoid access rights issues from the website (no access for of.planning.tournee)
+        self_sudo = self.sudo()
+        for wizard in self_sudo:
+            date_format = '%d/%m/%Y' if self.env.user.lang == 'fr_FR' else DEFAULT_SERVER_DATE_FORMAT
+            tour = wizard.map_tour_id
+            map_description_html = False
+            if wizard.map_line_id:
+                line_date = fields.Date.from_string(wizard.map_line_id.date).strftime(date_format)
+                line_day = wizard.map_line_id.weekday
+                line_day_str = '%s %s' % (line_day, line_date)
+                line_employee = wizard.map_line_id.employee_id
+                color = 'color: orange;' if wizard.res_line_id != wizard.map_line_id else ''
+                map_description_html = _(
+                    "<span style=\"font-size: x-small;font-weight: bold;%s\">Tour of %s, on %s</span>") % (
+                        color, line_employee.name, line_day_str)
+            wizard.map_description_html = map_description_html
+            wizard.intervention_map_ids = tour.intervention_map_ids if tour else []
+
     # @api.onchange
+    @api.onchange('search_period_in_days')
+    def _onchange_search_period_in_days(self):
+        self.ensure_one()
+        if self.search_period_in_days:
+            date_deb = fields.Date.from_string(self.date_recherche_debut)
+            # Sub 1 day because the search period is inclusive
+            date_fin = date_deb + timedelta(days=self.search_period_in_days - 1)
+            self.date_recherche_fin = fields.Date.to_string(date_fin)
 
     @api.onchange('partner_address_id')
     def _onchange_partner_address_id(self):
@@ -194,6 +414,11 @@ class OfTourneeRdv(models.TransientModel):
                 'of.intervention.settings', 'company_choice') or 'contact'
             if company_choice == 'contact' and self.partner_address_id.company_id:
                 self.company_id = self.partner_address_id.company_id.id
+            elif company_choice == 'contact' and self.partner_id and self.partner_id.company_id:
+                self.company_id = self.partner_id.company_id.id
+            # en mode contact avec un contact sans société, ou en mode user
+            else:
+                self.company_id = self.env.user.company_id.id
 
     @api.onchange('service_id')
     def _onchange_service(self):
@@ -235,7 +460,9 @@ class OfTourneeRdv(models.TransientModel):
 
             if not self.duree and self.tache_id.duree:
                 vals['duree'] = self.tache_id.duree
-
+            # If the duration is not set, we set it to 1 hour by default to avoid an error when searching time slots
+            if not vals.get('duree'):
+                vals['duree'] = 1.0
             employees = []
             for employee in self.pre_employee_ids:
                 if employee in self.tache_id.employee_ids:
@@ -248,8 +475,9 @@ class OfTourneeRdv(models.TransientModel):
         """Affecte date_recherche_fin"""
         self.ensure_one()
         if self.date_recherche_debut:
+            period_in_days = self.search_period_in_days or 7
             date_deb = fields.Date.from_string(self.date_recherche_debut)
-            date_fin = date_deb + timedelta(days=6)
+            date_fin = date_deb + timedelta(days=period_in_days)
             self.date_recherche_fin = fields.Date.to_string(date_fin)
 
     @api.onchange('date_recherche_fin')
@@ -258,27 +486,28 @@ class OfTourneeRdv(models.TransientModel):
         self.ensure_one()
         if self.date_recherche_fin and self.date_recherche_fin < self.date_recherche_debut:
             raise UserError(u"La date de fin de recherche doit être postérieure à la date de début de recherche")
-
-    @api.onchange('mode_recherche')
-    def _onchange_mode_recherche(self):
-        """Affecte max_recherche"""
-        self.ensure_one()
-        if self.mode_recherche:
-            self.max_recherche = self.mode_recherche == 'distance' and 50 or 60
+        # Sub 1 day because the search period is inclusive
+        start_date = fields.Date.from_string(self.date_recherche_debut) - timedelta(days=1)
+        end_date = fields.Date.from_string(self.date_recherche_fin)
+        self.search_period_in_days = (end_date - start_date).days
 
     # Actions
-
     @api.multi
-    def button_geocode(self):
-        """Géocode le partenaire"""
+    def action_open_wizard(self):
         self.ensure_one()
-        if self.geocode_retry:
-            raise UserError("Votre géocodeur par défaut n'a pas réussi a géocoder cette adresse")
-        self.partner_address_id.geo_code()
-        self.geocode_retry = True
-        if self.geo_lat != 0 or self.geo_lng != 0:
-            self.ignorer_geo = False
-        return {'type': 'ir.actions.do_nothing'}
+        form_view_id = self._get_wizard_form_view_id()
+        context = self._context.copy()
+        return {
+            'name': _("Plan intervention"),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'views': [(form_view_id, 'form')],
+            'res_model': 'of.tournee.rdv',
+            'res_id': self.id,
+            'target': 'new',
+            'context': context
+        }
 
     @api.multi
     def button_calcul(self):
@@ -287,13 +516,23 @@ class OfTourneeRdv(models.TransientModel):
         @todo: Remplacer le retour d'action par un return True, mais pour l'instant cela
           ne charge pas correctement la vue du planning.
         """
+        self.ensure_one()
+        # empty the current selected tour for the map
+        if self.map_tour_id:
+            self.map_tour_id = False
+        # empty the current selected line for the map
+        if self.map_line_id:
+            self.map_line_id = False
         self.compute()
         context = dict(self._context, employee_domain=self._get_employee_possible())
+        form_view_id = self._get_wizard_form_view_id()
         return {
+            'name': _("Plan intervention"),
             'type': 'ir.actions.act_window',
             'res_model': 'of.tournee.rdv',
             'view_type': 'form',
             'view_mode': 'form',
+            'views': [(form_view_id, 'form')],
             'res_id': self.id,
             'target': 'new',
             'context': context,
@@ -307,8 +546,9 @@ class OfTourneeRdv(models.TransientModel):
         Crée aussi une intervention récurrente si besoin.
         """
         self.ensure_one()
+        context = self._context.copy()
         group_flex = self.env.user.has_group('of_planning.of_group_planning_intervention_flexibility')
-        if not self._context.get('tz'):
+        if not context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
 
         intervention_obj = self.env['of.planning.intervention']
@@ -323,15 +563,16 @@ class OfTourneeRdv(models.TransientModel):
 
         values = self.get_values_intervention_create()
 
-        res = intervention_obj.create(values)
+        intervention = intervention_obj.create(values)
         if group_flex:
-            others = res.get_overlapping_intervention().filtered('flexible')
+            others = intervention.get_overlapping_intervention().filtered('flexible')
             if others:
                 others.button_postponed()
-        res.onchange_company_id()  # Permet de renseigner l'entrepôt
-        res.with_context(of_import_service_lines=True)._onchange_service_id()  # Charger les lignes de facturation
-        res.with_context(of_import_service_lines=True)._onchange_tache_id()  # Load invoice lines
-        res.with_context(of_intervention_wizard=True).onchange_template_id()  # Load questionnary lines
+        intervention.onchange_company_id()  # Permet de renseigner l'entrepôt
+        intervention.with_context(  # Charger les lignes de facturation
+            of_import_service_lines=True)._onchange_service_id()
+        intervention.with_context(of_import_service_lines=True)._onchange_tache_id()  # Load invoice lines
+        intervention.with_context(of_intervention_wizard=True).onchange_template_id()  # Load questionnary lines
         contract_custom = self.sudo().env['ir.module.module'].search([('name', '=', 'of_contract_custom')])
 
         # Creation/mise à jour du service si creer_recurrence
@@ -342,17 +583,31 @@ class OfTourneeRdv(models.TransientModel):
                     'date_fin': self.date_fin_planif
                 })
             elif self.creer_recurrence and (not contract_custom or contract_custom.state != 'installed'):
-                res.service_id = service_obj.create(self._get_service_data(date_propos_dt.month))
+                intervention.service_id = service_obj.create(self._get_service_data(date_propos_dt.month))
 
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'of.planning.intervention',
             'view_type': 'form',
             'view_mode': 'form',
-            'res_id': res.id,
+            'views': [(False, 'form')],
+            'res_id': intervention.id,
             'target': 'current',
-            'context': self._context
+            'context': context,
+            'flags': {'initial_mode': 'edit', 'form': {'options': {'mode': 'edit'}}},
         }
+
+    def action_show_more_results(self):
+        """Display more results in the tree views"""
+        self.ensure_one()
+        # number max of results to display
+        number_of_results = self.env['ir.values'].get_default('of.intervention.settings', 'number_of_results')
+        by_date_lines_hidden, by_distance_lines_hidden, by_duration_lines_hidden = self._get_hidden_lines()
+        # update lines to hide the lines who are above the number_of_results
+        by_date_lines_hidden[:number_of_results].write({'hidden': False})
+        by_distance_lines_hidden[:number_of_results].write({'hidden': False})
+        by_duration_lines_hidden[:number_of_results].write({'hidden': False})
+        return self.action_open_wizard()
 
     # Autres
 
@@ -373,6 +628,14 @@ class OfTourneeRdv(models.TransientModel):
         sudo=True quand recherche de créneau depuis le site web.
         """
         self.ensure_one()
+        if not self.duree:
+            raise UserError(_("You must set a duration to search for available time slots."))
+        if not self.company_id.partner_id.geo_lat and not self.company_id.partner_id.geo_lng:
+            raise UserError(_(
+                "The company address is not geocoded, please geocode it to plan an intervention. "
+                "If an employee's address is not geocoded, we will use the company address instead "
+                "to plan the intervention."))
+
         compare_precision = 5
 
         if not self._context.get('tz'):
@@ -386,8 +649,6 @@ class OfTourneeRdv(models.TransientModel):
         if sudo:
             employee_obj = employee_obj.sudo()
             intervention_obj = intervention_obj.sudo()
-
-        service = self.service_id
 
         # Suppression des anciens créneaux
         if mode == 'new':
@@ -412,12 +673,11 @@ class OfTourneeRdv(models.TransientModel):
                                     u"aucun intervenant pré-sélectionné ne peut la réaliser." % tache_id.name)
                     return
                 else:
-                    raise UserError(u"Aucun des intervenants sélectionnés n'a la compétence pour réaliser cette prestation.")
+                    raise UserError(
+                        u"Aucun des intervenants sélectionnés n'a la compétence pour réaliser cette prestation.")
 
         # Jours du service, jours travaillés des équipes et horaires de travail
-        jours_service = sudo and range(1, 8) or [jour.numero for jour in service.jour_ids] if service else range(1, 8)
-        if not jours_service:  # si les jours ne sont pas renseignés dans le service
-            jours_service = range(1, 8)
+        jours_service = sudo and range(1, 8) or [jour.numero for jour in self.days_ids] or range(1, 8)
 
         jours_feries = self.company_id.get_jours_feries(self.date_recherche_debut, self.date_recherche_fin)
         passer_jours_feries = self.env['ir.values'].get_default('of.intervention.settings', 'ignorer_jours_feries')
@@ -428,70 +688,72 @@ class OfTourneeRdv(models.TransientModel):
         avant_recherche_da = fields.Date.from_string(self.date_recherche_debut) - un_jour
         avant_recherche = fields.Date.to_string(avant_recherche_da)
         # Il faut mettre les date de début et de fin des bornes en UTC pour utilisation par le JS
-        avant_recherche_debut_dt = tz.localize(datetime.strptime(avant_recherche+" 00:00:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
+        avant_recherche_debut_dt = tz.localize(
+            datetime.strptime(avant_recherche + " 00:00:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
         avant_recherche_debut_dt = avant_recherche_debut_dt.astimezone(pytz.utc)  # passage en UTC
-        avant_recherche_fin_dt = tz.localize(datetime.strptime(avant_recherche+" 23:59:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
+        avant_recherche_fin_dt = tz.localize(
+            datetime.strptime(avant_recherche + " 23:59:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
         avant_recherche_fin_dt = avant_recherche_fin_dt.astimezone(pytz.utc)  # passage en UTC
         apres_recherche_da = fields.Date.from_string(self.date_recherche_fin) + un_jour
         apres_recherche = fields.Date.to_string(apres_recherche_da)
-        apres_recherche_debut_dt = tz.localize(datetime.strptime(apres_recherche+" 00:00:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
+        apres_recherche_debut_dt = tz.localize(
+            datetime.strptime(apres_recherche + " 00:00:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
         apres_recherche_debut_dt = apres_recherche_debut_dt.astimezone(pytz.utc)  # passage en UTC
-        apres_recherche_fin_dt = tz.localize(datetime.strptime(apres_recherche+" 23:59:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
+        apres_recherche_fin_dt = tz.localize(
+            datetime.strptime(apres_recherche + " 23:59:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
         apres_recherche_fin_dt = apres_recherche_fin_dt.astimezone(pytz.utc)  # passage en UTC
 
-        for employee in employees:
+        # create slots for search start and end, create slots for holidays
+        wizard_line_obj.create({
+            'name': u"Début de la recherche",
+            'debut_dt': avant_recherche_debut_dt,
+            'fin_dt': avant_recherche_fin_dt,
+            'date_flo': 0.0,
+            'date_flo_deadline': 23.9,
+            'date': avant_recherche_da,
+            'wizard_id': self.id,
+            'employee_id': False,
+            'intervention_id': False,
+            'disponible': False,
+            'allday': True,
+        })
+        wizard_line_obj.create({
+            'name': "Fin de la recherche",
+            'debut_dt': apres_recherche_debut_dt,
+            'fin_dt': apres_recherche_fin_dt,
+            'date_flo': 0.0,
+            'date_flo_deadline': 23.9,
+            'date': apres_recherche_da,
+            'wizard_id': self.id,
+            'employee_id': False,
+            'intervention_id': False,
+            'disponible': False,
+            'allday': True,
+        })
+        for d in jours_feries:
+            ferie_debut_dt = tz.localize(datetime.strptime(d + " 00:00:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
+            ferie_debut_dt = ferie_debut_dt.astimezone(pytz.utc)
+            ferie_fin_dt = tz.localize(datetime.strptime(d + " 23:59:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
+            ferie_fin_dt = ferie_fin_dt.astimezone(pytz.utc)
             wizard_line_obj.create({
-                'name': u"Début de la recherche",
-                'debut_dt': avant_recherche_debut_dt,
-                'fin_dt': avant_recherche_fin_dt,
+                'name': u"Férié: %s" % jours_feries[d].decode('utf-8'),
+                'debut_dt': ferie_debut_dt,
+                'fin_dt': ferie_fin_dt,
                 'date_flo': 0.0,
-                'date_flo_deadline': 23.9,
-                'date': avant_recherche_da,
+                'date_flo_deadline': 23.99,
+                'date': fields.Date.from_string(d),
                 'wizard_id': self.id,
-                'employee_id': employee.id,
+                'employee_id': False,
                 'intervention_id': False,
                 'disponible': False,
                 'allday': True,
+                'force_color': color_jours_feries,
             })
-            wizard_line_obj.create({
-                'name': "Fin de la recherche",
-                'debut_dt': apres_recherche_debut_dt,
-                'fin_dt': apres_recherche_fin_dt,
-                'date_flo': 0.0,
-                'date_flo_deadline': 23.9,
-                'date': apres_recherche_da,
-                'wizard_id': self.id,
-                'employee_id': employee.id,
-                'intervention_id': False,
-                'disponible': False,
-                'allday': True,
-            })
-            for d in jours_feries:
-                ferie_debut_dt = tz.localize(datetime.strptime(d + " 00:00:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
-                ferie_debut_dt = ferie_debut_dt.astimezone(pytz.utc)
-                ferie_fin_dt = tz.localize(datetime.strptime(d + " 23:59:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
-                ferie_fin_dt = ferie_fin_dt.astimezone(pytz.utc)
-                wizard_line_obj.create({
-                    'name': u"Férié: %s" % jours_feries[d].decode('utf-8'),
-                    'debut_dt': ferie_debut_dt,
-                    'fin_dt': ferie_fin_dt,
-                    'date_flo': 0.0,
-                    'date_flo_deadline': 23.99,
-                    'date': fields.Date.from_string(d),
-                    'wizard_id': self.id,
-                    'employee_id': employee.id,
-                    'intervention_id': False,
-                    'disponible': False,
-                    'allday': True,
-                    'force_color': color_jours_feries,
-                })
 
         # --- Recherche des créneaux ---
         date_recherche_da = avant_recherche_da
-        u"""
-        Parcourt tous les jours inclus entre la date de début de recherche et la date de fin de recherche.
-        Prend en compte les employés présélectionnés si il y en a et ceux qui peuvent effectuer la tache sinon
-        """
+        # Parcourt tous les jours inclus entre la date de début de recherche et la date de fin de recherche.
+        # Prend en compte les employés présélectionnés si il y en a et ceux qui peuvent effectuer la tache sinon
         while date_recherche_da < apres_recherche_da:
             date_recherche_da += un_jour
             num_jour = date_recherche_da.isoweekday()
@@ -529,8 +791,8 @@ class OfTourneeRdv(models.TransientModel):
                 employees_dispo = list(set(employees_dispo) & set(allowed_employee_ids))
 
             # Recherche de créneaux pour la date voulue et les équipes sélectionnées
-            jour_deb_dt = tz.localize(datetime.strptime(date_recherche_str+" 00:00:00", "%Y-%m-%d %H:%M:%S"))
-            jour_fin_dt = tz.localize(datetime.strptime(date_recherche_str+" 23:59:00", "%Y-%m-%d %H:%M:%S"))
+            jour_deb_dt = tz.localize(datetime.strptime(date_recherche_str + " 00:00:00", "%Y-%m-%d %H:%M:%S"))
+            jour_fin_dt = tz.localize(datetime.strptime(date_recherche_str + " 23:59:00", "%Y-%m-%d %H:%M:%S"))
             # Récupération des interventions déjà planifiées
             interventions = intervention_obj.search([('employee_ids', 'in', employees_dispo),
                                                      ('date', '<=', date_recherche_str),
@@ -571,11 +833,12 @@ class OfTourneeRdv(models.TransientModel):
                     tournee_obj = self.env['of.planning.tournee']
                     if sudo:
                         tournee_obj = tournee_obj.sudo()
-                    tournee = tournee_obj.search(
-                        [('date', '=', date_recherche_da),
-                         ('employee_id', '=', employee.id),
-                         ('secteur_id', '=', secteur_id)], limit=1)
+                    tournee = tournee_obj.search([
+                        ('date', '=', date_recherche_da),
+                        ('employee_id', '=', employee.id),
+                        ('secteur_id', '=', secteur_id)], limit=1)
                     if not tournee:
+                        # si pas de tournée on prend un autre employé
                         continue
                     elif web:
                         # Dans le cadre de la prise de vRDV en ligne, on vérifie le paramètre journées vierges
@@ -615,7 +878,7 @@ class OfTourneeRdv(models.TransientModel):
                             else:
                                 # L'intervention commence avant la fin du créneau courant
                                 if float_compare(fin, intervention_deb, compare_precision) == 1 and \
-                                  float_compare(deb, intervention_deb, compare_precision) != 0:
+                                        float_compare(deb, intervention_deb, compare_precision) != 0:
                                     # L'intervention commence au milieu du créneau courant (et pas en même temps!)
                                     duree += intervention_deb - deb
                                     creneaux_temp.append((deb, intervention_deb))
@@ -640,11 +903,11 @@ class OfTourneeRdv(models.TransientModel):
                     for intervention_deb, intervention_fin in creneaux:
                         description = "%s-%s" % tuple(hours_to_strs(intervention_deb, intervention_fin))
 
-                        date_debut_dt = datetime.combine(date_recherche_da, datetime.min.time())\
-                                        + timedelta(hours=intervention_deb)
+                        date_debut_dt = datetime.combine(date_recherche_da, datetime.min.time()) \
+                            + timedelta(hours=intervention_deb)
                         date_debut_dt = tz.localize(date_debut_dt, is_dst=None).astimezone(pytz.utc)
-                        date_fin_dt = datetime.combine(date_recherche_da, datetime.min.time())\
-                                      + timedelta(hours=intervention_fin)
+                        date_fin_dt = datetime.combine(date_recherche_da, datetime.min.time()) \
+                            + timedelta(hours=intervention_fin)
                         date_fin_dt = tz.localize(date_fin_dt, is_dst=None).astimezone(pytz.utc)
 
                         wizard_line_obj.create({
@@ -662,9 +925,11 @@ class OfTourneeRdv(models.TransientModel):
                 for intervention, intervention_deb, intervention_fin in intervention_dates:
                     description = "%s-%s" % tuple(hours_to_strs(intervention_deb, intervention_fin))
 
-                    date_debut_dt = datetime.combine(date_recherche_da, datetime.min.time()) + timedelta(hours=intervention_deb)
+                    date_debut_dt = datetime.combine(date_recherche_da, datetime.min.time()) + timedelta(
+                        hours=intervention_deb)
                     date_debut_dt = tz.localize(date_debut_dt, is_dst=None).astimezone(pytz.utc)
-                    date_fin_dt = datetime.combine(date_recherche_da, datetime.min.time()) + timedelta(hours=intervention_fin)
+                    date_fin_dt = datetime.combine(date_recherche_da, datetime.min.time()) + timedelta(
+                        hours=intervention_fin)
                     date_fin_dt = tz.localize(date_fin_dt, is_dst=None).astimezone(pytz.utc)
 
                     wizard_line_obj.create({
@@ -699,11 +964,12 @@ class OfTourneeRdv(models.TransientModel):
                 res = req.json()
                 if res:
                     self.orthodromique = False
-            except Exception as e:
+            except Exception:
                 self.orthodromique = True
             self.calc_distances_dates_employees(date_debut_da, date_fin_da, employees, sudo=sudo)
 
-        nb, nb_dispo, first_res = wizard_line_obj.get_nb_dispo(self)
+        # Hide lines to limit the number of results in tree views
+        nb, first_res = self.display_and_get_free_slots()
 
         # Sélection du résultat
         if nb > 0:
@@ -717,19 +983,22 @@ class OfTourneeRdv(models.TransientModel):
             name += address.city and (" " + address.city) or ""
 
             first_res_da = fields.Date.from_string(first_res.date)
-            date_propos_dt = datetime.combine(first_res_da, datetime.min.time()) + timedelta(hours=first_res.date_flo)  # datetime naive
-            date_propos_dt = tz.localize(date_propos_dt, is_dst=None).astimezone(pytz.utc)  # datetime utc
+            # datetime naive
+            date_propos_dt = datetime.combine(first_res_da, datetime.min.time()) + timedelta(hours=first_res.date_flo)
+            # datetime utc
+            date_propos_dt = tz.localize(date_propos_dt, is_dst=None).astimezone(pytz.utc)
 
             vals = {
-                'date_display'    : first_res.date,
-                'name'            : name,
-                'employee_id'     : first_res.employee_id.id,
-                'date_propos'     : date_propos_dt,  # datetime utc
+                'date_display': first_res.date,
+                'name': name,
+                'employee_id': first_res.employee_id.id,
+                'date_propos': date_propos_dt,  # datetime utc
                 'date_propos_hour': first_res.date_flo,
-                'res_line_id'     : first_res.id,
-                'display_res'     : True,
-                'zero_result'     : False,
-                'zero_dispo'      : False,
+                'res_line_id': first_res.id,
+                'map_line_id': first_res.id,
+                'map_tour_id': first_res.tour_id.id or False,
+                'display_res': True,
+                'zero_result': False,
             }
 
             if self.service_id and self.service_id.recurrence:
@@ -742,21 +1011,20 @@ class OfTourneeRdv(models.TransientModel):
             else:
                 vals['date_next'] = False
 
-            if nb_dispo == 0:
-                vals['display_res'] = True
-                vals['zero_dispo'] = True
-
         else:
             vals = {
                 'display_res': True,
                 'zero_result': True,
-                'zero_dispo': False,
             }
 
         self.write(vals)
         if self.res_line_id:
             self.res_line_id.selected = True
             self.res_line_id.selected_hour = self.res_line_id.date_flo
+            self.map_tour_id = self.res_line_id.tour_id.id
+            self.map_line_id = self.res_line_id.id
+            # force the map to be recomputed
+            self._compute_intervention_map_data()
 
     @api.multi
     def _get_service_data(self, mois):
@@ -797,6 +1065,7 @@ class OfTourneeRdv(models.TransientModel):
             'template_id': template and template.id,
             'service_id': self.service_id.id,
             'employee_ids': [(4, self.employee_id.id, 0)],
+            'tag_ids': [(4, tag.id, 0) for tag in self.service_id.tag_ids],
             'date': self.date_propos,
             'duree': self.duree,
             'user_id': self._uid,
@@ -807,8 +1076,64 @@ class OfTourneeRdv(models.TransientModel):
             'verif_dispo': True,
             'order_id': self.service_id.order_id.id,
             'origin_interface': u"Trouver un créneau (rdv.py)",
-            'flexible': self.tache_id.flexible
+            'flexible': self.tache_id.flexible,
+            'duration_one_way': self.res_line_id.duree_prec,
+            'distance_one_way': self.res_line_id.dist_prec,
+            'return_duration': self.res_line_id.duree_suiv,
+            'return_distance': self.res_line_id.dist_suiv,
         }
+
+    def _get_origin_arrival_addresses(self, sudo, employee, tournee):
+        """ Get the origin and arrival addresses for searching the route.
+        To avoid an error message during the search, we are trying to get a geocoded address.
+        First we try to get the tour's address, then the address of the employee otherwise the address of
+        the company is used. """
+        self.ensure_one()
+        origine = False
+        arrivee = False
+        # S'il y a une tournée, on favorise son point de départ plutôt que celui de l'employé.
+        # Note : une tournée est unique par employé et par date (contrainte SQL) donc len(tournee) <= 1
+        if sudo:
+            # @todo: en l'état j'ai dû retirer la tournee pour contourner une erreur de droit,
+            # il faut corriger ça
+            if employee.of_address_depart_id.sudo() and employee.of_address_depart_id.sudo().geo_lat and \
+                    employee.of_address_depart_id.sudo().geo_lng:
+                origine = employee.of_address_depart_id.sudo()
+            elif self.company_id.partner_id.sudo() and self.company_id.partner_id.sudo().geo_lat and \
+                    self.company_id.partner_id.sudo().geo_lng:
+                origine = self.company_id.partner_id.sudo()
+
+            if employee.of_address_retour_id.sudo() and employee.of_address_retour_id.sudo().geo_lat and \
+                    employee.of_address_retour_id.sudo().geo_lng:
+                arrivee = employee.of_address_retour_id.sudo()
+            elif self.company_id.partner_id.sudo() and self.company_id.partner_id.sudo().geo_lat and \
+                    self.company_id.partner_id.sudo().geo_lng:
+                arrivee = self.company_id.partner_id.sudo()
+        else:
+            # Take the tour's departure address if it exists else take the employee's departure address
+            # otherwise take the company's departure address
+            if tournee and tournee.address_depart_id and tournee.address_depart_id.geo_lat and \
+                    tournee.address_depart_id.geo_lng:
+                origine = tournee.address_depart_id
+            elif employee.of_address_depart_id and employee.of_address_depart_id.geo_lat and \
+                    employee.of_address_depart_id.geo_lng:
+                origine = employee.of_address_depart_id
+            elif self.company_id.partner_id and self.company_id.partner_id.geo_lat and \
+                    self.company_id.partner_id.geo_lng:
+                origine = self.company_id.partner_id
+
+            # Take the tour's arrival address if it exists else take the employee's arrival address
+            # otherwise take the company's arrival address
+            if tournee and tournee.address_retour_id and tournee.address_retour_id.geo_lat and \
+                    tournee.address_retour_id.geo_lng:
+                arrivee = tournee.address_retour_id
+            elif employee.of_address_retour_id and employee.of_address_retour_id.geo_lat and \
+                    employee.of_address_retour_id.geo_lng:
+                arrivee = employee.of_address_retour_id
+            elif self.company_id.partner_id and self.company_id.partner_id.geo_lat and \
+                    self.company_id.partner_id.geo_lng:
+                arrivee = self.company_id.partner_id
+        return origine, arrivee
 
     @api.multi
     def calc_distances_dates_employees(self, date_debut, date_fin, employees, sudo=False):
@@ -826,9 +1151,8 @@ class OfTourneeRdv(models.TransientModel):
         un_jour = timedelta(days=1)
         date_courante = date_debut
         employees = sudo and employees.sudo() or employees
+        search_mode = self.search_mode
         while date_courante <= date_fin:
-            mode_recherche = self.orthodromique and "distance" or self.mode_recherche
-            maxi = self.max_recherche
             for employee in employees:
                 employee = sudo and employee.sudo() or employee
                 # Ne pas prendre en compte les lignes allday qui ne sont pas liées à un RDV (jours fériés)
@@ -840,23 +1164,10 @@ class OfTourneeRdv(models.TransientModel):
                 if len(creneaux) == 0:
                     continue
                 if not sudo:
-                    tournee = tournee_obj.search([('date', '=', date_courante),
-                                                  ('employee_id', '=', employee.sudo().id)], limit=1)
-                # S'il y a une tournée, on favorise son point de départ plutôt que celui de l'employé.
-                # Note : une tournée est unique par employé et par date (contrainte SQL) donc len(tournee) <= 1
-                if sudo:
-                    # @todo: en l'état j'ai dû retirer la tournee pour contourner une erreur de droit, il faut corriger ça
-                    origine = (employee.of_address_depart_id.sudo() or
-                               False)
-                    arrivee = (employee.of_address_retour_id.sudo() or
-                               False)
-                else:
-                    origine = (tournee and tournee.address_depart_id or
-                               employee.of_address_depart_id or
-                               False)
-                    arrivee = (tournee and tournee.address_retour_id or
-                               employee.of_address_retour_id or
-                               False)
+                    tournee = tournee_obj.search([
+                        ('date', '=', date_courante), ('employee_id', '=', employee.sudo().id)], limit=1)
+
+                origine, arrivee = self._get_origin_arrival_addresses(sudo, employee, tournee)
                 # Pas d'origine ni pour la tournée ni pour l'employé
                 if not origine:
                     raise UserError(u"L'intervenant \"%s\" n'a pas d'adresse de départ." % employee.name)
@@ -916,12 +1227,15 @@ class OfTourneeRdv(models.TransientModel):
                         res = {}
 
                 if res and res.get('routes') or legs:
+                    # a leg is a route between two waypoints.
                     legs = legs or res['routes'][0]['legs']
                     if len(creneaux) == len(legs) - 1:  # depart -> creneau -> arrivee : 2 routes 1 creneau
                         i = 0
-                        l = len(creneaux)
-                        while i < l:
+                        len_slots = len(creneaux)
+                        while i < len_slots:
                             crens = creneaux[i]
+                            # Route : A ---> B ---> C ---> D
+                            # leg 0 : A ---> B, leg 1 : B ---> C, ...
                             vals = {
                                 'dist_prec': legs[i]['distance'] / 1000,
                                 'duree_prec': legs[i]['duration'] / 60,
@@ -929,34 +1243,31 @@ class OfTourneeRdv(models.TransientModel):
                             i += 1
                             if not crens.intervention_id:
                                 # On regroupe les créneaux libres qui se suivent
-                                while i < l and not creneaux[i].intervention_id:
+                                while i < len_slots and not creneaux[i].intervention_id:
                                     crens |= creneaux[i]
                                     i += 1
-                            vals['dist_suiv'] = legs[i]['distance'] / 1000  # legs[i] ok car len(legs) == len(creneaux) + 1
+
+                            # legs[i] ok car len(legs) == len(creneaux) + 1
+                            vals['dist_suiv'] = legs[i]['distance'] / 1000
                             vals['duree_suiv'] = legs[i]['duration'] / 60
                             vals['distance'] = vals['dist_prec'] + vals['dist_suiv']
                             vals['duree'] = vals['duree_prec'] + vals['duree_suiv']
                             duree_dispo = sum([c.date_flo_deadline - c.date_flo for c in crens])
 
                             if crens[0].disponible:
-                                if mode_recherche.startswith('distance_'):
-                                    val_utile = 'distance_utile'
-                                else:
-                                    val_utile = 'duree_utile'
-
-                                if mode_recherche in ['distance_a', 'duree_a']:
+                                if search_mode == 'oneway':
                                     vals['distance_utile'] = vals['dist_prec']
                                     vals['duree_utile'] = vals['duree_prec']
-                                elif mode_recherche in ['distance_r', 'duree_r']:
+                                elif search_mode == 'return':
                                     vals['distance_utile'] = vals['dist_suiv']
                                     vals['duree_utile'] = vals['duree_suiv']
-                                elif mode_recherche in ['distance_ar', 'duree_ar']:
+                                elif search_mode == 'round_trip':
                                     vals['distance_utile'] = vals['distance']
                                     vals['duree_utile'] = vals['duree']
-                                elif mode_recherche in ['distance_a_or_r', 'duree_a_or_r']:
+                                elif search_mode == 'oneway_or_return':
                                     vals['distance_utile'] = min(vals['dist_prec'], vals['dist_suiv'])
                                     vals['duree_utile'] = min(vals['duree_prec'], vals['duree_suiv'])
-                                elif mode_recherche in ['distance_a_am_r_pm', 'duree_a_am_r_pm']:
+                                elif search_mode == 'oneway_am_return_pm':
                                     if crens[0].date_flo <= AM_LIMIT_FLOAT:  # one way, if morning
                                         vals['distance_utile'] = vals['dist_prec']
                                         vals['duree_utile'] = vals['duree_prec']
@@ -964,13 +1275,8 @@ class OfTourneeRdv(models.TransientModel):
                                         vals['distance_utile'] = vals['dist_suiv']
                                         vals['duree_utile'] = vals['duree_suiv']
 
-                                # Créneau plus loin que la recherche accepte
-                                if vals[val_utile] > maxi:
-                                    vals['force_color'] = "#FF0000"
-                                    vals['name'] = "TROP LOIN"
-                                    vals['disponible'] = False
                                 # Trajet aller-retour plus long que la durée de l'intervention
-                                elif vals['duree'] > duree_dispo * 60:
+                                if vals['duree'] > duree_dispo * 60:
                                     # note: On vérifie si la durée de transport est inférieure à la durée du créneau.
                                     #   Cela a peu de sens si on ignore la durée réelle nécessaire pour l'intervention.
                                     #     (par exemple si le temps de trajet laisse 5 minutes pour l'intervention)
@@ -980,27 +1286,133 @@ class OfTourneeRdv(models.TransientModel):
                                     vals['force_color'] = "#AA0000"
                                     vals['name'] = "TROP COURT"
                                     vals['disponible'] = False
-
                             crens.update(vals)
                 else:
                     raise UserWarning("Erreur inattendue de routing")
             date_courante += un_jour
 
+    @api.multi
+    def display_and_get_free_slots(self):
+        """Returns the number of slots available (that match the search criteria),
+        and the first result (depending on search type)"""
+        self.ensure_one()
+        search_order_str = 'distance_utile, debut_dt, employee_id' if self.search_type == 'distance' \
+            else 'duree_utile, debut_dt, employee_id'
+        # number max of results to display
+        number_of_results = self.env['ir.values'].get_default('of.intervention.settings', 'number_of_results')
+        # get all available lines neither linked to an intervention nor to the search start/stop bounds
+        lines = self.env['of.tournee.rdv.line'].search([
+            ('wizard_id', '=', self.id),
+            ('disponible', '=', True),
+            ('allday', '=', False),
+            ('intervention_id', '=', False)], order=search_order_str)
+        # total number of available slots (that match the search criteria)
+        nb = len(lines)
+        first_slot = lines and lines[0] or False
+        # update lines to hide the lines who are above the number_of_results
+        by_date_lines_hidden, by_distance_lines_hidden, by_duration_lines_hidden = self._get_hidden_lines(
+            search_order_str)
+        by_date_lines_hidden[:number_of_results].write({'hidden': False})
+        by_distance_lines_hidden[:number_of_results].write({'hidden': False})
+        by_duration_lines_hidden[:number_of_results].write({'hidden': False})
+        return nb, first_slot
+
+
+class OfTourneeRdvLineMixin(models.AbstractModel):
+    _name = 'of.tournee.rdv.line.mixin'
+    _description = u"Mixin pour la propositions des RDVs"
+
+    @api.multi
+    def toggl_map_preview(self):
+        """Helper to set a decoration style on the line that was clicked"""
+        self.ensure_one()
+        self.search([('wizard_id', '=', self.wizard_id.id), ('map_preview', '=', True)]).write({'map_preview': False})
+        self.map_preview = True
+
+    @api.multi
+    def action_view_tour(self):
+        """Update the map on the right side of the list view. That should display the tour of the current intervenant"""
+        self.ensure_one()
+        self.wizard_id.map_tour_id = self.tour_id.id or False
+        # if we are on a delegated object we must use the id of parent object
+        self.wizard_id.map_line_id = self.original_line_id.id if self._name != 'of.tournee.rdv.line' else self.id
+        # force the map to be recomputed
+        self.wizard_id._compute_intervention_map_data()
+        self.toggl_map_preview()
+        return self.wizard_id.action_open_wizard()
+
+    @api.multi
+    def action_select_confirm_slot(self):
+        self.ensure_one()
+        self.button_select()
+        return self.button_confirm()
+
+    @api.multi
+    def button_confirm(self):
+        """Sélectionne ce créneau en tant que résultat. Appelé depuis la vue form du créneau"""
+        self.ensure_one()
+        if not self._context.get('tz'):
+            self = self.with_context(tz='Europe/Paris')
+        tz = pytz.timezone(self._context['tz'])
+        d = fields.Date.from_string(self.date)
+        date_propos_dt = datetime.combine(
+            d, datetime.min.time()) + timedelta(hours=self.selected_hour)  # datetime local
+        date_propos_dt = tz.localize(date_propos_dt, is_dst=None).astimezone(pytz.utc)  # datetime utc
+        self.wizard_id.date_propos = date_propos_dt
+        return self.wizard_id.button_confirm()
+
+    @api.multi
+    def button_select(self, sudo=False):
+        """Sélectionne ce créneau en tant que résultat. Appelé depuis la vue form du créneau"""
+        self.ensure_one()
+        selected_line = self.search([('wizard_id', '=', self.wizard_id.id), ('selected', '=', True)])
+        selected_line.write({'selected': False})
+        self.selected = True
+        self.selected_hour = self.date_flo
+
+        if sudo:
+            address = self.wizard_id.partner_address_id.sudo()
+            name = address.name or (address.parent_id and address.parent_id.sudo().name) or ''
+        else:
+            address = self.wizard_id.partner_address_id
+            name = address.name or (address.parent_id and address.parent_id.name) or ''
+        name += address.zip and (" " + address.zip) or ""
+        name += address.city and (" " + address.city) or ""
+        # if we are on the delegated object we must use the id of the parent object
+        res_line_id = self.original_line_id.id if self._name != 'of.tournee.rdv.line' else self.id
+        wizard_vals = {
+            'date_display': self.date,
+            'name': name,
+            'employee_id': self.employee_id.id,
+            'date_propos': self.debut_dt,
+            'date_propos_hour': self.date_flo,
+            'res_line_id': res_line_id,
+            'map_line_id': res_line_id,
+            'map_tour_id': self.tour_id.id or False
+        }
+        self.wizard_id.write(wizard_vals)
+        return {'type': 'ir.actions.do_nothing'}
+
 
 class OfTourneeRdvLine(models.TransientModel):
     _name = 'of.tournee.rdv.line'
-    _description = 'Propositions des RDVs'
-    _order = "date, employee_id, date_flo"
-    _inherit = "of.calendar.mixin"
+    _description = u"Propositions des RDVs"
+    _inherit = ['of.calendar.mixin', 'of.tournee.rdv.line.mixin']
 
+    weekday = fields.Char(string="Weekday", compute='_compute_date_weekday', store=True)
+    tour_id = fields.Many2one(
+        comodel_name='of.planning.tournee', string="Tour", compute='_compute_tour_id', store=True)
     date = fields.Date(string="Date")
     debut_dt = fields.Datetime(string=u"Début")
     fin_dt = fields.Datetime(string="Fin")
     date_flo = fields.Float(string='Date', required=True, digits=(12, 5))
     date_flo_deadline = fields.Float(string='Date', required=True, digits=(12, 5))
     description = fields.Char(string=u"Créneau", size=128)
-    wizard_id = fields.Many2one('of.tournee.rdv', string="RDV", required=True, ondelete='cascade')
-    employee_id = fields.Many2one('hr.employee', string='Intervenant')
+    wizard_id = fields.Many2one(comodel_name='of.tournee.rdv', string="RDV", required=True, ondelete='cascade')
+    employee_id = fields.Many2one(comodel_name='hr.employee', string='Intervenant')
+    employee_cal_ids = fields.Many2many(
+        comodel_name='hr.employee', compute='_compute_cal_employee_ids', string="Intervenants",
+        help="Technical field used to display attendees and colors in calendar view")
     intervention_id = fields.Many2one('of.planning.intervention', string="Planning")
     name = fields.Char(string="name", default="DISPONIBLE")
     distance = fields.Float(string='Dist.tot. (km)', digits=(12, 0), help="distance prec + distance suiv")
@@ -1017,12 +1429,12 @@ class OfTourneeRdvLine(models.TransientModel):
     of_color_ft = fields.Char(related="employee_id.of_color_ft", readonly=True)
     of_color_bg = fields.Char(related="employee_id.of_color_bg", readonly=True)
     disponible = fields.Boolean(string="Est dispo", default=True)
+    map_preview = fields.Boolean(string="Map preview", default=False)
     force_color = fields.Char("Couleur")
     allday = fields.Boolean('All Day', default=False)
     selected = fields.Boolean(u'Créneau sélectionné', default=False)
     selected_hour = fields.Float(string='Heure du RDV', digits=(2, 2))
     selected_description = fields.Text(string="Description", related="wizard_id.description")
-
     geo_lat = fields.Float(
         string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo",
         readonly=True)
@@ -1036,6 +1448,29 @@ class OfTourneeRdvLine(models.TransientModel):
              u"moyen: au village\n"
              u"haut: à la rue / au voisinage\n"
              u"très haut: au numéro de rue\n")
+
+    @api.multi
+    @api.depends('date')
+    def _compute_date_weekday(self):
+        weekdays = {
+            'Monday': _("Monday"),
+            'Tuesday': _("Tuesday"),
+            'Wednesday': _("Wednesday"),
+            'Thursday': _("Thursday"),
+            'Friday': _("Friday"),
+            'Saturday': _("Saturday"),
+            'Sunday': _("Sunday"),
+            # add french keys to avoid error on servers with french language
+            'lundi': _("Monday"),
+            'mardi': _("Tuesday"),
+            'mercredi': _("Wednesday"),
+            'jeudi': _("Thursday"),
+            'vendredi': _("Friday"),
+            'samedi': _("Saturday"),
+            'dimanche': _("Sunday"),
+        }
+        for record in self:
+            record.weekday = weekdays[fields.Date.from_string(record.date).strftime('%A')]
 
     # @api.depends
 
@@ -1074,68 +1509,31 @@ class OfTourneeRdvLine(models.TransientModel):
             else:
                 line.state_int = 3
 
-    # Actions
-
     @api.multi
-    def button_confirm(self):
-        """Sélectionne ce créneau en tant que résultat. Appelé depuis la vue form du créneau"""
-        self.ensure_one()
-        if not self._context.get('tz'):
-            self = self.with_context(tz='Europe/Paris')
-        tz = pytz.timezone(self._context['tz'])
-        d = fields.Date.from_string(self.date)
-        date_propos_dt = datetime.combine(d, datetime.min.time()) + timedelta(hours=self.selected_hour)  # datetime local
-        date_propos_dt = tz.localize(date_propos_dt, is_dst=None).astimezone(pytz.utc)  # datetime utc
-        self.wizard_id.date_propos = date_propos_dt
-        return self.wizard_id.button_confirm()
+    def _compute_cal_employee_ids(self):
+        for line in self:
+            employee_ids = line.wizard_id._get_employee_possible()
+            line.employee_cal_ids = line.employee_id or self.env['hr.employee'].browse(employee_ids)
 
-    @api.multi
-    def button_select(self, sudo=False):
-        """Sélectionne ce créneau en tant que résultat. Appelé depuis la vue form du créneau"""
-        self.ensure_one()
-        rdv_line_obj = self.env["of.tournee.rdv.line"]
-        selected_line = rdv_line_obj.search([('wizard_id', '=', self.wizard_id.id), ('selected', '=', True)])
-        selected_line.write({'selected': False})
-        self.selected = True
-        self.selected_hour = self.date_flo
-
-        if sudo:
-            address = self.wizard_id.partner_address_id.sudo()
-            name = address.name or (address.parent_id and address.parent_id.sudo().name) or ''
-        else:
-            address = self.wizard_id.partner_address_id
-            name = address.name or (address.parent_id and address.parent_id.name) or ''
-        name += address.zip and (" " + address.zip) or ""
-        name += address.city and (" " + address.city) or ""
-        wizard_vals = {
-            'date_display'    : self.date,
-            'name'            : name,
-            'employee_id'       : self.employee_id.id,
-            'date_propos'     : self.debut_dt,
-            'date_propos_hour': self.date_flo,
-            'res_line_id'     : self.id,
-        }
-        self.wizard_id.write(wizard_vals)
-
-        return {'type': 'ir.actions.do_nothing'}
-
-    # Autres
+    @api.depends('date', 'employee_id')
+    def _compute_tour_id(self):
+        for line in self:
+            # added sudo() to avoid access rights issues from the website (no access for portal users
+            # on of.planning.tournee)
+            line.tour_id = self.env['of.planning.tournee'].sudo().search([
+                ('date', '=', line.date),
+                ('employee_id', '=', line.employee_id.id),
+            ], limit=1) or False
 
     @api.model
-    def get_nb_dispo(self, wizard):
-        """Retourne le nombre de créneaux disponibles (qui correspondent aux critères de recherche),
-            le nombre de créneaux trop éloignés, et le premier résultat (en fonction du critère de résultat)"""
-        # ne pas inclure les lignes associées a une intervention ni les lignes de début et fin de recherche
-        lines = self.search([('wizard_id', '=', wizard.id),
-                             ('allday', '=', False),
-                             ('intervention_id', '=', False)],
-                            order="distance, debut_dt")  # events allDay sont debut et fin de recherche
-        lines_dispo = self.search([('wizard_id', '=', wizard.id), ('disponible', '=', True)],
-                                  order="distance, debut_dt")
-        nb = len(lines)
-        nb_dispo = len(lines_dispo)
-        first_res = lines_dispo and lines_dispo[0] or lines and lines[0] or False
-        return nb, nb_dispo, first_res
+    def create(self, vals):
+        line = super(OfTourneeRdvLine, self).create(vals)
+        self.env['of.tournee.rdv.line.by.date'].create({'original_line_id': line.id})
+        self.env['of.tournee.rdv.line.by.distance'].create({'original_line_id': line.id})
+        self.env['of.tournee.rdv.line.by.duration'].create({'original_line_id': line.id})
+        return line
+
+    # Autres
 
     @api.model
     def get_state_int_map(self):
@@ -1145,3 +1543,39 @@ class OfTourneeRdvLine(models.TransientModel):
         v2 = {'label': u'Réalisé', 'value': 2}
         v3 = {'label': u'Disponibilité', 'value': 3}
         return v0, v1, v2, v3
+
+
+class OfTourneeRdvLineByDate(models.TransientModel):
+    _name = 'of.tournee.rdv.line.by.date'
+    _description = u"Propositions des RDVs par date"
+    _inherit = 'of.tournee.rdv.line.mixin'
+    _inherits = {'of.tournee.rdv.line': 'original_line_id'}
+    _order = 'date, date_flo, employee_id'
+
+    original_line_id = fields.Many2one(
+        comodel_name='of.tournee.rdv.line', string="Original line", delegate=True, ondelete='cascade', required=True)
+    hidden = fields.Boolean(string="Hidden", default=True)
+
+
+class OfTourneeRdvLineByDuration(models.TransientModel):
+    _name = 'of.tournee.rdv.line.by.duration'
+    _description = u"Propositions des RDVs par durée"
+    _inherit = 'of.tournee.rdv.line.mixin'
+    _inherits = {'of.tournee.rdv.line': 'original_line_id'}
+    _order = 'duree_utile, debut_dt, employee_id'
+
+    original_line_id = fields.Many2one(
+        comodel_name='of.tournee.rdv.line', string="Original line", delegate=True, ondelete='cascade', required=True)
+    hidden = fields.Boolean(string="Hidden", default=True)
+
+
+class OfTourneeRdvLineByDistance(models.TransientModel):
+    _name = 'of.tournee.rdv.line.by.distance'
+    _description = u"Propositions des RDVs par distance"
+    _inherit = 'of.tournee.rdv.line.mixin'
+    _inherits = {'of.tournee.rdv.line': 'original_line_id'}
+    _order = 'distance_utile, debut_dt, employee_id'
+
+    original_line_id = fields.Many2one(
+        comodel_name='of.tournee.rdv.line', string="Original line", delegate=True, ondelete='cascade', required=True)
+    hidden = fields.Boolean(string="Hidden", default=True)

@@ -1,0 +1,68 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_tournee_parc_installe
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-10-07 15:13+0000\n"
+"PO-Revision-Date: 2022-10-07 15:13+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_tournee_parc_installe
+#: model:ir.model,name:of_tournee_parc_installe.model_project_issue
+msgid "Helpdesk"
+msgstr "Helpdesk"
+
+#. module: of_tournee_parc_installe
+#: model:ir.model,name:of_tournee_parc_installe.model_of_parc_installe
+msgid "Parc installé"
+msgstr "Parc installé"
+
+#. module: of_tournee_parc_installe
+#: model:ir.ui.view,arch_db:of_tournee_parc_installe.view_of_parc_installe_form_rdv_intervention
+#: model:ir.ui.view,arch_db:of_tournee_parc_installe.view_of_project_issue_form_rdv_intervention
+msgid "Plan Intervention"
+msgstr "Planifier intervention"
+
+#. module: of_tournee_parc_installe
+#: code:addons/of_tournee_parc_installe/models/of_parc_installe.py:31
+#: code:addons/of_tournee_parc_installe/models/of_parc_installe.py:60
+#, python-format
+msgid "Plan intervention"
+msgstr "Planifier intervention"
+
+#. module: of_tournee_parc_installe
+#: model:ir.model,name:of_tournee_parc_installe.model_of_tournee_rdv
+msgid "Prise de RDV dans les tournées"
+msgstr "Prise de RDV dans les tournées"
+
+#. module: of_tournee_parc_installe
+#: model:ir.model.fields,field_description:of_tournee_parc_installe.field_of_tournee_rdv_sav_id
+msgid "SAV"
+msgstr "SAV"
+
+#. module: of_tournee_parc_installe
+#: code:addons/of_tournee_parc_installe/models/of_parc_installe.py:17
+#, python-format
+msgid "There is no customer associated to this installed product. Please set one to plan an intervention."
+msgstr "Aucun client n'est associé à ce produit installé. Veuillez en définir un pour planifier une intervention."
+
+#. module: of_tournee_parc_installe
+#: code:addons/of_tournee_parc_installe/models/project_issue.py:16
+#, python-format
+msgid "There is no customer associated to this issue. Please set one to plan an intervention."
+msgstr "Aucun client n'est associé à ce SAV. Veuillez en définir un pour planifier une intervention."
+
+#. module: of_tournee_parc_installe
+#: code:addons/of_tournee_parc_installe/models/of_parc_installe.py:19
+#: code:addons/of_tournee_parc_installe/models/project_issue.py:18
+#, python-format
+msgid "This address is not geocoded, please geocode it to plan an intervention."
+msgstr "Cette adresse n'est pas géocodée, merci de la géocoder pour planifier une intervention."
