@@ -1370,6 +1370,9 @@ class OfPlanningIntervention(models.Model):
             if res.picking_id:
                 res.picking_id.min_date = res.date
 
+        if res.employee_ids:
+            res.message_post(body=_(u"Intervenants: %s") % ', '.join(res.employee_ids.mapped('name')))
+
         return res
 
     @api.multi
@@ -1410,7 +1413,10 @@ class OfPlanningIntervention(models.Model):
                     # len(self) == 1 car drag n drop ou redimensionnage
                     date_dt = fields.Datetime.from_string(self[0].date)
                 vals['duree'] = (date_deadline_dt - date_dt).total_seconds() / 3600
-        super(OfPlanningIntervention, self).write(vals)
+        employee_before = {rec: rec.employee_ids for rec in self}
+
+        result = super(OfPlanningIntervention, self).write(vals)
+
         self._affect_number()
         if vals.get('state', '') == 'done':
             self._send_report()
@@ -1421,7 +1427,14 @@ class OfPlanningIntervention(models.Model):
                 if rdv.picking_id:
                     rdv.picking_id.min_date = rdv.date
 
-        return True
+        if 'employee_ids' in vals:
+            for rdv in self:
+                rdv.message_post(body=_(u"Intervenants: %s => %s") % (
+                    ', '.join(employee_before[rdv].mapped('name')),
+                    ', '.join(rdv.employee_ids.mapped('name'))
+                ))
+
+        return result
 
     @api.multi
     def _write(self, vals):
