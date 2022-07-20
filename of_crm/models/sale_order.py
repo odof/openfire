@@ -151,7 +151,7 @@ class SaleOrder(models.Model):
                 rec.of_laying_week = u"Non programmée"
 
     @api.multi
-    @api.depends('of_crm_activity_ids', 'of_crm_activity_ids.state', 'of_crm_activity_ids.date')
+    @api.depends('of_crm_activity_ids', 'of_crm_activity_ids.state', 'of_crm_activity_ids.deadline_date')
     def _compute_of_activities_state(self):
         for sale in self:
             activities = sale.of_crm_activity_ids
