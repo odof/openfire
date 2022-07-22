@@ -72,6 +72,12 @@
             <field name="name" position="after">
                 <field name="active" invisible="1"/>
             </field>
+            <xpath expr="//field[@name='payment_type']" position="before">
+                <field name="of_payment_type_readonly" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='payment_type']" position="attributes">
+                <attribute name="attrs">{'readonly': ['|', ('state', '!=', 'draft'), ('of_payment_type_readonly', '=', True)]}</attribute>
+            </xpath>
             <form><footer position="replace"><div></div></footer></form>
         </field>
     </record>

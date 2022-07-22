@@ -73,6 +73,7 @@ class OFAccountPaymentWizard(models.TransientModel):
             else:
                 context['default_payment_type'] = 'inbound'
             context['of_default_partner_type'] = payment.partner_type or False  # Permet d'outrepasser un onchange.
+            context['default_of_payment_type_readonly'] = True  # Permet de mettre le type de paiment en lecture seule
         else:
             name = 'Modification de paiement'
             context['default_payment_type'] = payment.payment_type
