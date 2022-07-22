@@ -20,25 +20,21 @@
         <field name="inherit_id" ref="account.view_account_invoice_refund"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='filter_refund']" position="after">
-                <td colspan="1" class="o_td_label" t-if="refund_only">
-                    <label for="filter_refund"/>
-                </td>
-                <td colspan="1" style="width: 100%;" t-if="refund_only">
-                    <div class="o_form_field_radio o_vertical o_form_field o_form_required">
-                        <div class="o_radio_item">
-                            <input class="o_form_radio" type="radio" value="refund" checked="checked"/>
-                            <span class="o_form_label">Créer un avoir en brouillon</span>
-                        </div>
-                        <div class="o_radio_item">
-                            <input class="o_form_radio" disabled="disabled" type="radio" value="cancel"/>
-                            <span class="o_form_label">Annuler : créer l'avoir et lettrer</span>
-                        </div>
-                        <div class="o_radio_item">
-                            <input class="o_form_radio" disabled="disabled" type="radio" value="modify"/>
-                            <span class="o_form_label">Modifier : créer un avoir, le lettrer et créer une nouvelle facture en brouillon</span>
-                        </div>
+                <label for="filter_refund" attrs="{'invisible':[('refund_only','!=',True)]}"/>
+                <div class="o_form_field_radio o_vertical o_form_field o_form_required" attrs="{'invisible':[('refund_only','!=',True)]}">
+                    <div class="o_radio_item">
+                        <input class="o_form_radio" type="radio" value="refund" checked="checked"/>
+                        <span class="o_form_label">Créer un avoir en brouillon</span>
                     </div>
-                </td>
+                    <div class="o_radio_item">
+                        <input class="o_form_radio" disabled="disabled" type="radio" value="cancel"/>
+                        <span class="o_form_label">Annuler : créer l'avoir et lettrer</span>
+                    </div>
+                    <div class="o_radio_item">
+                        <input class="o_form_radio" disabled="disabled" type="radio" value="modify"/>
+                        <span class="o_form_label">Modifier : créer un avoir, le lettrer et créer une nouvelle facture en brouillon</span>
+                    </div>
+                </div>
             </xpath>
             <xpath expr="//group[1]/group[2]" position="inside">
                  <div attrs="{'invisible':[('refund_only','!=',True)]}" class="oe_grey" colspan="4">
