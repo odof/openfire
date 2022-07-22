@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from ast import literal_eval
 import base64
@@ -20,6 +21,8 @@ class OFCRMFunnelConversion4(models.Model):
     _rec_name = 'id'
 
     date = fields.Date(string=u"Date", readonly=True)
+    sale_type_id = fields.Many2one(comodel_name='of.sale.type', string=u"Type de devis", readonly=True)
+    canvasser_id = fields.Many2one(comodel_name='res.users', string=u"Prospecteur", readonly=True)
     company_id = fields.Many2one(comodel_name='res.company', string=u"Société", readonly=True)
     company_type_id = fields.Many2one(comodel_name='of.res.company.type', string=u"Type de société", readonly=True)
     company_sector_id = fields.Many2one(
@@ -33,8 +36,11 @@ class OFCRMFunnelConversion4(models.Model):
     partner_id = fields.Many2one(comodel_name='res.partner', string=u"Partenaire", readonly=True)
 
     opportunity_nb = fields.Integer(string=u"Nb opportunités", readonly=True)
+    previous_opportunity_nb = fields.Integer(string=u"Nb opportunités N-1", readonly=True)
     quotation_nb = fields.Integer(string=u"Nb devis", readonly=True)
+    previous_quotation_nb = fields.Integer(string=u"Nb devis N-1", readonly=True)
     order_nb = fields.Integer(string=u"Nb ventes", readonly=True)
+    previous_order_nb = fields.Integer(string=u"Nb ventes N-1", readonly=True)
     lost_quotation_nb = fields.Integer(string=u"Nb devis perdus", readonly=True)
 
     quotation_amount = fields.Float(string=u"Montant devis", readonly=True)
@@ -140,6 +146,14 @@ class OFCRMFunnelConversion4(models.Model):
                         %s
                         %s
                         %s
+                    UNION ALL
+                        %s
+                        %s
+                        %s
+                    UNION ALL
+                        %s
+                        %s
+                        %s
                     )           AS T
                 %s
                 %s
@@ -169,6 +183,12 @@ class OFCRMFunnelConversion4(models.Model):
                     self._sub_select_sale_order2(),
                     self._sub_from_sale_order2(),
                     self._sub_where_sale_order2(),
+                    self._sub_select_lead_n_1(),
+                    self._sub_from_lead_n_1(),
+                    self._sub_where_lead_n_1(),
+                    self._sub_select_quotation_n_1(),
+                    self._sub_from_quotation_n_1(),
+                    self._sub_where_quotation_n_1(),
                     self._sub_select_sale_order_n_1(),
                     self._sub_from_sale_order_n_1(),
                     self._sub_where_sale_order_n_1(),
@@ -180,6 +200,8 @@ class OFCRMFunnelConversion4(models.Model):
         select_str = """
             SELECT      MAX(T.id)                                       AS id
             ,           T.date::date                                    AS date
+            ,           T.sale_type_id                                  AS sale_type_id
+            ,           T.canvasser_id                                  AS canvasser_id
             ,           T.company_id
             ,           RC.of_company_type_id                           AS company_type_id
             ,           RC.of_company_sector_id                         AS company_sector_id
@@ -189,8 +211,11 @@ class OFCRMFunnelConversion4(models.Model):
             ,           T.project_id
             ,           T.partner_id
             ,           COALESCE(SUM(T.opportunity_nb), 0)              AS opportunity_nb
+            ,           COALESCE(SUM(T.previous_opportunity_nb), 0)     AS previous_opportunity_nb
             ,           COALESCE(SUM(T.quotation_nb), 0)                AS quotation_nb
+            ,           COALESCE(SUM(T.previous_quotation_nb), 0)       AS previous_quotation_nb
             ,           COALESCE(SUM(T.order_nb), 0)                    AS order_nb
+            ,           COALESCE(SUM(T.previous_order_nb), 0)           AS previous_order_nb
             ,           COALESCE(SUM(T.lost_quotation_nb), 0)           AS lost_quotation_nb
             ,           SUM(T.quotation_amount)                         AS quotation_amount
             ,           SUM(T.ordered_turnover)                         AS ordered_turnover
@@ -212,13 +237,18 @@ class OFCRMFunnelConversion4(models.Model):
         sub_select_lead_str = """
             SELECT  CL.id                   AS id
             ,       CL.of_date_prospection  AS date
+            ,       NULL                    AS sale_type_id
+            ,       CL.of_prospecteur_id    AS canvasser_id
             ,       CL.company_id           AS company_id
             ,       CL.user_id              AS vendor_id
             ,       NULL                    AS project_id
             ,       CL.partner_id           AS partner_id
             ,       1                       AS opportunity_nb
+            ,       0                       AS previous_opportunity_nb
             ,       0                       AS quotation_nb
+            ,       0                       AS previous_quotation_nb
             ,       0                       AS order_nb
+            ,       0                       AS previous_order_nb
             ,       0                       AS lost_quotation_nb
             ,       0                       AS quotation_amount
             ,       0                       AS ordered_turnover
@@ -248,18 +278,23 @@ class OFCRMFunnelConversion4(models.Model):
         sub_select_quotation_str = """
             SELECT  10000000 + SO.id                                AS id
             ,       SO.create_date                                  AS date
+            ,       SO.of_sale_type_id                              AS sale_type_id
+            ,       SO.of_canvasser_id                              AS canvasser_id
             ,       SO.company_id                                   AS company_id
             ,       SO.user_id                                      AS vendor_id
             ,       SO.project_id                                   AS project_id
             ,       SO.partner_id                                   AS partner_id
             ,       0                                               AS opportunity_nb
+            ,       0                                               AS previous_opportunity_nb
             ,       CASE
                         WHEN SO.of_cancelled_order_id IS NULL THEN
                             1
                         ELSE
                             -1
                     END                                             AS quotation_nb
+            ,       0                                               AS previous_quotation_nb
             ,       0                                               AS order_nb
+            ,       0                                               AS previous_order_nb
             ,       0                                               AS lost_quotation_nb
             ,       SO.amount_untaxed                               AS quotation_amount
             ,       0                                               AS ordered_turnover
@@ -289,18 +324,23 @@ class OFCRMFunnelConversion4(models.Model):
         sub_select_order_str = """
             SELECT  20000000 + SO2.id                               AS id
             ,       SO2.of_custom_confirmation_date                 AS date
+            ,       SO2.of_sale_type_id                             AS sale_type_id
+            ,       SO2.of_canvasser_id                             AS canvasser_id
             ,       SO2.company_id                                  AS company_id
             ,       SO2.user_id                                     AS vendor_id
             ,       SO2.project_id                                  AS project_id
             ,       SO2.partner_id                                  AS partner_id
             ,       0                                               AS opportunity_nb
+            ,       0                                               AS previous_opportunity_nb
             ,       0                                               AS quotation_nb
+            ,       0                                               AS previous_quotation_nb
             ,       CASE
                         WHEN SO2.of_cancelled_order_id IS NULL THEN
                             1
                         ELSE
                             -1
                     END                                             AS order_nb
+            ,       0                                               AS previous_order_nb
             ,       0                                               AS lost_quotation_nb
             ,       0                                               AS quotation_amount
             ,       0                                               AS ordered_turnover
@@ -332,13 +372,18 @@ class OFCRMFunnelConversion4(models.Model):
         sub_select_presale_order_str = """
             SELECT  30000000 + SO3.id               AS id
             ,       SO3.of_custom_confirmation_date AS date
+            ,       SO3.of_sale_type_id             AS sale_type_id
+            ,       SO3.of_canvasser_id             AS canvasser_id
             ,       SO3.company_id                  AS company_id
             ,       SO3.user_id                     AS vendor_id
             ,       SO3.project_id                  AS project_id
             ,       SO3.partner_id                  AS partner_id
             ,       0                               AS opportunity_nb
+            ,       0                               AS previous_opportunity_nb
             ,       0                               AS quotation_nb
+            ,       0                               AS previous_quotation_nb
             ,       0                               AS order_nb
+            ,       0                               AS previous_order_nb
             ,       0                               AS lost_quotation_nb
             ,       0                               AS quotation_amount
             ,       SO3.amount_untaxed              AS ordered_turnover
@@ -370,13 +415,18 @@ class OFCRMFunnelConversion4(models.Model):
         sub_select_sale_order_str = """
             SELECT  40000000 + SO4.id       AS id
             ,       SO4.confirmation_date   AS date
+            ,       SO4.of_sale_type_id     AS sale_type_id
+            ,       SO4.of_canvasser_id     AS canvasser_id
             ,       SO4.company_id          AS company_id
             ,       SO4.user_id             AS vendor_id
             ,       SO4.project_id          AS project_id
             ,       SO4.partner_id          AS partner_id
             ,       0                       AS opportunity_nb
+            ,       0                       AS previous_opportunity_nb
             ,       0                       AS quotation_nb
+            ,       0                       AS previous_quotation_nb
             ,       0                       AS order_nb
+            ,       0                       AS previous_order_nb
             ,       0                       AS lost_quotation_nb
             ,       0                       AS quotation_amount
             ,       0                       AS ordered_turnover
@@ -408,13 +458,18 @@ class OFCRMFunnelConversion4(models.Model):
         sub_select_lost_order_str = """
             SELECT  50000000 + SO5.id   AS id
             ,       SO5.create_date     AS date
+            ,       SO5.of_sale_type_id AS sale_type_id
+            ,       SO5.of_canvasser_id AS canvasser_id
             ,       SO5.company_id      AS company_id
             ,       SO5.user_id         AS vendor_id
             ,       SO5.project_id      AS project_id
             ,       SO5.partner_id      AS partner_id
             ,       0                   AS opportunity_nb
+            ,       0                   AS previous_opportunity_nb
             ,       0                   AS quotation_nb
+            ,       0                   AS previous_quotation_nb
             ,       0                   AS order_nb
+            ,       0                   AS previous_order_nb
             ,       1                   AS lost_quotation_nb
             ,       0                   AS quotation_amount
             ,       0                   AS ordered_turnover
@@ -451,13 +506,18 @@ class OFCRMFunnelConversion4(models.Model):
         sub_select_objective_str = """
             SELECT  60000000 + OSOL.id                          AS id
             ,       DATE(OSO.year || '-' || OSO.month || '-01') AS date
+            ,       NULL                                        AS sale_type_id
+            ,       NULL                                        AS canvasser_id
             ,       OSO.company_id                              AS company_id
             ,       RR.user_id                                  AS vendor_id
             ,       NULL                                        AS project_id
             ,       NULL                                        AS partner_id
             ,       0                                           AS opportunity_nb
+            ,       0                                           AS previous_opportunity_nb
             ,       0                                           AS quotation_nb
+            ,       0                                           AS previous_quotation_nb
             ,       0                                           AS order_nb
+            ,       0                                           AS previous_order_nb
             ,       0                                           AS lost_quotation_nb
             ,       0                                           AS quotation_amount
             ,       0                                           AS ordered_turnover
@@ -494,13 +554,18 @@ class OFCRMFunnelConversion4(models.Model):
         sub_select_sale_order2_str = """
             SELECT  70000000 + SO6.id               AS id
             ,       SO6.of_custom_confirmation_date AS date
+            ,       SO6.of_sale_type_id             AS sale_type_id
+            ,       SO6.of_canvasser_id             AS canvasser_id
             ,       SO6.company_id                  AS company_id
             ,       SO6.user_id                     AS vendor_id
             ,       SO6.project_id                  AS project_id
             ,       SO6.partner_id                  AS partner_id
             ,       0                               AS opportunity_nb
+            ,       0                               AS previous_opportunity_nb
             ,       0                               AS quotation_nb
+            ,       0                               AS previous_quotation_nb
             ,       0                               AS order_nb
+            ,       0                               AS previous_order_nb
             ,       0                               AS lost_quotation_nb
             ,       0                               AS quotation_amount
             ,       0                               AS ordered_turnover
@@ -528,20 +593,118 @@ class OFCRMFunnelConversion4(models.Model):
         """
         return sub_where_sale_order2_str
 
+    def _sub_select_lead_n_1(self):
+        sub_select_lead_n_1_str = """
+            SELECT  80000000 + CL3.id       AS id
+            ,       DATE(
+                        EXTRACT(YEAR FROM CL3.of_date_prospection) + 1 || '-' || 
+                        TO_CHAR(CL3.of_date_prospection, 'MM') || '-01'
+                    )                       AS date
+            ,       NULL                    AS sale_type_id
+            ,       CL3.of_prospecteur_id   AS canvasser_id
+            ,       CL3.company_id          AS company_id
+            ,       CL3.user_id             AS vendor_id
+            ,       NULL                    AS project_id
+            ,       CL3.partner_id          AS partner_id
+            ,       0                       AS opportunity_nb
+            ,       1                       AS previous_opportunity_nb
+            ,       0                       AS quotation_nb
+            ,       0                       AS previous_quotation_nb
+            ,       0                       AS order_nb
+            ,       0                       AS previous_order_nb
+            ,       0                       AS lost_quotation_nb
+            ,       0                       AS quotation_amount
+            ,       0                       AS ordered_turnover
+            ,       0                       AS recorded_turnover
+            ,       0                       AS recorded_turnover2
+            ,       0                       AS lost_turnover
+            ,       0                       AS ordered_margin
+            ,       0                       AS recorded_margin
+            ,       0                       AS recorded_margin2
+            ,       0                       AS budget_turnover_objective
+            ,       0                       AS ordered_turnover_objective
+            ,       0                       AS previous_recorded_turnover
+        """
+        return sub_select_lead_n_1_str
+
+    def _sub_from_lead_n_1(self):
+        sub_from_lead_n_1_str = """
+            FROM    crm_lead    CL3
+        """
+        return sub_from_lead_n_1_str
+
+    def _sub_where_lead_n_1(self):
+        sub_where_lead_n_1_str = ""
+        return sub_where_lead_n_1_str
+
+    def _sub_select_quotation_n_1(self):
+        sub_select_quotation_n_1_str = """
+            SELECT  90000000 + SO7.id                                AS id
+            ,       DATE(
+                        EXTRACT(YEAR FROM SO7.create_date) + 1 || '-' || 
+                        TO_CHAR(SO7.create_date, 'MM') || '-01'
+                    )                                               AS date
+            ,       SO7.of_sale_type_id                             AS sale_type_id
+            ,       SO7.of_canvasser_id                             AS canvasser_id
+            ,       SO7.company_id                                  AS company_id
+            ,       SO7.user_id                                     AS vendor_id
+            ,       SO7.project_id                                  AS project_id
+            ,       SO7.partner_id                                  AS partner_id
+            ,       0                                               AS opportunity_nb
+            ,       0                                               AS previous_opportunity_nb
+            ,       0                                               AS quotation_nb
+            ,       CASE
+                        WHEN SO7.of_cancelled_order_id IS NULL THEN
+                            1
+                        ELSE
+                            -1
+                    END                                             AS previous_quotation_nb
+            ,       0                                               AS order_nb
+            ,       0                                               AS previous_order_nb
+            ,       0                                               AS lost_quotation_nb
+            ,       SO7.amount_untaxed                              AS quotation_amount
+            ,       0                                               AS ordered_turnover
+            ,       0                                               AS recorded_turnover
+            ,       0                                               AS recorded_turnover2
+            ,       0                                               AS lost_turnover
+            ,       0                                               AS ordered_margin
+            ,       0                                               AS recorded_margin
+            ,       0                                               AS recorded_margin2
+            ,       0                                               AS budget_turnover_objective
+            ,       0                                               AS ordered_turnover_objective
+            ,       0                                               AS previous_recorded_turnover
+        """
+        return sub_select_quotation_n_1_str
+
+    def _sub_from_quotation_n_1(self):
+        sub_from_quotation_n_1_str = """
+            FROM    sale_order  SO7
+        """
+        return sub_from_quotation_n_1_str
+
+    def _sub_where_quotation_n_1(self):
+        sub_where_quotation_n_1_str = ""
+        return sub_where_quotation_n_1_str
+
     def _sub_select_sale_order_n_1(self):
         sub_select_sale_order_n_1_str = """
-            SELECT  80000000 + SO7.id   AS id
+            SELECT  100000000 + SO8.id   AS id
             ,       DATE(
-                        EXTRACT(YEAR FROM SO7.of_custom_confirmation_date) + 1 || '-' || 
-                        TO_CHAR(SO7.of_custom_confirmation_date, 'MM') || '-01'
+                        EXTRACT(YEAR FROM SO8.of_custom_confirmation_date) + 1 || '-' || 
+                        TO_CHAR(SO8.of_custom_confirmation_date, 'MM') || '-01'
                     )                   AS date
-            ,       SO7.company_id      AS company_id
-            ,       SO7.user_id         AS vendor_id
-            ,       SO7.project_id      AS project_id
-            ,       SO7.partner_id      AS partner_id
+            ,       SO8.of_sale_type_id AS sale_type_id
+            ,       SO8.of_canvasser_id AS canvasser_id
+            ,       SO8.company_id      AS company_id
+            ,       SO8.user_id         AS vendor_id
+            ,       SO8.project_id      AS project_id
+            ,       SO8.partner_id      AS partner_id
             ,       0                   AS opportunity_nb
+            ,       0                   AS previous_opportunity_nb
             ,       0                   AS quotation_nb
+            ,       0                   AS previous_quotation_nb
             ,       0                   AS order_nb
+            ,       1                   AS previous_order_nb
             ,       0                   AS lost_quotation_nb
             ,       0                   AS quotation_amount
             ,       0                   AS ordered_turnover
@@ -553,19 +716,19 @@ class OFCRMFunnelConversion4(models.Model):
             ,       0                   AS recorded_margin2
             ,       0                   AS budget_turnover_objective
             ,       0                   AS ordered_turnover_objective
-            ,       SO7.amount_untaxed  AS previous_recorded_turnover
+            ,       SO8.amount_untaxed  AS previous_recorded_turnover
         """
         return sub_select_sale_order_n_1_str
 
     def _sub_from_sale_order_n_1(self):
         sub_from_sale_order_n_1_str = """
-            FROM    sale_order          SO7
+            FROM    sale_order          SO8
         """
         return sub_from_sale_order_n_1_str
 
     def _sub_where_sale_order_n_1(self):
         sub_where_sale_order_n_1_str = """
-            WHERE   SO7.state           NOT IN ('draft', 'sent', 'cancel')
+            WHERE   SO8.state           NOT IN ('draft', 'sent', 'cancel')
         """
         return sub_where_sale_order_n_1_str
 
@@ -584,6 +747,8 @@ class OFCRMFunnelConversion4(models.Model):
     def _group_by(self):
         group_by_str = """
             GROUP BY    T.date
+            ,           T.sale_type_id
+            ,           T.canvasser_id
             ,           T.company_id
             ,           RC.of_company_type_id
             ,           RC.of_company_sector_id
