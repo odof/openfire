@@ -124,6 +124,15 @@ class AccountPayment(models.Model):
 
     active = fields.Boolean(string="Active", default=True)
 
+    of_payment_type_readonly = fields.Boolean(string=u"Type de paiement en lecture seule")
+
+    @api.model
+    def create(self, vals):
+        # Après la création, on ne veut plus avoir le type de paiement en lecture seule dans le cadre d'un remboursement
+        if vals.get('of_payment_type_readonly'):
+            vals['of_payment_type_readonly'] = False
+        return super(AccountPayment, self).create(vals)
+
     @api.multi
     def write(self, vals):
         res = super(AccountPayment, self).write(vals)
