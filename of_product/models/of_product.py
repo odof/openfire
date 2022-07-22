@@ -166,6 +166,9 @@ class ProductCategory(models.Model):
     of_layout_id = fields.Many2one('sale.layout_category', string="Section")
     # Uniformisation de la méthode de coût sur les sociétés (effectif si of_base_multicompany est installé)
     property_cost_method = fields.Selection(of_unify_companies=True)
+    of_stock_update_standard_price = fields.Boolean(
+        string=u"Mettre à jour le coût des articles suite aux mouvements de stock", default=True)
+    of_import_update_standard_price = fields.Boolean(string=u"Mettre à jour le coût des articles suite aux imports")
 
     @api.multi
     def copy_data(self, default=None):
