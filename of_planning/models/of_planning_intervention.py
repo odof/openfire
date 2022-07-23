@@ -1017,7 +1017,10 @@ class OfPlanningIntervention(models.Model):
             if rdv.order_id:
                 total = rdv.order_id.amount_total
                 if hasattr(rdv.order_id, 'payment_ids'):
-                    still_due = total - sum(rdv.order_id.payment_ids.mapped('of_amount_total'))
+                    # Permet de bypasser le manque de droits sur les paiements
+                    # pour avoir l'info du restant dû dans les RDV
+                    sudo_rdv = rdv.sudo()
+                    still_due = total - sum(sudo_rdv.order_id.payment_ids.mapped('of_amount_total'))
                 else:
                     still_due = 0.0
                 rdv.order_amount_total = total
