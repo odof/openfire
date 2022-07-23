@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import fields, models, api, tools, _
 
@@ -12,6 +13,7 @@ class OFCRMFunnelConversion(models.Model):
     _rec_name = 'id'
 
     date = fields.Date(string=u"Date", readonly=True)
+    canvasser_id = fields.Many2one(comodel_name='res.users', string=u"Prospecteur", readonly=True)
     company_id = fields.Many2one(comodel_name='res.company', string=u"Société", readonly=True)
     vendor_id = fields.Many2one(comodel_name='res.users', string=u"Vendeur", readonly=True)
     project_id = fields.Many2one(comodel_name='account.analytic.account',string=u"Compte analytique", readonly=True)
@@ -67,6 +69,7 @@ class OFCRMFunnelConversion(models.Model):
                     ,           CL.of_date_prospection                                                                  AS date
                     ,           CL.company_id
                     ,           CL.user_id                                                                              AS vendor_id
+                    ,           COALESCE(SO1.of_canvasser_id, SO2.of_canvasser_id)                                      AS canvasser_id
                     ,           COALESCE(SO1.project_id, SO2.project_id)                                                AS project_id
                     ,           COUNT(DISTINCT CL.id)                                                                   AS opportunity_nb
                     ,           COUNT(DISTINCT SO1.opportunity_id)                                                      AS quotation_nb
@@ -133,11 +136,14 @@ class OFCRMFunnelConversion(models.Model):
                     ,           SO2.margin
                     ,           SO1.project_id
                     ,           SO2.project_id
+                    ,           SO1.of_canvasser_id
+                    ,           SO2.of_canvasser_id
                 UNION ALL
                     SELECT      1000000 + OSOL.id                                                                       AS id
                     ,           DATE(OSO.year || '-' || OSO.month || '-01')                                             AS date
                     ,           OSO.company_id                                                                          AS company_id
                     ,           RR.user_id                                                                              AS vendor_id
+                    ,           NULL                                                                                    AS canvasser_id
                     ,           NULL                                                                                    AS project_id
                     ,           0                                                                                       AS opportunity_nb
                     ,           0                                                                                       AS quotation_nb
@@ -244,6 +250,7 @@ class OFCRMFunnelConversion2(models.Model):
     _rec_name = 'id'
 
     date = fields.Date(string=u"Date", readonly=True)
+    canvasser_id = fields.Many2one(comodel_name='res.users', string=u"Prospecteur", readonly=True)
     company_id = fields.Many2one(comodel_name='res.company', string=u"Société", readonly=True)
     vendor_id = fields.Many2one(comodel_name='res.users', string=u"Vendeur", readonly=True)
     project_id = fields.Many2one(comodel_name='account.analytic.account',string=u"Compte analytique", readonly=True)
@@ -306,6 +313,7 @@ class OFCRMFunnelConversion2(models.Model):
                 ,           T.date
                 ,           T.company_id
                 ,           T.vendor_id
+                ,           T.canvasser_id
                 ,           T.project_id
                 ,           COALESCE(SUM(T.opportunity_nb), 0)              AS opportunity_nb
                 ,           COALESCE(SUM(T.quotation_nb), 0)                AS quotation_nb
@@ -321,6 +329,7 @@ class OFCRMFunnelConversion2(models.Model):
                             ,           CL.of_date_prospection              AS date
                             ,           CL.company_id                       AS company_id
                             ,           CL.user_id                          AS vendor_id
+                            ,           CL.of_prospecteur_id                AS canvasser_id
                             ,           NULL                                AS project_id
                             ,           1                                   AS opportunity_nb
                             ,           0                                   AS quotation_nb
@@ -338,6 +347,7 @@ class OFCRMFunnelConversion2(models.Model):
                             ,           DATE(MAX(SO.date_order))            AS date
                             ,           CL2.company_id                      AS company_id
                             ,           CL2.user_id                         AS vendor_id
+                            ,           SO.of_canvasser_id                  AS canvasser_id
                             ,           MAX(SO.project_id)                  AS project_id
                             ,           0                                   AS opportunity_nb
                             ,           1                                   AS quotation_nb
@@ -356,6 +366,7 @@ class OFCRMFunnelConversion2(models.Model):
                             WHERE       SO.opportunity_id                   IS NOT NULL
                             AND         CL2.id                              = SO.opportunity_id
                             GROUP BY    SO.opportunity_id
+                            ,           SO.of_canvasser_id
                             ,           CL2.company_id
                             ,           CL2.user_id
                         UNION ALL
@@ -363,6 +374,7 @@ class OFCRMFunnelConversion2(models.Model):
                             ,           DATE(MAX(SO2.confirmation_date))    AS date
                             ,           CL3.company_id                      AS company_id
                             ,           CL3.user_id                         AS vendor_id
+                            ,           SO2.of_canvasser_id                 AS canvasser_id
                             ,           MAX(SO2.project_id)                 AS project_id
                             ,           0                                   AS opportunity_nb
                             ,           0                                   AS quotation_nb
@@ -379,6 +391,7 @@ class OFCRMFunnelConversion2(models.Model):
                             AND         SO2.state                           = 'sale'
                             AND         CL3.id                              = SO2.opportunity_id
                             GROUP BY    SO2.opportunity_id
+                            ,           SO2.of_canvasser_id
                             ,           CL3.company_id
                             ,           CL3.user_id
                         UNION ALL
@@ -386,6 +399,7 @@ class OFCRMFunnelConversion2(models.Model):
                             ,           DATE(CA.date)                       AS date
                             ,           CL4.company_id                      AS company_id
                             ,           CA.vendor_id                        AS vendor_id
+                            ,           CL4.of_prospecteur_id               AS canvasser_id
                             ,           NULL                                AS project_id
                             ,           0                                   AS opportunity_nb
                             ,           0                                   AS quotation_nb
@@ -405,6 +419,7 @@ class OFCRMFunnelConversion2(models.Model):
                             ,           DATE(OSO.year || '-' || OSO.month || '-01') AS date
                             ,           OSO.company_id                              AS company_id
                             ,           RR.user_id                                  AS vendor_id
+                            ,           NULL                                        AS canvasser_id
                             ,           NULL                                        AS project_id
                             ,           0                                           AS opportunity_nb
                             ,           0                                           AS quotation_nb
@@ -432,6 +447,7 @@ class OFCRMFunnelConversion2(models.Model):
                 GROUP BY    T.date
                 ,           T.company_id
                 ,           T.vendor_id
+                ,           T.canvasser_id
                 ,           T.project_id
             )""")
 
