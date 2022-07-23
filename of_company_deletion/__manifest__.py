@@ -17,6 +17,7 @@ Voici l'ensemble des objets supprimés en même temps que la société :
     - Factures client
     - Paiements client
     - Remises en banque
+    - Rapprochements bancaires
     - Bons de livraison
     - Partenaires
     - Commandes fournisseur

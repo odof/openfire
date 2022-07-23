@@ -91,8 +91,13 @@ class OFCompanyDeletionWizard(models.TransientModel):
         self.env.cr.commit()
 
         # On autorise l'annulation d'écritures sur tous les journaux des sociétés à supprimer
-        self.env['account.journal'].with_context(active_test=False).search(
-            [('company_id', 'in', self.company_ids.ids)]).write({'update_posted': True})
+        journals = self.env['account.journal'].with_context(active_test=False).search(
+            [('company_id', 'in', self.company_ids.ids)])
+        journals.write({'update_posted': True})
+        if hasattr(self.env['account.journal'], 'of_cancel_moves'):
+            journals.write({'of_cancel_moves': True})
+        if hasattr(self.env['account.journal'], 'journal_lock_date'):
+            journals.write({'journal_lock_date': False})
 
         # Remises en banque
         if 'of.account.payment.bank.deposit' in self.env:
@@ -103,6 +108,15 @@ class OFCompanyDeletionWizard(models.TransientModel):
             self.env['of.account.payment.bank.deposit'].with_context(active_test=False).search(
                 [('journal_id.company_id', 'in', self.company_ids.ids)]).unlink()
             _logger.info(u"Company Deletion - Companies %s - Bank Deposits - END" % company_ids)
+
+            self.env.cr.commit()
+
+        # Rapprochements bancaires
+        if 'of.account.bank.reconciliation' in self.env:
+            _logger.info(u"Company Deletion - Companies %s - Bank Reconciliations - START" % company_ids)
+            self.env['of.account.bank.reconciliation'].with_context(active_test=False).search(
+                [('company_id', 'in', self.company_ids.ids)]).unlink()
+            _logger.info(u"Company Deletion - Companies %s - Bank Reconciliations - END" % company_ids)
 
             self.env.cr.commit()
 
@@ -183,6 +197,11 @@ class OFCompanyDeletionWizard(models.TransientModel):
         account_move_lines = account_moves.mapped('line_ids')
         # On supprime les lettrages potentiels sur les écritures à supprimer
         account_move_lines.remove_move_reconcile()
+        # On vide les dates de verrouillage comptable sur les sociétés à supprimer
+        if hasattr(self.env['res.company'], 'permanent_lock_date'):
+            self.company_ids.permanent_lock_date = False
+        if hasattr(self.env['res.company'], 'fiscalyear_lock_date'):
+            self.company_ids.fiscalyear_lock_date = False
         # Seules les pièces annulées peuvent être supprimées
         account_moves.button_cancel()
         # Des valeurs de débit mal arrondies à 0 empêchent la suppression des écritures
@@ -429,8 +448,14 @@ class OFCompanyDeletionWizard(models.TransientModel):
                 orders = self.env['sale.order'].with_context(active_test=False).search(vals['__domain'])
                 orders.filtered(lambda o: o.state not in ('draft', 'cancel')).write({'state': 'cancel'})
                 orders.unlink()
-        self.env['stock.warehouse'].with_context(active_test=False).search(
-            [('company_id', 'in', self.company_ids.ids)]).unlink()
+        # Si les entrepôts à supprimer sont utilisés comme entrepôt par défaut sur des sociétés,
+        # on modifie les sociétés pour y mettre un autre entrepôt arbitrairement
+        warehouses = self.env['stock.warehouse'].with_context(active_test=False).search(
+            [('company_id', 'in', self.company_ids.ids)])
+        other_warehouse = self.env['stock.warehouse'].search([('company_id', 'not in', self.company_ids.ids)], limit=1)
+        self.env['res.company'].search([('of_default_warehouse_id', 'in', warehouses.ids)]).write(
+            {'of_default_warehouse_id': other_warehouse.id})
+        warehouses.unlink()
         _logger.info(u"Company Deletion - Companies %s - Stock Warehouses - END" % company_ids)
 
         self.env.cr.commit()
