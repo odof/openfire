@@ -292,7 +292,8 @@ class OFProductBrand(models.Model):
             ('of_import_remise', 'remise', 'la remise'),
             ('of_import_price', 'list_price', 'le prix de vente HT'),
         ]
-        if not product or product.id < 0 or product.cost_method == 'standard':
+        if not product or product.id < 0 or product.cost_method == 'standard' or \
+                product.categ_id.of_import_update_standard_price:
             # On ne calcule pas le coût des articles qui utilisent le coût réel ou le coût moyen
             price_fields.append(('of_import_cout', 'standard_price', u'le coût'))
         values = {}
