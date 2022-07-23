@@ -1,0 +1,112 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_website_portal_theme_laze
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-07-12 12:52+0000\n"
+"PO-Revision-Date: 2022-07-12 12:52+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_website_portal_theme_laze
+#: model:ir.ui.view,arch_db:of_website_portal_theme_laze.of_theme_customize
+msgid "<span class=\"fa fa-pencil center-block\"/>B2B COLORS"
+msgstr "<span class=\"fa fa-pencil center-block\"/>COULEURS B2B"
+
+#. module: of_website_portal_theme_laze
+#: model:ir.ui.view,arch_db:of_website_portal_theme_laze.of_theme_customize
+msgid "Color Preset 1"
+msgstr "Préréglage de couleur 1"
+
+#. module: of_website_portal_theme_laze
+#: model:ir.ui.view,arch_db:of_website_portal_theme_laze.of_theme_customize
+msgid "Color Preset 10"
+msgstr "Préréglage de couleur 10"
+
+#. module: of_website_portal_theme_laze
+#: model:ir.ui.view,arch_db:of_website_portal_theme_laze.of_theme_customize
+msgid "Color Preset 11"
+msgstr "Préréglage de couleur 11"
+
+#. module: of_website_portal_theme_laze
+#: model:ir.ui.view,arch_db:of_website_portal_theme_laze.of_theme_customize
+msgid "Color Preset 12"
+msgstr "Préréglage de couleur 12"
+
+#. module: of_website_portal_theme_laze
+#: model:ir.ui.view,arch_db:of_website_portal_theme_laze.of_theme_customize
+msgid "Color Preset 13"
+msgstr "Préréglage de couleur 13"
+
+#. module: of_website_portal_theme_laze
+#: model:ir.ui.view,arch_db:of_website_portal_theme_laze.of_theme_customize
+msgid "Color Preset 14"
+msgstr "Préréglage de couleur 14"
+
+#. module: of_website_portal_theme_laze
+#: model:ir.ui.view,arch_db:of_website_portal_theme_laze.of_theme_customize
+msgid "Color Preset 15"
+msgstr "Préréglage de couleur 15"
+
+#. module: of_website_portal_theme_laze
+#: model:ir.ui.view,arch_db:of_website_portal_theme_laze.of_theme_customize
+msgid "Color Preset 16"
+msgstr "Préréglage de couleur 16"
+
+#. module: of_website_portal_theme_laze
+#: model:ir.ui.view,arch_db:of_website_portal_theme_laze.of_theme_customize
+msgid "Color Preset 17"
+msgstr "Préréglage de couleur 17"
+
+#. module: of_website_portal_theme_laze
+#: model:ir.ui.view,arch_db:of_website_portal_theme_laze.of_theme_customize
+msgid "Color Preset 18"
+msgstr "Préréglage de couleur 18"
+
+#. module: of_website_portal_theme_laze
+#: model:ir.ui.view,arch_db:of_website_portal_theme_laze.of_theme_customize
+msgid "Color Preset 2"
+msgstr "Préréglage de couleur 2"
+
+#. module: of_website_portal_theme_laze
+#: model:ir.ui.view,arch_db:of_website_portal_theme_laze.of_theme_customize
+msgid "Color Preset 3"
+msgstr "Préréglage de couleur 3"
+
+#. module: of_website_portal_theme_laze
+#: model:ir.ui.view,arch_db:of_website_portal_theme_laze.of_theme_customize
+msgid "Color Preset 4"
+msgstr "Préréglage de couleur 4"
+
+#. module: of_website_portal_theme_laze
+#: model:ir.ui.view,arch_db:of_website_portal_theme_laze.of_theme_customize
+msgid "Color Preset 5"
+msgstr "Préréglage de couleur 5"
+
+#. module: of_website_portal_theme_laze
+#: model:ir.ui.view,arch_db:of_website_portal_theme_laze.of_theme_customize
+msgid "Color Preset 6"
+msgstr "Préréglage de couleur 6"
+
+#. module: of_website_portal_theme_laze
+#: model:ir.ui.view,arch_db:of_website_portal_theme_laze.of_theme_customize
+msgid "Color Preset 7"
+msgstr "Préréglage de couleur 7"
+
+#. module: of_website_portal_theme_laze
+#: model:ir.ui.view,arch_db:of_website_portal_theme_laze.of_theme_customize
+msgid "Color Preset 8"
+msgstr "Préréglage de couleur 8"
+
+#. module: of_website_portal_theme_laze
+#: model:ir.ui.view,arch_db:of_website_portal_theme_laze.of_theme_customize
+msgid "Color Preset 9"
+msgstr "Préréglage de couleur 9"
+
