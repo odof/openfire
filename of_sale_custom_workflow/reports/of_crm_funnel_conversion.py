@@ -662,7 +662,7 @@ class OFCRMFunnelConversion4(models.Model):
             ,       0                                               AS order_nb
             ,       0                                               AS previous_order_nb
             ,       0                                               AS lost_quotation_nb
-            ,       SO7.amount_untaxed                              AS quotation_amount
+            ,       0                                               AS quotation_amount
             ,       0                                               AS ordered_turnover
             ,       0                                               AS recorded_turnover
             ,       0                                               AS recorded_turnover2
