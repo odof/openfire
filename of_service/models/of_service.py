@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import math
 from datetime import date
@@ -6,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 import odoo.addons.decimal_precision as dp
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError
+from odoo.tools import float_is_zero
 from odoo.tools import float_compare
 from odoo.tools.safe_eval import safe_eval
 from odoo.addons.of_utils.models.of_utils import se_chevauchent
@@ -281,10 +283,10 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
     partner_tag_ids = fields.Many2many(string=u"Étiquettes client", related='partner_id.category_id', readonly=True)
 
     saleorder_ids = fields.One2many(comodel_name='sale.order', compute='_compute_saleorder_ids', string=u"Ventes")
-    sale_invoice_ids = fields.One2many(
-        comodel_name='account.invoice', compute='_compute_sale_invoice_ids', string=u"Factures de ventes")
+    invoice_ids = fields.One2many(
+        comodel_name='account.invoice', compute='_compute_invoice_ids', string=u"Factures de ventes")
     saleorder_count = fields.Integer(string=u"# Ventes", compute='_compute_saleorder_ids')
-    sale_invoice_count = fields.Integer(string=u"# Factures de ventes", compute='_compute_sale_invoice_ids')
+    invoice_count = fields.Integer(string=u"# Factures de ventes", compute='_compute_invoice_ids')
     historique_interv_ids = fields.Many2many(
         string=u"Historique des interventions", comodel_name='of.planning.intervention',
         column1='of.service', column2='of.planning.intervention', relation='of_service_historique_interv_rel',
@@ -496,12 +498,14 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
             service.saleorder_ids = service.line_ids.mapped('saleorder_line_id').mapped('order_id')
             service.saleorder_count = len(service.saleorder_ids)
 
-    @api.depends('line_ids', 'line_ids.saleorder_line_id.invoice_lines')
-    def _compute_sale_invoice_ids(self):
+    @api.depends('line_ids', 'line_ids.invoice_line_ids', 'saleorder_ids', 'saleorder_ids.invoice_ids',
+                 'line_ids.invoice_line_ids.invoice_id')
+    def _compute_invoice_ids(self):
         for service in self:
-            service.sale_invoice_ids = service.line_ids.mapped('saleorder_line_id').mapped('invoice_lines') \
-                .mapped('invoice_id')
-            service.sale_invoice_count = len(service.sale_invoice_ids)
+            invoices = service.line_ids.mapped('invoice_line_ids').mapped('invoice_id')
+            invoices |= service.saleorder_ids.mapped('invoice_ids')
+            service.invoice_count = len(invoices)
+            service.invoice_ids = invoices
 
     @api.depends('address_id.intervention_address_ids', 'partner_id.intervention_address_ids')
     def _compute_historique_interv_ids(self):
@@ -691,6 +695,37 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
                 return res.filtered(lambda s: ce_type.id in s.type_ids.ids)
         return res
 
+    @api.multi
+    def create_invoice(self):
+        invoice_obj = self.env['account.invoice']
+
+        msgs = []
+        for service in self:
+            # toutes les lignes sont liées à une commande (au moins une avec commande et aucune sans commande)
+            if not service.line_ids.filtered(lambda l: not l.invoice_line_ids):
+                msgs.append(u"Les lignes facturables de la demande d'intervention %s étant liées à des lignes de "
+                            u" commandes, veuillez effectuer la facturation depuis le bon de commande." % service.name)
+                continue
+            invoice_data, msg = service._prepare_invoice()
+            msgs.append(msg)
+            if invoice_data:
+                invoice = invoice_obj.create(invoice_data)
+                invoice.compute_taxes()
+                invoice.message_post_with_view('mail.message_origin_link',
+                                               values={'self': invoice, 'origin': service},
+                                               subtype_id=self.env.ref('mail.mt_note').id)
+        msg = "\n".join(msgs)
+
+        return {
+            'name': u"Création de la facture",
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'of.planning.message.invoice',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {'default_msg': msg}
+        }
+
     # Actions
 
     @api.multi
@@ -716,9 +751,16 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
             }
 
     @api.multi
-    def action_view_sale_invoice(self):
+    def action_view_invoice(self):
+        invoices = self.invoice_ids
         action = self.env.ref('account.action_invoice_tree1').read()[0]
-        action['domain'] = [('id', 'in', self.sale_invoice_ids._ids)]
+        if len(invoices) > 1:
+            action['domain'] = [('id', 'in', invoices.ids)]
+        elif len(invoices) == 1:
+            action['views'] = [(self.env.ref('account.invoice_form').id, 'form')]
+            action['res_id'] = invoices.ids[0]
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
         return action
 
     @api.multi
@@ -788,6 +830,11 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
             return self.env['of.popup.wizard'].popup_return(
                 message=u"Toutes les lignes sont déjà associées à une commande de vente.")
 
+        # Ne pas créer de commande si toutes les lignes sont déjà associées à une ou des factures
+        if not self.line_ids.filtered(lambda l: not l.invoice_line_ids):
+            return self.env['of.popup.wizard'].popup_return(
+                message=u"Toutes les lignes sont déjà associées à une ou plusieurs factures.")
+
         # Ne pas créer de commande si la position fiscale n'est pas renseignée
         if not self.fiscal_position_id:
             return self.env['of.popup.wizard'].popup_return(
@@ -809,7 +856,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
             lines_to_create.append((0, 0, line_vals))
         sale_order.write({'order_line': lines_to_create})
         # Connecter les lignes à leur ligne de commande correspondante
-        for line in self.line_ids.filtered(lambda l: not l.saleorder_line_id):
+        for line in self.line_ids.filtered(lambda l: not l.saleorder_line_id and not l.invoice_line_ids):
             line.saleorder_line_id = SaleLine.search([('of_service_line_id', '=', line.id)], limit=1)
         # Renvoyer la commande créée
         res['res_id'] = sale_order.id
@@ -820,7 +867,76 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
     def orderable_lines(self):
         """ Fonction à surcharger si on veut retirer des lignes lors de la création de commande"""
         self.ensure_one()
-        return self.line_ids.filtered(lambda l: not l.saleorder_line_id)
+        return self.line_ids.filtered(lambda l: not l.saleorder_line_id and not l.invoice_line_ids)
+
+    @api.multi
+    def _get_invoicing_company(self, partner):
+        return self.company_id or partner.company_id
+
+    @api.multi
+    def _prepare_invoice_lines(self):
+        self.ensure_one()
+        lines_data = []
+        error = ''
+        for line in self.line_ids.filtered(
+                lambda l: not l.saleorder_line_id and not l.invoice_line_ids):
+            line_data, line_error = line._prepare_invoice_line()
+            lines_data.append((0, 0, line_data))
+            error += line_error
+        return lines_data, error
+
+    @api.multi
+    def _prepare_invoice(self):
+        self.ensure_one()
+
+        msg_succes = u"SUCCÈS : création de la facture depuis la demande d'intervention %s"
+        msg_erreur = u"ÉCHEC : création de la facture depuis la demande d'intervention %s : %s"
+
+        partner = self.partner_id
+        if not partner:
+            if self.address_id:
+                if self.address_id.parent_id:
+                    invoice_address_id = self.address_id.parent_id.address_get(['invoice'])['invoice']
+                else:
+                    invoice_address_id = self.address_id.address_get(['invoice'])['invoice']
+                partner = self.env['res.partner'].browse(invoice_address_id)
+            else:
+                return (False,
+                        msg_erreur % (self.name, u'Pas de partenaire défini'))
+        pricelist = partner.property_product_pricelist
+        lines_data, error = self._prepare_invoice_lines()
+        if error:
+            return (False,
+                    msg_erreur % (self.name, error))
+        if not lines_data:
+            return (False,
+                    msg_erreur % (self.name, u"Aucune ligne facturable."))
+        company = self._get_invoicing_company(partner)
+        fiscal_position_id = self.fiscal_position_id.id or partner.property_account_position_id.id
+
+        journal_id = (self.env['account.invoice'].with_context(company_id=company.id)
+            .default_get(['journal_id'])['journal_id'])
+        if not journal_id:
+            return (False,
+                    msg_erreur % (
+                        self.name,
+                        u"Vous devez définir un journal des ventes pour cette société (%s)." % company.name))
+        invoice_data = {
+            'origin': self.number or u"Demande d'Intervention",
+            'type': 'out_invoice',
+            'account_id': partner.property_account_receivable_id.id,
+            'partner_id': partner.id,
+            'partner_shipping_id': self.address_id.id,
+            'journal_id': journal_id,
+            'currency_id': pricelist.currency_id.id,
+            'fiscal_position_id': fiscal_position_id,
+            'company_id': company.id,
+            'user_id': self._uid,
+            'invoice_line_ids': lines_data,
+        }
+
+        return (invoice_data,
+                msg_succes % (self.name,))
 
     @api.multi
     def button_open_of_planning_intervention(self):
@@ -1191,6 +1307,15 @@ class OfServiceLine(models.Model):
     price_subtotal = fields.Monetary(compute='_compute_amount', string=u"Sous-total HT", readonly=True, store=True)
     price_tax = fields.Monetary(compute='_compute_amount', string=u"Taxes", readonly=True, store=True)
     price_total = fields.Monetary(compute='_compute_amount', string=u"Sous-total TTC", readonly=True, store=True)
+    invoice_status = fields.Selection(selection=[
+        ('no', u"Rien à facturer"),
+        ('to invoice', u"À facturer"),
+        ('invoiced', u"Totalement facturée"),
+    ], string=u"État de facturation", compute='_compute_invoice_status', store=True)
+    qty_invoiced = fields.Float(string=u"Qté facturée", compute='_compute_qty_invoiced', store=True)
+    qty_invoiceable = fields.Float(string=u"Qté a facturer", compute='_compute_qty_invoiceable', store=True)
+    invoice_line_ids = fields.One2many(
+        'account.invoice.line', 'of_service_line_id', string=u"Ligne de facturation")
 
     @api.depends('qty', 'price_unit', 'taxe_ids')
     def _compute_amount(self):
@@ -1241,6 +1366,32 @@ class OfServiceLine(models.Model):
                 taxes = fiscal_position.map_tax(taxes, product, partner)
             line.taxe_ids = taxes
 
+    @api.depends('invoice_line_ids', 'invoice_line_ids.invoice_id', 'invoice_line_ids.quantity', 'invoice_line_ids.invoice_id')
+    def _compute_qty_invoiced(self):
+        for line in self:
+            line.qty_invoiced = sum(line.invoice_line_ids.mapped('quantity'))
+
+    @api.depends('qty', 'qty_invoiced', 'saleorder_line_id')
+    def _compute_qty_invoiceable(self):
+        for line in self:
+            if line.saleorder_line_id:
+                line.qty_invoiceable = 0.0
+            else:
+                line.qty_invoiceable = line.qty - line.qty_invoiced
+
+    @api.depends('qty', 'qty_invoiced', 'saleorder_line_id', 'qty_invoiceable')
+    def _compute_invoice_status(self):
+        precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+        for line in self:
+            if line.saleorder_line_id:
+                line.invoice_status = 'no'
+            elif not float_is_zero(line.qty_invoiceable, precision_digits=precision):
+                line.invoice_status = 'to invoice'
+            elif float_compare(line.qty_invoiced, line.qty, precision_digits=precision) >= 0:
+                line.invoice_status = 'invoiced'
+            else:
+                line.invoice_status = 'no'
+
     @api.multi
     def prepare_intervention_line_vals(self):
         self.ensure_one()
@@ -1271,6 +1422,46 @@ class OfServiceLine(models.Model):
         order_line_new.update({'product_uom_qty': self.qty})
         return order_line_new._convert_to_write(order_line_new._cache)
 
+    @api.multi
+    def _prepare_invoice_line(self):
+        self.ensure_one()
+        product = self.product_id
+        partner = self.partner_id
+        if not self.service_id.fiscal_position_id:
+            return {}, u"Veuillez définir une position fiscale pour la demande d'intervention %s" % self.name
+        fiscal_position = self.service_id.fiscal_position_id
+        taxes = self.taxe_ids
+        if taxes:
+            company = self.service_id._get_invoicing_company(partner)
+            if company:
+                if 'accounting_company_id' in company._fields:
+                    company = company.accounting_company_id
+                taxes = taxes.filtered(lambda r: r.company_id == company)
+        elif fiscal_position:
+            taxes = fiscal_position.map_tax(taxes, product, partner)
+
+        line_account = product.property_account_income_id or product.categ_id.property_account_income_categ_id
+        if not line_account:
+            return {}, u'Il faut configurer les comptes de revenus pour la catégorie du produit %s.\n' % product.name
+
+        # Mapping des comptes par taxe induit par le module of_account_tax
+        for tax in taxes:
+            line_account = tax.map_account(line_account)
+
+        line_name = self.name or product.name_get()[0][1]
+        print self.name
+        return {
+                   'name': line_name,
+                   'account_id': line_account.id,
+                   'price_unit': self.price_unit,
+                   'quantity': self.qty,
+                   'discount': 0.0,
+                   'uom_id': product.uom_id.id,
+                   'product_id': product.id,
+                   'invoice_line_tax_ids': [(6, 0, taxes._ids)],
+                   'of_service_line_id': self.id
+               }, ""
+
 
 class OfServiceType(models.Model):
     _name = 'of.service.type'
@@ -1295,3 +1486,9 @@ class OFServiceTag(models.Model):
     name = fields.Char(string=u"Libellé", required=True)
     active = fields.Boolean(string='Actif', default=True)
     color = fields.Integer(string=u"Color index")
+
+
+class AccountInvoiceLine(models.Model):
+    _inherit = 'account.invoice.line'
+
+    of_service_line_id = fields.Many2one(comodel_name='of.service.line', string=u"Ligne de DI")
