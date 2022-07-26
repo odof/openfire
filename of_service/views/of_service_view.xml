@@ -33,11 +33,11 @@
                                 icon="fa-usd">
                             <field name="saleorder_count" widget="statinfo" string="Ventes"/>
                         </button>
-                        <button name="action_view_sale_invoice"
+                        <button name="action_view_invoice"
                                 type="object"
                                 class="oe_stat_button"
                                 icon="fa-usd">
-                            <field name="sale_invoice_count" widget="statinfo" string="Factures client"/>
+                            <field name="invoice_count" widget="statinfo" string="Factures"/>
                         </button>
                         <button class="oe_stat_button" name="action_view_intervention" type="object" icon="fa-calendar">
                             <field string="RDVs Tech" name="intervention_count" widget="statinfo"/>
@@ -778,6 +778,23 @@
                 </page>
             </page>
         </field>
+    </record>
+
+        <!-- Générer facture depuis DI -->
+    <record id="action_of_create_invoice_service" model="ir.actions.server">
+        <field name="name">Générer facture</field>
+        <field name="model_id" ref="model_of_service"/>
+        <field name="state">code</field>
+        <field name="code">action = records.create_invoice()</field>
+        <field name="groups">account.group_account_invoice</field>
+    </record>
+
+    <record id="action_create_invoice_service" model="ir.values">
+        <field name="name">Générer facture</field>
+        <field name="key2">client_action_multi</field>
+        <field name="model">of.service</field>
+        <field name="value" eval="'ir.actions.server,%d'%action_of_create_invoice_service"/>
+        <field name="groups">account.group_account_invoice</field>
     </record>
 
 </odoo>
