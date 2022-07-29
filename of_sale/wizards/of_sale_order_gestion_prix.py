@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import api, fields, models
 import odoo.addons.decimal_precision as dp
@@ -86,7 +87,10 @@ class GestionPrix(models.TransientModel):
             ('0', u"Arrondir à l'euro le plus proche"),
             ('1', u"Arrondir aux 10 centimes les plus proches"),
         ], string=u"Précision d'arrondi", default='0')
-    cost_prorata = fields.Boolean(string=u"Prorata au coût")
+    cost_prorata = fields.Selection(selection=[
+            ('price', u"Prix de vente"),
+            ('cost', u"Coût"),
+        ], default='price', required=True, string=u"Prorata")
     of_client_view = fields.Boolean(string='Vue client/vendeur', related="order_id.of_client_view")
 
     @api.depends('line_ids.prix_total_ttc_simul', 'line_ids.prix_total_ht_simul', 'line_ids.cout_total_ht_simul')
@@ -208,8 +212,8 @@ class GestionPrix(models.TransientModel):
             total = False
 
         cur = order.pricelist_id.currency_id
-        cost_prorata = self.cost_prorata and self.methode_remise in [
-            'prix_ttc_cible', 'prix_ht_cible', 'montant_ttc', 'montant_ht']
+        cost_prorata = self.methode_remise in [
+            'prix_ttc_cible', 'prix_ht_cible', 'montant_ttc', 'montant_ht'] and self.cost_prorata or 'price'
         values = self._calculer(total, mode, cur, cost_prorata, line_rounding)
 
         # Pour une simulation, le travail s'arrête ici
@@ -385,7 +389,8 @@ class GestionPrixLine(models.TransientModel):
         @param to_distribute: Montant restant à distribuer
         @param total: Montant actuel cumulé des lignes de commande non encore recalculées
         @param currency: Monnaie utilisée
-        @param cost_prorata: La base de calcul pour le prorata. Basé sur le coût si True, sur le prix de vente sinon
+        :param cost_prorata: La base de calcul pour le prorata. Peut être 'price', 'cost'
+         (ou 'total_cost' si of_sale_budget est installé)
         @param rounding: Booleen déterminant si le prix unitaire doit être arrondi
         @param line_rounding: Règle d'arrondi sur le montant total de la ligne
                {'field': self.arrondi_mode, 'precision': int(self.arrondi_prec)} ou False
@@ -404,17 +409,11 @@ class GestionPrixLine(models.TransientModel):
             if total == 0.0:  # Permet de gérer les lignes de remises avec montant HT initial de 0
                 if self._context.get('pc_marge'):  # Dans le cas d'un calcul de % de marge on part du montant HT
                     taxes_percentage = 0.0
-                else:  # Dans tout les autres cas, on part du montant TTC
+                else:  # Dans tous les autres cas, on part du montant TTC
                     taxes_percentage = sum(taxes.mapped('amount')) / 100
-                if cost_prorata:
-                    price_unit = (order_line.purchase_price or 1.0) * to_distribute / (1 + taxes_percentage)
-                else:
-                    price_unit = (order_line.price_unit or 1.0) * to_distribute / (1 + taxes_percentage)
+                price_unit = self.get_base_amount(order_line, cost_prorata) * to_distribute / (1 + taxes_percentage)
             else:
-                if cost_prorata:
-                    price_unit = (order_line.purchase_price or 1.0) * to_distribute / total
-                else:
-                    price_unit = (order_line.price_unit or 1.0) * to_distribute / total
+                price_unit = self.get_base_amount(order_line, cost_prorata) * to_distribute / total
             if rounding:
                 price_unit = currency.round(price_unit)
 
@@ -500,7 +499,8 @@ class GestionPrixLine(models.TransientModel):
         :param to_distribute: Montant à distribuer
         :param mode: Type de manipulation. Peut être 'ht', 'ttc' ou 'reset'
         :param currency: Monnaie utilisée
-        :param cost_prorata: La base de calcul pour le prorata. Basé sur le coût si True, sur le prix de vente sinon
+        :param cost_prorata: La base de calcul pour le prorata. Peut être 'price', 'cost'
+         (ou 'total_cost' si of_sale_budget est installé)
         :param line_rounding: Règle d'arrondi sur le montant total de la ligne
                {'field': wizard.arrondi_mode, 'precision': int(wizard.arrondi_prec)} ou False
         """
@@ -527,7 +527,7 @@ class GestionPrixLine(models.TransientModel):
         for lf in lines_forced:
             vals, taxes = lf.get_distributed_amount(
                 lf.prix_total_ht_simul,
-                lf.cout_total_ht if cost_prorata else lf.prix_total_ht,
+                lf.cout_total_ht if cost_prorata != 'price' else lf.prix_total_ht,
                 currency=currency,
                 cost_prorata=cost_prorata,
                 rounding=True,
@@ -552,10 +552,7 @@ class GestionPrixLine(models.TransientModel):
         for line in lines_select.with_context(round=False):
             # Calcul manuel des taxes avec context['round']==False pour conserver la précision des calculs
             order_line = line.order_line_id
-            if cost_prorata:
-                price = order_line.purchase_price * (1 - (order_line.discount or 0.0) / 100.0)
-            else:
-                price = order_line.price_unit * (1 - (order_line.discount or 0.0) / 100.0)
+            price = self.get_base_amount(order_line, cost_prorata) * (1 - (order_line.discount or 0.0) / 100.0)
             taxes = order_line.tax_id.compute_all(
                 price, order_line.currency_id, order_line.product_uom_qty, product=order_line.product_id,
                 partner=order_line.order_id.partner_id)
@@ -600,6 +597,13 @@ class GestionPrixLine(models.TransientModel):
             line.prix_total_ht_simul = line.order_line_id.price_subtotal
             line.prix_total_ttc_simul = line.order_line_id.price_total
         return values
+
+    @api.model
+    def get_base_amount(self, order_line, cost_prorata):
+        if cost_prorata == 'cost':
+            return order_line.purchase_price or 1.0
+        else:
+            return order_line.price_unit or 1.0
 
 
 class SaleOrder(models.Model):
