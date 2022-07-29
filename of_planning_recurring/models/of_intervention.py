@@ -668,7 +668,8 @@ class OFPlanningIntervention(models.Model):
     @api.model
     def search(self, args, offset=0, limit=0, order=None, count=False):
         if not self.user_has_groups('of_planning_recurring.of_group_planning_intervention_recurring'):
-            return super(OFPlanningIntervention, self).search(args, offset=0, limit=0, order=None, count=False)
+            return super(OFPlanningIntervention, self).search(
+                args, offset=offset, limit=limit, order=order, count=count)
         # le comportement par défaut est de sélectionner aussi les occurrences virtuelles
         new_args = []
         for arg in args:
