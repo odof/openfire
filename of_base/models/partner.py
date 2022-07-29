@@ -249,6 +249,13 @@ class ResPartner(models.Model):
             convert = self._fields[name].convert_to_display_name
             for record in self:
                 result.append((record.id, '%s%s' % (convert(record[name], record), ''.join([' (', record.city, ')']) if record.city else '')))
+        elif self._context.get('show_email'):
+            result = []
+            for partner in self:
+                name = partner.name or ''
+                if partner.email:
+                    name = "%s <%s>" % (partner.email, name)
+                result.append((partner.id, name))
         else:
             result = super(ResPartner, self).name_get()
         return result
