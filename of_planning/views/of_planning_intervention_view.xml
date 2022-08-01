@@ -748,7 +748,7 @@
     <record id="of_planning_tache_view_form" model="ir.ui.view" >
         <field name="name">of.planning.tache.form</field>
         <field name="model">of.planning.tache</field>
-        <field name="arch" type="xml" >
+        <field name="arch" type="xml" >su
             <form class="oe_form_configuration">
                 <header></header>
                 <sheet>
