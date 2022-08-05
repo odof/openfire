@@ -97,7 +97,7 @@ class PlanningImpressionWizard(models.TransientModel):
         return title
 
     def get_interventions_one(self, employee_id):
-        intervention_obj = self.env['of.planning.intervention']
+        intervention_obj = self.env['of.planning.intervention'].with_context(virtual_id=True)
 
         # Toutes les poses de la semaine, sauf annulées ou reportées
         domain = [('date_deadline', '>=', self.date_start), ('date', '<=', self.date_stop),
@@ -107,7 +107,7 @@ class PlanningImpressionWizard(models.TransientModel):
         return interventions
 
     def get_interventions_all(self):
-        intervention_obj = self.env['of.planning.intervention']
+        intervention_obj = self.env['of.planning.intervention'].with_context(virtual_id=True)
 
         date_start_da = fields.Date.from_string(self.date_start)
         date_stop_da = fields.Date.from_string(self.date_stop)
