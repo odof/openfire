@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 import pytz
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError
@@ -130,6 +131,19 @@ class OFUpdateRecRulesWizard(models.TransientModel):
         self.ensure_one()
         if 0 <= self.end_hour < 24:
             self.duration = self.duration_computed
+
+    @api.onchange('count')
+    def _onchange_count(self):
+        if self.count > 100:
+            self.count = 100
+
+    @api.onchange('end_type', 'final_date')
+    def _onchange_final_date(self):
+        if self.end_type == 'end_date' and self.final_date:
+            date_max = fields.Date.from_string(self.rec_start_date) + relativedelta(years=1)
+            final_date = fields.Date.from_string(self.final_date)
+            if final_date > date_max:
+                self.final_date = fields.Date.to_string(date_max)
 
     def button_edit_all(self):
         # ici le RDV est déjà récurrent et reste récurrent

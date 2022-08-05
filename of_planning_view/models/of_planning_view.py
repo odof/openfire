@@ -245,7 +245,8 @@ class OfPlanningIntervention(models.Model):
         employees = employee_obj.browse(employee_ids)
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
-        intervention_obj = self.env['of.planning.intervention'].with_context(tz=self._context.get('tz'))
+        intervention_obj = self.env['of.planning.intervention'].with_context(
+            tz=self._context.get('tz'), virtual_id=True)
         tz = pytz.timezone(self._context['tz'])
         # avec les heures hiver/été, le tz_offset peut varier pour une même timezone, on prend donc la date de début
         # en tant que référence (c'est un lundi)

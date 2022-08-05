@@ -134,7 +134,7 @@ class HREmployee(models.Model):
         template_id = self.env.ref('of_planning.email_template_planning_jour_demain')
         next_day_da = fields.Date.from_string(fields.Date.today()) + timedelta(days=1)
         next_day_str = fields.Date.to_string(next_day_da)
-        interventions = self.env['of.planning.intervention'].search([
+        interventions = self.env['of.planning.intervention'].with_context(virtual_id=True).search([
             ('date', '>=', next_day_str),
             ('date_deadline', '<=', next_day_str),
             ('state', 'not in', ['draft', 'postponed', 'cancel']),
@@ -1767,7 +1767,7 @@ class OfPlanningIntervention(models.Model):
     @api.multi
     def do_verif_dispo(self):
         # Vérification de la validité du créneau: chevauchement
-        interv_obj = self.env['of.planning.intervention']
+        interv_obj = self.env['of.planning.intervention'].with_context(virtual_id=True)
         group_flex = self.env.user.has_group('of_planning.of_group_planning_intervention_flexibility')
         for interv in self:
             if group_flex and interv.flexible:
@@ -1792,7 +1792,7 @@ class OfPlanningIntervention(models.Model):
     @api.multi
     def get_overlapping_intervention(self):
         # Vérification de la validité du créneau: chevauchement
-        interv_obj = self.env['of.planning.intervention']
+        interv_obj = self.env['of.planning.intervention'].with_context(virtual_id=True)
         rdvs = interv_obj
         for interv in self:
             if interv.verif_dispo:

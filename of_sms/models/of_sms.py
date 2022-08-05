@@ -542,7 +542,7 @@ class OFPlanningIntervention(models.Model):
         else:
             date_fin_relance_str = date_demain_str
 
-        intervention_obj = self.env["of.planning.intervention"]
+        intervention_obj = self.env["of.planning.intervention"].with_context(virtual_id=True)
         my_model = self.env['ir.model'].search([('model', '=', "of.planning.intervention")])
 
         # On récupère l'émetteur du texto
