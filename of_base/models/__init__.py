@@ -2,6 +2,7 @@
 
 from . import of_base
 from . import mail
+from . import module
 from . import partner
 from . import product
 from . import of_log_message
