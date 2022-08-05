@@ -391,6 +391,7 @@ CalendarView.include({
                 if (isNaN(start) || isNaN(end)) {
                     return;
                 }
+                context['virtual_id'] = true;
 
                 var current_event_source = self.event_source;
                     // pour sauter au dernier event il faut changer les bornes de recherche

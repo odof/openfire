@@ -379,7 +379,7 @@ class OfTourneeRdv(models.TransientModel):
 
         employee_obj = self.env['hr.employee']
         wizard_line_obj = self.env['of.tournee.rdv.line']
-        intervention_obj = self.with_context(force_read=True).env['of.planning.intervention']
+        intervention_obj = self.with_context(force_read=True, virtual_id=True).env['of.planning.intervention']
 
         if sudo:
             employee_obj = employee_obj.sudo()

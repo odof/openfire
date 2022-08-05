@@ -493,6 +493,10 @@ var PlanningView = View.extend({
         if (! self.all_filters) {  // foolproofing
             self.all_filters = [];
         }
+        if (isNullOrUndef(context)) {
+            context = {};
+        }
+        context['virtual_id'] = true;
         self.rows = new Array(self.view_res_ids.length);
         // dictionnaire de la forme {id: index_row}
         // pour accéder facilement à l'indexe du filtre à partir de l'id de l'attendee
