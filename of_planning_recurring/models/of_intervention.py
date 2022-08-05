@@ -244,13 +244,13 @@ class OFPlanningRecurringMixin(models.AbstractModel):
             event_date = datetime.now()
 
         if self.all_day and self.rrule and 'UNTIL' in self.rrule and 'Z' not in self.rrule:
-            rset1 = rrule.rrulestr(str(self.rrule), dtstart=event_date.replace(tzinfo=None), forceset=True,
+            rset1 = rrule.rrulestr(str(self.rrule), dtstart=event_date.replace(tzinfo=None), forceset=True, cache=True,
                                    ignoretz=True)
         else:
             # Convert the event date to saved timezone (or context tz) as it'll
             # define the correct hour/day asked by the user to repeat for recurrence.
             event_date = event_date.astimezone(timezone)  # transform "+hh:mm" timezone
-            rset1 = rrule.rrulestr(str(self.rrule), dtstart=event_date, forceset=True, tzinfos={})
+            rset1 = rrule.rrulestr(str(self.rrule), dtstart=event_date, forceset=True, tzinfos={}, cache=True)
         # récupérer les éventuels RDV issus de RDV récurrents et détachés
         recurring_meetings = self.search(
             [('recurrent_id', '=', self.id), '|', ('active', '=', False), ('active', '=', True)])
@@ -359,9 +359,9 @@ class OFPlanningRecurringMixin(models.AbstractModel):
         ddate = fields.Datetime.from_string(date_start)
         if 'Z' in rule_str and not ddate.tzinfo:
             ddate = ddate.replace(tzinfo=pytz.timezone('UTC'))
-            rule = rrule.rrulestr(rule_str, dtstart=ddate)
+            rule = rrule.rrulestr(rule_str, dtstart=ddate, cache=True)
         else:
-            rule = rrule.rrulestr(rule_str, dtstart=ddate)
+            rule = rrule.rrulestr(rule_str, dtstart=ddate, cache=True)
 
         if rule._freq > 0 and rule._freq < 4:
             data['rrule_type'] = rrule_type[rule._freq]
@@ -665,44 +665,63 @@ class OFPlanningIntervention(models.Model):
             result = records_to_exclude.with_context(dont_notify=True).write({'active': False})
         return result
 
+    def get_date_start_fields(self):
+        return ['date', 'date_prompt', 'date_date']
+
+    def get_date_stop_fields(self):
+        return ['date_deadline', 'date_deadline_prompt', 'date_deadline_forcee']
+
     @api.model
     def search(self, args, offset=0, limit=0, order=None, count=False):
         if not self.user_has_groups('of_planning_recurring.of_group_planning_intervention_recurring'):
             return super(OFPlanningIntervention, self).search(
                 args, offset=offset, limit=limit, order=order, count=count)
-        # le comportement par défaut est de sélectionner aussi les occurrences virtuelles
         new_args = []
+        date_stop_fields = self.get_date_stop_fields()
         for arg in args:
             new_arg = arg
             # Chercher aussi les RDVs récurrents qui termine après la date donnée
-            if arg[0] in ('date_deadline', 'date_deadline_forcee', 'date_deadline_prompt') and arg[1] == ">=":
+            # pour pouvoir les afficher quand même si on n'affiche pas les différentes occurences
+            if arg[0] in date_stop_fields and arg[1] == ">=":
                 if self._context.get('virtual_id', True):
                     new_args += ['|', '&', ('recurrency', '=', 1), ('final_date', arg[1], arg[2])]
             elif arg[0] == "id":
                 new_arg = (arg[0], arg[1], get_real_ids(arg[2]))
             new_args.append(new_arg)
 
-        if not self._context.get('virtual_id', True):
-            return super(OFPlanningIntervention, self).search(
-                new_args, offset=offset, limit=limit, order=order, count=count)
-
-        if any(arg[0] in ('date', 'date_prompt', 'date_date') for arg in args) and \
-                not any(arg[0] in ('date_deadline', 'date_deadline_forcee', 'date_deadline_prompt', 'final_date')
-                        for arg in args):
+        date_start_fields = self.get_date_start_fields()
+        has_date_start_arg = any(arg[0] in date_start_fields for arg in args)
+        if has_date_start_arg and not any(arg[0] in (date_stop_fields + ['final_date']) for arg in args):
             # domain with a start filter but with no stop clause should be extended
             # e.g. start=2017-01-01, count=5 => virtual occurences must be included in ('start', '>', '2017-01-02')
             start_args = new_args
             new_args = []
             for arg in start_args:
                 new_arg = arg
-                if arg[0] in ('date', 'date_prompt', 'date_date') and arg[1] in ('>', '>='):
+                if arg[0] in date_start_fields:
                     new_args += ['|', '&', ('recurrency', '=', 1), ('final_date', arg[1], arg[2])]
                 new_args.append(new_arg)
 
+        # le comportement par défaut est de ne pas sélectionner les occurrences virtuelles
+        if not self._context.get('virtual_id', False):
+            return super(OFPlanningIntervention, self).search(
+                new_args, offset=offset, limit=limit, order=order, count=count)
+
+        if has_date_start_arg and any(arg[0] in date_stop_fields for arg in args):
+            # On a une borne de début et une borne de fin, on peut se risquer à mettre une limite à 0.
+            # On est à priori en vue calendar ou planning. Si on est en vue liste et que les bornes sont éloignées,
+            # l'utilisateur pourra s'attendre à avoir des lenteurs
+            virtual_limit = 0
+            virtual_offset = 0
+        else:
+            virtual_limit = limit
+            virtual_offset = offset
+
         # offset, limit, order and count must be treated separately as we may need to deal with virtual ids
-        prev_events = super(OFPlanningIntervention, self).search(new_args, offset=0, limit=0, order=None, count=False)
+        prev_events = super(OFPlanningIntervention, self).search(
+            new_args, offset=virtual_offset, limit=virtual_limit, order=None, count=False)
         # ici sont virtualisés les events et ajoutés aux résultats
-        events = self.browse(prev_events.get_recurrent_ids(args, order=order))
+        events = self.browse(prev_events.get_recurrent_ids(new_args, order=order))
         if count:
             return len(events)
         elif limit:
