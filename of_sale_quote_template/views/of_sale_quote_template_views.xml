@@ -454,16 +454,4 @@
         </field>
     </record>
 
-    <!-- Sale config wizard -->
-    <record id="of_sale_quote_template_view_sale_config_settings" model="ir.ui.view">
-        <field name="name">of sale settings</field>
-        <field name="model">sale.config.settings</field>
-        <field name="inherit_id" ref="sale.view_sales_config"/>
-        <field name="arch" type="xml">
-            <xpath expr="//group[@name='quotations_sales']" position="inside">
-                <field name="of_quote_template" widget="radio"/>
-            </xpath>
-        </field>
-    </record>
-
 </odoo>

@@ -12,6 +12,18 @@ class OFSaleConfiguration(models.TransientModel):
         group='base.group_user')
     module_of_sale_budget = fields.Boolean(
         string=u"(OF) Gestion du budget", help="Installe le module Ventes / Budget")
+    of_quote_template = fields.Selection(
+        [('add', u'Ajoute les lignes de commande du modèle au devis'),
+         ('replace', u'Remplace les lignes de commande du devis par celles du modèle')],
+        string=u"(OF) Modèle de devis", required=True, default='replace',
+        help=u"Ceci ne modifie que le fonctionnement des lignes de commandes du modèle."
+             u"Les autres informations (ex: position fiscale) ne sont pas impactées par ce paramètre et seront "
+             u"toujours remplacées par celles du dernier modèle choisi")
+
+    @api.multi
+    def set_of_quote_template_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_quote_template', self.of_quote_template)
 
     @api.multi
     def execute(self):
