@@ -1225,23 +1225,6 @@ class SaleOrderLine(models.Model):
         return res
 
 
-class OFSaleConfiguration(models.TransientModel):
-    _inherit = 'sale.config.settings'
-
-    of_quote_template = fields.Selection(
-        [('add', u'Ajoute les lignes de commande du modèle au devis'),
-         ('replace', u'Remplace les lignes de commande du devis par celles du modèle')],
-        string=u"(OF) Modèle de devis", required=True, default='replace',
-        help=u"Ceci ne modifie que le fonctionnement des lignes de commandes du modèle."
-             u"Les autres informations (ex: position fiscale) ne sont pas impactées par ce paramètre et seront "
-             u"toujours remplacées par celles du dernier modèle choisi")
-
-    @api.multi
-    def set_of_quote_template_defaults(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'of_quote_template', self.of_quote_template)
-
-
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
