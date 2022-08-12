@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 {
-    'name' : "OpenFire / Produits (articles)",
-    'version' : "10.0.1.0.0",
-    'author' : "OpenFire",
-    'website' : "openfire.fr",
-    'category' : "Generic Modules/Sales & Purchases",
-    'description': """
+    'name': u"OpenFire / Produits (articles)",
+    'version': '10.0.1.0.0',
+    'license': 'AGPL-3',
+    'author': u"OpenFire",
+    'website': u"openfire.fr",
+    'category': u"Generic Modules/Sales & Purchases",
+    'description': u"""
 Module produits OpenFire.
 =========================
 
@@ -14,7 +17,7 @@ Ce module apporte une personnalisation des produits :
  - Ajout des champs 'modele', 'marge', 'description_fabricant' et 'date_tarif' dans product.template
  - Ajout des champs 'old_code', 'pp_ht' et 'remise' dans product.supplierinfo
 """,
-    'depends' : [
+    'depends': [
         'product',
         'purchase',
         'of_base',  # forcer l'ordre de mise à jour
