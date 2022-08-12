@@ -194,24 +194,22 @@ class SaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'
 
     of_stock_warning_setting = fields.Boolean(
-        string="(OF) Avertissements de stock", required=True, default=False,
-        help="Afficher les messages d'avertissement de stock ?")
+        string="(OF) Stock Warnings", required=True, default=False, help="Show stock warning messages ?")
 
     default_invoice_policy = fields.Selection(
         selection_add=[('ordered_delivery', u"Facturer les quantités commandées à date de livraison")])
     group_sale_order_line_display_stock_info = fields.Boolean(
-        string=u"(OF) Informations de stock",
+        string="(OF) Stock information",
         implied_group='of_sale_stock.group_sale_order_line_display_stock_info',
         group='base.group_portal,base.group_user,base.group_public',
-        help=u"Affiche les informations de stock au niveau des lignes de commande")
+        help="Displays stock information at the order lines level")
     group_sale_order_line_display_menu_info = fields.Boolean(
-            string=u"(OF) Menu lignes de commande",
+            string="(OF) Order lines",
             implied_group='of_sale_stock.group_sale_order_line_display_menu_info',
             group='base.group_portal,base.group_user,base.group_public',
-            help=u"Affiche le menu lignes de commande depuis le menu ventes")
+            help="Displays the order lines menu from the sales menu")
     of_inclure_service_bl = fields.Boolean(
-        string="(OF) Bons de Livraison", help=u"Inclure les articles de type 'service' dans les bons de livraison"
-        )
+        string="(OF) Service type items", help="Include 'service' type items in delivery notes")
 
     @api.multi
     def set_stock_warning_defaults(self):
