@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import models, fields, api
 from dateutil.relativedelta import relativedelta
@@ -90,6 +91,14 @@ class OfService(models.Model):
                 record.last_intervention_state = rdvs[-1].state
             elif record.intervention_ids:
                 record.last_intervention_state = record.intervention_ids[-1].state
+
+    @api.depends('contract_id', 'contract_id.invoice_ids')
+    def _compute_invoice_ids(self):
+        super(OfService, self)._compute_invoice_ids()
+        for service in self:
+            if service.contract_id:
+                service.invoice_ids |= service.contract_id.invoice_ids
+                service.invoice_count = len(service.invoice_ids)
 
     # @api.onchange
 
@@ -191,6 +200,21 @@ class OfService(models.Model):
         if self._context.get('keep_contract_lines'):
             return lines
         return lines.filtered(lambda l: not l.of_contract_line_id)
+
+    @api.multi
+    def _prepare_invoice_lines(self):
+        self.ensure_one()
+        if self.contract_line_id:
+            lines_data = []
+            error = ''
+            for line in self.line_ids.filtered(
+                    lambda l: not l.saleorder_line_id and not l.invoice_line_ids and not l.of_contract_line_id):
+                line_data, line_error = line._prepare_invoice_line()
+                lines_data.append((0, 0, line_data))
+                error += line_error
+        else:
+            lines_data, error = super(OfService, self)._prepare_invoice_lines()
+        return lines_data, error
 
 
 class OFServiceLine(models.Model):
