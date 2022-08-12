@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import api, models, fields
 import odoo.addons.decimal_precision as dp
@@ -41,6 +42,9 @@ class ProductTemplate(models.Model):
 
     of_tag_ids = fields.Many2many(
         'of.product.template.tag', column1='product_id', column2='tag_id', string=u'Étiquettes')
+    of_linked_product_ids = fields.Many2many(
+        comodel_name='product.template', column1='of_product_template1_id', column2='of_product_template2_id',
+        relation='linked_product_rel', string=u"Articles liés")
 
     of_forbidden_discount = fields.Boolean(string=u"Remise interdite")
 
