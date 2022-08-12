@@ -22,13 +22,11 @@
         <field name="type">form</field>
         <field name="inherit_id" ref="of_sale.of_sale_view_sale_config_settings"/>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='rubrique_report']" position="after">
-                <group name="rubrique_rapport_openflam" string="Rapport de gestion">
-                    <label for="of_rapport_sur_mesure"/>
-                    <div name="of_rapport_sur_mesure">
-                        <field name="of_rapport_sur_mesure" class="oe_inline"/>
-                    </div>
-                </group>
+            <xpath expr="//group[@name='quotations_sales']/group[@name='field_fonctionnalities']/div[last()]" position="after">
+                <label for="of_rapport_sur_mesure"/>
+                <div name="of_rapport_sur_mesure">
+                    <field name="of_rapport_sur_mesure" class="oe_inline"/>
+                </div>
             </xpath>
             <xpath expr="//div[@name='of_sale_order_margin_control']" position="after">
                 <label for="of_sale_order_installation_date_control"/>

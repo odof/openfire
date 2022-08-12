@@ -10,158 +10,149 @@
             <xpath expr="//field[@name='module_sale_margin']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
-            <xpath expr="//field[@name='deposit_product_id_setting']" position="attributes">
+            <xpath expr="//group[@name='quotations_sales']" position="attributes">
+                <attribute name="string">Quotations &amp; Orders</attribute>
+            </xpath>
+
+            <!-- The default group "Products" has no attr name... So we are trying to get it by his position and his child -->
+            <xpath expr="//group/field[@name='group_product_variant']/.." position="attributes">
+                <attribute name="string">Product catalogue</attribute>
+                <attribute name="name">products_catalogue</attribute>
+            </xpath>
+
+            <!-- Replace field to move them -->
+            <xpath expr="//group[@name='products_catalogue']/field[@name='default_invoice_policy']" position="replace"/>
+            <xpath expr="//group[@name='quotations_sales']/field[@name='group_sale_delivery_address']" position="replace"/>
+            <xpath expr="//group[@name='quotations_sales']/field[@name='sale_note']" position="replace"/>
+            <xpath expr="//group[@name='quotations_sales']/field[@name='group_sale_layout']" position="replace"/>
+            <xpath expr="//group[@name='quotations_sales']/field[@name='auto_done_setting']" position="replace"/>
+            <xpath expr="//group[@name='quotations_sales']/field[@name='group_warning_sale']" position="replace"/>
+            <xpath expr="//group[@name='quotations_sales']/label[@for='sale_show_tax']" position="replace"/>
+            <xpath expr="//group[@name='quotations_sales']/div/field[@name='sale_show_tax']/.." position="replace"/>
+            <xpath expr="//group[@name='quotations_sales']/field[@name='group_discount_per_so_line']" position="replace"/>
+            <xpath expr="//group[@name='quotations_sales']/field[@name='module_sale_margin']" position="replace"/>
+            <xpath expr="//group[@name='customers']/field[@name='module_website_quote']" position="replace"/>
+            <xpath expr="//group[@name='customers']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
-            <xpath expr="//field[@name='deposit_product_id_setting']" position="after">
-                <field name="of_deposit_product_categ_id_setting" class="oe_inline"/>
+            <xpath expr="//field[@name='group_product_pricelist']/.." position="after">
+                <field name="group_discount_per_so_line" widget="radio"/>
+                <field name="module_sale_margin" widget="radio"/>
             </xpath>
-            <xpath expr="//group[@name='quotations_sales']" position="inside">
-                <field name="of_invoice_grouped" widget="radio"/>
-                <label for="of_position_fiscale"/>
-                <div name="of_position_fiscale">
-                    <field name="of_position_fiscale" class="oe_inline"/>
-                    <span>Forcer l'utilisation des positions fiscales dans les devis/commandes</span>
-                </div>
-                <label for="group_of_order_line_option"/>
-                <div name="group_of_order_line_option">
-                    <field name="group_of_order_line_option" class="oe_inline"/>
-                    <span>Activer les options de ligne de commande</span>
-                </div>
-                <label for="of_sale_order_margin_control"/>
-                <div name="of_sale_order_margin_control">
-                    <field name="of_sale_order_margin_control" class="oe_inline"/>
-                    <span>Activer le contrôle de marge à la validation des commandes</span>
-                </div>
-            </xpath>
-            <xpath expr="//field[@name='default_invoice_policy']" position="after">
-                <field name="of_propagate_payment_term"/>
-                <field name="group_of_sale_multiimage" widget="radio"/>
-                <field name="group_of_sale_print_attachment" widget="radio"/>
-                <label for="of_sale_print_multiimage_level"/>
-                <div name="of_sale_print_multiimage_level">
-                    <field name="of_sale_print_multiimage_level" widget="radio"/>
-                    <span attrs="{
-                        'invisible': ['|',
-                            ('of_sale_print_multiimage_level', '!=', 1),
-                            ('group_of_sale_multiimage', '=', 0)]}">Une première image de l'article sera affichée à la ligne et le tout en annexe</span>
-                </div>
-                <field name="group_of_sale_print_one_image" invisible="1"/>
-                <field name="group_of_sale_print_multiimage" invisible="1"/>
-            </xpath>
-            <xpath expr="//div[@id='main']" position="inside">
-                <group name="rubrique_report" string="Devis &amp; commandes PDF">
-                    <label for="pdf_adresse_civilite"/>
-                    <div name="pdf_afficher_civilite">
-                        <field name="pdf_adresse_civilite" class="oe_inline"/>
-                        <span>Afficher la civilité dans les rapports PDF</span>
-                    </div>
-                    <label for="pdf_adresse_nom_parent"/>
-                    <div name="pdf_afficher_nom_parent">
-                        <field name="pdf_adresse_nom_parent" class="oe_inline"/>
-                        <span>Remplacer le nom du contact par celui du parent dans les rapports PDF</span>
-                    </div>
-                    <label for="pdf_adresse_telephone"/>
-                    <div name="pdf_afficher_telephone" colspan="1" col="3">
-                        <field name="pdf_adresse_telephone" class="oe_inline" colspan="2" no_label="1"/>
-                        <span colspan="1"></span>
-                    </div>
-                    <label for="pdf_adresse_mobile"/>
-                    <div name="pdf_adresse_mobile" colspan="1" col="3">
-                        <field name="pdf_adresse_mobile" class="oe_inline" colspan="2" no_label="1"/>
-                        <span colspan="1"></span>
-                    </div>
-                    <label for="pdf_adresse_fax"/>
-                    <div name="pdf_afficher_fax" colspan="1" col="3">
-                        <field name="pdf_adresse_fax" class="oe_inline" colspan="2" no_label="1"/>
-                        <span colspan="1"></span>
-                    </div>
-                    <label for="pdf_adresse_email"/>
-                    <div name="pdf_afficher_email" colspan="1" col="3">
-                        <field name="pdf_adresse_email" class="oe_inline" colspan="2" no_label="1"/>
-                        <span colspan="1"></span>
-                    </div>
-                    <label for="pdf_display_product_ref_setting"/>
-                    <div name="pdf_display_product_ref_setting">
-                        <field name="pdf_display_product_ref_setting" class="oe_inline"/>
-                        <span>Afficher les références produits dans les rapports PDF</span>
-                    </div>
-                    <label for="pdf_date_validite_devis"/>
-                    <div name="pdf_date_validite_devis">
-                        <field name="pdf_date_validite_devis" class="oe_inline"/>
-                        <span>Afficher la date de validité dans le rapport PDF des devis</span>
-                    </div>
-                    <label for="pdf_vt_pastille"/>
-                    <div name="pdf_vt_pastille">
-                        <field name="pdf_vt_pastille" class="oe_inline"/>
-                        <span>Afficher la date de visite technique dans une pastille d'information dans le rapport PDF des devis</span>
-                    </div>
-                    <label for="pdf_afficher_multi_echeances"/>
-                    <div name="pdf_afficher_multi_echeances">
-                        <field name="pdf_afficher_multi_echeances" class="oe_inline"/>
-                        <span>Afficher les échéances multiples dans les rapports PDF</span>
-                    </div>
-                    <label for="pdf_hide_global_address_label"/>
-                    <div name="pdf_hide_global_address_label">
-                        <field name="pdf_hide_global_address_label" class="oe_inline"/>
-                        <span>Masquer le libellé "Adresse de livraison et de facturation" dans le rapport PDF des devis</span>
-                    </div>
-                    <label for="of_color_bg_section"/>
-                    <div name="of_color_bg_section_setting">
-                        <field name="of_color_bg_section" class="oe_inline" widget="color"/>
-                    </div>
-                    <label for="of_color_font"/>
-                    <div name="of_color_font">
-                        <field name="of_color_font" class="oe_inline" widget="color"/>
-                    </div>
-                    <label string="(OF) Pastille commercial" for="pdf_masquer_pastille_commercial"/>
-                    <div name="pdf_masquer_pastille_commercial">
-                        <field name="pdf_masquer_pastille_commercial" class="oe_inline"/>
-                        <span>NE PAS afficher dans les rapports PDF</span>
-                    </div>
-                    <label string="(OF) Pastille commercial" for="pdf_mail_commercial"
-                           attrs="{'invisible': [('pdf_masquer_pastille_commercial', '=', True)]}"/>
-                    <div name="pdf_mail_commercial"
-                         attrs="{'invisible': [('pdf_masquer_pastille_commercial', '=', True)]}">
-                        <field name="pdf_mail_commercial" class="oe_inline"/>
-                        <span>Afficher l'email du commercial dans la pastille des rapports PDF</span>
-                    </div>
-                    <label string="(OF) Pastille conditions de règlement" for="pdf_masquer_pastille_payment_term"/>
-                    <div name="pdf_masquer_pastille_payment_term">
-                        <field name="pdf_masquer_pastille_payment_term" class="oe_inline"/>
-                        <span>NE PAS afficher dans les rapports PDF</span>
-                    </div>
-                    <label for="of_pdf_taxes_display"/>
-                    <div name="of_pdf_taxes_display">
-                        <field name="of_pdf_taxes_display" class="oe_inline"/>
-                        <span>Afficher le tableau de détail des taxes dans les rapports PDF</span>
-                    </div>
+
+            <!-- Quotations & Sales -->
+            <xpath expr="//group[@name='quotations_sales']/field[@name='company_id']" position="after">
+                <group name="title_fonctionnalities" colspan="4">
+                    <h4 class="of-settings">Fonctionnalities</h4>
                 </group>
-            </xpath>
-            <xpath expr="//group[@name='quotations_sales']" position="inside">
-                <label for="stock_warning_setting"/>
-                <div name="stock_warning_setting">
-                    <field name="stock_warning_setting" class="oe_inline"/>
-                    <span>Afficher les messages d'avertissement de stock</span>
-                </div>
-            </xpath>
-            <xpath expr="//group[last()]" position="after">
-                <group name="temp_parameters" string="Paramètres temporaires">
+                <group name="field_fonctionnalities">
+                    <field name="group_sale_delivery_address" widget="radio"/>
                     <label for="of_allow_quote_addition"/>
-                    <div name="of_allow_quote_addition">
+                    <div id="of_allow_quote_addition">
                         <field name="of_allow_quote_addition" class="oe_inline"/>
-                        <span>Autoriser l'ajout de devis complémentaire aux bons de commandes</span>
+                        <span>Allow additional quotes to be added to sale orders</span>
+                    </div>
+                    <label for="group_of_order_line_option"/>
+                    <div id="group_of_order_line_option">
+                        <field name="group_of_order_line_option" class="oe_inline"/>
+                        <span>Enable command line options</span>
+                    </div>
+                    <label for="of_sale_order_margin_control"/>
+                    <div name="of_sale_order_margin_control">
+                        <field name="of_sale_order_margin_control" class="oe_inline"/>
+                        <span>Enable margin control on order validation</span>
+                    </div>
+                    <label for="group_of_afficher_total_ttc"/>
+                    <div>
+                        <field name="group_of_afficher_total_ttc" class="oe_inline"/>
+                        <span>Displays TTC subtotals by command line.</span>
+                        <br/>
+                        <span class="text-muted">Only in the form and not in the reports.</span>
                     </div>
                 </group>
+                <group name="title_parameters" colspan="4">
+                    <h4 class="of-settings">Parameters</h4>
+                </group>
+                <group name="field_parameters">
+                    <field name="sale_note"/>
+                    <field name="group_sale_layout" widget="radio"/>
+                    <field name="auto_done_setting" widget="radio"/>
+                    <field name="group_warning_sale" widget="radio"/>
+                    <field name="module_website_quote" widget="radio"/>
+                </group>
             </xpath>
-            <xpath expr="//field[@name='sale_show_tax']/.." position="after">
-                <label for="group_of_afficher_total_ttc"/>
-                <div>
-                    <field name="group_of_afficher_total_ttc" class="oe_inline"/>
-                    <span>Affiche les sous-totaux TTC par ligne de commande.</span>
-                    <br/>
-                    <span class="text-muted">Uniquement dans le formulaire et non dans les rapports.</span>
-                </div>
+
+            <xpath expr="//group[@name='quotations_sales']" position="after">
+
+                <!-- Tax & Invoicing -->
+                <group string="Taxes et facturation" id="tax_invoicing" name="tax_invoicing">
+                    <group name="title_parameters" colspan="4">
+                        <h4 class="of-settings">Parameters</h4>
+                    </group>
+                    <group name="field_parameters">
+                        <field name="default_invoice_policy" widget="radio"/>
+                        <label for="sale_show_tax"/>
+                        <div>
+                            <field name="sale_show_tax" class="oe_inline" widget="radio"/>
+                            <field name="group_show_price_subtotal" class="oe_inline" invisible="1"/>
+                            <field name="group_show_price_total" class="oe_inline" invisible="1"/>
+                        </div>
+                        <label for="of_position_fiscale"/>
+                        <div name="of_position_fiscale">
+                            <field name="of_position_fiscale" class="oe_inline"/>
+                            <span>Force the use of tax positions in quotes/orders</span>
+                        </div>
+                        <label for="of_propagate_payment_term"/>
+                        <div name="of_propagate_payment_term">
+                            <field name="of_propagate_payment_term" class="oe_inline"/>
+                            <span>Propagate payment terms in invoice</span>
+                        </div>
+                        <field name="of_invoice_grouped" widget="radio"/>
+                    </group>
+                    <group id="title-cfg-product" colspan="4">
+                        <h4 class="of-settings">Product configuration</h4>
+                    </group>
+                    <group name="field_parameters">
+                        <field name="of_deposit_product_categ_id_setting" class="oe_inline"/>
+                    </group>
+                </group>
+
+                <!-- Purchases stock -->
+                <group string="Purchases stock" id="purchase_stock" name="purchase_stock">
+                    <label for="stock_warning_setting"/>
+                    <div name="stock_warning_setting">
+                        <field name="stock_warning_setting" class="oe_inline"/>
+                        <span>Show stock warning messages</span>
+                    </div>
+                </group>
+
+                <!-- Manufacturing -->
+                <group string="Manufacturing" id="manufacturing" name="manufacturing"/>
+
+                <!-- PDF Printing -->
+                <group string="PDF Printing" id="pdf_printing" name="pdf_printing">
+                    <group colspan="4">
+                        <button type="object" name="action_printings_params" string="Define fields to display" class="oe_inline oe_link"/>
+                    </group>
+                    <group name="field_parameters">
+                        <field name="group_of_sale_multiimage" widget="radio"/>
+                        <field name="group_of_sale_print_attachment" widget="radio"/>
+                        <label for="of_sale_print_multiimage_level"/>
+                        <div name="of_sale_print_multiimage_level">
+                            <field name="of_sale_print_multiimage_level" widget="radio"/>
+                            <span attrs="{
+                                'invisible': ['|',
+                                    ('of_sale_print_multiimage_level', '!=', 1),
+                                    ('group_of_sale_multiimage', '=', 0)]}">A first image of the article will be displayed on the line and all in the appendix</span>
+                        </div>
+                        <field name="group_of_sale_print_one_image" invisible="1"/>
+                        <field name="group_of_sale_print_multiimage" invisible="1"/>
+                    </group>
+                </group>
+            </xpath>
+
+            <xpath expr="//field[@name='deposit_product_id_setting']" position="attributes">
+                <attribute name="invisible">1</attribute>
             </xpath>
         </field>
     </record>

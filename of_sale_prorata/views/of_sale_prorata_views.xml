@@ -30,9 +30,9 @@
     <record id="of_sale_prorata_view_sale_config_settings" model="ir.ui.view">
         <field name="name">of sale prorata settings</field>
         <field name="model">sale.config.settings</field>
-        <field name="inherit_id" ref="sale.view_sales_config"/>
+        <field name="inherit_id" ref="of_sale.of_sale_view_sale_config_settings"/>
         <field name="arch" type="xml">
-                <xpath expr="//field[@name='deposit_product_id_setting']" position="after">
+                <xpath expr="//group[@name='tax_invoicing']//field[@name='of_deposit_product_categ_id_setting']" position="after">
                     <field name="of_product_prorata_id_setting" class="oe_inline"
                            context="{'default_type':'service', 'default_default_code':'PRORATA'}"/>
                     <field name="of_product_situation_id_setting" class="oe_inline"

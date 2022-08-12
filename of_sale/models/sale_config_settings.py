@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
+from odoo.exceptions import AccessError
 
 
 class OFSaleConfiguration(models.TransientModel):
@@ -54,93 +55,6 @@ class OFSaleConfiguration(models.TransientModel):
         help=u"Afficher les messages d'avertissement de stock ?"
     )
 
-    pdf_display_product_ref_setting = fields.Boolean(
-        string=u"(OF) Réf. produits", required=True, default=False,
-        help=u"Afficher les références produits dans les rapports PDF ?"
-    )
-
-    pdf_date_validite_devis = fields.Boolean(
-        string=u"(OF) Date validité devis", required=True, default=False,
-        help=u"Afficher la date de validité dans le rapport PDF des devis ?"
-    )
-
-    pdf_vt_pastille = fields.Boolean(
-        string=u"(OF) Date VT pastille", required=True, default=False,
-        help=u"Afficher la date de visite technique dans une pastille dans le rapport PDF des devis ?"
-    )
-
-    pdf_hide_global_address_label = fields.Boolean(
-        string=u"(OF) Libellé adresse de livraison et facturation", required=True, default=False,
-        help=u'Masquer le libellé "Adresse de livraison et de facturation" dans le rapport PDF des devis ?')
-
-    pdf_masquer_pastille_commercial = fields.Boolean(
-        string=u"(OF) Masquer pastille commercial", required=True, default=False,
-        help=u"Masquer la pastille commercial dans les rapports PDF ?"
-    )
-
-    pdf_mail_commercial = fields.Boolean(
-        string=u"(OF) pastille commercial", required=True, default=False,
-        help=u"Afficher l'email dans la pastille commercial des rapports PDF ?"
-    )
-
-    pdf_masquer_pastille_payment_term = fields.Boolean(
-        string=u"(OF) Masquer pastille conditions de règlement", required=True, default=False,
-        help=u"Masquer la pastille conditions de règlement dans les rapports PDF ?"
-    )
-
-    pdf_adresse_nom_parent = fields.Boolean(
-        string=u"(OF) Nom parent contact", required=True, default=False,
-        help=u"Afficher le nom du 'parent' du contact au lieu du nom du contact dans les rapport PDF ?"
-    )
-    pdf_adresse_civilite = fields.Boolean(
-        string=u"(OF) Civilités", required=True, default=False,
-        help=u"Afficher la civilité dans les rapport PDF ?"
-    )
-    pdf_adresse_telephone = fields.Selection(
-        [
-            (1, u"Afficher dans l'encart d'adresse principal"),
-            (2, u"Afficher dans une pastille d'informations complémentaires"),
-            (3, u"Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
-        ], string=u"(OF) Téléphone",
-        help=u"Où afficher le numéro de téléphone dans les rapport PDF ? Ne rien mettre pour ne pas afficher."
-    )
-    pdf_adresse_mobile = fields.Selection(
-        [
-            (1, u"Afficher dans l'encart d'adresse principal"),
-            (2, u"Afficher dans une pastille d'informations complémentaires"),
-            (3, u"Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
-        ], string=u"(OF) Mobile",
-        help=u"Où afficher le numéro de téléphone mobile dans les rapport PDF ? Ne rien mettre pour ne pas afficher."
-    )
-    pdf_adresse_fax = fields.Selection(
-        [
-            (1, u"Afficher dans l'encart d'adresse principal"),
-            (2, u"Afficher dans une pastille d'informations complémentaires"),
-            (3, u"Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
-        ], string="(OF) Fax",
-        help=u"Où afficher le fax dans les rapport PDF ? Ne rien mettre pour ne pas afficher."
-    )
-    pdf_adresse_email = fields.Selection(
-        [
-            (1, u"Afficher dans l'encart d'adresse principal"),
-            (2, u"Afficher dans une pastille d'informations complémentaires"),
-            (3, u"Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
-        ], string="(OF) E-mail",
-        help=u"Où afficher l'adresse email dans les rapport PDF ? Ne rien mettre pour ne pas afficher."
-    )
-    pdf_afficher_multi_echeances = fields.Boolean(
-        string=u"(OF) Multi-échéances", required=True, default=False,
-        help=u"Afficher les échéances multiples dans les rapports PDF ?"
-    )
-    of_color_bg_section = fields.Char(
-        string="(OF) Couleur fond titres section",
-        help=u"Choisissez un couleur de fond pour les titres de section", default="#F0F0F0"
-    )
-    of_color_font = fields.Char(
-        string="(OF) Couleur police titre section",
-        help=u"Choisissez un couleur pour les titres de section", default="#000000"
-    )
-
     of_position_fiscale = fields.Boolean(string="(OF) Position fiscale")
     of_allow_quote_addition = fields.Boolean(string=u"(OF) Devis complémentaires")
 
@@ -155,15 +69,14 @@ class OFSaleConfiguration(models.TransientModel):
 
     group_of_sale_multiimage = fields.Selection([
         (0, 'One image per product'),
-        (1, 'Several images per product')
-        ], string='(OF) Multi Images', implied_group='of_sale.group_of_sale_multiimage',
+        (1, 'Several images per product')],
+        string='(OF) Multi Images', implied_group='of_sale.group_of_sale_multiimage',
         group='base.group_portal,base.group_user,base.group_public')
 
     of_sale_print_multiimage_level = fields.Selection([
         (0, 'Do not print'),
         (1, 'Print on each line'),
-        (2, 'Print on appendix')
-        ], string='(OF) Print product images on Sale Order')
+        (2, 'Print on appendix')], string='(OF) Print product images on Sale Order')
     group_of_sale_print_one_image = fields.Boolean(
         'Print on each line', implied_group='of_sale.group_of_sale_print_one_image',
         group='base.group_portal,base.group_user,base.group_public')
@@ -173,57 +86,63 @@ class OFSaleConfiguration(models.TransientModel):
 
     group_of_sale_print_attachment = fields.Selection([
         (0, 'Do not print'),
-        (1, 'Print on appendix')
-        ], string='(OF) Print product attachments on Sale Order',
+        (1, 'Print on appendix')], string='(OF) Print product attachments on Sale Order',
         implied_group='of_sale.group_of_sale_print_attachment',
         group='base.group_portal,base.group_user,base.group_public')
 
     of_invoice_grouped = fields.Selection(selection=[
         (0, 'Groupement par partenaire + devise'),
-        (1, 'Groupement par commande'),
-        ], string=u"(OF) Facturation groupée")
+        (1, 'Groupement par commande'), ], string=u"(OF) Facturation groupée")
 
     sale_show_tax = fields.Selection(selection_add=[('both', 'Afficher les sous-totaux HT (B2B) et TTC (B2C)')])
 
-    of_pdf_taxes_display = fields.Boolean(
-        string=u"(OF) Détails des taxes", help=u"Afficher le tableau de détail des taxes dans les rapports PDF")
-
     of_propagate_payment_term = fields.Boolean(
-        string=u"(OF) Propager les conditions de règlement dans la facture",
+        string=u"(OF) Terms of payment",
         help=u"Si décoché, les conditions de règlement ne sont pas propagées aux factures", default=True)
 
     of_sale_order_margin_control = fields.Boolean(
         string=u"(OF) Contrôle de marge", help=u"Activer le contrôle de marge à la validation des commandes")
 
-    @api.multi
-    def set_pdf_adresse_nom_parent_defaults(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'pdf_adresse_nom_parent', self.pdf_adresse_nom_parent)
+    @api.model
+    def default_get(self, fields):
+        res = super(OFSaleConfiguration, self).default_get(fields)
+        # store the default values of the groups for the sale settings in the cache dictionnary
+        for name in res:
+            if name.startswith('group_'):
+                self.pool._salesettings_groups_cache[name] = res[name]
+        return res
 
     @api.multi
-    def set_pdf_adresse_civilite_defaults(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'pdf_adresse_civilite', self.pdf_adresse_civilite)
+    def onchange_group_field(self, field_value, group_name):
+        """If the value is not the same that the value stored in the cache dict we add the field's name in a
+        "updated group list".
+        Otherwise if the value is set back to the original value we remove the field from this list.
+        """
+        original_settings_value = self.pool._salesettings_groups_cache[group_name]
+        if field_value != original_settings_value:
+            self.pool._salesettings_groups_has_changed.append(group_name)
+        if group_name in self.pool._salesettings_groups_has_changed and field_value == original_settings_value:
+            self.pool._salesettings_groups_has_changed.remove(group_name)
+        return {}
 
-    @api.multi
-    def set_pdf_adresse_telephone_defaults(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'pdf_adresse_telephone', self.pdf_adresse_telephone)
+    def _register_hook(self):
+        super(OFSaleConfiguration, self)._register_hook()
 
-    @api.multi
-    def set_pdf_adresse_mobile_defaults(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'pdf_adresse_mobile', self.pdf_adresse_mobile)
+        def make_method(name):
+            return lambda self: self.onchange_group_field(self[name], name)
 
-    @api.multi
-    def set_pdf_adresse_fax_defaults(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'pdf_adresse_fax', self.pdf_adresse_fax)
+        # add a cache dict of default values to check data value during the sale setting wizard
+        # add a todolist that will contains the name of groups that have been changed in settings
+        if not hasattr(self.pool, '_salesettings_groups_cache'):
+            self.pool._salesettings_groups_cache = {}
+        if not hasattr(self.pool, '_salesettings_groups_has_changed'):
+            self.pool._salesettings_groups_has_changed = []
 
-    @api.multi
-    def set_pdf_adresse_email_defaults(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'pdf_adresse_email', self.pdf_adresse_email)
+        # add onchange for all fields "group_"
+        for name in self._fields:
+            if name.startswith('group_'):
+                method = make_method(name)
+                self._onchange_methods[name].append(method)
 
     @api.multi
     def set_stock_warning_defaults(self):
@@ -231,59 +150,9 @@ class OFSaleConfiguration(models.TransientModel):
             'sale.config.settings', 'stock_warning_setting', self.stock_warning_setting)
 
     @api.multi
-    def set_pdf_display_product_ref_defaults(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'pdf_display_product_ref_setting', self.pdf_display_product_ref_setting)
-
-    @api.multi
-    def set_pdf_date_validite_devis_defaults(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'pdf_date_validite_devis', self.pdf_date_validite_devis)
-
-    @api.multi
-    def set_pdf_vt_pastille_defaults(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'pdf_vt_pastille', self.pdf_vt_pastille)
-
-    @api.multi
-    def set_pdf_hide_global_address_label_defaults(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'pdf_hide_global_address_label', self.pdf_hide_global_address_label)
-
-    @api.multi
-    def set_pdf_masquer_pastille_commercial(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'pdf_masquer_pastille_commercial', self.pdf_masquer_pastille_commercial)
-
-    @api.multi
-    def set_pdf_mail_commercial_defaults(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'pdf_mail_commercial', self.pdf_mail_commercial)
-
-    @api.multi
-    def set_pdf_masquer_pastille_payment_term(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'pdf_masquer_pastille_payment_term', self.pdf_masquer_pastille_payment_term)
-
-    @api.multi
     def set_of_deposit_product_categ_id_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_deposit_product_categ_id_setting', self.of_deposit_product_categ_id_setting.id)
-
-    @api.multi
-    def set_of_color_bg_section_defaults(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'of_color_bg_section', self.of_color_bg_section)
-
-    @api.multi
-    def set_of_color_font_defaults(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'of_color_font', self.of_color_font)
-
-    @api.multi
-    def set_pdf_afficher_multi_echeances_defaults(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'pdf_afficher_multi_echeances', self.pdf_afficher_multi_echeances)
 
     @api.multi
     def set_of_position_fiscale(self):
@@ -321,22 +190,17 @@ class OFSaleConfiguration(models.TransientModel):
             self.update({
                 'group_show_price_total': False,
                 'group_show_price_subtotal': True,
-                })
+            })
         elif self.sale_show_tax == "total":
             self.update({
                 'group_show_price_total': True,
                 'group_show_price_subtotal': False,
-                })
+            })
         else:
             self.update({
                 'group_show_price_total': True,
                 'group_show_price_subtotal': True,
-                })
-
-    @api.multi
-    def set_of_pdf_taxes_display(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'of_pdf_taxes_display', self.of_pdf_taxes_display)
+            })
 
     @api.multi
     def set_of_propagate_payment_term(self):
@@ -347,3 +211,93 @@ class OFSaleConfiguration(models.TransientModel):
     def set_of_sale_order_margin_control(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_sale_order_margin_control', self.of_sale_order_margin_control)
+
+    @api.multi
+    def execute(self):
+        """This function is called when the user validate the settings.
+        We overrided it to add the check of modified groups to allow the recompute only for groups thoses has been
+        modified and not for all.
+        """
+        self.ensure_one()
+        if not self.env.user._is_superuser() and not self.env.user.has_group('base.group_system'):
+            raise AccessError(_("This setting can only be enabled by the administrator, "
+                                "please contact support to enable this option."))
+
+        self = self.with_context(active_test=False)
+        classified = self._get_classified_fields()
+
+        # default values fields
+        IrValues = self.env['ir.values'].sudo()
+        for name, model, field in classified['default']:
+            if isinstance(self[name], models.BaseModel):
+                if self._fields[name].type == 'many2one':
+                    value = self[name].id
+                else:
+                    value = self[name].ids
+            else:
+                value = self[name]
+            IrValues.set_default(model, field, value)
+
+        # To avoid a very long time of computation (for database with a lot a Users/Groups), we don't want to recompute
+        # the groups if they haven't been changed in the settings.
+        if self.pool._salesettings_groups_has_changed:
+            # filter groups to recompute only modified ones
+            only_changed_values = filter(
+                lambda gval: gval and gval[0] in self.pool._salesettings_groups_has_changed, classified['group'])
+            # group fields: modify group / implied groups
+            with self.env.norecompute():
+                for name, groups, implied_group in only_changed_values:
+                    if self[name]:
+                        groups.write({'implied_ids': [(4, implied_group.id)]})
+                    else:
+                        groups.write({'implied_ids': [(3, implied_group.id)]})
+                        implied_group.write({'users': [(3, user.id) for user in groups.mapped('users')]})
+            self.recompute()
+
+        # other fields: execute all methods that start with 'set_'
+        for method in dir(self):
+            if method.startswith('set_'):
+                getattr(self, method)()
+
+        # module fields: install/uninstall the selected modules
+        to_install = []
+        to_uninstall_modules = self.env['ir.module.module']
+        lm = len('module_')
+        for name, module in classified['module']:
+            if self[name]:
+                to_install.append((name[lm:], module))
+            else:
+                if module and module.state in ('installed', 'to upgrade'):
+                    to_uninstall_modules += module
+
+        if to_uninstall_modules:
+            to_uninstall_modules.button_immediate_uninstall()
+
+        action = self._install_modules(to_install)
+        if action:
+            return action
+
+        if to_install or to_uninstall_modules:
+            # After the uninstall/install calls, the registry and environments
+            # are no longer valid. So we reset the environment.
+            self.env.reset()
+            self = self.env()[self._name]
+        config = self.env['res.config'].next() or {}
+        if config.get('type') not in ('ir.actions.act_window_close',):
+            return config
+
+        # force client-side reload (update user menu and current view)
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }
+
+    @api.multi
+    def action_printings_params(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'of.sale.wizard.set.printing.params',
+            'view_mode': 'form',
+            'view_type': 'form',
+            'target': 'new'
+        }

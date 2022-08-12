@@ -5,7 +5,7 @@
         <field name="model">sale.config.settings</field>
         <field name="inherit_id" ref="of_sale.of_sale_view_sale_config_settings"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@name='of_position_fiscale']" position="after">
+            <xpath expr="//group[@name='tax_invoicing']//div[@name='of_propagate_payment_term']" position="after">
                 <label for="of_compte_analytique" groups="analytic.group_analytic_accounting"/>
                 <div name="of_compte_analytique" groups="analytic.group_analytic_accounting">
                     <field name="of_compte_analytique" class="oe_inline"/>

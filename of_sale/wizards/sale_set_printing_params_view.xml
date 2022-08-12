@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="wizard_sales_set_printing_params_view_form" model="ir.ui.view">
+        <field name="name">wizard.sales.set.printing.params.view.form</field>
+        <field name="model">of.sale.wizard.set.printing.params</field>
+        <field name="arch" type="xml">
+            <form string="Configure PDF printing">
+                <group string="Printing parameters">
+                    <group col="2">
+                        <group col="2" colspan="2" name="address">
+                            <h4 class="of-settings" colspan="2">Address</h4>
+                            <field name="pdf_hide_global_address_label"/>
+                            <field name="pdf_adresse_civilite"/>
+                            <field name="pdf_adresse_nom_parent"/>
+                            <field name="pdf_adresse_telephone"/>
+                            <field name="pdf_adresse_mobile"/>
+                            <field name="pdf_adresse_fax"/>
+                            <field name="pdf_adresse_email"/>
+                        </group>
+                    </group>
+                    <group col="2">
+                       <group col="2" colspan="2" name="labels">
+                            <h4 class="of-settings" colspan="2">Labels</h4>
+                            <label for="pdf_masquer_pastille_payment_term"/>
+                            <div name="pdf_masquer_pastille_payment_term">
+                                <field name="pdf_masquer_pastille_payment_term" class="oe_inline"/>
+                                <span>DO NOT display in PDF reports</span>
+                            </div>
+                            <label for="pdf_masquer_pastille_commercial"/>
+                            <div name="pdf_masquer_pastille_commercial">
+                                <field name="pdf_masquer_pastille_commercial" class="oe_inline"/>
+                                <span>DO NOT display in PDF reports</span>
+                            </div>
+                            <label for="pdf_mail_commercial"
+                                attrs="{'invisible': [('pdf_masquer_pastille_commercial', '=', True)]}"/>
+                            <div name="pdf_mail_commercial"
+                                attrs="{'invisible': [('pdf_masquer_pastille_commercial', '=', True)]}">
+                                <field name="pdf_mail_commercial" class="oe_inline"/>
+                                <span>Display the salesperson's email in the PDF report button</span>
+                            </div>
+                            <field name="pdf_vt_pastille"/>
+                            <field name="pdf_date_validite_devis"/>
+                        </group>
+                        <group col="2" colspan="2">
+                            <h4 class="of-settings" colspan="2">Layout category</h4>
+                            <field name="of_color_bg_section" widget="color"/>
+                            <field name="of_color_font" widget="color"/>
+                        </group>
+                        <group col="2" colspan="2">
+                            <h4 class="of-settings" colspan="2">Order lines</h4>
+                            <field name="pdf_display_product_ref_setting"/>
+                        </group>
+                        <group col="2" colspan="2">
+                            <label for="pdf_afficher_multi_echeances" string="Payment schedule" class="of-settings"/>
+                            <div name="pdf_afficher_multi_echeances">
+                                <field name="pdf_afficher_multi_echeances" class="oe_inline"/>
+                            </div>
+                        </group>
+                        <group col="2" colspan="2">
+                            <label for="of_pdf_taxes_display" string="Tax detail" class="of-settings"/>
+                            <div name="of_pdf_taxes_display">
+                                <field name="of_pdf_taxes_display" class="oe_inline"/>
+                            </div>
+                        </group>
+                    </group>
+                </group>
+                <footer>
+                    <button string="Apply" type="object" name="action_validate" class="oe_highlight"/>
+                    <button string="Cancel" type="object" name="cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sale_set_printing_pdf_form" model="ir.actions.act_window">
+        <field name="name">Configure PDF printing</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.sale.wizard.set.printing.params</field>
+        <field name="view_id" ref="wizard_sales_set_printing_params_view_form"/>
+        <field name="view_mode">form</field>
+    </record>
+
+</odoo>

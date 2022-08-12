@@ -13,10 +13,10 @@
 ##############################################################################
 
 {
-    'name' : "OpenFire / Escomptes",
-    'version' : "10.0.1.0.0",
-    'author' : "OpenFire",
-    'website' : "www.openfire.fr",
+    'name': "OpenFire / Escomptes",
+    'version': "10.0.1.0.0",
+    'author': "OpenFire",
+    'website': "www.openfire.fr",
     'category': "Module Fabricants OpenFire",
     'summary': u"Gestion des escomptes",
     'description': u"""
@@ -29,7 +29,7 @@ Fonctionnalités
  - Ajout d'un type 'escompte' dans les catégories d'article
 
 """,
-    'depends' : [
+    'depends': [
         'product',
         'of_sale',
         'of_kit',
@@ -37,7 +37,7 @@ Fonctionnalités
         'sale',
         'purchase',
     ],
-    'data' : [
+    'data': [
         'views/ofab_escompte_views.xml',
         'reports/ofab_escompte_reports_views.xml',
     ],
