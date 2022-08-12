@@ -3,6 +3,8 @@
 
 from odoo import api, models, fields
 import odoo.addons.decimal_precision as dp
+from odoo.exceptions import UserError
+import re
 
 
 class ProductTemplate(models.Model):
@@ -57,6 +59,7 @@ class ProductTemplate(models.Model):
     of_other_logistic_costs = fields.Float(string=u"Autres frais logistiques")
     of_misc_taxes = fields.Float(string=u"Taxes divers")
     of_misc_costs = fields.Float(string=u"Frais divers")
+    of_url = fields.Char(string=u"URL")
 
     @api.multi
     @api.depends('lst_price', 'standard_price')
@@ -97,6 +100,25 @@ class ProductTemplate(models.Model):
 
         # On désactive le log dans le RSE pour gagner du temps lors d'import d'articles
         return super(ProductTemplate, self.with_context(mail_create_nolog=True)).create(vals)
+
+    @api.multi
+    def write(self, vals):
+        res = super(ProductTemplate, self).write(vals)
+
+        def is_valid_url(of_url):
+            regex = re.compile(
+                r'^https?://'  # http:// or https://
+                r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|'  # domain...
+                r'localhost|'  # localhost...
+                r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+                r'(?::\d+)?'  # optional port
+                r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+            return of_url is not None and regex.search(of_url)
+
+        if self.of_url:
+            if not is_valid_url(self.of_url):
+                raise UserError(u"L'URL saisie n'est pas correcte !")
+        return res
 
 
 class ProductProduct(models.Model):
