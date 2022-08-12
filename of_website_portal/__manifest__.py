@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 {
     'name': u"OpenFire / Portail du site internet",
-    'version': "10.0.1.0.0",
-    'author': "OpenFire",
-    'license': "",
-    'category': "OpenFire",
+    'version': '10.0.1.0.0',
+    'license': 'AGPL-3',
+    'author': u"OpenFire",
+    'category': u"OpenFire",
     'description': u"""
 Module OpenFire pour le portail du site internet
 ================================================
@@ -12,7 +14,7 @@ Module OpenFire pour le portail du site internet
 - Ajout de la possibilité d'uploader un fichier depuis le portail
 
 """,
-    'website': "www.openfire.fr",
+    'website': u"www.openfire.fr",
     'depends': [
         'base',
         'website_portal',
@@ -24,6 +26,7 @@ Module OpenFire pour le portail du site internet
         'of_planning',
         'of_parc_installe',
         'of_kit',
+        'of_document_website',
     ],
     'data': [
         'security/of_website_portal_security.xml',
@@ -38,4 +41,3 @@ Module OpenFire pour le portail du site internet
     'application': False,
     'auto_install': False,
 }
-

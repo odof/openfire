@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import http
 from odoo.http import request
@@ -53,6 +54,17 @@ class WebsiteAccount(website_account):
             ('Content-Disposition', 'attachment; filename=Bon_de_livraison.pdf;')
         ]
         return request.make_response(pdf, headers=pdfhttpheaders)
+
+    @http.route(['/my/documents'], type='http', auth='user', website=True)
+    def portal_my_documents(self):
+        values = self._prepare_portal_layout_values()
+        document_ids = request.env['muk_dms.file'].search([
+            ('of_attachment_partner_id', 'child_of', request.env.user.partner_id.id)
+        ])
+        values.update({
+            'documents': document_ids,
+        })
+        return request.render('of_website_portal.of_website_portal_portal_my_documents', values)
 
     @http.route(['/my/of_contracts'], type='http', auth='user', website=True)
     def portal_my_of_contracts(self):

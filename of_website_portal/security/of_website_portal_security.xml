@@ -26,4 +26,37 @@
         <field name="groups" eval="[(4, ref('base.group_public')), (4, ref('base.group_portal'))]"/>
     </record>
 
+    <record id="of_document_website_dms_data_database_published_portal_rule" model="ir.rule">
+        <field name="name">OF Document Website DMS Data Database Published Portal</field>
+        <field name="model_id" ref="muk_dms.model_muk_dms_data_database"/>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="domain_force">[('of_website_published', '=', True)]</field>
+    </record>
+
+    <record id="of_document_website_dms_file_published_rule" model="ir.rule">
+        <field name="name">OF Document Website DMS File Published</field>
+        <field name="model_id" ref="muk_dms.model_muk_dms_file"/>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="domain_force">[('of_website_published', '=', True), ('of_attachment_partner_id', 'in', [False, user.partner_id.id])]</field>
+    </record>
+
+    <record id="of_document_website_dms_file_published_public_rule" model="ir.rule">
+        <field name="name">OF Document Website DMS File Published</field>
+        <field name="model_id" ref="muk_dms.model_muk_dms_file"/>
+        <field name="groups" eval="[(4, ref('base.group_public'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="domain_force">[('of_website_published', '=', True), ('of_attachment_partner_id', '=', False)]</field>
+    </record>
+
 </odoo>

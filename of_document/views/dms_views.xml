@@ -1,6 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <record id="muk_dms.action_dms_file" model="ir.actions.act_window">
+        <field name="view_mode">tree,kanban,form</field>
+    </record>
+
+    <record id="of_muk_dms_directory_template_view_tree" model="ir.ui.view">
+        <field name="name">of.muk.dms.directory.template.view.tree</field>
+        <field name="model">of.muk.dms.directory.template</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="data_ids" widget="many2many_tags"/>
+                <field name="parent_id" context="{'default_muk_setting_id': active_id}"/>
+                <field name="muk_setting_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_muk_dms_directory_template_view_form" model="ir.ui.view">
+        <field name="name">of.muk.dms.directory.template.view.form</field>
+        <field name="model">of.muk.dms.directory.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <label for="name" class="oe_edit_only" />
+                    <h1>
+                        <field name="name" />
+                    </h1>
+                    <group>
+                        <field name="parent_id" context="{'default_muk_setting_id': active_id}"/>
+                        <field name="muk_setting_id" invisible="1"/>
+                    </group>
+                    <label for="data_ids"/>
+                    <field name="data_ids" nolabel="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_document_view_dms_settings_form" model="ir.ui.view">
+        <field name="name">of.document.view.dms.settings.form</field>
+        <field name="model">muk_dms.settings</field>
+        <field name="inherit_id" ref="muk_dms.view_dms_settings_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//h1" position="after">
+                <group>
+                    <field name="of_default_template"/>
+                </group>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Modèle de répertoires" name="template_directory">
+                    <group>
+                        <field name="of_source_directory_id"/>
+                    </group>
+                    <label for="of_subdirectory_ids"/>
+                    <field name="of_subdirectory_ids" nolabel="1"/>
+                    <button string="Mettre à jour l'arborescence de la GED" name="action_init_files" type="object"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
     <!-- DMS File Views -->
 
     <record id="of_document_dms_file_form_view" model="ir.ui.view">
@@ -43,6 +104,17 @@
             <xpath expr="//field[@name='path']" position="after">
                 <field name="of_category_id"/>
                 <field name="of_tag_ids"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_document_dms_directory_form_view" model="ir.ui.view">
+        <field name="name">of.document.dms.directory.form.view</field>
+        <field name="model">muk_dms.directory</field>
+        <field name="inherit_id" ref="muk_dms.view_dms_directory_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='count_files']" position="before">
+                <field name="of_partner_id"/>
             </xpath>
         </field>
     </record>
