@@ -1901,12 +1901,6 @@ msgid "Taxes et facturation"
 msgstr "Taxes et facturation"
 
 #. module: of_sale
-#: code:addons/of_sale/models/sale_config_settings.py:223
-#, python-format
-msgid "This setting can only be enabled by the administrator, please contact support to enable this option."
-msgstr "Ce paramètre ne peut être activé que par l'administrateur, veuillez contacter le support pour activer cette option."
-
-#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_of_specific_title
 msgid "Titre spécifique"
 msgstr "Titre spécifique"
