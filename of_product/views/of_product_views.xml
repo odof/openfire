@@ -73,6 +73,9 @@
                     <separator string="Description du fabricant" colspan="4"/>
                     <field name="description_fabricant" colspan="4" nolabel="1"
                         placeholder="Cette note correspond à la description du produit par son fabricant."/>
+                    <separator string="URL" colspan="4"/>
+                    <field name="of_url" colspan="4" nolabel="1" widget="url"
+                        placeholder="Ce champ permet d'accéder à la page web du produit."/>
                 </xpath>
                 <xpath expr="//notebook//page[@name='notes']" position="before">
                     <page string="Technique" name="technique" invisible="1"/>
