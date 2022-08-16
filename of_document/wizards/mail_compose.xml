@@ -5,6 +5,7 @@
         <field name="name">of.document.mail.compose.message.form</field>
         <field name="model">mail.compose.message</field>
         <field name="inherit_id" ref="mail.email_compose_message_wizard_form"/>
+        <field name="groups_id" eval="[(6, False, [ref('muk_dms.group_dms_user')])]"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='template_id']/.." position="after">
                 <group>
