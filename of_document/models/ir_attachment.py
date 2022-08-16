@@ -11,7 +11,7 @@ class IrAttachment(models.Model):
     def create(self, values):
         res = super(IrAttachment, self).create(values)
         if res.res_model and not res.res_field:
-            default_settings = self.env.ref('of_document.default_settings')
+            default_settings = self.env.ref('of_document.default_settings').sudo()
             data_ids = default_settings.of_subdirectory_ids.mapped('data_ids')
             dms_dir_obj = self.env['muk_dms.directory']
             dms_file_obj = self.env['muk_dms.file']

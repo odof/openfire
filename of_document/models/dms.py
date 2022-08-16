@@ -60,7 +60,7 @@ class Directory(dms_base.DMSModel):
         if not top_partner_dir:
             parent_dir = self.of_get_partner_parent_directory(top_partner)
             # Create partner directory
-            top_partner_dir = self.create({
+            top_partner_dir = self.sudo().create({
                 'name': top_partner.name,
                 'parent_directory': parent_dir.id,
                 'of_partner_id': top_partner.id})
@@ -82,7 +82,7 @@ class Directory(dms_base.DMSModel):
         ], limit=1)
         if not object_dir:
             # Create object directory
-            object_dir = self.create({
+            object_dir = self.sudo().create({
                 'name': data.name,
                 'parent_directory': partner_dir.id,
             })

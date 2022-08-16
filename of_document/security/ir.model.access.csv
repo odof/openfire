@@ -1,3 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_of_document_file_category,access.of.document.file.category,model_of_document_file_category,,1,1,1,1
 access_of_document_file_tag,access.of.document.file.tag,model_of_document_file_tag,,1,1,1,1
+access_of_muk_dms_directory_template_user,access.of.muk.dms.directory.template.user,model_of_muk_dms_directory_template,muk_dms.group_dms_user,1,0,0,0
+access_of_muk_dms_directory_template_admin,access.of.muk.dms.directory.template.admin,model_of_muk_dms_directory_template,muk_dms.group_dms_admin,1,1,1,1
