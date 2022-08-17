@@ -14,4 +14,16 @@
         </field>
     </record>
 
+    <record id="of_sale_order_kit_view_form" model="ir.ui.view">
+        <field name="name">of.partner.fuel.sale.order.kit.view.form</field>
+        <field name="model">of.saleorder.kit</field>
+        <field name="inherit_id" ref="of_kit.of_sale_order_kit_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='kit_line_ids']/tree" position="inside">
+                <field name="of_storage_readonly" invisible="1"/>
+                <field name="of_storage" attrs="{'readonly': [('of_storage_readonly', '=', True)]}"/>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>

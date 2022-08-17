@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 {
     'name': u"OpenFire / État de stock de combustible pour les clients",
-    'version': "10.0.1.0.0",
-    'author': "OpenFire",
-    'license': "",
-    'category': "OpenFire",
+    'version': '10.0.1.0.0',
+    'license': 'AGPL-3',
+    'author': u"OpenFire",
+    'category': u"OpenFire",
     'description': u"""
 Module d'état de stock de combustible pour les clients
 ======================================================
 
 """,
-    'website': "www.openfire.fr",
+    'website': u"www.openfire.fr",
     'depends': [
         'of_base',
         'of_external',
-        'of_sale_quote_template',
+        'of_sale_quote_template_kit',
         'stock',
-        'product'
+        'product',
     ],
     'data': [
         'reports/external_report_templates.xml',
