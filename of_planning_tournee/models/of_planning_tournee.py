@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+import json
+import requests
 from odoo import api, models, fields
 from odoo.exceptions import ValidationError
+from odoo.tools import config
 
 
 class OfPlanningTournee(models.Model):
@@ -39,6 +42,11 @@ class OfPlanningTournee(models.Model):
         'of.planning.intervention', 'of_planning_intervention_of_planning_tournee_rel', 'tournee_id', 'intervention_id',
         string='Interventions')
     intervention_map_ids = fields.One2many('of.planning.intervention', compute="_compute_intervention_map_ids")
+    tour_line_ids = fields.One2many(
+        comodel_name='of.planning.tournee.line', inverse_name='tour_id', string='Tour lines')
+    map_tour_line_ids = fields.One2many(
+        comodel_name='of.planning.tournee.line', inverse_name='tour_id', string='Tour lines')
+    osrm_route_steps = fields.Text(string='OSRM route steps')
 
     _sql_constraints = [
         ('date_employee_uniq', 'unique (date,employee_id)',
@@ -177,6 +185,61 @@ class OfPlanningTournee(models.Model):
                     raise ValidationError(u'Il existe déjà des interventions dans la journée pour cet intervenant.')
         return super(OfPlanningTournee, self).write(vals)
 
+    def _send_osrm_request(self):
+        routing_base_url = config.get("of_routing_base_url", "")
+        routing_version = config.get("of_routing_version", "")
+        routing_profile = config.get("of_routing_profile", "")
+        if not (routing_base_url and routing_version and routing_profile):
+            return {}
+        osrm_url = routing_base_url + "route/" + routing_version + "/" + routing_profile + "/"
+        # start points
+        start_address = self.address_depart_id
+        if not start_address:
+            start_address = self.employee_id.of_address_depart_id
+        coords_str = "%s,%s" % (start_address.geo_lng, start_address.geo_lat)
+        # get intervention points from the tour lines
+        for line in self.tour_line_ids:
+            coords_str += ";%s,%s" % (line.geo_lng, line.geo_lat)
+        # end points
+        stop_address = self.address_retour_id
+        if not stop_address:
+            stop_address = self.employee_id.of_address_retour_id
+        coords_str += ";%s,%s" % (stop_address.geo_lng, stop_address.geo_lat)
+        # request
+        full_query = osrm_url + coords_str + "?geometries=geojson&steps=true&overview=false"
+        try:
+            req = requests.get(full_query, timeout=10)
+            res = req.json()
+        except Exception:
+            res = {}
+        return res
+
+    @api.multi
+    def action_compute_osrm_steps(self):
+        for tour in self:
+            steps = []
+            if not tour.intervention_map_ids:
+                return steps
+            if not tour.tour_line_ids:
+                tour.update_tour_lines()
+            for line in tour.tour_line_ids:
+                line._get_osrm_steps()
+
+    @api.multi
+    def _prepare_tour_line(self, intervention):
+        self.ensure_one()
+        return {
+            'tour_': self.id,
+            'intervention_id': intervention.id,
+        }
+
+    @api.multi
+    def update_tour_lines(self):
+        for tour in self:
+            tour.tour_line_ids.unlink()
+            lines = [(0, 0, tour._prepare_tour_line(intervention)) for intervention in tour.intervention_ids]
+            tour.write({'tour_line_ids': lines})
+
     @api.model
     def get_color_map(self):
         if self._context.get('active_tour_id'):
@@ -187,3 +250,90 @@ class OfPlanningTournee(models.Model):
             v2 = {'label': u'Arrivée', 'value': 'red'}
             return {"title": title, "values": (v0, v1, v2)}
         return None
+
+
+class OFPlanningTourneeLine(models.Model):
+    _name = 'of.planning.tournee.line'
+    _description = 'Tour lines'
+    _order = 'tour_id, date_start'
+
+    tour_id = fields.Many2one(comodel_name='of.planning.tournee', string='Tour', required=True, ondelete='cascade')
+    intervention_id = fields.Many2one(
+        comodel_name='of.planning.intervention', string='intervention', required=True, ondelete='cascade')
+    osrm_steps = fields.Text('OSRM steps')
+    geojson_data = fields.Text('Geojson data')
+    # Related fields from intervention
+    date_start = fields.Datetime(
+        related='intervention_id.date', string='Start date', readonly=True, store=True)
+    employee_ids = fields.Many2many(related='intervention_id.employee_ids', string='Employees', readonly=True)
+    city = fields.Char(related='intervention_id.address_city', string='City', readonly=True)
+    duration = fields.Float(related='intervention_id.duree', string='Duration', readonly=True)
+    geo_lat = fields.Float(related='intervention_id.geo_lat', readonly=True)
+    geo_lng = fields.Float(related='intervention_id.geo_lng', readonly=True)
+    previous_geo_lat = fields.Float('Latitude of the previous point', compute='_compute_previous_coordinates')
+    previous_geo_lng = fields.Float('Longitude of the previous point', compute='_compute_previous_coordinates')
+    tache_name = fields.Char(related='intervention_id.tache_id.name', readonly=True)
+    partner_name = fields.Char(related='intervention_id.partner_id.name')
+    address_city = fields.Char(
+        related='intervention_id.address_id.city', string="Ville", oldname="partner_city", readonly=True)
+    address_zip = fields.Char(related='intervention_id.address_id.zip', readonly=True)
+    partner_phone = fields.Char(related='intervention_id.partner_id.phone', readonly=True)
+    partner_mobile = fields.Char(related='intervention_id.partner_id.mobile', readonly=True)
+    map_color_tour = fields.Char(related='intervention_id.map_color_tour', string='Color')
+    tour_number = fields.Char(related='intervention_id.tour_number', string='Tour number')
+    first_address_tour = fields.Boolean(
+        related='intervention_id.first_address_tour', string='Is the first address of the Tour ?')
+    last_address_tour = fields.Boolean(
+        related='intervention_id.last_address_tour', string='Is the last address of the Tour ?')
+
+    @api.multi
+    def _compute_previous_coordinates(self):
+        for line in self:
+            # lines are sorted by dates (date_start)
+            previous_line = line.search([('tour_id', '=', line.tour_id.id), ('id', '<', line.id)], limit=1)
+            if previous_line:
+                geo_lat = previous_line.geo_lat
+                geo_lng = previous_line.geo_lng
+            else:
+                geo_lat = False
+                geo_lng = False
+            line.previous_geo_lat = geo_lat
+            line.previous_geo_lng = geo_lng
+
+    def _get_osrm_steps(self):
+        self.ensure_one()
+        steps = False
+        geojson_data = False
+        routing_base_url = config.get("of_routing_base_url", "")
+        routing_version = config.get("of_routing_version", "")
+        routing_profile = config.get("of_routing_profile", "")
+        if not (routing_base_url and routing_version and routing_profile) or (
+                not self.geo_lat or not self.geo_lng) or (not self.previous_geo_lat or not self.previous_geo_lng):
+            return {}
+        osrm_url = routing_base_url + "route/" + routing_version + "/" + routing_profile + "/"
+        coords_str = "%s,%s;%s,%s" % (self.previous_geo_lng, self.previous_geo_lat, self.geo_lng, self.geo_lat)
+        # request
+        full_query = osrm_url + coords_str + "?geometries=geojson&steps=true&overview=false"
+        try:
+            req = requests.get(full_query, timeout=10)
+            res = req.json()
+        except Exception:
+            res = {}
+        if res.get('routes'):
+            route = res['routes'][0]
+            legs = route['legs']
+            steps = legs[0]['steps']
+            geojson_data = [step['geometry'] for step in steps]
+            geojson_data = json.dumps(geojson_data)
+        self.osrm_steps = steps
+        self.geojson_data = geojson_data
+        return res
+
+    @api.model
+    def custom_get_color_map(self):
+        title = ""
+        # gold is easier to read than yellow on the legend with a white background
+        v0 = {'label': u"Première intervention", 'value': 'gold'}
+        v1 = {'label': u'Intervention(s)', 'value': 'blue'}
+        v2 = {'label': u'Dernière intervention', 'value': 'red'}
+        return {"title": title, "values": (v0, v1, v2)}

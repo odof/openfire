@@ -95,6 +95,7 @@ var MapView = View.extend({
         this.tour_number = this.fields_view.arch.attrs.number_field;
         this.last_address = this.fields_view.arch.attrs.is_last_field;
         this.hide_pager = this.fields_view.arch.attrs.hide_pager || '0';
+        this.geojson_data = this.fields_view.arch.attrs.geojson_data || '0';
         this.name = "" + this.fields_view.arch.attrs.string;
         this.legend_context = JSON.parse(this.fields_view.arch.attrs.legend_context || "{}");
         this.fields = this.fields_view.fields;
@@ -146,9 +147,11 @@ var MapView = View.extend({
         this.record_options.latitude_field = this.lat_field;
         this.record_options.longitude_field = this.lng_field;
         this.record_options.number_field = this.tour_number;
+        this.record_options.geojson_data = this.geojson_data;
         this.record_options.intervention_to_preview = this.intervention_to_preview;
         this.record_options.is_last_field = this.last_address;
         this.record_options.color_field = this.fields_view.arch.attrs.color_field;
+        this.record_options.draw_routes = this.fields_view.arch.attrs.draw_routes || '0';
         this.record_options.connect_markers = this.fields_view.arch.attrs.connect_markers || '0';
     },
     init_displayer_options: function() {
@@ -1033,8 +1036,9 @@ MapView.LayerGroup = Widget.extend({
             this.the_layer.clearLayers();
         }
         this.the_layer = new L.LayerGroup();
-        var lat, lng, marker, icon, id, number, currentMarker;
+        var lat, lng, marker, icon, id, number, geojson, currentMarker;
         const latlngs = [];
+        const geojsonLines = [];
         for (var i=0; i<this.records.length; i++) {
             //console.log(this.records[i]);
             if (this.records[i] == undefined || this.records[i].rendered) {
@@ -1042,7 +1046,11 @@ MapView.LayerGroup = Widget.extend({
             }
             lat = this.records[i][this.options.latitude_field];
             lng = this.records[i][this.options.longitude_field];
+            geojson = this.records[i][this.options.geojson_data];
             latlngs.push([lat, lng]);
+            if (geojson) {
+                geojsonLines.push(JSON.parse(geojson));
+            }
             number = this.records[i][this.options.number_field] || false;
             if (this.options.custom_icon) {
                 var options = this.options.icon_options.unselected;
@@ -1084,6 +1092,9 @@ MapView.LayerGroup = Widget.extend({
             this.visible = true;
             if (this.options.connect_markers == '1' && latlngs.length > 0) {
                 this.do_connect_dot(latlngs);  // Add simple lines between the markers on the map
+            }
+            if (this.options.draw_routes == '1' && geojsonLines.length > 0) {
+                this.do_draw_draw_routes(geojsonLines);  // Draw routes get by the geojson data
             }
             this.do_show_range(this.map.view.current_min-1,false,true,set_bounds);
         }
@@ -1275,6 +1286,12 @@ MapView.LayerGroup = Widget.extend({
     },
     do_connect_dot: function (latlngs) {
         L.polyline(latlngs, {color: '#0066cc'}).addTo(this.map.the_map);
+    },
+    do_draw_draw_routes: function (geojsonLines) {
+        var self = this;
+        geojsonLines.forEach(function(geoline) { 
+            L.geoJSON(geoline).addTo(self.map.the_map);
+        });
     },
     /**
      *  Override method from Widget.

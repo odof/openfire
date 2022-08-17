@@ -121,6 +121,16 @@ class OfPlanningIntervention(models.Model):
             self.sudo().remove_tournees(date_list, employee_ids)
         return True
 
+    @api.multi
+    def name_get(self):
+        if not self._context.get('from_tour', False):
+            return super(OfPlanningIntervention, self).name_get()
+        result = []
+        for record in self:
+            name_intervention = '%s - %s' % (record.type_id.name or record.name, record.address_id.name)
+            result.append((record.id, name_intervention))
+        return result
+
     # Autres
 
     @api.model
