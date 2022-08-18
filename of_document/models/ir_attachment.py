@@ -57,6 +57,6 @@ class IrAttachment(models.Model):
             dms_dirs = dms_files_to_delete.mapped('directory')
             dms_files_to_delete.unlink()
             # Delete DMS directory if no file left
-            dms_dirs.filtered(lambda directory: not directory.files).unlink()
+            dms_dirs.filtered(lambda directory: not directory.files and not directory.child_directories).unlink()
 
         return res
