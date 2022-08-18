@@ -363,12 +363,16 @@ class SaleOrder(models.Model):
                 'Please check the following activities :\n%s') % (''.join(map(
                     lambda ma: ma and '- %s\n' % ma, mandatory_activities))))
         res = super(SaleOrder, self).action_confirm()
+        self.update_of_customer_state()
+        return res
+
+    @api.multi
+    def update_of_customer_state(self):
         partners = self.env['res.partner']
         for order in self:
             if order.partner_id.of_customer_state == 'lead' and order.partner_id not in partners:
                 partners += order.partner_id
-        partners.write({'of_customer_state': 'customer'})
-        return res
+        partners and partners.write({'of_customer_state': 'customer'})
 
     @api.multi
     def action_confirm_estimation(self):
@@ -473,13 +477,17 @@ class AccountInvoice(models.Model):
     @api.multi
     def invoice_validate(self):
         res = super(AccountInvoice, self).invoice_validate()
+        self.update_of_customer_state()
+        return res
+
+    @api.multi
+    def update_of_customer_state(self):
         partners = self.env['res.partner']
         for invoice in self:
             if invoice.partner_id.of_customer_state == 'lead' and invoice.partner_id not in partners and \
                     invoice.partner_id.customer:
                 partners += invoice.partner_id
-        partners.write({'of_customer_state': 'customer'})
-        return res
+        partners and partners.write({'of_customer_state': 'customer'})
 
 
 class SaleConfiguration(models.TransientModel):
