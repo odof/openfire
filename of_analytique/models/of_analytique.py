@@ -42,7 +42,7 @@ class SaleOrder(models.Model):
                     'partner_id': partner.id
                 })
                 order.project_id = analytic
-        super(SaleOrder, self).action_confirm()
+        return super(SaleOrder, self).action_confirm()
 
 
 class OFSaleConfiguration(models.TransientModel):

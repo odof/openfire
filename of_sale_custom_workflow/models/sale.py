@@ -6,17 +6,21 @@ from odoo import models, fields, api
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    state = fields.Selection(selection=[
-        ('draft', u"Estimation"),
-        ('sent', u"Devis"),
-        ('presale', u"Bon de commande"),
-        ('sale', u"Commande enregistrée"),
-        ('done', u"Verrouillé"),
-        ('cancel', u"Annulé"),
-        ('closed', u"Clôturé"),
-    ])
+    state = fields.Selection(selection='_get_sale_order_state_selection')
     of_custom_confirmation_date = fields.Datetime(string=u"Date de confirmation")
     confirmation_date = fields.Datetime(string=u"Date d'enregistrement")
+
+    @api.model
+    def _get_sale_order_state_selection(self):
+        return [
+            ('draft', u"Estimation"),
+            ('sent', u"Devis"),
+            ('presale', u"Bon de commande"),
+            ('sale', u"Commande enregistrée"),
+            ('done', u"Verrouillé"),
+            ('cancel', u"Annulé"),
+            ('closed', u"Clôturé"),
+        ]
 
     @api.depends('state', 'order_line.invoice_status', 'of_force_invoice_status', 'of_cancelled_order_id',
                  'of_cancellation_order_id')

@@ -92,13 +92,7 @@ class SaleOrder(models.Model):
     medium_id = fields.Many2one(
         'utm.medium', 'Medium', copy=False, help="This is the method of delivery.Ex: Postcard, Email, or Banner Ad",
         oldname='channel_id')
-    state = fields.Selection([
-        ('draft', u'Estimation'),
-        ('sent', u'Devis'),
-        ('sale', u'Bon de commande'),
-        ('done', u'Verrouillé'),
-        ('cancel', u'Annulé'),
-    ], default=_default_state)
+    state = fields.Selection(selection='_get_sale_order_state_selection', default=_default_state)
     of_sent_quotation = fields.Boolean(string=u"Devis envoyé")
     of_canvasser_id = fields.Many2one(comodel_name='res.users', string=u"Prospecteur")
     of_crm_activity_ids = fields.One2many(
@@ -124,6 +118,16 @@ class SaleOrder(models.Model):
     of_main_product_brand_id = fields.Many2one(
         comodel_name='of.product.brand', compute='_of_compute_main_product_brand_id',
         string="Brand of the main product", store=True)
+
+    @api.model
+    def _get_sale_order_state_selection(self):
+        return [
+            ('draft', u'Estimation'),
+            ('sent', u'Devis'),
+            ('sale', u'Bon de commande'),
+            ('done', u'Verrouillé'),
+            ('cancel', u'Annulé'),
+        ]
 
     @api.multi
     @api.depends('of_force_laying_date', 'of_manual_laying_date', 'intervention_ids',

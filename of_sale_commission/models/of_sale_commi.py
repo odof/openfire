@@ -664,7 +664,7 @@ class SaleOrder(models.Model):
 
     @api.multi
     def action_confirm(self):
-        super(SaleOrder, self).action_confirm()
+        res = super(SaleOrder, self).action_confirm()
 
         commi_obj = self.env['of.sale.commi'].sudo()
 
@@ -690,7 +690,7 @@ class SaleOrder(models.Model):
                     commi.create_lines(order.order_line)
 
         self.of_verif_acomptes()
-        return True
+        return res
 
     @api.multi
     def _prepare_invoice(self):
