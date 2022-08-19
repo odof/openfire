@@ -44,7 +44,7 @@ class OFResPartnerFuelStock(models.Model):
                 lambda l: l.of_storage and
                 (l.product_id == self.product_id or
                  (l.of_is_kit and
-                  l.kit_id.kit_line_ids.mapped('product_id').filtered(lambda p: p == self.product_id)))).\
+                  l.kit_id.kit_line_ids.filtered(lambda kl: kl.product_id == self.product_id and kl.of_storage)))).\
                 mapped('order_id')
             fuel_stock.order_ids = orders
             fuel_stock.order_count = len(orders.filtered(lambda o: o.state in ('sale', 'done')))
