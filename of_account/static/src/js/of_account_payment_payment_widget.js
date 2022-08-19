@@ -45,6 +45,7 @@ var ShowPaymentLineWidget = form_common.AbstractField.extend({
                             'currency': info.content[v].currency,
                             'position': info.content[v].position,
                             'payment_id': info.content[v].payment_id,
+                            'payment_state': info.payment_state,
                             'move_id': info.content[v].move_id,
                             'ref': info.content[v].ref,
                             }),

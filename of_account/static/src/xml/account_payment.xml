@@ -77,6 +77,7 @@
             </table>
         </div>
         <button class="btn btn-xs btn-primary js_unreconcile_payment pull-left"
+                t-if="payment_state != 'cancel'"
                 t-att-payment-id="payment_id" style="margin-top:5px; margin-bottom:5px;">Unreconcile</button>
         <button class="btn btn-xs btn-default js_open_payment pull-right"
                 t-att-move-id="move_id" style="margin-top:5px; margin-bottom:5px;">Ouvrir la pièce</button>
