@@ -661,6 +661,13 @@ class AccountMoveLine(models.Model):
                     pass
         return res
 
+    @api.multi
+    def remove_move_reconcile(self):
+        for move_line in self:
+            if move_line.payment_id.state == 'cancel':
+                raise UserError(_(u"Vous ne pouvez pas annuler le lettrage d'un paiement annulé"))
+        return super(AccountMoveLine, self).remove_move_reconcile()
+
     # Lors d'une saisie d'une pièce comptable, pour préremplir le compte de tiers du partenaire saisi
     # (première ligne uniquement).
     @api.onchange('partner_id')

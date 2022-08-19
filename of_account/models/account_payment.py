@@ -188,7 +188,7 @@ class AccountPayment(models.Model):
     def _get_payment_info_json(self):
         self.payments_widget = json.dumps(False)
         if self.payment_move_line_ids:
-            info = {'title': _('Less Payment'), 'outstanding': False, 'content': []}
+            info = {'title': _('Less Payment'), 'outstanding': False, 'payment_state': self.state, 'content': []}
             currency_id = self.currency_id
             for payment in self.payment_move_line_ids:
                 payment_currency_id = False

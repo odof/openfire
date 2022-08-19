@@ -146,6 +146,7 @@ class OFAccountPaymentWizard(models.TransientModel):
                     for move in payment.move_line_ids.mapped('move_id'):
                         rev_move = move.create_reversals(date=fields.Date.today(), reconcile=True)
                         rev_move.ref = form.description or move.name
+                        rev_move.line_ids.write({'payment_id': payment.id})
                     payment.state = 'cancel'
                     # L'annulation a été faite.
                     # On va à la liste des paiements clients ou fournisseurs (appel de l'action).
@@ -159,5 +160,6 @@ class OFAccountPaymentWizard(models.TransientModel):
                     for move in payment.move_line_ids.mapped('move_id'):
                         rev_move = move.create_reversals(reconcile=True)
                         rev_move.ref = form.description or move.name
+                        rev_move.line_ids.write({'payment_id': payment.id})
                     payment.state = 'cancel'
                     return self.get_action_payment_form(payment, 'modify')
