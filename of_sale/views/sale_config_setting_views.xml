@@ -7,9 +7,6 @@
         <field name="model">sale.config.settings</field>
         <field name="inherit_id" ref="sale.view_sales_config"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='module_sale_margin']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
             <xpath expr="//group[@name='quotations_sales']" position="attributes">
                 <attribute name="string">Quotations &amp; Orders</attribute>
             </xpath>
@@ -37,7 +34,7 @@
             </xpath>
             <xpath expr="//field[@name='group_product_pricelist']/.." position="after">
                 <field name="group_discount_per_so_line" widget="radio"/>
-                <field name="module_sale_margin" widget="radio"/>
+                <field name="module_sale_margin" widget="radio" invisible="1"/>
             </xpath>
 
             <!-- Quotations & Sales -->
