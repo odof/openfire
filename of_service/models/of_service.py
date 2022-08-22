@@ -1449,7 +1449,6 @@ class OfServiceLine(models.Model):
             line_account = tax.map_account(line_account)
 
         line_name = self.name or product.name_get()[0][1]
-        print self.name
         return {
                    'name': line_name,
                    'account_id': line_account.id,
