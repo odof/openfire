@@ -20,6 +20,7 @@ class OFSaleFollowupTag(models.Model):
             ir_config_obj.set_param('of.sale.followup.tag.data.loaded', 'True')
         return res
 
+    sequence = fields.Integer(string='Sequence', required=True, default=1)
     name = fields.Char(string='Name', required=True)
     color = fields.Integer(string='Color')
 

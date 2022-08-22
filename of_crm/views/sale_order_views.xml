@@ -53,11 +53,12 @@
                             </group>
                             <group colspan="4">
                                 <field name="of_crm_activity_ids" nolabel="1" options="{'reload_on_button': True}"
-                                        context="{'default_order_id': active_id, 'default_origin': 'sale_order', 'form_view_ref':'of_crm.of_crm_activity_from_sale_form_view'}">
-                                    <tree string="Activities" decoration-muted="state=='canceled'" decoration-danger="is_late">
+                                        context="{'active_test': False, 'default_order_id': active_id, 'default_partner_id': partner_id, 'default_origin': 'sale_order', 'form_view_ref':'of_crm.of_crm_activity_from_sale_form_view'}">
+                                    <tree string="Activities" decoration-muted="state=='canceled' or not active" decoration-danger="is_late">
                                         <field name="origin" invisible="1"/>
                                         <field name="is_late" invisible="1"/>
                                         <field name="active" invisible="1"/>
+                                        <field name="trigger_type" invisible="1"/>
                                         <field name="load_attachment" invisible="1"/>
                                         <field name="uploaded_attachment_id" invisible="1"/>
                                         <field name="user_id" invisible="1"/>

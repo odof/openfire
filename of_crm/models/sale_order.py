@@ -41,10 +41,6 @@ class SaleOrder(models.Model):
                 "AND column_name = 'of_canvasser_id'" % self._table)
             new_canvasser_field = not bool(cr.fetchall())
 
-        # migrate the value of the selection field for the activities state: 'cancelled' -> 'canceled'
-        cr.execute('SELECT id FROM sale_order WHERE of_activities_state = %s', ('cancelled',))
-        orders_to_update = cr.fetchall()
-
         res = super(SaleOrder, self)._auto_init()
 
         if new_workflow:
@@ -64,10 +60,6 @@ class SaleOrder(models.Model):
                 "LEFT JOIN crm_lead CL ON (CL.id = SO2.opportunity_id) "
                 "WHERE SO.id = SO2.id" % (self._table, self._table))
 
-        if orders_to_update:
-            # update the Sales Order with the correct value 'canceled'
-            order_ids = [order_id[0] for order_id in orders_to_update]
-            cr.execute("UPDATE sale_order SET of_activities_state = 'canceled' WHERE id IN %s", (tuple(order_ids),))
         return res
 
     @api.model
@@ -313,7 +305,8 @@ class SaleOrder(models.Model):
             lead = self.env['crm.lead'].browse(vals['opportunity_id'])
             # on connecte la commande aux RDV plutôt que l'inverse car plus facile de toucher un M2O qu'un O2M
             lead.of_intervention_ids.write({'order_id': order.id})
-
+        # activate and deactivate activities
+        order.deactivate_activities_triggered_later()
         # Check if the dict of values contains fields that will trigger the recompute of the deadline date of
         # the activities.
         activity_fields = filter(
@@ -329,6 +322,9 @@ class SaleOrder(models.Model):
         if values.get('state', False) == 'draft' and start_state == 'quotation':
             values.update(state='sent')
         res = super(SaleOrder, self).write(values)
+        if values.get('of_crm_activity_ids'):
+            self.filtered(
+                lambda o: o.state not in ['sale', 'cancel', 'done']).deactivate_activities_triggered_later()
         if values.get('opportunity_id') and len(self) == 1:
             lead = self.env['crm.lead'].browse(values['opportunity_id'])
             # on connecte la commande aux RDV plutôt que l'inverse car plus facile de toucher un M2O qu'un O2M
@@ -349,7 +345,8 @@ class SaleOrder(models.Model):
 
     def _of_not_done_mandatory_activities(self):
         return self.mapped('of_crm_activity_ids').filtered(
-            lambda act: act.type_id and act.type_id.of_mandatory and act.state == 'planned').mapped('title')
+            lambda act: act.type_id and act.type_id.of_mandatory and act.state == 'planned' and act.active
+        ).mapped('title')
 
     @api.multi
     def action_confirm(self):
@@ -364,6 +361,7 @@ class SaleOrder(models.Model):
                     lambda ma: ma and '- %s\n' % ma, mandatory_activities))))
         res = super(SaleOrder, self).action_confirm()
         self.update_of_customer_state()
+        self.activate_activities_triggered_at_confirmation()
         return res
 
     @api.multi
@@ -373,6 +371,19 @@ class SaleOrder(models.Model):
             if order.partner_id.of_customer_state == 'lead' and order.partner_id not in partners:
                 partners += order.partner_id
         partners and partners.write({'of_customer_state': 'customer'})
+
+    @api.multi
+    def action_draft(self):
+        res = super(SaleOrder, self).action_draft()
+        self.mapped('of_crm_activity_ids').filtered(lambda a: a.state == 'canceled').action_plan()
+        self.deactivate_activities_triggered_later()
+        return res
+
+    @api.multi
+    def action_cancel(self):
+        res = super(SaleOrder, self).action_cancel()
+        self.mapped('of_crm_activity_ids').filtered(lambda a: a.state == 'planned').action_cancel()
+        return res
 
     @api.multi
     def action_confirm_estimation(self):
@@ -427,6 +438,29 @@ class SaleOrder(models.Model):
     def cron_recompute_activities_state(self):
         for order in self.search([('of_crm_activity_ids', '!=', False)]):
             order._compute_of_activities_state()
+
+    @api.multi
+    def _get_activities_to_deactivate_at_creation(self):
+        return self.mapped('of_crm_activity_ids').filtered(
+            lambda a: a.active and a.trigger_type and a.trigger_type != 'at_creation')
+
+    @api.multi
+    def _get_activities_to_activate_at_confirmation(self):
+        return self.mapped('of_crm_activity_ids').filtered(lambda a: not a.active and a.trigger_type == 'at_validation')
+
+    @api.multi
+    def deactivate_activities_triggered_later(self):
+        """Will deactivate the activities that are not in the list of activities to trigger at the creation.
+        That will hide all activities that are not to do yet.
+        The other activities will be activated later when the order will be confirmed for instance.
+        """
+        self._get_activities_to_deactivate_at_creation().write({'active': False})
+
+    @api.multi
+    def activate_activities_triggered_at_confirmation(self):
+        """Will activate the activities that are in the list of activities to trigger at the confirmation.
+        """
+        self._get_activities_to_activate_at_confirmation().write({'active': True})
 
 
 class SaleOrderLine(models.Model):
