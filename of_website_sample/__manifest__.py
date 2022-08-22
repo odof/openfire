@@ -8,7 +8,7 @@
     'description': u"""
 Module OpenFire pour e-commerce : Gestion des échantillons
 ==========================================================
-- Créé automatiquement un article échantillon sur les produits ou est coché of_sample_available
+- Crée automatiquement un article échantillon pour les articles sur lesquels est coché of_sample_available
 - Ajoute une séquence pour les échantillons
 - Ajoute un bouton de commande d'échantillon sur le shop
 - Modifie le comportement du panier
