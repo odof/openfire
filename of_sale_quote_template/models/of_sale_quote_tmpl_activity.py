@@ -29,6 +29,8 @@ class OFSaleQuoteTemplateActivity(models.Model):
         date_deadline = order_obj._of_get_sale_activity_date_deadline(
             order, self.activity_id, self.days, self.compute_date)
         user_id = order_obj._of_get_sale_activity_user_id(order, self.activity_id)
+        trigger_type = self.activity_id.of_trigger_type
+        active = trigger_type in [False, 'at_creation']
         return {
             'type_id': self.activity_id.id,
             'description': self.description,
@@ -41,7 +43,8 @@ class OFSaleQuoteTemplateActivity(models.Model):
             'load_attachment': self.activity_id.of_load_attachment,
             'order_id': order.id,
             'origin': 'sale_order',
-            'active': True
+            'trigger_type': trigger_type,
+            'active': active
         }
 
     @api.onchange('activity_id')

@@ -78,6 +78,7 @@ class OFFollowupProject(models.Model):
             return sql_set_str
 
         for order_id, order_values in order_values_to_upd.items():
+            partner_id = order_values.pop('partner_id')
             followup_tags_ids = order_values.pop('of_sale_followup_tag_ids')
             activities = order_values.pop('of_crm_activity_ids') if 'of_crm_activity_ids' in order_values else []
             order_upd_sql = "UPDATE sale_order " \
@@ -97,13 +98,13 @@ class OFFollowupProject(models.Model):
                     'INSERT INTO "of_crm_activity" ("create_uid", "uploaded_attachment_id", "type_id", '
                     '"user_id", "vendor_id", "description", "deadline_date", "sequence", "order_id", '
                     '"title", "write_uid", "state", "write_date", "report", "create_date", "load_attachment", '
-                    '"origin", "active") VALUES '
-                    '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now(), %s, now(), %s, %s, %s);',
+                    '"origin", "active", "partner_id", "trigger_type") VALUES '
+                    '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, now(), %s, now(), %s, %s, %s, %s, %s);',
                     (
                         activity['create_uid'], None, activity['activity_id'], activity['create_uid'],
                         activity['vendor_id'], activity['summary'], activity['date_deadline'] or None,
                         activity['sequence'], order_id, activity['summary'] or None, activity['write_uid'],
-                        activity['state'], None, False, 'sale_order', True
+                        activity['state'], None, False, 'sale_order', True, partner_id, 'at_creation'
                     )
                 )
 
@@ -162,6 +163,7 @@ class OFFollowupProject(models.Model):
             for task in followup_task_obj.browse(tasks_ids):
                 project = task.project_id
                 type_id = task.type_id.id
+                partner_id = project.order_id.partner_id.id or False
                 short_name = task.type_id.short_name
                 k = '%s,%s' % (type_id, short_name)
                 activity_state = 'planned'  # default value
@@ -169,7 +171,7 @@ class OFFollowupProject(models.Model):
                     activity_state = 'done'
                 if project:
                     if not project_data.get(project):
-                        project_data[project] = {'of_crm_activity_ids': []}
+                        project_data[project] = {'partner_id': partner_id, 'of_crm_activity_ids': []}
 
                     # try to preload the deadline date dependings on the current follow-up's stage
                     date_deadline = False

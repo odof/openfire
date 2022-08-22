@@ -381,9 +381,11 @@ class SaleOrder(models.Model):
             if not order.payment_term_id:
                 continue
 
+            date_invoice = order.invoice_status == 'invoiced' and order.invoice_ids and \
+                order.invoice_ids[0].date_invoice or False
             dates = {
                 'order': order.confirmation_date,
-                'invoice': order.invoice_status == 'invoiced' and order.invoice_ids[0].date_invoice,
+                'invoice': date_invoice,
                 'default': False,
             }
             force_dates = [echeance.date for echeance in order.of_echeance_line_ids]

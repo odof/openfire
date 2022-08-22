@@ -32,10 +32,10 @@
                             <field name="origin" invisible="1"/>
                             <field name="order_id" attrs="{'invisible':[('origin', '!=', 'sale_order')], 'required':[('origin', '=', 'sale_order')]}" />
                             <field name="opportunity_id" attrs="{'invisible':[('origin', '!=', 'opportunity')], 'required':[('origin', '=', 'opportunity')]}"/>
+                            <field name="partner_id"/>
                             <field name="type_id"/>
+                            <field name="trigger_type" attrs="{'invisible':[('origin', '!=', 'sale_order')], 'required':[('origin', '=', 'sale_order')]}"/>
                             <field name="title"/>
-                            <field name="partner_id" context="{'show_address': 1'}" options="{'always_reload': True}"
-                                   attrs="{'invisible':[('origin', '!=', 'opportunity')]}"/>
                             <field name="phone" widget="phone" attrs="{'invisible':[('origin', '!=', 'opportunity')]}"/>
                             <field name="mobile" widget="phone" attrs="{'invisible':[('origin', '!=', 'opportunity')]}"/>
                             <field name="email" string="Courriel" widget="email" attrs="{'invisible':[('origin', '!=', 'opportunity')]}"/>
@@ -72,6 +72,7 @@
         <field name="priority" eval="20"/>
         <field name="arch" type="xml">
             <form>
+                <field name="active" invisible="1"/>
                 <field name="load_attachment" invisible="1"/>
                 <field name="uploaded_attachment_id" invisible="1"/>
                 <header>
@@ -147,6 +148,7 @@
                         <field name="is_late" invisible="1"/>
                         <group>
                             <field name="type_id" domain="['|', ('of_object', '=', 'sale_order'), ('of_object', '=', False)]"/>
+                            <field name="trigger_type" required="1"/>
                             <field name="title"/>
                         </group>
                         <group>
@@ -178,8 +180,8 @@
                 <field name="is_late" invisible="1"/>
                 <field name="load_attachment" invisible="1"/>
                 <field name="uploaded_attachment_id" invisible="1"/>
-                <field name="partner_id"/>
                 <field name="opportunity_id"/>
+                <field name="partner_id"/>
                 <field name="title"/>
                 <field name="type_id"/>
                 <field name="date"/>
@@ -208,6 +210,7 @@
                 <field name="load_attachment" invisible="1"/>
                 <field name="uploaded_attachment_id" invisible="1"/>
                 <field name="order_id"/>
+                <field name="partner_id"/>
                 <field name="title"/>
                 <field name="type_id"/>
                 <field name="date"/>
@@ -264,6 +267,7 @@
                 <group expand="0" string="Group By" colspan="16">
                     <filter string="Opportunity" context="{'group_by':'opportunity_id'}"/>
                     <filter string="Order" domain="[]" context="{'group_by':'order_id'}"/>
+                    <filter string="Customer" domain="[]" context="{'group_by':'partner_id'}"/>
                     <filter string="Activity type" context="{'group_by':'type_id'}"/>
                     <filter string="Author" context="{'group_by':'user_id'}"/>
                     <filter string="Assigned to" domain="[]" context="{'group_by':'vendor_id'}"/>
