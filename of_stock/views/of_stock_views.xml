@@ -113,6 +113,12 @@
                 <field name="of_amount_untaxed" groups="of_stock.group_of_bon_transfert_valorise"
                        widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
             </xpath>
+            <xpath expr="//field[@name='pack_operation_product_ids']/tree/field[@name='product_id']" position="before">
+                <field name="of_editable_record" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='pack_operation_product_ids']/tree/field[@name='product_id']" position="attributes">
+                <attribute name="attrs">{'readonly': [('fresh_record', '=', False), ('of_editable_record', '=', False)]}</attribute>
+            </xpath>
         </field>
     </record>
 
