@@ -30,8 +30,10 @@ class SaleQuoteLine(models.Model):
 
     def get_saleorder_kit_data(self):
         res = super(SaleQuoteLine, self).get_saleorder_kit_data()
+        if not self.of_is_kit:
+            return {}
         if self.no_update:
-            for kit_line in res.get('kit_line_ids'):
+            for kit_line in res['kit_line_ids']:
                 if len(kit_line) >= 3 and kit_line[2] and kit_line[2]['product_id']:
                     quote_kit_line = self.kit_id.kit_line_ids.filtered(
                         lambda l: l.product_id.id == kit_line[2]['product_id'])
@@ -46,12 +48,12 @@ class SaleQuoteLine(models.Model):
                     kit_line[2]['of_storage_readonly'] = quote_kit_line.of_storage_readonly
         else:
             if self.of_storage:
-                for kit_line in res.get('kit_line_ids'):
+                for kit_line in res['kit_line_ids']:
                     if len(kit_line) >= 3 and kit_line[2] and kit_line[2]['product_id']:
                         product_id = self.env['product.product'].browse(kit_line[2]['product_id'])
                         kit_line[2]['of_storage'] = product_id.of_storage
             else:
-                for kit_line in res.get('kit_line_ids'):
+                for kit_line in res['kit_line_ids']:
                     if len(kit_line) >= 3 and kit_line[2] and kit_line[2]['product_id']:
                         kit_line[2]['of_storage_readonly'] = True
         return res
