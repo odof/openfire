@@ -36,8 +36,13 @@ class StockWarehouse(models.Model):
         # Pour les quants
         company_ids = res_company_obj.search([('of_is_stock_owner', '=', True)])
         for company_id in company_ids:
+            stock_included_companies = company_id.child_ids.filtered(lambda c: not c.of_is_stock_owner)
+            child_companies = stock_included_companies.mapped('child_ids').filtered(lambda c: not c.of_is_stock_owner)
+            while child_companies:
+                stock_included_companies += child_companies
+                child_companies = child_companies.mapped('child_ids').filtered(lambda c: not c.of_is_stock_owner)
             quants = stock_quant_obj.with_context(active_test=False).search(
-                [('company_id', 'child_of', company_id.ids)])
+                [('company_id', 'in', stock_included_companies.ids)])
             if quants:
                 quants.write({'company_id': company_id.id})
 
