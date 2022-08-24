@@ -281,8 +281,6 @@ class SaleQuoteLine(models.Model):
 
     def get_saleorder_kit_data(self):
         self.ensure_one()
-        if not self.of_is_kit:
-            return {}
         res = {'of_pricing': self.of_pricing}
         lines = [(5,)]
         base_vals = {}
@@ -325,16 +323,22 @@ class SaleOrder(models.Model):
         """ Permet d'ajouter les données liées aux kits dnas les lignes de commande
         """
         data = super(SaleOrder, self)._get_data_from_template(line, price, discount)
-        sale_kit_vals = line.get_saleorder_kit_data()
-        sale_kit_vals["qty_order_line"] = line.product_uom_qty
-        new_vals = self.env["of.saleorder.kit"].create(sale_kit_vals)
-        data.update({
-            'kit_id' : new_vals,
-            'of_is_kit' : line.of_is_kit,
-            'price_comps' : line.price_comps,
-            'of_pricing' : line.of_pricing,
-            'sale_kits_to_unlink' : line.sale_kits_to_unlink,
-        })
+        if line.of_is_kit:
+            sale_kit_vals = line.get_saleorder_kit_data()
+            sale_kit_vals["qty_order_line"] = line.product_uom_qty
+            new_vals = self.env["of.saleorder.kit"].create(sale_kit_vals)
+            data.update({
+                'kit_id': new_vals,
+                'of_is_kit': True,
+                'price_comps': line.price_comps,
+                'of_pricing': line.of_pricing,
+                'sale_kits_to_unlink': line.sale_kits_to_unlink,
+            })
+        else:
+            data.update({
+                'of_is_kit': False,
+                'of_pricing': 'fixed',
+            })
         return data
 
     def _compute_prices_from_template(self):

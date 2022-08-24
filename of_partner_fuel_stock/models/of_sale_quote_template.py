@@ -30,8 +30,6 @@ class SaleQuoteLine(models.Model):
 
     def get_saleorder_kit_data(self):
         res = super(SaleQuoteLine, self).get_saleorder_kit_data()
-        if not self.of_is_kit:
-            return {}
         if self.no_update:
             for kit_line in res['kit_line_ids']:
                 if len(kit_line) >= 3 and kit_line[2] and kit_line[2]['product_id']:
