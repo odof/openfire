@@ -112,6 +112,17 @@ def sanitize_text(text, allowed=''):
     return re.sub('[^0-9A-Za-z%s]' % allowed, '', text)
 
 
+def is_valid_url(of_url):
+    regex = re.compile(
+        r'^https?://'  # http:// or https://
+        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|'  # domain...
+        r'localhost|'  # localhost...
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+        r'(?::\d+)?'  # optional port
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+    return of_url is not None and regex.search(of_url)
+
+
 class BigInteger(fields.Integer):
     column_type = ('int8', 'int8')
 

@@ -20,7 +20,7 @@ Ce module apporte une personnalisation des produits :
     'depends': [
         'product',
         'purchase',
-        'of_base',  # forcer l'ordre de mise à jour
+        'of_utils',
     ],
     'data': [
         'views/of_product_views.xml',

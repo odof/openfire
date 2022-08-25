@@ -4,7 +4,7 @@
 from odoo import api, models, fields
 import odoo.addons.decimal_precision as dp
 from odoo.exceptions import UserError
-import re
+from odoo.addons.of_utils.models.of_utils import is_valid_url
 
 
 class ProductTemplate(models.Model):
@@ -87,6 +87,9 @@ class ProductTemplate(models.Model):
 
     @api.model
     def create(self, vals):
+        if vals.get('of_url') and not is_valid_url(vals['of_url']):
+            raise UserError(u"L'URL saisie n'est pas correcte !")
+
         if not vals.get('categ_id'):
             # Récupération de la catégorie par défaut, basée sur la fonction _get_default_category_id du module product
             # Ceci afin d'éviter des erreurs à l'installation de modules qui veulent créer des articles sans préciser
@@ -103,22 +106,10 @@ class ProductTemplate(models.Model):
 
     @api.multi
     def write(self, vals):
-        res = super(ProductTemplate, self).write(vals)
+        if vals.get('of_url') and not is_valid_url(vals['of_url']):
+            raise UserError(u"L'URL saisie n'est pas correcte !")
 
-        def is_valid_url(of_url):
-            regex = re.compile(
-                r'^https?://'  # http:// or https://
-                r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|'  # domain...
-                r'localhost|'  # localhost...
-                r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
-                r'(?::\d+)?'  # optional port
-                r'(?:/?|[/?]\S+)$', re.IGNORECASE)
-            return of_url is not None and regex.search(of_url)
-
-        if self.of_url:
-            if not is_valid_url(self.of_url):
-                raise UserError(u"L'URL saisie n'est pas correcte !")
-        return res
+        return super(ProductTemplate, self).write(vals)
 
 
 class ProductProduct(models.Model):
