@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import models, fields, api
 from datetime import datetime
@@ -143,7 +144,8 @@ class ProjectTask(models.Model):
             context = safe_eval(action['context'])
             context.update({
                 'default_address_id': self.partner_id and self.partner_id.id or False,
-                'default_task_id': self.id,
+                'default_duree': self.planned_hours,
+                'default_employee_ids': [(6, 0, self.user_id and self.user_id.employee_ids.ids)],
             })
             if self.of_intervention_ids:
                 context['force_date_start'] = self.of_intervention_ids[-1].date_date

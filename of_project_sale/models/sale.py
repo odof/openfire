@@ -1,4 +1,5 @@
 # -*- coding: utf8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import models, fields, api
 
@@ -22,7 +23,8 @@ class SaleOrder(models.Model):
                     'user_id': False,
                     'description': description,
                     'sale_line_id': line.id,
-                    'of_planning_tache_id': task.planning_tache_id and task.planning_tache_id.id,
+                    'of_planning_tache_id': task.planning_tache_id.id,
+                    'user_id': task.user_id.id,
                 })
         return values
 
