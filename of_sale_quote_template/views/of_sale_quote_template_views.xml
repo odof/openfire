@@ -299,11 +299,9 @@
             <xpath expr="//field[@name='partner_shipping_id']" position="after">
                 <field name="of_template_id" context="{'company_id': company_id}"
                     options="{'no_create': True, 'no_open': True}"/>
-                <xpath expr="//field[@name='of_template_id']" position="after">
-                    <button string="Charger les sections" name="load_sections"
-                            groups="of_sale_quote_template.group_of_advanced_sale_layout_category"
-                            type="object" attrs="{'invisible': [('of_template_id', '=', False)]}" icon="fa-download"/>
-                </xpath>
+                <button string="Charger les sections" name="load_sections" colspan="2"
+                        groups="of_sale_quote_template.group_of_advanced_sale_layout_category"
+                        type="object" attrs="{'invisible': [('of_template_id', '=', False)]}" icon="fa-download"/>
                 <field name="of_note_insertion" nolabel="1" colspan="2" readonly="1"
                        attrs="{'invisible': [('of_note_insertion', '=', False)]}"/>
             </xpath>
