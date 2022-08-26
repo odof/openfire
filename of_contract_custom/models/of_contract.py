@@ -146,6 +146,7 @@ class OfContract(models.Model):
     automatic_sequence = fields.Boolean(
         string=u"Séquence automatique", compute='_compute_automatic_sequence',
         default=lambda c: c._default_automatic_sequence())
+    intervention_sites = fields.Char(string=u"Sites d'intervention", compute='_compute_intervention_sites')
 
     @api.model
     def _default_journal(self):
@@ -264,6 +265,13 @@ class OfContract(models.Model):
         """ Récupération des demandes d'intervention liées aux différentes lignes de contrat """
         for contract in self:
             contract.service_ids = contract.line_ids.mapped('service_ids')
+
+    @api.depends('line_ids', 'line_ids.address_id')
+    def _compute_intervention_sites(self):
+        """ Récupération des sites d'intervention liés aux différentes lignes de contrat """
+        for contract in self:
+            contract.intervention_sites = ', '.join(
+                contract.line_ids.mapped('address_id').mapped(lambda x: x.name or x.display_name))
 
     @api.depends('invoice_ids')
     def _get_invoice_count(self):
