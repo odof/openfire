@@ -69,6 +69,7 @@ class OFDeliveryDivisionWizardLine(models.TransientModel):
     wizard_id = fields.Many2one(comodel_name='of.delivery.division.wizard', string=u"Division du Bon de transfert")
     move_id = fields.Many2one(comodel_name='stock.move', string=u"Ligne du Bon de transfert")
     product_id = fields.Many2one(
-        comodel_name='product.product', related='move_id.product_id', string=u"Article", readonly=True)
+        comodel_name='product.product', related='move_id.product_id', string=u"Référence article", readonly=True)
+    name = fields.Char(string=u"Description", related='move_id.name', readonly=True)
     product_uom_qty = fields.Float(related='move_id.product_uom_qty', string=u"Quantité initiale", readonly=True)
     qty_to_divide = fields.Float(string=u"Quantité à diviser")

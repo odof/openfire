@@ -8,9 +8,10 @@
         <field name="arch" type="xml">
             <form>
                 <group>
-                    <field name="line_ids" nolabel="1" colspan="4">
+                    <field name="line_ids" nolabel="1" colspan="4" context="{'show_only_default_code': True,}">
                         <tree delete="false" create="false" editable="bottom">
                             <field name="product_id" options="{'no_open': True}"/>
+                            <field name="name"/>
                             <field name="product_uom_qty"/>
                             <field name="qty_to_divide"/>
                         </tree>
