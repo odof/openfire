@@ -25,8 +25,11 @@ class OFSaleOrderBudget(models.Model):
         string=u"Coût total", digits=dp.get_precision('Product Price'), compute='_compute_total_cost')
     sale_price = fields.Float(
         string=u"Prix de vente", digits=dp.get_precision('Product Price'), compute='_compute_sale_price')
+    real_price = fields.Float(string=u"PV réel", digits=dp.get_precision('Product Price'), readonly=True)
     coeff = fields.Float(string=u"Coef. (%)", digits=dp.get_precision('Product Price'))
     margin_coeff = fields.Float(string=u"Coef. Marge", digits=dp.get_precision('Product Price'), default=1.0)
+    real_coeff = fields.Float(
+        string=u"Coef. réel", digits=dp.get_precision('Product Price'), compute='_compute_real_coeff')
     notes = fields.Char(string=u"Notes")
 
     @api.depends('cost', 'coeff')
@@ -38,6 +41,11 @@ class OFSaleOrderBudget(models.Model):
     def _compute_sale_price(self):
         for budget in self:
             budget.sale_price = budget.total_cost * budget.margin_coeff
+
+    @api.depends('cost', 'real_price')
+    def _compute_real_coeff(self):
+        for budget in self:
+            budget.real_coeff = budget.real_price / budget.cost if budget.cost else 1
 
 
 class OFSaleOrderIndirectCost(models.Model):
@@ -171,6 +179,7 @@ class SaleOrder(models.Model):
                 lambda sol: sol.of_product_type != 'service' or sol.of_subcontracted_service is False)
             purchase_budget_line.cost = sum(map(
                 lambda x: x.product_uom_qty * x.purchase_price, purchase_order_lines))
+            purchase_budget_line.real_price = sum(purchase_order_lines.mapped('price_subtotal'))
 
         outsourcing_budget_line = budget_lines.filtered(lambda line: line.name == 'outsourcing')
         if outsourcing_budget_line:
@@ -178,6 +187,7 @@ class SaleOrder(models.Model):
                 lambda sol: sol.of_product_type == 'service' and sol.of_subcontracted_service is True)
             outsourcing_budget_line.cost = sum(map(
                 lambda x: x.product_uom_qty * x.purchase_price, outsourcing_order_lines))
+            outsourcing_budget_line.real_price = sum(outsourcing_order_lines.mapped('price_subtotal'))
 
         indirect_cost_budget_line = budget_lines.filtered(lambda line: line.name == 'indirect_cost')
         if indirect_cost_budget_line:

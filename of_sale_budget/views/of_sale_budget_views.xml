@@ -35,6 +35,8 @@
                 <field name="total_cost" sum="Total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                 <field name="margin_coeff"/>
                 <field name="sale_price" sum="Total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="real_coeff"/>
+                <field name="real_price" sum="Total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                 <field name="notes"/>
                 <field name="order_id" invisible="1"/>
                 <field name="currency_id" invisible="1"/>
