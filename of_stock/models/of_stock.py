@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import api, fields, models, _, SUPERUSER_ID
 from odoo.tools import float_utils
@@ -413,6 +414,29 @@ class Inventory(models.Model):
                     line.product_qty = line.product_qty + sum(other_lines.mapped('product_qty'))
                     other_lines.unlink()
         return True
+
+    @api.multi
+    def reset_real_qty(self):
+        # On n'appelle pas le super, car on change le comportement du bouton
+        category_ids = self.line_ids.mapped('product_id').mapped('categ_id').ids
+        wizard = self.env['of.stock.inventory.reset.qty'].create({
+            'stock_inventory_id': self.id,
+            'product_category_ids': [(6, 0, category_ids)],
+        })
+        context = self.env.context.copy()
+        context.update({
+            'domain_category_ids': category_ids,
+        })
+        return {
+            'name': u"Mettre les quantités des catégories à 0",
+            'view_type': 'form',
+            'view_mode': 'form',
+            'target': 'new',
+            'res_id': wizard.id,
+            'res_model': 'of.stock.inventory.reset.qty',
+            'type': 'ir.actions.act_window',
+            'context': context,
+        }
 
     @api.multi
     def create_missing_lines(self):

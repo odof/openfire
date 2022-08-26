@@ -19,9 +19,6 @@
             <xpath expr="//field[@name='company_id']" position="after">
                 <field name="of_category_ids" attrs="{'invisible': [('filter', 'not in','categories')], 'required': [('filter', 'in', 'categories')]}" options="{'no_create': True}" widget="many2many_tags"/>
             </xpath>
-            <button name="reset_real_qty" position="attributes">
-                <attribute name="confirm">Voulez-vous réellement mettre les quantités à zéro ?</attribute>
-            </button>
             <xpath expr="//button[@name='reset_real_qty']" position="after">
                 <button name="create_missing_lines" states="confirm" string="⇒ Créer les lignes manquantes à 0" type="object" class="oe_link oe_right" groups="stock.group_stock_user"
                         confirm="Voulez-vous réellement créer les lignes pour les articles en stock non présents dans cet inventaire ? Si oui, les lignes seront créées avec des quantités réelles à 0."/>
