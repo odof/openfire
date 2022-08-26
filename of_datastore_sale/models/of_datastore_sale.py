@@ -10,7 +10,23 @@ class OFDatastoreSale(models.Model):
     _rec_name = 'db_name'
     _order = 'db_name'
 
+    @api.model_cr_context
+    def _auto_init(self):
+        cr = self._cr
+
+        cr.execute("SELECT * FROM information_schema.tables WHERE table_name = '%s'" % ('of_datastore_sale_partner_rel',))
+        exists = cr.fetchall()
+        res = super(OFDatastoreSale, self)._auto_init()
+        if not exists:
+            datastores = self.env['of.datastore.sale'].search([])
+            for datastore in datastores:
+                datastore.write({'partner_ids': [(4, datastore.partner_id.id)]})
+        return res
+
     active = fields.Boolean(string=u"Actif", default=True)
+    partner_ids = fields.Many2many(
+        comodel_name='res.partner', relation='of_datastore_sale_partner_rel', string=u"Clients",
+        domain=[('customer', '=', True), '|', ('is_company', '=', True), ('parent_id', '=', False)])
     partner_id = fields.Many2one(
         comodel_name='res.partner', string=u"Client",
         domain=[('customer', '=', True), '|', ('is_company', '=', True), ('parent_id', '=', False)])
