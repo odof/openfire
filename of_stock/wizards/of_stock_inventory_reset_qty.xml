@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="of_stock_inventory_reset_qty_view_form" model="ir.ui.view">
+        <field name="name">of.stock.inventory.reset.qty.view.form</field>
+        <field name="model">of.stock.inventory.reset.qty</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="stock_inventory_id" invisible="1"/>
+                        <field name="product_category_ids" widget="many2many_tags"  domain="[('id', 'in', context.get('domain_category_ids', []))]"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Valider" name="reset_real_qty_category" type="object" class="btn-primary"
+                            confirm="Voulez-vous réellement mettre les quantités des catégories à zéro ?"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
