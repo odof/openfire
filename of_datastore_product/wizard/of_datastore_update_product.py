@@ -79,7 +79,9 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         @param supplier: browse_record of_datastore_supplier
         @param products: browse_record_list product.product
         """
-        product_obj = self.env['product.product']
+        # Permet de désactiver les règles de réappro si l'article doit être archivé avec le TC
+        products = products.with_context(from_tc=True)
+        product_obj = self.env['product.product'].with_context(from_tc=True)
         product_template_obj = self.env['product.template']
 
         supplier_value = supplier.id * DATASTORE_IND
@@ -201,17 +203,13 @@ class OfDatastoreUpdateProduct(models.TransientModel):
                 #   ce qui provoque un temps de calcul en O(n²) au lieu de O(n)
                 products_write_data[product] = ds_product_data
         for product, product_data in products_write_data.iteritems():
-            product.write(product_data)
+            product.with_context().write(product_data)
 
         # Mise à jour du paramètre active des product.template
         # Activation
         product_template_obj.search(
             [('active', '=', False), ('product_variant_ids.active', '=', True)]
         ).write({'active': True})
-        # Désactivation des modèles d'articles qui n'ont pas au moins un article (variante) actif.
-        active_templates = product_template_obj.search([('active', '=', True)])
-        active_product_templates = product_obj.search([('active', '=', True)]).mapped('product_tmpl_id')
-        (active_templates - active_product_templates).write({'active': False})
 
         return len(no_match_ids), len(unmatched_ids), len(ds_product_ids), len(ds_product_new_ids)
 
