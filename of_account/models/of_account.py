@@ -177,6 +177,13 @@ class AccountInvoice(models.Model):
     def _onchange_partner_id_warning(self):
         partner = self.partner_id
 
+        if partner:
+            # Référence client
+            ref = partner.ref
+            if not ref and partner.parent_id:
+                ref = partner.parent_id.ref
+            self.name = ref
+
         # If partner has no warning, check its parents
         # invoice_warn is shared between different objects
         if not partner.of_is_account_warn and partner.parent_id:
