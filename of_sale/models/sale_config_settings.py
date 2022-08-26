@@ -105,12 +105,14 @@ class OFSaleConfiguration(models.TransientModel):
 
     @api.model
     def default_get(self, fields):
+        # check or init cache here because in some cases the cache is not initialized when settings are loaded from
+        # xml files
+        self._check_init_group_cache()
         res = super(OFSaleConfiguration, self).default_get(fields)
         # store the default values of the groups for the sale settings in the cache dictionnary
-        if hasattr(self.pool, '_salesettings_groups_cache'):
-            for name in res:
-                if name.startswith('group_'):
-                    self.pool._salesettings_groups_cache[name] = res[name]
+        for name in res:
+            if name.startswith('group_'):
+                self.pool._salesettings_groups_cache[name] = res[name]
         return res
 
     @api.multi
@@ -126,24 +128,29 @@ class OFSaleConfiguration(models.TransientModel):
             self.pool._salesettings_groups_has_changed.remove(group_name)
         return {}
 
-    def _register_hook(self):
-        super(OFSaleConfiguration, self)._register_hook()
-
-        def make_method(name):
-            return lambda self: self.onchange_group_field(self[name], name)
-
-        # add a cache dict of default values to check data value during the sale setting wizard
-        # add a todolist that will contains the name of groups that have been changed in settings
+    def _check_init_group_cache(self):
+        """Initialize the cache dict user for the onchange method.
+        Add a cache dict of default values to check data value during the sale setting wizard.
+        Add a todolist that will contains the name of groups that have been changed in settings.
+        """
         if not hasattr(self.pool, '_salesettings_groups_cache'):
             self.pool._salesettings_groups_cache = {}
         if not hasattr(self.pool, '_salesettings_groups_has_changed'):
             self.pool._salesettings_groups_has_changed = []
+
+    def _register_hook(self):
+
+        def make_method(name):
+            return lambda self: self.onchange_group_field(self[name], name)
+
+        self._check_init_group_cache()
 
         # add onchange for all fields "group_"
         for name in self._fields:
             if name.startswith('group_'):
                 method = make_method(name)
                 self._onchange_methods[name].append(method)
+        return super(OFSaleConfiguration, self)._register_hook()
 
     @api.multi
     def set_stock_warning_defaults(self):
@@ -239,27 +246,21 @@ class OFSaleConfiguration(models.TransientModel):
                 value = self[name]
             IrValues.set_default(model, field, value)
 
-        only_changed_values = False
         # To avoid a very long time of computation (for database with a lot a Users/Groups), we don't want to recompute
         # the groups if they haven't been changed in the settings.
-        if hasattr(self.pool, '_salesettings_groups_has_changed') and self.pool._salesettings_groups_has_changed:
+        if self.pool._salesettings_groups_has_changed:
             # filter groups to recompute only modified ones
             only_changed_values = filter(
                 lambda gval: gval and gval[0] in self.pool._salesettings_groups_has_changed, classified['group'])
-        # If _salesettings_groups_has_changed isn't present in self.pool we still need to be able to change groups
-        # if needed
-        elif not hasattr(self.pool, '_salesettings_groups_has_changed'):
-            only_changed_values = classified['group']
-            # group fields: modify group / implied groups
-        if only_changed_values:
-            with self.env.norecompute():
-                for name, groups, implied_group in only_changed_values:
-                    if self[name]:
-                        groups.write({'implied_ids': [(4, implied_group.id)]})
-                    else:
-                        groups.write({'implied_ids': [(3, implied_group.id)]})
-                        implied_group.write({'users': [(3, user.id) for user in groups.mapped('users')]})
-            self.recompute()
+            if only_changed_values:
+                with self.env.norecompute():
+                    for name, groups, implied_group in only_changed_values:
+                        if self[name]:
+                            groups.write({'implied_ids': [(4, implied_group.id)]})
+                        else:
+                            groups.write({'implied_ids': [(3, implied_group.id)]})
+                            implied_group.write({'users': [(3, user.id) for user in groups.mapped('users')]})
+                self.recompute()
 
         # other fields: execute all methods that start with 'set_'
         for method in dir(self):
