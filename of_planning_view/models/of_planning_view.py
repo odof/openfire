@@ -34,6 +34,31 @@ class ResPartner(models.Model):
         return res
 
 
+class ResUsers(models.Model):
+    _inherit = "res.users"
+
+    default_view = fields.Selection(
+        [
+            ('planning', u"Planning"),
+            ('calendar', u"Calendrier"),
+        ], string=u"(OF) Vue par défaut", default='planning',
+        help=u"Vue affichée par défaut, à l'ouverture du module Interventions."
+    )
+
+    @api.multi
+    def write(self, vals):
+        if vals.get('default_view', False):
+            group_calendar = self.env.ref('of_planning_view.of_group_calendar_intervention')
+            group_planning = self.env.ref('of_planning_view.of_group_planning_intervention')
+            if vals.get('default_view', False) == 'calendar':
+                group_calendar.users |= self
+                group_planning.users -= self
+            else:
+                group_calendar.users -= self
+                group_planning.users |= self
+        return super(ResUsers, self).write(vals)
+
+
 class OfPlanningIntervention(models.Model):
     _name = "of.planning.intervention"
     _inherit = ["of.planning.intervention", "of.readgroup", "of.calendar.mixin"]

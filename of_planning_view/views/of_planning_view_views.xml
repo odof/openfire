@@ -53,6 +53,17 @@
         </field>
     </record>
 
+    <record id="of_access_control_res_users_form_view" model="ir.ui.view">
+        <field name="name">of.access.control.res.users.form.view</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <field name="action_id" position="after">
+                <field name="default_view"  class="oe_inline" widget="radio"/>
+            </field>
+        </field>
+    </record>
+
     <!-- Vue planning -->
     <record id="of_planning_intervention_view_planning" model="ir.ui.view">
         <field name="name">of.planning.intervention.timeline</field>
@@ -120,5 +131,122 @@
     <record id="of_planning.of_sale_order_open_interventions" model="ir.actions.act_window">
         <field name="view_mode">calendar,planning,tree,form,pivot</field>
     </record>
+
+   <record id="action_of_planning_intervention_cal" model="ir.actions.act_window">
+        <field name="name">Planning d'intervention</field>
+        <field name="res_model">of.planning.intervention</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">calendar,planning,form,tree,pivot,map</field>
+        <field name="view_id" ref="of_planning.of_planning_intervention_view_calendar"/>
+        <field name="search_view_id" ref="of_planning.of_planning_intervention_filter"/>
+        <field name="groups_id" eval="[(4, ref('of_planning_view.of_group_calendar_intervention'))]"/>
+        <field name="context">
+            {'search_default_state_confirm':1,
+            'search_default_state_done':1,
+            'search_default_state_draft':1,
+            'search_default_state_unfinished':1}
+        </field>
+    </record>
+
+    <record id="act_of_planning_intervention_calendar_cal" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">calendar</field>
+        <field name="view_id" ref="of_planning.of_planning_intervention_view_calendar"/>
+        <field name="act_window_id" ref="action_of_planning_intervention_cal"/>
+    </record>
+
+    <record id="act_of_planning_intervention_calendar_plan" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">planning</field>
+        <field name="view_id" ref="of_planning_intervention_view_planning"/>
+        <field name="act_window_id" ref="action_of_planning_intervention_cal"/>
+    </record>
+
+    <record id="act_of_planning_intervention_calendar_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_planning.of_planning_intervention_view_form"/>
+        <field name="act_window_id" ref="action_of_planning_intervention_cal"/>
+    </record>
+        <record id="act_of_planning_intervention_calendar_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="4"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="of_planning.of_planning_intervention_view_tree"/>
+        <field name="act_window_id" ref="action_of_planning_intervention_cal"/>
+    </record>
+
+    <record id="act_of_planning_intervention_calendar_pivot" model="ir.actions.act_window.view">
+        <field name="sequence" eval="5"/>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="of_planning.of_planning_intervention_pivot"/>
+        <field name="act_window_id" ref="action_of_planning_intervention_cal"/>
+    </record>
+
+    <record id="act_of_planning_intervention_calendar_map" model="ir.actions.act_window.view">
+        <field name="sequence" eval="6"/>
+        <field name="view_mode">map</field>
+        <field name="view_id" ref="of_planning.of_planning_intervention_map_view"/>
+        <field name="act_window_id" ref="action_of_planning_intervention_cal"/>
+    </record>
+
+    <record id="action_of_planning_intervention_plan" model="ir.actions.act_window">
+        <field name="name">Planning d'intervention</field>
+        <field name="res_model">of.planning.intervention</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">planning,calendar,form,tree,pivot,map</field>
+        <field name="view_id" ref="of_planning_intervention_view_planning"/>
+        <field name="search_view_id" ref="of_planning.of_planning_intervention_filter"/>
+        <field name="groups_id" eval="[(4, ref('of_planning_view.of_group_planning_intervention'))]"/>
+        <field name="context">
+            {'search_default_state_confirm':1,
+            'search_default_state_done':1,
+            'search_default_state_draft':1,
+            'search_default_state_unfinished':1}
+        </field>
+    </record>
+
+    <record id="act_of_planning_intervention_planning_plan" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">planning</field>
+        <field name="view_id" ref="of_planning_intervention_view_planning"/>
+        <field name="act_window_id" ref="action_of_planning_intervention_plan"/>
+    </record>
+
+    <record id="act_of_planning_intervention_planning_cal" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">calendar</field>
+        <field name="view_id" ref="of_planning.of_planning_intervention_view_calendar"/>
+        <field name="act_window_id" ref="action_of_planning_intervention_plan"/>
+    </record>
+
+    <record id="act_of_planning_intervention_planning_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_planning.of_planning_intervention_view_form"/>
+        <field name="act_window_id" ref="action_of_planning_intervention_plan"/>
+    </record>
+        <record id="act_of_planning_intervention_planning_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="4"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="of_planning.of_planning_intervention_view_tree"/>
+        <field name="act_window_id" ref="action_of_planning_intervention_plan"/>
+    </record>
+
+    <record id="act_of_planning_intervention_planning_pivot" model="ir.actions.act_window.view">
+        <field name="sequence" eval="5"/>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="of_planning.of_planning_intervention_pivot"/>
+        <field name="act_window_id" ref="action_of_planning_intervention_plan"/>
+    </record>
+
+    <record id="act_of_planning_intervention_planning_map" model="ir.actions.act_window.view">
+        <field name="sequence" eval="6"/>
+        <field name="view_mode">map</field>
+        <field name="view_id" ref="of_planning.of_planning_intervention_map_view"/>
+        <field name="act_window_id" ref="action_of_planning_intervention_plan"/>
+    </record>
+
+    <menuitem id="menu_of_planning_intervention_plan" name="Planning" parent="of_planning.menu_of_planning_intervention" sequence="1" action="action_of_planning_intervention_plan" groups="of_group_planning_intervention"/>
+    <menuitem id="menu_of_planning_intervention_cal" name="Calendrier" parent="of_planning.menu_of_planning_intervention" sequence="1" action="action_of_planning_intervention_cal" groups="of_group_calendar_intervention"/>
 
 </odoo>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="of_group_planning_intervention" model="res.groups">
+            <field name="name">Interventions - Vue planning</field>
+        </record>
+
+        <record id="of_group_calendar_intervention" model="res.groups">
+            <field name="name">Interventions - Vue calendrier</field>
+        </record>
+
+    </data>
+</odoo>

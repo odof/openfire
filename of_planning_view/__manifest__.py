@@ -2,7 +2,7 @@
 
 {
     "name": "OpenFire / Planning view",
-    "version": "10.0.1.0.0",
+    "version": "10.0.1.1.0",
     "author": "OpenFire",
     'category': 'OpenFire modules',
     'summary': 'Planning view',
@@ -16,6 +16,7 @@ Ajout de la vue planning.
         "of_utils",
     ],
     "data": [
+        "security/of_planning_view_security.xml",
         "views/of_planning_view_views.xml",
         "views/of_planning_view_templates.xml",
         "wizard/planification_views.xml",
