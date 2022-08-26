@@ -41,5 +41,5 @@ class SaleOrder(models.Model):
             #   lors de la recherche dans ir.values.
             # On doit donc reproduire le calcul de valeurs par défaut de _default_get() mais avec la société
             #   fournie dans vals.
-            vals['warehouse_id'] = self._get_default_warehouse_id_for_company(vals['company_id'])
+            vals['warehouse_id'] = self.get_default_warehouse_id_for_company(vals['company_id'])
         return super(SaleOrder, self).create(vals)
