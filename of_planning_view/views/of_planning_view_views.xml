@@ -59,7 +59,7 @@
         <field name="inherit_id" ref="base.view_users_form"/>
         <field name="arch" type="xml">
             <field name="action_id" position="after">
-                <field name="default_view"  class="oe_inline" widget="radio"/>
+                <field name="of_default_view"  class="oe_inline" widget="radio"/>
             </field>
         </field>
     </record>

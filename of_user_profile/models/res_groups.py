@@ -40,14 +40,7 @@ class ResGroups(models.Model):
                 elif item[0] == 3:
                     group_ids_to_unlink.append(item[1])
         res = super(ResGroups, self).write(vals)
-        group_calendar = self.env.ref('of_planning_view.of_group_calendar_intervention', raise_if_not_found=False)
-        group_planning = self.env.ref('of_planning_view.of_group_planning_intervention', raise_if_not_found=False)
-        new_self = self
-        if group_calendar and group_calendar in new_self:
-            new_self -= group_calendar
-        if group_planning and group_planning in new_self:
-            new_self -= group_planning
-        new_self._update_users(vals)
+        self._update_users(vals)
         # @TODO migration : comprendre la nécessité de ce bout de code et voir si le conserver
         if vals.get('implied_ids'):
             # Update group for all users depending of this group, in order to add new implied groups to their groups

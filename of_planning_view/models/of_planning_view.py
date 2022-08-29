@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
-
-from odoo.osv import orm
-from odoo.tools.float_utils import float_compare
-from odoo import models, fields, api
-from odoo.addons.of_utils.models.of_utils import se_chevauchent, hours_to_strs
-from odoo.exceptions import ValidationError
-from odoo.addons.calendar.models.calendar import calendar_id2real_id
-import re
-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 import pytz
 from datetime import datetime, timedelta
+from odoo import models, fields, api
+from odoo.osv import orm
+from odoo.addons.of_utils.models.of_utils import hours_to_strs
+from odoo.exceptions import ValidationError
+from odoo.tools.float_utils import float_compare
 
 PLANNING_VIEW = ('planning', 'Planning')
 
@@ -30,14 +27,14 @@ class ResPartner(models.Model):
             'id': self.id,
             'country': self.get_geocoding_country(),
             'name': self.name,
-            }
+        }
         return res
 
 
 class ResUsers(models.Model):
     _inherit = "res.users"
 
-    default_view = fields.Selection(
+    of_default_view = fields.Selection(
         [
             ('planning', u"Planning"),
             ('calendar', u"Calendrier"),
@@ -47,16 +44,33 @@ class ResUsers(models.Model):
 
     @api.multi
     def write(self, vals):
-        if vals.get('default_view', False):
-            group_calendar = self.env.ref('of_planning_view.of_group_calendar_intervention')
-            group_planning = self.env.ref('of_planning_view.of_group_planning_intervention')
-            if vals.get('default_view', False) == 'calendar':
-                group_calendar.users |= self
-                group_planning.users -= self
-            else:
-                group_calendar.users -= self
-                group_planning.users |= self
-        return super(ResUsers, self).write(vals)
+        from_profile_menu = self._context.get('default_of_is_user_profile', False)
+        groups_default_view = self._context.get('groups_default_view', False)
+        group_calendar = False
+        group_planning = False
+        if not groups_default_view and vals.get('of_default_view', False) or from_profile_menu:
+            group_calendar = self.env.ref('of_planning_view.of_group_calendar_intervention', raise_if_not_found=False)
+            group_planning = self.env.ref('of_planning_view.of_group_planning_intervention', raise_if_not_found=False)
+        if not groups_default_view and from_profile_menu and group_calendar and group_planning:
+            # We come from the profile menu. The profile will update all linked users and we will loose the groups
+            # used for the default view. So we want to save them before the profile is updated.
+            group_calendar_users = group_calendar.users
+            group_planning_users = group_planning.users
+        res = super(ResUsers, self).write(vals)
+        if not groups_default_view and group_calendar and group_planning and (
+                vals.get('of_default_view', False) or from_profile_menu):
+            # We update the groups used for the default view or we rewrite the groups for the default view if they were
+            # removed by the profile update.
+            for user in self.with_context(groups_default_view=True):
+                if vals.get('of_default_view', False) == 'calendar' or (
+                        from_profile_menu and user in group_calendar_users):
+                    user.groups_id |= group_calendar
+                    user.groups_id -= group_planning
+                elif vals.get('of_default_view', False) == 'planning' or (
+                        from_profile_menu and user in group_planning_users):
+                    user.groups_id -= group_calendar
+                    user.groups_id |= group_planning
+        return res
 
 
 class OfPlanningIntervention(models.Model):
@@ -406,8 +420,8 @@ class OfPlanningIntervention(models.Model):
                     continue
 
                 nb_heures_occupees = 0.0
-                jour_deb_dt = tz.localize(datetime.strptime(date_current_str+" 00:00:00", "%Y-%m-%d %H:%M:%S"))
-                jour_fin_dt = tz.localize(datetime.strptime(date_current_str+" 23:59:00", "%Y-%m-%d %H:%M:%S"))
+                jour_deb_dt = tz.localize(datetime.strptime(date_current_str + " 00:00:00", "%Y-%m-%d %H:%M:%S"))
+                jour_fin_dt = tz.localize(datetime.strptime(date_current_str + " 23:59:00", "%Y-%m-%d %H:%M:%S"))
                 for intervention in interventions:
                     intervention_heures = [intervention]
                     # read est détourné dans of_planning pour renvoyer les dates de l'occurence concernée
