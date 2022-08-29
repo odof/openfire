@@ -6,4 +6,5 @@ from . import stock_immediate_transfer
 from . import stock_backorder_confirmation
 from . import of_stock_date_confirmation
 from . import of_specific_delivery_report_wizard
-from . import of_stock_inventory_reset_qty
+from . import of_stock_inventory_reset_qty_wizard
+from . import of_stock_inventory_create_missing_wizard
