@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="of_stock_inventory_create_missing_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.stock.inventory.create.missing.wizard.view.form</field>
+        <field name="model">of.stock.inventory.create.missing.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="stock_inventory_id" invisible="1"/>
+                        <field name="product_category_ids" widget="many2many_tags"
+                               attrs="{'invisible': [('all_products', '=', True)], 'required': [('all_products', '=', False)]}"/>
+                        <field name="all_products"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Valider" name="create_missing_lines" type="object" class="btn-primary"
+                            confirm="Voulez-vous réellement créer les lignes pour les articles en stock non présents dans cet inventaire ? Si oui, les lignes seront créées avec des quantités réelles à 0."/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
