@@ -419,7 +419,7 @@ class Inventory(models.Model):
     def reset_real_qty(self):
         # On n'appelle pas le super, car on change le comportement du bouton
         category_ids = self.line_ids.mapped('product_id').mapped('categ_id').ids
-        wizard = self.env['of.stock.inventory.reset.qty'].create({
+        wizard = self.env['of.stock.inventory.reset.qty.wizard'].create({
             'stock_inventory_id': self.id,
             'product_category_ids': [(6, 0, category_ids)],
         })
@@ -433,7 +433,7 @@ class Inventory(models.Model):
             'view_mode': 'form',
             'target': 'new',
             'res_id': wizard.id,
-            'res_model': 'of.stock.inventory.reset.qty',
+            'res_model': 'of.stock.inventory.reset.qty.wizard',
             'type': 'ir.actions.act_window',
             'context': context,
         }
@@ -441,46 +441,22 @@ class Inventory(models.Model):
     @api.multi
     def create_missing_lines(self):
         self.ensure_one()
-
-        locations = self.env['stock.location'].search([('id', 'child_of', [self.location_id.id])])
-        self.env.cr.execute(
-            """ SELECT      product_id
-                ,           sum(qty)        as product_qty
-                ,           location_id
-                ,           lot_id          as prod_lot_id
-                ,           package_id
-                ,           owner_id        as partner_id
-                FROM        stock_quant
-                WHERE       location_id     in %s
-                AND         company_id      = %s
-                GROUP BY    product_id
-                ,           location_id
-                ,           lot_id
-                ,           package_id
-                ,           partner_id
-            """, (tuple(locations.ids), self.company_id.id,))
-
-        data = self.env.cr.dictfetchall()
-        vals = []
-        product_ids = self.line_ids.mapped('product_id').ids
-        prod_lot_ids = self.line_ids.mapped('prod_lot_id').ids
-        for product_data in data:
-            if product_data['product_qty'] != 0:
-                product_data['theoretical_qty'] = product_data['product_qty']
-                product_data['product_qty'] = 0.0
-                if product_data['product_id'] and product_data['product_id'] not in product_ids:
-                    product_data['product_uom_id'] = self.env['product.product'].browse(
-                        product_data['product_id']).uom_id.id
-                    vals.append(product_data)
-                elif product_data['prod_lot_id'] and product_data['product_id'] and \
-                        product_data['prod_lot_id'] not in prod_lot_ids:
-                    product_data['product_uom_id'] = self.env['product.product'].browse(
-                        product_data['product_id']).uom_id.id
-                    vals.append(product_data)
-
-        if vals:
-            self.write({'line_ids': [(0, 0, line_values) for line_values in vals]})
-        return True
+        category_ids = self.line_ids.mapped('product_id').mapped('categ_id').ids
+        wizard = self.env['of.stock.inventory.create.missing.wizard'].create({
+            'stock_inventory_id': self.id,
+            'product_category_ids': [(6, 0, category_ids)],
+        })
+        context = self.env.context.copy()
+        return {
+            'name': u"Créer les lignes manquantes à 0",
+            'view_type': 'form',
+            'view_mode': 'form',
+            'target': 'new',
+            'res_id': wizard.id,
+            'res_model': 'of.stock.inventory.create.missing.wizard',
+            'type': 'ir.actions.act_window',
+            'context': context,
+        }
 
     @api.multi
     def action_control(self):

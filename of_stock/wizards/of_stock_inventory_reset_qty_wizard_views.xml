@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <record id="of_stock_inventory_reset_qty_view_form" model="ir.ui.view">
-        <field name="name">of.stock.inventory.reset.qty.view.form</field>
-        <field name="model">of.stock.inventory.reset.qty</field>
+    <record id="of_stock_inventory_reset_qty_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.stock.inventory.reset.qty.wizard.view.form</field>
+        <field name="model">of.stock.inventory.reset.qty.wizard</field>
         <field name="arch" type="xml">
             <form>
                 <sheet>
