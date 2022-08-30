@@ -103,55 +103,6 @@ class OFSaleConfiguration(models.TransientModel):
     of_sale_order_margin_control = fields.Boolean(
         string=u"(OF) Contrôle de marge", help=u"Activer le contrôle de marge à la validation des commandes")
 
-    @api.model
-    def default_get(self, fields):
-        # check or init cache here because in some cases the cache is not initialized when settings are loaded from
-        # xml files
-        self._check_init_group_cache()
-        res = super(OFSaleConfiguration, self).default_get(fields)
-        # store the default values of the groups for the sale settings in the cache dictionnary
-        for name in res:
-            if name.startswith('group_'):
-                self.pool._salesettings_groups_cache[name] = res[name]
-        return res
-
-    @api.multi
-    def onchange_group_field(self, field_value, group_name):
-        """If the value is not the same that the value stored in the cache dict we add the field's name in a
-        "updated group list".
-        Otherwise if the value is set back to the original value we remove the field from this list.
-        """
-        original_settings_value = self.pool._salesettings_groups_cache[group_name]
-        if field_value != original_settings_value:
-            self.pool._salesettings_groups_has_changed.append(group_name)
-        if group_name in self.pool._salesettings_groups_has_changed and field_value == original_settings_value:
-            self.pool._salesettings_groups_has_changed.remove(group_name)
-        return {}
-
-    def _check_init_group_cache(self):
-        """Initialize the cache dict user for the onchange method.
-        Add a cache dict of default values to check data value during the sale setting wizard.
-        Add a todolist that will contains the name of groups that have been changed in settings.
-        """
-        if not hasattr(self.pool, '_salesettings_groups_cache'):
-            self.pool._salesettings_groups_cache = {}
-        if not hasattr(self.pool, '_salesettings_groups_has_changed'):
-            self.pool._salesettings_groups_has_changed = []
-
-    def _register_hook(self):
-
-        def make_method(name):
-            return lambda self: self.onchange_group_field(self[name], name)
-
-        self._check_init_group_cache()
-
-        # add onchange for all fields "group_"
-        for name in self._fields:
-            if name.startswith('group_'):
-                method = make_method(name)
-                self._onchange_methods[name].append(method)
-        return super(OFSaleConfiguration, self)._register_hook()
-
     @api.multi
     def set_stock_warning_defaults(self):
         return self.env['ir.values'].sudo().set_default(
@@ -231,6 +182,17 @@ class OFSaleConfiguration(models.TransientModel):
             raise AccessError(_("This setting can only be enabled by the administrator, "
                                 "please contact support to enable this option."))
 
+        # Get the default values of the groups and check if the value has been changed
+        groups_fields = [field_name for field_name in self.fields_get().keys() if field_name.startswith('group_')]
+        salesettings_groups_cache = {
+            field_name: default_value
+            for field_name, default_value in self.default_get(self.fields_get().keys()).iteritems()
+            if field_name.startswith('group_')}
+        salesettings_groups_has_changed = [
+            field_name
+            for field_name in groups_fields
+            if getattr(self, field_name) != salesettings_groups_cache[field_name]]
+
         self = self.with_context(active_test=False)
         classified = self._get_classified_fields()
 
@@ -248,10 +210,10 @@ class OFSaleConfiguration(models.TransientModel):
 
         # To avoid a very long time of computation (for database with a lot a Users/Groups), we don't want to recompute
         # the groups if they haven't been changed in the settings.
-        if self.pool._salesettings_groups_has_changed:
+        if salesettings_groups_has_changed:
             # filter groups to recompute only modified ones
             only_changed_values = filter(
-                lambda gval: gval and gval[0] in self.pool._salesettings_groups_has_changed, classified['group'])
+                lambda gval: gval and gval[0] in salesettings_groups_has_changed, classified['group'])
             if only_changed_values:
                 with self.env.norecompute():
                     for name, groups, implied_group in only_changed_values:
