@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, api
+from odoo.tools import pickle
 
 
 class SaleOrder(models.Model):
@@ -20,7 +21,7 @@ class SaleOrder(models.Model):
         self._cr.execute(
             "SELECT value "
             "FROM ir_values "
-            "WHERE v.key = 'default' AND v.model = 'sale.order' AND name = 'warehouse_id' "
+            "WHERE key = 'default' AND model = 'sale.order' AND name = 'warehouse_id' "
             "  AND (user_id = %s OR user_id IS NULL) "
             "  AND (company_id IS NULL or company_id = %s) "
             "ORDER BY user_id, company_id "
@@ -29,7 +30,8 @@ class SaleOrder(models.Model):
         )
         res = self._cr.fetchone()
         if res:
-            return res[0]
+            value = pickle.loads(res[0].encode('utf-8'))
+            return value
 
         # 3. look up field.default
         return self.env['res.company'].browse(company_id).of_default_warehouse_id
