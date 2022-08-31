@@ -133,7 +133,7 @@
                 <field name="type"/>
                 <field name="inverse_product_uom_qty" invisible="1"/>
                 <field name="product_uom_qty" widget="float_time" attrs="{'readonly': [('type','=','computed')]}"/>
-                <field name="hourly_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="hourly_cost" widget="monetary" options="{'currency_field': 'currency_id'}" attrs="{'readonly': [('type','=','computed')]}"/>
                 <field name="total_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                 <field name="notes"/>
                 <field name="order_id" invisible="1"/>
@@ -155,7 +155,7 @@
                     </h1>
                     <group>
                         <group>
-                            <field name="hourly_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="hourly_cost" widget="monetary" options="{'currency_field': 'currency_id'}" attrs="{'readonly': [('type','=','computed')]}"/>
                             <field name="inverse_product_uom_qty" invisible="1"/>
                             <field name="product_uom_qty" widget="float_time" attrs="{'readonly': [('type','=','computed')]}"/>
                             <field name="total_cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
@@ -195,5 +195,39 @@
     </record>
 
     <menuitem name="Heures chantier" id="of_sale_order_hour_worksite_menu" parent="sale.prod_config_main" action="of_sale_order_hour_worksite_action"/>
+
+    <record id="of_sale_planning_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.sale.budget.product.template.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="of_sale_planning.of_sale_planning_product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_duration_per_unit']/.." position="after">
+                <field name="of_hour_worksite_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_margin_sale_order_line" model="ir.ui.view">
+        <field name="name">of.sale.budget.sale.order.line</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_margin_sale_order_line"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="after">
+                <field name="of_labor_cost"/>
+                <field name="of_total_labor_cost"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_planning_sale_order_form_view" model="ir.ui.view">
+        <field name="name">of.sale.budget.sale.order.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale_planning.of_sale_planning_sale_order_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_duration']/.." position="after">
+                <field name="of_hour_worksite_id"/>
+            </xpath>
+        </field>
+    </record>
 
 </odoo>
