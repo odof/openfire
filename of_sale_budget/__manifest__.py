@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 ##############################################################################
 #
@@ -13,11 +14,11 @@
 
 {
     'name': u"OpenFire / Ventes / Budget",
-    'version': "10.0.1.0.0",
-    'license': '',
-    'author': "OpenFire",
-    'website': "www.openfire.fr",
-    'category': "OpenFire",
+    'version': '10.0.1.0.0',
+    'license': 'AGPL-3',
+    'author': u"OpenFire",
+    'website': u"www.openfire.fr",
+    'category': u"OpenFire",
     'summary': u"Gestion du budget OpenFire",
     'description': u"""
 Module OpenFire / Ventes / Budget

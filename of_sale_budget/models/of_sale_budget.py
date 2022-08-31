@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import models, fields, api, _
 import odoo.addons.decimal_precision as dp
@@ -100,12 +101,14 @@ class OFSaleOrderLaborCost(models.Model):
         for cost in self:
             cost.total_cost = cost.hourly_cost * cost.product_uom_qty
 
-    @api.depends('order_id.order_line.of_duration', 'inverse_product_uom_qty')
+    @api.depends('order_id.order_line.of_hour_worksite_id', 'order_id.order_line.of_duration',
+                 'inverse_product_uom_qty')
     def _compute_product_uom_qty(self):
         for cost in self:
             if cost.type == 'computed':
                 cost.product_uom_qty = sum(
-                    cost.order_id.order_line.mapped(lambda rec: rec.product_uom_qty * rec.of_duration))
+                    cost.order_id.order_line.filtered(
+                        lambda l: l.of_hour_worksite_id == cost.hour_worksite_id).mapped('of_duration'))
             else:
                 cost.product_uom_qty = cost.inverse_product_uom_qty
 
@@ -119,12 +122,11 @@ class OFSaleOrderLaborCost(models.Model):
         for cost in self:
             cost.hourly_cost = cost.hour_worksite_id.hourly_cost
 
-    @api.constrains('type', 'order_id')
+    @api.constrains('type', 'order_id', 'hour_worksite_id')
     def _check_description(self):
-        if self.type == 'computed':
-            if self.search_count([('order_id', '=', self.order_id.id), ('type', '=', 'computed')]) > 1:
-                raise ValidationError(u"Il ne peut y avoir qu'une ligne de frais de "
-                                      u"main d'oeuvre en type calculé par commande")
+        if self.search_count([('order_id', '=', self.order_id.id),
+                              ('hour_worksite_id', '=', self.hour_worksite_id.id), ('type', '=', 'computed')]) > 1:
+            raise ValidationError(u"Il ne peut y avoir deux ligne avec la même ligne de main d'oeuvre de type calculé")
 
 
 class OFSaleOrderHourWorksite(models.Model):
@@ -151,6 +153,15 @@ class SaleOrder(models.Model):
     of_labor_cost_ids = fields.One2many(
         comodel_name='of.sale.order.labor.cost', inverse_name='order_id',
         string=u"Frais de main d’oeuvre")
+
+    @api.onchange('of_template_id')
+    def onchange_template_id(self):
+        super(SaleOrder, self).onchange_template_id()
+        for line in self.order_line:
+            if line.product_id:
+                line.of_hour_worksite_id = \
+                    line.product_id.of_hour_worksite_id.id \
+                    or self.env.ref('of_sale_budget.of_sale_order_hour_worksite_data').id
 
     def action_of_budget_ids(self):
         """Met à jour l'onglet Budget"""
@@ -198,3 +209,75 @@ class SaleOrder(models.Model):
             labor_cost_budget_line.cost = sum(self.of_labor_cost_ids.mapped('total_cost'))
 
         self.of_budget_ids = budget_lines
+
+    @api.multi
+    def update_sale_order_labor_cost(self, hour_worksite_id):
+        labor_cost_obj = self.env['of.sale.order.labor.cost']
+
+        for order in self:
+            if hour_worksite_id not in order.of_labor_cost_ids.mapped('hour_worksite_id'):
+                labor_cost_obj.create({
+                    'order_id': order.id,
+                    'hour_worksite_id': hour_worksite_id.id
+                })
+        self.mapped('of_labor_cost_ids')._onchange_hour_worksite_id()
+
+
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+
+    of_hour_worksite_id = fields.Many2one(
+        comodel_name='of.sale.order.hour.worksite', string=u"Heures chantier")
+    of_labor_cost = fields.Float(
+        string=u"Coût main d'oeuvre", digits=dp.get_precision('Product Price'), compute='_compute_of_labor_cost')
+    of_total_labor_cost = fields.Float(
+        string=u"Total coût", digits=dp.get_precision('Product Price'), compute='_compute_of_labor_cost')
+
+    @api.depends('of_hour_worksite_id', 'of_hour_worksite_id.hourly_cost',
+                 'of_duration', 'purchase_price', 'product_uom_qty')
+    def _compute_of_labor_cost(self):
+        for line in self:
+            line.of_labor_cost = line.of_hour_worksite_id.hourly_cost * line.of_duration
+            line.of_total_labor_cost = line.of_labor_cost + (line.purchase_price * line.product_uom_qty)
+
+    @api.multi
+    @api.onchange('product_id')
+    def product_id_change(self):
+        res = super(SaleOrderLine, self).product_id_change()
+        if self.product_id:
+            self.of_hour_worksite_id = self.product_id.of_hour_worksite_id.id \
+                                       or self.env.ref('of_sale_budget.of_sale_order_hour_worksite_data').id
+        return res
+
+    @api.multi
+    def write(self, values):
+        res = super(SaleOrderLine, self).write(values)
+
+        if 'of_hour_worksite_id' in values:
+            hour_worksite = self.env['of.sale.order.hour.worksite'].browse(values.get('of_hour_worksite_id'))
+            self.mapped('order_id').update_sale_order_labor_cost(hour_worksite)
+
+        return res
+
+
+class ProductTemplate(models.Model):
+    _inherit = 'product.template'
+
+    of_hour_worksite_id = fields.Many2one(
+        comodel_name='of.sale.order.hour.worksite', string=u"Heures chantier", required=True,
+        default=lambda self: self.env.ref('of_sale_budget.of_sale_order_hour_worksite_data').id)
+
+    @api.model
+    def create(self, values):
+        res = super(ProductTemplate, self).create(values)
+        if res.of_hour_worksite_id:
+            res.of_hour_worksite_id.type = 'computed'
+        return res
+
+    @api.multi
+    def write(self, values):
+        res = super(ProductTemplate, self).write(values)
+        for product in self:
+            if product.of_hour_worksite_id:
+                product.of_hour_worksite_id.type = 'computed'
+        return res
