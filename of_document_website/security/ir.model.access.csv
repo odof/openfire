@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_dms_data_database_public,access.dms.data.database.public,model_muk_dms_data_database,,1,0,0,0
+access_of_muk_dms_file_public,access.of.muk.dms.file.public,muk_dms.model_muk_dms_file,,1,0,0,0
