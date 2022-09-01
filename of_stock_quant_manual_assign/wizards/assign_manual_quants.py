@@ -34,7 +34,7 @@ class AssignManualQuants(models.TransientModel):
     @api.multi
     def assign_quants(self):
         # Partie 1 : Annulation de la réservation des mouvements de stock donc on récupère les quants.
-        quants_to_unreserve = self.env['stock.quant']
+        quants_to_unreserve = self.env['stock.quant'].sudo()
         links_to_remove = self.env['stock.move.operation.link']
         pack_ops_to_recompute = self.env['stock.pack.operation']
         for line in self.quants_lines.filtered('selected').filtered('reservation_id'):
