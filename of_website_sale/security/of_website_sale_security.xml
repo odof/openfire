@@ -13,13 +13,10 @@
         </record>
 
         <!-- On passe la base en Affichage des sous-totaux HT (B2B) -->
-        <record id="sale_show_tax_b2b" model="sale.config.settings">
-            <field name="sale_show_tax">subtotal</field>
-        </record>
-
-        <function model="sale.config.settings" name="execute">
-            <!-- ids = -->        <value eval="[ref('of_website_sale.sale_show_tax_b2b')]"/>
-            <!-- context = -->    <value eval="{}"/>
+        <function model="ir.values" name="set_default">
+            <value>sale.config.settings</value>
+            <value>sale_show_tax</value>
+            <value>subtotal</value>
         </function>
 
         <!-- Le execute du dessus n'a pas répercuté les modification de groupe, on les force donc sur le groupe Portail et Employé -->
