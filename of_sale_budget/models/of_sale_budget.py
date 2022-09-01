@@ -146,13 +146,13 @@ class SaleOrder(models.Model):
 
     of_budget_ids = fields.One2many(
         comodel_name='of.sale.order.budget', inverse_name='order_id',
-        string=u"Tableau de budget")
+        string=u"Tableau de budget", copy=True)
     of_indirect_cost_ids = fields.One2many(
         comodel_name='of.sale.order.indirect.cost', inverse_name='order_id',
-        string=u"Frais indirects")
+        string=u"Frais indirects", copy=True)
     of_labor_cost_ids = fields.One2many(
         comodel_name='of.sale.order.labor.cost', inverse_name='order_id',
-        string=u"Frais de main d’oeuvre")
+        string=u"Frais de main d’oeuvre", copy=True)
 
     @api.onchange('of_template_id')
     def onchange_template_id(self):
@@ -215,7 +215,7 @@ class SaleOrder(models.Model):
         labor_cost_obj = self.env['of.sale.order.labor.cost']
 
         for order in self:
-            if hour_worksite_id not in order.of_labor_cost_ids.mapped('hour_worksite_id'):
+            if hour_worksite_id and hour_worksite_id not in order.of_labor_cost_ids.mapped('hour_worksite_id'):
                 labor_cost_obj.create({
                     'order_id': order.id,
                     'hour_worksite_id': hour_worksite_id.id
