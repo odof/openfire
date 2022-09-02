@@ -24,10 +24,15 @@ class OFCRMActivity(models.Model):
         cr.execute("SELECT * FROM information_schema.tables WHERE table_name = '%s'" % (self._table,))
         exists = bool(cr.fetchall())
         module_self = self.env['ir.module.module'].search([('name', '=', 'of_crm')])
-        migrate_activities = module_self and module_self.latest_version < '10.0.1.1.0' or False
-        cr.execute("SELECT * FROM of_sale_activity")
-        current_activies = cr.dictfetchall()
-        order_ids = map(lambda x: x['order_id'], current_activies)
+        update_activities = module_self and module_self.latest_version < '10.0.1.2.0' or False
+        cr.execute(
+            "SELECT * FROM information_schema.columns WHERE table_name = '%s' "
+            "AND column_name = 'partner_id'" % (self._table,))
+        partner_id_exists = cr.fetchall()
+        cr.execute(
+            "SELECT * FROM information_schema.columns WHERE table_name = '%s' "
+            "AND column_name = 'trigger_type'" % (self._table,))
+        trigger_type_exists = cr.fetchall()
         res = super(OFCRMActivity, self)._auto_init()
         if not exists:
             tz = pytz.timezone('Europe/Paris')
@@ -44,32 +49,40 @@ class OFCRMActivity(models.Model):
                              'user_id': SUPERUSER_ID,
                              'vendor_id': opportunity.user_id and opportunity.user_id.id or SUPERUSER_ID,
                              'state': 'planned'})
-        if exists and migrate_activities and current_activies:
-            # insert the activities linked to the Sale in their table
-            for activity in current_activies:
-                active = True
-                state = activity['state']
-                if state == 'cancelled':
-                    active = False
-                    state = 'canceled'
-                cr.execute(
-                    'INSERT INTO "of_crm_activity" ("create_uid", "uploaded_attachment_id", "type_id", '
-                    '"user_id", "vendor_id", "description", "deadline_date", "sequence", "order_id", '
-                    '"title", "write_uid", "state", "write_date", "report", "create_date", "load_attachment", '
-                    '"origin", "active") VALUES '
-                    '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);',
-                    (
-                        activity['create_uid'], activity['uploaded_attachment_id'], activity['activity_id'],
-                        activity['create_uid'], activity['user_id'], activity['description'],
-                        activity['date_deadline'] or None, activity['sequence'], activity['order_id'],
-                        activity['summary'] or None, activity['write_uid'], state, activity['write_date'] or None,
-                        activity['report'] or None, activity['create_date'] or None, activity['load_attachment'],
-                        'sale_order', active
-                    )
-                )
-            # recompute follow-up fields
-            orders = self.env['sale.order'].browse(order_ids)
-            orders._compute_of_activities_state()
+        if update_activities and not partner_id_exists:
+            # update partner_id from opportunities
+            cr.execute(
+                "UPDATE of_crm_activity "
+                "SET partner_id = crm_lead.partner_id "
+                "FROM crm_lead "
+                "WHERE of_crm_activity.opportunity_id = crm_lead.id AND of_crm_activity.origin = 'opportunity';")
+            # update partner_id from sales
+            cr.execute(
+                "UPDATE of_crm_activity "
+                "SET partner_id = sale_order.partner_id "
+                "FROM sale_order "
+                "WHERE of_crm_activity.order_id = sale_order.id AND of_crm_activity.partner_id IS NULL AND "
+                "of_crm_activity.origin = 'sale_order';")
+        if update_activities and not trigger_type_exists:
+            # update the existing activities with the good trigger_type value
+            cr.execute(
+                "WITH data as ("
+                "    SELECT OCA.id AS activity_id, OCA.type_id AS a_type, CA.of_trigger_type AS at_trigger_type "
+                "    FROM of_crm_activity OCA "
+                "    JOIN crm_activity CA on OCA.type_id = CA.id "
+                "    WHERE OCA.origin = 'sale_order' AND OCA.type_id = CA.id"
+                ")"
+                "UPDATE of_crm_activity "
+                "SET trigger_type = data.at_trigger_type "
+                "FROM data "
+                "WHERE id = data.activity_id;")
+            # deactivate the activities that are triggered at confirmation for the sales orders that are not already
+            # confirmed, cancelled or done.
+            not_confirmed_sale_orders = self.env['sale.order'].search([
+                ('state', 'not in', ['sale', 'done', 'cancel']),
+                ('of_crm_activity_ids', '!=', False)
+            ])
+            not_confirmed_sale_orders and not_confirmed_sale_orders.deactivate_activities_triggered_later()
         return res
 
     sequence = fields.Integer(string='Sequence', default=1)
@@ -93,13 +106,14 @@ class OFCRMActivity(models.Model):
     description = fields.Text(string=u"Description")
     report = fields.Text(string=u"Compte-rendu", track_visibility="onchange")
     cancel_reason = fields.Text(string=u"Raison d'annulation", track_visibility="onchange")
-    partner_id = fields.Many2one(related='opportunity_id.partner_id', string=u"Client", readonly=True)
+    partner_id = fields.Many2one(comodel_name='res.partner', string="Customer", readonly=True)
     phone = fields.Char(related='opportunity_id.phone', string=u"Téléphone", readonly=True)
     mobile = fields.Char(related='opportunity_id.mobile', string=u"Mobile", readonly=True)
     email = fields.Char(related='opportunity_id.email_from', string=u"Courriel", readonly=True)
     is_late = fields.Boolean(string=u"Activité en retard", compute="_compute_is_late", search="_search_is_late")
     load_attachment = fields.Boolean(string='Load an attachment')
     uploaded_attachment_id = fields.Many2one(comodel_name='ir.attachment', string='Uploaded attachment')
+    trigger_type = fields.Selection(selection='_get_trigger_selection', string='Trigger')
     # Couleurs
     of_color_ft = fields.Char(string=u"Couleur de texte", compute='_compute_custom_colors')
     of_color_bg = fields.Char(string=u"Couleur de fond", compute='_compute_custom_colors')
@@ -132,6 +146,12 @@ class OFCRMActivity(models.Model):
     def _onchange_opportunity_id(self):
         if self.opportunity_id:
             self.vendor_id = self.opportunity_id.user_id
+            self.partner_id = self.opportunity_id.partner_id
+
+    @api.onchange('order_id')
+    def _onchange_order_id(self):
+        if self.order_id:
+            self.partner_id = self.order_id.partner_id
 
     @api.onchange('type_id')
     def _onchange_type_id(self):
@@ -143,6 +163,7 @@ class OFCRMActivity(models.Model):
                 order_obj = self.env['sale.order']
                 user_id = order_obj._of_get_sale_activity_user_id(self.order_id, self.type_id)
                 self.deadline_date = order_obj._of_get_sale_activity_date_deadline(self.order_id, self.type_id)
+            self.trigger_type = self.type_id.of_trigger_type if self.origin == 'sale_order' else False
             self.title = self.type_id.of_short_name
             self.description = self.type_id.description
             self.load_attachment = self.type_id.of_load_attachment
@@ -162,7 +183,6 @@ class OFCRMActivity(models.Model):
     @api.multi
     def _of_get_crm_activity_date_deadline(self):
         self.ensure_one()
-
         if not self.type_id:
             return False
 
@@ -190,6 +210,13 @@ class OFCRMActivity(models.Model):
             ('sale_order', _('Sale Order'))
         ]
 
+    @api.model
+    def _get_trigger_selection(self):
+        return [
+            ('at_creation', _('At creation')),
+            ('at_validation', _('At validation'))
+        ]
+
     @api.multi
     def message_track(self, tracked_fields, initial_values):
         return super(OFCRMActivity, self.with_context(to_lead=True)).message_track(tracked_fields, initial_values)
@@ -209,7 +236,7 @@ class OFCRMActivity(models.Model):
 
     @api.multi
     def action_plan(self):
-        self.write({'state': 'planned'})
+        self.write({'state': 'planned', 'active': True})
         if self._context.get('close_and_reload'):  # only from the SaleOrder Form view
             return {'type': 'ir.actions.act_close_wizard_and_reload_view'}
 

@@ -17,6 +17,7 @@
             <xpath expr="//field[@name='team_id']" position="before">
                 <field name="of_object"/>
                 <field name="of_mandatory" attrs="{'invisible':[('of_object', '!=', 'sale_order')]}"/>
+                <field name="of_trigger_type" attrs="{'required':[('of_object', '=', 'sale_order')], 'invisible':[('of_object', '!=', 'sale_order')]}"/>
                 <field name="of_load_attachment"/>
             </xpath>
             <xpath expr="//field[@name='days']" position="after">

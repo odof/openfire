@@ -56,6 +56,7 @@ class SaleOrder(models.Model):
                     not ir_config_obj.get_param('of.followup.migration', False):
                 order.with_context(auto_followup=True, followup_creator_id=self.env.user.id).sudo().\
                     action_followup_project()
+        self.activate_activities_triggered_at_validation()
         return True
 
     @api.multi
@@ -66,6 +67,21 @@ class SaleOrder(models.Model):
             self.of_followup_project_id.set_to_in_progress()
         self.state = 'sale'
         return True
+
+    @api.multi
+    def _get_activities_to_activate_at_validation(self):
+        return self.mapped('of_crm_activity_ids').filtered(lambda a: not a.active and a.trigger_type == 'at_validation')
+
+    @api.multi
+    def _get_activities_to_activate_at_confirmation(self):
+        return self.mapped('of_crm_activity_ids').filtered(
+            lambda a: not a.active and a.trigger_type == 'at_confirmation')
+
+    @api.multi
+    def activate_activities_triggered_at_validation(self):
+        """Will activate the activities that are in the list of activities to trigger at the validation.
+        """
+        self._get_activities_to_activate_at_validation().write({'active': True})
 
 
 class SaleOrderLine(models.Model):
