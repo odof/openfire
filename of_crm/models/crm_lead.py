@@ -39,6 +39,16 @@ class CrmLead(models.Model):
         res = super(CrmLead, self)._auto_init()
         if not of_date_projet:
             cr.execute("UPDATE crm_lead SET of_date_projet = date_deadline, date_deadline = of_date_cloture")
+
+        module_self = self.env['ir.module.module'].search([('name', '=', 'of_crm')])
+        if module_self:
+            version = module_self.latest_version
+            if version < "10.0.1.1.1":
+                leads = self.search([('of_activity_ids', '!=', False), ('of_date_action', '=', False)])
+                leads_to_update = leads.mapped('of_activity_ids').filtered(lambda a: a.state == 'planned').\
+                    mapped('opportunity_id')
+                leads_to_update and leads_to_update._compute_of_action_info()
+
         return res
 
     @api.model
@@ -190,6 +200,7 @@ class CrmLead(models.Model):
             opportunity.kanban_state = kanban_state
 
     @api.multi
+    @api.depends('of_activity_ids', 'of_activity_ids.state', 'of_activity_ids.date', 'of_activity_ids.title')
     def _compute_of_action_info(self):
         for opportunity in self:
             if opportunity.of_activity_ids.filtered(lambda act: act.state == 'planned'):
