@@ -44,10 +44,15 @@ class CrmLead(models.Model):
         if module_self:
             version = module_self.latest_version
             if version < "10.0.1.1.1":
-                leads = self.search([('of_activity_ids', '!=', False), ('of_date_action', '=', False)])
-                leads_to_update = leads.mapped('of_activity_ids').filtered(lambda a: a.state == 'planned').\
-                    mapped('opportunity_id')
-                leads_to_update and leads_to_update._compute_of_action_info()
+                cr.execute(
+                    "UPDATE crm_lead        CL "
+                    "SET    of_date_action  = ( SELECT      OCA.date "
+                    "                           FROM        of_crm_activity     OCA "
+                    "                           WHERE       OCA.opportunity_id  = CL.id "
+                    "                           AND         OCA.state           = 'planned' "
+                    "                           ORDER BY    OCA.date "
+                    "                           LIMIT 1)"
+                )
 
         return res
 
