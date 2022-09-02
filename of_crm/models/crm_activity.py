@@ -15,6 +15,10 @@ class CRMActivity(models.Model):
         cr.execute("SELECT * FROM information_schema.columns "
                    "WHERE table_name = 'crm_activity' AND column_name = 'of_short_name'")
         exists = bool(cr.fetchall())
+        cr.execute(
+            "SELECT * FROM information_schema.columns WHERE table_name = '%s' "
+            "AND column_name = 'of_trigger_type'" % (self._table,))
+        trigger_type_exists = cr.fetchall()
         res = super(CRMActivity, self)._auto_init()
         if not exists:
             cr.execute(
@@ -24,6 +28,13 @@ class CRMActivity(models.Model):
                 "WHERE subtype_id = MMS.id AND of_short_name IS NULL")
             # Cause of existing crm.activities we have to apply the constraint manually
             cr.execute("ALTER TABLE crm_activity ALTER of_short_name SET NOT NULL;")
+        if not trigger_type_exists:
+            # Update the trigger_type field if the compute date is based on the confirmation date of the sale order
+            cr.execute(
+                "UPDATE crm_activity "
+                "SET of_trigger_type = 'at_validation' "
+                "WHERE of_compute_date = 'confirmation_date' AND of_object = 'sale_order'"
+            )
         return res
 
     days = fields.Integer(string='Delay')  # change the standard string
@@ -41,6 +52,7 @@ class CRMActivity(models.Model):
     of_mandatory = fields.Boolean(
         string='Mandatory', help="Prevent the confirmation of an order if the activity is not carried out")
     of_load_attachment = fields.Boolean(string='Load an attachment')
+    of_trigger_type = fields.Selection(selection='_get_trigger_selection', string='Trigger', default='at_creation')
 
     @api.onchange('team_id')
     def _onchange_team_id(self):
@@ -58,6 +70,7 @@ class CRMActivity(models.Model):
     def _onchange_of_object(self):
         if self.of_object != 'sale_order':
             self.of_user_assignement = False
+            self.of_trigger_type = False
         else:
             self.of_user_id = False
 
@@ -70,6 +83,8 @@ class CRMActivity(models.Model):
     def _onchange_of_compute_date(self):
         self.of_automatic_recompute = self.of_compute_date not in ['today_date', False] and \
             self.of_object == 'sale_order'
+        if self.of_compute_date == 'confirmation_date':
+            self.of_trigger_type = 'at_validation'
 
     @api.multi
     @api.depends('of_object', 'of_compute_date_crm', 'of_compute_date_sale', 'of_compute_date_both')
@@ -125,4 +140,11 @@ class CRMActivity(models.Model):
         return [
             ('opportunity', _('Opportunity')),
             ('sale_order', _('Sale Order'))
+        ]
+
+    @api.model
+    def _get_trigger_selection(self):
+        return [
+            ('at_creation', _('At creation')),
+            ('at_validation', _('At validation'))
         ]

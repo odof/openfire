@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-01 15:20+0000\n"
-"PO-Revision-Date: 2021-04-01 15:20+0000\n"
+"POT-Creation-Date: 2022-08-22 14:18+0000\n"
+"PO-Revision-Date: 2022-08-22 14:18+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,493 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_sale_custom_workflow
-#: model:ir.model.fields,field_description:sale.field_sale_order_confirmation_date
-msgid "Confirmation Date"
-msgstr "Date d'enregistrement"
+#: model:mail.template,body_html:of_sale_custom_workflow.of_sale_custom_workflow_daily_followup_email_template
+msgid "\n"
+"<p>Bonjour ,</p>\n"
+"<p>\n"
+"Veuillez trouver ci-joint le suivi quotidien.\n"
+"</p>\n"
+"<p>\n"
+"Vous en souhaitant bonne réception.<br/>\n"
+"</p>\n"
+""
+msgstr "\n"
+"<p>Bonjour ,</p>\n"
+"<p>\n"
+"Veuillez trouver ci-joint le suivi quotidien.\n"
+"</p>\n"
+"<p>\n"
+"Vous en souhaitant bonne réception.<br/>\n"
+"</p>\n"
+""
 
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_sale_config_settings_of_display_funnel_conversion4
+msgid "(OF) Affichage du tunnel de conversion brut"
+msgstr "(OF) Affichage du tunnel de conversion brut"
+
+#. module: of_sale_custom_workflow
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_of_sale_order_confirmation_form_view
+msgid "<i class=\"oe_grey\">\n"
+"                        Oui : la date d'enregistrement devient la date d'aujourd'hui.<br/>\n"
+"                        Non : la date d'enregistrement existante est conservée.\n"
+"                    </i>"
+msgstr "<i class=\"oe_grey\">\n"
+"                        Oui : la date d'enregistrement devient la date d'aujourd'hui.<br/>\n"
+"                        Non : la date d'enregistrement existante est conservée.\n"
+"                    </i>"
+
+#. module: of_sale_custom_workflow
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_fiche_intervention_report_template
+msgid "<span>Date d'enregistrement&amp;nbsp;:</span>"
+msgstr "<span>Date d'enregistrement&amp;nbsp;:</span>"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_sale_config_settings_group_funnel_conversion4
+#: model:res.groups,name:of_sale_custom_workflow.group_funnel_conversion4
+msgid "Affichage du tunnel de conversion brut"
+msgstr "Affichage du tunnel de conversion brut"
+
+#. module: of_sale_custom_workflow
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_order_closure_wizard_form_view
+msgid "Annuler"
+msgstr "Annuler"
+
+#. module: of_sale_custom_workflow
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_of_crm_funnel_conversion4_search_view
+msgid "Année en cours"
+msgstr "Année en cours"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model,name:of_sale_custom_workflow.model_of_sale_order_closure_wizard
+msgid "Assistant de clôture des commandes de vente"
+msgstr "Assistant de clôture des commandes de vente"
+
+#. module: of_sale_custom_workflow
+#: code:addons/of_sale_custom_workflow/models/crm_activity.py:13
+#: code:addons/of_sale_custom_workflow/models/of_crm_activity.py:13
+#, python-format
+msgid "At confirmation"
+msgstr "À la confirmation"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_budget_turnover_objective
+msgid "Budget"
+msgstr "Budget"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_previous_recorded_turnover
+msgid "CA N-1"
+msgstr "CA N-1"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_ordered_turnover
+msgid "CA commandé"
+msgstr "CA commandé"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_recorded_turnover
+msgid "CA enregistré"
+msgstr "CA enregistré"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_recorded_turnover2
+msgid "CA enregistré à date de confirmation"
+msgstr "CA enregistré à date de confirmation"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_lost_turnover
+msgid "CA perdu"
+msgstr "CA perdu"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_total_turnover
+msgid "CA total"
+msgstr "CA total"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_turnover_rate
+msgid "CA total / Montant devis (%)"
+msgstr "CA total / Montant devis (%)"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model,name:of_sale_custom_workflow.model_crm_activity
+msgid "CRM Activity"
+msgstr "Activité de \"Gestion de la relation client\""
+
+#. module: of_sale_custom_workflow
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_sale_order_form_view
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_order_closure_wizard_form_view
+msgid "Clôturer"
+msgstr "Clôturer"
+
+#. module: of_sale_custom_workflow
+#: model:ir.actions.act_window,name:of_sale_custom_workflow.of_sale_order_closure_wizard_action
+msgid "Clôturer la commande"
+msgstr "Clôturer la commande"
+
+#. module: of_sale_custom_workflow
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_sale_order_search_view
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_sale_quotation_search_view
+msgid "Clôturé"
+msgstr "Clôturé"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_sale_order_closure_wizard_order_id
+msgid "Commande à clôturer"
+msgstr "Commande à clôturer"
+
+#. module: of_sale_custom_workflow
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_sale_order_search_view
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_sale_quotation_search_view
+msgid "Commandes enregistrées"
+msgstr "Commandes enregistrées"
+
+#. module: of_sale_custom_workflow
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_sale_order_search_view
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_sale_quotation_search_view
+msgid "Commandes validées"
+msgstr "Commandes validées"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_total_turnover_comparison
+msgid "Comparaison N-1 (%)"
+msgstr "Comparaison N-1 (%)"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_project_id
+msgid "Compte analytique"
+msgstr "Compte analytique"
+
+#. module: of_sale_custom_workflow
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_sale_order_form_view
+msgid "Confirmer la vente"
+msgstr "Confirmer la vente"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_sale_order_closure_wizard_create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_sale_order_closure_wizard_create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: of_sale_custom_workflow
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_of_crm_funnel_conversion4_search_view
+msgid "Cumul à date - Annuel"
+msgstr "Cumul à date - Annuel"
+
+#. module: of_sale_custom_workflow
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_of_crm_funnel_conversion4_search_view
+msgid "Cumul à date - Mensuel"
+msgstr "Cumul à date - Mensuel"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_date
+msgid "Date"
+msgstr "Date"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_sale_order_of_custom_confirmation_date
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_sale_report_of_custom_confirmation_date
+msgid "Date de confirmation"
+msgstr "Date de confirmation"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_display_name
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_sale_order_closure_wizard_display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_sale_custom_workflow
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_sale_order_search_view
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_sale_quotation_search_view
+msgid "En cours"
+msgstr "En cours"
+
+#. module: of_sale_custom_workflow
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_sale_order_confirmation_date_form_view
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_sale_order_confirmation_date_form_view2
+msgid "Enregistrer la commande"
+msgstr "Enregistrer la commande"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_my_company
+msgid "Est mon magasin ?"
+msgstr "Est mon magasin ?"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_company_management_group_id
+msgid "Groupe Gestion de société"
+msgstr "Groupe Gestion de société"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_company_sales_group_id
+msgid "Groupe Ventes de société"
+msgstr "Groupe Ventes de société"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_id
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_sale_order_closure_wizard_id
+msgid "ID"
+msgstr "ID"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4___last_update
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_sale_order_closure_wizard___last_update
+msgid "Last Modified on"
+msgstr "Dernière Modification le"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_sale_order_closure_wizard_write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_sale_order_closure_wizard_write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_ordered_margin_percent
+msgid "Marge commandé %"
+msgstr "Marge commandé %"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_ordered_margin
+msgid "Marge commandé €"
+msgstr "Marge commandé €"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_recorded_margin_percent
+msgid "Marge enregistré %"
+msgstr "Marge enregistré %"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_recorded_margin
+msgid "Marge enregistré €"
+msgstr "Marge enregistré €"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_recorded_margin2
+msgid "Marge enregistré € à date de confirmation"
+msgstr "Marge enregistré € à date de confirmation"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_total_margin_percent
+msgid "Marge total %"
+msgstr "Marge total %"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_total_margin
+msgid "Marge total €"
+msgstr "Marge total €"
+
+#. module: of_sale_custom_workflow
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_of_crm_funnel_conversion4_search_view
+msgid "Mois en cours"
+msgstr "Mois en cours"
+
+#. module: of_sale_custom_workflow
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_of_crm_funnel_conversion4_search_view
+msgid "Mois précédent"
+msgstr "Mois précédent"
+
+#. module: of_sale_custom_workflow
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_of_crm_funnel_conversion4_search_view
+msgid "Mon magasin"
+msgstr "Mon magasin"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_quotation_amount
+msgid "Montant devis"
+msgstr "Montant devis"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_quotation_nb
+msgid "Nb devis"
+msgstr "Nb devis"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_quotation_rate
+msgid "Nb devis / Nb opportunités (%)"
+msgstr "Nb devis / Nb opportunités (%)"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_previous_quotation_nb
+msgid "Nb devis N-1"
+msgstr "Nb devis N-1"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_lost_quotation_nb
+msgid "Nb devis perdus"
+msgstr "Nb devis perdus"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_opportunity_nb
+msgid "Nb opportunités"
+msgstr "Nb opportunités"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_previous_opportunity_nb
+msgid "Nb opportunités N-1"
+msgstr "Nb opportunités N-1"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_order_nb
+msgid "Nb ventes"
+msgstr "Nb ventes"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_order_rate
+msgid "Nb ventes / Nb devis (%)"
+msgstr "Nb ventes / Nb devis (%)"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_previous_order_nb
+msgid "Nb ventes N-1"
+msgstr "Nb ventes N-1"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model,name:of_sale_custom_workflow.model_of_crm_activity
+msgid "OF Activité de CRM/Ventes"
+msgstr "OF Activité de CRM/Ventes"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_ordered_turnover_objective
+msgid "Objectif CA"
+msgstr "Objectif CA"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_quotation_cart
+msgid "Panier devis"
+msgstr "Panier devis"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_lost_cart
+msgid "Panier perdu"
+msgstr "Panier perdu"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_sale_cart
+msgid "Panier vente"
+msgstr "Panier vente"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_partner_id
+msgid "Partenaire"
+msgstr "Partenaire"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_canvasser_id
+msgid "Prospecteur"
+msgstr "Prospecteur"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_rest_to_do
+msgid "RAF (%)"
+msgstr "RAF (%)"
+
+#. module: of_sale_custom_workflow
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_sale_order_form_view
+msgid "Ré-ouvrir"
+msgstr "Ré-ouvrir"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model,name:of_sale_custom_workflow.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model,name:of_sale_custom_workflow.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de bons de commande"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model,name:of_sale_custom_workflow.model_sale_report
+msgid "Sales Orders Statistics"
+msgstr "Statistiques sur les commandes de ventes"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_company_sector_id
+msgid "Secteur de société"
+msgstr "Secteur de société"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_company_id
+msgid "Société"
+msgstr "Société"
+
+#. module: of_sale_custom_workflow
+#: model:mail.template,subject:of_sale_custom_workflow.of_sale_custom_workflow_daily_followup_email_template
+msgid "Suivi quotidien"
+msgstr "Suivi quotidien"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_sale_order_closure_wizard_info_txt
+msgid "Texte d'information"
+msgstr "Texte d'information"
+
+#. module: of_sale_custom_workflow
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_sale_config_settings_form_view
+msgid "Tunnel basé sur l'analyse brute des données commerciales.<br/>\n"
+"                        La valeur de référence est la date de chaque évènement.\n"
+"                        Toutes les données sont analysées.<br/>\n"
+"                        Le workflow des commandes est enrichi."
+msgstr "Tunnel basé sur l'analyse brute des données commerciales.<br/>\n"
+"                        La valeur de référence est la date de chaque évènement.\n"
+"                        Toutes les données sont analysées.<br/>\n"
+"                        Le workflow des commandes est enrichi."
+
+#. module: of_sale_custom_workflow
+#: model:ir.ui.menu,name:of_sale_custom_workflow.of_sale_custom_workflow_of_crm_funnel_conversion4_menu
+msgid "Tunnel brut"
+msgstr "Tunnel brut"
+
+#. module: of_sale_custom_workflow
+#: model:ir.actions.act_window,name:of_sale_custom_workflow.of_sale_custom_workflow_of_crm_funnel_conversion4_action
+msgid "Tunnel de conversion (brut)"
+msgstr "Tunnel de conversion (brut)"
+
+#. module: of_sale_custom_workflow
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_of_crm_funnel_conversion4_pivot_view
+msgid "Tunnel de conversion 4"
+msgstr "Tunnel de conversion 4"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model,name:of_sale_custom_workflow.model_of_crm_funnel_conversion4
+msgid "Tunnel de conversion CRM 4"
+msgstr "Tunnel de conversion CRM 4"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_sale_type_id
+msgid "Type de devis"
+msgstr "Type de devis"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_company_type_id
+msgid "Type de société"
+msgstr "Type de société"
+
+#. module: of_sale_custom_workflow
+#: code:addons/of_sale_custom_workflow/reports/of_crm_funnel_conversion.py:94
+#, python-format
+msgid "Unsupported search operator"
+msgstr "Unsupported search operator"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_of_crm_funnel_conversion4_vendor_id
+msgid "Vendeur"
+msgstr "Vendeur"
+
+#. module: of_sale_custom_workflow
+#: model:ir.ui.view,arch_db:of_sale_custom_workflow.of_sale_custom_workflow_of_sale_order_confirmation_form_view
+msgid "Voulez-vous mettre à jour la date d'enregistrement de la commande ? <br/>"
+msgstr "Voulez-vous mettre à jour la date d'enregistrement de la commande ? <br/>"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model,name:of_sale_custom_workflow.model_sale_config_settings
+msgid "sale.config.settings"
+msgstr "sale.config.settings"
