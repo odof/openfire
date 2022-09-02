@@ -260,6 +260,30 @@ class SaleOrderLine(models.Model):
         return res
 
 
+class OFSaleOrderLayoutCategory(models.Model):
+    _inherit = 'of.sale.order.layout.category'
+
+    labor_cost = fields.Float(
+        string=u"Coût main d'oeuvre", digits=dp.get_precision('Product Price'), compute='_compute_labor_cost')
+    total_labor_cost = fields.Float(
+        string=u"Total coût", digits=dp.get_precision('Product Price'), compute='_compute_labor_cost')
+    margin = fields.Float(string=u"Marge HT", compute='_compute_margin')
+    pc_margin = fields.Float(string=u"% Marge", compute='_compute_margin')
+
+    @api.depends('order_line_ids')
+    def _compute_labor_cost(self):
+        for layout_category in self:
+            layout_category.labor_cost = sum(layout_category.order_line_ids.mapped('of_labor_cost'))
+            layout_category.total_labor_cost = sum(layout_category.order_line_ids.mapped('of_total_labor_cost'))
+
+    @api.depends('total_labor_cost', 'prix_vente')
+    def _compute_margin(self):
+        for layout_category in self:
+            layout_category.margin = layout_category.prix_vente - layout_category.total_labor_cost
+            layout_category.pc_margin = 100 * (1 - layout_category.total_labor_cost / layout_category.prix_vente) \
+                if layout_category.prix_vente else - layout_category.total_labor_cost
+
+
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
