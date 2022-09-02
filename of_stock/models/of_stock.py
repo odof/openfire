@@ -828,6 +828,7 @@ class StockPackOperation(models.Model):
         string=u"Total HT", readonly=True, currency_field='company_currency_id', compute='_compute_of_amount_untaxed')
     company_currency_id = fields.Many2one(
         'res.currency', related='picking_id.company_id.currency_id', string=u"Company currency", readonly=True)
+    of_editable_record = fields.Boolean(string=u"Ligne modifiable", compute='_compute_editable_record')
 
     @api.depends('linked_move_operation_ids.move_id.of_computed_price_unit')
     def _compute_of_price_unit(self):
@@ -842,6 +843,13 @@ class StockPackOperation(models.Model):
         for pack in self:
             if len(pack.linked_move_operation_ids) == 1:
                 pack.of_amount_untaxed = pack.linked_move_operation_ids.move_id.of_amount_untaxed
+
+    @api.depends('product_qty')
+    def _compute_editable_record(self):
+        picking_product_id = self.env['ir.values'].sudo().get_default(
+            'of.intervention.settings', 'picking_product_id')
+        for pack in self:
+            pack.of_editable_record = pack.product_qty and pack.product_id.id == picking_product_id
 
 
 class StockMove(models.Model):
