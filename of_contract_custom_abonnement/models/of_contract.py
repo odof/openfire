@@ -41,7 +41,7 @@ class OFContractProduct(models.Model):
         """ Calcul de la qté à facturer """
         for product_line in self:
             line = product_line.line_id
-            if line.ctype != 'abonnement':
+            if line.ctype != 'subscription':
                 super(OFContractProduct, product_line)._compute_quantities()
             else:
                 qty_per_period = product_line.quantity
@@ -49,12 +49,16 @@ class OFContractProduct(models.Model):
                 qty_to_invoice = 1
                 if line.prorata and not line.invoice_line_ids.filtered(lambda il: il.invoice_id.state != 'cancel'):
                     start = fields.Date.from_string(line.date_start)
-                    end = fields.Date.from_string(line.next_date)
+                    end = fields.Date.from_string(line.next_date or line.first_invoicing)
                     start_next_month = start + relativedelta(months=1, day=1)
                     start_beg_month = start + relativedelta(day=1)
-                    diviseur = (start_next_month - start_beg_month) + (end - start_next_month)
-                    dividende = (start_next_month - start) + (end - start_next_month)
-                    qty_to_invoice = dividende / diviseur
+                    diviseur = ((start_next_month - start_beg_month) + (end - start_next_month)).days
+                    dividende = ((start_next_month - start) + (end - start_next_month)).days
+                    # un des chiffres doit être cast en float autrement on trouve un arrondi
+                    qty_to_invoice = float(dividende) / diviseur
+                    if line.recurring_invoicing_payment_id.code == 'pre-paid':
+                        # pre-paid signifie qu'on paie pour la période a venir donc qty = prorata + 1
+                        qty_to_invoice += 1.0
                 elif line.prorata and line.date_end:
                     start = fields.Date.from_string(line.next_date)
                     frequency = line.contract_id.frequency
@@ -77,5 +81,6 @@ class OFContractProduct(models.Model):
                     end = fields.Date.from_string(line.date_end)
                     diviseur = last_date - start
                     dividende = end - start
-                    qty_to_invoice = dividende / diviseur
+                    # un des chiffres doit être cast en float autrement on trouve un arrondi
+                    qty_to_invoice = float(dividende) / diviseur
                 product_line.qty_to_invoice = qty_to_invoice

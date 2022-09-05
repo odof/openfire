@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from dateutil.relativedelta import relativedelta
 from odoo.addons import decimal_precision as dp
 from odoo.exceptions import UserError
@@ -42,40 +42,46 @@ class OfContract(models.Model):
     @api.model_cr_context
     def _auto_init(self):
         cr = self._cr
-        cr.execute(
-            "SELECT * FROM information_schema.columns "
-            "WHERE table_name = '%s' AND column_name = 'contract_type'" % (self._table,))
-        exist1 = bool(cr.fetchall())
-        cr.execute(
-            "SELECT * FROM information_schema.columns "
-            "WHERE table_name = '%s' AND column_name = 'type'" % (self._table,))
-        exist2 = bool(cr.fetchall())
-        cr.execute(
-            "SELECT * FROM information_schema.columns "
-            "WHERE table_name = '%s' AND column_name = 'frequency'" % (self._table,))
-        exist3 = bool(cr.fetchall())
+        # Vérification si la table existe, si elle n'existe pas on est en cours d'installation du module
+        cr.execute("SELECT * FROM information_schema.columns "
+                   "WHERE table_name = '%s'" % (self._table,))
+        table_exist = bool(cr.fetchall())
+        if table_exist:
+            cr.execute(
+                "SELECT * FROM information_schema.columns "
+                "WHERE table_name = '%s' AND column_name = 'contract_type'" % (self._table,))
+            exist1 = bool(cr.fetchall())
+            cr.execute(
+                "SELECT * FROM information_schema.columns "
+                "WHERE table_name = '%s' AND column_name = 'type'" % (self._table,))
+            exist2 = bool(cr.fetchall())
+            cr.execute(
+                "SELECT * FROM information_schema.columns "
+                "WHERE table_name = '%s' AND column_name = 'frequency'" % (self._table,))
+            exist3 = bool(cr.fetchall())
         res = super(OfContract, self)._auto_init()
-        if not exist1 and exist2:
-            cr.execute("UPDATE %s "
-                       "SET contract_type = 'advanced'" % (self._table, ))
-            self.env['ir.values'].sudo().set_default(
-                'of.intervention.settings', 'of_contract', True)
-        if not exist3:
-            def old_invoicing_frequencing_to_new(contract):
-                rrtype = contract.recurring_rule_type
-                if rrtype == 'date':
-                    return {'frequency': 'date', 'frequency_amount': 0}
-                if rrtype == 'month':
-                    return {'frequency': 'months', 'frequency_amount': 1}
-                if rrtype == 'trimester':
-                    return {'frequency': 'trimester', 'frequency_amount': 1}
-                if rrtype == 'semester':
-                    return {'frequency': 'semester', 'frequency_amount': 1}
-                if rrtype == 'year':
-                    return {'frequency': 'years', 'frequency_amount': 1}
-            contracts = self.env['of.contract'].search([])
-            for contract in contracts:
-                contract.write(old_invoicing_frequencing_to_new(contract))
+        if table_exist:
+            if not exist1 and exist2:
+                cr.execute("UPDATE %s "
+                           "SET contract_type = 'advanced'" % (self._table, ))
+                self.env['ir.values'].sudo().set_default(
+                    'of.intervention.settings', 'of_contract', True)
+            if not exist3:
+                def old_invoicing_frequencing_to_new(contract):
+                    rrtype = contract.recurring_rule_type
+                    if rrtype == 'date':
+                        return {'frequency': 'date', 'frequency_amount': 0}
+                    if rrtype == 'month':
+                        return {'frequency': 'months', 'frequency_amount': 1}
+                    if rrtype == 'trimester':
+                        return {'frequency': 'trimester', 'frequency_amount': 1}
+                    if rrtype == 'semester':
+                        return {'frequency': 'semester', 'frequency_amount': 1}
+                    if rrtype == 'year':
+                        return {'frequency': 'years', 'frequency_amount': 1}
+                contracts = self.env['of.contract'].search([])
+                for contract in contracts:
+                    contract.write(old_invoicing_frequencing_to_new(contract))
         return res
 
     @api.model
@@ -108,7 +114,8 @@ class OfContract(models.Model):
         ], string=u"Fréquence de facturation", help="Intervalle de temps entre chaque facturation",
     )
     recurring_invoicing_payment_id = fields.Many2one(
-        'of.contract.recurring.invoicing.payment', string="Type de facturation")
+        'of.contract.recurring.invoicing.payment', string="Type de facturation",
+        default=lambda s: s._default_recurring_invoicing_payment_id())
     journal_id = fields.Many2one(
         'account.journal', string='Journal', default=lambda s: s._default_journal(),
         domain="[('type', '=', 'sale'),('company_id', '=', company_id)]")
@@ -122,7 +129,10 @@ class OfContract(models.Model):
     date_end = fields.Date(string='Date de fin')
     recurring_next_date = fields.Date(string='Date de la prochaine facture', compute="_compute_next_date", store=True)
     fiscal_position_id = fields.Many2one(
-        'account.fiscal.position', string="Position fiscale", domain="[('company_id', '=', company_id)]")
+        'account.fiscal.position', string="Position fiscale",
+        domain="['|', ('company_id', '=', company_id), "
+               "      ('company_id', '=', False),"
+               "('tax_ids.tax_src_id.type_tax_use', '=', 'sale')]")
     next_subtotal = fields.Monetary(
         string="Prochain montant HT", compute='_compute_next_total', currency_field='company_currency_id', store=True)
     next_taxes = fields.Monetary(
@@ -192,6 +202,22 @@ class OfContract(models.Model):
     prorata = fields.Boolean(string="Prorata")
 
     @api.model
+    def _default_recurring_invoicing_payment_id(self):
+        # post paid par défaut car pre-paid est pour toutes fréquences sauf a date.
+        default = self.env.ref(
+            'of_contract_custom.of_contract_recurring_invoicing_payment_post-paid', raise_if_not_found=False)
+        if default:
+            return default.id
+        return False
+
+    @api.constrains('date_start', 'date_end')
+    def _check_dates(self):
+        for contract in self:
+            if contract.date_start and contract.date_end and contract.date_end < contract.date_start:
+                raise UserError(
+                    _(u"La date de fin du contrat ne peut pas être avant la date de début."))
+
+    @api.model
     def _default_journal(self):
         company_id = self.env.context.get(
             'company_id', self.env.user.company_id.id)
@@ -247,12 +273,14 @@ class OfContract(models.Model):
         """ Calcul de l'état du contrat en fonction de la date du jour, se recalcul quand le champ est affiché """
         today = fields.Date.today()
         for contract in self:
-            if contract.date_start > today:
+            if not any([line_state == 'validated' for line_state in contract.line_ids.mapped('state')]) and \
+                    (not contract.date_end or today < contract.date_end) or contract.date_start > today:
                 contract.state = 'upcoming'
-            elif contract.date_end and contract.date_end < today:
-                contract.state = 'inactive'
-            else:
+            elif any([line_state == 'validated' for line_state in contract.line_ids.mapped('state')]) and \
+                    contract.date_start < today:
                 contract.state = 'in_progress'
+            else:
+                contract.state = 'inactive'
 
     @api.depends('line_ids', 'line_ids.next_date')
     def _compute_next_date(self):
@@ -350,26 +378,26 @@ class OfContract(models.Model):
                 end_date = date + relativedelta(years=1, day=1, month=1) - relativedelta(days=1)
                 self.date_end = fields.Date.to_string(end_date)
 
-    @api.onchange('date_start')
-    def _onchange_date_start(self):
-        if self.date_start:
-            if not self.renewal:
-                date = fields.Date.from_string(self.date_start)
-                end_date = date + relativedelta(years=1, days=-1)
-                self.date_end = fields.Date.to_string(end_date)
+    @api.onchange('date_start', 'date_end')
+    def _onchange_dates(self):
+        if self.date_start and not self.renewal:
+            date = fields.Date.from_string(self.date_start)
+            end_date = date + relativedelta(years=1, days=-1)
+            self.date_end = fields.Date.to_string(end_date)
+        self._check_dates()
 
     @api.onchange('partner_id')
     def onchange_partner(self):
         """ Prend la position fiscale renseignée sur le client """
         self.fiscal_position_id = self.partner_id.property_account_position_id
 
-    @api.onchange('recurring_rule_type')
-    def _onchange_recurring_rule_type(self):
+    @api.onchange('frequency')
+    def _onchange_frequency(self):
         self.ensure_one()
-        if self.recurring_rule_type == 'date':
+        if self.frequency == 'date':
             if self.recurring_invoicing_payment_id.code not in ('date', 'post-paid'):
                 self.recurring_invoicing_payment_id = False
-        elif self.recurring_rule_type:
+        elif self.frequency:
             if self.recurring_invoicing_payment_id.code not in ('pre-paid', 'post-paid'):
                 self.recurring_invoicing_payment_id = False
 
@@ -818,69 +846,75 @@ class OfContractLine(models.Model):
     @api.model_cr_context
     def _auto_init(self):
         cr = self._cr
-        cr.execute(
-            "SELECT * FROM information_schema.columns "
-            "WHERE table_name = '%s' AND column_name = 'interv_frequency_nbr'" % (self._table,))
-        exist1 = bool(cr.fetchall())
-        cr.execute(
-            "SELECT * FROM information_schema.columns "
-            "WHERE table_name = '%s' AND column_name = 'nbr_interv'" % (self._table,))
-        exist2 = bool(cr.fetchall())
-        change_planif = False
-        if exist2 and not exist1:
+        # Vérification si la table existe, si elle n'existe pas on est en cours d'installation du module
+        cr.execute("SELECT * FROM information_schema.columns "
+                   "WHERE table_name = '%s'" % (self._table,))
+        table_exist = bool(cr.fetchall())
+        if table_exist:
             cr.execute(
-                "SELECT ocl.id, ocl.nbr_interv, sub.nbr_month "
-                "FROM of_contract_line AS ocl "
-                "JOIN (SELECT rel.of_contract_line_id AS line_id, count(rel.of_mois_id) AS nbr_month "
-                "FROM of_contract_line_of_mois_rel AS rel "
-                "GROUP BY rel.of_contract_line_id) AS sub ON sub.line_id=ocl.id")
-            change_planif = cr.fetchall()
-        cr.execute(
-            "SELECT * FROM information_schema.columns "
-            "WHERE table_name = '%s' AND column_name = 'first_invoicing'" % (self._table,))
-        exist3 = bool(cr.fetchall())
+                "SELECT * FROM information_schema.columns "
+                "WHERE table_name = '%s' AND column_name = 'interv_frequency_nbr'" % (self._table,))
+            exist1 = bool(cr.fetchall())
+            cr.execute(
+                "SELECT * FROM information_schema.columns "
+                "WHERE table_name = '%s' AND column_name = 'nbr_interv'" % (self._table,))
+            exist2 = bool(cr.fetchall())
+            change_planif = False
+            if exist2 and not exist1:
+                cr.execute(
+                    "SELECT ocl.id, ocl.nbr_interv, sub.nbr_month "
+                    "FROM of_contract_line AS ocl "
+                    "JOIN (SELECT rel.of_contract_line_id AS line_id, count(rel.of_mois_id) AS nbr_month "
+                    "FROM of_contract_line_of_mois_rel AS rel "
+                    "GROUP BY rel.of_contract_line_id) AS sub ON sub.line_id=ocl.id")
+                change_planif = cr.fetchall()
+            cr.execute(
+                "SELECT * FROM information_schema.columns "
+                "WHERE table_name = '%s' AND column_name = 'first_invoicing'" % (self._table,))
+            exist3 = bool(cr.fetchall())
         res = super(OfContractLine, self)._auto_init()
-        if change_planif:
-            for line_id, nbr_interv, nbr_month in change_planif:
-                if (float(nbr_interv)/float(nbr_month)).is_integer():
-                    ratio = nbr_interv/nbr_month
-                    values = ('month', ratio, line_id)
-                else:
-                    values = ('year', nbr_interv, line_id)
-                cr.execute("UPDATE of_contract_line "
-                           "SET interv_frequency = %s, interv_frequency_nbr = %s WHERE id = %s", values)
-        if not exist3:
-            # Initialisation de la colonne first_invoicing
-            # Cas 1, la ligne de contrat a déjà été facturée donc
-            #   date de première facturation = date supposée de la première facture
-            # Cas 2, la ligne de contrat n'a pas été facturée mais a une date de début donc
-            #   date de première facturation = date de début de la ligne
-            # Cas 3, la ligne de contrat n'a pas été facturée ET n'a pas de date de début
-            #   date de première facturation = date de début du contrat
-            cr.execute("UPDATE of_contract_line AS ocl "
-                       "SET first_invoicing = subr.date " 
-                       "FROM (SELECT * "
-                       "FROM ( "
-                       "  SELECT "
-                       "    ROW_NUMBER() OVER (PARTITION BY ocl.id ORDER BY ail.name) AS r, "
-                       "    ocl.id AS line_id, "
-                       "    CASE "
-                       "      WHEN ail.of_contract_supposed_date IS NOT NULL"
-                       "      THEN ail.of_contract_supposed_date "
-                       "      WHEN ocl.date_start IS NOT NULL"
-                       "      THEN ocl.date_start "
-                       "      ELSE oc.date_start "
-                       "    END"
-                       "    AS date "
-                       "  FROM "
-                       "    of_contract_line AS ocl "
-                       "  LEFT OUTER JOIN "
-                       "    account_invoice_line AS ail ON ail.of_contract_line_id=ocl.id "
-                       "  LEFT JOIN "
-                       "    of_contract AS oc ON oc.id=ocl.contract_id) AS sub "
-                       "WHERE "
-                       "  sub.r <= 1) AS subr "
-                       "WHERE subr.line_id=ocl.id")
+        if table_exist:
+            if change_planif:
+                for line_id, nbr_interv, nbr_month in change_planif:
+                    if (float(nbr_interv)/float(nbr_month)).is_integer():
+                        ratio = nbr_interv/nbr_month
+                        values = ('month', ratio, line_id)
+                    else:
+                        values = ('year', nbr_interv, line_id)
+                    cr.execute("UPDATE of_contract_line "
+                               "SET interv_frequency = %s, interv_frequency_nbr = %s WHERE id = %s", values)
+            if not exist3:
+                # Initialisation de la colonne first_invoicing
+                # Cas 1, la ligne de contrat a déjà été facturée donc
+                #   date de première facturation = date supposée de la première facture
+                # Cas 2, la ligne de contrat n'a pas été facturée mais a une date de début donc
+                #   date de première facturation = date de début de la ligne
+                # Cas 3, la ligne de contrat n'a pas été facturée ET n'a pas de date de début
+                #   date de première facturation = date de début du contrat
+                cr.execute("UPDATE of_contract_line AS ocl "
+                           "SET first_invoicing = subr.date " 
+                           "FROM (SELECT * "
+                           "FROM ( "
+                           "  SELECT "
+                           "    ROW_NUMBER() OVER (PARTITION BY ocl.id ORDER BY ail.name) AS r, "
+                           "    ocl.id AS line_id, "
+                           "    CASE "
+                           "      WHEN ail.of_contract_supposed_date IS NOT NULL"
+                           "      THEN ail.of_contract_supposed_date "
+                           "      WHEN ocl.date_start IS NOT NULL"
+                           "      THEN ocl.date_start "
+                           "      ELSE oc.date_start "
+                           "    END"
+                           "    AS date "
+                           "  FROM "
+                           "    of_contract_line AS ocl "
+                           "  LEFT OUTER JOIN "
+                           "    account_invoice_line AS ail ON ail.of_contract_line_id=ocl.id "
+                           "  LEFT JOIN "
+                           "    of_contract AS oc ON oc.id=ocl.contract_id) AS sub "
+                           "WHERE "
+                           "  sub.r <= 1) AS subr "
+                           "WHERE subr.line_id=ocl.id")
 
         return res
 
@@ -911,9 +945,7 @@ class OfContractLine(models.Model):
         ('year', u'Annuelle'),
         ], default='month', string=u"Fréquence de facturation", required=True)
     recurring_invoicing_payment_id = fields.Many2one(
-        'of.contract.recurring.invoicing.payment', string="Type de facturation", required=True,
-        default=lambda s: s.env.ref(
-            'of_contract_custom.of_contract_recurring_invoicing_payment_pre-paid', raise_if_not_found=False))
+        'of.contract.recurring.invoicing.payment', string="Type de facturation", required=True)
 
     next_date = fields.Date(string="Prochaine facturation", compute="_compute_dates", store=True, copy=False)
     is_invoiceable = fields.Boolean(compute="_compute_is_invoiceable", store=True, copy=False)
@@ -956,7 +988,11 @@ class OfContractLine(models.Model):
     invoice_count = fields.Integer(string="Nombre de factures", compute='_compute_invoice_count')
     contract_product_ids = fields.One2many(
         comodel_name="of.contract.product", inverse_name='line_id', string="Articles", copy=False)
-    fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale")
+    fiscal_position_id = fields.Many2one(
+        'account.fiscal.position', string="Position fiscale",
+        domain="['|', ('company_id', '=', company_id), "
+               "      ('company_id', '=', False),"
+               "('tax_ids.tax_src_id.type_tax_use', '=', 'sale')]")
     next_purchase_price = fields.Float(string=u"Prochain coût", compute='_compute_prices')
     year_purchase_price = fields.Float(string=u"Coût annuel", compute='_compute_prices')
     amount_subtotal = fields.Monetary(
@@ -1138,7 +1174,10 @@ class OfContractLine(models.Model):
                         next_date = base_date + relativedelta(months=1, day=1, days=-1)
                     line.next_date = next_date
             else:
-                base_date = fields.Date.from_string(last_invoice_date or line.date_contract_start)
+                base_date = fields.Date.from_string(last_invoice_date or line.first_invoicing)
+                if not line.invoice_line_ids:
+                    line.next_date = base_date
+                    continue
                 end = fields.Date.from_string(line.date_contract_end)
                 frequency = line.frequency
                 amount = line.frequency_amount
@@ -1700,30 +1739,36 @@ class OfContractProduct(models.Model):
     @api.model_cr_context
     def _auto_init(self):
         cr = self._cr
-        cr.execute(
-            "SELECT * FROM information_schema.columns "
-            "WHERE table_name = '%s' AND column_name = 'layout_category_id'" % (self._table,))
-        exist = bool(cr.fetchall())
+        # Vérification si la table existe, si elle n'existe pas on est en cours d'installation du module
+        cr.execute("SELECT * FROM information_schema.columns "
+                   "WHERE table_name = '%s'" % (self._table,))
+        table_exist = bool(cr.fetchall())
+        if table_exist:
+            cr.execute(
+                "SELECT * FROM information_schema.columns "
+                "WHERE table_name = '%s' AND column_name = 'layout_category_id'" % (self._table,))
+            exist = bool(cr.fetchall())
         res = super(OfContractProduct, self)._auto_init()
-        if not exist:
-            # Fait dans les of.contract.product car un write doit être réalisé sur of.contract.line qui va provoquer
-            # un recalcul dans of.contract.product et planter si les nouveaux champs n'existe pas encore en db
-            def old_invoicing_frequencing_to_new(contract_line):
-                rrtype = contract_line.frequency_type
-                if rrtype == 'date':
-                    return {'frequency': 'date', 'frequency_amount': 0}
-                if rrtype == 'month':
-                    return {'frequency': 'months', 'frequency_amount': 1}
-                if rrtype == 'trimester':
-                    return {'frequency': 'trimester', 'frequency_amount': 1}
-                if rrtype == 'semester':
-                    return {'frequency': 'semester', 'frequency_amount': 1}
-                if rrtype == 'year':
-                    return {'frequency': 'years', 'frequency_amount': 1}
-            contract_lines = self.env['of.contract.line'].search([])
-            contract_lines = contract_lines.with_context(no_verification=True)
-            for contract_line in contract_lines:
-                contract_line.write(old_invoicing_frequencing_to_new(contract_line))
+        if table_exist:
+            if not exist:
+                # Fait dans les of.contract.product car un write doit être réalisé sur of.contract.line qui va provoquer
+                # un recalcul dans of.contract.product et planter si les nouveaux champs n'existe pas encore en db
+                def old_invoicing_frequencing_to_new(contract_line):
+                    rrtype = contract_line.frequency_type
+                    if rrtype == 'date':
+                        return {'frequency': 'date', 'frequency_amount': 0}
+                    if rrtype == 'month':
+                        return {'frequency': 'months', 'frequency_amount': 1}
+                    if rrtype == 'trimester':
+                        return {'frequency': 'trimester', 'frequency_amount': 1}
+                    if rrtype == 'semester':
+                        return {'frequency': 'semester', 'frequency_amount': 1}
+                    if rrtype == 'year':
+                        return {'frequency': 'years', 'frequency_amount': 1}
+                contract_lines = self.env['of.contract.line'].search([])
+                contract_lines = contract_lines.with_context(no_verification=True)
+                for contract_line in contract_lines:
+                    contract_line.write(old_invoicing_frequencing_to_new(contract_line))
         return res
 
     sequence = fields.Integer(string=u"Séquence", default=10, help=u"Séquence")
@@ -1869,12 +1914,16 @@ class OfContractProduct(models.Model):
                 qty_to_invoice = round(product_line.qty_per_period - product_line.qty_invoiced, 3)
             elif line.prorata and not line.invoice_line_ids.filtered(lambda il: il.invoice_id.state != 'cancel'):
                 start = fields.Date.from_string(line.date_start)
-                end = fields.Date.from_string(line.next_date)
+                end = fields.Date.from_string(line.next_date or line.first_invoicing)
                 start_next_month = start + relativedelta(months=1, day=1)
                 start_beg_month = start + relativedelta(day=1)
-                diviseur = (start_next_month - start_beg_month) + (end - start_next_month)
-                dividende = (start_next_month - start) + (end - start_next_month)
-                prorata = dividende / diviseur
+                diviseur = ((start_next_month - start_beg_month) + (end - start_next_month)).days
+                dividende = ((start_next_month - start) + (end - start_next_month)).days
+                # un des chiffres doit être cast en float autrement on trouve un arrondi
+                prorata = float(dividende) / diviseur
+                if line.recurring_invoicing_payment_id.code == 'pre-paid':
+                    # pre-paid signifie qu'on paie pour la période a venir donc il faut facturer 1x + prorata
+                    prorata += 1.0
             elif line.prorata and line.date_end and line.next_date > line.date_end:
                 start = fields.Date.from_string(line.next_date)
                 last_date = safe_eval('base_date + relativedelta(%s=amount)' % frequency,
@@ -1885,7 +1934,8 @@ class OfContractProduct(models.Model):
                 end = fields.Date.from_string(line.date_end)
                 diviseur = last_date - start
                 dividende = end - start
-                prorata = dividende / diviseur
+                # un des chiffres doit être cast en float autrement on trouve un arrondi
+                prorata = float(dividende) / diviseur
             date_end_period = fields.Date.from_string(line.current_period_id.date_end)
             date_start_period = fields.Date.from_string(line.current_period_id.date_start)
             if frequency == 'days':
@@ -1959,7 +2009,8 @@ class OfContractProduct(models.Model):
             'of_contract_supposed_date': self.line_id.next_date,
             'account_id': account.id,
             'account_analytic_id': self.account_analytic_id and self.account_analytic_id.id,
-            'layout_category_id': self.layout_category_id.id
+            'layout_category_id': self.layout_category_id.id,
+            # 'purchase_price': self.purchase_price,
         })
 
         return invoice_line_vals
