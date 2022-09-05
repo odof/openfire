@@ -106,7 +106,8 @@ class OFCRMActivity(models.Model):
     description = fields.Text(string=u"Description")
     report = fields.Text(string=u"Compte-rendu", track_visibility="onchange")
     cancel_reason = fields.Text(string=u"Raison d'annulation", track_visibility="onchange")
-    partner_id = fields.Many2one(comodel_name='res.partner', string="Customer", readonly=True)
+    partner_id = fields.Many2one(
+        comodel_name='res.partner', compute='_compute_partner_id', string="Customer", store=True)
     phone = fields.Char(related='opportunity_id.phone', string=u"Téléphone", readonly=True)
     mobile = fields.Char(related='opportunity_id.mobile', string=u"Mobile", readonly=True)
     email = fields.Char(related='opportunity_id.email_from', string=u"Courriel", readonly=True)
@@ -117,6 +118,14 @@ class OFCRMActivity(models.Model):
     # Couleurs
     of_color_ft = fields.Char(string=u"Couleur de texte", compute='_compute_custom_colors')
     of_color_bg = fields.Char(string=u"Couleur de fond", compute='_compute_custom_colors')
+
+    @api.multi
+    @api.depends('origin', 'order_id', 'opportunity_id', 'order_id.partner_id', 'opportunity_id.partner_id')
+    def _compute_partner_id(self):
+        for activity in self:
+            partner = getattr(
+                activity.order_id if activity.origin == 'sale_order' else activity.opportunity_id, 'partner_id')
+            activity.partner_id = partner.id
 
     @api.multi
     def _compute_is_late(self):
@@ -146,12 +155,6 @@ class OFCRMActivity(models.Model):
     def _onchange_opportunity_id(self):
         if self.opportunity_id:
             self.vendor_id = self.opportunity_id.user_id
-            self.partner_id = self.opportunity_id.partner_id
-
-    @api.onchange('order_id')
-    def _onchange_order_id(self):
-        if self.order_id:
-            self.partner_id = self.order_id.partner_id
 
     @api.onchange('type_id')
     def _onchange_type_id(self):
