@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 from odoo import fields, models, api, _
 from datetime import datetime, date, timedelta
 
@@ -75,7 +77,8 @@ class SaleOrder(models.Model):
         product = self.env['product.product'].browse(int(product_id))
 
         # Si gestion des stocks et interdit de commander stock non disponible
-        if website.get_website_config() != 'none' and website.get_of_unavailability_management() == 'notify':
+        if website.get_website_config() != 'none' and website.get_of_unavailability_management() == 'notify' \
+                and product.availability is False:
 
             # On calcul le product_quantity en fonction de la configuration on_hand/forecast
             product_quantity = product.qty_available
