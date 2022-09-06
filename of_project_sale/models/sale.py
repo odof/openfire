@@ -35,7 +35,9 @@ class SaleOrder(models.Model):
             self.client_order_ref and (' - ' + self.client_order_ref) or '')
         return {
             'name': project_name,
-            'tasks': [(0, 0, task) for task in self._prepare_tasks_values()]
+            'of_sale_id': self.id,
+            'partner_id': self.partner_id.id,
+            'tasks': [(0, 0, task) for task in self._prepare_tasks_values()],
         }
 
     @api.multi
@@ -45,6 +47,5 @@ class SaleOrder(models.Model):
         for rec in self:
             tasks = rec.order_line.mapped('product_id.of_product_tasks_tmpl_ids')
             if tasks:
-                project = project_obj.create(rec._prepare_project_values())
-                project.of_sale_id = rec.id
+                project_obj.create(rec._prepare_project_values())
         return result
