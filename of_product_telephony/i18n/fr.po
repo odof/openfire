@@ -1,0 +1,146 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_product_telephony
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-09-21 09:36+0000\n"
+"PO-Revision-Date: 2022-09-21 09:36+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_product_telephony
+#: model:ir.model.fields,field_description:of_product_telephony.field_of_parc_installe_is_telecom
+#: model:ir.model.fields,field_description:of_product_telephony.field_product_product_of_is_telecom
+#: model:ir.model.fields,field_description:of_product_telephony.field_product_template_of_is_telecom
+msgid "Article Télécom"
+msgstr "Article Télécom"
+
+#. module: of_product_telephony
+#: model:ir.model.fields,help:of_product_telephony.field_of_parc_installe_concentration_point
+msgid "Codification qui indique l’emplacement de l’armoire de rue (point de mutualisation) sur les trottoirs ou raccorder la fibre."
+msgstr "Codification qui indique l’emplacement de l’armoire de rue (point de mutualisation) sur les trottoirs ou raccorder la fibre."
+
+#. module: of_product_telephony
+#: model:ir.ui.view,arch_db:of_product_telephony.of_contract_line_view_form
+msgid "Commentaires"
+msgstr "Commentaires"
+
+#. module: of_product_telephony
+#: model:ir.model.fields,help:of_product_telephony.field_of_parc_installe_cancel_date
+msgid "Date de fin de ligne de contrat, fin de ligne d’abonnement"
+msgstr "Date de fin de ligne de contrat, fin de ligne d’abonnement"
+
+#. module: of_product_telephony
+#: model:ir.model.fields,field_description:of_product_telephony.field_of_parc_installe_cancel_date
+msgid "Date de résiliation"
+msgstr "Date de résiliation"
+
+#. module: of_product_telephony
+#: model:ir.model.fields,field_description:of_product_telephony.field_of_contract_line_external_description
+msgid "Description externe"
+msgstr "Description externe"
+
+#. module: of_product_telephony
+#: model:ir.ui.view,arch_db:of_product_telephony.of_contract_line_view_form
+msgid "Description interne"
+msgstr "Description interne"
+
+#. module: of_product_telephony
+#: selection:product.template,of_optical_fiber_type:0
+msgid "FFTH (fiber to the home)"
+msgstr "FFTH (fiber to the home)"
+
+#. module: of_product_telephony
+#: selection:product.template,of_optical_fiber_type:0
+msgid "FFTO (fiber to the office)"
+msgstr "FFTO (fiber to the office)"
+
+#. module: of_product_telephony
+#: model:ir.model.fields,help:of_product_telephony.field_of_parc_installe_power_outlet_ref
+msgid "Identifiant référence opérateur bis"
+msgstr "Identifiant référence opérateur bis"
+
+#. module: of_product_telephony
+#: selection:product.template,of_telecom_type:0
+msgid "Internet"
+msgstr "Internet"
+
+#. module: of_product_telephony
+#: model:ir.model.fields,field_description:of_product_telephony.field_of_contract_line_order_line_id
+msgid "Ligne de commande"
+msgstr "Ligne de commande"
+
+#. module: of_product_telephony
+#: model:ir.model.fields,field_description:of_product_telephony.field_of_parc_installe_provider_id
+msgid "Opérateur"
+msgstr "Opérateur"
+
+#. module: of_product_telephony
+#: model:ir.model.fields,help:of_product_telephony.field_of_parc_installe_provider_id
+msgid "Orange, SFR, etc choisi par le client pour la ligne téléphone. Choisi par MCT selon la disponibilité pour l’accès internet"
+msgstr "Orange, SFR, etc choisi par le client pour la ligne téléphone. Choisi par MCT selon la disponibilité pour l’accès internet"
+
+#. module: of_product_telephony
+#: model:ir.model,name:of_product_telephony.model_of_parc_installe
+msgid "Parc installé"
+msgstr "Parc installé"
+
+#. module: of_product_telephony
+#: model:ir.model.fields,help:of_product_telephony.field_of_parc_installe_secondary_site_id
+msgid "Permet de définir une zone avec un site principal et un site secondaire"
+msgstr "Permet de définir une zone avec un site principal et un site secondaire"
+
+#. module: of_product_telephony
+#: model:ir.model.fields,field_description:of_product_telephony.field_of_parc_installe_concentration_point
+msgid "Position au PM"
+msgstr "Position au PM"
+
+#. module: of_product_telephony
+#: model:ir.model,name:of_product_telephony.model_product_template
+msgid "Product Template"
+msgstr "Modèle d'article"
+
+#. module: of_product_telephony
+#: model:ir.model.fields,field_description:of_product_telephony.field_of_parc_installe_provider_ref
+msgid "Référence opérateur"
+msgstr "Référence opérateur"
+
+#. module: of_product_telephony
+#: model:ir.model.fields,field_description:of_product_telephony.field_of_parc_installe_power_outlet_ref
+msgid "Référence prise"
+msgstr "Référence prise"
+
+#. module: of_product_telephony
+#: model:ir.model.fields,field_description:of_product_telephony.field_of_parc_installe_secondary_site_id
+msgid "Site B du lien"
+msgstr "Site B du lien"
+
+#. module: of_product_telephony
+#: selection:product.template,of_telecom_type:0
+msgid "Telephony"
+msgstr "Telephony"
+
+#. module: of_product_telephony
+#: model:ir.model.fields,field_description:of_product_telephony.field_of_parc_installe_optical_fiber_type
+#: model:ir.model.fields,field_description:of_product_telephony.field_product_product_of_optical_fiber_type
+#: model:ir.model.fields,field_description:of_product_telephony.field_product_template_of_optical_fiber_type
+msgid "Type de Fibre"
+msgstr "Type de Fibre"
+
+#. module: of_product_telephony
+#: model:ir.model.fields,field_description:of_product_telephony.field_product_product_of_telecom_type
+#: model:ir.model.fields,field_description:of_product_telephony.field_product_template_of_telecom_type
+msgid "Type de Télécom"
+msgstr "Type de Télécom"
+
+#. module: of_product_telephony
+#: model:ir.model,name:of_product_telephony.model_of_contract_line
+msgid "of.contract.line"
+msgstr "of.contract.line"

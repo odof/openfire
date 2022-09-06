@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_contract_line_view_form" model="ir.ui.view">
+        <field name="name">of.product.telephony.contract.line.view.form</field>
+        <field name="model">of.contract.line</field>
+        <field name="inherit_id" ref="of_contract_custom.of_contract_line_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='planification']//separator" position="replace"/>
+            <xpath expr="//notebook/page[@name='planification']//field[@name='notes']" position="replace"/>
+            <xpath expr="//notebook/page[@name='invoicing']" position="after">
+                <page name="comments" string="Commentaires">
+                    <group>
+                        <separator string="Description interne" colspan="4"/>
+                        <field name="notes" nolabel="1" colspan="4" attrs="{'form_readonly_exception': True}"/>
+                        <separator string="Description interne" colspan="4"/>
+                        <field name="external_description" nolabel="1" colspan="4"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

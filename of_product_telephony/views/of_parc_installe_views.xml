@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_parc_installe_form_view" model="ir.ui.view">
+        <field name="name">of.product.telephony.parc.installe.form.view</field>
+        <field name="model">of.parc.installe</field>
+        <field name="inherit_id" ref="of_parc_installe.of_parc_installe_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="is_telecom" invisible="1"/>
+                <field name="optical_fiber_type" invisible="1"/>
+                <field name="provider_ref" attrs="{'invisible': [('is_telecom', '=', False)]}"/>
+                <field name="power_outlet_ref" attrs="{'invisible': ['|', ('is_telecom', '=', False), ('optical_fiber_type', '!=', 'ffth')], 'required': [('optical_fiber_type', '=', 'ffth')]}"/>
+            </xpath>
+            <xpath expr="//field[@name='site_adresse_id']" position="after">
+                <field name="secondary_site_id" attrs="{'invisible': ['|', ('is_telecom', '=', False), ('optical_fiber_type', '!=', 'ffto')]}"/>
+            </xpath>
+            <xpath expr="//field[@name='date_installation']" position="after">
+                <field name="cancel_date" attrs="{'invisible': [('is_telecom', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//group[@name='pose']" position="inside">
+                <field name="provider_id" attrs="{'invisible': [('is_telecom', '=', False)]}"/>
+                <field name="concentration_point" attrs="{'invisible': ['|', ('is_telecom', '=', False), ('optical_fiber_type', '!=', 'ffth')]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
