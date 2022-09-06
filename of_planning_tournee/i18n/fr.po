@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-29 10:54+0000\n"
-"PO-Revision-Date: 2022-07-29 10:54+0000\n"
+"POT-Creation-Date: 2022-09-06 11:49+0000\n"
+"PO-Revision-Date: 2022-09-06 11:49+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -103,9 +103,13 @@ msgstr "Bloqué"
 
 #. module: of_planning_tournee
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_by_duration_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_by_duration_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_by_duration_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_by_duration_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_wizard
 #: selection:of.intervention.settings,slots_display_mode:0
 msgid "Calendar"
@@ -113,9 +117,13 @@ msgstr "Calendrier"
 
 #. module: of_planning_tournee
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_by_duration_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_by_duration_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_by_duration_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_by_duration_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_wizard
 msgid "Calendrier"
 msgstr "Calendrier"
@@ -251,11 +259,17 @@ msgstr "Créera une intervention récurrente s'il n'en existe pas déjà une ass
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_duration_description
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_description
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_by_duration_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_by_duration_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_by_duration_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_by_duration_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_by_duration_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_by_duration_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_by_duration_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_by_duration_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_simple_of_tournee_rdv_line_by_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_simple_of_tournee_rdv_line_by_distance_wizard
@@ -278,6 +292,11 @@ msgid "Créneau sélectionné"
 msgstr "Créneau sélectionné"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_intervention_to_preview
+msgid "Data for the Marker to preview"
+msgstr "Données pour le marqueur à prévisualiser"
+
+#. module: of_planning_tournee
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_date
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_date_date
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_date_date_flo
@@ -292,7 +311,7 @@ msgstr "Créneau sélectionné"
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_date_flo
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_date_flo_deadline
 msgid "Date"
-msgstr "Date "
+msgstr "Date"
 
 #. module: of_planning_tournee
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_date_max
@@ -356,6 +375,11 @@ msgid "Display mode"
 msgstr "Mode d'affichage"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_show_next_available_time_slots
+msgid "Display next time slots by date"
+msgstr "Afficher les prochains créneaux horaires par date"
+
+#. module: of_planning_tournee
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_date_distance_utile
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_distance_distance_utile
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_duration_distance_utile
@@ -401,17 +425,23 @@ msgstr "Dist.tot. (km)"
 
 #. module: of_planning_tournee
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_by_duration_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_by_duration_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_by_duration_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_by_duration_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_by_duration_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_by_duration_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_by_duration_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_by_duration_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_wizard
 msgid "Distance"
 msgstr "Distance"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:191
+#: code:addons/of_planning_tournee/wizard/rdv.py:201
 #: selection:of.intervention.settings,search_type:0
 #, python-format
 msgid "Distance (km)"
@@ -433,7 +463,7 @@ msgid "Documents"
 msgstr "Documents"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:192
+#: code:addons/of_planning_tournee/wizard/rdv.py:202
 #: selection:of.intervention.settings,search_type:0
 #, python-format
 msgid "Duration (min)"
@@ -447,11 +477,17 @@ msgstr "Durée aller (min)"
 #. module: of_planning_tournee
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_duree
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_by_duration_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_by_duration_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_by_duration_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_by_duration_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_by_duration_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_by_duration_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_by_duration_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_by_duration_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_wizard
 msgid "Durée"
 msgstr "Durée"
@@ -533,7 +569,7 @@ msgid "Fin"
 msgstr "Fin"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:1278
+#: code:addons/of_planning_tournee/wizard/rdv.py:1404
 #, python-format
 msgid "Friday"
 msgstr "Vendredi"
@@ -722,10 +758,19 @@ msgid "Libellé"
 msgstr "Libellé"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_map_line_id
+msgid "Line selected for the map preview"
+msgstr "Ligne sélectionnée pour l'aperçu de la carte"
+
+#. module: of_planning_tournee
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_by_duration_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_by_duration_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_by_duration_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_by_duration_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_wizard
 #: selection:of.intervention.settings,slots_display_mode:0
 msgid "List"
@@ -760,7 +805,7 @@ msgid "Mixin pour la propositions des RDVs"
 msgstr "Mixin pour la propositions des RDVs"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:1274
+#: code:addons/of_planning_tournee/wizard/rdv.py:1400
 #, python-format
 msgid "Monday"
 msgstr "Lundi"
@@ -805,19 +850,19 @@ msgid "Number of results to show in the planning. (Max : 30)"
 msgstr "Nombre de résultats à afficher dans le planning. (Max : 30)"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:197
+#: code:addons/of_planning_tournee/wizard/rdv.py:207
 #, python-format
 msgid "One way"
 msgstr "Aller"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:201
+#: code:addons/of_planning_tournee/wizard/rdv.py:211
 #, python-format
 msgid "One way if morning / Return if afternoon"
 msgstr "Aller si matin / Retour si après-midi"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:200
+#: code:addons/of_planning_tournee/wizard/rdv.py:210
 #, python-format
 msgid "One way or Return"
 msgstr "Aller ou Retour"
@@ -856,9 +901,9 @@ msgid "Plan an Intervention"
 msgstr "Planifier une intervention"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_service.py:40
-#: code:addons/of_planning_tournee/wizard/rdv.py:379
-#: code:addons/of_planning_tournee/wizard/rdv.py:405
+#: code:addons/of_planning_tournee/models/of_service.py:36
+#: code:addons/of_planning_tournee/wizard/rdv.py:496
+#: code:addons/of_planning_tournee/wizard/rdv.py:525
 #, python-format
 msgid "Plan intervention"
 msgstr "Planifier intervention"
@@ -911,7 +956,7 @@ msgstr "Pour sélectionner ou voir les informations d'un créneau, veuillez cliq
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_precision
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_precision
 msgid "Precision"
-msgstr "Précision"
+msgstr "Precision"
 
 #. module: of_planning_tournee
 #: model:ir.model,name:of_planning_tournee.model_of_tournee_rdv
@@ -988,7 +1033,7 @@ msgid "Rechercher"
 msgstr "Rechercher"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:198
+#: code:addons/of_planning_tournee/wizard/rdv.py:208
 #, python-format
 msgid "Return"
 msgstr "Retour"
@@ -1004,7 +1049,7 @@ msgid "Return duration (min)"
 msgstr "Durée retour (min)"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:199
+#: code:addons/of_planning_tournee/wizard/rdv.py:209
 #, python-format
 msgid "Round trip"
 msgstr "Aller-retour"
@@ -1015,17 +1060,13 @@ msgid "Résultat de Planification de RDV"
 msgstr "Résultat de Planification de RDV"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:1279
+#: code:addons/of_planning_tournee/wizard/rdv.py:1405
 #, python-format
 msgid "Saturday"
 msgstr "Samedi"
 
 #. module: of_planning_tournee
-#: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_search_criteria
-msgid "Search Criteria"
-msgstr "Critères de recherche"
-
-#. module: of_planning_tournee
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_wizard
 msgid "Search criteria"
 msgstr "Critères de recherche"
@@ -1083,9 +1124,13 @@ msgstr "Créneaux par distance"
 
 #. module: of_planning_tournee
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_by_duration_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_by_duration_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_calendar_1st_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_by_duration_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_by_duration_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_wizard
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_wo_date_wizard
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_wizard
 msgid "Slots by distance / duration"
 msgstr "Créneaux par distance / durée"
@@ -1116,7 +1161,7 @@ msgid "Street2"
 msgstr "Rue 2"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:1280
+#: code:addons/of_planning_tournee/wizard/rdv.py:1406
 #, python-format
 msgid "Sunday"
 msgstr "Dimanche"
@@ -1128,20 +1173,20 @@ msgid "The Number of results can't exceed more than 30"
 msgstr "Le nombre de résultats ne peut pas dépasser plus de 30"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:184
+#: code:addons/of_planning_tournee/wizard/rdv.py:194
 #, python-format
 msgid "The value of 'Search period (in days)' must be between 1 and 45"
 msgstr "La valeur de 'Période de recherche (en jours)' doit être comprise entre 1 et 45"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_service.py:34
-#: code:addons/of_planning_tournee/models/res_partner.py:15
+#: code:addons/of_planning_tournee/models/of_service.py:15
+#: code:addons/of_planning_tournee/models/res_partner.py:14
 #, python-format
 msgid "This address is not geocoded, please geocode it to plan an intervention."
 msgstr "Cette adresse n'est pas géocodée, merci de la géocoder pour planifier une intervention."
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:1277
+#: code:addons/of_planning_tournee/wizard/rdv.py:1403
 #, python-format
 msgid "Thursday"
 msgstr "Jeudi"
@@ -1178,7 +1223,7 @@ msgid "Tournées"
 msgstr "Tournées"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:1275
+#: code:addons/of_planning_tournee/wizard/rdv.py:1401
 #, python-format
 msgid "Tuesday"
 msgstr "Mardi"
@@ -1211,7 +1256,7 @@ msgid "Voir Résultats"
 msgstr "Voir Résultats"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:1276
+#: code:addons/of_planning_tournee/wizard/rdv.py:1402
 #, python-format
 msgid "Wednesday"
 msgstr "Mercredi"

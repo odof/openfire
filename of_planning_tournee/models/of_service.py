@@ -11,6 +11,8 @@ class OFService(models.Model):
     @api.multi
     def action_open_wizard_plan_intervention(self):
         self.ensure_one()
+        if self.address_id and not self.address_id.geo_lat and not self.address_id.geo_lng:
+            raise UserError(_("This address is not geocoded, please geocode it to plan an intervention."))
         tour_meetup_obj = self.env['of.tournee.rdv']
         context = self._context.copy()
         slots_display_mode = self.env['ir.values'].get_default('of.intervention.settings', 'slots_display_mode')
@@ -29,12 +31,7 @@ class OFService(models.Model):
         time_slots_wizard = tour_meetup_obj.create(wizard_values)
         # start the comute of the time slots
         time_slots_wizard.compute()
-        if self.address_id and not self.address_id.geo_lat and not self.address_id.geo_lng:
-            raise UserError(_("This address is not geocoded, please geocode it to plan an intervention."))
-        if slots_display_mode == 'list':
-            form_view_id = self.env.ref('of_planning_tournee.view_rdv_intervention_wizard').id
-        else:
-            form_view_id = self.env.ref('of_planning_tournee.view_rdv_intervention_calendar_1st_wizard').id
+        form_view_id = time_slots_wizard._get_wizard_form_view_id()
         return {
             'name': _('Plan intervention'),
             'type': 'ir.actions.act_window',

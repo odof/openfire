@@ -96,9 +96,16 @@ class OfTourneeRdv(models.TransientModel):
     def _default_slots_display_mode(self):
         return self.env['ir.values'].get_default('of.intervention.settings', 'slots_display_mode') or 'list'
 
+    @api.model
+    def _default_show_next_available_time_slots(self):
+        return self.env['ir.values'].get_default('of.intervention.settings', 'show_next_available_time_slots')
+
     source_model = fields.Char(string='Source Model', readonly=True)
     slots_display_mode = fields.Char(
         string='Display mode', readonly=True, required=True, default=lambda s: s._default_slots_display_mode())
+    show_next_available_time_slots = fields.Boolean(
+        string='Display next time slots by date', readonly=True,
+        default=lambda s: s._default_show_next_available_time_slots())
     # Champs de recherche
     partner_id = fields.Many2one(
         'res.partner', string="Client", required=True, readonly=True)
@@ -142,7 +149,6 @@ class OfTourneeRdv(models.TransientModel):
         comodel_name='of.jours', relation='wizard_plan_intervention_days_rel', column1='wizard_id',
         column2='jour_id', string="Days", required=True, default=lambda s: s._default_days())
     orthodromique = fields.Boolean(string=u"Distances à vol d'oiseau")
-    search_criteria = fields.Boolean(string='Search Criteria')
 
     # Champs de résultat
     display_res = fields.Boolean(string=u"Voir Résultats", default=False)  # Utilisé pour attrs invisible des résultats
@@ -184,7 +190,7 @@ class OfTourneeRdv(models.TransientModel):
 
     @api.constrains('search_period_in_days')
     def _check_search_period_in_days(self):
-        if self.search_period_in_days < 1 and self.search_period_in_days > 45:
+        if self.search_period_in_days < 1 or self.search_period_in_days > 45:
             raise ValidationError(_("The value of 'Search period (in days)' must be between 1 and 45"))
 
     def _get_search_max_value(self):
@@ -207,30 +213,105 @@ class OfTourneeRdv(models.TransientModel):
 
     @api.multi
     def _get_wizard_form_view_id(self):
+        """Return the good xml_id for the wizard form view depending on the settings and the search criteria.
+
+        If we are in display_mode = 'list', we want to display the tab with the list of time slots
+        by distance/by duration in the first position.
+        Then the second tab is the calendar view.
+        If the display_mode = 'calendar', we want to display the calendar view in the first position.
+
+        And if in the settings if the option 'show_next_available_time_slots' is set to True, we want to
+        display the next available time slots near the time slots by distance/by duration.
+        """
         self.ensure_one()
         display_mode = self._default_slots_display_mode()
+        # if we are coming from `of.service` model we want to display the simple form view in all cases
+        # else we want to display the complete form view.
         if self.source_model == 'of.service':
-            if display_mode == 'list':
-                form_view_id = self.env.ref('of_planning_tournee.view_rdv_intervention_wizard').id \
-                    if self.search_type == 'distance' else \
-                    self.env.ref('of_planning_tournee.view_rdv_intervention_by_duration_wizard').id
-            else:
-                form_view_id = self.env.ref('of_planning_tournee.view_rdv_intervention_calendar_1st_wizard').id \
-                    if self.search_type == 'distance' else \
-                    self.env.ref('of_planning_tournee.view_rdv_intervention_calendar_1st_by_duration_wizard').id
+            return self._get_wizard_list_mode_form_view_id() if display_mode == 'list' else \
+                self._get_wizard_calendar_1st_mode_form_view_id()
+        elif display_mode == 'list':
+            return self._get_wizard_list_mode_complete_form_view_id()
         else:
-            if display_mode == 'list':
-                form_view_id = self.env.ref('of_planning_tournee.view_rdv_intervention_complete_form_wizard').id \
-                    if self.search_type == 'distance' else \
-                    self.env.ref(
-                        'of_planning_tournee.view_rdv_intervention_complete_form_by_duration_wizard').id
-            else:
-                form_view_id = self.env.ref(
-                    'of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_wizard').id \
-                    if self.search_type == 'distance' else \
-                    self.env.ref(
-                        'of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_by_duration_wizard').id
-        return form_view_id
+            return self._get_wizard_calendar_1st_mode_complete_form_view_id()
+
+    @api.multi
+    def _get_wizard_list_mode_form_view_id(self):
+        """Get the correct form view id for the wizard in list mode.
+        """
+        self.ensure_one()
+        if self.show_next_available_time_slots:
+            # Display the list of available time slots by distance or by duration with
+            # the next available time slots
+            return self.env.ref('of_planning_tournee.view_rdv_intervention_wizard').id \
+                if self.search_type == 'distance' else \
+                self.env.ref('of_planning_tournee.view_rdv_intervention_by_duration_wizard').id
+        else:
+            # Display the list of available time slots by distance or by duration and without
+            # the next available time slots
+            return self.env.ref('of_planning_tournee.view_rdv_intervention_wo_date_wizard').id \
+                if self.search_type == 'distance' else \
+                self.env.ref('of_planning_tournee.view_rdv_intervention_by_duration_wo_date_wizard').id
+
+    @api.multi
+    def _get_wizard_calendar_1st_mode_form_view_id(self):
+        """Get the correct form view id for the wizard in calendar 1st mode.
+        """
+        self.ensure_one()
+        if self.show_next_available_time_slots:
+            # Display the calendar in first position then the list of available time slots by distance or
+            # by duration with the next available time slots
+            return self.env.ref('of_planning_tournee.view_rdv_intervention_calendar_1st_wizard').id \
+                if self.search_type == 'distance' else \
+                self.env.ref('of_planning_tournee.view_rdv_intervention_calendar_1st_by_duration_wizard').id
+        else:
+            # Display the calendar in first position then the list of available time slots by distance or
+            # by duration and without the next available time slots
+            return self.env.ref(
+                'of_planning_tournee.view_rdv_intervention_calendar_1st_wo_date_wizard').id \
+                if self.search_type == 'distance' else \
+                self.env.ref('of_planning_tournee.view_rdv_intervention_calendar_1st_by_duration_wo_date_wizard').id
+
+    @api.multi
+    def _get_wizard_list_mode_complete_form_view_id(self):
+        """Get the correct complete form view id for the wizard in list mode.
+        """
+        self.ensure_one()
+        if self.show_next_available_time_slots:
+            # Display the list of available time slots by distance or by duration with
+            # the next available time slots
+            return self.env.ref('of_planning_tournee.view_rdv_intervention_complete_form_wizard').id \
+                if self.search_type == 'distance' else \
+                self.env.ref('of_planning_tournee.view_rdv_intervention_complete_form_by_duration_wizard').id
+        else:
+            # Display the list of available time slots by distance or by duration and without
+            # the next available time slots
+            return self.env.ref(
+                'of_planning_tournee.view_rdv_intervention_complete_wo_date_form_wizard').id \
+                if self.search_type == 'distance' else \
+                self.env.ref('of_planning_tournee.view_rdv_intervention_complete_form_by_duration_wo_date_wizard').id
+
+    @api.multi
+    def _get_wizard_calendar_1st_mode_complete_form_view_id(self):
+        """Get the correct complete form view id for the wizard in calendar 1st mode.
+        """
+        self.ensure_one()
+        if self.show_next_available_time_slots:
+            # Display the list of available time slots by distance or by duration with
+            # the next available time slots
+            return self.env.ref(
+                'of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_wizard').id \
+                if self.search_type == 'distance' else \
+                self.env.ref(
+                    'of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_by_duration_wizard').id
+        else:
+            # Display the list of available time slots by distance or by duration and without
+            # the next available time slots
+            return self.env.ref(
+                'of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_wo_date_wizard').id \
+                if self.search_type == 'distance' else \
+                self.env.ref(
+                'of_planning_tournee.view_rdv_intervention_complete_form_calendar_1st_by_duration_wo_date_wizard').id
 
     def _get_hidden_lines(self):
         by_date_lines_hidden = self.env['of.tournee.rdv.line.by.date'].search([
@@ -970,6 +1051,7 @@ class OfTourneeRdv(models.TransientModel):
             'template_id': template and template.id,
             'service_id': self.service_id.id,
             'employee_ids': [(4, self.employee_id.id, 0)],
+            'tag_ids': [(4, tag.id, 0) for tag in self.service_id.tag_ids],
             'date': self.date_propos,
             'duree': self.duree,
             'user_id': self._uid,
@@ -1317,6 +1399,14 @@ class OfTourneeRdvLine(models.TransientModel):
             'Friday': _('Friday'),
             'Saturday': _('Saturday'),
             'Sunday': _('Sunday'),
+            # add french keys to avoid error on servers with french language
+            'lundi': _('Monday'),
+            'mardi': _('Tuesday'),
+            'mercredi': _('Wednesday'),
+            'jeudi': _('Thursday'),
+            'vendredi': _('Friday'),
+            'samedi': _('Saturday'),
+            'dimanche': _('Sunday'),
         }
         for record in self:
             record.weekday = weekdays[fields.Date.from_string(record.date).strftime('%A')]

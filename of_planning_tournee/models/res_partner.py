@@ -10,9 +10,14 @@ class OFResPartner(models.Model):
     @api.multi
     def action_open_wizard_plan_intervention(self):
         self.ensure_one()
-        context = self._context.copy()
         if not self.geo_lat and not self.geo_lng:
             raise UserError(_("This address is not geocoded, please geocode it to plan an intervention."))
+        ir_values_obj = self.env['ir.values']
+        context = self._context.copy()
+        context['default_slots_display_mode'] = ir_values_obj.get_default(
+            'of.intervention.settings', 'slots_display_mode')
+        context['default_search_type'] = ir_values_obj.get_default(
+            'of.intervention.settings', 'search_type') or 'distance'
         form_view_id = self.env.ref('of_planning_tournee.view_rdv_intervention_complete_form_wizard').id
         return {
             'type': 'ir.actions.act_window',
