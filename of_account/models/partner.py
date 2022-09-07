@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 
 
 class ResPartner(models.Model):
@@ -29,6 +30,23 @@ class ResPartner(models.Model):
     invoice_warn = fields.Selection(help=u"Type d'avertissement", compute='_compute_invoice_warn', store=True)
     invoice_warn_msg = fields.Text(
         string=u"Message", help=u"Message qui sera affiché comme avertissement si ce partenaire est sélectionné")
+
+    @api.onchange('parent_id', 'property_account_receivable_id')
+    def _onchange_property_account_receivable_id(self):
+        # Si la compte client est modifié
+        if self.property_account_receivable_id:
+            # On vérifie si l'ancien avait des écritures
+            origin_move_line_ids = self.env['account.move.line'].search(
+                [('account_id', '=', self._origin.property_account_receivable_id.id)])
+            if origin_move_line_ids:
+                return {
+                    'warning': {
+                        'title': _('Warning'),
+                        'message': _(u"Si vous sauvegardez, vous allez modifier un compte comptable qui contient"
+                                     u"des écritures. Si vous êtes sûr(e) de vous, vous pouvez continuer, "
+                                     u"sinon veuillez ne pas sauvegarder et annuler.")
+                    }
+                }
 
     @api.depends('of_is_account_warn')
     def _compute_of_is_warn(self):
