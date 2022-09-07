@@ -37,8 +37,13 @@ class CrmLead(models.Model):
         if self.of_datastore_sent:
             raise UserError(u"L'opportunité a déjà été envoyée par le connecteur !")
 
+        network_members = self.env['of.datastore.crm.network.member'].search(
+            [('partner_id', '=', self.of_allocated.id)])
+
         # On vérifie s'il existe un connecteur achat pour ce fournisseur
-        datastore_crm = self.env['of.datastore.crm.sender'].search([('partner_id', '=', self.of_allocated.id)], limit=1)
+        datastore_crm = self.env['of.datastore.crm.sender'].search(
+            ['|', '&', ('partner_id', '=', self.of_allocated.id), ('is_multicompany', '=', False),
+             '&', ('child_ids', 'in', network_members.ids), ('is_multicompany', '=', True)], limit=1)
 
         if datastore_crm:
             client = datastore_crm.of_datastore_connect()
@@ -80,6 +85,10 @@ class CrmLead(models.Model):
                 'email_from': self.email_from,
                 'description': self.description,
             }
+
+            if datastore_crm.is_multicompany:
+                company_id = datastore_crm.child_ids.filtered(lambda c: c.partner_id == self.of_allocated).company_id
+                values['company_id'] = company_id
 
             datastore_crm.of_datastore_create(ds_lead_obj, values)
 
