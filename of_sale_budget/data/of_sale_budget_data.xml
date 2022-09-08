@@ -8,4 +8,13 @@
         <field name="type">computed</field>
     </record>
 
+    <!-- Lorsqu'on ajoute la valeur par défaut sur le champ of_hour_worksite_id, l'entrée xml n'a pas encore été créée.
+         On l'ajoute donc via une fonction additionnelle : -->
+    <function model="product.template" name="write">
+        <function name="search" model="product.template">
+            <value eval="['|', ('active', '=', True), ('active', '=', False)]"/>
+        </function>
+        <value eval="{'of_hour_worksite_id': ref('of_sale_budget.of_sale_order_hour_worksite_data')}"/>
+    </function>
+
 </odoo>
