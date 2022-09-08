@@ -51,7 +51,7 @@
         <field name="model">of.service</field>
         <field name="inherit_id" ref="of_service.view_of_service_filter"/>
         <field name="arch" type="xml">
-            <xpath expr="//filter[@name='filter_entretien']" position="before">
+            <xpath expr="//filter[@name='filter_technical_aera']" position="before">
                 <filter string="SAV" name="filter_sav" domain="[('type_id', '=', %(of_service_parc_installe.of_service_type_sav)d)]"/>
             </xpath>
         </field>
