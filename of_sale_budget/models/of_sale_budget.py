@@ -287,9 +287,14 @@ class OFSaleOrderLayoutCategory(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
+    @api.model
+    def _default_of_hour_worksite_id(self):
+        hour_worksite = self.env.ref('of_sale_budget.of_sale_order_hour_worksite_data', False)
+        return hour_worksite and hour_worksite.id
+
     of_hour_worksite_id = fields.Many2one(
         comodel_name='of.sale.order.hour.worksite', string=u"Heures chantier", required=True,
-        default=lambda self: self.env.ref('of_sale_budget.of_sale_order_hour_worksite_data').id)
+        default=lambda self: self._default_of_hour_worksite_id())
 
     @api.model
     def create(self, values):
