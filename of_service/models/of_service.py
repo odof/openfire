@@ -209,7 +209,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
     address_phone = fields.Char(related='address_id.phone', string=u"Téléphone", readonly=1)
     address_mobile = fields.Char(related='address_id.mobile', string=u"Mobile", readonly=1)
     secteur_tech_id = fields.Many2one(
-        related='address_id.of_secteur_tech_id', readonly=True)
+        related='address_id.of_secteur_tech_id', readonly=True, store=True)
     department_id = fields.Many2one(
         'res.country.department', compute='_compute_department_id', string=u"Département", readonly=True, store=True)
     tag_ids = fields.Many2many(
@@ -915,7 +915,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
         fiscal_position_id = self.fiscal_position_id.id or partner.property_account_position_id.id
 
         journal_id = (self.env['account.invoice'].with_context(company_id=company.id)
-            .default_get(['journal_id'])['journal_id'])
+                      .default_get(['journal_id'])['journal_id'])
         if not journal_id:
             return (False,
                     msg_erreur % (
@@ -1366,7 +1366,8 @@ class OfServiceLine(models.Model):
                 taxes = fiscal_position.map_tax(taxes, product, partner)
             line.taxe_ids = taxes
 
-    @api.depends('invoice_line_ids', 'invoice_line_ids.invoice_id', 'invoice_line_ids.quantity', 'invoice_line_ids.invoice_id')
+    @api.depends('invoice_line_ids', 'invoice_line_ids.invoice_id', 'invoice_line_ids.quantity',
+                 'invoice_line_ids.invoice_id')
     def _compute_qty_invoiced(self):
         for line in self:
             line.qty_invoiced = sum(line.invoice_line_ids.mapped('quantity'))
@@ -1450,16 +1451,16 @@ class OfServiceLine(models.Model):
 
         line_name = self.name or product.name_get()[0][1]
         return {
-                   'name': line_name,
-                   'account_id': line_account.id,
-                   'price_unit': self.price_unit,
-                   'quantity': self.qty,
-                   'discount': 0.0,
-                   'uom_id': product.uom_id.id,
-                   'product_id': product.id,
-                   'invoice_line_tax_ids': [(6, 0, taxes._ids)],
-                   'of_service_line_id': self.id
-               }, ""
+            'name': line_name,
+            'account_id': line_account.id,
+            'price_unit': self.price_unit,
+            'quantity': self.qty,
+            'discount': 0.0,
+            'uom_id': product.uom_id.id,
+            'product_id': product.id,
+            'invoice_line_tax_ids': [(6, 0, taxes._ids)],
+            'of_service_line_id': self.id
+        }, ""
 
 
 class OfServiceType(models.Model):

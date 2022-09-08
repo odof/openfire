@@ -348,6 +348,7 @@
                 <filter string="Récurrente" name="filter_rec" domain="[('recurrence', '=', True)]"/>
                 <filter string="Ponctuelle" name="filter_ponc" domain="[('recurrence', '=', False)]"/>
                 <separator/>
+                <filter string="Secteur technique" name="filter_technical_aera" domain="[('secteur_tech_id', '!=', False)]"/>
                 <filter string="Entretien" name="filter_entretien"
                         domain="[('type_id', '=', %(of_service.of_service_type_maintenance)d)]"/>
                 <filter string="Installation" name="filter_installation"
