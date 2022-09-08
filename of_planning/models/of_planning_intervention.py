@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -431,6 +432,8 @@ class OfPlanningIntervention(models.Model):
         'hr.employee', string=u"Employé principal", compute="_compute_employee_main_id",
         search="_search_employee_main_id", store=True)
     partner_id = fields.Many2one(comodel_name='res.partner', string=u"Client", ondelete='restrict')
+    partner_tag_ids = fields.Many2many(comodel_name='res.partner.category', string=u"Étiquettes client",
+                                       related='partner_id.category_id', readonly=True)
     address_id = fields.Many2one(comodel_name='res.partner', string=u"Adresse", track_visibility='onchange')
     address_street = fields.Char(related='address_id.street', string=u"Rue", readonly=1)
     address_street2 = fields.Char(related='address_id.street2', string=u"Rue 2", readonly=1)
