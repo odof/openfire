@@ -16,11 +16,7 @@ from odoo.tools.float_utils import float_compare
 from odoo.tools.safe_eval import safe_eval
 
 import odoo.addons.decimal_precision as dp
-from odoo.addons.of_utils.models.of_utils import se_chevauchent, float_2_heures_minutes, compare_date, hours_to_strs
-try:
-    import simplejson as json
-except ImportError:
-    import json
+from odoo.addons.of_utils.models.of_utils import float_2_heures_minutes, compare_date, hours_to_strs
 
 
 @api.model
@@ -144,7 +140,6 @@ class HREmployee(models.Model):
             lambda e: e.of_impression_planning and e.of_daily_email)
         wiz_vals = {'type': 'day', 'date_start': next_day_str, }
         impression_wizard = self.env['of_planning.impression_wizard'].create(wiz_vals)
-        attachment_obj = self.env['ir.attachment']
         # Pour chaque employé, générer le PDF et envoyer l'email
         for employee in employees:
             impression_wizard.employee_ids = [(6, 0, [employee.id])]
@@ -995,7 +990,7 @@ class OfPlanningIntervention(models.Model):
         # Faire même calcul que pour les sale.order
         for rdv in self:
             rdv.picking_ids = rdv.procurement_group_id and \
-                              self.env['stock.picking'].search([('group_id', '=', rdv.procurement_group_id.id)]) or []
+                self.env['stock.picking'].search([('group_id', '=', rdv.procurement_group_id.id)]) or []
             rdv.delivery_count = len(rdv.picking_ids)
 
     @api.depends('partner_id', 'address_id')
@@ -1219,12 +1214,12 @@ class OfPlanningIntervention(models.Model):
                 self.fiscal_position_id = tache_accounting.fiscal_position_id
             if self.tache_id.product_id:
                 self.line_ids.new({
-                    'intervention_id':  self.id,
-                    'product_id':       self.tache_id.product_id.id,
-                    'qty':              1,
-                    'price_unit':       self.tache_id.product_id.lst_price,
-                    'name':             self.tache_id.product_id.name,
-                    })
+                    'intervention_id': self.id,
+                    'product_id': self.tache_id.product_id.id,
+                    'qty': 1,
+                    'price_unit': self.tache_id.product_id.lst_price,
+                    'name': self.tache_id.product_id.name,
+                })
                 self.line_ids.compute_taxes()
             self.flexible = self.tache_id.flexible
             # affichage de la description de la tâche
@@ -1401,7 +1396,7 @@ class OfPlanningIntervention(models.Model):
                 # de la forme [[6, 0, ids_list]] en cas de drag n drop
                 employee_eval = vals.get('employee_ids', [[-1, 0, []]])[0][2]
                 vals['date'], vals['date_deadline_forcee'] = self.get_all_day_datetime(
-                    mode='both',date_eval=vals['date'],employee_eval=employee_eval)
+                    mode='both', date_eval=vals['date'], employee_eval=employee_eval)
             elif vals.get('date_deadline'):
                 vals['date_deadline_forcee'] = vals['date_deadline'][:17] + '00'
 
@@ -1801,7 +1796,7 @@ class OfPlanningIntervention(models.Model):
                     ('date_deadline_prompt', '>', interv.date),
                     ('id', '!=', interv.id),
                     ('state', 'not in', ('cancel', 'postponed')),
-                    ]
+                ]
                 if group_flex:
                     domain += [('flexible', '=', False)]
                 rdv = interv_obj.search(domain, limit=1)
@@ -1824,7 +1819,7 @@ class OfPlanningIntervention(models.Model):
                     ('date_deadline', '>', interv.date),
                     ('id', '!=', interv.id),
                     ('state', 'not in', ('cancel', 'postponed')),
-                    ]
+                ]
                 rdv = interv_obj.search(domain, limit=1)
                 if rdv:
                     rdvs |= rdv
@@ -2017,9 +2012,9 @@ class OfPlanningIntervention(models.Model):
         for picking in pickings:
             if picking.pack_operation_product_ids:
                 pickings_layouted.append({
-                    'name' : picking.name,
+                    'name': picking.name,
                     'lines': picking.pack_operation_product_ids,
-                    })
+                })
         return pickings_layouted
 
 
@@ -2060,7 +2055,7 @@ class OfPlanningInterventionLine(models.Model):
         ('no', u'Rien à facturer'),
         ('to invoice', u'À facturer'),
         ('invoiced', u'Totalement facturée'),
-        ], string=u"État de facturation", compute='_compute_invoice_status', store=True
+    ], string=u"État de facturation", compute='_compute_invoice_status', store=True
     )
 
     @api.depends('qty', 'price_unit', 'taxe_ids')
@@ -2073,10 +2068,10 @@ class OfPlanningInterventionLine(models.Model):
             taxes = line.taxe_ids.compute_all(price, line.currency_id, line.qty,
                                               product=line.product_id, partner=line.intervention_id.address_id)
             line.update({
-                'price_tax':        taxes['total_included'] - taxes['total_excluded'],
-                'price_total':      taxes['total_included'],
-                'price_subtotal':   taxes['total_excluded'],
-                })
+                'price_tax': taxes['total_included'] - taxes['total_excluded'],
+                'price_total': taxes['total_included'],
+                'price_subtotal': taxes['total_excluded'],
+            })
 
     @api.onchange('product_id')
     def _onchange_product(self):
@@ -2210,13 +2205,13 @@ class OfPlanningInterventionLine(models.Model):
                           .mapped('qty'))
             qty = order_line.product_uom_qty - planned
             line.update({
-                'order_line_id':    order_line.id,
-                'product_id':       order_line.product_id.id,
-                'qty':              qty,
-                'price_unit':       order_line.price_unit,
-                'name':             order_line.name,
-                'taxe_ids':         [(5, )] + [(4, tax.id) for tax in order_line.tax_id]
-                })
+                'order_line_id': order_line.id,
+                'product_id': order_line.product_id.id,
+                'qty': qty,
+                'price_unit': order_line.price_unit,
+                'name': order_line.name,
+                'taxe_ids': [(5, )] + [(4, tax.id) for tax in order_line.tax_id]
+            })
 
     @api.multi
     def _prepare_intervention_line_procurement(self, group_id=False):
@@ -2315,7 +2310,7 @@ class ResPartner(models.Model):
             'default_partner_id': self.id,
             'default_address_id': self.id,
             'default_date': fields.Date.today(9),
-            })
+        })
         return context
 
     @api.multi
