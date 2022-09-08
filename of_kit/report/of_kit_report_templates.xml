@@ -104,6 +104,7 @@
             <t t-if="l.of_is_kit and doc.of_kit_display_mode == 'expand'" name="kit_expanded">
                 <t t-foreach="l.kit_id.kit_line_ids" t-as="comp">
                     <tr>
+                        <td groups="of_sale.group_of_sale_print_one_image"/>
                         <td>
                             <span style="padding: 0 8px;">-&gt;</span><span t-esc="comp.get_report_name()"/>
                         </td>

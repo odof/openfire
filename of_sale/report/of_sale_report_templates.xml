@@ -205,9 +205,7 @@
                                     <t t-foreach="the_name" t-as="name_line">
                                         <t t-set="line_num" t-value="line_num + 1"/>
                                         <tr>
-                                            <t groups="of_sale.group_of_sale_print_one_image">
-                                                <td name="product_image" t-att-style=" 'padding-bottom: 0px; border-bottom: 0;' if the_name else ''"/>
-                                            </t>
+                                            <td groups="of_sale.group_of_sale_print_one_image" name="product_image" t-att-style="'border-top: 0; padding-top: 0px;' + (' padding-bottom: 0px;' if line_num &lt; len(the_name) else '')"/>
                                             <td name="descr" t-att-style="'border-top: 0; padding-top: 0px;' + (' padding-bottom: 0px;' if line_num &lt; len(the_name) else '')">
                                                 <t t-if="name_line">
                                                     <span t-esc="name_line"/>
