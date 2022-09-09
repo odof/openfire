@@ -844,7 +844,7 @@ class StockPackOperation(models.Model):
             if len(pack.linked_move_operation_ids) == 1:
                 pack.of_amount_untaxed = pack.linked_move_operation_ids.move_id.of_amount_untaxed
 
-    @api.depends('product_id', 'product_qty')
+    @api.depends('product_qty')
     def _compute_editable_record(self):
         picking_product_id = self.env['ir.values'].sudo().get_default(
             'of.intervention.settings', 'picking_product_id')
