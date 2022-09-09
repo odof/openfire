@@ -191,9 +191,7 @@ class OFPlanningIntervention(models.Model):
 
         res = super(OFPlanningIntervention, self).write(vals)
 
-        date_deadline_change = {rdv.id: date_deadline_avant[rdv.id] != rdv.date_deadline for rdv in self}
-
-        if state_interv or any(date_deadline_change):
+        if state_interv or any(date_deadline_avant[rdv.id] != rdv.date_deadline for rdv in self):
             for intervention in self:
                 service = intervention.service_id
                 date_next = False
