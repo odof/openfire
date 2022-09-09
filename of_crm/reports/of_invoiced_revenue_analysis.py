@@ -96,6 +96,15 @@ class OfInvoicedRevenueAnalysis(models.Model):
                 rec.invoiced_turnover_budget_comparison = "N/E"
 
     def init(self):
+        # On récupère l'article acompte
+        product_id = False
+        categ_id = self.env['ir.values'].get_default('sale.config.settings', 'of_deposit_product_categ_id_setting')
+        if categ_id:
+            product = self.env['product.product'].search(
+                [('categ_id', '=', categ_id), ('type', '=', 'service')], limit=1)
+            if product:
+                product_id = product.id
+
         tools.drop_view_if_exists(self._cr, 'of_invoiced_revenue_analysis')
         self._cr.execute("""
             CREATE VIEW of_invoiced_revenue_analysis AS (
@@ -106,7 +115,8 @@ class OfInvoicedRevenueAnalysis(models.Model):
             )""" % (self._select(),
                     self._from(),
                     self._where(),
-                    self._group_by()))
+                    self._group_by()),
+            (product_id, ))
 
     def _select(self):
         select_str = """
@@ -116,8 +126,8 @@ class OfInvoicedRevenueAnalysis(models.Model):
             ,           T.vendor_id
             ,           T.partner_id
             ,           T.product_id
-            ,           T.product_categ_id
-            ,           T.product_brand_id
+            ,           PT.categ_id                                     AS product_categ_id
+            ,           PT.brand_id                                     AS product_brand_id
             ,           SUM(T.invoiced_turnover_budget)                 AS invoiced_turnover_budget
             ,           SUM(T.invoiced_total)                           AS invoiced_total
             ,           SUM(T.previous_invoiced_total)                  AS previous_invoiced_total
@@ -131,7 +141,11 @@ class OfInvoicedRevenueAnalysis(models.Model):
 
     def _from(self):
         from_str = """
-            FROM    (%s) AS T
+            FROM    (%s)                        AS T
+            LEFT JOIN product_product           AS PP
+                ON PP.id = T.product_id
+            LEFT JOIN product_template          AS PT
+                ON PT.id = PP.product_tmpl_id
         """ % self._sub_from()
         return from_str
 
@@ -195,8 +209,6 @@ class OfInvoicedRevenueAnalysis(models.Model):
             ,       AI.user_id                                  AS vendor_id
             ,       AI.partner_id                               AS partner_id
             ,       NULL                                        AS product_id
-            ,       NULL                                        AS product_categ_id
-            ,       NULL                                        AS product_brand_id
             ,       0                                           AS invoiced_turnover_budget
             ,       0                                           AS invoiced_total
             ,       0                                           AS previous_invoiced_total
@@ -228,9 +240,7 @@ class OfInvoicedRevenueAnalysis(models.Model):
             ,       AI.company_id           AS company_id
             ,       AI.user_id              AS vendor_id
             ,       AI.partner_id           AS partner_id
-            ,       PP.id                   AS product_id
-            ,       PT.categ_id             AS product_categ_id
-            ,       PT.brand_id             AS product_brand_id
+            ,       AIL.product_id          AS product_id
             ,       0                       AS invoiced_turnover_budget
             ,       CASE
                         WHEN AI.type = 'out_invoice' THEN
@@ -251,8 +261,6 @@ class OfInvoicedRevenueAnalysis(models.Model):
         sub_from_account_invoice_line_str = """
             FROM    account_invoice         AI
             ,       account_invoice_line    AIL
-            ,       product_product         PP
-            ,       product_template        PT
         """
         return sub_from_account_invoice_line_str
 
@@ -261,8 +269,6 @@ class OfInvoicedRevenueAnalysis(models.Model):
             WHERE   AI.state            IN ('open', 'paid')
             AND     AI.type             IN ('out_invoice', 'out_refund')
             AND     AI.id               = AIL.invoice_id
-            AND     PP.id               = AIL.product_id
-            AND     PP.product_tmpl_id  = PT.id
         """
         return sub_where_account_invoice_line_str
 
@@ -274,8 +280,6 @@ class OfInvoicedRevenueAnalysis(models.Model):
             ,       RR.user_id                                  AS vendor_id
             ,       NULL                                        AS partner_id
             ,       NULL                                        AS product_id
-            ,       NULL                                        AS product_categ_id
-            ,       NULL                                        AS product_brand_id
             ,       OSOL.invoiced_turnover                      AS invoiced_turnover_budget
             ,       0                                           AS invoiced_total
             ,       0                                           AS previous_invoiced_total
@@ -306,7 +310,7 @@ class OfInvoicedRevenueAnalysis(models.Model):
 
     def _sub_select_account_invoice_n_1(self):
         sub_select_account_invoice_n_1_str = """
-            SELECT  30000000 + AI.id    AS id
+            SELECT  30000000 + AIL.id   AS id
             ,       DATE(
                         EXTRACT(YEAR FROM AI.date_invoice) + 1 || '-' || 
                         TO_CHAR(AI.date_invoice, 'MM') || '-01'
@@ -314,9 +318,7 @@ class OfInvoicedRevenueAnalysis(models.Model):
             ,       AI.company_id       AS company_id
             ,       AI.user_id          AS vendor_id
             ,       AI.partner_id       AS partner_id
-            ,       PP.id               AS product_id
-            ,       PT.categ_id         AS product_categ_id
-            ,       PT.brand_id         AS product_brand_id
+            ,       AIL.product_id      AS product_id
             ,       0                   AS invoiced_turnover_budget
             ,       0                   AS invoiced_total
             ,       CASE
@@ -337,8 +339,6 @@ class OfInvoicedRevenueAnalysis(models.Model):
         sub_from_account_invoice_n_1_str = """
             FROM    account_invoice         AI
             ,       account_invoice_line    AIL
-            ,       product_product         PP
-            ,       product_template        PT
         """
         return sub_from_account_invoice_n_1_str
 
@@ -347,8 +347,6 @@ class OfInvoicedRevenueAnalysis(models.Model):
             WHERE   AI.state            IN ('open', 'paid')
             AND     AI.type             IN ('out_invoice', 'out_refund')
             AND     AIL.invoice_id      = AI.id
-            AND     PP.id               = AIL.product_id
-            AND     PT.id               = PP.product_tmpl_id
         """
         return sub_where_account_invoice_n_1_str
 
@@ -358,17 +356,7 @@ class OfInvoicedRevenueAnalysis(models.Model):
             ,       CASE
                         WHEN SOL.state = 'presale' THEN
                             SO.of_date_de_pose
-                        WHEN SOL.product_id = ( SELECT  PP2.id
-                                                FROM    ir_values                   IV
-                                                ,       product_template            PT2
-                                                ,       product_product             PP2
-                                                WHERE   IV.name                     = 'of_deposit_product_categ_id_setting'
-                                                AND     PT2.categ_id                = SUBSTR(value, 2, POSITION(E'\n' in value) - 1)::INT
-                                                AND     PT2.type                    = 'service'
-                                                AND     PP2.product_tmpl_id         = PT2.id
-                                                LIMIT   1
-                                               )
-                        THEN
+                        WHEN SOL.product_id = %s THEN
                             (   SELECT  MAX(SOL2.of_invoice_date_prev)
                                 FROM    sale_order_line                 SOL2
                                 WHERE   SOL2.order_id                   = SOL.order_id
@@ -381,9 +369,7 @@ class OfInvoicedRevenueAnalysis(models.Model):
             ,       SO.company_id                                                   AS company_id
             ,       SO.user_id                                                      AS vendor_id
             ,       SO.partner_id                                                   AS partner_id
-            ,       PP.id                                                           AS product_id
-            ,       PT.categ_id                                                     AS product_categ_id
-            ,       PT.brand_id                                                     AS product_brand_id
+            ,       SOL.product_id                                                  AS product_id
             ,       0                                                               AS invoiced_turnover_budget
             ,       0                                                               AS invoiced_total
             ,       0                                                               AS previous_invoiced_total
@@ -399,8 +385,6 @@ class OfInvoicedRevenueAnalysis(models.Model):
         sub_from_sale_order_line_str = """
             FROM    sale_order          SO
             ,       sale_order_line     SOL
-            ,       product_product     PP
-            ,       product_template    PT
         """
         return sub_from_sale_order_line_str
 
@@ -410,8 +394,6 @@ class OfInvoicedRevenueAnalysis(models.Model):
             AND     SOL.of_amount_to_invoice    != 0
             AND     SO.id                       = SOL.order_id
             AND     SO.state                    NOT IN ('draft', 'sent', 'closed', 'cancel')
-            AND     PP.id                       = SOL.product_id
-            AND     PP.product_tmpl_id          = PT.id
         """
         return sub_where_sale_order_line_str
 
@@ -422,9 +404,7 @@ class OfInvoicedRevenueAnalysis(models.Model):
             ,       OPI.company_id                              AS company_id
             ,       OPI.user_id                                 AS vendor_id
             ,       OPI.partner_id                              AS partner_id
-            ,       PP.id                                       AS product_id
-            ,       PT.categ_id                                 AS product_categ_id
-            ,       PT.brand_id                                 AS product_brand_id
+            ,       OPIL.product_id                             AS product_id
             ,       0                                           AS invoiced_turnover_budget
             ,       0                                           AS invoiced_total
             ,       0                                           AS previous_invoiced_total
@@ -440,8 +420,6 @@ class OfInvoicedRevenueAnalysis(models.Model):
         sub_from_intervention_str = """
             FROM    of_planning_intervention        OPI
             ,       of_planning_intervention_line   OPIL
-            ,       product_product                 PP
-            ,       product_template                PT
         """
         return sub_from_intervention_str
 
@@ -451,8 +429,6 @@ class OfInvoicedRevenueAnalysis(models.Model):
             AND     OPIL.price_subtotal         != 0
             AND     OPI.id                      = OPIL.intervention_id
             AND     OPI.type_id                 = %s
-            AND     PP.id                       = OPIL.product_id
-            AND     PP.product_tmpl_id          = PT.id
         """ % self.env.ref('of_service.of_service_type_maintenance').id
         return sub_where_intervention_str
 
@@ -463,9 +439,7 @@ class OfInvoicedRevenueAnalysis(models.Model):
             ,       OS.company_id                               AS company_id
             ,       OS.user_id                                  AS vendor_id
             ,       OS.partner_id                               AS partner_id
-            ,       PP.id                                       AS product_id
-            ,       PT.categ_id                                 AS product_categ_id
-            ,       PT.brand_id                                 AS product_brand_id
+            ,       OSL.product_id                              AS product_id
             ,       0                                           AS invoiced_turnover_budget
             ,       0                                           AS invoiced_total
             ,       0                                           AS previous_invoiced_total
@@ -481,8 +455,6 @@ class OfInvoicedRevenueAnalysis(models.Model):
         sub_from_service_str = """
             FROM    of_service          OS
             ,       of_service_line     OSL
-            ,       product_product     PP
-            ,       product_template    PT
         """
         return sub_from_service_str
 
@@ -493,8 +465,6 @@ class OfInvoicedRevenueAnalysis(models.Model):
             AND     OS.id                       = OSL.service_id
             AND     OS.base_state               = 'calculated'
             AND     OS.type_id                  = %s
-            AND     PP.id                       = OSL.product_id
-            AND     PP.product_tmpl_id          = PT.id
         """ % self.env.ref('of_service.of_service_type_maintenance').id
         return sub_where_service_str
 
@@ -510,8 +480,8 @@ class OfInvoicedRevenueAnalysis(models.Model):
             ,           T.vendor_id
             ,           T.partner_id
             ,           T.product_id
-            ,           T.product_categ_id
-            ,           T.product_brand_id
+            ,           PT.categ_id
+            ,           PT.brand_id
         """
         return group_by_str
 
