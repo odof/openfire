@@ -12,6 +12,7 @@
                         <field name="name"/>
                         <field name="duration" widget="float_time"/>
                         <field name="planning_tache_id"/>
+                        <field name="user_id"/>
                     </group>
                 </sheet>
             </form>
@@ -27,6 +28,7 @@
                 <field name="name"/>
                 <field name="duration" widget="float_time"/>
                 <field name="planning_tache_id"/>
+                <field name="user_id"/>
             </tree>
         </field>
     </record>
