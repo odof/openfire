@@ -144,6 +144,7 @@ class ProjectTask(models.Model):
             context = safe_eval(action['context'])
             context.update({
                 'default_address_id': self.partner_id and self.partner_id.id or False,
+                'default_task_id': self.id,
                 'default_duree': self.planned_hours,
                 'default_employee_ids': [(6, 0, self.user_id and self.user_id.employee_ids.ids)],
             })
