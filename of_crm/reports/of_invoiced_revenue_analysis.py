@@ -97,7 +97,7 @@ class OfInvoicedRevenueAnalysis(models.Model):
 
     def init(self):
         # On récupère l'article acompte
-        product_id = False
+        product_id = None
         categ_id = self.env['ir.values'].get_default('sale.config.settings', 'of_deposit_product_categ_id_setting')
         if categ_id:
             product = self.env['product.product'].search(
