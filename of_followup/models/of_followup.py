@@ -238,6 +238,7 @@ class OFFollowupProject(models.Model):
                 values = self._get_order_values(
                     project, mapping_project_tags, default_of_kanban_step_id, done_of_kanban_step_id,
                     in_progress_of_kanban_step_id)
+                values['partner_id'] = project.order_id.partner_id.id
                 order_values_to_upd[project.order_id.id] = values
             self._update_tables_from_sale_values(order_values_to_upd)
 
