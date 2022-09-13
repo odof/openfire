@@ -123,10 +123,10 @@ class OFAccountPaymentWizard(models.TransientModel):
                         u"Vous ne pouvez pas modifier ou annuler un paiement remis en banque."))
                 # On vérifie s'il n'y a pas un autre lettrage.
                 for move_line in payment.move_line_ids:
-                    if move_line.reconciled:
+                    if move_line.matched_debit_ids or move_line.matched_credit_ids:
                         raise UserError(_(
                             u"Le paiement est lettré (lié à une facture par exemple). "
-                            u"Vous ne pouvez modifier ou annuler un paiement que si il n'est pas lettré. "
+                            u"Vous ne pouvez modifier ou annuler un paiement que s'il n'est pas lettré. "
                             u"Annulez le lettrage auparavant."))
 
                 # Annulation
