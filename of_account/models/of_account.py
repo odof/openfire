@@ -186,6 +186,34 @@ AccountInvoice.group_lines = group_lines
 class AccountAccount(models.Model):
     _inherit = 'account.account'
 
+    @api.model_cr_context
+    def _auto_init(self):
+        # À l'initialisation du module, on force par défaut les comptes 999 et les comptes clients/fournisseur de base
+        # en non-éditables
+        cr = self._cr
+        cr.execute(
+            "SELECT 1 FROM information_schema.columns "
+            "WHERE table_name = 'account_account' AND column_name = 'of_editable'")
+        set_value = not cr.fetchall()
+        res = super(AccountAccount, self)._auto_init()
+        if set_value:
+            # Récupération des comptes de tiers pas défaut
+            cr.execute(
+                "SELECT prop.value_reference "
+                "FROM ir_model_fields AS field "
+                "INNER JOIN ir_property AS prop ON prop.fields_id = field.id "
+                "WHERE field.model = 'res.partner'"
+                "  AND field.name IN ('property_account_receivable_id', 'property_account_payable_id') "
+                "  AND prop.res_id IS NULL")
+            account_ids = [int(row[0].split(",")[1]) for row in cr.fetchall() if row[0].startswith('account.account,')]
+            cr.execute(
+                "UPDATE account_account "
+                "SET of_editable = false "
+                "WHERE id IN %s "
+                "  OR code ~ '^9+$'",
+                (tuple(account_ids), ))
+        return res
+
     of_account_counterpart_id = fields.Many2one('account.account', string="Compte de contrepartie")
     of_accept_entries = fields.Boolean(
         string="Compte de saisie", default=True,
