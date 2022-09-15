@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+import mock
 from odoo.addons.of_unittest.tests.test_order_common import OFTestOrderTransactionCase
 
 
@@ -57,6 +58,9 @@ class OFTestOrder(OFTestOrderTransactionCase):
             - Le sous total de la ligne doit être de 150€
         5 - Je contrôle les montants de la commande
         6 - Je confirme la commande
+            - Attention nous ne voulons pas contacter le service externe
+            - On souhaite quand même vérifier l'appel à la méthode d'envoi au service externe
+                - Elle ne doit être appelée qu'une seule fois
         7 - Le client doit changer de statut"""
         sale_order_obj = self.env['sale.order']
         sale_order_line_obj = self.env['sale.order.line']
@@ -89,7 +93,9 @@ class OFTestOrder(OFTestOrderTransactionCase):
         self.assertEqual(test_order.state, 'sent')
 
         # Order confirmation
-        test_order.action_confirm()
+        with mock.patch.object(test_order, '_send_sale_to_external_service') as m:
+            test_order.action_confirm()
+            m.assert_called_once()
 
         self.assertEqual(test_order.state, 'sale')
 
