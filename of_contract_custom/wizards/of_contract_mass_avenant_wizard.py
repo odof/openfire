@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+# 1: imports of python lib
 from dateutil.relativedelta import relativedelta
+# 2: imports of odoo
+from odoo import models, fields, api
+# 3: imports from odoo modules
+# 4: local imports
+# 5: Import of unknown third party lib
 
 
 class OFContractMassAvenantWizard(models.TransientModel):

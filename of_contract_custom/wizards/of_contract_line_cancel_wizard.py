@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 
+# 1: imports of python lib
+# 2: imports of odoo
 from odoo import models, fields, api
 from odoo.exceptions import UserError
+# 3: imports from odoo modules
 from odoo.addons.of_utils.models.of_utils import format_date
+# 4: local imports
+# 5: Import of unknown third party lib
 
 
 class OFContractLineCancelWizard(models.TransientModel):

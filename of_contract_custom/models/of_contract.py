@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
+# 1: imports of python lib
+import math
 from dateutil.relativedelta import relativedelta
+# 2: imports of odoo
+from odoo import models, fields, api, _
 from odoo.addons import decimal_precision as dp
 from odoo.exceptions import UserError
 from odoo.exceptions import ValidationError
-from odoo.addons.of_utils.models.of_utils import format_date, se_chevauchent
 from odoo.tools.safe_eval import safe_eval
-import math
+# 3: imports from odoo modules
+from odoo.addons.of_utils.models.of_utils import format_date, se_chevauchent
+# 4: local imports
+# 5: Import of unknown third party lib
 
 
 class OfDocumentsJoints(models.AbstractModel):

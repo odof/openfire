@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
-from odoo.addons import decimal_precision as dp
+# 1: imports of python lib
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+# 2: imports of odoo
+from odoo import models, fields, api
+from odoo.addons import decimal_precision as dp
+# 3: imports from odoo modules
+# 4: local imports
+# 5: Import of unknown third party lib
 
 
 class OFContractTemplate(models.Model):
