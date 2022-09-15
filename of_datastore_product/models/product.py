@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 import odoo.addons.decimal_precision as dp
 
@@ -210,6 +210,10 @@ class ProductProduct(models.Model):
 
     @api.multi
     def write(self, vals):
+        if 'default_code' in vals and not self._context.get('skip_default_code_lock', False):
+            for record in self:
+                if record.of_datastore_res_id and vals['default_code'] != record.default_code:
+                    raise ValidationError(_("You cannot change the default code of a centralized product."))
         # Archivage des règles de réappro quand les articles sont archivés depuis le TC
         orderpoints_to_activate = False
         if 'active' in vals:
