@@ -25,9 +25,11 @@ Ces références seront toujours accessibles via le tarif centralisé.<br/>
                 </div>
                 <footer>
                     <button name="update_products" type="object" string="Update" class="btn-primary"
-                            attrs="{'invisible': ['|',('nb_local_products', '&gt;', 1500),('is_update','=',False)]}"/>
+                            attrs="{'invisible': ['|',('nb_local_products', '&gt;', 1500),('is_update','=',False)]}"
+                            context="{'skip_default_code_lock': True}"/>
                     <button name="update_products" type="object" string="Import" class="btn-primary"
-                            attrs="{'invisible': ['|',('nb_local_products', '&gt;', 1500),('is_update','=',True)]}"/>
+                            attrs="{'invisible': ['|',('nb_local_products', '&gt;', 1500),('is_update','=',True)]}"
+                            context="{'skip_default_code_lock': True}"/>
                     <button special="cancel" string="Cancel"/>
                 </footer>
             </form>

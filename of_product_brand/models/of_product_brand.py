@@ -92,7 +92,7 @@ class OfProductBrand(models.Model):
         if remove_previous_prefix and isinstance(remove_previous_prefix, basestring) and \
                 not remove_previous_prefix.endswith('_'):
             remove_previous_prefix += '_'
-        for product in products:
+        for product in products.with_context(skip_default_code_lock=True):
             # update_products_default_code() can be called from onchange, when default_code is not already filled
             default_code = product.default_code or ''
             if remove_previous_prefix:
