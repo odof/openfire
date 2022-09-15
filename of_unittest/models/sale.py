@@ -15,6 +15,7 @@ class SaleOrder(models.Model):
 
     @api.multi
     def action_confirm(self):
+        """ Surcharge de la fonction d'origine pour ajouter un appel à un service web sensible. """
         res = super(SaleOrder, self).action_confirm()
         for rec in self:
             rec.weekday_sms_sent = bool(is_weekday(datetime.now()))
