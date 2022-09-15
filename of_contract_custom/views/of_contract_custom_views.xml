@@ -341,6 +341,11 @@
                 <field name="amount_total" sum="Prochain total"/>
                 <field name="company_id" groups="base.group_multi_company"/>
                 <field name="state"/>
+                <button name="supprimer_la_ligne" type="object" icon="fa-trash-o"
+                        help="Supprimer"
+                        attrs="{'invisible': [('state', '!=', 'draft')]}"
+                        confirm="Voulez-vous supprimer la ligne ?"
+                        groups="of_contract_custom.group_of_contract_custom_creation"/>
             </tree>
         </field>
     </record>

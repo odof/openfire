@@ -11,7 +11,7 @@ from odoo import models, fields, api
 class OFContractGenerateFromTemplateWizard(models.TransientModel):
     _name = 'of.contract.generate.from.template.wizard'
 
-    contract_id = fields.Many2one(comodel_name='of.contract')
+    contract_id = fields.Many2one(comodel_name='of.contract', string="Contrat")
     contract_template_id = fields.Many2one(comodel_name='of.contract.template', string=u"Modèle de contrat")
 
     def button_confirm(self):

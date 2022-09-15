@@ -46,32 +46,18 @@ class OfContract(models.Model):
 
     @api.model_cr_context
     def _auto_init(self):
+        module_self = self.env['ir.module.module'].search([('name', '=', 'of_contract_custom')])
+        version = ''
+        if module_self:
+            version = module_self.latest_version
         cr = self._cr
         # Vérification si la table existe, si elle n'existe pas on est en cours d'installation du module
         cr.execute("SELECT * FROM information_schema.columns "
                    "WHERE table_name = '%s'" % (self._table,))
         table_exist = bool(cr.fetchall())
-        if table_exist:
-            cr.execute(
-                "SELECT * FROM information_schema.columns "
-                "WHERE table_name = '%s' AND column_name = 'contract_type'" % (self._table,))
-            exist1 = bool(cr.fetchall())
-            cr.execute(
-                "SELECT * FROM information_schema.columns "
-                "WHERE table_name = '%s' AND column_name = 'type'" % (self._table,))
-            exist2 = bool(cr.fetchall())
-            cr.execute(
-                "SELECT * FROM information_schema.columns "
-                "WHERE table_name = '%s' AND column_name = 'frequency'" % (self._table,))
-            exist3 = bool(cr.fetchall())
         res = super(OfContract, self)._auto_init()
         if table_exist:
-            if not exist1 and exist2:
-                cr.execute("UPDATE %s "
-                           "SET contract_type = 'advanced'" % (self._table, ))
-                self.env['ir.values'].sudo().set_default(
-                    'of.intervention.settings', 'of_contract', True)
-            if not exist3:
+            if version and version < '10.0.2':
                 def old_invoicing_frequencing_to_new(contract):
                     rrtype = contract.recurring_rule_type
                     if rrtype == 'date':
@@ -109,7 +95,7 @@ class OfContract(models.Model):
         'res.partner.category', related="partner_id.category_id", string=u"Étiquettes client")
     pricelist_id = fields.Many2one('product.pricelist', string='Liste de prix')
     line_ids = fields.One2many('of.contract.line', 'contract_id', string='Lignes de contrat')
-    line_ids_rel = fields.One2many(related='line_ids', string='Lignes de contrat')
+    line_ids_rel = fields.One2many('of.contract.line', 'contract_id', string='Lignes de contrat', related=False)
     recurring_rule_type = fields.Selection([
         ('date', u'À la prestation'),
         ('month', 'Mensuelle'),
@@ -831,7 +817,7 @@ class OfContract(models.Model):
         view_id = self.env.ref('of_contract_custom.of_contract_generate_from_template_wizard_view_form').id
         wizard = self.env['of.contract.generate.from.template.wizard'].create({'contract_id': self.id})
         return {
-            'name'     : 'Avenant',
+            'name'     : u"Sélection de modèle",
             'type'     : 'ir.actions.act_window',
             'view_type': 'form',
             'view_mode': 'form',
@@ -850,45 +836,18 @@ class OfContractLine(models.Model):
 
     @api.model_cr_context
     def _auto_init(self):
+        module_self = self.env['ir.module.module'].search([('name', '=', 'of_contract_custom')])
+        version = ''
+        if module_self:
+            version = module_self.latest_version
         cr = self._cr
         # Vérification si la table existe, si elle n'existe pas on est en cours d'installation du module
         cr.execute("SELECT * FROM information_schema.columns "
                    "WHERE table_name = '%s'" % (self._table,))
         table_exist = bool(cr.fetchall())
-        if table_exist:
-            cr.execute(
-                "SELECT * FROM information_schema.columns "
-                "WHERE table_name = '%s' AND column_name = 'interv_frequency_nbr'" % (self._table,))
-            exist1 = bool(cr.fetchall())
-            cr.execute(
-                "SELECT * FROM information_schema.columns "
-                "WHERE table_name = '%s' AND column_name = 'nbr_interv'" % (self._table,))
-            exist2 = bool(cr.fetchall())
-            change_planif = False
-            if exist2 and not exist1:
-                cr.execute(
-                    "SELECT ocl.id, ocl.nbr_interv, sub.nbr_month "
-                    "FROM of_contract_line AS ocl "
-                    "JOIN (SELECT rel.of_contract_line_id AS line_id, count(rel.of_mois_id) AS nbr_month "
-                    "FROM of_contract_line_of_mois_rel AS rel "
-                    "GROUP BY rel.of_contract_line_id) AS sub ON sub.line_id=ocl.id")
-                change_planif = cr.fetchall()
-            cr.execute(
-                "SELECT * FROM information_schema.columns "
-                "WHERE table_name = '%s' AND column_name = 'first_invoicing'" % (self._table,))
-            exist3 = bool(cr.fetchall())
         res = super(OfContractLine, self)._auto_init()
         if table_exist:
-            if change_planif:
-                for line_id, nbr_interv, nbr_month in change_planif:
-                    if (float(nbr_interv)/float(nbr_month)).is_integer():
-                        ratio = nbr_interv/nbr_month
-                        values = ('month', ratio, line_id)
-                    else:
-                        values = ('year', nbr_interv, line_id)
-                    cr.execute("UPDATE of_contract_line "
-                               "SET interv_frequency = %s, interv_frequency_nbr = %s WHERE id = %s", values)
-            if not exist3:
+            if version and version < '10.0.2':
                 # Initialisation de la colonne first_invoicing
                 # Cas 1, la ligne de contrat a déjà été facturée donc
                 #   date de première facturation = date supposée de la première facture
@@ -899,26 +858,26 @@ class OfContractLine(models.Model):
                 cr.execute("UPDATE of_contract_line AS ocl "
                            "SET first_invoicing = subr.date " 
                            "FROM (SELECT * "
-                           "FROM ( "
-                           "  SELECT "
-                           "    ROW_NUMBER() OVER (PARTITION BY ocl.id ORDER BY ail.name) AS r, "
-                           "    ocl.id AS line_id, "
-                           "    CASE "
-                           "      WHEN ail.of_contract_supposed_date IS NOT NULL"
-                           "      THEN ail.of_contract_supposed_date "
-                           "      WHEN ocl.date_start IS NOT NULL"
-                           "      THEN ocl.date_start "
-                           "      ELSE oc.date_start "
-                           "    END"
-                           "    AS date "
-                           "  FROM "
-                           "    of_contract_line AS ocl "
-                           "  LEFT OUTER JOIN "
-                           "    account_invoice_line AS ail ON ail.of_contract_line_id=ocl.id "
-                           "  LEFT JOIN "
-                           "    of_contract AS oc ON oc.id=ocl.contract_id) AS sub "
-                           "WHERE "
-                           "  sub.r <= 1) AS subr "
+                           "  FROM ( "
+                           "    SELECT "
+                           "      ROW_NUMBER() OVER (PARTITION BY ocl.id ORDER BY ail.name) AS r, "
+                           "      ocl.id AS line_id, "
+                           "      CASE "
+                           "        WHEN ail.of_contract_supposed_date IS NOT NULL "
+                           "        THEN ail.of_contract_supposed_date "
+                           "        WHEN ocl.date_start IS NOT NULL "
+                           "        THEN ocl.date_start "
+                           "        ELSE oc.date_start "
+                           "      END "
+                           "      AS date "
+                           "    FROM "
+                           "      of_contract_line AS ocl "
+                           "    LEFT OUTER JOIN "
+                           "      account_invoice_line AS ail ON ail.of_contract_line_id=ocl.id "
+                           "    LEFT JOIN "
+                           "      of_contract AS oc ON oc.id=ocl.contract_id) AS sub "
+                           "  WHERE "
+                           "    sub.r <= 1) AS subr "
                            "WHERE subr.line_id=ocl.id")
 
         return res
@@ -1743,19 +1702,18 @@ class OfContractProduct(models.Model):
 
     @api.model_cr_context
     def _auto_init(self):
+        module_self = self.env['ir.module.module'].search([('name', '=', 'of_contract_custom')])
+        version = ''
+        if module_self:
+            version = module_self.latest_version
         cr = self._cr
         # Vérification si la table existe, si elle n'existe pas on est en cours d'installation du module
         cr.execute("SELECT * FROM information_schema.columns "
                    "WHERE table_name = '%s'" % (self._table,))
         table_exist = bool(cr.fetchall())
-        if table_exist:
-            cr.execute(
-                "SELECT * FROM information_schema.columns "
-                "WHERE table_name = '%s' AND column_name = 'layout_category_id'" % (self._table,))
-            exist = bool(cr.fetchall())
         res = super(OfContractProduct, self)._auto_init()
         if table_exist:
-            if not exist:
+            if version and version < '10.0.2':
                 # Fait dans les of.contract.product car un write doit être réalisé sur of.contract.line qui va provoquer
                 # un recalcul dans of.contract.product et planter si les nouveaux champs n'existe pas encore en db
                 def old_invoicing_frequencing_to_new(contract_line):
