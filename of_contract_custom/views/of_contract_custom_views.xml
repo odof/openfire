@@ -150,7 +150,7 @@
                                 <field name="frequency" nolabel="1" class="oe_inline" style="margin-right: 5px"/>
                                 <field name="recurring_invoicing_payment_id" nolabel="1" class="oe_inline"
                                        options="{'no_create': True, 'no_open': True}"
-                                       attrs="{'required': [('ctype', '=', 'maintenance')]}"
+                                       required="1"
                                        domain="[('code', 'in', frequency == 'date' and ('date', 'post-paid') or ('pre-paid', 'post-paid'))]"/>
                             </div>
                             <field name="journal_id" attrs="{'readonly': [('invoice_count','>',0)]}" options="{'no_create': True}"/>

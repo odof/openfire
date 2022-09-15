@@ -933,7 +933,7 @@ class OfContractLine(models.Model):
     address_street2 = fields.Char(string="Rue", related="address_id.street2", readonly=True)
     address_zip = fields.Char(string="Zip", related="address_id.zip", readonly=True)
     address_city = fields.Char(string="Ville", related="address_id.city", readonly=True)
-    contract_id = fields.Many2one('of.contract', string=u"Contrat", required=True)
+    contract_id = fields.Many2one('of.contract', string=u"Contrat", required=True, ondelete='cascade')
     company_id = fields.Many2one('res.company', related="contract_id.company_id", string='Société')
     supplier_id = fields.Many2one('res.partner', string="Prestataire", domain="[('supplier','=',True)]")
     supplier_tag_ids = fields.Many2many("res.partner.category", related="supplier_id.category_id",
@@ -1912,35 +1912,36 @@ class OfContractProduct(models.Model):
             if frequency == 'trimester':
                 amount *= 3
                 frequency == 'months'
-            if frequency == 'semester':
+            elif frequency == 'semester':
                 amount *= 6
                 frequency == 'months'
             if last_day and last_day == line.next_date and line.revision == 'last_day':
                 qty_to_invoice = round(product_line.qty_per_period - product_line.qty_invoiced, 3)
-            elif line.prorata and not line.invoice_line_ids.filtered(lambda il: il.invoice_id.state != 'cancel'):
-                start = fields.Date.from_string(line.date_start)
-                end = fields.Date.from_string(line.next_date or line.first_invoicing)
-                start_next_month = start + relativedelta(months=1, day=1)
-                start_beg_month = start + relativedelta(day=1)
-                diviseur = ((start_next_month - start_beg_month) + (end - start_next_month)).days
-                dividende = ((start_next_month - start) + (end - start_next_month)).days
-                # un des chiffres doit être cast en float autrement on trouve un arrondi
-                prorata = float(dividende) / diviseur
-                if line.recurring_invoicing_payment_id.code == 'pre-paid':
-                    # pre-paid signifie qu'on paie pour la période a venir donc il faut facturer 1x + prorata
-                    prorata += 1.0
-            elif line.prorata and line.date_end and line.next_date > line.date_end:
-                start = fields.Date.from_string(line.next_date)
-                last_date = safe_eval('base_date + relativedelta(%s=amount)' % frequency,
-                                      {'base_date': start,
-                                       'relativedelta': relativedelta,
-                                       'amount': amount}
-                                      )
-                end = fields.Date.from_string(line.date_end)
-                diviseur = last_date - start
-                dividende = end - start
-                # un des chiffres doit être cast en float autrement on trouve un arrondi
-                prorata = float(dividende) / diviseur
+            if line.prorata:
+                if not line.invoice_line_ids.filtered(lambda il: il.invoice_id.state != 'cancel'):
+                    start = fields.Date.from_string(line.date_start)
+                    end = fields.Date.from_string(line.next_date or line.first_invoicing)
+                    start_next_month = start + relativedelta(months=1, day=1)
+                    start_beg_month = start + relativedelta(day=1)
+                    diviseur = ((start_next_month - start_beg_month) + (end - start_next_month)).days
+                    dividende = ((start_next_month - start) + (end - start_next_month)).days
+                    # un des chiffres doit être cast en float autrement on trouve un arrondi
+                    prorata = float(dividende) / diviseur
+                    if line.recurring_invoicing_payment_id.code == 'pre-paid':
+                        # pre-paid signifie qu'on paie pour la période a venir donc il faut facturer 1x + prorata
+                        prorata += 1.0
+                elif line.date_end and line.next_date > line.date_end:
+                    start = fields.Date.from_string(line.next_date)
+                    last_date = safe_eval('base_date + relativedelta(%s=amount)' % frequency,
+                                          {'base_date': start,
+                                           'relativedelta': relativedelta,
+                                           'amount': amount}
+                                          )
+                    end = fields.Date.from_string(line.date_end)
+                    diviseur = last_date - start
+                    dividende = end - start
+                    # un des chiffres doit être cast en float autrement on trouve un arrondi
+                    prorata = float(dividende) / diviseur
             date_end_period = fields.Date.from_string(line.current_period_id.date_end)
             date_start_period = fields.Date.from_string(line.current_period_id.date_start)
             if frequency == 'days':

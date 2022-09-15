@@ -45,17 +45,18 @@ class SaleOrder(models.Model):
     @api.multi
     def action_confirm(self):
         res = super(SaleOrder, self).action_confirm()
-        if self.of_subscription and not self.of_contract_id:
-            contract_vals = self.get_contract_vals()
-            contract_lines = []
-            for order_line in self.order_line.filtered('of_subscription'):
-                contract_lines.append((0, 0, order_line.get_contract_vals()))
-            contract_vals.update({
-                'line_ids': contract_lines,
-            })
-            contract = self.env['of.contract'].create(contract_vals)
-            contract.line_ids.mapped('contract_product_ids')._compute_tax_id()
-            self.write({'of_contract_id': contract.id})
+        for order in self:
+            if order.of_subscription and not self.of_contract_id:
+                contract_vals = order.get_contract_vals()
+                contract_lines = []
+                for order_line in order.order_line.filtered('of_subscription'):
+                    contract_lines.append((0, 0, order_line.get_contract_vals()))
+                contract_vals.update({
+                    'line_ids': contract_lines,
+                })
+                contract = self.env['of.contract'].create(contract_vals)
+                contract.line_ids.mapped('contract_product_ids')._compute_tax_id()
+                order.write({'of_contract_id': contract.id})
         return res
 
 
