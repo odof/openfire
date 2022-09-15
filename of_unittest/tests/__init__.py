@@ -2,3 +2,4 @@
 from . import test_01_partner
 from . import test_020_order
 from . import test_021_order_sms_test
+from . import test_022_order_requests
