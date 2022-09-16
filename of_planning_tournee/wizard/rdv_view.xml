@@ -1067,7 +1067,7 @@
         view_id="view_rdv_intervention_wizard"
         id="action_view_rdv_intervention_wizard_service"
         target="new"
-        groups="of_planning.of_group_planning_intervention_lecture_siens"
+        groups="of_planning.group_planning_intervention_access"
     />
 
     <!-- Ajout bouton planifier une intervention dans vue form partenaire-->
@@ -1077,7 +1077,8 @@
         <field name="inherit_id" ref="of_base.of_base_partner_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="action_open_wizard_plan_intervention" string="Plan Intervention" type="object"/>
+                <button name="action_open_wizard_plan_intervention" string="Plan Intervention" type="object"
+                        groups="of_planning.group_planning_intervention_access"/>
             </xpath>
         </field>
     </record>
@@ -1091,7 +1092,8 @@
             <xpath expr="//header" position="inside">
                 <button name="action_open_wizard_plan_intervention" string="Plan Intervention"
                         type="object" invisible="context.get('hide_bouton_planif')"
-                        attrs="{'invisible': [('base_state', '!=', 'calculated')]}"/>
+                        attrs="{'invisible': [('base_state', '!=', 'calculated')]}"
+                        groups="of_planning.group_planning_intervention_access"/>
             </xpath>
         </field>
     </record>
