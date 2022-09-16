@@ -40,7 +40,7 @@ class StockMove(models.Model):
     def _get_new_picking_values(self):
         res = super(StockMove, self)._get_new_picking_values()
         if isinstance(res, dict):
-            responsable = self.procurement_id.sale_line_id.order_id.of_user_id
-            if responsable:
+            responsable = self.mapped('procurement_id').mapped('sale_line_id').mapped('order_id').mapped('of_user_id')
+            if len(responsable) == 1:
                 res['of_user_id'] = responsable.id
         return res
