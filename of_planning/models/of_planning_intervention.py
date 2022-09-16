@@ -1168,7 +1168,9 @@ class OfPlanningIntervention(models.Model):
         template_accounting = template.sudo().with_context(
             force_company=self.company_id.id or self.env.user.company_id.id)
         # context ajouté dans of_service pour initialiser les champs d'un RDV. Utile ici pour prioriser la DI
-        if self.state == "draft" and template and not self._context.get('of_import_service_lines'):
+        if (self.state == "draft" or
+                (self.state == 'confirm' and self._context.get('of_intervention_wizard'))) and \
+                template and not self._context.get('of_import_service_lines'):
             if template.tache_id:
                 self.tache_id = template.tache_id
             # On change la position fiscale par celle du modèle si celle présente n'est pas sur la même société
@@ -1183,10 +1185,7 @@ class OfPlanningIntervention(models.Model):
             if template_accounting.fiscal_position_id and not self.lien_commande and \
                     (not self.fiscal_position_id or change_fiscal_pos):
                 self.fiscal_position_id = template_accounting.fiscal_position_id
-            if self.line_ids:
-                new_lines = self.line_ids
-            else:
-                new_lines = intervention_line_obj
+            new_lines = self.line_ids or intervention_line_obj
             for line in template.line_ids:
                 data = line.get_intervention_line_values()
                 data['intervention_id'] = self.id
@@ -1196,6 +1195,7 @@ class OfPlanningIntervention(models.Model):
 
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
+        planning_line_obj = self.env['of.planning.intervention.line']
         if self.tache_id:
             tache_accounting = self.tache_id.sudo().with_context(
                 force_company=self.company_id.id or self.env.user.company_id.id)
@@ -1213,7 +1213,7 @@ class OfPlanningIntervention(models.Model):
             if tache_accounting.fiscal_position_id and (not self.fiscal_position_id or change_fiscal_pos):
                 self.fiscal_position_id = tache_accounting.fiscal_position_id
             if self.tache_id.product_id:
-                self.line_ids.new({
+                self.line_ids = planning_line_obj.new({
                     'intervention_id': self.id,
                     'product_id': self.tache_id.product_id.id,
                     'qty': 1,
