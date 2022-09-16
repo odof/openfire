@@ -29,6 +29,7 @@
                         <field name="of_emission_poussiere"/>
                         <field name="of_emission_nox"/>
                         <field name="of_cog_emission"/>
+                        <field name="of_cov_emission"/>
                         <field name="of_indice_i"/>
                         <label for="of_efficacite_saison"/>
                         <div>
