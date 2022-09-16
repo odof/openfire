@@ -978,6 +978,21 @@ class ProductTemplate(models.Model):
                 rec.of_lot_serial_management = False
 
 
+class ProductProduct(models.Model):
+    _inherit = 'product.product'
+
+    @api.multi
+    def name_get(self):
+        if self._context.get('show_only_default_code', False):
+            result = []
+            for product in self:
+                result.append((product.id, '[%s]' % product.default_code))
+            return result
+        else:
+            res = super(ProductProduct, self).name_get()
+            return res
+
+
 class StockWarehouseOrderpoint(models.Model):
     _inherit = 'stock.warehouse.orderpoint'
 

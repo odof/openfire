@@ -71,7 +71,8 @@
         <field name="arch" type="xml">
             <!-- Ajout du type de mouvement dans le contexte (picking_type_code) -->
             <xpath expr="//field[@name='move_lines']" position="attributes">
-                <attribute name="context">{'address_in_id': partner_id, 'form_view_ref':'stock.view_move_picking_form', 'tree_view_ref':'stock.view_move_picking_tree', 'default_picking_type_id': picking_type_id, 'default_location_id': location_id, 'default_location_dest_id': location_dest_id, 'of_picking_type_code': picking_type_code}</attribute>
+                <attribute name="context" remove="}" separator="}"/>
+                <attribute name="context" add="'of_picking_type_code': picking_type_code,}"/>
             </xpath>
         </field>
     </record>
