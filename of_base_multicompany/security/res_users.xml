@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+<!-- WIP WIP WIP : je ne veux pas perdre la requete du coup je la mets là :joy: -->
+<!-- WITH res_user_data AS (
+    SELECT id AS res_id FROM res_users WHERE login = 'openfire'
+)
+    INSERT INTO ir_model_data (create_date, write_date, create_uid, write_uid, name, module, model, res_id, noupdate, date_update, date_init)
+    SELECT current_timestamp, current_timestamp, 1, 1, 'of_user_openfire', 'of_base_multicompany', 'res.users', res_user_data.res_id, 't', current_timestamp, current_timestamp FROM res_user_data
+    ON CONFLICT DO NOTHING -->
+        <record id="of_user_openfire" model="res.users">
+            <field name="name">OpenFire</field>
+            <field name="login">openfire</field>
+            <field name="active" eval="True"/>
+            <field name="groups_id" eval="[(4,ref('base.group_user'))]"/>
+        </record>
+
+        <record id="of_user_openfire2" model="res.users">
+            <field name="name">OpenFire 2</field>
+            <field name="login">openfire2</field>
+            <field name="active" eval="True"/>
+            <field name="company_ids" search="[]"/>
+            <field name="groups_id" eval="[
+            (4, ref('base.group_system')),
+            (4, ref('sales_team.group_sale_manager'))]"/>
+        </record>
+    </data>
+</odoo>

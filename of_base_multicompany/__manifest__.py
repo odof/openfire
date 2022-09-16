@@ -25,6 +25,7 @@ Personnalisation multi-sociétés :
     'category': "OpenFire",
     'data': [
         'security/of_base_multicompany_security.xml',
+        'security/res_users.xml',
         'views/account_invoice_view.xml',
         'views/res_company_view.xml',
         'views/sale_order_view.xml',
