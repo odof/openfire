@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import threading
 import logging
@@ -301,13 +302,6 @@ class ResPartner(models.Model):
         if parent_id and isinstance(parent_id, (int, long)) and not values.get('ref') and 'default_ref' not in self._context:
             values['ref'] = self.browse(parent_id).ref
         return super(ResPartner, self)._add_missing_default_values(values)
-
-    @api.onchange('parent_id')
-    def onchange_parent_id(self):
-        result = super(ResPartner, self).onchange_parent_id()
-        if self.parent_id:
-            result.setdefault('value', {})['ref'] = self.parent_id.ref
-        return result
 
     @api.model
     def _check_no_ref_duplicate(self, ref):

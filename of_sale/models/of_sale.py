@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import itertools
 import json
@@ -324,8 +325,14 @@ class SaleOrder(models.Model):
         if payment_term != self.payment_term_id and not self.payment_term_id:
             self.payment_term_id = payment_term.id,
 
-        # Adresses par défaut
         if self.partner_id:
+            # Référence client
+            ref = self.partner_id.ref
+            if not ref and self.partner_id.parent_id:
+                ref = self.partner_id.parent_id.ref
+            self.client_order_ref = ref
+
+            # Adresses par défaut
             if not self.partner_invoice_id.of_default_address:
                 default_invoice_address = self.partner_id.child_ids.filtered(
                     lambda child: child.type == 'invoice' and child.of_default_address)
