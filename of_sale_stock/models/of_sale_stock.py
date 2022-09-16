@@ -376,10 +376,11 @@ class ProductProduct(models.Model):
 
     @api.multi
     def _need_procurement(self):
-        inclure_service = self.env['ir.values'].get_default('sale.config.settings', 'of_inclure_service_bl')
         for product in self:
-            if inclure_service and product.type == 'service':
-                return True
+            if product.type == 'service':
+                if self.env['ir.values'].get_default('sale.config.settings', 'of_inclure_service_bl'):
+                    return True
+                break
         return super(ProductProduct, self)._need_procurement()
 
 
