@@ -183,13 +183,18 @@ class OfPlanningIntervention(models.Model):
         self.questionnaire_id = False
 
     @api.onchange('template_id')
-    def onchange_template(self):
+    def onchange_template_id(self):
+        super(OfPlanningIntervention, self).onchange_template_id()
+
         # Charger toutes les questions qui n'ont pas d'id_code et celles dont l'id_code n'est pas déjà présent,
         # pour ne pas avoir de problèmes avec la contrainte d'unicité au moment de sauvegarder
+        question_line_obj = self.env['of.planning.intervention.question']
+        question_line = question_line_obj
         for question in self.template_id.question_ids.filtered(
                 lambda q: not q.id_code or q.id_code not in self.question_ids.mapped('id_code')):
             vals = self._get_question_vals(question)
-            self.question_ids.new(vals)
+            question_line += question_line_obj.new(vals)
+        self.question_ids = question_line
 
     @api.onchange('parc_installe_id')
     def onchange_parc_installe_id(self):

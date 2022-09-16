@@ -330,6 +330,8 @@ class OfTourneeRdv(models.TransientModel):
                 others.button_postponed()
         res.onchange_company_id()  # Permet de renseigner l'entrepôt
         res.with_context(of_import_service_lines=True)._onchange_service_id()  # Charger les lignes de facturation
+        res.with_context(of_import_service_lines=True)._onchange_tache_id()  # Load invoice lines
+        res.with_context(of_intervention_wizard=True).onchange_template_id()  # Load questionnary lines
         contract_custom = self.sudo().env['ir.module.module'].search([('name', '=', 'of_contract_custom')])
 
         # Creation/mise à jour du service si creer_recurrence
