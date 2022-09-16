@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 ##############################################################################
 #
@@ -12,11 +13,11 @@
 ##############################################################################
 
 {
-    'name': "OpenFire / Planning",
-    'version': "10.0.1.0.0",
-    'author': "OpenFire",
-    'website': "www.openfire.fr",
-    'category': "Generic Modules",
+    'name': u"OpenFire / Planning",
+    'version': '10.0.1.0.0',
+    'author': u"OpenFire",
+    'website': u"www.openfire.fr",
+    'category': u"Generic Modules",
     'summary': u"Gestion des interventions",
     'description': u"""
 Module OpenFire / Planning
