@@ -95,9 +95,11 @@ CalendarView.include({
                     self.all_filters[i] = filter_item;
                     self.res_ids_indexes[a['id']] = i;
                     // ne montrer que les filtres (à droite) qui passent le filtrage par société et type de planning
-                    if (self.attendee_mode == 'tech' && a['of_est_intervenant'] ||
-                      self.attendee_mode == 'com' && a['of_est_commercial'] || self.attendee_mode == 'comtech') {
-                            filter_item.is_visible = true;
+                    if ((self.attendee_mode == 'tech' && a['of_est_intervenant'])
+                            || (self.attendee_mode == 'com' && a['of_est_commercial'])
+                            || (self.attendee_mode == 'comtech'
+                                && (a['of_est_intervenant'] || a['of_est_commercial']))) {
+                        filter_item.is_visible = true;
                     }
                 };
                 var ir_values_model = new Model("ir.values");
@@ -299,9 +301,10 @@ CalendarView.include({
             for (var i in this.all_filters) {
                 this.all_filters[i].is_visible = false;
 
-                if (this.attendee_mode == "tech" && this.all_filters[i].est_intervenant
-                  || this.attendee_mode == "com" && this.all_filters[i].est_commercial
-                  || this.attendee_mode == "comtech") {
+                if ((this.attendee_mode == "tech" && this.all_filters[i].est_intervenant)
+                        || (this.attendee_mode == "com" && this.all_filters[i].est_commercial)
+                        || (this.attendee_mode == "comtech"
+                            && (this.all_filters[i].est_intervenant || this.all_filters[i].est_commercial))) {
                     this.now_filter_ids.push(this.all_filters[i].value);
                     this.all_filters[i].is_visible = true;
                 }
