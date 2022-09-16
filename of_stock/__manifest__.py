@@ -17,6 +17,7 @@ Extension OpenFire du module stock
 """,
     "depends": [
         "stock",
+        "stock_account",
         "of_external",
     ],
     "data": [
