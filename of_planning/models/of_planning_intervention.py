@@ -2515,8 +2515,10 @@ class StockMove(models.Model):
 
     def _get_new_picking_values(self):
         res = super(StockMove, self)._get_new_picking_values()
-        if isinstance(res, dict) and self.procurement_id.of_intervention_line_id:
-            res['min_date'] = self.procurement_id.of_intervention_line_id.intervention_id.date
+        if isinstance(res, dict):
+            interventions = self.mapped('procurement_id').mapped('of_intervention_line_id').mapped('intervention_id')
+            if len(interventions) == 1:
+                res['min_date'] = interventions.date
         return res
 
 
