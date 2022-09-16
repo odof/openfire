@@ -8,7 +8,8 @@
         <field name="inherit_id" ref="of_parc_installe.of_parc_installe_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="action_open_wizard_plan_intervention" string="Plan Intervention" type="object"/>
+                <button name="action_open_wizard_plan_intervention" string="Plan Intervention" type="object"
+                        groups="of_planning.group_planning_intervention_access"/>
             </xpath>
         </field>
     </record>
@@ -20,7 +21,8 @@
         <field name="inherit_id" ref="of_project_issue.of_project_issue_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="action_open_wizard_plan_intervention" string="Plan Intervention" type="object"/>
+                <button name="action_open_wizard_plan_intervention" string="Plan Intervention" type="object"
+                        groups="of_planning.group_planning_intervention_access"/>
             </xpath>
         </field>
     </record>

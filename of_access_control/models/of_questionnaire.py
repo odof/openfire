@@ -24,7 +24,7 @@ class OFQuestionnaireLineReponse(models.Model):
     def write(self, vals):
 
         if self._uid != SUPERUSER_ID and not self.env.user.has_group('of_access_control'
-                                                                     '.of_group_planning_intervention_manager'):
+                                                                     '.group_planning_intervention_manager'):
             if self.env['of.questionnaire.line'].search([('answer_ids', 'in', self._ids)]) or \
                     self.env['of.planning.intervention.question'].search([('answer_ids', 'in', self._ids),
                                                                           ('definitive_answer', '=', False)]) or \

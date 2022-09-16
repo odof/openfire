@@ -66,7 +66,7 @@
             <!-- Ajout smart button RDVs Tech -->
             <xpath expr="//form//div[@name='button_box']" position="inside">
                 <button class="oe_stat_button" name="action_view_intervention" type="object" icon="fa-calendar"
-                  groups="of_planning.of_group_planning_intervention_lecture_tout">
+                  groups="of_planning.group_planning_intervention_modification">
                     <field string="RDVs Tech" name="intervention_count" widget="statinfo"/>
                 </button>
             </xpath>
@@ -1141,9 +1141,9 @@
 <!--#############################################_________Menus__________#####################################################-->
 <!--##########################################################################################################################-->
 
-    <menuitem id="menu_of_planning" name="Interventions" groups="of_group_planning_intervention_lecture_siens" sequence="2" web_icon="of_planning,static/description/icon.png"/>
+    <menuitem id="menu_of_planning" name="Interventions" groups="group_planning_intervention_access" sequence="2" web_icon="of_planning,static/description/icon.png"/>
 
-        <menuitem id="menu_of_planning_intervention" name="Interventions" parent="of_planning.menu_of_planning" groups="of_group_planning_intervention_lecture_siens" sequence="10"/>
+        <menuitem id="menu_of_planning_intervention" name="Interventions" parent="of_planning.menu_of_planning" groups="group_planning_intervention_access" sequence="10"/>
             <menuitem id="menu_of_planning_intervention_calendar" name="Planning" parent="of_planning.menu_of_planning_intervention" sequence="2" action="action_of_planning_intervention_calendar"/>
 
         <menuitem id="menu_of_planning_clients" name="Clients" parent="of_planning.menu_of_planning" sequence="20"/>

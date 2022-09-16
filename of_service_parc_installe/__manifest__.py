@@ -23,6 +23,7 @@ Module de lien entre service, interventions et parc installé
     ],
     'data': [
         'security/of_service_parc_installe_security.xml',
+        'security/ir.model.access.csv',
         'data/of_service_parc_installe_data.xml',
         'report/of_service_parc_installe_fiche_intervention.xml',
         'report/of_planning_rapport_intervention.xml',
