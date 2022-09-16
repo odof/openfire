@@ -244,8 +244,9 @@ class ResPartner(models.Model):
     def name_get(self):
         """ Permet de renvoyer le nom + la ville du client quand valeur du contexte 'of_show_address_line' présent """
         name = self._rec_name
-        affichage_ville = self.env['ir.values'].get_default('base.config.settings', 'of_affichage_ville')
-        if affichage_ville and self._context.get('of_show_address_line') and name in self._fields:
+        if self._context.get('of_show_address_line') \
+                and name in self._fields \
+                and self.env['ir.values'].get_default('base.config.settings', 'of_affichage_ville'):
             result = []
             convert = self._fields[name].convert_to_display_name
             for record in self:
