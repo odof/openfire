@@ -307,7 +307,7 @@
         view_id="view_of_planif_wizard"
         id="action_view_of_planif_wizard"
         target="new"
-        groups="of_planning.of_group_planning_intervention_modification_siens"
+        groups="of_planning.group_planning_intervention_modification"
     />
 
     <act_window
@@ -318,7 +318,7 @@
         view_id="of_planning.of_planning_intervention_view_form"
         id="action_view_of_planning_intervention_form_wizard"
         target="new"
-        groups="of_planning.of_group_planning_intervention_modification_siens"
+        groups="of_planning.group_planning_intervention_modification"
     />
 
     <record id="view_of_planif_creneau_secteur_wizard" model="ir.ui.view">
@@ -350,7 +350,7 @@
         view_id="view_of_planif_creneau_secteur_wizard"
         id="action_view_of_planif_creneau_secteur_wizard"
         target="new"
-        groups="of_planning.of_group_planning_intervention_modification_siens"
+        groups="of_planning.group_planning_intervention_modification"
     />
 
 </odoo>

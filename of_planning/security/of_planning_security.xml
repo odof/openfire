@@ -4,20 +4,6 @@
 
         <!-- ################# Création des catégories de droits planning intervention ################# -->
 
-        <!-- Groupe droits de lecture planning intervention-->
-        <record model="ir.module.category" id="of_planning_intervention_lecture_category">
-            <field name="name">OF Interventions : Accès</field>
-            <field name="description">Définit les droits de lecture au planning d'intervention OpenFire.</field>
-            <field name="sequence">93</field>
-        </record>
-
-        <!-- Groupe droits de modification planning intervention-->
-        <record model="ir.module.category" id="of_planning_intervention_modification_category">
-            <field name="name">OF Interventions : Modification</field>
-            <field name="description">Définit les droits de modification au planning d'intervention OpenFire.</field>
-            <field name="sequence">94</field>
-        </record>
-
         <record model="ir.module.category" id="of_planning_intervention_category">
             <field name="name">OF Interventions</field>
             <field name="description">Définit les droits d'accès au planning d'intervention OpenFire.</field>
@@ -29,30 +15,6 @@
         <!-- Active la flexibilité des interventions -->
         <record id="of_group_planning_intervention_flexibility" model="res.groups">
             <field name="name">Flexibilité des interventions</field>
-        </record>
-
-        <!-- Droits de lecture planning intervention -->
-        <record id="of_group_planning_intervention_lecture_siens" model="res.groups">
-            <field name="name">Voir mes interventions seulement</field>
-            <field name="category_id" ref="of_planning_intervention_lecture_category"/>
-        </record>
-
-        <record id="of_group_planning_intervention_lecture_tout" model="res.groups">
-            <field name="name">Voir toutes les interventions</field>
-            <field name="category_id" ref="of_planning_intervention_lecture_category"/>
-            <field name="implied_ids" eval="[(4, ref('of_group_planning_intervention_lecture_siens'))]"/>
-        </record>
-
-        <!-- Droits de modification planning intervention -->
-        <record id="of_group_planning_intervention_modification_siens" model="res.groups">
-            <field name="name">Modifier mes interventions seulement</field>
-            <field name="category_id" ref="of_planning_intervention_modification_category"/>
-        </record>
-
-        <record id="of_group_planning_intervention_modification_tout" model="res.groups">
-            <field name="name">Modifier toutes les interventions</field>
-            <field name="category_id" ref="of_planning_intervention_modification_category"/>
-            <field name="implied_ids" eval="[(4, ref('of_group_planning_intervention_modification_siens'))]"/>
         </record>
 
         <!-- Droits de modification planning intervention -->
@@ -91,7 +53,7 @@
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
             <field name="perm_unlink" eval="False"/>
-            <field name="groups" eval="[(4, ref('of_planning.of_group_planning_intervention_lecture_siens')), (4, ref('of_planning.group_planning_intervention_access'))]"/>
+            <field name="groups" eval="[(4, ref('of_planning.group_planning_intervention_access'))]"/>
         </record>
         <record id="of_planning_intervention_lecture_tout_rule" model="ir.rule">
             <field name="name">Lire tous les rendez-vous</field>
@@ -100,7 +62,7 @@
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
             <field name="perm_unlink" eval="False"/>
-            <field name="groups" eval="[(4, ref('of_planning.of_group_planning_intervention_lecture_tout')), (4, ref('of_planning.group_planning_intervention_modification'))]"/>
+            <field name="groups" eval="[(4, ref('of_planning.group_planning_intervention_modification'))]"/>
         </record>
 
         <!-- Règles droit modification -->
@@ -121,19 +83,12 @@
             <field name="perm_unlink" eval="False"/>
             <field name="groups" eval="[(4, ref('of_planning.group_planning_intervention_modification'))]"/>
         </record>
-        <record id="of_planning_intervention_modification_siens_rule" model="ir.rule">
-            <field name="name">Modifier propres rendez-vous</field>
-            <field ref="model_of_planning_intervention" name="model_id"/>
-            <field name="domain_force">[('employee_ids.user_id','=',user.id)]</field>
-            <field name="perm_read" eval="False"/>
-            <field name="groups" eval="[(4, ref('of_planning.of_group_planning_intervention_modification_siens'))]"/>
-        </record>
         <record id="of_planning_intervention_modification_tout_rule" model="ir.rule">
             <field name="name">Modifier tous les rendez-vous</field>
             <field ref="model_of_planning_intervention" name="model_id"/>
             <field name="domain_force">[(1,'=',1)]</field>
             <field name="perm_read" eval="False"/>
-            <field name="groups" eval="[(4, ref('of_planning.of_group_planning_intervention_modification_tout')), (4, ref('of_planning.group_planning_intervention_responsible'))]"/>
+            <field name="groups" eval="[(4, ref('of_planning.group_planning_intervention_responsible'))]"/>
         </record>
 
         <!-- Deletion access rules -->
@@ -145,12 +100,6 @@
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
         </record>
-
-        <function
-                id="transfer_old_access_rights"
-                model="res.groups"
-                name="_transfer_old_planning_access_rights">
-        </function>
 
     </data>
 </odoo>

@@ -111,6 +111,6 @@
     </record>
 
     <menuitem id="menu_intervention_general_settings" name="Configuration" parent="of_planning.menu_of_planning_configuration"
-                sequence="0" action="of_planning.action_intervention_settings" groups="of_planning.of_group_planning_intervention_modification_tout"/>
+                sequence="0" action="of_planning.action_intervention_settings" groups="of_planning.group_planning_intervention_modification"/>
 
 </odoo>

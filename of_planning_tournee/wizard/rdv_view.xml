@@ -1067,7 +1067,7 @@
         view_id="view_rdv_intervention_wizard"
         id="action_view_rdv_intervention_wizard_service"
         target="new"
-        groups="of_planning.of_group_planning_intervention_lecture_siens"
+        groups="of_planning.group_planning_intervention_access"
     />
 
     <!-- Ajout bouton planifier une intervention dans vue form partenaire-->
