@@ -26,6 +26,7 @@
         'views/of_planning_intervention_view.xml',
         'views/of_planning_tournee_view.xml',
         'views/of_intervention_settings_views.xml',
+        'views/templates.xml',
     ],
     'installable': True,
 }

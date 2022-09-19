@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-06 11:49+0000\n"
-"PO-Revision-Date: 2022-09-06 11:49+0000\n"
+"POT-Creation-Date: 2022-09-16 15:22+0000\n"
+"PO-Revision-Date: 2022-09-16 15:22+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -344,6 +344,11 @@ msgid "Default mode for the display of the results"
 msgstr "Mode par défaut pour l'affichage des résultats"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_intervention_settings_default_planning_task_id
+msgid "Default task for the search"
+msgstr "Tâche par défaut pour la recherche"
+
+#. module: of_planning_tournee
 #: model:ir.model,name:of_planning_tournee.model_of_service
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_service_id
 msgid "Demande d'intervention"
@@ -441,7 +446,7 @@ msgid "Distance"
 msgstr "Distance"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:201
+#: code:addons/of_planning_tournee/wizard/rdv.py:206
 #: selection:of.intervention.settings,search_type:0
 #, python-format
 msgid "Distance (km)"
@@ -463,7 +468,7 @@ msgid "Documents"
 msgstr "Documents"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:202
+#: code:addons/of_planning_tournee/wizard/rdv.py:207
 #: selection:of.intervention.settings,search_type:0
 #, python-format
 msgid "Duration (min)"
@@ -569,7 +574,8 @@ msgid "Fin"
 msgstr "Fin"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:1404
+#: code:addons/of_planning_tournee/wizard/rdv.py:1403
+#: code:addons/of_planning_tournee/wizard/rdv.py:1411
 #, python-format
 msgid "Friday"
 msgstr "Vendredi"
@@ -692,16 +698,6 @@ msgid "Interventions"
 msgstr "Interventions"
 
 #. module: of_planning_tournee
-#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_intervention_first_address_tour
-msgid "Is the first address of the Tour ?"
-msgstr "Est-ce la première adresse de la tournée ?"
-
-#. module: of_planning_tournee
-#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_intervention_last_address_tour
-msgid "Is the last address of the Tour ?"
-msgstr "Est-ce la dernière adresse de la tournée ?"
-
-#. module: of_planning_tournee
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_date_jour
 msgid "Jour"
 msgstr "Jour"
@@ -805,7 +801,8 @@ msgid "Mixin pour la propositions des RDVs"
 msgstr "Mixin pour la propositions des RDVs"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:1400
+#: code:addons/of_planning_tournee/wizard/rdv.py:1399
+#: code:addons/of_planning_tournee/wizard/rdv.py:1407
 #, python-format
 msgid "Monday"
 msgstr "Lundi"
@@ -850,19 +847,19 @@ msgid "Number of results to show in the planning. (Max : 30)"
 msgstr "Nombre de résultats à afficher dans le planning. (Max : 30)"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:207
+#: code:addons/of_planning_tournee/wizard/rdv.py:212
 #, python-format
 msgid "One way"
 msgstr "Aller"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:211
+#: code:addons/of_planning_tournee/wizard/rdv.py:216
 #, python-format
 msgid "One way if morning / Return if afternoon"
 msgstr "Aller si matin / Retour si après-midi"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:210
+#: code:addons/of_planning_tournee/wizard/rdv.py:215
 #, python-format
 msgid "One way or Return"
 msgstr "Aller ou Retour"
@@ -902,8 +899,9 @@ msgstr "Planifier une intervention"
 
 #. module: of_planning_tournee
 #: code:addons/of_planning_tournee/models/of_service.py:36
-#: code:addons/of_planning_tournee/wizard/rdv.py:496
-#: code:addons/of_planning_tournee/wizard/rdv.py:525
+#: code:addons/of_planning_tournee/models/res_partner.py:41
+#: code:addons/of_planning_tournee/wizard/rdv.py:494
+#: code:addons/of_planning_tournee/wizard/rdv.py:523
 #, python-format
 msgid "Plan intervention"
 msgstr "Planifier intervention"
@@ -1033,7 +1031,7 @@ msgid "Rechercher"
 msgstr "Rechercher"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:208
+#: code:addons/of_planning_tournee/wizard/rdv.py:213
 #, python-format
 msgid "Return"
 msgstr "Retour"
@@ -1049,7 +1047,7 @@ msgid "Return duration (min)"
 msgstr "Durée retour (min)"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:209
+#: code:addons/of_planning_tournee/wizard/rdv.py:214
 #, python-format
 msgid "Round trip"
 msgstr "Aller-retour"
@@ -1060,7 +1058,8 @@ msgid "Résultat de Planification de RDV"
 msgstr "Résultat de Planification de RDV"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:1405
+#: code:addons/of_planning_tournee/wizard/rdv.py:1404
+#: code:addons/of_planning_tournee/wizard/rdv.py:1412
 #, python-format
 msgid "Saturday"
 msgstr "Samedi"
@@ -1161,19 +1160,20 @@ msgid "Street2"
 msgstr "Rue 2"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:1406
+#: code:addons/of_planning_tournee/wizard/rdv.py:1405
+#: code:addons/of_planning_tournee/wizard/rdv.py:1413
 #, python-format
 msgid "Sunday"
 msgstr "Dimanche"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_intervention_settings.py:49
+#: code:addons/of_planning_tournee/models/of_intervention_settings.py:59
 #, python-format
 msgid "The Number of results can't exceed more than 30"
 msgstr "Le nombre de résultats ne peut pas dépasser plus de 30"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:194
+#: code:addons/of_planning_tournee/wizard/rdv.py:199
 #, python-format
 msgid "The value of 'Search period (in days)' must be between 1 and 45"
 msgstr "La valeur de 'Période de recherche (en jours)' doit être comprise entre 1 et 45"
@@ -1186,7 +1186,8 @@ msgid "This address is not geocoded, please geocode it to plan an intervention."
 msgstr "Cette adresse n'est pas géocodée, merci de la géocoder pour planifier une intervention."
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:1403
+#: code:addons/of_planning_tournee/wizard/rdv.py:1402
+#: code:addons/of_planning_tournee/wizard/rdv.py:1410
 #, python-format
 msgid "Thursday"
 msgstr "Jeudi"
@@ -1223,7 +1224,8 @@ msgid "Tournées"
 msgstr "Tournées"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:1401
+#: code:addons/of_planning_tournee/wizard/rdv.py:1400
+#: code:addons/of_planning_tournee/wizard/rdv.py:1408
 #, python-format
 msgid "Tuesday"
 msgstr "Mardi"
@@ -1256,7 +1258,8 @@ msgid "Voir Résultats"
 msgstr "Voir Résultats"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:1402
+#: code:addons/of_planning_tournee/wizard/rdv.py:1401
+#: code:addons/of_planning_tournee/wizard/rdv.py:1409
 #, python-format
 msgid "Wednesday"
 msgstr "Mercredi"

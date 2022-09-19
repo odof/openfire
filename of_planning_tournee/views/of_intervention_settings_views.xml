@@ -13,6 +13,7 @@
                     <field name="number_of_results" />
                     <field name="show_next_available_time_slots" />
                     <field name="search_type" />
+                    <field name="default_planning_task_id" />
                 </group>
             </xpath>
         </field>

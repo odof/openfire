@@ -5,8 +5,8 @@
         <field name="name">of.planning.intervention.tour.map.view</field>
         <field name="model">of.planning.intervention</field>
         <field name="arch" type="xml">
-            <map latitude_field="geo_lat" longitude_field="geo_lng" color_field="map_color_tour" number_field="tour_number" is_first_field="first_address_tour" 
-                    is_last_field="last_address_tour" connect_markers="1" hide_pager="1" force_legend_method="custom_get_color_map">
+            <map latitude_field="geo_lat" longitude_field="geo_lng" color_field="map_color_tour" number_field="tour_number" 
+                    connect_markers="1" hide_pager="1" force_legend_method="custom_get_color_map">
                 <field name="map_color_tour" required="1"/>
                 <field name="geo_lat" required="1"/>
                 <field name="geo_lng" required="1"/>
@@ -18,8 +18,6 @@
                 <field name="partner_phone"/>
                 <field name="date"/>
                 <field name="tour_number"/>
-                <field name="first_address_tour"/>
-                <field name="last_address_tour"/>
                 <templates>
                     <t t-name="of_map_record_box">
                         <div t-attf-class="#{map_record_color(record.map_color_tour.raw_value)} of_map_record_global_click">

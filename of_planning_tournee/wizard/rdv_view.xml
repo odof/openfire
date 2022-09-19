@@ -48,7 +48,7 @@
                         <div name="slots_lists" style="display: flex;">
                             <group name="slots_by_distance_duration" string="Slots by distance / duration">
                                 <!-- by default this view display the time slots by distance, this field is replaced in the other primary views bellow -->
-                                <field name="by_distance_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}">
+                                <field name="by_distance_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
                                     <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
                                         <button name="action_view_tour" type="object" icon="fa-map-marker" />
                                         <field name="weekday"/>
@@ -67,7 +67,7 @@
                                 </field>
                             </group>
                             <group name="slots_by_date" string="Slots by date" style="margin-left: 10px;">
-                                <field name="by_date_planning_tree_ids" mode="tree" colspan="2" nolabel="1" options="{'reload_on_button': true}">
+                                <field name="by_date_planning_tree_ids" mode="tree" colspan="2" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_date">
                                     <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
                                         <button name="action_view_tour" type="object" icon="fa-map-marker"/>
                                         <field name="weekday"/>
@@ -178,7 +178,7 @@
         <field name="inherit_id" ref="of_planning_tournee.view_rdv_intervention_wizard"/>
         <field name="arch" type="xml">
             <xpath expr="//group[@name='slots_by_distance_duration']//field[@name='by_distance_planning_tree_ids']" position="replace">
-                <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}">
+                <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
                     <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
                         <button name="action_view_tour" type="object" icon="fa-map-marker" />
                         <field name="weekday"/>
@@ -209,7 +209,7 @@
         <field name="arch" type="xml">
             <xpath expr="//group[@name='slots_by_date']" position="replace"/>
             <xpath expr="//group[@name='slots_by_distance_duration']//field[@name='by_distance_planning_tree_ids']" position="replace">
-                <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}">
+                <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
                     <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
                         <button name="action_view_tour" type="object" icon="fa-map-marker" />
                         <field name="weekday"/>
@@ -267,7 +267,7 @@
                 <page name="list_results" string="List">
                     <div name="slots_lists" style="display: flex;">
                         <group string="Slots by distance / duration">
-                            <field name="by_distance_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}">
+                            <field name="by_distance_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
                                 <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
                                     <button name="action_view_tour" type="object" icon="fa-map-marker" />
                                     <field name="weekday"/>
@@ -286,7 +286,7 @@
                             </field>
                         </group>
                         <group name="slots_by_date" string="Slots by date" style="margin-left: 10px;">
-                            <field name="by_date_planning_tree_ids" mode="tree" colspan="2" nolabel="1" options="{'reload_on_button': true}">
+                            <field name="by_date_planning_tree_ids" mode="tree" colspan="2" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_date">
                                 <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
                                     <button name="action_view_tour" type="object" icon="fa-map-marker"/>
                                     <field name="weekday"/>
@@ -349,7 +349,7 @@
                 <page name="list_results" string="List">
                     <div name="slots_lists" style="display: flex;">
                         <group string="Slots by distance / duration">
-                            <field name="by_distance_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}">
+                            <field name="by_distance_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
                                 <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
                                     <button name="action_view_tour" type="object" icon="fa-map-marker" />
                                     <field name="weekday"/>
@@ -413,7 +413,7 @@
                 <page name="list_results" string="List">
                     <div name="slots_lists" style="display: flex;">
                         <group string="Slots by distance / duration">
-                            <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}">
+                            <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
                                 <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
                                     <button name="action_view_tour" type="object" icon="fa-map-marker" />
                                     <field name="weekday"/>
@@ -432,7 +432,7 @@
                             </field>
                         </group>
                         <group name="slots_by_date" string="Slots by date" style="margin-left: 10px;">
-                            <field name="by_date_planning_tree_ids" mode="tree" colspan="2" nolabel="1" options="{'reload_on_button': true}">
+                            <field name="by_date_planning_tree_ids" mode="tree" colspan="2" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_date">
                                 <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
                                     <button name="action_view_tour" type="object" icon="fa-map-marker"/>
                                     <field name="weekday"/>
@@ -495,7 +495,7 @@
                 <page name="list_results" string="List">
                     <div name="slots_lists" style="display: flex;">
                         <group string="Slots by distance / duration">
-                            <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}">
+                            <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
                                 <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
                                     <button name="action_view_tour" type="object" icon="fa-map-marker" />
                                     <field name="weekday"/>
@@ -604,7 +604,7 @@
         <field name="inherit_id" ref="of_planning_tournee.view_rdv_intervention_complete_form_wizard"/>
         <field name="arch" type="xml">
             <xpath expr="//group[@name='slots_by_distance_duration']//field[@name='by_distance_planning_tree_ids']" position="replace">
-                <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}">
+                <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
                     <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
                         <button name="action_view_tour" type="object" icon="fa-map-marker" />
                         <field name="weekday"/>
@@ -635,7 +635,7 @@
         <field name="arch" type="xml">
             <xpath expr="//group[@name='slots_by_date']" position="replace"/>
             <xpath expr="//group[@name='slots_by_distance_duration']//field[@name='by_distance_planning_tree_ids']" position="replace">
-                <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}">
+                <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
                     <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
                         <button name="action_view_tour" type="object" icon="fa-map-marker" />
                         <field name="weekday"/>
@@ -693,7 +693,7 @@
                 <page name="list_results" string="List" attrs="{'invisible': [('display_res', '=', False)]}">
                     <div name="slots_lists" style="display: flex;">
                         <group string="Slots by distance / duration">
-                            <field name="by_distance_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}">
+                            <field name="by_distance_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
                                 <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
                                     <button name="action_view_tour" type="object" icon="fa-map-marker" />
                                     <field name="weekday"/>
@@ -712,7 +712,7 @@
                             </field>
                         </group>
                         <group name="slots_by_date" string="Slots by date" style="margin-left: 10px;">
-                            <field name="by_date_planning_tree_ids" mode="tree" colspan="2" nolabel="1" options="{'reload_on_button': true}">
+                            <field name="by_date_planning_tree_ids" mode="tree" colspan="2" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_date">
                                 <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
                                     <button name="action_view_tour" type="object" icon="fa-map-marker"/>
                                     <field name="weekday"/>
@@ -775,7 +775,7 @@
                 <page name="list_results" string="List" attrs="{'invisible': [('display_res', '=', False)]}">
                     <div name="slots_lists" style="display: flex;">
                         <group string="Slots by distance / duration">
-                            <field name="by_distance_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}">
+                            <field name="by_distance_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
                                 <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
                                     <button name="action_view_tour" type="object" icon="fa-map-marker" />
                                     <field name="weekday"/>
@@ -839,7 +839,7 @@
                 <page name="list_results" string="List" attrs="{'invisible': [('display_res', '=', False)]}">
                     <div name="slots_lists" style="display: flex;">
                         <group string="Slots by distance / duration">
-                            <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}">
+                            <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
                                 <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
                                     <button name="action_view_tour" type="object" icon="fa-map-marker" />
                                     <field name="weekday"/>
@@ -858,7 +858,7 @@
                             </field>
                         </group>
                         <group name="slots_by_date" string="Slots by date" style="margin-left: 10px;">
-                            <field name="by_date_planning_tree_ids" mode="tree" colspan="2" nolabel="1" options="{'reload_on_button': true}">
+                            <field name="by_date_planning_tree_ids" mode="tree" colspan="2" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_date">
                                 <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
                                     <button name="action_view_tour" type="object" icon="fa-map-marker"/>
                                     <field name="weekday"/>
@@ -921,7 +921,7 @@
                 <page name="list_results" string="List" attrs="{'invisible': [('display_res', '=', False)]}">
                     <div name="slots_lists" style="display: flex;">
                         <group string="Slots by distance / duration">
-                            <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}">
+                            <field name="by_duration_planning_tree_ids" mode="tree" nolabel="1" options="{'reload_on_button': true}" class="planning_tour_by_distance_duration">
                                 <tree limit="5" create="false" delete="false" readonly="1" colors="green: selected==True; orange: map_preview==True">
                                     <button name="action_view_tour" type="object" icon="fa-map-marker" />
                                     <field name="weekday"/>

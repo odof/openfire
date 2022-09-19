@@ -100,6 +100,10 @@ class OfTourneeRdv(models.TransientModel):
     def _default_show_next_available_time_slots(self):
         return self.env['ir.values'].get_default('of.intervention.settings', 'show_next_available_time_slots')
 
+    @api.model
+    def _default_planning_task(self):
+        return self.env['ir.values'].get_default('of.intervention.settings', 'default_planning_task_id')
+
     source_model = fields.Char(string='Source Model', readonly=True)
     slots_display_mode = fields.Char(
         string='Display mode', readonly=True, required=True, default=lambda s: s._default_slots_display_mode())
@@ -125,7 +129,8 @@ class OfTourneeRdv(models.TransientModel):
     company_id = fields.Many2one('res.company', string='Magasin', required=True, default=lambda s: s._default_company())
     service_id = fields.Many2one(
         comodel_name='of.service', string=u"Demande d'intervention", domain="[('partner_id', '=', partner_id)]")
-    tache_id = fields.Many2one('of.planning.tache', string=u"Tâche", required=True)
+    tache_id = fields.Many2one(
+        comodel_name='of.planning.tache', string=u"Tâche", required=True, default=lambda s: s._default_planning_task())
     creer_recurrence = fields.Boolean(
         string=u"Créer récurrence?",
         help=u"Créera une intervention récurrente s'il n'en existe pas déjà une associée à ce RDV.")
@@ -374,7 +379,6 @@ class OfTourneeRdv(models.TransientModel):
                 'last_address_tour': False,
                 'partner_name': wizard.partner_id.name,
                 'tour_number': False,
-                'first_address_tour': False,
                 'geo_lng': wizard.geo_lng,
                 'partner_phone': False,
                 'geo_lat': wizard.geo_lat,

@@ -28,6 +28,14 @@ class OfInterventionSettings(models.TransientModel):
         if not self.env['ir.values'].get_default('of.intervention.settings', 'slots_display_mode'):
             self.env['ir.values'].sudo().set_default(
                 'of.intervention.settings', 'slots_display_mode', 'list')
+        if not self.env['ir.values'].get_default('of.intervention.settings', 'default_planning_task_id'):
+            planning_task_obj = self.env['of.planning.tache']
+            task = planning_task_obj.search([('id', '=', 1)], limit=1)
+            task_id = task.id if task else False
+            if not task_id:
+                frist_task = planning_task_obj.search([], order='id asc', limit=1)
+                task_id = frist_task and frist_task[0].id or False
+            self.env['ir.values'].sudo().set_default('of.intervention.settings', 'default_planning_task_id', task_id)
         return res
 
     # Time slots research
@@ -42,6 +50,8 @@ class OfInterventionSettings(models.TransientModel):
     slots_display_mode = fields.Selection(
         string="Default mode for the display of the results", selection=[('list', 'List'), ('calendar', 'Calendar')],
         default='list', required=True)
+    default_planning_task_id = fields.Many2one(
+        comodel_name='of.planning.tache', string="Default task for the search", required=True)
 
     @api.constrains('number_of_results')
     def _check_number_of_results(self):
@@ -65,10 +75,14 @@ class OfInterventionSettings(models.TransientModel):
 
     @api.multi
     def set_search_type(self):
-        return self.env['ir.values'].sudo().set_default(
-            'of.intervention.settings', 'search_type', self.search_type)
+        return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'search_type', self.search_type)
 
     @api.multi
     def set_slots_display_mode(self):
         return self.env['ir.values'].sudo().set_default(
             'of.intervention.settings', 'slots_display_mode', self.slots_display_mode)
+
+    @api.multi
+    def set_default_planning_task_id(self):
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings', 'default_planning_task_id', self.default_planning_task_id.id or False)

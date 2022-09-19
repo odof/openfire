@@ -93,7 +93,6 @@ var MapView = View.extend({
         this.lat_field = this.fields_view.arch.attrs.latitude_field;
         this.lng_field = this.fields_view.arch.attrs.longitude_field;
         this.tour_number = this.fields_view.arch.attrs.number_field;
-        this.first_address = this.fields_view.arch.attrs.is_first_field;
         this.last_address = this.fields_view.arch.attrs.is_last_field;
         this.hide_pager = this.fields_view.arch.attrs.hide_pager || '0';
         this.name = "" + this.fields_view.arch.attrs.string;
@@ -148,7 +147,6 @@ var MapView = View.extend({
         this.record_options.longitude_field = this.lng_field;
         this.record_options.number_field = this.tour_number;
         this.record_options.intervention_to_preview = this.intervention_to_preview;
-        this.record_options.is_first_field = this.first_address;
         this.record_options.is_last_field = this.last_address;
         this.record_options.color_field = this.fields_view.arch.attrs.color_field;
         this.record_options.connect_markers = this.fields_view.arch.attrs.connect_markers || '0';
@@ -994,21 +992,18 @@ MapView.LayerGroup = Widget.extend({
                 console.log("undefined record at index ",i);
                 return;
             }
-            var lat, lng, marker, icon, id, number, first_address, last_address;
+            var lat, lng, marker, icon, id, number;
             lat = this.records[i][this.options.latitude_field];
             lng = this.records[i][this.options.longitude_field];
             number = this.records[i][this.options.number_field] || false;
-            first_address = this.records[i][this.options.is_first_field] || false;
-            last_address = this.records[i][this.options.is_last_field] || false;
             if (this.options.custom_icon) {
                 var options = this.options.icon_options.unselected;
                 options['id'] = 'icon_'+this.records[i].id;
                 options["iconUrl"] = this.get_color_url(this.records[i]);
-                if (number && (!first_address && !last_address)) {
+                if (number) {
                     options["prefix"] = '';
                     options["glyph"] = number;
                 } else {
-                    // we dont want to display the number if it is the first or last address
                     options["prefix"] = 'mdi';
                     options["glyph"] = 'radiobox-blank';
                 }
@@ -1038,7 +1033,7 @@ MapView.LayerGroup = Widget.extend({
             this.the_layer.clearLayers();
         }
         this.the_layer = new L.LayerGroup();
-        var lat, lng, marker, icon, id, number, first_address, last_address, currentMarker;
+        var lat, lng, marker, icon, id, number, currentMarker;
         const latlngs = [];
         for (var i=0; i<this.records.length; i++) {
             //console.log(this.records[i]);
@@ -1049,13 +1044,11 @@ MapView.LayerGroup = Widget.extend({
             lng = this.records[i][this.options.longitude_field];
             latlngs.push([lat, lng]);
             number = this.records[i][this.options.number_field] || false;
-            first_address = this.records[i][this.options.is_first_field] || false;
-            last_address = this.records[i][this.options.is_last_field] || false;
             if (this.options.custom_icon) {
                 var options = this.options.icon_options.unselected;
                 options['id'] = 'icon_'+this.records[i].id;
                 options["iconUrl"] = this.get_color_url(this.records[i]);
-                if (number && (!first_address && !last_address)) {
+                if (number) {
                     options["prefix"] = '';
                     options["glyph"] = number;
                 } else {
