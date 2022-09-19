@@ -268,7 +268,7 @@ class OfContract(models.Model):
                     (not contract.date_end or today < contract.date_end) or contract.date_start > today:
                 contract.state = 'upcoming'
             elif any([line_state == 'validated' for line_state in contract.line_ids.mapped('state')]) and \
-                    contract.date_start < today:
+                    contract.date_start <= today:
                 contract.state = 'in_progress'
             else:
                 contract.state = 'inactive'
