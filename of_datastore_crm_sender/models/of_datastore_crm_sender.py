@@ -13,7 +13,7 @@ class OFDatastoreCRM(models.Model):
     _order = 'db_name'
 
     active = fields.Boolean(string=u"Actif", default=True)
-    is_multicompany = fields.Boolean(string=u"Multi-société", compute='_compute_is_multicompany', store=True)
+    is_multicompany = fields.Boolean(string=u"Multi-société", compute='_compute_is_multicompany')
     partner_id = fields.Many2one(comodel_name='res.partner', string=u"Membre réseau")
     child_ids = fields.One2many(
         comodel_name='of.datastore.crm.network.member', inverse_name='parent_id', string=u"Membres réseau")
@@ -53,34 +53,31 @@ class OFDatastoreCRM(models.Model):
         for datastore in self:
             client = datastore.of_datastore_connect()
             if isinstance(client, basestring):
-                raise UserError(u"Échec de la connexion au connecteur CRM !")
+                datastore.is_multicompany = False
+            else:
+                ds_company_obj = datastore.of_datastore_get_model(client, 'res.company')
 
-            ds_company_obj = datastore.of_datastore_get_model(client, 'res.company')
-
-            # On récupère les sociétés sur la base fille
-            company_ids = datastore.of_datastore_search(ds_company_obj, [])
-            datastore.is_multicompany = len(company_ids) > 1
+                # On récupère les sociétés sur la base fille
+                company_ids = datastore.of_datastore_search(ds_company_obj, [])
+                datastore.is_multicompany = len(company_ids) > 1
 
     @api.model
     def create(self, values):
-        if 'partner_id' in values:
+        if values.get('partner_id'):
             # On passe le partner en membre réseau
-            if values['partner_id']:
-                self.env['res.partner'].browse(values['partner_id']).of_network_member = True
-
+            self.env['res.partner'].browse(values['partner_id']).of_network_member = True
         return super(OFDatastoreCRM, self).create(values)
 
     @api.multi
     def write(self, values):
         if 'partner_id' in values:
-            # On passe l'ancien membre réseau à False
-            if self.partner_id:
-                self.partner_id.of_network_member = False
-
             # On passe le nouveau à True
             if values['partner_id']:
                 self.env['res.partner'].browse(values['partner_id']).of_network_member = True
-
+            for datastore in self:
+                # On passe l'ancien membre réseau à False
+                if not datastore.is_multicompany and datastore.partner_id:
+                    datastore.partner_id.of_network_member = False
         return super(OFDatastoreCRM, self).write(values)
 
 
@@ -88,8 +85,9 @@ class OFDatastoreCRMNetworkMember(models.Model):
     _name = 'of.datastore.crm.network.member'
     _description = u"Membres réseau"
 
-    parent_id = fields.Many2one(comodel_name='of.datastore.crm.sender', string=u"Connecteur CRM", required=True)
-    company = fields.Char(string=u"Société", required=True)
+    parent_id = fields.Many2one(
+        comodel_name='of.datastore.crm.sender', string=u"Connecteur CRM", ondelete='cascade', required=True)
+    company = fields.Char(string=u"Société", ondelete='cascade', required=True)
     company_id = fields.Integer(string=u"ID de la Société sur la base distante", required=True)
     partner_id = fields.Many2one(comodel_name='res.partner', string=u"Membre réseau")
 
@@ -100,3 +98,23 @@ class OFDatastoreCRMNetworkMember(models.Model):
                 lambda l: l.partner_id and l.partner_id == line.partner_id)) > 1 for line in self):
             raise ValidationError(
                 u'Vous ne pouvez pas renseigner deux fois le même membre réseau pour deux sociétés différentes.')
+
+    @api.model
+    def create(self, values):
+        if values.get('partner_id'):
+            # On passe le partner en membre réseau
+            self.env['res.partner'].browse(values['partner_id']).of_network_member = True
+        return super(OFDatastoreCRMNetworkMember, self).create(values)
+
+    @api.multi
+    def write(self, values):
+        if 'partner_id' in values:
+            # On passe le nouveau à True
+            if values['partner_id']:
+                self.env['res.partner'].browse(values['partner_id']).of_network_member = True
+            for child in self:
+                # On passe l'ancien membre réseau à False
+                if child.partner_id:
+                    child.partner_id.of_network_member = False
+
+        return super(OFDatastoreCRMNetworkMember, self).write(values)

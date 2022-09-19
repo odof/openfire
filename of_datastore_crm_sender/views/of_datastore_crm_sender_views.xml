@@ -14,7 +14,7 @@
                         <group>
                             <field name="is_multicompany" invisible="1"/>
                             <field name="datastore_id"/>
-                            <field name="partner_id" attrs="{'invisible':[('is_multicompany','=',True)]}" domain="[('of_network_member', '=', True)]" options="{'no_create': True, 'no_edit': True}"/>
+                            <field name="partner_id" attrs="{'invisible':[('is_multicompany','=',True)]}"/>
                             <field name="active"/>
                         </group>
                         <group>
@@ -35,7 +35,7 @@
                                     <field name="parent_id" invisible="1"/>
                                     <field name="company" readonly="1"/>
                                     <field name="company_id" invisible="1"/>
-                                    <field name="partner_id" domain="[('of_network_member', '=', True)]" options="{'no_create': True, 'no_edit': True}"/>
+                                    <field name="partner_id"/>
                                 </tree>
                             </field>
                         </group>
