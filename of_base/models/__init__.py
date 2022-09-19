@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 from . import ir_cron
 from . import of_base
 from . import mail
@@ -10,3 +11,4 @@ from . import res_config
 from . import res_company
 from . import res_bank
 from . import ir_ui_menu
+from . import res_users
