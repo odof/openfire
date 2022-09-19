@@ -30,7 +30,7 @@
         </style>
     </template>
 
-    <!-- étiquettes de stockage 2x2 pour stock.picking, intialement demandé par hexa -->
+    <!-- étiquettes de stockage 2x2 pour stock.picking -->
     <template id="report_of_label_stock_1">
         <div class="of_label_4x4">
             <div class="of_label_table" style="height: 10%; width: 100%">
@@ -97,7 +97,7 @@
         </div>
     </template>
 
-    <!-- étiquettes de stockage 3x7 pour product.template et product.product, intialement demandé par hcl -->
+    <!-- étiquettes de stockage 3x7 pour product.template et product.product -->
     <template id="report_of_label_product_1">
         <div class="of_label_3x7">
             <div class="of_label_table" style="width:100%; height:10mm!important;">
