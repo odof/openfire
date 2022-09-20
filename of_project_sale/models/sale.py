@@ -28,17 +28,10 @@ class SaleOrder(models.Model):
                 })
         return values
 
-    def _prepare_project_values(self):
-        self.ensure_one()
-        project_name = '%s%s' % (
-            self.name,
-            self.client_order_ref and (' - ' + self.client_order_ref) or '')
-        return {
-            'name': project_name,
-            'of_sale_id': self.id,
-            'partner_id': self.partner_id.id,
-            'tasks': [(0, 0, task) for task in self._prepare_tasks_values()],
-        }
+    def _prepare_project_vals(self):
+        vals = super(SaleOrder, self)._prepare_project_vals()
+        vals['tasks'] = [(0, 0, task) for task in self._prepare_tasks_values()]
+        return vals
 
     @api.multi
     def action_confirm(self):
@@ -47,5 +40,5 @@ class SaleOrder(models.Model):
         for rec in self:
             tasks = rec.order_line.mapped('product_id.of_product_tasks_tmpl_ids')
             if tasks:
-                project_obj.create(rec._prepare_project_values())
+                project_obj.create(rec._prepare_project_vals())
         return result
