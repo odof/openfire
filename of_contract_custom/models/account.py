@@ -4,19 +4,11 @@
 from dateutil.relativedelta import relativedelta
 # 2: imports of odoo
 from odoo import models, fields, api
+from odoo.tools.safe_eval import safe_eval
 # 3: imports from odoo modules
 from odoo.addons.of_utils.models.of_utils import format_date
 # 4: local imports
 # 5: Import of unknown third party lib
-
-
-month_correspondance = {
-    'date': 0,
-    'month': 1,
-    'trimester': 3,  # Tout les 3 mois
-    'semester': 6,  # 2 fois par ans
-    'year': 12,
-}
 
 
 class OfAccountInvoice(models.Model):
@@ -64,32 +56,34 @@ class OfAccountInvoice(models.Model):
                 recurring_invoicing_payment = invoice.of_contract_id.recurring_invoicing_payment_id
                 # Pour passer ici il faut que toutes les lignes utilisent la même fréquence mais celle du contrat
                 # peut avoir été changée donc prendre celle de la première ligne
-                recurring_rule_type = contractual_lines[0].of_contract_line_id.frequency_type
-                months = month_correspondance[recurring_rule_type]
-                if recurring_invoicing_payment.code == 'pre-paid':
-                    if not months and invoice.of_intervention_id:
-                        invoice.of_contract_period = u"Facturation à date %s" % format_date(
-                                invoice.of_intervention_id.date_date, lang)
-                    else:
-                        date = fields.Date.from_string(base_date)
-                        period_end = date + relativedelta(months=months, days=-1)
-                        invoice.of_contract_period = "%s - %s" % (format_date(base_date, lang),
-                                                                  format_date(fields.Date.to_string(period_end), lang))
+                contract_line = contractual_lines[0].of_contract_line_id
+                frequency = contract_line.frequency
+                amount = contract_line.frequency_amount
+                if frequency == 'trimester':
+                    amount *= 3
+                    frequency = 'months'
+                if frequency == 'semester':
+                    amount *= 6
+                    frequency = 'months'
+                days_to_add = safe_eval('relativedelta(%s=amount)' % frequency,
+                                        {'base_date': base_date,
+                                         'relativedelta': relativedelta,
+                                         'amount': amount}
+                                        )
+                if contract_line.frequency == 'date' and invoice.of_intervention_id:
+                    invoice.of_contract_period = u"Facturation à date %s" % format_date(
+                        invoice.of_intervention_id.date_date, lang)
+                elif recurring_invoicing_payment.code == 'pre-paid':
+                    date = fields.Date.from_string(base_date)
+                    period_end = date + days_to_add
+                    invoice.of_contract_period = "%s - %s" % (format_date(base_date, lang),
+                                                              format_date(fields.Date.to_string(period_end), lang))
                 else:
-                    if not months and invoice.of_intervention_id:
-                        invoice.of_contract_period = u"Facturation à date %s" % format_date(
-                                invoice.of_intervention_id.date_date, lang)
-                    else:
-                        months = -(months-1)
-                        date = fields.Date.from_string(base_date)
-                        if recurring_rule_type == 'date':
-                            period_start = date + relativedelta(day=1)
-                        else:
-                            period_start = date + relativedelta(months=months, day=1)
-
-                        invoice.of_contract_period = "%s - %s" % (
-                            format_date(fields.Date.to_string(period_start), lang),
-                            format_date(base_date, lang))
+                    date = fields.Date.from_string(base_date)
+                    period_start = date + days_to_add
+                    invoice.of_contract_period = "%s - %s" % (
+                        format_date(fields.Date.to_string(period_start), lang),
+                        format_date(base_date, lang))
 
     def _get_refund_common_fields(self):
         common_fields = ['of_contract_id']
