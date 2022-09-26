@@ -16,6 +16,13 @@
                     <field name="default_planning_task_id" />
                 </group>
             </xpath>
+            <xpath expr="//group[@name='planning']" position="after">
+                <group name="tour" string="Tour">
+                    <field name="nbr_days_tour_creation" />
+                    <field name="employee_ids" widget="many2many_tags"/>
+                    <field name="days_ids" widget="many2many_tags"/>
+                </group>
+            </xpath>
         </field>
     </record>
 

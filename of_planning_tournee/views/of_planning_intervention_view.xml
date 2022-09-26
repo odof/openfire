@@ -82,17 +82,4 @@
         </field>
     </record>
 
-    <record id="of_planning_intervention_tour_small_map_view" model="ir.ui.view">
-        <field name="name">of.planning.intervention.tour.small.map.view</field>
-        <field name="model">of.planning.intervention</field>
-        <field name="mode">primary</field>
-        <field name="inherit_id" ref="of_planning_tournee.of_planning_intervention_tour_map_view"/>
-        <field name="arch" type="xml">
-            <xpath expr="//map" position="attributes">
-                <attribute name="min_width">460px</attribute>
-                <attribute name="min_height">360px</attribute>
-            </xpath>
-        </field>
-    </record>
-
 </odoo>

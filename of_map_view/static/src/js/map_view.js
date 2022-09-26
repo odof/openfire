@@ -45,6 +45,8 @@ var iconUrls = {
     "red": '/of_map_view/static/src/img/marker-icon-red.png',
     "violet": '/of_map_view/static/src/img/marker-icon-violet.png',
     "yellow": '/of_map_view/static/src/img/marker-icon-yellow.png',
+    "start": '/of_map_view/static/src/img/marker-icon-black.png',
+    "stop": '/of_map_view/static/src/img/marker-icon-black.png',
 };
 
 var MapView = View.extend({
@@ -106,6 +108,12 @@ var MapView = View.extend({
         } else {
             this.intervention_to_preview = false;
         }
+        if (this.dataset.get_context().__eval_context.__contexts[1].markers_to_preview) {
+            // This is the data of the start and the end address of the Tour that we want to display on the map as a fake marker.
+            this.markers_to_preview = JSON.parse(this.dataset.get_context().__eval_context.__contexts[1].markers_to_preview);
+        } else {
+            this.markers_to_preview = false;
+        }
         this.grouped = undefined;  // later implementation
         this.group_by_field = undefined;  // later implementation
         this.default_group_by = this.fields_view.arch.attrs.default_group_by;  // later implementation
@@ -149,6 +157,7 @@ var MapView = View.extend({
         this.record_options.number_field = this.tour_number;
         this.record_options.geojson_data = this.geojson_data;
         this.record_options.intervention_to_preview = this.intervention_to_preview;
+        this.record_options.markers_to_preview = this.markers_to_preview;
         this.record_options.is_last_field = this.last_address;
         this.record_options.color_field = this.fields_view.arch.attrs.color_field;
         this.record_options.draw_routes = this.fields_view.arch.attrs.draw_routes || '0';
@@ -336,9 +345,9 @@ var MapView = View.extend({
                         self.map.reset_layer_groups();
                     })
                     .then(function() {
-                        if (self.records.length || self.record_options.intervention_to_preview !== undefined) {
-                            // if there is no records to display but there is an intervention to preview, display it
-                            self.map.add_layer_group(self.records,self.record_options);
+                        if (self.records.length || self.record_options.intervention_to_preview !== undefined || self.record_options.markers_to_preview !== undefined) {
+                            // if there is no records to display but there is fake markers to preview , display them
+                            self.map.add_layer_group(self.records, self.record_options);
                             self.map.nocontent_displayer.do_hide();
                         }else{
                             self.map.nocontent_displayer.do_show();
@@ -487,10 +496,13 @@ var MapView = View.extend({
         if (this.dataset.select_id(event.data.id)) {
             this.do_switch_view('form', options);
         } else {
-            // We are using a fake record marker to display the intervention to plan on the map with the other reals
-            // intervention on the Tour. So there is a fake id on the record that is not in the dataset.
+            // We are using fakes records markers to display the intervention to plan, the start/the end of the tour on
+            // the map with the other reals intervention on the Tour. So there are fakes id on the records that are not in the dataset.
             // We don't want to display the warning message in this case.
             if (event.target.options.intervention_to_preview === undefined || event.target.options.intervention_to_preview.id != event.data.id) {
+                this.do_warn("Map: could not find id#" + event.data.id);
+            }
+            if (event.target.options.markers_to_preview === undefined || event.target.options.markers_to_preview[0].id != event.data.id) {
                 this.do_warn("Map: could not find id#" + event.data.id);
             }
         }
@@ -1078,14 +1090,30 @@ MapView.LayerGroup = Widget.extend({
             var options = this.options.icon_options.unselected;
             // this id is a negative value to avoid conflict with existing ids of real markers
             options['id'] = 'icon_' + this.options.intervention_to_preview.id;
-            options["iconUrl"] = iconUrls["green"];
-            options["prefix"] = 'mdi';
-            options["glyph"] = 'radiobox-blank';
+            options['iconUrl'] = iconUrls["green"];
+            options['prefix'] = 'mdi';
+            options['glyph'] = 'radiobox-blank';
             icon = L.icon.glyph(options);
             currentMarker = this.options.intervention_to_preview;
             marker = new MapView.Marker([currentMarker.geo_lat, currentMarker.geo_lng],this,currentMarker,{icon:icon});
             this.the_layer.addLayer(marker);
             marker.set_ids_dict_ref();
+        }
+        // Add the makers for the start and end of the tour
+        if (this.options.markers_to_preview){
+            for (var i = 0; i < this.options.markers_to_preview.length; i++) {
+                var options = this.options.icon_options.unselected;
+                // this id is a negative value to avoid conflict with existing ids of real markers
+                options['id'] = 'icon_' + this.options.markers_to_preview[i].id;
+                options['iconUrl'] = iconUrls[this.options.markers_to_preview[i].iconUrl];
+                options['prefix'] = 'mdi';
+                options['glyph'] = 'radiobox-blank';
+                icon = L.icon.glyph(options);
+                currentMarker = this.options.markers_to_preview[i];
+                marker = new MapView.Marker([currentMarker.geo_lat, currentMarker.geo_lng], this, currentMarker, {icon:icon});
+                this.the_layer.addLayer(marker);
+                marker.set_ids_dict_ref();
+            }
         }
         if (this.options.auto_addTo) {
             this.the_layer.addTo(this.map.the_map);
@@ -1180,6 +1208,13 @@ MapView.LayerGroup = Widget.extend({
         // If there is a fake marker, we need to check it too
         if (this.options.intervention_to_preview != undefined && this.options.intervention_to_preview.id === id) {
             found = true;
+        }
+        // If there are fake markers for the start or the end of the tour, we need to check them too
+        for (var i=0; i<this.options.markers_to_preview.length && found === false; i++) {
+            if (this.options.markers_to_preview[i] != undefined && this.options.markers_to_preview[i].id === id) {
+                found = true;
+                break;
+            }
         }
         return found;
     },
@@ -1289,8 +1324,24 @@ MapView.LayerGroup = Widget.extend({
     },
     do_draw_draw_routes: function (geojsonLines) {
         var self = this;
-        geojsonLines.forEach(function(geoline) { 
-            L.geoJSON(geoline).addTo(self.map.the_map);
+        // List the colors available for the routes (one per intervention) on the map
+        const listAvailableColors = [
+            '#0066cc','#ff0000','#00ff00','#0000ff','#ff00ff','#00ffff','#ffff00','#D2691E', '#7CFC00',
+            '#008080', '#ff6347', '#6A5ACD', '#2e8b57', '#8b4513', '#ff1493', '#00bfff', '#ff4500', '#ff8c00'];
+        var lastColor = false;
+        geojsonLines.forEach(function(geoline, index) {
+            console.log('- geoline', index);
+            var color = listAvailableColors[Math.floor(Math.random() * listAvailableColors.length)];
+            console.log('color ', color);
+            console.log('lastColor ', lastColor);
+            console.log('color == lastColor ', color == lastColor);
+            while (color == lastColor) {
+                color = listAvailableColors[Math.floor(Math.random() * listAvailableColors.length)];
+                console.log('    color ', color);
+                console.log('    color == lastColor ', color == lastColor);
+            }
+            lastColor = color;
+            L.geoJSON(geoline, {'color': color}).addTo(self.map.the_map);
         });
     },
     /**

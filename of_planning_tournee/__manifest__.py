@@ -2,7 +2,7 @@
 
 {
     'name': u'OpenFire / Planning des tournées',
-    'version': '10.0.2.0.0',
+    'version': '10.0.2.1.0',
     'license': 'AGPL-3',
     'author': 'OpenFire',
     'website': 'http://www.openfire.fr',
@@ -23,6 +23,7 @@
     'data': [
         'security/ir.model.access.csv',
         'wizard/rdv_view.xml',
+        'wizard/tour_planning_optimization_view.xml',
         'views/of_planning_intervention_view.xml',
         'views/of_planning_tournee_view.xml',
         'views/of_intervention_settings_views.xml',

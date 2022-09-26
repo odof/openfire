@@ -16,6 +16,15 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,help:of_planning_tournee.field_of_planning_tournee_state
+msgid " * 'Draft' : With remaining available slots, unconfirmed.\n"
+" * 'Full' : No slots available.\n"
+" * 'Confirmed' : Click on “Confirm” (may or may not have slots available)"
+msgstr " * 'Bouillon' : Avec créneaux dispo restants, non confirmée.\n"
+" * 'Complet' : Sans créneaux disponibles.\n"
+" * 'Confirmé' : Clic sur “Confirmer” (peut avoir ou non des créneaux disponibles)"
+
+#. module: of_planning_tournee
 #: model:ir.ui.view,arch_db:of_planning_tournee.of_planning_tournee_service_map_view
 msgid "<i class=\"fa fa-calendar-o\"/><span class=\"of_ws\"/>\n"
 "                    <span>Planifier une intervention</span><br/>"
@@ -57,16 +66,6 @@ msgstr "Adresse de départ"
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_equipe_address_retour_id
 msgid "Adresse de retour"
 msgstr "Adresse de retour"
-
-#. module: of_planning_tournee
-#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_address_depart_id
-msgid "Adresse départ"
-msgstr "Adresse départ"
-
-#. module: of_planning_tournee
-#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_address_retour_id
-msgid "Adresse retour"
-msgstr "Adresse retour"
 
 #. module: of_planning_tournee
 #: model:ir.model.fields,help:of_planning_tournee.field_of_tournee_rdv_flexible
@@ -154,6 +153,7 @@ msgid "Choisissez votre couleur"
 msgstr "Choisissez votre couleur"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_city
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_partner_address_city
 msgid "City"
 msgstr "Ville"
@@ -165,6 +165,7 @@ msgstr "Client"
 
 #. module: of_planning_tournee
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_intervention_map_color_tour
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_map_color_tour
 msgid "Color"
 msgstr "Couleur"
 
@@ -180,6 +181,11 @@ msgstr "Complet"
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_simple_of_tournee_rdv_line_wizard
 msgid "Confirm this slot"
 msgstr "Confirmer le RDV"
+
+#. module: of_planning_tournee
+#: selection:of.planning.tournee,state:0
+msgid "Confirmed"
+msgstr "Confirmé"
 
 #. module: of_planning_tournee
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_simple_of_tournee_rdv_line_by_date_wizard
@@ -224,6 +230,17 @@ msgid "Country"
 msgstr "Pays"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,help:of_planning_tournee.field_of_intervention_settings_days_ids
+msgid "Create only tours for these days"
+msgstr "Créer uniquement des tournées pour ces jours"
+
+#. module: of_planning_tournee
+#: model:ir.model.fields,help:of_planning_tournee.field_of_intervention_settings_employee_ids
+msgid "Create only tours for these employees"
+msgstr "Créer uniquement des tournées pour ces employés"
+
+#. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_create_uid
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_create_uid
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_create_uid
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_date_create_uid
@@ -234,6 +251,7 @@ msgid "Created by"
 msgstr "Créé par"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_create_date
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_create_date
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_create_date
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_date_create_date
@@ -344,6 +362,11 @@ msgid "Default mode for the display of the results"
 msgstr "Mode par défaut pour l'affichage des résultats"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,help:of_planning_tournee.field_of_intervention_settings_nbr_days_tour_creation
+msgid "Defines the number of days on which to create the routes for each employee with schedules filled in. Maximum: 180 days"
+msgstr "Définit le nombre de jours sur lesquels créer les tournées pour chaque employé dont les horaires sont renseignés. Maximum : 180 jours"
+
+#. module: of_planning_tournee
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_intervention_settings_default_planning_task_id
 msgid "Default task for the search"
 msgstr "Tâche par défaut pour la recherche"
@@ -364,6 +387,7 @@ msgid "Description"
 msgstr "Description"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_display_name
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_display_name
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_display_name
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_date_display_name
@@ -463,9 +487,14 @@ msgid "Distances à vol d'oiseau"
 msgstr "Distances à vol d'oiseau"
 
 #. module: of_planning_tournee
-#: model:ir.ui.view,arch_db:of_planning_tournee.of_planning_tournee_view_form
-msgid "Documents"
-msgstr "Documents"
+#: selection:of.planning.tournee,state:0
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_duration
+msgid "Duration"
+msgstr "Durée"
 
 #. module: of_planning_tournee
 #: code:addons/of_planning_tournee/wizard/rdv.py:207
@@ -548,9 +577,9 @@ msgid "Employee"
 msgstr "Employé"
 
 #. module: of_planning_tournee
-#: model:ir.ui.view,arch_db:of_planning_tournee.of_planning_tournee_view_form
-msgid "Epicentre"
-msgstr "Epicentre"
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_employee_ids
+msgid "Employees"
+msgstr "Employés"
 
 #. module: of_planning_tournee
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_date_disponible
@@ -574,11 +603,16 @@ msgid "Fin"
 msgstr "Fin"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:1403
-#: code:addons/of_planning_tournee/wizard/rdv.py:1411
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:14
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:22
 #, python-format
 msgid "Friday"
 msgstr "Vendredi"
+
+#. module: of_planning_tournee
+#: selection:of.planning.tournee,state:0
+msgid "Full"
+msgstr "Complet"
 
 #. module: of_planning_tournee
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_equipe_geo_lat
@@ -599,6 +633,11 @@ msgstr "Géo Lat"
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_geo_lng
 msgid "Geo Lng"
 msgstr "Géo Lng"
+
+#. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_geojson_data
+msgid "Geojson data"
+msgstr "Geojson data"
 
 #. module: of_planning_tournee
 #: selection:of.tournee.rdv.line,precision:0
@@ -631,6 +670,7 @@ msgid "How"
 msgstr "Comment"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_id
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_id
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_id
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_date_id
@@ -667,11 +707,6 @@ msgid "Indéterminé"
 msgstr "Indéterminé"
 
 #. module: of_planning_tournee
-#: model:ir.ui.view,arch_db:of_planning_tournee.of_planning_tournee_view_form
-msgid "Info"
-msgstr "Info"
-
-#. module: of_planning_tournee
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_employee_id
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_employee_id
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_date_employee_id
@@ -687,13 +722,8 @@ msgid "Intervenant(s)"
 msgstr "Intervenant(s)"
 
 #. module: of_planning_tournee
-#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_intervention_map_ids
-#: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_intervention_map_ids
-msgid "Intervention map ids"
-msgstr "Intervention map ids"
-
-#. module: of_planning_tournee
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_intervention_ids
+#: model:ir.ui.view,arch_db:of_planning_tournee.of_planning_tournee_view_form
 msgid "Interventions"
 msgstr "Interventions"
 
@@ -718,6 +748,7 @@ msgid "Jusqu'au"
 msgstr "Jusqu'au"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line___last_update
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee___last_update
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv___last_update
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line___last_update
@@ -729,6 +760,7 @@ msgid "Last Modified on"
 msgstr "Dernière Modification le"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_write_uid
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_write_uid
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_date_write_uid
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_distance_write_uid
@@ -739,6 +771,7 @@ msgid "Last Updated by"
 msgstr "Dernière mise à jour par"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_write_date
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_write_date
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_date_write_date
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_distance_write_date
@@ -749,6 +782,17 @@ msgid "Last Updated on"
 msgstr "Dernière mise à jour le"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_geo_lat
+msgid "Latitude"
+msgstr "Latitude"
+
+#. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_previous_geo_lat
+msgid "Latitude of the previous point"
+msgstr "Latitude du point précédent"
+
+#. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_tache_name
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_name
 msgid "Libellé"
 msgstr "Libellé"
@@ -773,6 +817,16 @@ msgid "List"
 msgstr "Liste"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_geo_lng
+msgid "Longitude"
+msgstr "Longitude"
+
+#. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_previous_geo_lng
+msgid "Longitude of the previous point"
+msgstr "Longitude du point précédent"
+
+#. module: of_planning_tournee
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_company_id
 msgid "Magasin"
 msgstr "Magasin"
@@ -788,6 +842,11 @@ msgid "Map"
 msgstr "Carte"
 
 #. module: of_planning_tournee
+#: model:ir.ui.view,arch_db:of_planning_tournee.of_planning_tournee_view_form
+msgid "Map (test itinéraire)"
+msgstr "Map (test itinéraire)"
+
+#. module: of_planning_tournee
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_date_map_preview
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_distance_map_preview
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_duration_map_preview
@@ -796,13 +855,23 @@ msgid "Map preview"
 msgstr "Aperçu de la carte"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_map_tour_line_ids
+msgid "Map tour line ids"
+msgstr "Map tour line ids"
+
+#. module: of_planning_tournee
 #: model:ir.model,name:of_planning_tournee.model_of_tournee_rdv_line_mixin
 msgid "Mixin pour la propositions des RDVs"
 msgstr "Mixin pour la propositions des RDVs"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:1399
-#: code:addons/of_planning_tournee/wizard/rdv.py:1407
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_partner_mobile
+msgid "Mobile"
+msgstr "Mobile"
+
+#. module: of_planning_tournee
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:10
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:18
 #, python-format
 msgid "Monday"
 msgstr "Lundi"
@@ -816,6 +885,12 @@ msgstr "Plus de résultats"
 #: selection:of.tournee.rdv.line,precision:0
 msgid "Moyen"
 msgstr "Moyen"
+
+#. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_partner_name
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_name
+msgid "Name"
+msgstr "Nom"
 
 #. module: of_planning_tournee
 #: model:ir.model.fields,help:of_planning_tournee.field_of_tournee_rdv_line_by_date_precision
@@ -847,22 +922,42 @@ msgid "Number of results to show in the planning. (Max : 30)"
 msgstr "Nombre de résultats à afficher dans le planning. (Max : 30)"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:212
+#: model:ir.ui.view,arch_db:of_planning_tournee.of_planning_tournee_view_form
+msgid "OSRM TEST"
+msgstr "OSRM TEST"
+
+#. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_osrm_route_steps
+msgid "OSRM route steps"
+msgstr "OSRM route steps"
+
+#. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_osrm_steps
+msgid "OSRM steps"
+msgstr "OSRM steps"
+
+#. module: of_planning_tournee
+#: code:addons/of_planning_tournee/wizard/rdv.py:202
 #, python-format
 msgid "One way"
 msgstr "Aller"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:216
+#: code:addons/of_planning_tournee/wizard/rdv.py:206
 #, python-format
 msgid "One way if morning / Return if afternoon"
 msgstr "Aller si matin / Retour si après-midi"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:215
+#: code:addons/of_planning_tournee/wizard/rdv.py:205
 #, python-format
 msgid "One way or Return"
 msgstr "Aller ou Retour"
+
+#. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_is_optimized
+msgid "Optimized"
+msgstr "Optimisée"
 
 #. module: of_planning_tournee
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_date_original_line_id
@@ -885,6 +980,11 @@ msgstr "Partenaire"
 #: selection:of.tournee.rdv.line,precision:0
 msgid "Pas tenté"
 msgstr "Pas tenté"
+
+#. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_partner_phone
+msgid "Phone"
+msgstr "Téléphone"
 
 #. module: of_planning_tournee
 #: model:ir.ui.view,arch_db:of_planning_tournee.of_view_partner_form_rdv_intervention
@@ -1037,6 +1137,11 @@ msgid "Return"
 msgstr "Retour"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_return_address_id
+msgid "Return address"
+msgstr "Adresse de retour"
+
+#. module: of_planning_tournee
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_intervention_return_distance
 msgid "Return distance (km)"
 msgstr "Distance retour (km)"
@@ -1058,8 +1163,8 @@ msgid "Résultat de Planification de RDV"
 msgstr "Résultat de Planification de RDV"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:1404
-#: code:addons/of_planning_tournee/wizard/rdv.py:1412
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:15
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:23
 #, python-format
 msgid "Saturday"
 msgstr "Samedi"
@@ -1145,6 +1250,17 @@ msgid "Source Model"
 msgstr "Modèle Source"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_start_address_id
+msgid "Start address"
+msgstr "Adresse de départ"
+
+#. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_date_start
+msgid "Start date"
+msgstr "Date de début"
+
+#. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_state
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_partner_address_state_id
 msgid "State"
 msgstr "État"
@@ -1160,34 +1276,45 @@ msgid "Street2"
 msgstr "Rue 2"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:1405
-#: code:addons/of_planning_tournee/wizard/rdv.py:1413
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:16
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:24
 #, python-format
 msgid "Sunday"
 msgstr "Dimanche"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_intervention_settings.py:59
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_sequence
+msgid "Séquence"
+msgstr "Séquence"
+
+#. module: of_planning_tournee
+#: code:addons/of_planning_tournee/models/of_intervention_settings.py:64
 #, python-format
 msgid "The Number of results can't exceed more than 30"
 msgstr "Le nombre de résultats ne peut pas dépasser plus de 30"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:199
+#: code:addons/of_planning_tournee/models/of_intervention_settings.py:69
+#, python-format
+msgid "The number of days for the tours creation can't exceed more than 180"
+msgstr "Le nombre de jours pour la création des tournées ne peut excéder 180"
+
+#. module: of_planning_tournee
+#: code:addons/of_planning_tournee/wizard/rdv.py:189
 #, python-format
 msgid "The value of 'Search period (in days)' must be between 1 and 45"
 msgstr "La valeur de 'Période de recherche (en jours)' doit être comprise entre 1 et 45"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_service.py:15
-#: code:addons/of_planning_tournee/models/res_partner.py:14
+#: code:addons/of_planning_tournee/models/of_service.py:33
+#: code:addons/of_planning_tournee/models/res_partner.py:15
 #, python-format
 msgid "This address is not geocoded, please geocode it to plan an intervention."
 msgstr "Cette adresse n'est pas géocodée, merci de la géocoder pour planifier une intervention."
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:1402
-#: code:addons/of_planning_tournee/wizard/rdv.py:1410
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:13
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:21
 #, python-format
 msgid "Thursday"
 msgstr "Jeudi"
@@ -1198,16 +1325,35 @@ msgid "Time slots research"
 msgstr "Recherche de créneaux horaires"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_tour_id
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_date_tour_id
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_distance_tour_id
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_duration_tour_id
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_tour_id
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_map_tour_id
+#: model:ir.ui.view,arch_db:of_planning_tournee.of_planning_tournee_view_form
+#: model:ir.ui.view,arch_db:of_planning_tournee.view_of_intervention_settings
 msgid "Tour"
 msgstr "Tournée"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_intervention_settings_days_ids
+msgid "Tours // Days"
+msgstr "Tournées // Jours"
+
+#. module: of_planning_tournee
+#: model:ir.model,name:of_planning_tournee.model_of_planning_tour_line
+#: model:ir.model,name:of_planning_tournee.model_of_planning_tournee_line
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_map_tour_line_ids
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_test_map_tour_line_ids
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_tour_line_ids
+#: model:ir.ui.view,arch_db:of_planning_tournee.of_planning_tournee_view_form
+msgid "Tour lines"
+msgstr "Lignes de tournée"
+
+#. module: of_planning_tournee
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_intervention_tour_number
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_tour_number
 msgid "Tour number"
 msgstr "Numéro de tournée"
 
@@ -1224,8 +1370,18 @@ msgid "Tournées"
 msgstr "Tournées"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:1400
-#: code:addons/of_planning_tournee/wizard/rdv.py:1408
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_intervention_settings_nbr_days_tour_creation
+msgid "Tours // Create Tours over __ days"
+msgstr "Tournées // Créer les tournées sur __ jours"
+
+#. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_intervention_settings_employee_ids
+msgid "Tours // Employees"
+msgstr "Tournées // Employés"
+
+#. module: of_planning_tournee
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:11
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:19
 #, python-format
 msgid "Tuesday"
 msgstr "Mardi"
@@ -1234,6 +1390,11 @@ msgstr "Mardi"
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_tache_id
 msgid "Tâche"
 msgstr "Tâche"
+
+#. module: of_planning_tournee
+#: model:ir.ui.view,arch_db:of_planning_tournee.of_planning_tournee_view_form
+msgid "UPDATE TEST"
+msgstr "UPDATE TEST"
 
 #. module: of_planning_tournee
 #: model:ir.model.fields,help:of_planning_tournee.field_of_planning_tournee_is_confirme
@@ -1248,6 +1409,7 @@ msgid "Valeur d'état"
 msgstr "Valeur d'état"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_address_city
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_zip_id
 msgid "Ville"
 msgstr "Ville"
@@ -1258,13 +1420,14 @@ msgid "Voir Résultats"
 msgstr "Voir Résultats"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:1401
-#: code:addons/of_planning_tournee/wizard/rdv.py:1409
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:12
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:20
 #, python-format
 msgid "Wednesday"
 msgstr "Mercredi"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_weekday
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_date_weekday
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_distance_weekday
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_by_duration_weekday
@@ -1288,6 +1451,7 @@ msgid "Who"
 msgstr "Qui"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_address_zip
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_partner_address_zip
 msgid "Zip"
 msgstr "Code postal"
@@ -1324,6 +1488,11 @@ msgstr "durée prec + durée suiv"
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_date_fin_planif
 msgid "expiration de prochaine planif"
 msgstr "expiration de prochaine planif"
+
+#. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_intervention_id
+msgid "Intervention"
+msgstr "Intervention"
 
 #. module: of_planning_tournee
 #: model:ir.model.fields,help:of_planning_tournee.field_of_planning_equipe_geo_lat
@@ -1389,11 +1558,6 @@ msgstr "Épicentre Lat"
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_epi_lon
 msgid "Épicentre Lon"
 msgstr "Épicentre Lon"
-
-#. module: of_planning_tournee
-#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_equipe_id
-msgid "Équipe"
-msgstr "Équipe"
 
 #. module: of_planning_tournee
 #: model:ir.model,name:of_planning_tournee.model_of_planning_equipe

@@ -38,6 +38,11 @@ class OfInterventionSettings(models.TransientModel):
             self.env['ir.values'].sudo().set_default('of.intervention.settings', 'default_planning_task_id', task_id)
         return res
 
+    @api.model
+    def _default_days_ids(self):
+        days = self.env['of.jours'].search([('numero', 'in', (1, 2, 3, 4, 5))], order="numero")
+        return [day.id for day in days]
+
     # Time slots research
     planning_results = fields.Boolean(string="Planning results", default=True, help="Show results in the planning")
     number_of_results = fields.Integer(
@@ -52,11 +57,26 @@ class OfInterventionSettings(models.TransientModel):
         default='list', required=True)
     default_planning_task_id = fields.Many2one(
         comodel_name='of.planning.tache', string="Default task for the search", required=True)
+    # Tour planning
+    nbr_days_tour_creation = fields.Integer(
+        string='Tours // Create Tours over __ days', default=30, required=True,
+        help="Defines the number of days on which to create the routes for each employee with schedules "
+        "filled in. Maximum: 180 days")
+    employee_ids = fields.Many2many(
+        comodel_name='hr.employee', string='Tours // Employees', help="Create only tours for these employees")
+    days_ids = fields.Many2many(
+        comodel_name='of.jours', string='Tours // Days', help="Create only tours for these days",
+        default=lambda self: self._default_days_ids())
 
     @api.constrains('number_of_results')
     def _check_number_of_results(self):
         if self.number_of_results > 30:
             raise ValidationError(_("The Number of results can't exceed more than 30"))
+
+    @api.constrains('nbr_days_tour_creation')
+    def _check_nbr_days_tour_creation(self):
+        if self.nbr_days_tour_creation > 180:
+            raise ValidationError(_("The number of days for the tours creation can't exceed more than 180"))
 
     @api.multi
     def set_planning_results(self):
@@ -86,3 +106,27 @@ class OfInterventionSettings(models.TransientModel):
     def set_default_planning_task_id(self):
         return self.env['ir.values'].sudo().set_default(
             'of.intervention.settings', 'default_planning_task_id', self.default_planning_task_id.id or False)
+
+    @api.multi
+    def set_nbr_days_tour_creation(self):
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings', 'nbr_days_tour_creation', self.nbr_days_tour_creation)
+
+    @api.model
+    def get_default_values(self, fields):
+        IrValues = self.env['ir.values'].sudo()
+        days_ids = IrValues.get_default('of.intervention.settings', 'days_ids')
+        employee_ids = IrValues.get_default('of.intervention.settings', 'employee_ids')
+        days = [(6, 0, days_ids)] if days_ids else False
+        employees = [(6, 0, employee_ids)] if employee_ids else False
+        return {'days_ids': days, 'employee_ids': employees}
+
+    @api.multi
+    def set_employee_ids(self):
+        IrValues = self.env['ir.values'].sudo()
+        IrValues.set_default('of.intervention.settings', 'employee_ids', self.employee_ids.ids)
+
+    @api.multi
+    def set_days_ids(self):
+        IrValues = self.env['ir.values'].sudo()
+        IrValues.set_default('of.intervention.settings', 'days_ids', self.days_ids.ids)

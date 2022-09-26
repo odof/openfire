@@ -6,32 +6,37 @@
         <field name="model">of.planning.tournee</field>
         <field name="arch" type="xml">
             <form string="Tournées">
-                <group colspan="2" col="4">
-                    <separator string="Info" colspan="4"/>
-                    <field name="date_jour"/>
-                    <field name="date"/>
-                    <field name="employee_id"/>
-                    <field name="secteur_id"/>
-                    <field name="address_depart_id"/>
-                    <field name="address_retour_id"/>
-                    <field name="distance" attrs="{'required': [('is_bloque', '=', False)]}"/>
-                    <group colspan="4" col="8">
-                        <field name="is_complet"/>
-                        <field name="is_bloque"/>
-                        <field name="is_confirme"/>
+                <field name="markers_to_preview" invisible="1"/>
+                <header>
+                    <button string="Optimize" name="action_optimize_tour" type="object" class="oe_highlight" 
+                        confirm="Tour optimization is a long process, remember to launch it when your route is complete"/>
+                </header>
+                <div class="oe_title">
+                    <h1>Tour <field name="name" readonly="1"/></h1>
+                </div>
+                <group col="6">
+                    <group colspan="2" col="2">
+                        <field name="weekday"/>
+                        <field name="date"/>
+                        <field name="employee_id" options="{'no_create_edit': True, 'not_delete':True, 'no_create': True}"/>
+                        <field name="employee_other_ids" widget="many2many_tags" options="{'no_create_edit': True, 'not_delete':True, 'no_create': True}"/>
                     </group>
-                    <separator string="Epicentre" colspan="4" col="4"/>
-                    <field name="zip_id"/>
-                    <separator colspan="4"/>
-                    <field name="epi_lat" attrs="{'required': [('is_bloque', '=', False)]}"/>
-                    <field name="epi_lon" attrs="{'required': [('is_bloque', '=', False)]}"/>
-                    <separator colspan="4" string="Documents"/>
+                    <group colspan="2" col="2">
+                        <field name="secteur_id"/>
+                        <field name="zip_id"/>
+                        <field name="start_address_id"/>
+                        <field name="return_address_id"/>
+                    </group>
+                </group>
+                <group>
                     <button string="OSRM TEST" name="action_compute_osrm_steps" type="object" class="oe_highlight"/>
+                    <button string="UPDATE TEST" name="update_tour_lines" type="object" class="oe_highlight"/>
                 </group>
                 <notebook>
-                    <page name="tour_lines" string="Lines">
+                    <page name="tour_lines" string="Interventions">
                         <field name="tour_line_ids" mode="tree" nolabel="1" context="{'from_tour':1}">
                             <tree string="Tour lines" editable="top">
+                                <field name="sequence" widget="handle"/>
                                 <field name="intervention_id"/>
                                 <field name="date_start"/>
                                 <field name="city"/>
@@ -41,10 +46,12 @@
                         </field>
                     </page>
                     <page name="tour_lines_map" string="Map">
-                        <field name="map_tour_line_ids" mode="map" nolabel="1" context="{'from_tour':1, 'active_tour_id': active_id}"/>
+                        <field name="map_tour_line_ids" mode="map" nolabel="1"
+                            context="{'map_view_ref':'of_planning_tournee.of_planning_tour_line_map_view', 'from_tour':1, 'active_tour_id': active_id}"/>
                     </page>
-                    <page name="intervention_map" string="Map">
-                        <field name="intervention_map_ids" mode="map" nolabel="1" context="{'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_map_view', 'active_tour_id': active_id}"/>
+                    <page name="tour_lines_map_draw" string="Map (test itinéraire)">
+                        <field name="test_map_tour_line_ids" mode="map" nolabel="1"
+                            context="{'map_view_ref':'of_planning_tournee.of_planning_tour_line_map_view_drawroute', 'from_tour':1, 'active_tour_id': active_id, 'markers_to_preview': markers_to_preview}"/>
                     </page>
                 </notebook>
             </form>
@@ -55,16 +62,17 @@
         <field name="name">of.planning.tournee.tree</field>
         <field name="model">of.planning.tournee</field>
         <field name="arch" type="xml">
-            <tree editable="top" colors="red:(is_complet==True) or (is_bloque==True);grey:(is_confirme==False)">
-                <field name="date_jour"/>
+            <tree decoration-danger="(state=='full' or is_complet==True) or is_bloque==True" decoration-muted="state=='confirmed'" edit="false">
+                <field name="weekday"/>
                 <field name="date"/>
                 <field name="employee_id"/>
                 <field name="secteur_id"/>
                 <field name="zip_id"/>
-                <field name="address_depart_id"/>
-                <field name="address_retour_id"/>
-                <field name="is_complet"/>
-                <field name="is_confirme"/>
+                <field name="start_address_id"/>
+                <field name="return_address_id"/>
+                <field name="state"/>
+                <field name="is_complet" invisible="1"/>
+                <field name="is_confirme" invisible="1"/>
                 <field name="is_bloque" invisible="1"/>
                 <field name="intervention_ids" widget="many2many_tags" readonly="1"/>
             </tree>
@@ -89,11 +97,11 @@
     </record>
 
     <record id="of_planning_tour_line_map_view" model="ir.ui.view">
-        <field name="name">of.planning.tournee.line.map.view</field>
-        <field name="model">of.planning.tournee.line</field>
+        <field name="name">of.planning.tour.line.map.view</field>
+        <field name="model">of.planning.tour.line</field>
         <field name="arch" type="xml">
-            <map latitude_field="geo_lat" longitude_field="geo_lng" color_field="map_color_tour" number_field="tour_number" is_first_field="first_address_tour" 
-                    is_last_field="last_address_tour" draw_routes="0" connect_markers="1" hide_pager="1" force_legend_method="custom_get_color_map" geojson_data="geojson_data">
+            <map latitude_field="geo_lat" longitude_field="geo_lng" color_field="map_color_tour" number_field="tour_number"
+                    draw_routes="0" connect_markers="1" hide_pager="1" force_legend_method="custom_get_color_map" geojson_data="geojson_data">
                 <field name="map_color_tour" required="1"/>
                 <field name="geo_lat" required="1"/>
                 <field name="geo_lng" required="1"/>
@@ -105,9 +113,6 @@
                 <field name="partner_phone"/>
                 <field name="date_start"/>
                 <field name="tour_number"/>
-                <field name="first_address_tour"/>
-                <field name="last_address_tour"/>
-                <field name="last_address_tour"/>
                 <field name="geojson_data"/>
                 <templates>
                     <t t-name="of_map_record_box">
@@ -170,6 +175,49 @@
                     </t>
                 </templates>
             </map>
+        </field>
+    </record>
+
+    <record id="of_planning_tour_line_small_map_view" model="ir.ui.view">
+        <field name="name">of.planning.tour.line.small.map.view</field>
+        <field name="model">of.planning.tour.line</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.of_planning_tour_line_map_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//map" position="attributes">
+                <attribute name="min_width">460px</attribute>
+                <attribute name="min_height">360px</attribute>
+                <attribute name="force_legend_method">custom_get_color_map_with_preview</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_planning_tour_line_small_map_drawroutes_view" model="ir.ui.view">
+        <field name="name">of.planning.tour.line.small.map.drawroutes.view</field>
+        <field name="model">of.planning.tour.line</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.of_planning_tour_line_map_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//map" position="attributes">
+                <attribute name="min_width">460px</attribute>
+                <attribute name="min_height">360px</attribute>
+                <attribute name="draw_routes">1</attribute>
+                <attribute name="connect_markers">0</attribute>
+                <attribute name="force_legend_method">custom_get_color_map_with_preview</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_planning_tour_line_map_view_drawroute" model="ir.ui.view">
+        <field name="name">of.planning.tour.line.map.drawroute.view</field>
+        <field name="model">of.planning.tour.line</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.of_planning_tour_line_map_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//map" position="attributes">
+                <attribute name="draw_routes">1</attribute>
+                <attribute name="connect_markers">0</attribute>
+            </xpath>
         </field>
     </record>
 

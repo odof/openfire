@@ -172,7 +172,7 @@ class OfPlanningIntervention(models.Model):
             for date_eval in dates_eval:
                 tournee = tournee_obj.search([('date', '=', date_eval), ('employee_id', '=', employee.id)], limit=1)
                 if not tournee:
-                    tournee_data = {
+                    tour = tournee_obj.create({
                         'date': date_eval,
                         'employee_id': employee.id,
                         'secteur_id': address.of_secteur_tech_id.id,
@@ -180,8 +180,9 @@ class OfPlanningIntervention(models.Model):
                         'epi_lon': address.geo_lng,
                         'is_bloque': False,
                         'is_confirme': False
-                    }
-                    res.append(tournee_obj.create(tournee_data))
+                    })
+                    res.append(tour)
+                    tour.update_tour_lines()
                 elif tournee.secteur_id != address.of_secteur_tech_id:
                     tournee.secteur_id = address.of_secteur_tech_id
         return res
@@ -208,10 +209,10 @@ class OfPlanningIntervention(models.Model):
                     # Il n'existe plus de plannings pour la tournee, on la supprime
                     employees_tournees_unlink_ids.append(employee_id)
 
-            tournees_unlink |= planning_tournee_obj.search(
-                [('date', '=', date_eval), ('employee_id', 'in', employees_tournees_unlink_ids),
-                 ('is_bloque', '=', False), ('is_confirme', '=', False),
-                 ('address_depart_id', '=', False), ('address_retour_id', '=', False), ('secteur_id', '=', False)])
+            tournees_unlink |= planning_tournee_obj.search([
+                ('date', '=', date_eval), ('employee_id', 'in', employees_tournees_unlink_ids),
+                ('is_bloque', '=', False), ('is_confirme', '=', False),
+                ('start_address_id', '=', False), ('return_address_id', '=', False), ('secteur_id', '=', False)])
         return tournees_unlink.unlink()
 
     @api.model

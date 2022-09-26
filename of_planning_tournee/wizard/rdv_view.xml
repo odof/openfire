@@ -86,7 +86,7 @@
                             </group>
                         </div>
                         <group col="2" colspan="2">
-                            <field name="intervention_map_ids" mode="map" nolabel="1" context="{'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'intervention_to_preview': intervention_to_preview}"/>
+                            <field name="map_tour_line_ids" mode="map" nolabel="1" context="{'map_view_ref': 'of_planning_tournee.of_planning_tour_line_small_map_view', 'active_tour_id': map_tour_id, 'intervention_to_preview': intervention_to_preview}"/>
                         </group>
                     </page>
                     <page name="calendar_results" string="Calendar">
@@ -305,7 +305,7 @@
                         </group>
                     </div>
                     <group col="2" colspan="2">
-                        <field name="intervention_map_ids" mode="map" nolabel="1" context="{'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'intervention_to_preview': intervention_to_preview}"/>
+                        <field name="map_tour_line_ids" mode="map" nolabel="1" context="{'map_view_ref': 'of_planning_tournee.of_planning_tour_line_small_map_view', 'active_tour_id': map_tour_id, 'intervention_to_preview': intervention_to_preview}"/>
                     </group>
                 </page>
             </xpath>
@@ -369,7 +369,7 @@
                         </group>
                     </div>
                     <group col="2" colspan="2">
-                        <field name="intervention_map_ids" mode="map" nolabel="1" context="{'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'intervention_to_preview': intervention_to_preview}"/>
+                        <field name="map_tour_line_ids" mode="map" nolabel="1" context="{'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'intervention_to_preview': intervention_to_preview}"/>
                     </group>
                 </page>
             </xpath>
@@ -451,7 +451,7 @@
                         </group>
                     </div>
                     <group col="2" colspan="2">
-                        <field name="intervention_map_ids" mode="map" nolabel="1" context="{'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'intervention_to_preview': intervention_to_preview}"/>
+                        <field name="map_tour_line_ids" mode="map" nolabel="1" context="{'map_view_ref': 'of_planning_tournee.of_planning_tour_line_small_map_view', 'active_tour_id': map_tour_id, 'intervention_to_preview': intervention_to_preview}"/>
                     </group>
                 </page>
             </xpath>
@@ -515,7 +515,7 @@
                         </group>
                     </div>
                     <group col="2" colspan="2">
-                        <field name="intervention_map_ids" mode="map" nolabel="1" context="{'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'intervention_to_preview': intervention_to_preview}"/>
+                        <field name="map_tour_line_ids" mode="map" nolabel="1" context="{'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'intervention_to_preview': intervention_to_preview}"/>
                     </group>
                 </page>
             </xpath>
@@ -731,7 +731,7 @@
                         </group>
                     </div>
                     <group col="2" colspan="2">
-                        <field name="intervention_map_ids" mode="map" nolabel="1" context="{'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'intervention_to_preview': intervention_to_preview}"/>
+                        <field name="map_tour_line_ids" mode="map" nolabel="1" context="{'map_view_ref': 'of_planning_tournee.of_planning_tour_line_small_map_view', 'active_tour_id': map_tour_id, 'intervention_to_preview': intervention_to_preview}"/>
                     </group>
                 </page>
             </xpath>
@@ -795,7 +795,7 @@
                         </group>
                     </div>
                     <group col="2" colspan="2">
-                        <field name="intervention_map_ids" mode="map" nolabel="1" context="{'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'intervention_to_preview': intervention_to_preview}"/>
+                        <field name="map_tour_line_ids" mode="map" nolabel="1" context="{'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'intervention_to_preview': intervention_to_preview}"/>
                     </group>
                 </page>
             </xpath>
@@ -877,7 +877,7 @@
                         </group>
                     </div>
                     <group col="2" colspan="2">
-                        <field name="intervention_map_ids" mode="map" nolabel="1" context="{'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'intervention_to_preview': intervention_to_preview}"/>
+                        <field name="map_tour_line_ids" mode="map" nolabel="1" context="{'map_view_ref': 'of_planning_tournee.of_planning_tour_line_small_map_view', 'active_tour_id': map_tour_id, 'intervention_to_preview': intervention_to_preview}"/>
                     </group>
                 </page>
             </xpath>
@@ -941,7 +941,7 @@
                         </group>
                     </div>
                     <group col="2" colspan="2">
-                        <field name="intervention_map_ids" mode="map" nolabel="1" context="{'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'intervention_to_preview': intervention_to_preview}"/>
+                        <field name="map_tour_line_ids" mode="map" nolabel="1" context="{'map_view_ref': 'of_planning_tournee.of_planning_intervention_tour_small_map_view', 'active_tour_id': map_tour_id, 'intervention_to_preview': intervention_to_preview}"/>
                     </group>
                 </page>
             </xpath>

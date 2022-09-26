@@ -47,7 +47,7 @@
                     <group name="fiche_intervention" string="Fiche d'intervention">
                         <field name="fiche_intervention_cacher_montant"/>
                     </group>
-                    <group name="creneaux" string="Créneaux non travaillés">
+                    <group name="planning" string="Planning">
                         <label for="color_ft_creneaux_dispo" string="(OF) Créneaux dispo"/>
                         <div name="color_ft_creneaux_dispo">
                             <field name="color_ft_creneaux_dispo" class="oe_inline" widget="color"/>

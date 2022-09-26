@@ -1,0 +1,38 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<odoo>
+
+    <record id="tour_planning_optimization_wizard_view_form" model="ir.ui.view">
+        <field name="name">tour.planning.optimization.wizard.view.form</field>
+        <field name="model">tour.planning.optimization.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Optimize tour">
+                <sheet>
+                    <group>
+                        <field name="tour_id" invisible="1"/>
+                        <field name="optimization_mode"/>
+                        <field name="include_fixed_appointments"/>
+                    </group>
+                    <group>
+                        <field name="opt_tour_line_ids" mode="tree" nolabel="1" readonly="1" style="pointer-events: none;"
+                                options="{'not_delete':True, 'no_create_edit': True, 'no_create': True, 'no_open': True}">
+                            <tree editable="bottom">
+                                <field name="intervention_id"/>
+                                <field name="old_time_slot"/>
+                                <field name="new_time_slot"/>
+                                <field name="flexible"/>
+                                <field name="workers_names"/>
+                                <field name="duration" widget="float_time"/>
+                                <field name="distance"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_optimize" string="Optimize" type="object" class="oe_highlight"/>
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

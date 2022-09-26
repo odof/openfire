@@ -15,6 +15,7 @@ from odoo.tools.float_utils import float_compare
 from odoo.addons.of_utils.models.of_utils import distance_points, hours_to_strs
 from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
 from odoo.addons.calendar.models.calendar import calendar_id2real_id
+from odoo.addons.of_planning_tournee.models.of_planning_tournee import WEEKDAYS_TR
 
 _logger = logging.getLogger(__name__)
 
@@ -77,7 +78,7 @@ class OfTourneeRdv(models.TransientModel):
         return res
 
     @api.model
-    def _default_days(self):
+    def _default_days_ids(self):
         # added sudo() to avoid access rights issues from the website (no access for of.planning.tournee)
         days = self.env['of.jours'].sudo().search([('numero', 'in', (1, 2, 3, 4, 5))], order="numero")
         return [day.id for day in days]
@@ -152,7 +153,7 @@ class OfTourneeRdv(models.TransientModel):
     search_period_in_days = fields.Integer(string="Search period (in days)", default=7, required=True)
     days_ids = fields.Many2many(
         comodel_name='of.jours', relation='wizard_plan_intervention_days_rel', column1='wizard_id',
-        column2='jour_id', string="Days", required=True, default=lambda s: s._default_days())
+        column2='jour_id', string="Days", required=True, default=lambda s: s._default_days_ids())
     orthodromique = fields.Boolean(string=u"Distances à vol d'oiseau")
 
     # Champs de résultat
@@ -176,7 +177,7 @@ class OfTourneeRdv(models.TransientModel):
     map_tour_id = fields.Many2one(comodel_name='of.planning.tournee', string="Tour")
     intervention_to_preview = fields.Char(
         string='Data for the Marker to preview', compute='_compute_intervention_to_preview')
-    intervention_map_ids = fields.One2many('of.planning.intervention', compute="_compute_intervention_map_ids")
+    map_tour_line_ids = fields.One2many(comodel_name='of.planning.tour.line', compute="_compute_map_tour_line_ids")
 
     name = fields.Char(string=u"Libellé", size=64, required=False)
     description = fields.Text(string="Description")
@@ -476,12 +477,12 @@ class OfTourneeRdv(models.TransientModel):
         self.search_period_in_days = (end_date - start_date).days
 
     @api.depends('map_tour_id', 'map_line_id')
-    def _compute_intervention_map_ids(self):
+    def _compute_map_tour_line_ids(self):
         # added sudo() to avoid access rights issues from the website (no access for of.planning.tournee)
         self_sudo = self.sudo()
         for wizard in self_sudo:
             tour = wizard.map_tour_id
-            wizard.intervention_map_ids = tour.intervention_map_ids if tour else []
+            wizard.map_tour_line_ids = tour.map_tour_line_ids if tour else []
         return True
 
     # Actions
@@ -1014,7 +1015,7 @@ class OfTourneeRdv(models.TransientModel):
             self.res_line_id.selected_hour = self.res_line_id.date_flo
             self.map_tour_id = self.res_line_id.tour_id.id or False
             self.map_line_id = self.res_line_id.id
-            self._compute_intervention_map_ids()
+            self._compute_map_tour_line_ids()
 
     @api.multi
     def _get_service_data(self, mois):
@@ -1109,17 +1110,11 @@ class OfTourneeRdv(models.TransientModel):
                 if sudo:
                     # @todo: en l'état j'ai dû retirer la tournee pour contourner une erreur de droit,
                     # il faut corriger ça
-                    origine = (employee.of_address_depart_id.sudo() or
-                               False)
-                    arrivee = (employee.of_address_retour_id.sudo() or
-                               False)
+                    origine = (employee.of_address_depart_id.sudo() or False)
+                    arrivee = (employee.of_address_retour_id.sudo() or False)
                 else:
-                    origine = (tournee and tournee.address_depart_id or
-                               employee.of_address_depart_id or
-                               False)
-                    arrivee = (tournee and tournee.address_retour_id or
-                               employee.of_address_retour_id or
-                               False)
+                    origine = (tournee and tournee.start_address_id or employee.of_address_depart_id or False)
+                    arrivee = (tournee and tournee.return_address_id or employee.of_address_retour_id or False)
                 # Pas d'origine ni pour la tournée ni pour l'employé
                 if not origine:
                     raise UserError(u"L'intervenant \"%s\" n'a pas d'adresse de départ." % employee.name)
@@ -1283,7 +1278,7 @@ class OfTourneeRdvLineMixin(models.AbstractModel):
         self.wizard_id.map_tour_id = self.tour_id.id or False
         # if we are on the delegated object we must use the id of the parent object
         self.wizard_id.map_line_id = self.original_line_id.id if self._name != 'of.tournee.rdv.line' else self.id
-        self.wizard_id._compute_intervention_map_ids()
+        self.wizard_id._compute_map_tour_line_ids()
         self.toggl_map_preview()
         return self.wizard_id.action_open_wizard()
 
@@ -1395,25 +1390,8 @@ class OfTourneeRdvLine(models.TransientModel):
     @api.multi
     @api.depends('date')
     def _compute_date_weekday(self):
-        weekdays = {
-            'Monday': _('Monday'),
-            'Tuesday': _('Tuesday'),
-            'Wednesday': _('Wednesday'),
-            'Thursday': _('Thursday'),
-            'Friday': _('Friday'),
-            'Saturday': _('Saturday'),
-            'Sunday': _('Sunday'),
-            # add french keys to avoid error on servers with french language
-            'lundi': _('Monday'),
-            'mardi': _('Tuesday'),
-            'mercredi': _('Wednesday'),
-            'jeudi': _('Thursday'),
-            'vendredi': _('Friday'),
-            'samedi': _('Saturday'),
-            'dimanche': _('Sunday'),
-        }
         for record in self:
-            record.weekday = weekdays[fields.Date.from_string(record.date).strftime('%A')]
+            record.weekday = WEEKDAYS_TR[fields.Date.from_string(record.date).strftime('%A')]
 
     # @api.depends
 

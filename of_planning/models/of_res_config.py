@@ -16,6 +16,11 @@ class OfInterventionSettings(models.TransientModel):
                     'of.intervention.settings', 'company_choice', 'contact')
         return res
 
+    @api.model
+    def _default_days_ids(self):
+        days = self.env['of.jours'].search([('numero', 'in', (1, 2, 3, 4, 5))], order="numero")
+        return [day.id for day in days]
+
     company_id = fields.Many2one(
         'res.company', string=u'(OF) Société', required=True, default=lambda self: self.env.user.company_id)
     calendar_min_time = fields.Integer(string='(OF) Heure min', help=u"Heure minimale affichée")

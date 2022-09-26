@@ -91,8 +91,8 @@ class OfPlanningIntervention(models.Model):
         if tournee:
             secteur = tournee.secteur_id
             # les lieux de départ et de retour d'une tournée priment sur ceux de l'employé
-            lieu_depart = tournee.address_depart_id and tournee.address_depart_id.get_infos_lieu() or lieu_depart
-            lieu_retour = tournee.address_retour_id and tournee.address_retour_id.get_infos_lieu() or lieu_retour
+            lieu_depart = tournee.start_address_id and tournee.start_address_id.get_infos_lieu() or lieu_depart
+            lieu_retour = tournee.return_address_id and tournee.return_address_id.get_infos_lieu() or lieu_retour
         else:
             secteur = False
         secteur_str = secteur and secteur.name or ""
