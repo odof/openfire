@@ -178,8 +178,8 @@ msgstr "(OF) Date validité devis"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_of_recalcul_date_confirmation
-msgid "(OF) Recalcul de la date d'enregistrement"
-msgstr "(OF) Recalcul de la date d'enregistrement"
+msgid "(OF) Recalcul de la date de confirmation"
+msgstr "(OF) Recalcul de la date de confirmation"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_mail_commercial
@@ -589,7 +589,6 @@ msgstr "Client"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_order_id
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_margin_regulator_order_id
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification_order_id
 msgid "Commande"
 msgstr "Commande"
@@ -635,11 +634,6 @@ msgstr "Coût"
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_cout_total_ht_simul
 msgid "Coût Total HT simulé"
 msgstr "Coût Total HT simulé"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_margin_regulator_delivered_cost
-msgid "Coût livré"
-msgstr "Coût livré"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_cout_total_ht
@@ -706,25 +700,19 @@ msgid "Date"
 msgstr "Date "
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_margin_regulator_confirmation_date
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_confirmation_date
-msgid "Date d'enregistrement"
-msgstr "Date d'enregistrement"
+msgid "Date de confirmation"
+msgstr "Date de confirmation"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_line_confirmation_date_order
-msgid "Date d'enregistrement de commande"
-msgstr "Date d'enregistrement de commande"
+msgid "Date de confirmation de commande"
+msgstr "Date de confirmation de commande"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_line_date_order
 msgid "Date de commande"
 msgstr "Date de commande"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_margin_regulator_invoice_date
-msgid "Date de dernière facture"
-msgstr "Date de dernière facture"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_of_fixed_invoice_date
@@ -803,7 +791,6 @@ msgstr "Remise (%)"
 #: model:ir.model.fields,field_description:of_sale.field_of_order_line_option_display_name
 #: model:ir.model.fields,field_description:of_sale.field_of_product_image_display_name
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_display_name
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_margin_regulator_display_name
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_display_name
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation_display_name
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_display_name
@@ -888,8 +875,8 @@ msgstr "Détermine comment est calculée la remise sur les lignes sélectionnée
 
 #. module: of_sale
 #: model:ir.actions.act_window,name:of_sale.action_of_sale_confirmation_devis
-msgid "Enregistrer la commande"
-msgstr "Enregistrer la commande"
+msgid "Confirmer la vente"
+msgstr "Confirmer la vente"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_of_to_invoice
@@ -992,7 +979,6 @@ msgstr "Masquer la pastille commercial dans les rapports PDF ?"
 #: model:ir.model.fields,field_description:of_sale.field_of_order_line_option_id
 #: model:ir.model.fields,field_description:of_sale.field_of_product_image_id
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_id
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_margin_regulator_id
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_id
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation_id
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_id
@@ -1095,7 +1081,6 @@ msgstr "Pastilles"
 #: model:ir.model.fields,field_description:of_sale.field_of_order_line_option___last_update
 #: model:ir.model.fields,field_description:of_sale.field_of_product_image___last_update
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance___last_update
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_margin_regulator___last_update
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard___last_update
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation___last_update
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix___last_update
@@ -1426,11 +1411,6 @@ msgid "Parameters"
 msgstr "Paramètres"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_margin_regulator_partner_id
-msgid "Partenaire"
-msgstr "Partenaire"
-
-#. module: of_sale
 #: model:ir.model,name:of_sale.model_res_partner
 msgid "Partner"
 msgstr "Partenaire"
@@ -1759,11 +1739,6 @@ msgid "Référence article"
 msgstr "Référence article"
 
 #. module: of_sale
-#: model:ir.model,name:of_sale.model_of_sale_margin_regulator
-msgid "Régule de marge"
-msgstr "Régule de marge"
-
-#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_reset_option
 msgid "Réinitialiser l'option ?"
 msgstr "Réinitialiser l'option ?"
@@ -1856,11 +1831,6 @@ msgid "Simuler"
 msgstr "Simuler"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_margin_regulator_company_id
-msgid "Société"
-msgstr "Société"
-
-#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_account_invoice_of_residual
 msgid "Somme du montant non payé des factures d'acompte et de la facture finale"
 msgstr "Somme du montant non payé des factures d'acompte et de la facture finale"
@@ -1915,11 +1885,6 @@ msgstr "Titre spécifique"
 #: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
 msgid "Total"
 msgstr "Total"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_margin_regulator_invoiced_total
-msgid "Total HT facturé"
-msgstr "Total HT facturé"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_montant_total_ht_initial
@@ -2034,11 +1999,6 @@ msgstr "Valider BL liés"
 #: selection:account.config.settings,of_validate_pickings:0
 msgid "Valider les BL au moment de la validation de la facture"
 msgstr "Valider les BL au moment de la validation de la facture"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_margin_regulator_user_id
-msgid "Vendeur"
-msgstr "Vendeur"
 
 #. module: of_sale
 #: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
@@ -2193,11 +2153,6 @@ msgstr "Échéancier prévisionnel"
 #: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
 msgid "État"
 msgstr "État"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_margin_regulator_invoice_status
-msgid "État de facturation"
-msgstr "État de facturation"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_gb_partner_tag_id
