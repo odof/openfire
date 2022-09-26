@@ -1091,11 +1091,11 @@ class OFRapportOpenflamWizard(models.TransientModel):
                             if account not in payment_dict:
                                 payment_dict[account] = {"ht": 0.0, "taxe": 0.0}
                             payment_dict[account]["taxe"] -= tax_move_line.balance * percent
-                            tax = tax_move_line.tax_line_id
-                            move_lines_linked = invoice_move.line_ids.filtered(
-                                lambda ml: tax.amount in [t.amount for t in ml.tax_ids])
-                            if move_lines_linked:
-                                payment_dict[account]["ht"] -= percent * sum(move_lines_linked.mapped('balance'))
+                        taxes = tax_move_lines.mapped('tax_line_id')
+                        move_lines_linked = invoice_move.line_ids.filtered(
+                            lambda ml: any(tax.amount in ml.tax_ids.mapped('amount') for tax in taxes))
+                        if move_lines_linked:
+                            payment_dict[account]["ht"] -= percent * sum(move_lines_linked.mapped('balance'))
                 else:
                     # On conserve les paiements non intégralement lettrés pour les signaler a l'utilisateur
                     undefined_payments_list.append(payment)
@@ -1103,9 +1103,8 @@ class OFRapportOpenflamWizard(models.TransientModel):
                 tax_account_used_dict[account] = tax_column
                 tax_column += tax_column_increment
 
-        for company in display.keys():
+        for company, display_company in display.iteritems():
             # Affichage par société
-            display_company = display[company]
             payments_sorted = sorted(display_company['payments'].iteritems(), key=lambda x: x[0].payment_date)
             tax_account_used_dict = display_company['tax_account_used']
             undefined_payments_list = display_company['undefined_payments']
@@ -1147,8 +1146,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
                 worksheet.write(
                     line_number, 3, "%s" % invoices and ", ".join(invoices) or "", styles['text_title_border'])
                 worksheet.write(line_number, 4, payment.amount, styles['number_title_border'])
-                for tax in tax_account_used_dict.keys():
-                    column = tax_account_used_dict[tax]
+                for tax, column in tax_account_used_dict.iteritems():
                     worksheet.write(
                         line_number, column, tax_dict[tax]["ht"] if tax in tax_dict else "", styles['number_border'])
                     worksheet.write(
