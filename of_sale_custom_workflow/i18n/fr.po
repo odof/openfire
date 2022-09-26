@@ -506,3 +506,8 @@ msgstr "Voulez-vous mettre à jour la date d'enregistrement de la commande ? <br
 #: model:ir.model,name:of_sale_custom_workflow.model_sale_config_settings
 msgid "sale.config.settings"
 msgstr "sale.config.settings"
+
+#. module: of_sale_custom_workflow
+#: model:ir.model.fields,field_description:of_sale_custom_workflow.field_sale_report_of_confirmation_date
+msgid "Date d'enregistrement"
+msgstr "Date d'enregistrement"

@@ -1,0 +1,24 @@
+#. module: sale
+#: model:ir.model.fields,field_description:sale.field_sale_order_confirmation_date
+msgid "Date d'enregistrement"
+msgstr "Date d'enregistrement"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_of_recalcul_date_confirmation
+msgid "(OF) Recalcul de la date d'enregistrement"
+msgstr "(OF) Recalcul de la date d'enregistrement"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_confirmation_date
+msgid "Date d'enregistrement"
+msgstr "Date d'enregistrement"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_confirmation_date_order
+msgid "Date d'enregistrement de commande"
+msgstr "Date d'enregistrement de commande"
+
+#. module: of_sale
+#: model:ir.actions.act_window,name:of_sale.action_of_sale_confirmation_devis
+msgid "Enregistrer la commande"
+msgstr "Enregistrer la commande"
