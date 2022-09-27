@@ -13,13 +13,16 @@ class OFContractMassAvenantWizard(models.TransientModel):
     _name = 'of.contract.mass.avenant.wizard'
 
     date_start = fields.Date(string="Date de prise d'effet", required=True)
-    frequency_type = fields.Selection([
-        ('date', u'À la prestation'),
-        ('month', 'Mensuelle'),
-        ('trimester', u'Trimestrielle'),  # Tout les 3 mois
-        ('semester', u'Semestrielle'),  # 2 fois par ans
-        ('year', u'Annuelle'),
+    frequency = fields.Selection(selection=[
+        ('date', u"À la prestation"),
+        ('days', "Jour"),
+        ('weeks', "Semaine"),
+        ('months', "Mois"),
+        ('trimester', "Trimestre"),
+        ('semester', "Semestre"),
+        ('years', u"Année"),
         ], string=u"Fréquence de facturation")
+    frequency_amount = fields.Integer(string="Amount")
     recurring_invoicing_payment_id = fields.Many2one(
         'of.contract.recurring.invoicing.payment', string="Type de facturation")
     line_ids = fields.One2many('of.contract.mass.avenant.wizard.line', 'wizard_id')
@@ -46,8 +49,10 @@ class OFContractMassAvenantWizard(models.TransientModel):
                 })[0]
             if self.recurring_invoicing_payment_id:
                 data['recurring_invoicing_payment_id'] = self.recurring_invoicing_payment_id.id
-            if self.frequency_type:
-                data['frequency_type'] = self.frequency_type
+            if self.frequency:
+                data['frequency'] = self.frequency
+            if self.frequency_amount:
+                data['frequency_amount'] = self.frequency_amount
             line_data = []
             for line in origine.contract_product_ids:
                 line_data.append((0, 0, line.copy_data(default={'previous_product_id': line.id})[0]))

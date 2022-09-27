@@ -9,7 +9,7 @@
             <xpath expr="//group[@name='sale_pay']" position="inside">
                 <field name="of_subscription" invisible="1"/>
                 <field name="of_contract_template_id"
-                       attrs="{'invisible': [('of_subscription','=',False)], 'required' : [('of_subscription','=',True)]}"
+                       attrs="{'invisible': [('of_subscription','=',False)], 'required' : [('of_subscription','=',True), ('of_contract_id', '=', False)]}"
                        domain="[('ctype','=','subscription')]"
                 />
                 <field name="of_contract_id"
@@ -26,15 +26,16 @@
                 <div>
                     <field name="of_subscription" class="oe_inline"/>
                 </div>
-                <label for="of_contract_line_template_id"/>
-                <div>
+                <label for="of_contract_line_template_id" attrs="{'invisible': [('of_subscription', '=', False)]}"/>
+                <div attrs="{'invisible': [('of_subscription', '=', False)]}">
                     <field name="of_contract_line_template_id" class="oe_inline"
                            domain="context.get('of_contract_template_id') and [('template_id', '=', context.get('of_contract_template_id'))] or [('ctype','=','subscription')]"
+                           attrs="{'required' : [('of_subscription','=',True)]}"
                     />
                 </div>
-                <label for="of_date_mis"/>
-                <div>
-                    <field name="of_date_mis" class="oe_inline"/>
+                <label for="of_date_mis" attrs="{'invisible': [('of_subscription', '=', False)]}"/>
+                <div attrs="{'invisible': [('of_subscription', '=', False)]}">
+                    <field name="of_date_mis" class="oe_inline" attrs="{'required' : [('of_subscription','=',True)]}"/>
                 </div>
             </xpath>
         </field>

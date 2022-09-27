@@ -25,6 +25,7 @@
         <field name="inherit_id" ref="of_contract_custom.of_contract_line_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='date_start']" position="attributes">
+                <attribute name="invisible">0</attribute>
                 <attribute name="attrs">{'invisible': [('ctype','!=','subscription')]}</attribute>
             </xpath>
             <xpath expr="//field[@name='date_contract_start']" position="attributes">
@@ -39,6 +40,7 @@
         <field name="inherit_id" ref="of_contract_custom.of_contract_line_view_form_simplified"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='date_start']" position="attributes">
+                <attribute name="invisible">0</attribute>
                 <attribute name="attrs">{'invisible': [('ctype','!=','subscription')]}</attribute>
             </xpath>
             <xpath expr="//field[@name='date_contract_start']" position="attributes">

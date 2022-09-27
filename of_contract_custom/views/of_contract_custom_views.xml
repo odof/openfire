@@ -191,7 +191,7 @@
                                                  'default_revision': revision,
                                                  'default_grouped': grouped,
                                                  'default_ctype': ctype,
-                                                 'default_first_invoicing': date_start,
+                                                 'default_first_invoicing': recurring_next_date or date_start,
                                                  'form_readonly': '[(&quot;state&quot;,&quot;in&quot;,[&quot;validated&quot;,&quot;cancel&quot;])]'}">
                                 </field>
                                 <field name="line_ids_rel" mode="tree" nolabel="1" colspan="2"
@@ -213,7 +213,7 @@
                                                  'default_revision': revision,
                                                  'default_grouped': grouped,
                                                  'default_ctype': ctype,
-                                                 'default_first_invoicing': date_start,
+                                                 'default_first_invoicing': recurring_next_date or date_start,
                                                  'form_readonly': '[(&quot;state&quot;,&quot;in&quot;,[&quot;validated&quot;,&quot;cancel&quot;])]'}">
                                 </field>
                             </group>
@@ -360,7 +360,8 @@
                 <field name="code_de_ligne"/>
                 <field name="address_id"/>
                 <field name="tache_id"/>
-                <field name="frequency_type"/>
+                <field name="frequency_amount" string="" style="margin-right: 5px"/>
+                <field name="frequency"/>
                 <field name="next_date"/>
                 <field name="year_purchase_price" sum="Coût annuel"/>
                 <field name="year_subtotal" sum="Total HT annuel"/>
@@ -435,10 +436,12 @@
                         <button class="oe_stat_button" type="object" name="action_view_invoices" icon="fa-pencil-square-o">
                             <field name="invoice_count" widget="statinfo" string="Factures"/>
                         </button>
-                        <button class="oe_stat_button" type="object" name="action_view_services" icon="fa-calendar">
+                        <button class="oe_stat_button" type="object" name="action_view_services" icon="fa-calendar"
+                                attrs="{'invisible': [('ctype', '!=', 'maintenance')]}">
                             <field name="service_count" widget="statinfo" string="Planification"/>
                         </button>
-                        <button class="oe_stat_button" type="object" name="action_view_intervention" icon="fa-calendar">
+                        <button class="oe_stat_button" type="object" name="action_view_intervention" icon="fa-calendar"
+                                attrs="{'invisible': [('ctype', '!=', 'maintenance')]}">
                             <field name="intervention_count" widget="statinfo" string="RDVs"/>
                         </button>
                     </div>
@@ -479,9 +482,9 @@
                             <field name="date_start" invisible="1"/>
                             <field name="date_contract_start"/>
                             <field name="first_invoicing"/>
-                            <field name="date_contract_end" readonly="1"/>
+                            <field name="date_contract_end" invisible="1"/>
                             <field name="line_origine_id"/>
-                            <field name="date_end" invisible="1"/>
+                            <field name="date_end"/>
                             <field name="supplier_id" attrs="{'form_readonly_exception': True}"/>
                             <field name="supplier_tag_ids" widget="many2many_tags"/>
                         </group>
@@ -619,10 +622,12 @@
                         <button class="oe_stat_button" type="object" name="action_view_invoices" icon="fa-pencil-square-o">
                             <field name="invoice_count" widget="statinfo" string="Factures"/>
                         </button>
-                        <button class="oe_stat_button" type="object" name="action_view_services" icon="fa-calendar">
+                        <button class="oe_stat_button" type="object" name="action_view_services" icon="fa-calendar"
+                                attrs="{'invisible': [('ctype', '!=', 'maintenance')]}">
                             <field name="service_count" widget="statinfo" string="Planification"/>
                         </button>
-                        <button class="oe_stat_button" type="object" name="action_view_intervention" icon="fa-calendar">
+                        <button class="oe_stat_button" type="object" name="action_view_intervention" icon="fa-calendar"
+                                attrs="{'invisible': [('ctype', '!=', 'maintenance')]}">
                             <field name="intervention_count" widget="statinfo" string="RDVs"/>
                         </button>
                     </div>

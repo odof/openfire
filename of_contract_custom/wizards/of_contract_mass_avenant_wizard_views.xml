@@ -8,8 +8,15 @@
             <form string="Avenant">
                 <group>
                     <field name="date_start"/>
-                    <field name="frequency_type"/>
-                    <field name="recurring_invoicing_payment_id"/>
+                    <div name="invoicing">
+                        <span  style="margin-right: 5px">Répéter chaque</span>
+                        <field name="frequency_amount" nolabel="1" class="oe_inline" style="margin-right: 5px"/>
+                        <field name="frequency" nolabel="1" class="oe_inline" style="margin-right: 5px"/>
+                        <field name="recurring_invoicing_payment_id" nolabel="1" class="oe_inline"
+                               options="{'no_create': True, 'no_open': True}"
+                               required="1"
+                               domain="[('code', 'in', frequency == 'date' and ('date', 'post-paid') or ('pre-paid', 'post-paid'))]"/>
+                    </div>
                 </group>
                 <field name="line_ids" nolabel="1">
                     <tree colors="green:selected" editable="bottom" delete="false" create="false">

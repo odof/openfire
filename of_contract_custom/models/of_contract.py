@@ -909,7 +909,8 @@ class OfContractLine(models.Model):
         ('year', u'Annuelle'),
         ], default='month', string=u"Fréquence de facturation", required=True)
     recurring_invoicing_payment_id = fields.Many2one(
-        'of.contract.recurring.invoicing.payment', string="Type de facturation", required=True)
+        'of.contract.recurring.invoicing.payment', string="Type de facturation", required=True,
+        default=lambda r: r._default_recurring_invoicing_payment_id())
 
     next_date = fields.Date(string="Prochaine facturation", compute="_compute_dates", store=True, copy=False)
     is_invoiceable = fields.Boolean(compute="_compute_is_invoiceable", store=True, copy=False)
@@ -1021,6 +1022,15 @@ class OfContractLine(models.Model):
     frequency_amount = fields.Integer(string="Amount")
     first_invoicing = fields.Date(string=u"Date première facturation", required=True)
     prorata = fields.Boolean(string="Prorata")
+
+    @api.model
+    def _default_recurring_invoicing_payment_id(self):
+        # post paid par défaut car pre-paid est pour toutes fréquences sauf a date.
+        default = self.env.ref(
+            'of_contract_custom.of_contract_recurring_invoicing_payment_post-paid', raise_if_not_found=False)
+        if default:
+            return default.id
+        return False
 
     @api.depends('code_de_ligne',
                  'line_avenant_id', 'line_avenant_id.code_de_ligne',
@@ -1286,6 +1296,13 @@ class OfContractLine(models.Model):
         elif self.frequency_type:
             if self.recurring_invoicing_payment_id.code not in ('pre-paid', 'post-paid'):
                 self.recurring_invoicing_payment_id = False
+
+    @api.onchange('first_invoicing', 'date_start')
+    def _onchange_first_invoicing(self):
+        if self.first_invoicing and self.first_invoicing < self.date_contract_start:
+            self.first_invoicing = self.date_contract_start
+            raise UserError(u"Vous ne pouvez définir une date de première facturation antérieure "
+                            u"à la date de début de la ligne.")
 
     @api.model
     def cancel_contract_lines(self):
@@ -1786,6 +1803,7 @@ class OfContractProduct(models.Model):
         """ Calcul des montants pour la ligne d'article """
         # c_product pour contract_product
         for c_product in self:
+            # a faire pour les contrats d'abonnement
             price = c_product.price_unit * (1 - (c_product.discount or 0.0) / 100.0)
             # For a single month
             taxes = c_product.tax_ids.compute_all(price, c_product.company_currency_id, c_product.qty_to_invoice,
@@ -1860,6 +1878,8 @@ class OfContractProduct(models.Model):
         """ Calcul de la qté à facturer """
         for product_line in self:
             line = product_line.line_id
+            if line.state != 'validated' or not line.current_period_id:
+                continue
             qty_per_period = product_line.quantity
             product_line.qty_per_period = qty_per_period
             last_day = product_line.line_id.current_period_id.date_end
@@ -1879,16 +1899,17 @@ class OfContractProduct(models.Model):
                 if not line.invoice_line_ids.filtered(lambda il: il.invoice_id.state != 'cancel'):
                     start = fields.Date.from_string(line.date_start)
                     end = fields.Date.from_string(line.next_date or line.first_invoicing)
-                    start_next_month = start + relativedelta(months=1, day=1)
-                    start_beg_month = start + relativedelta(day=1)
-                    diviseur = ((start_next_month - start_beg_month) + (end - start_next_month)).days
-                    dividende = ((start_next_month - start) + (end - start_next_month)).days
-                    # un des chiffres doit être cast en float autrement on trouve un arrondi
-                    prorata = float(dividende) / diviseur
-                    if line.recurring_invoicing_payment_id.code == 'pre-paid':
-                        # pre-paid signifie qu'on paie pour la période a venir donc il faut facturer 1x + prorata
-                        prorata += 1.0
-                elif line.date_end and line.next_date > line.date_end:
+                    if start < end:
+                        start_next_month = start + relativedelta(months=1, day=1)
+                        start_beg_month = start + relativedelta(day=1)
+                        diviseur = ((start_next_month - start_beg_month) + (end - start_next_month)).days
+                        dividende = ((start_next_month - start) + (end - start_next_month)).days
+                        # un des chiffres doit être cast en float autrement on trouve un arrondi
+                        prorata = float(dividende) / diviseur
+                        if line.recurring_invoicing_payment_id.code == 'pre-paid':
+                            # pre-paid signifie qu'on paie pour la période a venir donc il faut facturer 1x + prorata
+                            prorata += 1.0
+                elif line.date_end and line.next_date >= line.date_end:
                     start = fields.Date.from_string(line.next_date)
                     last_date = safe_eval('base_date + relativedelta(%s=amount)' % frequency,
                                           {'base_date': start,

@@ -49,9 +49,9 @@ class OFContractProduct(models.Model):
             if line.ctype != 'subscription':
                 super(OFContractProduct, product_line)._compute_quantities()
             else:
-                qty_per_period = product_line.quantity
-                product_line.qty_per_period = qty_per_period
-                qty_to_invoice = 1
+                qty_to_invoice = product_line.quantity
+                product_line.qty_per_period = qty_to_invoice  # a corriger
+                multiplier = 1
                 if line.prorata:
                     if not line.invoice_line_ids.filtered(lambda il: il.invoice_id.state != 'cancel'):
                         start = fields.Date.from_string(line.date_start)
@@ -61,11 +61,11 @@ class OFContractProduct(models.Model):
                         diviseur = ((start_next_month - start_beg_month) + (end - start_next_month)).days
                         dividende = ((start_next_month - start) + (end - start_next_month)).days
                         # un des chiffres doit être cast en float autrement on trouve un arrondi
-                        qty_to_invoice = float(dividende) / diviseur
+                        multiplier = float(dividende) / diviseur
                         if line.recurring_invoicing_payment_id.code == 'pre-paid':
                             # pre-paid signifie qu'on paie pour la période a venir donc qty = prorata + 1
-                            qty_to_invoice += 1.0
-                    elif line.date_end:
+                            multiplier += 1.0
+                    elif line.date_end and line.next_date >= line.date_end:
                         start = fields.Date.from_string(line.next_date)
                         frequency = line.contract_id.frequency
                         amount = line.contract_id.frequency_amount
@@ -88,5 +88,5 @@ class OFContractProduct(models.Model):
                         diviseur = last_date - start
                         dividende = end - start
                         # un des chiffres doit être cast en float autrement on trouve un arrondi
-                        qty_to_invoice = float(dividende) / diviseur
-                product_line.qty_to_invoice = qty_to_invoice
+                        multiplier = float(dividende) / diviseur
+                product_line.qty_to_invoice = qty_to_invoice * multiplier
