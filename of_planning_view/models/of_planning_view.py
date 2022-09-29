@@ -283,6 +283,19 @@ class OfPlanningIntervention(models.Model):
 
         un_jour = timedelta(days=1)
 
+        # On récupère les interventions de tous les employés sur la période
+        all_interventions = intervention_obj.sudo().search([
+            ('employee_ids', 'in', employees.ids),
+            ('date_prompt', '<=', fields.Date.to_string(date_stop_da)),
+            ('date_deadline_prompt', '>=', fields.Date.to_string(date_start_da)),
+            ('state', 'not in', ('cancel', 'postponed'))], order='date')
+        # On fait un read global pour éviter les requêtes 1 à 1
+        # read est détourné dans of_planning pour renvoyer les dates de l'occurence concernée
+        # dans le cas des RDV recurrents
+        data_interventions = all_interventions.read(['date_prompt', 'date_deadline_prompt'])
+        data_interventions_dict = {
+            intervention['id']: intervention for intervention in data_interventions
+        }
         for employee in employees:
             employee_id = employee.id
             res[employee_id]['tz'] = self._context.get('tz')
@@ -348,12 +361,9 @@ class OfPlanningIntervention(models.Model):
                 journee_fin = horaires_du_jour[-1][1]
 
                 # On récupère tous les rdvs de la journée
-                interventions = intervention_obj.sudo().search(
-                    [('employee_ids', 'in', employee_id),
-                     ('date_prompt', '<=', date_current_str),
-                     ('date_deadline_prompt', '>=', date_current_str),
-                     ('state', 'not in', ('cancel', 'postponed'))],
-                    order='date')
+                interventions = all_interventions.filtered(
+                    lambda i: employee_id in i.employee_ids.ids and
+                    i.date_prompt[:10] <= date_current_str <= i.date_deadline_prompt[:10])
                 intervention_liste = []
                 # Journée entièrement libre
                 if not interventions:
@@ -383,9 +393,7 @@ class OfPlanningIntervention(models.Model):
                 jour_fin_dt = tz.localize(datetime.strptime(date_current_str+" 23:59:00", "%Y-%m-%d %H:%M:%S"))
                 for intervention in interventions:
                     intervention_heures = [intervention]
-                    # read est détourné dans of_planning pour renvoyer les dates de l'occurence concernée
-                    # dans le cas des RDV recurrents
-                    data = intervention.read(['date_prompt', 'date_deadline_prompt'])[0]
+                    data = data_interventions_dict[intervention.id]
                     for intervention_heure in (data['date_prompt'], data['date_deadline_prompt']):
                         # Conversion des dates de début et de fin en nombres flottants et à l'heure locale
                         intervention_locale_dt = fields.Datetime.context_timestamp(
