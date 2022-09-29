@@ -627,7 +627,7 @@ var PlanningView = View.extend({
         var self = this;
         var dfd = $.Deferred();
         var p = dfd.promise()
-        res_ids = res_ids || self.view_res_ids;
+        res_ids = res_ids || self.actual_res_ids;
         start = start || self.range_start;
         end = end || self.range_stop;
 
