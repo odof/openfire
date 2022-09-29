@@ -39,7 +39,10 @@ class OFPlanningRecurringMixin(models.AbstractModel):
     ], string=u"type d'intervalle", default='weekly',
         help=u"type d'intervalle entre 2 occurences de ce RDV. hebdomadaire par défaut")
     recurrency = fields.Boolean(string=u"Recurrent", help=u"RDV récurrent")
-    recurrent_id = fields.Integer(string=u"ID du recurrent associé")
+    recurrent_id = fields.Integer(string=u"ID du recurrent associé", index=True)
+    # Champ occurrence_ids à surcharger dans les héritages de la classe abstraite
+    occurrence_ids = fields.One2many(
+        comodel_name='of.planning.recurring.mixin', inverse_name='recurrent_id', string=u"Occurrences")
     recurrent_id_date = fields.Datetime(string=u"Date du recurrent associé")
     end_type = fields.Selection([
         ('count', u"nombre de répétitions"),
@@ -252,8 +255,7 @@ class OFPlanningRecurringMixin(models.AbstractModel):
             event_date = event_date.astimezone(timezone)  # transform "+hh:mm" timezone
             rset1 = rrule.rrulestr(str(self.rrule), dtstart=event_date, forceset=True, tzinfos={}, cache=True)
         # récupérer les éventuels RDV issus de RDV récurrents et détachés
-        recurring_meetings = self.search(
-            [('recurrent_id', '=', self.id), '|', ('active', '=', False), ('active', '=', True)])
+        recurring_meetings = self.with_context(active_test=False).occurrence_ids
 
         for meeting in recurring_meetings:
             date = todate(meeting.recurrent_id_date)
@@ -409,6 +411,8 @@ class OFPlanningIntervention(models.Model):
     jour_ids = fields.Many2many(
         string=u"Jours", comodel_name='of.jours', relation='of_interv_recurring_jour_rel',
         column1='intervention_id', column2='jour_id', compute='_compute_jour_ids')
+    occurrence_ids = fields.One2many(
+        comodel_name='of.planning.intervention', inverse_name='recurrent_id', string=u"Occurrences")
 
     # @API.DEPENDS
 

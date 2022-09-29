@@ -45,6 +45,8 @@ class OFUpdateRecRulesWizard(models.TransientModel):
         help=u"Si la date de début a été modifiée, on doit 'modifier toutes les occurences'")
     alert_coherence_hours = fields.Boolean(
         string=u"Incohérence dans les heures", compute="_compute_alert_coherence_hours")
+    occurrence_ids = fields.One2many(
+        comodel_name='of.update.rec.rules.wizard', inverse_name='recurrent_id', string=u"Occurrences")
 
     @api.constrains('start_hour', 'end_hour')
     def check_coherence_hours(self):
