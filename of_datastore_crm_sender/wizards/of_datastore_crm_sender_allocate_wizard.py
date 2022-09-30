@@ -16,8 +16,13 @@ class OfDatastoreCrmAllocateWizard(models.TransientModel):
         if self.partner_id:
             self.lead_id.of_allocated = self.partner_id
 
+            network_members = self.env['of.datastore.crm.network.member'].search(
+                [('partner_id', '=', self.partner_id.id)])
+
+            # On vérifie s'il existe un connecteur achat pour ce fournisseur
             connecteur_ids = self.env['of.datastore.crm.sender'].search(
-                [('partner_id', '=', self.lead_id.of_allocated.id)])
+                ['|', '&', ('partner_id', '=', self.partner_id.id), ('is_multicompany', '=', False),
+                 '&', ('child_ids', 'in', network_members.ids), ('is_multicompany', '=', True)])
 
             # Si un connecteur vers une base fille existe pour ce membre réseau,
             # on crée cette opportunité sur la base fille
@@ -72,7 +77,6 @@ class OfDatastoreCrmAutoAllocateWizard(models.TransientModel):
                 if partner_ids:
                     partner_id = partner_ids[0]
 
-
             wizard_line_obj.new({
                 'wizard_id': self.id,
                 'lead_id': lead.id,
@@ -85,8 +89,13 @@ class OfDatastoreCrmAutoAllocateWizard(models.TransientModel):
             if line.partner_id:
                 line.lead_id.of_allocated = line.partner_id
 
+                network_members = self.env['of.datastore.crm.network.member'].search(
+                    [('partner_id', '=', line.partner_id.id)])
+
+                # On vérifie s'il existe un connecteur achat pour ce fournisseur
                 connecteur_ids = self.env['of.datastore.crm.sender'].search(
-                    [('partner_id', '=', line.lead_id.of_allocated.id)])
+                    ['|', '&', ('partner_id', '=', line.partner_id.id), ('is_multicompany', '=', False),
+                     '&', ('child_ids', 'in', network_members.ids), ('is_multicompany', '=', True)])
 
                 # Si un connecteur vers une base fille existe pour ce membre réseau,
                 # on crée cette opportunité sur la base fille

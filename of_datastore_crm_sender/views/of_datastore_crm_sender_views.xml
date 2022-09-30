@@ -12,8 +12,9 @@
                 <sheet>
                     <group>
                         <group>
+                            <field name="is_multicompany" invisible="1"/>
                             <field name="datastore_id"/>
-                            <field name="partner_id"/>
+                            <field name="partner_id" attrs="{'invisible':[('is_multicompany','=',True)]}"/>
                             <field name="active"/>
                         </group>
                         <group>
@@ -25,6 +26,19 @@
                             <button name="button_dummy" string="Test connexion" type="object"/>
                         </group>
                         <field name="error_msg" colspan="4"/>
+
+                        <group colspan="4" attrs="{'invisible':[('is_multicompany','=',False)]}">
+                            <separator string="Membres réseau"/>
+                            <button name="button_load_companies" class="pull-right" colspan="2" string="Charger les sociétés" type="object"/>
+                            <field name="child_ids" nolabel="1" colspan="2">
+                                <tree editable="top" options="{'no_create': True}">
+                                    <field name="parent_id" invisible="1"/>
+                                    <field name="company" readonly="1"/>
+                                    <field name="company_id" invisible="1"/>
+                                    <field name="partner_id"/>
+                                </tree>
+                            </field>
+                        </group>
                     </group>
                 </sheet>
             </form>
