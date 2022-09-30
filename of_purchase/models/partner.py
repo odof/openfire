@@ -17,8 +17,22 @@ class ResPartner(models.Model):
     @api.multi
     def _purchase_invoice_count(self):
         super(ResPartner, self)._purchase_invoice_count()
-        all_partners = self.search([('id', 'child_of', self.ids)])
+        all_partners = self.with_context(active_test=False).search([('id', 'child_of', self.ids)])
         all_partners.read(['parent_id'])
+
+        purchase_order_groups = self.env['purchase.order'].read_group(
+            domain=[('partner_id', 'in', all_partners.ids)],
+            fields=['partner_id'], groupby=['partner_id']
+        )
+
+        for group in purchase_order_groups:
+            partner = self.browse(group['partner_id'][0])
+            while partner:
+                if partner in self:
+                    # On assigne purchase_order_count sans le += contrairement à la fonction originale,
+                    # car elle est appelée dans le super. Du coup, on souhaite écraser la valeur existante
+                    partner.purchase_order_count = group['partner_id_count']
+                partner = partner.parent_id
 
         # On réapplique la deuxième étape de la fonction pour ajouter les avoir fournisseurs
         supplier_invoice_groups = self.env['account.invoice'].read_group(
