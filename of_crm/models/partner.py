@@ -123,7 +123,7 @@ Ce champ se met à jour automatiquement sur confirmation de commande et sur vali
 
     def of_compute_sale_orders_count(self, field, state_domain=[]):
         # retrieve all children partners and prefetch 'parent_id' on them
-        all_partners = self.search([('id', 'child_of', self.ids)])
+        all_partners = self.with_context(active_test=False).search([('id', 'child_of', self.ids)])
         all_partners.read(['parent_id'])
 
         sale_order_groups = self.env['sale.order'].read_group(
