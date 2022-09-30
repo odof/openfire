@@ -21,6 +21,7 @@
         'reports/of_service_demande_intervention_templates.xml',
         'data/of_service_data.xml',
         'security/ir.model.access.csv',
+        'security/res_groups.xml',
         'views/of_service_view.xml',
     ],
     'installable': True,

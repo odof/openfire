@@ -121,4 +121,22 @@
         <field name="view_mode">calendar,planning,tree,form,pivot</field>
     </record>
 
+    <record id="action_of_planning_intervention_calendar_first" model="ir.actions.act_window">
+        <field name="name">Planning d'intervention</field>
+        <field name="res_model">of.planning.intervention</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">calendar,planning,form,tree,pivot,map</field>
+        <field name="view_id" ref="of_planning.of_planning_intervention_view_calendar"/>
+        <field name="search_view_id" ref="of_planning.of_planning_intervention_filter"/>
+        <field name="groups_id" eval="[(4, ref('of_planning_view.of_group_intervention_open_calendar'))]"/>
+        <field name="context">
+            {'search_default_state_confirm':1,
+            'search_default_state_done':1,
+            'search_default_state_draft':1,
+            'search_default_state_unfinished':1}
+        </field>
+    </record>
+
+    <menuitem id="menu_of_planning_intervention_calendar_first" name="Planning" parent="of_planning.menu_of_planning_intervention" sequence="2" action="action_of_planning_intervention_calendar_first" groups="of_planning_view.of_group_intervention_open_calendar"/>
+
 </odoo>

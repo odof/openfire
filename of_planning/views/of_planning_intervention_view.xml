@@ -1144,7 +1144,7 @@
     <menuitem id="menu_of_planning" name="Interventions" groups="of_group_planning_intervention_lecture_siens" sequence="2" web_icon="of_planning,static/description/icon.png"/>
 
         <menuitem id="menu_of_planning_intervention" name="Interventions" parent="of_planning.menu_of_planning" groups="of_group_planning_intervention_lecture_siens" sequence="10"/>
-            <menuitem id="menu_of_planning_intervention_calendar" name="Planning" parent="of_planning.menu_of_planning_intervention" sequence="1" action="action_of_planning_intervention_calendar"/>
+            <menuitem id="menu_of_planning_intervention_calendar" name="Planning" parent="of_planning.menu_of_planning_intervention" sequence="2" action="action_of_planning_intervention_calendar"/>
 
         <menuitem id="menu_of_planning_clients" name="Clients" parent="of_planning.menu_of_planning" sequence="20"/>
             <menuitem id="menu_of_planning_clients_clients" name="Clients" parent="of_planning.menu_of_planning_clients" action="action_of_partner_form_planning" sequence="10"/>
