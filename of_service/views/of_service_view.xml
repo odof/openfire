@@ -562,6 +562,9 @@
     <menuitem id="of_service_maintenance_menu" name="Entretien - Maintenance" parent="of_planning.menu_of_planning_intervention"
               action="of_service_maintenance_action" sequence="10"/>
 
+    <menuitem id="of_service_maintenance_menu_first" name="Entretien - Maintenance" parent="of_planning.menu_of_planning_intervention"
+              action="of_service_maintenance_action" sequence="1" groups="of_service.of_group_intervention_open_menu_maintenance"/>
+
     <menuitem id="of_service_stage_menu" name="Étapes de DI" parent="of_planning.menu_of_planning_configuration_res"
               action="of_service_stage_action" sequence="90"/>
 
