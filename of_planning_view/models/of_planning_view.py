@@ -175,9 +175,7 @@ class OfPlanningIntervention(models.Model):
                             'secteur_str': secteur_str,
                             'display_secteur': display_secteur,
                             'warning_horaires': intervention_forcee,
-                        }
-                        to_append["defaults"] = {
-                            'employee_ids': [employee_id],
+                            'defaults': {'employee_ids': [employee_id]},
                         }
                         creneaux.append(to_append)
                 break
@@ -227,7 +225,7 @@ class OfPlanningIntervention(models.Model):
     @api.model
     def get_emp_horaires_info(
             self, employee_ids, date_start, date_stop, horaires_list_dict=False, fusion_creneaux=True,
-            view_mode='planning'):
+            view_mode='planning', return_fields=[]):
         """
         Fonction appelée par le javascript de la vue Planning.
         Renvoie toutes les informations nécessaires à l'affichage de la vue Planning:
