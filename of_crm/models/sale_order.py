@@ -119,7 +119,7 @@ class SaleOrder(models.Model):
 
     @api.multi
     @api.depends('of_force_laying_date', 'of_manual_laying_date', 'intervention_ids',
-                 'intervention_ids.date', 'intervention_ids.type_id')
+                 'intervention_ids.date', 'intervention_ids.type_id', 'intervention_ids.state')
     def _compute_of_reference_laying_date(self):
         for rec in self:
             laying_date = False
@@ -127,13 +127,15 @@ class SaleOrder(models.Model):
                 laying_date = rec.of_manual_laying_date
             elif rec.intervention_ids:
                 installation_type = self.env.ref('of_service.of_service_type_installation')
-                inter_installation = rec.intervention_ids.filtered(lambda i: i.type_id == installation_type)
-                future_installation = inter_installation.filtered(lambda i: i.date > fields.Datetime.now())
+                inter_installation = rec.intervention_ids.filtered(
+                    lambda i: i.type_id == installation_type and i.state == 'confirm')
                 # by default Interventions are sorted by date (_order = 'date')
-                if future_installation:
-                    laying_date = future_installation[0].date_date
-                elif inter_installation:
-                    laying_date = inter_installation[-1].date_date or False
+
+                if inter_installation:
+                    laying_date = inter_installation[0].date_date or False
+                else:
+                    # we keep the old value
+                    laying_date = rec.read(['of_reference_laying_date'])[0]['of_reference_laying_date']
             rec.of_reference_laying_date = laying_date
             if laying_date:
                 date_laying_week = datetime.strptime(laying_date, "%Y-%m-%d").date()
