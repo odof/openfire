@@ -605,42 +605,47 @@ class OFPlanningIntervention(models.Model):
             return super(OFPlanningIntervention, self).read(fields=fields, load=load)
 
         fields2 = fields and fields[:] or None
-        extra_fields = ('user_id', 'duree', 'all_day', 'date', 'rrule', 'date_prompt', 'date_deadline_prompt')
-        for f in extra_fields:
-            if fields and (f not in fields):
-                fields2.append(f)
+        if 'duree' not in fields:
+            fields2.append('duree')
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
         tz = pytz.timezone(self._context['tz'])
 
-        select = map(lambda x: (x, calendar_id2real_id(x)), self.ids)
-        real_events = self.browse([real_id for calendar_id, real_id in select])
+        select = {x: calendar_id2real_id(x) for x in self.ids}
+        real_events = self.browse(select.values())
         real_data = super(OFPlanningIntervention, real_events).read(fields=fields2, load=load)
-        real_data = dict((d['id'], d) for d in real_data)
+        real_data = {d['id']: d for d in real_data}
 
         result = []
-        for calendar_id, real_id in select:
+        for calendar_id, real_id in select.iteritems():
+            if calendar_id == real_id:
+                result.append(real_data[real_id])
+                continue
             res = real_data[real_id].copy()
             ls = calendar_id2real_id(
                 calendar_id, with_date=res and res.get('duree', 0) > 0 and res.get('duree') or 1)
             if not isinstance(ls, (basestring, int, long)) and len(ls) >= 2:
+                res['date'] = ls[1]
+                res['date_deadline'] = ls[2]
                 res['date_prompt'] = ls[1]
                 res['date_deadline_prompt'] = ls[2]
                 # mettre en date locale pour éviter les erreurs de date pour les RDV tard le soir
-                debut_dt = tz.localize(datetime.strptime(res['date_prompt'], "%Y-%m-%d %H:%M:%S"))
+                debut_dt = tz.localize(datetime.strptime(ls[1], "%Y-%m-%d %H:%M:%S"))
                 res['jour'] = debut_dt.strftime("%A").capitalize()
-                fin_dt = tz.localize(datetime.strptime(res['date_deadline_prompt'], "%Y-%m-%d %H:%M:%S"))
+                fin_dt = tz.localize(datetime.strptime(ls[2], "%Y-%m-%d %H:%M:%S"))
                 res['jour_fin'] = fin_dt.strftime("%A").capitalize()
-                res['forcer_dates'] = True
                 res['date_deadline_forcee'] = ls[2]
+                # Normalement forcer_dates vaut déjà True dans le planning récurrent de base
+                # Cette surcharge ne devrait donc pas être utile
+                res['forcer_dates'] = True
 
             res['id'] = calendar_id
             result.append(res)
 
-        for r in result:
-            for k in extra_fields:
-                if (k in r) and (fields and (k not in fields)):
-                    del r[k]
+        if 'duree' not in fields:
+            for r in result:
+                if 'duree' in r:
+                    del r['duree']
         return result
 
     @api.multi
