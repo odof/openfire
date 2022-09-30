@@ -17,6 +17,7 @@ class SaleOrder(models.Model):
     def _prepare_project_vals(self):
         vals = super(SaleOrder, self)._prepare_project_vals()
         vals['of_sale_id'] = self.id
+        vals['partner_id'] = self.partner_id.id
         return vals
 
     def of_action_view_project(self):
@@ -29,5 +30,8 @@ class SaleOrder(models.Model):
             action['res_id'] = projects.id
         else:
             action = self.env.ref('project.open_create_project').read()[0]
-            action['context'] = {'default_of_sale_id': self.id}
+            action['context'] = {
+                'default_of_sale_id': self.id,
+                'default_partner_id': self.partner_id.id,
+            }
         return action
