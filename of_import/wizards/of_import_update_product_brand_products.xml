@@ -38,4 +38,13 @@
         <field name="target">new</field>
     </record>
 
+    <record id="action_of_import_update_product_brand_products_no_context" model="ir.actions.act_window">
+        <field name="name">Appliquer les règles de la marque</field>
+        <field name="res_model">of.import.update.product.brand.products</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_import_update_product_brand_products_form_view"/>
+        <field name="target">new</field>
+    </record>
+
 </odoo>
