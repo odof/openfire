@@ -26,6 +26,7 @@
                         <field name="of_puissance_nom"/>
                         <field name="of_rendement"/>
                         <field name="of_emission_co"/>
+                        <field name="of_emission_co_mg"/>
                         <field name="of_emission_poussiere"/>
                         <field name="of_emission_nox"/>
                         <field name="of_cog_emission"/>
