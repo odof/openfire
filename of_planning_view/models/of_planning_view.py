@@ -223,7 +223,7 @@ class OfPlanningIntervention(models.Model):
         return temps_chevauche
 
     @api.model
-    def get_emp_horaires_info(
+    def get_display_data(
             self, employee_ids, date_start, date_stop, horaires_list_dict=False, fusion_creneaux=True,
             view_mode='planning', return_fields=[]):
         """

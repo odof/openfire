@@ -627,7 +627,7 @@ var PlanningView = View.extend({
 
         var Planning = new Model(self.model);
         Planning.call(
-            'get_emp_horaires_info', [res_ids, start, end, segments, !self.mode_calendar, 'planning', return_fields])
+            'get_display_data', [res_ids, start, end, segments, !self.mode_calendar, 'planning', return_fields])
         .then(function (result) {
             if (isNullOrUndef(self.res_horaires_info)) {
                 self.res_horaires_info = {};

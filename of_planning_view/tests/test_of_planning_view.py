@@ -69,8 +69,8 @@ class OfTestPlannings(OfTestEmployees):
 
         # Informations sur les horaires du lundi 04/11 au vendredi 08/11/2019
         intervention_obj = self.intervention_model.with_context(emp_info_force_min_date='1970-01-01')
-        infos_juin = intervention_obj.get_emp_horaires_info(emp_ids, '2019-06-03 02:00:00', '2019-06-07 23:00:00')
-        infos_novembre = intervention_obj.get_emp_horaires_info(emp_ids, '2019-11-04 02:00:00', '2019-11-08 23:00:00')
+        infos_juin = intervention_obj.get_display_data(emp_ids, '2019-06-03 02:00:00', '2019-06-07 23:00:00')
+        infos_novembre = intervention_obj.get_display_data(emp_ids, '2019-11-04 02:00:00', '2019-11-08 23:00:00')
 
         # Test des créneaux de l'employé 1 :
         creneaux_1_juin = infos_juin[self.emp_1.id]['creneaux_dispo'][0]
