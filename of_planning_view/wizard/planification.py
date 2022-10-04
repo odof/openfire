@@ -50,13 +50,13 @@ class OfPlanifCreneau(models.TransientModel):
           u" les calculs de distances\n"
           u"Si vous ne le faites pas, pas de panique! On considérera que le lieu de précédent est le lieu suivant")],
         compute="_compute_messages")
-    street_prec = fields.Char(compute="compute_prec_suiv_vals")
-    zip_prec = fields.Char(compute="compute_prec_suiv_vals")
-    city_prec = fields.Char(compute="compute_prec_suiv_vals")
-    country_prec_id = fields.Many2one('res.country', compute="compute_prec_suiv_vals")
-    geo_lat_prec = fields.Float(compute="compute_prec_suiv_vals")
-    geo_lng_prec = fields.Float(compute="compute_prec_suiv_vals")
-    precision_prec = fields.Selection(GEO_PRECISION, compute="compute_prec_suiv_vals")
+    street_prec = fields.Char(compute="_compute_prec_suiv_vals")
+    zip_prec = fields.Char(compute="_compute_prec_suiv_vals")
+    city_prec = fields.Char(compute="_compute_prec_suiv_vals")
+    country_prec_id = fields.Many2one('res.country', compute="_compute_prec_suiv_vals")
+    geo_lat_prec = fields.Float(compute="_compute_prec_suiv_vals")
+    geo_lng_prec = fields.Float(compute="_compute_prec_suiv_vals")
+    precision_prec = fields.Selection(GEO_PRECISION, compute="_compute_prec_suiv_vals")
 
     # Lieu suivant
     lieu_suiv_arrivee = fields.Boolean(string=u"lieu d'arrivée de la journée", compute="_compute_lieu_depart_arrivee")
@@ -81,13 +81,13 @@ class OfPlanifCreneau(models.TransientModel):
           u" de distances.\n"
           u"Si vous ne le faites pas, les résultat proposés ne tiendront pas compte des distances")],
         compute="_compute_messages")
-    street_suiv = fields.Char(compute="compute_prec_suiv_vals")
-    zip_suiv = fields.Char(compute="compute_prec_suiv_vals")
-    city_suiv = fields.Char(compute="compute_prec_suiv_vals")
-    country_suiv_id = fields.Many2one('res.country', compute="compute_prec_suiv_vals")
-    geo_lat_suiv = fields.Float(compute="compute_prec_suiv_vals")
-    geo_lng_suiv = fields.Float(compute="compute_prec_suiv_vals")
-    precision_suiv = fields.Selection(GEO_PRECISION, compute="compute_prec_suiv_vals")
+    street_suiv = fields.Char(compute="_compute_prec_suiv_vals")
+    zip_suiv = fields.Char(compute="_compute_prec_suiv_vals")
+    city_suiv = fields.Char(compute="_compute_prec_suiv_vals")
+    country_suiv_id = fields.Many2one('res.country', compute="_compute_prec_suiv_vals")
+    geo_lat_suiv = fields.Float(compute="_compute_prec_suiv_vals")
+    geo_lng_suiv = fields.Float(compute="_compute_prec_suiv_vals")
+    precision_suiv = fields.Selection(GEO_PRECISION, compute="_compute_prec_suiv_vals")
 
     # Recherche
     rayon_max = fields.Integer(
@@ -121,9 +121,9 @@ class OfPlanifCreneau(models.TransientModel):
     proposition_readonly_ids = fields.One2many(related="proposition_ids", readonly=True)
     aucun_res = fields.Boolean(string=u"Aucun résultat!")
     priorite_max = fields.Integer(string=u"Priorité max", help=u"Priorité la plus haute parmis les propositions")
-    tout_calcule = fields.Boolean(string=u"réelles toutes calculées", compute="compute_tout_calcule")
-    prop_nb = fields.Integer(string=u"Nombre propositionsé", compute="compute_tout_calcule")
-    calcule_nb = fields.Integer(string=u"Nombre déjà calculé", compute="compute_tout_calcule")
+    tout_calcule = fields.Boolean(string=u"réelles toutes calculées", compute="_compute_tout_calcule")
+    prop_nb = fields.Integer(string=u"Nombre propositionsé", compute="_compute_tout_calcule")
+    calcule_nb = fields.Integer(string=u"Nombre déjà calculé", compute="_compute_tout_calcule")
 
     # Sélection
     selected_id = fields.Many2one('of.planif.creneau.prop', string="Proposition")
@@ -199,7 +199,7 @@ class OfPlanifCreneau(models.TransientModel):
 
     @api.multi
     @api.depends('lieu_prec_id', 'lieu_prec_manual_id', 'lieu_suiv_id', 'lieu_suiv_manual_id')
-    def compute_prec_suiv_vals(self):
+    def _compute_prec_suiv_vals(self):
         for wizard in self:
             if wizard.lieu_prec_manual_id:
                 wizard.street_prec = wizard.lieu_prec_manual_id.street
@@ -236,7 +236,7 @@ class OfPlanifCreneau(models.TransientModel):
 
     @api.multi
     @api.depends('proposition_ids', 'proposition_ids.fait')
-    def compute_tout_calcule(self):
+    def _compute_tout_calcule(self):
         for wizard in self:
             if not wizard.proposition_ids:
                 wizard.tout_calcule = True
@@ -252,8 +252,9 @@ class OfPlanifCreneau(models.TransientModel):
     @api.depends('employee_id', 'heure_debut_creneau', 'heure_fin_creneau')
     def _compute_name(self):
         for creneau in self:
-            creneau.name = u'%s : Créneau %s' % ((creneau.employee_id.name or u''),
-                                                 (creneau.creneaux_reels_formatted or u''))
+            creneau.name = u'%s : Créneau %s' % (
+                creneau.employee_id.name or u'',
+                creneau.creneaux_reels_formatted or u'')
 
     @api.onchange('pre_tache_categ_ids')
     def onchange_pre_tache_categ_ids(self):
@@ -882,7 +883,6 @@ class OfPlanifCreneauProp(models.TransientModel):
     def get_closer_one(self):
         """Renvoie la proposition dont la distance réelle est la plus petite parmi les éléments de self
            ordonnés par priorite DESC, distance_arrondi_order, date_next, date_fin, distance_order"""
-        min_prop = False
         if not len(self):
             return False
         creneau = self[0].creneau_id
