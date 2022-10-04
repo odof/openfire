@@ -3,10 +3,8 @@
 from odoo.osv import orm
 from odoo.tools.float_utils import float_compare
 from odoo import models, fields, api
-from odoo.addons.of_utils.models.of_utils import se_chevauchent, hours_to_strs
+from odoo.addons.of_utils.models.of_utils import hours_to_strs
 from odoo.exceptions import ValidationError
-from odoo.addons.calendar.models.calendar import calendar_id2real_id
-import re
 
 import pytz
 from datetime import datetime, timedelta

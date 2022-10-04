@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import itertools
 from odoo.tests import common
 from odoo.addons.of_calendar.tests.test_of_calendar import OfTestEmployees
+
 
 # @tagged('-standard', 'OpenFire', 'of_calendar')
 @common.post_install(True)
@@ -83,7 +83,7 @@ class OfTestPlannings(OfTestEmployees):
 
         horaires_attendus = [
             # Employé 1 - juin
-            [(8, 12, 4), (15 ,17, 2)],
+            [(8, 12, 4), (15, 17, 2)],
             # Employé 1 - novembre
             [(8, 10, 2), (13, 17, 4)],
             # Employé 2 - juin
