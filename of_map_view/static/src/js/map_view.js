@@ -25,6 +25,8 @@ var time = require('web.time');
 
 //var TILE_SERVER_ADDR = 'http://192.168.1.80/osm_tiles/{z}/{x}/{y}.png';
 var TILE_SERVER_ADDR = '//{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png';
+// ratio to get marker width out of marker height
+var H2W_RATIO = 1.64
 
 var Class = core.Class;
 var _t = core._t;
@@ -34,18 +36,6 @@ var qweb = core.qweb;
 function isNullOrUndef(value) {
     return _.isUndefined(value) || _.isNull(value);
 }
-
-var iconUrls = {
-    "black": '/of_map_view/static/src/img/marker-icon-black.png',
-    "blue": '/of_map_view/static/src/img/marker-icon-blue.png',
-    "green": '/of_map_view/static/src/img/marker-icon-green.png',
-    "grey": '/of_map_view/static/src/img/marker-icon-grey.png',
-    "gray": '/of_map_view/static/src/img/marker-icon-grey.png',
-    "orange": '/of_map_view/static/src/img/marker-icon-orange.png',
-    "red": '/of_map_view/static/src/img/marker-icon-red.png',
-    "violet": '/of_map_view/static/src/img/marker-icon-violet.png',
-    "yellow": '/of_map_view/static/src/img/marker-icon-yellow.png',
-};
 
 var MapView = View.extend({
     template: 'MapView',
@@ -133,10 +123,22 @@ var MapView = View.extend({
      */
     init_record_options: function() {
         //console.log("MapView.init_record_fields");
+        var self = this;
+        var dfd = $.Deferred();
+        var p = dfd.promise();
         this.record_options = {};
         this.record_options.latitude_field = this.lat_field;
         this.record_options.longitude_field = this.lng_field;
         this.record_options.color_field = this.fields_view.arch.attrs.color_field;
+        var ir_config = new Model('ir.config_parameter');
+        ir_config.call('get_param', ['Map_Marker_Size']).then(function(res){
+            if (['x-small', 'small', 'medium', 'large'].includes(res)) {
+                self.record_options.marker_size = res;
+            }
+            dfd.resolve();
+        });
+
+        return $.when(p);
     },
     init_displayer_options: function() {
         this.displayer_options = {};
@@ -180,7 +182,6 @@ var MapView = View.extend({
                 }
             }
         }
-        this.init_record_options();
         this.init_displayer_options();
 
         var rendered_prom = this.$el.html(qweb.render(this.template, {widget: this})).promise();
@@ -191,12 +192,13 @@ var MapView = View.extend({
         if (!this.options.tile_server_addr) { // the map will use default tile server config, found in ir.config_parameter
             options.tile_server_addr = true;
         }
+        var record_option_inited = this.init_record_options();
 
         var q = true;
         if (options.map_center_and_zoom || options.tile_server_addr) {
             q = this.get_default_map_config(options).promise();
         }
-        return $.when(this._super(),rendered_prom,q);
+        return $.when(this._super(), rendered_prom, record_option_inited, q);
     },
     /**
      * Method called after rendering. Mostly used to bind actions, perform asynchronous
@@ -209,10 +211,10 @@ var MapView = View.extend({
      */ 
     start: function() {
         //console.log("MapView.start: ",arguments);
-        
         this.$el.addClass(this.fields_view.arch.attrs.class || "o_map_view");
         var options = {center: this.options.map_center_and_zoom[0], zoom: this.options.map_center_and_zoom[1]};
         if (this.options.tile_server_addr) options.tile_server_addr = this.options.tile_server_addr;
+        if (this.record_options.marker_size) options.marker_size = this.options.marker_size;
         options.displayer_options = this.displayer_options;
         options.container_id = this.map_id;
         var args = {view: this, options};
@@ -930,6 +932,7 @@ MapView.LayerGroup = Widget.extend({
         this._super(map.view);
         this.records = records || [];
         this.options = _.defaults(options,this.defaults);
+        this.init_icon_options();
         this.icon = null;
         this.the_layer = new L.LayerGroup();
         // the view's number of records per page (|| section), defaults to 80
@@ -945,6 +948,53 @@ MapView.LayerGroup = Widget.extend({
         this.map = map;
         this.current_selection = {}; // id dictionary of records currently selected. of the form id: record
         //console.log("MapView.LayerGroup this: ",this);
+    },
+    /**
+     *  init icon options, for marker sizes
+     */
+    init_icon_options: function() {
+        var marker_size = this.options.marker_size;
+        var base_path = '/of_map_view/static/src/img/marker-icon';
+        var shadow_path = '/of_map_view/static/src/img/marker-shadow';
+        var marker_height = 41;
+        var marker_width;
+        var shadow_height = 41;
+        var glyph_size = '13px';
+        var glyph_anchor = [6, -7];
+        if (marker_size) {
+            base_path += '-' + marker_size + '-';
+            shadow_path += '-' + marker_size;
+            switch (marker_size) {
+                case 'x-small':
+                    marker_height = 10;
+                    shadow_height = 10;
+                    glyph_size = '6px';
+                    glyph_anchor = [0, -8];
+                    break;
+                case 'small':
+                    marker_height = 20;
+                    shadow_height = 20;
+                    glyph_size = '10px';
+                    glyph_anchor = [1, -3];
+                    break;
+            }
+        }else{
+            base_path += '-m-';
+            shadow_path += '-m';
+        }
+        marker_width = marker_height / H2W_RATIO;
+        var icon_options_dict = {
+            'shadowUrl': shadow_path + '.png',
+            'shadowSize': [shadow_height, shadow_height],
+            'shadowAnchor': [shadow_height / 4 + 1 , shadow_height - 1],
+            'iconSize': [marker_width, marker_height],
+            'iconAnchor': [marker_width / 2, marker_height - 1],
+            'glyphSize': glyph_size,
+            'glyphAnchor': glyph_anchor
+        }
+        this.options.icon_options.unselected = _.extend(this.options.icon_options.unselected, icon_options_dict);
+        this.options.icon_options.selected = _.extend(this.options.icon_options.selected, icon_options_dict);
+        this.options.icon_options['icon_path'] = base_path;
     },
     /**
      *  looks like this one is never used? les arcanes du javascript sont souvent impénétrables!
@@ -976,7 +1026,7 @@ MapView.LayerGroup = Widget.extend({
             if (this.options.custom_icon) {
                 var options = this.options.icon_options.unselected;
                 options['id'] = 'icon_'+this.records[i].id;
-                options["iconUrl"] = this.get_color_url(this.records[i]);
+                options['iconUrl'] = this.get_color_url(this.records[i]);
 
                 icon = L.icon.glyph(options);
 
@@ -1017,7 +1067,7 @@ MapView.LayerGroup = Widget.extend({
             if (this.options.custom_icon) {
                 var options = this.options.icon_options.unselected;
                 options['id'] = 'icon_'+this.records[i].id;
-                options["iconUrl"] = this.get_color_url(this.records[i]);
+                options['iconUrl'] = this.get_color_url(this.records[i]);
 
                 icon = L.icon.glyph(options);
 
@@ -1044,10 +1094,13 @@ MapView.LayerGroup = Widget.extend({
      */
     get_color_url: function (record) {
         var color_field =  this.options.color_field;
-        if (color_field && record[color_field]) {
-            return iconUrls[record[color_field]];
+        var base_path = this.options.icon_options.icon_path;
+        if (color_field && record[color_field] && record[color_field] == 'grey') {
+            return base_path + 'gray.png';
+        }else if (color_field && record[color_field]) {
+            return base_path + record[color_field] + '.png';
         }else{
-            return iconUrls["blue"];
+            return base_path + 'blue.png';
         }
     },
     /**
@@ -1434,12 +1487,8 @@ MapView.Marker = L.Marker.extend({
         var options;
         this.selected ? options = this.group.options.icon_options.selected : options = this.group.options.icon_options.unselected;
         options['id'] = 'icon_'+this.id;
-        if (color) {
-            return iconUrls[color];
-        }else{
-            return iconUrls["blue"];
-        }
-        options["iconUrl"] = iconUrls[color];
+        color = color || 'blue';
+        options['iconUrl'] = this.group.options.icon_options.icon_path + color + '.png';
 
         var icon = L.icon.glyph(options);
         this.setIcon(icon);
