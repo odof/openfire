@@ -288,13 +288,16 @@ class OfPlanningIntervention(models.Model):
             ('date_deadline_prompt', '>=', fields.Date.to_string(date_start_da)),
             ('state', 'not in', ('cancel', 'postponed'))], order='date')
 
-        res['interventions'] = [
-            {
-                field: intervention_obj._fields[field].convert_to_read(interv[field], interv)
-                for field in return_fields
-            }
-            for interv in all_interventions
-        ]
+        if view_mode == 'planning':
+            if 'id' not in return_fields:
+                return_fields.append('id')
+            res['interventions'] = [
+                {
+                    field: intervention_obj._fields[field].convert_to_read(interv[field], interv)
+                    for field in return_fields
+                }
+                for interv in all_interventions
+            ]
         for employee in employees:
             employee_id = employee.id
             res[employee_id]['tz'] = self._context.get('tz')
