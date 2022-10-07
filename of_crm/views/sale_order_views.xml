@@ -13,7 +13,7 @@
                     <button name="action_confirm_estimation" string="Confirmer l'estimation" type="object" states="draft" class="btn-primary"/>
                 </xpath>
                 <xpath expr="//div[hasclass('oe_title')]/h1" position="inside">
-                    <field name="of_priority" widget="priority"/>
+                    <field name="of_priority" widget="priority" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
                 </xpath>
                 <xpath expr="//sheet/group/group[1]" position="inside">
                     <field name="of_sent_quotation"/>
