@@ -24,6 +24,15 @@
             <field name="landscape">True</field>
         </record>
 
+        <record id="s03" model="label.config">
+            <field name="label_main_id" ref="b0"/>
+            <field name="name">1 x 1 paysage</field>
+            <field name="height">210</field>
+            <field name="width">297</field>
+            <field name="cell_spacing">10.0</field>
+            <field name="landscape">True</field>
+        </record>
+
         <record id="b1" model="label.brand">
             <field name="brand_name">Others</field>
         </record>
