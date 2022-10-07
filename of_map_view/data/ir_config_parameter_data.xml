@@ -20,5 +20,11 @@
         <field name="key">Map_Tile_Server_Address</field>
         <field name="value">undefined</field>
     </record>
-    
+
+    <record id="map_marker_size" model="ir.config_parameter">
+        <field name="key">Map_Marker_Size</field>
+        <!-- here goes either x-small, small or medium. large could be easily implemented if necessary -->
+        <field name="value">medium</field>
+    </record>
+
 </odoo>
