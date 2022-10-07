@@ -33,7 +33,7 @@ class GestionPrix(models.TransientModel):
             ('montant_ttc', u'montant TTC à déduire'),
             ('prix_ht_cible', 'montant total HT cible'),
             ('montant_ht', u'montant HT à déduire'),
-            ('pc', u'% de remise sur les lignes sélectionnées'),
+            ('pc', u'% de remise globale'),
         ]
         if self.user_has_groups('of_sale.of_group_sale_marge_manager'):
             liste.append(('pc_marge', '% marge'))
@@ -88,9 +88,9 @@ class GestionPrix(models.TransientModel):
             ('1', u"Arrondir aux 10 centimes les plus proches"),
         ], string=u"Précision d'arrondi", default='0')
     cost_prorata = fields.Selection(selection=[
-            ('price', u"Prix de vente"),
-            ('cost', u"Coût"),
-        ], default='price', required=True, string=u"Prorata")
+        ('price', u"Prix de vente"),
+        ('cost', u"Coût"),
+    ], default='price', required=True, string=u"Prorata")
     of_client_view = fields.Boolean(string='Vue client/vendeur', related="order_id.of_client_view")
 
     @api.depends('line_ids.prix_total_ttc_simul', 'line_ids.prix_total_ht_simul', 'line_ids.cout_total_ht_simul')
@@ -267,7 +267,7 @@ class GestionPrix(models.TransientModel):
         return ' / '.join([
             fields.Date.to_string(fields.Date.from_string(gestion.order_id.confirmation_date)) or
             fields.Date.to_string(fields.Date.from_string(gestion.order_id.date_order)) for gestion in docs
-            ])
+        ])
 
     def get_recap(self):
         order_lines = self.line_ids.filtered(lambda l: l.state == 'included').mapped('order_line_id')
@@ -369,8 +369,8 @@ class GestionPrixLine(models.TransientModel):
             pc_marge = 100 * (1 - line.cout_total_ht_simul / line.prix_total_ht_simul) if line.prix_total_ht_simul else\
                 -100
             if float_compare(pc_marge, line.pc_marge, precision_rounding=0.01):
-                line.prix_total_ht_simul = line.cout_total_ht_simul and line.cout_total_ht_simul *\
-                                           (100 / (100 - line.pc_marge))
+                line.prix_total_ht_simul = line.cout_total_ht_simul and line.cout_total_ht_simul * \
+                    (100 / (100 - line.pc_marge))
 
     @api.onchange('prix_total_ht_simul')
     def _onchange_prix_total_ht_simul(self):
@@ -481,7 +481,7 @@ class GestionPrixLine(models.TransientModel):
                 'of_price_management_variation': 0.0,
                 'of_unit_price_variation': new_price_variation,
                 'purchase_price': order_line.product_id.standard_price,
-             }},
+            }},
             taxes)
 
     @api.multi
