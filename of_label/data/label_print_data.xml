@@ -33,5 +33,34 @@
             <field name="template_css_id" ref="of_label.report_of_label_style"/>
         </record>
 
+        <record id="of_label_product_product_full" model="label.print">
+            <field name="name">Étiquette article 1x1</field>
+            <field name="label_brand_id" ref="of_label.b0"/>
+            <field name="label_config_id" ref="of_label.s03"/>
+            <field name="model_id" ref="product.model_product_product"/>
+            <field name="mode">template</field>
+            <field name="template_id" ref="of_label.report_of_label_product_full"/>
+            <field name="template_css_id" ref="of_label.report_of_label_style_full"/>
+        </record>
+
+        <record id="of_label_product_template_full" model="label.print">
+            <field name="name">Étiquette article 1x1</field>
+            <field name="label_brand_id" ref="of_label.b0"/>
+            <field name="label_config_id" ref="of_label.s03"/>
+            <field name="model_id" ref="product.model_product_template"/>
+            <field name="mode">template</field>
+            <field name="template_id" ref="of_label.report_of_label_product_full"/>
+            <field name="template_css_id" ref="of_label.report_of_label_style_full"/>
+        </record>
+
+        <record id="of_label_stock_full" model="label.print">
+            <field name="name">Étiquette de stock 1x1</field>
+            <field name="label_brand_id" ref="of_label.b0"/>
+            <field name="label_config_id" ref="of_label.s03"/>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="mode">template</field>
+            <field name="template_id" ref="of_label.report_of_label_stock_full"/>
+            <field name="template_css_id" ref="of_label.report_of_label_style_full"/>
+        </record>
     </data>
 </odoo>
