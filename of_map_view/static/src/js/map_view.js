@@ -979,8 +979,8 @@ MapView.LayerGroup = Widget.extend({
                     break;
             }
         }else{
-            base_path += '-m-';
-            shadow_path += '-m';
+            base_path += '-medium-';
+            shadow_path += '-medium';
         }
         marker_width = marker_height / H2W_RATIO;
         var icon_options_dict = {
