@@ -355,7 +355,7 @@ class OfWizardSituation(models.TransientModel):
                 if sit_lines:
                     # inhiber l'affichage de la référence
                     afficher_ref = self.env['ir.values']\
-                        .get_default('sale.config.settings', 'pdf_display_product_ref_setting')
+                        .get_default('sale.config.settings', 'pdf_product_reference')
 
                     for line in sit_lines:
                         order_id = line.order_line_id.order_id

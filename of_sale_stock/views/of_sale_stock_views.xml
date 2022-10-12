@@ -262,6 +262,8 @@
             <xpath expr="//group[@name='quotations_sales']/label[@for='module_sale_order_dates']" position="replace"/>
             <xpath expr="//group[@name='quotations_sales']//field[@name='module_sale_order_dates']/.." position="replace"/>
             <xpath expr="//group[@name='customers']//field[@name='security_lead']" position="replace"/>
+            <!-- This option is moved to the printing settings -->
+            <xpath expr="//field[@name='group_display_incoterm']" position="replace"/>
         </field>
     </record>
     <record id="view_of_sale_stock_sale_config_settings_of_sale" model="ir.ui.view">

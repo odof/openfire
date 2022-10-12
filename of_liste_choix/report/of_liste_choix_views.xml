@@ -54,7 +54,7 @@
             <attribute name="style">display: none;</attribute>
             <attribute name="t-att-style"/>
         </xpath>
-        <xpath expr="//div[@t-if='doc.pdf_afficher_multi_echeances()']/parent::div" position="attributes">
+        <xpath expr="//div[@t-if='pdf_payment_schedule']/parent::div" position="attributes">
             <attribute name="style">display: none;</attribute>
             <attribute name="t-att-style"/>
         </xpath>

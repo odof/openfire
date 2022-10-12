@@ -7,59 +7,84 @@
             <form string="Configure PDF printing">
                 <group string="Printing parameters">
                     <group col="2">
-                        <group col="2" colspan="2" name="address">
-                            <h4 class="of-settings" colspan="2">Address</h4>
-                            <field name="pdf_hide_global_address_label"/>
-                            <field name="pdf_adresse_civilite"/>
-                            <field name="pdf_adresse_nom_parent"/>
-                            <field name="pdf_adresse_telephone"/>
-                            <field name="pdf_adresse_mobile"/>
-                            <field name="pdf_adresse_fax"/>
-                            <field name="pdf_adresse_email"/>
+                        <group col="2" colspan="2" name="address_insert">
+                            <h4 class="of-printing-parameter-title" colspan="2">Address insert</h4>
+                            <field name="pdf_address_title"/>
+                            <field name="pdf_address_contact_titles"/>
+                            <field name="pdf_address_contact_parent_name"/>
+                            <field name="pdf_address_contact_name"/>
+                            <field name="pdf_address_contact_phone"/>
+                            <field name="pdf_address_contact_mobile"/>
+                            <field name="pdf_address_contact_fax"/>
+                            <field name="pdf_address_contact_email"/>
+                        </group>
+                        <group col="2" colspan="2" name="commercial_insert">
+                            <label for="pdf_commercial_insert" class="of-printing-parameter-title"/>
+                            <div name="pdf_commercial_insert">
+                                <field name="pdf_commercial_insert" class="oe_inline"/>
+                            </div>
+                            <label for="pdf_commercial_contact"/>
+                            <div name="pdf_commercial_contact">
+                                <field name="pdf_commercial_contact" class="oe_inline"/>
+                            </div>
+                            <label for="pdf_commercial_email"/>
+                            <div name="pdf_commercial_email">
+                                <field name="pdf_commercial_email" class="oe_inline"/>
+                            </div>
+                        </group>
+                        <group col="2" colspan="2" name="customer_insert">
+                            <label for="pdf_customer_insert" string="Customers insert" class="of-printing-parameter-title"/>
+                            <div name="pdf_customer_insert">
+                                <field name="pdf_customer_insert" class="oe_inline"/>
+                            </div>
+                            <label for="pdf_customer_phone"/>
+                            <div name="pdf_customer_phone">
+                                <field name="pdf_customer_phone"/>
+                            </div>
+                            <label for="pdf_customer_mobile"/>
+                            <div name="pdf_customer_mobile">
+                                <field name="pdf_customer_mobile" class="oe_inline"/>
+                            </div>
+                            <label for="pdf_customer_fax"/>
+                            <div name="pdf_customer_fax">
+                                <field name="pdf_customer_fax" class="oe_inline"/>
+                            </div>
+                            <label for="pdf_customer_email"/>
+                            <div name="pdf_customer_email">
+                                <field name="pdf_customer_email" class="oe_inline"/>
+                            </div>
                         </group>
                     </group>
                     <group col="2">
                        <group col="2" colspan="2" name="labels">
-                            <h4 class="of-settings" colspan="2">Labels</h4>
-                            <label for="pdf_masquer_pastille_payment_term"/>
-                            <div name="pdf_masquer_pastille_payment_term">
-                                <field name="pdf_masquer_pastille_payment_term" class="oe_inline"/>
-                                <span>DO NOT display in PDF reports</span>
+                            <h4 class="of-printing-parameter-title" colspan="2">Labels</h4>
+                            <label for="pdf_payment_term_insert"/>
+                            <div name="pdf_payment_term_insert">
+                                <field name="pdf_payment_term_insert" class="oe_inline"/>
                             </div>
-                            <label for="pdf_masquer_pastille_commercial"/>
-                            <div name="pdf_masquer_pastille_commercial">
-                                <field name="pdf_masquer_pastille_commercial" class="oe_inline"/>
-                                <span>DO NOT display in PDF reports</span>
-                            </div>
-                            <label for="pdf_mail_commercial"
-                                attrs="{'invisible': [('pdf_masquer_pastille_commercial', '=', True)]}"/>
-                            <div name="pdf_mail_commercial"
-                                attrs="{'invisible': [('pdf_masquer_pastille_commercial', '=', True)]}">
-                                <field name="pdf_mail_commercial" class="oe_inline"/>
-                                <span>Display the salesperson's email in the PDF report button</span>
-                            </div>
-                            <field name="pdf_vt_pastille"/>
-                            <field name="pdf_date_validite_devis"/>
+                            <field name="group_display_incoterm"/>
+                            <field name="pdf_technical_visit_insert"/>
+                            <field name="pdf_validity_insert"/>
                         </group>
                         <group col="2" colspan="2">
-                            <h4 class="of-settings" colspan="2">Layout category</h4>
-                            <field name="of_color_bg_section" widget="color"/>
-                            <field name="of_color_font" widget="color"/>
+                            <h4 class="of-printing-parameter-title" colspan="2">Section</h4>
+                            <field name="pdf_section_bg_color" widget="color"/>
+                            <field name="pdf_section_font_color" widget="color"/>
                         </group>
                         <group col="2" colspan="2">
-                            <h4 class="of-settings" colspan="2">Order lines</h4>
-                            <field name="pdf_display_product_ref_setting"/>
+                            <h4 class="of-printing-parameter-title" colspan="2">Order lines</h4>
+                            <field name="pdf_product_reference"/>
                         </group>
                         <group col="2" colspan="2">
-                            <label for="pdf_afficher_multi_echeances" string="Payment schedule" class="of-settings"/>
-                            <div name="pdf_afficher_multi_echeances">
-                                <field name="pdf_afficher_multi_echeances" class="oe_inline"/>
+                            <label for="pdf_payment_schedule" string="Payment schedule" class="of-printing-parameter-title"/>
+                            <div name="pdf_payment_schedule">
+                                <field name="pdf_payment_schedule" class="oe_inline"/>
                             </div>
                         </group>
                         <group col="2" colspan="2">
-                            <label for="of_pdf_taxes_display" string="Tax detail" class="of-settings"/>
-                            <div name="of_pdf_taxes_display">
-                                <field name="of_pdf_taxes_display" class="oe_inline"/>
+                            <label for="pdf_taxes_detail" class="of-printing-parameter-title"/>
+                            <div name="pdf_taxes_detail">
+                                <field name="pdf_taxes_detail" class="oe_inline"/>
                             </div>
                         </group>
                     </group>

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-26 14:02+0000\n"
-"PO-Revision-Date: 2022-07-26 14:02+0000\n"
+"POT-Creation-Date: 2022-10-14 11:25+0000\n"
+"PO-Revision-Date: 2022-10-14 11:25+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,29 +16,20 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_sale_order_dates
-#: model:ir.model.fields,field_description:of_sale_order_dates.field_of_sale_wizard_set_printing_params_of_pdf_display_requested_week
-msgid "(OF) Afficher pastille 'Semaine demandée'"
-msgstr "(OF) Afficher pastille 'Semaine demandée'"
-
-#. module: of_sale_order_dates
-#: model:ir.ui.view,arch_db:of_sale_order_dates.wizard_sales_set_printing_params_view_form
-msgid "(OF) Semaine demandée"
-msgstr "(OF) Semaine demandée"
-
-#. module: of_sale_order_dates
-#: model:ir.ui.view,arch_db:of_sale_order_dates.wizard_sales_set_printing_params_view_form
-msgid "<span>Afficher la semaine demandée dans les rapports PDF</span>"
-msgstr "<span>Afficher la semaine demandée dans les rapports PDF</span>"
-
-#. module: of_sale_order_dates
 #: model:ir.ui.view,arch_db:of_sale_order_dates.of_sale_order_dates_report_saleorder_document
 msgid "<strong>Semaine demandée&amp;nbsp;:</strong>"
 msgstr "<strong>Semaine demandée&amp;nbsp;:</strong>"
 
 #. module: of_sale_order_dates
-#: model:ir.model.fields,help:of_sale_order_dates.field_of_sale_wizard_set_printing_params_of_pdf_display_requested_week
-msgid "Afficher la pastille 'Semaine demandée' dans les rapports PDF ?"
-msgstr "Afficher la pastille 'Semaine demandée' dans les rapports PDF ?"
+#: model:ir.model.fields,help:of_sale_order_dates.field_of_sale_wizard_set_printing_params_pdf_requested_week
+msgid "If checked, displays the requested week under the payment terms."
+msgstr "Si coché, affiche la semaine demandée sous les conditions de paiement."
+
+#. module: of_sale_order_dates
+#: model:ir.model.fields,field_description:of_sale_order_dates.field_of_sale_wizard_set_printing_params_pdf_requested_week
+#: model:ir.ui.view,arch_db:of_sale_order_dates.wizard_sales_set_printing_params_view_form
+msgid "Requested week"
+msgstr "Semaine demandée"
 
 #. module: of_sale_order_dates
 #: model:ir.model,name:of_sale_order_dates.model_sale_order
@@ -61,8 +52,3 @@ msgstr "Semaine demandée"
 #: model:ir.model,name:of_sale_order_dates.model_of_sale_wizard_set_printing_params
 msgid "of.sale.wizard.set.printing.params"
 msgstr "of.sale.wizard.set.printing.params"
-
-#. module: of_sale_order_dates
-#: model:ir.model,name:of_sale_order_dates.model_sale_config_settings
-msgid "sale.config.settings"
-msgstr "sale.config.settings"
