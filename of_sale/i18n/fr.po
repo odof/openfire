@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-26 13:45+0000\n"
-"PO-Revision-Date: 2022-07-26 13:45+0000\n"
+"POT-Creation-Date: 2022-10-17 10:11+0000\n"
+"PO-Revision-Date: 2022-10-17 10:11+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -47,19 +47,9 @@ msgid "(OF) Afficher les sous-totaux TTC par ligne de commande"
 msgstr "(OF) Afficher les sous-totaux TTC par ligne de commande"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_of_color_bg_section
-msgid "(OF) Background color"
-msgstr "(OF) Couleur fond"
-
-#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_of_deposit_product_categ_id_setting
 msgid "(OF) Catégorie des acomptes"
 msgstr "(OF) Catégorie des acomptes"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_adresse_nom_parent
-msgid "(OF) Contact parent name"
-msgstr "(OF) Nom parent contact"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_of_sale_order_margin_control
@@ -77,19 +67,9 @@ msgid "(OF) Couleur police titre section"
 msgstr "(OF) Couleur police titre section"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_vt_pastille
-msgid "(OF) Date VT badge"
-msgstr "(OF) Date VT dans la pastille"
-
-#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_account_config_settings_pdf_vt_pastille
 msgid "(OF) Date VT pastille"
 msgstr "(OF) Date VT pastille"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_hide_global_address_label
-msgid "(OF) Description of the delivery and invoicing address"
-msgstr "(OF) Libellé adresse de livraison et facturation"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_of_allow_quote_addition
@@ -97,39 +77,9 @@ msgid "(OF) Devis complémentaires"
 msgstr "(OF) Devis complémentaires"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_adresse_email
-msgid "(OF) E-mail"
-msgstr "(OF) E-mail"
-
-#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_of_invoice_grouped
 msgid "(OF) Facturation groupée"
 msgstr "(OF) Facturation groupée"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_adresse_fax
-msgid "(OF) Fax"
-msgstr "(OF) Fax"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_of_color_font
-msgid "(OF) Font color"
-msgstr "(OF) Couleur police"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_masquer_pastille_commercial
-msgid "(OF) Hide commercial badge"
-msgstr "(OF) Masquer pastille commercial"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_masquer_pastille_payment_term
-msgid "(OF) Hide payment terms badge"
-msgstr "(OF) Masquer la pastille conditions de règlement"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_adresse_mobile
-msgid "(OF) Mobile"
-msgstr "(OF) Mobile"
 
 #. module: of_sale
 #: model:res.groups,name:of_sale.group_of_can_modify_sale_purchase_price
@@ -140,11 +90,6 @@ msgstr "(OF) Modifier le coût dans les lignes de commande"
 #: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_group_of_sale_multiimage
 msgid "(OF) Multi Images"
 msgstr "(OF) Images multiples dans l’article"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_afficher_multi_echeances
-msgid "(OF) Multi-maturities"
-msgstr "(OF) Multi-échéances"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_group_of_order_line_option
@@ -167,44 +112,14 @@ msgid "(OF) Print product images on Sale Order"
 msgstr "(OF) Impression images de l’article"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_display_product_ref_setting
-msgid "(OF) Products Ref."
-msgstr "(OF) Réf. produits"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_date_validite_devis
-msgid "(OF) Quote validity date"
-msgstr "(OF) Date validité devis"
-
-#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_of_recalcul_date_confirmation
 msgid "(OF) Recalcul de la date de confirmation"
 msgstr "(OF) Recalcul de la date de confirmation"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_mail_commercial
-msgid "(OF) Sales email"
-msgstr "(OF) Email commercial"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_of_pdf_taxes_display
-msgid "(OF) Tax details"
-msgstr "(OF) Détails des taxes"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_adresse_telephone
-msgid "(OF) Telephone"
-msgstr "(OF) Téléphone"
-
-#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_of_propagate_payment_term
 msgid "(OF) Terms of payment"
 msgstr "(OF) Conditions de réglement"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_adresse_civilite
-msgid "(OF) Titles"
-msgstr "(OF) Civilités"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_account_config_settings_of_validate_pickings
@@ -267,16 +182,6 @@ msgstr "<span>Afficher la date de visite technique dans une pastille d'informati
 #: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
 msgid "<span>Allow additional quotes to be added to sale orders</span>"
 msgstr "<span>Autoriser l'ajout de devis complémentaire aux bons de commandes</span>"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.wizard_sales_set_printing_params_view_form
-msgid "<span>DO NOT display in PDF reports</span>"
-msgstr "<span>NE PAS afficher dans les rapports PDF</span>"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.wizard_sales_set_printing_params_view_form
-msgid "<span>Display the salesperson's email in the PDF report button</span>"
-msgstr "<span>Afficher l'email du commercial dans la pastille des rapports PDF</span>"
 
 #. module: of_sale
 #: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
@@ -369,8 +274,13 @@ msgstr "Addable quote ids"
 
 #. module: of_sale
 #: model:ir.ui.view,arch_db:of_sale.wizard_sales_set_printing_params_view_form
-msgid "Address"
-msgstr "Adresse"
+msgid "Address insert"
+msgstr "Encart adresse"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_address_title
+msgid "Address title"
+msgstr "Libellé adresse"
 
 #. module: of_sale
 #: model:ir.model.fields,help:of_sale.field_of_sale_order_gestion_prix_afficher_remise
@@ -513,6 +423,16 @@ msgid "Avertissement ventes"
 msgstr "Avertissement ventes"
 
 #. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_section_bg_color
+msgid "Background color"
+msgstr "Couleur fond"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_section_bg_color
+msgid "Background color of the section headings. Default is white."
+msgstr "Couleur de fond des titres de section. La valeur par défaut est le blanc."
+
+#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_order_id
 msgid "Bon de commande"
 msgstr "Bon de commande"
@@ -573,16 +493,6 @@ msgid "Choisissez une couleur pour les titres de section"
 msgstr "Choisissez une couleur pour les titres de section"
 
 #. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_of_color_bg_section
-msgid "Choose a background color for the section titles"
-msgstr "Choisissez un couleur de fond pour les titres de section"
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_of_color_font
-msgid "Choose a color for the section headings"
-msgstr "Choisissez un couleur pour les titres de section"
-
-#. module: of_sale
 #: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
 msgid "Client"
 msgstr "Client"
@@ -592,6 +502,11 @@ msgstr "Client"
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification_order_id
 msgid "Commande"
 msgstr "Commande"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_commercial_insert
+msgid "Commercial insert"
+msgstr "Pastille commercial"
 
 #. module: of_sale
 #: model:ir.model,name:of_sale.model_res_company
@@ -614,6 +529,21 @@ msgstr "Confirmer la vente"
 #: model:ir.ui.view,arch_db:of_sale.of_view_sale_order_gestion_prix
 msgid "Confirmez-vous l'application des nouveaux prix calculés au devis/bon de commande (non réversible) ?"
 msgstr "Confirmez-vous l'application des nouveaux prix calculés au devis/bon de commande (non réversible) ?"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_commercial_contact
+msgid "Contact"
+msgstr "Contact"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_address_contact_name
+msgid "Contact's name"
+msgstr "Nom du contact"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_address_contact_parent_name
+msgid "Contact's parent name"
+msgstr "Nom du contact parent"
 
 #. module: of_sale
 #: selection:of.sale.order.verification,type:0
@@ -679,6 +609,12 @@ msgid "Currency"
 msgstr "Devise"
 
 #. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_insert
+#: model:ir.ui.view,arch_db:of_sale.wizard_sales_set_printing_params_view_form
+msgid "Customers insert"
+msgstr "Pastille clients"
+
+#. module: of_sale
 #: selection:res.company,afficher_descr_fab:0
 msgid "Dans les devis"
 msgstr "Dans les devis"
@@ -738,6 +674,11 @@ msgstr "Date de pose prévisionnelle"
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_date_tarif
 msgid "Date du tarif"
 msgstr "Date du tarif"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_technical_visit_insert
+msgid "Date of technical visit"
+msgstr "Date de visite technique"
 
 #. module: of_sale
 #: model:ir.model.fields,help:of_sale.field_sale_order_line_confirmation_date_order
@@ -801,45 +742,6 @@ msgid "Display Name"
 msgstr "Nom affiché"
 
 #. module: of_sale
-#: selection:of.sale.wizard.set.printing.params,pdf_adresse_email:0
-#: selection:of.sale.wizard.set.printing.params,pdf_adresse_fax:0
-#: selection:of.sale.wizard.set.printing.params,pdf_adresse_mobile:0
-#: selection:of.sale.wizard.set.printing.params,pdf_adresse_telephone:0
-msgid "Display in an additional information badge"
-msgstr "Afficher dans une pastille d'informations complémentaires"
-
-#. module: of_sale
-#: selection:of.sale.wizard.set.printing.params,pdf_adresse_email:0
-#: selection:of.sale.wizard.set.printing.params,pdf_adresse_fax:0
-#: selection:of.sale.wizard.set.printing.params,pdf_adresse_mobile:0
-#: selection:of.sale.wizard.set.printing.params,pdf_adresse_telephone:0
-msgid "Display in the main address insert"
-msgstr "Afficher dans l'encart d'adresse principal"
-
-#. module: of_sale
-#: selection:of.sale.wizard.set.printing.params,pdf_adresse_email:0
-#: selection:of.sale.wizard.set.printing.params,pdf_adresse_fax:0
-#: selection:of.sale.wizard.set.printing.params,pdf_adresse_mobile:0
-#: selection:of.sale.wizard.set.printing.params,pdf_adresse_telephone:0
-msgid "Display in the main address insert and in an additional information badge"
-msgstr "Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires"
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_mail_commercial
-msgid "Display the email in the commercial button of the PDF reports ?"
-msgstr "Afficher l'email dans la pastille commercial des rapports PDF ?"
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_vt_pastille
-msgid "Display the technical visit date in a badge in the PDF quotes report ?"
-msgstr "Afficher la date de visite technique dans une pastille dans le rapport PDF des devis ?"
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_adresse_civilite
-msgid "Display titles in PDF reports ?"
-msgstr "Afficher la civilité dans les rapport PDF ?"
-
-#. module: of_sale
 #: selection:sale.config.settings,group_of_sale_print_attachment:0
 #: selection:sale.config.settings,of_sale_print_multiimage_level:0
 msgid "Do not print"
@@ -879,6 +781,13 @@ msgid "Confirmer la vente"
 msgstr "Confirmer la vente"
 
 #. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_address_contact_email
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_commercial_email
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_email
+msgid "Email"
+msgstr "Email"
+
+#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_of_to_invoice
 msgid "Entièrement facturable"
 msgstr "Entièrement facturable"
@@ -899,6 +808,12 @@ msgid "Exclus"
 msgstr "Exclus"
 
 #. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_address_contact_fax
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_fax
+msgid "Fax"
+msgstr "Fax"
+
+#. module: of_sale
 #: model:ir.actions.report.xml,name:of_sale.of_report_sale_order_gestion_prix
 msgid "Feuille de marge"
 msgstr "Feuille de marge"
@@ -907,6 +822,16 @@ msgstr "Feuille de marge"
 #: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
 msgid "Fonctionnalities"
 msgstr "Fonctionnalités"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_section_font_color
+msgid "Font color"
+msgstr "Couleur police"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_section_font_color
+msgid "Font color of the section headings. Default is black."
+msgstr "Couleur de la police des titres de section. La valeur par défaut est le noir."
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_of_force_invoice_status
@@ -940,6 +865,11 @@ msgid "Gives the sequence order when displaying a list of payment term lines."
 msgstr "Donne l'ordre lors de l'affichage des lignes des conditions de paiement."
 
 #. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_group_display_incoterm
+msgid "Incoterms"
+msgstr "Incoterms"
+
+#. module: of_sale
 #: selection:sale.config.settings,of_invoice_grouped:0
 msgid "Groupement par commande"
 msgstr "Groupement par commande"
@@ -960,21 +890,6 @@ msgid "HT"
 msgstr "HT"
 
 #. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_masquer_pastille_payment_term
-msgid "Hide payment terms badge in PDF reports ?"
-msgstr "Masquer la pastille conditions de règlement dans les rapports PDF ?"
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_hide_global_address_label
-msgid "Hide the \"Delivery and billing address\" label in the PDF quote report ?"
-msgstr "Masquer le libellé \"Adresse de livraison et de facturation\" dans le rapport PDF des devis ?"
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_masquer_pastille_commercial
-msgid "Hide the sales badge in PDF reports ?"
-msgstr "Masquer la pastille commercial dans les rapports PDF ?"
-
-#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_documents_joints_id
 #: model:ir.model.fields,field_description:of_sale.field_of_order_line_option_id
 #: model:ir.model.fields,field_description:of_sale.field_of_product_image_id
@@ -987,6 +902,121 @@ msgstr "Masquer la pastille commercial dans les rapports PDF ?"
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_id
 msgid "ID"
 msgstr "ID"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_payment_schedule
+msgid "If checked, displays the Payment schedule in the report"
+msgstr "Si coché, affiche l'échéancier de paiement dans le rapport"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_commercial_insert
+msgid "If checked, displays the commercial insert"
+msgstr "Si coché, affiche l'encart commercial"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_commercial_contact
+msgid "If checked, displays the contact in the commercial insert"
+msgstr "Si coché, affiche le contact dans la pastille commercial"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_address_contact_fax
+msgid "If checked, displays the contact's fax in the address insert"
+msgstr "Si coché, affiche le fax du contact dans l'encart adresse"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_address_contact_email
+msgid "If checked, displays the contact's mail in the address insert"
+msgstr "Si coché, affiche l'email du contact dans l'encart adresse"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_address_contact_mobile
+msgid "If checked, displays the contact's mobile in the address insert"
+msgstr "Si coché, affiche le mobile du contact dans l'encart adresse"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_address_contact_name
+msgid "If checked, displays the contact's name in the address insert"
+msgstr "Si coché, affiche le nom du contact dans l'encart adresse"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_address_contact_parent_name
+msgid "If checked, displays the contact's parent name in the address insert"
+msgstr "Si coché, affiche le nom du parent du contact dans l'encart adresse"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_address_contact_phone
+msgid "If checked, displays the contact's phone in the address insert"
+msgstr "Si coché, affiche le téléphone du contact dans l'encart adresse"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_email
+msgid "If checked, displays the customer's email in the customers insert"
+msgstr "Si coché, affiche l'email du client dans la pastille clients"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_fax
+msgid "If checked, displays the customer's fax in the customers insert"
+msgstr "Si coché, affiche le fax du client dans la pastille clients"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_mobile
+msgid "If checked, displays the customer's mobile in the customers insert"
+msgstr "Si coché, affiche le mobile du client dans la pastille clients"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_phone
+msgid "If checked, displays the customer's phone in the customers insert"
+msgstr "Si coché, affiche le téléphone du client dans la pastille clients"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_insert
+msgid "If checked, displays the customers insert"
+msgstr "Si coché, affiche la pastille clients"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_commercial_email
+msgid "If checked, displays the email in the commercial insert"
+msgstr "Si coché, affiche l'email dans la pastille commercial"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_address_title
+msgid "If checked, displays the label \"Delivery and billing address\""
+msgstr "Si coché, affiche le titre \"Adresse de livraison et de facturation\""
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_payment_term_insert
+msgid "If checked, displays the payment terms in the inserts"
+msgstr "Si coché, affiche les conditions de règlement dans les pastilles"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_product_reference
+msgid "If checked, displays the product reference in the order lines on the report"
+msgstr "Si coché, affiche la référence du produit dans les lignes de commande du rapport"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_taxes_detail
+msgid "If checked, displays the taxes detail in the report"
+msgstr "Si coché, affiche le détail des taxes dans le rapport"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_technical_visit_insert
+msgid "If checked, displays the technical visit date in the inserts"
+msgstr "Si coché, affiche la date de la visite technique dans les encarts"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_address_contact_titles
+msgid "If checked, displays the titles in the address insert"
+msgstr "Si coché, affiche les civilités dans l'encart d'adresse"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_validity_insert
+msgid "If checked, displays the validity date in the inserts"
+msgstr "Si coché, affiche la date de validité dans les encarts"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_group_display_incoterm
+msgid "If checked, the printed reports will display the incoterms for the sales orders and the related invoices"
+msgstr "Si coché, les rapports imprimés afficheront les incoterms pour les bons de commande et les factures liées"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_product_image_image
@@ -1117,11 +1147,6 @@ msgid "Last Updated on"
 msgstr "Dernière mise à jour le"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.wizard_sales_set_printing_params_view_form
-msgid "Layout category"
-msgstr "Section"
-
-#. module: of_sale
 #: model:ir.ui.view,arch_db:of_sale.of_account_invoice_view_form
 msgid "Le total du montant des factures d'acompte est différent de celui des paiements.<br/>\n"
 "                    Vérifier que les factures d'acompte ont bien été payées."
@@ -1222,6 +1247,12 @@ msgstr "Marge&amp;nbsp;%"
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification_message
 msgid "Message"
 msgstr "Message"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_address_contact_mobile
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_mobile
+msgid "Mobile"
+msgstr "Mobile"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_methode_remise
@@ -1431,9 +1462,15 @@ msgid "Payment Term Line"
 msgstr "Ligne de conditions de paiement"
 
 #. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_payment_schedule
 #: model:ir.ui.view,arch_db:of_sale.wizard_sales_set_printing_params_view_form
 msgid "Payment schedule"
 msgstr "Échéancier"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_payment_term_insert
+msgid "Payment terms"
+msgstr "Condition de règlement"
 
 #. module: of_sale
 #: model:ir.model.fields,help:of_sale.field_sale_order_of_force_invoice_status
@@ -1446,6 +1483,12 @@ msgstr "Permet de forcer l'état de facturation de la commande.\n"
 #: model:res.groups,comment:of_sale.group_of_order_line_option
 msgid "Permet l'activation des options de ligne de commande"
 msgstr "Permet l'activation des options de ligne de commande"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_address_contact_phone
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_phone
+msgid "Phone"
+msgstr "Téléphone"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_res_partner_of_invoice_policy
@@ -1622,6 +1665,11 @@ msgid "Product configuration"
 msgstr "Configuration d'article"
 
 #. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_product_reference
+msgid "Product reference"
+msgstr "Référence produit"
+
+#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_cost_prorata
 msgid "Prorata"
 msgstr "Prorata"
@@ -1772,6 +1820,7 @@ msgstr "Secteurs"
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_product_product_of_layout_category_id
 #: model:ir.model.fields,field_description:of_sale.field_product_template_of_layout_category_id
+#: model:ir.ui.view,arch_db:of_sale.wizard_sales_set_printing_params_view_form
 msgid "Section"
 msgstr "Section"
 
@@ -1789,31 +1838,6 @@ msgstr "Séquence"
 #: selection:sale.config.settings,group_of_sale_multiimage:0
 msgid "Several images per product"
 msgstr "Nombreuses images par article"
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_adresse_nom_parent
-msgid "Show contact 'parent' name instead of contact name in PDF reports ?"
-msgstr "Afficher le nom du 'parent' du contact au lieu du nom du contact dans les rapport PDF ?"
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_afficher_multi_echeances
-msgid "Show multiple due dates in PDF reports ?"
-msgstr "Afficher les échéances multiples dans les rapports PDF ?"
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_display_product_ref_setting
-msgid "Show product references in PDF reports ?"
-msgstr "Afficher les références produits dans les rapports PDF ?"
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_of_pdf_taxes_display
-msgid "Show tax detail table in PDF reports"
-msgstr "Afficher le tableau de détail des taxes dans les rapports PDF"
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_date_validite_devis
-msgid "Show the validity date in the PDF quote report ?"
-msgstr "Afficher la date de validité dans le rapport PDF des devis ?"
 
 #. module: of_sale
 #: model:ir.model.fields,help:of_sale.field_sale_config_settings_of_propagate_payment_term
@@ -1861,8 +1885,8 @@ msgid "Taux de marge en % minimum recommandé quand l'article principal d'un dev
 msgstr "Taux de marge en % minimum recommandé quand l'article principal d'un devis fait partie de la catégorie."
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.wizard_sales_set_printing_params_view_form
-msgid "Tax detail"
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_taxes_detail
+msgid "Taxes detail"
 msgstr "Détail des taxes"
 
 #. module: of_sale
@@ -1871,10 +1895,15 @@ msgid "Taxes et facturation"
 msgstr "Taxes et facturation"
 
 #. module: of_sale
-#: code:addons/of_sale/models/sale_config_settings.py:223
+#: code:addons/of_sale/models/sale_config_settings.py:145
 #, python-format
 msgid "This setting can only be enabled by the administrator, please contact support to enable this option."
 msgstr "Ce paramètre ne peut être activé que par l'administrateur, veuillez contacter le support pour activer cette option."
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_address_contact_titles
+msgid "Titles"
+msgstr "Civilités"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_of_specific_title
@@ -1897,7 +1926,7 @@ msgid "Total HT simulé"
 msgstr "Total HT simulé"
 
 #. module: of_sale
-#: code:addons/of_sale/models/of_sale.py:613
+#: code:addons/of_sale/models/of_sale.py:643
 #, python-format
 msgid "Total TTC"
 msgstr "Total TTC"
@@ -2001,6 +2030,11 @@ msgid "Valider les BL au moment de la validation de la facture"
 msgstr "Valider les BL au moment de la validation de la facture"
 
 #. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_validity_insert
+msgid "Validity date"
+msgstr "Date de validité"
+
+#. module: of_sale
 #: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
 msgid "Vente"
 msgstr "Vente"
@@ -2032,26 +2066,6 @@ msgstr "Vous devez d'abord configurer un article d'acompte"
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_of_client_view
 msgid "Vue client/vendeur"
 msgstr "Vue client/vendeur"
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_adresse_email
-msgid "Where to display the email address in PDF reports? Do not put anything so as not to display."
-msgstr "Où afficher l'adresse email dans les rapports PDF ? Ne rien mettre pour ne pas afficher."
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_adresse_fax
-msgid "Where to display the fax number in PDF reports? Do not put anything so as not to display."
-msgstr "Où afficher le fax dans les rapports PDF ? Ne rien mettre pour ne pas afficher."
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_adresse_mobile
-msgid "Where to display the mobile phone number in PDF reports? Do not put anything so as not to display."
-msgstr "Où afficher le numéro de téléphone mobile dans les rapports PDF ? Ne rien mettre pour ne pas afficher."
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_adresse_telephone
-msgid "Where to display the phone number in PDF reports ? Do not put anything so as not to display."
-msgstr "Où afficher le numéro de téléphone dans les rapports PDF ? Ne rien mettre pour ne pas afficher."
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_wizard_id

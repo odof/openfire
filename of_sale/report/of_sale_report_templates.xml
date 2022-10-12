@@ -3,17 +3,27 @@
 <template id="sale.report_saleorder_document">
     <t t-call="report.external_layout">
         <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)" />
-        <t t-set="pdf_telephone" t-value="doc.pdf_afficher_telephone()"/>
-        <t t-set="pdf_mobile" t-value="doc.pdf_afficher_mobile()"/>
-        <t t-set="pdf_fax" t-value="doc.pdf_afficher_fax()"/>
-        <t t-set="pdf_email" t-value="doc.pdf_afficher_email()"/>
-        <t t-set="pdf_vt_pastille" t-value="doc.pdf_vt_pastille()"/>
-        <t t-set="pdf_masquer_commercial" t-value="doc.pdf_masquer_commercial()"/>
-        <t t-set="pdf_mail_commercial" t-value="doc.pdf_mail_commercial()"/>
-        <t t-set="pdf_masquer_payment_term" t-value="doc.pdf_masquer_payment_term()"/>
-        <t t-set="client_info_pastille" t-value="(pdf_telephone &gt; 1 and doc.partner_id.phone) or (pdf_mobile &gt; 1 and doc.partner_id.mobile) or (pdf_fax &gt; 1 and doc.partner_id.fax) or (pdf_email &gt; 1 and doc.partner_id.email)"/>
-        <t t-set="pdf_hide_global_address_label" t-value="doc.pdf_hide_global_address_label()"/>
-        <t t-set="pdf_taxes_display" t-value="doc.pdf_of_pdf_taxes_display()"/>
+        <t t-set="pdf_commercial_contact" t-value="doc.pdf_commercial_contact()"/>
+        <t t-set="pdf_commercial_email" t-value="doc.pdf_commercial_email()"/>
+        <t t-set="pdf_commercial_insert" t-value="doc.pdf_commercial_insert() and (pdf_commercial_contact or pdf_commercial_email)"/>
+        <t t-set="pdf_address_contact_parent_name" t-value="doc.pdf_address_contact_parent_name()"/>
+        <t t-set="pdf_address_contact_titles" t-value="doc.pdf_address_contact_titles()"/>
+        <t t-set="pdf_address_contact_name" t-value="doc.pdf_address_contact_name()"/>
+        <t t-set="pdf_address_title" t-value="doc.pdf_address_title()"/>
+        <t t-set="pdf_address_contact_phone" t-value="doc.pdf_address_contact_phone()"/>
+        <t t-set="pdf_address_contact_mobile" t-value="doc.pdf_address_contact_mobile()"/>
+        <t t-set="pdf_address_contact_fax" t-value="doc.pdf_address_contact_fax()"/>
+        <t t-set="pdf_address_contact_email" t-value="doc.pdf_address_contact_email()"/>
+        <t t-set="pdf_customer_phone" t-value="doc.pdf_customer_phone()"/>
+        <t t-set="pdf_customer_mobile" t-value="doc.pdf_customer_mobile()"/>
+        <t t-set="pdf_customer_fax" t-value="doc.pdf_customer_fax()"/>
+        <t t-set="pdf_customer_email" t-value="doc.pdf_customer_email()"/>
+        <t t-set="pdf_taxes_detail" t-value="doc.pdf_taxes_detail()"/>
+        <t t-set="pdf_customer_insert" t-value="doc.pdf_customer_insert() and (pdf_customer_phone or pdf_customer_mobile or pdf_customer_fax or pdf_customer_email)"/>
+        <t t-set="pdf_payment_term_insert" t-value="doc.pdf_payment_term_insert()"/>
+        <t t-set="pdf_technical_visit_insert" t-value="doc.pdf_technical_visit_insert()"/>
+        <t t-set="pdf_validity_insert" t-value="doc.pdf_validity_insert()"/>
+        <t t-set="pdf_payment_schedule" t-value="doc.pdf_payment_schedule()"/>
         <!--####################
             La vue d'origine est entièrement réécrite ici.
             ####################-->
@@ -23,36 +33,41 @@
                 <div class="col-xs-6">
                     <div name="adresse_livraison" t-if="doc.partner_shipping_id != doc.partner_invoice_id">
                         <strong name="libelle_adr_livraison">Adresse de livraison&amp;nbsp;:</strong><br/>
-                        <t t-set="the_shipping_address" t-value="doc.partner_shipping_id"/>
-                        <t t-if="doc.pdf_afficher_nom_parent()">
-                            <t t-if="the_shipping_address.parent_id"><t t-set="the_shipping_address" t-value="the_shipping_address.parent_id"/></t>
+                        <t t-if="pdf_address_contact_parent_name and doc.partner_shipping_id.parent_id">
+                            <span t-if="pdf_address_contact_titles and doc.partner_shipping_id.parent_id.title" t-field="doc.partner_shipping_id.parent_id.title"/>
+                            <span t-field="doc.partner_shipping_id.parent_id.name"/>
                         </t>
-                        <t t-if="the_shipping_address.title and doc.pdf_afficher_civilite()"><span t-field="the_shipping_address.title"/></t>
-                        <t t-if="the_shipping_address.name"><span t-field="the_shipping_address.name"/></t>
-                        <t t-if="not the_shipping_address.name and the_shipping_address.parent_id"><span t-field="the_shipping_address.parent_id.name"/></t>
+                        <span t-if="pdf_address_contact_titles and doc.partner_shipping_id.title" t-field="doc.partner_shipping_id.title"/>
+                        <t t-if="pdf_address_contact_name">
+                            <span t-if="not doc.partner_shipping_id.name and doc.partner_shipping_id.parent_id" t-field="doc.partner_shipping_id.parent_id.name"/>
+                            <span t-if="doc.partner_shipping_id.name" t-field="doc.partner_shipping_id.name"/>
+                        </t>
                         <div t-field="doc.partner_shipping_id" t-field-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;], &quot;no_marker&quot;: true}"/>
-                        <t t-if="doc.partner_shipping_id.phone and pdf_telephone % 2 == 1">Tél. <span t-field="doc.partner_shipping_id.phone"/><br/></t>
-                        <t t-if="doc.partner_shipping_id.mobile and pdf_mobile % 2 == 1">Tél. <span t-field="doc.partner_shipping_id.mobile"/><br/></t>
-                        <t t-if="doc.partner_shipping_id.fax and pdf_fax % 2 == 1">Fax <span t-field="doc.partner_shipping_id.fax"/><br/></t>
-                        <t t-if="doc.partner_shipping_id.email and pdf_email % 2 == 1"><span t-field="doc.partner_shipping_id.email"/><br/></t>
+                        <t t-if="doc.partner_shipping_id.phone and pdf_address_contact_phone">Tél. <span t-field="doc.partner_shipping_id.phone"/><br/></t>
+                        <t t-if="doc.partner_shipping_id.mobile and pdf_address_contact_mobile">Tél. <span t-field="doc.partner_shipping_id.mobile"/><br/></t>
+                        <t t-if="doc.partner_shipping_id.fax and pdf_address_contact_fax">Fax <span t-field="doc.partner_shipping_id.fax"/><br/></t>
+                        <t t-if="doc.partner_shipping_id.email and pdf_address_contact_email"><span t-field="doc.partner_shipping_id.email"/><br/></t>
                         <p t-if="doc.partner_id.vat">VAT: <span t-field="doc.partner_id.vat"/></p>
                     </div>
                 </div>
                 <div name="adresse_facturation" class="col-xs-5 col-xs-offset-1" style="font-size: large">
-                    <strong name="libelle_adr_fact_livraison" t-if="doc.partner_shipping_id == doc.partner_invoice_id and not pdf_hide_global_address_label">Adresse de livraison et de facturation&amp;nbsp;:</strong>
+                    <strong name="libelle_adr_fact_livraison" t-if="pdf_address_title and doc.partner_shipping_id == doc.partner_invoice_id">Adresse de livraison et de facturation&amp;nbsp;:</strong>
                     <strong name="libelle_adr_facturation" t-if="doc.partner_shipping_id != doc.partner_invoice_id">Adresse de facturation&amp;nbsp;:</strong><br/>
-                    <t t-set="the_address" t-value="doc.partner_invoice_id"/>
-                    <t t-if="doc.pdf_afficher_nom_parent()">
-                        <t t-if="the_address.parent_id"><t t-set="the_address" t-value="the_address.parent_id"/></t>
+                    <t t-set="main_address" t-value="doc.partner_invoice_id"/>
+                    <t t-if="pdf_address_contact_parent_name and main_address.parent_id">
+                        <span t-if="pdf_address_contact_titles and main_address.parent_id.title" t-field="main_address.parent_id.title"/>
+                        <span t-field="main_address.parent_id.name"/>
                     </t>
-                    <t t-if="the_address.title and doc.pdf_afficher_civilite()"><span t-field="the_address.title"/></t>
-                    <t t-if="the_address.name"><span t-field="the_address.name"/></t>
-                    <t t-if="not the_address.name and the_address.parent_id"><span t-field="the_address.parent_id.name"/></t>
+                    <span t-if="pdf_address_contact_titles and main_address.title" t-field="main_address.title"/>
+                    <t t-if="pdf_address_contact_name">
+                        <span t-if="not main_address.name and main_address.parent_id" t-field="main_address.parent_id.name"/>
+                        <span t-if="main_address.name" t-field="main_address.name"/>
+                    </t>
                     <div t-field="doc.partner_invoice_id" t-field-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;], &quot;no_marker&quot;: true}"/>
-                    <t t-if="doc.partner_invoice_id.phone and pdf_telephone % 2 == 1">Tél. <span t-field="doc.partner_invoice_id.phone"/><br/></t>
-                    <t t-if="doc.partner_invoice_id.mobile and pdf_mobile % 2 == 1">Tél. <span t-field="doc.partner_invoice_id.mobile"/><br/></t>
-                    <t t-if="doc.partner_invoice_id.fax and pdf_fax % 2 == 1">Fax <span t-field="doc.partner_invoice_id.fax"/><br/></t>
-                    <t t-if="doc.partner_invoice_id.email and pdf_email % 2 == 1"><span t-field="doc.partner_invoice_id.email"/><br/></t>
+                    <t t-if="doc.partner_invoice_id.phone and pdf_address_contact_phone">Tél. <span t-field="doc.partner_invoice_id.phone"/><br/></t>
+                    <t t-if="doc.partner_invoice_id.mobile and pdf_address_contact_mobile">Tél. <span t-field="doc.partner_invoice_id.mobile"/><br/></t>
+                    <t t-if="doc.partner_invoice_id.fax and pdf_address_contact_fax">Fax <span t-field="doc.partner_invoice_id.fax"/><br/></t>
+                    <t t-if="doc.partner_invoice_id.email and pdf_address_contact_email"><span t-field="doc.partner_invoice_id.email"/><br/></t>
                     <p t-if="doc.partner_id.vat">TVA: <span t-field="doc.partner_id.vat"/></p>
                 </div>
             </div>
@@ -73,48 +88,48 @@
                         </div>
                         <div t-if="doc.client_order_ref" style="display: table-cell; width: 4px"/>
 
-                        <div name="commercial" t-if="doc.user_id and not pdf_masquer_commercial" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                        <div name="commercial" t-if="doc.user_id and pdf_commercial_insert" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                             <strong>Commercial(e)&amp;nbsp;:</strong>
                             <p>
-                                <t t-if="doc.user_id.name"><span t-field="doc.user_id.name"/><br/></t>
+                                <t t-if="pdf_commercial_contact and doc.user_id.name"><span t-field="doc.user_id.name"/><br/></t>
                                 <t t-if="doc.user_id.phone"><span t-field="doc.user_id.phone"/><br/></t>
                                 <t t-if="doc.user_id.mobile"><span t-field="doc.user_id.mobile"/><br/></t>
                                 <t t-if="doc.user_id.fax">Fax. <span t-field="doc.user_id.fax"/><br/></t>
-                                <t t-if="doc.user_id.email and pdf_mail_commercial"><span t-field="doc.user_id.email"/><br/></t>
+                                <t t-if="pdf_commercial_email and doc.user_id.email"><span t-field="doc.user_id.email"/><br/></t>
                             </p>
                         </div>
                         <div t-if="doc.user_id" style="display: table-cell; width: 4px;"/>
 
-                        <div name="client" t-if="client_info_pastille" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                        <div name="client" t-if="pdf_customer_insert" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                             <strong>Client(e)&amp;nbsp;:</strong>
                             <p>
-                                <t t-if="pdf_telephone &gt; 1 and doc.partner_id.phone"><span t-field="doc.partner_id.phone"/><br/></t>
-                                <t t-if="pdf_mobile &gt; 1 and doc.partner_id.mobile"><span t-field="doc.partner_id.mobile"/><br/></t>
-                                <t t-if="pdf_fax &gt; 1 and doc.partner_id.fax"><span t-field="doc.partner_id.fax"/><br/></t>
-                                <t t-if="pdf_email &gt; 1 and doc.partner_id.email"><span t-field="doc.partner_id.email"/></t>
+                                <t t-if="pdf_customer_phone and doc.partner_id.phone"><span t-field="doc.partner_id.phone"/><br/></t>
+                                <t t-if="pdf_customer_mobile and doc.partner_id.mobile"><span t-field="doc.partner_id.mobile"/><br/></t>
+                                <t t-if="pdf_customer_fax and doc.partner_id.fax"><span t-field="doc.partner_id.fax"/><br/></t>
+                                <t t-if="pdf_customer_email and doc.partner_id.email"><span t-field="doc.partner_id.email"/></t>
                             </p>
                         </div>
-                        <div t-if="client_info_pastille" style="display: table-cell; width: 4px;"/>
+                        <div t-if="pdf_customer_insert" style="display: table-cell; width: 4px;"/>
 
                         <!-- div name="payment_term" important pour sale_stock.report_saleorder_document_inherit_sale_stock -->
-                        <div name="payment_term" t-if="doc.payment_term_id and not pdf_masquer_payment_term" style="flex: 1; padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                        <div name="payment_term" t-if="pdf_payment_term_insert and doc.payment_term_id" style="flex: 1; padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                             <strong>Conditions de règlement&amp;nbsp;:</strong>
                             <p t-field="doc.payment_term_id"/>
                         </div>
-                        <div t-if="doc.payment_term_id and not pdf_masquer_payment_term" style="display: table-cell; width: 4px;"/>
+                        <div t-if="pdf_payment_term_insert and doc.payment_term_id" style="display: table-cell; width: 4px;"/>
 
-                        <div name="pastille_date_vt" t-if="doc.of_date_vt and pdf_vt_pastille"
+                        <div name="pastille_date_vt" t-if="pdf_technical_visit_insert and doc.of_date_vt"
                              style="flex: 1; padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                             <strong>Visite technique&amp;nbsp;:</strong>
                             <p t-field="doc.of_date_vt"/>
                         </div>
-                        <div t-if="doc.of_date_vt and pdf_vt_pastille" style="display: table-cell; width: 4px;"/>
+                        <div t-if="pdf_technical_visit_insert and doc.of_date_vt" style="display: table-cell; width: 4px;"/>
 
-                        <div name="date_validite" t-if="doc.validity_date and doc.state in ('draft', 'sent') and doc.pdf_afficher_date_validite()" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                        <div name="date_validite" t-if="doc.state in ('draft', 'sent') and pdf_validity_insert and doc.validity_date" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                             <strong>Date de validité&amp;nbsp;:</strong>
                             <p t-field="doc.validity_date"/>
                         </div>
-                        <div t-if="doc.validity_date and doc.state in ('draft', 'sent') and doc.pdf_afficher_date_validite()" style="display: table-cell; width: 4px;"/>
+                        <div t-if="doc.state in ('draft', 'sent') and pdf_validity_insert and doc.validity_date" style="display: table-cell; width: 4px;"/>
                     </div>
                 </div>
             </div>
@@ -280,7 +295,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-xs-6" t-if="doc.pdf_afficher_multi_echeances()" string="Échéances">
+                <div class="col-xs-6" t-if="pdf_payment_schedule" string="Échéances">
                     <t t-set="show_ech_name" t-value="bool(doc.of_echeance_line_ids.filtered('date'))"/>
                     <table class="table table-condensed">
                         <thead>
@@ -303,7 +318,7 @@
                 </div>
             </div>
 
-            <div class="row" t-if="pdf_taxes_display and len(doc.of_get_taxes_display()) > 0">
+            <div class="row" t-if="pdf_taxes_detail and len(doc.of_get_taxes_display()) > 0">
                 <div class="col-xs-6">
                     <table class="table table-condensed">
                         <thead>
@@ -360,7 +375,7 @@
                 </div>
             </t>
 
-            <p t-if="doc.of_date_vt and not pdf_vt_pastille">
+            <p t-if="not pdf_technical_visit_insert and doc.of_date_vt">
                 <t t-set="date_order" t-value="doc.of_date_vt[8:10] + '/' + doc.of_date_vt[5:7] + '/' + doc.of_date_vt[0:4]"/>
                 Date de visite technique : <span t-esc="date_order"/>
             </p>

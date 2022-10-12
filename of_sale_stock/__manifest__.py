@@ -2,7 +2,7 @@
 
 {
     "name": "OpenFire / Stock ventes",
-    "version": "10.0.1.0.0",
+    "version": "10.0.1.1.0",
     "author": "OpenFire",
     'license': 'AGPL-3',
     'category': 'OpenFire modules',
