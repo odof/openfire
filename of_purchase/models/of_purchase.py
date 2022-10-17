@@ -14,9 +14,9 @@ class PurchaseOrder(models.Model):
     customer_id = fields.Many2one('res.partner', string='Client')
     customer_shipping_id = fields.Many2one(comodel_name='res.partner', string=u"Adresse de Livraison du Client")
     customer_shipping_city = fields.Char(
-        related='customer_shipping_id.city', string=u"Ville", store=True, readonly=True)
+        related='customer_shipping_id.city', string=u"Ville", store=True, readonly=True, compute_sudo=True)
     customer_shipping_zip = fields.Char(
-        related='customer_shipping_id.zip', string=u"Code Postal", store=True, readonly=True)
+        related='customer_shipping_id.zip', string=u"Code Postal", store=True, readonly=True, compute_sudo=True)
     sale_order_id = fields.Many2one('sale.order', string=u"Commande d'origine")
     delivery_expected = fields.Char(string='Livraison attendue', states={'done': [('readonly', True)]})
     of_sent = fields.Boolean(string=u"CF envoyée")
