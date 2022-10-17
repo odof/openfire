@@ -9,14 +9,14 @@ class StockPicking(models.Model):
     of_customer_id = fields.Many2one('res.partner', string="Client")
     of_customer_shipping_id = fields.Many2one('res.partner', string=u"Adresse de Livraison du Client")
     of_customer_shipping_city = fields.Char(
-        related='of_customer_shipping_id.city', string=u"Ville", store=True, readonly=True)
+        related='of_customer_shipping_id.city', string=u"Ville", store=True, readonly=True, compute_sudo=True)
     of_customer_shipping_zip = fields.Char(
-        related='of_customer_shipping_id.zip', string=u"Code Postal", store=True, readonly=True)
+        related='of_customer_shipping_id.zip', string=u"Code Postal", store=True, readonly=True, compute_sudo=True)
     partner_shipping_id = fields.Many2one('res.partner', string=u"Adresse de Livraison du Partenaire")
     partner_shipping_city = fields.Char(
-        related='partner_shipping_id.city', string=u"Ville", store=True, readonly=True)
+        related='partner_shipping_id.city', string=u"Ville", store=True, readonly=True, compute_sudo=True)
     partner_shipping_zip = fields.Char(
-        related='partner_shipping_id.zip', string=u"Code Postal", store=True, readonly=True)
+        related='partner_shipping_id.zip', string=u"Code Postal", store=True, readonly=True, compute_sudo=True)
     # Permet de cacher le champ of_customer_id si pas sur BR
     of_location_usage = fields.Selection(related="location_id.usage")
     of_user_id = fields.Many2one(comodel_name='res.users', string="Responsable technique")
