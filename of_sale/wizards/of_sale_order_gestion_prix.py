@@ -280,7 +280,9 @@ class GestionPrix(models.TransientModel):
                 ('Services', order_lines_service),
                 ('Total', order_lines)]:
             lines_dict = {'name': name}
-            total_achat = sum(lines.mapped('purchase_price'))
+            total_achat = 0.0
+            for line in lines:
+                total_achat += line.purchase_price * line.product_uom_qty
             total_vente = sum(lines.mapped('price_subtotal'))
             lines_dict['cout'] = "%0.2f %s" % (total_achat, currency_symbol)
             lines_dict['vente'] = "%0.2f %s" % (total_vente, currency_symbol)
@@ -381,7 +383,7 @@ class GestionPrixLine(models.TransientModel):
                     if line.prix_total_ht_simul else -100
 
     @api.multi
-    def get_distributed_amount(self, to_distribute, total, currency, cost_prorata, rounding, line_rounding):
+    def get_distributed_amount(self, to_distribute, total, currency, cost_prorata, rounding, line_rounding, all_zero):
         """
         Cette fonction calcule le nouveau montant à allouer à la ligne de commande passée en paramètre.
         Elle retourne un dictionnaire des valeurs à modifier sur cette ligne.
@@ -411,9 +413,10 @@ class GestionPrixLine(models.TransientModel):
                     taxes_percentage = 0.0
                 else:  # Dans tous les autres cas, on part du montant TTC
                     taxes_percentage = sum(taxes.mapped('amount')) / 100
-                price_unit = self.get_base_amount(order_line, cost_prorata) * to_distribute / (1 + taxes_percentage)
+                price_unit = self.get_base_amount(order_line, cost_prorata, all_zero) * \
+                    to_distribute / (1 + taxes_percentage)
             else:
-                price_unit = self.get_base_amount(order_line, cost_prorata) * to_distribute / total
+                price_unit = self.get_base_amount(order_line, cost_prorata, all_zero) * to_distribute / total
             if rounding:
                 price_unit = currency.round(price_unit)
 
@@ -523,6 +526,13 @@ class GestionPrixLine(models.TransientModel):
         values = {}
 
         # Les totaux des lignes forcées sont gardés en précision standard
+        order_lines = lines_select.with_context(round=False).mapped('order_line_id')
+        all_zero = False
+        # Vérification si toutes les lignes sont a 0 en fonction du prorata choisi
+        if cost_prorata == 'cost':
+            all_zero = all(purchase_price == 0.0 for purchase_price in order_lines.mapped('purchase_price'))
+        elif cost_prorata == 'price':
+            all_zero = all(price_unit == 0.0 for price_unit in order_lines.mapped('price_unit'))
         total_forced = 0
         for lf in lines_forced:
             vals, taxes = lf.get_distributed_amount(
@@ -531,7 +541,8 @@ class GestionPrixLine(models.TransientModel):
                 currency=currency,
                 cost_prorata=cost_prorata,
                 rounding=True,
-                line_rounding=False)
+                line_rounding=False,
+                all_zero=True)
 
             if not round_tax:
                 amount_tax = sum(tax['amount'] for tax in taxes['taxes'])
@@ -552,7 +563,8 @@ class GestionPrixLine(models.TransientModel):
         for line in lines_select.with_context(round=False):
             # Calcul manuel des taxes avec context['round']==False pour conserver la précision des calculs
             order_line = line.order_line_id
-            price = self.get_base_amount(order_line, cost_prorata) * (1 - (order_line.discount or 0.0) / 100.0)
+            price = self.get_base_amount(order_line, cost_prorata, all_zero) * \
+                (1 - (order_line.discount or 0.0) / 100.0)
             taxes = order_line.tax_id.compute_all(
                 price, order_line.currency_id, order_line.product_uom_qty, product=order_line.product_id,
                 partner=order_line.order_id.partner_id)
@@ -577,7 +589,8 @@ class GestionPrixLine(models.TransientModel):
                     cost_prorata=cost_prorata,
                     # On arrondit toutes les lignes sauf la dernière
                     rounding=line != lines_select[-1],
-                    line_rounding=line_rounding)
+                    line_rounding=line_rounding,
+                    all_zero=all_zero)
             # Recalcul de 'total_excluded' et 'total_included' sans les arrondis
             if not round_tax:
                 amount_tax = sum(tax['amount'] for tax in taxes['taxes'])
@@ -599,11 +612,18 @@ class GestionPrixLine(models.TransientModel):
         return values
 
     @api.model
-    def get_base_amount(self, order_line, cost_prorata):
+    def get_base_amount(self, order_line, cost_prorata, all_zero):
+        """
+        @param order_line: La ligne de commande sur laquelle on récupère les informations
+        @param cost_prorata: Le type de prorata utilisé
+        @param all_zero: Vrai si cost_prorata == 'cost' et tout les purchase price sont a 0,
+                              si cost_prorata == 'price' et tout les price unit sont a 0,
+                         Faux dans les autres cas
+        """
         if cost_prorata == 'cost':
-            return order_line.purchase_price or 1.0
+            return order_line.purchase_price or all_zero and 1.0 or 0.0
         else:
-            return order_line.price_unit or 1.0
+            return order_line.price_unit or all_zero and 1.0 or 0.0
 
 
 class SaleOrder(models.Model):
