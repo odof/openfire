@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 {
     'name': u"OpenFire / Contrôles d'accès",
     'version': "10.0.1.0.0",
@@ -15,7 +16,6 @@ Module de modification des droits
     'depends': [
         'of_crm',
         'of_project_issue',
-        'of_followup',
         'of_service',
         'of_parc_installe',
         'of_questionnaire',
