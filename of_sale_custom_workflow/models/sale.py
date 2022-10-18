@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import models, fields, api
 from datetime import datetime
@@ -86,11 +87,6 @@ class SaleOrder(models.Model):
                 of_custom_confirmation_delta = of_custom_confirmation_date - date_order
                 # We use a float to avoid rounding the result
                 order.of_custom_confirmation_delta = of_custom_confirmation_delta.total_seconds() / 86400.0
-            # ir_config_obj = self.env['ir.config_parameter']
-            # if not self._context.get('order_cancellation', False) and \
-            #         not ir_config_obj.get_param('of.followup.migration', False):
-            #     order.with_context(auto_followup=True, followup_creator_id=self.env.user.id).sudo().\
-            #         action_followup_project()
         self.activate_activities_triggered_at_validation()
         return True
 
@@ -109,9 +105,6 @@ class SaleOrder(models.Model):
     @api.multi
     def action_reopen(self):
         self.ensure_one()
-        # On ré-ouvre le suivi
-        if self.of_followup_project_id:
-            self.of_followup_project_id.set_to_in_progress()
         self.state = 'sale'
         return True
 
