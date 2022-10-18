@@ -30,7 +30,10 @@ class OFContractAvenantWizard(models.TransientModel):
             'date_end'       : fields.Date.to_string(fields.Date.from_string(self.date_start) - relativedelta(days=1)),
             })
         origine.remove_services()
-        view_id = self.env.ref('of_contract_custom.of_contract_line_view_form_extended').id
+        if self.contract_line_id.contract_type == 'simple':
+            view_id = self.env.ref('of_contract_custom.of_contract_line_view_form_simplified').id
+        else:
+            view_id = self.env.ref('of_contract_custom.of_contract_line_view_form').id
         return {
             'name'     : 'Ligne de contrat (avenant)',
             'type'     : 'ir.actions.act_window',

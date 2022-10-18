@@ -455,6 +455,7 @@
                             </div>
                             <field name="partner_code_magasin"/>
                             <field name="partner_id"/>
+                            <field name="contract_id" required="0" readonly="1" class="oe_read_only"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                         <group col="2" colspan="2" name="description" string="Description">
@@ -629,6 +630,7 @@
                             </div>
                             <field name="partner_code_magasin" invisible="1"/>
                             <field name="partner_id"/>
+                            <field name="contract_id" required="0" readonly="1" class="oe_read_only"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                         <group col="2" colspan="2" name="description" string="Description" invisible="1">
@@ -747,19 +749,6 @@
                     </notebook>
                 </sheet>
             </form>
-        </field>
-    </record>
-
-    <record id="of_contract_line_view_form_extended" model="ir.ui.view" >
-        <field name="name">Ligne de contrat</field>
-        <field name="model">of.contract.line</field>
-        <field name="mode">primary</field>
-        <field name="type">form</field>
-        <field name="inherit_id" ref="of_contract_custom.of_contract_line_view_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="contract_id" readonly="1"/>
-            </xpath>
         </field>
     </record>
 
