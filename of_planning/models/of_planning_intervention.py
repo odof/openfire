@@ -1802,9 +1802,20 @@ class OfPlanningIntervention(models.Model):
                     domain += [('flexible', '=', False)]
                 rdv = interv_obj.search(domain, limit=1)
                 if rdv:
+                    lang = self.env['res.lang']._lang_get(self.env.user.lang)
+                    date = fields.Datetime.context_timestamp(rdv, fields.Datetime.from_string(rdv.date))
+                    date_d = fields.Datetime.context_timestamp(rdv, fields.Datetime.from_string(rdv.date_deadline))
+                    date_start = date.strftime(lang.date_format + " " + lang.time_format)
+                    date_stop = date_d.strftime(lang.time_format)
+                    if date.date() != date_d.date():
+                        date_stop = date_d.strftime(lang.date_format) + " " + date_stop
                     raise ValidationError(
-                        u"L'employé %s a déjà au moins un rendez-vous sur ce créneau.\nid du rdv: %d" %
-                        ((rdv.employee_ids & interv.employee_ids)[0].name, rdv.id))
+                        u"L'employé %s a déjà au moins un rendez-vous sur ce créneau.\n"
+                        u"Rdv : %s - %s : %s\n"
+                        u"(id du rdv: %s)" %
+                        ((rdv.employee_ids & interv.employee_ids)[0].name,
+                         date_start, date_stop, rdv.name,
+                         rdv.id))
 
     @api.multi
     def get_overlapping_intervention(self):
