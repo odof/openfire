@@ -97,7 +97,7 @@ class OFPlanningRecurringMixin(models.AbstractModel):
                 if meeting.rrule_type == 'weekly':
                     rrule_text += u"Toutes les "
                 else:
-                    rrule_text += u"Touts les "
+                    rrule_text += u"Tous les "
                 if meeting.interval > 1:
                     rrule_text += (str(meeting.interval)).decode('utf-8') + u" "
                 if meeting.rrule_type == 'weekly':
@@ -686,7 +686,7 @@ class OFPlanningIntervention(models.Model):
             new_arg = arg
             # Chercher aussi les RDVs récurrents qui termine après la date donnée
             # pour pouvoir les afficher quand même si on n'affiche pas les différentes occurences
-            if arg[0] in date_stop_fields and arg[1] == ">=":
+            if arg[0] in date_stop_fields and arg[1] in ('>', '>='):
                 if self._context.get('virtual_id', True):
                     new_args += ['|', '&', ('recurrency', '=', 1), ('final_date', arg[1], arg[2])]
             elif arg[0] == "id":
