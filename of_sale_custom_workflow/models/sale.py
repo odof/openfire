@@ -1,10 +1,35 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from datetime import datetime
 
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
+
+    @api.model_cr_context
+    def _auto_init(self):
+        module_self = self.env['ir.module.module'].search(
+            [('name', '=', 'of_sale_custom_workflow'), ('state', 'in', ['installed', 'to upgrade'])])
+        res = super(SaleOrder, self)._auto_init()
+        if module_self:
+            # installed_version est trompeur, il contient la version en cours d'installation
+            # on utilise donc latest version à la place
+            version = module_self.latest_version
+            if version < '10.0.2':
+                cr = self.env.cr
+                cr.execute("""
+                -- update of_custom_confirmation_delta
+                UPDATE sale_order SO
+                SET of_custom_confirmation_delta = EXTRACT(EPOCH FROM (SO.of_custom_confirmation_date::timestamp - SO.date_order::timestamp)) / 86400.0
+                WHERE SO.of_custom_confirmation_date IS NOT NULL AND SO.date_order IS NOT NULL AND SO.state IN ('presale', 'sale', 'done', 'closed');
+
+                -- update of_confirmation_delta
+                UPDATE sale_order SO
+                SET of_confirmation_delta = EXTRACT(EPOCH FROM (SO.confirmation_date::timestamp - SO.of_custom_confirmation_date::timestamp)) / 86400.0
+                WHERE SO.of_custom_confirmation_date IS NOT NULL AND SO.date_order IS NOT NULL AND SO.state IN ('sale', 'done', 'closed');""")
+        return res
+
 
     state = fields.Selection(selection=[
         ('draft', u"Estimation"),
@@ -17,6 +42,9 @@ class SaleOrder(models.Model):
     ])
     of_custom_confirmation_date = fields.Datetime(string=u"Date de confirmation")
     confirmation_date = fields.Datetime(string=u"Date d'enregistrement")
+    of_custom_confirmation_delta = fields.Float(
+        string=u"Délai de confirmation", digits=(4, 1), readonly=True, copy=False)
+    of_confirmation_delta = fields.Float(string=u"Délai d'enregistrement", digits=(4, 1), readonly=True, copy=False)
 
     @api.depends('state', 'order_line.invoice_status', 'of_force_invoice_status', 'of_cancelled_order_id',
                  'of_cancellation_order_id')
@@ -50,7 +78,14 @@ class SaleOrder(models.Model):
     def action_preconfirm(self):
         for order in self:
             order.state = 'presale'
-            order.of_custom_confirmation_date = fields.Datetime.now()
+            of_custom_confirmation_date = fields.Datetime.now()
+            order.of_custom_confirmation_date = of_custom_confirmation_date
+            if order.date_order:
+                date_order = datetime.strptime(order.date_order, "%Y-%m-%d %H:%M:%S")
+                of_custom_confirmation_date = datetime.strptime(of_custom_confirmation_date, "%Y-%m-%d %H:%M:%S")
+                of_custom_confirmation_delta = of_custom_confirmation_date - date_order
+                # We use a float to avoid rounding the result
+                order.of_custom_confirmation_delta = of_custom_confirmation_delta.total_seconds() / 86400.0
             ir_config_obj = self.env['ir.config_parameter']
             if not self._context.get('order_cancellation', False) and \
                     not ir_config_obj.get_param('of.followup.migration', False):
@@ -58,6 +93,18 @@ class SaleOrder(models.Model):
                     action_followup_project()
         self.activate_activities_triggered_at_validation()
         return True
+
+    @api.multi
+    def action_confirm(self):
+        res = super(SaleOrder, self).action_confirm()
+        for order in self:
+            of_custom_confirmation_date = datetime.strptime(order.of_custom_confirmation_date, "%Y-%m-%d %H:%M:%S")
+            if order.confirmation_date:
+                confirmation_date = datetime.strptime(order.confirmation_date, "%Y-%m-%d %H:%M:%S")
+                of_confirmation_delta = confirmation_date - of_custom_confirmation_date
+                # We use a float to avoid rounding the result
+                order.of_confirmation_delta = of_confirmation_delta.total_seconds() / 86400.0
+        return res
 
     @api.multi
     def action_reopen(self):

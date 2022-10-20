@@ -30,6 +30,10 @@
             <xpath expr="//field[@name='confirmation_date']" position="before">
                 <field name="of_custom_confirmation_date" attrs="{'invisible': [('state', 'in', ['draft', 'sent', 'cancel'])]}" widget="date"/>
             </xpath>
+            <xpath expr="//field[@name='confirmation_date']" position="after">
+                <field name="of_custom_confirmation_delta" states="presale,sale,done,closed"/>
+                <field name="of_confirmation_delta" states="sale,done,closed"/>
+            </xpath>
             <xpath expr="//field[@name='confirmation_date']" position="attributes">
                 <attribute name="attrs">{'invisible': [('state', 'in', ['draft', 'sent', 'presale', 'cancel'])]}</attribute>
             </xpath>
