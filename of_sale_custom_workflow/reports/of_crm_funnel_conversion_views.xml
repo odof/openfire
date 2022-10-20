@@ -30,6 +30,8 @@
                     <field name="recorded_margin_percent" type="measure"/>
                     <field name="total_margin" type="measure"/>
                     <field name="total_margin_percent" type="measure"/>
+                    <field name="avg_custom_confirmation_delta" type="measure"/>
+                    <field name="avg_confirmation_delta" type="measure"/>
                 </pivot>
             </field>
         </record>
