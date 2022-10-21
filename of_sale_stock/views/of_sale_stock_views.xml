@@ -92,8 +92,28 @@
             <xpath expr="//field[@name='pack_operation_product_ids']/tree/field[@name='product_id']" position="after">
                 <field name="move_name" groups="of_sale_stock.group_description_BL_variant"/>
             </xpath>
+            <xpath expr="//field[@name='pack_operation_product_ids']" position="attributes">
+                <attribute name="context" remove="}" separator="}"/>
+                <attribute name="context" remove="'show_only_default_code': True,"/>
+                <attribute name="context" add=",}"/>
+            </xpath>
         </field>
     </record>
+
+    <record id="view_of_stock_picking_group_description_BL_variant_form" model="ir.ui.view">
+        <field name="name">of.sale.stock.view.picking.form</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="groups_id" eval="[(4, ref('of_sale_stock.group_description_BL_variant'))]"/>
+        <field name="priority" eval="20"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='pack_operation_product_ids']" position="attributes">
+                <attribute name="context" remove="}" separator="}"/>
+                <attribute name="context" add="'show_only_default_code': True,}"/>
+            </xpath>
+        </field>
+    </record>
+
 
     <!-- Sale Order Form View -->
     <record id="of_sale_stock_view_order_form" model="ir.ui.view">
@@ -157,6 +177,33 @@
             </xpath>
             <xpath expr="//field[@name='move_lines']" position="attributes">
                 <attribute name="attrs">{'readonly': [('state', 'in', ('cancel', 'done'))]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_picking_inherit_form2" model="ir.ui.view">
+        <field name="name">of.sale.stock.picking.inherit.form2</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="of_stock.view_picking_inherit_form2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='move_lines']" position="attributes">
+                <attribute name="context" remove="}" separator="}"/>
+                <attribute name="context" remove="'show_only_default_code': True,"/>
+                <attribute name="context" add=",}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_picking_inherit_group_description_BL_variant_form2" model="ir.ui.view">
+        <field name="name">of.sale.stock.picking.inherit.group.description.form2</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="of_sale_stock.view_picking_inherit_form2"/>
+        <field name="groups_id" eval="[(4, ref('of_sale_stock.group_description_BL_variant'))]"/>
+        <field name="priority" eval="20"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='move_lines']" position="attributes">
+                <attribute name="context" remove="}" separator="}"/>
+                <attribute name="context" add="'show_only_default_code': True,}"/>
             </xpath>
         </field>
     </record>
