@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from itertools import groupby
 from odoo import api, fields, models, _
 import odoo.addons.decimal_precision as dp
 
@@ -1282,9 +1283,22 @@ class AccountInvoice(models.Model):
                     'color': category and category.get_color('account.invoice') or section_color
                 })
 
-        # Si les sections avancées ne sont pas configurées, on appelle le super()
+        # Si les sections avancées ne sont pas configurées,
+        # on reprend le comportement standard (odoo/addons/sale/models/account_invoice.py). Il est répété ici
+        # pour éviter de surcharger la fonction de mise en page des lignes de facture.
+        # Nous ajoutons juste la traduction de la section quand il n'y a pas de section : _("Uncategorized").
         else:
-            report_pages = super(AccountInvoice, self).order_lines_layouted()
+            for category, lines in groupby(self.invoice_line_ids, lambda l: l.layout_category_id):
+                # If last added category induced a pagebreak, this one will be on a new page
+                if report_pages[-1] and report_pages[-1][-1]['pagebreak']:
+                    report_pages.append([])
+                # Append category to current report page
+                report_pages[-1].append({
+                    'name': category and category.name or _("Uncategorized"),
+                    'subtotal': category and category.subtotal,
+                    'pagebreak': category and category.pagebreak,
+                    'lines': list(lines)
+                })
             for page in report_pages:
                 for group in page:
                     group['color'] = section_color
