@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+
+    <t t-extend="SwitchCompanyMenu">
+        <t t-jquery="li.o_switch_company_menu > ul.dropdown-menu" t-operation="attributes" >
+            <attribute name="style">max-height: 450px; overflow-y: scroll;</attribute>
+        </t>
+    </t>
+
+</templates>
