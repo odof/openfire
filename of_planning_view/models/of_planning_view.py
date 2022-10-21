@@ -175,9 +175,7 @@ class OfPlanningIntervention(models.Model):
                             'secteur_str': secteur_str,
                             'display_secteur': display_secteur,
                             'warning_horaires': intervention_forcee,
-                        }
-                        to_append["defaults"] = {
-                            'employee_ids': [employee_id],
+                            'defaults': {'employee_ids': [employee_id]},
                         }
                         creneaux.append(to_append)
                 break
@@ -225,9 +223,9 @@ class OfPlanningIntervention(models.Model):
         return temps_chevauche
 
     @api.model
-    def get_emp_horaires_info(
+    def get_display_data(
             self, employee_ids, date_start, date_stop, horaires_list_dict=False, fusion_creneaux=True,
-            view_mode='planning'):
+            view_mode='planning', return_fields=[]):
         """
         Fonction appelée par le javascript de la vue Planning.
         Renvoie toutes les informations nécessaires à l'affichage de la vue Planning:
@@ -283,6 +281,23 @@ class OfPlanningIntervention(models.Model):
 
         un_jour = timedelta(days=1)
 
+        # On récupère les interventions de tous les employés sur la période
+        all_interventions = intervention_obj.sudo().search([
+            ('employee_ids', 'in', employees.ids),
+            ('date_prompt', '<=', fields.Date.to_string(date_stop_da)),
+            ('date_deadline_prompt', '>=', fields.Date.to_string(date_start_da)),
+            ('state', 'not in', ('cancel', 'postponed'))], order='date')
+
+        if view_mode == 'planning':
+            if 'id' not in return_fields:
+                return_fields.append('id')
+            res['interventions'] = [
+                {
+                    field: intervention_obj._fields[field].convert_to_read(interv[field], interv)
+                    for field in return_fields
+                }
+                for interv in all_interventions
+            ]
         for employee in employees:
             employee_id = employee.id
             res[employee_id]['tz'] = self._context.get('tz')
@@ -302,6 +317,9 @@ class OfPlanningIntervention(models.Model):
             fillerbarzz = []  # liste des fillerbars. Une par jour
             creneaux_dispozz = []  # liste de liste pour les créneaux dispos. Une sous-liste par jour
             date_current_da = date_start_da
+            # Un premier filtered avant la boucle sur date, évite de générer le browse_record employee_ids pour chaque
+            # date parcourue, gain de temps conséquent.
+            employee_interventions = all_interventions.filtered(lambda i: employee_id in i.employee_ids.ids)
 
             # Parcours de toutes les dates à évaluer
             while date_current_da <= date_stop_da:
@@ -326,7 +344,7 @@ class OfPlanningIntervention(models.Model):
                 else:
                     horaires_du_jour = segment_courant[2].get(num_jour, False)  # [ [h_debut, h_fin] ,  .. ]
                 if not horaires_du_jour:
-                    # L'employé ne travaille pas ce jour ci
+                    # L'employé ne travaille pas ce jour-ci
                     fillerbarzz.append(fillerbar)
                     creneaux_dispozz.append([])
                     date_current_da += un_jour
@@ -348,12 +366,8 @@ class OfPlanningIntervention(models.Model):
                 journee_fin = horaires_du_jour[-1][1]
 
                 # On récupère tous les rdvs de la journée
-                interventions = intervention_obj.sudo().search(
-                    [('employee_ids', 'in', employee_id),
-                     ('date_prompt', '<=', date_current_str),
-                     ('date_deadline_prompt', '>=', date_current_str),
-                     ('state', 'not in', ('cancel', 'postponed'))],
-                    order='date')
+                interventions = employee_interventions.filtered(
+                    lambda i: i.date_prompt[:10] <= date_current_str <= i.date_deadline_prompt[:10])
                 intervention_liste = []
                 # Journée entièrement libre
                 if not interventions:
@@ -381,12 +395,10 @@ class OfPlanningIntervention(models.Model):
                 nb_heures_occupees = 0.0
                 jour_deb_dt = tz.localize(datetime.strptime(date_current_str+" 00:00:00", "%Y-%m-%d %H:%M:%S"))
                 jour_fin_dt = tz.localize(datetime.strptime(date_current_str+" 23:59:00", "%Y-%m-%d %H:%M:%S"))
-                for intervention in interventions:
-                    intervention_heures = [intervention]
-                    # read est détourné dans of_planning pour renvoyer les dates de l'occurence concernée
-                    # dans le cas des RDV recurrents
-                    data = intervention.read(['date_prompt', 'date_deadline_prompt'])[0]
-                    for intervention_heure in (data['date_prompt'], data['date_deadline_prompt']):
+                for interv in interventions:
+                    intervention_heures = [interv]
+                    # data = data_interventions_dict[intervention.id]
+                    for intervention_heure in (interv.date_prompt, interv.date_deadline_prompt):
                         # Conversion des dates de début et de fin en nombres flottants et à l'heure locale
                         intervention_locale_dt = fields.Datetime.context_timestamp(
                             self, fields.Datetime.from_string(intervention_heure))
@@ -422,9 +434,9 @@ class OfPlanningIntervention(models.Model):
                                                    * 100 / fillerbar['nb_heures_travaillees'])
 
                 fillerbarzz.append(fillerbar)
-                intervention_forcee = len(interventions.filtered(lambda i: i.forcer_dates)) > 0
                 # Ne pas calculer les créneaux dispos dans le passé
                 if date_current_str >= date_today_str:
+                    intervention_forcee = any(i.forcer_dates for i in interventions)
                     creneaux_dispo = intervention_obj.get_creneaux_dispo(
                         employee_id, date_current_str, intervention_liste, horaires_du_jour, duree_min,
                         intervention_forcee, fusion_creneaux)

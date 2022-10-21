@@ -156,7 +156,7 @@ CalendarView.include({
             end = moment(start).endOf(this.get_actual_mode() || "week")._d;
 
             var Planning = new Model(self.model);
-            Planning.call('get_emp_horaires_info', [res_ids, start, end, get_segments, false, 'calendar'])
+            Planning.call('get_display_data', [res_ids, start, end, get_segments, false, 'calendar'])
             .then(function (result) {
                 if (isNullOrUndef(self.res_horaires_info)) {
                     self.res_horaires_info = result;
