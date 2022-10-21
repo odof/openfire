@@ -163,7 +163,7 @@ class AccountInvoice(models.Model):
                     .mapped('sale_line_ids')
                     .mapped('invoice_lines')
                     .mapped('invoice_id')
-                    .filtered(lambda i: i.state != 'cancel'))
+                    .filtered(lambda i: i.state != 'cancel')) - self
         while to_check:
             invoices |= to_check
             to_check = (to_check
