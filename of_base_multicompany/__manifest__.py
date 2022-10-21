@@ -29,6 +29,9 @@ Personnalisation multi-sociétés :
         'views/res_company_view.xml',
         'views/sale_order_view.xml',
     ],
+    'qweb': [
+        'static/src/xml/of_base_multicompany.xml',
+    ],
     'installable': True,
     'application': False,
     'auto_install': False,
