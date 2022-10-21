@@ -8,10 +8,9 @@
         <field name="arch" type="xml">
             <form>
                 <group>
-                    <field name="line_ids" nolabel="1" colspan="4" context="{'show_only_default_code': True,}">
+                    <field name="line_ids" nolabel="1" colspan="4">
                         <tree delete="false" create="false" editable="bottom">
                             <field name="product_id" options="{'no_open': True}"/>
-                            <field name="name"/>
                             <field name="product_uom_qty"/>
                             <field name="qty_to_divide"/>
                         </tree>
@@ -22,6 +21,22 @@
                     <button string="Annuler" special="cancel" class="btn-default"/>
                 </footer>
             </form>
+        </field>
+    </record>
+
+    <record id="of_delivery_division_wizard_group_description_BL_variant_form_view" model="ir.ui.view">
+        <field name="name">of.delivery.division.wizard.group.description.form.view</field>
+        <field name="model">of.delivery.division.wizard</field>
+        <field name="groups_id" eval="[(4, ref('of_sale_stock.group_description_BL_variant'))]"/>
+        <field name="inherit_id" ref="of_sale_stock.of_delivery_division_wizard_form_view"/>
+        <field name="priority" eval="20"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="name"/>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']" position="attributes">
+                <attribute name="context">{'show_only_default_code': True,}</attribute>
+            </xpath>
         </field>
     </record>
 
