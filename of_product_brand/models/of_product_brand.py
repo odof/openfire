@@ -296,9 +296,9 @@ class SaleOrderLine(models.Model):
         result = super(SaleOrderLine, self).product_id_change()
         name = self.name
         if self.product_id.brand_id.use_brand_description_sale:
-            # Recalcul du libelllé de la ligne
+            # Recalcul du libellé de la ligne
             name = self.product_id.name_get()[0][1]
-            brand_desc = self.env['mail.template'].render_template(
+            brand_desc = self.env['mail.template'].with_context(safe=True).render_template(
                 self.product_id.brand_id.description_sale, 'product.product', self.product_id.id, post_process=False)
             name += u'\n%s' % brand_desc
         if self.product_id.brand_id.show_in_sales:
