@@ -110,9 +110,9 @@ class GestionPrixLine(models.TransientModel):
                 kit_price_unit += price_unit * kit_line.qty_per_kit
 
             if line_rounding:
-                return self._calcule_vals_ligne(
-                    order_line, kit_price_unit, order_line.price_unit, order_line.currency_id, rounding=False,
-                    line_rounding=line_rounding, kit_lines_price_unit=values)
+                return self.get_distributed_amount(
+                    kit_price_unit, order_line.price_unit, order_line.currency_id, cost_prorata='price', rounding=False,
+                    line_rounding=line_rounding, all_zero=False, kit_lines_price_unit=values)
 
             price = kit_price_unit * (1 - (order_line.discount or 0.0) / 100.0)
             taxes = order_line.tax_id.compute_all(
