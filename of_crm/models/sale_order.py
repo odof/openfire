@@ -91,7 +91,7 @@ class SaleOrder(models.Model):
         ('done', u'Verrouillé'),
         ('cancel', u'Annulé'),
     ], default=_default_state)
-    of_sent_quotation = fields.Boolean(string=u"Devis envoyé")
+    of_sent_quotation = fields.Boolean(string=u"Devis envoyé", copy=False)
     of_canvasser_id = fields.Many2one(comodel_name='res.users', string=u"Prospecteur")
     of_crm_activity_ids = fields.One2many(
         comodel_name='of.crm.activity', inverse_name='order_id', string='Activities', copy=True,

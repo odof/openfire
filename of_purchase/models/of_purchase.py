@@ -20,7 +20,7 @@ class PurchaseOrder(models.Model):
         related='customer_shipping_id.zip', string=u"Code Postal", store=True, readonly=True, compute_sudo=True)
     sale_order_id = fields.Many2one('sale.order', string=u"Commande d'origine")
     delivery_expected = fields.Char(string='Livraison attendue', states={'done': [('readonly', True)]})
-    of_sent = fields.Boolean(string=u"CF envoyée")
+    of_sent = fields.Boolean(string=u"CF envoyée", copy=False)
     of_project_id = fields.Many2one(comodel_name='account.analytic.account', string=u"Compte analytique")
     of_user_id = fields.Many2one(comodel_name='res.users', string="Responsable technique")
     of_reception_state = fields.Selection(selection=[
