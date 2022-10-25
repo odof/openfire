@@ -159,24 +159,13 @@
         </field>
     </record>
 
-    <act_window
-        id="action_view_rdv_intervention_wizard_task"
-        name="Planifier une intervention"
-        res_model="of.tournee.rdv"
-        src_model="project.task"
-        view_mode="form"
-        view_id="of_planning_tournee.view_rdv_intervention_wizard"
-        key2="client_action_multi"
-        target="new"
-        groups="of_planning.of_group_planning_intervention_lecture_siens"/>
-
     <record id="of_project_project_task_form_view" model="ir.ui.view">
         <field name="name">of_project.project.task.form.view</field>
         <field name="model">project.task</field>
         <field name="inherit_id" ref="project.view_task_form2"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="%(action_view_rdv_intervention_wizard_task)d" string="Planifier Intervention" type="action" groups="of_project.group_of_planning_project"/>
+                <button name="action_open_wizard_plan_intervention" string="Plan Intervention" type="object" groups="of_project.group_of_planning_project"/>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button class="oe_stat_button" name="action_view_interventions" type="object" icon="fa-calendar">
