@@ -604,8 +604,10 @@ class OFPlanningIntervention(models.Model):
         if not self.user_has_groups('of_planning_recurring.of_group_planning_intervention_recurring'):
             return super(OFPlanningIntervention, self).read(fields=fields, load=load)
 
-        fields2 = fields and fields[:] or None
-        if 'duree' not in fields:
+        fields2 = fields and fields[:] or []
+        # Si fields2 est vide, read doit lire tous les champs, on ne veut pas ajouter 'duree' à fields2
+        # Car si on l'ajoute, seul le champ duree sera lu au lieu de tous les champs
+        if fields2 and 'duree' not in fields2:
             fields2.append('duree')
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
