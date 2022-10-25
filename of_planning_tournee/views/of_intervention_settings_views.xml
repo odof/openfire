@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_of_intervention_settings" model="ir.ui.view">
+        <field name="name">view.of.intervention.settings</field>
+        <field name="model">of.intervention.settings</field>
+        <field name="inherit_id" ref="of_planning.view_of_intervention_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='calendar_view']" position="after">
+                <group name="time_slots_research" string="Time slots research">
+                    <field name="slots_display_mode" class="oe_inline"/>
+                    <field name="number_of_results" class="oe_inline"/>
+                    <field name="show_next_available_time_slots" class="oe_inline"/>
+                    <field name="search_mode" class="oe_inline"/>
+                    <field name="search_type" class="oe_inline"/>
+                    <label for="enable_quick_scheduling"/>
+                    <div name="group_enable_quick_scheduling">
+                        <field name="enable_quick_scheduling" class="oe_inline"/>
+                        <i class="oe_grey">/!\ Be careful, this can affect the performance of your database</i>
+                    </div>
+                    <field name="default_planning_task_id" class="oe_inline" 
+                        attrs="{'invisible': [('enable_quick_scheduling', '=', False)], 'required': [('enable_quick_scheduling', '=', True)]}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

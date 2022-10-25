@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="view_rdv_intervention_wizard_sav" model="ir.ui.view">
-        <field name="name">Planifier une intervention (SAV)</field>
+    <record id="view_rdv_intervention_complete_form_sav_wizard" model="ir.ui.view">
+        <field name="name">view.rdv.intervention.complete.form.sav.wizard</field>
         <field name="model">of.tournee.rdv</field>
         <field name="type">form</field>
-        <field name="inherit_id" ref="of_planning_tournee.view_rdv_intervention_wizard"/>
+        <field name="inherit_id" ref="of_planning_tournee.view_rdv_intervention_complete_form_wizard"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='service_id']" position="before">
+            <xpath expr="//group[@name='what']//field[@name='service_id']" position="before">
                 <field name="sav_id" widget="selection"/>
             </xpath>
         </field>

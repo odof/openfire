@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_intervention_tour_map_view" model="ir.ui.view">
+        <field name="name">of.planning.intervention.tour.map.view</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="arch" type="xml">
+            <map latitude_field="geo_lat" longitude_field="geo_lng" color_field="map_color_tour" number_field="tour_number" 
+                    connect_markers="1" hide_pager="1" force_legend_method="custom_get_color_map">
+                <field name="map_color_tour" required="1"/>
+                <field name="geo_lat" required="1"/>
+                <field name="geo_lng" required="1"/>
+                <field name="partner_name"/>
+                <field name="tache_name"/>
+                <field name="address_zip"/>
+                <field name="address_city"/>
+                <field name="partner_mobile"/>
+                <field name="partner_phone"/>
+                <field name="date"/>
+                <field name="tour_number"/>
+                <templates>
+                    <t t-name="of_map_record_box">
+                        <div t-attf-class="#{map_record_color(record.map_color_tour.raw_value)} of_map_record_global_click">
+                            <div class="of_map_record_buttons">
+                                <i class="of_map_record_close fa fa-lg fa-times"/>
+                            </div>
+                            <div name="content" class="of_map_record_content">
+                                <t t-if="record.tour_number.raw_value">
+                                    <i class="of_map_record_main fa fa-hashtag"/><span class="of_ws"/><strong><field name="tour_number"/></strong>
+                                    <br/>
+                                </t>
+                                <t t-if="record.partner_name.raw_value">
+                                    <i class="of_map_record_main fa fa-user"/><span class="of_ws"/><strong><field name="partner_name"/></strong>
+                                    <br/>
+                                </t>
+                                <t t-if="record.address_zip.raw_value">
+                                    <i class="of_map_record_main fa fa-map-marker"/><span class="of_ws"/><field name="address_zip"/><span class="of_ws"/><field name="address_city"/><br/>
+                                </t>
+                                <t t-if="record.partner_phone.raw_value">
+                                    <i class="of_map_record_main fa fa-phone"/><span class="of_ws"/><field name="partner_phone"/><br/>
+                                </t>
+                                <t t-if="record.partner_mobile.raw_value">
+                                    <i class="of_map_record_main fa fa-phone"/><span class="of_ws"/><field name="partner_mobile"/><br/>
+                                </t>
+                                <t t-if="record.tache_name.raw_value">
+                                    <i class="of_map_record_main fa fa-cogs"/><span class="of_ws"/><field name="tache_name"/><br/>
+                                </t>
+                                <t t-if="record.date.raw_value">
+                                    <i class="of_map_record_main fa fa-truck"/><span class="of_ws"/><field name="date"/><br/>
+                                </t>
+                            </div>
+                        </div>
+                    </t>
+                    <t t-name="of_map_marker_tooltip">
+                        <div name="marker_tooltip">
+                            <t t-if="record.tour_number.raw_value">
+                                <i class="of_map_record_main fa fa-hashtag"/><span class="of_ws"/><strong><field name="tour_number"/></strong>
+                                <br/>
+                            </t>
+                            <t t-if="record.partner_name.raw_value">
+                                <i class="fa fa-user"/><span class="of_ws"/><field name="partner_name"/><br/>
+                            </t>
+                            <t t-if="record.address_zip.raw_value or record.address_city.raw_value">
+                                <i class="fa fa-map-marker"/><span class="of_ws"/><field name="address_zip"/><span class="of_ws"/><field name="address_city"/><br/>
+                            </t>
+                            <t t-if="record.partner_phone.raw_value">
+                                <i class="fa fa-phone"/><span class="of_ws"/><field name="partner_phone"/><br/>
+                            </t>
+                            <t t-if="record.partner_mobile.raw_value">
+                                <i class="fa fa-phone"/><span class="of_ws"/><field name="partner_mobile"/><br/>
+                            </t>
+                            <t t-if="record.tache_name.raw_value">
+                                <i class="fa fa-cogs"/><span class="of_ws"/><field name="tache_name"/><br/>
+                            </t>
+                            <t t-if="record.date.raw_value">
+                                <i class="fa fa-truck"/><span class="of_ws"/><field name="date"/><br/>
+                            </t>
+                        </div>
+                    </t>
+                </templates>
+            </map>
+        </field>
+    </record>
+
+    <!-- This view disables all buttons in the header -->
+    <!-- It is called from the planification wizard to ensure that the user will not change any intervention state by clicking on them -->
+    <record id="of_planning_intervention_view_form" model="ir.ui.view">
+        <field name="name">of.planning.intervention.form.view</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="replace">
+                <header>
+                    <field name="closed" invisible="1"/>
+                    <field name="state" widget="statusbar" nolabel="1" statusbar_visible="draft,confirm,done"/>
+                </header>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_planning_intervention_tour_small_map_view" model="ir.ui.view">
+        <field name="name">of.planning.intervention.tour.small.map.view</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.of_planning_intervention_tour_map_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//map" position="attributes">
+                <attribute name="min_width">460px</attribute>
+                <!-- 335px because we want to display the full wizard windows without a scrollbar, with all lists and map -->
+                <attribute name="min_height">335px</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

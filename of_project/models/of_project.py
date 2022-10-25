@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api
-from datetime import datetime
 import json
+from datetime import datetime
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 from odoo import SUPERUSER_ID
 from odoo.tools.safe_eval import safe_eval
 
@@ -136,6 +137,26 @@ class ProjectTask(models.Model):
     of_intervention_ids = fields.One2many(
         comodel_name='of.planning.intervention', inverse_name='task_id',
         string=u"RDV", compute='_compute_of_intervention_ids')
+
+    @api.multi
+    def action_open_wizard_plan_intervention(self):
+        self.ensure_one()
+        context = self._context.copy()
+        if not self.partner_id:
+            raise UserError(_("There is no customer associated to this task. Please set one to plan an intervention."))
+        if not self.partner_id.geo_lat and not self.partner_id.geo_lng:
+            raise UserError(_("This address is not geocoded, please geocode it to plan an intervention."))
+        form_view_id = self.env.ref('of_planning_tournee.view_rdv_intervention_complete_form_wizard').id
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'of.tournee.rdv',
+            'res_id': False,
+            'views': [(form_view_id, 'form')],
+            'target': 'new',
+            'context': context
+        }
 
     @api.multi
     def action_view_interventions(self):

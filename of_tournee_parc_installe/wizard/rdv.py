@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 from odoo import api, models, fields
-from odoo.exceptions import UserError
 
 
 class OfTourneeRdv(models.TransientModel):
@@ -31,7 +30,7 @@ class OfTourneeRdv(models.TransientModel):
         else:
             return res
 
-        if address and not (address.geo_lat or address.geo_lng):
+        if address and not address.geo_lat and not address.geo_lng:
             address = partner_obj.search(['|', ('id', '=', partner.id), ('parent_id', '=', partner.id),
                                           '|', ('geo_lat', '!=', 0), ('geo_lng', '!=', 0)],
                                          limit=1) or address

@@ -12,8 +12,7 @@ class OfInterventionSettings(models.TransientModel):
     def _auto_init(self):
         res = super(OfInterventionSettings, self)._auto_init()
         if not self.env['ir.values'].get_default('of.intervention.settings', 'company_choice'):
-            self.env['ir.values'].sudo().set_default(
-                    'of.intervention.settings', 'company_choice', 'contact')
+            self.env['ir.values'].sudo().set_default('of.intervention.settings', 'company_choice', 'contact')
         return res
 
     company_id = fields.Many2one(
@@ -59,11 +58,9 @@ class OfInterventionSettings(models.TransientModel):
 
     do_deliveries = fields.Selection(selection=[
         (0, 'Ne pas utiliser les bons de livraisons depuis les RDV'),
-        (1, 'Utiliser les bons de livraisons depuis les RDV'),
-        ], string="(OF) BL d'intervention")
+        (1, 'Utiliser les bons de livraisons depuis les RDV')], string="(OF) BL d'intervention")
     group_of_group_planning_intervention_flexibility = fields.Boolean(
         string=u"Flexibilité des RDV", implied_group='of_planning.of_group_planning_intervention_flexibility')
-
 
     @api.multi
     def set_calendar_min_time_defaults(self):
@@ -127,7 +124,7 @@ class OfInterventionSettings(models.TransientModel):
     @api.multi
     def set_do_deliveries_defaults(self):
         return self.env['ir.values'].sudo().set_default(
-                'of.intervention.settings', 'do_deliveries', self.do_deliveries)
+            'of.intervention.settings', 'do_deliveries', self.do_deliveries)
 
     @api.multi
     def set_areas_automatically(self):

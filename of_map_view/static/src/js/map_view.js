@@ -78,14 +78,22 @@ var MapView = View.extend({
         this.qweb = new QWeb(session.debug, {_s: session.origin}, false);
 
         this._model = new Model(this.dataset.model);
-
+        this.min_width = this.fields_view.arch.attrs.min_width;
+        this.min_height = this.fields_view.arch.attrs.min_height;
         this.lat_field = this.fields_view.arch.attrs.latitude_field;
         this.lng_field = this.fields_view.arch.attrs.longitude_field;
+        this.number_field = this.fields_view.arch.attrs.number_field;
+        this.hide_pager = this.fields_view.arch.attrs.hide_pager || '0';
         this.name = "" + this.fields_view.arch.attrs.string;
         this.legend_context = JSON.parse(this.fields_view.arch.attrs.legend_context || "{}");
         this.fields = this.fields_view.fields;
         this.fields_keys = _.keys(this.fields_view.fields);
-
+        if (this.dataset.get_context().eval().additional_record) {
+            // Data that we want to display on the map with a fake record marker.
+            this.additional_record = JSON.parse(this.dataset.get_context().eval().additional_record);
+        } else {
+            this.additional_record = false;
+        }
         this.grouped = undefined;  // later implementation
         this.group_by_field = undefined;  // later implementation
         this.default_group_by = this.fields_view.arch.attrs.default_group_by;  // later implementation
@@ -129,7 +137,10 @@ var MapView = View.extend({
         this.record_options = {};
         this.record_options.latitude_field = this.lat_field;
         this.record_options.longitude_field = this.lng_field;
+        this.record_options.number_field = this.number_field;
+        this.record_options.additional_record = this.additional_record;
         this.record_options.color_field = this.fields_view.arch.attrs.color_field;
+        this.record_options.connect_markers = this.fields_view.arch.attrs.connect_markers || '0';
         var ir_config = new Model('ir.config_parameter');
         ir_config.call('get_param', ['Map_Marker_Size']).then(function(res){
             if (['x-small', 'small', 'medium', 'large'].includes(res)) {
@@ -146,9 +157,10 @@ var MapView = View.extend({
         this.displayer_options.legends = [];
         this.displayer_options.context = this.legend_context;
         if (this.fields_view.arch.attrs.color_field) {
+            var legend_method = this.fields_view.arch.attrs.force_legend_method || 'get_color_map';
             var legend_color = {
                 name: 'legend_color',
-                method: 'get_color_map',
+                method: legend_method,
                 template: 'MapView.legend.colors'
             };
             this.displayer_options.legends.push(legend_color);
@@ -321,7 +333,8 @@ var MapView = View.extend({
                         self.map.reset_layer_groups();
                     })
                     .then(function() {
-                        if (self.records.length) {
+                        if (self.records.length || self.record_options.additional_record !== undefined) {
+                            // if there is no records to display but there is an additional record, display it
                             self.map.add_layer_group(self.records,self.record_options);
                             self.map.nocontent_displayer.do_hide();
                         }else{
@@ -471,7 +484,12 @@ var MapView = View.extend({
         if (this.dataset.select_id(event.data.id)) {
             this.do_switch_view('form', options);
         } else {
-            this.do_warn("Map: could not find id#" + event.data.id);
+            // We are using a fake record marker to display an additional record on the map with the other reals
+            // markers based on real records of the O2M. So there is a fake id on the record that is not in the dataset.
+            // We don't want to display the warning message in this case.
+            if (event.target.options.additional_record === undefined || event.target.options.additional_record.id != event.data.id) {
+                this.do_warn("Map: could not find id#" + event.data.id);
+            }
         }
     },
     /**
@@ -690,7 +708,10 @@ MapView.Map = Widget.extend({
             var v = self.view;
             v.do_search(v.domain,v.context,v.group_by);
         });
-        
+        // when the map is loaded and attached to the container, if needed we will hide the pager above the map.
+        if (self.view.hide_pager == '1') {
+            self.view.ViewManager.$el.find('.o_x2m_control_panel').addClass('o_hidden');
+        }
     },
     /**
      *  adds a layer group to the map's list of layer groups.
@@ -909,11 +930,15 @@ MapView.LayerGroup = Widget.extend({
         icon_options: {
             unselected: {
                 prefix: 'mdi',
-                glyph: 'radiobox-blank'
+                glyph: 'circle-outline',
+                glyphPrefix: 'numeric',
+                glyphSuffix: 'circle-outline'
             },
             selected: {
                 prefix: 'mdi',
-                glyph: 'radiobox-marked'
+                glyph: 'circle',
+                glyphPrefix: 'numeric',
+                glyphSuffix: 'circle'
             }
         },
         visible: true, // false if none of the markers in this layer group is visible
@@ -959,8 +984,8 @@ MapView.LayerGroup = Widget.extend({
         var marker_height = 41;
         var marker_width;
         var shadow_height = 41;
-        var glyph_size = '13px';
-        var glyph_anchor = [6, -7];
+        var glyph_size = '18px';  // set to 18px for numeric mdi icons
+        var glyph_anchor = [4, -7]; // left, top
         if (marker_size) {
             base_path += '-' + marker_size + '-';
             shadow_path += '-' + marker_size;
@@ -1019,17 +1044,30 @@ MapView.LayerGroup = Widget.extend({
                 console.log("undefined record at index ",i);
                 return;
             }
-            var lat, lng, marker, icon, id;
+            var lat, lng, marker, icon, id, number, manyNumbers;
             lat = this.records[i][this.options.latitude_field];
             lng = this.records[i][this.options.longitude_field];
-
+            number = this.records[i][this.options.number_field] || false;
+            manyNumbers = number && number.split(',').length > 1 || false;
             if (this.options.custom_icon) {
                 var options = this.options.icon_options.unselected;
                 options['id'] = 'icon_'+this.records[i].id;
+                options['number'] = number;
                 options['iconUrl'] = this.get_color_url(this.records[i]);
-
+                if (number && !manyNumbers && parseInt(number) < 11) {
+                    options['prefix'] = 'mdi';
+                    options['glyph'] = options['glyphPrefix'] + '-' + number + '-' + options['glyphSuffix'];
+                } else if (number && (parseInt(number) >= 11 || manyNumbers)) {
+                    // If the number is greater than 10 or if there are two numbers separated by a comma,
+                    // we only display strings. Because we can't display more than 1 digit as a glyph.
+                    // TODO: find a way to display more than 1 digit as a glyph (maybe try to combine 2 glyphs? Or don't use glyphs at all?)
+                    options['prefix'] = '';
+                    options['glyph'] = number;
+                } else {
+                    options['prefix'] = 'mdi';
+                    options['glyph'] = 'radiobox-blank';
+                }
                 icon = L.icon.glyph(options);
-
                 marker = new MapView.Marker([lat, lng],this,this.records[i],{icon:icon});
             }else{
                 marker = new MapView.Marker([lat, lng],this,this.records[i]);
@@ -1055,7 +1093,8 @@ MapView.LayerGroup = Widget.extend({
             this.the_layer.clearLayers();
         }
         this.the_layer = new L.LayerGroup();
-        var lat, lng, marker, icon, id;
+        var lat, lng, marker, icon, id, number, currentMarker, manyNumbers;
+        var latlngs = [];
         for (var i=0; i<this.records.length; i++) {
             //console.log(this.records[i]);
             if (this.records[i] == undefined || this.records[i].rendered) {
@@ -1063,27 +1102,56 @@ MapView.LayerGroup = Widget.extend({
             }
             lat = this.records[i][this.options.latitude_field];
             lng = this.records[i][this.options.longitude_field];
-
+            latlngs.push([lat, lng]);
+            number = this.records[i][this.options.number_field] || false;
+            manyNumbers = number && number.split(',').length > 1 || false;
             if (this.options.custom_icon) {
                 var options = this.options.icon_options.unselected;
                 options['id'] = 'icon_'+this.records[i].id;
+                options['number'] = number;
                 options['iconUrl'] = this.get_color_url(this.records[i]);
-
+                if (number && !manyNumbers && parseInt(number) < 11) {
+                    options['prefix'] = 'mdi';
+                    options['glyph'] = options['glyphPrefix'] + '-' + number + '-' + options['glyphSuffix'];
+                } else if (number && (parseInt(number) >= 11 || manyNumbers)) {
+                    // If the number is greater than 10 or if there are two numbers separated by a comma,
+                    // we only display strings. Because we can't display more than 1 digit as a glyph.
+                    // TODO: find a way to display more than 1 digit as a glyph (maybe try to combine 2 glyphs? Or don't use glyphs at all?)
+                    options['prefix'] = '';
+                    options['glyph'] = number;
+                } else {
+                    options['prefix'] = 'mdi';
+                    options['glyph'] = 'radiobox-blank';
+                }
                 icon = L.icon.glyph(options);
-
                 marker = new MapView.Marker([lat, lng],this,this.records[i],{icon:icon});
             }else{
                 marker = new MapView.Marker([lat, lng],this,this.records[i]);
             }
-                    
             this.the_layer.addLayer(marker);
             marker.set_ids_dict_ref();
             this.records[i]["rendered"] = true;
         }
-
+        // Add the current marker if there is an additionnal record
+        if (this.options.additional_record){
+            var options = this.options.icon_options.unselected;
+            // this id is a negative value to avoid conflict with existing ids of real markers
+            options['id'] = 'icon_' + this.options.additional_record.id;
+            options['iconUrl'] = this.get_color_url(false, 'green');
+            options['prefix'] = 'mdi';
+            options['glyph'] = 'radiobox-blank';
+            icon = L.icon.glyph(options);
+            currentMarker = this.options.additional_record;
+            marker = new MapView.Marker([currentMarker.geo_lat, currentMarker.geo_lng],this,currentMarker,{icon:icon});
+            this.the_layer.addLayer(marker);
+            marker.set_ids_dict_ref();
+        }
         if (this.options.auto_addTo) {
             this.the_layer.addTo(this.map.the_map);
             this.visible = true;
+            if (this.options.connect_markers == '1' && latlngs.length > 0) {
+                this.do_connect_dot(latlngs);  // Add simple lines between the markers on the map
+            }
             this.do_show_range(this.map.view.current_min-1,false,true,set_bounds);
         }
 
@@ -1092,15 +1160,15 @@ MapView.LayerGroup = Widget.extend({
     /**
      *  returns the URL for the icon, given the color_field. defaults to blue.
      */
-    get_color_url: function (record) {
+    get_color_url: function (record, color='blue') {
         var color_field =  this.options.color_field;
         var base_path = this.options.icon_options.icon_path;
-        if (color_field && record[color_field] && record[color_field] == 'grey') {
+        if (record && color_field && record[color_field] && record[color_field] == 'grey') {
             return base_path + 'gray.png';
-        }else if (color_field && record[color_field]) {
+        }else if (record && color_field && record[color_field]) {
             return base_path + record[color_field] + '.png';
         }else{
-            return base_path + 'blue.png';
+            return base_path + color + '.png';
         }
     },
     /**
@@ -1167,6 +1235,10 @@ MapView.LayerGroup = Widget.extend({
                 found = true;
                 break;
             }
+        }
+        // If there is a fake marker, we need to check it too
+        if (this.options.additional_record != undefined && this.options.additional_record.id === id) {
+            found = true;
         }
         return found;
     },
@@ -1270,6 +1342,9 @@ MapView.LayerGroup = Widget.extend({
             this.do_show_range(0,i1);
             this.do_show_range(i2,this.records.length);
         }
+    },
+    do_connect_dot: function (latlngs) {
+        L.polyline(latlngs, {color: '#0066cc'}).addTo(this.map.the_map);
     },
     /**
      *  Override method from Widget.
@@ -1461,22 +1536,30 @@ MapView.Marker = L.Marker.extend({
      *  Updates the icon's glyph. Called when a marker is selected or unselected, ie by click on its icon
      */
     update_glyph: function() {
-        //console.log("MapView.Marker.update_glyph");
-        var selected_glyph_class = this.group.options.icon_options.selected.prefix + "-" + this.group.options.icon_options.selected.glyph;
-        var unselected_glyph_class = this.group.options.icon_options.unselected.prefix + "-" + this.group.options.icon_options.unselected.glyph;
-        var glyph_id = '#glyph_icon_'+this.id;
-
-        var $glyph = $(glyph_id);
-        if ($glyph.length>0) {
-            if ($glyph.hasClass(selected_glyph_class)) {
-                $glyph.removeClass(selected_glyph_class);
-                $glyph.addClass(unselected_glyph_class);
-            }else{
-                $glyph.removeClass(unselected_glyph_class);
-                $glyph.addClass(selected_glyph_class);
+        var withPrefix = this.options.icon && this.options.icon.options['prefix'] !== '';
+        // We only change the glyph if the icon has a prefix, some records have no prefix and are only the number of the element instead of a glyph
+        if (withPrefix) {
+            var glyph_id = '#glyph_icon_'+this.id;
+            var selected_glyph_class, unselected_glyph_class;
+            if (this.options.icon.options['glyph'] == 'radiobox-blank' || this.options.icon.options['number'] == false) {
+                selected_glyph_class = this.group.options.icon_options.selected.prefix + "-" + this.group.options.icon_options.selected.glyph;
+                unselected_glyph_class = this.group.options.icon_options.unselected.prefix + "-" + this.group.options.icon_options.unselected.glyph;
+            } else {  // MDI numeric icon selectors
+                selected_glyph_class = `${this.options.icon.options['prefix']}-${this.group.options.icon_options.selected.glyphPrefix}-${this.options.icon.options['number']}-${this.group.options.icon_options.selected.glyphSuffix}`;
+                unselected_glyph_class = `${this.options.icon.options['prefix']}-${this.group.options.icon_options.unselected.glyphPrefix}-${this.options.icon.options['number']}-${this.group.options.icon_options.unselected.glyphSuffix}`;
             }
-        }else{
-            console.log("update_glyph: couldn't find glyph id"+glyph_id);
+            var $glyph = $(glyph_id);
+            if ($glyph.length>0) {
+                if ($glyph.hasClass(selected_glyph_class)) {
+                    $glyph.removeClass(selected_glyph_class);
+                    $glyph.addClass(unselected_glyph_class);
+                }else{
+                    $glyph.removeClass(unselected_glyph_class);
+                    $glyph.addClass(selected_glyph_class);
+                }
+            }else{
+                console.log("update_glyph: couldn't find glyph id"+glyph_id);
+            }
         }
     },
     /**
@@ -1496,8 +1579,8 @@ MapView.Marker = L.Marker.extend({
     /**
      *  returns the URL for the icon. defaults to blue.
      */
-    get_color_url: function (record) {
-        return this.group.get_color_url(record);
+    get_color_url: function (record, color='blue') {
+        return this.group.get_color_url(record, color);
     },
     /**
      *  Displays (make visible) the marker
