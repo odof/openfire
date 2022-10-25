@@ -208,6 +208,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
     address_city = fields.Char('Ville', related='address_id.city', oldname="partner_city", readonly=1)
     address_phone = fields.Char(related='address_id.phone', string=u"Téléphone", readonly=1)
     address_mobile = fields.Char(related='address_id.mobile', string=u"Mobile", readonly=1)
+    address_email = fields.Char(related='address_id.email', string=u"Courriel", readonly=1)
     secteur_tech_id = fields.Many2one(
         related='address_id.of_secteur_tech_id', readonly=True, store=True)
     department_id = fields.Many2one(
