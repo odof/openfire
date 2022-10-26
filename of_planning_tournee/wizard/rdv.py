@@ -7,6 +7,7 @@ import pytz
 import urllib
 from datetime import datetime, timedelta, date
 from dateutil.relativedelta import relativedelta
+from operator import itemgetter
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
@@ -15,7 +16,6 @@ from odoo.tools.float_utils import float_compare
 from odoo.addons.of_planning_tournee.models.of_intervention_settings import SELECTION_SEARCH_TYPES
 from odoo.addons.of_planning_tournee.models.of_intervention_settings import SELECTION_SEARCH_MODES
 from odoo.addons.of_utils.models.of_utils import distance_points, hours_to_strs
-from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
 from odoo.addons.calendar.models.calendar import calendar_id2real_id
 
 _logger = logging.getLogger(__name__)
@@ -167,17 +167,17 @@ class OfTourneeRdv(models.TransientModel):
     # Champs de résultat
     display_res = fields.Boolean(string=u"Voir Résultats", default=False)  # Utilisé pour attrs invisible des résultats
     zero_result = fields.Boolean(string="Recherche infructueuse", default=False, help=u"Aucun résultat")
-    can_show_more = fields.Boolean(string="Can show more", compute='_compute_can_show_more', store=True)
+    can_show_more = fields.Boolean(string="Can show more", compute='_compute_can_show_more')
     planning_ids = fields.One2many('of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs')
     by_distance_planning_tree_ids = fields.One2many(
-        comodel_name='of.tournee.rdv.line.by.distance', inverse_name='wizard_id', string="Slots by distance",
-        domain=[('intervention_id', '=', False), ('allday', '=', False), ('hidden', '=', False)])
+        comodel_name='of.tournee.rdv.line', compute='_compute_by_distance_planning_tree_ids',
+        string="Slots by distance")
     by_duration_planning_tree_ids = fields.One2many(
-        comodel_name='of.tournee.rdv.line.by.duration', inverse_name='wizard_id', string="Slots by duration",
-        domain=[('intervention_id', '=', False), ('allday', '=', False), ('hidden', '=', False)])
+        comodel_name='of.tournee.rdv.line', compute='_compute_by_duration_planning_tree_ids',
+        string="Slots by duration")
     by_date_planning_tree_ids = fields.One2many(
-        comodel_name='of.tournee.rdv.line.by.date', inverse_name='wizard_id', string="Slots by date",
-        domain=[('intervention_id', '=', False), ('allday', '=', False), ('hidden', '=', False)])
+        comodel_name='of.tournee.rdv.line', compute='_compute_by_date_planning_tree_ids',
+        string="Slots by date")
     res_line_id = fields.Many2one(comodel_name='of.tournee.rdv.line', string=u"Créneau Sélectionné")
     map_line_id = fields.Many2one(comodel_name='of.tournee.rdv.line', string="Line selected for the map preview")
     map_tour_id = fields.Many2one(comodel_name='of.planning.tournee', string="Tour")
@@ -306,30 +306,47 @@ class OfTourneeRdv(models.TransientModel):
         if search_str is None:
             search_str = 'distance_utile, debut_dt, employee_id' if self.search_type == 'distance' \
                 else 'duree_utile, debut_dt, employee_id'
-        by_date_lines_hidden = self.env['of.tournee.rdv.line.by.date'].search([
+
+        lines_hidden = self.env['of.tournee.rdv.line'].search([
             ('wizard_id', '=', self.id),
             ('disponible', '=', True),
             ('allday', '=', False),
             ('intervention_id', '=', False),
-            ('hidden', '=', True),
+            '|',
+            ('by_date_hidden', '=', True),
+            '|',
+            ('by_distance_hidden', '=', True),
+            ('by_duration_hidden', '=', True),
         ], order=search_str)
-        by_distance_lines_hidden = self.env['of.tournee.rdv.line.by.distance'].search([
-            ('wizard_id', '=', self.id),
-            ('disponible', '=', True),
-            ('allday', '=', False),
-            ('intervention_id', '=', False),
-            ('hidden', '=', True),
-        ], order=search_str)
-        by_duration_lines_hidden = self.env['of.tournee.rdv.line.by.duration'].search([
-            ('wizard_id', '=', self.id),
-            ('disponible', '=', True),
-            ('allday', '=', False),
-            ('intervention_id', '=', False),
-            ('hidden', '=', True),
-        ], order=search_str)
+        by_date_lines_hidden = lines_hidden.filtered(lambda l: l.by_date_hidden)
+        by_distance_lines_hidden = lines_hidden.filtered(lambda l: l.by_distance_hidden)
+        by_duration_lines_hidden = lines_hidden.filtered(lambda l: l.by_duration_hidden)
         return by_date_lines_hidden, by_distance_lines_hidden, by_duration_lines_hidden
 
     # @api.depends
+    @api.multi
+    def _compute_by_distance_planning_tree_ids(self):
+        for wizard in self:
+            lines = wizard.planning_ids.filtered(
+                lambda l: not l.intervention_id and not l.allday and not l.by_distance_hidden)
+            wizard.by_distance_planning_tree_ids = lines.sorted(
+                key=lambda l: (l.distance_utile, l.debut_dt, l.employee_id))
+
+    @api.multi
+    def _compute_by_duration_planning_tree_ids(self):
+        for wizard in self:
+            lines = wizard.planning_ids.filtered(
+                lambda l: not l.intervention_id and not l.allday and not l.by_duration_hidden)
+            wizard.by_duration_planning_tree_ids = lines.sorted(
+                key=lambda l: (l.duree_utile, l.debut_dt, l.employee_id))
+
+    @api.multi
+    def _compute_by_date_planning_tree_ids(self):
+        for wizard in self:
+            lines = wizard.planning_ids.filtered(
+                lambda l: not l.intervention_id and not l.allday and not l.by_date_hidden)
+            wizard.by_date_planning_tree_ids = lines.sorted(
+                key=lambda l: (l.date, l.date_flo, l.employee_id))
 
     @api.depends('partner_address_id', 'partner_address_id.geocoding', 'partner_address_id.precision')
     def _compute_geocode_retry(self):
@@ -343,9 +360,6 @@ class OfTourneeRdv(models.TransientModel):
             else:
                 wizard.geocode_retry = True
 
-    @api.depends(
-        'by_distance_planning_tree_ids.hidden', 'by_duration_planning_tree_ids.hidden',
-        'by_date_planning_tree_ids.hidden')
     def _compute_can_show_more(self):
         for wizard in self:
             by_date_lines_hidden, by_distance_lines_hidden, by_duration_lines_hidden = wizard._get_hidden_lines()
@@ -458,11 +472,9 @@ class OfTourneeRdv(models.TransientModel):
                 # Si il n'y a pas d'a_programmer, on affecte creer_recurrence en fonction de la tâche
                 vals['creer_recurrence'] = self.tache_id.recurrence
 
-            if not self.duree and self.tache_id.duree:
-                vals['duree'] = self.tache_id.duree
             # If the duration is not set, we set it to 1 hour by default to avoid an error when searching time slots
-            if not vals.get('duree'):
-                vals['duree'] = 1.0
+            if not self.duree:
+                vals['duree'] = self.tache_id.duree or 1.0
             employees = []
             for employee in self.pre_employee_ids:
                 if employee in self.tache_id.employee_ids:
@@ -604,9 +616,9 @@ class OfTourneeRdv(models.TransientModel):
         number_of_results = self.env['ir.values'].get_default('of.intervention.settings', 'number_of_results')
         by_date_lines_hidden, by_distance_lines_hidden, by_duration_lines_hidden = self._get_hidden_lines()
         # update lines to hide the lines who are above the number_of_results
-        by_date_lines_hidden[:number_of_results].write({'hidden': False})
-        by_distance_lines_hidden[:number_of_results].write({'hidden': False})
-        by_duration_lines_hidden[:number_of_results].write({'hidden': False})
+        by_date_lines_hidden[:number_of_results].write({'by_date_hidden': False})
+        by_distance_lines_hidden[:number_of_results].write({'by_distance_hidden': False})
+        by_duration_lines_hidden[:number_of_results].write({'by_duration_hidden': False})
         return self.action_open_wizard()
 
     # Autres
@@ -827,6 +839,8 @@ class OfTourneeRdv(models.TransientModel):
             # Calcul des créneaux dispos et des créneaux occupés
             for employee in employee_obj.browse(employees_dispo):
                 intervention_dates = employee_intervention_dates[employee.id]
+                # On retrie la liste des RDV, car l'ordre naturel est erroné avec les RDV réguliers
+                intervention_dates.sort(key=itemgetter(1))
 
                 # Si paramètre secteur, on contrôle les tournées de l'intervenant
                 if secteur_id:
@@ -1197,11 +1211,14 @@ class OfTourneeRdv(models.TransientModel):
                 # Créneaux et interventions
                 non_loc = False
                 for line in creneaux:
-                    if line.geo_lat == line.geo_lng == 0:
+                    line_geo_lat = line.intervention_id.geo_lat if line.intervention_id else line.wizard_id.geo_lat
+                    line_geo_lng = line.intervention_id.geo_lng if line.intervention_id else line.wizard_id.geo_lng
+
+                    if line_geo_lat == line_geo_lng == 0:
                         non_loc = True
                         break
-                    coords_str += ";" + str(line.geo_lng) + "," + str(line.geo_lat)
-                    coords.append({'lat': line.geo_lat, 'lng': line.geo_lng})
+                    coords_str += ";" + str(line_geo_lng) + "," + str(line_geo_lat)
+                    coords.append({'lat': line_geo_lat, 'lng': line_geo_lng})
                 if non_loc:
                     continue
 
@@ -1312,9 +1329,9 @@ class OfTourneeRdv(models.TransientModel):
         # update lines to hide the lines who are above the number_of_results
         by_date_lines_hidden, by_distance_lines_hidden, by_duration_lines_hidden = self._get_hidden_lines(
             search_order_str)
-        by_date_lines_hidden[:number_of_results].write({'hidden': False})
-        by_distance_lines_hidden[:number_of_results].write({'hidden': False})
-        by_duration_lines_hidden[:number_of_results].write({'hidden': False})
+        by_date_lines_hidden[:number_of_results].write({'by_date_hidden': False})
+        by_distance_lines_hidden[:number_of_results].write({'by_distance_hidden': False})
+        by_duration_lines_hidden[:number_of_results].write({'by_duration_hidden': False})
         return nb, first_slot
 
 
@@ -1335,7 +1352,7 @@ class OfTourneeRdvLineMixin(models.AbstractModel):
         self.ensure_one()
         self.wizard_id.map_tour_id = self.tour_id.id or False
         # if we are on a delegated object we must use the id of parent object
-        self.wizard_id.map_line_id = self.original_line_id.id if self._name != 'of.tournee.rdv.line' else self.id
+        self.wizard_id.map_line_id = self.id
         # force the map to be recomputed
         self.wizard_id._compute_intervention_map_data()
         self.toggl_map_preview()
@@ -1379,7 +1396,7 @@ class OfTourneeRdvLineMixin(models.AbstractModel):
         name += address.zip and (" " + address.zip) or ""
         name += address.city and (" " + address.city) or ""
         # if we are on the delegated object we must use the id of the parent object
-        res_line_id = self.original_line_id.id if self._name != 'of.tournee.rdv.line' else self.id
+        res_line_id = self.id
         wizard_vals = {
             'date_display': self.date,
             'name': name,
@@ -1402,18 +1419,19 @@ class OfTourneeRdvLine(models.TransientModel):
     weekday = fields.Char(string="Weekday", compute='_compute_date_weekday', store=True)
     tour_id = fields.Many2one(
         comodel_name='of.planning.tournee', string="Tour", compute='_compute_tour_id', store=True)
-    date = fields.Date(string="Date")
+    date = fields.Date(string="Date", index=True)
     debut_dt = fields.Datetime(string=u"Début")
     fin_dt = fields.Datetime(string="Fin")
     date_flo = fields.Float(string='Date', required=True, digits=(12, 5))
     date_flo_deadline = fields.Float(string='Date', required=True, digits=(12, 5))
     description = fields.Char(string=u"Créneau", size=128)
-    wizard_id = fields.Many2one(comodel_name='of.tournee.rdv', string="RDV", required=True, ondelete='cascade')
+    wizard_id = fields.Many2one(
+        comodel_name='of.tournee.rdv', string="RDV", required=True, ondelete='cascade', index=True)
     employee_id = fields.Many2one(comodel_name='hr.employee', string='Intervenant')
     employee_cal_ids = fields.Many2many(
         comodel_name='hr.employee', compute='_compute_cal_employee_ids', string="Intervenants",
         help="Technical field used to display attendees and colors in calendar view")
-    intervention_id = fields.Many2one('of.planning.intervention', string="Planning")
+    intervention_id = fields.Many2one(comodel_name='of.planning.intervention', string="Planning", index=True)
     name = fields.Char(string="name", default="DISPONIBLE")
     distance = fields.Float(string='Dist.tot. (km)', digits=(12, 0), help="distance prec + distance suiv")
     dist_prec = fields.Float(string='Dist.Prec. (km)', digits=(12, 0))
@@ -1428,26 +1446,16 @@ class OfTourneeRdvLine(models.TransientModel):
     duree_utile = fields.Float(string=u'Durée. utile (min)', digits=(12, 0))
     of_color_ft = fields.Char(related="employee_id.of_color_ft", readonly=True)
     of_color_bg = fields.Char(related="employee_id.of_color_bg", readonly=True)
-    disponible = fields.Boolean(string="Est dispo", default=True)
+    disponible = fields.Boolean(string="Est dispo", default=True, index=True)
     map_preview = fields.Boolean(string="Map preview", default=False)
     force_color = fields.Char("Couleur")
-    allday = fields.Boolean('All Day', default=False)
+    by_distance_hidden = fields.Boolean(string="Hidden", default=True, index=True)
+    by_duration_hidden = fields.Boolean(string="Hidden", default=True, index=True)
+    by_date_hidden = fields.Boolean(string="Hidden", default=True, index=True)
+    allday = fields.Boolean('All Day', default=False, index=True)
     selected = fields.Boolean(u'Créneau sélectionné', default=False)
     selected_hour = fields.Float(string='Heure du RDV', digits=(2, 2))
     selected_description = fields.Text(string="Description", related="wizard_id.description")
-    geo_lat = fields.Float(
-        string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo",
-        readonly=True)
-    geo_lng = fields.Float(
-        string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo",
-        readonly=True)
-    precision = fields.Selection(
-        GEO_PRECISION, default='not_tried', readonly=True, compute="_compute_geo",
-        help=u"Niveau de précision de la géolocalisation.\n"
-             u"bas: à la ville.\n"
-             u"moyen: au village\n"
-             u"haut: à la rue / au voisinage\n"
-             u"très haut: au numéro de rue\n")
 
     @api.multi
     @api.depends('date')
@@ -1474,26 +1482,6 @@ class OfTourneeRdvLine(models.TransientModel):
 
     # @api.depends
 
-    @api.multi
-    @api.depends("intervention_id")
-    def _compute_geo(self):
-        for line in self:
-            if line.intervention_id:
-                # Créneau déjà occupé
-                vals = {
-                    'geo_lat': line.intervention_id.geo_lat,
-                    'geo_lng': line.intervention_id.geo_lng,
-                    'precision': line.intervention_id.precision,
-                }
-            else:
-                # Créneau libre
-                vals = {
-                    'geo_lat': line.wizard_id.geo_lat,
-                    'geo_lng': line.wizard_id.geo_lng,
-                    'precision': line.wizard_id.precision,
-                }
-            line.update(vals)
-
     @api.depends('intervention_id')
     def _compute_state_int(self):
         """de of.calendar.mixin"""
@@ -1518,20 +1506,13 @@ class OfTourneeRdvLine(models.TransientModel):
     @api.depends('date', 'employee_id')
     def _compute_tour_id(self):
         for line in self:
-            # added sudo() to avoid access rights issues from the website (no access for portal users
-            # on of.planning.tournee)
-            line.tour_id = self.env['of.planning.tournee'].sudo().search([
-                ('date', '=', line.date),
-                ('employee_id', '=', line.employee_id.id),
-            ], limit=1) or False
-
-    @api.model
-    def create(self, vals):
-        line = super(OfTourneeRdvLine, self).create(vals)
-        self.env['of.tournee.rdv.line.by.date'].create({'original_line_id': line.id})
-        self.env['of.tournee.rdv.line.by.distance'].create({'original_line_id': line.id})
-        self.env['of.tournee.rdv.line.by.duration'].create({'original_line_id': line.id})
-        return line
+            sql_result = False
+            if line.employee_id:
+                self._cr.execute(
+                    "SELECT id FROM of_planning_tournee WHERE date = %s AND employee_id = %s LIMIT 1",
+                    (line.date, line.employee_id.id))
+                sql_result = self._cr.fetchone()
+            line.tour_id = sql_result and sql_result[0] or False
 
     # Autres
 
@@ -1543,39 +1524,3 @@ class OfTourneeRdvLine(models.TransientModel):
         v2 = {'label': u'Réalisé', 'value': 2}
         v3 = {'label': u'Disponibilité', 'value': 3}
         return v0, v1, v2, v3
-
-
-class OfTourneeRdvLineByDate(models.TransientModel):
-    _name = 'of.tournee.rdv.line.by.date'
-    _description = u"Propositions des RDVs par date"
-    _inherit = 'of.tournee.rdv.line.mixin'
-    _inherits = {'of.tournee.rdv.line': 'original_line_id'}
-    _order = 'date, date_flo, employee_id'
-
-    original_line_id = fields.Many2one(
-        comodel_name='of.tournee.rdv.line', string="Original line", delegate=True, ondelete='cascade', required=True)
-    hidden = fields.Boolean(string="Hidden", default=True)
-
-
-class OfTourneeRdvLineByDuration(models.TransientModel):
-    _name = 'of.tournee.rdv.line.by.duration'
-    _description = u"Propositions des RDVs par durée"
-    _inherit = 'of.tournee.rdv.line.mixin'
-    _inherits = {'of.tournee.rdv.line': 'original_line_id'}
-    _order = 'duree_utile, debut_dt, employee_id'
-
-    original_line_id = fields.Many2one(
-        comodel_name='of.tournee.rdv.line', string="Original line", delegate=True, ondelete='cascade', required=True)
-    hidden = fields.Boolean(string="Hidden", default=True)
-
-
-class OfTourneeRdvLineByDistance(models.TransientModel):
-    _name = 'of.tournee.rdv.line.by.distance'
-    _description = u"Propositions des RDVs par distance"
-    _inherit = 'of.tournee.rdv.line.mixin'
-    _inherits = {'of.tournee.rdv.line': 'original_line_id'}
-    _order = 'distance_utile, debut_dt, employee_id'
-
-    original_line_id = fields.Many2one(
-        comodel_name='of.tournee.rdv.line', string="Original line", delegate=True, ondelete='cascade', required=True)
-    hidden = fields.Boolean(string="Hidden", default=True)
