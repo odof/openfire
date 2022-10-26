@@ -51,6 +51,7 @@ class OFParcInstalle(models.Model):
         time_slots_new._onchange_partner_address_id()
         time_slots_new._onchange_service()
         time_slots_new._onchange_tache_id()
+        time_slots_new._onchange_date_recherche_fin()
         wizard_values = tour_meetup_obj._convert_to_write(time_slots_new._cache)
         time_slots_wizard = tour_meetup_obj.create(wizard_values)
         # start time slots computing

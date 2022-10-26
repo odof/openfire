@@ -10,13 +10,14 @@ class OfPlanningTournee(models.Model):
     _order = 'date DESC'
     _rec_name = 'date'
 
-    date = fields.Date(string='Date', required=True)
+    date = fields.Date(string='Date', required=True, index=True)
     date_jour = fields.Char(compute="_compute_date_jour", string="Jour")
     # Champ equipe_id avant la refonte du planning nov. 2019.
     # Conservé quelques jours pour la transtion des données.
     # À supprimer par la suite.
-    equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe')
-    employee_id = fields.Many2one('hr.employee', string=u'Intervenant', required=True, ondelete='cascade')
+    equipe_id = fields.Many2one(comodel_name='of.planning.equipe', string=u'Équipe')
+    employee_id = fields.Many2one(
+        comodel_name='hr.employee', string=u'Intervenant', required=True, ondelete='cascade', index=True)
     employee_other_ids = fields.Many2many(
         'hr.employee', 'tournee_employee_other_rel', 'tournee_id', 'employee_id', string=u'Équipiers', required=True,
         domain="['|', ('of_est_intervenant', '=', True), ('of_est_commercial', '=', True)]")
