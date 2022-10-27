@@ -119,12 +119,8 @@
         <field name="model">of.planning.intervention</field>
         <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//notebook/page[@name='infos']" position="after">
-                <page name="parc_installe" string="Produit installé" groups="project.group_project_user">
-                    <group>
-                        <field name="parc_installe_id" context="{'default_client_id': partner_id}"/>
-                    </group>
-                </page>
+            <xpath expr="//field[@name='duree']" position="after">
+                <field name="parc_installe_id"/>
             </xpath>
 
         </field>
