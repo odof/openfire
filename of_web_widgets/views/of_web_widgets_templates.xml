@@ -3,6 +3,7 @@
     <template id="assets_backend" name="of_web_widgets assets" inherit_id="web.assets_backend">
         <xpath expr="." position="inside">
             <link rel="stylesheet" href="/of_web_widgets/static/src/less/of_web_widgets.less"/>
+            <script type="text/javascript" src="/of_web_widgets/static/src/js/of_dialog.js"/>
             <script type="text/javascript" src="/of_web_widgets/static/src/js/of_kanban.js"/>
             <script type="text/javascript" src="/of_web_widgets/static/src/js/of_form.js"/>
             <script type="text/javascript" src="/of_web_widgets/static/src/js/of_data.js"/>
