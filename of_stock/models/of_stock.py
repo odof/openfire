@@ -961,6 +961,387 @@ class StockQuant(models.Model):
         return super(StockQuant, self)._quants_get_reservation_domain(
             move, pack_operation_id, lot_id, company_id, initial_domain)
 
+    @api.model
+    def test_stock(self):
+        """
+        Test de cohérence des mouvements de stock avec les quants
+        """
+        move_obj = self.env['stock.move']
+        locations = self.env['stock.location'].search([('usage', '=', 'internal')])
+
+        moves_out = move_obj.search([('state', '=', 'done'), ('location_id', 'in', locations.ids)])
+        moves_in = move_obj.search([('state', '=', 'done'), ('location_dest_id', 'in', locations.ids)])
+
+        to_check = moves_out
+        location_field = 'location_id'
+        while to_check:
+            move = to_check[0]
+            location = move[location_field]
+            move_pack = move_obj
+            move_pack_new = move
+            # On récupère tous les mouvements sortants et entrants liés à celui-ci par le biais des quants
+            while move_pack != move_pack_new:
+                move_pack = move_pack_new
+                quants = move_pack.mapped('quant_ids')
+                move_pack_new |= quants\
+                    .mapped('history_ids')\
+                    .filtered(lambda m: m.location_id == location or m.location_dest_id == location)
+            move_pack_out = move_pack.filtered(lambda m: m.location_id == location)
+            move_pack_in = move_pack.filtered(lambda m: m.location_dest_id == location)
+            # Début des vérifs
+            total_out = sum(move_pack_out.mapped('product_qty'))
+            total_in = sum(move_pack_in.mapped('product_qty'))
+            total_quant = sum(quant.qty for quant in quants if quant.location_id == location)
+            if round(total_in - total_out, 2) != round(total_quant, 2):
+                print u"Incohérence :", min(move_pack.mapped('create_date')), round(total_in - total_out, 2),\
+                    round(total_quant, 2), move.id, move_pack, quants
+                to_check -= move_pack
+            else:
+                to_check -= move
+            if not to_check and location_field == 'location_id':
+                to_check = moves_in
+                location_field = 'location_dest_id'
+
+    @api.model
+    def test_move_quants(self):
+        """
+        Fonction qui vérifie que la somme des quants positifs d'un move sortant est égale à la quantité du move
+        """
+        for move in self.env['stock.move'].search([('state', '=', 'done')]):
+            quant_qty = sum([quant.qty for quant in move.quant_ids if quant.qty > 0])
+            if float_compare(quant_qty, move.product_qty, precision_rounding=move.product_id.uom_id.rounding):
+                print\
+                    move.write_date,\
+                    u"Incohérence quantité sur move %s : %s (%s) vs %s (%s) vs %s - %s : precision %s"\
+                    % (move.id, move.product_qty, move.product_uom_qty,
+                       quant_qty, " + ".join(str(quant.qty) for quant in move.quant_ids),
+                       sum(move.linked_move_operation_ids.mapped('qty')),
+                       move.product_uom.name, move.product_uom.rounding)
+
+    @api.model
+    def test_quant_chain(self):
+        """
+        Fonction qui vérifie si les moves associés à un quant forment bien une chaîne
+          et si l'emplacement final de la chaîne correspond bien à l'emplacement du quant
+        """
+        for quant in self.env['stock.quant'].search([]):
+            loc_vals = {}
+            increment = 1 if quant.qty > 0 else -1
+            for move in quant.history_ids:
+                loc_vals[move.location_id] = loc_vals.get(move.location_id, 0) - increment
+                loc_vals[move.location_dest_id] = loc_vals.get(move.location_dest_id, 0) + increment
+            cpt = 0
+            loc_out = False
+            loc_in = False
+            for loc, v in loc_vals.iteritems():
+                if v:
+                    cpt += abs(v)
+                    if cpt > 2:
+                        print u"Incohérence de chaîne de mvts sur quant %s" % quant.id
+                        break
+                    if v == 1:
+                        loc_out = loc
+                    elif v == -1:
+                        loc_in = loc
+            else:
+                if loc_out:
+                    if loc_out != quant.location_id:
+                        print u"Incohérence emplacement du quant %s : %s vs %s" %\
+                              (quant.id, quant.location_id.id, loc_out.id)
+                    elif loc_in.usage == 'internal' and quant.qty > 0 and not quant.propagated_from_id:
+                        print u"Le quant provient d'un emplacement physique mais n'a pas de quant négatif associé : %s"\
+                              % quant.id
+                    elif loc_in.usage != 'internal' and quant.propagated_from_id:
+                        print u"Le quant provient d'un emplacement virtuel mais a un quant négatif associé : %s"\
+                              % quant.id
+                else:
+                    # Les mouvements du quant forment un circuit (emplacement de départ = emplacement d'arrivée)
+                    if quant.location_id not in loc_vals:
+                        print u"Incohérence emplacement final inexistant sur quant %s (circuit)" % quant.id
+                    elif quant.location_id.usage == 'internal' and quant.qty > 0 and not quant.propagated_from_id:
+                        print u"Le quant forme un circuit mais son emplacement final n'est pas virtuel : %s" % quant.id
+                    elif quant.location_id.usage != 'internal' and quant.propagated_from_id:
+                        print u"Le quant forme un circuit avec quant négatif associé, " \
+                              u"mais son emplacement est virtuel : %s" % quant.id
+                # Test de graphe disjoint
+                # Ces erreurs montrent une incohérence, mais qui ne devrait pas avoir d'incidence négative sur
+                # les stocks (un cycle n'a pas d'impact sur le stock, si le quant pointe sur un emplacement qui est
+                #  en-dehors, ou sur un emplacement virtuel, il n'aura pas non-plus d'impact, donc intégrité respectée).
+                if quant.qty < 0:
+                    continue
+                loc_moves = {}
+                for move in quant.history_ids:
+                    location_id = move.location_id.id
+                    if location_id in loc_moves:
+                        loc_moves[location_id].append(move)
+                    else:
+                        loc_moves[location_id] = [move]
+                to_test = [loc_in and loc_in.id or loc.id]
+                checked = to_test[:]
+                while to_test:
+                    for move in loc_moves.get(to_test.pop(), []):
+                        if move.location_dest_id.id in checked:
+                            continue
+                        checked.append(move.location_dest_id.id)
+                        to_test.append(move.location_dest_id.id)
+                if len(checked) < len(loc_vals):
+                    if loc_out:
+                        print u"Le quant forme une chaîne et au moins un circuit disjoints : %s" % quant.id
+                    else:
+                        print u"Le quant forme plusieurs circuits disjoints : %s" % quant.id
+
+    @api.model
+    def _extract_greatest_chain(self, moves_dict, end_loc, nb_restricted_moves, move_start=False):
+        u"""
+        Retourne la plus grosse chaîne de mouvements de stocks menant à l'emplacement final demandé.
+        :param moves_dict: Dictionnaire des mouvements de stock par emplacement de destination.
+        :param end_loc: Emplacement de fin de la chaîne.
+            On part de cet emplacement et on remonte les mouvements pour générer la chaîne.
+        :param nb_restricted_moves: Nombre de mouvements ayant une restriction de lot (n° de série associé)
+            La chaîne retournée doit avoir un nombre de mouvements à n° de série égal à 0 ou nb_restricted_moves
+        :param move_start: Mouvement de départ d'une chaîne (car un quant négatif y est associé).
+            Si on passe dessus, on s'arrête !
+        :return: mouvements de stock, emplacement d'origine, nombre de mouvements restreints inclus
+        """
+        # Attention, récursivité interdite en python T_T
+        # On voudrait un plc, parcours en largeur
+        move_obj = self.env['stock.move']
+        todo = [(move_obj, end_loc, 0, False)]
+        result = (False, False, 0)
+        while todo:
+            moves, loc, nb_restrict, start_reached = todo.pop(0)
+            potential_moves = moves_dict.get(loc.id, move_obj) - moves
+            if start_reached or not potential_moves:
+                # On retourne en priorité un résultat qui contient les mouvements restreints (liés à un n° de série)
+                if nb_restrict == result[2] or nb_restrict == nb_restricted_moves:
+                    result = (moves, loc, nb_restrict)
+                continue
+            for p_move in potential_moves:
+                if p_move in moves:
+                    continue
+                todo.append((
+                    moves + p_move,
+                    p_move.location_id,
+                    nb_restrict + bool(p_move.restrict_lot_id),
+                    p_move == move_start))
+        return result
+
+    @api.multi
+    def of_make_negative_quant(self, move_origin):
+        rounding = move_origin.product_id.uom_id.rounding
+        neg_qt = self.create({
+            'product_id': self.product_id.id,
+            'location_id': move_origin.location_id.id,
+            'qty': float_round(-self.qty, precision_rounding=rounding),
+            'cost': self.cost,
+            'history_ids': [(4, move_origin.id)],
+            'negative_move_id': move_origin.id,
+            'in_date': self.in_date,
+            'company_id': self.company_id.id,
+            'lot_id': self.lot_id.id,
+            'owner_id': self.owner_id.id,
+        })
+        self.propagated_from_id = neg_qt
+
+    @api.model
+    def action_of_repair_move_quants_quantities(self):
+        """
+        Cette fonction répare les quantités des stock.move et stock.quant quand elles ne sont pas cohérentes
+        Dans ces cas, on cherche un stock.move.operation.link (réservation du mouvement de stock dans un stock.picking)
+        Seuls deux cas de figure sont traités :
+        - Si le quant a raison, on modifie la quantité du mouvement de stock
+        - Si le mouvement de stock a raison ET que sa quantité est supérieure à celle des quants, on ajoute un quant
+          de complément et éventuellement un quant négatif
+        """
+        move_obj = self.env['stock.move']
+        quant_obj = self.env['stock.quant']
+
+        sale_lines_to_recompute = self.env['sale.order.line']
+        purchase_lines_to_recompute = self.env['purchase.order.line']
+        for move in move_obj.search([('state', '=', 'done')]):
+            quant_qty = sum([quant.qty for quant in move.quant_ids if quant.qty > 0])
+            if float_compare(quant_qty, move.product_qty, precision_rounding=move.product_id.uom_id.rounding):
+                # Plusieurs cas possibles
+                # 1 - Si la quantité réservée donne raison au quant, c'est le mouvement de stock qui a tort
+                if not float_compare(
+                        quant_qty, sum(move.linked_move_operation_ids.mapped('qty')),
+                        precision_rounding=move.product_id.uom_id.rounding):
+                    # SQL pas top, mais la surcharge de write dans le module stock empêche de modifier la quantité
+                    # d'un mouvement traité
+                    self._cr.execute(
+                        "UPDATE stock_move SET product_qty = %s, product_uom_qty = %s WHERE id = %s"
+                        % (quant_qty,
+                           move.product_id.uom_id._compute_quantity(quant_qty, move.product_uom),
+                           move.id))
+                    # Il faut recalculer les quantités des lignes de commande, mais le cache est périmé à cause
+                    # de la modification en SQL.
+                    # On va donc reléguer ce calcul à la fin et on nettoiera le cache avant de l'effectuer
+                    sale_lines_to_recompute |= move.procurement_id.sale_line_id
+                    purchase_lines_to_recompute |= move.purchase_line_id
+                # 2 - Si la quantité réservée donne raison au mouvement de stock, c'est le quant qui a tort
+                elif not float_compare(
+                        move.product_qty, sum(move.linked_move_operation_ids.mapped('qty')),
+                        precision_rounding=move.product_id.uom_id.rounding):
+                    if move.product_qty > quant_qty:
+                        quant_obj._quant_create_from_move(
+                            float_round(
+                                move.product_qty - quant_qty,
+                                precision_rounding=move.product_id.uom_id.rounding),
+                            move)
+        move_obj.invalidate_cache(['product_uom_qty'])
+        # Recalcul de la qté livrée de la commande client associée
+        for sale_line in sale_lines_to_recompute:
+            sale_line.qty_delivered = sale_line._get_delivered_qty()
+        # Recalcul de la quantité de la commande fournisseur associée
+        for purchase_line in purchase_lines_to_recompute:
+            purchase_line.product_qty = sum(purchase_line.move_ids.mapped('product_uom_qty'))
+
+    @api.model
+    def action_of_repair_quant_chain(self):
+        """ Identifie et répare les problèmes de chaîne sur les quants.
+        Plusieurs problèmes possibles sont corrigés par cette fonction :
+        - Si les mouvements de stock liés au quant ne forment pas un chemin continu, on crée des quants pour séparer
+          ces mouvements en différents chemins continus
+        - Correction de l'emplacement du quant s'il n'est pas cohérent avec ses mouvements de stock
+        - Création/suppression/correction d'un quant négatif associé à un quant positif, au besoin
+        """
+        def repair_negative_quant(quant, location, move=False):
+            def get_move():
+                if move:
+                    return move
+                for mv in quant.history_ids:
+                    if mv.location_id == location:
+                        return mv
+            if location.usage == 'internal':
+                if not quant.propagated_from_id:
+                    # Il manque un quant négatif
+                    quant.of_make_negative_quant(get_move())
+                else:
+                    # Réparation du quant négatif si besoin
+                    neg_quant = quant.propagated_from_id
+                    vals = {}
+                    if neg_quant.location_id != location:
+                        vals['location_id'] = location.id
+                    if neg_quant.negative_move_id.location_id != location:
+                        move = get_move()
+                        vals['negative_move_id'] = move.id
+                        vals['history_ids'] = [(6, 0, [move.id])]
+                    if vals:
+                        neg_quant.write(vals)
+            elif location.usage != 'internal' and quant.propagated_from_id:
+                # Il y a un quant négatif en trop
+                quant.propagated_from_id.unlink()
+
+        quant_obj = self.env['stock.quant']
+        new_quant_defaults = {
+            'history_ids': False,
+            'lot_id': False,
+            'negative_move_id': False,
+            'propagated_from_id': False,
+            'reservation_id': False,
+        }
+
+        for quant in quant_obj.search([('qty', '>', 0)]):
+            loc_vals = {}
+            for move in quant.history_ids:
+                loc_vals[move.location_id] = loc_vals.get(move.location_id, 0) - 1
+                loc_vals[move.location_dest_id] = loc_vals.get(move.location_dest_id, 0) + 1
+            loc_out = []
+            loc_in = False
+            for loc, v in loc_vals.iteritems():
+                if v > 0:
+                    loc_out += [loc] * v
+                elif v < 0:
+                    loc_in = loc
+            if len(loc_out) > 1:
+                # Il y a plusieurs emplacements finaux différents, la chaîne n'est donc pas respectée.
+                # Il faut séparer les chaînes sur des quants distincts
+                negative_quant = quant.propagated_from_id
+                negative_move = negative_quant.negative_move_id
+                nb_restricted_moves = 0
+                moves_packs = []
+                available_moves = quant.history_ids
+                for loc_dest in loc_out:
+                    # Dictionnaire des mouvements disponibles par emplacement de destination
+                    moves_dict = {}
+                    for move in available_moves:
+                        if move.location_dest_id.id in moves_dict:
+                            moves_dict[move.location_dest_id.id] += move
+                        else:
+                            moves_dict[move.location_dest_id.id] = move
+                        if move.restrict_lot_id:
+                            nb_restricted_moves += 1
+                    # Extraction d'une chaîne
+                    moves, loc_orig, nb_restrict = self._extract_greatest_chain(
+                        moves_dict, loc_dest, nb_restricted_moves, negative_move)
+                    if nb_restrict:
+                        nb_restricted_moves = 0
+                    if not moves:
+                        raise UserError(
+                            u"ERR_001 - La découpe des mouvements du quant a échoué. "
+                            u"Probablement en raison d'un n° de série. "
+                            u"quant : %s" % (quant.name_get(), ))
+                    if loc_vals[loc_orig] >= 0:
+                        raise UserError(
+                            u"ERR_002 - Problème de calcul de chaîne. "
+                            u"L'emplacement d'origine calculé ne semble pas correspondre."
+                            u"quant: %s, orig: %s, moves: %s" % (quant.name_get(), loc_orig.name_get(), moves.ids))
+                    loc_vals[loc_orig] += 1
+                    moves_packs.append((moves, loc_orig, loc_dest, nb_restrict))
+                    available_moves -= moves
+                if available_moves:
+                    raise UserError(
+                        u"ERR_003 - Il reste des mouvements non affectés après la découpe du quant."
+                        u"quant : %s, moves : %s" % (quant.name_get(), moves.ids))
+                all_quants = []
+                while len(moves_packs) > 1:
+                    moves, loc_orig, loc_dest, nb_restrict = moves_packs.pop(moves_packs[0][2] != 0)
+                    new_quant_data = quant.copy_data(new_quant_defaults)[0]
+                    new_quant_data['history_ids'] = [(6, 0, moves.ids)]
+                    new_quant_data['location_id'] = loc_dest.id
+
+                    if negative_move.id == moves.ids[-1]:
+                        # Un quant négatif est associé, qui alimente ce quant
+                        new_quant_data['propagated_from_id'] = negative_quant.id
+                        quant.propagated_from_id = False
+                    if quant.reservation_id and quant.reservation_id in moves:
+                        new_quant_data['reservation_id'] = quant.reservation_id.id
+                        quant.reservation_id = False
+                    new_quant = quant_obj.create(new_quant_data)
+                    all_quants.append((new_quant, moves[-1]))
+                    # Modification des réservations des opérations
+                    op_links = moves.mapped('linked_move_operation_ids')\
+                                    .filtered(lambda link: link.reserved_quant_id.id == quant.id)
+                    if op_links:
+                        op_links.write({'reserved_quant_id': new_quant.id})
+                quant.history_ids = moves_packs[0][0]
+                all_quants.append((quant, moves_packs[0][0][-1]))
+                # Correction de l'emplacement du quant d'origine
+                if quant.location_id != moves_packs[0][0][0].location_dest_id:
+                    quant.location_id = moves_packs[0][0][0].location_dest_id
+                for qt, move_orig in all_quants:
+                    repair_negative_quant(qt, move_orig.location_id)
+            else:
+                # Le chaînage est correct, on vérifie l'emplacement du quant et les quants négatifs
+                if loc_out:
+                    if loc_out[0] != quant.location_id:
+                        quant.location_id = loc_out[0]
+                else:
+                    # Les mouvements du quant forment un circuit (emplacement de départ = emplacement d'arrivée)
+                    if quant.location_id not in loc_vals:
+                        if quant.propagated_from_id:
+                            # On prend l'emplacement du quant négatif associé, le cas échéant
+                            quant.location_id = quant.propagated_from_id.location_id
+                        else:
+                            # Sinon, on prend un emplacement au hasard, si possible virtuel
+                            for loc in loc_vals:
+                                if loc.usage != 'internal':
+                                    break
+                            quant.location_id = loc
+                    loc_in = quant.location_id
+
+                repair_negative_quant(quant, loc_in)
+
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
