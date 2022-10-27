@@ -10,9 +10,9 @@ var _lt = core._lt;
 
 
 ListView.List.include({
-/*
-    redéfinition fonction render_cell pour émuler un widget many2many_tags pour les one2many en vue liste 
-*/
+    /**
+     *   redéfinition fonction render_cell pour émuler un widget many2many_tags pour les one2many en vue liste
+     */
     render_cell: function (record, column) {
         var value;
         if(column.type === 'reference') {
