@@ -13,7 +13,6 @@
                     <group>
                         <group>
                             <field name="partner_id"/>
-                            <field name="datastore_id"/>
                             <field name="active"/>
                             <label for="dropshipping"/>
                             <div>
@@ -31,6 +30,12 @@
                             <field name="password" invisible="1"/>
                             <button name="button_dummy" string="Test connexion" type="object"/>
                         </group>
+                        <field name="child_ids" nolabel="1" colspan="4">
+                            <tree editable="top" options="{'no_create': True}">
+                                <field name="company_id" options="{'no_create': True, 'no_edit': True}"/>
+                                <field name="datastore_id"/>
+                            </tree>
+                        </field>
                         <field name="error_msg" colspan="4"/>
                     </group>
                 </sheet>

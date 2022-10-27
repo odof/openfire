@@ -40,6 +40,7 @@ class PurchaseOrder(models.Model):
 
         # On vérifie s'il existe un connecteur achat pour ce fournisseur
         datastore_purchase = self.env['of.datastore.purchase'].search([('partner_id', '=', self.partner_id.id)])
+        datastore_company = datastore_purchase.child_ids.filtered(lambda c: c.company_id.id == self.company_id.id)
         if datastore_purchase:
             client = datastore_purchase.of_datastore_connect()
             if isinstance(client, basestring):
@@ -55,7 +56,7 @@ class PurchaseOrder(models.Model):
 
             # On récupère le client sur la base fournisseur
             partner_ids = datastore_purchase.of_datastore_search(
-                ds_partner_obj, [('of_datastore_id', '=', datastore_purchase.datastore_id)])
+                ds_partner_obj, [('of_datastore_id', '=', datastore_company.datastore_id)])
             if partner_ids:
                 partner_id = partner_ids[0]
             else:
