@@ -4,6 +4,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from odoo import models, fields, api
 import odoo.addons.decimal_precision as dp
+from odoo.tools.misc import formatLang
 from odoo.tools.float_utils import float_round
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
@@ -89,6 +90,22 @@ class PurchaseOrder(models.Model):
     def action_set_date_planned(self):
         for order in self:
             order.order_line.update({'date_planned': order.of_delivery_force})
+
+    @api.multi
+    @api.depends('name', 'partner_ref')
+    def name_get(self):
+        if self._context.get('purchase_amount_total', False):
+            # keep the standard if purchase_amount_total is set in the context
+            return super(PurchaseOrder, self).name_get()
+        result = []
+        for po in self:
+            name = po.name
+            if po.partner_ref:
+                name += ' (' + po.partner_ref + ')'
+            if po.amount_untaxed:
+                name += ': ' + formatLang(self.env, po.amount_untaxed, currency_obj=po.currency_id)
+            result.append((po.id, name))
+        return result
 
     @api.onchange('customer_id')
     def _onchange_customer_id(self):
