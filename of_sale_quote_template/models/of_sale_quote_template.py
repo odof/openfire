@@ -461,8 +461,7 @@ class OfSaleOrderLayoutCategory(models.Model):
     @api.model
     def _get_domain_parent_id(self):
         order = self.env['sale.order'].browse(self._context.get('default_order_id'))
-        res = [('id', 'in', order.of_layout_category_ids.ids)]
-        return res
+        return [('id', 'in', order.of_layout_category_ids.ids)]
 
     sequence = fields.Integer(required=True, default=10)
     sequence_name = fields.Char(string=u"Séquence")
