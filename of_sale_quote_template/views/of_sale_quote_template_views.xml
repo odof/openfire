@@ -345,7 +345,7 @@
                 <attribute name="invisible">0</attribute>
             </xpath>
             <xpath expr="//notebook/page[1]" position="before">
-                <page string="Sections">
+                <page string="Sections" name="layout_categ">
                     <button icon="fa-plus" name="action_add" type="object" class="pull-right"/>
                     <field name="of_layout_category_ids" mode="tree,kanban" attrs="{'readonly': [('state', 'in', ('done','cancel'))]}" context="{'default_order_id': active_id}" options="{'reload_on_button': true}">
                         <tree string="Sale Layout Category" decoration-bf="depth==0" decoration-muted="depth>1" create="false" editable="bottom">

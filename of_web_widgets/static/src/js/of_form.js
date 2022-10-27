@@ -15,6 +15,7 @@ var ControlPanel = require('web.ControlPanel');
 
 var FieldMany2One = form_relational.FieldMany2One;
 var FieldOne2Many = core.form_widget_registry.get('one2many');
+var Many2ManyListView = core.view_registry.get('many2many_list');
 
 var _t = core._t;
 
@@ -411,3 +412,66 @@ core.form_widget_registry
 
 return FieldOne2One;
 });
+
+odoo.define('of_web_widgets.Many2ManyListView', function (require) {
+"use strict";
+
+var form_common = require('web.form_common');
+var core = require('web.core');
+var data = require('web.data')
+
+var Many2ManyListView = core.view_registry.get('many2many_list');
+
+var _t = core._t;
+
+Many2ManyListView.include({
+    init: function () {
+        this._super.apply(this, arguments);
+        this.on('list_view_loaded', this, this.proxy('_m2m_listview_loaded'));
+        this.is_editing = false;
+    },
+    /**
+     *  Opens directly M2M 'add element' popup
+     */
+    _m2m_listview_loaded: function () {
+        if (!this.is_editing && this.x2m.build_context().eval()['auto_open']) {
+            this.is_editing = true;
+            this.do_add_record();
+        }
+    },
+    /**
+     *  Replace original function to allow inheritance of on_select function
+     */
+    do_add_record: function () {
+        var self = this;
+        this.is_editing = true;
+
+        new form_common.SelectCreateDialog(this, {
+            res_model: this.model,
+            domain: new data.CompoundDomain(this.x2m.build_domain(), ["!", ["id", "in", this.x2m.dataset.ids]]),
+            context: this.x2m.build_context(),
+            title: _t("Add: ") + this.x2m.string,
+            alternative_form_view: this.x2m.field.views ? this.x2m.field.views.form : undefined,
+            no_create: this.x2m.options.no_create || !this.is_action_enabled('create'),
+            on_selected: function(element_ids) {
+                // here, 'this' is a SelectCreateDialog instance
+                return self.add_record_on_selected(this, element_ids);
+            }
+        }).open();
+    },
+    add_record_on_selected: function (popup, element_ids) {
+        var self = this;
+        return self.x2m.data_link_multi(element_ids).then(function() {
+            self.x2m.reload_current_view();
+        });
+    },
+    _before_unedit: function () {
+        this._super.apply(this, arguments);
+        this.is_editing = false;
+    },
+});
+
+// return it so it can be called with 'require' and allow correct chaining of inheritance
+return Many2ManyListView;
+});
+
