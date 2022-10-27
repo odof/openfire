@@ -107,7 +107,7 @@
                         <tree editable="bottom" colors="red: not is_valid">
                             <field name="type" string="Type"/>
                             <field name="title_id" string="Civilité" options="{'no_open': True}" widget="selection"/>
-                            <field name="number_display" string="Numéro" required="True"/>
+                            <field name="number_display" string="Numéro" placeholder="Numéro" required="True"/>
                             <field name="number" invisible="1" readonly="1"/>
                             <field name="is_valid" invisible="1"/>
                         </tree>
