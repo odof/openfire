@@ -53,6 +53,7 @@ Module basé sur les modules Muk DMS avec les ajouts/modifications suivantes :
         'security/ir.model.access.csv',
         'views/dms_views.xml',
         'views/partner_views.xml',
+        'views/sale_views.xml',
         'views/of_document_templates.xml',
         'wizards/mail_compose.xml',
     ],
