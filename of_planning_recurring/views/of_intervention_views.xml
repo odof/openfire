@@ -82,7 +82,7 @@
             <xpath expr="//page[@name='facturation']" position="attributes">
                 <attribute name="attrs">{'invisible': [('type_id', '=', %(of_planning_recurring.of_service_type_misc)d)]}</attribute>
             </xpath>
-            <xpath expr="//page[@name='parc_installe']" position="attributes">
+            <xpath expr="//field[@name='parc_installe_id']" position="attributes">
                 <attribute name="attrs">{'invisible': [('type_id', '=', %(of_planning_recurring.of_service_type_misc)d)]}</attribute>
             </xpath>
             <xpath expr="//page[@name='questionnaire']" position="attributes">
