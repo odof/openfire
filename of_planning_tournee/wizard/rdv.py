@@ -168,7 +168,8 @@ class OfTourneeRdv(models.TransientModel):
     display_res = fields.Boolean(string=u"Voir Résultats", default=False)  # Utilisé pour attrs invisible des résultats
     zero_result = fields.Boolean(string="Recherche infructueuse", default=False, help=u"Aucun résultat")
     can_show_more = fields.Boolean(string="Can show more", compute='_compute_can_show_more')
-    planning_ids = fields.One2many('of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs')
+    planning_ids = fields.One2many(
+        comodel_name='of.tournee.rdv.line', inverse_name='wizard_id', string=u"Proposition de RDVs")
     by_distance_planning_tree_ids = fields.One2many(
         comodel_name='of.tournee.rdv.line', compute='_compute_by_distance_planning_tree_ids',
         string="Slots by distance")
@@ -183,13 +184,15 @@ class OfTourneeRdv(models.TransientModel):
     map_tour_id = fields.Many2one(comodel_name='of.planning.tournee', string="Tour")
     additional_record = fields.Char(
         string="Data for the additional record to preview", compute='_compute_additional_record')
-    map_description_html = fields.Html(string="Map description", compute='_compute_intervention_map_data')
+    map_description_html = fields.Html(
+        string="Map description", compute='_compute_intervention_map_data', compute_sudo=True)
     intervention_map_ids = fields.One2many(
-        comodel_name='of.planning.intervention', compute='_compute_intervention_map_data', string="Interventions")
+        comodel_name='of.planning.intervention', compute='_compute_intervention_map_data', string="Interventions",
+        compute_sudo=True)
 
     name = fields.Char(string=u"Libellé", size=64, required=False)
     description = fields.Text(string="Description")
-    employee_id = fields.Many2one('hr.employee', string=u"Intervenant")
+    employee_id = fields.Many2one(comodel_name='hr.employee', string=u"Intervenant")
     date_propos = fields.Datetime(string=u"RDV Début")
     date_propos_hour = fields.Float(string=u"Heure de début", digits=(12, 5))
     date_display = fields.Char(string="Jour du RDV", size=64, readonly=True)
@@ -392,10 +395,9 @@ class OfTourneeRdv(models.TransientModel):
 
     @api.depends('res_line_id', 'map_tour_id', 'map_line_id')
     def _compute_intervention_map_data(self):
-        # added sudo() to avoid access rights issues from the website (no access for of.planning.tournee)
-        self_sudo = self.sudo()
-        for wizard in self_sudo:
-            date_format = '%d/%m/%Y' if self.env.user.lang == 'fr_FR' else DEFAULT_SERVER_DATE_FORMAT
+        lang = self.env['res.lang']._lang_get(self.env.user.lang or 'fr_FR')
+        date_format = lang and lang.date_format or DEFAULT_SERVER_DATE_FORMAT
+        for wizard in self:
             tour = wizard.map_tour_id
             map_description_html = False
             if wizard.map_line_id:
@@ -642,7 +644,10 @@ class OfTourneeRdv(models.TransientModel):
         self.ensure_one()
         if not self.duree:
             raise UserError(_("You must set a duration to search for available time slots."))
-        if not self.company_id.partner_id.geo_lat and not self.company_id.partner_id.geo_lng:
+
+        # To avoid an access error from the website
+        company = self.company_id if not sudo else self.company_id.sudo()
+        if not company.partner_id.geo_lat and not company.partner_id.geo_lng:
             raise UserError(_(
                 "The company address is not geocoded, please geocode it to plan an intervention. "
                 "If an employee's address is not geocoded, we will use the company address instead "
@@ -1038,7 +1043,7 @@ class OfTourneeRdv(models.TransientModel):
             self.map_tour_id = self.res_line_id.tour_id.id
             self.map_line_id = self.res_line_id.id
             # force the map to be recomputed
-            self._compute_intervention_map_data()
+            self.sudo()._compute_intervention_map_data()
 
     @api.multi
     def _get_service_data(self, mois):
@@ -1354,7 +1359,7 @@ class OfTourneeRdvLineMixin(models.AbstractModel):
         # if we are on a delegated object we must use the id of parent object
         self.wizard_id.map_line_id = self.id
         # force the map to be recomputed
-        self.wizard_id._compute_intervention_map_data()
+        self.wizard_id.sudo()._compute_intervention_map_data()
         self.toggl_map_preview()
         return self.wizard_id.action_open_wizard()
 
