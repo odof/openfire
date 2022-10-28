@@ -246,24 +246,34 @@ class OFPlanningRecurringMixin(models.AbstractModel):
         if not event_date:
             event_date = datetime.now()
 
-        if self.all_day and self.rrule and 'UNTIL' in self.rrule and 'Z' not in self.rrule:
-            rset1 = rrule.rrulestr(str(self.rrule), dtstart=event_date.replace(tzinfo=None), forceset=True, cache=True,
-                                   ignoretz=True)
-        else:
+        use_naive_datetime = self.all_day and self.rrule and 'UNTIL' in self.rrule and 'Z' not in self.rrule
+        if not use_naive_datetime:
             # Convert the event date to saved timezone (or context tz) as it'll
             # define the correct hour/day asked by the user to repeat for recurrence.
             event_date = event_date.astimezone(timezone)  # transform "+hh:mm" timezone
-            rset1 = rrule.rrulestr(str(self.rrule), dtstart=event_date, forceset=True, tzinfos={}, cache=True)
+
+        # The start date is naive
+        # the timezone will be applied, if necessary, at the very end of the process
+        # to allow for DST timezone reevaluation
+        rset1 = rrule.rrulestr(str(self.rrule), dtstart=event_date.replace(tzinfo=None), forceset=True, ignoretz=True)
+
         # récupérer les éventuels RDV issus de RDV récurrents et détachés
         recurring_meetings = self.with_context(active_test=False).occurrence_ids
 
         for meeting in recurring_meetings:
-            date = todate(meeting.recurrent_id_date)
+            date = fields.Datetime.from_string(meeting.recurrent_id_date)
+            if use_naive_datetime:
+                date = date.replace(tzinfo=None)
+            else:
+                date = todate(meeting.recurrent_id_date).replace(tzinfo=None)
             if date_field.startswith('date_deadline'):
                 date = date + timedelta(hours=self.duree)
             # exclure la date de ce RDV des occurrences du RDV récurrent
             rset1._exdate.append(date)
-        return [d.astimezone(pytz.UTC) if d.tzinfo else d for d in rset1]
+        def naive_tz_to_utc(d):
+            return timezone.localize(d).astimezone(pytz.UTC)
+
+        return [naive_tz_to_utc(d) if not use_naive_datetime else d for d in rset1]
 
     @api.multi
     def _get_recurrency_end_date(self, format_dt=False):
