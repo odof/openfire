@@ -21,6 +21,7 @@
         <t t-set="pdf_taxes_detail" t-value="doc.pdf_taxes_detail()"/>
         <t t-set="pdf_customer_insert" t-value="doc.pdf_customer_insert() and (pdf_customer_phone or pdf_customer_mobile or pdf_customer_fax or pdf_customer_email)"/>
         <t t-set="pdf_payment_term_insert" t-value="doc.pdf_payment_term_insert()"/>
+        <t t-set="pdf_customer_ref_insert" t-value="doc.pdf_customer_ref_insert()"/>
         <t t-set="pdf_technical_visit_insert" t-value="doc.pdf_technical_visit_insert()"/>
         <t t-set="pdf_validity_insert" t-value="doc.pdf_validity_insert()"/>
         <t t-set="pdf_payment_schedule" t-value="doc.pdf_payment_schedule()"/>
@@ -76,11 +77,11 @@
                 <div class="col-xs-12">
                     <div name="libelle_vos_references"><strong>Vos références&amp;nbsp;: </strong></div>
                     <div class="mt8" id="informations" style="display: table">
-                        <div name="ref_client" t-if="doc.partner_id.ref" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                        <div name="ref_client" t-if="pdf_customer_ref_insert and doc.partner_id.ref" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                             <strong>Réf. client&amp;nbsp;:</strong>
                             <p t-field="doc.partner_id.ref"/>
                         </div>
-                        <div t-if="doc.partner_id.ref" style="display: table-cell; width: 4px;"/>
+                        <div t-if="pdf_customer_ref_insert and doc.partner_id.ref" style="display: table-cell; width: 4px;"/>
 
                         <div name="ref_commande" t-if="doc.client_order_ref" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                             <strong>Réf. commande&amp;nbsp;:</strong>
