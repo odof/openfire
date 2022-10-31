@@ -107,6 +107,9 @@ class SaleOrder(models.Model):
     def pdf_payment_term_insert(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_payment_term_insert')
 
+    def pdf_customer_ref_insert(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_customer_ref_insert')
+
     def pdf_taxes_detail(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_taxes_detail')
 

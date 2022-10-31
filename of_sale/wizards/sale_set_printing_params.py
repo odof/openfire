@@ -32,6 +32,7 @@ class OFSaleWizardSetPrintingParams(models.TransientModel):
             'pdf_customer_fax': {'default_value': True, 'oldname': False},
             'pdf_customer_email': {'default_value': True, 'oldname': False},
             'pdf_payment_term_insert': {'default_value': True, 'oldname': 'pdf_masquer_pastille_payment_term'},
+            'pdf_customer_ref_insert': {'default_value': True, 'oldname': False},
             'pdf_technical_visit_insert': {'default_value': False, 'oldname': 'pdf_vt_pastille'},
             'pdf_validity_insert': {'default_value': False, 'oldname': 'pdf_date_validite_devis'},
             'pdf_section_bg_color': {'default_value': '#FFFFFF', 'oldname': 'of_color_bg_section'},
@@ -159,6 +160,8 @@ class OFSaleWizardSetPrintingParams(models.TransientModel):
     # Inserts
     pdf_payment_term_insert = fields.Boolean(
         string="Payment terms", default=True, help="If checked, displays the payment terms in the inserts")
+    pdf_customer_ref_insert = fields.Boolean(
+        string="Customer reference", default=True, help="If checked, displays the customer reference in the inserts")
     pdf_technical_visit_insert = fields.Boolean(
         string="Date of technical visit", default=False,
         help="If checked, displays the technical visit date in the inserts")
@@ -319,6 +322,11 @@ class OFSaleWizardSetPrintingParams(models.TransientModel):
     def set_pdf_payment_term_insert(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'pdf_payment_term_insert', self.pdf_payment_term_insert)
+
+    @api.multi
+    def set_pdf_customer_ref_insert(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_customer_ref_insert', self.pdf_customer_ref_insert)
 
     @api.multi
     def set_pdf_technical_visit_insert(self):
