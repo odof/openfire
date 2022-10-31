@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-17 10:11+0000\n"
-"PO-Revision-Date: 2022-10-17 10:11+0000\n"
+"POT-Creation-Date: 2022-10-31 15:35+0000\n"
+"PO-Revision-Date: 2022-10-31 15:35+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -609,6 +609,11 @@ msgid "Currency"
 msgstr "Devise"
 
 #. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_ref_insert
+msgid "Customer reference"
+msgstr "Référence client"
+
+#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_insert
 #: model:ir.ui.view,arch_db:of_sale.wizard_sales_set_printing_params_view_form
 msgid "Customers insert"
@@ -947,6 +952,11 @@ msgstr "Si coché, affiche le nom du parent du contact dans l'encart adresse"
 #: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_address_contact_phone
 msgid "If checked, displays the contact's phone in the address insert"
 msgstr "Si coché, affiche le téléphone du contact dans l'encart adresse"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_ref_insert
+msgid "If checked, displays the customer reference in the inserts"
+msgstr "Si coché, affiche la référence client dans les pastilles"
 
 #. module: of_sale
 #: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_email

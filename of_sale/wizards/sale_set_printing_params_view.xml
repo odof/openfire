@@ -62,6 +62,10 @@
                             <div name="pdf_payment_term_insert">
                                 <field name="pdf_payment_term_insert" class="oe_inline"/>
                             </div>
+                            <label for="pdf_customer_ref_insert"/>
+                            <div name="pdf_customer_ref_insert">
+                                <field name="pdf_customer_ref_insert" class="oe_inline"/>
+                            </div>
                             <field name="group_display_incoterm"/>
                             <field name="pdf_technical_visit_insert"/>
                             <field name="pdf_validity_insert"/>
