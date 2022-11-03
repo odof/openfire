@@ -434,14 +434,15 @@ class GestionPrixLine(models.TransientModel):
                     montant += sum(tax['amount'] for tax in taxes['taxes'])
 
                 montant_arrondi = round(montant, line_rounding['precision'])
-                ratio = montant_arrondi / montant
-                price_unit *= ratio
-                # Recalcul des taxes pour l'affichage de la simulation
-                price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
-                taxes = order_line.tax_id.with_context(base_values=(price, price, price))
-                taxes = taxes.compute_all(
-                    price, currency, order_line.product_uom_qty, product=order_line.product_id,
-                    partner=order_line.order_id.partner_id)
+                if float_compare(montant_arrondi, montant, precision_rounding=0.01):
+                    ratio = montant_arrondi / montant
+                    price_unit *= ratio
+                    # Recalcul des taxes pour l'affichage de la simulation
+                    price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
+                    taxes = order_line.tax_id.with_context(base_values=(price, price, price))
+                    taxes = taxes.compute_all(
+                        price, currency, order_line.product_uom_qty, product=order_line.product_id,
+                        partner=order_line.order_id.partner_id)
 
             price_management_variation = price_unit - order_line.price_unit + order_line.of_price_management_variation
             new_price_variation = price_management_variation - (price_unit * (order_line.discount or 0.0) / 100.0)
