@@ -1046,7 +1046,14 @@ class OFRapportOpenflamWizard(models.TransientModel):
             domain += [('company_id', 'in', self.company_ids._ids)]
         payments = payment_obj.search(domain, order='payment_date')
         # Les comptes de taxe sont triés par ordre de montant
-        sorted_accounts = tax_obj.search([('type_tax_use', '=', 'sale')], order='amount').mapped('account_id')
+        taxes = tax_obj.search([('type_tax_use', '=', 'sale')], order='amount')
+        sorted_accounts = taxes.mapped('account_id')
+        correspondance = {}
+        for tax in taxes:
+            if tax.account_id not in correspondance:
+                correspondance[tax.account_id] = tax.mapped('account_ids').mapped('account_dest_id')
+            else:
+                correspondance[tax.account_id] |= tax.mapped('account_ids').mapped('account_dest_id')
 
         display = {}
         for company in companies:
@@ -1091,11 +1098,9 @@ class OFRapportOpenflamWizard(models.TransientModel):
                             if account not in payment_dict:
                                 payment_dict[account] = {"ht": 0.0, "taxe": 0.0}
                             payment_dict[account]["taxe"] -= tax_move_line.balance * percent
-                        taxes = tax_move_lines.mapped('tax_line_id')
-                        move_lines_linked = invoice_move.line_ids.filtered(
-                            lambda ml: any(tax.amount in ml.tax_ids.mapped('amount') for tax in taxes))
-                        if move_lines_linked:
-                            payment_dict[account]["ht"] -= percent * sum(move_lines_linked.mapped('balance'))
+                            corresponding_ht_lines = invoice_move.line_ids.filtered(
+                                lambda ml: ml.account_id.id in correspondance[account]._ids)
+                            payment_dict[account]["ht"] -= percent * sum(corresponding_ht_lines.mapped('balance'))
                 else:
                     # On conserve les paiements non intégralement lettrés pour les signaler a l'utilisateur
                     undefined_payments_list.append(payment)
