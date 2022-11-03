@@ -116,28 +116,6 @@ class OfProductBrand(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    @api.model_cr_context
-    def _auto_init(self):
-        # À supprimer
-        cr = self._cr
-        cr.execute("SELECT 1 FROM ir_model_data WHERE module='of_product_brand' AND name='main_brand'")
-        if not cr.fetchall():
-            cr.execute("SELECT 1 FROM information_schema.tables WHERE table_name = '%s'" % (self._table,))
-            if cr.fetchall():
-                cr.execute(
-                    "INSERT INTO ir_model_data(create_uid, create_date, module, name, model, res_id, noupdate) "
-                    "SELECT %s, (now() at time zone 'UTC'), 'of_product_brand', 'main_brand', 'of.product.brand',"
-                    "       b.id, true "
-                    "FROM product_template AS t "
-                    "INNER JOIN of_product_brand AS b ON b.id = t.brand_id "
-                    "WHERE t.type = 'service' "
-                    "GROUP BY b.id "
-                    "ORDER BY count(*) DESC, b.id "
-                    "LIMIT 1",
-                    (self.env.uid, )
-                )
-        return super(ProductTemplate, self)._auto_init()
-
     brand_id = fields.Many2one(
         'of.product.brand', string='Brand', required=True, index=True,
         default=lambda s: s._default_brand_id())
@@ -167,6 +145,8 @@ class ProductTemplate(models.Model):
             }
             seller_data = self.env['product.supplierinfo']._add_missing_default_values(seller_data)
             self.seller_ids = [(0, 0, seller_data)]
+        elif self.brand_id and len(self.seller_ids) == 1:
+            self.seller_ids.name = self.brand_id.partner_id
 
     @api.onchange('default_code')
     def _onchange_default_code(self):
