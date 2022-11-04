@@ -164,6 +164,10 @@ class SaleOrder(models.Model):
         ('order_line', u'Prix par ligne de commande'),
     ], string=u"Impressions des prix", default='order_line', required=True)
     of_apply_on_invoice = fields.Boolean(string=u"Appliquer aux factures", default=True)
+    of_partner_phone = fields.Char(related='partner_id.phone', string=u"Téléphone du partenaire", readonly=True)
+    of_partner_mobile = fields.Char(related='partner_id.mobile', string=u"Mobile du partenaire", readonly=True)
+    of_partner_email = fields.Char(related='partner_id.email', string=u"Courriel du partenaire", readonly=True)
+
 
     @api.multi
     @api.depends('name', 'date', 'state')
