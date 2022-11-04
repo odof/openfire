@@ -292,7 +292,7 @@ class SaleQuoteLine(models.Model):
                 comp_vals['qty_per_kit'] = line.qty_per_kit
                 comp_vals['sequence'] = line.sequence
                 comp_vals['name'] = line.product_id.name_get()[0][1] or line.product_id.name
-                comp_vals['price_unit'] = line.product_id.list_price
+                comp_vals['price_unit'] = line.product_id.of_price_used
                 comp_vals['cost_unit'] = line.product_id.standard_price
                 comp_vals['customer_lead'] = line.product_id.sale_delay
                 lines.append((0, 0, comp_vals))
@@ -305,7 +305,7 @@ class SaleQuoteLine(models.Model):
                 comp_vals['qty_per_kit'] = line.product_qty
                 comp_vals['sequence'] = line.sequence
                 comp_vals['name'] = line.product_id.name_get()[0][1] or line.product_id.name
-                comp_vals['price_unit'] = line.product_id.list_price
+                comp_vals['price_unit'] = line.product_id.of_price_used
                 comp_vals['cost_unit'] = line.product_id.standard_price
                 comp_vals['customer_lead'] = line.product_id.sale_delay
                 lines.append((0, 0, comp_vals))
@@ -323,11 +323,11 @@ class SaleOrder(models.Model):
         if line.of_is_kit:
             sale_kit_vals = line.get_saleorder_kit_data()
             sale_kit_vals['qty_order_line'] = line.product_uom_qty
-            new_vals = self.env['of.saleorder.kit'].create(sale_kit_vals)
+            new_kit = self.env['of.saleorder.kit'].create(sale_kit_vals)
             data.update({
-                'kit_id': new_vals,
+                'kit_id': new_kit,
                 'of_is_kit': True,
-                'price_comps': line.price_comps,
+                'price_comps': new_kit.price_comps,
                 'of_pricing': line.of_pricing,
                 'sale_kits_to_unlink': line.sale_kits_to_unlink,
             })
