@@ -1623,8 +1623,8 @@ msgstr "Configuration d'article"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_cost_prorata
-msgid "Prorata au coût"
-msgstr "Prorata au coût"
+msgid "Prorata"
+msgstr "Prorata"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_arrondi_prec

@@ -26,17 +26,15 @@ class GestionPrixLine(models.TransientModel):
             reverse=True)
 
     def get_distributed_amount(self, to_distribute, total, currency, cost_prorata, rounding, line_rounding,
-                               kit_lines_price_unit=False):
+                               all_zero, kit_lines_price_unit=False):
         self.ensure_one()
         order_line = self.order_line_id
         if order_line.of_is_kit and order_line.of_pricing == 'computed':
             # Le calcul du prix doit se faire sur les composants
 
             kit_lines = order_line.kit_id.kit_line_ids.sorted('qty_per_kit', reverse=True)
-            if cost_prorata:
-                to_distribute = total and order_line.purchase_price * to_distribute / total
-            else:
-                to_distribute = total and order_line.price_unit * to_distribute / total
+            to_distribute = total and self.get_base_amount(order_line, cost_prorata, all_zero) * \
+                to_distribute / total
 
             if kit_lines_price_unit:
                 total = sum(
@@ -93,7 +91,7 @@ class GestionPrixLine(models.TransientModel):
             return values, taxes
         else:
             return super(GestionPrixLine, self).get_distributed_amount(
-                to_distribute, total, currency, cost_prorata, rounding, line_rounding)
+                to_distribute, total, currency, cost_prorata, rounding, line_rounding, all_zero)
 
     @api.multi
     def get_reset_amount(self, line_rounding):
@@ -112,9 +110,9 @@ class GestionPrixLine(models.TransientModel):
                 kit_price_unit += price_unit * kit_line.qty_per_kit
 
             if line_rounding:
-                return self._calcule_vals_ligne(
-                    order_line, kit_price_unit, order_line.price_unit, order_line.currency_id, rounding=False,
-                    line_rounding=line_rounding, kit_lines_price_unit=values)
+                return self.get_distributed_amount(
+                    kit_price_unit, order_line.price_unit, order_line.currency_id, cost_prorata='price', rounding=False,
+                    line_rounding=line_rounding, all_zero=False, kit_lines_price_unit=values)
 
             price = kit_price_unit * (1 - (order_line.discount or 0.0) / 100.0)
             taxes = order_line.tax_id.compute_all(
