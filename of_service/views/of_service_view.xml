@@ -99,6 +99,10 @@
                                         <i class="fa fa-phone of_ws"/>
                                         <field name="address_mobile"/>
                                     </div>
+                                    <div attrs="{'invisible': [('address_email', '=', False)]}">
+                                        <i class="fa fa-envelope of_ws"/>
+                                        <field name="address_email"/>
+                                    </div>
                                 </div>
                                 <field name="secteur_tech_id"/>
                             </group>

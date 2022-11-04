@@ -81,6 +81,14 @@
                                                          'hover_false': 'Vue vendeur' }}"/>
                     </button>
                 </xpath>
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <label string="Coordonnées client"/>
+                    <div>
+                        <field name="of_partner_phone" nolabel="1" style="margin-right:10px;" attrs="{'invisible': [('of_partner_phone', '=', False)]}"/>
+                        <field name="of_partner_mobile" nolabel="1"/><br/>
+                        <field name="of_partner_email" nolabel="1"/>
+                    </div>
+                </xpath>
                 <field name="date_order" position="attributes">
                     <attribute name="widget">date</attribute>
                 </field>
