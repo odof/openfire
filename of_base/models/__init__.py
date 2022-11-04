@@ -9,3 +9,4 @@ from . import of_log_message
 from . import res_config
 from . import res_company
 from . import res_bank
+from . import ir_ui_menu
