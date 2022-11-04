@@ -26,9 +26,10 @@ class Partner(models.Model):
         if self.of_dms_file_count:
             partner_dir = self.env['muk_dms.directory'].search([('of_partner_id', '=', self.commercial_partner_id.id)])
             action = self.env.ref('muk_dms.action_dms_file').read()[0]
-            action['views'] = [(self.env.ref('muk_dms.view_dms_file_tree').id, 'tree'),
-                               (self.env.ref('muk_dms.view_dms_file_kanban').id, 'kanban'),
-                               (self.env.ref('muk_dms.view_dms_file_form').id, 'form')]
+            action['views'] = [
+                (self.env.ref('muk_dms.view_dms_file_kanban').id, 'kanban'),
+                (self.env.ref('muk_dms.view_dms_file_tree').id, 'tree'),
+                (self.env.ref('muk_dms.view_dms_file_form').id, 'form')]
             action['domain'] = [('directory', 'child_of', partner_dir.id)]
             return action
 
