@@ -3,7 +3,7 @@
 
 {
     'name': u"OpenFire / Articles Cheminées",
-    'version': '10.0.4.0.0',
+    'version': '10.0.4.1.0',
     'license': 'AGPL-3',
     'author': u"OpenFire",
     'category': u"OpenFire",
