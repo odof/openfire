@@ -8,6 +8,7 @@
             <pivot string="Tunnel de conversion 4" disable_linking="True">
                 <field name="date" interval="month" type="row"/>
                 <field name="invoiced_total" type="measure"/>
+                <field name="landing_forecast_sales" type="measure"/>
                 <field name="invoiced_turnover_budget" type="measure"/>
                 <field name="previous_invoiced_total" type="measure"/>
                 <field name="margin_perc" type="measure"/>
