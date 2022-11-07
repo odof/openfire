@@ -34,6 +34,10 @@ class OfInvoicedRevenueAnalysis(models.Model):
     margin_perc = fields.Char(
         string=u"Marge facturé (%)", compute='_compute_margin_perc', compute_sudo=True, readonly=True)
 
+    landing_forecast_sales = fields.Char(
+        string=u"Atterrissage CA prévisionnel", compute='_compute_landing_forecast_sales', compute_sudo=True,
+        readonly=True)
+
     invoiced_turnover_budget_gap = fields.Char(
         string=u"Écart au budget (€)", compute='_compute_invoiced_turnover_budget_gap',
         compute_sudo=True, readonly=True)
@@ -73,10 +77,16 @@ class OfInvoicedRevenueAnalysis(models.Model):
                 rec.margin_perc = "N/E"
 
     @api.multi
+    def _compute_landing_forecast_sales(self):
+        for rec in self:
+            rec.landing_forecast_sales = rec.invoiced_total + rec.amount_to_invoice + rec.amount_to_invoice_intervention
+
+    @api.multi
     def _compute_invoiced_turnover_budget_gap(self):
         for rec in self:
             rec.invoiced_turnover_budget_gap = \
-                '%.0f' % ((rec.invoiced_total + rec.amount_to_invoice) - rec.invoiced_turnover_budget)
+                '%.0f' % ((rec.invoiced_total + rec.amount_to_invoice + rec.amount_to_invoice_intervention)
+                          - rec.invoiced_turnover_budget)
 
     @api.multi
     def _compute_invoiced_total_comparison(self):
@@ -312,7 +322,7 @@ class OfInvoicedRevenueAnalysis(models.Model):
         sub_select_account_invoice_n_1_str = """
             SELECT  30000000 + AIL.id   AS id
             ,       DATE(
-                        EXTRACT(YEAR FROM AI.date_invoice) + 1 || '-' || 
+                        EXTRACT(YEAR FROM AI.date_invoice) + 1 || '-' ||
                         TO_CHAR(AI.date_invoice, 'MM') || '-01'
                     )                   AS date
             ,       AI.company_id       AS company_id
@@ -498,6 +508,8 @@ class OfInvoicedRevenueAnalysis(models.Model):
             fields_copy.append('amount_to_invoice')
         if 'margin_total' not in fields_copy:
             fields_copy.append('margin_total')
+        if 'amount_to_invoice_intervention' not in fields_copy:
+            fields_copy.append('amount_to_invoice_intervention')
 
         res = super(OfInvoicedRevenueAnalysis, self).read_group(
             domain, fields_copy, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
@@ -510,11 +522,22 @@ class OfInvoicedRevenueAnalysis(models.Model):
                         replace('.', ',')
                 else:
                     line['margin_perc'] = "N/E"
+            if 'landing_forecast_sales' in fields_copy:
+                if 'invoiced_total' in line and line['invoiced_total'] is not None and \
+                        'amount_to_invoice' in line and line['amount_to_invoice'] is not None and \
+                        'amount_to_invoice_intervention' in line and line['amount_to_invoice_intervention'] is not None:
+                    value = line['invoiced_total'] + line['amount_to_invoice'] + line['amount_to_invoice_intervention']
+                    line['landing_forecast_sales'] = '{:,.0f}'.format(value).replace(',', ' ').replace('.', ',')
+                else:
+                    line['landing_forecast_sales'] = "N/E"
             if 'invoiced_turnover_budget_gap' in fields_copy:
                 if 'invoiced_total' in line and line['invoiced_total'] is not None and \
                         'amount_to_invoice' in line and line['amount_to_invoice'] is not None and \
+                        'amount_to_invoice_intervention' in line and \
+                        line['amount_to_invoice_intervention'] is not None and \
                         'invoiced_turnover_budget' in line and line['invoiced_turnover_budget'] is not None:
-                    value = (line['invoiced_total'] + line['amount_to_invoice']) - line['invoiced_turnover_budget']
+                    value = (line['invoiced_total'] + line['amount_to_invoice'] +
+                             line['amount_to_invoice_intervention']) - line['invoiced_turnover_budget']
                     line['invoiced_turnover_budget_gap'] = '{:,.0f}'.format(value).replace(',', ' ').replace('.', ',')
                 else:
                     line['invoiced_turnover_budget_gap'] = "N/E"
