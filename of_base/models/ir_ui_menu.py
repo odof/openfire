@@ -15,8 +15,8 @@ class IrUiMenu(models.Model):
     @api.model
     def _visible_menu_ids(self, debug=False):
         hidden_group = self.env.ref('of_base.of_group_hidden', raise_if_not_found=False)
-        menus_ids = super(IrUiMenu, self)._visible_menu_ids(debug=debug)
+        menu_ids = super(IrUiMenu, self)._visible_menu_ids(debug=debug)
         if hidden_group and self._uid != SUPERUSER_ID:
             # remove all menus that are specified in the group's menu items
-            return menus_ids - set(hidden_group.menu_access.ids)
-        return menus_ids
+            return menu_ids - set(hidden_group.sudo().menu_access.ids)
+        return menu_ids
