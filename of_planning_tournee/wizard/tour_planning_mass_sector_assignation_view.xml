@@ -1,0 +1,40 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<odoo>
+
+    <record id="of_tour_planning_area_mass_assignation_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.tour.planning.mass.sector.assignation.wizard.view.form</field>
+        <field name="model">of.tour.planning.mass.sector.assignation.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Mass area assignation">
+                <sheet>
+                    <group>
+                        <group colspan="4">
+                            <p>
+                                <b>Warning:</b> This action will assign a sector to all the lines of the selected tours. If a tour has already an intervention with a different area, it will not be updated.
+                            </p>
+                        </group>
+                        <group colspan="1">
+                            <field name="sector_id"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_button_validate" string="Validate" type="object" class="oe_highlight" />
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window
+        id="of_tour_planning_area_mass_assignation_wizard_act"
+        name="Mass area assignation"
+        res_model="of.tour.planning.mass.sector.assignation.wizard"
+        src_model="of.planning.tournee"
+        view_mode="form"
+        key2="client_action_multi"
+        view_id="of_tour_planning_area_mass_assignation_wizard_view_form"
+        target="new"
+    />
+
+</odoo>

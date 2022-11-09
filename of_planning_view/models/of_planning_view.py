@@ -19,7 +19,7 @@ class ResPartner(models.Model):
     def get_infos_lieu(self):
         """Retourne un dictionnaire de valeurs contenant l'adresse et les données de géoloc"""
         self.ensure_one()
-        res = {
+        return {
             'geo_lat': self.geo_lat,
             'geo_lng': self.geo_lng,
             'precision': self.precision,
@@ -28,8 +28,7 @@ class ResPartner(models.Model):
             'id': self.id,
             'country': self.get_geocoding_country(),
             'name': self.name,
-            }
-        return res
+        }
 
 
 class OfPlanningIntervention(models.Model):
@@ -87,10 +86,11 @@ class OfPlanningIntervention(models.Model):
         tz = pytz.timezone(self._context.get('tz', 'Europe/Paris'))
 
         if tournee:
-            secteur = tournee.secteur_id
+            # sector_ids is a M2M field, take the 1st record as "main" area
+            secteur = tournee.sector_ids and tournee.sector_ids[0] or False
             # les lieux de départ et de retour d'une tournée priment sur ceux de l'employé
-            lieu_depart = tournee.address_depart_id and tournee.address_depart_id.get_infos_lieu() or lieu_depart
-            lieu_retour = tournee.address_retour_id and tournee.address_retour_id.get_infos_lieu() or lieu_retour
+            lieu_depart = tournee.start_address_id and tournee.start_address_id.get_infos_lieu() or lieu_depart
+            lieu_retour = tournee.return_address_id and tournee.return_address_id.get_infos_lieu() or lieu_retour
         else:
             secteur = False
         secteur_str = secteur and secteur.name or ""
@@ -396,8 +396,8 @@ class OfPlanningIntervention(models.Model):
                     continue
 
                 nb_heures_occupees = 0.0
-                jour_deb_dt = tz.localize(datetime.strptime(date_current_str+" 00:00:00", "%Y-%m-%d %H:%M:%S"))
-                jour_fin_dt = tz.localize(datetime.strptime(date_current_str+" 23:59:00", "%Y-%m-%d %H:%M:%S"))
+                jour_deb_dt = tz.localize(datetime.strptime(date_current_str + " 00:00:00", "%Y-%m-%d %H:%M:%S"))
+                jour_fin_dt = tz.localize(datetime.strptime(date_current_str + " 23:59:00", "%Y-%m-%d %H:%M:%S"))
                 for interv in interventions:
                     intervention_heures = [interv]
                     # data = data_interventions_dict[intervention.id]

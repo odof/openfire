@@ -1,0 +1,38 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<odoo>
+
+    <record id="of_tour_planning_area_mass_route_update_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.tour.planning.mass.route.update.wizard.view.form</field>
+        <field name="model">of.tour.planning.mass.route.update.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Mass route update">
+                <sheet>
+                    <group>
+                        <group colspan="4">
+                            <p>
+                                <b>Warning:</b> This action will update all routes of the selected tours.
+                            </p>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_button_validate" string="Validate" type="object" class="oe_highlight" />
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window
+        id="of_tour_planning_area_mass_route_update_wizard_act"
+        name="Mass route update"
+        res_model="of.tour.planning.mass.route.update.wizard"
+        src_model="of.planning.tournee"
+        view_mode="form"
+        key2="client_action_multi"
+        view_id="of_tour_planning_area_mass_route_update_wizard_view_form"
+        target="new"
+        groups="of_base.of_group_root_only"
+    />
+
+</odoo>

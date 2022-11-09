@@ -1,0 +1,37 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_website_planning_booking
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-04-12 12:23+0000\n"
+"PO-Revision-Date: 2023-04-12 12:23+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_planning_tour_line_created_from_website
+#: model:ir.ui.view,arch_db:of_website_planning_booking.of_planning_tournee_view_form
+msgid "Created from website"
+msgstr "Créé depuis le site web"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,help:of_website_planning_booking.field_of_planning_tournee_website_intervention
+msgid "If there is at least one intervention created from the website on Tour, this field is True"
+msgstr "S'il y a au moins une intervention créée à partir du site web de la tournée, ce champ est Vrai."
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_planning_tournee_website_intervention
+msgid "Intervention created from website"
+msgstr "Intervention créée à partir d'un site web"
+
+#. module: of_website_planning_booking
+#: model:ir.ui.view,arch_db:of_website_planning_booking.of_planning_tournee_view_form
+msgid "This tour contains interventions created from the website. You should consider to no optimize the tour because you will risk moving a slot validated by the customer on the website."
+msgstr "Cette tournée contient des interventions créées depuis le site web. Vous devez envisager de ne pas optimiser la tournée car vous risquez de déplacer un créneau validé par le client sur le site web."

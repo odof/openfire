@@ -905,29 +905,29 @@ class OfPlanifCreneauProp(models.TransientModel):
 
 class OfPlanifCreneauSecteur(models.TransientModel):
     _name = 'of.planif.creneau.secteur'
-    _description = u'Assigner un secteur à un créneau disponible'
+    _description = u"Assigner un secteur à un créneau disponible"
 
     secteur_id = fields.Many2one(
-        'of.secteur', string="Secteur", help="Laisser vide pour retirer l'assignation de secteur")
-    employee_id = fields.Many2one('hr.employee', string="Intervenant", readonly=True)
+        comodel_name='of.secteur', string=u"Secteur", help=u"Laisser vide pour retirer l'assignation de secteur")
+    employee_id = fields.Many2one(comodel_name='hr.employee', string=u"Intervenant", readonly=True)
     date_creneau = fields.Date(string=u"Date du créneau", readonly=True)
 
     @api.multi
     def button_confirm(self):
         self.ensure_one()
-        tournee_obj = self.env['of.planning.tournee']
-        tournee = tournee_obj.search(
-            [('employee_id', '=', self.employee_id.id),
-             ('date', '=', self.date_creneau)], limit=1)
-        if tournee:
-            tournee.secteur_id = self.secteur_id
-        elif self.secteur_id:
+        tour_obj = self.env['of.planning.tournee']
+        tour = tour_obj.search([('employee_id', '=', self.employee_id.id), ('date', '=', self.date_creneau)], limit=1)
+        if not tour:
             vals = {
                 'employee_id': self.employee_id.id,
                 'date': self.date_creneau,
-                'secteur_id': self.secteur_id.id,
+                'sector_ids': [(6, 0, [self.secteur_id.id])] if self.secteur_id else False,
             }
-            tournee_obj.create(vals)
+            tour_obj.create(vals)
+        elif not tour.sector_ids and self.secteur_id:
+            tour.sector_ids = [(6, 0, [self.secteur_id.id])]
+        elif self.secteur_id and self.secteur_id.id not in tour.sector_ids.ids:
+            tour.sector_ids = [(4, self.secteur_id.id)]
         return
 
     @api.multi

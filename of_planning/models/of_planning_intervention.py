@@ -382,14 +382,14 @@ class OfPlanningIntervention(models.Model):
 
     # Header
     state = fields.Selection(
-        [
-            ('draft', "Brouillon"),
-            ('confirm', u"Confirmé"),
-            ('done', u"Réalisé"),
-            ('unfinished', u"Inachevé"),
-            ('cancel', u"Annulé"),
-            ('postponed', u"Reporté"),
-        ], string=u"État", index=True, readonly=True, default='draft', track_visibility='onchange')
+        selection=[
+            ('draft', "Draft"),
+            ('confirm', "Confirmed"),
+            ('done', "Done"),
+            ('unfinished', "Unfinished"),
+            ('cancel', "Cancelled"),
+            ('postponed', "Postponed")], string="State", index=True, readonly=True, default='draft',
+        track_visibility='onchange')
     closed = fields.Boolean(string=u"Clôturé", default=False)
     raison_id = fields.Many2one('of.planning.intervention.raison', string="Raison")
     number = fields.Char(String=u"Numéro", copy=False)
@@ -1777,6 +1777,28 @@ class OfPlanningIntervention(models.Model):
             return datetime_fin_utc_str
         return (datetime_deb_utc_str, datetime_fin_utc_str)
 
+    def _get_domain_states_values_overlap(self):
+        return ['cancel', 'postponed']
+
+    def _get_domain_do_check_overlap(self, interv, date_prompt=False):
+        if date_prompt:
+            return [
+                # /!\ conserver .ids : ._ids est un tuple et génère une erreur à l'évaluation
+                ('employee_ids', 'in', interv.employee_ids.ids),
+                ('date_prompt', '<', interv.date_deadline),
+                ('date_deadline_prompt', '>', interv.date),
+                ('id', '!=', interv.id),
+                ('state', 'not in', self._get_domain_states_values_overlap()),
+            ]
+        return [
+            # /!\ conserver .ids : ._ids est un tuple et génère une erreur à l'évaluation
+            ('employee_ids', 'in', interv.employee_ids.ids),
+            ('date', '<', interv.date_deadline),
+            ('date_deadline', '>', interv.date),
+            ('id', '!=', interv.id),
+            ('state', 'not in', self._get_domain_states_values_overlap()),
+        ]
+
     @api.multi
     def do_verif_dispo(self):
         # Vérification de la validité du créneau: chevauchement
@@ -1786,14 +1808,7 @@ class OfPlanningIntervention(models.Model):
             if group_flex and interv.flexible:
                 continue
             if interv.verif_dispo:
-                domain = [
-                    # /!\ conserver .ids : ._ids est un tuple et génère une erreur à l'évaluation
-                    ('employee_ids', 'in', interv.employee_ids.ids),
-                    ('date_prompt', '<', interv.date_deadline),
-                    ('date_deadline_prompt', '>', interv.date),
-                    ('id', '!=', interv.id),
-                    ('state', 'not in', ('cancel', 'postponed')),
-                ]
+                domain = self._get_domain_do_check_overlap(interv, date_prompt=True)
                 if group_flex:
                     domain += [('flexible', '=', False)]
                 rdv = interv_obj.search(domain, limit=1)
@@ -1820,14 +1835,7 @@ class OfPlanningIntervention(models.Model):
         rdvs = interv_obj
         for interv in self:
             if interv.verif_dispo:
-                domain = [
-                    # /!\ conserver .ids : ._ids est un tuple et génère une erreur à l'évaluation
-                    ('employee_ids', 'in', interv.employee_ids.ids),
-                    ('date', '<', interv.date_deadline),
-                    ('date_deadline', '>', interv.date),
-                    ('id', '!=', interv.id),
-                    ('state', 'not in', ('cancel', 'postponed')),
-                ]
+                domain = self._get_domain_do_check_overlap(interv, date_prompt=False)
                 rdv = interv_obj.search(domain, limit=1)
                 if rdv:
                     rdvs |= rdv
