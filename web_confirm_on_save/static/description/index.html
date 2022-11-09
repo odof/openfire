@@ -1,0 +1,28 @@
+<div id="index-rendered" class="markdown-body">
+<p>Show dialog to confirm or alert on form view after save a record:</p>
+<p>If you want to check condition to show dialog, add these functions to model:</p>
+<pre><code class="language-python"><span class="hljs-meta">    @api.model</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">check_condition_show_dialog</span><span class="hljs-params">(self, record_id, data)</span>:</span>
+    <span class="hljs-string">    """
+            :param:   self: current model
+                      record_id: id of record if save on write function, False on create function
+                      data: data from the form
+            :returns: True: show dialog
+                      False: ignore dialog
+        """</span>
+    <span class="hljs-keyword">    return</span> <span class="hljs-keyword">False</span>
+</code></pre>
+<p>Return False by default, override and return True to open a dialog.</p>
+<pre><code class="language-python"><span class="hljs-meta">    @api.model</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">dialog_type</span><span class="hljs-params">(self)</span>:</span>
+    <span class="hljs-string">    """
+            :param self: current model.
+            :returns: False, False -> No dialog
+                      'confirm', "message" -> A confirmation dialog that won't save unless the user press OK
+                      'alert', "message" -> An alert dialog that will warn the user and still save
+        """</span>
+    <span class="hljs-keyword">    return</span> <span class="hljs-keyword">False, False</span>
+</code></pre>
+<p>Return the type of dialog and displayed message.</p>
+
+</div>

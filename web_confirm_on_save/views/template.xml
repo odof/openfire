@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="assets_backend" name="web_confirm_on_save assets" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" href="/web_confirm_on_save/static/src/css/index.css"/>
+            <script type="text/javascript" src="/web_confirm_on_save/static/src/js/web_confirm_on_save.js"></script>
+        </xpath>
+    </template>
+</odoo>
