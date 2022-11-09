@@ -11,7 +11,9 @@ class AccountAnalyticAccount(models.Model):
     of_amount_total = fields.Monetary(string='Montant total', compute='_compute_of_amount_all', store=True)
     of_fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale")
 
-    @api.depends('recurring_invoice_line_ids.price_subtotal', 'of_fiscal_position_id')
+    @api.depends(
+        'recurring_invoice_line_ids.product_id', 'recurring_invoice_line_ids.quantity',
+        'recurring_invoice_line_ids.price_unit', 'recurring_invoice_line_ids.discount', 'of_fiscal_position_id')
     def _compute_of_amount_all(self):
         # Code adapté de la fonction _amout_all définie dans le module sale pour sale.order
         for contract in self:
