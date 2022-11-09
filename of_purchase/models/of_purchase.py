@@ -2,11 +2,35 @@
 
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from odoo import models, fields, api
+from odoo import models, fields, api, _, SUPERUSER_ID
 import odoo.addons.decimal_precision as dp
 from odoo.tools.misc import formatLang
 from odoo.tools.float_utils import float_round
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.exceptions import UserError
+from odoo.addons.purchase.models.purchase import PurchaseOrder as Purchase
+
+
+@api.multi
+def unlink(self):
+    """
+    On surcharge la fonction unlink() de cette façon par besoin d'insérer notre test sur les mouvements de stock
+    entre le test sur l'état annulé et le super().
+    """
+    stock_move_obj = self.env['stock.move']
+    for order in self:
+        if not order.state == 'cancel':
+            raise UserError(_('In order to delete a purchase order, you must cancel it first.'))
+        if self.env.uid != SUPERUSER_ID:
+            move_lines = stock_move_obj.search([('origin', '=', order.name), ('state', '!=', 'cancel')])
+            # L'admin garde la possibilité de supprimer une CF
+            if move_lines:
+                raise UserError(u"Vous ne pouvez supprimer une commande fournisseur, "
+                                u"même annulée, qui a des mouvements de stock non annulés.")
+    return super(Purchase, self).unlink()
+
+
+Purchase.unlink = unlink
 
 
 class PurchaseOrder(models.Model):
