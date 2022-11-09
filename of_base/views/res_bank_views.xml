@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_partner_bank_view_form" model="ir.ui.view">
+        <field name="name">of.base.res.partner.bank.view.form</field>
+        <field name="model">res.partner.bank</field>
+        <field name="inherit_id" ref="base.view_partner_bank_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='bank_id']" position="after">
+                <field name="bank_bic" readonly="1" attrs="{'invisible': [('bank_bic','=',False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
     'name': "OpenFire / Base",
@@ -47,7 +48,8 @@ Ajout d'un modèle servant de log interne :
         'crm',
         'product',
         'mail',
-        'contacts'
+        'contacts',
+        'web_confirm_on_save',
     ],
     'category': "OpenFire",
     'data': [
@@ -61,6 +63,7 @@ Ajout d'un modèle servant de log interne :
         'views/mail_views.xml',
         'views/templates.xml',
         'views/res_config_view.xml',
+        'views/res_bank_views.xml',
         'wizard/base_module_upgrade_view.xml',
         'wizard/of_popup_wizard_view.xml',
         'wizard/of_res_partner_check_duplications_views.xml',
