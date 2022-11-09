@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-from odoo import api, models, _
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
 
@@ -64,3 +64,23 @@ class OFResPartner(models.Model):
             'target': 'new',
             'context': context
         }
+
+    def _is_geodata_changed(self, vals):
+        return self.filtered(lambda r: r.geo_lat != vals.get('geo_lat') or r.geo_lng != vals.get('geo_lng'))
+
+    @api.multi
+    def write(self, vals):
+        geodata_changed = self._is_geodata_changed(vals)
+        result = super(OFResPartner, self).write(vals)
+        # if geodata changed, we need to recompute tours routes with an intervention planned on this address
+        if geodata_changed:
+            self.invalidate_cache(['geo_lat', 'geo_lng'], geodata_changed.ids)
+            tours_to_recompute = self.env['of.planning.tour.line'].sudo().search([
+                ('address_id', 'in', geodata_changed.ids)
+            ]).mapped('tour_id')
+            if tours_to_recompute:
+                # we only recompute tours that aren't confirmed and not in the past
+                tours_to_recompute = tours_to_recompute.filtered(
+                    lambda t: t.state != 'confirmed' and t.date >= fields.Date.today())
+                tours_to_recompute.action_compute_osrm_data(reload=True)
+        return result

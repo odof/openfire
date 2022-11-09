@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <!-- vue map des services -->
+    <record id="of_planning_tournee_service_map_view" model="ir.ui.view">
+        <field name="name">of.planning.tournee.service.view.map</field>
+        <field name="model">of.service</field>
+        <field name="inherit_id" ref="of_service.of_service_map_view"/>
+        <field name="arch" type="xml">
+            <!-- ajout champs nécessaires -->
+            <xpath expr="//map//field[@name='date_next']" position="after">
+                <field name="partner_id"/>
+                <field name="address_id"/>
+            </xpath>
+            <!-- ajout action "planifier une intervention" -->
+            <xpath expr="//map//templates//div[@name='content']" position="inside">
+                <t t-set="service_id" t-value="record.id.raw_value"/>
+                <t t-set="address_id" t-value="record.address_id.raw_value[0]"/> <!-- dans le contexte d'une vue map, address_id n'est jamais undefined -->
+                <t t-set="partner_id" t-value="record.partner_id.raw_value[0] || address_id"/>
+                <a name="%(of_planning_tournee.action_view_rdv_intervention_wizard_service)d" type="action"
+                  t-attf-data-context="{'default_partner_id': {{partner_id}}, 'default_service_id': {{service_id}}, 'default_address_id': {{address_id}},}">
+                    <i class="fa fa-calendar-o"/><span class="of_ws"/>
+                    <span>Planifier une intervention</span><br/>
+                </a>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

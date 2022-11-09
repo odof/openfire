@@ -1,22 +1,20 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 from datetime import timedelta
 from odoo import api, models, fields, _
 from odoo.exceptions import ValidationError, UserError
 
 
 class OfPlanningIntervention(models.Model):
-    _inherit = "of.planning.intervention"
+    _inherit = 'of.planning.intervention'
 
+    state = fields.Selection(selection_add=[('being_optimized', "Being optimized")])
     tournee_ids = fields.Many2many(
-        'of.planning.tournee', 'of_planning_intervention_of_planning_tournee_rel', 'intervention_id', 'tournee_id',
-        compute='_compute_tournee_ids', store=True, string='Planification')
-    map_color_tour = fields.Char(compute='_compute_tour_data', string='Color')
-    tour_number = fields.Char(compute='_compute_tour_data', string='Tour number')
-    # Time slots data
-    duration_one_way = fields.Float(string='Duration one way (min)', copy=False)
-    distance_one_way = fields.Float(string='Distance one way (km)', copy=False)
-    return_duration = fields.Float(string='Return duration (min)', copy=False)
-    return_distance = fields.Float(string='Return distance (km)', copy=False)
+        comodel_name='of.planning.tournee', relation='of_planning_intervention_of_planning_tournee_rel',
+        column1='intervention_id', column2='tournee_id', compute='_compute_tournee_ids', store=True,
+        string="Planification")
+    map_color_tour = fields.Char(compute='_compute_tour_data', string="Color")
+    tour_number = fields.Char(compute='_compute_tour_data', string="Tour number")
 
     # @api.depends
 
@@ -37,14 +35,15 @@ class OfPlanningIntervention(models.Model):
         if self._context.get('active_tour_id'):
             tour = self.env['of.planning.tournee'].browse(self._context.get('active_tour_id'))
             address_dict = {}
-            for idx, inter in enumerate(tour.intervention_ids, 1):
+            for idx, inter in enumerate(tour._get_linked_interventions(), 1):
                 if not address_dict.get(inter.address_id.id):
                     address_dict[inter.address_id.id] = {inter: idx}
                 else:
                     address_dict[inter.address_id.id][inter] = idx
             for rec in self:
                 interventions_at_address = address_dict.get(rec.address_id.id)
-                tour_number = ', '.join(map(str, interventions_at_address.values()))
+                tour_number = \
+                    ', '.join(map(str, interventions_at_address.values())) if interventions_at_address else False
                 color = 'blue'
                 rec.map_color_tour = color
                 rec.tour_number = tour_number
@@ -52,6 +51,16 @@ class OfPlanningIntervention(models.Model):
             for rec in self:
                 rec.map_color_tour = False
                 rec.tour_number = False
+
+    @api.depends('state')
+    def _compute_state_int(self):
+        interv_left = self.env['of.planning.intervention']
+        for interv in self:
+            if interv.state and interv.state == 'being_optimized':
+                interv.state_int = 3
+            else:
+                interv_left |= interv
+        super(OfPlanningIntervention, interv_left)._compute_state_int()
 
     # Héritages
 
@@ -71,69 +80,287 @@ class OfPlanningIntervention(models.Model):
 
         planning_tournees = planning_tournee_obj.search([('date', '=', date_jour),
                                                          ('employee_id', 'in', employee_ids)])
-        tournees_bloquees = planning_tournees.filtered(lambda t: t.is_bloque)
+        tournees_bloquees = planning_tournees.filtered(lambda t: t.is_blocked)
 
         if tournees_bloquees:
             raise ValidationError(u'Un des intervenants a déjà une tournée bloquée à cette date.')
 
         intervention = super(OfPlanningIntervention, self).create(vals)
-        # La vérif de nécessité de création de tournée est faite directement dans la fonction create_tournees
-        intervention.create_tournees()
-        intervention._recompute_todo(self._fields['tournee_ids'])
+
+        tours = intervention.create_tour()
+
+        # Updates the tour lines data
+        self.update_tour_lines_data(tours)
         return intervention
 
     @api.multi
-    def write(self, vals):
-        intervention_sudo_obj = self.env['of.planning.intervention'].sudo()
-        old_data = {}
-        recompute_tournee_fields = self.get_recompute_tournee_fields()
-        if any(field_name in vals for field_name in recompute_tournee_fields):
-            if self.mapped('tournee_ids').filtered('is_bloque'):
-                raise ValidationError(u"La tournée d'un des intervenants est bloquée")
+    def create_tour(self):
+        self.ensure_one()
+        # La vérif de nécessité de création de tournée est faite directement dans la fonction create_tour
+        tours = self._create_tour()
+        self._recompute_todo(self._fields['tournee_ids'])
+        return tours
 
-            # Vérification des tournées à supprimer
-            for intervention in self:
-                for date_tournee in intervention.get_date_tournees():
-                    employee_ids = old_data.setdefault(date_tournee, set())
-                    employee_ids |= set(intervention.employee_ids.ids)
+    @api.model
+    def update_tour_lines_data(self, tours):
+        """ Updates tour lines data for the given tours
+        """
+        for tour in tours:
+            tour._populate_tour_lines()  # add this intervention to the tour lines if not already present
+            tour._check_missing_osrm_data(force=True)
+
+    @api.multi
+    def resync_and_update_tour(self, interventions):
+        """ Resyncs and update tours data.
+        We should resync tours if the geodata of the interventions has changed, to update tour lines data.
+
+        :param geodata_interventions: interventions to resync (theirs geodata has changed)
+        """
+        # Resyncs
+        tours_to_resync = interventions.mapped('tournee_ids')
+        tours_to_update = self._get_tours_to_update_on_write() - tours_to_resync
+        tours_to_resync and tours_to_resync.action_compute_osrm_data(reload=True)
+
+        # Updates
+        tours_to_update and self.update_tour_lines_data(tours_to_update)
+
+    @api.multi
+    def reorder_tour(self, interventions):
+        """ Reorder lines and resync/update tours data.
+        We should resync tours if the geodata of the interventions has changed, to update tour lines data.
+
+        :param geodata_interventions: interventions to resync (theirs geodata has changed)
+        """
+        tours = interventions.mapped('tournee_ids')
+        tours and tours._reorder_tour_lines()
+
+    @api.model
+    def check_intervention_to_move(self, old_intervention_values=None):
+        """ If the intervention's duration has changed, we must check if it can be moved to another tour or
+        if it must be added or removed from other tours.
+
+        For example, if the intervention's duration has been increased to 48 hours, this intervention is split in many
+        interventions of X working hours, we have to had this intervention into the futurs tours.
+        And in another way, if the intervention's duration has been decreased to 1 working hour, so this intervention
+        should be removed from the futurs tours where it is.
+
+        :param old_intervention_values: dict of old intervention values
+        """
+        if not old_intervention_values:
+            return
+
+        for intervention, old_values in old_intervention_values.iteritems():
+            added_dates = list(set(intervention.get_date_tournees()))
+            removed_dates = list(set(old_values) - set(intervention.get_date_tournees()))
+            if added_dates:
+                # Tours have been created earlier by the write method with the call to create_tour
+                tours = self.env['of.planning.tournee'].sudo().search([
+                    ('date', 'in', added_dates), ('employee_id', 'in', intervention.employee_ids.ids)])
+                # Updates the tour lines data
+                self.update_tour_lines_data(tours)
+            if removed_dates:
+                self.remove_from_tour({intervention: removed_dates})
+
+    @api.model
+    def remove_from_tour(self, old_intervention_values=None):
+        """ Removes the intervention from its tour if the intervention's date has changed.
+        """
+        if not old_intervention_values:
+            return
+
+        tours_dates = old_intervention_values.values()
+        interventions = self.env['of.planning.intervention'].browse()
+        for intervention in old_intervention_values.keys():  # transform dict keys to recordset
+            interventions |= intervention
+
+        if not tours_dates or not interventions:
+            return
+
+        intervention_ids = interventions.ids
+        existing_tour_lines = self.env['of.planning.tour.line'].sudo().search([
+            ('intervention_id', 'in', intervention_ids),
+            ('tour_id.date', 'in', tours_dates[0]),
+            ('tour_id.date', '>=', fields.Date.today()),
+        ])
+        if existing_tour_lines:
+            tours = existing_tour_lines.mapped('tour_id')
+            existing_tour_lines.unlink()
+            for tour in tours:
+                tour._reset_sequence()
+                tour._check_missing_osrm_data(force=True)
+
+    @api.multi
+    def write(self, vals):
+        recompute_tournee_fields = self._get_recompute_tournee_fields()
+
+        if any(
+            field_name in vals for field_name in recompute_tournee_fields
+        ) and self.mapped('tournee_ids').filtered('is_blocked'):
+            raise ValidationError(u"La tournée d'un des intervenants est bloquée")
+
+        interventions_to_remove = {
+            intervention: intervention.get_date_tournees()
+            for intervention in self._get_interventions_date_changed(vals) | self._get_cancelled_interventions(vals)
+        }
+        geodata_changed = self._get_interventions_geodata_updated(vals)
+        hours_changed = self._get_interventions_only_hours_changed(vals)
+        duration_changed = self._get_interventions_duration_changed(vals)
+        force_date_changed = self._get_interventions_force_date_changed(vals)
+        interventions_to_move = {
+            intervention: intervention.get_date_tournees() for intervention in duration_changed | force_date_changed
+        }
 
         res = super(OfPlanningIntervention, self).write(vals)
 
-        if old_data:
-            if ('date' in vals or 'employee_ids' in vals) and self.mapped('tournee_ids').filtered('is_bloque'):
-                raise ValidationError(u"Un des intervenants a déjà une tournée bloquée sur ce créneau")
-            for date_eval, employee_ids in old_data.iteritems():
-                intervention_sudo_obj.remove_tournees([date_eval], employee_ids)
+        if ('date' in vals or 'employee_ids' in vals) and self.mapped('tournee_ids').filtered('is_blocked'):
+            raise ValidationError(u"Un des intervenants a déjà une tournée bloquée sur ce créneau")
 
-        for intervention in self:
-            # La vérif de nécessité de création de tournée est faite directement dans la fonction create_tournees
-            intervention.create_tournees()
-            intervention._recompute_todo(self._fields['tournee_ids'])
+        # avoid multiple calls to create_tour/_recompute_todo if this is not necessary
+        if not self._context.get('from_tour_wizard') and any(
+                field_name in vals for field_name in recompute_tournee_fields):
+            for intervention in self:
+                # La vérif de nécessité de création de tournée est faite directement dans la fonction _create_tour
+                intervention.create_tour()
 
+            # Updates tour lines for interventions which dates were changed or that were cancelled
+            self.check_intervention_to_move(interventions_to_move)
+
+            # Updates tour lines for interventions that have changed their date or that have been cancelled
+            self.remove_from_tour(interventions_to_remove)
+
+            # Updates tours data for interventions that have changed their hours
+            self.reorder_tour(hours_changed)
+
+            # Updates tours data or reloads it if the geodata has changed or if the intervention has been reopened
+            self.resync_and_update_tour(geodata_changed)
         return res
 
     @api.multi
+    def _get_tours_to_update_on_write(self):
+        """ Helper function to get tours to update on write. It could be overridden to filter/change tours to update.
+        """
+        return self.filtered(lambda i: i.state != 'cancel').mapped('tournee_ids')
+
+    @api.multi
     def unlink(self):
-        interventions = [(intervention.get_date_tournees(), intervention.employee_ids.ids) for intervention in self]
-        super(OfPlanningIntervention, self).unlink()
-        for date_list, employee_ids in interventions:
-            # la vérif de nécessité de suppression de tournée est faite directement dans la fonction remove_tournee
-            self.sudo().remove_tournees(date_list, employee_ids)
-        return True
+        tours_dates = [intervention.get_date_tournees() for intervention in self]
+        flattened_tours_dates = [item for sublist in tours_dates for item in sublist]
+        existing_tour_lines = self.env['of.planning.tour.line'].sudo().search([
+            ('intervention_id', 'in', self.ids),
+            ('tour_id.date', 'in', flattened_tours_dates)
+        ])  # Tour lines are deleted in cascade so we need to get them before
+        tours = existing_tour_lines and existing_tour_lines.mapped('tour_id') or self.env['of.planning.tournee']
+        result = super(OfPlanningIntervention, self).unlink()
+        if tours:
+            # As we are deleting a tour line, we need to recompute sequences and OSRM data
+            for tour in tours:
+                tour._reset_sequence()
+                tour._check_missing_osrm_data(force=True)
+        return result
+
+    @api.multi
+    def name_get(self):
+        if not self._context.get('from_tour', False):
+            return super(OfPlanningIntervention, self).name_get()
+        result = []
+        for record in self:
+            name_intervention = '%s - %s' % (record.type_id.name or record.name, record.address_id.name or 'N/A')
+            result.append((record.id, name_intervention))
+        return result
 
     # Autres
 
+    def _get_domain_states_values_overlap(self):
+        states = super(OfPlanningIntervention, self)._get_domain_states_values_overlap()
+        return states + ['being_optimized']
+
     @api.model
-    def get_recompute_tournee_fields(self):
-        return ['date', 'employee_ids', 'state']
+    def _get_recompute_tournee_fields(self):
+        return ['date', 'employee_ids', 'state', 'duree', 'address_id', 'forcer_dates']
+
+    @api.multi
+    def _get_interventions_geodata_updated(self, vals):
+        """ Helper function to get interventions whose geodata has changed.
+
+        :param vals: Values to write
+        :return: interventions recordset
+        """
+        def _compare_geodata(i, vals):
+            address_id = i.address_id and i.address_id.id or False
+            if 'geo_lat' in vals and i.geo_lat != vals.get('geo_lat'):
+                return True
+            if 'geo_lng' in vals and i.geo_lng != vals.get('geo_lng'):
+                return True
+            return 'address_id' in vals and address_id != vals.get('address_id')
+        return self.filtered(lambda i: _compare_geodata(i, vals))
+
+    @api.multi
+    def _get_interventions_date_changed(self, vals):
+        """ Helper function to get interventions whose date has changed (to another day)
+
+        :param vals: Values to write
+        :return: interventions recordset
+        """
+        date_field = 'date_prompt' if 'date_prompt' in vals else 'date'
+        return self.filtered(
+            lambda i:
+            date_field in vals and
+            getattr(i, date_field) != vals.get(date_field) and
+            fields.Datetime.from_string(getattr(i, date_field)).date() !=
+            fields.Datetime.from_string(vals[date_field]).date())
+
+    @api.multi
+    def _get_cancelled_interventions(self, vals):
+        """ Helper function to get interventions whose state has changed to 'cancelled'
+
+        :param vals: Values to write
+        :return: interventions recordset
+        """
+        return self.filtered(lambda i: 'state' in vals and vals.get('state') == 'cancel')
+
+    @api.multi
+    def _get_interventions_only_hours_changed(self, vals):
+        """ Helper function to get interventions whose hours has changed (same date but different hours)
+
+        :param vals: Values to write
+        :return: interventions recordset
+        """
+        def _compare_hours(i, vals):
+            if 'date' not in vals and 'date_prompt' not in vals:
+                return False
+            used_date = 'date_prompt' if 'date_prompt' in vals else 'date'
+            date = fields.Datetime.from_string(getattr(i, used_date))
+            date_new = fields.Datetime.from_string(vals[used_date])
+            if date_new.date() != date.date():
+                return False
+            return date.hour != date_new.hour or date.minute != date_new.minute or date.second != date_new.second
+
+        return self.filtered(lambda i: _compare_hours(i, vals))
+
+    @api.multi
+    def _get_interventions_duration_changed(self, vals):
+        """ Helper function to get interventions which duration has changed
+
+        :param vals: Values to write
+        :return: interventions recordset
+        """
+        return self.filtered(lambda i: 'duree' in vals and i.duree != vals.get('duree'))
+
+    @api.multi
+    def _get_interventions_force_date_changed(self, vals):
+        """ Helper function to get interventions which force_date has changed
+
+        :param vals: Values to write
+        :return: interventions recordset
+        """
+        return self.filtered(lambda i: 'forcer_dates' in vals and i.forcer_dates != vals.get('forcer_dates'))
 
     @api.multi
     def get_date_tournees(self):
         self.ensure_one()
-        res = []
         date_deb_str = self.date_date
         date_fin_str = fields.Date.to_string(fields.Date.from_string(self.date_deadline))
-        res.append(date_deb_str)
+        res = [date_deb_str]
         # intervention sur plusieurs jours, prendre toutes les dates intermédiaires
         if date_fin_str != date_deb_str:
             date_fin_da = fields.Date.from_string(self.date_deadline)
@@ -144,7 +371,7 @@ class OfPlanningIntervention(models.Model):
         return res
 
     @api.multi
-    def create_tournees(self):
+    def _create_tour(self):
         """
         Crée les tournées des employés de cette intervention si besoin
         C'est à dire si il n'y a pas de tournée et que l'intervention n'est ni annulée ni reportée
@@ -160,49 +387,24 @@ class OfPlanningIntervention(models.Model):
 
         for employee in self.employee_ids:
             for date_eval in dates_eval:
-                tournee = tournee_obj.search([('date', '=', date_eval), ('employee_id', '=', employee.id)], limit=1)
-                if not tournee:
-                    tournee_data = {
+                tour = tournee_obj.search([('date', '=', date_eval), ('employee_id', '=', employee.id)], limit=1)
+                address_sector = address.of_secteur_tech_id
+                if not tour:
+                    tour = tournee_obj.create({
                         'date': date_eval,
                         'employee_id': employee.id,
-                        'secteur_id': address.of_secteur_tech_id.id,
+                        'sector_ids': [(6, 0, [address_sector.id])] if address_sector else False,
                         'epi_lat': address.geo_lat,
                         'epi_lon': address.geo_lng,
-                        'is_bloque': False,
-                        'is_confirme': False
-                    }
-                    res.append(tournee_obj.create(tournee_data))
-                elif tournee.secteur_id != address.of_secteur_tech_id:
-                    tournee.secteur_id = address.of_secteur_tech_id
+                        'is_blocked': False,
+                        'is_confirmed': False
+                    })
+                elif not tour.sector_ids and address_sector:
+                    tour.sector_ids = [(6, 0, [address_sector.id])]
+                elif address_sector and address_sector.id not in tour.sector_ids.ids:
+                    tour.sector_ids = [(4, address_sector.id)]
+                res.append(tour)
         return res
-
-    @api.model
-    def remove_tournees(self, date_list, employee_ids):
-        """
-        Vérifie le tournées des employés renseignés à une date et supprime celle qui n'ont aucun RDV.
-        :param date_list: liste de dates au format string à vérifier
-        :param employee_ids: list des ids des employés à vérifier
-        :return: True
-        """
-        planning_tournee_obj = self.env['of.planning.tournee']
-        tournees_unlink = self.env['of.planning.tournee']
-        for date_eval in date_list:
-            employees_tournees_unlink_ids = []
-            for employee_id in employee_ids:
-                planning_intervention = self.search([
-                    ('date_date', '<=', date_eval),
-                    ('date_deadline', '>=', date_eval),
-                    ('state', 'in', ('draft', 'confirm', 'done', 'unfinished')),
-                    ('employee_ids', 'in', employee_id)], limit=1)
-                if not planning_intervention:
-                    # Il n'existe plus de plannings pour la tournee, on la supprime
-                    employees_tournees_unlink_ids.append(employee_id)
-
-            tournees_unlink |= planning_tournee_obj.search(
-                [('date', '=', date_eval), ('employee_id', 'in', employees_tournees_unlink_ids),
-                 ('is_bloque', '=', False), ('is_confirme', '=', False),
-                 ('address_depart_id', '=', False), ('address_retour_id', '=', False), ('secteur_id', '=', False)])
-        return tournees_unlink.unlink()
 
     @api.multi
     def action_open_wizard_plan_intervention(self):
@@ -247,6 +449,5 @@ class OfPlanningIntervention(models.Model):
     def custom_get_color_map(self):
         title = ""
         v0 = {'label': u"DI à planifier", 'value': 'green'}
-        # gold is easier to read than yellow on the legend with a white background
         v1 = {'label': u'Intervention(s) de la tournée', 'value': 'blue'}
         return {"title": title, "values": (v0, v1)}

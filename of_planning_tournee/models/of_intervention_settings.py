@@ -39,6 +39,12 @@ class OfInterventionSettings(models.TransientModel):
             ir_values_obj.set_default('of.intervention.settings', 'slots_display_mode', 'list')
         return res
 
+    @api.model
+    def _default_day_ids(self):
+        # monday to friday as default
+        days = self.env['of.jours'].search([('numero', 'in', (1, 2, 3, 4, 5))], order="numero")
+        return [day.id for day in days]
+
     # Time slots research
     number_of_results = fields.Integer(
         string="Number of results", default=10, help="Number of results to show in the planning. (Max : 30)")
@@ -56,6 +62,17 @@ class OfInterventionSettings(models.TransientModel):
         string="Enable quick scheduling", default=False,
         help="Will trigger auto search from contacts/installed parks/tasks/etc. like for intervention requests")
     default_planning_task_id = fields.Many2one(comodel_name='of.planning.tache', string="Default task for searching")
+    # Tour planning
+    nbr_days_tour_creation = fields.Integer(
+        string='Tours // Create Tours over __ days', default=30, required=True,
+        help="Defines the number of days on which to create the routes for each employee whose work hours "
+        "are defined. Maximum: 180 days.")
+    tour_employee_ids = fields.Many2many(
+        comodel_name='hr.employee', relation='intervention_settings_tour_employee_rel', string="Tours // Employees",
+        help="Create tours for these employees only", default=False)
+    tour_day_ids = fields.Many2many(
+        comodel_name='of.jours', relation='intervention_settings_tour_days_rel', string="Tours // Days",
+        help="Create tours for these days only", default=lambda self: self._default_day_ids())
 
     @api.onchange('enable_quick_scheduling')
     def _onchange_enable_quick_scheduling(self):
@@ -68,6 +85,11 @@ class OfInterventionSettings(models.TransientModel):
     def _check_number_of_results(self):
         if 1 <= self.number_of_results > 30:
             raise ValidationError(_("The Number of results must be positive and can't exceed 30."))
+
+    @api.constrains('nbr_days_tour_creation')
+    def _check_nbr_days_tour_creation(self):
+        if 1 <= self.nbr_days_tour_creation > 180:
+            raise ValidationError(_("The number of days for the tours creation must be positive and can't exceed 180"))
 
     @api.multi
     def set_enable_quick_scheduling(self):
@@ -101,3 +123,18 @@ class OfInterventionSettings(models.TransientModel):
     def set_default_planning_task_id(self):
         return self.env['ir.values'].sudo().set_default(
             'of.intervention.settings', 'default_planning_task_id', self.default_planning_task_id.id or False)
+
+    @api.multi
+    def set_nbr_days_tour_creation(self):
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings', 'nbr_days_tour_creation', self.nbr_days_tour_creation)
+
+    @api.multi
+    def set_tour_employee_ids(self):
+        IrValues = self.env['ir.values'].sudo()
+        return IrValues.set_default('of.intervention.settings', 'tour_employee_ids', self.tour_employee_ids.ids)
+
+    @api.multi
+    def set_tour_day_ids(self):
+        IrValues = self.env['ir.values'].sudo()
+        return IrValues.set_default('of.intervention.settings', 'tour_day_ids', self.tour_day_ids.ids)

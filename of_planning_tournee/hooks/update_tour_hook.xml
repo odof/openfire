@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    
+    <function model="of.planning.tournee" name="_tour_update_hook">
+        <!-- ids = --><value eval="[]"/>
+        <!-- targeted_version = --><value eval="'10.0.3.0.0'"/>
+    </function>
+
+</odoo>

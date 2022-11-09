@@ -5,28 +5,91 @@
         <field name="name">of.planning.tournee.form</field>
         <field name="model">of.planning.tournee</field>
         <field name="arch" type="xml">
-            <form string="Tournées">
-                <group colspan="2" col="4">
-                    <separator string="Info" colspan="4"/>
-                    <field name="date_jour"/>
-                    <field name="date"/>
-                    <field name="employee_id"/>
-                    <field name="secteur_id"/>
-                    <field name="address_depart_id"/>
-                    <field name="address_retour_id"/>
-                    <field name="distance" attrs="{'required': [('is_bloque', '=', False)]}"/>
-                    <group colspan="4" col="8">
-                        <field name="is_complet"/>
-                        <field name="is_bloque"/>
-                        <field name="is_confirme"/>
+            <form string="Tours" create="false" delete="false">
+                <field name="need_optimization_update" invisible="1"/>
+                <field name="ignore_alert_optimization_update" invisible="1"/>
+                <field name="additional_records" invisible="1"/>
+                <field name="is_full" invisible="1"/>
+                <field name="hide_action_buttons" invisible="1"/>
+                <header>
+                    <button string="Confirm" name="action_confirm_tour" type="object" class="oe_highlight" groups="of_planning.group_planning_intervention_responsible, of_planning.group_planning_intervention_manager"/>
+                    <button string="Set back to draft" name="action_set_back_draft" type="object" groups="of_planning.group_planning_intervention_responsible, of_planning.group_planning_intervention_manager"
+                        class="oe_highlight" attrs="{'invisible': ['|', ('is_full', '=', True), ('state', '=', 'draft')]}"/>
+                    <button string="Set back to full" name="action_set_back_full" type="object" groups="of_planning.group_planning_intervention_responsible, of_planning.group_planning_intervention_manager"
+                        class="oe_highlight" attrs="{'invisible': ['|', ('is_full', '=', False), '&amp;', ('is_full', '=', True), ('state', '!=', 'confirmed')]}"/>
+                    <button string="Optimize" name="action_optimize_tour" type="object" class="oe_highlight" attrs="{'invisible': [('hide_action_buttons', '=', True)]}"
+                        groups="of_planning.group_planning_intervention_responsible, of_planning.group_planning_intervention_manager"/>
+                    <button string="Reorganize" name="action_reorganize_tour" type="object" class="oe_highlight" attrs="{'invisible': [('hide_action_buttons', '=', True)]}"
+                        groups="of_planning.group_planning_intervention_responsible, of_planning.group_planning_intervention_manager"/>
+                    <field name="state" widget="statusbar" nolabel="1"/>
+                </header>
+                <div class="oe_title">
+                    <div id="header" style="display: flex;">
+                        <div id="title" style="width: 100%;"><h1>Tour <field name="name" readonly="1"/></h1></div>
+                        <div class="oe_button_box" name="button_box" style="display: flex;margin-top: 20px;">
+                            <button name="action_view_interventions" type="object" class="oe_stat_button" icon="fa-calendar">
+                                <field string="# Interventions" name="count_interventions" widget="statinfo"/>
+                            </button>
+                        </div>
+                    </div>
+                    <div name="geodata_alert" attrs="{'invisible': ['|', ('need_optimization_update', '=', False), ('ignore_alert_optimization_update', '=', True)]}">
+                        <p class="alert alert-warning">
+                            The Geodata of an intervention have changed since the last optimization. You should consider re-optimize the tour. <button name="action_ignore_alert_optimization_update" string="(Ignore that message)" type="object" class="oe_link"/>
+                        </p>
+                    </div>
+                </div>
+                <group col="6">
+                    <group colspan="2" col="2">
+                        <field name="weekday"/>
+                        <field name="date" readonly="1"/>
+                        <field name="employee_id" readonly="1" options="{'no_create_edit': True, 'not_delete':True, 'no_create': True}"/>
+                        <field name="employee_other_ids" widget="many2many_tags" options="{'no_create_edit': True, 'not_delete':True, 'no_create': True}"/>
                     </group>
-                    <separator string="Epicentre" colspan="4" col="4"/>
-                    <field name="zip_id"/>
-                    <separator colspan="4"/>
-                    <field name="epi_lat" attrs="{'required': [('is_bloque', '=', False)]}"/>
-                    <field name="epi_lon" attrs="{'required': [('is_bloque', '=', False)]}"/>
-                    <separator colspan="4" string="Documents"/>
+                    <group colspan="2" col="2">
+                        <field name="sector_ids" widget="many2many_tags"/>
+                        <field name="zip_id"/>
+                        <field name="start_address_id" required="1"/>
+                        <field name="return_address_id" required="1"/>
+                        <field name="total_distance"/>
+                        <field name="total_duration" widget="float_time"/>
+                    </group>
                 </group>
+                <notebook>
+                    <page name="tour_lines" string="Interventions"> <!-- Tour lines page -->
+                        <field name="tour_line_ids" mode="tree" nolabel="1" readonly="1" context="{'from_tour':1}">
+                            <tree string="Tour lines">
+                                <field name="intervention_id"/>
+                                <field name="date_start"/>
+                                <field name="address_city"/>
+                                <field name="flexible"/>
+                                <field name="employee_ids"/>
+                                <field name="duration" widget="float_time"/>
+                                <field name="duration_one_way" widget="float_time"/>
+                                <field name="distance_one_way" />
+                            </tree>
+                        </field>
+                    </page> <!-- End of Tour lines page -->
+                    <page name="tour_lines_map" string="Route"> <!-- Map page -->
+                        <field name="map_tour_line_ids" mode="map" nolabel="1"
+                            context="{'map_view_ref':'of_planning_tournee.of_planning_tour_line_map_view_drawroute', 'from_tour':1, 'active_tour_id': active_id, 'additional_records': additional_records}"/>
+                    </page> <!-- End of Map page  -->
+                    <page name="technical" string="Technical" groups="of_base.of_group_root_only"> <!-- Technial page for OpenFire -->
+                        <group name="update_map" string="Map &amp; OSRM data">
+                            <button string="Update map routes" name="action_update_map_and_reload" type="object" class="oe_highlight"/>
+                        </group>
+                        <group name="tour_restore" string="Tour data" attrs="{'invisible': [('last_modification_date', '=', False)]}">
+                            <group colspan="4">
+                                <p class="oe_grey" style="display: inline-block; margin: 0px 0px 0px 8px;">
+                                    Allow to restore the tour as it was before the last optimization/reorganization. <br/>
+                                    Last modification date <field name="last_modification_date" nolabel="1"/>
+                                </p>
+                            </group>
+                            <group colspan="1">
+                                <button string="Restore tour" name="action_restore_tour" type="object" class="oe_highlight" attrs="{'invisible': [('last_modification_date', '=', False)]}"/>
+                            </group>
+                        </group>
+                    </page> <!-- End of technical page -->
+                </notebook>
             </form>
         </field>
     </record>
@@ -35,18 +98,25 @@
         <field name="name">of.planning.tournee.tree</field>
         <field name="model">of.planning.tournee</field>
         <field name="arch" type="xml">
-            <tree editable="top" colors="red:(is_complet==True) or (is_bloque==True);grey:(is_confirme==False)">
-                <field name="date_jour"/>
+            <tree decoration-danger="(state=='full' or is_full==True) or is_blocked==True" decoration-warning="need_optimization_update" 
+                    decoration-success="is_optimized" decoration-muted="state=='confirmed'" create="false" edit="false">
+                <button icon="fa-exclamation-triangle" name="dummy" string="Need optimization update" attrs="{'invisible': ['|', ('need_optimization_update', '=', False), ('ignore_alert_optimization_update', '=', True)]}" />
+                <button icon="fa-check" name="dummy" string="Optimized" attrs="{'invisible': [('is_optimized', '=', False)]}"/>
+                <field name="weekday"/>
                 <field name="date"/>
                 <field name="employee_id"/>
-                <field name="secteur_id"/>
+                <field name="sector_ids" widget="many2many_tags"/>
                 <field name="zip_id"/>
-                <field name="address_depart_id"/>
-                <field name="address_retour_id"/>
-                <field name="is_complet"/>
-                <field name="is_confirme"/>
-                <field name="is_bloque" invisible="1"/>
-                <field name="intervention_ids" widget="many2many_tags" readonly="1"/>
+                <field name="start_address_id"/>
+                <field name="return_address_id"/>
+                <field name="state"/>
+                <field name="is_full" invisible="1"/>
+                <field name="is_confirmed" invisible="1"/>
+                <field name="is_blocked" invisible="1"/>
+                <field name="is_optimized" invisible="1"/>
+                <field name="need_optimization_update" invisible="1"/>
+                <field name="ignore_alert_optimization_update" invisible="1"/>
+                <field name="count_interventions"/>
             </tree>
         </field>
     </record>
@@ -57,17 +127,207 @@
         <field name="arch" type="xml">
             <search string="Recherche">
                 <group>
-                    <filter name="filter_incomplet" string="Incomplet" icon="terp-accessories-archiver" domain="[('is_complet', '=', False)]"/>
+                    <field name="date"/>
                     <field name="date_min" filter_domain="[('date','&gt;=',self)]"/>
                     <field name="date_max" filter_domain="[('date','&lt;=',self)]"/>
                     <field name="employee_id"/>
-                    <field name="secteur_id"/>
+                    <field name="sector_ids"/>
                     <field name="zip_id"/>
+                    <separator/>
+                    <filter name="not_full" string="Not full" icon="terp-accessories-archiver" domain="[('is_full', '=', False)]"/>
+                    <filter name="optimized" string="Optimized" domain="[('is_optimized', '=', True)]"/>
+                    <filter name="not_empty" string="Not empty" domain="[('count_interventions', '>', 0)]"/>
+                    <!-- "ignore_alert_optimization_update" not in domain to be able to see the tours that need to be optimized even if the user ignored alert  -->
+                    <filter name="need_optimization_update" string="Need optimization update" domain="[('need_optimization_update', '=', True)]"/>
                 </group>
              </search>
         </field>
     </record>
 
+    <record id="of_planning_tour_line_form_view" model="ir.ui.view">
+        <field name="name">of.planning.tour.line.form.view</field>
+        <field name="model">of.planning.tour.line</field>
+        <field name="arch" type="xml">
+            <form string="Tour line">
+                <group>
+                    <field name="sequence"/>
+                    <field name="intervention_id"/>
+                    <field name="date_start"/>
+                    <field name="tache_name"/>
+                    <field name="duration" widget="float_time"/>
+                    <field name="employee_ids" widget="many2many_tags"/>
+                    <field name="partner_name"/>
+                    <field name="address_zip"/>
+                    <field name="address_city"/>
+                    <field name="partner_mobile"/>
+                    <field name="partner_phone"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <!-- Base Map view for tour lines -->
+    <record id="of_planning_tour_line_map_view" model="ir.ui.view">
+        <field name="name">of.planning.tour.line.map.view</field>
+        <field name="model">of.planning.tour.line</field>
+        <field name="arch" type="xml">
+            <map latitude_field="geo_lat" longitude_field="geo_lng" color_field="map_color_tour" number_field="tour_number"
+                    draw_routes="0" connect_markers="1" hide_pager="1" force_legend_method="custom_get_color_map">
+                <field name="map_color_tour" required="1"/>
+                <field name="geo_lat" required="1"/>
+                <field name="geo_lng" required="1"/>
+                <field name="partner_name"/>
+                <field name="tache_name"/>
+                <field name="address_zip"/>
+                <field name="address_city"/>
+                <field name="partner_mobile"/>
+                <field name="partner_phone"/>
+                <field name="date_start"/>
+                <field name="tour_number"/>
+                <field name="hexa_color"/>
+                <templates>
+                    <t t-name="of_map_record_box">
+                        <div t-attf-class="#{map_record_color(record.map_color_tour.raw_value)} of_map_record_global_click">
+                            <div class="of_map_record_buttons">
+                                <i class="of_map_record_close fa fa-lg fa-times"/>
+                            </div>
+                            <div name="content" class="of_map_record_content">
+                                <t t-if="record.tour_number.raw_value">
+                                    <i class="of_map_record_main fa fa-hashtag"/><span class="of_ws"/><strong><field name="tour_number"/></strong>
+                                    <br/>
+                                </t>
+                                <t t-if="record.partner_name.raw_value">
+                                    <i class="of_map_record_main fa fa-user"/><span class="of_ws"/><strong><field name="partner_name"/></strong>
+                                    <br/>
+                                </t>
+                                <t t-if="record.address_zip.raw_value">
+                                    <i class="of_map_record_main fa fa-map-marker"/><span class="of_ws"/><field name="address_zip"/><span class="of_ws"/><field name="address_city"/><br/>
+                                </t>
+                                <t t-if="record.partner_phone.raw_value">
+                                    <i class="of_map_record_main fa fa-phone"/><span class="of_ws"/><field name="partner_phone"/><br/>
+                                </t>
+                                <t t-if="record.partner_mobile.raw_value">
+                                    <i class="of_map_record_main fa fa-phone"/><span class="of_ws"/><field name="partner_mobile"/><br/>
+                                </t>
+                                <t t-if="record.tache_name.raw_value">
+                                    <i class="of_map_record_main fa fa-cogs"/><span class="of_ws"/><field name="tache_name"/><br/>
+                                </t>
+                                <t t-if="record.date_start.raw_value">
+                                    <i class="of_map_record_main fa fa-truck"/><span class="of_ws"/><field name="date_start"/><br/>
+                                </t>
+                            </div>
+                        </div>
+                    </t>
+                    <t t-name="of_map_marker_tooltip">
+                        <div name="marker_tooltip">
+                            <t t-if="record.tour_number.raw_value">
+                                <i class="of_map_record_main fa fa-hashtag"/><span class="of_ws"/><strong><field name="tour_number"/></strong>
+                                <br/>
+                            </t>
+                            <t t-if="record.partner_name.raw_value">
+                                <i class="fa fa-user"/><span class="of_ws"/><field name="partner_name"/><br/>
+                            </t>
+                            <t t-if="record.address_zip.raw_value or record.address_city.raw_value">
+                                <i class="fa fa-map-marker"/><span class="of_ws"/><field name="address_zip"/><span class="of_ws"/><field name="address_city"/><br/>
+                            </t>
+                            <t t-if="record.partner_phone.raw_value">
+                                <i class="fa fa-phone"/><span class="of_ws"/><field name="partner_phone"/><br/>
+                            </t>
+                            <t t-if="record.partner_mobile.raw_value">
+                                <i class="fa fa-phone"/><span class="of_ws"/><field name="partner_mobile"/><br/>
+                            </t>
+                            <t t-if="record.tache_name.raw_value">
+                                <i class="fa fa-cogs"/><span class="of_ws"/><field name="tache_name"/><br/>
+                            </t>
+                            <t t-if="record.date_start.raw_value">
+                                <i class="fa fa-truck"/><span class="of_ws"/><field name="date_start"/><br/>
+                            </t>
+                        </div>
+                    </t>
+                </templates>
+            </map>
+        </field>
+    </record>
+
+    <!-- Small Map view of the tour without drawn routes, just markers connected with a blue line (can be used in the planification wizard if we don't want the full route) -->
+    <record id="of_planning_tour_line_small_map_view" model="ir.ui.view">
+        <field name="name">of.planning.tour.line.small.map.view</field>
+        <field name="model">of.planning.tour.line</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.of_planning_tour_line_map_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//map" position="attributes">
+                <attribute name="min_width">460px</attribute>
+                <attribute name="min_height">360px</attribute>
+                <attribute name="force_legend_method">custom_get_color_map_with_preview</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Small Map view of the tour with drawn routes, (can be used in the planification wizard) -->
+    <record id="of_planning_tour_line_small_map_drawroutes_view" model="ir.ui.view">
+        <field name="name">of.planning.tour.line.small.map.drawroutes.view</field>
+        <field name="model">of.planning.tour.line</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.of_planning_tour_line_map_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//map//field[@name='tour_number']" position="after">
+                <field name="geojson_data"/>
+                <field name="endpoint_geojson_data"/>
+            </xpath>
+            <xpath expr="//map" position="attributes">
+                <attribute name="geojson_data">geojson_data</attribute>
+                <attribute name="endpoint_geojson_data">endpoint_geojson_data</attribute>
+                <attribute name="min_width">460px</attribute>
+                <attribute name="min_height">360px</attribute>
+                <attribute name="draw_routes">1</attribute>
+                <attribute name="connect_markers">0</attribute>
+                <attribute name="force_legend_method">custom_get_color_map_with_preview</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Small Map view of the tour with drawn routes, also display the path from/to the start/end addresses (used in the tour optimization wizard) -->
+    <record id="of_planning_tour_line_small_map_drawroutes_optz_view" model="ir.ui.view">
+        <field name="name">of.planning.tour.line.small.map.drawroutes.optz.view</field>
+        <field name="model">of.planning.tour.line</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.of_planning_tour_line_map_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//map//field[@name='tour_number']" position="after">
+                <field name="geojson_data"/>
+                <field name="endpoint_geojson_data"/>
+            </xpath>
+            <xpath expr="//map" position="attributes">
+                <attribute name="geojson_data">geojson_data</attribute>
+                <attribute name="endpoint_geojson_data">endpoint_geojson_data</attribute>
+                <attribute name="min_width">460px</attribute>
+                <attribute name="min_height">355px</attribute>
+                <attribute name="draw_routes">1</attribute>
+                <attribute name="connect_markers">0</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Large Map view of the tour with drawn routes, also display the path from/to the start/end addresses (used in the form view of tour) -->
+    <record id="of_planning_tour_line_map_view_drawroute" model="ir.ui.view">
+        <field name="name">of.planning.tour.line.map.drawroute.view</field>
+        <field name="model">of.planning.tour.line</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tournee.of_planning_tour_line_map_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//map//field[@name='tour_number']" position="after">
+                <field name="geojson_data"/>
+                <field name="endpoint_geojson_data"/>
+            </xpath>
+            <xpath expr="//map" position="attributes">
+                <attribute name="geojson_data">geojson_data</attribute>
+                <attribute name="endpoint_geojson_data">endpoint_geojson_data</attribute>
+                <attribute name="draw_routes">1</attribute>
+                <attribute name="connect_markers">0</attribute>
+            </xpath>
+        </field>
+    </record>
 
     <record id="action_of_planning_tournee_tree" model="ir.actions.act_window">
         <field name="name">Préparation des tournées</field>
@@ -80,30 +340,5 @@
 
     <menuitem name="Tournées" id="menu_of_planning_tournee_tree" parent="of_planning.menu_of_planning_intervention" sequence="75"
               action="action_of_planning_tournee_tree"/>
-
-    <!-- vue map des services -->
-    <record id="of_planning_tournee_service_map_view" model="ir.ui.view">
-        <field name="name">of.planning.tournee.service.view.map</field>
-        <field name="model">of.service</field>
-        <field name="inherit_id" ref="of_service.of_service_map_view"/>
-        <field name="arch" type="xml">
-            <!-- ajout champs nécessaires -->
-            <xpath expr="//map//field[@name='date_next']" position="after">
-                <field name="partner_id"/>
-                <field name="address_id"/>
-            </xpath>
-            <!-- ajout action "planifier une intervention" -->
-            <xpath expr="//map//templates//div[@name='content']" position="inside">
-                <t t-set="service_id" t-value="record.id.raw_value"/>
-                <t t-set="address_id" t-value="record.address_id.raw_value[0]"/> <!-- dans le contexte d'une vue map, address_id n'est jamais undefined -->
-                <t t-set="partner_id" t-value="record.partner_id.raw_value[0] || address_id"/>
-                <a name="%(of_planning_tournee.action_view_rdv_intervention_wizard_service)d" type="action"
-                  t-attf-data-context="{'default_partner_id': {{partner_id}}, 'default_service_id': {{service_id}}, 'default_address_id': {{address_id}},}">
-                    <i class="fa fa-calendar-o"/><span class="of_ws"/>
-                    <span>Planifier une intervention</span><br/>
-                </a>
-            </xpath>
-        </field>
-    </record>
 
 </odoo>
