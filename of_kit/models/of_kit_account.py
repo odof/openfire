@@ -220,7 +220,7 @@ class AccountInvoiceLine(models.Model):
                     'qty_per_kit': 1,
                     'product_uom_id': self.uom_id.id or self.product_id.uom_id.id,
                     'price_unit': self.product_id.list_price,
-                    'cost_unit': self.product_id.standard_price,
+                    'cost_unit': self.product_id.get_cost(),
                     'hide_prices': False,
                     }
                 account_kit_vals = {
@@ -431,7 +431,7 @@ class OfAccountInvoiceKitLine(models.Model):
                 'name': self.product_id.name_get()[0][1] or self.product_id.name,
                 'product_uom_id': self.product_id.product_tmpl_id.uom_id,
                 'price_unit': self.product_id.list_price,
-                'cost_unit': self.product_id.standard_price,
+                'cost_unit': self.product_id.get_cost(),
             }
             if self.kit_id.invoice_line_id:
                 if self.kit_id.invoice_line_id.of_pricing == 'fixed':

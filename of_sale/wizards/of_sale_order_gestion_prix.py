@@ -484,8 +484,8 @@ class GestionPrixLine(models.TransientModel):
                 'price_unit': price_unit,
                 'of_price_management_variation': 0.0,
                 'of_unit_price_variation': new_price_variation,
-                'purchase_price': order_line.product_id.standard_price,
-            }},
+                'purchase_price': order_line.product_id.get_cost(),
+             }},
             taxes)
 
     @api.multi
@@ -581,7 +581,7 @@ class GestionPrixLine(models.TransientModel):
             if mode == 'reset':
                 vals, taxes = line.get_reset_amount(line_rounding=line_rounding)
                 line.cout_total_ht_simul = \
-                    line.order_line_id.product_id.standard_price * line.order_line_id.product_uom_qty
+                    line.order_line_id.product_id.get_cost() * line.order_line_id.product_uom_qty
             else:
                 vals, taxes = line.get_distributed_amount(
                     to_distribute,

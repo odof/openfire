@@ -92,7 +92,7 @@ class AccountInvoiceLine(models.Model):
                     cost = line.product_id.cost_comps
                     purchase_price = line.product_id.seller_price_comps
                 else:
-                    cost = line.product_id.standard_price
+                    cost = line.product_id.get_cost()
                     purchase_price = line.product_id.of_seller_price
             line.of_unit_cost = cost
             line.of_purchase_price = purchase_price

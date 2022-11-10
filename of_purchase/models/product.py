@@ -21,7 +21,9 @@ class ProductProduct(models.Model):
     @api.multi
     def _set_standard_price(self, value):
         super(ProductProduct, self)._set_standard_price(value)
-        self.of_purchase_coeff_cost_propagation(value)
+        for product in self:
+            if product.cost_method not in ('average', 'real') or product.categ_id.of_sale_cost == 'standard':
+                product.of_purchase_coeff_cost_propagation(value)
 
     @api.multi
     def of_purchase_coeff_cost_propagation(self, cost):
@@ -41,8 +43,10 @@ class ProductProduct(models.Model):
         # Si le module of_base_multicompany est installé, il est inutile de le diffuser sur les sociétés "magasins"
         companies = self.env['res.company'].search(['|', ('chart_template_id', '!=', False), ('parent_id', '=', False)])
         property_obj = self.env['ir.property'].sudo()
-        coeff_values = {product.id: product.standard_price and seller_price and product.standard_price / seller_price
-                        or 1 for product in self}
+        coeff_values = {}
+        for product in self:
+            cost = product.get_cost()
+            coeff_values[product.id] = cost and seller_price and cost / seller_price or 1
         for company in companies:
             property_obj.with_context(force_company=company.id).set_multi(
                 'property_of_purchase_coeff', 'product.product', coeff_values)
