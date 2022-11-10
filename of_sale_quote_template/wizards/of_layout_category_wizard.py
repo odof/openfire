@@ -7,19 +7,19 @@ class OfLayoutCategoryAddWizard(models.TransientModel):
     _name = 'of.layout.category.add.wizard'
     _description = u"Wizard d'ajout de ligne de section"
 
-    type = fields.Selection([('quote', 'Modèle de devis'), ('order', 'Devis/Commande')], string=u'Type', required=True)
+    type = fields.Selection([('quote', u"Modèle de devis"), ('order', "Devis/Commande")], string=u"Type", required=True)
 
-    order_id = fields.Many2one('sale.order', string=u'Commande')
+    order_id = fields.Many2one('sale.order', string=u"Commande")
     order_layout_category_id = fields.Many2one(
-        'of.sale.order.layout.category', string=u'Ligne de section', ondelete='cascade')
+        'of.sale.order.layout.category', string=u"Ligne de section", ondelete='cascade')
 
-    quote_id = fields.Many2one('sale.quote.template', string=u'Modèle de devis')
+    quote_id = fields.Many2one('sale.quote.template', string=u"Modèle de devis")
     quote_layout_category_id = fields.Many2one(
-        'of.sale.quote.template.layout.category', string=u'Ligne de section', ondelete='cascade')
+        'of.sale.quote.template.layout.category', string=u"Ligne de section", ondelete='cascade')
 
-    section_number = fields.Integer(string=u'Nombre de section', required=True)
-    min_section_number = fields.Integer(string=u'Nombre de section minimum', required=True)
-    display_button = fields.Boolean(string=u'Afficher bouton de validation')
+    section_number = fields.Integer(string=u"Nombre de sections", required=True)
+    min_section_number = fields.Integer(string=u"Nombre de sections minimum", required=True)
+    display_button = fields.Boolean(string=u"Afficher bouton de validation")
 
     @api.onchange('section_number')
     def onchange_section_number(self):
@@ -88,22 +88,22 @@ class OfLayoutCategoryDuplicateWizard(models.TransientModel):
     _name = 'of.layout.category.duplicate.wizard'
     _description = u"Wizard de duplication de ligne de section"
 
-    type = fields.Selection([('quote', 'Modèle de devis'), ('order', 'Devis/Commande')], string=u'Type', required=True)
+    type = fields.Selection([('quote', u"Modèle de devis"), ('order', "Devis/Commande")], string=u'Type', required=True)
 
-    order_id = fields.Many2one('sale.order', string=u'Commande')
+    order_id = fields.Many2one('sale.order', string=u"Commande")
     order_layout_category_id = fields.Many2one(
-        'of.sale.order.layout.category', string=u'Ligne de section', ondelete='cascade')
+        'of.sale.order.layout.category', string=u"Ligne de section", ondelete='cascade')
     order_parent_id = fields.Many2one(
-        'of.sale.order.layout.category', string=u'Parent')
+        'of.sale.order.layout.category', string=u"Parent")
 
-    quote_id = fields.Many2one('sale.quote.template', string=u'Modèle de devis')
+    quote_id = fields.Many2one('sale.quote.template', string=u"Modèle de devis")
     quote_layout_category_id = fields.Many2one(
-        'of.sale.quote.template.layout.category', string=u'Ligne de section', ondelete='cascade')
+        'of.sale.quote.template.layout.category', string=u"Ligne de section", ondelete='cascade')
     quote_parent_id = fields.Many2one(
-        'of.sale.quote.template.layout.category', string=u'Parent')
+        'of.sale.quote.template.layout.category', string=u"Parent")
 
-    name = fields.Char(string=u'Nom de la section', required=True)
-    inclure_sous_sections = fields.Boolean(string=u'Inclure les sous-sections')
+    name = fields.Char(string=u"Nom de la section", required=True)
+    inclure_sous_sections = fields.Boolean(string=u"Inclure les sous-sections")
 
     def action_done_order(self):
         # On duplique la section
@@ -152,23 +152,23 @@ class OfLayoutCategoryMoveWizard(models.TransientModel):
     _name = 'of.layout.category.move.wizard'
     _description = u"Wizard de déplacement de ligne de section"
 
-    type = fields.Selection([('quote', 'Modèle de devis'), ('order', 'Devis/Commande')], string=u'Type', required=True)
+    type = fields.Selection([('quote', u"Modèle de devis"), ('order', "Devis/Commande")], string=u"Type", required=True)
 
-    order_id = fields.Many2one('sale.order', string=u'Commande')
+    order_id = fields.Many2one('sale.order', string=u"Commande")
     order_layout_category_id = fields.Many2one(
-        'of.sale.order.layout.category', string=u'Ligne de section', ondelete='cascade')
+        'of.sale.order.layout.category', string=u"Ligne de section", ondelete='cascade')
     order_parent_id = fields.Many2one(
-        'of.sale.order.layout.category', string=u'Parent')
+        'of.sale.order.layout.category', string=u"Parent")
 
     quote_id = fields.Many2one('sale.quote.template', string=u'Modèle de devis')
     quote_layout_category_id = fields.Many2one(
-        'of.sale.quote.template.layout.category', string=u'Ligne de section', ondelete='cascade')
+        'of.sale.quote.template.layout.category', string=u"Ligne de section", ondelete='cascade')
     quote_parent_id = fields.Many2one(
-        'of.sale.quote.template.layout.category', string=u'Parent')
+        'of.sale.quote.template.layout.category', string=u"Parent")
 
-    position = fields.Integer(string=u'Position de la ligne')
-    previous_position = fields.Integer(string=u'Position précédente')
-    inclure_sous_sections = fields.Boolean(string=u'Inclure les sous-sections', default=True)
+    position = fields.Integer(string=u"Position de la ligne")
+    previous_position = fields.Integer(string=u"Position précédente")
+    inclure_sous_sections = fields.Boolean(string=u"Inclure les sous-sections", default=True)
 
     def action_done_order(self):
         order_layout_category_obj = self.env['of.sale.order.layout.category']
