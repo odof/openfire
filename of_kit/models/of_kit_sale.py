@@ -331,7 +331,7 @@ class SaleOrderLine(models.Model):
                     'qty_per_kit': 1,
                     'product_uom_id': self.product_uom.id or self.product_id.uom_id.id,
                     'price_unit': self.product_id.list_price,
-                    'cost_unit': self.product_id.standard_price,
+                    'cost_unit': self.product_id.get_cost(),
                     'customer_lead': self.product_id.sale_delay,
                     'hide_prices': False,
                     }
@@ -757,7 +757,7 @@ class OfSaleOrderKitLine(models.Model):
                 'name': self.product_id.name_get()[0][1] or self.product_id.name,
                 'product_uom_id': self.product_id.product_tmpl_id.uom_id,
                 'price_unit': self.product_id.list_price,
-                'cost_unit': self.product_id.standard_price,
+                'cost_unit': self.product_id.get_cost(),
                 'customer_lead': self.product_id.sale_delay,
                 'hide_prices': self.kit_id.order_line_id and self.kit_id.order_line_id.of_pricing == 'fixed',
             }

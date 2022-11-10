@@ -142,7 +142,7 @@ class SaleQuoteLine(models.Model):
                     'qty_per_kit': 1,
                     'product_uom_id': self.product_uom_id.id or self.product_id.uom_id.id,
                     'price_unit': self.product_id.list_price,
-                    'cost_unit': self.product_id.standard_price,
+                    'cost_unit': self.product_id.get_cost(),
                     'customer_lead': self.product_id.sale_delay,
                     'hide_prices': False,
                     }
@@ -293,7 +293,7 @@ class SaleQuoteLine(models.Model):
                 comp_vals['sequence'] = line.sequence
                 comp_vals['name'] = line.product_id.name_get()[0][1] or line.product_id.name
                 comp_vals['price_unit'] = line.product_id.of_price_used
-                comp_vals['cost_unit'] = line.product_id.standard_price
+                comp_vals['cost_unit'] = line.product_id.get_cost()
                 comp_vals['customer_lead'] = line.product_id.sale_delay
                 lines.append((0, 0, comp_vals))
         else:
@@ -306,7 +306,7 @@ class SaleQuoteLine(models.Model):
                 comp_vals['sequence'] = line.sequence
                 comp_vals['name'] = line.product_id.name_get()[0][1] or line.product_id.name
                 comp_vals['price_unit'] = line.product_id.of_price_used
-                comp_vals['cost_unit'] = line.product_id.standard_price
+                comp_vals['cost_unit'] = line.product_id.get_cost()
                 comp_vals['customer_lead'] = line.product_id.sale_delay
                 lines.append((0, 0, comp_vals))
         res['kit_line_ids'] = lines

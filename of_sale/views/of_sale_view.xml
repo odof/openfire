@@ -477,6 +477,9 @@
                 <xpath expr="//group[@name='group_general']/div[@name='standard_price_uom']" position="attributes">
                     <attribute name="groups">-base.group_user, of_sale.of_group_sale_marge_manager</attribute>
                 </xpath>
+                <xpath expr="//group[@name='group_general']/field[@name='of_theoretical_cost']" position="attributes">
+                    <attribute name="groups">-base.group_user, of_sale.of_group_sale_marge_manager</attribute>
+                </xpath>
                 <xpath expr="//group[@name='group_general']/label[@for='marge']" position="attributes">
                     <attribute name="groups">of_sale.of_group_sale_marge_manager</attribute>
                 </xpath>
