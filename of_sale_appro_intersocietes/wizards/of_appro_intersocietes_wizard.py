@@ -99,7 +99,7 @@ class OfApproIntersocieteWizard(models.TransientModel):
                 'product_uom_qty': product_qty,
                 'product_uom': product_uom.id,
                 'order_id': sale_order.id,
-                'price_unit': marge_ratio and product.standard_price * 100.0 / marge_ratio,
+                'price_unit': marge_ratio and product.get_cost() * 100.0 / marge_ratio,
                 'name': name,
                 'customer_lead': product.sale_delay,
             })
@@ -110,7 +110,7 @@ class OfApproIntersocieteWizard(models.TransientModel):
                 'product_uom': product_uom.id,
                 'product_qty': product_qty,
                 'order_id': purchase_order.id,
-                'price_unit': marge_ratio and product.standard_price * 100.0 / marge_ratio,
+                'price_unit': marge_ratio and product.get_cost() * 100.0 / marge_ratio,
                 'date_planned': self.date_planned,
             })
             line.bl_line_id.write({'state': 'waiting'})
@@ -137,7 +137,7 @@ class OfApproIntersocietesWizardLine(models.TransientModel):
         for line in self:
             if line.product_id:
                 vals = {
-                    'price': line.product_id.standard_price,
+                    'price': line.product_id.get_cost(),
                     'product_uom_id': line.product_id.uom_id.id,
                 }
                 line.update(vals)  # utile pour rafraichir les valeurs sur la vue

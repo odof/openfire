@@ -261,7 +261,7 @@ class OfAnalyseChantierLine(models.AbstractModel):
 
     def get_purchase_price(self, qty):
         if self.methode_cout == 'cout':
-            return self.product_id.standard_price * qty
+            return self.product_id.get_cost() * qty
         elif self.methode_cout == 'ach':
             if self.saleorder_kit_line_ids:
                 purchase_lines = self.saleorder_kit_line_ids.mapped('procurement_ids').mapped('move_ids').mapped('move_orig_ids').mapped(
@@ -269,7 +269,7 @@ class OfAnalyseChantierLine(models.AbstractModel):
             elif self.order_line_ids:
                 purchase_lines = self.order_line_ids.mapped('procurement_ids').mapped('move_ids').mapped('move_orig_ids').mapped('purchase_line_id')
             else:
-                return self.product_id.standard_price * qty
+                return self.product_id.get_cost() * qty
             return sum(purchase_lines.mapped('price_subtotal'))
         else:
             return self.purchase_price

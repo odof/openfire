@@ -75,7 +75,7 @@ class OFSaleOrderIndirectCost(models.Model):
     @api.onchange('product_id')
     def _onchange_product_id(self):
         for cost in self:
-            cost.unit_cost = cost.product_id.standard_price
+            cost.unit_cost = cost.product_id.get_cost()
 
 
 class OFSaleOrderLaborCost(models.Model):

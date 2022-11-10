@@ -729,6 +729,9 @@ class OfDatastoreCentralized(models.AbstractModel):
         if field_name == 'of_seller_name':
             # Le fournisseur est directement défini par la marque
             return True
+        if field_name == 'of_theoretical_cost':
+            # Cas particulier pour le coût théorique qu'on veut récupérer du TC
+            return False
         return _of_datastore_is_computed_field(self, field_name)
 
     @api.model

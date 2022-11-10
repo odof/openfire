@@ -61,14 +61,62 @@ class ProductTemplate(models.Model):
     of_misc_costs = fields.Float(string=u"Frais divers")
     of_url = fields.Char(string=u"URL")
 
+    # Gestion du coût standard et du coût théorique
+    standard_price = fields.Float(
+        help=u"Le coût est exprimé dans l'unité de mesure par défaut de l'article.\n"
+             u"Correspond au coût calculé selon la \"méthode de coût\" définie dans la catégorie de l'article. "
+             u"Cette valeur de coût est celle utilisée pour la valorisation de l'inventaire.")
+    of_theoretical_cost = fields.Float(
+        string=u"Coût théorique", compute='_compute_of_theoretical_cost',
+        inverse='_set_of_theoretical_cost', search='_search_of_theoretical_cost',
+        digits=dp.get_precision('Product Price'), groups="base.group_user",
+        help=u"Correspond au coût calculé par application des règles définies dans la marque ou dans les fichiers "
+             u"d'import. Cette valeur de coût peut servir pour le calcul de la marge dans les devis et les factures ; "
+             u"elle n'est en revanche jamais utilisée pour la valorisation de l'inventaire.")
+
+    @api.depends('product_variant_ids', 'product_variant_ids.of_theoretical_cost')
+    def _compute_of_theoretical_cost(self):
+        unique_variants = self.filtered(lambda template: len(template.product_variant_ids) == 1)
+        for template in unique_variants:
+            template.of_theoretical_cost = template.product_variant_ids.of_theoretical_cost
+        for template in (self - unique_variants):
+            template.of_theoretical_cost = 0.0
+
+    @api.one
+    def _set_of_theoretical_cost(self):
+        if len(self.product_variant_ids) == 1:
+            self.product_variant_ids.of_theoretical_cost = self.of_theoretical_cost
+            # On répercute le changement sur le coût standard
+            if self.cost_method not in ('average', 'real'):
+                self.product_variant_ids.standard_price = self.of_theoretical_cost
+
+    def _search_of_theoretical_cost(self, operator, value):
+        products = self.env['product.product'].search([('of_theoretical_cost', operator, value)], limit=None)
+        return [('id', 'in', products.mapped('product_tmpl_id').ids)]
+
+    @api.one
+    def _set_standard_price(self):
+        super(ProductTemplate, self)._set_standard_price()
+        # On répercute le changement sur le coût théorique
+        if len(self.product_variant_ids) == 1 and self.cost_method not in ('average', 'real'):
+            self.product_variant_ids.of_theoretical_cost = self.standard_price
+
     @api.multi
-    @api.depends('lst_price', 'standard_price')
+    def get_cost(self):
+        self.ensure_one()
+        if self.cost_method not in ('average', 'real') or self.categ_id.of_sale_cost == 'standard':
+            return self.standard_price
+        else:
+            return self.of_theoretical_cost
+
+    @api.multi
+    @api.depends('lst_price', 'standard_price', 'of_theoretical_cost')
     def _compute_marge(self):
         # la marge est calculée en fonction du prix de vente, faire en fonction du prix d'achat?
         for product in self:
             lst_price = product.lst_price
             if lst_price != 0:
-                product.marge = (lst_price - product.standard_price) * 100.00 / lst_price
+                product.marge = (lst_price - product.get_cost()) * 100.00 / lst_price
             else:  # division par 0!
                 product.marge = -100
 
@@ -84,6 +132,11 @@ class ProductTemplate(models.Model):
     def onchange_of_seller_price(self):
         if self.seller_ids:
             self.seller_ids[0].price = self.of_seller_price
+
+    def _get_related_fields_variant_template(self):
+        related_fields = super(ProductTemplate, self)._get_related_fields_variant_template()
+        related_fields.append('of_theoretical_cost')
+        return related_fields
 
     @api.model
     def create(self, vals):
@@ -115,7 +168,32 @@ class ProductTemplate(models.Model):
 class ProductProduct(models.Model):
     _inherit = "product.product"
 
-    standard_price = fields.Float(of_unify_companies=True)
+    @api.model_cr_context
+    def _auto_init(self):
+        cr = self._cr
+        cr.execute("SELECT * FROM information_schema.columns WHERE table_name = '%s' "
+                   "AND column_name = 'of_theoretical_cost'" % (self._table,))
+        exists = cr.fetchall()
+
+        res = super(ProductProduct, self)._auto_init()
+
+        if not exists:
+            # On initialise le coût théorique des articles avec la valeur du coût standard
+            for product in self.with_context(active_test=False).search([]):
+                product.of_theoretical_cost = product.standard_price
+
+        return res
+
+    standard_price = fields.Float(
+        of_unify_companies=True,
+        help=u"Le coût est exprimé dans l'unité de mesure par défaut de l'article.\n"
+             u"Correspond au coût calculé selon la \"méthode de coût\" définie dans la catégorie de l'article. "
+             u"Cette valeur de coût est celle utilisée pour la valorisation de l'inventaire.")
+    of_theoretical_cost = fields.Float(
+        string=u"Coût théorique", digits=dp.get_precision('Product Price'), groups="base.group_user",
+        help=u"Correspond au coût calculé par application des règles définies dans la marque ou dans les fichiers "
+             u"d'import. Cette valeur de coût peut servir pour le calcul de la marge dans les devis et les factures ; "
+             u"elle n'est en revanche jamais utilisée pour la valorisation de l'inventaire.")
 
     @api.model
     def _add_missing_default_values(self, values):
@@ -131,6 +209,46 @@ class ProductProduct(models.Model):
         companies = self.env['res.company'].search(['|', ('chart_template_id', '!=', False), ('parent_id', '=', False)])
         for company in companies:
             super(ProductProduct, self.with_context(force_company=company.id))._set_standard_price(value)
+
+    @api.multi
+    def get_cost(self):
+        if not self:
+            return 0
+        self.ensure_one()
+        if self.cost_method not in ('average', 'real') or self.categ_id.of_sale_cost == 'standard':
+            return self.standard_price
+        else:
+            return self.of_theoretical_cost
+
+    @api.model
+    def create(self, vals):
+        product = super(ProductProduct, self).create(vals)
+        if product.cost_method not in ('average', 'real'):
+            product.of_theoretical_cost = product.standard_price
+
+        product.of_purchase_coeff_cost_propagation(product.get_cost())
+
+        return product
+
+    @api.multi
+    def write(self, values):
+        res = super(ProductProduct, self).write(values)
+
+        for product in self:
+            if product.cost_method not in ('average', 'real'):
+                if 'standard_price' in values and values['standard_price'] != product.of_theoretical_cost:
+                    product.of_theoretical_cost = product.standard_price
+                elif 'of_theoretical_cost' in values and values['of_theoretical_cost'] != product.standard_price:
+                    product.standard_price = product.of_theoretical_cost
+
+            if (product.cost_method not in ('average', 'real') or product.categ_id.of_sale_cost == 'standard') and \
+                    'standard_price' in values:
+                product.of_purchase_coeff_cost_propagation(product.standard_price)
+            elif product.cost_method in ('average', 'real') and product.categ_id.of_sale_cost == 'theoretical' and \
+                    'of_theoretical_cost' in values:
+                product.of_purchase_coeff_cost_propagation(product.of_theoretical_cost)
+
+        return res
 
 
 class ProductSupplierInfo(models.Model):
@@ -186,6 +304,10 @@ class ProductCategory(models.Model):
     of_stock_update_standard_price = fields.Boolean(
         string=u"Mettre à jour le coût des articles suite aux mouvements de stock", default=True)
     of_import_update_standard_price = fields.Boolean(string=u"Mettre à jour le coût des articles suite aux imports")
+    of_sale_cost = fields.Selection(
+        selection=[('theoretical', u"Coût théorique"), ('standard', u"Coût standard")], string=u"Coût pour les ventes",
+        help=u"Le coût choisi sera repris dans les commandes et factures de vente.", required=True,
+        default='theoretical')
 
     @api.multi
     def copy_data(self, default=None):

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import csv
 import datetime
@@ -291,6 +292,7 @@ class OFProductBrand(models.Model):
         price_fields = [
             ('of_import_remise', 'remise', 'la remise'),
             ('of_import_price', 'list_price', 'le prix de vente HT'),
+            ('of_import_cout', 'of_theoretical_cost', u'le coût théorique'),
         ]
         if not product or product.id < 0 or product.cost_method == 'standard' or \
                 product.categ_id.of_import_update_standard_price:
@@ -355,6 +357,8 @@ class OFProductBrand(models.Model):
             values['list_price'] *= udm_ratio
         if 'standard_price' in values:
             values['standard_price'] *= udm_ratio
+        if 'of_theoretical_cost' in values:
+            values['of_theoretical_cost'] *= udm_ratio
 
         return values
 
@@ -412,7 +416,7 @@ class ProductTemplate(models.Model):
                         product.uom_po_id,
                         product,
                         seller.price,
-                        product.standard_price,
+                        product.get_cost(),
                         based_on_price=product.of_is_net_price,
                     )
                     values = {key: val for key, val in values.iteritems()
