@@ -1805,7 +1805,7 @@ class OfContractProduct(models.Model):
                 name += '\n' + product.description_sale
             self.name = name
             self.price_unit = product.list_price
-            self.purchase_price = product.standard_price
+            self.purchase_price = product.get_cost()
             self.uom_id = product.uom_id
             self._compute_tax_id()
 

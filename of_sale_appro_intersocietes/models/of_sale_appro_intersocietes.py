@@ -62,12 +62,12 @@ class StockPicking(models.Model):
             product = line.product_id
             product_qty = line.product_uom_qty
             marge_ratio = 100.0 - rule.marge_fournisseur
-            price_marge = marge_ratio and product.standard_price * 100.0 / marge_ratio
+            price_marge = marge_ratio and product.get_cost() * 100.0 / marge_ratio
             lines.append(wizard_inter_line_obj.create({
                 'product_id': product.id,
                 'product_uom_id': product.uom_id.id,
                 'product_qty': product_qty,
-                'price': product.standard_price,
+                'price': product.get_cost(),
                 'price_marge': price_marge,
                 'wizard_id': wizard.id,
                 'bl_line_id': line.id,

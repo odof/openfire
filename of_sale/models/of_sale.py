@@ -984,6 +984,16 @@ class SaleOrderLine(models.Model):
                                                        reverse_direction, seen)
         return []
 
+    def _compute_margin(self, order_id, product_id, product_uom_id):
+        """Override to use the theoretical cost instead of the standard cost price when the settings is set to True"""
+        frm_cur = self.env.user.company_id.currency_id
+        to_cur = order_id.pricelist_id.currency_id
+        purchase_price = product_id.get_cost()
+        if product_uom_id != product_id.uom_id:
+            purchase_price = product_id.uom_id._compute_price(purchase_price, product_uom_id)
+        price = frm_cur.with_context(date=order_id.date_order).compute(purchase_price, to_cur, round=False)
+        return price
+
     @api.multi
     @api.onchange('product_id')
     def product_id_change(self):
@@ -1041,6 +1051,17 @@ class SaleOrderLine(models.Model):
         self.of_seller_price = frm_cur.with_context(ctx).compute(seller_price, to_cur, round=False)
 
     @api.model
+    def _get_purchase_price(self, pricelist, product, product_uom, date):
+        """Override to use the theoretical cost instead of the standard cost price when the settings is set to True"""
+        frm_cur = self.env.user.company_id.currency_id
+        to_cur = pricelist.currency_id
+        purchase_price = product.get_cost()
+        if product_uom != product.uom_id:
+            purchase_price = product.uom_id._compute_price(purchase_price, product_uom)
+        price = frm_cur.with_context(date=date).compute(purchase_price, to_cur, round=False)
+        return {'purchase_price': price}
+
+    @api.model
     def _get_of_seller_price(self, pricelist, product, product_uom, date):
         frm_cur = self.env.user.company_id.currency_id
         to_cur = pricelist.currency_id
@@ -1087,7 +1108,7 @@ class SaleOrderLine(models.Model):
             if self.order_id.pricelist_id and self.order_id.partner_id:
                 self.price_unit = self.env['account.tax']._fix_tax_included_price_company(
                     self._get_display_price(product), product.taxes_id, self.tax_id, self.company_id)
-            self.purchase_price = product.standard_price
+            self.purchase_price = product.get_cost()
             if self.of_order_line_option_id.description_update:
                 self.name = self.name.replace(self.of_order_line_option_id.description_update, '')
             self.of_order_line_option_id = False

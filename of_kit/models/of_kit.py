@@ -66,7 +66,7 @@ class ProductTemplate(models.Model):
             comp_vals['sequence'] = line.sequence
             comp_vals['name'] = line.product_id.name_get()[0][1] or line.product_id.name
             comp_vals['price_unit'] = line.product_id.list_price
-            comp_vals['cost_unit'] = line.product_id.standard_price
+            comp_vals['cost_unit'] = line.product_id.get_cost()
             lines.append((0, 0, comp_vals))
         res['kit_line_ids'] = lines
         return res
@@ -86,7 +86,7 @@ class ProductTemplate(models.Model):
             comp_vals['sequence'] = line.sequence
             comp_vals['name'] = line.product_id.name_get()[0][1] or line.product_id.name
             comp_vals['price_unit'] = line.product_id.of_price_used
-            comp_vals['cost_unit'] = line.product_id.standard_price
+            comp_vals['cost_unit'] = line.product_id.get_cost()
             comp_vals['customer_lead'] = line.product_id.sale_delay
             lines.append((0, 0, comp_vals))
         res['kit_line_ids'] = lines
@@ -101,7 +101,7 @@ class ProductTemplate(models.Model):
                 for line in product_tmpl.kit_line_ids:
                     price += line.product_id.uom_id._compute_price(line.product_id.list_price,
                                                                    line.product_uom_id) * line.product_qty
-                    cost += line.product_id.uom_id._compute_price(line.product_id.standard_price,
+                    cost += line.product_id.uom_id._compute_price(line.product_id.get_cost(),
                                                                   line.product_uom_id) * line.product_qty
                     purchase_price += line.product_id.uom_id._compute_price(
                         line.product_id.of_seller_price, line.product_uom_id) * line.product_qty
@@ -128,7 +128,8 @@ class ProductTemplate(models.Model):
                 product_tmpl.of_price_used = product_tmpl.list_price
 
     @api.multi
-    @api.depends('list_price', 'standard_price', 'price_comps', 'cost_comps', 'of_pricing', 'of_is_kit')
+    @api.depends(
+        'list_price', 'standard_price', 'of_theoretical_cost', 'price_comps', 'cost_comps', 'of_pricing', 'of_is_kit')
     def _compute_marge(self):
         for product_tmpl in self:
             if product_tmpl.of_is_kit:
@@ -226,8 +227,14 @@ class OfProductKitLine(models.Model):
     product_uom_id = fields.Many2one(
         comodel_name='product.uom', string="UoM", domain="[('category_id', '=', product_uom_categ_id)]", required=True)
     product_price = fields.Float(related='product_id.list_price', readonly=True)
-    product_cost = fields.Float(related='product_id.standard_price', readonly=True)
+    product_cost = fields.Float(compute='_compute_product_cost', digits=dp.get_precision('Product Price'))
     sequence = fields.Integer(string="Sequence", default=10)
+
+    @api.multi
+    @api.depends('product_id')
+    def _compute_product_cost(self):
+        for kit_line in self:
+            kit_line.product_cost = kit_line.product_id.get_cost()
 
     @api.constrains('kit_id', 'product_id')
     @api.multi

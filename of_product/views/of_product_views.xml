@@ -57,6 +57,8 @@
                     <div name="standard_price_uom" groups="base.group_user">
                         <field name="standard_price" widget='monetary' options="{'currency_field': 'currency_id'}"/>
                     </div>
+                    <field name="of_theoretical_cost" groups="base.group_user" widget='monetary' options="{'currency_field': 'currency_id'}"
+                           attrs="{'invisible': [('cost_method' , 'not in', ['average', 'real'])]}"/>
                     <field name="list_price" widget='monetary' options="{'currency_field': 'currency_id'}"/>
                     <label for="marge"/>
                     <span><field name="marge" class="oe_inline"/>%</span>
@@ -175,6 +177,18 @@
                 </xpath>
             </field>
         </record>
+
+    <record id="of_product_product_variant_form_view" model="ir.ui.view">
+        <field name="name">of.product.product.variant.form.view</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='standard_price']" position="after">
+                <field name="of_theoretical_cost" widget='monetary' options="{'currency_field': 'currency_id'}"
+                       attrs="{'invisible': [('cost_method' , 'not in', ['average', 'real'])]}"/>
+            </xpath>
+        </field>
+    </record>
 
 <!--##############################################################################-->
 <!--###################### ______ Infos Fournisseurs ______ ######################-->
@@ -307,6 +321,7 @@
             <xpath expr="//field[@name='property_cost_method']" position="after">
                 <field name="of_stock_update_standard_price" attrs="{'invisible': [('property_cost_method' , 'not in', ['average', 'real'])]}"/>
                 <field name="of_import_update_standard_price" attrs="{'invisible': [('property_cost_method' , 'not in', ['average', 'real'])]}"/>
+                <field name="of_sale_cost" attrs="{'invisible': [('property_cost_method' , 'not in', ['average', 'real'])]}"/>
             </xpath>
         </field>
     </record>

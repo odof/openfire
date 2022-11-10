@@ -15,7 +15,7 @@ Bon de livraison client :
     "website": "www.openfire.fr",
     'license': '',
     "depends": [
-        'sale',
+        'of_sale',
         'stock',
         'of_base',
     ],
