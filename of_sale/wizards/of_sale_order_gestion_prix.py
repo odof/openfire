@@ -350,12 +350,29 @@ class GestionPrixLine(models.TransientModel):
             if vente:
                 line.pc_marge = 100 * (1 - achat / vente)
 
-    @api.depends('prix_total_ht_simul', 'prix_total_ht')
+    @api.depends('prix_total_ht_simul', 'order_line_id')
     def _compute_prix_total_ttc_simul(self):
+        print('_compute_prix_total_ttc_simul : %s' % self)
         for line in self:
-            if line.prix_total_ht:
-                factor = line.prix_total_ht_simul / line.prix_total_ht
+            order_line = line.order_line_id
+
+            price_unit = order_line.price_unit * (1 - (order_line.discount or 0.0) / 100.0)
+
+            compute_all = order_line.tax_id.compute_all(price_unit, order_line.order_id.currency_id, order_line.product_uom_qty,
+                                            product=order_line.product_id, partner=order_line.order_id.partner_id)
+
+            prix_total_ht = compute_all['base']
+
+            print('price_unit : %s' % price_unit)
+            print('compute_all : %s' % compute_all)
+            print('prix_total_ht : %s' % prix_total_ht)
+            if prix_total_ht:
+                # On recalcule le prix_total_ht car celui qui nous parvient de la ligne de commande
+                # est un arrondi et fausse le calcul
+                factor = line.prix_total_ht_simul / prix_total_ht
                 line.prix_total_ttc_simul = line.prix_total_ttc * factor
+            else:
+                line.prix_total_ttc_simul = line.prix_total_ttc * 1
 
     @api.onchange('pc_marge')
     def _onchange_pc_marge(self):
@@ -450,6 +467,7 @@ class GestionPrixLine(models.TransientModel):
             line_vals = {'price_unit': price_unit,
                          'of_price_management_variation': price_management_variation,
                          'of_unit_price_variation': new_price_variation}
+
         return {order_line: line_vals}, taxes
 
     @api.multi
