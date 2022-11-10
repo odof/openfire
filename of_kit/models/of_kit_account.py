@@ -9,23 +9,20 @@ class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
     of_contains_kit = fields.Boolean(
-        string='Contains a kit', compute='_compute_of_contains_kit', search='_search_of_contains_kit'
-    )
+        string="Contains a kit", compute='_compute_of_contains_kit', search='_search_of_contains_kit')
     comp_ids = fields.One2many(
-        'of.invoice.kit.line', 'invoice_id', string='Components',
-        help="Contains all kit components in this invoice that are not kits themselves."
-    )
+        comodel_name='of.invoice.kit.line', inverse_name='invoice_id', string="Components",
+        help="Contains all kit components in this invoice that are not kits themselves.")
     of_kit_display_mode = fields.Selection(
         [
-            ('none', 'None'),
-            ('collapse', 'Collapse'),
-            ('expand', 'Expand'),
-        ], string='Kit display mode', default='expand',
+            ('none', "None"),
+            ('collapse', "Collapse"),
+            ('expand', "Expand"),
+        ], string="Kit display mode", default='expand',
         help="defines the way kits and their components should be printed out in pdf reports:\n"
              "- None: One line per kit. Nothing printed out about components\n"
              "- Collapse: One line per kit, with minimal info\n"
-             "- Expand: One line per kit, plus one line per component"
-    )
+             "- Expand: One line per kit, plus one line per component")
 
     @api.multi
     @api.depends('invoice_line_ids.product_id')
@@ -34,10 +31,10 @@ class AccountInvoice(models.Model):
         if self and isinstance(self[0].id, models.NewId):
             # Le calcul se situe dans un appel onchange
             # l'objet est donc unique, et il faut utiliser _origin au lieu de id
-            self.of_contains_kit = comp_obj.search([("invoice_id", "=", self._origin.id)], count=True) > 0
+            self.of_contains_kit = comp_obj.search([('invoice_id', '=', self._origin.id)], count=True) > 0
         else:
             for invoice in self:
-                invoice.of_contains_kit = comp_obj.search([("invoice_id", "=", invoice.id)], count=True) > 0
+                invoice.of_contains_kit = comp_obj.search([('invoice_id', '=', invoice.id)], count=True) > 0
 
     @api.model
     def _search_of_contains_kit(self, operator, value):
@@ -66,34 +63,30 @@ class AccountInvoice(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
-    kit_id = fields.Many2one('of.invoice.kit', string="Components")
-    of_is_kit = fields.Boolean(string='Is a kit')
+    kit_id = fields.Many2one(comodel_name='of.invoice.kit', string="Components")
+    of_is_kit = fields.Boolean(string="Is a kit")
 
     price_comps = fields.Float(
-        string='Compo Price/Kit', compute='_compute_price_comps', oldname="unit_compo_price",
-        help="Sum of the prices of all components necessary for 1 unit of this kit"
-    )
+        string="Compo Price/Kit", compute='_compute_price_comps', oldname='unit_compo_price',
+        help="Sum of the prices of all components necessary for 1 unit of this kit")
     cost_comps = fields.Monetary(
-        string='Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
-        help="Sum of the costs of all components necessary for 1 unit of this kit"
-    )
+        string="Compo Cost/Kit", digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
+        help="Sum of the costs of all components necessary for 1 unit of this kit")
     of_pricing = fields.Selection(
         [
-            ('fixed', 'Fixed'),
-            ('computed', 'Computed'),
+            ('fixed', "Fixed"),
+            ('computed', "Computed"),
         ], string="Pricing", required=True, default='fixed',
         help=u"""
             This field is only relevant if the product is a kit.
             It represents the way the price should be computed.\n
             If set to 'fixed', the price of it's components won't be taken into account
              and the price will be the one of the kit.\n
-            If set to 'computed', the price will be computed according to the components of the kit."""
-    )
+            If set to 'computed', the price will be computed according to the components of the kit.""")
 
     invoice_kits_to_unlink = fields.Boolean(
         string="account kits to unlink?", default=False,
-        help="True if at least 1 account kit needs to be deleted from database"
-    )
+        help="True if at least 1 account kit needs to be deleted from database")
 
     def get_kit_descr_collapse(self):
         """
@@ -134,17 +127,17 @@ class AccountInvoiceLine(models.Model):
         res = super(AccountInvoiceLine, self)._onchange_product_id()
         new_vals = {}
         if self.kit_id:  # former product was a kit -> unlink it's kit_id
-            self.kit_id.write({"to_unlink": True})
+            self.kit_id.write({'to_unlink': True})
             new_vals['kit_id'] = False
-            new_vals["invoice_kits_to_unlink"] = True
+            new_vals['invoice_kits_to_unlink'] = True
         if not self.product_id:
             return res
         if self.product_id.of_is_kit:  # new product is a kit, we need to add its components
             new_vals['of_is_kit'] = True
             new_vals['of_pricing'] = self.product_id.of_pricing
             account_kit_vals = self.product_id.get_invoice_kit_data()
-            account_kit_vals["qty_invoice_line"] = self.quantity
-            new_vals["kit_id"] = self.env["of.invoice.kit"].create(account_kit_vals)
+            account_kit_vals['qty_invoice_line'] = self.quantity
+            new_vals['kit_id'] = self.env['of.invoice.kit'].create(account_kit_vals)
         else:  # new product is not a kit
             new_vals['of_is_kit'] = False
             new_vals['of_pricing'] = 'fixed'
@@ -215,9 +208,9 @@ class AccountInvoiceLine(models.Model):
     def _onchange_of_is_kit(self):
         new_vals = {}
         if self.kit_id:  # former product was a kit -> unlink it's kit_id
-            self.kit_id.write({"to_unlink": True})
-            new_vals["kit_id"] = False
-            new_vals["invoice_kits_to_unlink"] = True
+            self.kit_id.write({'to_unlink': True})
+            new_vals['kit_id'] = False
+            new_vals['invoice_kits_to_unlink'] = True
         if self.of_is_kit:  # checkbox got checked
             if not self.product_id.of_is_kit:  # a product that is not a kit is being made into a kit
                 # we create a component with current product (for procurements, kits are ignored)
@@ -234,15 +227,15 @@ class AccountInvoiceLine(models.Model):
                     'of_pricing': 'computed',
                     'kit_line_ids': [(0, 0, new_comp_vals)],
                     }
-                new_vals["kit_id"] = self.env["of.invoice.kit"].create(account_kit_vals)
-                new_vals["of_pricing"] = "computed"
+                new_vals['kit_id'] = self.env['of.invoice.kit'].create(account_kit_vals)
+                new_vals['of_pricing'] = 'computed'
             else:  # can happen if uncheck then recheck a kit
                 new_vals['of_pricing'] = self.product_id.of_pricing
                 account_kit_vals = self.product_id.get_invoice_kit_data()
-                new_vals["kit_id"] = self.env["of.invoice.kit"].create(account_kit_vals)
+                new_vals['kit_id'] = self.env['of.invoice.kit'].create(account_kit_vals)
         else:  # a product that was a kit is not anymore, we unlink its components
-            new_vals["of_pricing"] = 'fixed'
-            new_vals["price_unit"] = self.product_id.list_price
+            new_vals['of_pricing'] = 'fixed'
+            new_vals['price_unit'] = self.product_id.list_price
         self.update(new_vals)
         self._refresh_price_unit()
 
@@ -251,20 +244,20 @@ class AccountInvoiceLine(models.Model):
         self.ensure_one()
         so_line = self.env['sale.order.line'].search([('id', '=', so_line_id)])
         if self.kit_id:
-            self.kit_id.write({"to_unlink": True})
+            self.kit_id.write({'to_unlink': True})
             self.write({'kit_id': False, 'invoice_kits_to_unlink': True})
         if so_line.kit_id:
             account_kit_vals = so_line.kit_id._prepare_account_kit(self.id)
-            self.kit_id = self.env["of.invoice.kit"].create(account_kit_vals)
+            self.kit_id = self.env['of.invoice.kit'].create(account_kit_vals)
             self._refresh_price_unit()
 
     @api.model
     def create(self, vals):
         # from_so_line key added in vals in case of creation from a sale order
-        from_so_line = vals.pop("from_so_line", False)
-        if vals.get("invoice_kits_to_unlink"):
-            self.sudo().env["of.invoice.kit"].search([("to_unlink", "=", True)]).unlink()
-            vals.pop("invoice_kits_to_unlink")
+        from_so_line = vals.pop('from_so_line', False)
+        if vals.get('invoice_kits_to_unlink'):
+            self.sudo().env['of.invoice.kit'].search([('to_unlink', '=', True)]).unlink()
+            vals.pop('invoice_kits_to_unlink')
         line = super(AccountInvoiceLine, self).create(vals)
         if line.of_is_kit and not from_so_line:
             account_kit_vals = {'invoice_line_id': line.id, 'name': line.name}
@@ -279,13 +272,13 @@ class AccountInvoiceLine(models.Model):
         if len(self._ids) == 1:
             if self.of_pricing == 'computed' and not float_compare(self.price_unit, self.price_comps, 2):
                 vals['price_unit'] = self.price_comps
-            if vals.get("invoice_kits_to_unlink") or self.invoice_kits_to_unlink:
-                self.sudo().env["of.invoice.kit"].search([("to_unlink", "=", True)]).unlink()
-                vals["invoice_kits_to_unlink"] = False
-            if vals.get("kit_id") and not self.kit_id:
+            if vals.get('invoice_kits_to_unlink') or self.invoice_kits_to_unlink:
+                self.sudo().env['of.invoice.kit'].search([('to_unlink', '=', True)]).unlink()
+                vals['invoice_kits_to_unlink'] = False
+            if vals.get('kit_id') and not self.kit_id:
                 # a account_invoice_kit was added
                 update_il_id = True
-            elif vals.get("name") and self.kit_id:
+            elif vals.get('name') and self.kit_id:
                 # line changed name
                 update_il_id = True
         super(AccountInvoiceLine, self).write(vals)
@@ -312,8 +305,8 @@ class AccountInvoiceLine(models.Model):
             super(AccountInvoiceLine, self).write(vals_price)
         if update_il_id:
             account_kit_vals = {'invoice_line_id': self.id}
-            if vals.get("name"):
-                account_kit_vals["name"] = vals.get("name")
+            if vals.get('name'):
+                account_kit_vals['name'] = vals.get('name')
             self.kit_id.write(account_kit_vals)
         return True
 
@@ -329,25 +322,27 @@ class AccountInvoiceLine(models.Model):
 class OfAccountInvoiceKit(models.Model):
     _name = 'of.invoice.kit'
 
-    invoice_line_id = fields.Many2one("account.invoice.line", string="Invoice line", ondelete="cascade", copy=False)
+    invoice_line_id = fields.Many2one(
+        comodel_name='account.invoice.line', string="Invoice line", ondelete='cascade', copy=False)
 
-    name = fields.Char(string='Name', required=True, default="draft invoice kit")
-    kit_line_ids = fields.One2many('of.invoice.kit.line', 'kit_id', string="Components", copy=True)
+    name = fields.Char(string="Name", required=True, default="draft invoice kit")
+    kit_line_ids = fields.One2many(
+        comodel_name='of.invoice.kit.line', inverse_name='kit_id', string="Components", copy=True)
 
-    qty_invoice_line = fields.Float(string="Invoice Line Qty", related="invoice_line_id.quantity", readonly=True)
-    currency_id = fields.Many2one(related='invoice_line_id.currency_id', store=True, string='Currency', readonly=True)
+    qty_invoice_line = fields.Float(string="Invoice Line Qty", related='invoice_line_id.quantity', readonly=True)
+    currency_id = fields.Many2one(related='invoice_line_id.currency_id', store=True, string="Currency", readonly=True)
     price_comps = fields.Float(
-        string='Compo Price/Kit', compute='_compute_price_comps',
-        help="Sum of the prices of all components necessary for 1 unit of this kit", oldname="unit_compo_price")
+        string="Compo Price/Kit", compute='_compute_price_comps',
+        help="Sum of the prices of all components necessary for 1 unit of this kit", oldname='unit_compo_price')
     cost_comps = fields.Monetary(
-        string='Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
+        string="Compo Cost/Kit", digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
         help="Sum of the costs of all components necessary for 1 unit of this kit")
 
     to_unlink = fields.Boolean(string="to unlink?", default=False)
     of_pricing = fields.Selection(
         [
-            ('fixed', 'Fixed'),
-            ('computed', 'Computed'),
+            ('fixed', "Fixed"),
+            ('computed', "Computed"),
         ], string="Pricing", required=True, default='fixed',
         help="This field represents the way the price should be computed.\n"
              "if set to 'fixed', the price of it's components won't be taken into account"
@@ -379,59 +374,53 @@ class OfAccountInvoiceKit(models.Model):
 
 class OfAccountInvoiceKitLine(models.Model):
     _name = 'of.invoice.kit.line'
-    _order = "kit_id, sequence, id"
+    _order = 'kit_id, sequence, id'
 
-    kit_id = fields.Many2one('of.invoice.kit', string="Kit", ondelete="cascade")
-    invoice_id = fields.Many2one('account.invoice', string="Invoice", related="kit_id.invoice_line_id.invoice_id")
-    order_comp_id = fields.Many2one('of.saleorder.kit.line', string="Original comp")
+    kit_id = fields.Many2one(comodel_name='of.invoice.kit', string="Kit", ondelete='cascade')
+    invoice_id = fields.Many2one(
+        comodel_name='account.invoice', string="Invoice", related='kit_id.invoice_line_id.invoice_id')
+    order_comp_id = fields.Many2one(comodel_name='of.saleorder.kit.line', string="Original comp")
 
-    name = fields.Char(string='Name', required=True)
-    default_code = fields.Char(related='product_id.default_code', string='Prod ref', readonly=True)
-    sequence = fields.Integer(string=u'Sequence', default=10)
+    name = fields.Char(string="Name", required=True)
+    default_code = fields.Char(related='product_id.default_code', string="Prod ref", readonly=True)
+    sequence = fields.Integer(string="Sequence", default=10)
 
     product_id = fields.Many2one(
-        'product.product', string='Product', required=True, domain="[('of_is_kit', '=', False)]"
-    )
-    currency_id = fields.Many2one(related='invoice_id.currency_id', string='Currency', readonly=True)
-    product_uom_id = fields.Many2one('product.uom', string='UoM', readonly=True, related='product_id.uom_id')
+        comodel_name='product.product', string="Product", required=True, domain="[('of_is_kit', '=', False)]")
+    currency_id = fields.Many2one(related='invoice_id.currency_id', string="Currency", readonly=True)
+    product_uom_id = fields.Many2one(
+        comodel_name='product.uom', string="UoM", readonly=True, related='product_id.uom_id')
     price_unit = fields.Monetary(
-        string='Unit Price', digits=dp.get_precision('Product Price'), required=True, default=0.0, oldname="unit_price"
-    )
+        string="Unit Price", digits=dp.get_precision('Product Price'), required=True, default=0.0, oldname='unit_price')
     price_unit_display = fields.Monetary(related='price_unit')
-    cost_unit = fields.Monetary(string='Unit Cost', digits=dp.get_precision('Product Price'))
+    cost_unit = fields.Monetary(string="Unit Cost", digits=dp.get_precision('Product Price'))
     cost_total = fields.Float(
-        string='Subtotal Cost', compute='_compute_prices',
-        help="Cost of this component total quantity. Equal to total quantity * unit cost."
-    )
+        string="Subtotal Cost", compute='_compute_prices',
+        help="Cost of this component total quantity. Equal to total quantity * unit cost.")
     cost_per_kit = fields.Monetary(
-        string='Cost/Kit', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
+        string="Cost/Kit", digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
         help="Cost of this component quantity necessary to make one unit of its invoice line kit."
-             "Equal to quantity per kit unit * unit cost."
-    )
+             "Equal to quantity per kit unit * unit cost.")
 
     qty_per_kit = fields.Float(
-        string='Qty / Kit', digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0,
+        string="Qty / Kit", digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0,
         help="Quantity per kit unit (invoice line).\n"
              "example: 2 kit K1 -> 3 prod P. \n"
              "P.qty_per_kit = 3\n"
-             "P.qty_total = 6"
-    )
+             "P.qty_total = 6")
 
-    nb_kits = fields.Float(string='Number of kits', related='kit_id.qty_invoice_line', readonly=True)
+    nb_kits = fields.Float(string="Number of kits", related='kit_id.qty_invoice_line', readonly=True)
     qty_total = fields.Float(
-        string='Total Qty', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_qty_total',
-        help='total quantity equal to quantity per kit times number of kits.'
-    )
+        string="Total Qty", digits=dp.get_precision('Product Unit of Measure'), compute='_compute_qty_total',
+        help="total quantity equal to quantity per kit times number of kits.")
     price_total = fields.Monetary(
-        string='Subtotal Price', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
-        help="Price of this component total quantity. Equal to total quantity * unit price."
-    )
+        string="Subtotal Price", digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
+        help="Price of this component total quantity. Equal to total quantity * unit price.")
     price_per_kit = fields.Float(
-        string='Price/Kit', compute='_compute_prices',
+        string="Price/Kit", compute='_compute_prices',
         help="Price of this component quantity necessary to make one unit of its invoice line kit."
-             "Equal to quantity per kit unit * unit price."
-    )
-    kit_pricing = fields.Selection(related="kit_id.of_pricing", readonly=True)
+             "Equal to quantity per kit unit * unit price.")
+    kit_pricing = fields.Selection(related='kit_id.of_pricing', readonly=True)
     hide_prices = fields.Boolean(string="Hide prices", default=False)
 
     @api.onchange('product_id')
