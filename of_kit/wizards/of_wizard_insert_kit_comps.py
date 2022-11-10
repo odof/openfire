@@ -2,11 +2,13 @@
 
 from odoo import api, fields, models
 
-class OfWizardInsertKitComps(models.TransientModel):
-    _name = "of.wizard.insert.kit.comps"
 
-    product_id = fields.Many2one('product.product', string="Kit")
-    comp_ids = fields.One2many('of.wizard.insert.kit.comps.line', 'wizard_id', string="Composants")
+class OfWizardInsertKitComps(models.TransientModel):
+    _name = 'of.wizard.insert.kit.comps'
+
+    product_id = fields.Many2one(comodel_name='product.product', string=u"Kit")
+    comp_ids = fields.One2many(
+        comodel_name='of.wizard.insert.kit.comps.line', inverse_name='wizard_id', string=u"Composants")
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
@@ -42,20 +44,22 @@ class OfWizardInsertKitComps(models.TransientModel):
     @api.multi
     def button_select_all(self, select=True):
         self.comp_ids.write({'is_selected': select})
-        return {"type": "ir.actions.do_nothing"}
+        return {'type': 'ir.actions.do_nothing'}
 
     def button_unselect_all(self):
         return self.button_select_all(select=False)
 
-class OfWizardInsertKitCompsLine(models.TransientModel):
-    _name = "of.wizard.insert.kit.comps.line"
 
-    product_id = fields.Many2one('product.product', string="Article", required=True)
+class OfWizardInsertKitCompsLine(models.TransientModel):
+    _name = 'of.wizard.insert.kit.comps.line'
+
+    product_id = fields.Many2one(comodel_name='product.product', string=u"Article", required=True)
     product_uom_qty = fields.Float(string=u"Qté", required=True)
-    product_uom_id = fields.Many2one('product.uom', string='UoM', required=True, domain="[('category_id', '=', product_uom_categ_id)]")
+    product_uom_id = fields.Many2one(
+        comodel_name='product.uom', string="UoM", required=True, domain="[('category_id', '=', product_uom_categ_id)]")
     product_uom_categ_id = fields.Many2one(related='product_id.uom_id.category_id', readonly=True)
     is_selected = fields.Boolean(string=u"Sélectionné", default=True)
-    wizard_id = fields.Many2one('of.wizard.insert.kit.comps', string="Wizard")
+    wizard_id = fields.Many2one(comodel_name='of.wizard.insert.kit.comps', string="Wizard")
 
     @api.onchange('product_id')
     def _onchange_product_id(self):

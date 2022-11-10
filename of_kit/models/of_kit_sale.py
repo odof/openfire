@@ -15,24 +15,21 @@ class SaleOrder(models.Model):
     # Composants de kits
     # Un champ classique pour faciliter l'édition
     comp_ids = fields.One2many(
-        'of.saleorder.kit.line', 'order_id', string='Components',
-        help="Contains all kit components in this sale order."
-    )
+        comodel_name='of.saleorder.kit.line', inverse_name='order_id', string="Components",
+        help="Contains all kit components in this sale order.")
     of_contains_kit = fields.Boolean(
-        string='Contains a kit', compute='_compute_of_contains_kit', search='_search_of_contains_kit'
-    )
+        string="Contains a kit", compute='_compute_of_contains_kit', search='_search_of_contains_kit')
     of_kit_display_mode = fields.Selection(
         [
-            ('none', 'None'),
-            ('collapse', 'Collapse'),
-            ('expand', 'Expand'),
-        ], string='Kit display mode', default='expand',
+            ('none', "None"),
+            ('collapse', "Collapse"),
+            ('expand', "Expand"),
+        ], string="Kit display mode", default='expand',
         help="defines the way kits and their components should be printed out in pdf reports:\n"
              "- None: One line per kit. Nothing printed out about components\n"
              "- Collapse: One line per kit, with minimal info\n"
-             "- Expand: One line per kit, plus one line per component"
-    )
-    of_difference = fields.Boolean(compute='_compute_of_difference', readonly=True)
+             "- Expand: One line per kit, plus one line per component")
+    of_difference = fields.Boolean(string="Price difference", compute='_compute_of_difference', readonly=True)
 
     @api.depends('order_line', 'order_line.of_difference')
     def _compute_of_difference(self):
@@ -49,10 +46,10 @@ class SaleOrder(models.Model):
         if self and isinstance(self[0].id, models.NewId):
             # Le calcul se situe dans un appel onchange
             # l'objet est donc unique, et il faut utiliser _origin au lieu de id
-            self.of_contains_kit = comp_obj.search([("order_id", "=", self._origin.id)], count=True) > 0
+            self.of_contains_kit = comp_obj.search([('order_id', '=', self._origin.id)], count=True) > 0
         else:
             for order in self:
-                order.of_contains_kit = comp_obj.search([("order_id", "=", order.id)], count=True) > 0
+                order.of_contains_kit = comp_obj.search([('order_id', '=', order.id)], count=True) > 0
 
     @api.model
     def _search_of_contains_kit(self, operator, value):
@@ -101,32 +98,28 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    kit_id = fields.Many2one('of.saleorder.kit', string="Components", copy=True)
-    of_is_kit = fields.Boolean(string='Is a kit')
+    kit_id = fields.Many2one(comodel_name='of.saleorder.kit', string="Components", copy=True)
+    of_is_kit = fields.Boolean(string="Is a kit")
 
     price_comps = fields.Float(
-        string='Compo Price/Kit', compute='_compute_price_comps',
-        help="Sum of the prices of all components necessary for 1 unit of this kit", oldname="unit_compo_price"
-    )
+        string="Compo Price/Kit", compute='_compute_price_comps',
+        help="Sum of the prices of all components necessary for 1 unit of this kit", oldname='unit_compo_price')
     cost_comps = fields.Monetary(
-        string='Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
-        help="Sum of the costs of all components necessary for 1 unit of this kit"
-    )
+        string="Compo Cost/Kit", digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
+        help="Sum of the costs of all components necessary for 1 unit of this kit")
     of_pricing = fields.Selection(
         [
-            ('fixed', 'Fixed'),
-            ('computed', 'Computed'),
+            ('fixed', "Fixed"),
+            ('computed', "Computed"),
         ], string="Pricing", required=True, default='fixed',
         help="This field is only relevant if the product is a kit. It represents the way the price should be computed.\n"
              "if set to 'fixed', the price of it's components won't be taken into account and the price will be the one of the kit.\n"
-             "if set to 'computed', the price will be computed according to the components of the kit."
-    )
+             "if set to 'computed', the price will be computed according to the components of the kit.")
     of_difference = fields.Boolean(compute='_compute_of_difference', store=True)
 
     sale_kits_to_unlink = fields.Boolean(
         string="sale kits to unlink?", default=False,
-        help="True if at least 1 sale kit needs to be deleted from database"
-    )
+        help="True if at least 1 sale kit needs to be deleted from database")
 
     def _compute_margin(self, order_id, product_id, product_uom_id):
         if not product_id.of_is_kit:
@@ -216,17 +209,17 @@ class SaleOrderLine(models.Model):
         res = super(SaleOrderLine, self).product_id_change()
         new_vals = {}
         if self.kit_id:  # former product was a kit -> unlink it's kit_id
-            self.kit_id.write({"to_unlink": True})
+            self.kit_id.write({'to_unlink': True})
             new_vals['kit_id'] = False
-            new_vals["sale_kits_to_unlink"] = True
+            new_vals['sale_kits_to_unlink'] = True
         if not self.product_id:
             return res
         if self.product_id.of_is_kit:  # new product is a kit, we need to add its components
             new_vals['of_is_kit'] = True
             new_vals['of_pricing'] = self.product_id.of_pricing
             sale_kit_vals = self.product_id.get_saleorder_kit_data()
-            sale_kit_vals["qty_order_line"] = self.product_uom_qty
-            new_vals["kit_id"] = self.env["of.saleorder.kit"].create(sale_kit_vals)
+            sale_kit_vals['qty_order_line'] = self.product_uom_qty
+            new_vals['kit_id'] = self.env['of.saleorder.kit'].create(sale_kit_vals)
         else:  # new product is not a kit
             new_vals['of_is_kit'] = False
             new_vals['of_pricing'] = 'fixed'
@@ -326,9 +319,9 @@ class SaleOrderLine(models.Model):
     def _onchange_of_is_kit(self):
         new_vals = {}
         if self.kit_id:  # former product was a kit -> unlink it's kit_id
-            self.kit_id.write({"to_unlink": True})
-            new_vals["kit_id"] = False
-            new_vals["sale_kits_to_unlink"] = True
+            self.kit_id.write({'to_unlink': True})
+            new_vals['kit_id'] = False
+            new_vals['sale_kits_to_unlink'] = True
         if self.of_is_kit:  # checkbox got checked
             if not self.product_id.of_is_kit:  # a product that is not a kit is being made into a kit
                 # we create a component with current product (for procurements, kits are ignored)
@@ -346,16 +339,16 @@ class SaleOrderLine(models.Model):
                     'of_pricing': 'computed',
                     'kit_line_ids': [(0, 0, new_comp_vals)],
                     }
-                new_vals["kit_id"] = self.env["of.saleorder.kit"].create(sale_kit_vals)
-                new_vals["of_pricing"] = "computed"
+                new_vals['kit_id'] = self.env['of.saleorder.kit'].create(sale_kit_vals)
+                new_vals['of_pricing'] = 'computed'
             else:  # can happen if uncheck then recheck a kit
                 new_vals['of_pricing'] = self.product_id.of_pricing
                 sale_kit_vals = self.product_id.get_saleorder_kit_data()
-                new_vals["kit_id"] = self.env["of.saleorder.kit"].create(sale_kit_vals)
+                new_vals['kit_id'] = self.env['of.saleorder.kit'].create(sale_kit_vals)
 
         else:  # a product that was a kit is not anymore, we unlink its components
-            new_vals["of_pricing"] = 'fixed'
-            new_vals["price_unit"] = self.product_id.list_price
+            new_vals['of_pricing'] = 'fixed'
+            new_vals['price_unit'] = self.product_id.list_price
         self.update(new_vals)
         self._refresh_price_unit()
 
@@ -422,7 +415,7 @@ class SaleOrderLine(models.Model):
         precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
         inclure_service = self.env['ir.values'].get_default('sale.config.settings', 'of_inclure_service_bl')
         for comp in components:
-            if not inclure_service and comp.product_id.type == "service":
+            if not inclure_service and comp.product_id.type == 'service':
                 continue
             if comp.qty_delivered < comp.qty_total \
                     and not float_is_zero(comp.qty_delivered - comp.qty_total, precision_digits=precision):
@@ -482,9 +475,9 @@ class SaleOrderLine(models.Model):
 
     @api.model
     def create(self, vals):
-        if vals.get("sale_kits_to_unlink"):
-            self.sudo().env["of.saleorder.kit"].search([("to_unlink", "=", True)]).unlink()
-            vals.pop("sale_kits_to_unlink")
+        if vals.get('sale_kits_to_unlink'):
+            self.sudo().env['of.saleorder.kit'].search([('to_unlink', '=', True)]).unlink()
+            vals.pop('sale_kits_to_unlink')
         line = super(SaleOrderLine, self).create(vals)
         sale_kit_vals = {'order_line_id': line.id, 'name': line.name, 'of_pricing': line.of_pricing}
         line.kit_id.write(sale_kit_vals)
@@ -495,14 +488,14 @@ class SaleOrderLine(models.Model):
 
     @api.multi
     def write(self, vals):
-        if vals.get("sale_kits_to_unlink") or self.filtered(lambda l: l.sale_kits_to_unlink):
-            self.sudo().env["of.saleorder.kit"].search([("to_unlink", "=", True)]).unlink()
-            vals["sale_kits_to_unlink"] = False
+        if vals.get('sale_kits_to_unlink') or self.filtered(lambda l: l.sale_kits_to_unlink):
+            self.sudo().env['of.saleorder.kit'].search([('to_unlink', '=', True)]).unlink()
+            vals['sale_kits_to_unlink'] = False
         update_ol_id = False
-        if len(self) == 1 and vals.get("kit_id") and not self.kit_id:
+        if len(self) == 1 and vals.get('kit_id') and not self.kit_id:
             # a sale_order_kit was added
             update_ol_id = True
-        elif len(self) == 1 and vals.get("name") and self.kit_id:
+        elif len(self) == 1 and vals.get('name') and self.kit_id:
             # line changed name
             update_ol_id = True
         elif 'of_pricing' in vals:
@@ -526,10 +519,10 @@ class SaleOrderLine(models.Model):
         super(SaleOrderLine, self).write(vals)
         if update_ol_id:
             sale_kit_vals = {'order_line_id': self.id}
-            if vals.get("name"):
-                sale_kit_vals["name"] = vals.get("name")
-            if vals.get("of_pricing"):
-                sale_kit_vals["of_pricing"] = vals.get("of_pricing")
+            if vals.get('name'):
+                sale_kit_vals['name'] = vals.get('name')
+            if vals.get('of_pricing'):
+                sale_kit_vals['of_pricing'] = vals.get('of_pricing')
             self.kit_id.write(sale_kit_vals)
         if len(self) == 1 and 'kit_id' in vals:
             if not vals.get('kit_id'):
@@ -589,39 +582,38 @@ class SaleOrderLine(models.Model):
 class OfSaleOrderKit(models.Model):
     _name = 'of.saleorder.kit'
 
-    order_line_id = fields.Many2one("sale.order.line", string="Order line", ondelete="cascade", copy=False)
+    order_line_id = fields.Many2one(comodel_name='sale.order.line', string="Order line", ondelete='cascade', copy=False)
 
-    name = fields.Char(string='Name', required=True, default="draft saleorder kit")
-    kit_line_ids = fields.One2many('of.saleorder.kit.line', 'kit_id', string="Components", copy=True)
+    name = fields.Char(string="Name", required=True, default="draft saleorder kit")
+    kit_line_ids = fields.One2many(
+        comodel_name='of.saleorder.kit.line', inverse_name='kit_id', string="Components", copy=True)
 
-    qty_order_line = fields.Float(string="Order Line Qty", related="order_line_id.product_uom_qty", readonly=True)
-    currency_id = fields.Many2one(related='order_line_id.currency_id', store=True, string='Currency', readonly=True)
+    qty_order_line = fields.Float(string="Order Line Qty", related='order_line_id.product_uom_qty', readonly=True)
+    currency_id = fields.Many2one(related='order_line_id.currency_id', store=True, string="Currency", readonly=True)
     price_comps = fields.Float(
-        string='Compo Price/Kit', compute='_compute_price_comps',
-        help="Sum of the prices of all components necessary for 1 unit of this kit", oldname="unit_compo_price")
+        string="Compo Price/Kit", compute='_compute_price_comps',
+        help="Sum of the prices of all components necessary for 1 unit of this kit", oldname='unit_compo_price')
     cost_comps = fields.Float(
-        string='Compo Cost/Kit', compute='_compute_price_comps',
+        string="Compo Cost/Kit", compute='_compute_price_comps',
         help="Sum of the costs of all components necessary for 1 unit of this kit")
-    qty_invoiced = fields.Float(related="order_line_id.qty_invoiced", readonly=True)
+    qty_invoiced = fields.Float(related='order_line_id.qty_invoiced', readonly=True)
     state = fields.Selection(
         [
-            ('draft', 'Quotation'),
-            ('sent', 'Quotation Sent'),
-            ('sale', 'Sale Order'),
-            ('done', 'Done'),
-            ('cancel', 'Cancelled'),
-        ], related='order_line_id.state', string='Order Status', copy=False, default='draft'
-    )
+            ('draft', "Quotation"),
+            ('sent', "Quotation Sent"),
+            ('sale', "Sale Order"),
+            ('done', "Done"),
+            ('cancel', "Cancelled"),
+        ], related='order_line_id.state', string="Order Status", copy=False, default='draft')
     to_unlink = fields.Boolean(string="to unlink?", default=False)
     of_pricing = fields.Selection([
-        ('fixed', 'Fixed'),
-        ('computed', 'Computed')
+        ('fixed', "Fixed"),
+        ('computed', "Computed")
         ], string="Pricing", required=True, default='computed',
         help="This field represents the way the price should be computed.\n"
              "if set to 'fixed', the price of it's components won't be taken into account"
              "and the price will be the one of the kit.\n"
-             "if set to 'computed', the price will be computed according to the components of the kit."
-    )
+             "if set to 'computed', the price will be computed according to the components of the kit.")
 
     @api.multi
     @api.depends('kit_line_ids')
@@ -655,7 +647,7 @@ class OfSaleOrderKit(models.Model):
         for line in self.kit_line_ids:
             comp_vals = line._prepare_account_kit_comp()
             lines.append((0, 0, comp_vals))
-        account_kit_vals["kit_line_ids"] = lines
+        account_kit_vals['kit_line_ids'] = lines
         return account_kit_vals
 
     @api.multi
@@ -677,83 +669,75 @@ class OfSaleOrderKit(models.Model):
 
 class OfSaleOrderKitLine(models.Model):
     _name = 'of.saleorder.kit.line'
-    _order = "kit_id, sequence, id"
+    _order = 'kit_id, sequence, id'
 
-    kit_id = fields.Many2one('of.saleorder.kit', string="Kit", ondelete="cascade")
-    order_id = fields.Many2one('sale.order', string="Order", related="kit_id.order_line_id.order_id")
+    kit_id = fields.Many2one(comodel_name='of.saleorder.kit', string="Kit", ondelete='cascade')
+    order_id = fields.Many2one(comodel_name='sale.order', string="Order", related='kit_id.order_line_id.order_id')
 
-    name = fields.Char(string='Name', required=True)
-    default_code = fields.Char(related='product_id.default_code', string='Prod ref', readonly=True)
-    sequence = fields.Integer(string=u'Sequence', default=10)
+    name = fields.Char(string="Name", required=True)
+    default_code = fields.Char(related='product_id.default_code', string="Prod ref", readonly=True)
+    sequence = fields.Integer(string="Sequence", default=10)
 
     product_id = fields.Many2one(
-        'product.product', string='Product', required=True, domain="[('of_is_kit', '=', False)]"
-    )
-    currency_id = fields.Many2one(related='order_id.currency_id', string='Currency', readonly=True)
-    product_uom_id = fields.Many2one('product.uom', string='UoM', readonly=True, related='product_id.uom_id')
+        comodel_name='product.product', string="Product", required=True, domain="[('of_is_kit', '=', False)]")
+    currency_id = fields.Many2one(related='order_id.currency_id', string="Currency", readonly=True)
+    product_uom_id = fields.Many2one(
+        comodel_name='product.uom', string="UoM", readonly=True, related='product_id.uom_id')
     price_unit = fields.Monetary(
-        string='Unit Price', digits=dp.get_precision('Product Price'), required=True, default=0.0, oldname="unit_price"
-    )
+        string="Unit Price", digits=dp.get_precision('Product Price'), required=True, default=0.0, oldname='unit_price')
     price_unit_display = fields.Monetary(related='price_unit')
-    cost_unit = fields.Monetary('Unit Cost', digits=dp.get_precision('Product Price'))
+    cost_unit = fields.Monetary("Unit Cost", digits=dp.get_precision('Product Price'))
     cost_total = fields.Monetary(
-        string='Subtotal Cost', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
-        help="Cost of this component total quantity. Equal to total quantity * unit cost."
-    )
+        string="Subtotal Cost", digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
+        help="Cost of this component total quantity. Equal to total quantity * unit cost.")
     cost_per_kit = fields.Monetary(
-        string='Cost/Kit', compute='_compute_prices',
+        string="Cost/Kit", compute='_compute_prices',
         help="Cost of this component quantity necessary to make one unit of its order line kit."
-             "Equal to quantity per kit unit * unit cost."
-    )
+             "Equal to quantity per kit unit * unit cost.")
 
     qty_per_kit = fields.Float(
-        string='Qty / Kit', digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0,
-        oldname="qty_per_line",
+        string="Qty / Kit", digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0,
+        oldname='qty_per_line',
         help="Quantity per kit unit (order line).\n"
              "example: 2 kit K1 -> 3 prod P.\n"
              "P.qty_per_kit = 3\n"
-             "P.qty_total = 6"
-    )
+             "P.qty_total = 6")
 
-    nb_kits = fields.Float(string='Number of kits', related='kit_id.qty_order_line', readonly=True)
+    nb_kits = fields.Float(string="Number of kits", related='kit_id.qty_order_line', readonly=True)
     qty_total = fields.Float(
-        string='Total Qty', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_qty_total',
-        help='total quantity equal to quantity per kit times number of kits.')
+        string="Total Qty", digits=dp.get_precision('Product Unit of Measure'), compute='_compute_qty_total',
+        help="total quantity equal to quantity per kit times number of kits.")
     price_total = fields.Monetary(
-        string='Subtotal Price', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
+        string="Subtotal Price", digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
         help="Price of this component total quantity. Equal to total quantity * unit price.",
-        oldname="price_per_line_total"
-    )
+        oldname='price_per_line_total')
     price_per_kit = fields.Monetary(
-        string='Price/Kit', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
+        string="Price/Kit", digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
         help="Price of this component quantity necessary to make one unit of its order line kit."
-             "Equal to quantity per kit unit * unit price."
-    )
-    kit_pricing = fields.Selection(related="kit_id.of_pricing", readonly=True)
+             "Equal to quantity per kit unit * unit price.")
+    kit_pricing = fields.Selection(related='kit_id.of_pricing', readonly=True)
     hide_prices = fields.Boolean(string="Hide prices", default=False)
     state = fields.Selection(
         [
-            ('draft', 'Quotation'),
-            ('sent', 'Quotation Sent'),
-            ('sale', 'Sale Order'),
-            ('done', 'Done'),
-            ('cancel', 'Cancelled'),
-        ], related='order_id.state', string='Order Status', readonly=True, copy=False, store=True, default='draft'
-    )
+            ('draft', "Quotation"),
+            ('sent', "Quotation Sent"),
+            ('sale', "Sale Order"),
+            ('done', "Done"),
+            ('cancel', "Cancelled"),
+        ], related='order_id.state', string="Order Status", readonly=True, copy=False, store=True, default='draft')
 
     customer_lead = fields.Float(
-        string='Delivery Lead Time', required=True, default=0.0,
+        string="Delivery Lead Time", required=True, default=0.0,
         help="Number of days between the order confirmation and the shipping of the products to the customer")
-    procurement_ids = fields.One2many('procurement.order', 'of_sale_comp_id', string='Procurements')
+    procurement_ids = fields.One2many(
+        comodel_name='procurement.order', inverse_name='of_sale_comp_id', string="Procurements")
 
     qty_delivered = fields.Float(
-        string='Delivered Qty', copy=False, digits=dp.get_precision('Product Unit of Measure'), default=0.0
-    )
+        string="Delivered Qty", copy=False, digits=dp.get_precision('Product Unit of Measure'), default=0.0)
     qty_delivered_updateable = fields.Boolean(
-        compute='_compute_qty_delivered_updateable', string='Can Edit Delivered', readonly=True, default=True
-    )
-    invoiced = fields.Boolean("Invoiced", compute="_compute_invoiced")  # for readonly in XML
-    route_id = fields.Many2one('stock.location.route', string="Route", compute="_compute_route")
+        compute='_compute_qty_delivered_updateable', string="Can Edit Delivered", readonly=True, default=True)
+    invoiced = fields.Boolean("Invoiced", compute='_compute_invoiced')  # for readonly in XML
+    route_id = fields.Many2one(comodel_name='stock.location.route', string="Route", compute='_compute_route')
 
     of_price_management_variation = fields.Float(
         string=u"Montant unitaire de la variation de prix liée à la gestion de prix")
@@ -775,8 +759,8 @@ class OfSaleOrderKitLine(models.Model):
                 'price_unit': self.product_id.list_price,
                 'cost_unit': self.product_id.standard_price,
                 'customer_lead': self.product_id.sale_delay,
+                'hide_prices': self.kit_id.order_line_id and self.kit_id.order_line_id.of_pricing == 'fixed',
             }
-            new_vals['hide_prices'] = self.kit_id.order_line_id and self.kit_id.order_line_id.of_pricing == 'fixed'
             self.update(new_vals)
 
     @api.multi
@@ -798,7 +782,7 @@ class OfSaleOrderKitLine(models.Model):
             comp.qty_total = comp.qty_per_kit * comp.nb_kits
 
     @api.multi
-    @api.depends("kit_id")
+    @api.depends('kit_id')
     def _compute_invoiced(self):
         for kit_line in self:
             kit_line.invoiced = kit_line.kit_id.order_line_id and kit_line.kit_id.order_line_id.qty_invoiced
@@ -852,11 +836,11 @@ class OfSaleOrderKitLine(models.Model):
 
             if not comp.order_id.procurement_group_id:
                 vals = comp.order_id._prepare_procurement_group()
-                comp.order_id.procurement_group_id = self.env["procurement.group"].create(vals)
+                comp.order_id.procurement_group_id = self.env['procurement.group'].create(vals)
 
             vals = comp._prepare_order_comp_procurement(group_id=comp.order_id.procurement_group_id.id)
             vals['product_qty'] = comp.qty_total - qty
-            new_proc = self.env["procurement.order"].with_context(procurement_autorun_defer=True).create(vals)
+            new_proc = self.env['procurement.order'].with_context(procurement_autorun_defer=True).create(vals)
             new_proc.message_post_with_view('mail.message_origin_link',
                                             values={'self': new_proc, 'origin': comp.order_id},
                                             subtype_id=self.env.ref('mail.mt_note').id)
@@ -873,10 +857,10 @@ class OfSaleOrderKitLine(models.Model):
         self.ensure_one()
         qty = 0.0
         for move in self.procurement_ids.mapped('move_ids').filtered(lambda r: r.state == 'done' and not r.scrapped):
-            if move.location_dest_id.usage == "customer":
+            if move.location_dest_id.usage == 'customer':
                 if not move.origin_returned_move_id:
                     qty += move.product_uom._compute_quantity(move.product_uom_qty, self.product_uom_id)
-            elif move.location_dest_id.usage == "internal" and move.to_refund_so:
+            elif move.location_dest_id.usage == 'internal' and move.to_refund_so:
                 qty -= move.product_uom._compute_quantity(move.product_uom_qty, self.product_uom_id)
         return qty
 

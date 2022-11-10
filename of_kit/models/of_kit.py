@@ -6,34 +6,30 @@ from odoo.addons import decimal_precision as dp
 
 
 class ProductTemplate(models.Model):
-    _inherit = "product.template"
+    _inherit = 'product.template'
 
     of_is_kit = fields.Boolean(string="Is a kit")
     # store=True for domain searches and _sq_constraint
     is_kit_comp = fields.Boolean(
-        string="Is a comp", compute="_compute_is_kit_comp", store=True, help="is a component of a kit"
-    )
-    kit_line_ids = fields.One2many('of.product.kit.line', 'kit_id', string='Components', copy=True)
+        string="Is a comp", compute='_compute_is_kit_comp', store=True, help="is a component of a kit")
+    kit_line_ids = fields.One2many(
+        comodel_name='of.product.kit.line', inverse_name='kit_id', string="Components", copy=True)
 
     price_comps = fields.Monetary(
-        string='Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_compo_price_n_cost',
-        help="Sum of the prices of all components necessary for 1 unit of this kit"
-    )
+        string="Compo Price/Kit", digits=dp.get_precision('Product Price'), compute='_compute_compo_price_n_cost',
+        help="Sum of the prices of all components necessary for 1 unit of this kit")
     cost_comps = fields.Monetary(
-        string='Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_compo_price_n_cost',
-        help="Sum of the costs of all components necessary for 1 unit of this kit"
-    )
+        string="Compo Cost/Kit", digits=dp.get_precision('Product Price'), compute='_compute_compo_price_n_cost',
+        help="Sum of the costs of all components necessary for 1 unit of this kit")
     seller_price_comps = fields.Monetary(
-        string='Compo Purchase price/Kit', digits=dp.get_precision('Product Price'),
+        string="Compo Purchase price/Kit", digits=dp.get_precision('Product Price'),
         compute='_compute_compo_price_n_cost',
-        help="Sum of the purchase prices of all components necessary for 1 unit of this kit"
-    )
+        help="Sum of the purchase prices of all components necessary for 1 unit of this kit")
 
     of_price_used = fields.Monetary(
-        string='Used Price', digits=dp.get_precision('Product Price'), compute='_compute_of_price_used',
+        string="Used Price", digits=dp.get_precision('Product Price'), compute='_compute_of_price_used',
         help="Price that will be taken into account in sale orders and invoices."
-             "Either list price or the price of its components, dependant on the pricing."
-    )
+             "Either list price or the price of its components, dependant on the pricing.")
 
     of_pricing = fields.Selection(
         [
@@ -44,16 +40,15 @@ class ProductTemplate(models.Model):
              "It represents the way the price should be computed.\n"
              "if set to 'fixed', the price of it's components won't be taken into account"
              "and the price will be the one of the kit.\n"
-             "if set to 'computed', the price will be computed according to the components of the kit."
-    )
+             "if set to 'computed', the price will be computed according to the components of the kit.")
 
-    kit_count = fields.Integer('# Kits', compute='_compute_kit_count')
-    comp_count = fields.Integer('# Comps', compute='_compute_comp_count')
+    kit_count = fields.Integer(string="# Kits", compute='_compute_kit_count')
+    comp_count = fields.Integer(string="# Comps", compute='_compute_comp_count')
 
     _sql_constraints = [
         ('kit_n_comp_constraint',
          'CHECK ( NOT(of_is_kit AND is_kit_comp) )',
-         _('A product can not be a kit and a kit component at the same time !'))
+         _("A product can not be a kit and a kit component at the same time !"))
     ]
 
     def get_invoice_kit_data(self):
@@ -62,18 +57,18 @@ class ProductTemplate(models.Model):
         lines = [(5,)]
         comp_vals = {}
         if self.of_pricing == 'fixed':
-            comp_vals["hide_prices"] = True
+            comp_vals['hide_prices'] = True
         for line in self.kit_line_ids:
             comp_vals = comp_vals.copy()
-            comp_vals["product_id"] = line.product_id.id
-            comp_vals["product_uom_id"] = line.product_uom_id.id
-            comp_vals["qty_per_kit"] = line.product_qty
-            comp_vals["sequence"] = line.sequence
-            comp_vals["name"] = line.product_id.name_get()[0][1] or line.product_id.name
-            comp_vals["price_unit"] = line.product_id.list_price
-            comp_vals["cost_unit"] = line.product_id.standard_price
+            comp_vals['product_id'] = line.product_id.id
+            comp_vals['product_uom_id'] = line.product_uom_id.id
+            comp_vals['qty_per_kit'] = line.product_qty
+            comp_vals['sequence'] = line.sequence
+            comp_vals['name'] = line.product_id.name_get()[0][1] or line.product_id.name
+            comp_vals['price_unit'] = line.product_id.list_price
+            comp_vals['cost_unit'] = line.product_id.standard_price
             lines.append((0, 0, comp_vals))
-        res["kit_line_ids"] = lines
+        res['kit_line_ids'] = lines
         return res
 
     def get_saleorder_kit_data(self):
@@ -82,19 +77,19 @@ class ProductTemplate(models.Model):
         lines = [(5,)]
         comp_vals = {}
         if self.of_pricing == 'fixed':
-            comp_vals["hide_prices"] = True
+            comp_vals['hide_prices'] = True
         for line in self.kit_line_ids:
             comp_vals = comp_vals.copy()
-            comp_vals["product_id"] = line.product_id.id
-            comp_vals["product_uom_id"] = line.product_uom_id.id
-            comp_vals["qty_per_kit"] = line.product_qty
-            comp_vals["sequence"] = line.sequence
-            comp_vals["name"] = line.product_id.name_get()[0][1] or line.product_id.name
-            comp_vals["price_unit"] = line.product_id.list_price
-            comp_vals["cost_unit"] = line.product_id.standard_price
-            comp_vals["customer_lead"] = line.product_id.sale_delay
+            comp_vals['product_id'] = line.product_id.id
+            comp_vals['product_uom_id'] = line.product_uom_id.id
+            comp_vals['qty_per_kit'] = line.product_qty
+            comp_vals['sequence'] = line.sequence
+            comp_vals['name'] = line.product_id.name_get()[0][1] or line.product_id.name
+            comp_vals['price_unit'] = line.product_id.of_price_used
+            comp_vals['cost_unit'] = line.product_id.standard_price
+            comp_vals['customer_lead'] = line.product_id.sale_delay
             lines.append((0, 0, comp_vals))
-        res["kit_line_ids"] = lines
+        res['kit_line_ids'] = lines
         return res
 
     @api.multi
@@ -181,13 +176,12 @@ class ProductTemplate(models.Model):
 
 
 class ProductProduct(models.Model):
-    _inherit = "product.product"
+    _inherit = 'product.product'
 
-    kit_count = fields.Integer('# Kits', compute='_compute_kit_count')
+    kit_count = fields.Integer(string="# Kits", compute='_compute_kit_count')
     # store=True for domain searches and _sq_constraint
     is_kit_comp = fields.Boolean(
-        string="Is a comp", compute="_compute_is_kit_comp", store=True, help="is a component of a kit"
-    )
+        string="Is a comp", compute='_compute_is_kit_comp', store=True, help="is a component of a kit")
 
     def _compute_kit_count(self):
         read_group_res = self.env['of.product.kit.line']\
@@ -216,28 +210,24 @@ class ProductProduct(models.Model):
 
 
 class OfProductKitLine(models.Model):
-    _name = "of.product.kit.line"
+    _name = 'of.product.kit.line'
     _order = 'kit_id, sequence'
 
     kit_id = fields.Many2one(
-        "product.template", string="Kit",  domain="[('is_kit_comp', '=', False)]",
-        help="Kit containing this as component", ondelete="cascade"
-    )
+        comodel_name='product.template', string="Kit",  domain="[('is_kit_comp', '=', False)]",
+        help="Kit containing this as component", ondelete='cascade')
     product_id = fields.Many2one(
-        "product.product", string="Product", domain="[('of_is_kit', '=', False)]", required=True,
-        help="Product this line references"
-    )
+        comodel_name='product.product', string="Product", domain="[('of_is_kit', '=', False)]", required=True,
+        help="Product this line references")
     product_qty = fields.Float(
-        string='Qty / Kit', digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0,
-        help="Quantity per kit unit."
-    )
+        string="Qty / Kit", digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0,
+        help="Quantity per kit unit.")
     product_uom_categ_id = fields.Many2one(related='product_id.uom_id.category_id', readonly=True)
     product_uom_id = fields.Many2one(
-        'product.uom', string='UoM', domain="[('category_id', '=', product_uom_categ_id)]", required=True
-    )
+        comodel_name='product.uom', string="UoM", domain="[('category_id', '=', product_uom_categ_id)]", required=True)
     product_price = fields.Float(related='product_id.list_price', readonly=True)
     product_cost = fields.Float(related='product_id.standard_price', readonly=True)
-    sequence = fields.Integer(string=u'Sequence', default=10)
+    sequence = fields.Integer(string="Sequence", default=10)
 
     @api.constrains('kit_id', 'product_id')
     @api.multi
@@ -261,7 +251,7 @@ class OfProductKitLine(models.Model):
     @api.multi
     def write(self, vals):
         if len(self) == 1 and 'product_id' in vals:
-            products = self.env["product.product"]
+            products = self.env['product.product']
             products |= self.product_id
         super(OfProductKitLine, self).write(vals)
         if len(self) == 1 and 'product_id' in vals:
@@ -283,7 +273,7 @@ class OfProductKitLine(models.Model):
 class ProcurementOrder(models.Model):
     _inherit = 'procurement.order'
 
-    of_sale_comp_id = fields.Many2one('of.saleorder.kit.line', string='Sale Order Kit Component')
+    of_sale_comp_id = fields.Many2one(comodel_name='of.saleorder.kit.line', string="Sale Order Kit Component")
 
     def _get_sale_order(self):
         # fonction définie dans of_purchase
@@ -315,7 +305,7 @@ class StockPicking(models.Model):
 
 
 class StockMove(models.Model):
-    _inherit = "stock.move"
+    _inherit = 'stock.move'
 
     @api.multi
     def action_done(self):
