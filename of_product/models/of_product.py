@@ -7,6 +7,40 @@ from odoo.exceptions import UserError
 from odoo.addons.of_utils.models.of_utils import is_valid_url
 
 
+class ProductCategory(models.Model):
+    _inherit = "product.category"
+
+    route_ids = fields.Many2many(
+            'stock.location.route', 'stock_location_route_categ', 'categ_id', 'route_id', 'Routes',
+            domain=[('product_categ_selectable', '=', True)], copy=True)
+    of_layout_id = fields.Many2one('sale.layout_category', string="Section")
+    # Uniformisation de la méthode de coût sur les sociétés (effectif si of_base_multicompany est installé)
+    property_cost_method = fields.Selection(of_unify_companies=True)
+    of_stock_update_standard_price = fields.Boolean(
+        string=u"Mettre à jour le coût des articles suite aux mouvements de stock", default=True)
+    of_import_update_standard_price = fields.Boolean(string=u"Mettre à jour le coût des articles suite aux imports")
+    of_sale_cost = fields.Selection(
+        selection=[('theoretical', u"Coût théorique"), ('standard', u"Coût standard")], string=u"Coût pour les ventes",
+        help=u"Le coût choisi sera repris dans les commandes et factures de vente.", required=True,
+        default='theoretical')
+
+    @api.multi
+    def copy_data(self, default=None):
+        if default is None:
+            default = {}
+        default['name'] = self.name + u" (Copie)"
+        default['property_account_creditor_price_difference_categ'] = \
+            self.property_account_creditor_price_difference_categ
+        default['property_account_income_categ_id'] = self.property_account_income_categ_id
+        default['property_account_expense_categ_id'] = self.property_account_expense_categ_id
+        default['property_stock_account_input_categ_id'] = self.property_stock_account_input_categ_id
+        default['property_stock_account_output_categ_id'] = self.property_stock_account_output_categ_id
+        default['property_stock_valuation_account_id'] = self.property_stock_valuation_account_id
+        default['property_stock_journal'] = self.property_stock_journal
+        res = super(ProductCategory, self).copy_data(default)
+        return res
+
+
 class ProductTemplate(models.Model):
     _inherit = "product.template"
 
@@ -290,37 +324,3 @@ class ProductTemplateTag(models.Model):
     color = fields.Integer(string='Index Couleur')
     active = fields.Boolean(default=True)
     product_ids = fields.Many2many('product.template', column1='tag_id', column2='product_id', string='Produits')
-
-
-class ProductCategory(models.Model):
-    _inherit = "product.category"
-
-    route_ids = fields.Many2many(
-            'stock.location.route', 'stock_location_route_categ', 'categ_id', 'route_id', 'Routes',
-            domain=[('product_categ_selectable', '=', True)], copy=True)
-    of_layout_id = fields.Many2one('sale.layout_category', string="Section")
-    # Uniformisation de la méthode de coût sur les sociétés (effectif si of_base_multicompany est installé)
-    property_cost_method = fields.Selection(of_unify_companies=True)
-    of_stock_update_standard_price = fields.Boolean(
-        string=u"Mettre à jour le coût des articles suite aux mouvements de stock", default=True)
-    of_import_update_standard_price = fields.Boolean(string=u"Mettre à jour le coût des articles suite aux imports")
-    of_sale_cost = fields.Selection(
-        selection=[('theoretical', u"Coût théorique"), ('standard', u"Coût standard")], string=u"Coût pour les ventes",
-        help=u"Le coût choisi sera repris dans les commandes et factures de vente.", required=True,
-        default='theoretical')
-
-    @api.multi
-    def copy_data(self, default=None):
-        if default is None:
-            default = {}
-        default['name'] = self.name + u" (Copie)"
-        default['property_account_creditor_price_difference_categ'] = \
-            self.property_account_creditor_price_difference_categ
-        default['property_account_income_categ_id'] = self.property_account_income_categ_id
-        default['property_account_expense_categ_id'] = self.property_account_expense_categ_id
-        default['property_stock_account_input_categ_id'] = self.property_stock_account_input_categ_id
-        default['property_stock_account_output_categ_id'] = self.property_stock_account_output_categ_id
-        default['property_stock_valuation_account_id'] = self.property_stock_valuation_account_id
-        default['property_stock_journal'] = self.property_stock_journal
-        res = super(ProductCategory, self).copy_data(default)
-        return res
