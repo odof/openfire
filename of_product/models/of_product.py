@@ -202,22 +202,6 @@ class ProductTemplate(models.Model):
 class ProductProduct(models.Model):
     _inherit = "product.product"
 
-    @api.model_cr_context
-    def _auto_init(self):
-        cr = self._cr
-        cr.execute("SELECT * FROM information_schema.columns WHERE table_name = '%s' "
-                   "AND column_name = 'of_theoretical_cost'" % (self._table,))
-        exists = cr.fetchall()
-
-        res = super(ProductProduct, self)._auto_init()
-
-        if not exists:
-            # On initialise le coût théorique des articles avec la valeur du coût standard
-            for product in self.with_context(active_test=False).search([]):
-                product.of_theoretical_cost = product.standard_price
-
-        return res
-
     standard_price = fields.Float(
         of_unify_companies=True,
         help=u"Le coût est exprimé dans l'unité de mesure par défaut de l'article.\n"
