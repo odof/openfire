@@ -140,7 +140,7 @@ class ProductTemplate(models.Model):
                 if price:
                     product_tmpl.marge = (price - product_tmpl.cost_comps) * 100.00 / price
                 else:
-                    product_tmpl.marge = -100
+                    product_tmpl.marge = 0
             else:
                 super(ProductTemplate, product_tmpl)._compute_marge()
 
@@ -215,7 +215,7 @@ class OfProductKitLine(models.Model):
     _order = 'kit_id, sequence'
 
     kit_id = fields.Many2one(
-        comodel_name='product.template', string="Kit",  domain="[('is_kit_comp', '=', False)]",
+        comodel_name='product.template', string="Kit", domain="[('is_kit_comp', '=', False)]",
         help="Kit containing this as component", ondelete='cascade')
     product_id = fields.Many2one(
         comodel_name='product.product', string="Product", domain="[('of_is_kit', '=', False)]", required=True,
