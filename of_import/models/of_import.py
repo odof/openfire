@@ -1300,7 +1300,16 @@ class OfImport(models.Model):
 
                             if valeur:
                                 libelle_ref = u"réf. " + valeur
-
+                        if champs_odoo[champ_fichier_sansrel]['type'] in ['date', 'datetime']:
+                            try:
+                                function = champs_odoo[champ_fichier_sansrel]['type'] == 'date' and \
+                                    fields.Date.from_string or fields.Datetime.form_string
+                                function(valeur)
+                            except ValueError:  # Value is not a date
+                                erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" n'est pas du bon format."
+                                       u" %s non importé."
+                                       % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, valeur,
+                                          model_data['nom_objet'].capitalize()))
                         valeurs[champ_fichier_sansrel] = valeur
 
             if champ_fichier and champ_fichier_sansrel == model_data['champ_primaire']:
