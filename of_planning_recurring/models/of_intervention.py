@@ -185,6 +185,7 @@ class OFPlanningRecurringMixin(models.AbstractModel):
     @api.onchange('rrule_type')
     def _onchange_rrule_type(self):
         self.ensure_one()
+        # self.date is the date stored in DB, not the calculated date of this occurence
         if self.date:
             if self.rrule_type == 'weekly':
                 dt = datetime.strptime(self.date, DEFAULT_SERVER_DATETIME_FORMAT)
@@ -232,6 +233,7 @@ class OFPlanningRecurringMixin(models.AbstractModel):
         if date_field in self._fields.keys() and self._fields[date_field].type in ('date', 'datetime'):
             reference_date = self[date_field]
         else:
+            # date field stored in DB, NOT this occurence date
             reference_date = self.date
 
         def todate(date_eval):
@@ -637,8 +639,6 @@ class OFPlanningIntervention(models.Model):
             ls = calendar_id2real_id(
                 calendar_id, with_date=res and res.get('duree', 0) > 0 and res.get('duree') or 1)
             if not isinstance(ls, (basestring, int, long)) and len(ls) >= 2:
-                res['date'] = ls[1]
-                res['date_deadline'] = ls[2]
                 res['date_prompt'] = ls[1]
                 res['date_deadline_prompt'] = ls[2]
                 # mettre en date locale pour éviter les erreurs de date pour les RDV tard le soir
@@ -791,6 +791,7 @@ class OFPlanningIntervention(models.Model):
             self = self.with_context(tz='Europe/Paris')
         tz = pytz.timezone(self._context['tz'])
 
+        # self.date is the start date of the recurence, not the calculated date of this occurence
         date_utc_dt = pytz.utc.localize(fields.Datetime.from_string(self.date))
         date_local_dt = date_utc_dt.astimezone(tz)
         date_deadline_utc_dt = pytz.utc.localize(fields.Datetime.from_string(self.date_deadline))
