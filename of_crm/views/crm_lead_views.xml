@@ -999,6 +999,20 @@
                             domain="[('write_date', '>=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d'))]"/>
                     <separator/>
                 </xpath>
+                <xpath expr="//filter[@name='today']" position="replace">
+                    <filter string="Today Activities" name="today"
+                            domain="[('of_date_action_filter', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                </xpath>
+                <xpath expr="//filter[@name='this_week']" position="replace">
+                    <filter string="This Week Activities" name="this_week"
+                        domain="['&amp;', ('of_date_action_filter', '&gt;=', context_today().strftime('%Y-%m-%d')),
+                                    ('of_date_action_filter', '&lt;=', (context_today()+datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                </xpath>
+                <xpath expr="//filter[@name='overdue']" position="replace">
+                    <filter string="Overdue Activities" name="overdue"
+                        domain="[('of_date_action_filter', '&lt;', context_today().strftime('%Y-%m-%d'))]"
+                        help="Show all opportunities for which the next action date is before today"/>
+                </xpath>
             </field>
         </record>
 

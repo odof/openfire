@@ -149,6 +149,9 @@ class CrmLead(models.Model):
     # store=True car of_date_action est la date de référence pour la vue calendar
     of_date_action = fields.Datetime(
         string=u"Date de la prochaine action", compute='_compute_of_action_info', store=True)
+    of_date_action_filter = fields.Date(
+        string="Date of the next action", compute='_compute_of_action_info', store=True, index=True,
+        help="Technical field used in the search view to filter on the date of the next action")
     of_title_action = fields.Char(string=u"Libellé de la prochaine action", compute='_compute_of_action_info')
 
     of_date_projet = fields.Date(string="Date projet")
@@ -212,10 +215,12 @@ class CrmLead(models.Model):
                 next_activity = opportunity.of_activity_ids.filtered(lambda act: act.state == 'planned')[-1]
                 opportunity.of_next_action_activity_id = next_activity
                 opportunity.of_date_action = next_activity.date
+                opportunity.of_date_action_filter = fields.Date.from_string(next_activity.date).strftime('%Y-%m-%d')
                 opportunity.of_title_action = next_activity.title
             else:
                 opportunity.of_next_action_activity_id = False
                 opportunity.of_date_action = False
+                opportunity.of_date_action_filter = False
                 opportunity.of_title_action = False
 
     @api.onchange('partner_id')
