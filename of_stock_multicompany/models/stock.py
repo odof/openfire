@@ -52,11 +52,12 @@ class StockWarehouse(models.Model):
     @api.model
     def create(self, vals):
         # On force la création des entrepôts sur la société qui est propriétaire des stocks
-        if vals.get('company_id'):
-            company = self.env['res.company'].browse(vals.get('company_id'))
-            while not company.of_is_stock_owner and company.parent_id:
-                company = company.parent_id
-            vals['company_id'] = company.id
+        if not vals.get('company_id'):
+            vals['company_id'] = self.env['res.company']._company_default_get('stock.inventory').id
+        company = self.env['res.company'].browse(vals.get('company_id'))
+        while not company.of_is_stock_owner and company.parent_id:
+            company = company.parent_id
+        vals['company_id'] = company.id
         return super(StockWarehouse, self).create(vals)
 
     @api.multi
