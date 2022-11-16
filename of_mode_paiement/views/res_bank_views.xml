@@ -11,7 +11,8 @@
                 <group name="of_sepa" col="4">
                     <separator string="Mandat SEPA" colspan="4"/>
                     <field name="of_sepa_rum"/>
-                    <button colspan="2" name="action_demande_confirmation_code_rum" string="Générer code RUM" type="object" icon="fa-file-text"/>
+                    <button colspan="2" name="action_demande_confirmation_code_rum" string="Générer code RUM"
+                            type="object" icon="fa-file-text" attrs="{'invisible': [('of_sepa_rum', '!=', False)]}"/>
                     <field name="of_sepa_date_mandat"/>
                     <field name="of_sepa_type_prev"/>
                 </group>

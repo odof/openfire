@@ -50,6 +50,13 @@ class ResPartnerBank(models.Model):
         ('unique_of_sepa_rum', 'unique(of_sepa_rum)', u'La référence unique de mandat (RUM) doit être unique')
     ]
 
+    @api.model
+    def create(self, vals):
+        res = super(ResPartnerBank, self).create(vals)
+        if not res.of_sepa_rum:
+            res.generer_code_rum()
+        return res
+
     @api.multi
     def action_demande_confirmation_code_rum(self):
         """Action appelée pour générer code RUM"""
