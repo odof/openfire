@@ -315,6 +315,21 @@ class ResPartner(models.Model):
         return super(ResPartner, self).name_search(name, args, operator, limit)
 
 
+class ProductProduct(models.Model):
+    _inherit = 'product.product'
+
+    @api.multi
+    def name_get(self):
+        if self._context.get('show_only_name', True):
+            result = []
+            for product in self:
+                result.append((product.id, '%s' % product.name))
+            return result
+        else:
+            res = super(ProductProduct, self).name_get()
+            return res
+
+
 class ProjectIssue(models.Model):
     _name = 'project.issue'
     _inherit = ['project.issue', 'of.map.view.mixin']
