@@ -308,6 +308,18 @@
         </field>
     </record>
 
+    <record id="account_payment_view_form" model="ir.ui.view">
+        <field name="name">of.account.payment.view.form</field>
+        <field name="model">account.payment</field>
+        <field name="priority">20</field>
+        <field name="inherit_id" ref="payment.view_account_payment_form_inherit_payment"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payment_transaction_id']" position="after">
+                <field name="company_id" groups="base.group_no_one"/>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Account journal form view -->
     <record id="of_account_journal_form_view" model="ir.ui.view">
         <field name="name">account.journal.form</field>
