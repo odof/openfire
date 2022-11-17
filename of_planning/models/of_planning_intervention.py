@@ -1449,6 +1449,12 @@ class OfPlanningIntervention(models.Model):
         pickings.filtered(lambda p: p.state != 'done').unlink()
         return res
 
+    @api.multi
+    def copy_data(self, default=None):
+        default = default.copy() if default else {}
+        default['verif_dispo'] = False
+        return super(OfPlanningIntervention, self).copy_data(default)
+
     @api.model
     def _read_group_process_groupby(self, gb, query):
         # Ajout de la possibilité de regrouper par employé
