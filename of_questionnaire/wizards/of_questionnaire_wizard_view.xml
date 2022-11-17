@@ -44,15 +44,23 @@
         <field name="inherit_id" ref="of_questionnaire.of_questionnaire_of_planning_intervention_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//notebook/page[@name='questionnaire']//field[@name='questionnaire_id']" position="after">
+                <field name="question_answered" invisible="1"/>
                 <button class="oe_right" name="of_questionnaire.action_of_repondre_questionnaire"
                         string="Répondre"
                         context="{'question_ids': question_ids}"
-                        attrs="{'invisible': ['|', ('state', 'in', ('draft', 'cancel', 'postponed')), ('question_ids', '=', False)]}"
+                        attrs="{'invisible': ['|', ('state', 'in', ('draft', 'cancel', 'postponed')), ('question_ids', '=', [])]}"
                         type="action"/>
+                <button class="oe_right" name="unlink_question_ids"
+                        string="Supprimer"
+                        attrs="{'invisible': ['|', '|', ('state', '!=', 'draft'), ('question_ids', '=', []), ('question_answered', '=', True)]}"
+                        type="object"/>
             </xpath>
             <xpath expr="//notebook/page[@name='questionnaire']//field[@name='question_ids']/tree//field[@name='definitive_answer']" position="after">
                 <field name="id" invisible="1"/>
-                <button name="of_questionnaire.action_of_repondre_questionnaire" type="action" icon="fa-pencil" context="{'question_ids': [], 'default_question_id': id}"/>
+                <button name="of_questionnaire.action_of_repondre_questionnaire" type="action" icon="fa-pencil"
+                        context="{'question_ids': [], 'default_question_id': id}"
+                        attrs="{'invisible': [('intervention_state', 'in', ('draft', 'cancel', 'postponed'))]}"/>
+                <field name="intervention_state" invisible="1"/>
             </xpath>
         </field>
     </record>
