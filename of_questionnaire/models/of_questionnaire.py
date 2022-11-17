@@ -147,7 +147,14 @@ class OfPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
     question_ids = fields.One2many('of.planning.intervention.question', 'intervention_id', string="Questions")
+    question_answered = fields.Boolean(
+        string=u"Question answered", compute='_compute_question_answered', help=u"At least one")
     questionnaire_id = fields.Many2one('of.questionnaire', string="Questionnaire")
+
+    @api.depends('question_ids.definitive_answer')
+    def _compute_question_answered(self):
+        for interv in self:
+            interv.question_answered = any(interv.question_ids.mapped('definitive_answer'))
 
     @api.model
     def _get_question_vals(self, question, parc_id=False):
@@ -234,6 +241,9 @@ class OfPlanningIntervention(models.Model):
         else:
             return []
 
+    def unlink_question_ids(self):
+        self.question_ids.unlink()
+
 
 class OfPlanningInterventionModel(models.Model):
     _inherit = "of.planning.intervention.template"
@@ -253,6 +263,7 @@ class OfPlanningInterventionQuestion(models.Model):
         column1='question_id', column2='answer_id', string=u'Réponses possibles')
     definitive_answer = fields.Text(string=u"Réponse")
     intervention_id = fields.Many2one('of.planning.intervention', string="Intervention")
+    intervention_state = fields.Selection(related='intervention_id.state')
     parc_installe_id = fields.Many2one('of.parc.installe.question', string=u"Équipement")
     condition_unmet = fields.Boolean(string=u"Condition non respectée")
 
