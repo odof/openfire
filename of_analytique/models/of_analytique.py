@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import api, fields, models
 from odoo.tools.safe_eval import safe_eval
@@ -100,6 +101,10 @@ class AccountInvoice(models.Model):
 
     of_project_id = fields.Many2one(
         'account.analytic.account', string='Compte analytique', readonly=True, states={'draft': [('readonly', False)]})
+
+    def _get_refund_common_fields(self):
+        common_fields = ['of_project_id']
+        return (super(AccountInvoice, self)._get_refund_common_fields() or []) + common_fields
 
     @api.onchange('of_project_id')
     def _onchange_project_id(self):
