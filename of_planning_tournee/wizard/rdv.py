@@ -34,8 +34,8 @@ class OfTourneeRdv(models.TransientModel):
     _description = u"Prise de RDV dans les tournées"
 
     @api.model
-    def default_get(self, fields=None):
-        res = super(OfTourneeRdv, self).default_get(fields)
+    def default_get(self, field_list=None):
+        res = super(OfTourneeRdv, self).default_get(field_list)
         # Suivant que la prise de rdv se fait depuis la fiche client ou une demande d'intervention
         service_obj = self.env['of.service']
         partner_obj = self.env['res.partner']
@@ -43,17 +43,23 @@ class OfTourneeRdv(models.TransientModel):
         service = False
         partner = False
         address = False
+        intervention = False
         if active_model == 'res.partner':
             partner_id = self._context['active_ids'][0]
             partner = partner_obj.browse(partner_id)
             service = service_obj.search([('partner_id', '=', partner.id), ('recurrence', '=', True)], limit=1)
             address = partner_obj.browse(partner.address_get(['delivery'])['delivery'])
-        elif active_model == 'of.service':
-            service_id = self._context['active_ids'][0]
-            service = service_obj.browse(service_id)
-            partner = service.partner_id
-            address = service.address_id
-            res['pre_employee_ids'] = [(6, 0, [emp.id for emp in service.employee_ids])]
+        elif active_model in ['of.service', 'of.planning.intervention']:
+            active_record_id = self._context['active_ids'][0]
+            active_record = self.env[active_model].browse(active_record_id)
+            partner = active_record.partner_id
+            address = active_record.address_id
+            if active_model == 'of.service':
+                service = active_record
+            else:
+                intervention = active_record
+                service = intervention.service_id
+            res['pre_employee_ids'] = [(6, 0, [emp.id for emp in active_record.employee_ids])]
         elif active_model == 'sale.order':
             order_id = self._context['active_ids'][0]
             order = self.env['sale.order'].browse(order_id)
@@ -72,9 +78,12 @@ class OfTourneeRdv(models.TransientModel):
         res['partner_id'] = partner and partner.id or False
         res['partner_address_id'] = address and address.id or False
         res['service_id'] = service and service.id or False
+        res['origin_intervention_id'] = intervention and intervention.id or False
         if service:
             res['days_ids'] = [(6, 0, service.jour_ids.ids)]
-        if service and service.date_next and service.date_next >= date.today().strftime(DEFAULT_SERVER_DATE_FORMAT):
+        if intervention:
+            res['date_recherche_debut'] = fields.Date.today()
+        elif service and service.date_next and service.date_next >= date.today().strftime(DEFAULT_SERVER_DATE_FORMAT):
             res['date_recherche_debut'] = service.date_next
             res['date_recherche_fin'] = service.date_fin
         return res
@@ -137,6 +146,7 @@ class OfTourneeRdv(models.TransientModel):
         comodel_name='res.company', string=u"Magasin", required=True, default=lambda s: s._default_company())
     service_id = fields.Many2one(
         comodel_name='of.service', string=u"Demande d'intervention", domain="[('partner_id', '=', partner_id)]")
+    origin_intervention_id = fields.Many2one(comodel_name='of.planning.intervention', string="Origin intervention")
     tache_id = fields.Many2one(
         comodel_name='of.planning.tache', string=u"Tâche", required=True, default=lambda s: s._default_planning_task())
     creer_recurrence = fields.Boolean(
@@ -227,7 +237,7 @@ class OfTourneeRdv(models.TransientModel):
         self.ensure_one()
         display_mode = self._default_slots_display_mode()
         # simple form view is for when we come from 'of.service' model, complete form view is for other source models
-        if self.source_model == 'of.service':
+        if self.source_model in ['of.service', 'of.planning.intervention']:
             return self._get_wizard_list_mode_form_view_id() if display_mode == 'list' else \
                 self._get_wizard_calendar_1st_mode_form_view_id()
         elif display_mode == 'list':
@@ -368,17 +378,24 @@ class OfTourneeRdv(models.TransientModel):
             by_date_lines_hidden, by_distance_lines_hidden, by_duration_lines_hidden = wizard._get_hidden_lines()
             wizard.can_show_more = bool(by_date_lines_hidden or by_distance_lines_hidden or by_duration_lines_hidden)
 
-    @api.depends('geo_lat', 'geo_lng', 'service_id', 'service_id.geo_lat', 'service_id.geo_lng')
+    @api.depends(
+        'geo_lat', 'geo_lng', 'service_id', 'service_id.geo_lat', 'service_id.geo_lng', 'origin_intervention_id',
+        'origin_intervention_id.geo_lat', 'origin_intervention_id.geo_lng')
     def _compute_additional_record(self):
         """Builds a dict to display an additional record on the map, containing information about the field operation
         to be planned.
         """
         for wizard in self:
+            additionnal_record = wizard.service_id or wizard.origin_intervention_id
+            if not additionnal_record:
+                wizard.additional_record = json.dumps({})
+                continue
+
             date_preview = \
                 wizard.map_line_id.debut_dt and \
                 fields.Datetime.from_string(wizard.map_line_id.debut_dt).strftime('%Y-%m-%d %H:%M:%S') or False
             wizard.additional_record = json.dumps({
-                'id': wizard.service_id.id * -1,  # Negative id to avoid conflict with real interventions on the map
+                'id': additionnal_record.id * -1,  # Negative id to avoid conflict with real interventions on the map
                 'map_color_tour': 'green',
                 'address_city': wizard.partner_address_city,
                 'partner_name': wizard.partner_id.name,
@@ -439,7 +456,7 @@ class OfTourneeRdv(models.TransientModel):
     @api.onchange('service_id')
     def _onchange_service(self):
         """Affecte la tâche, la description et l'adresse"""
-        if not self.service_id:
+        if not self.service_id or self.origin_intervention_id:
             return
 
         service = self.service_id
@@ -454,17 +471,31 @@ class OfTourneeRdv(models.TransientModel):
         }
         self.update(vals)
 
+    @api.onchange('origin_intervention_id')
+    def _onchange_origin_intervention_id(self):
+        if not self.origin_intervention_id:
+            return
+
+        intervention = self.origin_intervention_id
+        vals = {
+            'description': intervention.description,
+            'tache_id': intervention.tache_id,
+            'partner_address_id': intervention.address_id,
+            'service_id': intervention.service_id,
+        }
+        self.update(vals)
+
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
         """Affecte creer_recurrence, duree et pre_employee_ids"""
-        service_obj = self.env['of.service']
         vals = {'service_id': False}
         if self.tache_id:
+            service_obj = self.env['of.service']
             if self.service_id and self.service_id.tache_id.id == self.tache_id.id:
                 del vals['service_id']
             else:
-                service = service_obj.search([('partner_id', '=', self.partner_id.id),
-                                              ('tache_id', '=', self.tache_id.id)], limit=1)
+                service = service_obj.search([
+                    ('partner_id', '=', self.partner_id.id), ('tache_id', '=', self.tache_id.id)], limit=1)
                 if service:
                     vals['service_id'] = service
 
@@ -477,10 +508,8 @@ class OfTourneeRdv(models.TransientModel):
             # If the duration is not set, we set it to 1 hour by default to avoid an error when searching time slots
             if not self.duree:
                 vals['duree'] = self.tache_id.duree or 1.0
-            employees = []
-            for employee in self.pre_employee_ids:
-                if employee in self.tache_id.employee_ids:
-                    employees.append(employee.id)
+
+            employees = [employee.id for employee in self.pre_employee_ids if employee in self.tache_id.employee_ids]
             vals['pre_employee_ids'] = employees
         self.update(vals)
 
@@ -583,12 +612,14 @@ class OfTourneeRdv(models.TransientModel):
             if others:
                 others.button_postponed()
         intervention.onchange_company_id()  # Permet de renseigner l'entrepôt
-        intervention.with_context(  # Charger les lignes de facturation
-            of_import_service_lines=True)._onchange_service_id()
-        intervention.with_context(of_import_service_lines=True)._onchange_tache_id()  # Load invoice lines
-        intervention.with_context(of_intervention_wizard=True).onchange_template_id()  # Load questionnary lines
-        contract_custom = self.sudo().env['ir.module.module'].search([('name', '=', 'of_contract_custom')])
+        # if we came from a postponed intervention, we want to keep the copied values of the original intervention
+        if not self.origin_intervention_id:
+            intervention.with_context(  # Charger les lignes de facturation
+                of_import_service_lines=True)._onchange_service_id()
+            intervention.with_context(of_import_service_lines=True)._onchange_tache_id()  # Load invoice lines
+            intervention.with_context(of_intervention_wizard=True).onchange_template_id()  # Load questionnary lines
 
+        contract_custom = self.sudo().env['ir.module.module'].search([('name', '=', 'of_contract_custom')])
         # Creation/mise à jour du service si creer_recurrence
         if self.date_next:
             if self.service_id:
@@ -1072,28 +1103,34 @@ class OfTourneeRdv(models.TransientModel):
         :return: dictionnaires de valeurs pour la création du RDV Tech
         """
         self.ensure_one()
-        if self.service_id and self.service_id.template_id:
-            template = self.service_id.template_id
+        service = self.service_id
+        if service and service.template_id:
+            template = service.template_id
         else:
             template = False
 
-        return {
+        tag_ids = \
+            [(4, tag.id) for tag in service.tag_ids] \
+            if not self.origin_intervention_id else [(6, 0, self.origin_intervention_id.tag_ids.ids)]
+        order_id = service.oder_id.id if not self.origin_intervention_id else self.origin_intervention_id.order_id.id
+        name = self.name if not self.origin_intervention_id else self.origin_intervention_id.name
+        values = {
             'partner_id': self.partner_id.id,
             'address_id': self.partner_address_id.id,
             'tache_id': self.tache_id.id,
             'template_id': template and template.id,
-            'service_id': self.service_id.id,
+            'service_id': service.id,
             'employee_ids': [(4, self.employee_id.id, 0)],
-            'tag_ids': [(4, tag.id, 0) for tag in self.service_id.tag_ids],
+            'tag_ids': tag_ids,
             'date': self.date_propos,
             'duree': self.duree,
             'user_id': self._uid,
             'company_id': self.company_id.id,
-            'name': self.name,
+            'name': name,
             'description': self.description or '',
             'state': 'confirm',
             'verif_dispo': True,
-            'order_id': self.service_id.order_id.id,
+            'order_id': order_id,
             'origin_interface': u"Trouver un créneau (rdv.py)",
             'flexible': self.tache_id.flexible,
             'duration_one_way': self.res_line_id.duree_prec,
@@ -1101,6 +1138,20 @@ class OfTourneeRdv(models.TransientModel):
             'return_duration': self.res_line_id.duree_suiv,
             'return_distance': self.res_line_id.dist_suiv,
         }
+        if self.origin_intervention_id:
+            copied_lines = []
+            for line in self.origin_intervention_id.line_ids:
+                l_dict = line.copy_data()[0]
+                l_dict.update({'intervention_id': False})
+                copied_lines.append((0, 0, l_dict))
+            values['line_ids'] = copied_lines
+            copied_questions = []
+            for question in self.origin_intervention_id.question_ids:
+                q_dict = question.copy_data()[0]
+                q_dict.update({'intervention_id': False})
+                copied_questions.append((0, 0, q_dict))
+            values['question_ids'] = copied_questions
+        return values
 
     def _get_origin_arrival_addresses(self, sudo, employee, tournee):
         """ Get the origin and arrival addresses for searching the route.
