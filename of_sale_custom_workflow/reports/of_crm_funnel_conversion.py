@@ -40,8 +40,12 @@ class OFCRMFunnelConversion4(models.Model):
     quotation_nb = fields.Integer(string=u"Nb devis", readonly=True)
     previous_quotation_nb = fields.Integer(string=u"Nb devis N-1", readonly=True)
     order_nb = fields.Integer(string=u"Nb ventes", readonly=True)
+    presale_order_nb = fields.Integer(string=u"Nb ventes enregistrées", readonly=True)
     previous_order_nb = fields.Integer(string=u"Nb ventes N-1", readonly=True)
     lost_quotation_nb = fields.Integer(string=u"Nb devis perdus", readonly=True)
+
+    custom_confirmation_delta = fields.Float(string=u"Délai de confirmation", readonly=True)
+    confirmation_delta = fields.Float(string=u"Délai d'enregistrement", readonly=True)
 
     quotation_amount = fields.Float(string=u"Montant devis", readonly=True)
     ordered_turnover = fields.Float(string=u"CA commandé", readonly=True)
@@ -73,6 +77,13 @@ class OFCRMFunnelConversion4(models.Model):
         string=u"Panier vente", compute='_compute_sale_cart', compute_sudo=True, readonly=True)
     lost_cart = fields.Char(
         string=u"Panier perdu", compute='_compute_lost_cart', compute_sudo=True, readonly=True)
+
+    avg_custom_confirmation_delta = fields.Char(
+        string=u"Délai de confirmation moyen", compute='_compute_avg_custom_confirmation_delta',
+        compute_sudo=True, readonly=True)
+    avg_confirmation_delta = fields.Char(
+        string=u"Délai d'enregistrement moyen", compute='_compute_avg_confirmation_delta',
+        compute_sudo=True, readonly=True)
 
     ordered_margin_percent = fields.Char(
         string=u"Marge commandé %", compute='_compute_ordered_margin_percent', compute_sudo=True, readonly=True)
@@ -215,8 +226,11 @@ class OFCRMFunnelConversion4(models.Model):
             ,           COALESCE(SUM(T.quotation_nb), 0)                AS quotation_nb
             ,           COALESCE(SUM(T.previous_quotation_nb), 0)       AS previous_quotation_nb
             ,           COALESCE(SUM(T.order_nb), 0)                    AS order_nb
+            ,           COALESCE(SUM(T.presale_order_nb), 0)            AS presale_order_nb
             ,           COALESCE(SUM(T.previous_order_nb), 0)           AS previous_order_nb
             ,           COALESCE(SUM(T.lost_quotation_nb), 0)           AS lost_quotation_nb
+            ,           COALESCE(SUM(T.of_custom_confirmation_delta), 0)     AS custom_confirmation_delta
+            ,           COALESCE(SUM(T.of_confirmation_delta), 0)            AS confirmation_delta
             ,           SUM(T.quotation_amount)                         AS quotation_amount
             ,           SUM(T.ordered_turnover)                         AS ordered_turnover
             ,           SUM(T.recorded_turnover)                        AS recorded_turnover
@@ -248,8 +262,11 @@ class OFCRMFunnelConversion4(models.Model):
             ,       0                       AS quotation_nb
             ,       0                       AS previous_quotation_nb
             ,       0                       AS order_nb
+            ,       0                       AS presale_order_nb
             ,       0                       AS previous_order_nb
             ,       0                       AS lost_quotation_nb
+            ,       0                       AS of_custom_confirmation_delta
+            ,       0                       AS of_confirmation_delta
             ,       0                       AS quotation_amount
             ,       0                       AS ordered_turnover
             ,       0                       AS recorded_turnover
@@ -294,8 +311,11 @@ class OFCRMFunnelConversion4(models.Model):
                     END                                             AS quotation_nb
             ,       0                                               AS previous_quotation_nb
             ,       0                                               AS order_nb
+            ,       0                                               AS presale_order_nb
             ,       0                                               AS previous_order_nb
             ,       0                                               AS lost_quotation_nb
+            ,       0                                               AS of_custom_confirmation_delta
+            ,       0                                               AS of_confirmation_delta
             ,       SO.amount_untaxed                               AS quotation_amount
             ,       0                                               AS ordered_turnover
             ,       0                                               AS recorded_turnover
@@ -340,8 +360,11 @@ class OFCRMFunnelConversion4(models.Model):
                         ELSE
                             -1
                     END                                             AS order_nb
+            ,       0                                               AS presale_order_nb
             ,       0                                               AS previous_order_nb
             ,       0                                               AS lost_quotation_nb
+            ,       0                                               AS of_custom_confirmation_delta
+            ,       0                                               AS of_confirmation_delta
             ,       0                                               AS quotation_amount
             ,       0                                               AS ordered_turnover
             ,       0                                               AS recorded_turnover
@@ -370,32 +393,40 @@ class OFCRMFunnelConversion4(models.Model):
 
     def _sub_select_presale_order(self):
         sub_select_presale_order_str = """
-            SELECT  30000000 + SO3.id               AS id
-            ,       SO3.of_custom_confirmation_date AS date
-            ,       SO3.of_sale_type_id             AS sale_type_id
-            ,       SO3.of_canvasser_id             AS canvasser_id
-            ,       SO3.company_id                  AS company_id
-            ,       SO3.user_id                     AS vendor_id
-            ,       SO3.project_id                  AS project_id
-            ,       SO3.partner_id                  AS partner_id
-            ,       0                               AS opportunity_nb
-            ,       0                               AS previous_opportunity_nb
-            ,       0                               AS quotation_nb
-            ,       0                               AS previous_quotation_nb
-            ,       0                               AS order_nb
-            ,       0                               AS previous_order_nb
-            ,       0                               AS lost_quotation_nb
-            ,       0                               AS quotation_amount
-            ,       SO3.amount_untaxed              AS ordered_turnover
-            ,       0                               AS recorded_turnover
-            ,       0                               AS recorded_turnover2
-            ,       0                               AS lost_turnover
-            ,       SO3.margin                      AS ordered_margin
-            ,       0                               AS recorded_margin
-            ,       0                               AS recorded_margin2
-            ,       0                               AS budget_turnover_objective
-            ,       0                               AS ordered_turnover_objective
-            ,       0                               AS previous_recorded_turnover
+            SELECT  30000000 + SO3.id                       AS id
+            ,       SO3.of_custom_confirmation_date         AS date
+            ,       SO3.of_sale_type_id                     AS sale_type_id
+            ,       SO3.of_canvasser_id                     AS canvasser_id
+            ,       SO3.company_id                          AS company_id
+            ,       SO3.user_id                             AS vendor_id
+            ,       SO3.project_id                          AS project_id
+            ,       SO3.partner_id                          AS partner_id
+            ,       0                                       AS opportunity_nb
+            ,       0                                       AS previous_opportunity_nb
+            ,       0                                       AS quotation_nb
+            ,       0                                       AS previous_quotation_nb
+            ,       0                                       AS order_nb
+            ,       CASE
+                        WHEN SO3.of_cancelled_order_id IS NULL THEN
+                            1
+                        ELSE
+                            -1
+                    END                                     AS presale_order_nb
+            ,       0                                       AS previous_order_nb
+            ,       0                                       AS lost_quotation_nb
+            ,       SO3.of_custom_confirmation_delta        AS of_custom_confirmation_delta
+            ,       0                                       AS of_confirmation_delta
+            ,       0                                       AS quotation_amount
+            ,       SO3.amount_untaxed                      AS ordered_turnover
+            ,       0                                       AS recorded_turnover
+            ,       0                                       AS recorded_turnover2
+            ,       0                                       AS lost_turnover
+            ,       SO3.margin                              AS ordered_margin
+            ,       0                                       AS recorded_margin
+            ,       0                                       AS recorded_margin2
+            ,       0                                       AS budget_turnover_objective
+            ,       0                                       AS ordered_turnover_objective
+            ,       0                                       AS previous_recorded_turnover
         """
         return sub_select_presale_order_str
 
@@ -426,8 +457,11 @@ class OFCRMFunnelConversion4(models.Model):
             ,       0                       AS quotation_nb
             ,       0                       AS previous_quotation_nb
             ,       0                       AS order_nb
+            ,       0                       AS presale_order_nb
             ,       0                       AS previous_order_nb
             ,       0                       AS lost_quotation_nb
+            ,       0                       AS of_custom_confirmation_delta
+            ,       0                       AS of_confirmation_delta
             ,       0                       AS quotation_amount
             ,       0                       AS ordered_turnover
             ,       SO4.amount_untaxed      AS recorded_turnover
@@ -469,8 +503,11 @@ class OFCRMFunnelConversion4(models.Model):
             ,       0                   AS quotation_nb
             ,       0                   AS previous_quotation_nb
             ,       0                   AS order_nb
+            ,       0                   AS presale_order_nb
             ,       0                   AS previous_order_nb
             ,       1                   AS lost_quotation_nb
+            ,       0                   AS of_custom_confirmation_delta
+            ,       0                   AS of_confirmation_delta
             ,       0                   AS quotation_amount
             ,       0                   AS ordered_turnover
             ,       0                   AS recorded_turnover
@@ -517,8 +554,11 @@ class OFCRMFunnelConversion4(models.Model):
             ,       0                                           AS quotation_nb
             ,       0                                           AS previous_quotation_nb
             ,       0                                           AS order_nb
+            ,       0                                           AS presale_order_nb
             ,       0                                           AS previous_order_nb
             ,       0                                           AS lost_quotation_nb
+            ,       0                                           AS of_custom_confirmation_delta
+            ,       0                                           AS of_confirmation_delta
             ,       0                                           AS quotation_amount
             ,       0                                           AS ordered_turnover
             ,       0                                           AS recorded_turnover
@@ -552,32 +592,35 @@ class OFCRMFunnelConversion4(models.Model):
 
     def _sub_select_sale_order2(self):
         sub_select_sale_order2_str = """
-            SELECT  70000000 + SO6.id               AS id
-            ,       SO6.of_custom_confirmation_date AS date
-            ,       SO6.of_sale_type_id             AS sale_type_id
-            ,       SO6.of_canvasser_id             AS canvasser_id
-            ,       SO6.company_id                  AS company_id
-            ,       SO6.user_id                     AS vendor_id
-            ,       SO6.project_id                  AS project_id
-            ,       SO6.partner_id                  AS partner_id
-            ,       0                               AS opportunity_nb
-            ,       0                               AS previous_opportunity_nb
-            ,       0                               AS quotation_nb
-            ,       0                               AS previous_quotation_nb
-            ,       0                               AS order_nb
-            ,       0                               AS previous_order_nb
-            ,       0                               AS lost_quotation_nb
-            ,       0                               AS quotation_amount
-            ,       0                               AS ordered_turnover
-            ,       0                               AS recorded_turnover
-            ,       SO6.amount_untaxed              AS recorded_turnover2
-            ,       0                               AS lost_turnover
-            ,       0                               AS ordered_margin
-            ,       0                               AS recorded_margin
-            ,       SO6.margin                      AS recorded_margin2
-            ,       0                               AS budget_turnover_objective
-            ,       0                               AS ordered_turnover_objective
-            ,       0                               AS previous_recorded_turnover
+            SELECT  70000000 + SO6.id                       AS id
+            ,       SO6.of_custom_confirmation_date         AS date
+            ,       SO6.of_sale_type_id                     AS sale_type_id
+            ,       SO6.of_canvasser_id                     AS canvasser_id
+            ,       SO6.company_id                          AS company_id
+            ,       SO6.user_id                             AS vendor_id
+            ,       SO6.project_id                          AS project_id
+            ,       SO6.partner_id                          AS partner_id
+            ,       0                                       AS opportunity_nb
+            ,       0                                       AS previous_opportunity_nb
+            ,       0                                       AS quotation_nb
+            ,       0                                       AS previous_quotation_nb
+            ,       0                                       AS order_nb
+            ,       0                                       AS presale_order_nb
+            ,       0                                       AS previous_order_nb
+            ,       0                                       AS lost_quotation_nb
+            ,       SO6.of_custom_confirmation_delta        AS of_custom_confirmation_delta
+            ,       SO6.of_confirmation_delta               AS of_confirmation_delta
+            ,       0                                       AS quotation_amount
+            ,       0                                       AS ordered_turnover
+            ,       0                                       AS recorded_turnover
+            ,       SO6.amount_untaxed                      AS recorded_turnover2
+            ,       0                                       AS lost_turnover
+            ,       0                                       AS ordered_margin
+            ,       0                                       AS recorded_margin
+            ,       SO6.margin                              AS recorded_margin2
+            ,       0                                       AS budget_turnover_objective
+            ,       0                                       AS ordered_turnover_objective
+            ,       0                                       AS previous_recorded_turnover
         """
         return sub_select_sale_order2_str
 
@@ -611,8 +654,11 @@ class OFCRMFunnelConversion4(models.Model):
             ,       0                       AS quotation_nb
             ,       0                       AS previous_quotation_nb
             ,       0                       AS order_nb
+            ,       0                       AS presale_order_nb
             ,       0                       AS previous_order_nb
             ,       0                       AS lost_quotation_nb
+            ,       0                       AS of_custom_confirmation_delta
+            ,       0                       AS of_confirmation_delta
             ,       0                       AS quotation_amount
             ,       0                       AS ordered_turnover
             ,       0                       AS recorded_turnover
@@ -660,8 +706,11 @@ class OFCRMFunnelConversion4(models.Model):
                             -1
                     END                                             AS previous_quotation_nb
             ,       0                                               AS order_nb
+            ,       0                                               AS presale_order_nb
             ,       0                                               AS previous_order_nb
             ,       0                                               AS lost_quotation_nb
+            ,       0                                               AS of_custom_confirmation_delta
+            ,       0                                               AS of_confirmation_delta
             ,       0                                               AS quotation_amount
             ,       0                                               AS ordered_turnover
             ,       0                                               AS recorded_turnover
@@ -704,8 +753,11 @@ class OFCRMFunnelConversion4(models.Model):
             ,       0                   AS quotation_nb
             ,       0                   AS previous_quotation_nb
             ,       0                   AS order_nb
+            ,       0                   AS presale_order_nb
             ,       1                   AS previous_order_nb
             ,       0                   AS lost_quotation_nb
+            ,       0                   AS of_custom_confirmation_delta
+            ,       0                   AS of_confirmation_delta
             ,       0                   AS quotation_amount
             ,       0                   AS ordered_turnover
             ,       0                   AS recorded_turnover
@@ -810,6 +862,22 @@ class OFCRMFunnelConversion4(models.Model):
                 rec.lost_cart = "N/E"
 
     @api.multi
+    def _compute_avg_custom_confirmation_delta(self):
+        for rec in self:
+            if rec.order_nb != 0:
+                rec.avg_custom_confirmation_delta = '%.0f' % (rec.custom_confirmation_delta / rec.order_nb)
+            else:
+                rec.avg_custom_confirmation_delta = "N/E"
+
+    @api.multi
+    def _compute_avg_confirmation_delta(self):
+        for rec in self:
+            if (rec.order_nb - rec.presale_order_nb) != 0:
+                rec.avg_confirmation_delta = '%.0f' % (rec.confirmation_delta / (rec.order_nb - rec.presale_order_nb))
+            else:
+                rec.avg_confirmation_delta = "N/E"
+
+    @api.multi
     def _compute_ordered_margin_percent(self):
         for rec in self:
             if rec.ordered_turnover != 0:
@@ -861,12 +929,18 @@ class OFCRMFunnelConversion4(models.Model):
             fields_copy.append('opportunity_nb')
         if 'order_nb' not in fields_copy:
             fields_copy.append('order_nb')
+        if 'presale_order_nb' not in fields_copy:
+            fields_copy.append('presale_order_nb')
         if 'total_turnover' not in fields_copy:
             fields_copy.append('total_turnover')
         if 'lost_turnover' not in fields_copy:
             fields_copy.append('lost_turnover')
         if 'lost_quotation_nb' not in fields_copy:
             fields_copy.append('lost_quotation_nb')
+        if 'of_custom_confirmation_delta' not in fields_copy:
+            fields_copy.append('of_custom_confirmation_delta')
+        if 'of_confirmation_delta' not in fields_copy:
+            fields_copy.append('of_confirmation_delta')
         if 'ordered_turnover' not in fields_copy:
             fields_copy.append('ordered_turnover')
         if 'ordered_margin' not in fields_copy:
@@ -923,6 +997,20 @@ class OFCRMFunnelConversion4(models.Model):
                         replace('.', ',')
                 else:
                     line['lost_cart'] = "N/E"
+            if 'avg_custom_confirmation_delta' in fields_copy:
+                if 'custom_confirmation_delta' in line and line['custom_confirmation_delta'] is not None and \
+                        line.get('order_nb', False):
+                    line['avg_custom_confirmation_delta'] = ('%.1f' % (
+                        round(line['custom_confirmation_delta'] / line['order_nb'], 2))).replace('.', ',')
+                else:
+                    line['avg_custom_confirmation_delta'] = "N/E"
+            if 'avg_confirmation_delta' in fields_copy:
+                if 'confirmation_delta' in line and line['confirmation_delta'] is not None and (
+                        line.get('order_nb', 0) - line.get('presale_order_nb', 0) != 0):
+                    line['avg_confirmation_delta'] = ('%.1f' % (round(line['confirmation_delta'] / (
+                            line['order_nb'] - line['presale_order_nb']), 2))).replace('.', ',')
+                else:
+                    line['avg_confirmation_delta'] = "N/E"
             if 'ordered_margin_percent' in fields_copy:
                 if 'ordered_turnover' in line and line['ordered_turnover'] is not None and \
                         'ordered_margin' in line and line['ordered_margin'] is not None and \
