@@ -110,7 +110,7 @@
                         <h4 class="of-settings">Product configuration</h4>
                     </group>
                     <group name="field_parameters">
-                        <field name="of_deposit_product_categ_id_setting" class="oe_inline"/>
+                        <field name="of_deposit_product_categ_id_setting" class="oe_inline" groups="of_base.of_group_root_only"/>
                     </group>
                 </group>
 
