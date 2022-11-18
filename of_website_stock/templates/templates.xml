@@ -1,226 +1,225 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-	<!--	/shop/product	-->
+    <!--    /shop/product    -->
 
-	<template id="display_stock_qty_message" name="Display Stock Qty Message">
-		<t t-if="product.availability not in ['in_stock','warning']">
-			<t t-if="product_quantity &gt; 0">
-				<div class="qty-text">
-					<t t-esc="product_quantity"/> <t t-esc="product.sudo().uom_id.name"/> left.
-				</div>
-				<div class="alert alert-success">
-					<span class="fa fa-check in-stock"/>
-					<span>In Stock</span>
-				</div>
-			</t>
+    <template id="display_stock_qty_message" name="Display Stock Qty Message">
+        <t t-if="product.availability not in ['in_stock','warning']">
+            <t t-if="product_quantity &gt; 0">
+                <div class="qty-text">
+                    <t t-esc="product_quantity"/> <t t-esc="product.sudo().uom_id.name"/> left.
+                </div>
+                <div class="alert alert-success">
+                    <span class="fa fa-check in-stock"/>
+                    <span>In Stock</span>
+                </div>
+            </t>
 
-			<t t-if="not product_quantity &gt; 0">
-				<div class="alert alert-danger out-of-stock">
-					<span class="fa fa-warning" />
-					<span>Out of Stock</span><span t-if="website.get_of_unavailability_management() == 'delay'">, the delivery time will be extended.</span>
-				</div>
-			</t>
-			<form class="js_notify_form" method="POST">
-				<div class="oe_snippet_body input-group js_notify"
-					 data-list-id="0" t-att-id="product.product_tmpl_id.id">
-					<input type="hidden" name="notify" t-att-value="'1' if website.get_of_unavailability_management() == 'notify' else '0'"/>
-					<input
-							type="email"
-							name="email"
-							class="js_notify_email form-control"
-							placeholder="Enter your e-mail..."/>
-					<span class="input-group-btn">
-						<a href="#" class="btn btn-primary js_notify_btn">Notify</a>
-						<a href="#" class="btn btn-success js_subscribed_btn hidden" disabled="disabled">Thanks</a>
-					</span>
-					<div class="alert alert-success success-message hidden">Thank you for your interest! You will be notified by mail when the product is available.</div>
+            <t t-if="not product_quantity &gt; 0">
+                <div class="alert alert-danger out-of-stock">
+                    <span class="fa fa-warning" />
+                    <span>Out of Stock</span><span t-if="website.get_of_unavailability_management() == 'delay'">, the delivery time will be extended.</span>
+                </div>
+            </t>
+            <form class="js_notify_form" method="POST">
+                <div class="oe_snippet_body input-group js_notify"
+                     data-list-id="0" t-att-id="product.product_tmpl_id.id">
+                    <input type="hidden" name="notify" t-att-value="'1' if website.get_of_unavailability_management() == 'notify' and product.availability is False else '0'"/>
+                    <input
+                            type="email"
+                            name="email"
+                            class="js_notify_email form-control"
+                            placeholder="Enter your e-mail..."/>
+                    <span class="input-group-btn">
+                        <a href="#" class="btn btn-primary js_notify_btn">Notify</a>
+                        <a href="#" class="btn btn-success js_subscribed_btn hidden" disabled="disabled">Thanks</a>
+                    </span>
+                    <div class="alert alert-success success-message hidden">Thank you for your interest! You will be notified by mail when the product is available.</div>
 
-				</div>
-				<div class="alert alert-danger danger-message hidden" style="margin-top: 10px;">Enter Valid Email Address</div>
-			</form>
-		</t>
-	</template>
+                </div>
+                <div class="alert alert-danger danger-message hidden" style="margin-top: 10px;">Enter Valid Email Address</div>
+            </form>
+        </t>
+    </template>
 
-	<template id="show_stock_qty_message" name="Show Stock Qty Message">
-		<t t-foreach="product.product_variant_ids" t-as="product">
-			<t t-if="website.get_website_config() == 'on_hand'">
-				<t t-set="product_quantity" t-value="product.sudo().qty_available"/>
-			</t>
-			<t t-if="website.get_website_config() == 'forecast'">
-				<t t-set="product_quantity" t-value="product.sudo().qty_available - product.sudo().outgoing_qty + product.sudo().incoming_qty"/>
-			</t>
-			<div class="show_hide_stock_change" t-att-id="'%s' % product.id" t-att-value="'%s' % product_quantity">
-				<t t-call="of_website_stock.display_stock_qty_message"/>
-			</div>
-		</t>
-	</template>
+    <template id="show_stock_qty_message" name="Show Stock Qty Message">
+        <t t-foreach="product.product_variant_ids" t-as="product">
+            <t t-if="website.get_website_config() == 'on_hand'">
+                <t t-set="product_quantity" t-value="product.sudo().qty_available"/>
+            </t>
+            <t t-if="website.get_website_config() == 'forecast'">
+                <t t-set="product_quantity" t-value="product.sudo().qty_available - product.sudo().outgoing_qty + product.sudo().incoming_qty"/>
+            </t>
+            <div class="show_hide_stock_change" t-att-id="'%s' % product.id" t-att-value="'%s' % product_quantity">
+                <t t-call="of_website_stock.display_stock_qty_message"/>
+            </div>
+        </t>
+    </template>
 
-	<template id="product_qty_in_single_product_page" inherit_id="website_sale.product" active="True" customize_show="True" name="Show Stock Qty 1">
-		<xpath expr="//div[@id='product_details']" position="inside">
-			<t t-if="website.get_website_config() != 'none' and product.availability != 'empty'">
-				<t t-call="of_website_stock.show_stock_qty_message"/>
-			</t>
-		</xpath>
-	</template>
+    <template id="product_qty_in_single_product_page" inherit_id="website_sale.product" active="True" customize_show="True" name="Show Stock Qty 1">
+        <xpath expr="//div[@id='product_details']" position="inside">
+            <t t-if="website.get_website_config() != 'none' and product.availability != 'empty'">
+                <t t-call="of_website_stock.show_stock_qty_message"/>
+            </t>
+        </xpath>
+    </template>
 
+    <!--    /shop    -->
 
-	<!--	/shop	-->
+    <template id="display_stock_qty_message_in_item" name="Display Stock Qty Message">
+        <t t-if="product.availability not in ['in_stock','warning']">
+            <t t-if="website.get_website_config() == 'on_hand'">
+                <t t-set="product_quantity" t-value="product.qty_available"/>
+            </t>
+            <t t-if="website.get_website_config() == 'forecast'">
+                <t t-set="product_quantity" t-value="product.qty_available - product.outgoing_qty + product.incoming_qty"/>
+            </t>
+            <t t-if="product_quantity &gt; 0">
+                <span class="label label-primary">In Stock</span>
+            </t>
+            <t t-if="not product_quantity &gt; 0">
+                <span class="label label-danger">Out of Stock</span>
+            </t>
+        </t>
+        <t t-if="product.availability == 'in_stock'">
+            <span class="label label-primary">
+                <span>In Stock</span>
+            </span>
+        </t>
+        <t t-if="product.availability == 'warning'">
+            <span class="label label-warning">
+                <span t-field="product.availability_warning" />
+            </span>
+        </t>
+    </template>
 
-	<template id="display_stock_qty_message_in_item" name="Display Stock Qty Message">
-		<t t-if="product.availability not in ['in_stock','warning']">
-			<t t-if="website.get_website_config() == 'on_hand'">
-				<t t-set="product_quantity" t-value="product.qty_available"/>
-			</t>
-			<t t-if="website.get_website_config() == 'forecast'">
-				<t t-set="product_quantity" t-value="product.qty_available - product.outgoing_qty + product.incoming_qty"/>
-			</t>
-			<t t-if="product_quantity &gt; 0">
-				<span class="label label-primary">In Stock</span>
-			</t>
-			<t t-if="not product_quantity &gt; 0">
-				<span class="label label-danger">Out of Stock</span>
-			</t>
-		</t>
-		<t t-if="product.availability == 'in_stock'">
-			<span class="label label-primary">
-				<span>In Stock</span>
-			</span>
-		</t>
-		<t t-if="product.availability == 'warning'">
-			<span class="label label-warning">
-				<span t-field="product.availability_warning" />
-			</span>
-		</t>
-	</template>
+    <template id="product_qty_in_products_item_page" inherit_id="website_sale.products_item" active="True" customize_show="True" name="Show Stock Qty 2">
 
-	<template id="product_qty_in_products_item_page" inherit_id="website_sale.products_item" active="True" customize_show="True" name="Show Stock Qty 2">
+        <xpath expr="//form" position="inside">
+            <t t-if="website.get_website_config() != 'none' and product.availability != 'empty'">
+                <div class="stock-qty-message pull-right mt8 mr8">
+                    <t t-call="of_website_stock.display_stock_qty_message_in_item"/>
+                </div>
+            </t>
+        </xpath>
 
-		<xpath expr="//form" position="inside">
-			<t t-if="website.get_website_config() != 'none' and product.availability != 'empty'">
-				<div class="stock-qty-message pull-right mt8 mr8">
-					<t t-call="of_website_stock.display_stock_qty_message_in_item"/>
-				</div>
-			</t>
-		</xpath>
+        <xpath expr="//section//div//b" position="after">
+            <t t-if="website.get_website_config() != 'none' and product.availability != 'empty'">
+                <t t-if="product.availability not in ['in_stock','warning']">
+                    <t t-if="website.get_website_config() == 'on_hand'">
+                        <t t-set="product_quantity" t-value="product.qty_available"/>
+                    </t>
+                    <t t-if="website.get_website_config() == 'forecast'">
+                        <t t-set="product_quantity" t-value="product.qty_available - product.outgoing_qty + product.incoming_qty"/>
+                    </t>
+                    <t t-if="product_quantity &gt; 0">
+                        <span class="qty-text">
+                            <t t-esc="product_quantity"/> <t t-esc="product.sudo().uom_id.name"/> left.
+                        </span>
+                    </t>
+                </t>
+            </t>
+        </xpath>
 
-		<xpath expr="//section//div//b" position="after">
-			<t t-if="website.get_website_config() != 'none' and product.availability != 'empty'">
-				<t t-if="product.availability not in ['in_stock','warning']">
-					<t t-if="website.get_website_config() == 'on_hand'">
-						<t t-set="product_quantity" t-value="product.qty_available"/>
-					</t>
-					<t t-if="website.get_website_config() == 'forecast'">
-						<t t-set="product_quantity" t-value="product.qty_available - product.outgoing_qty + product.incoming_qty"/>
-					</t>
-					<t t-if="product_quantity &gt; 0">
-						<span class="qty-text">
-							<t t-esc="product_quantity"/> <t t-esc="product.sudo().uom_id.name"/> left.
-						</span>
-					</t>
-				</t>
-			</t>
-		</xpath>
+        <xpath expr="//div[@itemscope='itemscope']" position="attributes">
+            <attribute name="t-att-data-publish">'off' if product.product_variant_ids and not (product.sudo().qty_available - product.sudo().outgoing_qty + product.sudo().incoming_qty) &gt; 0 else 'on'</attribute>
+        </xpath>
 
-		<xpath expr="//div[@itemscope='itemscope']" position="attributes">
-			<attribute name="t-att-data-publish">'off' if product.product_variant_ids and not (product.sudo().qty_available - product.sudo().outgoing_qty + product.sudo().incoming_qty) &gt; 0 else 'on'</attribute>
-		</xpath>
+    </template>
 
-	</template>
+    <!--    /shop/cart    -->
 
-	<!--	/shop/cart	-->
+    <template id="cart_lines_inherit" inherit_id="website_sale.cart_lines"  name="Shopping Cart">
+        <xpath expr="//*[@id='td-qty']" position='replace'>
+            <td class="text-center" id="td-qty">
+                <div class="input-group oe_website_spinner">
+                    <a t-attf-href="#" class="mb8 input-group-addon js_add_cart_json" data-no-instant="">
+                        <i class="fa fa-minus"></i>
+                    </a>
 
-	<template id="cart_lines_inherit" inherit_id="website_sale.cart_lines"  name="Shopping Cart">
-		<xpath expr="//*[@id='td-qty']" position='replace'>
-			<td class="text-center" id="td-qty">
-				<div class="input-group oe_website_spinner">
-					<a t-attf-href="#" class="mb8 input-group-addon js_add_cart_json" data-no-instant="">
-						<i class="fa fa-minus"></i>
-					</a>
+                    <t t-if="website.get_website_config() == 'none'">
+                        <input type="text" class="js_quantity form-control quantity"
+                               t-att-data-line-id="line.id"
+                               t-att-data-product-id="line.product_id.id"
+                               t-att-value="int(line.product_uom_qty) == line.product_uom_qty and int(line.product_uom_qty) or line.product_uom_qty" />
+                    </t>
 
-					<t t-if="website.get_website_config() == 'none'">
-						<input type="text" class="js_quantity form-control quantity"
-							   t-att-data-line-id="line.id"
-							   t-att-data-product-id="line.product_id.id"
-							   t-att-value="int(line.product_uom_qty) == line.product_uom_qty and int(line.product_uom_qty) or line.product_uom_qty" />
-					</t>
+                    <t t-if="not website.get_website_config() == 'none'">
+                        <t t-if="website.get_website_config() == 'on_hand'">
+                            <t t-set="product_quantity" t-value="line.product_id.qty_available"/>
+                        </t>
+                        <t t-if="website.get_website_config() == 'forecast'">
+                            <t t-set="product_quantity" t-value="line.product_id.qty_available - line.product_id.outgoing_qty + line.product_id.incoming_qty"/>
+                        </t>
+                        <input type="text" class="js_quantity form-control"
+                               t-att-data-line-id="line.id"
+                               t-att-data-product-id="line.product_id.id"
+                               t-att-data-qty="int(product_quantity) if website.get_of_unavailability_management() == 'notify' and line.product_id.availability is False else 'None'"
+                               t-att-value="int(line.product_uom_qty)"/>
+                    </t>
 
-					<t t-if="not website.get_website_config() == 'none'">
-						<t t-if="website.get_website_config() == 'on_hand'">
-							<t t-set="product_quantity" t-value="line.product_id.qty_available"/>
-						</t>
-						<t t-if="website.get_website_config() == 'forecast'">
-							<t t-set="product_quantity" t-value="line.product_id.qty_available - line.product_id.outgoing_qty + line.product_id.incoming_qty"/>
-						</t>
-						<input type="text" class="js_quantity form-control"
-							   t-att-data-line-id="line.id"
-							   t-att-data-product-id="line.product_id.id"
-							   t-att-data-qty="int(product_quantity) if website.get_of_unavailability_management() == 'notify' else 'None'"
-							   t-att-value="int(line.product_uom_qty)"/>
-					</t>
+                    <a t-attf-href="#" class="mb8 input-group-addon float_left js_add_cart_json" data-no-instant="">
+                        <i class="fa fa-plus"></i>
+                    </a>
+                </div>
+            </td>
+        </xpath>
+    </template>
 
-					<a t-attf-href="#" class="mb8 input-group-addon float_left js_add_cart_json" data-no-instant="">
-						<i class="fa fa-plus"></i>
-					</a>
-				</div>
-			</td>
-		</xpath>
-	</template>
+    <!--    /shop/payment    -->
 
-	<!--	/shop/payment	-->
+    <template id="of_payment" inherit_id="website_sale.payment"  name="(OF) Payment">
+        <xpath expr="//*[@id='cart_products']/thead/tr" position='inside'>
+            <t t-if="website.get_of_delivery_management()">
+                <th class="text-right">Delay</th>
+                <th class="text-right">Delivery Delay</th>
+            </t>
+        </xpath>
+        <xpath expr="//*[@id='cart_products']/tbody/tr" position='inside'>
+            <t t-if="website.get_of_delivery_management()">
+                <td class="text-right">
+                    <span t-esc="line.get_days_of_delay()"/> <span>days</span>
+                </td>
+                <td class="text-right">
+                    <span t-esc="line.get_delivery_date().strftime('%d/%m/%Y') or ''"/>
+                </td>
+            </t>
+        </xpath>
+        <xpath expr="//*[@id='payment_method']/../*[1]" position='before'>
+            <div class="container" t-if="website.get_of_delivery_management()">
+                <div class="row">
+                    <div class='col-sm-6'>
+                        <h4>Choose your Delivery Date</h4>
+                        <div class="form-group">
+                            <div class='input-group date' id='datetimepicker'>
+                                <input name="requested_date" type='text' class="form-control" autocomplete="off"/>
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <script type="text/javascript">
+                        $(function () {
 
-	<template id="of_payment" inherit_id="website_sale.payment"  name="(OF) Payment">
-		<xpath expr="//*[@id='cart_products']/thead/tr" position='inside'>
-			<t t-if="website.get_of_delivery_management()">
-				<th class="text-right">Delay</th>
-				<th class="text-right">Delivery Delay</th>
-			</t>
-		</xpath>
-		<xpath expr="//*[@id='cart_products']/tbody/tr" position='inside'>
-			<t t-if="website.get_of_delivery_management()">
-				<td class="text-right">
-					<span t-esc="line.get_days_of_delay()"/> <span>days</span>
-				</td>
-				<td class="text-right">
-					<span t-esc="line.get_delivery_date().strftime('%d/%m/%Y') or ''"/>
-				</td>
-			</t>
-		</xpath>
-		<xpath expr="//*[@id='payment_method']/../*[1]" position='before'>
-			<div class="container" t-if="website.get_of_delivery_management()">
-				<div class="row">
-					<div class='col-sm-6'>
-						<h4>Choose your Delivery Date</h4>
-						<div class="form-group">
-							<div class='input-group date' id='datetimepicker'>
-								<input name="requested_date" type='text' class="form-control" autocomplete="off"/>
-								<span class="input-group-addon">
-									<span class="glyphicon glyphicon-calendar"></span>
-								</span>
-							</div>
-						</div>
-					</div>
-					<script type="text/javascript">
-						$(function () {
+                        var $pay_button = $('.oe_sale_acquirer_button button');
+                        $pay_button.prop('disabled', false);
 
-						var $pay_button = $('.oe_sale_acquirer_button button');
-						$pay_button.prop('disabled', false);
-
-						$('#datetimepicker').datetimepicker({
-						format: 'DD/MM/YYYY',
-						defaultDate: "<t t-esc="website_sale_order.requested_date if website_sale_order.requested_date else website_sale_order.of_website_commitment_date" t-options="{'widget': 'date'}"/>",
-						minDate: "<t t-esc="website_sale_order.of_website_commitment_date" t-options="{'widget': 'date'}"/>",
-						pickTime: false,
-						}).on('dp.change', function () {
-						$pay_button.prop('disabled', true);
-						var requested_date = $(this).find("input[name='requested_date']").val();
-						window.location.href = '/shop/payment?requested_date=' + requested_date;
-						});
-						});
-					</script>
-				</div>
-			</div>
-		</xpath>
-	</template>
+                        $('#datetimepicker').datetimepicker({
+                        format: 'DD/MM/YYYY',
+                        defaultDate: "<t t-esc="website_sale_order.requested_date if website_sale_order.requested_date else website_sale_order.of_website_commitment_date" t-options="{'widget': 'date'}"/>",
+                        minDate: "<t t-esc="website_sale_order.of_website_commitment_date" t-options="{'widget': 'date'}"/>",
+                        pickTime: false,
+                        }).on('dp.change', function () {
+                        $pay_button.prop('disabled', true);
+                        var requested_date = $(this).find("input[name='requested_date']").val();
+                        window.location.href = '/shop/payment?requested_date=' + requested_date;
+                        });
+                        });
+                    </script>
+                </div>
+            </div>
+        </xpath>
+    </template>
 
 </odoo>
