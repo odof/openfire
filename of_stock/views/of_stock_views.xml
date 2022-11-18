@@ -142,6 +142,9 @@
         <field name="model">stock.move</field>
         <field name="inherit_id" ref="stock.view_move_picking_tree"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="before">
+                <field name="sequence" widget="handle"/>
+            </xpath>
             <xpath expr="//field[@name='product_uom_qty']" position="after">
                 <field name="of_reserved_qty"/>
                 <field name="of_available_qty"/>
@@ -157,6 +160,17 @@
                        attrs="{'readonly': [('origin', '!=', False)]}" groups="of_stock.group_of_bon_transfert_valorise"/>
                 <field name="of_amount_untaxed" groups="of_stock.group_of_bon_transfert_valorise"
                        widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="stock_move_view_form" model="ir.ui.view">
+        <field name="name">stock.move.view.form</field>
+        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="stock.view_move_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='location_dest_id']" position="after">
+                <field name="sequence"/>
             </xpath>
         </field>
     </record>
