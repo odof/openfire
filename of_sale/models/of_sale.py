@@ -89,6 +89,18 @@ class SaleOrder(models.Model):
     def pdf_of_pdf_taxes_display(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'of_pdf_taxes_display')
 
+    def pdf_vendor_signature(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_vendor_signature')
+
+    def pdf_prefill_vendor_signature(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_prefill_vendor_signature')
+
+    def pdf_customer_signature(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_customer_signature')
+
+    def pdf_signature_text(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_signature_text')
+
     def get_color_section(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'of_color_bg_section')
 

@@ -91,6 +91,22 @@ class OFSaleWizardSetPrintingParams(models.TransientModel):
     )
     of_pdf_taxes_display = fields.Boolean(
         string="(OF) Tax details", help="Show tax detail table in PDF reports")
+    # Signatures
+    pdf_signatures = fields.Boolean(
+        string="(OF) Signatures", default=False,
+        help=u"Permet d’afficher les encarts de signature dans les rapports PDF")
+    pdf_customer_signature = fields.Boolean(
+        string="(OF) Signature client", default=False,
+        help="Permet d’afficher l’encart de signature client tout en bas du devis à droite")
+    pdf_vendor_signature = fields.Boolean(
+        string="(OF) Signature vendeur", default=False,
+        help="Permet d’afficher l’encart de signature client tout en bas du devis à gauche")
+    pdf_prefill_vendor_signature = fields.Boolean(
+        string=u"(OF) Signature vendeur prérempli", default=False,
+        help=u"Active la possibilité de charger une image de signature dans l’utilisateur")
+    pdf_signature_text = fields.Char(
+        string="(OF) Mention de signature", default=False,
+        help="Permet d’ajouter un commentaire  un commentaire de signature")
 
     @api.model
     def default_get(self, fields_list):
@@ -193,7 +209,47 @@ class OFSaleWizardSetPrintingParams(models.TransientModel):
             'sale.config.settings', 'of_pdf_taxes_display', self.of_pdf_taxes_display)
 
     @api.multi
+    def set_pdf_signatures(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_signatures', self.pdf_signatures)
+
+    @api.multi
+    def set_pdf_customer_signature(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_customer_signature', self.pdf_customer_signature)
+
+    @api.multi
+    def set_pdf_vendor_signature(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_vendor_signature', self.pdf_vendor_signature)
+
+    @api.multi
+    def set_pdf_prefill_vendor_signature(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_prefill_vendor_signature', self.pdf_prefill_vendor_signature)
+    @api.multi
+    def set_pdf_signature_text(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_signature_text', self.pdf_signature_text)
+
+    @api.onchange('pdf_signatures')
+    def _onchange_pdf_signatures(self):
+        self.pdf_customer_signature = self.pdf_signatures
+        self.pdf_vendor_signature = self.pdf_signatures
+
+    @api.onchange('pdf_vendor_signature')
+    def _onchange_pdf_vendor_signature(self):
+        if not self.pdf_vendor_signature:
+            self.pdf_prefill_vendor_signature = False
+
+    @api.multi
     def action_validate(self):
         for method in dir(self):
             if method.startswith('set_'):
                 getattr(self, method)()
+        group_user = self.env.ref('base.group_user')
+        group_prefill_signature = self.env.ref('of_sale.group_of_pdf_prefill_vendor_signature')
+        if self.pdf_prefill_vendor_signature:
+            group_prefill_signature.users = [(6, 0, group_user.users.ids)]
+        else:
+            group_prefill_signature.users = [(5,)]

@@ -19,7 +19,7 @@
                         </group>
                     </group>
                     <group col="2">
-                       <group col="2" colspan="2" name="labels">
+                        <group col="2" colspan="2" name="labels">
                             <h4 class="of-settings" colspan="2">Labels</h4>
                             <label for="pdf_masquer_pastille_payment_term"/>
                             <div name="pdf_masquer_pastille_payment_term">
@@ -60,6 +60,28 @@
                             <label for="of_pdf_taxes_display" string="Tax detail" class="of-settings"/>
                             <div name="of_pdf_taxes_display">
                                 <field name="of_pdf_taxes_display" class="oe_inline"/>
+                            </div>
+                        </group>
+                        <group col="2" colspan="2" name="signatures">
+                            <label for="pdf_signatures" class="of-settings"/>
+                            <div name="pdf_signatures">
+                                <field name="pdf_signatures" class="oe_inline"/>
+                            </div>
+                            <label for="pdf_customer_signature"/>
+                            <div name="pdf_customer_signature">
+                                <field name="pdf_customer_signature" class="oe_inline"/>
+                            </div>
+                            <label for="pdf_vendor_signature"/>
+                            <div name="pdf_vendor_signature">
+                                <field name="pdf_vendor_signature" class="oe_inline"/>
+                            </div>
+                            <label for="pdf_prefill_vendor_signature" attrs="{'invisible': [('pdf_vendor_signature', '=', False)]}"/>
+                            <div name="pdf_prefill_vendor_signature" attrs="{'invisible': [('pdf_vendor_signature', '=', False)]}">
+                                <field name="pdf_prefill_vendor_signature" class="oe_inline"/>
+                            </div>
+                            <label for="pdf_signature_text"/>
+                            <div name="pdf_signature_text">
+                                <field name="pdf_signature_text" class="oe_inline"/>
                             </div>
                         </group>
                     </group>
