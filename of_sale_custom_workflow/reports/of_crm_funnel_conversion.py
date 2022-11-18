@@ -937,10 +937,10 @@ class OFCRMFunnelConversion4(models.Model):
             fields_copy.append('lost_turnover')
         if 'lost_quotation_nb' not in fields_copy:
             fields_copy.append('lost_quotation_nb')
-        if 'of_custom_confirmation_delta' not in fields_copy:
-            fields_copy.append('of_custom_confirmation_delta')
-        if 'of_confirmation_delta' not in fields_copy:
-            fields_copy.append('of_confirmation_delta')
+        if 'custom_confirmation_delta' not in fields_copy:
+            fields_copy.append('custom_confirmation_delta')
+        if 'confirmation_delta' not in fields_copy:
+            fields_copy.append('confirmation_delta')
         if 'ordered_turnover' not in fields_copy:
             fields_copy.append('ordered_turnover')
         if 'ordered_margin' not in fields_copy:
