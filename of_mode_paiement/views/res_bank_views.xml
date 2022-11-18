@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Ajouter aux comptes en banque les données relatives au mandat SEPA -->
+    <record id="of_res_partner_bank_form" model="ir.ui.view">
+        <field name="name">of.res.partner.bank.form</field>
+        <field name="model">res.partner.bank</field>
+        <field name="inherit_id" ref="base.view_partner_bank_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="/form/group" position="after">
+                <group name="of_sepa" col="4">
+                    <separator string="Mandat SEPA" colspan="4"/>
+                    <field name="of_sepa_rum"/>
+                    <button colspan="2" name="action_demande_confirmation_code_rum" string="Générer code RUM"
+                            type="object" icon="fa-file-text" attrs="{'invisible': [('of_sepa_rum', '!=', False)]}"/>
+                    <field name="of_sepa_date_mandat"/>
+                    <field name="of_sepa_type_prev"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
