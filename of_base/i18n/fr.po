@@ -1,6 +1,7 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 #	* of_base
+#	* base
 #
 msgid ""
 msgstr ""
@@ -108,3 +109,14 @@ msgstr "Raison de l'échec. Ceci est souvent l'exception envoyée par le serveur
 #: model:ir.ui.view,arch_db:of_base.of_view_message_form
 msgid "Failure Reason"
 msgstr "Raison de l'échec"
+
+#. module: base
+#: model:ir.model.fields,field_description:base.field_res_partner_bank_acc_number
+msgid "Account Number"
+msgstr "Numéro de compte (IBAN)"
+
+#. module: base
+#: model:ir.model.fields,field_description:base.field_res_bank_bic
+#: model:ir.model.fields,field_description:base.field_res_partner_bank_bank_bic
+msgid "Bank Identifier Code"
+msgstr "Code d'identification bancaire (BIC)"
