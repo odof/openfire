@@ -25,6 +25,7 @@
         'data/ir_sequence_data.xml',
         'security/ir.model.access.csv',
         'views/of_mode_paiement_edi_view.xml',
+        'views/res_bank_views.xml',
         'wizard/of_wizard_generer_code_rum_view.xml',
     ],
     'installable': True,
