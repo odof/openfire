@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 
@@ -88,9 +90,28 @@ class ProductTemplate(models.Model):
             'domain': [('product_id.product_tmpl_id', '=', self.id)],
         }
 
+    @api.multi
+    def unlink(self):
+        # Le ondelete cascade dans product.product fait qu'on ne passe pas dans le unlink de product.product
+        # doit donc être fait également dans ce unlink()
+        ir_values_obj_sudo = self.env['ir.values'].sudo()
+        deposit_product_id = ir_values_obj_sudo.get_default('sale.config.settings', 'deposit_product_id_setting')
+        ids_deleted = self.mapped('product_variant_ids')._ids
+        res = super(ProductTemplate, self).unlink()
+        if deposit_product_id in ids_deleted:
+            ir_values_obj_sudo.set_default('sale.config.settings', 'deposit_product_id_setting', False)
+        return res
+
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'
+
+    @api.model
+    def _auto_init(self):
+        res = super(ProductProduct, self)._auto_init()
+        # Setting the value to False because it isn't used when this module is installed
+        self.env['ir.values'].sudo().set_default('sale.config.settings', 'deposit_product_id_setting', False)
+        return res
 
     @api.multi
     def _sales_count(self):
@@ -124,6 +145,16 @@ class ProductProduct(models.Model):
             to_activate = self.mapped('product_tmpl_id').filtered(lambda p: not p.active)
             if to_activate:
                 to_activate.write({'active': True})
+        return res
+
+    @api.multi
+    def unlink(self):
+        ir_values_obj_sudo = self.env['ir.values'].sudo()
+        deposit_product_id = ir_values_obj_sudo.get_default('sale.config.settings', 'deposit_product_id_setting')
+        ids_deleted = self._ids
+        res = super(ProductProduct, self).unlink()
+        if deposit_product_id in ids_deleted:
+            ir_values_obj_sudo.set_default('sale.config.settings', 'deposit_product_id_setting', False)
         return res
 
 
