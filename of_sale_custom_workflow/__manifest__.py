@@ -14,7 +14,7 @@
 
 {
     'name': u"OpenFire / Ventes - Workflow commande spécifique",
-    'version': '10.0.1.0.0',
+    'version': '10.0.2.0.0',
     'license': 'AGPL-3',
     'author': u"OpenFire",
     'website': u"www.openfire.fr",
