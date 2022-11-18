@@ -13,10 +13,10 @@ class OfPlanningIntervention(models.Model):
     map_color_tour = fields.Char(compute='_compute_tour_data', string='Color')
     tour_number = fields.Char(compute='_compute_tour_data', string='Tour number')
     # Time slots data
-    duration_one_way = fields.Float(string='Duration one way (min)')
-    distance_one_way = fields.Float(string='Distance one way (km)')
-    return_duration = fields.Float(string='Return duration (min)')
-    return_distance = fields.Float(string='Return distance (km)')
+    duration_one_way = fields.Float(string='Duration one way (min)', copy=False)
+    distance_one_way = fields.Float(string='Distance one way (km)', copy=False)
+    return_duration = fields.Float(string='Return duration (min)', copy=False)
+    return_distance = fields.Float(string='Return distance (km)', copy=False)
 
     # @api.depends
 
