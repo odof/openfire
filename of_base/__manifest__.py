@@ -64,6 +64,7 @@ Ajout d'un modèle servant de log interne :
         'views/templates.xml',
         'views/res_config_view.xml',
         'views/res_bank_views.xml',
+        'views/res_users_views.xml',
         'wizard/base_module_upgrade_view.xml',
         'wizard/of_popup_wizard_view.xml',
         'wizard/of_res_partner_check_duplications_views.xml',
