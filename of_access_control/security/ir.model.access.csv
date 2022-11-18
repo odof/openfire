@@ -93,3 +93,5 @@ access_of_horaire_modele_responsible,of.horaire.modele.responsible,of_calendar.m
 
 of_crm.access_of_sale_objective_manager,of.sale.objective.manager,of_crm.model_of_sale_objective,of_group_project_responsible,1,1,1,1
 of_crm.access_of_sale_objective_line_manager,of.sale.objective.line.manager,of_crm.model_of_sale_objective_line,of_group_project_responsible,1,1,1,1
+
+of_sale_kanban.access_of_sale_order_kanban_responsible,of.sale.order.kanban.responsible,of_sale_kanban.model_of_sale_order_kanban,of_group_sale_responsible,1,1,1,1
