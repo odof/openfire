@@ -65,16 +65,16 @@ msgstr ", le délai de livraison sera donc rallongé."
 #. module: of_website_stock
 #: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
 msgid "<span class=\"fa fa-check in-stock\"/>\n"
-"					<span>In Stock</span>"
+"                    <span>In Stock</span>"
 msgstr "<span class=\"fa fa-check in-stock\"/>\n"
-"					<span>En stock</span>"
+"                    <span>En stock</span>"
 
 #. module: of_website_stock
 #: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message
 msgid "<span class=\"fa fa-warning\"/>\n"
-"					<span>Out of Stock</span>"
+"                    <span>Out of Stock</span>"
 msgstr "<span class=\"fa fa-warning\"/>\n"
-"					<span>Indisponible</span>"
+"                    <span>Indisponible</span>"
 
 #. module: of_website_stock
 #: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message_in_item
@@ -84,11 +84,11 @@ msgstr "<span class=\"label label-danger\">Indisponible</span>"
 #. module: of_website_stock
 #: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message_in_item
 msgid "<span class=\"label label-primary\">\n"
-"				<span>In Stock</span>\n"
-"			</span>"
+"                <span>In Stock</span>\n"
+"            </span>"
 msgstr "<span class=\"label label-primary\">\n"
-"				<span>En stock</span>\n"
-"			</span>"
+"                <span>En stock</span>\n"
+"            </span>"
 
 #. module: of_website_stock
 #: model:ir.ui.view,arch_db:of_website_stock.display_stock_qty_message_in_item
@@ -339,3 +339,13 @@ msgstr "of.website.stock.notify"
 #: model:ir.model,name:of_website_stock.model_website_config_settings
 msgid "website.config.settings"
 msgstr "website.config.settings"
+
+#. module: website_sale
+#: model:ir.model.fields,help:website_sale.field_product_product_availability
+#: model:ir.model.fields,help:website_sale.field_product_template_availability
+msgid "Laisser vide pour une gestion standard des stock sur le site web, le remplir rajoute une exception sur "
+"cet article et permet de ne pas gérer les stocks. 'Ne rien afficher' n'affiche aucun message, "
+"'En stock' affiche un message 'En stock', 'Avertissement' affiche le message de votre choix."
+msgstr "Laisser vide pour une gestion standard des stock sur le site web, le remplir rajoute une exception sur "
+"cet article et permet de ne pas gérer les stocks. 'Ne rien afficher' n'affiche aucun message, "
+"'En stock' affiche un message 'En stock', 'Avertissement' affiche le message de votre choix."

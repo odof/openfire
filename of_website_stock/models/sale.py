@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 from odoo import fields, models, api, _
 from datetime import datetime, date, timedelta
 
@@ -74,8 +76,9 @@ class SaleOrder(models.Model):
 
         product = self.env['product.product'].browse(int(product_id))
 
-        # Si gestion des stocks et interdit de commander stock non disponible
-        if website.get_website_config() != 'none' and website.get_of_unavailability_management() == 'notify':
+        # Si gestion des stocks et interdit de commander stock non disponible et pas d'exception sur l'article
+        if website.get_website_config() != 'none' and website.get_of_unavailability_management() == 'notify' \
+                and product.availability is False:
 
             # On calcul le product_quantity en fonction de la configuration on_hand/forecast
             product_quantity = product.qty_available
@@ -87,7 +90,6 @@ class SaleOrder(models.Model):
                 self.env['sale.order.line'].browse(int(res['line_id'])).write({
                     'product_uom_qty': product_quantity,
                 })
-
         return res
 
 
@@ -130,4 +132,8 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     # On met le default à vide
-    availability = fields.Selection(default='')
+    availability = fields.Selection(
+        help=u"Laisser vide pour une gestion standard des stock sur le site web, le remplir rajoute une exception sur "
+             u"cet article et permet de ne pas gérer les stocks. 'Ne rien afficher' n'affiche aucun message, "
+             u"'En stock' affiche un message 'En stock', 'Avertissement' affiche le message de votre choix.",
+        default=False)

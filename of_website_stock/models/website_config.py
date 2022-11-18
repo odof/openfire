@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 from odoo import fields, models, api, _
-
-
-# class ResCompany(models.Model):
-#     _inherit = 'res.company'
-#
-#     of_website_security_lead = fields.Float('Website Safety Days', required=True, default = 0.0,
-#         help="Margin of error for dates promised to customers on website.")
 
 
 class Website(models.Model):
@@ -44,6 +39,12 @@ class WebsiteConfigSettings(models.TransientModel):
                 .set_default('website.config.settings', 'of_unavailability_management', 'notify')
         if not self.env['ir.values'].get_default('website.config.settings', 'of_delivery_management'):
             self.env['ir.values'].sudo().set_default('website.config.settings', 'of_delivery_management', False)
+
+        module_self = self.env['ir.module.module'].search(
+            [('name', '=', 'of_website_stock')])
+        if module_self.state == 'to install':
+            cr = self.env.cr
+            cr.execute("UPDATE product_template SET availability = NULL WHERE availability = 'empty'")
 
     of_stock_type = fields.Selection([
         ('none', 'Display nothing'), ('on_hand', 'Qty On Hand'), ('forecast', 'Qty Forecast')], default='none',
