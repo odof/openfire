@@ -30,21 +30,6 @@
         </field>
     </record>
 
-    <record id="action_of_verification_validite_sepa" model="ir.actions.server">
-        <field name="name">Vérifier la validité du SEPA</field>
-        <field name="model_id" ref="account.model_account_invoice"/>
-        <field name="state">code</field>
-        <field name="code">records.verification_validite_sepa()</field>
-    </record>
-
-    <record id="action_of_verification_validite_sepa_value" model="ir.values">
-        <field name="model">account.invoice</field>
-        <field name="key" >action</field>
-        <field name="key2">client_action_multi</field>
-        <field name="name">Vérifier la validité du SEPA value</field>
-        <field name="value" eval="'ir.actions.server,%d'%action_of_verification_validite_sepa"/>
-    </record>
-
     <!-- ############################### -->
     <!-- ###### Modes de paiement ###### -->
     <!-- ############################### -->
@@ -193,17 +178,39 @@
     <menuitem action="of_action_paiement_edi" id="of_menu_paiement_edi"
               parent="account.menu_finance_receivables" sequence="50" groups="account.group_account_manager,account.group_account_invoice"/>
 
-    <!-- Ajout action prélèvements SEPA, LCR par EDI dans vue formulaire factures -->
-    <act_window
-            id="action_of_paiement_edi_form"
-            name="Prélèvements SEPA, LCR par EDI"
-            res_model="of.paiement.edi"
-            src_model="account.invoice"
-            multi="True"
-            view_mode="form"
-            view_type="form"
-            view_id="of_paiement_edi_form"
-            target="current"
-            groups="account.group_account_manager,account.group_account_invoice" />
+
+    <!-- Ajout action prélèvements SEPA, LCR par EDI dans les vues list/form factures -->
+    <record id="action_of_sepa_direct_debit" model="ir.actions.act_window">
+        <field name="name">Prélèvements SEPA, LCR par EDI</field>
+        <field name="res_model">of.paiement.edi</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_paiement_edi_form"/>
+        <field name="target">current</field>
+    </record>
+
+
+    <record id="action_of_sepa_direct_debit_value" model="ir.values">
+        <field name="key2">client_action_multi</field>
+        <field name="model">account.invoice</field>
+        <field name="name">Prélèvements SEPA, LCR par EDI</field>
+        <field eval="'ir.actions.act_window,' + str(action_of_sepa_direct_debit)" name="value"/>
+    </record>
+
+    <!-- Ajout action vérifier la validité du SEPA les vues list/form factures -->
+    <record id="action_of_sepa_validity_check" model="ir.actions.server">
+        <field name="name">Vérifier la validité du SEPA</field>
+        <field name="model_id" ref="account.model_account_invoice"/>
+        <field name="state">code</field>
+        <field name="code">records.verification_validite_sepa()</field>
+    </record>
+
+    <record id="action_of_sepa_validity_check_value" model="ir.values">
+        <field name="model">account.invoice</field>
+        <field name="key" >action</field>
+        <field name="key2">client_action_multi</field>
+        <field name="name">Vérifier la validité du SEPA value</field>
+        <field name="value" eval="'ir.actions.server,%d'%action_of_sepa_validity_check"/>
+    </record>
 
 </odoo>
