@@ -1350,6 +1350,12 @@ class ProductTemplate(models.Model):
         string=u"Géré par lot/num. de série", compute='_compute_of_lot_serial_management', store=True)
     of_delay = fields.Integer(string="Delivery Lead Time", related='seller_ids.delay', readonly=True)
 
+    # Stock Product Localization
+    of_product_posx = fields.Char(string=u"Corridor (X)")
+    of_product_posy = fields.Char(string=u"Shelves (Y)")
+    of_product_posz = fields.Char(string=u"Height (Z)")
+
+
     @api.depends('tracking')
     def _compute_of_lot_serial_management(self):
         for rec in self:
