@@ -1,8 +1,8 @@
 /*! CSS Used from: https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css */
-.markdown-body li,p,pre,ul{margin:0;padding:0;}
+.markdown-body li,.markdown-body p,.markdown-body pre,.markdown-body ul{margin:0;padding:0;}
 .markdown-body ul{list-style:none;}
-.markdown-body *,::after,::before{box-sizing:inherit;}
-.markdown-body code,pre{-moz-osx-font-smoothing:auto;-webkit-font-smoothing:auto;font-family:monospace;}
+.markdown-body *,.markdown-body::after,.markdown-body::before{box-sizing:inherit;}
+.markdown-body code,.markdown-body pre{-moz-osx-font-smoothing:auto;-webkit-font-smoothing:auto;font-family:monospace;}
 .markdown-body code{background-color:#f5f5f5;color:#ff3860;font-size:.875em;font-weight:400;padding:.25em .5em .25em;}
 .markdown-body span{font-style:inherit;font-weight:inherit;}
 .markdown-body pre{-webkit-overflow-scrolling:touch;background-color:#f5f5f5;color:#4a4a4a;font-size:.875em;overflow-x:auto;padding:1.25rem 1.5rem;white-space:pre;word-wrap:normal;}
@@ -33,7 +33,7 @@
 .markdown-body .hljs-params{color:#fd8b19;}
 .markdown-body .hljs-string{color:#8fc13e;}
 .markdown-body .hljs-meta{color:#149b93;}
-.markdown-body .hljs-function,.hljs-title{color:#1290bf;}
+.markdown-body .hljs-function,.markdown-body .hljs-title{color:#1290bf;}
 .markdown-body .hljs-keyword{color:#c85e7c;}
 /*! CSS Used from: https://d33wubrfki0l68.cloudfront.net/bundles/f479db426f5743f9d9e3387255659347c9c759c3.css */
 .markdown-body p{margin-top:1em;}
