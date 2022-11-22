@@ -32,7 +32,5 @@
         view_type="form"
         view_id="of_saleorder_line_to_parc_installe_wizard_view_form"
         target="new"/>
-<!--         key2="client_action_multi" -->
-<!--         context="{'model':'res.partner'}"/> -->
 
 </odoo>
