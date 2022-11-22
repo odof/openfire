@@ -132,35 +132,34 @@ WHERE os.sav_id = pi.id AND pi.id in %s""", (sav_type.id, sav_avec_di._ids))
 
             if sav_sans_di:
                 _logger.info(u"OPENFIRE : création de DI pour les SAV sans DI")
-                cr.execute("""INSERT INTO of_service (
-    create_uid,
-    create_date,
-    write_uid,
-    write_date,
-    base_state,
-    titre,
-    active,
-    partner_id,
-    address_id,
-    company_id,
-    priority,
-    user_id,
-    of_categorie_id,
-    of_canal_id,
-    parc_installe_id,
-    sav_id,
-    name,
-    note,
-    payer_mode,
-    date_next,
-    date_fin,
-    kanban_step_id,
-    tache_id,
-    duree,
-    type_id
-)
-(
-SELECT
+                fields_list = [
+                    'create_uid',
+                    'create_date',
+                    'write_uid',
+                    'write_date',
+                    'base_state',
+                    'titre',
+                    'active',
+                    'partner_id',
+                    'address_id',
+                    'company_id',
+                    'priority',
+                    'user_id',
+                    'of_categorie_id',
+                    'of_canal_id',
+                    'parc_installe_id',
+                    'sav_id',
+                    'name',
+                    'note',
+                    'payer_mode',
+                    'date_next',
+                    'date_fin',
+                    'kanban_step_id',
+                    'tache_id',
+                    'duree',
+                    'type_id',
+                ]
+                query_vals = """
     1,
     now(),
     1,
@@ -219,9 +218,34 @@ Article associé ancienne version: ['
     %s,
     %s,
     %s
+"""
+                query_params = [sav_tache.id, sav_tache.id, sav_tache.duree, sav_type.id]
+
+                # Ajout des valeurs par défaut
+                fields_list_default = [
+                    field_name
+                    for field_name, field in service_obj._fields.iteritems()
+                    if field.store
+                    if field_name not in fields_list
+                    if field.type not in ('one2many', 'many2many')
+                    if not field.company_dependent
+                ]
+                for field_name, value in service_obj.default_get(fields_list_default).iteritems():
+                    if not value:
+                        continue
+                    fields_list.append(field_name)
+                    query_vals += ",\n    %s"
+                    query_params.append(value)
+
+                query_fields = ",\n    ".join(fields_list)
+                cr.execute("""INSERT INTO of_service (
+    """ + query_fields + """
+)
+(
+SELECT""" + query_vals + """
 FROM project_issue pi
 WHERE pi.id in %s
-)""", (sav_tache.id, sav_tache.id, sav_tache.duree, sav_type.id, sav_sans_di._ids))
+)""", query_params + [sav_sans_di._ids])
 
             # noter tous les SAV avec partenaire comme "migrés"
             (sav_avec_di | sav_sans_di).write({'is_migrated': True})
