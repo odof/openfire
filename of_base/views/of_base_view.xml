@@ -124,6 +124,12 @@
                    position="after">
                 <field name="of_default_address" attrs="{'invisible': [('type', 'not in', ('invoice', 'delivery'))]}"/>
             </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page name="customer_communication" string="Communication client" invisible="1"
+                      attrs="{'invisible': [('customer', '=', False)]}">
+                    <group/>
+                </page>
+            </xpath>
         </field>
     </record>
 
