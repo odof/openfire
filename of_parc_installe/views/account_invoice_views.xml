@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_parc_installe_invoice_form_view" model="ir.ui.view">
+        <field name="name">of.parc.installe.invoice.form.view</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="of_account.of_account_invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" name="action_view_parc_installe" type="object" icon="fa-home" attrs="{'invisible': [('of_parc_count', '=', 0)]}">
+                    <field string="Parc installé" name="of_parc_count" widget="statinfo"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

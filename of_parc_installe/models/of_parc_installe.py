@@ -1,77 +1,77 @@
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 # -*- coding: utf-8 -*-
-
-from datetime import timedelta
 from odoo import models, fields, api
 from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
 
 
 class OFParcInstalle(models.Model):
-    """Parc installé"""
     _name = 'of.parc.installe'
     _description = u"Parc installé"
 
-    name = fields.Char(u"No de série", size=64, required=False, copy=False)
-    date_service = fields.Date("Date vente", required=False)
-    date_installation = fields.Date("Date d'installation", required=False)
-    date_fin_garantie = fields.Date(string="Fin de garantie")
-    type_garantie = fields.Selection([
+    name = fields.Char(string=u"No de série", size=64, required=False, copy=False)
+    date_service = fields.Date(string=u"Date vente", required=False)
+    date_installation = fields.Date(string=u"Date d'installation", required=False)
+    date_fin_garantie = fields.Date(string=u"Fin de garantie")
+    type_garantie = fields.Selection(selection=[
         ('initial', u"Initiale"),
         ('extension', u"Extension"),
-        ('expired', u"Expirée"),
-    ], string=u"Type de garantie")
-    product_id = fields.Many2one('product.product', 'Produit', required=True, ondelete='restrict')
-    product_category_id = fields.Many2one('product.category', string=u'Catégorie')
+        ('expired', u"Expirée")], string=u"Type de garantie")
+    product_id = fields.Many2one(comodel_name='product.product', string=u"Produit", required=True, ondelete='restrict')
+    product_category_id = fields.Many2one(comodel_name='product.category', string=u"Catégorie")
     client_id = fields.Many2one(
-        'res.partner', string='Client', required=True, domain="[('parent_id','=',False)]", ondelete='restrict')
+        comodel_name='res.partner', string=u"Client", required=True, domain="[('parent_id','=',False)]",
+        ondelete='restrict')
     client_name = fields.Char(related='client_id.name')  # for map view
     client_mobile = fields.Char(related='client_id.mobile')  # for map view
     site_adresse_id = fields.Many2one(
-        'res.partner', string='Site installation', required=False,
+        comodel_name='res.partner', string=u"Site installation", required=False,
         domain="['|',('parent_id','=',client_id),('id','=',client_id)]", ondelete='restrict')
     revendeur_id = fields.Many2one(
-        comodel_name='res.partner', string='Revendeur', required=False, ondelete='restrict')
+        comodel_name='res.partner', string=u"Revendeur", required=False, ondelete='restrict')
     installateur_id = fields.Many2one(
-        comodel_name='res.partner', string='Installateur', required=False, ondelete='restrict')
+        comodel_name='res.partner', string=u"Installateur", required=False, ondelete='restrict')
     installateur_adresse_id = fields.Many2one(
-        'res.partner', string='Adresse installateur', required=False,
+        comodel_name='res.partner', string=u"Adresse installateur", required=False,
         domain="['|',('parent_id','=',installateur_id),('id','=',installateur_id)]", ondelete='restrict')
-    note = fields.Text('Note')
-    tel_site_id = fields.Char(u"Téléphone site installation", related='site_adresse_id.phone', readonly=True)
-    street_site_id = fields.Char(u'Adresse', related="site_adresse_id.street", readonly=True)
-    street2_site_id = fields.Char(u'Complément adresse', related="site_adresse_id.street2", readonly=True)
-    zip_site_id = fields.Char(u'Code postal', related="site_adresse_id.zip", readonly=True, store=True)
-    city_site_id = fields.Char(u'Ville', related="site_adresse_id.city", readonly=True)
-    country_site_id = fields.Many2one('res.country', u'Pays', related="site_adresse_id.country_id", readonly=True)
-    no_piece = fields.Char(u'N° pièce', size=64, required=False)
-    project_issue_ids = fields.One2many('project.issue', 'of_produit_installe_id', 'SAV')
-    active = fields.Boolean(string=u'Actif', default=True)
-    brand_id = fields.Many2one('of.product.brand', string="Marque")
-    modele = fields.Char(u'Modèle')
-    installation = fields.Char(u"Type d'installation")
-    conforme = fields.Boolean('Conforme', default=True)
+    note = fields.Text(string="Note")
+    tel_site_id = fields.Char(string=u"Téléphone site installation", related='site_adresse_id.phone', readonly=True)
+    street_site_id = fields.Char(string=u"Adresse", related='site_adresse_id.street', readonly=True)
+    street2_site_id = fields.Char(string=u"Complément adresse", related='site_adresse_id.street2', readonly=True)
+    zip_site_id = fields.Char(string=u"Code postal", related='site_adresse_id.zip', readonly=True, store=True)
+    city_site_id = fields.Char(string=u"Ville", related='site_adresse_id.city', readonly=True)
+    country_site_id = fields.Many2one(
+        comodel_name='res.country', string=u"Pays", related='site_adresse_id.country_id', readonly=True)
+    no_piece = fields.Char(string=u"N° pièce", size=64, required=False)
+    project_issue_ids = fields.One2many(
+        comodel_name='project.issue', inverse_name='of_produit_installe_id', string=u"SAV")
+    active = fields.Boolean(string=u"Actif", default=True)
+    brand_id = fields.Many2one(comodel_name='of.product.brand', string=u"Marque")
+    modele = fields.Char(string=u"Modèle")
+    installation = fields.Char(string=u"Type d'installation")
+    conforme = fields.Boolean(string=u"Conforme", default=True)
     state = fields.Selection(
         selection=[
-            ('neuf', 'Neuf'),
-            ('bon', 'Bon'),
-            ('usage', u'Usagé'),
+            ('neuf', "Neuf"),
+            ('bon', "Bon"),
+            ('usage', u"Usagé"),
             ('remplacer', u"À remplacer"),
-        ], string=u'État', default="neuf")
-    sale_order_ids = fields.Many2many('sale.order', string="Commandes")
+        ], string=u"État", default="neuf")
+    sale_order_ids = fields.Many2many(comodel_name='sale.order', string=u"Commandes")
     sale_order_amount = fields.Float(compute='_compute_links')
-    account_invoice_ids = fields.Many2many('account.invoice', string="Factures")
+    account_invoice_ids = fields.Many2many(comodel_name='account.invoice', string=u"Factures")
     account_invoice_amount = fields.Float(compute='_compute_links')
 
     # Champs ajoutés pour la vue map
-    geo_lat = fields.Float('geo_lat', compute='_compute_geo', store=True)
-    geo_lng = fields.Float('geo_lng', compute='_compute_geo', store=True)
+    geo_lat = fields.Float(string="geo_lat", compute='_compute_geo', store=True)
+    geo_lng = fields.Float(string="geo_lng", compute='_compute_geo', store=True)
     precision = fields.Selection(
-        GEO_PRECISION, default='not_tried', string='precision', compute='_compute_geo', store=True,
+        GEO_PRECISION, default='not_tried', string="precision", compute='_compute_geo', store=True,
         help=u"Niveau de précision de la géolocalisation.\n"
              u"bas: à la ville.\n"
              u"moyen: au village\n"
              u"haut: à la rue / au voisinage\n"
              u"très haut: au numéro de rue\n")
-    lot_id = fields.Many2one('stock.production.lot', string="Lot d'origine")
+    lot_id = fields.Many2one(comodel_name='stock.production.lot', string="Lot d'origine")
 
     technician_id = fields.Many2one(comodel_name='hr.employee', string=u"Technicien")
 
@@ -258,315 +258,3 @@ class OFParcInstalle(models.Model):
         parc_expire = all_parc_date_garantie.filtered(
             lambda p: p.date_fin_garantie < today and p.type_garantie != 'expired')
         parc_expire.write({'type_garantie': 'expired'})
-
-
-class ResPartner(models.Model):
-    _inherit = "res.partner"
-
-    of_revendeur = fields.Boolean('Revendeur', help="Cocher cette case si ce partenaire est un revendeur.")
-    of_installateur = fields.Boolean('Installateur', help="Cocher cette case si ce partenaire est un installateur.")
-    of_parc_installe_count = fields.Integer(string=u"Parc installé", compute='_compute_of_parc_installe_count')
-    of_parc_installe_ids = fields.One2many('of.parc.installe', 'client_id', string=u"Parc installé")
-
-    @api.multi
-    def _compute_of_parc_installe_count(self):
-        for partner in self:
-            partner.of_parc_installe_count = self.env['of.parc.installe'].search_count([('client_id', '=', partner.id)])
-
-    @api.multi
-    def name_get(self):
-        """
-        Permet, dans un parc installé ou un pop-up de création de parc installé, de proposer les partenaires
-        qui ne sont pas revendeurs/installateurs entre parenthèse. """
-        revendeur_prio = self._context.get('of_revendeur_prio')
-        installateur_prio = self._context.get('of_installateur_prio')
-        if revendeur_prio or installateur_prio:
-            result = []
-            for employee in self:
-                est_prio = revendeur_prio and employee.of_revendeur or installateur_prio and employee.of_installateur
-                result.append((employee.id, "%s%s%s" % ('' if est_prio else '(',
-                                                        employee.name,
-                                                        '' if est_prio else ')')))
-            return result
-        return super(ResPartner, self).name_get()
-
-    @api.model
-    def name_search(self, name='', args=None, operator='ilike', limit=100):
-        """Permet dans un parc installé de proposer en premier les partenaires revendeurs/installateurs"""
-        champ_prio = ''
-        if self._context.get('of_revendeur_prio'):
-            champ_prio = 'of_revendeur'
-        elif self._context.get('of_installateur_prio'):
-            champ_prio = 'of_installateur'
-        if champ_prio:
-            args = args or []
-            res = super(ResPartner, self).name_search(
-                name,
-                args + [[champ_prio, '=', True]],
-                operator,
-                limit) or []
-            limit = limit - len(res)
-            res += super(ResPartner, self).name_search(
-                name,
-                args + [[champ_prio, '=', False]],
-                operator,
-                limit) or []
-            return res
-        return super(ResPartner, self).name_search(name, args, operator, limit)
-
-
-class ProductProduct(models.Model):
-    _inherit = 'product.product'
-
-    @api.multi
-    def name_get(self):
-        if self._context.get('show_only_name', True):
-            result = []
-            for product in self:
-                result.append((product.id, '%s' % product.name))
-            return result
-        else:
-            res = super(ProductProduct, self).name_get()
-            return res
-
-
-class ProjectIssue(models.Model):
-    _name = 'project.issue'
-    _inherit = ['project.issue', 'of.map.view.mixin']
-
-    def _search_of_parc_installe_site_adresse(self, operator, value):
-        """Permet la recherche sur l'adresse d'installation de la machine depuis un SAV"""
-        # Deux cas :
-        # - Rechercher tous les SAV qui ont une machine installée mais dont l'adresse d'installation
-        #   n'est soit pas renseignée, soit vide (1er cas du if)
-        # - Recherche classique sur sur la rue, complément adresse, CP ou la ville (2e cas du if).
-
-        cr = self._cr
-        if value == '' and operator == '=':
-            # Si l'opérateur est = et value vide, c'est qu'on vient du filtre personnalisé
-            # -> rechercher les adresses d'installation non renseignées ou vides.
-            cr.execute(
-                "SELECT project_issue.id AS id\n"
-                "FROM project_issue\n"
-                "INNER JOIN of_parc_installe ON of_parc_installe.id = project_issue.of_produit_installe_id\n"
-                "LEFT JOIN res_partner ON res_partner.id = of_parc_installe.site_adresse_id\n"
-                "WHERE (res_partner.street = '' OR res_partner.street is null)\n"
-                "  AND (res_partner.street2 = '' OR res_partner.street2 is null)\n"
-                "  AND (res_partner.zip = '' OR res_partner.zip is null)\n"
-                "  AND (res_partner.city = '' OR res_partner.city is null)")
-        else:
-            value = '%%%s%%' % value
-            cr.execute(
-                "SELECT project_issue.id AS id\n"
-                "FROM res_partner, of_parc_installe, project_issue\n"
-                "WHERE (res_partner.street ilike %s OR res_partner.street2 ilike %s"
-                "       OR res_partner.zip ilike %s OR res_partner.city ilike %s)\n"
-                "  AND res_partner.id = of_parc_installe.site_adresse_id\n"
-                "  AND of_parc_installe.id = project_issue.of_produit_installe_id", (value, value, value, value))
-
-        return [('id', 'in', cr.fetchall())]
-
-    of_produit_installe_id = fields.Many2one(
-        'of.parc.installe', u'Produit installé', ondelete='restrict', readonly=False)
-    product_name_id = fields.Many2one('product.product', u'Désignation', ondelete='restrict')
-    product_category_id = fields.Many2one(
-        'product.category', string=u'Famille', related="product_name_id.categ_id", readonly=True, store=True)
-    of_parc_installe_client_nom = fields.Char(
-        u'Client produit installé', related="of_produit_installe_id.client_id.name", readonly=True)
-    of_parc_installe_client_adresse = fields.Char(
-        u'Adresse client', related="of_produit_installe_id.client_id.contact_address", readonly=True)
-    of_parc_installe_site_nom = fields.Char(
-        u"Lieu d'installation", related="of_produit_installe_id.site_adresse_id.name", readonly=True)
-    of_parc_installe_site_zip = fields.Char(
-        'Code Postal', size=24, related='of_produit_installe_id.site_adresse_id.zip')
-    of_parc_installe_site_city = fields.Char(
-        'Ville', related='of_produit_installe_id.site_adresse_id.city')
-    of_parc_installe_site_adresse = fields.Char(
-        u"Adresse d'installation", related="of_produit_installe_id.site_adresse_id.contact_address",
-        search='_search_of_parc_installe_site_adresse', readonly=True)
-    of_parc_installe_note = fields.Text(
-        u'Note produit installé', related="of_produit_installe_id.note", readonly=True)
-    of_parc_installe_fin_garantie = fields.Date(
-        string='Fin de garantie', related="of_produit_installe_id.date_fin_garantie", readonly=True)
-    of_parc_installe_lieu_id = fields.Many2one(
-        'res.partner', string=u"lieu du produit installé", compute="_compute_of_parc_installe_lieu_id")
-    of_parc_installe_client_id = fields.Many2one(
-        'res.partner', string=u"Client du produit installé", compute="_compute_of_parc_installe_lieu_id")
-
-    # Champs ajoutés pour la vue map
-    of_geo_lat = fields.Float(related='of_produit_installe_id.geo_lat')
-    of_geo_lng = fields.Float(related='of_produit_installe_id.geo_lng')
-    of_precision = fields.Selection(related='of_produit_installe_id.precision')
-
-    of_color_map = fields.Char(string="Couleur du marqueur", compute="_compute_of_color_map")
-
-    # @api.depends
-
-    @api.multi
-    @api.depends('of_produit_installe_id', 'of_produit_installe_id.client_id', 'of_produit_installe_id.site_adresse_id')
-    def _compute_of_parc_installe_lieu_id(self):
-        for issue in self:
-            if issue.of_produit_installe_id:
-                issue.of_parc_installe_client_id = issue.of_produit_installe_id.client_id.id
-                if issue.of_produit_installe_id.site_adresse_id:
-                    issue.of_parc_installe_lieu_id = issue.of_produit_installe_id.site_adresse_id.id
-                else:
-                    issue.of_parc_installe_lieu_id = issue.of_produit_installe_id.client_id.id
-
-    @api.multi
-    @api.depends('date_deadline')
-    def _compute_of_color_map(self):
-        date_today = fields.Date.from_string(fields.Date.today())
-
-        for issue in self:
-            color = 'gray'
-            if issue.date_deadline:
-                date_deadline = fields.Date.from_string(issue.date_deadline)
-                if date_deadline > date_today + timedelta(days=15):
-                    # deadline dans plus de 2 semaines
-                    color = "blue"
-                elif date_deadline >= date_today:
-                    # deadline dans moins de 2 semaines
-                    color = "orange"
-                else:
-                    # deadline passée
-                    color = "red"
-            issue.of_color_map = color
-
-    # @api.onchange
-
-    @api.onchange('of_produit_installe_id')
-    def onchange_of_produit_installe_id(self):
-        # Si le no de série est saisi, on met le produit du no de série du parc installé.
-        if self.of_produit_installe_id:
-            parc = self.env['of.parc.installe'].browse([self.of_produit_installe_id.id])
-            if parc and parc.product_id:
-                self.product_name_id = parc.product_id.id
-
-    @api.onchange('product_name_id')
-    def onchange_product_name_id(self):
-        # Si un no de série est saisie, on force le produit lié au no de série.
-        # Si pas de no de série, on laisse la possibilité de choisir un article
-        if self.of_produit_installe_id:  # Si no de série existe, on récupère l'article associé
-            self.onchange_of_produit_installe_id()
-
-    @api.model
-    def get_color_map(self):
-        u"""
-        fonction pour la légende de la vue map
-        """
-        return {
-            'title': u"Échéance",
-            'values': (
-                {'label': u'Aucune', 'value': 'gray'},
-                {'label': u"Plus de 15 jours", 'value': 'blue'},
-                {'label': u'Moins de 15 jours', 'value': 'orange'},
-                {'label': u'En retard', 'value': 'red'},
-            )
-        }
-
-
-class SaleOrder(models.Model):
-    _inherit = 'sale.order'
-
-    of_parc_installe_ids = fields.Many2many('of.parc.installe', string=u'Parcs installés', copy=False)
-    of_parc_count = fields.Integer(compute='_compute_parc_count')
-
-    @api.multi
-    def action_view_parc_installe(self):
-        action = self.env.ref('of_parc_installe.action_view_of_parc_installe_sale').read()[0]
-        action['domain'] = [('id', 'in', self.of_parc_installe_ids._ids)]
-        return action
-
-    @api.depends('of_parc_installe_ids')
-    def _compute_parc_count(self):
-        for order in self:
-            order.of_parc_count = len(order.of_parc_installe_ids)
-
-
-class AccountInvoice(models.Model):
-    _inherit = 'account.invoice'
-
-    of_parc_installe_ids = fields.Many2many('of.parc.installe', string=u'Parcs installés')
-    of_parc_count = fields.Integer(compute='_compute_parc_count')
-
-    @api.multi
-    def action_view_parc_installe(self):
-        action = self.env.ref('of_parc_installe.action_view_of_parc_installe_sale').read()[0]
-        action['domain'] = [('id', 'in', self.of_parc_installe_ids._ids)]
-        return action
-
-    @api.depends('of_parc_installe_ids')
-    def _compute_parc_count(self):
-        for invoice in self:
-            invoice.of_parc_count = len(invoice.of_parc_installe_ids)
-
-
-class StockPicking(models.Model):
-    _inherit = 'stock.picking'
-
-    @api.multi
-    def do_transfer(self):
-        u"""
-        Créé automatiquement un parc installé pour le client si param de config et type BL
-        """
-        res = super(StockPicking, self).do_transfer()
-        if len(self) == 1 and res and self.user_has_groups('stock.group_production_lot') and \
-                self.picking_type_id.code == 'outgoing' and\
-                self.env['ir.values'].get_default('stock.config.settings', 'of_parc_installe_auto'):
-            lots = self.pack_operation_product_ids.mapped('pack_lot_ids').mapped('lot_id')
-            if lots:
-                lots.sudo().creer_parc_installe(self)
-        return res
-
-
-class StockProductionLot(models.Model):
-    _inherit = 'stock.production.lot'
-
-    of_parc_installe_id = fields.Many2one(comodel_name='of.parc.installe', string=u"Parc installé")
-
-    @api.multi
-    def creer_parc_installe(self, picking):
-        u"""
-        Appelée au moment de valider un BL pour créer automatiquement un parc installé au client
-        :param picking: BL validé
-        """
-        parc_installe_obj = self.env['of.parc.installe']
-        if not picking.partner_id:
-            return
-        for lot in self:
-            values = lot._get_new_parc_values(picking)
-            parc_installe_obj.create(values)
-
-    @api.multi
-    def _get_new_parc_values(self, picking):
-        self.ensure_one()
-        return {
-            'name': "%s - %s" % (self.name, picking.partner_id.name),
-            'client_id': picking.partner_id.id,
-            'site_adresse_id': picking.partner_id.id,
-            'product_id': self.product_id.id,
-            'brand_id': self.product_id.brand_id.id,
-            'product_category_id': self.product_id.categ_id.id,
-            'date_installation': fields.Date.today(),
-            'date_service': picking.sale_id and fields.Date.to_string(
-                fields.Date.from_string(picking.sale_id.confirmation_date)),
-            'lot_id': self.id
-        }
-
-
-class StockSettings(models.TransientModel):
-    _inherit = 'stock.config.settings'
-
-    of_parc_installe_auto = fields.Boolean(
-        string=u"(OF) Création automatique du parc installé",
-        help=u"Créer automatiquement le parc installé lors de la confirmation du BL si un numéro de série "
-        u"est renseigné.")
-
-    @api.multi
-    def set_of_parc_installe_auto_defaults(self):
-        if not bool(self.group_stock_production_lot):
-            return self.env['ir.values'].sudo().set_default('stock.config.settings', 'of_parc_installe_auto', False)
-        else:
-            return self.env['ir.values'].sudo().set_default('stock.config.settings', 'of_parc_installe_auto',
-                                                            self.of_parc_installe_auto)
