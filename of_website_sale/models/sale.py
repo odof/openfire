@@ -18,3 +18,14 @@ class SaleOrder(models.Model):
             order_line_vals['product_uom_qty'] = values['product_uom_qty']
 
         return order_line_vals
+
+    @api.multi
+    def _cart_update(self, product_id=None, line_id=None, add_qty=0, set_qty=0, attributes=None, **kwargs):
+        result = super(SaleOrder, self)._cart_update(
+            product_id=product_id, line_id=line_id, add_qty=add_qty, set_qty=set_qty, attributes=attributes, **kwargs)
+        # FIX de l'utilisation de liste de prix avec discount_policy == 'without_discount'
+        # (recalcul du champ discount de la ligne de commande).
+        if result['quantity']:
+            # Si la quantité vaut 0, la ligne vient d'être supprimée, il ne faut pas travailler dessus.
+            self.env['sale.order.line'].browse(result['line_id']).sudo()._onchange_discount()
+        return result
