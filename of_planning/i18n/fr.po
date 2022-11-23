@@ -602,12 +602,6 @@ msgid "Affichage description"
 msgstr "Affichage description"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_old_description
-#: model:ir.ui.view,arch_db:of_planning.of_planning_intervention_view_form
-msgid "Ancienne description"
-msgstr "Ancienne description"
-
-#. module: of_planning
 #: model:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Annexes <i>(Modèles de courrier)</i>"
 msgstr "Annexes <i>(Modèles de courrier)</i>"
