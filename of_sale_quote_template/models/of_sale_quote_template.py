@@ -1167,21 +1167,45 @@ class SaleOrder(models.Model):
         remise = self.env['of.sale.order.gestion.prix'].browse(res['res_id'])
 
         categ_prec_id = -1
+        forbidden_discount_prec = -1
         layout_category_vals = []
-        for remise_line in remise.line_ids.sorted(
+        # On trie les lignes de gestion de prix par section puis par le critère de remise interdite
+        remise_lines_sorted = remise.line_ids.sorted(
                 key=lambda l: (not l.order_line_id.of_layout_category_id,
                                l.order_line_id.of_layout_category_id.sequence,
-                               l.order_line_id.of_layout_category_id.id)):
+                               l.order_line_id.of_layout_category_id.id,
+                               l.order_line_id.of_product_forbidden_discount))
+        for remise_line in remise_lines_sorted:
+            # Ici, on s'attaque à une nouvelle section, donc on rajoute une ligne
             if remise_line.order_line_id.of_layout_category_id.id != categ_prec_id:
                 category = remise_line.order_line_id.of_layout_category_id
+                forbidden_discount_prec = remise_line.order_line_id.of_product_forbidden_discount
                 categ_prec_id = category.id
                 layout_category_vals.append({
                     'layout_category_id': category.id,
+                    'product_forbidden_discount': forbidden_discount_prec,
                     'line_ids': [(6, 0, [remise_line.id])],
-                    'state': 'included',
+                    'state': 'included' if
+                    not forbidden_discount_prec
+                    else 'excluded',
                     'simulated_price_subtotal': remise_line.order_line_id.price_subtotal,
                     'simulated_price_total': remise_line.order_line_id.price_total,
                 })
+            # Ici, on passe à un changement de remise interdite au sein d'une section, donc on rajoute une ligne
+            elif remise_line.order_line_id.of_product_forbidden_discount != forbidden_discount_prec:
+                forbidden_discount_prec = remise_line.order_line_id.of_product_forbidden_discount
+                layout_category_vals.append({
+                    'layout_category_id': category.id,
+                    'product_forbidden_discount': forbidden_discount_prec,
+                    'line_ids': [(6, 0, [remise_line.id])],
+                    'state': 'included' if
+                    not forbidden_discount_prec
+                    else 'excluded',
+                    'simulated_price_subtotal': remise_line.order_line_id.price_subtotal,
+                    'simulated_price_total': remise_line.order_line_id.price_total,
+                })
+            # Si on ne change ni de section ni de remise interdite,
+            # alors on additionne la ligne courante à la dernière ligne traitée.
             else:
                 vals = layout_category_vals[-1]
                 vals['line_ids'][0][2].append(remise_line.id)
