@@ -285,8 +285,11 @@ class OfPlanningIntervention(models.Model):
         all_interventions = intervention_obj.sudo().search([
             ('employee_ids', 'in', employees.ids),
             ('date_prompt', '<=', fields.Date.to_string(date_stop_da)),
-            ('date_deadline_prompt', '>=', fields.Date.to_string(date_start_da)),
-            ('state', 'not in', ('cancel', 'postponed'))], order='date')
+            ('date_deadline_prompt', '>=', fields.Date.to_string(date_start_da))], order='date')
+
+        # La vue planning fait un postfiltrage des RDVs annulés et reportés,
+        # pour pouvoir le montrer de façon conditionnelle
+        all_relevant_interv = all_interventions.filtered(lambda i: i.state not in ('cancel', 'postponed'))
 
         if view_mode == 'planning':
             if 'id' not in return_fields:
@@ -319,7 +322,7 @@ class OfPlanningIntervention(models.Model):
             date_current_da = date_start_da
             # Un premier filtered avant la boucle sur date, évite de générer le browse_record employee_ids pour chaque
             # date parcourue, gain de temps conséquent.
-            employee_interventions = all_interventions.filtered(lambda i: employee_id in i.employee_ids.ids)
+            employee_interventions = all_relevant_interv.filtered(lambda i: employee_id in i.employee_ids.ids)
 
             # Parcours de toutes les dates à évaluer
             while date_current_da <= date_stop_da:
