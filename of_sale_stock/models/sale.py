@@ -251,8 +251,7 @@ class SaleOrderLine(models.Model):
                 line.of_reserved_qty = 0
 
     @api.depends('procurement_ids', 'procurement_ids.move_ids', 'procurement_ids.move_ids.picking_id',
-                 'procurement_ids.move_ids.picking_id.move_lines',
-                 'procurement_ids.move_ids.picking_id.move_lines.date_expected')
+                 'procurement_ids.move_ids.picking_id.of_min_week')
     def _compute_of_picking_min_week(self):
         for line in self:
             pickings = line.procurement_ids.mapped('move_ids').mapped('picking_id')
