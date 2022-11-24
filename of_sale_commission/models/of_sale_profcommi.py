@@ -36,7 +36,7 @@ class OFSaleProfcommi(models.Model):
     name = fields.Char(string="Profil")
     taux_commi = fields.Float(string="Taux global", digits=(16, 2), default=4)
     taux_acompte = fields.Float(string="Indice acompte", default=50)
-    taux_solde = fields.Float(string=u"Indice règlement", compute="_compute_taux_solde")
+    taux_solde = fields.Float(string=u"Indice règlement", compute='_compute_taux_solde')
     profcommi_line_ids = fields.One2many('of.sale.profcommi.line', 'profcommi_id', string="Commissions")
     user_ids = fields.One2many('res.users', 'of_profcommi_id', string="Utilisateurs", readonly=True)
 
@@ -80,5 +80,5 @@ class OFSaleProfcommiLine(models.Model):
     taux_commi = fields.Float(string="Pourcentage", digits=(16, 2), default=4)
     type = fields.Selection(
         [('commission', "Taux de Commission"), ('acompte', "Premier Versement")], string="Type", required=True,
-        default="commission"
+        default='commission'
     )

@@ -72,9 +72,8 @@ class AccountInvoice(models.Model):
                     'order_commi_ids': [(6, 0, commi_orig.order_commi_ids.ids)],
                 })
 
-                commi_lines_data = commi.make_commi_invoice_lines_from_old(commi_orig, invoice,
-                                                                           commi.user_id.of_profcommi_id,
-                                                                           commi.type, False)
+                commi_lines_data = commi.make_commi_invoice_lines_from_old(
+                    commi_orig, invoice, commi.user_id.of_profcommi_id, commi.type, False)
                 for commi_line_data in commi_lines_data:
                     commi_line_obj.create(commi_line_data)
 
@@ -139,16 +138,16 @@ class AccountInvoice(models.Model):
         # Ces lignes doivent être placées AVANT l'appel au super(), car cette opération peut invalider les
         # valeurs mises en cache par _compute_payments()
         partner_ids = self.mapped('partner_id').ids
-        self.env['sale.order'].search(['|',
-                                       ('partner_id', 'in', partner_ids),
-                                       ('partner_invoice_id', 'in', partner_ids)]).of_verif_acomptes()
+        self.env['sale.order']\
+            .search(['|', ('partner_id', 'in', partner_ids), ('partner_invoice_id', 'in', partner_ids)])\
+            .of_verif_acomptes()
         super(AccountInvoice, self)._compute_payments()
 
     @api.multi
     def refund(self, date_invoice=None, date=None, description=None, journal_id=None):
         self = self.with_context(of_commis_to_refund=False)
-        refunds = super(AccountInvoice, self).refund(date_invoice=date_invoice, date=date, description=description,
-                                                     journal_id=journal_id)
+        refunds = super(AccountInvoice, self).refund(
+            date_invoice=date_invoice, date=date, description=description, journal_id=journal_id)
         commi_obj = self.env['of.sale.commi']
         commi_line_obj = self.env['of.sale.commi.line']
 
@@ -175,9 +174,8 @@ class AccountInvoice(models.Model):
                     }
                     commi = commi_obj.create(commi_data)
 
-                    commi_lines_data = commi.make_commi_invoice_lines_from_old(commi_inv, refund,
-                                                                               commi_inv.user_id.of_profcommi_id,
-                                                                               type, True)
+                    commi_lines_data = commi.make_commi_invoice_lines_from_old(
+                        commi_inv, refund, commi_inv.user_id.of_profcommi_id, type, True)
                     for commi_line_data in commi_lines_data:
                         commi_line_obj.create(commi_line_data)
                     # Ne va créer aucune ligne, mais mettra a jour les totaux
