@@ -139,7 +139,7 @@
                 </tbody>
             </table>
 
-            <div class="row">
+            <div class="row" style="page-break-inside:avoid;">
                 <div name="subdivision" class="col-xs-4 pull-right">
                     <table class="table table-condensed">
                         <!-- Affichage des paiements et autres groupes de sous-totaux -->
@@ -175,7 +175,7 @@
 
             <!-- DO NOT REMOVE THIS TABLE. MANDATORY IN SOME COUNTRIES -->
             <t t-set='of_recap_taxes' t-value="invoice_data['taxes']"/>
-            <div class="row" name="of_recap_taxes" t-if="len(of_recap_taxes) > 0">
+            <div class="row" name="of_recap_taxes" t-if="len(of_recap_taxes) > 0" style="page-break-inside:avoid;">
                 <div class="col-xs-6">
                     <table class="table table-condensed">
                         <thead>
