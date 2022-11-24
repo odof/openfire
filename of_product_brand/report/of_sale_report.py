@@ -130,3 +130,25 @@ class SaleReport(models.Model):
                 for entry in res:
                     entry[display_margin_percent[0]] = entry[display_margin_percent[1]] * 100 / (entry[display_margin_percent[2]] or 1)
         return res
+
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        fields_copy = fields
+        if 'price_subtotal' not in fields_copy:
+            fields_copy.append('price_subtotal')
+        if 'margin' not in fields_copy:
+            fields_copy.append('margin')
+        if 'of_margin_percentage' not in fields_copy:
+            fields_copy.append('of_margin_percentage')
+        if 'of_diff_margin' not in fields_copy:
+            fields_copy.append('of_diff_margin')
+        if 'of_diff_price' not in fields_copy:
+            fields_copy.append('of_diff_price')
+        if 'qty_delivered' not in fields_copy:
+            fields_copy.append('qty_delivered')
+        if 'of_diff_qty_delivered' not in fields_copy:
+            fields_copy.append('of_diff_qty_delivered')
+        if 'of_montant_livre' not in fields_copy:
+            fields_copy.append('of_montant_livre')
+        return super(SaleReport, self).read_group(
+            domain, fields_copy, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
