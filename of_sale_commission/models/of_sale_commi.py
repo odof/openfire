@@ -17,8 +17,8 @@ class OFSaleCommi(models.Model):
         'res.users', string="Commercial", required=True,
         domain="[('of_profcommi_id', '!=', False)]"
     )
-    partner_id = fields.Many2one('res.partner', string="Client", compute="_compute_partner_id", store=True)
-    company_id = fields.Many2one('res.company', string=u"Société", compute="_compute_company_id", store=True)
+    partner_id = fields.Many2one('res.partner', string="Client", compute='_compute_partner_id', store=True)
+    company_id = fields.Many2one('res.company', string=u"Société", compute='_compute_company_id', store=True)
     date_valid = fields.Date(string="Date de validation")
     date_paiement = fields.Date(string="Date de paiement")
     state = fields.Selection(
@@ -31,8 +31,8 @@ class OFSaleCommi(models.Model):
             ('paid_cancel', u"Payé annulé"),
         ], string=u"État", required=True, default='draft'
     )
-    total_vente = fields.Float(compute="_compute_total_vente", string="Total ventes HT")
-    total_commi = fields.Float(compute="_compute_total_commi", string="Total commissions")
+    total_vente = fields.Float(compute='_compute_total_vente', string="Total ventes HT")
+    total_commi = fields.Float(compute='_compute_total_commi', string="Total commissions")
     total_du = fields.Float(string="Commission due")
     commi_line_ids = fields.One2many('of.sale.commi.line', 'commi_id', string="Lignes commission")
     order_id = fields.Many2one('sale.order', string="Bon de commande", readonly=True)
@@ -40,8 +40,8 @@ class OFSaleCommi(models.Model):
     inv_commi_id = fields.Many2one('of.sale.commi', u"Commission associée")
     cancel_commi_id = fields.Many2one('of.sale.commi', u"Commission annulée")
     order_commi_ids = fields.One2many('of.sale.commi', 'inv_commi_id', string=u'Commissions associées')
-    compl_du = fields.Float(compute="_compute_compl_du", string=u"Commission versée")
-    total_du_b = fields.Float(compute="_compute_total_du_b", string="Commission Due")
+    compl_du = fields.Float(compute='_compute_compl_du', string=u"Commission versée")
+    total_du_b = fields.Float(compute='_compute_total_du_b', string="Commission Due")
 
     @api.depends('order_id', 'invoice_id', 'order_id.partner_id', 'invoice_id.partner_id')
     def _compute_partner_id(self):
@@ -422,15 +422,15 @@ class OFSaleCommiLine(models.Model):
     _name = "of.sale.commi.line"
     _description = "Lignes de commission"
 
-    commi_id = fields.Many2one('of.sale.commi', string='Commission', required=True, ondelete='cascade')
+    commi_id = fields.Many2one('of.sale.commi', string="Commission", required=True, ondelete='cascade')
     product_id = fields.Many2one('product.product', compute='_compute_product_id', string="Article")
-    qty = fields.Float(compute="_compute_qty", string=u"Quantité")
+    qty = fields.Float(compute='_compute_qty', string=u"Quantité")
     prix_vente = fields.Float(compute='_compute_prix_vente', string="Prix de vente")
     taux_commi = fields.Float(string='Taux Commission')
     px_commi = fields.Float(string='Commission Totale')
-    order_line_id = fields.Many2one('sale.order.line', 'Ligne de commande', readonly=True)
-    invoice_line_id = fields.Many2one('account.invoice.line', 'Ligne de facture', readonly=True)
-    type = fields.Selection(related='commi_id.type', readonly=True, string='Type')
+    order_line_id = fields.Many2one('sale.order.line', string="Ligne de commande", readonly=True)
+    invoice_line_id = fields.Many2one('account.invoice.line', string="Ligne de facture", readonly=True)
+    type = fields.Selection(related='commi_id.type', readonly=True, string="Type")
 
     def _compute_product_id(self):
         for line in self:
