@@ -8,7 +8,7 @@
             <form>
                 <group col="4">
                     <field name="name"/>
-                    <field name="product_id" required="1"/>
+                    <field name="product_id" required="1" context="{'show_shorten_name': 120}"/>
                     <field name="client_id" required="1"/>
                     <field name="site_adresse_id"/>
                     <field name="revendeur_id" context="{'default_of_revendeur': 1, 'of_revendeur_prio': 1}"/>
@@ -32,7 +32,5 @@
         view_type="form"
         view_id="of_saleorder_line_to_parc_installe_wizard_view_form"
         target="new"/>
-<!--         key2="client_action_multi" -->
-<!--         context="{'model':'res.partner'}"/> -->
 
 </odoo>
