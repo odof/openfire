@@ -37,6 +37,8 @@ class OfAccountPaymentBankDeposit(models.Model):
     journal_id = fields.Many2one(
         'account.journal', 'Journal', required=True,
         domain="[('type', 'in', ('cash', 'bank')), ('of_allow_bank_deposit', '=', True)]")
+    company_id = fields.Many2one(
+        comodel_name='res.company', string=u"Société", related='journal_id.company_id', readonly=True)
     bank_acc_number = fields.Char(string=u"IBAN", compute='_compute_bank_acc_number')
 
     _order = 'date DESC'
