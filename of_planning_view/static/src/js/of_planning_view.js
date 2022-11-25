@@ -1431,7 +1431,7 @@ var PlanningCreneauDispo = Widget.extend({
         this.secteur_str = record.secteur_str;
         this.display_secteur = record.display_secteur;
         var heures = Math.trunc(this.duree);
-        var minutes = (this.duree - heures) * 60;
+        var minutes = Math.round((this.duree - heures) * 60);
         if (!heures) {
             this.duree_str = minutes + "min";  // exple: 45min
         }else if (!minutes) {
@@ -1674,7 +1674,7 @@ var PlanningCreneauIndispo = Widget.extend({
         this.heure_fin_str = formats.format_value(record.heure_fin,descript_ft);
         this.duree = this.heure_fin - this.heure_debut;
         var heures = Math.trunc(this.duree);
-        var minutes = (this.duree - heures) * 60;
+        var minutes = Math.round((this.duree - heures) * 60);
         if (!heures) {
             this.duree_str = minutes + "min";  // exple: 45min
         }else if (!minutes) {
@@ -1760,7 +1760,7 @@ var PlanningRecord = Widget.extend({
         this.heure_fin = hh_mm_to_float(this.heure_fin_str)
         this.duree = record.duree_prompt
         var heures = Math.trunc(this.duree);
-        var minutes = (this.duree - heures) * 60;
+        var minutes = Math.round((this.duree - heures) * 60);
         if (!heures) {
             this.duree_str = minutes + "min";  // exple: 45min
         }else if (!minutes) {
