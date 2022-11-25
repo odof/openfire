@@ -208,6 +208,12 @@ class OfPlanningIntervention(models.Model):
             else:
                 self.question_ids.create(vals)
 
+    def copy(self, default=None):
+        interv_new = super(OfPlanningIntervention, self).copy(default=default)
+        for question in self.question_ids:
+            question.copy({'intervention_id': interv_new.id})
+        return interv_new
+
     @api.multi
     def _filter_answers_category(self, questions):
         self.ensure_one()
@@ -251,10 +257,10 @@ class OfPlanningInterventionQuestion(models.Model):
     answer_ids = fields.Many2many(
         comodel_name='of.questionnaire.line.reponse', relation="of_planning_question_reponse_rel",
         column1='question_id', column2='answer_id', string=u'Réponses possibles')
-    definitive_answer = fields.Text(string=u"Réponse")
+    definitive_answer = fields.Text(string=u"Réponse", copy=False)
     intervention_id = fields.Many2one('of.planning.intervention', string="Intervention")
     parc_installe_id = fields.Many2one('of.parc.installe.question', string=u"Équipement")
-    condition_unmet = fields.Boolean(string=u"Condition non respectée")
+    condition_unmet = fields.Boolean(string=u"Condition non respectée", copy=False)
 
     _sql_constraints = [
         ('of_id_code_intervention_uniq', 'unique(id_code,intervention_id)',
