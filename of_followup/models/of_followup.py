@@ -1309,7 +1309,7 @@ class SaleOrder(models.Model):
 
     @api.multi
     def action_confirm(self):
-        super(SaleOrder, self).action_confirm()
+        return super(SaleOrder, self).action_confirm()
         ir_config_obj = self.env['ir.config_parameter']
         if not self._context.get('order_cancellation', False) and \
                 not ir_config_obj.get_param('of.followup.migration', False):

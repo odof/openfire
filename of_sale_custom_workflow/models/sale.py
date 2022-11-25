@@ -86,11 +86,11 @@ class SaleOrder(models.Model):
                 of_custom_confirmation_delta = of_custom_confirmation_date - date_order
                 # We use a float to avoid rounding the result
                 order.of_custom_confirmation_delta = of_custom_confirmation_delta.total_seconds() / 86400.0
-            ir_config_obj = self.env['ir.config_parameter']
-            if not self._context.get('order_cancellation', False) and \
-                    not ir_config_obj.get_param('of.followup.migration', False):
-                order.with_context(auto_followup=True, followup_creator_id=self.env.user.id).sudo().\
-                    action_followup_project()
+            # ir_config_obj = self.env['ir.config_parameter']
+            # if not self._context.get('order_cancellation', False) and \
+            #         not ir_config_obj.get_param('of.followup.migration', False):
+            #     order.with_context(auto_followup=True, followup_creator_id=self.env.user.id).sudo().\
+            #         action_followup_project()
         self.activate_activities_triggered_at_validation()
         return True
 
