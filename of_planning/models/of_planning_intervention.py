@@ -482,7 +482,7 @@ class OfPlanningIntervention(models.Model):
 
     # Rubrique Documents liés
     order_id = fields.Many2one(
-        "sale.order", string=u"Commande",
+        "sale.order", string=u"Commande", copy=False,
         domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")
     order_amount_total = fields.Monetary(string=u"Montant CC", readonly=True, compute='_compute_order_amounts')
     order_still_due = fields.Monetary(string=u"Restant dû CC", readonly=True, compute='_compute_order_amounts')
@@ -547,7 +547,7 @@ class OfPlanningIntervention(models.Model):
     invoice_count = fields.Integer(string="Nombre de factures", compute="_compute_invoice_ids")
 
     picking_id = fields.Many2one(
-        comodel_name='stock.picking', string=u"Bon de livraison",
+        comodel_name='stock.picking', string=u"Bon de livraison", copy=False,
         domain="order_id and [('id', 'in', picking_domain and picking_domain[0] and picking_domain[0][2] or [])]"
                "or [('picking_type_code', '=', 'outgoing')]")
     picking_domain = fields.Many2many(comodel_name='stock.picking', compute='_compute_picking_domain')
@@ -1449,6 +1449,19 @@ class OfPlanningIntervention(models.Model):
         pickings.filtered(lambda p: p.state != 'done').unlink()
         return res
 
+    def copy(self, default=None):
+        interv_new = super(OfPlanningIntervention, self).copy(default=default)
+        for line in self.line_ids:
+            line.copy({'intervention_id': interv_new.id})
+        return interv_new
+
+    @api.multi
+    def copy_data(self, default=None):
+        default = default.copy() if default else {}
+        default['verif_dispo'] = False
+        default['origin_interface'] = 'duplication manuelle'
+        return super(OfPlanningIntervention, self).copy_data(default)
+
     @api.model
     def _read_group_process_groupby(self, gb, query):
         # Ajout de la possibilité de regrouper par employé
@@ -2039,7 +2052,7 @@ class OfPlanningInterventionLine(models.Model):
     company_id = fields.Many2one('res.company', related='intervention_id.company_id', string=u'Société', readonly=True)
     currency_id = fields.Many2one('res.currency', string='Currency', readonly=True, related="company_id.currency_id")
 
-    order_line_id = fields.Many2one('sale.order.line', string='Ligne de commande')
+    order_line_id = fields.Many2one('sale.order.line', string='Ligne de commande', copy=False)
     so_number = fields.Char(
         string=u"Numéro de commande client", related='order_line_id.order_id.name', readonly=True)
     product_id = fields.Many2one('product.product', string='Article')
@@ -2050,7 +2063,7 @@ class OfPlanningInterventionLine(models.Model):
     name = fields.Text(string='Description')
     taxe_ids = fields.Many2many('account.tax', string="TVA")
     discount = fields.Float(string='Remise (%)', digits=dp.get_precision('Discount'), default=0.0)
-    qty_delivered = fields.Float(string=u"Qté livrée",)
+    qty_delivered = fields.Float(string=u"Qté livrée", copy=False)
     qty_invoiced = fields.Float(string=u"Qté facturée", compute='_compute_qty_invoiced', store=True)
     qty_invoiceable = fields.Float(string=u"Qté a facturer", compute='_compute_qty_invoiceable', store=True)
 
