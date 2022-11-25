@@ -918,7 +918,7 @@ class OfPlanningIntervention(models.Model):
         for rdv in self:
             invoices = rdv.line_ids.mapped('invoice_line_ids').mapped('invoice_id')
             if rdv.order_id:
-                for invoice in rdv.order_id.invoice_ids:
+                for invoice in rdv.order_id.sudo().invoice_ids:
                     invoices |= invoice
             rdv.invoice_count = len(invoices)
             rdv.invoice_ids = invoices
@@ -940,7 +940,7 @@ class OfPlanningIntervention(models.Model):
         for intervention in self:
             picking_list = []
             if intervention.order_id:
-                picking_list = intervention.order_id.picking_ids.ids
+                picking_list = intervention.order_id.sudo().picking_ids.ids
             intervention.picking_domain = picking_list
 
     @api.depends('state')
@@ -1014,11 +1014,11 @@ class OfPlanningIntervention(models.Model):
     def _compute_order_amounts(self):
         for rdv in self:
             if rdv.order_id:
-                total = rdv.order_id.amount_total
-                if hasattr(rdv.order_id, 'payment_ids'):
-                    # Permet de bypasser le manque de droits sur les paiements
-                    # pour avoir l'info du restant dû dans les RDV
-                    sudo_rdv = rdv.sudo()
+                # Permet de bypasser le manque de droits sur les commandes et paiements
+                # pour avoir l'info du restant dû dans les RDV
+                sudo_rdv = rdv.sudo()
+                total = sudo_rdv.order_id.amount_total
+                if hasattr(sudo_rdv.order_id, 'payment_ids'):
                     still_due = total - sum(sudo_rdv.order_id.payment_ids.mapped('of_amount_total'))
                 else:
                     still_due = 0.0
@@ -1029,7 +1029,7 @@ class OfPlanningIntervention(models.Model):
     def _compute_picking_amounts(self):
         for rdv in self:
             if rdv.picking_id:
-                rdv.picking_amount_total = rdv.picking_id.get_sale_value()
+                rdv.picking_amount_total = rdv.picking_id.sudo().get_sale_value()
 
     # Search #
 
