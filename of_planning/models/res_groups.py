@@ -65,3 +65,4 @@ class ResGroups(models.Model):
             _logger.info(u"Transfer old rights - Responsible : %d users" % len(users_responsible))
             users_responsible_list = [(4, user_id) for user_id in users_responsible._ids]
             group_intervention_responsible.write({'users': users_responsible_list})
+        _logger.info(u"Transfer old rights - END")
