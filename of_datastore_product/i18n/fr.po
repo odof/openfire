@@ -653,3 +653,9 @@ msgstr "Stock du fournisseur"
 #: model:ir.actions.act_window,name:of_datastore_product.action_of_datastore_display_stock
 msgid "Supplier stock"
 msgstr "Stock du fournisseur"
+
+#. module: of_datastore_product
+#: code:addons/of_datastore_product/models/product.py:216
+#, python-format
+msgid "You cannot change the default code of a centralized product."
+msgstr "Vous ne pouvez pas modifier la référence interne d'un article centralisé."
