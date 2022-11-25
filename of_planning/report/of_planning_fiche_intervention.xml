@@ -242,10 +242,19 @@
                                                 <div class="h5" style="padding: 0px 16px;">
                                                     <div><strong>Contact</strong></div>
                                                     <t t-if="o.address_id">
-                                                        <div style="padding-top: 4px" t-field="o.address_id" t-field-options="{'widget': 'contact', 'fields': ['name', 'phone', 'mobile', 'email']}"/>
+                                                        <div style="padding-top: 4px" t-field="o.address_id" t-field-options="{'widget': 'contact', 'fields': ['name', 'email']}"/>
                                                     </t>
                                                     <t t-elif="order.partner_shipping_id">
-                                                        <div style="padding-top: 4px" t-field="order.partner_shipping_id" t-field-options="{'widget': 'contact', 'fields': ['name', 'phone', 'mobile', 'email']}"/>
+                                                        <div style="padding-top: 4px" t-field="order.partner_shipping_id" t-field-options="{'widget': 'contact', 'fields': ['name', 'email']}"/>
+                                                    </t>
+                                                    <t t-set="contact_address" t-value="o.address_id or order.partner_shipping_id or False"/>
+                                                    <t t-foreach="contact_address.of_phone_number_ids[:5]" t-as="phone_number">
+                                                        <i><div>
+                                                            <t t-if="phone_number.title_id">
+                                                                <span style="padding-top: 4px" t-field="phone_number.title_id.name"/> -
+                                                            </t>
+                                                            <span style="padding-top: 4px" t-field="phone_number.number_display"/>
+                                                        </div></i>
                                                     </t>
                                                 </div>
                                             </div>
