@@ -2596,8 +2596,8 @@ msgstr "Ce mois"
 
 #. module: of_crm
 #: model:ir.ui.view,arch_db:of_crm.of_view_crm_case_opportunities_filter
-msgid "This Week Activities"
-msgstr "Activités de cette Semaine"
+msgid "This Week Activities To Do"
+msgstr "Activités à faire cette semaine"
 
 #. module: of_crm
 #: model:ir.model.fields,help:of_crm.field_res_users_campaign_id
