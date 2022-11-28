@@ -65,10 +65,12 @@ CalendarView.include({
         var dfd = $.Deferred();
         var p = dfd.promise();
         var Attendees = new Model(self.attendee_model);
+        var attendee_domain = this.build_attendee_domain();
 
         Attendees.query(
                 ['id', self.color_ft_field, self.color_bg_field, 'of_est_intervenant', 'of_est_commercial',
                  'name', 'sequence']) // retrieve colors from db
+            .filter(attendee_domain)
             .order_by(['sequence'])
             .all()
             .then(function (attendees){
