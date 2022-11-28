@@ -30,6 +30,7 @@
                 <t t-set="order" t-value="vals[1]"/>
                 <t t-set="template" t-value="o.template_id or o.env.ref('of_planning.of_planning_default_intervention_template', raise_if_not_found=False) or o.template_id" name="get_template"/>
                 <t t-set="o" t-value="o.with_context(of_report_name=template.ri_title)"/>
+                <t t-if="order"><t t-set="order" t-value="order.sudo()"/></t>
                 <t t-call="report.external_layout" name="general_layout">
                     <div class="page">
                         <t t-if="template">
