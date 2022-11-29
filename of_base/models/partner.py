@@ -379,11 +379,19 @@ class ResPartner(models.Model):
 
     @api.model
     def create(self, vals):
+        # Email field validation
+        if vals.get('email'):
+            email_address = vals.get('email')
+            if not tools.single_email_re.match(email_address):
+                raise ValidationError(u"L'adresse courriel %s est invalide" % (email_address,))
+
         parent_id = vals.get('parent_id', False)
         if parent_id and not vals.get('is_company', False):
             parent = self.browse(parent_id)
             vals.update(customer=parent.customer, supplier=parent.supplier)
+
         partner = super(ResPartner, self).create(vals)
+
         self._check_no_ref_duplicate(vals.get('ref'))
         # Calcul de la ref en fonction de la configuration
         if partner.company_id.of_ref_mode == 'id' and not partner.ref:
@@ -416,12 +424,19 @@ class ResPartner(models.Model):
 
     @api.multi
     def write(self, vals):
+        # Email field validation
+        if vals.get('email'):
+            email_address = vals.get('email')
+            if not tools.single_email_re.match(email_address):
+                raise ValidationError(u"L'adresse courriel %s est invalide" % (email_address,))
+
         # Modification de la fonction write pour propager la modification de la référence aux enfants si besoin
         write_ref = 'ref' in vals
         if write_ref:
             # La référence est modifiée, il va falloir propager la nouvelle valeur aux enfants
             ref = vals['ref']
             partner_refs = [(partner, partner.ref) for partner in self if partner.ref != ref]
+
         # Permet la synchronisation des champs customer et supplier pour tout les contacts liés
         if ('customer' in vals or 'supplier' in vals) and self._context.get('partner_recursion', True):
             for partner in self:
@@ -435,9 +450,12 @@ class ResPartner(models.Model):
                 if 'supplier' in vals:
                     values['supplier'] = vals['supplier']
                 partners.with_context(partner_recursion=False).write(values)
+
         super(ResPartner, self).write(vals)
+
         if write_ref:
             self._update_refs(ref, partner_refs)
+
         # Calcul de la ref en fonction de la configuration
         for partner in self.filtered(lambda p: p.company_id.sudo().of_ref_mode == 'id' and not p.ref):
             if not self.env['res.partner'].with_context(active_test=False).search([('ref', '=', str(partner.id))]):
@@ -448,6 +466,7 @@ class ResPartner(models.Model):
                         [('ref', '=', str(partner.id) + '-' + str(i))]):
                     i += 1
                 partner.ref = str(partner.id) + '-' + str(i)
+
         return True
 
     # Permet à l'auteur du mail de le recevoir en copie.
