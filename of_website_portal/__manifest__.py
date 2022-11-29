@@ -27,6 +27,7 @@ Module OpenFire pour le portail du site internet
         'of_parc_installe',
         'of_kit',
         'of_document_website',
+        'auth_signup',
     ],
     'data': [
         'security/of_website_portal_security.xml',

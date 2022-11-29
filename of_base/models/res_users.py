@@ -33,6 +33,18 @@ class ResUsers(models.Model):
         return result
 
     @api.multi
+    def _get_default_email(self):
+        self.ensure_one()
+        return self.partner_id.name.lower().replace(" ", "") + "@example.com"
+
+    @api.model
+    def create(self, vals):
+        user = super(ResUsers, self).create(vals)
+        if not user.email:
+            user.email = user._get_default_email()
+        return user
+
+    @api.multi
     def write(self, values):
         if SUPERUSER_ID in self._ids and self._uid != SUPERUSER_ID:
             raise AccessError(u'Seul le compte administrateur peut modifier les informations du compte administrateur.')
