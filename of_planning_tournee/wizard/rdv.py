@@ -841,12 +841,18 @@ class OfTourneeRdv(models.TransientModel):
             # Recherche de créneaux pour la date voulue et les équipes sélectionnées
             jour_deb_dt = tz.localize(datetime.strptime(date_recherche_str + " 00:00:00", "%Y-%m-%d %H:%M:%S"))
             jour_fin_dt = tz.localize(datetime.strptime(date_recherche_str + " 23:59:00", "%Y-%m-%d %H:%M:%S"))
-            # Récupération des interventions déjà planifiées
-            interventions = intervention_obj.search([('employee_ids', 'in', employees_dispo),
-                                                     ('date', '<=', date_recherche_str),
-                                                     ('date_deadline', '>=', date_recherche_str),
-                                                     ('state', 'not in', ('cancel', 'postponed')),
-                                                     ], order='date')
+            # Récupération des interventions déjà planifiées, on exclut l'intervention reportée en
+            # cours de replanification
+            domain_interventions = [
+                ('employee_ids', 'in', employees_dispo),
+                ('date', '<=', date_recherche_str),
+                ('date_deadline', '>=', date_recherche_str)]
+            if self.origin_intervention_id:
+                domain_interventions += [
+                    '|',
+                    ('id', '=', self.origin_intervention_id.id)]
+            domain_interventions += [('state', 'not in', ('cancel', 'postponed'))]
+            interventions = intervention_obj.search(domain_interventions, order='date')
 
             employee_intervention_dates = {employee_id: [] for employee_id in employees_dispo}
             for intervention in interventions:
