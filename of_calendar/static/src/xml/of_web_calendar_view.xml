@@ -88,6 +88,9 @@
                         <t t-esc="filters_value.label"/>
                     </span>
                 </t>
+                <t t-if="(filters_value.value != -1) &amp;&amp; (filters_value.can_be_removed)">
+                    <span class="o_remove_contact fa fa-times" title="Remove this favorite from the list" t-att-data-id="filters_value.value"/>
+                </t>
             </t>
         </t>
     </t>
