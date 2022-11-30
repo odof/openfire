@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
 
@@ -9,39 +9,52 @@ class OFSaleCommi(models.Model):
     _name = "of.sale.commi"
     _description = "Commissions sur les ventes"
 
+    @api.model
+    def _auto_init(self):
+        super(OFSaleCommi, self)._auto_init()
+        module_self = self.env['ir.module.module'].search([('name', '=', 'of_sale_commission')])
+        if module_self:
+            version = module_self.latest_version
+            if version < '10.0.1.1.0':
+                cr = self.env.cr
+                cr.execute("UPDATE of_sale_commi SET state = 'to_pay' WHERE state = 'to_cancel'")
+                cr.execute("UPDATE of_sale_commi SET state = 'paid' WHERE state = 'paid_cancel'")
+
     name = fields.Char(string=u"Libellé")
     type = fields.Selection(
-        [('acompte', "Acompte"), ('solde', "Solde"), ('avoir', "Avoir")], string="Type"
-    )
+        [('acompte', "Acompte"), ('solde', "Solde"), ('avoir', "Avoir")], string="Type", required=True)
     user_id = fields.Many2one(
         'res.users', string="Commercial", required=True,
-        domain="[('of_profcommi_id', '!=', False)]"
-    )
+        domain="[('of_profcommi_id', '!=', False)]")
     partner_id = fields.Many2one('res.partner', string="Client", compute='_compute_partner_id', store=True)
     company_id = fields.Many2one('res.company', string=u"Société", compute='_compute_company_id', store=True)
     date_valid = fields.Date(string="Date de validation")
     date_paiement = fields.Date(string="Date de paiement")
     state = fields.Selection(
         [
-            ('draft', "Brouillon"),
-            ('paid', u"Payé"),
-            ('to_pay', u"À payer"),
             ('cancel', u"Annulé"),
-            ('to_cancel', u"À annuler"),
-            ('paid_cancel', u"Payé annulé"),
-        ], string=u"État", required=True, default='draft'
-    )
+            ('draft', "Brouillon"),
+            ('to_pay', u"À payer"),
+            ('paid', u"Payé"),
+        ], string=u"État", required=True, default='draft')
     total_vente = fields.Float(compute='_compute_total_vente', string="Total ventes HT")
     total_commi = fields.Float(compute='_compute_total_commi', string="Total commissions")
-    total_du = fields.Float(string="Commission due")
+    total_du = fields.Float(
+        string="Commission due", readonly=True,
+        states={'draft': [('readonly', False)], 'to_pay': [('readonly', False)]})
     commi_line_ids = fields.One2many('of.sale.commi.line', 'commi_id', string="Lignes commission")
     order_id = fields.Many2one('sale.order', string="Bon de commande", readonly=True)
     invoice_id = fields.Many2one('account.invoice', string="Facture", readonly=True)
     inv_commi_id = fields.Many2one('of.sale.commi', u"Commission associée")
-    cancel_commi_id = fields.Many2one('of.sale.commi', u"Commission annulée")
+    cancel_commi_id = fields.Many2one(
+        comodel_name='of.sale.commi', string=u"Commission annulée",
+        help="Commission sur acompte annulée par la commission courante.")
+    # Champ O2M mais ne pointant que sur 1 enregistrement max (champ O2O)
+    canceled_by_commi_ids = fields.One2many(
+        comodel_name='of.sale.commi', inverse_name='cancel_commi_id', string=u"Annulée par",
+        help="Commissions annulant la commission sur acompte courante.")
     order_commi_ids = fields.One2many('of.sale.commi', 'inv_commi_id', string=u'Commissions associées')
-    compl_du = fields.Float(compute='_compute_compl_du', string=u"Commission versée")
-    total_du_b = fields.Float(compute='_compute_total_du_b', string="Commission Due")
+    compl_du = fields.Float(compute='_compute_compl_du', string=u"Commission versée", store=True)
 
     @api.depends('order_id', 'invoice_id', 'order_id.partner_id', 'invoice_id.partner_id')
     def _compute_partner_id(self):
@@ -61,46 +74,45 @@ class OFSaleCommi(models.Model):
 
     @api.depends('order_id.amount_untaxed', 'invoice_id.amount_untaxed')
     def _compute_total_vente(self):
+        group_paiements = self.env['of.invoice.report.total.group'].get_group_paiements()
         for commi in self:
             if commi.type == 'acompte':
                 sign = commi.cancel_commi_id and -1 or 1
                 commi.total_vente = commi.order_id.amount_untaxed * sign
+            elif commi.invoice_id.type == 'out_refund':
+                commi.total_vente = commi.invoice_id.amount_untaxed_signed
             else:
                 invoice = commi.invoice_id
-                orders = invoice.invoice_line_ids.mapped('sale_line_ids').mapped('order_id')
-                if orders:
-                    invoices = orders.mapped('order_line').mapped('invoice_lines').mapped('invoice_id')
-                    total_vente = sum(invoices.mapped('amount_untaxed'))
-                else:
-                    total_vente = invoice.amount_untaxed_signed
-                # Si le module of_sale_prorata est installé, il faut retirer la retenue de garantie
-                # :todo: calculer avec la somme des lignes de commi
-                commi.total_vente = total_vente
+                # On prend le total HT des lignes qui ne sont pas considérées comme des paiements
+                payment_invoice_lines = group_paiements.filter_lines(invoice.invoice_line_ids, invoices=invoice)
+                invoice_lines = invoice.invoice_line_ids - payment_invoice_lines
+                commi.total_vente = sum(invoice_lines.mapped('price_subtotal'))
 
     @api.depends('commi_line_ids.px_commi')
     def _compute_total_commi(self):
         for commi in self:
             if commi.cancel_commi_id:
-                # Sur une commission d'annulation de commission sur acompte, le montant total est
+                # Sur une commission d'annulation de commission sur acompte, le montant total est négatif
                 commi.total_commi = -sum(round(line.px_commi, 2) for line in commi.cancel_commi_id.commi_line_ids)
             else:
                 commi.total_commi = sum(round(line.px_commi, 2) for line in commi.commi_line_ids)
 
-    @api.depends('order_commi_ids.total_du')
+    @api.depends(
+        'order_commi_ids.total_du', 'order_commi_ids.state',
+        'order_commi_ids.canceled_by_commi_ids.total_du', 'order_commi_ids.canceled_by_commi_ids.state')
     def _compute_compl_du(self):
         for commi in self:
             if commi.type == 'solde':
-                compl_du = sum(compl.total_du for compl in commi.order_commi_ids)
+                order_commis = commi.order_commi_ids.filtered(lambda c: c.state != 'cancel')
+                # Si la commission sur acompte a été annulée par une commission inverse, on la retire du montant
+                order_commis |= order_commis.mapped('canceled_by_commi_ids').filtered(lambda c: c.state != 'cancel')
+                compl_du = sum(order_commis.mapped('total_du'))
                 commi.compl_du = compl_du
-                commi.total_du = commi.total_commi - compl_du
+                if commi.state != 'paid':
+                    # Si la commission a déjà été versée, le montant ne doit pas se recalculer
+                    commi.total_du = commi.total_commi - compl_du
             else:
                 commi.compl_du = 0
-
-    @api.onchange('total_commi', 'compl_du')
-    def _compute_total_du_b(self):
-        for commi in self:
-            if commi.type != 'acompte':
-                commi.total_du_b = commi.total_commi - commi.compl_du
 
     @api.multi
     def action_to_pay(self):
@@ -109,19 +121,58 @@ class OFSaleCommi(models.Model):
         commis.write({'state': 'to_pay'})
         commis_date.write({'date_valid': fields.Date.today()})
 
+    def action_draft(self):
+        if any(commi.state != 'cancel' for commi in self):
+            raise UserError(_(u"Vous ne pouvez rouvrir que des commissions à l'état \"annulé\""))
+        self.write({'state': 'draft'})
+
     @api.multi
     def action_cancel(self):
+        to_cancel = self.env['of.sale.commi']
+        new_commis = self.env['of.sale.commi']
         for commi in self:
-            self.create({
-                'name': commi.name,
-                'state': 'to_cancel',
-                'user_id': commi.user_id.id,
-                'type': 'acompte',
-                'total_du': -commi.total_du,
-                'date_valid': fields.Date.today(),
-                'order_id': commi.order_id.id,
-                'cancel_commi_id': commi.id,
-            })
+            if commi.state == 'cancel':
+                raise UserError(_(u"Vous ne pouvez pas annuler une commission qui est déjà à l'état \"annulé\""))
+            if commi.type == 'acompte':
+                if commi.inv_commi_id and commi.inv_commi_id.state != 'cancel':
+                    if commi.inv_commi_id.state == 'draft':
+                        raise UserError(_(u"Vous devez d'abord annuler la commission de la facture associée"))
+                    else:
+                        raise UserError(_(
+                            u"La commission de la facture associée a été réglée, c'est la seule à annuler, "
+                            u"si ce n'est pas déjà fait"))
+                if commi.state in ('draft', 'to_pay'):
+                    to_cancel += commi
+                else:
+                    if commi.cancel_commi_id:
+                        raise UserError(_(
+                            u"Vous ne pouvez pas annuler une commission d'annulation qui a déjà été payée"))
+                    if commi.canceled_by_commi_ids:
+                        raise UserError(_(
+                            u"Vous ne pouvez pas annuler une commission qui dispose déjà d'une annulation"))
+                    new_commis += self.create({
+                        'name': commi.name,
+                        'state': 'to_pay',
+                        'user_id': commi.user_id.id,
+                        'type': 'acompte',
+                        'total_du': -commi.total_du,
+                        'date_valid': fields.Date.today(),
+                        'order_id': commi.order_id.id,
+                        'cancel_commi_id': commi.id,
+                        'invoice_id': False,
+                    })
+            elif commi.type == 'solde':
+                if commi.state == 'paid':
+                    raise UserError(_(
+                        u"Vous ne pouvez pas annuler une commission sur solde qui est déjà payée."
+                        u"Une commission inverse se génèrera si vous réalisez un avoir depuis la facture concernée."))
+                to_cancel += commi
+        to_cancel.write({'state': 'cancel'})
+        if new_commis:
+            # Si on a généré des commissions d'annulation, on renvoie une action d'affichage en vue liste
+            action = self.env.ref('of_sale_commission.action_of_sale_commi_tree').read()[0]
+            action['domain'] = [('id', 'in', self.ids + new_commis.ids)]
+            return action
 
     @api.multi
     def get_total_du(self):
@@ -129,7 +180,7 @@ class OFSaleCommi(models.Model):
         if self.type == 'solde':
             # On verse la totalité de la commission, moins ce qui a déjà été versé
             return self.total_commi - (self.compl_du or 0)
-        if type == 'avoir':
+        if self.type == 'avoir':
             return self.total_commi
         # Type acompte
         profil = self.user_id.of_profcommi_id
@@ -207,20 +258,14 @@ class OFSaleCommi(models.Model):
     def update_commi(self, filtre=None):
         for commi in self:
             if commi.type == 'acompte':
-                source = commi.order_id
-                source_lines = source.order_line
-
-                def line_source(commi_line):
-                    return commi_line.order_line_id
+                source_lines = commi.order_id.order_line
+                source_field = 'order_line_id'
             else:
-                source = commi.invoice_id
-                source_lines = source.invoice_line_ids
-
-                def line_source(commi_line):
-                    return commi_line.invoice_line_id
+                source_lines = commi.invoice_id.invoice_line_ids
+                source_field = 'invoice_line_id'
 
             for line in commi.commi_line_ids:
-                if line_source(line) in source_lines:
+                if line[source_field] in source_lines:
                     line.update_line(filtre)
                 else:
                     line.unlink()
@@ -333,6 +378,7 @@ class OFSaleCommi(models.Model):
             order_commis = self.env['of.sale.commi']
             compl_du = 0
 
+            # On rattache la commission à la première trouvée pour le même vendeur sur chaque commande liée.
             for order in orders:
                 for commi_ac in order.get_active_commis():
                     if commi_ac.user_id == self.user_id and commi_ac.inv_commi_id | self == self:
@@ -364,7 +410,9 @@ class OFSaleCommi(models.Model):
     @api.multi
     def recalc_total_du(self):
         for commi in self:
-            commi.total_du = commi.total_commi - commi.compl_du
+            if commi.state != 'paid':
+                # On ne doit jamais recalculer le montant d'une commission déjà payée
+                commi.total_du = commi.total_commi - commi.compl_du
 
     @api.multi
     def copy_data(self, default=None):
@@ -379,42 +427,43 @@ class OFSaleCommi(models.Model):
             elif vals.get('invoice_id'):
                 invoice = self.env['account.invoice'].browse(vals['invoice_id'])
                 vals['name'] = invoice.origin or invoice.reference
-        commi = super(OFSaleCommi, self).create(vals)
-        if vals.get('inv_commi_id'):
-            commi.inv_commi_id.recalc_total_du()
-        return commi
+        return super(OFSaleCommi, self).create(vals)
 
     @api.multi
-    def write(self, vals):
-        if not self:
-            return True
-        # self.check_commi_access_rights()
-        for commi in self:
-            if commi.type == 'acompte':
-                inv_commi_old = False
-                if 'inv_commi_id' in vals:
-                    inv_commi_old = commi.inv_commi_id
-
-                result = super(OFSaleCommi, self).write(vals)
-
-                if inv_commi_old:
-                    inv_commi_old.recalc_total_du()
-                if commi.inv_commi_id:
-                    commi.inv_commi_id.recalc_total_du()
-            else:
-                result = super(OFSaleCommi, commi).write(vals)
-        return result
+    def _write(self, vals):
+        res = super(OFSaleCommi, self)._write(vals)
+        if 'compl_du' in vals and 'total_du' not in vals:
+            self.filtered(lambda c: c.type == 'solde' and c.state != 'paid').recalc_total_du()
+        return res
 
     @api.multi
     def unlink(self):
-        to_recalc = self.env['of.sale.commi']
+        to_cancel = self.env['of.sale.commi']
         for commi in self:
-            if commi.state in ('paid', 'paid_cancel'):
+            if commi.state == 'paid':
                 raise UserError(u'Vous ne pouvez pas supprimer une commission qui a déjà été payée')
             if commi.type == 'acompte' and commi.inv_commi_id:
-                to_recalc |= commi.inv_commi_id
+                if commi.inv_commi_id in self:
+                    continue
+                elif commi.inv_commi_id.state != 'cancel':
+                    if commi.inv_commi_id.state == 'paid':
+                        raise UserError(
+                            _(u"La commission de la facture associée a été réglée, c'est la seule à annuler, "
+                              u"si ce n'est pas déjà fait"))
+                    else:
+                        raise UserError(_(u"Vous devez d'abord annuler la commission de la facture associée"))
+            if commi.type == 'invoice' and commi.state != 'cancel':
+                # On annule les commissions sur acomptes liées, si leur commande associée est annulée
+                for ac_commi in commi.order_commi_ids - self:
+                    if ac_commi.order_id.state != 'cancel':
+                        continue
+                    if ac_commi.state in ('draft', 'to_pay'):
+                        to_cancel += ac_commi
+                    elif ac_commi.state == 'paid' and not ac_commi.canceled_by_commi_ids:
+                        to_cancel += ac_commi
+        if to_cancel:
+            to_cancel.action_cancel()
         res = super(OFSaleCommi, self).unlink()
-        to_recalc.recalc_total_du()
         return res
 
 

@@ -69,7 +69,10 @@ class AccountInvoice(models.Model):
                     'user_id': commi_orig.user_id.id,
                     'type': commi_orig.type,
                     'invoice_id': invoice.id,
-                    'order_commi_ids': [(6, 0, commi_orig.order_commi_ids.ids)],
+                    # Si la commission d'origine a été payée on ne lie pas la nouvelle au bon de commande
+                    # car l'annulation a aussi pris en compte le montant commissionné sur acompte
+                    # et il faut donc recommissionner la totalité
+                    'order_commi_ids': commi_orig.state == 'cancel' and [(6, 0, commi_orig.order_commi_ids.ids)],
                 })
 
                 commi_lines_data = commi.make_commi_invoice_lines_from_old(
@@ -97,7 +100,8 @@ class AccountInvoice(models.Model):
     @api.multi
     def write(self, vals):
         result = super(AccountInvoice, self).write(vals)
-
+        if 'invoice_line_ids' not in vals:
+            return result
         # Recalcul des acomptes pour les lignes de facture modifiées
         recalc_filtre = [
             inv_val[1]
@@ -143,6 +147,15 @@ class AccountInvoice(models.Model):
             .of_verif_acomptes()
         super(AccountInvoice, self)._compute_payments()
 
+    @api.model
+    def _prepare_refund(self, invoice, date_invoice=None, date=None, description=None, journal_id=None):
+        result = super(AccountInvoice, self)._prepare_refund(
+            invoice, date_invoice=date_invoice, date=date, description=description, journal_id=journal_id)
+        # Un avoir ne doit pas générer automatiquement de commission.
+        # Elles seront créées par copie de celles de la facture d'origine
+        result['of_commi_ids'] = False
+        return result
+
     @api.multi
     def refund(self, date_invoice=None, date=None, description=None, journal_id=None):
         self = self.with_context(of_commis_to_refund=False)
@@ -151,7 +164,7 @@ class AccountInvoice(models.Model):
         commi_obj = self.env['of.sale.commi']
         commi_line_obj = self.env['of.sale.commi.line']
 
-        refund_mode = self._context.get('refund_mode')
+        refund_mode = self._context.get('of_refund_mode')
         for invoice, refund in itertools.izip(self, refunds):
             if refund.type == 'out_refund':
                 commi_type = 'avoir'
@@ -175,22 +188,26 @@ class AccountInvoice(models.Model):
                     commi = commi_obj.create(commi_data)
 
                     commi_lines_data = commi.make_commi_invoice_lines_from_old(
-                        commi_inv, refund, commi_inv.user_id.of_profcommi_id, type, True)
+                        commi_inv, refund, commi_inv.user_id.of_profcommi_id, commi_type, True)
                     for commi_line_data in commi_lines_data:
                         commi_line_obj.create(commi_line_data)
-                    # Ne va créer aucune ligne, mais mettra a jour les totaux
-                    commi.create_lines(refund.invoice_line_ids)
+                    commi.total_du = commi.get_total_du()
         return refunds
 
     @api.multi
     def unlink(self):
+        # Appel manuel de unlink() pour vérifier que les commissions autorisent leur suppression
         self.mapped('of_commi_ids').unlink()
         return super(AccountInvoice, self).unlink()
 
     @api.multi
     def action_view_commissions(self):
         action = self.env.ref('of_sale_commission.action_of_sale_commi_tree').read()[0]
-        action['domain'] = ['|', ('invoice_id', 'in', self.ids), ('inv_commi_id.invoice_id', 'in', self.ids)]
+        action['domain'] = [
+            '|', '|',
+            ('invoice_id', 'in', self.ids),
+            ('inv_commi_id.invoice_id', 'in', self.ids),
+            ('cancel_commi_id.inv_commi_id.invoice_id', 'in', self.ids)]
         commi_type = 'solde' if self.type == 'out_invoice' else 'avoir'
         action['context'] = {
             'default_type': commi_type,
@@ -200,7 +217,5 @@ class AccountInvoice(models.Model):
 
     @api.model
     def _get_refund_modify_read_fields(self):
-        fields = super(AccountInvoice, self)._get_refund_modify_read_fields()
-        if self._context.get('of_commis_to_refund'):
-            fields.append('of_commi_ids')
-        return fields
+        # Récupération des commissions de la facture d'origine lors d'un avoir de modification
+        return super(AccountInvoice, self)._get_refund_modify_read_fields() + ['of_commi_ids']

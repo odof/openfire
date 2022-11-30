@@ -54,7 +54,7 @@ class SaleOrder(models.Model):
                 if commi.total_du < 0:
                     # Annulation de commission generee a la main
                     continue
-                if commi.state not in ('paid', 'to_cancel', 'cancel'):
+                if commi.state != 'paid' and not commi.cancel_commi_id:
                     commi.update_commi()
             orders.of_verif_acomptes()
         if 'of_echeance_line_ids' in vals:
@@ -67,18 +67,18 @@ class SaleOrder(models.Model):
         return result
 
     @api.multi
-    def get_active_commis(self):
-        result = self.env['of.sale.commi']
-        for order in self:
-            commis = order.of_commi_ids.filtered(lambda commi: commi.state != 'cancel')
-            cancel_commis = commis.filtered('cancel_commi_id')
-            result |= commis - cancel_commis - cancel_commis.mapped('cancel_commi_id')
-        return result
+    def get_active_commis(self, get_invoiced=False):
+        """ Retourne la liste des commissions en attente d'une commission sur solde (ou bien d'une annulation)."""
+        def is_active_commi(commi):
+            return commi.state != 'cancel' \
+                and (get_invoiced or not commi.inv_commi_id or commi.inv_commi_id.state == 'cancel') \
+                and not commi.cancel_commi_id \
+                and not commi.canceled_by_commi_ids
+        return self.mapped('of_commi_ids').filtered(is_active_commi)
 
     @api.multi
     def action_cancel(self):
         super(SaleOrder, self).action_cancel()
-        self.sudo().of_commi_ids.filtered(lambda c: c.state in ('draft', 'to_pay')).write({'state': 'cancel'})
         self.sudo().get_active_commis().action_cancel()
         return True
 
@@ -87,15 +87,20 @@ class SaleOrder(models.Model):
         super(SaleOrder, self).action_confirm()
 
         commi_obj = self.env['of.sale.commi'].sudo()
-
+        to_unlink = self.env['of.sale.commi'].sudo()
+        to_draft = self.env['of.sale.commi'].sudo()
         for order in self.sudo():
             commi_vendeur = False
             for commi in order.of_commi_ids:
-                if commi.state == 'cancel':
-                    commi.write({'state': 'draft'})
-                    commi.update_commi()
-                    if commi.user_id == order.user_id:
-                        commi_vendeur = True
+                if commi.state == 'paid':
+                    continue
+                if commi.user_id == order.user_id:
+                    commi_vendeur = True
+                if commi.cancel_commi_id:
+                    to_unlink += commi
+                elif commi.state == 'cancel':
+                    # Les commissions annnulées sont restaurées
+                    to_draft += commi
 
             if not commi_vendeur:
                 if order.user_id.of_profcommi_id:
@@ -109,6 +114,11 @@ class SaleOrder(models.Model):
                     commi = commi_obj.create(commi_data)
                     commi.create_lines(order.order_line)
 
+        if to_draft:
+            to_draft.write({'state': 'draft'})
+            to_draft.update_commi()
+        if to_unlink:
+            to_unlink.unlink()
         self.of_verif_acomptes()
         return True
 
@@ -129,8 +139,8 @@ class SaleOrder(models.Model):
         invoices = invoice_ids and self.env['account.invoice'].browse(invoice_ids)
         for invoice in invoices:
             orders = invoice.invoice_line_ids.mapped('sale_line_ids').mapped('order_id')
-            commis = orders.sudo().get_active_commis().filtered(
-                lambda c: not c.inv_commi_id or c.inv_commi_id.state == 'cancel')
+
+            commis = orders.sudo().get_active_commis(get_invoiced=True)
             user_commis = {}
             for commi in commis:
                 if commi.user_id in user_commis:
@@ -138,13 +148,17 @@ class SaleOrder(models.Model):
                 else:
                     user_commis[commi.user_id] = commi
             for user, commis in user_commis.iteritems():
+                # Commissions déjà liées à une facture
+                # Peut-être que la facture a été annulée par un avoir, ou qu'on fait une facturation en plusieurs fois.
+                # On ne fait pas le lien pour ne pas déduire une 2nde fois le montant versé sur acompte
+                commmis_to_link = commis.filtered(lambda c: not c.inv_commi_id or c.inv_commi_id.state == 'cancel')
                 inv_commi = commi_obj.create({
                     'name': invoice.origin,
                     'state': 'draft',
                     'user_id': user.id,
                     'type': 'solde',
                     'invoice_id': invoice.id,
-                    'order_commi_ids': [(6, 0, commis.ids)],
+                    'order_commi_ids': [(6, 0, commmis_to_link.ids)],
                 })
 
                 commi_lines_data = inv_commi.make_commi_invoice_lines_from_old(commis, invoice, user.of_profcommi_id)
