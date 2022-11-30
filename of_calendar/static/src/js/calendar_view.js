@@ -1512,6 +1512,7 @@ Sidebar.include({
 SidebarFilter.include({
     events: {
         'click .o_calendar_contact': 'on_click',
+        'click .o_remove_contact': 'on_remove_filter',
         'mouseover .of_calendar_filter': 'on_mouseover',
         'mouseout .of_calendar_filter': 'on_mouseout',
     },
@@ -1540,6 +1541,10 @@ SidebarFilter.include({
                     .then(function(){return self.trigger_up('filters_rendered')});
             });
         }
+    },
+    _remove_filter: function (value) {
+        delete this.view.res_ids_indexes[value];
+        return this._super(value);
     },
     /**
      *  Override of parent function. handles radio filters.
