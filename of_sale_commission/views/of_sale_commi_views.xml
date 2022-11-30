@@ -81,9 +81,9 @@
                 <field name="user_id"/>
                 <field name="type"/>
                 <filter string="Brouillon" name="state_draft" domain="[('state','=','draft')]" />
-                <filter string="À payer" name="state_to_pay" domain="[('state','in',('to_pay','to_cancel'))]" />
-                <filter string="Payé" name="state_paid" domain="[('state','in',('paid','paid_cancel'))]" />
-                <filter string="Annulé" name="state_cancel" domain="[('state','in',('cancel','paid_cancel'))]" />
+                <filter string="À payer" name="state_to_pay" domain="[('state','=','to_pay')]" />
+                <filter string="Payé" name="state_paid" domain="[('state','=','paid')]" />
+                <filter string="Annulé" name="state_cancel" domain="['|',('state','=','cancel'),('canceled_by_commi_ids.state','!=','cancel')]" />
                 <separator/>
                 <filter string="Acompte" name="type_acompte" domain="[('type','=','acompte')]" />
                 <filter string="Règlement" name="type_solde" domain="[('type','=','solde')]" />
@@ -102,42 +102,46 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_cancel" states="paid" string="Annuler" type="object"
-                            help="Génère une annulation de commission"/>
+                    <button name="action_draft" string="Rouvrir" type="object"
+                            attrs="{'invisible':[('state','!=','cancel')]}"
+                            help="Rouvre une commission qui est annulée"/>
+                    <button name="action_cancel" string="Annuler" type="object"
+                            attrs="{'invisible':['|',('state','=','cancel'),'&amp;',('type','!=','acompte'),('state','=',('paid'))]}"
+                            confirm="Cette action va annuler la commission "
+                            help="Annule la commission ou génère une annulation de commission"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,to_pay,paid" readonly="1"/>
                 </header>
                 <sheet>
                     <group>
                         <group>
                             <field name="name" invisible="1"/>
                             <field name="user_id" options="{'no_create_edit':True}"
-                                   attrs="{'readonly':[('state','in',('paid','to_cancel','paid_cancel'))]}" />
+                                   attrs="{'readonly':['|',('state','=','paid'),('cancel_commi_id','!=',False)]}" />
                             <field name="partner_id" readonly="1" />
                             <field name="order_id" attrs="{'invisible':[('type','!=','acompte')]}" />
                             <field name="invoice_id" attrs="{'invisible':[('type','!=','solde')]}"
                                    context="{'form_view_ref' : 'account.invoice_form'}"/>
-                            <field name="date_valid" attrs="{'readonly':[('state','in',('paid','to_cancel','paid_cancel'))]}"/>
                             <!-- widget="many2many_tags" est nécessaire ici,
                              sans quoi le lien ne se fera pas lors d'une création de commission depuis une facture -->
                             <field name="order_commi_ids" widget="many2many_tags" invisible="1"/>
+                            <field name="cancel_commi_id" invisible="1"/>
                             <field name="inv_commi_id" invisible="1"/>
                             <field name="compl_du" invisible="1"/>
                         </group>
                         <group>
                             <field name="type" readonly="1" />
-                            <field name="state" readonly="1" />
                             <field name="date_paiement" readonly="1"/>
+                            <field name="date_valid" attrs="{'readonly':['|',('state','=','paid'),('cancel_commi_id','!=',False)]}"/>
                         </group>
                     </group>
                     <field name="commi_line_ids" colspan="6" nolabel="1" mode="tree"
-                           attrs="{'readonly':['|',('user_id','=',False),('state','in',('paid','to_cancel','paid_cancel'))]}"
+                           attrs="{'readonly':['|',('user_id','=',False),('state','=','paid')]}"
                            context="{'commi_type': type}"/>
                     <group class="oe_subtotal_footer oe_right">
                         <field name="total_vente" invisible="1" />
-                        <field name="total_commi" invisible="1" attrs="{'readonly':[('state','in',('paid','to_cancel','paid_cancel'))]}"/>
+                        <field name="total_commi" invisible="1" attrs="{'readonly':[('state','=','paid')]}"/>
                         <field name="total_du" widget="monetary"
-                               attrs="{'invisible':[('type','!=','acompte')],'readonly':[('state','in',('paid','to_cancel','paid_cancel'))]}"/>
-                        <field name="total_du_b" widget="monetary"
-                               attrs="{'invisible':[('type','=','acompte')]}"/>
+                               attrs="{'readonly':['|',('type','!=','acompte'),'|',('state','=','paid'),('cancel_commi_id','!=',False)]}"/>
                     </group>
                     <br/>
                 </sheet>
@@ -149,7 +153,7 @@
         <field name="name">of.sale.commi.tree</field>
         <field name="model">of.sale.commi</field>
         <field name="arch" type="xml">
-            <tree string="Commissions">
+            <tree string="Commissions" decoration-muted="state=='cancel'" decoration-warning="total_du &lt; 0">
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="user_id"/>

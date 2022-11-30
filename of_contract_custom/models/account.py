@@ -106,14 +106,14 @@ class OfAccountInvoice(models.Model):
                         # Par sécurité mais supposément non nécessaire
                         result[i][2][name] = lines[i][name] and lines[i][name].id or False
                         lines[i][name] = False
-        elif self.env.context.get('of_mode') in ('refund', 'modify'):
+        elif self.env.context.get('of_refund_mode') in ('refund', 'modify'):
             for i in xrange(0, len(lines)):
                 for name, field in lines[i]._fields.iteritems():
                     if name in ('of_contract_product_id', 'of_contract_line_id'):
                         # La fonction d'origine copie tous les champs many2one y compris ceux en copy=False
                         # On ne veut pas que ce soit copié dans ce cas
                         result[i][2][name] = False
-        elif self.env.context.get('of_mode') == 'cancel':
+        elif self.env.context.get('of_refund_mode') == 'cancel':
             for i in xrange(0, len(lines)):
                 for name, field in lines[i]._fields.iteritems():
                     if name in ('of_contract_product_id', 'of_contract_line_id'):

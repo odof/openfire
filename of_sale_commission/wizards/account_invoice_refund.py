@@ -17,5 +17,5 @@ class AccountInvoiceRefund(models.TransientModel):
 
         return super(
             AccountInvoiceRefund,
-            self.with_context(of_commis_to_refund=commis, refund_mode=mode)
+            self.with_context(of_commis_to_refund=commis)
         ).compute_refund(mode=mode)

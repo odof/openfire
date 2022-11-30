@@ -12,6 +12,8 @@ class GestionPrix(models.TransientModel):
         super(GestionPrix, self).calculer(simuler=simuler)
         if not simuler:
             self.order_id.of_commi_ids.filtered(
-                lambda commi: (commi.total_du >= 0 and
-                               commi.state not in ('paid', 'to_cancel', 'cancel', 'paid_cancel'))
+                lambda commi: (
+                    commi.total_du >= 0 and
+                    commi.state not in ('paid', 'cancel') and
+                    not commi.cancel_commi_id)
             ).update_commi()
