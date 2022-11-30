@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-31 15:35+0000\n"
-"PO-Revision-Date: 2022-10-31 15:35+0000\n"
+"POT-Creation-Date: 2022-11-30 11:11+0000\n"
+"PO-Revision-Date: 2022-11-30 11:11+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -614,6 +614,11 @@ msgid "Customer reference"
 msgstr "Référence client"
 
 #. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_signature
+msgid "Customer signature"
+msgstr "Signature client"
+
+#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_insert
 #: model:ir.ui.view,arch_db:of_sale.wizard_sales_set_printing_params_view_form
 msgid "Customers insert"
@@ -793,6 +798,11 @@ msgid "Email"
 msgstr "Email"
 
 #. module: of_sale
+#: model:ir.ui.view,arch_db:of_sale.res_users_view_form_group_of_pdf_prefill_vendor_signature
+msgid "Email signatures"
+msgstr "Signature des mails"
+
+#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_of_to_invoice
 msgid "Entièrement facturable"
 msgstr "Entièrement facturable"
@@ -909,6 +919,16 @@ msgid "ID"
 msgstr "ID"
 
 #. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_group_pdf_prefill_vendor_signature
+msgid "If checked, allows you to load a signature image in the user form view"
+msgstr "Si coché, vous permet de charger une image de signature dans la vue du formulaire utilisateur"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_signatures_insert
+msgid "If checked, displays signatures insert in PDF reports"
+msgstr "Si coché, affiche les encarts de signature dans les rapports PDF"
+
+#. module: of_sale
 #: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_payment_schedule
 msgid "If checked, displays the Payment schedule in the report"
 msgstr "Si coché, affiche l'échéancier de paiement dans le rapport"
@@ -957,6 +977,16 @@ msgstr "Si coché, affiche le téléphone du contact dans l'encart adresse"
 #: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_ref_insert
 msgid "If checked, displays the customer reference in the inserts"
 msgstr "Si coché, affiche la référence client dans les pastilles"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_vendor_signature
+msgid "If checked, displays the salesman signature insert at the bottom of the estimate on the left"
+msgstr "Si coché, affiche l'insert de signature du vendeur en bas du devis à gauche"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_signature
+msgid "If checked, displays the customer signature insert at the bottom of the quote on the right"
+msgstr "Si coché, affiche l'encart de signature du client en bas du devis à droite"
 
 #. module: of_sale
 #: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_email
@@ -1509,11 +1539,21 @@ msgid "Politique de facturation"
 msgstr "Politique de facturation"
 
 #. module: of_sale
+#: model:res.groups,name:of_sale.group_of_pdf_prefill_vendor_signature
+msgid "Pre-populated Salesman signature group"
+msgstr "Groupe signature vendeur préremplie"
+
+#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_percent
 #: selection:of.order.line.option,purchase_price_update_type:0
 #: selection:of.order.line.option,sale_price_update_type:0
 msgid "Pourcentage"
 msgstr "Pourcentage"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_group_pdf_prefill_vendor_signature
+msgid "Pre-filled Salesman signature"
+msgstr "Signature vendeur préremplie"
 
 #. module: of_sale
 #: model:ir.model,name:of_sale.model_product_pricelist
@@ -1822,6 +1862,11 @@ msgid "Sales Orders Statistics"
 msgstr "Statistiques sur les commandes de ventes"
 
 #. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_vendor_signature
+msgid "Salesman signature"
+msgstr "Signature vendeur"
+
+#. module: of_sale
 #: model:ir.actions.act_window,name:of_sale.action_of_secteur_tree_sale
 #: model:ir.ui.menu,name:of_sale.of_secteur_sale_menu
 msgid "Secteurs"
@@ -1858,6 +1903,27 @@ msgstr "Si décoché, les conditions de règlement ne sont pas propagées aux fa
 #: model:ir.model.fields,help:of_sale.field_sale_order_of_date_vt
 msgid "Si renseignée apparaîtra sur le devis / Bon de commande"
 msgstr "Si renseignée apparaîtra sur le devis / Bon de commande"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_signature_text
+msgid "Signature comment positioned below the titles \"Salesman signature\" and \"Customer signature\""
+msgstr "Commentaire de signature placé sous les titres \"Signature du vendeur\" et \"Signature du client\""
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_signature_text
+msgid "Signature statement"
+msgstr "Mention de signature"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_res_users_of_vendor_signature
+msgid "Salesman signature in sales report"
+msgstr "Signature vendeur rapport de vente"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_signatures
+#: model:ir.ui.view,arch_db:of_sale.wizard_sales_set_printing_params_view_form
+msgid "Signatures"
+msgstr "Signatures"
 
 #. module: of_sale
 #: model:ir.ui.view,arch_db:of_sale.of_view_sale_order_gestion_prix
@@ -1936,7 +2002,7 @@ msgid "Total HT simulé"
 msgstr "Total HT simulé"
 
 #. module: of_sale
-#: code:addons/of_sale/models/of_sale.py:643
+#: code:addons/of_sale/models/of_sale.py:662
 #, python-format
 msgid "Total TTC"
 msgstr "Total TTC"

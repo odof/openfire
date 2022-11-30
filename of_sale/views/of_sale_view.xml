@@ -725,7 +725,7 @@ Tous les articles seront considérés comme disponibles et marqués comme livré
     </record>
 
 <!--##############################################################################-->
-<!--########################### ______ Utilisateurs ______ ###########################-->
+<!--########################## ______ Utilisateurs ______ ########################-->
 <!--##############################################################################-->
 
     <record id="of_sale_view_users_simple_form" model="ir.ui.view">
@@ -738,6 +738,22 @@ Tous les articles seront considérés comme disponibles et marqués comme livré
             <xpath expr="//field[@name='email']" position="replace"/>
             <xpath expr="//field[@name='fax']" position="after">
                 <field name="email"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="res_users_view_form_group_of_pdf_prefill_vendor_signature" model="ir.ui.view">
+        <field name="name">of.sale.res.users.view.form</field>
+        <field name="model">res.users</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="groups_id" eval="[(4, ref('of_sale.group_of_pdf_prefill_vendor_signature'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='signature']" position="attributes">
+                <attribute name="string">Email signatures</attribute>
+            </xpath>
+            <xpath expr="//field[@name='signature']" position="after">
+                <field name="of_vendor_signature" widget="image" class="oe_avatar"/>
             </xpath>
         </field>
     </record>

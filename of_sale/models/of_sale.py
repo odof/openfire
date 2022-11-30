@@ -113,6 +113,21 @@ class SaleOrder(models.Model):
     def pdf_taxes_detail(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_taxes_detail')
 
+    def pdf_signatures_insert(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_signatures_insert')
+
+    def pdf_vendor_signature(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_vendor_signature')
+
+    def pdf_prefill_vendor_signature(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_prefill_vendor_signature')
+
+    def pdf_customer_signature(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_customer_signature')
+
+    def pdf_signature_text(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_signature_text')
+
     def get_color_section(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_section_bg_color') or '#FFFFFF'
 
@@ -191,7 +206,6 @@ class SaleOrder(models.Model):
     of_partner_phone = fields.Char(related='partner_id.phone', string=u"Téléphone du partenaire", readonly=True)
     of_partner_mobile = fields.Char(related='partner_id.mobile', string=u"Mobile du partenaire", readonly=True)
     of_partner_email = fields.Char(related='partner_id.email', string=u"Courriel du partenaire", readonly=True)
-
 
     @api.multi
     @api.depends('name', 'date', 'state')
