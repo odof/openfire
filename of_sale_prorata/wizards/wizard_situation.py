@@ -51,7 +51,7 @@ class OfWizardSituation(models.TransientModel):
             round_globally = order.company_id.tax_calculation_rounding_method == 'round_globally'
 
             # tableau de valeurs HT, TVA, TTC pour les situations totale à venir, totale facturée, différentielle
-            values = [[0.0]*3 for _ in xrange(3)]
+            values = [[0.0] * 3 for _ in xrange(3)]
             # situation_only=False car on veut l'information du total déjà facturé, situations ET acomptes
             for tax, amounts in wizard.get_situation_amounts(situation_only=False).iteritems():
                 for i, amount in enumerate(amounts + [amounts[0] - amounts[1]]):
@@ -393,7 +393,7 @@ class OfWizardSituation(models.TransientModel):
         return date.today().strftime(lang.date_format)
 
     def get_color_font(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'of_color_font') or "#000000"
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_section_font_color') or "#000000"
 
 
 class OfWizardSituationLine(models.TransientModel):
