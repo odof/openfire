@@ -12,7 +12,7 @@
             <attribute name="t-att-style">'' if doc.of_price_printing in ['order_line', 'layout_category_with_products'] else 'display:none;'</attribute>
         </xpath>
         <xpath expr="//div[@name='total']" position="attributes">
-            <attribute name="t-att-style">'' if doc.of_price_printing in ['order_line', 'layout_category_with_products'] else 'display:none;'</attribute>
+            <attribute name="t-att-style">'page-break-inside:avoid;' if doc.of_price_printing in ['order_line', 'layout_category_with_products'] else 'display:none;'</attribute>
         </xpath>
     </template>
 

@@ -262,7 +262,7 @@
                 </t>
             </t>
 
-            <div class="row" name="total" t-att-style="'' if doc.of_price_printing == 'order_line' else 'display:none;'">
+            <div class="row" name="total" t-att-style="'page-break-inside:avoid;' if doc.of_price_printing == 'order_line' else 'display:none;'">
                 <div name="subdivision" class="col-xs-4 pull-right">
                     <table class="table table-condensed">
                         <!-- Affichage des paiements et autres groupes de sous-totaux -->
@@ -295,7 +295,7 @@
                     </table>
                 </div>
             </div>
-            <div class="row">
+            <div class="row" style="page-break-inside:avoid;">
                 <div class="col-xs-6" t-if="pdf_payment_schedule" string="Échéances">
                     <t t-set="show_ech_name" t-value="bool(doc.of_echeance_line_ids.filtered('date'))"/>
                     <table class="table table-condensed">
@@ -319,7 +319,7 @@
                 </div>
             </div>
 
-            <div class="row" t-if="pdf_taxes_detail and len(doc.of_get_taxes_display()) > 0">
+            <div class="row" t-if="pdf_taxes_detail and len(doc.of_get_taxes_display()) > 0" style="page-break-inside:avoid;">
                 <div class="col-xs-6">
                     <table class="table table-condensed">
                         <thead>
