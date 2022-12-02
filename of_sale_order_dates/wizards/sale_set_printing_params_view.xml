@@ -6,11 +6,10 @@
         <field name="model">of.sale.wizard.set.printing.params</field>
         <field name="inherit_id" ref="of_sale.wizard_sales_set_printing_params_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='labels']//div[@name='pdf_masquer_pastille_payment_term']" position="after">
-                <label string="(OF) Semaine demandée" for="of_pdf_display_requested_week"/>
-                <div name="of_pdf_display_requested_week">
-                    <field name="of_pdf_display_requested_week" class="oe_inline"/>
-                    <span>Afficher la semaine demandée dans les rapports PDF</span>
+            <xpath expr="//group[@name='labels']//div[@name='pdf_payment_term_insert']" position="after">
+                <label string="Requested week" for="pdf_requested_week"/>
+                <div name="pdf_requested_week">
+                    <field name="pdf_requested_week" class="oe_inline"/>
                 </div>
             </xpath>
         </field>

@@ -7,43 +7,6 @@ from odoo.exceptions import AccessError
 class OFSaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'
 
-    @api.model
-    def _auto_init(self):
-        """
-        Certains paramètres d'affichage sont passés de Booléen à Sélection.
-        Cette fonction est appelée à chaque mise à jour, mais ne fait quelque chose
-        que la première fois qu'elle est appelée.
-        """
-        set_value = False
-        # Cette fonction n'a encore jamais été appelée
-        if not self.env['ir.values'].get_default('sale.config.settings', 'bool_vers_selection_fait'):
-            set_value = True
-        super(OFSaleConfiguration, self)._auto_init()
-        if set_value:
-            if self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_telephone'):
-                self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_telephone', 1)
-            else:
-                self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_telephone', 0)
-            if self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_mobile'):
-                self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_mobile', 1)
-            else:
-                self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_mobile', 0)
-            if self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_fax'):
-                self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_fax', 1)
-            else:
-                self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_fax', 0)
-            if self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_email'):
-                self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_email', 1)
-            else:
-                self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_email', 0)
-            if not self.env['ir.values'].get_default('sale.config.settings', 'of_color_font'):
-                self.env['ir.values'].sudo().set_default('sale.config.settings', 'of_color_font', "#000000")
-            self.env['ir.values'].sudo().set_default('sale.config.settings', 'bool_vers_selection_fait', True)
-
-        if not self.env['ir.values'].search(
-                [('name', '=', 'of_propagate_payment_term'), ('model', '=', 'sale.config.settings')]):
-            self.env['ir.values'].sudo().set_default('sale.config.settings', 'of_propagate_payment_term', True)
-
     of_deposit_product_categ_id_setting = fields.Many2one(
         'product.category',
         string=u"(OF) Catégorie des acomptes",

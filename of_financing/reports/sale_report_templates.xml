@@ -2,7 +2,7 @@
 <odoo>
 
     <template id="of_financing_report_saleorder_document" inherit_id="sale.report_saleorder_document">
-        <xpath expr="//div[@t-if='doc.pdf_afficher_multi_echeances()']/parent::div" position="after">
+        <xpath expr="//div[@t-if='pdf_payment_schedule']/parent::div" position="after">
             <div class="row">
                 <div class="col-xs-12" t-if="doc.of_financing_printing" name="financing">
                     <table class="table table-condensed">
