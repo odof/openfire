@@ -6,3 +6,7 @@ label.of-settings {
     text-transform: uppercase;
     text-decoration: underline;
 }
+
+.of-printing-parameter-title {
+    text-transform: uppercase;
+}

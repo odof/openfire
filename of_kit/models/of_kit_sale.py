@@ -889,7 +889,7 @@ class OfSaleOrderKitLine(models.Model):
     def get_report_name(self):
         self.ensure_one()
         # inhiber l'affichage de la référence
-        afficher_ref = self.env['ir.values'].get_default('sale.config.settings', 'pdf_display_product_ref_setting')
+        afficher_ref = self.env['ir.values'].get_default('sale.config.settings', 'pdf_product_reference')
         self = self.with_context(
             lang=self.order_id.partner_id.lang,
             partner=self.order_id.partner_id.id,

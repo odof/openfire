@@ -47,53 +47,77 @@ class SaleOrder(models.Model):
     _name = 'sale.order'
     _inherit = ['sale.order', 'of.documents.joints']
 
-    def pdf_afficher_multi_echeances(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_afficher_multi_echeances')
+    def pdf_payment_schedule(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_payment_schedule')
 
-    def pdf_afficher_nom_parent(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_nom_parent')
+    def pdf_address_contact_parent_name(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_address_contact_parent_name')
 
-    def pdf_afficher_civilite(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_civilite')
+    def pdf_address_contact_titles(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_address_contact_titles')
 
-    def pdf_afficher_telephone(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_telephone') or 0
+    def pdf_address_contact_name(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_address_contact_name')
 
-    def pdf_afficher_mobile(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_mobile') or 0
+    def pdf_address_contact_phone(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_address_contact_phone') or False
 
-    def pdf_afficher_fax(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_fax') or 0
+    def pdf_address_contact_mobile(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_address_contact_mobile') or False
 
-    def pdf_afficher_email(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_email') or 0
+    def pdf_address_contact_fax(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_address_contact_fax') or False
 
-    def pdf_afficher_date_validite(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_date_validite_devis')
+    def pdf_address_contact_email(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_address_contact_email') or False
 
-    def pdf_vt_pastille(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_vt_pastille')
+    def pdf_technical_visit_insert(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_technical_visit_insert')
 
-    def pdf_hide_global_address_label(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_hide_global_address_label')
+    def pdf_validity_insert(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_validity_insert')
 
-    def pdf_masquer_commercial(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_masquer_pastille_commercial')
+    def pdf_address_title(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_address_title')
 
-    def pdf_mail_commercial(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_mail_commercial')
+    def pdf_commercial_insert(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_commercial_insert')
 
-    def pdf_masquer_payment_term(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_masquer_pastille_payment_term')
+    def pdf_commercial_contact(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_commercial_contact')
 
-    def pdf_of_pdf_taxes_display(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'of_pdf_taxes_display')
+    def pdf_commercial_email(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_commercial_email')
+
+    def pdf_customer_insert(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_customer_insert')
+
+    def pdf_customer_phone(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_customer_phone')
+
+    def pdf_customer_mobile(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_customer_mobile')
+
+    def pdf_customer_fax(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_customer_fax')
+
+    def pdf_customer_email(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_customer_email')
+
+    def pdf_payment_term_insert(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_payment_term_insert')
+
+    def pdf_customer_ref_insert(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_customer_ref_insert')
+
+    def pdf_taxes_detail(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_taxes_detail')
 
     def get_color_section(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'of_color_bg_section')
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_section_bg_color') or '#FFFFFF'
 
     def get_color_font(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'of_color_font') or "#000000"
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_section_font_color') or "#000000"
 
     def _search_of_to_invoice(self, operator, value):
         # Récupération des bons de commande non entièrement livrés
@@ -1122,7 +1146,7 @@ class SaleOrderLine(models.Model):
     def of_get_line_name(self):
         self.ensure_one()
         # inhiber l'affichage de la référence
-        afficher_ref = self.env['ir.values'].get_default('sale.config.settings', 'pdf_display_product_ref_setting')
+        afficher_ref = self.env['ir.values'].get_default('sale.config.settings', 'pdf_product_reference')
         le_self = self.with_context(
             lang=self.order_id.partner_id.lang,
             partner=self.order_id.partner_id.id,

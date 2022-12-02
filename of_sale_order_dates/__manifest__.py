@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': u"OpenFire / Dates sur Commandes de Vente",
-    'version': "10.0.1.0.0",
+    'version': "10.0.2.0.0",
     'author': "OpenFire",
     'website': "www.openfire.fr",
     'category': "OpenFire",

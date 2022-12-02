@@ -25,8 +25,8 @@ class SaleOrder(models.Model):
             else:
                 order.of_requested_week = ""
 
-    def pdf_display_requested_week(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'of_pdf_display_requested_week')
+    def pdf_requested_week(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_requested_week')
 
 
 class SaleOrderLine(models.Model):
