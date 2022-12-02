@@ -14,7 +14,7 @@
 
 {
     'name': u"OpenFire / Planning",
-    'version': '10.0.1.0.0',
+    'version': '10.0.1.1.0',
     'author': u"OpenFire",
     'website': u"www.openfire.fr",
     'category': u"Generic Modules",
