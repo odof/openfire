@@ -1095,4 +1095,18 @@
             </xpath>
         </field>
     </record>
+
+    <!-- Ajout bouton planifier une intervention dans vue form intervention #intervenception -->
+    <record id="of_planning_intervention_view_form_rdv_intervention" model="ir.ui.view">
+        <field name="name">of.planning.intervention.form.rdv.intervention</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header//button[@name='button_postponed']" position="after">
+                <button name="action_open_wizard_plan_intervention" string="Plan Intervention"
+                        type="object" invisible="context.get('hide_bouton_planif')"
+                        attrs="{'invisible': [('state', '!=', 'postponed')]}"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>
