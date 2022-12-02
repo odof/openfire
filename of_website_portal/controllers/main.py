@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import http
+from odoo import http, tools
 from odoo.http import request
 from odoo.exceptions import AccessError
 from odoo.addons.website_portal.controllers.main import website_account
+from odoo.addons.auth_signup.controllers.main import AuthSignupHome
 
 
 class WebsiteAccount(website_account):
@@ -130,3 +131,18 @@ class WebsiteAccount(website_account):
             order.action_confirm()
 
         return request.redirect('/my/quotes')
+
+
+class SignupVerifyEmail(AuthSignupHome):
+
+    @http.route()
+    def web_auth_signup(self, *args, **kw):
+        qcontext = self.get_auth_signup_qcontext()
+
+        # Email verification
+        email_address = http.request.params.get('login')
+        if email_address and not tools.single_email_re.match(email_address):
+            qcontext["error"] = u"Veuillez renseigner un courriel valide."
+            return request.render('auth_signup.signup', qcontext)
+
+        return super(SignupVerifyEmail, self).web_auth_signup(*args, **kw)

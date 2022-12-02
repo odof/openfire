@@ -102,3 +102,9 @@ class MailMessage(models.Model):
             if mail:
                 message.of_state = mail.state
                 message.of_failure_reason = mail.failure_reason
+
+    @api.model
+    def _get_default_from(self):
+        if not self.env.user.email:
+            self.env.user.email = self.env.user._get_default_email()
+        return super(MailMessage, self)._get_default_from()
