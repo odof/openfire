@@ -94,6 +94,7 @@ class GestionPrixLayoutCategory(models.TransientModel):
     pc_margin = fields.Float(string=u"% Marge", compute='_compute_marge')
 
     of_client_view = fields.Boolean(string=u"Vue client/vendeur", related="wizard_id.of_client_view")
+    product_forbidden_discount = fields.Boolean(string=u"Remise interdite pour cette section", readonly=True)
 
     @api.depends('line_ids')
     def _compute_price(self):
