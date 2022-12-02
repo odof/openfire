@@ -327,6 +327,34 @@
         </field>
     </record>
 
+    <record id="view_template_localization_form_product_stock" model="ir.ui.view">
+        <field name="name">product.template.stock.localization.form.inherit.product.stock</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="stock.product_template_form_view_procurement_button"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='property_stock_procurement']" position="replace"/>
+            <xpath expr="//field[@name='property_stock_production']" position="replace"/>
+            <xpath expr="//field[@name='property_stock_inventory']" position="replace"/>
+
+            <xpath expr="//field[@name='seller_ids']"  position="after">
+                <group string="Localization" name="product_localization" groups="base.group_user">
+                    <group>
+                        <field name="property_stock_procurement"/>
+                        <field name="property_stock_production"/>
+                        <field name="property_stock_inventory"/>
+                    </group>
+                    <group>
+                        <field name="of_product_posx" string="Corridor (X)" attrs="{'invisible':[('type', 'not in', ['product', 'consu'])]}"/>
+                        <field name="of_product_posy" string="Shelves (Y)" attrs="{'invisible':[('type', 'not in', ['product', 'consu'])]}"/>
+                        <field name="of_product_posz" string="Height (Z)" attrs="{'invisible':[('type', 'not in', ['product', 'consu'])]}"/>
+                    </group>
+                </group>
+            </xpath>
+
+        </field>
+    </record>
+
     <!-- Action articles du module stock, mettre vue tree en première -->
     <record id="stock.product_template_action_product" model="ir.actions.act_window">
         <field name="view_mode">tree,kanban,form</field>

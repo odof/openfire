@@ -31,3 +31,23 @@ msgstr "<strong>Quantité</strong>"
 #: model:ir.ui.menu,name:stock.menu_stock_inventory_control
 msgid "Inventory Control"
 msgstr "Articles"
+
+#. module: of_stock
+#: model:ir.ui.view,arch_db:of_stock.view_template_localization_form_product_stock
+msgid "Localization"
+msgstr "Localisation"
+
+#. module: of_stock
+#: model:ir.ui.view,arch_db:of_stock.view_template_localization_form_product_stock
+msgid "Corridor (X)"
+msgstr "Couloir (X)"
+
+#. module: of_stock
+#: model:ir.ui.view,arch_db:of_stock.view_template_localization_form_product_stock
+msgid "Shelves (Y)"
+msgstr "Rayon (Y)"
+
+#. module: of_stock
+#: model:ir.ui.view,arch_db:of_stock.view_template_localization_form_product_stock
+msgid "Height (Z)"
+msgstr "Hauteur (Z)"
