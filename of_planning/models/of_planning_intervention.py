@@ -360,6 +360,19 @@ class OfPlanningIntervention(models.Model):
                    "AND column_name = 'old_description'" % (self._table,))
         exists = cr.fetchall()
         res = super(OfPlanningIntervention, self)._auto_init()
+        module_self = self.env['ir.module.module'].search([('name', '=', 'of_planning')])
+        if module_self:
+            version = module_self.latest_version
+            if version < '10.0.1.1.0':
+                cr = self.env.cr
+                cr.execute("UPDATE of_planning_intervention "
+                           "SET invoice_status = 'no' "
+                           "WHERE ID IN "
+                           "(SELECT T1.id "
+                           "FROM of_planning_intervention T1 "
+                           "LEFT JOIN of_planning_intervention_line T2 ON T2.intervention_id = T1.id "
+                           "WHERE T2.intervention_id IS NULL)")
+
         cr.execute('SELECT id FROM of_planning_intervention WHERE warehouse_id IS NULL',)
         fetch = cr.fetchall()
         if fetch:
@@ -967,7 +980,7 @@ class OfPlanningIntervention(models.Model):
         Copie de sale.order._compute_invoice_status(), adaptée pour of.planning.intervention
         Compute the invoice status of a OPI. Possible statuses:
         - no: if the OPF is not in status 'confirm' or 'done', we consider that there is nothing to
-          invoice. This is also hte default value if the conditions of no other status is met.
+          invoice. This is also the default value if the conditions of no other status is met.
         - to invoice: if any OPI line is 'to invoice', the whole OPI is 'to invoice'
         - invoiced: if all OPI lines are invoiced, the OPI is invoiced..
         """
@@ -977,12 +990,15 @@ class OfPlanningIntervention(models.Model):
             line_invoice_status = [line.invoice_status for line in rdv.line_ids.filtered(lambda l: not l.order_line_id)
                                    if line.product_id != deposit_product_id]
 
-            if rdv.state not in ('confirm', 'done'):
-                rdv.invoice_status = 'no'
-            elif any(invoice_status == 'to invoice' for invoice_status in line_invoice_status):
-                rdv.invoice_status = 'to invoice'
-            elif all(invoice_status == 'invoiced' for invoice_status in line_invoice_status):
-                rdv.invoice_status = 'invoiced'
+            if len(line_invoice_status):
+                if rdv.state not in ('confirm', 'done'):
+                    rdv.invoice_status = 'no'
+                elif 'to invoice' in line_invoice_status:
+                    rdv.invoice_status = 'to invoice'
+                elif all(invoice_status == 'invoiced' for invoice_status in line_invoice_status):
+                    rdv.invoice_status = 'invoiced'
+                else:
+                    rdv.invoice_status = 'no'
             else:
                 rdv.invoice_status = 'no'
 
