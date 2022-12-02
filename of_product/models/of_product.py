@@ -152,7 +152,7 @@ class ProductTemplate(models.Model):
             if lst_price != 0:
                 product.marge = (lst_price - product.get_cost()) * 100.00 / lst_price
             else:  # division par 0!
-                product.marge = -100
+                product.marge = 0
 
     def _get_default_category_id(self):
         return False
