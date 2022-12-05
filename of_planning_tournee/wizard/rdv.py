@@ -1118,7 +1118,7 @@ class OfTourneeRdv(models.TransientModel):
         tag_ids = \
             [(4, tag.id) for tag in service.tag_ids] \
             if not self.origin_intervention_id else [(6, 0, self.origin_intervention_id.tag_ids.ids)]
-        order_id = service.oder_id.id if not self.origin_intervention_id else self.origin_intervention_id.order_id.id
+        order_id = service.order_id.id if not self.origin_intervention_id else self.origin_intervention_id.order_id.id
         name = self.name if not self.origin_intervention_id else self.origin_intervention_id.name
         values = {
             'partner_id': self.partner_id.id,
