@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import threading
 import logging
+import re
+import threading
 
 from odoo import models, api, tools, fields
 from odoo.exceptions import ValidationError
@@ -20,6 +21,12 @@ PHONE_TYPES = [('01_domicile', u"Domicile"),
                ('02_bureau', u"Bureau"),
                ('03_mobile', u"Mobile"),
                ('04_fax', u"Fax")]
+
+# Regex qui valide un texte comme une suite d'adresses email séparées par des espaces et/ou virgules
+# La partie identifiant une adresse email est récupérée de single_email_re, définie dans odoo/tools/mail.py
+multiple_emails_re = re.compile(
+    r"""^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,63}([ ,]+[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,63})*$""",
+    re.VERBOSE)
 
 
 def convert_phone_number(value, default_country_code=None, new_format='e164', strict=False):
@@ -382,7 +389,7 @@ class ResPartner(models.Model):
         # Email field validation
         if vals.get('email'):
             email_address = vals.get('email')
-            if not tools.single_email_re.match(email_address):
+            if not multiple_emails_re.match(email_address):
                 raise ValidationError(u"L'adresse courriel %s est invalide" % (email_address,))
 
         parent_id = vals.get('parent_id', False)
@@ -427,7 +434,7 @@ class ResPartner(models.Model):
         # Email field validation
         if vals.get('email'):
             email_address = vals.get('email')
-            if not tools.single_email_re.match(email_address):
+            if not multiple_emails_re.match(email_address):
                 raise ValidationError(u"L'adresse courriel %s est invalide" % (email_address,))
 
         # Modification de la fonction write pour propager la modification de la référence aux enfants si besoin
