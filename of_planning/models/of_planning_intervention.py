@@ -2358,7 +2358,7 @@ class ResPartner(models.Model):
     def action_view_intervention(self):
         action = self.env.ref('of_planning.of_sale_order_open_interventions').read()[0]
 
-        action['domain'] = ['|', ('partner_id', 'child_of', self.ids), ('partner_id', 'child_of', self.ids)]
+        action['domain'] = ['|', ('partner_id', 'child_of', self.ids), ('address_id', 'child_of', self.ids)]
         if len(self._ids) == 1:
             context = safe_eval(action['context'])
             action['context'] = self._get_action_view_intervention_context(context)
