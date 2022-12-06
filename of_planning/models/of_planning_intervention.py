@@ -1357,6 +1357,9 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def write(self, vals):
+        ri_report = self.env.ref('of_planning.of_planning_raport_intervention_report', raise_if_not_found=False)
+        default_template = self.env.ref(
+            'of_planning.of_planning_default_intervention_template', raise_if_not_found=False)
         if 'default_date' in self._context:
             # On doit supprimer 'default_date' du context, sans quoi il affecte la creation des mail.message
             new_context = dict(self._context)
@@ -1396,6 +1399,15 @@ class OfPlanningIntervention(models.Model):
         employee_before = {rec: rec.employee_ids for rec in self}
 
         result = super(OfPlanningIntervention, self).write(vals)
+
+        # Génération auto du rapport d'intervention
+        if ri_report and vals.get('state', '') == 'done':
+            for record in self:
+                if (record.template_id and record.template_id.attach_report) or \
+                    (default_template and default_template.attach_report):
+                    self.env['report'].sudo().get_pdf(docids=record._ids, report_name=ri_report.report_name)
+        for picking in self.mapped('picking_ids').filtered(lambda p: p.state in ('partially_available', 'assigned')):
+            self.env['stock.immediate.transfer'].create({'pick_id': picking.id}).process()
 
         self._affect_number()
         if vals.get('state', '') == 'done':
@@ -1522,7 +1534,8 @@ class OfPlanningIntervention(models.Model):
         ctx.update({
             'default_model': 'of.planning.intervention',
             'default_res_id': self.ids[0],
-            'default_composition_mode': 'comment'
+            'default_composition_mode': 'comment',
+            'force_attachment': True,
         })
         return {
             'type': 'ir.actions.act_window',
@@ -1544,7 +1557,7 @@ class OfPlanningIntervention(models.Model):
     @api.multi
     def button_done(self):
         res = self.write({'state': 'done'})
-        for picking in self.picking_ids.filtered(lambda p: p.state in ('partially_available', 'assigned')):
+        for picking in self.mapped('picking_ids').filtered(lambda p: p.state in ('partially_available', 'assigned')):
             self.env['stock.immediate.transfer'].create({'pick_id': picking.id}).process()
         return res
 
