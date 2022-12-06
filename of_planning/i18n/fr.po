@@ -1895,16 +1895,6 @@ msgid "Mode de règlement :"
 msgstr "Mode de règlement :"
 
 #. module: of_planning
-#: model:res.groups,name:of_planning.of_group_planning_intervention_modification_siens
-msgid "Modifier mes interventions seulement"
-msgstr "Modifier mes interventions seulement"
-
-#. module: of_planning
-#: model:res.groups,name:of_planning.of_group_planning_intervention_modification_tout
-msgid "Modifier toutes les interventions"
-msgstr "Modifier toutes les interventions"
-
-#. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_equipe_modele_id
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template_line_template_id
 msgid "Modèle"
@@ -2804,16 +2794,6 @@ msgstr "Verrouillé"
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_address_city
 msgid "Ville"
 msgstr "Ville"
-
-#. module: of_planning
-#: model:res.groups,name:of_planning.of_group_planning_intervention_lecture_siens
-msgid "Voir mes interventions seulement"
-msgstr "Voir mes interventions seulement"
-
-#. module: of_planning
-#: model:res.groups,name:of_planning.of_group_planning_intervention_lecture_tout
-msgid "Voir toutes les interventions"
-msgstr "Voir toutes les interventions"
 
 #. module: of_planning
 #: model:mail.template,subject:of_planning.email_template_of_planning_intervention_rapport_intervention

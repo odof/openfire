@@ -63,7 +63,6 @@ of_followup.access_of_followup_project_tag,of.followup.project.tag.user,of_follo
 access_of_followup_project_tag_manager,of.followup.project.tag.manager,of_followup.model_of_followup_project_tag,sales_team.group_sale_manager,1,1,1,1
 of_followup.access_of_followup_project_alert,access.of.followup.project.alert,of_followup.model_of_followup_project_alert,sales_team.group_sale_salesman,1,0,0,0
 
-
 of_crm.access_of_sale_objective_manager,of.sale.objective.manager,of_crm.model_of_sale_objective,of_group_project_responsible,1,1,1,1
 of_crm.access_of_sale_objective_line_manager,of.sale.objective.line.manager,of_crm.model_of_sale_objective_line,of_group_project_responsible,1,1,1,1
 

@@ -34,6 +34,7 @@
     <!-- déplacer le menu des catégories de SAV -->
     <record id="of_project_issue.menu_of_project_issue_categorie_action_form" model="ir.ui.menu">
         <field name="parent_id" ref="of_planning.menu_of_planning_configuration_res"/>
+        <field name="groups_id" eval="[(6, 0, [])]"/>
     </record>
     <!-- masquer les menus des SAV et étiquettes de SAV -->
     <record model="ir.ui.menu" id="of_project_issue.menu_of_planning_intervention_sav">

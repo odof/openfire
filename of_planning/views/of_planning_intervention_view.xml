@@ -358,7 +358,8 @@
                                             stock.group_stock_user"/>
                                     <!-- widget many2many_tags car sinon le picking_domain[0][2] ne fonctionne pas
                                         (dans le domain du champ picking_id) -->
-                                    <field name="picking_domain" invisible="1" widget="many2many_tags"/>
+                                    <field name="picking_domain" invisible="1" widget="many2many_tags"
+                                           context="{'force_read': True}"/>
                                     <field name="picking_id" groups="sales_team.group_sale_salesman,
                                                                    account.group_account_invoice,
                                                                    stock.group_stock_user"/>
@@ -1154,11 +1155,11 @@
             <menuitem id="menu_of_planning_vente_articles" name="Articles" parent="of_planning.menu_of_planning_vente" action="of_product_template_action_planning" sequence="10"/>
             <menuitem id="menu_of_planning_vente_kits" name="Kits" parent="of_planning.menu_of_planning_vente" action="of_template_open_kit_planning" sequence="20"/>
 
-        <menuitem id="menu_of_planning_configuration" name="Configuration" parent="of_planning.menu_of_planning" groups="hr.group_hr_manager" sequence="100"/>
+        <menuitem id="menu_of_planning_configuration" name="Configuration" parent="of_planning.menu_of_planning" groups="group_planning_intervention_responsible" sequence="100"/>
             <menuitem id="menu_of_planning_configuration_res" name="Ressources" parent="of_planning.menu_of_planning_configuration" sequence="10"/>
                 <menuitem name="Employés" id="menu_hr_employee_tree" parent="of_planning.menu_of_planning_configuration_res" sequence="10" action="action_hr_employee_tree"/>
                 <menuitem name="Équipes" id="menu_of_planning_equipe_tree" parent="of_planning.menu_of_planning_configuration_res" sequence="20" action="action_of_planning_equipe_tree"/>
-                <menuitem id="menu_hr_config_of_creneau_intervention" name="Créneaux horaires" parent="menu_of_planning_configuration_res" groups="hr.group_hr_manager" action="action_view_of_horaire_creneau_tree_intervention" sequence="30"/>
+                <menuitem id="menu_hr_config_of_creneau_intervention" name="Créneaux horaires" parent="menu_of_planning_configuration_res" action="action_view_of_horaire_creneau_tree_intervention" sequence="30"/>
                 <menuitem name="Catégories de tâches" id="menu_of_planning_tache_categ_tree" parent="of_planning.menu_of_planning_configuration_res" sequence="40" action="action_of_planning_tache_categ_tree"/>
                 <menuitem name="Tâches" id="menu_of_planning_tache_tree" parent="of_planning.menu_of_planning_configuration_res" sequence="50" action="action_of_planning_tache_tree"/>
                 <menuitem name="Erreurs" id="menu_of_planning_intervention_raison_tree" parent="of_planning.menu_of_planning_configuration_res" sequence="60" action="action_of_planning_intervention_raison_tree"/>
@@ -1166,6 +1167,16 @@
                 <menuitem name="Étiquettes d'intervention" id="menu_of_planning_tag_tree" parent="of_planning.menu_of_planning_configuration_res" sequence="80" action="action_of_planning_tag_tree"/>
             <menuitem id="menu_of_planning_configuration_template" name="Modèles" parent="of_planning.menu_of_planning_configuration" sequence="30"/>
                 <menuitem name="Modèles de courriers" id="menu_of_planning_mail_templates" parent="of_planning.menu_of_planning_configuration_template" sequence="20" action="of_gesdoc.action_of_mail_template_tree_all" />
+
+    <!-- Suppression des anciens groupes de certains menus (PEUT ÊTRE SUPPRIMÉ APRÈS APPLICATION) -->
+
+    <record id="of_planning.menu_of_planning_configuration" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('of_planning.group_planning_intervention_responsible')])]"/>
+    </record>
+
+    <record id="of_planning.menu_hr_config_of_creneau_intervention" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [])]"/>
+    </record>
 
     <!-- Creation la facture depuis planning intervention -->
 

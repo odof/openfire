@@ -363,7 +363,7 @@ class OfPlanningInterventionTemplate(models.Model):
     @api.multi
     def get_fi_internal_docs(self, rdv):
         self.ensure_one()
-        report_obj = self.env['report']
+        report_obj = self.env['report'].sudo()
         data = []
         # order : sale.report_saleorder
         # invoice : account.report_invoice
@@ -416,7 +416,7 @@ class OfPlanningInterventionTemplate(models.Model):
     @api.multi
     def get_ri_internal_docs(self, rdv):
         self.ensure_one()
-        report_obj = self.env['report']
+        report_obj = self.env['report'].sudo()
         data = []
         # order : sale.report_saleorder
         # invoice : account.report_invoice

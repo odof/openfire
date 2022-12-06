@@ -109,10 +109,11 @@ class SaleOrder(models.Model):
     of_notes = fields.Text(string='Follow-up notes')
     of_info = fields.Text(string='Info')
     of_reference_laying_date = fields.Date(
-        compute='_compute_of_reference_laying_date', string='Reference laying date', store=True)
+        compute='_compute_of_reference_laying_date', string='Reference laying date', store=True, compute_sudo=True)
     of_force_laying_date = fields.Boolean(string='Force laying date')
     of_manual_laying_date = fields.Date(string='Manual laying date')
-    of_laying_week = fields.Char(compute='_compute_of_reference_laying_date', string="Laying week", store=True)
+    of_laying_week = fields.Char(
+        compute='_compute_of_reference_laying_date', string="Laying week", store=True, compute_sudo=True)
     of_main_product_brand_id = fields.Many2one(
         comodel_name='of.product.brand', compute='_of_compute_main_product_brand_id',
         string="Brand of the main product", store=True)
