@@ -178,9 +178,9 @@ class SaleOrder(models.Model):
         [('order', u'Quantités commandées'), ('delivery', u'Quantités livrées')], string="Politique de facturation"
     )
     of_fixed_invoice_date = fields.Date(string="Date de facturation fixe")
-    of_invoice_date_prev = fields.Date(string=u"Date de facturation prévisonnelle",
-                                       compute="_compute_of_invoice_date_prev",
-                                       inverse="_inverse_of_invoice_date_prev", store=True)
+    of_invoice_date_prev = fields.Date(
+        string=u"Date de facturation prévisonnelle", compute="_compute_of_invoice_date_prev",
+        inverse="_inverse_of_invoice_date_prev", store=True, compute_sudo=True)
     of_delivered = fields.Boolean(string=u"Livrée", compute="_compute_delivered", store=True)
     of_allow_quote_addition = fields.Boolean(
         string=u"Permet l'ajout de devis complémentaires", compute='_compute_of_allow_quote_addition')
@@ -858,9 +858,9 @@ class SaleOrderLine(models.Model):
                                          string="Politique de facturation",
                                          compute="_compute_of_invoice_policy",
                                          store=True)
-    of_invoice_date_prev = fields.Date(string=u"Date de facturation prévisionnelle",
-                                       compute="_compute_of_invoice_date_prev",
-                                       store=True)
+    of_invoice_date_prev = fields.Date(
+        string=u"Date de facturation prévisionnelle", compute="_compute_of_invoice_date_prev", store=True,
+        compute_sudo=True)
     of_seller_price = fields.Float(string=u"Prix d'achat")
 
     of_date_tarif = fields.Date(string="Date du tarif", related="product_id.date_tarif", readonly=True)

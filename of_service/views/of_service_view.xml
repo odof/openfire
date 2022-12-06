@@ -16,7 +16,8 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="button_valider" string="Valider" states="draft" type="object"/>
+                    <button name="button_valider" string="Valider" states="draft" type="object"
+                            groups="of_planning.group_planning_intervention_responsible"/>
                     <button name="button_annuler" string="Annuler" type="object"
                             attrs="{'invisible': [('base_state', '!=', 'calculated')]}"/>
                     <button name="button_brouillon" string="Remettre en brouillon" states="cancel" type="object"/>

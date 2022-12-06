@@ -45,6 +45,12 @@
         <field name="implied_ids" eval="[(4, ref('of_group_stock_responsible'))]"/>
     </record>
 
+    <function
+        id="transfer_old_access_rights"
+        model="res.groups"
+        name="_transfer_old_access_control_access_rights">
+    </function>
+
     <data noupdate="1">
 
         <!-- CRM Lead -->

@@ -101,5 +101,11 @@
             <field name="perm_create" eval="False"/>
         </record>
 
+        <function
+            id="transfer_old_access_rights"
+            model="res.groups"
+            name="_transfer_old_planning_access_rights">
+        </function>
+
     </data>
 </odoo>

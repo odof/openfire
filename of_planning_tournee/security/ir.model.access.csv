@@ -1,5 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_of_planning_tournee_user,of.planning.tournee.user,model_of_planning_tournee,of_planning.group_planning_intervention_access,1,0,0,0
-access_of_planning_tournee_modification,of.planning.tournee.modification,model_of_planning_tournee,of_planning.group_planning_intervention_manager,1,1,1,0
-access_of_planning_tournee_manager,of.planning.tournee.manager,model_of_planning_tournee,of_planning.group_planning_intervention_access,1,1,1,1
-
+access_of_planning_tournee_intervention_access,access.of.planning.tournee.intervention.access,model_of_planning_tournee,of_planning.group_planning_intervention_access,1,1,1,0
+access_of_planning_tournee_intervention_manager,access.of.planning.tournee.intervention.manager,model_of_planning_tournee,of_planning.group_planning_intervention_manager,1,1,1,1
