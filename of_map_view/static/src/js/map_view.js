@@ -1093,7 +1093,7 @@ MapView.LayerGroup = Widget.extend({
             this.the_layer.clearLayers();
         }
         this.the_layer = new L.LayerGroup();
-        var lat, lng, marker, icon, id, number, currentMarker, manyNumbers;
+        var lat, lng, marker, icon, id, number, additionnalRecord, manyNumbers;
         var latlngs = [];
         for (var i=0; i<this.records.length; i++) {
             //console.log(this.records[i]);
@@ -1133,7 +1133,8 @@ MapView.LayerGroup = Widget.extend({
             this.records[i]["rendered"] = true;
         }
         // Add the current marker if there is an additionnal record
-        if (this.options.additional_record){
+        additionnalRecord = this.options.additional_record || false;
+        if (additionnalRecord && (additionnalRecord.geo_lat || additionnalRecord.geo_lng)){
             var options = this.options.icon_options.unselected;
             // this id is a negative value to avoid conflict with existing ids of real markers
             options['id'] = 'icon_' + this.options.additional_record.id;
@@ -1141,8 +1142,7 @@ MapView.LayerGroup = Widget.extend({
             options['prefix'] = 'mdi';
             options['glyph'] = 'radiobox-blank';
             icon = L.icon.glyph(options);
-            currentMarker = this.options.additional_record;
-            marker = new MapView.Marker([currentMarker.geo_lat, currentMarker.geo_lng],this,currentMarker,{icon:icon});
+            marker = new MapView.Marker([additionnalRecord.geo_lat, additionnalRecord.geo_lng],this,additionnalRecord,{icon:icon});
             this.the_layer.addLayer(marker);
             marker.set_ids_dict_ref();
         }
