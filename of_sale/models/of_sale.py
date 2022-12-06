@@ -172,7 +172,7 @@ class SaleOrder(models.Model):
     of_notes_client = fields.Text(related='partner_id.comment', string="Notes client", readonly=True)
 
     of_total_cout = fields.Monetary(compute='_compute_of_marge', string='Prix de revient')
-    of_marge_pc = fields.Float(compute='_compute_of_marge', string='Marge %')
+    of_marge_pc = fields.Float(compute='_compute_of_marge', string=u"Marge %", search='_search_of_marge_pc')
 
     of_etiquette_partenaire_ids = fields.Many2many(
         'res.partner.category', related='partner_id.category_id', string=u"Étiquettes client")
@@ -515,6 +515,35 @@ class SaleOrder(models.Model):
         # Recalcul de la dernière échéance si besoin
         self.filtered('of_echeances_modified').of_recompute_echeance_last()
         return res
+
+    def _search_of_marge_pc(self, operator, value):
+        top = value + 0.004
+        down = value - 0.005
+        params = []
+        request = "SELECT id FROM sale_order WHERE "
+        if operator == '=':
+            request += "of_marge_pc >= %s AND of_marge_pc <= %s;"
+            params = (down, top)
+        elif operator == '!=':
+            request += "of_marge_pc <= %s OR of_marge_pc >= %s;"
+            params = (down, top)
+        elif operator == '>=':
+            request += "of_marge_pc >= %s;"
+            params = (down,)
+        elif operator == '>':
+            request += "of_marge_pc > %s;"
+            params = (top,)
+        elif operator == '<=':
+            request += "of_marge_pc <= %s;"
+            params = (top,)
+        elif operator == '<':
+            request += "of_marge_pc < %s;"
+            params = (down,)
+        else:
+            raise NotImplementedError(_("Search operator %s not implemented for value %s") % (operator, value))
+        self.env.cr.execute(request, params)
+        ids = [r[0] for r in self.env.cr.fetchall()]
+        return [('id', 'in', ids)]
 
     @api.depends('state', 'order_line', 'order_line.qty_to_invoice', 'order_line.product_uom_qty')
     def _compute_of_to_invoice(self):
