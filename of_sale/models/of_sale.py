@@ -154,7 +154,7 @@ class SaleOrder(models.Model):
     of_notes_client = fields.Text(related='partner_id.comment', string="Notes client", readonly=True)
 
     of_total_cout = fields.Monetary(compute='_compute_of_marge', string='Prix de revient')
-    of_marge_pc = fields.Float(compute='_compute_of_marge', string='Marge %')
+    of_marge_pc = fields.Float(compute='_compute_of_marge', string='Marge %', store=True)
 
     of_etiquette_partenaire_ids = fields.Many2many(
         'res.partner.category', related='partner_id.category_id', string=u"Étiquettes client")
