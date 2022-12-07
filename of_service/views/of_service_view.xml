@@ -16,7 +16,8 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="button_valider" string="Valider" states="draft" type="object"/>
+                    <button name="button_valider" string="Valider" states="draft" type="object"
+                            groups="of_planning.group_planning_intervention_responsible"/>
                     <button name="button_annuler" string="Annuler" type="object"
                             attrs="{'invisible': [('base_state', '!=', 'calculated')]}"/>
                     <button name="button_brouillon" string="Remettre en brouillon" states="cancel" type="object"/>
@@ -744,11 +745,11 @@
             </xpath>
             <xpath expr="//form//div[@name='button_box']" position="inside">
                 <button class="oe_stat_button" name="action_view_recurrent" type="object" icon="fa-wrench"
-                  groups="of_planning.of_group_planning_intervention_lecture_tout">
+                  groups="of_planning.group_planning_intervention_modification">
                     <field string="DI récurrentes" name="recurrent_count" widget="statinfo"/>
                 </button>
                 <button class="oe_stat_button" name="action_view_a_programmer" type="object" icon="fa-wrench"
-                  groups="of_planning.of_group_planning_intervention_lecture_tout">
+                  groups="of_planning.group_planning_intervention_modification">
                     <field string="DI à programmer" name="a_programmer_count" widget="statinfo"/>
                 </button>
             </xpath>

@@ -88,6 +88,7 @@
             <t t-foreach="docs" t-as="vals">
                 <t t-set="o" t-value="vals[0]"/>
                 <t t-set="order" t-value="vals[1]"/>
+                <t t-if="order"><t t-set="order" t-value="order.sudo()"/></t>
                 <t t-call="of_planning.of_internal_layout">
                     <div class="page">
                         <t t-set="cacher_montant" t-value="order.fiche_intervention_cacher_montant()"/>

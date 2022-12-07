@@ -929,9 +929,9 @@ class OfPlanningIntervention(models.Model):
     @api.depends('line_ids', 'line_ids.invoice_line_ids', 'order_id', 'order_id.invoice_ids')
     def _compute_invoice_ids(self):
         for rdv in self:
-            invoices = rdv.line_ids.mapped('invoice_line_ids').mapped('invoice_id')
+            invoices = rdv.line_ids.sudo().mapped('invoice_line_ids').mapped('invoice_id')
             if rdv.order_id:
-                for invoice in rdv.order_id.invoice_ids:
+                for invoice in rdv.order_id.sudo().invoice_ids:
                     invoices |= invoice
             rdv.invoice_count = len(invoices)
             rdv.invoice_ids = invoices
@@ -953,7 +953,7 @@ class OfPlanningIntervention(models.Model):
         for intervention in self:
             picking_list = []
             if intervention.order_id:
-                picking_list = intervention.order_id.picking_ids.ids
+                picking_list = intervention.order_id.sudo().picking_ids.ids
             intervention.picking_domain = picking_list
 
     @api.depends('state')
@@ -1007,7 +1007,7 @@ class OfPlanningIntervention(models.Model):
         # Faire même calcul que pour les sale.order
         for rdv in self:
             rdv.picking_ids = rdv.procurement_group_id and \
-                self.env['stock.picking'].search([('group_id', '=', rdv.procurement_group_id.id)]) or []
+                self.env['stock.picking'].sudo().search([('group_id', '=', rdv.procurement_group_id.id)]) or []
             rdv.delivery_count = len(rdv.picking_ids)
 
     @api.depends('partner_id', 'address_id')
@@ -1030,11 +1030,11 @@ class OfPlanningIntervention(models.Model):
     def _compute_order_amounts(self):
         for rdv in self:
             if rdv.order_id:
-                total = rdv.order_id.amount_total
-                if hasattr(rdv.order_id, 'payment_ids'):
-                    # Permet de bypasser le manque de droits sur les paiements
-                    # pour avoir l'info du restant dû dans les RDV
-                    sudo_rdv = rdv.sudo()
+                # Permet de bypasser le manque de droits sur les commandes et paiements
+                # pour avoir l'info du restant dû dans les RDV
+                sudo_rdv = rdv.sudo()
+                total = sudo_rdv.order_id.amount_total
+                if hasattr(sudo_rdv.order_id, 'payment_ids'):
                     still_due = total - sum(sudo_rdv.order_id.payment_ids.mapped('of_amount_total'))
                 else:
                     still_due = 0.0
@@ -1045,7 +1045,7 @@ class OfPlanningIntervention(models.Model):
     def _compute_picking_amounts(self):
         for rdv in self:
             if rdv.picking_id:
-                rdv.picking_amount_total = rdv.picking_id.get_sale_value()
+                rdv.picking_amount_total = rdv.picking_id.sudo().get_sale_value()
 
     # Search #
 
@@ -1338,7 +1338,8 @@ class OfPlanningIntervention(models.Model):
         Exceptions pour les lignes déjà facturées ou liées à une commande, celles-ci doivent concerver leurs taxes.
         """
         if self.fiscal_position_id:
-            self.line_ids.filtered(lambda l: not l.order_line_id and not l.invoice_line_ids)._compute_tax_id()
+            self.line_ids.filtered(lambda l: not l.sudo().order_line_id and not l.sudo().invoice_line_ids).\
+                _compute_tax_id()
 
     # Héritages
 
@@ -1573,7 +1574,7 @@ class OfPlanningIntervention(models.Model):
     @api.multi
     def button_confirm(self):
         res = self.write({'state': 'confirm'})
-        self.line_ids._action_procurement_create()
+        self.line_ids.sudo()._action_procurement_create()
         return res
 
     @api.multi
@@ -2148,7 +2149,7 @@ class OfPlanningInterventionLine(models.Model):
     @api.depends('invoice_line_ids', 'invoice_line_ids.invoice_id', 'invoice_line_ids.quantity')
     def _compute_qty_invoiced(self):
         for line in self:
-            line.qty_invoiced = sum(line.invoice_line_ids.mapped('quantity'))
+            line.qty_invoiced = sum(line.sudo().invoice_line_ids.mapped('quantity'))
 
     @api.depends('intervention_id.invoice_policy', 'intervention_id.state',
                  'qty', 'qty_delivered', 'qty_invoiced', 'order_line_id')
@@ -2185,14 +2186,14 @@ class OfPlanningInterventionLine(models.Model):
     def create(self, vals):
         res = super(OfPlanningInterventionLine, self).create(vals)
         if res.intervention_id.state == 'confirm':
-            res._action_procurement_create()
+            res.sudo()._action_procurement_create()
         return res
 
     @api.multi
     def write(self, vals):
         res = super(OfPlanningInterventionLine, self).write(vals)
         if 'qty' in vals:
-            self._action_procurement_create()
+            self.sudo()._action_procurement_create()
         return res
 
     @api.multi
@@ -2504,6 +2505,14 @@ class StockPicking(models.Model):
     def _compute_of_intervention_count(self):
         for picking in self:
             picking.of_intervention_count = len(picking.of_intervention_ids)
+
+    @api.multi
+    def read(self, fields=None, load='_classic_read'):
+        if self._context.get('force_read'):
+            res = super(StockPicking, self.sudo()).read(fields, load)
+        else:
+            res = super(StockPicking, self).read(fields, load)
+        return res
 
     @api.multi
     def action_view_interventions(self):
