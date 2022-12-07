@@ -279,10 +279,11 @@ class OFFollowupProject(models.Model):
     user_id = fields.Many2one(comodel_name='res.users', string=u"Responsable", default=lambda self: self.env.user)
     vendor_id = fields.Many2one(related='order_id.user_id', string=u"Vendeur", readonly=True)
     reference_laying_date = fields.Date(
-        compute='_compute_reference_laying_date', string=u"Date de pose de référence", store=True)
+        compute='_compute_reference_laying_date', string=u"Date de pose de référence", store=True, compute_sudo=True)
     force_laying_date = fields.Boolean(string=u"Forcer la date de pose")
     manual_laying_date = fields.Date(string=u"Date de pose (manuelle)")
-    laying_week = fields.Char(compute='_compute_reference_laying_date', string=u"Semaine de pose", store=True)
+    laying_week = fields.Char(
+        compute='_compute_reference_laying_date', string=u"Semaine de pose", store=True, compute_sudo=True)
     task_ids = fields.One2many(comodel_name='of.followup.task', inverse_name='project_id', string=u"Tâches")
     predefined_task_ids = fields.One2many(
         comodel_name='of.followup.task', inverse_name='project_id', string=u"Tâches pré-définies",

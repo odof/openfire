@@ -112,7 +112,7 @@ class SaleOrderLine(models.Model):
         string=u"Qté(s) réservée(s)", digits=dp.get_precision('Product Unit of Measure'),
         compute='_compute_of_stock_qty')
     of_picking_min_week = fields.Char(
-        string=u"Sem. de livraison prévue", compute='_compute_of_picking_min_week', store=True)
+        string=u"Sem. de livraison prévue", compute='_compute_of_picking_min_week', store=True, compute_sudo=True)
     of_receipt_min_week = fields.Char(string=u"Sem. de réception prévue", compute='_compute_of_receipt_min_week')
     of_product_type = fields.Selection(
         selection=[('product', u"Produit stockable"),
