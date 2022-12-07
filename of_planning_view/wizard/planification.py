@@ -329,7 +329,10 @@ class OfPlanifCreneau(models.TransientModel):
         if not self.duree_rdv:
             raise UserError(u"Avez-vous pensé à vérifier la durée de votre intervention?")
         intervention = self.create_intervention()
-        intervention.onchange_company_id()  # Permet de renseigner l'entrepôt
+        # Permet de renseigner l'entrepôt
+        intervention.onchange_company_id()
+        # Permet de renseigner les lignes de facturation
+        intervention.onchange_template_id()
         if self.selected_id.service_id.recurrence:
             date_next = intervention.service_id.get_next_date(self.date_creneau)
             intervention.service_id.write({
@@ -346,6 +349,10 @@ class OfPlanifCreneau(models.TransientModel):
         if not self.duree_rdv:
             raise UserError(u"Avez-vous pensé à vérifier la durée de votre intervention?")
         intervention = self.create_intervention()
+        # Permet de renseigner l'entrepôt
+        intervention.onchange_company_id()
+        # Permet de renseigner les lignes de facturation
+        intervention.onchange_template_id()
         intervention._compute_date_deadline()
         date_dt = fields.Datetime.from_string(intervention.date)
         date_deadline_dt = fields.Datetime.from_string(intervention.date_deadline)
@@ -570,6 +577,7 @@ class OfPlanifCreneau(models.TransientModel):
         values = {
             'partner_id': service.partner_id.id,
             'address_id': service.address_id.id,
+            'template_id': service.template_id.id,
             'tache_id': service.tache_id.id,
             'service_id': service.id,
             'employee_ids': [(6, 0, employee_ids)],
