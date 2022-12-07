@@ -1230,14 +1230,16 @@ class OfPlanningIntervention(models.Model):
             if tache_accounting.fiscal_position_id and (not self.fiscal_position_id or change_fiscal_pos):
                 self.fiscal_position_id = tache_accounting.fiscal_position_id
             if self.tache_id.product_id:
-                self.line_ids = planning_line_obj.new({
+                lines = self.line_ids
+                lines |= planning_line_obj.new({
                     'intervention_id': self.id,
                     'product_id': self.tache_id.product_id.id,
                     'qty': 1,
                     'price_unit': self.tache_id.product_id.lst_price,
                     'name': self.tache_id.product_id.name,
                 })
-                self.line_ids.compute_taxes()
+                lines.compute_taxes()
+                self.line_ids = lines
             self.flexible = self.tache_id.flexible
             # affichage de la description de la tâche
             if self.tache_id.description:
