@@ -1,5 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_of_service_user,of.service.user,model_of_service,of_planning.group_planning_intervention_access,1,0,0,0
+access_of_service_user,of.service.user,model_of_service,base.group_user,1,0,0,0
 access_of_service_line_user,of.service.line.user,model_of_service_line,of_planning.group_planning_intervention_access,1,0,0,0
 access_of_service_tag_user,of.service.tag.user,model_of_service_tag,of_planning.group_planning_intervention_access,1,0,0,0
 access_of_service_type_user,of.service.type.user,model_of_service_type,of_planning.group_planning_intervention_access,1,0,0,0
