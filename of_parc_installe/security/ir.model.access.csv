@@ -1,4 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_parc_installe_user,access.of.parc.installe.user,model_of_parc_installe,base.group_user,1,0,0,0
 access_of_parc_installe_intervention_access,access.of.parc.installe.intervention.access,model_of_parc_installe,of_planning.group_planning_intervention_access,1,1,0,0
 access_of_parc_installe_intervention_modification,access.of.parc.installe.intervention.modification,model_of_parc_installe,of_planning.group_planning_intervention_modification,1,1,1,0
 access_of_parc_installe_intervention_manager,access.of.parc.installe.intervention.manager,model_of_parc_installe,of_planning.group_planning_intervention_manager,1,1,1,1
