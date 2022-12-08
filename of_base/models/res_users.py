@@ -15,6 +15,7 @@ class ResUsers(models.Model):
         return [
             ('web', u"Web"),
             ('technical', u"Technique"),
+            ('external', u"Externe"),
         ]
 
     @api.model
