@@ -460,6 +460,8 @@ class OfPlanningIntervention(models.Model):
     order_id = fields.Many2one(
         "sale.order", string=u"Commande", copy=False,
         domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")
+    order_user_id = fields.Many2one(
+        comodel_name='res.users', string=u"Vendeur", related='order_id.user_id', readonly=True)
     order_amount_total = fields.Monetary(string=u"Montant CC", readonly=True, compute='_compute_order_amounts')
     order_still_due = fields.Monetary(string=u"Restant dû CC", readonly=True, compute='_compute_order_amounts')
     picking_amount_total = fields.Monetary(string=u"Montant BL lié", readonly=True, compute='_compute_picking_amounts')
