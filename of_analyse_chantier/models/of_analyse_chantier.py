@@ -382,9 +382,10 @@ class OfAnalyseChantierRemise(models.Model):
 class OfAnalyseChantier(models.Model):
     _name = "of.analyse.chantier"
 
-    name = fields.Char(string="Nom", compute="_compute_name")
+    name = fields.Char(string="Nom", compute="_compute_name", store=True)
     state = fields.Selection(string=u"État", selection=[('draft', 'En cours'), ('done', u'Validée')], default='draft')
-    partner_id = fields.Many2one('res.partner', string="Partenaire", compute="_compute_partner")
+    partner_id = fields.Many2one(
+        comodel_name='res.partner', string="Partenaire", compute="_compute_partner", store=True)
     order_ids = fields.One2many('sale.order', 'of_analyse_id', string="Commandes")
     invoice_ids = fields.One2many('account.invoice', 'of_analyse_id', string="Factures")
     picking_ids = fields.One2many('stock.picking', 'of_analyse_id', string="Bons de livraisons")
@@ -733,8 +734,9 @@ class SaleOrder(models.Model):
     @api.multi
     def action_confirm(self):
         res = super(SaleOrder, self).action_confirm()
-        self.creer_analyse_chantier()
+        self.sudo().creer_analyse_chantier()
         return res
+
 
 class AccountInvoice(models.Model):
     _inherit = "account.invoice"
