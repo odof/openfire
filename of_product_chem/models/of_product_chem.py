@@ -17,7 +17,16 @@ class OFProductTemplate(models.Model):
             "SELECT * FROM information_schema.columns WHERE table_name = '%s' AND column_name = 'of_flamme_verte'" %
             (self._table,))
         exists = bool(cr.fetchall())
+
         res = super(OFProductTemplate, self)._auto_init()
+
+        module_self = self.env['ir.module.module'].search([('name', '=', 'of_product_chem')])
+        if module_self:
+            version = module_self.latest_version
+            if version < '10.0.4.2.0':
+                cr = self.env.cr
+                cr.execute("UPDATE product_template SET of_efficacite_saison = of_efficacite_saison_moved0")
+
         if not exists:
             product_brands = self.env['of.product.brand'].with_context(active_test=False).search([])
             for product_brand in product_brands:
@@ -71,7 +80,7 @@ ${'\\n' + object.description_sale}
     of_cog_emission = fields.Char(string=u"Émission de COG", help=u"Exprimé en mg/m3")
     of_cov_emission = fields.Char(string=u"Émission de COV", help=u"Exprimé en µg/m3")
     of_indice_i = fields.Char(string=u"Indice I")
-    of_efficacite_saison = fields.Float(string=u"% Efficacité énergétique saisonnière", digits=(2, 2))
+    of_efficacite_saison = fields.Char(string=u"% Efficacité énergétique saisonnière")
     of_fonds_air_bois = fields.Boolean(string=u"Éligible Fonds Air Bois ?")
 
 
