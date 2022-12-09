@@ -35,9 +35,6 @@
                 <field name="category_child_ids" widget="many2many_tags"
                        attrs="{'invisible': ['|',('category_child_ids', '=', False),('filter','!=','category')]}"/>
             </xpath>
-            <xpath expr="//notebook//field[@name='line_ids']/tree" position="attributes">
-                <attribute name="editable">top</attribute>
-            </xpath>
             <xpath expr="//notebook//field[@name='line_ids']/tree/field[@name='product_id']" position="before">
                 <field name="id"/>
             </xpath>
