@@ -18,3 +18,7 @@ class ResCompany(models.Model):
         if self._uid != SUPERUSER_ID:
             raise ValidationError(u"Seul l'administrateur peut supprimer une société.")
         return super(ResCompany, self).unlink()
+
+    @api.model
+    def get_allowed_company_ids(self):
+        return self.env.user.company_ids.ids

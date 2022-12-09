@@ -17,6 +17,8 @@ var utils = require("web.utils");
 var time = require('web.time');
 var data = require("web.data");
 
+var CompoundDomain = data.CompoundDomain;
+
 var SidebarFilter = widgets.SidebarFilter;
 var Sidebar = widgets.Sidebar;
 var _t = core._t;
@@ -165,11 +167,12 @@ CalendarView.include({
         var dnd_dfd = ir_config_model.call('get_param',['Calendar_Drag_And_Drop']);
         var mintime_dfd = ir_values_model.call("get_default", ["of.intervention.settings", "calendar_min_time"]);
         var maxtime_dfd = ir_values_model.call("get_default", ["of.intervention.settings", "calendar_max_time"]);
+        var company_ids_dfd = new Model('res.company').call('get_allowed_company_ids', []);
 
         // initialiser les couleurs des créneaux dispo et leur durée minimale
         var creneau_dispo_data_def = self.set_creneau_dispo_opt();
 
-        return $.when(dnd_dfd, mintime_dfd, maxtime_dfd, creneau_dispo_data_def, this._super())
+        return $.when(dnd_dfd, mintime_dfd, maxtime_dfd, company_ids_dfd, creneau_dispo_data_def, this._super())
         .then(function () {
             // privilégier l'attribut draggable de la vue XML si présent: exemple rdv_view.xml
             if (!isNullOrUndef(self.draggable)) {
@@ -189,6 +192,7 @@ CalendarView.include({
             }else if (max_time) {
                 self.maxTime = max_time + ":00:00"
             }
+            self.company_ids = arguments[3]
             return $.when();
         });
     },
@@ -256,8 +260,10 @@ CalendarView.include({
         var dfd = $.Deferred();
         var p = dfd.promise();
         var Attendees = new Model(self.attendee_model);
+        var attendee_domain = this.build_attendee_domain();
 
         Attendees.query(['id', self.color_ft_field, self.color_bg_field, 'name', 'sequence']) // retrieve colors from db
+            .filter(attendee_domain)
             .order_by(['sequence'])
             .all()
             .then(function (attendees){
@@ -324,6 +330,13 @@ CalendarView.include({
             });
 
         return $.when(p);
+    },
+    /**
+     *  builds domain to filter attendees to be displayed in the right panel
+     */
+    build_attendee_domain: function() {
+        var attendee_domain = ['|', ['company_id', '=', false], ['company_id', 'in', this.company_ids]];
+        return new CompoundDomain(attendee_domain);
     },
     make_attendee_columns: function(){
         var self = this;
