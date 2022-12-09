@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-23 10:00+0000\n"
-"PO-Revision-Date: 2022-08-23 10:00+0000\n"
+"POT-Creation-Date: 2022-11-16 13:01+0000\n"
+"PO-Revision-Date: 2022-11-16 13:01+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -1180,6 +1180,11 @@ msgid "Date of the day"
 msgstr "Date du jour"
 
 #. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_date_action_filter
+msgid "Date of the next action"
+msgstr "Date de la prochaine action"
+
+#. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_date_projet
 msgid "Date projet"
 msgstr "Date projet"
@@ -2109,6 +2114,11 @@ msgid "Origine"
 msgstr "Origine"
 
 #. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_view_crm_case_opportunities_filter
+msgid "Overdue Activities"
+msgstr "Activités en retard"
+
+#. module: of_crm
 #: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
 msgid "Overdue activities"
 msgstr "Activités en retard"
@@ -2469,6 +2479,11 @@ msgid "Short Name"
 msgstr "Nom court"
 
 #. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_view_crm_case_opportunities_filter
+msgid "Show all opportunities for which the next action date is before today"
+msgstr "Montrer toutes les opportunités pour lesquelles la date de la prochaine activité est antérieur à aujourd'hui."
+
+#. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion2_company_id
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_funnel_conversion_company_id
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_projet_line_company_id
@@ -2549,6 +2564,11 @@ msgid "Taux de transformation (%)"
 msgstr "Taux de transformation (%)"
 
 #. module: of_crm
+#: model:ir.model.fields,help:of_crm.field_crm_lead_of_date_action_filter
+msgid "Technical field used in the search view to filter on the date of the next action"
+msgstr "Champ technique utilisé dans la vue de recherche pour filtrer sur la date de la prochaine action"
+
+#. module: of_crm
 #: code:addons/of_crm/models/crm_activity.py:117
 #, python-format
 msgid "Technical visit date"
@@ -2573,6 +2593,11 @@ msgstr "Texte Long"
 #, python-format
 msgid "This Month"
 msgstr "Ce mois"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_view_crm_case_opportunities_filter
+msgid "This Week Activities To Do"
+msgstr "Activités à faire cette semaine"
 
 #. module: of_crm
 #: model:ir.model.fields,help:of_crm.field_res_users_campaign_id
@@ -2660,6 +2685,11 @@ msgstr "À faire"
 #, python-format
 msgid "Today"
 msgstr "Aujourd'hui"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_view_crm_case_opportunities_filter
+msgid "Today Activities"
+msgstr "Activités du Jour"
 
 #. module: of_crm
 #: model:ir.ui.view,arch_db:of_crm.of_crm_of_sale_objective_form_view
