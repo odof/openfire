@@ -32,10 +32,7 @@
                         <field name="of_cog_emission"/>
                         <field name="of_cov_emission"/>
                         <field name="of_indice_i"/>
-                        <label for="of_efficacite_saison"/>
-                        <div>
-                            <field name="of_efficacite_saison" nolabel="1" class="oe_inline"/>%
-                        </div>
+                        <field name="of_efficacite_saison"/>
                         <field name="of_fonds_air_bois"/>
                     </group>
                 </group>
