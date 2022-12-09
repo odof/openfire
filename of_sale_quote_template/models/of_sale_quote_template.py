@@ -771,8 +771,9 @@ class SaleOrder(models.Model):
         compute='_compute_of_layout_category_invoice_status', string=u"État de facturation des lignes de section",
         readonly=True)
     of_price_printing = fields.Selection(selection_add=[
-        ('layout_category', u'Prix par sections'),
-        ('layout_category_with_products', u'Prix par sections avec articles'),
+        ('layout_category', "Prix par sections"),
+        ('layout_category_with_products', "Prix par sections avec articles"),
+        ('summary', u"Récapitulatif des prix par sections"),
     ])
 
     # Onchange nécessaire, car lors de la suppression d'une ligne de section, cette ligne de section est toujours
@@ -1107,9 +1108,15 @@ class SaleOrder(models.Model):
 
             # On crée une liste de lignes de commande pour chaque section avancée, y compris celles vides
             for index, layout_category in enumerate(of_layout_category_ids_sorted):
+                if self.of_price_printing == 'summary':
+                    domain = [('of_layout_category_id', 'child_of', layout_category.id)]
+                else:
+                    domain = [('of_layout_category_id', '=', layout_category.id)]
+
+                lines = self.order_line.search(domain)
                 new_dict[index] = {
                     'layout_category': layout_category,
-                    'order_lines': self.order_line.search([('of_layout_category_id', '=', layout_category.id)])
+                    'order_lines': lines,
                 }
 
             # On récupère les lignes de commande qui n'ont pas de lignes de section associées
@@ -1254,8 +1261,9 @@ class AccountInvoice(models.Model):
 
     of_layout_category_ids = fields.Many2many('of.sale.order.layout.category', string=u"Liste de section", copy=True)
     of_price_printing = fields.Selection(selection_add=[
-        ('layout_category', u'Prix par sections'),
-        ('layout_category_with_products', u'Prix par sections avec articles'),
+        ('layout_category', "Prix par sections"),
+        ('layout_category_with_products', "Prix par sections avec articles"),
+        ('summary', u"Récapitulatif des prix par sections"),
     ])
 
     @api.multi
@@ -1273,10 +1281,15 @@ class AccountInvoice(models.Model):
 
             # On crée une liste de lignes de facture pour chaque section avancée, y compris celles vides
             for index, layout_category in enumerate(of_layout_category_ids_sorted):
+                if self.of_price_printing == 'summary':
+                    domain = [('of_layout_category_id', 'child_of', layout_category.id)]
+                else:
+                    domain = [('of_layout_category_id', '=', layout_category.id)]
+
+                lines = self.invoice_line_ids.search(domain)
                 new_dict[index] = {
                     'layout_category': layout_category,
-                    'invoice_line_ids': self.invoice_line_ids.search(
-                        [('of_layout_category_id', '=', layout_category.id)]),
+                    'invoice_line_ids': lines,
                 }
 
             # On récupère les lignes de facture qui n'ont pas de lignes de section associées
