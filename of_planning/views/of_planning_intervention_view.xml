@@ -1211,9 +1211,9 @@
                     </button>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/form//field[@name='qty_delivered']/parent::node()" position="after">
-                    <label for="of_qty_planifiee" string="Qté(s) réalisée(s)" invisible="context.get('hide_sale')"/>
+                    <label for="of_qty_planning_done" string="Qté(s) réalisée(s)" invisible="context.get('hide_sale')"/>
                     <div invisible="context.get('hide_sale')">
-                        <field name="of_qty_planifiee" invisible="context.get('hide_sale')"/>
+                        <field name="of_qty_planning_done" invisible="context.get('hide_sale')"/>
                     </div>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/tree" position="inside">
