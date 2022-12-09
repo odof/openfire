@@ -2371,7 +2371,7 @@ msgid "Qté prévue"
 msgstr "Qté prévue"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_sale_order_line_of_qty_planifiee
+#: model:ir.model.fields,field_description:of_planning.field_sale_order_line_of_qty_planning_done
 #: model:ir.ui.view,arch_db:of_planning.of_sale_view_order_form
 msgid "Qté(s) réalisée(s)"
 msgstr "Qté(s) réalisée(s)"

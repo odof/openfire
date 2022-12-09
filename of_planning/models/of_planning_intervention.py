@@ -2446,7 +2446,9 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     of_intervention_line_ids = fields.One2many('of.planning.intervention.line', 'order_line_id')
-    of_qty_planifiee = fields.Float(string=u"Qté(s) réalisée(s)", compute="_compute_of_qty_planifiee", store=True)
+    of_qty_planning_done = fields.Float(
+        string=u"Qté(s) réalisée(s)", compute='_compute_of_qty_planning_done', store=True,
+        digits=dp.get_precision('Product Unit of Measure'), oldname='of_qty_planifiee')
     of_intervention_state = fields.Selection(
         [('todo', u'À planifier'),
          ('confirm', u'Planifée'),
@@ -2456,10 +2458,10 @@ class SaleOrderLine(models.Model):
 
     @api.depends('of_intervention_line_ids', 'of_intervention_line_ids.qty',
                  'of_intervention_line_ids.intervention_state')
-    def _compute_of_qty_planifiee(self):
+    def _compute_of_qty_planning_done(self):
         for line in self:
             lines = line.of_intervention_line_ids.filtered(lambda l: l.intervention_state in ('done', ))
-            line.of_qty_planifiee = sum(lines.mapped('qty'))
+            line.of_qty_planning_done = sum(lines.mapped('qty'))
 
     @api.depends('of_intervention_line_ids', 'of_intervention_line_ids.intervention_state')
     def _compute_intervention_state(self):

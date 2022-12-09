@@ -72,7 +72,7 @@
         <field name="inherit_id" ref="of_sale.of_sale_order_line_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='qty_invoiced']" position="before">
-                <field name="of_qty_planifiee"/>
+                <field name="of_qty_planning_done"/>
             </xpath>
         </field>
     </record>

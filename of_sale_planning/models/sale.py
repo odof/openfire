@@ -36,7 +36,7 @@ class SaleOrderLine(models.Model):
 
     @api.depends('qty_invoiced', 'qty_delivered', 'product_uom_qty', 'order_id.state',
                  'order_id.of_invoice_policy', 'order_id.partner_id.of_invoice_policy',
-                 'of_qty_planifiee')
+                 'of_qty_planning_done')
     def _get_to_invoice_qty(self):
         """
         Compute the quantity to invoice. If the invoice policy is order, the quantity to invoice is
@@ -44,7 +44,7 @@ class SaleOrderLine(models.Model):
         """
         for line in self.filtered(lambda l: l.of_invoice_policy == 'intervention'):
             if line.order_id.state in ['sale', 'done']:
-                line.qty_to_invoice = line.of_qty_planifiee - line.qty_invoiced
+                line.qty_to_invoice = line.of_qty_planning_done - line.qty_invoiced
             else:
                 line.qty_to_invoice = 0
         super(SaleOrderLine, self.filtered(lambda l: l.of_invoice_policy != 'intervention'))._get_to_invoice_qty()
