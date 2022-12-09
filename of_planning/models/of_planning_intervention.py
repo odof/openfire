@@ -1202,13 +1202,14 @@ class OfPlanningIntervention(models.Model):
             if template_accounting.fiscal_position_id and not self.lien_commande and \
                     (not self.fiscal_position_id or change_fiscal_pos):
                 self.fiscal_position_id = template_accounting.fiscal_position_id
-            new_lines = self.line_ids or intervention_line_obj
-            for line in template.line_ids:
-                data = line.get_intervention_line_values()
-                data['intervention_id'] = self.id
-                new_lines += intervention_line_obj.new(data)
-            new_lines.compute_taxes()
-            self.line_ids = new_lines
+            if not self._context.get('of_intervention_wizard', False):
+                new_lines = self.line_ids or intervention_line_obj
+                for line in template.line_ids:
+                    data = line.get_intervention_line_values()
+                    data['intervention_id'] = self.id
+                    new_lines += intervention_line_obj.new(data)
+                new_lines.compute_taxes()
+                self.line_ids = new_lines
 
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
