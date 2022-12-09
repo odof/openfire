@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, api, fields
-
+import odoo.addons.decimal_precision as dp
 from odoo.exceptions import UserError
 
 
@@ -25,8 +25,11 @@ class StockMove(models.Model):
 
     # Par défaut les champs relationnels sont lus en tant qu'admin.
     # Ici ce ne doit pas être le cas car les quantités doivent êtres lues dans la société de l'utilisateur
-    of_qty_available_stock = fields.Float(string=u"Qté stock", compute="_compute_of_qty_stock")
-    of_qty_virtual_stock = fields.Float(string=u"Qté prévisionnelle", compute="_compute_of_qty_stock")
+    of_qty_available_stock = fields.Float(
+        string=u"Qté stock", digits=dp.get_precision('Product Unit of Measure'), compute='_compute_of_qty_stock')
+    of_qty_virtual_stock = fields.Float(
+        string=u"Qté prévisionnelle", digits=dp.get_precision('Product Unit of Measure'),
+        compute='_compute_of_qty_stock')
 
     @api.depends('product_id')
     def _compute_of_qty_stock(self):
