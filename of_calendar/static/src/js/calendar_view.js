@@ -1252,35 +1252,40 @@ CalendarView.include({
                                     var now_id;
 
                                     now_id = the_attendee_people;
-                                    tempColorFT = self.all_filters[self.res_ids_indexes[now_id]].color_ft;
-                                    tempColorBG = self.all_filters[self.res_ids_indexes[now_id]].color_bg;
-                                    // this will be the main color of the event
-                                    if (self.all_filters[self.res_ids_indexes[now_id]].is_checked && !found &&
-                                        !isNullOrUndef(self.event_ids_attendees[evt["id"]]) &&
-                                        !_.contains(self.event_ids_attendees[evt["id"]], now_id)) {
-                                        // quand on montre les créneaux dispo,
-                                        // on duplique les events à plusieurs attendees pour avoir un bel alignement
-                                        // il faut donc leur donner chacun une couleur différente
-                                        evt["color_filter_id"] = now_id;
-                                        self.event_ids_attendees[evt["id"]].push(now_id);
-                                        found = true;
-                                        if (!self.colorIsAttendee || color_captions) {
+                                    // if this attendee is not present in self.all_filters, it means they belong to a
+                                    // a company that is not in current user's authorized companies
+                                    // in this case, don't do anything
+                                    if (!isNullOrUndef(self.all_filters[self.res_ids_indexes[now_id]])) {
+                                        tempColorFT = self.all_filters[self.res_ids_indexes[now_id]].color_ft;
+                                        tempColorBG = self.all_filters[self.res_ids_indexes[now_id]].color_bg;
+                                        // this will be the main color of the event
+                                        if (self.all_filters[self.res_ids_indexes[now_id]].is_checked && !found &&
+                                            !isNullOrUndef(self.event_ids_attendees[evt["id"]]) &&
+                                            !_.contains(self.event_ids_attendees[evt["id"]], now_id)) {
+                                            // quand on montre les créneaux dispo,
+                                            // on duplique les events à plusieurs attendees pour avoir un bel alignement
+                                            // il faut donc leur donner chacun une couleur différente
+                                            evt["color_filter_id"] = now_id;
+                                            self.event_ids_attendees[evt["id"]].push(now_id);
+                                            found = true;
+                                            if (!self.colorIsAttendee || color_captions) {
+                                                the_title_avatar +=
+                                                    '<i class="of_calendar_evt_top of_calendar_attendee_box" title="' +
+                                                    _.escape(self.all_attendees[the_attendee_people]) + '"' +
+                                                    'style="background: ' + tempColorBG +
+                                                    '; border: 1px solid #0D0D0D; position: absolute; right: ' +
+                                                    icon_offset_px + 'px;" ></i>';
+                                                    icon_offset_px += 15;
+                                            }
+                                        }else{
                                             the_title_avatar +=
                                                 '<i class="of_calendar_evt_top of_calendar_attendee_box" title="' +
                                                 _.escape(self.all_attendees[the_attendee_people]) + '"' +
                                                 'style="background: ' + tempColorBG +
                                                 '; border: 1px solid #0D0D0D; position: absolute; right: ' +
                                                 icon_offset_px + 'px;" ></i>';
-                                                icon_offset_px += 15;
+                                            icon_offset_px += 15;
                                         }
-                                    }else{
-                                        the_title_avatar +=
-                                            '<i class="of_calendar_evt_top of_calendar_attendee_box" title="' +
-                                            _.escape(self.all_attendees[the_attendee_people]) + '"' +
-                                            'style="background: ' + tempColorBG +
-                                            '; border: 1px solid #0D0D0D; position: absolute; right: ' +
-                                            icon_offset_px + 'px;" ></i>';
-                                        icon_offset_px += 15;
                                     }
                                 }else if (evt["virtuel"] && !evt["ferie"]){
                                     var tempColorFT, tempColorBG;
