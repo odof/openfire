@@ -331,8 +331,9 @@ class OfPlanifCreneau(models.TransientModel):
         intervention = self.create_intervention()
         # Permet de renseigner l'entrepôt
         intervention.onchange_company_id()
-        # Permet de renseigner les lignes de facturation
-        intervention.onchange_template_id()
+        # Permet de renseigner les lignes de facturation et de questionnaire
+        intervention.with_context(of_import_service_lines=True).onchange_template_id()
+        intervention.with_context(of_import_service_lines=True)._onchange_service_id()
         if self.selected_id.service_id.recurrence:
             date_next = intervention.service_id.get_next_date(self.date_creneau)
             intervention.service_id.write({
@@ -351,8 +352,9 @@ class OfPlanifCreneau(models.TransientModel):
         intervention = self.create_intervention()
         # Permet de renseigner l'entrepôt
         intervention.onchange_company_id()
-        # Permet de renseigner les lignes de facturation
-        intervention.onchange_template_id()
+        # Permet de renseigner les lignes de facturation et de questionnaire
+        intervention.with_context(of_import_service_lines=True).onchange_template_id()
+        intervention.with_context(of_import_service_lines=True)._onchange_service_id()
         intervention._compute_date_deadline()
         date_dt = fields.Datetime.from_string(intervention.date)
         date_deadline_dt = fields.Datetime.from_string(intervention.date_deadline)
