@@ -388,7 +388,7 @@ class ResPartner(models.Model):
     def create(self, vals):
         # Email field validation
         if vals.get('email'):
-            email_address = vals.get('email')
+            email_address = vals['email']
             if not multiple_emails_re.match(email_address):
                 raise ValidationError(u"L'adresse courriel %s est invalide" % (email_address,))
 
@@ -432,8 +432,9 @@ class ResPartner(models.Model):
     @api.multi
     def write(self, vals):
         # Email field validation
-        if vals.get('email'):
-            email_address = vals.get('email')
+        if vals.get('email') and (not self._context.get('from_of_mobile') or
+                                  (len(self) == 1 and self.email != vals['email'])):
+            email_address = vals['email']
             if not multiple_emails_re.match(email_address):
                 raise ValidationError(u"L'adresse courriel %s est invalide" % (email_address,))
 
