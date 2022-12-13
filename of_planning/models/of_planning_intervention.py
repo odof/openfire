@@ -2450,13 +2450,13 @@ class SaleOrderLine(models.Model):
     of_intervention_line_ids = fields.One2many('of.planning.intervention.line', 'order_line_id')
     of_qty_planning_done = fields.Float(
         string=u"Qté(s) réalisée(s)", compute='_compute_of_qty_planning_done', store=True,
-        digits=dp.get_precision('Product Unit of Measure'), oldname='of_qty_planifiee')
+        digits=dp.get_precision('Product Unit of Measure'), oldname='of_qty_planifiee', compute_sudo=True)
     of_intervention_state = fields.Selection(
         [('todo', u'À planifier'),
          ('confirm', u'Planifée'),
          ('done', u'Réalisée'),
          ],
-        string=u"État de planification", compute="_compute_intervention_state", store=True)
+        string=u"État de planification", compute="_compute_intervention_state", store=True, compute_sudo=True)
 
     @api.depends('of_intervention_line_ids', 'of_intervention_line_ids.qty',
                  'of_intervention_line_ids.intervention_state')
