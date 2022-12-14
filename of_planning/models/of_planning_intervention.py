@@ -353,43 +353,6 @@ class OfPlanningIntervention(models.Model):
     _inherit = ["of.readgroup", "of.calendar.mixin", 'mail.thread']
     _order = 'date'
 
-    @api.model_cr_context
-    def _auto_init(self):
-        cr = self._cr
-        cr.execute("SELECT * FROM information_schema.columns WHERE table_name = '%s' "
-                   "AND column_name = 'old_description'" % (self._table,))
-        exists = cr.fetchall()
-        res = super(OfPlanningIntervention, self)._auto_init()
-        module_self = self.env['ir.module.module'].search([('name', '=', 'of_planning')])
-        if module_self:
-            version = module_self.latest_version
-            if version < '10.0.1.1.0':
-                cr = self.env.cr
-                cr.execute("UPDATE of_planning_intervention "
-                           "SET invoice_status = 'no' "
-                           "WHERE ID IN "
-                           "(SELECT T1.id "
-                           "FROM of_planning_intervention T1 "
-                           "LEFT JOIN of_planning_intervention_line T2 ON T2.intervention_id = T1.id "
-                           "WHERE T2.intervention_id IS NULL)")
-
-        cr.execute('SELECT id FROM of_planning_intervention WHERE warehouse_id IS NULL',)
-        fetch = cr.fetchall()
-        if fetch:
-            ids = [tup[0] for tup in fetch]
-            cr.execute(
-                "UPDATE of_planning_intervention ofp "
-                "SET warehouse_id = rc.of_default_warehouse_id "
-                "FROM res_company rc "
-                "WHERE rc.id = ofp.company_id "
-                "  AND ofp.id IN %s", (tuple(ids),))
-        if not exists:
-            records_to_update = self.search([('description', '!=', False)])
-            for rec in records_to_update:
-                rec.old_description = rec.description
-                rec.description = tools.html2plaintext('<div>' + rec.description + '</div>')
-        return res
-
     # Domain #
 
     @api.model

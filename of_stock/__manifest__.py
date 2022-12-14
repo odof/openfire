@@ -21,7 +21,6 @@ Extension OpenFire du module stock
         "of_external",
     ],
     "data": [
-        'data/mail_template_data.xml',
         'data/res_groups.xml',
         'views/of_stock_views.xml',
         'wizards/of_stock_date_confirmation_views.xml',
@@ -32,6 +31,7 @@ Extension OpenFire du module stock
         'wizards/of_stock_inventory_create_missing_wizard_views.xml',
         'reports/of_specific_delivery_report.xml',
         'reports/of_valued_delivery_report.xml',
+        'data/mail_template_data.xml',
     ],
     'installable': True,
     'application': False,
