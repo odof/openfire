@@ -88,6 +88,9 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
             cr.execute("UPDATE of_service SET base_state = 'calculated'")
 
             # On demande la mise à jour du champ date_next des services
+            # On supprime la clé 'of_service_compute_date_next' potentiellement déjà existante
+            cr.execute("DELETE FROM ir_config_parameter "
+                       "WHERE key = 'of_service_compute_date_next'")
             cr.execute("INSERT INTO ir_config_parameter(key,value) "
                        "VALUES ('of_service_compute_date_next', 'init_date_fin_contrat')")
         return res
