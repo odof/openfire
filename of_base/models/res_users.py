@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from unidecode import unidecode
+
 from odoo import models, api, tools, fields, SUPERUSER_ID, _
 from odoo.exceptions import AccessError, UserError
 
@@ -36,7 +38,7 @@ class ResUsers(models.Model):
     @api.multi
     def _get_default_email(self):
         self.ensure_one()
-        return self.partner_id.name.lower().replace(" ", "") + "@example.com"
+        return unidecode(self.partner_id.name).lower().replace(" ", "") + "@example.com"
 
     @api.model
     def create(self, vals):
