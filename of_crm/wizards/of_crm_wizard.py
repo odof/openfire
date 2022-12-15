@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from odoo import api, models
+from odoo import api, fields, models
 
 
 class OFCRMActivityLog(models.TransientModel):
@@ -25,3 +25,9 @@ class OFCRMActivityLog(models.TransientModel):
                 suivi = new_line + suivi
                 log.lead_id.write({'description': suivi})
         return super(OFCRMActivityLog, self).action_log()
+
+
+class CrmLeadLost(models.TransientModel):
+    _inherit = 'crm.lead.lost'
+
+    lost_reason_id = fields.Many2one(required=True)
