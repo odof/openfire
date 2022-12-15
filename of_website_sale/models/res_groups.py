@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import models, fields, api
-from odoo.tools.safe_eval import safe_eval
 
 
 class ResUsers(models.Model):
@@ -13,15 +13,14 @@ class ResUsers(models.Model):
         if 'groups_id' in values:
             group_portal_b2c = self.env.ref('of_website_sale.group_portal_b2c')
             group_portal_b2b = self.env.ref('base.group_portal')
-            website_id = self.env.ref('website.default_website')
 
             for user in self:
                 # On teste si on ajoute le groupe b2c sur l'utilisateur
                 if group_portal_b2c.id == values['groups_id'][0][1] and values['groups_id'][0][0] == 4:
 
                     # On ajoute la liste de prix b2c ainsi que la position fiscale b2c
-                    user.partner_id.property_product_pricelist = website_id.of_pricelist_b2c_id
-                    user.partner_id.property_account_position_id = website_id.of_fiscal_position_b2c_id
+                    user.partner_id.property_product_pricelist = user.of_pricelist_id
+                    user.partner_id.property_account_position_id = user.of_fiscal_position_id
                     # On supprime l'utilisateur du groupe b2b et des groupes impliqués
                     group_portal_b2b.users = [(3, user.id)]
                     for group in group_portal_b2b.implied_ids:
@@ -31,8 +30,8 @@ class ResUsers(models.Model):
                 if group_portal_b2b.id == values['groups_id'][0][1] and values['groups_id'][0][0] == 4:
 
                     # On ajoute la liste de prix b2b ainsi que la position fiscale b2c
-                    user.partner_id.property_product_pricelist = website_id.of_pricelist_b2b_id
-                    user.partner_id.property_account_position_id = website_id.of_fiscal_position_b2b_id
+                    user.partner_id.property_product_pricelist = user.of_pricelist_id
+                    user.partner_id.property_account_position_id = user.of_fiscal_position_id
                     # On supprime l'utilisateur du groupe b2c et des groupes impliqués
                     group_portal_b2c.users = [(3, user.id)]
                     for group in group_portal_b2c.implied_ids:
