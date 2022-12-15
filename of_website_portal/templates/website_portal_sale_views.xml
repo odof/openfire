@@ -28,16 +28,19 @@
 
     <template id="portal_my_home_menu_sale_b2c" name="Portal layout : sales menu entries b2c" inherit_id="website_portal_sale.portal_my_home_menu_sale">
         <xpath expr="//a[@href='/my/quotes']/.." position="attributes">
-            <attribute name="groups">base.group_portal,base.group_user</attribute>
+            <attribute name="t-if">'quotation' in tabs</attribute>
         </xpath>
         <xpath expr="//a[@href='/my/orders']/.." position="attributes">
-            <attribute name="groups">base.group_portal,base.group_user</attribute>
+            <attribute name="t-if">'order' in tabs</attribute>
         </xpath>
         <xpath expr="//a[@href='/my/of_contracts']/.." position="attributes">
-            <attribute name="groups">base.group_portal,base.group_user</attribute>
+            <attribute name="t-if">'contract' in tabs</attribute>
+        </xpath>
+        <xpath expr="//a[@href='/my/invoices']/.." position="attributes">
+            <attribute name="t-if">'invoice' in tabs</attribute>
         </xpath>
         <xpath expr="//a[@href='/my/invoices']/.." position="after">
-            <li groups="base.group_portal,base.group_user">
+            <li t-if="'delivery' in tabs">
                 <a href="/my/deliveries">Livraisons</a>
             </li>
             <li groups="base.group_portal,base.group_user">
@@ -48,16 +51,19 @@
 
     <template id="portal_my_home_sale_b2c" name="Portal My Home : sales entries b2c" inherit_id="website_portal_sale.portal_my_home_sale">
         <xpath expr="//a[@href='/my/quotes']/.." position="attributes">
-            <attribute name="groups">base.group_portal,base.group_user</attribute>
+            <attribute name="t-if">'quotation' in tabs</attribute>
         </xpath>
         <xpath expr="//a[@href='/my/orders']/.." position="attributes">
-            <attribute name="groups">base.group_portal,base.group_user</attribute>
+            <attribute name="t-if">'order' in tabs</attribute>
         </xpath>
         <xpath expr="//a[@href='/my/of_contracts']/.." position="attributes">
-            <attribute name="groups">base.group_portal,base.group_user</attribute>
+            <attribute name="t-if">'contract' in tabs</attribute>
+        </xpath>
+        <xpath expr="//a[@href='/my/invoices']/.." position="attributes">
+            <attribute name="t-if">'invoice' in tabs</attribute>
         </xpath>
         <xpath expr="//a[@href='/my/invoices']/.." position="after">
-            <h3 class="page-header" groups="base.group_portal,base.group_user">
+            <h3 class="page-header" t-if="'delivery' in tabs">
                 <a href="/my/deliveries">Vos livraisons
                     <small class="ml8">
                         <t t-if="delivery_count">
@@ -90,6 +96,24 @@
         </xpath>
         <xpath expr="//table/thead/tr/th[3]" position="attributes">
             <attribute name="groups">of_website_portal.group_of_validate_order_from_portal</attribute>
+        </xpath>
+    </template>
+
+    <template id="portal_my_home" inherit_id="website_project.portal_my_home">
+        <xpath expr="//h3[@t-if='project_count']" position="attributes">
+            <attribute name="t-if">project_count and 'project' in tabs</attribute>
+        </xpath>
+        <xpath expr="//h3[@t-if='task_count']" position="attributes">
+            <attribute name="t-if">task_count and 'task' in tabs</attribute>
+        </xpath>
+    </template>
+
+    <template id="portal_layout" inherit_id="website_project.portal_layout">
+        <xpath expr="//li[@t-if='project_count']" position="attributes">
+            <attribute name="t-if">project_count and 'project' in tabs</attribute>
+        </xpath>
+        <xpath expr="//li[@t-if='task_count']" position="attributes">
+            <attribute name="t-if">task_count and 'task' in tabs</attribute>
         </xpath>
     </template>
 

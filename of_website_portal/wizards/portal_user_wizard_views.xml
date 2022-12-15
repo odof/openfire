@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="wizard_view" model="ir.ui.view">
+        <field name="name">Portal Access Management</field>
+        <field name="model">portal.wizard</field>
+        <field name="inherit_id" ref="portal.wizard_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='in_portal']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='in_portal']" position="after">
+                <field name="user_group_ids" invisible="1"/>
+                <field name="of_user_profile_id" domain="[('of_is_user_profile', '=', True), ('id', 'in',  user_group_ids and user_group_ids[0] and user_group_ids[0][2] or False)]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
