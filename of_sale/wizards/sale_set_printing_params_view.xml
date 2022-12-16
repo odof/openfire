@@ -56,7 +56,7 @@
                         </group>
                     </group>
                     <group col="2">
-                       <group col="2" colspan="2" name="labels">
+                        <group col="2" colspan="2" name="labels">
                             <h4 class="of-printing-parameter-title" colspan="2">Labels</h4>
                             <label for="pdf_payment_term_insert"/>
                             <div name="pdf_payment_term_insert">
@@ -89,6 +89,28 @@
                             <label for="pdf_taxes_detail" class="of-printing-parameter-title"/>
                             <div name="pdf_taxes_detail">
                                 <field name="pdf_taxes_detail" class="oe_inline"/>
+                            </div>
+                        </group>
+                        <group col="2" colspan="2" name="signatures">
+                            <label for="pdf_signatures_insert" string="Signatures" class="of-printing-parameter-title"/>
+                            <div name="pdf_signatures_insert">
+                                <field name="pdf_signatures_insert" class="oe_inline"/>
+                            </div>
+                            <label for="pdf_customer_signature"/>
+                            <div name="pdf_customer_signature">
+                                <field name="pdf_customer_signature" class="oe_inline"/>
+                            </div>
+                            <label for="pdf_vendor_signature"/>
+                            <div name="pdf_vendor_signature">
+                                <field name="pdf_vendor_signature" class="oe_inline"/>
+                            </div>
+                            <label for="group_pdf_prefill_vendor_signature" attrs="{'invisible': [('pdf_vendor_signature', '=', False)]}"/>
+                            <div name="pdf_prefill_vendor_signature" attrs="{'invisible': [('pdf_vendor_signature', '=', False)]}">
+                                <field name="group_pdf_prefill_vendor_signature" class="oe_inline"/>
+                            </div>
+                            <label for="pdf_signature_text"/>
+                            <div name="pdf_signature_text">
+                                <field name="pdf_signature_text" class="oe_inline"/>
                             </div>
                         </group>
                     </group>

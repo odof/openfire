@@ -40,6 +40,7 @@ class OFSaleWizardSetPrintingParams(models.TransientModel):
             'pdf_product_reference': {'default_value': False, 'oldname': 'pdf_display_product_ref_setting'},
             'pdf_payment_schedule': {'default_value': False, 'oldname': 'pdf_afficher_multi_echeances'},
             'pdf_taxes_detail': {'default_value': False, 'oldname': 'of_pdf_taxes_display'},
+            'pdf_signatures_insert': {'default_value': False, 'oldname': False},
         }
 
     def _get_ir_values_settings_value(self, contact_selection_fields, reverted_fields, name, oldname, current_values):
@@ -193,6 +194,23 @@ class OFSaleWizardSetPrintingParams(models.TransientModel):
     pdf_taxes_detail = fields.Boolean(
         string="Taxes detail", default=False, help="If checked, displays the taxes detail in the report")
 
+    # Signatures insert
+    pdf_signatures_insert = fields.Boolean(
+        string="Signatures", default=False, help="If checked, displays signatures insert in PDF reports")
+    pdf_customer_signature = fields.Boolean(
+        string="Customer signature", default=False,
+        help="If checked, displays the customer signature insert at the bottom left of the quotation")
+    pdf_vendor_signature = fields.Boolean(
+        string="Salesman signature", default=False,
+        help="If checked, displays the salesman signature insert at the bottom right of the quotation")
+    group_pdf_prefill_vendor_signature = fields.Boolean(
+        string="Pre-filled salesman signature", implied_group='of_sale.group_of_pdf_prefill_vendor_signature',
+        help="If checked, allows you to load a signature image in the user form view. "
+             "This image will be used as a pre-filled signature in the PDF documents.")
+    pdf_signature_text = fields.Char(
+        string="Signature statement", default=False,
+        help="Signature comment positioned below the titles \"Salesman signature\" and \"Customer signature\"")
+
     @api.onchange('pdf_commercial_insert')
     def onchange_pdf_commercial_insert(self):
         # we have to check the value of the field before the onchange is applied, because when the form is loaded, the
@@ -202,6 +220,21 @@ class OFSaleWizardSetPrintingParams(models.TransientModel):
             self.pdf_commercial_contact = True
         if not origin_value and self.pdf_commercial_insert and not self.pdf_commercial_email:
             self.pdf_commercial_email = True
+
+    @api.onchange('pdf_signatures_insert')
+    def _onchange_pdf_signatures_insert(self):
+        # we have to check the value of the field before the onchange is applied, because when the form is loaded, the
+        # onchange will update the value of the field even if it is not changed by the user
+        origin_value = self.env['ir.values'].get_default('sale.config.settings', 'pdf_signatures_insert')
+        if not origin_value and self.pdf_signatures_insert and not self.pdf_customer_signature:
+            self.pdf_customer_signature = True
+        if not origin_value and self.pdf_signatures_insert and not self.pdf_vendor_signature:
+            self.pdf_vendor_signature = True
+
+    @api.onchange('pdf_vendor_signature')
+    def _onchange_pdf_vendor_signature(self):
+        if not self.pdf_vendor_signature:
+            self.group_pdf_prefill_vendor_signature = False
 
     @api.model
     def _get_groups_fields(self):
@@ -362,6 +395,31 @@ class OFSaleWizardSetPrintingParams(models.TransientModel):
     def set_pdf_taxes_detail(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'pdf_taxes_detail', self.pdf_taxes_detail)
+
+    @api.multi
+    def set_pdf_signatures_insert(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_signatures_insert', self.pdf_signatures_insert)
+
+    @api.multi
+    def set_pdf_customer_signature(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_customer_signature', self.pdf_customer_signature)
+
+    @api.multi
+    def set_pdf_vendor_signature(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_vendor_signature', self.pdf_vendor_signature)
+
+    @api.multi
+    def set_pdf_prefill_vendor_signature(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_prefill_vendor_signature', self.group_pdf_prefill_vendor_signature)
+
+    @api.multi
+    def set_pdf_signature_text(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_signature_text', self.pdf_signature_text)
 
     @api.multi
     def action_validate(self):

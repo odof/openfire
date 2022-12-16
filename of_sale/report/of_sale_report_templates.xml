@@ -25,6 +25,11 @@
         <t t-set="pdf_technical_visit_insert" t-value="doc.pdf_technical_visit_insert()"/>
         <t t-set="pdf_validity_insert" t-value="doc.pdf_validity_insert()"/>
         <t t-set="pdf_payment_schedule" t-value="doc.pdf_payment_schedule()"/>
+        <t t-set="pdf_vendor_signature" t-value="doc.pdf_vendor_signature()"/>
+        <t t-set="pdf_customer_signature" t-value="doc.pdf_customer_signature()"/>
+        <t t-set="pdf_signature_insert" t-value="doc.pdf_signatures_insert() and (pdf_vendor_signature or pdf_customer_signature)"/>
+        <t t-set="pdf_prefill_vendor_signature" t-value="doc.pdf_prefill_vendor_signature()"/>
+        <t t-set="pdf_signature_text" t-value="doc.pdf_signature_text()"/>
         <!--####################
             La vue d'origine est entièrement réécrite ici.
             ####################-->
@@ -343,6 +348,7 @@
                     </table>
                 </div>
             </div>
+
             <t groups="of_sale.group_of_sale_print_one_image+of_sale.group_of_sale_multiimage,of_sale.group_of_sale_print_multiimage" name="image_annexe">
                 <t t-set="any_image" t-value="any(doc.order_line.mapped('of_product_image_ids')) or any(doc.order_line.mapped('product_id.image'))"/>
                 <div class="row" t-if="any_image">
@@ -391,6 +397,45 @@
                 <strong>Note de position fiscale&amp;nbsp;:</strong>
                 <span t-field="doc.fiscal_position_id.note"/>
             </p>
+
+            <!-- Signatures -->
+            <div t-if="pdf_signature_insert" name="signatures" class="row">
+                <div name="customer_signature" class="col-xs-6" style="page-break-inside: avoid;">
+                    <t t-if="pdf_customer_signature">
+                        <div class="encart_signature_titre h4 mb4">
+                            <div>
+                                <strong>Signature du client</strong>
+                            </div>
+                            <div t-if="pdf_signature_text" class="signature_text">
+                                <span t-esc="pdf_signature_text" style="font-size: 14px; font-style: italic;"/>
+                            </div>
+                        </div>
+                        <div class="encart_signature" style="border: 1px solid lightgray; border-top: 2px solid black; padding: 0px 16px; height: 130px; max-height: 130px; overflow: hidden;">
+                            <!-- Signature client -->
+                        </div>
+                    </t>
+                </div>
+                <div name="vendor_signature" class="col-xs-6" style="page-break-inside: avoid;">
+                    <t t-if="pdf_vendor_signature">
+                        <div class="encart_signature_titre h4 mb4">
+                            <div>
+                                <strong>Signature du vendeur</strong>
+                            </div>
+                            <div t-if="pdf_signature_text" class="signature_text">
+                                <span t-esc="pdf_signature_text" style="font-size: 14px; font-style: italic;"/>
+                            </div>
+                        </div>
+                        <div class="encart_signature" style="border: 1px solid lightgray; border-top: 2px solid black; padding: 0px 16px; height: 130px; max-height: 130px; overflow: hidden;">
+                            <!-- Signature vendeur -->
+                            <t t-if="pdf_prefill_vendor_signature and doc.user_id.of_vendor_signature">
+                                <div style="height: 130px; padding: 0px 16px;">
+                                    <span t-field="doc.user_id.of_vendor_signature" class="o_not_editable" t-field-options='{"widget": "image", "class": "img-photo", "style": "max-height: 128px; margin: auto;"}'/>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                </div>
+            </div>
             <div class="oe_structure"/>
         </div>
     </t>
