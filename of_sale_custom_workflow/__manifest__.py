@@ -31,7 +31,6 @@ Module ajoutant une étape intermédiaire dans le workflow des commandes de vent
     'depends': [
         'of_crm',
         'of_sale_payment',
-        'of_followup',
         'of_access_control',
         'of_planning',
         'of_sale_order_cancellation',

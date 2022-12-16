@@ -45,24 +45,6 @@ base.access_res_company_group_erp_manager,res_company group_erp_manager,base.mod
 access_res_users_group_erp_user,res_users group_erp_user,base.model_res_users,of_group_erp_user,1,1,0,0
 base.access_res_users_group_erp_manager,res_users group_erp_manager,base.model_res_users,base.group_system,1,1,1,1
 
-of_followup.access_of_followup_project,of.followup.project.user,of_followup.model_of_followup_project,sales_team.group_sale_salesman,1,0,0,0
-of_followup.access_manager_of_followup_project,of.followup.project.responsible,of_followup.model_of_followup_project,of_group_sale_responsible,1,1,1,1
-of_followup.access_of_followup_project_stage,of.followup.project.stage.user,of_followup.model_of_followup_project_stage,sales_team.group_sale_salesman,1,0,0,0
-of_followup.access_manager_of_followup_project_stage,of.followup.project.stage.manager,of_followup.model_of_followup_project_stage,sales_team.group_sale_manager,1,1,1,1
-of_followup.access_of_followup_task,access.of.followup.task.user,of_followup.model_of_followup_task,sales_team.group_sale_salesman,1,0,0,0
-access_of_followup_task_responsible,of.followup.task.responsible,of_followup.model_of_followup_task,of_group_sale_responsible,1,1,1,1
-of_followup.access_of_followup_task_type,of.followup.task.type.user,of_followup.model_of_followup_task_type,sales_team.group_sale_salesman,1,0,0,0
-access_of_followup_task_type_manager,of.followup.task.type.manager,of_followup.model_of_followup_task_type,sales_team.group_sale_manager,1,1,1,1
-of_followup.access_of_followup_task_type_state,of.followup.task.type.state.user,of_followup.model_of_followup_task_type_state,sales_team.group_sale_salesman,1,0,0,0
-access_of_followup_task_type_state_manager,of.followup.task.type.state.manager,of_followup.model_of_followup_task_type_state,sales_team.group_sale_manager,1,1,1,1
-of_followup.access_of_followup_project_template,of.followup.project.template.user,of_followup.model_of_followup_project_template,sales_team.group_sale_salesman,1,0,0,0
-access_of_followup_project_template_manager,of.followup.project.template.manager,of_followup.model_of_followup_project_template,sales_team.group_sale_manager,1,1,1,1
-of_followup.access_of_followup_project_tmpl_task,of.followup.project.tmpl.task.user,of_followup.model_of_followup_project_tmpl_task,sales_team.group_sale_salesman,1,0,0,0
-access_of_followup_project_tmpl_task_manager,of.followup.project.tmpl.task.manager,of_followup.model_of_followup_project_tmpl_task,sales_team.group_sale_manager,1,1,1,1
-of_followup.access_of_followup_project_tag,of.followup.project.tag.user,of_followup.model_of_followup_project_tag,sales_team.group_sale_salesman,1,0,0,0
-access_of_followup_project_tag_manager,of.followup.project.tag.manager,of_followup.model_of_followup_project_tag,sales_team.group_sale_manager,1,1,1,1
-of_followup.access_of_followup_project_alert,access.of.followup.project.alert,of_followup.model_of_followup_project_alert,sales_team.group_sale_salesman,1,0,0,0
-
 of_crm.access_of_sale_objective_manager,of.sale.objective.manager,of_crm.model_of_sale_objective,of_group_project_responsible,1,1,1,1
 of_crm.access_of_sale_objective_line_manager,of.sale.objective.line.manager,of_crm.model_of_sale_objective_line,of_group_project_responsible,1,1,1,1
 

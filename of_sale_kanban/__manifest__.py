@@ -37,6 +37,7 @@ Modification de la vue kanban des devis/commandes + ajout d'un champ étapes kan
     'data': [
         'security/ir.model.access.csv',
         'views/of_sale_kanban_view.xml',
+        'views/of_sale_kanban_templates.xml',
         'data/of_sale_kanban_data.xml',
         ],
     'installable': True,

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
@@ -49,10 +50,6 @@ class SaleOrder(models.Model):
 
         # Annulation demandes de prix
         self.env['purchase.order'].search([('sale_order_id', '=', self.id), ('state', '=', 'draft')]).button_cancel()
-
-        # Annulation suivi
-        if self.of_followup_project_id:
-            self.of_followup_project_id.set_to_canceled()
 
         self.of_commercially_cancelled = True
         self.of_cancellation_order_id = cancel_order.id
