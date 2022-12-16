@@ -7,9 +7,9 @@
         <field name="inherit_id" ref="base.view_base_module_upgrade"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='module_info']" position="after">
-                <separator string="Confirmation de désinstallation" colspan="2"/>
+                <separator string="Uninstallation Confirmation" colspan="2"/>
                 <group>
-                    <field name="of_validation_code" string="Mot de passe" password="True"/>
+                    <field name="of_validation_code" string="Password" password="True"/>
                 </group>
             </xpath>
         </field>

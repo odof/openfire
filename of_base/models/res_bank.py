@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 from odoo import models, api
 from odoo.exceptions import ValidationError
 from schwifty import BIC
@@ -8,20 +7,20 @@ from schwifty import BIC
 class ResBank(models.Model):
     _inherit = 'res.bank'
 
-    @api.model
-    def create(self, vals):
-        if vals.get('bic'):
-            try:
-                BIC(vals['bic'])
-            except Exception as e:
-                raise ValidationError("Le code bic est incorrect")
-        return super(ResBank, self).create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('bic'):
+                try:
+                    BIC(vals['bic'])
+                except Exception as e:
+                    raise ValidationError("The BIC code is incorrect") from e
+        return super().create(vals_list)
 
-    @api.multi
     def write(self, vals):
         if vals.get('bic'):
             try:
                 BIC(vals['bic'])
             except Exception as e:
-                raise ValidationError("Le code bic est incorrect")
-        return super(ResBank, self).write(vals)
+                raise ValidationError("The BIC code is incorrect") from e
+        return super().write(vals)

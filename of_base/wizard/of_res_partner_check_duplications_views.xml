@@ -6,7 +6,7 @@
         <field name="model">of.res.partner.check.duplications</field>
         <field name="arch" type="xml">
             <form>
-                <separator string="Suspicion de doublons !"/>
+                <separator string="Suspicion of duplicates !"/>
                 <field name="new_partner_id" invisible="1"/>
                 <field name="display_list" invisible="1"/>
                 <field name="duplication_ids" readonly="1" nolabel="1" attrs="{'invisible': [('display_list', '=', False)]}">
@@ -22,7 +22,7 @@
                 <field name="info_txt" readonly="1" nolabel="1"/>
                 <footer>
                     <button string="OK" special="cancel" class="oe_highlight"/>
-                    <button name="action_merge_partners" string="Fusionner" type="object" class="oe_highlight"
+                    <button name="action_merge_partners" string="Merge" type="object" class="oe_highlight"
                             attrs="{'invisible': [('display_list', '=', False)]}"/>
                 </footer>
             </form>

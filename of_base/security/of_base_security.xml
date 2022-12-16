@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <data noupdate="1">
-
-        <record id="of_base_res_partner_rule" model="ir.rule">
-            <field name="name">OF Partners company</field>
-            <field name="model_id" ref="model_res_partner"/>
-            <field name="domain_force">['|', '|', ('company_id', 'child_of', [user.company_id.id]), ('company_id', '=', False), ('supplier', '=', True)]</field>
-            <field name="active" eval="False"/>
-        </record>
-
-    </data>
-
     <!-- Restreindre l'accès au menu "Applications" à l'utilisateur root (admin) -->
     <!-- Ajout d'un groupe pour l'administrateur uniquement -->
-    <record id="of_group_root_only" model="res.groups">
-        <field name="name">Admin seulement</field>
-        <field name="comment">Groupe uniquement pour l'utilisateur admin (root)</field>
-        <field name="users" eval="[(4, ref('base.user_root'))]"/>
+    <record id="of_base.of_group_root_only" model="res.groups">
+        <field name="name">Admin only</field>
+        <field name="comment">Group only for admin (root) user</field>
+        <field name="users" eval="[Command.link(ref('base.user_admin'))]"/>
     </record>
+
+    <!-- Création groupe utilisateurs intranet -->
+    <record id="of_base.of_group_intranet" model="res.groups">
+        <field name="name">Intranet</field>
+        <field name="category_id" ref="base.module_category_extra"/>
+        <field name="comment">OpenFire rights: gives access rights to the intranet</field>
+    </record>
+
+    <record id="of_base.of_group_hidden" model="res.groups">
+        <field name="name">Hidden Special Group</field>
+        <field name="comment">OpenFire special group : allows to hide some menu items</field>
+    </record>
+
 
 </odoo>

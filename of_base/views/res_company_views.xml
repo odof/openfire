@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <!-- Ajout onglet "Paramètres avancés" dans la fiche société -->
+    <record id="of_base_view_company_form" model="ir.ui.view">
+        <field name="name">of.base.company.form</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='phone']" position="replace"/>
+            <xpath expr="//field[@name='email']" position="replace"/>
+            <xpath expr="//field[@name='website']" position="after">
+                <field name="phone"/>
+                <field name="email"/>
+            </xpath>
+            <xpath expr="//field[@name='company_registry']" position="before">
+                <field name="of_legal_form"/>
+                <field name="of_capital"/>
+            </xpath>
+            <xpath expr="//field[@name='vat']" position="replace"/>
+            <xpath expr="//field[@name='company_registry']" position="after">
+                <field name="vat"/>
+            </xpath>
+            <xpath expr="//field[@name='currency_id']" position="replace"/>
+            <xpath expr="//notebook/page[1]/group[1]" position="inside">
+                <group name="miscellaneous" string="Miscellaneous">
+                    <field name="of_general_id"/>
+                    <field name="of_accounting_id"/>
+                    <field name="currency_id" options="{'no_create': True, 'no_open': True}" id="company_currency" context="{'active_test': False}"/>
+                </group>
+                <group name="insurance_qualification" string="Insurance &amp; Qualification">
+                    <field name="of_decennial_insurance"/>
+                    <field name="of_multirisk_insurance"/>
+                    <field name="of_qualif"/>
+                </group>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page  name="advanced_settings" string="Advanced settings" invisible="1">
+                    <group name="advanced_settings_group_1" col="4"/>
+                    <group name="advanced_settings_group_2" col="4"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 from odoo import models, fields, api
+
 
 class OfPopupWizard(models.TransientModel):
     """API fonction permettant d'afficher un message dans une fenêtre au cours de l'exécution d'une fonction"""
@@ -18,5 +18,5 @@ class OfPopupWizard(models.TransientModel):
             'view_type': 'form',
             'view_mode': 'form',
             'target': 'new',
-            'context': str({'default_message': message})
+            'context': {'default_message': message}
         }

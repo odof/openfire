@@ -1,14 +1,14 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-#	* of_base
+# 	* of_base
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 9.0c\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-24 10:57+0000\n"
-"PO-Revision-Date: 2017-02-24 10:57+0000\n"
-"Last-Translator: <>\n"
+"POT-Creation-Date: 2022-12-09 16:51+0000\n"
+"PO-Revision-Date: 2022-12-09 16:51+0000\n"
+"Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,95 +16,2055 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_base
-#: model:ir.ui.view,arch_db:of_base.of_base_login
-msgid "Login"
-msgstr "Identifiant"
-
-#. module: of_base
-#: model:ir.ui.view,arch_db:of_base.of_base_partner_form
-msgid "e.g. Sales Director"
-msgstr "ex : Directeur Commercial"
-
-#. module: of_base
-#: model:ir.model.fields,field_description:base.field_res_partner_bank_acc_type
-msgid "Acc type"
-msgstr "Type de compte"
-
-#. module: of_base
-#: model:ir.model.fields,help:base.field_res_partner_bank_acc_type
-msgid "Laissez le type de compte IBAN pour laisser le logiciel vérifier la validité du code saisi.\n"
-"Utiliser le type Banque pour tout autre type de compte, aucune vérification ne sera effectuée."
-msgstr "Laissez le type de compte IBAN pour laisser le logiciel vérifier la validité du code saisi.\n"
-"Utiliser le type Banque pour tout autre type de compte, aucune vérification ne sera effectuée."
-
-#. module: of_base
-#: model:ir.model.fields,field_description:base_setup.field_base_config_settings_company_share_partner
-msgid "Partager les clients entre toutes les sociétés"
-msgstr "Partager les clients entre toutes les sociétés"
-
-#. module: of_base
-#: model:ir.model.fields,help:base_setup.field_base_config_settings_company_share_partner
-msgid ""
-"Partagez vos clients avec toutes les sociétés définies dans votre base.\n"
-"* Coché : Les clients sont visibles par toutes les sociétés, "
-"même si une société est définie pour le client.\n"
-"* Non coché : Chaque société ne peut voir que ses clients (clients pour lesquels la société est "
-"définie). Les clients non reliés à une société sont visibles par toutes les sociétés."
+#. odoo-javascript
+#: code:addons/of_base/static/src/js/of_form.js:0
+#, python-format
+msgid " & Close"
 msgstr ""
-"Partagez vos clients avec toutes les sociétés définies dans votre base.\n"
-"* Coché : Les clients sont visibles par toutes les sociétés, "
-"même si une société est définie pour le client.\n"
-"* Non coché : Chaque société ne peut voir que ses clients (clients pour lesquels la société est "
-"définie). Les clients non reliés à une société sont visibles par toutes les sociétés."
 
 #. module: of_base
-#: selection:mail.compose.message,of_state:0
-#: selection:mail.message,of_state:0
-msgid "Outgoing"
-msgstr "Sortant"
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__of_ref_mode
+#: model:ir.model.fields,field_description:of_base.field_res_config_settings__of_ref_mode
+msgid "(OF) Customer reference"
+msgstr "(OF) Référence client"
 
 #. module: of_base
-#: selection:mail.compose.message,of_state:0
-#: selection:mail.message,of_state:0
-msgid "Received"
-msgstr "Reçu"
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__of_display_city
+#: model:ir.model.fields,field_description:of_base.field_res_config_settings__of_display_city
+msgid "(OF) Display city"
+msgstr "(OF) Afficher ville"
 
 #. module: of_base
-#: selection:mail.compose.message,of_state:0
-#: selection:mail.message,of_state:0
-msgid "Sent"
-msgstr "Envoyé"
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_email_compose_message_wizard_form
+msgid "(Re)compute the text field"
+msgstr "(Re)calculer le champ texte"
 
 #. module: of_base
-#: model:ir.model.fields,field_description:of_base.field_mail_compose_message_of_state
-#: model:ir.model.fields,field_description:of_base.field_mail_mail_of_state
-#: model:ir.model.fields,field_description:of_base.field_mail_message_of_state
-msgid "Status"
-msgstr "État"
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
+msgid ""
+"* The data entered in this field will be displayed under the heading "
+"'Customer notes' in the quote and the intervention schedule."
+msgstr ""
+"* Les données saisies dans ce champ seront affichées sous la rubrique 'Notes"
+" clients' dans le devis et le planning d'intervention."
 
 #. module: of_base
-#: selection:mail.compose.message,of_state:0
-#: selection:mail.message,of_state:0
-msgid "Delivery Failed"
-msgstr "Échec de l'envoi"
+#: model:ir.model,name:of_base.model_res_groups
+msgid "Access Groups"
+msgstr "Groupes d'accès"
 
 #. module: of_base
-#: selection:mail.compose.message,of_state:0
-#: selection:mail.message,of_state:0
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__unsplash_access_key
+msgid "Access Key"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_taxcloud
+msgid "Account TaxCloud"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__account_journal_early_pay_discount_loss_account_id
+msgid ""
+"Account for the difference amount after the expense discount has been "
+"granted"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__account_journal_early_pay_discount_gain_account_id
+msgid ""
+"Account for the difference amount after the income discount has been granted"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__account_cash_basis_base_account_id
+msgid ""
+"Account that will be set on lines created in cash basis journal entry and "
+"used to keep track of the tax base amount."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_company__of_accounting_id
+msgid "Accountant ID"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_accountant
+#: model_terms:ir.ui.view,arch_db:of_base.of_connector_config_settings_view
+msgid "Accounting"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__message_needaction
+msgid "Action Needed"
+msgstr ""
+
+#. module: of_base
+#: model:res.groups,name:of_base.of_group_root_only
+msgid "Admin only"
+msgstr "Admin seulement"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_sale_pricelist
+msgid "Advanced Pricelists"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_view_company_form
+msgid "Advanced settings"
+msgstr "Paramètres avancés"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__alias_domain
+msgid "Alias Domain"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_product_margin
+msgid "Allow Product Margin"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_check_printing
+msgid "Allow check printing and deposits"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_mail_plugin
+msgid "Allow integration with the mail plugins"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_google_calendar
+msgid "Allow the users to synchronize their calendar  with Google Calendar"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_microsoft_calendar
+msgid "Allow the users to synchronize their calendar with Outlook Calendar"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_base_import
+msgid "Allow users to import data from CSV/XLS/XLSX/ODS files"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__group_sale_pricelist
+msgid ""
+"Allows to manage different prices based on rules per category of customers.\n"
+"                Example: 10% for retailers, promotion of 5 EUR on this product, etc."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__group_multi_currency
+msgid "Allows to work in a multi currency environment"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__group_proforma_sales
+msgid "Allows you to send pro-forma invoice."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_sale_amazon
+msgid "Amazon Sync"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_analytic_accounting
+msgid "Analytic Accounting"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__unsplash_app_id
+msgid "Application ID"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_connector_config_settings_view
+msgid "Apply"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_connector_config_settings_view
+msgid "Are you sure to commit the changes ?"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_voip
+msgid "Asterisk (VoIP)"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__message_attachment_count
+msgid "Attachment Count"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__crm_auto_assignment_action
+msgid "Auto Assignment Action"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__crm_auto_assignment_interval_type
+msgid "Auto Assignment Interval Unit"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__crm_auto_assignment_run_datetime
+msgid "Auto Assignment Next Execution Date"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_currency_rate_live
+msgid "Automatic Currency Rates"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__automatic_invoice
+msgid "Automatic Invoice"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_partner__of_phone_error
+#: model:ir.model.fields,field_description:of_base.field_res_users__of_phone_error
+msgid "Badly formatted phone numbers"
+msgstr "Numéros de téléphone mal formatés"
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/models/res_partner_bank.py:0
+#: model:ir.model,name:of_base.model_res_bank
+#, python-format
+msgid "Bank"
+msgstr "Banque"
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_res_partner_bank
+msgid "Bank Accounts"
+msgstr "Comptes bancaires"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__account_journal_suspense_account_id
+msgid "Bank Suspense Account"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__account_journal_suspense_account_id
+msgid ""
+"Bank Transactions are posted immediately after import or synchronization. Their counterparty is the bank suspense account.\n"
+"Reconciliation replaces the latter by the definitive account(s)."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__account_cash_basis_base_account_id
+msgid "Base Tax Received Account"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_budget
+msgid "Budget Management"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__secondary_color
+msgid "Button Color"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_res_partner_tree
+msgid "CP"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_connector_config_settings_view
+msgid "Cancel"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__mail_message__of_state__cancel
 msgid "Cancelled"
 msgstr "Annulé"
 
 #. module: of_base
-#: model:ir.model.fields,help:of_base.field_mail_compose_message_of_failure_reason
-#: model:ir.model.fields,help:of_base.field_mail_mail_of_failure_reason
-#: model:ir.model.fields,help:of_base.field_mail_message_of_failure_reason
-msgid "Failure reason. This is usually the exception thrown by the email server, stored to ease the debugging of mailing issues."
-msgstr "Raison de l'échec. Ceci est souvent l'exception envoyée par le serveur de messagerie, stockée pour faciliter le débogage des mails d'incidents."
+#. odoo-python
+#: code:addons/of_base/models/of_read_group.py:0
+#, python-format
+msgid "Cannot aggregate field %r."
+msgstr ""
 
 #. module: of_base
-#: model:ir.model.fields,field_description:of_base.field_mail_compose_message_of_failure_reason
-#: model:ir.model.fields,field_description:of_base.field_mail_mail_of_failure_reason
-#: model:ir.model.fields,field_description:of_base.field_mail_message_of_failure_reason
-#: model:ir.ui.view,arch_db:of_base.of_view_message_form
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__tax_exigibility
+msgid "Cash Basis"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__account_journal_early_pay_discount_gain_account_id
+msgid "Cash Discount Gain account"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__account_journal_early_pay_discount_loss_account_id
+msgid "Cash Discount Loss account"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_cash_rounding
+msgid "Cash Rounding"
+msgstr ""
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/models/base.py:0
+#, python-format
+msgid ""
+"Changing the company of a contact should only be done if it was never "
+"correctly set. If an existing contact starts working for a new company then "
+"a new contact should be created under that new company. You can use the "
+"\"Discard\" button to abandon this change."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_partner__city
+#: model:ir.model.fields,field_description:of_base.field_res_users__city
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
+msgid "City"
+msgstr "Ville"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__title_id
+msgid "Civility of the number"
+msgstr "Civilité du numéro"
+
+#. module: of_base
+#. odoo-javascript
+#: code:addons/of_base/static/src/js/of_form.js:0
+#, python-format
+msgid "Close"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_res_company
+msgid "Companies"
+msgstr "Sociétés"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__company_id
+msgid "Company"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__company_informations
+msgid "Company Informations"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__company_name
+msgid "Company Name"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__has_chart_of_accounts
+msgid "Company has a chart of accounts"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_account_invoice_send__of_computed_body
+#: model:ir.model.fields,field_description:of_base.field_mail_compose_message__of_computed_body
+msgid "Computed body"
+msgstr "Contenu calculé"
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de config"
+
+#. module: of_base
+#: model:ir.ui.menu,name:of_base.of_connector_config_settings_menu
+msgid "Configuration"
+msgstr ""
+
+#. module: of_base
+#: model:ir.actions.act_window,name:of_base.of_connector_config_settings_action
+#: model:ir.model,name:of_base.model_of_connector_config_settings
+#: model_terms:ir.ui.view,arch_db:of_base.of_connector_config_settings_view
+msgid "Configure connectors"
+msgstr "Configurer les connecteurs"
+
+#. module: of_base
+#: model:ir.ui.menu,name:of_base.of_connector_menu
+msgid "Connectors"
+msgstr "Connecteurs"
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_partner__country_id
+#: model:ir.model.fields,field_description:of_base.field_res_users__country_id
+msgid "Country"
+msgstr "Pays"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__country_code
+msgid "Country Code"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_sale_loyalty
+msgid "Coupons & Loyalty"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_website_crm_iap_reveal
+msgid "Create Leads/Opportunities from your website's traffic"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__lead_mining_in_pipeline
+msgid "Create a lead mining request directly from the opportunity pipeline."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__create_uid
+#: model:ir.model.fields,field_description:of_base.field_of_log_message__create_uid
+#: model:ir.model.fields,field_description:of_base.field_of_popup_wizard__create_uid
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_check_duplications__create_uid
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__create_date
+#: model:ir.model.fields,field_description:of_base.field_of_log_message__create_date
+#: model:ir.model.fields,field_description:of_base.field_of_popup_wizard__create_date
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_check_duplications__create_date
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__currency_id
+msgid "Currency"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__currency_exchange_journal_id
+msgid "Currency Exchange Journal"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__external_email_server_default
+msgid "Custom Email Servers"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__report_footer
+msgid "Custom Report Footer"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__portal_allow_api_keys
+msgid "Customer API Keys"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__auth_signup_uninvited
+msgid "Customer Account"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_sale_delivery_address
+msgid "Customer Addresses"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
+msgid "Customer note..."
+msgstr "Notes client..."
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_company__of_ref_mode
+msgid "Customer reference"
+msgstr "Référence client"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_delivery_dhl
+msgid "DHL Express Connector"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_company__of_decennial_insurance
+msgid "Decennial insurance"
+msgstr "Assurance décennale"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__user_default_rights
+msgid "Default Access Rights"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__account_default_credit_limit
+msgid "Default Credit Limit"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__purchase_tax_id
+msgid "Default Purchase Tax"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__use_quotation_validity_days
+msgid "Default Quotation Validity"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__quotation_validity_days
+msgid "Default Quotation Validity (Days)"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__sale_tax_id
+msgid "Default Sale Tax"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__use_invoice_terms
+msgid "Default Terms & Conditions"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_partner__of_default_address
+#: model:ir.model.fields,field_description:of_base.field_res_users__of_default_address
+msgid "Default address"
+msgstr "Adresse par défaut"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__incoterm_id
+msgid "Default incoterm"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__deposit_default_product_id
+msgid "Default product used for payment advances"
+msgstr ""
+
+#. module: of_base
+#: model:ir.actions.server,name:of_base.of_base_cron_delete_old_logs_ir_actions_server
+#: model:ir.cron,cron_name:of_base.of_base_cron_delete_old_logs
+#: model:ir.cron,name:of_base.of_base_cron_delete_old_logs
+msgid "Delete log messages"
+msgstr "Suppression des messages de logs"
+
+#. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__mail_message__of_state__exception
+msgid "Delivery Failed"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_delivery
+msgid "Delivery Methods"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__deposit_default_product_id
+msgid "Deposit Product"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__digest_id
+msgid "Digest Email"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__digest_emails
+msgid "Digest Emails"
+msgstr ""
+
+#. module: of_base
+#. odoo-javascript
+#: code:addons/of_base/static/src/js/of_form.js:0
+#, python-format
+msgid "Discard"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_discount_per_so_line
+msgid "Discounts"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__display_name
+#: model:ir.model.fields,field_description:of_base.field_of_log_message__display_name
+#: model:ir.model.fields,field_description:of_base.field_of_popup_wizard__display_name
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_check_duplications__display_name
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__qr_code
+msgid "Display SEPA QR-code"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_check_duplications__display_list
+msgid "Display list"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__preview_ready
+msgid "Display preview button"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__of_display_city
+#: model:ir.model.fields,help:of_base.field_res_config_settings__of_display_city
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_view_general_configuration
+msgid ""
+"Displays the city in parentheses after the partner name when searching for a"
+" partner"
+msgstr ""
+"Affiche la ville entre parenthèses après le nom du partenaire lors de la "
+"recherche de partenaire"
+
+#. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__res_company__of_ref_mode__no
+msgid "Do not fill"
+msgstr "Ne pas remplir"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_invoice_extract
+msgid "Document Digitization"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__external_report_layout_id
+msgid "Document Template"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_reports
+msgid "Dynamic Reports"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_mail_template__of_copy_to_sender
+msgid "E-mail copy to sender"
+msgstr "Copie du mail à l'expéditeur"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_l10n_eu_oss
+msgid "EU Intra-community Distance Selling"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_delivery_easypost
+msgid "Easypost Connector"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_partner__email
+#: model:ir.model.fields,field_description:of_base.field_res_users__email
+msgid "Email"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_mail_template
+msgid "Email Templates"
+msgstr "Modèles d'emails"
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_mail_compose_message
+msgid "Email composition wizard"
+msgstr "Assistant de composition d'emails"
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__invoice_mail_template_id
+msgid "Email sent to the customer once the invoice is available."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__auth_signup_reset_password
+msgid "Enable password reset from Login page"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__account_use_credit_limit
+msgid "Enable the use of credit limit on partners."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__lead_enrich_auto
+msgid "Enrich lead automatically"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_crm_iap_enrich
+msgid ""
+"Enrich your leads automatically with company data based on their email "
+"address."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__of_log_message__log_level__error
+msgid "Error"
+msgstr "Erreur"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_log_message__type
+msgid "Error type"
+msgstr "Type d'erreur"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__fail_counter
+msgid "Fail Mail"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_mail_mail__of_failure_reason
+#: model:ir.model.fields,field_description:of_base.field_mail_message__of_failure_reason
+#: model_terms:ir.ui.view,arch_db:of_base.of_mail_message_view_form
 msgid "Failure Reason"
-msgstr "Raison de l'échec"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_mail_mail__of_failure_reason
+#: model:ir.model.fields,help:of_base.field_mail_message__of_failure_reason
+msgid ""
+"Failure reason. This is usually the exception thrown by the email server, "
+"stored to ease the debugging of mailing issues."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_partner__fax
+#: model:ir.model.fields,field_description:of_base.field_res_users__fax
+#: model:ir.model.fields.selection,name:of_base.selection__of_res_partner_phone__type__04_fax
+msgid "Fax"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_delivery_fedex
+msgid "FedEx Connector"
+msgstr ""
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/models/of_read_group.py:0
+#, python-format
+msgid ""
+"Field %s is not a stored field, only stored fields (regular or many2many) "
+"are valid for the 'groupby' parameter"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_ir_model_fields
+msgid "Fields"
+msgstr "Champs"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__account_fiscal_country_id
+msgid "Fiscal Country Code"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__message_follower_ids
+msgid "Followers"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__message_partner_ids
+msgid "Followers (Partners)"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__report_footer
+msgid "Footer text displayed at the bottom of all reports."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_ir_model_fields__of_custom_groupby
+msgid "Force authorization for grouping"
+msgstr "Autorisation forcée pour le regroupement"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_log_message__function
+#: model_terms:ir.ui.view,arch_db:of_base.of_log_message_search_view
+msgid "Function"
+msgstr "Fonction"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__income_currency_exchange_account_id
+msgid "Gain Account"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_company__of_general_id
+msgid "General ID"
+msgstr "ID général"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_crm_iap_mine
+msgid "Generate new leads based on their country, industries, size, etc."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_base_geolocalize
+msgid "GeoLocalize"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_product_images
+msgid "Get product pictures using barcode"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__google_gmail_client_identifier
+msgid "Gmail Client Id"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__google_gmail_client_secret
+msgid "Gmail Client Secret"
+msgstr ""
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/models/res_users.py:0
+#, python-format
+msgid "Group \"%s\" cannot be added to a user!"
+msgstr "Le groupe \"%s\" ne peut être ajouté à un utilisateur !"
+
+#. module: of_base
+#: model:res.groups,comment:of_base.of_group_root_only
+msgid "Group only for admin (root) user"
+msgstr "Groupe uniquement pour l'utilisateur admin (root)"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__has_accounting_entries
+msgid "Has Accounting Entries"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__has_message
+msgid "Has Message"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__primary_color
+msgid "Header Color"
+msgstr ""
+
+#. module: of_base
+#: model:res.groups,name:of_base.of_group_hidden
+msgid "Hidden Special Group"
+msgstr "Groupe spécial caché"
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
+msgid "History"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__of_res_partner_phone__type__01_domicile
+msgid "Home"
+msgstr "Domicile"
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/models/res_partner_bank.py:0
+#, python-format
+msgid "IBAN"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__id
+#: model:ir.model.fields,field_description:of_base.field_of_log_message__id
+#: model:ir.model.fields,field_description:of_base.field_of_popup_wizard__id
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_check_duplications__id
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__id
+msgid "ID"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_res_partner_phone__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_res_partner_phone__message_has_error
+msgid "If checked, some messages have a delivery error."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__alias_domain
+msgid ""
+"If you have setup a catch-all email domain redirected to the Odoo server, "
+"enter the domain name here."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__use_twilio_rtc_servers
+msgid "If you want to use twilio as TURN/STUN server provider"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_bank_statement_import_qif
+msgid "Import .qif files"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_bank_statement_import_csv
+msgid "Import in .csv format"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_bank_statement_import_ofx
+msgid "Import in .ofx format"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_bank_statement_import_camt
+msgid "Import in CAMT.053 format"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_log_message_search_view
+msgid "Import/export history"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__account_journal_payment_debit_account_id
+msgid ""
+"Incoming payments are posted on an Outstanding Receipts Account. In the bank reconciliation widget, they appear as blue lines.\n"
+"Bank transactions are then reconciled on the Outstanding Receipts Accounts rather than the Receivable Account."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__of_log_message__log_level__info
+msgid "Info"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_check_duplications__info_txt
+msgid "Info text"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_view_company_form
+msgid "Insurance & Qualification"
+msgstr "Assurance & Qualification"
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__transfer_account_id
+msgid ""
+"Intermediary account used when moving from a liquidity account to another."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__transfer_account_id
+msgid "Internal Transfer Account"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__incoterm_id
+msgid ""
+"International Commercial Terms are a series of predefined commercial terms "
+"used in international transactions."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__crm_auto_assignment_interval_type
+msgid "Interval type between each cron run (e.g. each 2 days or each 2 hours)"
+msgstr ""
+
+#. module: of_base
+#: model:res.groups,name:of_base.of_group_intranet
+msgid "Intranet"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_intrastat
+msgid "Intrastat"
+msgstr ""
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/models/of_read_group.py:0
+#, python-format
+msgid "Invalid aggregation function %r."
+msgstr ""
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/models/of_read_group.py:0
+#, python-format
+msgid "Invalid field specification %r."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__invoice_mail_template_id
+msgid "Invoice Email Template"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_payment
+msgid "Invoice Online Payment"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__default_invoice_policy
+msgid "Invoicing Policy"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__message_is_follower
+msgid "Is Follower"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__is_valid
+msgid "Is a valid number ?"
+msgstr "Est un numéro est valide ?"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_auth_ldap
+msgid "LDAP Authentication"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings____last_update
+#: model:ir.model.fields,field_description:of_base.field_of_log_message____last_update
+#: model:ir.model.fields,field_description:of_base.field_of_popup_wizard____last_update
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_check_duplications____last_update
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__write_uid
+#: model:ir.model.fields,field_description:of_base.field_of_log_message__write_uid
+#: model:ir.model.fields,field_description:of_base.field_of_popup_wizard__write_uid
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_check_duplications__write_uid
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__write_date
+#: model:ir.model.fields,field_description:of_base.field_of_log_message__write_date
+#: model:ir.model.fields,field_description:of_base.field_of_popup_wizard__write_date
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_check_duplications__write_date
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_partner__of_last_order_date
+#: model:ir.model.fields,field_description:of_base.field_res_users__of_last_order_date
+msgid "Last quote date"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__predictive_lead_scoring_fields
+msgid "Lead Scoring Frequency Fields"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__predictive_lead_scoring_fields_str
+msgid "Lead Scoring Frequency Fields in String"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__predictive_lead_scoring_start_date
+msgid "Lead Scoring Starting Date"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__predictive_lead_scoring_start_date_str
+msgid "Lead Scoring Starting Date in String"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_use_lead
+msgid "Leads"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_account_setup_bank_manual_config__acc_type
+#: model:ir.model.fields,help:of_base.field_res_partner_bank__acc_type
+msgid ""
+"Leave the account type IBAN to let the software check the validity of the "
+"entered code.Use the Bank type for any other type of account, no "
+"verification will be performed."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_company__of_legal_form
+msgid "Legal form"
+msgstr "Forme juridique"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__show_line_subtotals_tax_selection
+msgid "Line Subtotals Tax Display"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_auto_done_setting
+msgid "Lock Confirmed Sales"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_log_message__log_level
+#: model_terms:ir.ui.view,arch_db:of_base.of_log_message_search_view
+msgid "Log level"
+msgstr ""
+
+#. module: of_base
+#: model:ir.actions.act_window,name:of_base.of_log_message_action
+msgid "Log messages"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_login
+msgid "Login"
+msgstr ""
+
+#. module: of_base
+#: model:ir.ui.menu,name:of_base.of_log_parent_menu
+msgid "Logs"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__expense_currency_exchange_account_id
+msgid "Loss Account"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_ir_mail_server
+msgid "Mail Server"
+msgstr "Serveur d'email"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__message_main_attachment_id
+msgid "Main Attachment"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__currency_id
+msgid "Main currency of the company."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_inter_company_rules
+msgid "Manage Inter Company"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__crm_auto_assignment_action
+msgid ""
+"Manual assign allow to trigger assignment from team form view using an "
+"action button. Automatic configures a cron running repeatedly assignment in "
+"all teams."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_sale_margin
+msgid "Margins"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_connector_config_settings_view
+msgid "Marketing / CRM"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_ir_ui_menu
+msgid "Menu"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_res_partner_check_duplications_form_view
+msgid "Merge"
+msgstr "Fusionner"
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_base_partner_merge_automatic_wizard
+msgid "Merge Partner Wizard"
+msgstr "Assistant de fusion des partenaires"
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_mail_message
+#: model:ir.model.fields,field_description:of_base.field_of_log_message__message
+#: model:ir.model.fields,field_description:of_base.field_of_popup_wizard__message
+msgid "Message"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__message_has_error
+msgid "Message Delivery error"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__message_ids
+#: model:ir.ui.menu,name:of_base.of_log_message_menu
+msgid "Messages"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_view_company_form
+msgid "Miscellaneous"
+msgstr "Divers"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_partner__mobile
+#: model:ir.model.fields,field_description:of_base.field_res_users__mobile
+#: model:ir.model.fields.selection,name:of_base.selection__of_res_partner_phone__type__03_mobile
+msgid "Mobile"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_log_message__model
+#: model_terms:ir.ui.view,arch_db:of_base.of_log_message_search_view
+msgid "Model"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_ir_module_module
+msgid "Module"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__is_membership_multi
+msgid "Multi Teams"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_multi_currency
+msgid "Multi-Currencies"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_company__of_multirisk_insurance
+msgid "Multi-risk insurance"
+msgstr "Assurance multirisques"
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__product_pricelist_setting
+msgid ""
+"Multiple prices: Pricelists with fixed price rules by product,\n"
+"Advanced rules: enables advanced price rules for pricelists."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_partner__name
+#: model:ir.model.fields,field_description:of_base.field_res_users__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_check_duplications__new_partner_id
+msgid "New partner"
+msgstr "Nouveau partenaire"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__number
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
+msgid "Number"
+msgstr "Numéro"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__number_display
+msgid "Number in national format"
+msgstr "Numéro au format national"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__message_needaction_counter
+msgid "Number of Actions"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__active_user_count
+msgid "Number of Active Users"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__company_count
+msgid "Number of Companies"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__language_count
+msgid "Number of Languages"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__message_has_error_counter
+msgid "Number of errors"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__crm_auto_assignment_interval_number
+msgid ""
+"Number of interval type between each cron run (e.g. each 2 days or each 4 "
+"days)"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_res_partner_phone__message_needaction_counter
+msgid "Number of messages which requires an action"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_res_partner_phone__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__type
+msgid "Number type"
+msgstr "Type de numéro"
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_res_partner_check_duplications_form_view
+msgid "OK"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__of_res_partner_phone__type__02_bureau
+msgid "Office"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_popup_wizard_view
+msgid "Ok"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__portal_confirmation_pay
+msgid "Online Payment"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__portal_confirmation_sign
+msgid "Online Signature"
+msgstr ""
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/models/res_groups.py:0
+#, python-format
+msgid "Only the admin account can belong to this group."
+msgstr "Seul le compte admin peut appartenir à ce groupe."
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/models/res_users.py:0
+#, python-format
+msgid ""
+"Only the administrator account can modify the information of the "
+"administrator account."
+msgstr ""
+"Seul le compte administrateur peut modifier les informations du compte "
+"administrateur."
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/models/res_company.py:0
+#: code:addons/of_base/models/res_company.py:0
+#, python-format
+msgid "Only the administrator can create a new company."
+msgstr "Seul l'administrateur peut créer une nouvelle société."
+
+#. module: of_base
+#: model:res.groups,comment:of_base.of_group_intranet
+msgid "OpenFire rights: gives access rights to the intranet"
+msgstr "Droits OpenFire : donne les droits d'accès à l'intranet"
+
+#. module: of_base
+#: model:res.groups,comment:of_base.of_group_hidden
+msgid "OpenFire special group : allows to hide some menu items"
+msgstr "Groupe spécial OpenFire : permet de cacher certains éléments de menu"
+
+#. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__mail_message__of_state__outgoing
+msgid "Outgoing"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__account_journal_payment_credit_account_id
+msgid ""
+"Outgoing Payments are posted on an Outstanding Payments Account. In the bank reconciliation widget, they appear as blue lines.\n"
+"Bank transactions are then reconciled on the Outstanding Payments Account rather the Payable Account."
+msgstr ""
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/models/of_read_group.py:0
+#, python-format
+msgid "Output name %r is used twice."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__account_journal_payment_credit_account_id
+msgid "Outstanding Payments Account"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__account_journal_payment_debit_account_id
+msgid "Outstanding Receipts Account"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_partner__of_parent_category_id
+#: model:ir.model.fields,field_description:of_base.field_res_users__of_parent_category_id
+msgid "Parent labels"
+msgstr "Étiquettes parent"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__partner_id
+msgid "Partner"
+msgstr "Partenaire"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_partner_autocomplete
+msgid "Partner Autocomplete"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_res_partner_title
+msgid "Partner Title"
+msgstr "Titre du partenaire"
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_view_module_upgrade
+msgid "Password"
+msgstr "Mot de passe"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_partner__phone
+#: model:ir.model.fields,field_description:of_base.field_res_users__phone
+msgid "Phone"
+msgstr "Téléphone"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_partner__of_phone_number_ids
+#: model:ir.model.fields,field_description:of_base.field_res_users__of_phone_number_ids
+msgid "Phone numbers"
+msgstr "Numéros de téléphone"
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
+msgid "Phones"
+msgstr "Téléphones"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_partner__of_potential_duplication
+#: model:ir.model.fields,field_description:of_base.field_res_users__of_potential_duplication
+msgid "Potential duplicate ?"
+msgstr "Doublon potentiel ?"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_check_duplications__duplication_ids
+#: model_terms:ir.ui.view,arch_db:of_base.of_res_partner_filter
+msgid "Potential duplicates"
+msgstr "Doublons potentiels"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__predictive_lead_scoring_field_labels
+msgid "Predictive Lead Scoring Field Labels"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_product_pricelist
+msgid "Pricelists"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__product_pricelist_setting
+msgid "Pricelists Method"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__invoice_is_print
+msgid "Print"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_proforma_sales
+msgid "Pro-Forma Invoice"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_product_template
+msgid "Product"
+msgstr "Article"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_stock_packaging
+msgid "Product Packagings"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_product_product
+msgid "Product Variant"
+msgstr "Variante d'article"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__profiling_enabled_until
+msgid "Profiling enabled until"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_loyalty
+msgid "Promotions, Coupons, Gift Card & Loyalty Program"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_show_purchase_receipts
+msgid "Purchase Receipt"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_connector_config_settings_view
+msgid "Purchases"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_company__of_qualif
+msgid "Qualifications"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__quick_edit_mode
+msgid "Quick encoding"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__mail_message__of_state__received
+msgid "Received"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_use_recurring_revenues
+msgid "Recurring Revenues"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__crm_auto_assignment_interval_number
+msgid "Repeat every"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__restrict_template_rendering
+msgid "Restrict Template Rendering"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__crm_use_auto_assignment
+msgid "Rule-Based Assignment"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_sepa
+msgid "SEPA Credit Transfer (SCT)"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_warning_sale
+msgid "Sale Order Warnings"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_show_sale_receipts
+msgid "Sale Receipt"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__account_use_credit_limit
+msgid "Sales Credit Limit"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_sale_product_matrix
+msgid "Sales Grid Entry"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_res_partner_filter
+#: model_terms:ir.ui.view,arch_db:of_base.of_res_partner_tree
+msgid "Salesperson"
+msgstr "Commercial"
+
+#. module: of_base
+#. odoo-javascript
+#: code:addons/of_base/static/src/js/of_form.js:0
+#, python-format
+msgid "Save"
+msgstr ""
+
+#. module: of_base
+#. odoo-javascript
+#: code:addons/of_base/static/src/js/of_form.js:0
+#, python-format
+msgid "Save & New"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__invoice_is_email
+msgid "Send Email"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_delivery_sendcloud
+msgid "Sendcloud Connector"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_view_message_search
+msgid "Sending error"
+msgstr "Erreur d'envoi"
+
+#. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__mail_message__of_state__sent
+msgid "Sent"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__show_effect
+msgid "Show Effect"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_show_line_subtotals_tax_included
+msgid "Show line subtotals with taxes (B2C)"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_show_line_subtotals_tax_excluded
+msgid "Show line subtotals without taxes (B2B)"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_snailmail_account
+msgid "Snailmail"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_company__of_capital
+msgid "Social capital"
+msgstr "Capital social"
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/models/of_read_group.py:0
+#, python-format
+msgid "Sorting field %s not found on model %s"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_product_email_template
+msgid "Specific Email"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_mail_mail__of_state
+#: model:ir.model.fields,field_description:of_base.field_mail_message__of_state
+msgid "Status"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__account_storno
+msgid "Storno accounting"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_partner__street
+#: model:ir.model.fields,field_description:of_base.field_res_users__street
+msgid "Street"
+msgstr "Rue"
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_res_partner_filter
+msgid "Street or additional address"
+msgstr "Rue ou complément"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_partner__street2
+#: model:ir.model.fields,field_description:of_base.field_res_users__street2
+msgid "Street2"
+msgstr "Rue 2"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_google_gmail
+msgid "Support Gmail Authentication"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_microsoft_outlook
+msgid "Support Outlook Authentication"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_res_partner_check_duplications_form_view
+msgid "Suspicion of duplicates !"
+msgstr "Suspicion de doublons !"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__tax_cash_basis_journal_id
+msgid "Tax Cash Basis Journal"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__tax_calculation_rounding_method
+msgid "Tax calculation rounding method"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__early_pay_discount_computation
+msgid "Tax setting"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__chart_template_id
+msgid "Template"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__auth_signup_template_user_id
+msgid "Template user for new users created through signup"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__invoice_terms
+msgid "Terms & Conditions"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__invoice_terms_html
+msgid "Terms & Conditions as a Web page"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__terms_type
+msgid "Terms & Conditions format"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__country_code
+msgid ""
+"The ISO country code in two chars. \n"
+"You can use this field for quick search."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__currency_exchange_journal_id
+msgid ""
+"The accounting journal where automatic exchange differences will be "
+"registered"
+msgstr ""
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/models/res_groups.py:0
+#, python-format
+msgid "The admin account cannot be removed from this group."
+msgstr "Le compte admin ne peut pas être retiré de ce groupe."
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__account_fiscal_country_id
+msgid "The country to use the tax reports from for this company"
+msgstr ""
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/models/partner.py:0
+#, python-format
+msgid "The customer account number is already in use and must be unique (%s)."
+msgstr "Le n° de compte client est déjà utilisé et doit être unique (%s)."
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/models/res_users.py:0
+#, python-format
+msgid "The group \"%s\" cannot be removed from the administrator account."
+msgstr "Le groupe \"%s\" ne peut être retiré du compte administrateur."
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__automatic_invoice
+msgid ""
+"The invoice is generated automatically and available in the customer portal when the transaction is confirmed by the payment provider.\n"
+"The invoice is marked as paid and the payment is registered in the payment journal defined in the configuration of the payment provider.\n"
+"This mode is advised if you issue the final invoice at the order and not after the delivery."
+msgstr ""
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/wizard/base_module_upgrade.py:0
+#, python-format
+msgid "The validation code is incorrect."
+msgstr "Le code de validation est incorrect."
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
+msgid ""
+"These notes will be displayed under the heading 'Customer notes' in the "
+"quote and the intervention schedule."
+msgstr ""
+"Ces notes seront affichées sous la rubrique 'Notes clients' dans le devis et"
+" le planning d'intervention."
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__module_account_batch_payment
+msgid ""
+"This allows you grouping payments into a single batch and eases the reconciliation process.\n"
+"-This installs the account_batch_payment module."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__account_default_credit_limit
+msgid ""
+"This is the default credit limit that will be used on partners that do not "
+"have a specific limit on them."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_log_message__name
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
+#: model_terms:ir.ui.view,arch_db:of_base.of_log_message_search_view
+msgid "Title"
+msgstr "Titre"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_base_gengo
+msgid "Translate Your Website with Gengo"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__twilio_account_token
+msgid "Twilio Account Auth Token"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__twilio_account_sid
+msgid "Twilio Account SID"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
+msgid "Type"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_account_setup_bank_manual_config__acc_type
+#: model:ir.model.fields,field_description:of_base.field_res_partner_bank__acc_type
+msgid "Type of account"
+msgstr "Type de compte"
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_log_message_search_view
+msgid "Type of error"
+msgstr "Type d'erreur"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_delivery_ups
+msgid "UPS Connector"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_delivery_usps
+msgid "USPS Connector"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_view_module_upgrade
+msgid "Uninstallation Confirmation"
+msgstr "Confirmation de désinstallation"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_uom
+msgid "Units of Measure"
+msgstr ""
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/models/of_read_group.py:0
+#, python-format
+msgid "Unknown field %r in 'groupby'"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_web_unsplash
+msgid "Unsplash Image Library"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_base_module_upgrade
+msgid "Upgrade Module"
+msgstr "Module de mise à jour"
+
+#. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__res_company__of_ref_mode__id
+msgid "Use Partner ID"
+msgstr "Utiliser l'id du partenaire"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_sepa_direct_debit
+msgid "Use SEPA Direct Debit"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__use_twilio_rtc_servers
+msgid "Use Twilio ICE servers"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_batch_payment
+msgid "Use batch payments"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_auth_oauth
+msgid "Use external authentication providers (OAuth)"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_partner_title__of_used_for_phone
+msgid "Used for phone numbers"
+msgstr "Utilisée pour les numéros de téléphone"
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_res_users
+msgid "User"
+msgstr "Utilisateur"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_users__of_user_type
+msgid "User type"
+msgstr "Type d'utilisateur"
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__restrict_template_rendering
+msgid ""
+"Users will still be able to render templates.\n"
+"However only Mail Template Editors will be able to create new dynamic templates or modify existing ones."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_base_module_upgrade__of_validation_code
+msgid "Validation code"
+msgstr "Code de validation"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_product_variant
+msgid "Variants"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__vat_check_vies
+msgid "Verify VAT Numbers"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__product_volume_volume_in_cubic_feet
+msgid "Volume unit of measure"
+msgstr ""
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/models/base.py:0
+#: model:ir.model.fields.selection,name:of_base.selection__of_log_message__log_level__warning
+#, python-format
+msgid "Warning"
+msgstr "Avertissement"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_warning_account
+msgid "Warnings in Invoices"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__website_message_ids
+msgid "Website Messages"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_res_partner_phone__website_message_ids
+msgid "Website communication history"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__product_weight_in_lbs
+msgid "Weight unit of measure"
+msgstr ""
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/models/ir_module.py:0
+#, python-format
+msgid "You are trying to delete one or more protected modules : %s"
+msgstr "Vous tentez de supprimer un ou plusieurs modules protégés : %s"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_partner__zip
+#: model:ir.model.fields,field_description:of_base.field_res_users__zip
+msgid "Zip"
+msgstr "Code postal"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_delivery_bpost
+msgid "bpost Connector"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
+msgid "e.g. Mister"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
+msgid "e.g. Sales Director"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_of_form_readonly
+msgid "of.form.readonly"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_of_log_message
+msgid "of.log.message"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_of_popup_wizard
+msgid "of.popup.wizard"
+msgstr ""
+
+#. module: of_base
+#: model:ir.actions.act_window,name:of_base.action_of_popup_wizard
+msgid "of.popup.wizard.action"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_of_readgroup
+msgid "of.readgroup"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_of_res_partner_check_duplications
+msgid "of.res.partner.check.duplications"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_of_res_partner_phone
+msgid "of.res.partner.phone"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_google_recaptcha
+msgid "reCAPTCHA"
+msgstr ""

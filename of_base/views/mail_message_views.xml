@@ -1,0 +1,33 @@
+<odoo>
+
+    <record id="of_mail_message_view_form" model="ir.ui.view">
+        <field name="name">of.mail.message.view.form</field>
+        <field name="model">mail.message</field>
+        <field name="inherit_id" ref="mail.mail_message_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header attrs="{'invisible': [('of_state', '=', False)]}">
+                    <field name="of_state" widget="statusbar"/>
+                </header>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Failure Reason" attrs="{'invisible': [('of_state', '!=', 'exception')]}">
+                    <field name="of_failure_reason"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_view_message_search" model="ir.ui.view">
+        <field name="name">of.view.message.search</field>
+        <field name="model">mail.message</field>
+        <field name="inherit_id" ref="mail.view_message_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[last()]" position="after">
+                <separator/>
+                <filter string="Sending error" name="failure" domain="[('of_state', '=', 'exception')]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

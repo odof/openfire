@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Permet de cacher le menu application pour tout le monde sauf admin -->
+    <record id="base.menu_management" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6,0,[ref('of_base.of_group_root_only')])]"/>
+    </record>
+
+    <!-- Permet de cacher le menu Groupes pour tout le monde sauf admin -->
+    <record id="base.menu_action_res_groups" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6,0,[ref('of_base.of_group_root_only')])]"/>
+    </record>
+
+    <!-- Vue tree par défaut pour les contacts -->
+    <record id="contacts.action_contacts_view_kanban" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+    </record>
+
+
+    <menuitem name="Connectors" id="of_base.of_connector_menu" parent="base.menu_administration" groups="base.group_system"/>
+
+</odoo>

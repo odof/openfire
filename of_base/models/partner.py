@@ -1,13 +1,9 @@
-# -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-
 import threading
 import logging
-
-from odoo import models, api, tools, fields
+from odoo import models, api, tools, fields, _
 from odoo.exceptions import ValidationError
 from odoo.modules import get_module_resource
-from odoo.addons.base_iban.models.res_partner_bank import validate_iban
 
 _logger = logging.getLogger(__name__)
 
@@ -16,10 +12,10 @@ try:
 except ImportError:
     _logger.debug(u"Impossible d'importer la librairie Python 'phonenumbers'.")
 
-PHONE_TYPES = [('01_domicile', u"Domicile"),
-               ('02_bureau', u"Bureau"),
-               ('03_mobile', u"Mobile"),
-               ('04_fax', u"Fax")]
+PHONE_TYPES = [('01_domicile', "Home"),
+               ('02_bureau', "Office"),
+               ('03_mobile', "Mobile"),
+               ('04_fax', "Fax")]
 
 
 def convert_phone_number(value, default_country_code=None, new_format='e164', strict=False):
@@ -75,47 +71,30 @@ def convert_phone_number(value, default_country_code=None, new_format='e164', st
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    @api.model_cr_context
-    def _auto_init(self):
-        """
-        Synchronisation des champs 'customer' et 'supplier' entre les contacts enfants physiques et leur parent
-        """
-        res = super(ResPartner, self)._auto_init()
-        cr = self._cr
-        cr.execute("""  UPDATE  res_partner     RP
-                        SET     customer        = RP1.customer
-                        ,       supplier        = RP1.supplier
-                        FROM    res_partner     RP1
-                        WHERE   RP.parent_id    IS NOT NULL
-                        AND     RP.is_company   = False
-                        AND     RP1.id          = RP.parent_id""")
-        return res
-
-    name = fields.Char(track_visibility='onchange')
-    street = fields.Char(track_visibility='onchange')
-    street2 = fields.Char(track_visibility='onchange')
-    zip = fields.Char(track_visibility='onchange')
-    city = fields.Char(track_visibility='onchange')
-    country_id = fields.Many2one(track_visibility='onchange')
-    email = fields.Char(track_visibility='onchange')
+    name = fields.Char(tracking=True)
+    street = fields.Char(tracking=True)
+    street2 = fields.Char(tracking=True)
+    zip = fields.Char(tracking=True)
+    city = fields.Char(tracking=True)
+    country_id = fields.Many2one(tracking=True)
+    email = fields.Char(tracking=True)
     phone = fields.Char(compute='_compute_old_phone_fields', inverse='_inverse_phone')
     mobile = fields.Char(compute='_compute_old_phone_fields', inverse='_inverse_mobile')
     fax = fields.Char(compute='_compute_old_phone_fields', inverse='_inverse_fax')
     of_phone_number_ids = fields.One2many(
-        comodel_name='of.res.partner.phone', inverse_name='partner_id', string=u"Numéros de téléphone")
+        comodel_name='of.res.partner.phone', inverse_name='partner_id', string="Phone numbers")
     of_phone_error = fields.Boolean(
-        string=u"Numéros de téléphone mal formatés", compute="_compute_of_phone_error", search="_search_of_phone_error")
-    of_parent_category_id = fields.Many2many('res.partner.category', string=u"Étiquettes parent",
-                                             compute="_compute_parent_category")
-    of_default_address = fields.Boolean(string=u"Adresse par défaut")
+        string="Badly formatted phone numbers", compute='_compute_of_phone_error', search='_search_of_phone_error')
+    of_parent_category_id = fields.Many2many(
+        comodel_name='res.partner.category', string="Parent labels", compute='_compute_parent_category')
+    of_default_address = fields.Boolean(string="Default address")
 
     of_last_order_date = fields.Date(
-        string="Date du dernier devis", compute='_compute_of_last_order_date', compute_sudo=True)
+        string="Last quote date", compute='_compute_of_last_order_date', compute_sudo=True)
     of_potential_duplication = fields.Boolean(
-        string=u"Doublon potentiel ?", compute='_compute_of_potential_duplication',
+        string="Potential duplicate ?", compute='_compute_of_potential_duplication',
         search='_search_of_potential_duplication')
 
-    @api.multi
     def _compute_old_phone_fields(self):
         user = self.env.user
         default_country = user.country_id or user.company_id.country_id
@@ -136,21 +115,19 @@ class ResPartner(models.Model):
     @api.depends('parent_id', 'parent_id.category_id')
     def _compute_parent_category(self):
         for partner in self:
-            if not isinstance(partner.id, models.NewId):
-                partners = self.search([('id', 'parent_of', partner.id)])
-                partners -= partner
-                partner.of_parent_category_id = partners.mapped('category_id')
+            if isinstance(partner.id, models.NewId):
+                partner.of_parent_category_id = False
+                continue
 
-    @api.multi
+            partners = self.search([('id', 'parent_of', partner.id)])
+            partners -= partner
+            partner.of_parent_category_id = partners.mapped('category_id')
+
     def _compute_of_last_order_date(self):
         for partner in self:
             last_order = self.env['sale.order'].search([('partner_id', "=", partner.id)], order='id desc', limit=1)
-            if last_order:
-                partner.of_last_order_date = last_order.date_order
-            else:
-                partner.of_last_order_date = False
+            partner.of_last_order_date = last_order.date_order if last_order else False
 
-    @api.multi
     def _of_set_number(self, number_field, number_type):
         user = self.env.user
         default_country = user.country_id or user.company_id.country_id
@@ -163,16 +140,15 @@ class ResPartner(models.Model):
             # Ne rien faire si le numéro est déjà présent
             if rec.of_phone_number_ids.filtered(lambda p: p.number == number):
                 continue
-            else:
-                # On remplace la valeur actuelle s'il y en a une
-                current_phone = rec.of_phone_number_ids.filtered(lambda p: p.type == number_type)
-                if current_phone:
-                    rec.of_phone_number_ids = [(1, current_phone[0].id, {'number': number})]
-                # Sinon on crée le nouveau numéro si la valeur est non vide
-                elif number:
-                    rec.of_phone_number_ids = [(0, 0, {'number': number, 'type': number_type})]
 
-    @api.multi
+            # On remplace la valeur actuelle s'il y en a une
+            current_phone = rec.of_phone_number_ids.filtered(lambda p: p.type == number_type)
+            if current_phone:
+                rec.of_phone_number_ids = [(1, current_phone[0].id, {'number': number})]
+            # Sinon on crée le nouveau numéro si la valeur est non vide
+            elif number:
+                rec.of_phone_number_ids = [(0, 0, {'number': number, 'type': number_type})]
+
     def _inverse_phone(self):
         for rec in self:
             if rec.of_phone_number_ids.filtered(lambda p: p.type == '01_domicile') or \
@@ -181,15 +157,12 @@ class ResPartner(models.Model):
             else:
                 rec._of_set_number('phone', '02_bureau')
 
-    @api.multi
     def _inverse_mobile(self):
         self._of_set_number('mobile', '03_mobile')
 
-    @api.multi
     def _inverse_fax(self):
         self._of_set_number('fax', '04_fax')
 
-    @api.multi
     def _compute_of_phone_error(self):
         for partner in self:
             for phone in partner.of_phone_number_ids:
@@ -205,7 +178,6 @@ class ResPartner(models.Model):
         return [('id', 'in', partners.ids)]
 
     # Pour afficher l'adresse au format français par défaut quand le pays n'est pas renseigné et non le format US
-    @api.multi
     def _display_address(self, without_company=False):
         """
         The purpose of this function is to build and return an address formatted accordingly to the
@@ -238,28 +210,30 @@ class ResPartner(models.Model):
     # Pour afficher dans le menu déroulant du choix de partenaire l'adresse du contact et pas que le nom.
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
-        return super(ResPartner, self.with_context(of_show_address_line=True)).name_search(name=name, args=args, operator=operator, limit=limit)
+        return super(ResPartner, self.with_context(of_show_address_line=True)).name_search(
+            name=name, args=args, operator=operator, limit=limit)
 
-    @api.multi
     def name_get(self):
         """ Permet de renvoyer le nom + la ville du client quand valeur du contexte 'of_show_address_line' présent """
         name = self._rec_name
         if self._context.get('of_show_address_line') \
                 and name in self._fields \
-                and self.env['ir.values'].get_default('base.config.settings', 'of_affichage_ville'):
-            result = []
+                and self.env['ir.config_parameter'].sudo().get_param('of.partner.display_city'):
             convert = self._fields[name].convert_to_display_name
-            for record in self:
-                result.append((record.id, '%s%s' % (convert(record[name], record), ''.join([' (', record.city, ')']) if record.city else '')))
+            result = [(
+                record.id,
+                f"{convert(record[name], record)}{''.join([' (', record.city, ')']) if record.city else ''}"
+            ) for record in self]
+
         elif self._context.get('show_email'):
             result = []
             for partner in self:
                 name = partner.name or ''
                 if partner.email:
-                    name = "%s <%s>" % (partner.email, name)
+                    name = f"{partner.email} <{name}>"
                 result.append((partner.id, name))
         else:
-            result = super(ResPartner, self).name_get()
+            result = super().name_get()
         return result
 
     @api.model
@@ -276,15 +250,16 @@ class ResPartner(models.Model):
             parent_image = self.browse(parent_id).image
             image = parent_image and parent_image.decode('base64') or None
 
-        if not image and partner_type == 'invoice':
-            img_path = get_module_resource('base', 'static/src/img', 'money.png')
-        elif not image and partner_type == 'delivery':
-            img_path = get_module_resource('base', 'static/src/img', 'truck.png')
-        elif not image and is_company:
-            img_path = get_module_resource('base', 'static/src/img', 'company_image.png')
-        elif not image:
-            img_path = get_module_resource('base', 'static/src/img', 'avatar.png')
-            colorize = True
+        if not image:
+            if partner_type == 'invoice':
+                img_path = get_module_resource('base', 'static/src/img', 'money.png')
+            elif partner_type == 'delivery':
+                img_path = get_module_resource('base', 'static/src/img', 'truck.png')
+            elif is_company:
+                img_path = get_module_resource('base', 'static/src/img', 'company_image.png')
+            else:
+                img_path = get_module_resource('base', 'static/src/img', 'avatar.png')
+                colorize = True
 
         if img_path:
             with open(img_path, 'rb') as f:
@@ -300,9 +275,10 @@ class ResPartner(models.Model):
     def _add_missing_default_values(self, values):
         # La référence par défaut est celle du parent.
         parent_id = values.get('parent_id')
-        if parent_id and isinstance(parent_id, (int, long)) and not values.get('ref') and 'default_ref' not in self._context:
+        if parent_id and isinstance(parent_id, int) and not values.get('ref') and \
+                'default_ref' not in self._context:
             values['ref'] = self.browse(parent_id).ref
-        return super(ResPartner, self)._add_missing_default_values(values)
+        return super()._add_missing_default_values(values)
 
     @api.model
     def _check_no_ref_duplicate(self, ref):
@@ -318,7 +294,8 @@ class ResPartner(models.Model):
                     ids.add(pid)
                 elif parent_id:
                     if id != parent_id:
-                        raise ValidationError(u"Le n° de compte client est déjà utilisé et doit être unique (%s)." % (ref,))
+                        raise ValidationError(
+                            _("The customer account number is already in use and must be unique (%s).") % (ref,))
                 else:
                     parent_id = id
             if not ids:
@@ -326,15 +303,11 @@ class ResPartner(models.Model):
             cr.execute("SELECT id,parent_id FROM res_partner WHERE id IN %s", (tuple(ids),))
         return True
 
-    @api.multi
     def _compute_of_potential_duplication(self):
         # On teste l'existence de doublons potentiels basés sur l'email ou les numéros de téléphone
         self = self.sudo()
         for partner in self:
-            if partner.check_duplications():
-                partner.of_potential_duplication = True
-            else:
-                partner.of_potential_duplication = False
+            partner.of_potential_duplication = bool(partner.check_duplications())
 
     @api.model
     def _search_of_potential_duplication(self, operator, value):
@@ -359,8 +332,8 @@ class ResPartner(models.Model):
             same_phone_ids = [x[0] for x in self._cr.fetchall()]
             return [('id', 'in', same_email_ids + same_phone_ids)]
 
-    @api.one
     def check_duplications(self):
+        self.ensure_one()
         # On teste l'existence de doublons potentiels basés sur l'email ou les numéros de téléphone
         self = self.sudo()
         same_email_ids = self.env['res.partner']
@@ -372,34 +345,29 @@ class ResPartner(models.Model):
             same_phone_ids = self.env['of.res.partner.phone'].\
                 search([('number', 'in', numbers_list), ('partner_id', '!=', self.id)]).mapped('partner_id')
         duplication_ids = same_email_ids | same_phone_ids
-        if duplication_ids:
-            return duplication_ids.ids
-        else:
-            return False
+        return duplication_ids.ids if duplication_ids else False
 
-    @api.model
-    def create(self, vals):
-        parent_id = vals.get('parent_id', False)
-        if parent_id and not vals.get('is_company', False):
-            parent = self.browse(parent_id)
-            vals.update(customer=parent.customer, supplier=parent.supplier)
-        partner = super(ResPartner, self).create(vals)
-        self._check_no_ref_duplicate(vals.get('ref'))
+    @api.model_create_multi
+    def create(self, vals_list):
+        partner = super().create(vals_list)
+        for vals in vals_list:
+            self._check_no_ref_duplicate(vals.get('ref'))
         # Calcul de la ref en fonction de la configuration
         if partner.company_id.of_ref_mode == 'id' and not partner.ref:
-            if not self.env['res.partner'].with_context(active_test=False).search([('ref', '=', str(partner.id))]):
-                partner.ref = str(partner.id)
-            else:
+            if self.env['res.partner'].with_context(active_test=False).search([('ref', '=', str(partner.id))]):
                 i = 2
                 while self.env['res.partner'].with_context(active_test=False).search(
-                        [('ref', '=', str(partner.id) + '-' + str(i))]):
+                        [('ref', '=', f'{str(partner.id)}-{i}')]):
                     i += 1
-                partner.ref = str(partner.id) + '-' + str(i)
+                partner.ref = f'{str(partner.id)}-{i}'
+            else:
+                partner.ref = str(partner.id)
         return partner
 
     @api.model
     def _update_refs(self, new_ref, partner_refs):
-        # Avant de mettre a jour les enfants, on vérifie que les partenaires avec cette référence ont bien tous un parent commun
+        # Avant de mettre a jour les enfants, on vérifie que les partenaires avec cette référence ont bien tous
+        # un parent commun
         self._check_no_ref_duplicate(new_ref)
 
         to_update_ids = []
@@ -407,14 +375,14 @@ class ResPartner(models.Model):
             partner, old_ref = partner_refs.pop()
             for child in partner.child_ids:
                 if child.ref == old_ref:
-                    # La reference du contact était la même que celle du parent, on met à jour et on continue le parcours
+                    # La reference du contact était la même que celle du parent, on met à jour et on continue
+                    # le parcours
                     to_update_ids.append(child.id)
                     partner_refs.append((child, old_ref))
         if to_update_ids:
             self.env['res.partner'].browse(to_update_ids).write({'ref': new_ref})
         return True
 
-    @api.multi
     def write(self, vals):
         # Modification de la fonction write pour propager la modification de la référence aux enfants si besoin
         write_ref = 'ref' in vals
@@ -435,7 +403,7 @@ class ResPartner(models.Model):
                 if 'supplier' in vals:
                     values['supplier'] = vals['supplier']
                 partners.with_context(partner_recursion=False).write(values)
-        super(ResPartner, self).write(vals)
+        res = super().write(vals)
         if write_ref:
             self._update_refs(ref, partner_refs)
         # Calcul de la ref en fonction de la configuration
@@ -444,14 +412,13 @@ class ResPartner(models.Model):
                 partner.ref = str(partner.id)
             else:
                 i = 2
-                while self.env['res.partner'].with_context(active_test=False).search(
-                        [('ref', '=', str(partner.id) + '-' + str(i))]):
+                while self.env['res.partner'].with_context(active_test=False).search([
+                        ('ref', '=', f'{str(partner.id)}-{i}')]):
                     i += 1
-                partner.ref = str(partner.id) + '-' + str(i)
-        return True
+                partner.ref = f'{str(partner.id)}-{i}'
+        return res
 
     # Permet à l'auteur du mail de le recevoir en copie.
-    @api.multi
     def _notify(self, message, force_send=False, send_after_commit=True, user_signature=True):
         message_sudo = message.sudo()
         email_channels = message.channel_ids.filtered(lambda channel: channel.email_send)
@@ -466,183 +433,4 @@ class ResPartner(models.Model):
                 ('notify_email', '!=', 'none')])._notify_by_email(message, force_send=force_send,
                                                                   send_after_commit=send_after_commit,
                                                                   user_signature=user_signature)
-        return super(ResPartner, self)._notify(message, force_send, send_after_commit, user_signature)
-
-
-class ResPartnerBank(models.Model):
-    _inherit = 'res.partner.bank'
-
-    @api.model_cr_context
-    def _auto_init(self):
-        # A l'installation du module il faut déterminer si le type des comptes bancaires existants
-        cr = self._cr
-        cr.execute("SELECT 1 FROM information_schema.columns "
-                   "WHERE table_name = 'res_partner_bank' AND column_name = 'acc_type'")
-        acc_type_exists = bool(cr.fetchall())
-        res = super(ResPartnerBank, self)._auto_init()
-
-        if not acc_type_exists:
-            # Initialisation des comptes bancaires existants
-            cr.execute("SELECT id, acc_number FROM res_partner_bank")
-            for acc_id, acc_number in cr.fetchall():
-                try:
-                    validate_iban(acc_number)
-                except ValidationError:
-                    cr.execute("UPDATE res_partner_bank SET acc_type = 'bank' WHERE id = %s", (acc_id, ))
-        return res
-
-    acc_type = fields.Selection(
-        [('bank', u"Banque"), ('iban', u"IBAN")],
-        string=u"Type de compte", required=True, default='iban',
-        help=u"Laissez le type de compte IBAN pour laisser le logiciel vérifier la validité du code saisi.\n"
-             u"Utilisez le type Banque pour tout autre type de compte, aucune vérification ne sera effectuée."
-    )
-
-    @api.multi
-    def write(self, vals):
-        if (vals.get('acc_type') == 'iban') and 'acc_number' not in vals:
-            for bank in self:
-                # On ajoute acc_number dans vals pour forcer son nettoyage dans le module base_iban
-                vals['acc_number'] = bank.acc_number
-                super(ResPartnerBank, bank).write(vals)
-        else:
-            return super(ResPartnerBank, self).write(vals)
-        return True
-
-
-class ResPartnerTitle(models.Model):
-    _inherit = 'res.partner.title'
-
-    of_used_for_phone = fields.Boolean(string="Utilisée pour les numéros de téléphone", default=True)
-
-
-class OFResPartnerPhone(models.Model):
-    _name = 'of.res.partner.phone'
-    _inherit = ['mail.thread']
-    _order = 'type,id'
-    _rec_name = 'number'
-
-    partner_id = fields.Many2one(comodel_name='res.partner', string=u"Partenaire", index=True, ondelete='cascade')
-    number = fields.Char(string="Numéro")
-    number_display = fields.Char(
-        string="Numéro au format national", compute="_compute_number_display", inverse="_inverse_number_display",
-        track_visibility='onchange')
-    type = fields.Selection(selection=PHONE_TYPES, string="Type de numéro", required=True)
-    title_id = fields.Many2one(
-        comodel_name="res.partner.title", string="Civilité du numéro", domain="[('of_used_for_phone', '=', True)]")
-    is_valid = fields.Boolean(string="Est valide", compute='_compute_is_valid', store=True)
-
-    @api.depends('number')
-    def _compute_number_display(self):
-        user_country_code = self.env.user.country_id.code or self.env.user.company_id.country_id.code or 'FR'
-        for rec in self:
-            if rec.is_valid:
-                rec.number_display = convert_phone_number(rec.number, user_country_code, new_format='country')
-            else:
-                rec.number_display = rec.number
-
-    @api.multi
-    def _inverse_number_display(self):
-        default_country_code = self.env.user.country_id.code or self.env.user.company_id.country_id.code or 'FR'
-        for rec in self:
-            number = convert_phone_number(rec.number_display, default_country_code, strict=True)
-            if not number:
-                country_code = rec.partner_id.country_id and rec.partner_id.country_id.code or default_country_code
-                number = convert_phone_number(rec.number_display, country_code)
-            rec.number = number
-
-    @api.depends('number')
-    def _compute_is_valid(self):
-        for rec in self:
-            rec.is_valid = bool(convert_phone_number(rec.number, strict=True))
-
-    @api.onchange('number_display')
-    def _onchange_number_display(self):
-        default_country_code = self.env.user.country_id.code or self.env.user.company_id.country_id.code or 'FR'
-        for rec in self:
-            number = convert_phone_number(rec.number_display, default_country_code, strict=True)
-            if not number:
-                country_code = rec.partner_id.country_id and rec.partner_id.country_id.code or default_country_code
-                number = convert_phone_number(rec.number_display, country_code)
-            rec.number = number
-
-    @api.model_cr_context
-    def _auto_init(self):
-        """
-        Recover old phone numbers
-        """
-        cr = self._cr
-        cr.execute("SELECT * FROM information_schema.tables WHERE table_name = '%s'" % (self._table,))
-        exists = bool(cr.fetchall())
-        res = super(OFResPartnerPhone, self)._auto_init()
-        if not exists:
-            partner_ids = self.env['res.partner'].search([])
-            for partner_id in partner_ids:
-                phone_number_ids = []
-                cr.execute("""  SELECT  phone
-                                ,       mobile
-                                ,       fax
-                                FROM    res_partner
-                                WHERE   id          = %s""" % partner_id.id)
-                result = cr.fetchone()
-                phone = result[0]
-                mobile = result[1]
-                fax = result[2]
-                country_code = partner_id.country_id and partner_id.country_id.code or "FR"
-                if phone:
-                    number = convert_phone_number(phone, country_code)
-                    phone_number_ids.append((0, 0, {'number': number, 'type': '01_domicile'}))
-                if mobile:
-                    number = convert_phone_number(mobile, country_code)
-                    phone_number_ids.append((0, 0, {'number': number, 'type': '03_mobile'}))
-                if fax:
-                    number = convert_phone_number(fax, country_code)
-                    phone_number_ids.append((0, 0, {'number': number, 'type': '04_fax'}))
-                partner_id.write({'of_phone_number_ids': phone_number_ids})
-        return res
-
-    @api.model
-    def create(self, vals):
-        if vals.get('number', False):
-            partner_id = vals.get('partner_id', False)
-            if partner_id:
-                partner = self.env['res.partner'].browse(partner_id)
-                country_code = (partner.country_id and partner.country_id.code) or \
-                    (self.env.user.company_id.country_id and self.env.user.company_id.country_id.code) or \
-                    "FR"
-            vals['number'] = convert_phone_number(vals.get('number'), country_code)
-        return super(OFResPartnerPhone, self.with_context(mail_create_nolog=True)).create(vals)
-
-    @api.multi
-    def write(self, vals):
-        if vals.get('number', False):
-            partner = self[0].partner_id
-            country_code = (partner.country_id and partner.country_id.code) or \
-                (self.env.user.company_id.country_id and self.env.user.company_id.country_id.code) or \
-                "FR"
-            vals['number'] = convert_phone_number(vals.get('number'), country_code)
-        return super(OFResPartnerPhone, self).write(vals)
-
-    @api.model
-    def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
-        if args and len(args) == 1 and args[0][0] == 'number':
-            if args[0][2] and args[0][2][0] == '0':
-                args = [(args[0][0], args[0][1], args[0][2][1:].replace(" ", ""))]
-
-        return super(OFResPartnerPhone, self)._search(args, offset=offset, limit=limit, order=order,
-                                                      count=count, access_rights_uid=access_rights_uid)
-
-    @api.multi
-    def message_post(self, body='', subject=None, message_type='notification',
-                     subtype=None, parent_id=False, attachments=None,
-                     content_subtype='html', **kwargs):
-        self.ensure_one()
-        if self.partner_id:
-            self.partner_id.message_post(body=body, subject=subject, message_type=message_type,
-                                         subtype=subtype, parent_id=parent_id, attachments=attachments,
-                                         content_subtype=content_subtype, **kwargs)
-        return super(OFResPartnerPhone, self).message_post(body=body, subject=subject, message_type=message_type,
-                                                           subtype=subtype, parent_id=parent_id,
-                                                           attachments=attachments, content_subtype=content_subtype,
-                                                           **kwargs)
-
+        return super()._notify(message, force_send, send_after_commit, user_signature)

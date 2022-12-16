@@ -5,17 +5,17 @@
         <field name="name">of.log.message.search</field>
         <field name="model">of.log.message</field>
         <field name="arch" type="xml">
-            <search string="Historique des imports/exports">
+            <search string="Import/export history">
                 <field name="name"/>
                 <field name="type"/>
                 <field name="model"/>
                 <field name="function"/>
                 <separator/>
-                <filter string="Titre" context="{'group_by':'name'}"/>
-                <filter string="Type d'erreur" context="{'group_by':'type'}"/>
-                <filter string="Modèle" context="{'group_by':'model'}"/>
-                <filter string="Fonction" context="{'group_by':'function'}"/>
-                <filter string="Niveau de log" context="{'group_by':'log_level'}"/>
+                <filter name="title" string="Title" context="{'group_by':'name'}"/>
+                <filter name="error_type" string="Type of error" context="{'group_by':'type'}"/>
+                <filter name="model" string="Model" context="{'group_by':'model'}"/>
+                <filter name="function" string="Function" context="{'group_by':'function'}"/>
+                <filter name="log_level" string="Log level" context="{'group_by':'log_level'}"/>
             </search>
         </field>
     </record>
@@ -64,13 +64,12 @@
     </record>
 
     <record id="of_log_message_action" model="ir.actions.act_window">
-        <field name="name">Message de logs</field>
+        <field name="name">Log messages</field>
         <field name="res_model">of.log.message</field>
-        <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
     </record>
 
     <menuitem id="of_log_parent_menu" parent="base.menu_administration" name="Logs" sequence="2"/>
-    <menuitem id="of_log_message_menu" name="Message" parent="of_log_parent_menu" action="of_log_message_action" sequence="10"/>
+    <menuitem id="of_log_message_menu" name="Messages" parent="of_log_parent_menu" action="of_log_message_action" sequence="10"/>
 
 </odoo>
