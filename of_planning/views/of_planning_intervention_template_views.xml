@@ -33,6 +33,7 @@
                             <group>
                                 <field name="sequence_id" colspan="2"/>
                                 <field name="send_reports" colspan="2"/>
+                                <field name="attach_report" colspan="2"/>
                             </group>
                         </page>
                         <page name="facturation" string="Facturation">

@@ -87,7 +87,10 @@ class OfPlanningInterventionTemplate(models.Model):
         selection=[
             ('manual', u"Envoi manuel"),
             ('auto_done', u"Envoi automatique quand intervention en “Réalisé”")
-        ], string=u"Envoi des rapports", default='manual')
+        ], string=u"Envoi du rapport", default='manual')
+    attach_report = fields.Boolean(
+        string=u"Stockage auto du rapport",
+        help=u"Le rapport d'intervention sera automatiquement mis en pièce jointe à la réalisation de l'intervention.")
 
     is_default_template = fields.Boolean(compute="_compute_is_default_template")
     # FICHE D'INTERVENTION
