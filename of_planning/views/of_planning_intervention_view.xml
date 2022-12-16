@@ -372,8 +372,8 @@
                                 <field name="description_interne" colspan="4" nolabel="1"/>
                                 <div colspan="4"><h4><span>Description externe</span></h4></div>
                                 <field name="description" colspan="4" nolabel="1"/>
-                                <h4 name="old_desc_title">Ancienne description</h4>
-                                <field name="old_description" nolabel="1" colspan="2"/>
+<!--                                <h4 name="old_desc_title">Ancienne description</h4>-->
+<!--                                <field name="old_description" nolabel="1" colspan="2"/>-->
                                 <!-- Notes client -->
                                 <group attrs="{'invisible':[('of_notes_client','=',False)]}">
                                     <separator string="Notes client" colspan="2"/>
