@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-31 15:35+0000\n"
-"PO-Revision-Date: 2022-10-31 15:35+0000\n"
+"POT-Creation-Date: 2022-12-08 14:38+0000\n"
+"PO-Revision-Date: 2022-12-08 14:38+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -614,6 +614,11 @@ msgid "Customer reference"
 msgstr "Référence client"
 
 #. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_signature
+msgid "Customer signature"
+msgstr "Signature client"
+
+#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_insert
 #: model:ir.ui.view,arch_db:of_sale.wizard_sales_set_printing_params_view_form
 msgid "Customers insert"
@@ -793,6 +798,11 @@ msgid "Email"
 msgstr "Email"
 
 #. module: of_sale
+#: model:ir.ui.view,arch_db:of_sale.res_users_view_form_group_of_pdf_prefill_vendor_signature
+msgid "Email signatures"
+msgstr "Signature des mails"
+
+#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_of_to_invoice
 msgid "Entièrement facturable"
 msgstr "Entièrement facturable"
@@ -909,6 +919,16 @@ msgid "ID"
 msgstr "ID"
 
 #. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_group_pdf_prefill_vendor_signature
+msgid "If checked, allows you to load a signature image in the user form view. This image will be used as a pre-filled signature in the PDF documents."
+msgstr "Si coché, vous permet de charger une image de signature dans la vue du formulaire utilisateur. Cette image sera utilisée comme signature pré-remplie dans les documents PDF."
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_signatures_insert
+msgid "If checked, displays signatures insert in PDF reports"
+msgstr "Si coché, affiche les encarts de signature dans les rapports PDF"
+
+#. module: of_sale
 #: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_payment_schedule
 msgid "If checked, displays the Payment schedule in the report"
 msgstr "Si coché, affiche l'échéancier de paiement dans le rapport"
@@ -959,6 +979,11 @@ msgid "If checked, displays the customer reference in the inserts"
 msgstr "Si coché, affiche la référence client dans les pastilles"
 
 #. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_signature
+msgid "If checked, displays the customer signature insert at the bottom left of the quotation"
+msgstr "Si coché, affiche l'encart de signature du client en bas à gauche du devis"
+
+#. module: of_sale
 #: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_customer_email
 msgid "If checked, displays the customer's email in the customers insert"
 msgstr "Si coché, affiche l'email du client dans la pastille clients"
@@ -1002,6 +1027,11 @@ msgstr "Si coché, affiche les conditions de règlement dans les pastilles"
 #: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_product_reference
 msgid "If checked, displays the product reference in the order lines on the report"
 msgstr "Si coché, affiche la référence du produit dans les lignes de commande du rapport"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_vendor_signature
+msgid "If checked, displays the salesman signature insert at the bottom right of the quotation"
+msgstr "Si coché, affiche l'encart de signature du vendeur en bas à droite du devis"
 
 #. module: of_sale
 #: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_taxes_detail
@@ -1516,6 +1546,16 @@ msgid "Pourcentage"
 msgstr "Pourcentage"
 
 #. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_group_pdf_prefill_vendor_signature
+msgid "Pre-filled salesman signature"
+msgstr "Signature vendeur préremplie"
+
+#. module: of_sale
+#: model:res.groups,name:of_sale.group_of_pdf_prefill_vendor_signature
+msgid "Pre-populated salesman signature group"
+msgstr "Groupe signature vendeur préremplie"
+
+#. module: of_sale
 #: model:ir.model,name:of_sale.model_product_pricelist
 msgid "Pricelist"
 msgstr "Liste de prix"
@@ -1822,6 +1862,16 @@ msgid "Sales Orders Statistics"
 msgstr "Statistiques sur les commandes de ventes"
 
 #. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_vendor_signature
+msgid "Salesman signature"
+msgstr "Signature vendeur"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_res_users_of_vendor_signature
+msgid "Salesman signature in sales report"
+msgstr "Signature vendeur rapport de vente"
+
+#. module: of_sale
 #: model:ir.actions.act_window,name:of_sale.action_of_secteur_tree_sale
 #: model:ir.ui.menu,name:of_sale.of_secteur_sale_menu
 msgid "Secteurs"
@@ -1858,6 +1908,22 @@ msgstr "Si décoché, les conditions de règlement ne sont pas propagées aux fa
 #: model:ir.model.fields,help:of_sale.field_sale_order_of_date_vt
 msgid "Si renseignée apparaîtra sur le devis / Bon de commande"
 msgstr "Si renseignée apparaîtra sur le devis / Bon de commande"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_sale_wizard_set_printing_params_pdf_signature_text
+msgid "Signature comment positioned below the titles \"Salesman signature\" and \"Customer signature\""
+msgstr "Commentaire de signature placé sous les titres \"Signature du vendeur\" et \"Signature du client\""
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_signature_text
+msgid "Signature statement"
+msgstr "Mention de signature"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_signatures_insert
+#: model:ir.ui.view,arch_db:of_sale.wizard_sales_set_printing_params_view_form
+msgid "Signatures"
+msgstr "Signatures"
 
 #. module: of_sale
 #: model:ir.ui.view,arch_db:of_sale.of_view_sale_order_gestion_prix
@@ -1936,7 +2002,7 @@ msgid "Total HT simulé"
 msgstr "Total HT simulé"
 
 #. module: of_sale
-#: code:addons/of_sale/models/of_sale.py:643
+#: code:addons/of_sale/models/of_sale.py:664
 #, python-format
 msgid "Total TTC"
 msgstr "Total TTC"
