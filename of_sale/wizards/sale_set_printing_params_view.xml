@@ -10,6 +10,11 @@
                         <group col="2" colspan="2" name="address_insert">
                             <h4 class="of-printing-parameter-title" colspan="2">Address insert</h4>
                             <field name="pdf_address_title"/>
+                            <label for="pdf_shipping_address_specific_title"/>
+                            <div name="pdf_shipping_address_specific_title">
+                                <field name="pdf_shipping_address_specific_title"/>
+                                <span class="text-muted">Will be also applied on the invoices.</span>
+                            </div>
                             <field name="pdf_address_contact_titles"/>
                             <field name="pdf_address_contact_parent_name"/>
                             <field name="pdf_address_contact_name"/>
