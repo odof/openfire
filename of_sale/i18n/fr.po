@@ -1900,6 +1900,11 @@ msgid "Several images per product"
 msgstr "Nombreuses images par article"
 
 #. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_shipping_address_specific_title
+msgid "Shipping Address Title"
+msgstr "Libellé adresse de livraison"
+
+#. module: of_sale
 #: model:ir.model.fields,help:of_sale.field_sale_config_settings_of_propagate_payment_term
 msgid "Si décoché, les conditions de règlement ne sont pas propagées aux factures"
 msgstr "Si décoché, les conditions de règlement ne sont pas propagées aux factures"
@@ -2269,3 +2274,8 @@ msgstr "Étiquettes du produit"
 #: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
 msgid "Êtes-vous sûr de vouloir verrouiller la vente ? Une fois verrouillée, vous ne pourrez plus rien modifier. Cette action est irréversible."
 msgstr "Êtes-vous sûr de vouloir verrouiller la vente ? Une fois verrouillée, vous ne pourrez plus rien modifier. Cette action est irréversible."
+
+#. module: of_sale
+#: model:ir.ui.view,arch_db:of_sale.wizard_sales_set_printing_params_view_form
+msgid "<span class="text-muted">Will be also applied on the invoices.</span>"
+msgstr "<span class="text-muted">Sera également appliqué aux factures.</span>"

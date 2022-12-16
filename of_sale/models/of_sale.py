@@ -80,6 +80,9 @@ class SaleOrder(models.Model):
     def pdf_address_title(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_address_title')
 
+    def pdf_shipping_address_specific_title(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_shipping_address_specific_title') or False
+
     def pdf_commercial_insert(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_commercial_insert')
 
