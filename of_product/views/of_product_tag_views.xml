@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="product_tag_form_view" model="ir.ui.view">
+        <field name="name">product.tag.form</field>
+        <field name="model">product.tag</field>
+        <field name="inherit_id" ref="product.product_tag_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group/group" position="after">
+                <group name="description">
+                    <field name="description"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_tag_tree_view" model="ir.ui.view">
+        <field name="name">product.tag.tree</field>
+        <field name="model">product.tag</field>
+        <field name="inherit_id" ref="product.product_tag_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <attribute name="decoration-muted">not active</attribute>
+            </xpath>
+            <xpath expr="//tree/field[@name='color']" position="after">
+                <field name="active" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_product_tag_search_view" model="ir.ui.view">
+        <field name="name">of.product.tag.search</field>
+        <field name="model">product.tag</field>
+        <field name="arch" type="xml">
+            <search string="Tags">
+                <field name="name"/>
+                <field name="description"/>
+                <separator/>
+                <filter string="Active" name="active" domain="[('active','=',True)]"/>
+                <filter string="Inactive" name="inactive" domain="[('active','=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="product.product_tag_action" model="ir.actions.act_window">
+        <field name="search_view_id" ref="of_product_tag_search_view"/>
+    </record>
+
+    <menuitem id="menu_of_product_tag" name="Tags" action="product.product_tag_action" parent="sale.prod_config_main" sequence="3"/>
+
+</odoo>

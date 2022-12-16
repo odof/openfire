@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.product.template.common.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="priority" eval="1"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='sale_ok']/parent::span" position="replace"/>
+            <xpath expr="//field[@name='purchase_ok']/parent::span" position="replace"/>
+            <xpath expr="//div[@name='options']" position="inside">
+                <span class="d-inline-block">
+                    <field name="of_obsolete"/>
+                    <label for="of_obsolete"/>
+                </span>
+            </xpath>
+            <xpath expr="//group[@name='group_general']" position="attributes">
+                <attribute name="cols" eval="2"/>
+                <attribute name="string">Distributor information</attribute>
+            </xpath>
+            <xpath expr="//group[@name='group_general']//field[@name='uom_id']" position="replace"/>
+            <xpath expr="//group[@name='group_general']//field[@name='uom_po_id']" position="replace"/>
+            <xpath expr="//group[@name='group_standard_price']" position="replace">
+                <group>
+                    <group name="group_standard_price" string="Supplier information" colspan="2">
+                        <field name="of_cost_date"/>
+                        <label for="of_seller_price"/>
+                        <div col="3">
+                            <field name="of_seller_price" class="oe_inline" attrs="{'readonly':[('seller_ids','=',[])]}"/>
+                            <span groups="product.group_uom"> / <field name="of_uom_po_id_display" class="oe_inline"/></span>
+                        </div>
+                        <label for="of_seller_pp_untaxed"/>
+                        <div col="5">
+                            <field name="of_seller_pp_untaxed" class="oe_inline" attrs="{'readonly':[('seller_ids','=',[])]}"/>
+                            <span groups="product.group_uom"> / <field name="of_uom_po_id_display2" class="oe_inline"/></span>
+                        </div>
+                        <field name="of_seller_discount"/>
+                    </group>
+                    <group name="advanced_information" string="Advanced information" colspan="2">
+                        <field name="currency_id" invisible="1"/>
+                        <field name="cost_currency_id" invisible="1"/>
+                        <field name="product_variant_id" invisible="1"/>
+                        <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                        <field name="uom_id" groups="uom.group_uom" options="{'no_create': True}"/>
+                        <field name="uom_po_id" groups="uom.group_uom" options="{'no_create': True}"/>
+                        <field name="categ_id" string="Product Category"/>
+                        <field name="of_model"/>
+                        <field name="product_tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_edit_color': 1}"/>
+                        <field name="of_uom_category_id" invisible="1"/>
+                    </group>
+                    <group name="miscellaneous" string="Miscellaneous" colspan="2">
+                        <field name="sale_ok"/>
+                        <field name="purchase_ok"/>
+                    </group>
+                </group>
+            </xpath>
+            <xpath expr="//group[@name='group_general']" position="inside">
+                <field name="cost_method" invisible="1"/>
+                <label for="standard_price" groups="base.group_user" attrs="{'invisible': [('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False)]}"/>
+                <div name="standard_price_uom" groups="base.group_user" attrs="{'invisible': [('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False)]}">
+                    <field name="standard_price" class="oe_inline" widget='monetary' options="{'currency_field': 'cost_currency_id', 'field_digits': True}"/>
+                    <span groups="uom.group_uom" >/
+                        <field name="uom_name" class="oe_inline"/>
+                    </span>
+                </div>
+                <field name="of_theoretical_cost" groups="base.group_user" widget='monetary' options="{'currency_field': 'currency_id'}"
+                       attrs="{'invisible': [('cost_method' , '=', 'standard')]}"/>
+                <label for="list_price" class="mt-1"/>
+                <div name="pricing">
+                    <field name="list_price" class="oe_inline" widget='monetary'
+                    options="{'currency_field': 'currency_id', 'field_digits': True}"/>
+                </div>
+                <label for="of_margin"/>
+                <span><field name="of_margin" class="oe_inline"/>%</span>
+                <field name="of_forbidden_discount"/>
+            </xpath>
+            <xpath expr="//page[@name='general_information']//field[@name='description']/.." position="attributes">
+                <attribute name="name">group_internal_note</attribute>
+            </xpath>
+            <xpath expr="//page[@name='sales']//group[@name='description']" position="after">
+                <group string="Description of the manufacturer" name="manufacturer_description">
+                    <field colspan="2" name="of_manufacturer_description" nolabel="1" placeholder="This note corresponds to the description of the product by its manufacturer."/>
+                </group>
+                <group string="URL" name="manufacturer_description">
+                    <field colspan="2" name="of_url" nolabel="1" placeholder="This field provides access to the product's web page."/>
+                </group>
+            </xpath>
+            <xpath expr="//notebook//page[@name='purchase']" position="before">
+                <page string="Technical" name="technical" invisible="1"/>
+            </xpath>
+            <xpath expr="//notebook//page[@name='sales']//group[@name='sale']" position="after">
+                <group name="price_struct" string="Pricing structure" colspan="2">
+                    <field name="of_purchase_transport"/>
+                    <field name="of_sale_transport"/>
+                    <field name="of_sale_coeff"/>
+                    <field name="of_other_logistic_costs"/>
+                    <field name="of_misc_taxes"/>
+                    <field name="of_misc_costs"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_product_template_form_view_account" model="ir.ui.view">
+        <field name="name">of.product.template.form.view.account</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="account.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='invoicing']" position="after">
+                <page string="Related products" name="linked_product">
+                    <field name="of_linked_product_ids" nolable="1" domain="[('id', '!=', active_id)]"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- FIXME : incorrect view inheritance ? -->
+    <!-- Déplacement du champ Code barre -->
+    <!-- <record id="of_product_product_template_only_form_view" model="ir.ui.view">
+        <field name="name">of.product.product.template.only.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='barcode']" position="replace"/>
+            <xpath expr="//field[@name='route_ids']" position="before">
+                <field name="barcode"/>
+            </xpath>
+        </field>
+    </record> -->
+
+    <!-- FIXME : incorrect view inheritance ? -->
+    <!-- Déplacement du champ Code barre -->
+    <!-- <record id="of_product_product_normal_form_view" model="ir.ui.view">
+        <field name="name">of.product.product.normal.form.view</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+                <xpath expr="//field[@name='barcode']" position="replace"/>
+                <xpath expr="//field[@name='route_ids']" position="before">
+                    <field name="barcode"/>
+                </xpath>
+        </field>
+    </record> -->
+
+    <!-- Ajout des étiquettes sur la vue kanban -->
+    <record id="of_product_template_kanban_view" model="ir.ui.view">
+        <field name="name">of.product.template.product.kanban</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='currency_id']" position="after">
+                <field name="product_tag_ids"/>
+            </xpath>
+            <xpath expr="//div[@class='o_kanban_image me-1']" position="before">
+                <div>
+                    <field name="product_tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Ajout de la recherche sur étiquettes -->
+    <record id="of_product_template_search_view" model="ir.ui.view">
+        <field name="name">of.product.template.search</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='categ_id']" position="before">
+                <field name="product_tag_ids"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- FIXME : incorrect view inheritance ? -->
+    <record id="of_product_product_variant_form_view" model="ir.ui.view">
+        <field name="name">of.product.product.variant.form.view</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='standard_price']" position="after">
+                <field name="cost_method" invisible="1"/>
+                <field name="of_theoretical_cost" widget="monetary" options="{'currency_field': 'currency_id'}"
+                    attrs="{'invisible': [('cost_method' , '=', 'standard')]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

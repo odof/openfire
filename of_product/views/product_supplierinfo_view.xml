@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    
+    <record id="of_product_supplierinfo_form_view" model="ir.ui.view">
+        <field name="name">of.product.supplierinfo.form.view</field>
+        <field name="model">product.supplierinfo</field>
+        <field name="inherit_id" ref="product.product_supplierinfo_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_code']" position="after">
+                <field name="of_product_category_name"/>
+            </xpath>
+            <xpath expr="//label[@for='date_start']" position="before">
+                <field name="of_public_price_untaxed" class="oe_inline"/><field name="pp_currency_id" class="oe_inline" groups="base.group_multi_currency"/>
+                <label for="of_discount"/>
+                <span><field name="of_discount" class="oe_inline"/>%</span>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Ajout des champs dans la vue liste afin qu'ils puissent être retournés par les on_change.
+        Sans ça, ces champs sont mis à 0/False quand les informations fournisseur sont crées à la sélection de la marque de l'article
+    -->
+    <record id="of_product_supplierinfo_tree_view" model="ir.ui.view">
+        <field name="name">of.product.supplierinfo.tree.view</field>
+        <field name="model">product.supplierinfo</field>
+        <field name="inherit_id" ref="product.product_supplierinfo_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="of_public_price_untaxed" invisible="1"/>
+                <field name="of_discount" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+    
+</odoo>

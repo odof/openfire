@@ -5,7 +5,7 @@
     <!-- Inhibition des droits de modification/création/suppression des UOM -->
     <record id="of_product_uom_rule_restrict" model="ir.rule">
         <field name="name">OF Product UOM Restrict Rule</field>
-        <field name="model_id" ref="product.model_product_uom"/>
+        <field name="model_id" ref="product.model_uom_uom"/>
         <field name="global" eval="True"/>
         <field name="domain_force">[(0, '=', 1)]</field>
         <field name="perm_read" eval="False"/>

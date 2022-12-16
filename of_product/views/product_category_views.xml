@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_product_product_category_form_view" model="ir.ui.view">
+        <field name="name">of.product.product.category.form.view</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='first']" position="inside">
+                <field name="of_layout_id" groups="sale.group_sale_layout"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_product_view_category_property_form_stock" model="ir.ui.view">
+        <field name="name">of.product.product.category.stock.property.form.view</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="stock_account.view_category_property_form_stock"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='property_cost_method']" position="after">
+                <field name="of_stock_update_standard_price" attrs="{'invisible': [('property_cost_method' , '=', 'standard')]}"/>
+                <field name="of_import_update_standard_price" attrs="{'invisible': [('property_cost_method' , '=', 'standard')]}"/>
+                <field name="of_sale_cost" attrs="{'invisible': [('property_cost_method' , '=', 'standard')]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
