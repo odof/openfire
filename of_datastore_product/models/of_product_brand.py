@@ -251,7 +251,7 @@ class OfProductBrand(models.Model):
           de calcul ont été modifiées dans la marque.
         """
         suppliers = self.mapped('datastore_supplier_id')
-        domain = [('model', 'in', ('product.product', 'product.template'))] + ['|'] * (len(self._ids) - 1)
+        domain = [('model', 'in', ('product.product', 'product.template'))] + ['|'] * (len(suppliers._ids) - 1)
         for supplier in suppliers:
             domain += [
                 '&',
