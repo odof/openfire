@@ -69,10 +69,11 @@ class OfProductBrand(models.Model):
 
     @api.multi
     def write(self, vals):
-        previous_code = self and self.code
+        previous_codes_dict = {brand.id: brand.code for brand in self}
         res = super(OfProductBrand, self).write(vals)
-        if 'use_prefix' in vals or (self.use_prefix and 'code' in vals):
-            self.update_products_default_code(remove_previous_prefix=previous_code)
+        for rec in self:
+            if 'use_prefix' in vals or (rec.use_prefix and 'code' in vals):
+                rec.update_products_default_code(remove_previous_prefix=previous_codes_dict[rec.id])
         return res
 
     @api.multi
