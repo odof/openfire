@@ -36,6 +36,11 @@
         <field name="model">of.analyse.chantier</field>
         <field name="arch" type="xml">
             <search string="Recherche">
+                <field name="name" filter_domain="[('name','ilike',self)]"/>
+                <field name="partner_id"/>
+               <filter string="Brouillon" name="draft" domain="[('state','=','draft')]"/>
+               <filter string="Validée" name="done" domain="[('state','=','done')]"/>
+               <separator/>
              </search>
         </field>
     </record>
@@ -51,7 +56,7 @@
                             confirm="Toutes modifications apportées manuellement à des lignes liées avec une commande/facture seront écrasées. Continuer ?"/>
                     <button name="button_deliver_all" string="Livrer tout" type="object"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
-                    <button name="action_done" string="Valider" type="object" groups="of_analyse_chantier.of_group_analyse_chantier_manager"/>
+                    <button name="action_done" string="Valider" type="object" groups="of_analyse_chantier.of_group_analyse_chantier_manager" states="draft"/>
                     <button name="recuperer_facture_liees" string="Lier factures" type="object" groups="of_analyse_chantier.of_group_analyse_chantier_manager"
                             confirm="Cette action va récupérer les factures liés aux commandes. Voulez-vous continuer ?"/>
                     <button name="recuperer_commande_client_liees" string="Lier commandes" type="object" groups="of_analyse_chantier.of_group_analyse_chantier_manager"
@@ -346,7 +351,7 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
                 <field name="of_analyse_id" string="Analyse" invisible="1"/>
-                <button class="oe_stat_button" name="action_view_analyse_chantier" type="object" icon="fa-usd" attrs="{'invisible': [('of_analyse_id', '=', False)]}" string="Analyse"/>
+                <button class="oe_stat_button" name="action_view_analyse_chantier" type="object" icon="fa-usd" attrs="{'invisible': [('of_analyse_id', '=', False)]}" string="Analyse" groups="of_analyse_chantier.of_group_analyse_chantier_user"/>
             </xpath>
         </field>
     </record>
