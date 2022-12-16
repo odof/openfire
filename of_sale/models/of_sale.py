@@ -80,6 +80,9 @@ class SaleOrder(models.Model):
     def pdf_address_title(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_address_title')
 
+    def pdf_shipping_address_specific_title(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_shipping_address_specific_title') or False
+
     def pdf_commercial_insert(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_commercial_insert')
 
@@ -191,7 +194,6 @@ class SaleOrder(models.Model):
     of_partner_phone = fields.Char(related='partner_id.phone', string=u"Téléphone du partenaire", readonly=True)
     of_partner_mobile = fields.Char(related='partner_id.mobile', string=u"Mobile du partenaire", readonly=True)
     of_partner_email = fields.Char(related='partner_id.email', string=u"Courriel du partenaire", readonly=True)
-
 
     @api.multi
     @api.depends('name', 'date', 'state')

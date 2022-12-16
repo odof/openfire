@@ -108,6 +108,9 @@ class AccountInvoice(models.Model):
     def get_color_font(self):
         return self.env['ir.values'].get_default('account.config.settings', 'of_color_font') or "#000000"
 
+    def pdf_shipping_address_specific_title(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_shipping_address_specific_title') or False
+
     @api.multi
     def action_invoice_open(self):
         """Mise à jour des dates de l'échéancier"""
