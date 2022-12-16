@@ -13,7 +13,7 @@
             <xpath expr="//kanban" position="attributes">
                 <attribute name="default_order">of_priority desc, date_order desc, id desc</attribute>
                 <attribute name="default_group_by">of_kanban_step_id</attribute>
-                <attribute name="class">o_kanban_dashboard of_followup_kanban</attribute>
+                <attribute name="class">o_kanban_dashboard of_sale_kanban</attribute>
             </xpath>
             <xpath expr="//kanban/field[@name='currency_id']" position="after">
                 <field name="amount_untaxed"/>
@@ -32,12 +32,12 @@
             <xpath expr="//templates/t[@t-name='kanban-box']" position="replace">
                 <t t-name="kanban-box">
                     <div class="oe_kanban_global_click">
-                        <div class="of_followup_kanban_main">
+                        <div class="of_sale_kanban_main">
                             <div class="o_kanban_card_content">
                                 <div class="o_kanban_tags_section">
-                                    <field name="of_sale_followup_tag_ids"/>
+                                    <field style="max-height: 100px;" name="of_sale_followup_tag_ids"/>
                                 </div>
-                                <div style="margin-left: 5px; margin-bottom: 25px;">
+                                <div style="margin-left: 5px; margin-right: 5px; margin-bottom: 25px;">
                                     <h4>
                                         <b><field name="name"/></b> - <field name="partner_id"/>
                                     </h4>
@@ -49,7 +49,10 @@
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <span><b><field name="user_id"/> / <field name="of_main_product_brand_id" /></b></span>
+                                    <span style="white-space: inherit;">
+                                        <b><field name="user_id"/> / <field name="of_main_product_brand_id"/></b>
+                                    </span>
+                                    <br/>
                                     <span><b>Sem. de pose : <field name="of_laying_week"/></b></span>
                                     <br/>
                                     <ul t-if="record.of_notes_display">
@@ -71,12 +74,12 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="of_followup_kanban_boxes">
-                            <div class="of_followup_kanban_box">
+                        <div class="of_sale_kanban_boxes">
+                            <div class="of_sale_kanban_box">
                                 <field name="of_activities_state" class="oe_inline"/>
                                 <field t-if="record.of_activities_state.raw_value == 'late'" name="of_nbr_overdue_activities" class="oe_inline"/>
                             </div>
-                            <div t-att-class="'of_followup_kanban_color_' + (record.of_activities_state.raw_value or '0') + ' of_followup_kanban_box'">
+                            <div t-att-class="'of_sale_kanban_color_' + (record.of_activities_state.raw_value or '0') + ' of_sale_kanban_box'">
                                 <ul t-if="record.of_activities_state.raw_value == 'late'">
                                     <t t-value="JSON.parse(record.of_overdue_activities.raw_value)" t-set="of_overdue_activities"/>
                                     <t t-foreach="of_overdue_activities" t-as="overdue_activity">
@@ -84,7 +87,7 @@
                                     </t>
                                 </ul>
                             </div>
-                            <div class="of_followup_kanban_box">
+                            <div class="of_sale_kanban_box">
                                 <field name="invoice_status"/>
                             </div>
                         </div>

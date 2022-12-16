@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import api, fields, models
 
@@ -51,8 +52,5 @@ class OFSaleOrderClosureWizard(models.TransientModel):
     @api.multi
     def action_close(self):
         self.ensure_one()
-        # On clôture le suivi
-        if self.order_id.of_followup_project_id:
-            self.order_id.of_followup_project_id.set_to_done()
         self.order_id.state = 'closed'
         return True
