@@ -1,27 +1,24 @@
-# -*- coding: utf-8 -*-
-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 {
-    'name': u"OpenFire / Connecteur Odoo",
-    'version': "10.0.1.0.0",
+    'name': "OpenFire / Connecteur Odoo",
+    'version': '16.0.1.0.0',
     'author': "OpenFire",
-    'website': "http://www.openfire.fr",
-    'category': "Openfire",
-    'description': u"""
-Module OpenFire de connexion à une base Odoo.
-=============================================
-
-Ajout d'une classe abstraite permettant de se connecter à une autre base odoo.
-""",
-    'depends': [],
+    'website': 'http://www.openfire.fr',
+    'category': 'Openfire',
+    'description': """""",
+    'depends': [
+        'of_base'
+    ],
     'external_dependencies': {
         'python': [
-            'openerplib'
+            'openerp-client-lib'
         ],
     },
-    'init_xml': [],
-    'demo_xml': [],
     'data': [
         'views/of_datastore_connector_views.xml',
     ],
     'installable': True,
+    'application': False,
+    'auto_install': False,
+    'license': 'LGPL-3',
 }

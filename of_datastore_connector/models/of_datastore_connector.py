@@ -1,7 +1,8 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 import logging
 import threading
-import xmlrpclib
+import xmlrpc.client
 import socket  # Ne pas supprimer cette ligne, voir fonction connect()
 
 from odoo import models, fields, api, _
@@ -15,36 +16,37 @@ except (ImportError, IOError) as err:
 
 
 class OfDatastoreConnector(models.AbstractModel):
-    u"""
+    """
     Fonctions de communication avec le serveur.
     Toute communication distante doit se faire par appel de ces fonctions.
     Le changement d'outil de connexion (erppeek, openerplib, odoorpc) peut ainsi se faire par "simple"
         redéfinition des méthodes de cette classe.
     """
+
     _name = 'of.datastore.connector'
 
-    server_address = fields.Char(string=u'Server address', required=True)
-    db_name = fields.Char(u'Database', required=True)
-    login = fields.Char('Login', required=True)
-    password = fields.Char('Password')
+    server_address = fields.Char(string="Server address", required=True)
+    db_name = fields.Char(string="Database", required=True)
+    login = fields.Char(string="Login", required=True)
+    password = fields.Char(string="Password")
     new_password = fields.Char(
-        string='Set Password', compute='_compute_new_password', inverse='_inverse_new_password',
+        string="Set Password", compute='_compute_new_password', inverse='_inverse_new_password',
         help="Specify a value only when changing the password, otherwise leave empty")
-    error_msg = fields.Char(string='Error', compute='_compute_error_msg')
+    error_msg = fields.Char(string="Error", compute='_compute_error_msg')
 
     @api.depends()
     def _compute_new_password(self):
-        for supplier in self:
-            supplier.new_password = ''
+        for connector in self:
+            connector.new_password = ''
 
     # Fonctions récupérées depuis le champ new_password défini pour res_users.
     def _inverse_new_password(self):
-        for supplier in self:
-            if not supplier.new_password:
+        for connector in self:
+            if not connector.new_password:
                 # Do not update the password if no value is provided, ignore silently.
                 # For example web client submits False values for all empty fields.
                 continue
-            supplier.password = supplier.new_password
+            connector.password = connector.new_password
 
     @api.depends('db_name', 'server_address', 'login', 'password', 'new_password')
     def _compute_error_msg(self):
@@ -59,18 +61,18 @@ class OfDatastoreConnector(models.AbstractModel):
                     break
             else:
                 error_msg = connector.of_datastore_connect()
-                if not isinstance(error_msg, basestring):
-                    error_msg = _('Connection successful')
+                if not isinstance(error_msg, str):
+                    error_msg = _("Connection successful")
             connector.error_msg = error_msg
 
     @api.model
     def _get_context(self):
-        return {key: val for key, val in self._context.iteritems() if key in ('lang', 'tz', 'active_test')}
+        return {key: val for key, val in self._context.copy().items() if key in ('lang', 'tz', 'active_test')}
 
-    @api.multi
     def of_datastore_connect(self):
         # Connexion à la base du fournisseur
         # Utilisation d'un thread pour stopper une connexion trop longue
+
         class FuncThread(threading.Thread):
             def __init__(self):
                 threading.Thread.__init__(self)
@@ -78,12 +80,12 @@ class OfDatastoreConnector(models.AbstractModel):
 
             def run(self):
                 try:
-                    server_address = supplier.server_address
+                    server_address = connector.server_address
                     # ======= Code à recommenter après la résolution du bug OVH =======
                     # Retrait du prefixe http://
                     ip_address = socket.gethostbyname(server_address.split('://')[1])
                     # Sur s-alpha le port 8010 est utilisé pour la connexion xmlrpc v10
-                    server_address = "http://%s:8010" % (ip_address,)
+                    server_address = f'http://{ip_address}:8010'
                     # =================================================================
 
                     i = server_address.find('://')
@@ -94,35 +96,32 @@ class OfDatastoreConnector(models.AbstractModel):
                     else:
                         # Protocole xmlrpc ou xmlrpcs en fonction de http ou https
                         protocol = server_address[:i].replace('http', 'xmlrpc')
-                        address = server_address[i+3:]
+                        address = server_address[i + 3:]
                     j = address.find(':')
                     if j == -1:
                         port = 443 if server_address[:i] == 'https' else 80
                     else:
-                        port = int(address[j+1:])
+                        port = int(address[j + 1:])
                         address = address[:j]
-                    cli = openerplib.get_connection(hostname=address, port=port, protocol=protocol,
-                                                    database=supplier.db_name,
-                                                    login=supplier.login, password=supplier.new_password or supplier.password)
+                    cli = openerplib.get_connection(
+                        hostname=address, port=port, protocol=protocol, database=connector.db_name,
+                        login=connector.login, password=connector.new_password or connector.password)
 
                     # Opération pour vérifier la connexion
                     self.result = cli.get_model('res.users').search([]) and cli or ''
-                except xmlrpclib.Fault, exc:
+                except xmlrpc.client.Fault as exc:
                     self.result = exc.faultCode
-                except Exception, exc:
+                except Exception as exc:
                     self.result = _(str(exc))
+
         self.ensure_one()
         # Call super() as no user shall have access right to this object
-        supplier = self.sudo()
+        connector = self.sudo()
 
         it = FuncThread()
         it.start()
         it.join(10)  # attente de 10 secondes ou jusqu'à la fin de l'opération
-        if it.isAlive():
-            client = _('Connection timeout')
-        else:
-            client = it.result
-        return client
+        return _("Connection timeout") if it.is_alive() else it.result
 
     @api.model
     def of_datastore_get_model(self, ds_client, model_name):
