@@ -214,7 +214,7 @@ class OfPlanningTache(models.Model):
     _name = "of.planning.tache"
     _description = u"Planning OpenFire : Tâches"
 
-    name = fields.Char(u"Libellé", size=64, required=True)
+    name = fields.Char(string=u"Libellé", size=100, required=True)
     description = fields.Text("Description")
     affichage = fields.Selection([
         ('hide', u"Ne pas afficher"),
