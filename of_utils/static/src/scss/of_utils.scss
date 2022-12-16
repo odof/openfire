@@ -1,0 +1,88 @@
+.of_table_fix_head {
+    overflow-y: auto;
+    height: 100px;
+}
+.of_table_fix_head thead th {
+    position: sticky;
+    top: 0;
+    border-bottom: 2px solid #ddd;
+    z-index: 4;
+}
+
+.of_thead_ovbc_color thead th {
+    background-color: $o-view-background-color;
+}
+
+.of_thead_obl_color thead th {
+    background-color: $o-brand-lightsecondary;
+}
+
+.of_pulse {
+  //margin:100px;
+  //display: block;
+  //width: 22px;
+  //height: 22px;
+  //border-radius: 50%;
+  //background: #cca92c;
+  cursor: pointer;
+  box-shadow: 0 0 0 rgba(0,0,0, 0.4);
+  animation: pulse 1s infinite;
+}
+
+.of_title {
+    color: #1D1D54;
+}
+
+.of_icon_button {
+    cursor: pointer;
+}
+
+.of_ws {
+    padding-right: 4px;
+}
+
+.of_ws_l {
+    padding-left: 4px;
+}
+
+.of_ws_lr {
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.of_pulse:hover {
+  //animation: none;
+}
+
+.of_red {
+    color: red;
+}
+
+.of_orange {
+    color: orange;
+}
+
+.of_label {
+    flex: 1, 0, auto;
+    padding: 0;
+    display: block;
+    // odoo adds a `style="width: 100%"` by javascript
+    // directly on the tag so we need `!important` here:
+    max-width: 100%;
+    //border-right: 1px solid #ddd;
+    font-weight: bold!important;
+    width: 25%!important
+}
+
+.of_label_form_field {
+    border-left: 1px solid #ddd;
+    padding-left: 8px;
+}
+
+.of_grey_background {
+    background-color: #F2F2F2;
+    margin-right: 2% !important;
+    width: 48% !important;
+    min-height: 200px !important;
+    padding: 17px !important;
+}

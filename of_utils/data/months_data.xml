@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="of_months_1" model="of.months">
+        <field name="name">Janvier</field>
+        <field name="abbreviation">janv.</field>
+        <field name="number">1</field>
+    </record>
+    <record id="of_months_2" model="of.months">
+        <field name="name">Février</field>
+        <field name="abbreviation">févr.</field>
+        <field name="number">2</field>
+    </record>
+    <record id="of_months_3" model="of.months">
+        <field name="name">Mars</field>
+        <field name="abbreviation">mars</field>
+        <field name="number">3</field>
+    </record>
+    <record id="of_months_4" model="of.months">
+        <field name="name">Avril</field>
+        <field name="abbreviation">avr.</field>
+        <field name="number">4</field>
+    </record>
+    <record id="of_months_5" model="of.months">
+        <field name="name">Mai</field>
+        <field name="abbreviation">mai</field>
+        <field name="number">5</field>
+    </record>
+    <record id="of_months_6" model="of.months">
+        <field name="name">Juin</field>
+        <field name="abbreviation">juin</field>
+        <field name="number">6</field>
+    </record>
+    <record id="of_months_7" model="of.months">
+        <field name="name">Juillet</field>
+        <field name="abbreviation">juill.</field>
+        <field name="number">7</field>
+    </record>
+    <record id="of_months_8" model="of.months">
+        <field name="name">Août</field>
+        <field name="abbreviation">août</field>
+        <field name="number">8</field>
+    </record>
+    <record id="of_months_9" model="of.months">
+        <field name="name">Septembre</field>
+        <field name="abbreviation">sept.</field>
+        <field name="number">9</field>
+    </record>
+    <record id="of_months_10" model="of.months">
+        <field name="name">Octobre</field>
+        <field name="abbreviation">oct.</field>
+        <field name="number">10</field>
+    </record>
+    <record id="of_months_11" model="of.months">
+        <field name="name">Novembre</field>
+        <field name="abbreviation">nov.</field>
+        <field name="number">11</field>
+    </record>
+    <record id="of_months_12" model="of.months">
+        <field name="name">Décembre</field>
+        <field name="abbreviation">déc.</field>
+        <field name="number">12</field>
+    </record>
+
+</odoo>
