@@ -59,58 +59,16 @@ class OFSaleWizardSetPrintingParams(models.TransientModel):
         """
         IrValues = self.env['ir.values']
 
-        should_be_updated = IrValues.get_default('sale.config.settings', 'pdf_settings_target_version') != '10.0.3.0.0'
-
         current_module = self.env['ir.module.module'].search([('name', '=', 'of_sale')])
         latest_version = current_module.latest_version
-        if latest_version < '10.0.3.0.0' and should_be_updated:
-            # list of fields that were changed from selection to boolean
-            contact_selection_fields = [
-                'pdf_address_contact_phone', 'pdf_address_contact_mobile', 'pdf_address_contact_fax',
-                'pdf_address_contact_email']
-            # list of fields whose values were reverted (a negative setting become positive)
-            reverted_fields = [
-                'pdf_hide_global_address_label', 'pdf_masquer_pastille_commercial',
-                'pdf_masquer_pastille_payment_term']
-            # dict of new fields names and the oldnames and their default values
-            mapping_data_dict = self._get_dict_fields_mapping()
-            # we will delete the old fields
-            to_unlink = [data['oldname'] for data in mapping_data_dict.values() if data['oldname']]
-            # save the current values of the old fields to update the new fields
-            current_values = {
-                current_name: IrValues.get_default('sale.config.settings', current_name) for current_name in to_unlink}
-
-            for field in contact_selection_fields:
-                # if this field was not set to be displayed in an additional customer insert or in both insert
-                # (current value == 1 or never set) then we set the default value to False for the new field.
-                # that's because we don't want to activate unwanted fields (keep the previous display behavior)
-                oldname = mapping_data_dict[field]['oldname']
-                if current_values.get(oldname) in [1, False, None]:
-                    linked_to = mapping_data_dict[field]['linked_to']
-                    # update the default value of the linked field
-                    mapping_data_dict[linked_to]['default_value'] = False
 
         res = super(OFSaleWizardSetPrintingParams, self)._auto_init()
 
-        if latest_version < '10.0.3.0.0' and should_be_updated:
-            # create new settings or update existing ones
-            for name, data in mapping_data_dict.items():
-                if data['oldname'] and data['oldname'] in current_values:
-                    if IrValues.get_default('sale.config.settings', data['oldname']) is not None:
-                        # get the correct value for the new field
-                        value = self._get_ir_values_settings_value(
-                            contact_selection_fields, reverted_fields, name, data['oldname'], current_values)
-                    elif IrValues.get_default('sale.config.settings', data['oldname']) is None:
-                        # case where the old field was not set example of "pdf_masquer_pastille_commercial" can has
-                        # never been set to True
-                        value = data['default_value']
-                    IrValues.set_default('sale.config.settings', name, value)
-                elif not data['oldname'] and IrValues.get_default('sale.config.settings', name) is None:
-                    IrValues.set_default('sale.config.settings', name, data['default_value'])
-            # delete old settings
-            IrValues.search([('model', '=', 'sale.config.settings'), ('name', 'in', to_unlink)]).unlink()
-            # set the target version to avoid calling this function again
-            IrValues.set_default('sale.config.settings', 'pdf_settings_target_version', '10.0.3.0.0')
+        if latest_version and latest_version < '10.0.3.1.0':
+            if not IrValues.get_default('sale.config.settings', 'pdf_shipping_address_specific_title'):
+                IrValues.set_default('sale.config.settings', 'pdf_shipping_address_specific_title',
+                                     'Adresse de livraison')
+
         return res
 
     # Address insert
@@ -137,6 +95,7 @@ class OFSaleWizardSetPrintingParams(models.TransientModel):
     pdf_address_contact_email = fields.Boolean(
         string="Email", default=True,
         help="If checked, displays the contact's mail in the address insert")
+    pdf_shipping_address_specific_title = fields.Char(string="Shipping Address Title", size=30)
 
     # Commercial insert
     pdf_commercial_insert = fields.Boolean(
@@ -275,6 +234,11 @@ class OFSaleWizardSetPrintingParams(models.TransientModel):
     def set_pdf_address_title(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'pdf_address_title', self.pdf_address_title)
+
+    @api.multi
+    def set_pdf_shipping_address_specific_title_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_shipping_address_specific_title', self.pdf_shipping_address_specific_title)
 
     @api.multi
     def set_pdf_address_contact_titles(self):

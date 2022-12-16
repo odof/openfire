@@ -10,6 +10,7 @@
         <t t-set="pdf_address_contact_titles" t-value="doc.pdf_address_contact_titles()"/>
         <t t-set="pdf_address_contact_name" t-value="doc.pdf_address_contact_name()"/>
         <t t-set="pdf_address_title" t-value="doc.pdf_address_title()"/>
+        <t t-set="pdf_shipping_address_specific_title" t-value="doc.pdf_shipping_address_specific_title()"/>
         <t t-set="pdf_address_contact_phone" t-value="doc.pdf_address_contact_phone()"/>
         <t t-set="pdf_address_contact_mobile" t-value="doc.pdf_address_contact_mobile()"/>
         <t t-set="pdf_address_contact_fax" t-value="doc.pdf_address_contact_fax()"/>
@@ -38,7 +39,7 @@
             <div name="addresses" class="row mt8">
                 <div class="col-xs-6">
                     <div name="adresse_livraison" t-if="doc.partner_shipping_id != doc.partner_invoice_id">
-                        <strong name="libelle_adr_livraison">Adresse de livraison&amp;nbsp;:</strong><br/>
+                        <strong name="libelle_adr_livraison"><span t-esc="pdf_shipping_address_specific_title"/>&amp;nbsp;:</strong><br/>
                         <t t-if="pdf_address_contact_parent_name and doc.partner_shipping_id.parent_id">
                             <span t-if="pdf_address_contact_titles and doc.partner_shipping_id.parent_id.title" t-field="doc.partner_shipping_id.parent_id.title"/>
                             <span t-field="doc.partner_shipping_id.parent_id.name"/>
@@ -57,7 +58,7 @@
                     </div>
                 </div>
                 <div name="adresse_facturation" class="col-xs-5 col-xs-offset-1" style="font-size: large">
-                    <strong name="libelle_adr_fact_livraison" t-if="pdf_address_title and doc.partner_shipping_id == doc.partner_invoice_id">Adresse de livraison et de facturation&amp;nbsp;:</strong>
+                    <strong name="libelle_adr_fact_livraison" t-if="pdf_address_title and doc.partner_shipping_id == doc.partner_invoice_id"><span t-esc="pdf_shipping_address_specific_title"/> et de facturation&amp;nbsp;:</strong>
                     <strong name="libelle_adr_facturation" t-if="doc.partner_shipping_id != doc.partner_invoice_id">Adresse de facturation&amp;nbsp;:</strong><br/>
                     <t t-set="main_address" t-value="doc.partner_invoice_id"/>
                     <t t-if="pdf_address_contact_parent_name and main_address.parent_id">
@@ -450,10 +451,11 @@
     </xpath>
     <xpath expr="//div[@name='invoice_address']" position="before">
         <t t-set="pdf_vt_pastille" t-value="o.pdf_vt_pastille()"/>
+        <t t-set="pdf_shipping_address_specific_title" t-value="o.pdf_shipping_address_specific_title()"/>
         <div name="addresses" class="row mt8" groups="sale.group_delivery_invoice_address">
             <div class="col-xs-6">
                 <div name="adresse_livraison" t-if="o.partner_shipping_id and o.partner_shipping_id != o.partner_id">
-                    <strong name="libelle_adr_livraison">Adresse de livraison</strong><br/>
+                    <strong name="libelle_adr_livraison"><span t-esc="pdf_shipping_address_specific_title"/></strong><br/>
                     <t t-set="the_shipping_address" t-value="o.partner_shipping_id"/>
                     <t t-if="o.pdf_afficher_nom_parent()">
                         <t t-if="the_shipping_address.parent_id"><t t-set="the_shipping_address" t-value="the_shipping_address.parent_id"/></t>
