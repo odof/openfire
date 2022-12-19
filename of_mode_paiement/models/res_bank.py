@@ -101,7 +101,10 @@ class ResPartnerBank(models.Model):
         # Une date de SEPA est définie et est antérieure ou égale à la date du contrôle
         date_valide = self.of_sepa_date_mandat and self.of_sepa_date_mandat <= fields.Date.today()
 
-        if iban and rum_unique and date_valide:
+        # Vérification du bic
+        bic = self.bank_bic
+
+        if iban and rum_unique and date_valide and bic:
             return True
         return False
 
