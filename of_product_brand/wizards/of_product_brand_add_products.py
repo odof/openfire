@@ -1,14 +1,14 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api
+from odoo import models, fields
+
 
 class OfProductBrandAddProducts(models.TransientModel):
     _name = 'of.product.brand.add.products'
 
-    brand_id = fields.Many2one('of.product.brand', 'Brand', required=True)
-    product_ids = fields.Many2many('product.template', string="Products")
+    brand_id = fields.Many2one(comodel_name='of.product.brand', string="Brand", required=True)
+    product_ids = fields.Many2many(comodel_name='product.template', string="Products")
 
-    @api.multi
     def add_products(self):
         self.ensure_one()
         if self.product_ids:

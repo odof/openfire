@@ -1,31 +1,33 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    "name": "OpenFire / Products brands",
-    "version": "10.0.1.0.0",
-    "author": "OpenFire",
-    "website": "http://www.openfire.fr",
-    "category": "OpenFire",
-    "license": "AGPL-3",
-    "description": """
-OpenFire module to manage products brand
-========================================
-
-""",
-    "depends": [
-        'of_product',
+    'name': "OpenFire / Products brands",
+    'version': '16.0.1.0.0',
+    'author': "OpenFire",
+    'category': 'OpenFire',
+    'sequence': 15,
+    'summary': "Base module for OpenFire",
+    'website': 'https://www.openfire.fr',
+    'description': "",
+    'depends': [
         'sale',
+        'of_product'
     ],
-    "init_xml": [],
-    "demo_xml": [],
-    "data": [
+    'data': [
         'data/of_product_brand_data.xml',
         'security/ir.model.access.csv',
-        'wizards/of_product_brand_add_products.xml',
         'views/of_product_brand_view.xml',
+        'views/product_supplierinfo_view.xml',
+        'views/product_views.xml',
+        'views/res_partner_views.xml',
+        'views/sale_order_views.xml',
+        'wizards/of_product_brand_add_products.xml',
         'report/of_sale_report_view.xml',
         'report/of_purchase_report_views.xml',
         'report/of_account_report_views.xml',
     ],
-    "installable": True,
+    'installable': True,
+    'application': False,
+    'auto_install': False,
+    'license': 'LGPL-3',
 }

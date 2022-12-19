@@ -1,30 +1,15 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api, _
+from odoo import models, fields, api
 
 
 class AccountInvoiceReport(models.Model):
-    _inherit = "account.invoice.report"
+    _inherit = 'account.invoice.report'
 
-    of_brand_id = fields.Many2one("of.product.brand", "Marque", readonly=True)
-    of_diff_price = fields.Float(u"Δ% HT", compute="_compute_dummy")
-    of_diff_qty = fields.Float(u"Δ% qté ", compute="_compute_dummy")
-
-    of_my_company = fields.Boolean(
-        string=u"Est mon magasin ?", compute='_get_is_my_company', search='_search_is_my_company')
-
-    @api.model
-    def _search_is_my_company(self, operator, value):
-        if operator != '=' or not value:
-            raise ValueError(_("Unsupported search operator"))
-        req = """SELECT id
-            FROM account_invoice_report
-            WHERE
-            company_id = %s"""
-        self.env.cr.execute(
-            req, (self.env.user.company_id.id,))
-        lead_ids = [r[0] for r in self.env.cr.fetchall()]
-        return [('id', 'in', lead_ids)]
+    of_brand_id = fields.Many2one(comodel_name='of.product.brand', string="Brand", readonly=True)
+    of_diff_price = fields.Float(string="Δ% HT", compute='_compute_dummy')
+    of_diff_qty = fields.Float(string="Δ% Qty", compute='_compute_dummy')
+    of_my_company = fields.Boolean(string="Is my store ?")
 
     def _get_is_my_company(self):
         for rec in self:
@@ -32,38 +17,52 @@ class AccountInvoiceReport(models.Model):
 
     @api.depends()
     def _compute_dummy(self):
-        """ Sert uniquement à avoir des champs calculés que l'on peuple plus tard.
+        """ Dummy method to allow to search on computed fields.
+        Thoses fields should be comptued on the fly after with the values of the previous period
         """
-        return
+        pass
 
     def _select(self):
-        res = super(AccountInvoiceReport, self)._select()
-        res += ", sub.of_brand_id as of_brand_id"
-        return res
-
-    def _sub_select(self):
-        res = super(AccountInvoiceReport, self)._sub_select()
-        res += ", pt.brand_id as of_brand_id"
-        return res
+        select_str = super()._select()
+        select_str += """,
+            template.brand_id as of_brand_id,
+            CASE WHEN line.company_id = %s THEN True ELSE False END AS of_my_company""" \
+            % self.env.user.company_id.id
+        return select_str
 
     def _from(self):
-        res = super(AccountInvoiceReport, self)._from()
-        res += "LEFT JOIN of_product_brand b on pt.brand_id = b.id\n"
-        return res
-
-    def _group_by(self):
-        res = super(AccountInvoiceReport, self)._group_by()
-        res += ", pt.brand_id"
-        return res
+        from_str = super()._from()
+        from_str += """
+            LEFT JOIN of_product_brand b on template.brand_id = b.id"""
+        return from_str
 
     @api.model
     def _read_group_raw(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
-        res = super(AccountInvoiceReport, self)._read_group_raw(domain, fields, groupby, offset, limit, orderby, lazy)
-        time_groupbys = ('date:month', 'date:year', 'date')
+        # FIXME: Is that ok ?
+        # Workarround to remove unstored computed field of the fields list, beacause we can't send non stored
+        # field no more here. Thoses fields should be comptued on the fly after with the values of the previous period
+        depends_mapping = {
+            'of_diff_price': ('of_diff_price', 'price_subtotal'),
+            'of_diff_qty': ('of_diff_qty', 'quantity'),
+        }
+        of_compute_fields = [
+            f.name
+            for f in self._fields.values()
+            if f.name in depends_mapping and not f.store and not f.search
+        ]
+        fields_copy = [
+            f
+            for f in fields
+            if f not in tuple(map(lambda e: f'{e}:sum', of_compute_fields))
+        ]
+        res = super()._read_group_raw(domain, fields_copy, groupby, offset, limit, orderby, lazy)
+        time_groupbys = ('invoice_date:month', 'invoice_date:year', 'invoice_date')
         # Les deltas dépendent d'un champ qui doit être calculé
-        diff_percent = [vals for vals in (('of_diff_price', 'price_total'),
-                                          ('of_diff_qty', 'product_qty'))
-                        if vals[0] in fields and vals[1] in fields]
+        diff_percent = [
+            v
+            for v in depends_mapping.values()
+            if f'{v[0]}:sum' in fields and f'{v[1]}:sum' in fields
+        ]
         diff = []
         if groupby and (diff or diff_percent) and any(gb in time_groupbys for gb in groupby[-2:]):
             # Regroupement des résultats par période pour calcul des deltas
@@ -76,16 +75,18 @@ class AccountInvoiceReport(models.Model):
                     time_gb, other_gb = other_gb, time_gb
 
             # Liste de toutes les périodes de temps affichée, par ordre croissant
-            periods = sorted(list(set([r[time_gb] for r in res])))
-            others = other_gb and sorted(list(set([r[other_gb] for r in res]))) or [other_gb]
+            # On filtre les valeurs False pour les périodes qui n'ont pas de données
+            periods = sorted(
+                list({r[time_gb] for r in res if r[time_gb]})) + list({False for r in res if not r[time_gb]})
+            others = other_gb and sorted(list({r[other_gb] for r in res})) or [other_gb]
 
             # Mise en ordre des données pour traitement
             values = {period: {other: False for other in others} for period in periods}
             for r in res:
                 values[r[time_gb]][other_gb and r[other_gb]] = r
-                for f1, _ in diff:
+                for f1, _dummy in diff:
                     r[f1] = False
-                for f1, _ in diff_percent:
+                for f1, _dummy in diff_percent:
                     r[f1] = False
 
             period_prec = periods[0]
@@ -96,7 +97,9 @@ class AccountInvoiceReport(models.Model):
                         for field1, field2 in diff:
                             r[field1] = r[field2] - values[period_prec][other][field2]
                         for field1, field2 in diff_percent:
-                            r[field1] = ((r[field2] / values[period_prec][other][field2] - 1)) * 100 if values[period_prec][other][field2] else 100
+                            r[field1] = (
+                                (r[field2] / values[period_prec][other][field2] - 1)
+                            ) * 100 if values[period_prec][other][field2] else 100
                 period_prec = period
 
         return res

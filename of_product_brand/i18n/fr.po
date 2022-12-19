@@ -1,14 +1,14 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-#	* of_product_brand
+# 	* of_product_brand
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 10.0\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-09 13:32+0000\n"
-"PO-Revision-Date: 2018-07-09 13:32+0000\n"
-"Last-Translator: <>\n"
+"POT-Creation-Date: 2023-01-13 14:52+0000\n"
+"PO-Revision-Date: 2023-01-13 14:52+0000\n"
+"Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,271 +16,435 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_res_partner_supplier_brand_count
-#: model:ir.model.fields,field_description:of_product_brand.field_res_users_supplier_brand_count
+#: model:ir.model.fields,field_description:of_product_brand.field_res_partner__supplier_brand_count
+#: model:ir.model.fields,field_description:of_product_brand.field_res_users__supplier_brand_count
 msgid "# Brands"
-msgstr "Nb. Marques"
+msgstr "# Marques"
 
 #. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_product_count
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__product_count
 msgid "# Products"
-msgstr "Nb. Articles"
+msgstr "# Produits"
 
 #. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_active
+#. odoo-python
+#: code:addons/of_product_brand/models/product_template.py:0
+#, python-format
+msgid "%s (copy)"
+msgstr "%s (copie)"
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__active
 msgid "Active"
 msgstr "Actif"
 
 #. module: of_product_brand
-#: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_form_view
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_brand_form_view
 msgid "Add products to brand"
-msgstr "Ajouter des articles à la marque"
+msgstr "Ajouter des produits à la marque"
 
 #. module: of_product_brand
-#: sql_constraint:of.product.brand:0
+#: model:ir.model.constraint,message:of_product_brand.constraint_of_product_brand_code
 msgid "Another brand already exists with this code"
 msgstr "Une autre marque existe déjà avec ce code"
 
 #. module: of_product_brand
-#: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_search
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_form
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_search
 msgid "Archived"
 msgstr "Archivé"
 
 #. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_delivery_carrier_brand_id
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products_brand_id
-#: model:ir.model.fields,field_description:of_product_brand.field_product_product_brand_id
-#: model:ir.model.fields,field_description:of_product_brand.field_product_template_brand_id
-#: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_product_template_search_view
+#: model:ir.model.fields,field_description:of_product_brand.field_account_invoice_report__of_brand_id
+#: model:ir.model.fields,field_description:of_product_brand.field_account_move_line__of_product_brand_id
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products__brand_id
+#: model:ir.model.fields,field_description:of_product_brand.field_product_product__brand_id
+#: model:ir.model.fields,field_description:of_product_brand.field_product_template__brand_id
+#: model:ir.model.fields,field_description:of_product_brand.field_purchase_report__of_brand_id
+#: model:ir.model.fields,field_description:of_product_brand.field_sale_order_line__of_product_brand_id
+#: model:ir.model.fields,field_description:of_product_brand.field_sale_report__of_brand_id
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_account_view_account_invoice_report_search
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_brand_product_template_search_view
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_kanban
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_sale_view_order_product_search
 msgid "Brand"
 msgstr "Marque"
 
 #. module: of_product_brand
 #: model:ir.actions.act_window,name:of_product_brand.act_res_partner_2_brands
 #: model:ir.actions.act_window,name:of_product_brand.of_product_brand_action
-#: model:ir.model.fields,field_description:of_product_brand.field_res_partner_brand_ids
-#: model:ir.model.fields,field_description:of_product_brand.field_res_users_brand_ids
+#: model:ir.model.fields,field_description:of_product_brand.field_res_partner__brand_ids
+#: model:ir.model.fields,field_description:of_product_brand.field_res_users__brand_ids
 #: model:ir.ui.menu,name:of_product_brand.of_menu_brand
-#: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_partner_form
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_partner_form
 msgid "Brands"
 msgstr "Marques"
 
 #. module: of_product_brand
-#: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_form_view
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_brand_form_view
 msgid "Cancel"
 msgstr "Annuler"
 
 #. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_code
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__code
 msgid "Code"
-msgstr "Code"
+msgstr ""
 
 #. module: of_product_brand
-#: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_kanban
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_kanban
 msgid "Code:"
-msgstr "Code:"
+msgstr ""
 
 #. module: of_product_brand
-#: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_form_view
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_brand_form_view
 msgid "Confirm"
 msgstr "Confirmer"
 
 #. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products_create_uid
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_create_uid
-msgid "Created by"
-msgstr "Créé par"
-
-#. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products_create_date
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_create_date
-msgid "Created on"
-msgstr "Créé le"
-
-#. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products_display_name
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_display_name
-msgid "Display Name"
-msgstr "Nom affiché"
-
-#. module: of_product_brand
-#: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_product_template_search_view
-msgid "Group By"
-msgstr "Grouper par"
-
-#. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products_id
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_id
-msgid "ID"
-msgstr "ID"
-
-#. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand___last_update
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products___last_update
-msgid "Last Modified on"
-msgstr "Dernière modification le"
-
-#. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products_write_uid
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_write_uid
-msgid "Last Updated by"
-msgstr "Mis à jour par"
-
-#. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products_write_date
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_write_date
-msgid "Last Updated on"
-msgstr "Mis à jour le"
-
-#. module: of_product_brand
-#: model:ir.actions.act_window,name:of_product_brand.action_of_product_brand_add_products
-#: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_form
-msgid "Link products"
-msgstr "Associer des articles"
-
-#. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_logo
-msgid "Logo"
-msgstr "Logo"
-
-#. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_name
-msgid "Name"
-msgstr "Nom"
-
-#. module: of_product_brand
-#: model:ir.ui.view,arch_db:of_product_brand.of_product_vrand_view_order_form
-msgid "Note: When searching for a product, typing \"m:ABC\" will filter products for brand \"ABC\"."
-msgstr "Note: Lorsque vous recherchez un article, taper \"m:ABC\" filtrera les articles de la marque \"ABC\"."
-
-#. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_note
-msgid "Notes"
-msgstr "Notes"
-
-#. module: of_product_brand
-#: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_form
-msgid "OPE"
-msgstr "OPE"
-
-#. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_delivery_carrier_of_previous_brand_id
-#: model:ir.model.fields,field_description:of_product_brand.field_product_product_of_previous_brand_id
-#: model:ir.model.fields,field_description:of_product_brand.field_product_template_of_previous_brand_id
-msgid "Of previous brand id"
-msgstr ""
-
-#. module: of_product_brand
-#: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_form
-msgid "OpenFire"
-msgstr "OpenFire"
+#: model:ir.model.fields,field_description:of_product_brand.field_sale_report__of_confirmation_date
+msgid "Confirmation date"
+msgstr "Date de confirmation"
 
 #. module: of_product_brand
 #: model:ir.model,name:of_product_brand.model_res_partner
-msgid "Partner"
-msgstr "Partenaire"
-
-#. module: of_product_brand
-#: model:ir.model,name:of_product_brand.model_product_product
-msgid "Product"
-msgstr "Article"
-
-#. module: of_product_brand
-#: model:ir.model,name:of_product_brand.model_product_template
-msgid "Product Template"
-msgstr "Modèle d'article"
-
-#. module: of_product_brand
-#: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_form
-#: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_tree
-msgid "Product brand"
-msgstr "Marque"
-
-#. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_product_change_warn
-msgid "Product change warn"
+msgid "Contact"
 msgstr ""
 
 #. module: of_product_brand
-#: code:addons/of_product_brand/models/of_product_brand.py:170
-#, python-format
-msgid "Product reference must be unique per brand !n"
-"Reference : %s"
-msgstr "La référence article doit être unique par marque !\n"
-"Référence : %s"
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__create_uid
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products__create_uid
+msgid "Created by"
+msgstr ""
 
 #. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_product_variant_ids
-msgid "Product variants"
-msgstr "Variantes d'articles"
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__create_date
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products__create_date
+msgid "Created on"
+msgstr ""
 
 #. module: of_product_brand
-#: model:ir.actions.act_window,name:of_product_brand.of_brand_product_action
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products_product_ids
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_product_ids
-#: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_form
-msgid "Products"
-msgstr "Articles"
+#: model:ir.model.fields,field_description:of_product_brand.field_sale_report__of_delivered_amount
+msgid "Delivered amount"
+msgstr "Montant livré"
 
 #. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_partner_id
-#: model:ir.ui.view,arch_db:of_product_brand.of_product_template_search_view
-msgid "Supplier"
-msgstr "Fournisseur"
-
-#. module: of_product_brand
-#: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_kanban
-msgid "Supplier:"
-msgstr "Fournisseur:"
-
-#. module: of_product_brand
-#: model:ir.model.fields,help:of_product_brand.field_of_product_brand_product_count
-msgid "The number of products of this brand"
-msgstr "Le nombre d'articles de cette marque"
-
-#. module: of_product_brand
-#: model:ir.model.fields,help:of_product_brand.field_of_product_brand_use_prefix
-msgid "The products internal references will be prefixed with the brand code"
-msgstr "La référence interne des articles sera préfixée avec le code de la marque"
-
-#. module: of_product_brand
-#: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_form
-msgid "The reference of this brand's products will be modified if you save these changes."
-msgstr "La référence des articles de cette marque sera modifiée si vous sauvegardez ces modifications."
-
-#. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_use_prefix
-msgid "Use code as prefix"
-msgstr "Utilise le code comme préfixe"
-
-#. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_product_product_of_seller_name
-#: model:ir.model.fields,field_description:of_product_brand.field_product_template_of_seller_name
-msgid "Vendor"
-msgstr "Fournisseur"
-
-#. module: of_product_brand
-#: model:ir.model.fields,help:of_product_brand.field_product_product_of_seller_name
-#: model:ir.model.fields,help:of_product_brand.field_product_template_of_seller_name
-msgid "Vendor of this product"
-msgstr "Fournisseur de cet article"
-
-#. module: of_product_brand
-#: model:ir.model,name:of_product_brand.model_of_product_brand
-msgid "of.product.brand"
-msgstr "of.product.brand"
-
-#. module: of_product_brand
-#: model:ir.model,name:of_product_brand.model_of_product_brand_add_products
-msgid "of.product.brand.add.products"
-msgstr "of.product.brand.add.products"
-
-#. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_supplier_delay
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__supplier_delay
 msgid "Delivery Delay (days)"
 msgstr "Délai de livraison (jours)"
 
 #. module: of_product_brand
-#: model:ir.model.fields,help:of_product_brand.field_of_product_brand_supplier_delay
-msgid "The number of days it takes for the supplier to deliver products of this brand"
-msgstr "Le nombre de jours que le fournisseur met pour livrer les articles de cette marque"
+#: model:ir.model.fields,field_description:of_product_brand.field_sale_report__of_delivery_date
+msgid "Delivery date"
+msgstr "Date de livraison"
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__description_sale
+msgid "Description for quotations"
+msgstr "Description pour les devis"
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__display_name
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__id
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products__id
+msgid "ID"
+msgstr ""
+
+#. module: of_product_brand
+#: model:ir.model.fields,help:of_product_brand.field_of_product_brand__show_in_sales
+msgid ""
+"If this option is checked, the brand will be added at the beginning of the "
+"description of order and invoice lines"
+msgstr ""
+"Si cette option est cochée, la marque sera ajoutée au début du descriptif "
+"des lignes de commandes et factures"
+
+#. module: of_product_brand
+#: model:ir.model,name:of_product_brand.model_account_invoice_report
+msgid "Invoices Statistics"
+msgstr "Statistiques des factures"
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_account_invoice_report__of_my_company
+#: model:ir.model.fields,field_description:of_product_brand.field_sale_report__of_my_company
+msgid "Is my store ?"
+msgstr "Est mon magasin ?"
+
+#. module: of_product_brand
+#: model:ir.model,name:of_product_brand.model_account_move_line
+msgid "Journal Item"
+msgstr "Écriture comptable"
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand____last_update
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__write_uid
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__write_date
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_product_brand
+#: model:ir.actions.act_window,name:of_product_brand.action_of_product_brand_add_products
+msgid "Link products"
+msgstr "Associer des articles"
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__logo
+msgid "Logo"
+msgstr ""
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_sale_report__of_margin_percentage
+msgid "Margin (%)"
+msgstr "Marge (%)"
+
+#. module: of_product_brand
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_account_view_account_invoice_report_search
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_sale_view_order_product_search
+msgid "Monthly accumulation"
+msgstr "Cumul à date - Mensuel"
+
+#. module: of_product_brand
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_account_view_account_invoice_report_search
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_sale_view_order_product_search
+msgid "My store"
+msgstr "Mon magasin"
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__name
+msgid "Name"
+msgstr ""
+
+#. module: of_product_brand
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_vrand_view_order_form
+msgid ""
+"Note: When searching for a product, typing \"m:ABC\" will filter products "
+"for brand \"ABC\"."
+msgstr ""
+"Note: Lorsque vous recherchez un article, taper \"m:ABC\" filtrera les "
+"articles de la marque \"ABC\"."
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__note
+msgid "Notes"
+msgstr ""
+
+#. module: of_product_brand
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_form
+msgid "OPE"
+msgstr ""
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_product_product__of_previous_brand_id
+#: model:ir.model.fields,field_description:of_product_brand.field_product_template__of_previous_brand_id
+msgid "Of Previous Brand"
+msgstr ""
+
+#. module: of_product_brand
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_form
+msgid "OpenFire"
+msgstr ""
+
+#. module: of_product_brand
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_account_view_account_invoice_report_search
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_sale_view_order_product_search
+msgid "Previous month"
+msgstr "Mois précédent"
+
+#. module: of_product_brand
+#: model:ir.model,name:of_product_brand.model_product_template
+msgid "Product"
+msgstr "Modèle d'article"
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__product_change_warn
+msgid "Product Change Warn"
+msgstr ""
+
+#. module: of_product_brand
+#: model:ir.model,name:of_product_brand.model_product_product
+msgid "Product Variant"
+msgstr "Variante d'article"
+
+#. module: of_product_brand
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_form
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_tree
+msgid "Product brand"
+msgstr "Marque"
+
+#. module: of_product_brand
+#. odoo-python
+#: code:addons/of_product_brand/models/product_product.py:0
+#, python-format
+msgid ""
+"Product reference must be unique per brand !\n"
+"Reference : %s"
+msgstr ""
+"La référence produit doit être unique par marque !\n"
+"Référence : %s"
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__product_variant_ids
+msgid "Product variants"
+msgstr ""
+
+#. module: of_product_brand
+#: model:ir.actions.act_window,name:of_product_brand.of_brand_product_action
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__product_ids
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products__product_ids
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_form
+msgid "Products"
+msgstr "Articles"
+
+#. module: of_product_brand
+#: model:ir.model,name:of_product_brand.model_purchase_report
+msgid "Purchase Report"
+msgstr "Rapport d'achat"
+
+#. module: of_product_brand
+#: model:ir.model,name:of_product_brand.model_sale_report
+msgid "Sales Analysis Report"
+msgstr "Rapport d'analyse des ventes"
+
+#. module: of_product_brand
+#: model:ir.model,name:of_product_brand.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de bons de commande"
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__show_in_sales
+msgid "Show in sales order lines"
+msgstr "Afficher dans les lignes de ventes"
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__partner_id
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_template_search_view
+msgid "Supplier"
+msgstr "Fournisseur"
+
+#. module: of_product_brand
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_kanban
+msgid "Supplier:"
+msgstr "Fournisseur:"
+
+#. module: of_product_brand
+#: model:ir.model.fields,help:of_product_brand.field_of_product_brand__supplier_delay
+msgid ""
+"The number of days it takes for the supplier to deliver products of this "
+"brand"
+msgstr ""
+"Le nombre de jours qu'il faut pour que le fournisseur livre les produits de "
+"cette marque"
+
+#. module: of_product_brand
+#: model:ir.model.fields,help:of_product_brand.field_of_product_brand__product_count
+msgid "The number of products of this brand"
+msgstr "Le nombre d'articles de cette marque"
+
+#. module: of_product_brand
+#: model:ir.model.fields,help:of_product_brand.field_of_product_brand__use_prefix
+msgid "The products internal references will be prefixed with the brand code"
+msgstr ""
+"Les références internes des produits seront préfixées du code de la marque"
+
+#. module: of_product_brand
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_form
+msgid ""
+"The reference of this brand's products will be modified if you save these "
+"changes."
+msgstr ""
+"La référence des articles de cette marque sera modifiée si vous enregistrez "
+"ces changements."
+
+#. module: of_product_brand
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_account_view_account_invoice_report_search
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_sale_view_order_product_search
+msgid "This month"
+msgstr "Mois en cours"
+
+#. module: of_product_brand
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_account_view_account_invoice_report_search
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_sale_view_order_product_search
+msgid "This year"
+msgstr "Année en cours"
+
+#. module: of_product_brand
+#. odoo-python
+#: code:addons/of_product_brand/report/of_account_report.py:0
+#: code:addons/of_product_brand/report/of_sale_report.py:0
+#, python-format
+msgid "Unsupported search operator"
+msgstr "Opérateur de recherche non supporté"
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__use_brand_description_sale
+msgid "Use brand-level sales description"
+msgstr "Utiliser la description de vente au niveau de la marque"
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__use_prefix
+msgid "Use code as prefix"
+msgstr "Utiliser le code comme préfixe"
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_product_product__of_seller_partner_id
+#: model:ir.model.fields,field_description:of_product_brand.field_product_template__of_seller_partner_id
+msgid "Vendor"
+msgstr "Fournisseur"
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_product_product__seller_ids
+#: model:ir.model.fields,field_description:of_product_brand.field_product_template__seller_ids
+msgid "Vendors"
+msgstr "Fournisseurs"
+
+#. module: of_product_brand
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_account_view_account_invoice_report_search
+#: model_terms:ir.ui.view,arch_db:of_product_brand.of_sale_view_order_product_search
+msgid "Yearly accumulation"
+msgstr "Cumul à date - Annuel"
+
+#. module: of_product_brand
+#: model:ir.model,name:of_product_brand.model_of_product_brand
+msgid "of.product.brand"
+msgstr ""
+
+#. module: of_product_brand
+#: model:ir.model,name:of_product_brand.model_of_product_brand_add_products
+msgid "of.product.brand.add.products"
+msgstr ""
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_account_invoice_report__of_diff_price
+#: model:ir.model.fields,field_description:of_product_brand.field_sale_report__of_diff_price
+msgid "Δ% HT"
+msgstr ""
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_sale_report__of_diff_margin
+msgid "Δ% Margin"
+msgstr ""
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_account_invoice_report__of_diff_qty
+msgid "Δ% Qty"
+msgstr ""
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_sale_report__of_diff_qty_delivered
+msgid "Δ% Shipped qty."
+msgstr ""

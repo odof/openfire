@@ -6,27 +6,28 @@
         <field name="model">account.invoice.report</field>
         <field name="inherit_id" ref="account.view_account_invoice_report_search"/>
         <field name="arch" type="xml">
-            <xpath expr="//group[@expand='1']/separator" position="before">
-                <field string="Marque" name="of_brand_id" context="{'group_by' : 'of_brand_id'}"/>
+            <xpath expr="//group//filter[@name='company']" position="after">
+                <filter string="Brand" name="of_brand_id" context="{'group_by' : 'of_brand_id'}"/>
             </xpath>
-            <xpath expr="//filter[@name='thisyear']" position="replace">
-                <filter string="Mon magasin" name="my_company" domain="[('of_my_company', '=', True)]"/>
+            <xpath expr="//filter[@name='invoice_date']" position="after">
                 <separator/>
-                <filter string="Mois en cours" name="this_month"
-                        domain="[('date', '&gt;=', context_today().strftime('%Y-%m-01')),
-                                 ('date', '&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-01'))]"/>
-                <filter string="Mois précédent" name="previous_month"
-                        domain="[('date', '&gt;=', (context_today() + relativedelta(months=-1)).strftime('%Y-%m-01')),
-                                 ('date', '&lt;', context_today().strftime('%Y-%m-01'))]"/>
-                <filter string="Année en cours" name="this_year"
-                        domain="[('date', '&gt;=', context_today().strftime('%Y-01-01')),
-                                 ('date', '&lt;', (context_today() + relativedelta(day=1,years=1)).strftime('%Y-01-01'))]"/>
-                <filter string="Cumul à date - Mensuel" name="monthly_accumulation"
-                        domain="[('date', u'&gt;=', context_today().strftime('%Y-%m-01')),
-                                 ('date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
-                <filter string="Cumul à date - Annuel" name="yearly_accumulation"
-                        domain="[('date', u'&gt;=', context_today().strftime('%Y-01-01')),
-                                 ('date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="My store" name="my_company" domain="[('of_my_company', '=', True)]"/>
+                <separator/>
+                <filter string="This month" name="this_month"
+                        domain="[('invoice_date', '&gt;=', context_today().strftime('%Y-%m-01')),
+                                 ('invoice_date', '&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-01'))]"/>
+                <filter string="Previous month" name="previous_month"
+                        domain="[('invoice_date', '&gt;=', (context_today() + relativedelta(months=-1)).strftime('%Y-%m-01')),
+                                 ('invoice_date', '&lt;', context_today().strftime('%Y-%m-01'))]"/>
+                <filter string="This year" name="this_year"
+                        domain="[('invoice_date', '&gt;=', context_today().strftime('%Y-01-01')),
+                                 ('invoice_date', '&lt;', (context_today() + relativedelta(day=1,years=1)).strftime('%Y-01-01'))]"/>
+                <filter string="Monthly accumulation" name="monthly_accumulation"
+                        domain="[('invoice_date', u'&gt;=', context_today().strftime('%Y-%m-01')),
+                                 ('invoice_date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Yearly accumulation" name="yearly_accumulation"
+                        domain="[('invoice_date', u'&gt;=', context_today().strftime('%Y-01-01')),
+                                 ('invoice_date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
             </xpath>
         </field>
     </record>
@@ -36,7 +37,7 @@
         <field name="model">account.invoice.report</field>
         <field name="inherit_id" ref="account.view_account_invoice_report_pivot"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='price_total']" position="after">
+            <xpath expr="//field[@name='price_subtotal']" position="after">
                 <field name="of_diff_price" type="measure"/>
                 <field name="of_diff_qty" type="measure"/>
             </xpath>

@@ -22,7 +22,6 @@
     <record id="action_of_product_brand_add_products" model="ir.actions.act_window">
         <field name="name">Link products</field>
         <field name="res_model">of.product.brand.add.products</field>
-        <field name="view_type">form</field>
         <field name="view_mode">form</field>
         <field name="view_id" ref="of_product_brand_form_view"/>
         <field name="context">{'default_brand_id': active_id}</field>
