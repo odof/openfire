@@ -381,6 +381,7 @@ class OfPaiementEdi(models.Model):
         # On classe la liste des DIs par type de prélèvement
         services_par_type = {}
         rib_rum_frst = self.env['res.partner.bank'].browse()
+        rib_failed_sepa = self.env['res.partner.bank']
         for edi_ligne in edi_lignes:
 
             partner_display_name = edi_ligne.service_id.partner_id.display_name
@@ -394,6 +395,9 @@ class OfPaiementEdi(models.Model):
                                 + u").\n\nPour effectuer une opération SEPA, un compte en banque doit être défini "
                                   u"pour le client de chaque DI.")
 
+            if not rib.verification_validite():  # un seul message d'erreur pour avoir tout ceux en erreur
+                rib_failed_sepa += rib
+                continue
             type_prev = rib.of_sepa_type_prev
             if not type_prev:
                 raise UserError(u"Erreur ! (#ED431)\n\nLe champ \"Type de prélèvement SEPA\" "
@@ -416,6 +420,11 @@ class OfPaiementEdi(models.Model):
             # qui seront à passer à la fonction de validation des paiements.
             if type_prev == 'FRST':
                 rib_rum_frst |= rib
+        if rib_failed_sepa:
+            bank_failed_str = u"\n".join([u"%s - %s" % (rib.display_name, rib.partner_id.name)
+                                          for rib in rib_failed_sepa])
+            raise UserError(u"Vous ne pas pouvez pas générer de fichier de prélèvement si votre SEPA n'est pas "
+                            u"vérifié et valide.\n%s" % bank_failed_str)
 
         sortie += u"<b>Tiré(s) :</b>\n<ul>\n"
         # On parcourt la liste des DIs
