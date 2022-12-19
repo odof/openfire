@@ -1554,46 +1554,51 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def button_confirm(self):
-        res = self.write({'state': 'confirm'})
+        self.write({'state': 'confirm'})
         self.line_ids.sudo()._action_procurement_create()
-        return res
+        return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
     def button_done(self):
-        res = self.write({'state': 'done'})
+        self.write({'state': 'done'})
         for picking in self.mapped('picking_ids').filtered(lambda p: p.state in ('partially_available', 'assigned')):
             self.env['stock.immediate.transfer'].create({'pick_id': picking.id}).process()
-        return res
+        return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
     def button_unfinished(self):
-        return self.write({'state': 'unfinished'})
+        self.write({'state': 'unfinished'})
+        return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
     def button_postponed(self):
-        return self.write({'state': 'postponed'})
+        self.write({'state': 'postponed'})
+        return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
     def button_cancel(self):
-        res = self.write({'state': 'cancel'})
+        self.write({'state': 'cancel'})
         if self.picking_ids.filtered(lambda p: p.state not in ('done', 'cancel')):
             self.picking_ids.filtered(lambda p: p.state not in ('done', 'cancel')).action_cancel()
         self.mapped('line_ids').mapped('procurement_ids').cancel()  # la fonctionne n'annule pas les appro déjà terminés
         self.mapped('line_ids').mapped('procurement_ids').filtered(lambda p: p.state == 'cancel')\
             .write({'of_intervention_line_id': False})
-        return res
+        return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
     def button_draft(self):
-        return self.write({'state': 'draft'})
+        self.write({'state': 'draft'})
+        return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
     def button_close(self):
-        return self.write({'closed': True})
+        self.write({'closed': True})
+        return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
     def button_open(self):
-        return self.write({'closed': False})
+        self.write({'closed': False})
+        return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
     def button_import_order_line(self):
@@ -1618,11 +1623,13 @@ class OfPlanningIntervention(models.Model):
                     'name': line.name,
                     'taxe_ids': [(4, tax.id) for tax in line.tax_id]
                 })
+        return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
     def button_update_lines(self):
         self.ensure_one()
         self.line_ids.update_vals()
+        return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
     def action_view_delivery(self):
