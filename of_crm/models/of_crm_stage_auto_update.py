@@ -41,7 +41,7 @@ class OfCrmStageAutoUpdate(models.AbstractModel):
         res = super(OfCrmStageAutoUpdate, self)._write(values)
 
         # CRM stages
-        for rec in self:
+        for rec in self.sudo():
             if rec.opportunity_id:
                 stages = self.env['crm.stage'].search(
                         [('of_auto_model_name', '=', self._name),
