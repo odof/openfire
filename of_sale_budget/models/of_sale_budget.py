@@ -124,9 +124,9 @@ class OFSaleOrderLaborCost(models.Model):
 
     @api.constrains('type', 'order_id', 'hour_worksite_id')
     def _check_description(self):
-        if self.search_count([('order_id', '=', self.order_id.id),
-                              ('hour_worksite_id', '=', self.hour_worksite_id.id), ('type', '=', 'computed')]) > 1:
-            raise ValidationError(u"Il ne peut y avoir deux ligne avec la même ligne de main d'oeuvre de type calculé")
+        if self.search_count(
+                [('order_id', '=', self.order_id.id), ('hour_worksite_id', '=', self.hour_worksite_id.id)]) > 1:
+            raise ValidationError(u"Il ne peut y avoir deux lignes avec la même désignation de main d'oeuvre")
 
 
 class OFSaleOrderHourWorksite(models.Model):
@@ -209,17 +209,32 @@ class SaleOrder(models.Model):
             labor_cost_budget_line.cost = sum(self.of_labor_cost_ids.mapped('total_cost'))
 
         self.of_budget_ids = budget_lines
+        self.update_sale_order_labor_cost()
 
     @api.multi
-    def update_sale_order_labor_cost(self, hour_worksite_id):
+    def update_sale_order_labor_cost(self):
         labor_cost_obj = self.env['of.sale.order.labor.cost']
 
         for order in self:
-            if hour_worksite_id and hour_worksite_id not in order.of_labor_cost_ids.mapped('hour_worksite_id'):
+            order_hour_worksite = order.order_line.mapped('of_hour_worksite_id')
+            labor_cost_hour_worksite = order.of_labor_cost_ids.mapped('hour_worksite_id')
+            hour_worksite_to_add = order_hour_worksite - labor_cost_hour_worksite
+
+            # On récupère les lignes computed à supprimer
+            hour_worksite_to_delete = labor_cost_hour_worksite.filtered(
+                lambda l: l.type == 'computed') - order_hour_worksite
+
+            for hour_worksite in hour_worksite_to_add:
                 labor_cost_obj.create({
                     'order_id': order.id,
-                    'hour_worksite_id': hour_worksite_id.id
+                    'hour_worksite_id': hour_worksite.id,
+                    'product_uom_qty': sum(order.order_line.filtered(
+                        lambda l: l.of_hour_worksite_id == hour_worksite).mapped('product_uom_qty')),
                 })
+
+            # On supprime les lignes computed en trop
+            order.of_labor_cost_ids.filtered(lambda l: l.hour_worksite_id in hour_worksite_to_delete).unlink()
+
         self.mapped('of_labor_cost_ids')._onchange_hour_worksite_id()
 
 
@@ -254,8 +269,7 @@ class SaleOrderLine(models.Model):
         res = super(SaleOrderLine, self).write(values)
 
         if 'of_hour_worksite_id' in values:
-            hour_worksite = self.env['of.sale.order.hour.worksite'].browse(values.get('of_hour_worksite_id'))
-            self.mapped('order_id').update_sale_order_labor_cost(hour_worksite)
+            self.mapped('order_id').update_sale_order_labor_cost()
 
         return res
 
