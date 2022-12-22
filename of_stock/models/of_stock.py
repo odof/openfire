@@ -60,15 +60,22 @@ def _get_inventory_lines_values(self):
         domain += ' AND product_id = ANY (%s)'
         args += (categ_products.ids,)
         products_to_filter |= categ_products
-    # OF case 6 : Filter on multiple product categories
-    if self.of_category_ids:
-        categ_products = Product.search([('categ_id', 'in', self.of_category_ids._ids)])
+    # OF case 6 : Filter on multiple product categories/brands
+    if self.of_category_ids or self.of_brand_ids:
+        product_domain = []
+        if self.of_category_ids:
+            product_domain += [('categ_id', 'in', self.of_category_ids._ids)]
+        if self.of_brand_ids:
+            product_domain += [('brand_id', 'in', self.of_brand_ids._ids)]
+        categ_products = Product.search(product_domain)
         domain += ' AND product_id = ANY (%s)'
         args += (categ_products.ids,)
         products_to_filter |= categ_products
     if hasattr(self, 'of_option') and self.of_option:
         domain += ' AND in_date <= %s'
         args += (self.date, )
+    if hasattr(self, 'of_quant_state') and self.of_quant_state == 'unreserved':
+        domain += ' AND reservation_id IS NULL'
 
     self.env.cr.execute("""SELECT product_id, sum(qty) as product_qty, location_id, lot_id as prod_lot_id, package_id, owner_id as partner_id
                 FROM stock_quant
@@ -352,6 +359,13 @@ class Inventory(models.Model):
         states={'draft': [('readonly', False)]},
         help="Specify Product Category to focus your inventory on a particular Category."
     )
+    of_category_compute = fields.Boolean(string=u"Has categories", compute='_compute_of_category_compute')
+    of_brand_ids = fields.Many2many(comodel_name='of.product.brand', string=u"Inventoried Brands")
+    of_brand_compute = fields.Boolean(string=u"Has brands", compute='_compute_of_brand_compute')
+    of_quant_state = fields.Selection(
+        selection=[('all', u"All"), ('unreserved', u"Unreserved")], string=u"Reservation state",
+        default='all', required=True
+    )
 
     @api.depends('company_id')
     def _compute_of_option(self):
@@ -370,6 +384,18 @@ class Inventory(models.Model):
             else:
                 children = categ_obj
             inventory.category_child_ids = children.ids
+
+    @api.depends('of_category_ids')
+    def _compute_of_category_compute(self):
+        for inventory in self:
+            if inventory.of_category_ids:
+                inventory.of_category_compute = True
+
+    @api.depends('of_brand_ids')
+    def _compute_of_brand_compute(self):
+        for inventory in self:
+            if inventory.of_brand_ids:
+                inventory.of_brand_compute = True
 
     @api.multi
     def action_check(self):
@@ -519,8 +545,16 @@ class Inventory(models.Model):
     def _selection_filter(self):
         filters = super(Inventory, self)._selection_filter()
         index = filters.index(('category', _('One product category')))
-        filters.insert(index+1, ('categories', u"Plusieurs catégories d'articles"))
+        filters.insert(index+1, ('categories', u"Sélectionner les catégories et les marques"))
         return filters
+
+    @api.onchange('filter')
+    def onchange_filter(self):
+        res = super(Inventory, self).onchange_filter()
+        if self.filter != 'categories':
+            self.of_category_ids = False
+            self.of_brand_ids = False
+        return res
 
 
 class InventoryLine(models.Model):
@@ -544,6 +578,10 @@ class InventoryLine(models.Model):
     of_product_lot_serial_management = fields.Boolean(string=u"Géré par lot/num. de série")
     of_product_lot_serial_management_copy = fields.Boolean(string=u"Géré par lot/num. de série (champ technique)")
     of_inventory_gap = fields.Float(string=u"Écart d'inventaire", compute='_compute_of_inventory_gap', store=True)
+    of_product_brand_id = fields.Many2one(
+        comodel_name='of.product.brand', string=u"Brand", related='product_id.brand_id', readonly=True)
+    of_product_categ_id = fields.Many2one(
+        comodel_name='product.category', string=u"Product category", related='product_id.categ_id', readonly=True)
 
     @api.depends('of_theoretical_qty', 'product_qty')
     def _compute_of_inventory_gap(self):
@@ -771,6 +809,13 @@ class InventoryLine(models.Model):
             out_move_request += """
             AND     SQ.lot_id                   IS NULL
             """
+        if self.inventory_id.of_quant_state == 'unreserved':
+            in_move_request += """
+            AND     SQ.reservation_id           IS NULL
+            """
+            out_move_request += """
+            AND     SQ.reservation_id           IS NULL
+            """
 
         self.env.cr.execute(
             """
@@ -785,6 +830,12 @@ class InventoryLine(models.Model):
             (self.inventory_id.date, self.location_id.id, self.product_id.id,
              self.inventory_id.date, self.location_id.id, self.product_id.id,))
         return self.env.cr.fetchone()
+
+    def _get_quants(self):
+        quants = super(InventoryLine, self)._get_quants()
+        if self.inventory_id.of_quant_state == 'unreserved':
+            quants = quants.filtered(lambda q: not q.reservation_id)
+        return quants
 
 
 class StockConfigSettings(models.TransientModel):
@@ -801,6 +852,11 @@ class StockConfigSettings(models.TransientModel):
     pdf_mention_legale = fields.Text(
         string=u"(OF) Mentions légales", help=u"Sera affiché dans les BL"
     )
+    group_stock_inventory_group_advanced_quant_inventory = fields.Selection([
+        (0, u"Use all quantities from the selected stock location."),
+        (1, u"Choose between all quantities and only unreserved quantities.")
+        ], u"(OF) Stock inventory quantities",
+        implied_group='of_stock.stock_inventory_group_advanced_quant_inventory')
 
     @api.multi
     def set_of_forcer_date_inventaire_defaults(self):
