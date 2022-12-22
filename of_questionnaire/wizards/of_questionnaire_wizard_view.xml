@@ -65,4 +65,15 @@
         </field>
     </record>
 
+    <record id="of_planning_intervention_question_view_form_domain_field" model="ir.ui.view">
+        <field name="name">of.planning.intervention.question.view.form</field>
+        <field name="model">of.planning.intervention.question</field>
+        <field name="inherit_id" ref="of_questionnaire.of_planning_intervention_question_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='intervention_id']" position="after">
+                <field name="intervention_state" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
