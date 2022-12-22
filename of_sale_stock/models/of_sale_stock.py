@@ -4,7 +4,7 @@ from datetime import datetime
 
 from odoo import api, fields, models
 import odoo.addons.decimal_precision as dp
-from odoo.tools.float_utils import float_compare
+from odoo.tools.float_utils import float_compare, float_round
 from odoo.addons.stock.models.stock_move import StockMove
 
 
@@ -362,17 +362,100 @@ class ProductTemplate(models.Model):
 
     invoice_policy = fields.Selection(selection_add=[('ordered_delivery', u'Quantités commandées à date de livraison')])
 
-    @api.depends('product_variant_ids')
     def _compute_of_qty_unreserved(self):
-        quant_obj = self.env['stock.quant']
-        for product_template in self:
-            products = product_template.mapped('product_variant_ids')
-            quants = quant_obj.search([('product_id', 'in', products.ids)]).filtered(lambda q: not q.reservation_id)
-            product_template.of_qty_unreserved = sum(quants.mapped('qty'))
+        res = self._compute_quantities_unreserved_dict()
+        for template in self:
+            template.of_qty_unreserved = res[template.id]['of_qty_unreserved']
 
+    def _compute_quantities_unreserved_dict(self):
+        # TDE FIXME: why not using directly the function fields ?
+        variants_available = self.mapped('product_variant_ids')._compute_quantities_unreserved_dict(
+            self._context.get('lot_id'), self._context.get('owner_id'), self._context.get('package_id'),
+            self._context.get('from_date'), self._context.get('to_date'))
+        res = {}
+        for template in self:
+            of_qty_unreserved = 0
+            for p in template.product_variant_ids:
+                of_qty_unreserved += variants_available[p.id]["qty_unreserved"]
+            res[template.id] = {
+                "of_qty_unreserved": of_qty_unreserved,
+            }
+        return res
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'
+
+    of_qty_unreserved = fields.Float(string=u'Qté non réservée', compute='_compute_of_qty_unreserved')
+
+    @api.depends('stock_quant_ids', 'stock_move_ids')
+    def _compute_of_qty_unreserved(self):
+        res = self._compute_quantities_unreserved_dict(
+            self._context.get('lot_id'), self._context.get('owner_id'), self._context.get('package_id'),
+            self._context.get('from_date'), self._context.get('to_date'))
+        for product in self:
+            product.of_qty_unreserved = res[product.id]['qty_unreserved']
+
+    @api.multi
+    def _compute_quantities_unreserved_dict(self, lot_id, owner_id, package_id, from_date=False, to_date=False):
+        """
+        based on _compute_quantities_dict from odoo-ocb/addons/stock/models/product.py
+        """
+        domain_quant_loc, domain_move_in_loc, domain_move_out_loc = self._get_domain_locations()
+        # Seule addition faite à la fonction ('reservation_id', '=', False)
+        domain_quant = [('product_id', 'in', self.ids), ('reservation_id', '=', False)] + domain_quant_loc
+        dates_in_the_past = False
+        if to_date and to_date < fields.Datetime.now(): #Only to_date as to_date will correspond to qty_available
+            dates_in_the_past = True
+
+        domain_move_in = [('product_id', 'in', self.ids)] + domain_move_in_loc
+        domain_move_out = [('product_id', 'in', self.ids)] + domain_move_out_loc
+        if lot_id:
+            domain_quant += [('lot_id', '=', lot_id)]
+        if owner_id:
+            domain_quant += [('owner_id', '=', owner_id)]
+            domain_move_in += [('restrict_partner_id', '=', owner_id)]
+            domain_move_out += [('restrict_partner_id', '=', owner_id)]
+        if package_id:
+            domain_quant += [('package_id', '=', package_id)]
+        if dates_in_the_past:
+            domain_move_in_done = list(domain_move_in)
+            domain_move_out_done = list(domain_move_out)
+        if from_date:
+            domain_move_in += [('date', '>=', from_date)]
+            domain_move_out += [('date', '>=', from_date)]
+        if to_date:
+            domain_move_in += [('date', '<=', to_date)]
+            domain_move_out += [('date', '<=', to_date)]
+
+        Move = self.env['stock.move']
+        Quant = self.env['stock.quant']
+        quants_res = dict(
+            (item['product_id'][0], item['qty'])
+            for item in Quant.read_group(domain_quant, ['product_id', 'qty'], ['product_id'], orderby='id'))
+        if dates_in_the_past:
+            # Calculate the moves that were done before now to calculate back in time
+            # (as most questions will be recent ones)
+            domain_move_in_done = [('state', '=', 'done'), ('date', '>', to_date)] + domain_move_in_done
+            domain_move_out_done = [('state', '=', 'done'), ('date', '>', to_date)] + domain_move_out_done
+            moves_in_res_past = dict(
+                (item['product_id'][0], item['product_qty'])
+                for item in Move.read_group(domain_move_in_done, ['product_id', 'product_qty'], ['product_id'],
+                                            orderby='id'))
+            moves_out_res_past = dict(
+                (item['product_id'][0], item['product_qty'])
+                for item in Move.read_group(domain_move_out_done, ['product_id', 'product_qty'], ['product_id'],
+                                            orderby='id'))
+
+        res = dict()
+        for product in self.with_context(prefetch_fields=False):
+            res[product.id] = {}
+            if dates_in_the_past:
+                qty_unreserved = quants_res.get(product.id, 0.0) - moves_in_res_past.get(product.id, 0.0) + \
+                    moves_out_res_past.get(product.id, 0.0)
+            else:
+                qty_unreserved = quants_res.get(product.id, 0.0)
+            res[product.id]['qty_unreserved'] = float_round(qty_unreserved, precision_rounding=product.uom_id.rounding)
+        return res
 
     @api.multi
     def _need_procurement(self):
