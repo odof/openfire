@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="stock_inventory_group_advanced_quant_inventory" model="res.groups">
+        <field name="name">Inventories with management of unreserved quantities</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+</odoo>

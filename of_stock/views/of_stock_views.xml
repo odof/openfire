@@ -17,7 +17,13 @@
                 </button>
             </xpath>
             <xpath expr="//field[@name='company_id']" position="after">
-                <field name="of_category_ids" attrs="{'invisible': [('filter', 'not in','categories')], 'required': [('filter', 'in', 'categories')]}" options="{'no_create': True}" widget="many2many_tags"/>
+                <field name="of_category_ids" attrs="{'invisible': [('filter', 'not in',['categories'])], 'required': [('filter', 'in', ['categories']), ('of_brand_compute', '=', False)], 'readonly': [('state', '!=', 'draft')]}" options="{'no_create': True}" widget="many2many_tags"/>
+                <field name="of_category_compute" invisible="1"/>
+                <field name="of_brand_ids" attrs="{'invisible': [('filter', 'not in',['categories'])], 'required': [('filter', 'in', ['categories']), ('of_category_compute', '=', False)], 'readonly': [('state', '!=', 'draft')]}" options="{'no_create': True}" widget="many2many_tags"/>
+                <field name="of_brand_compute" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='exhausted']" position="after">
+                <field name="of_quant_state" widget="radio" attrs="{'readonly': [('state', '!=', 'draft')]}" groups="of_stock.stock_inventory_group_advanced_quant_inventory"/>
             </xpath>
             <xpath expr="//button[@name='reset_real_qty']" position="after">
                 <button name="create_missing_lines" states="confirm" string="⇒ Créer les lignes manquantes à 0" type="object" class="oe_link oe_right" groups="stock.group_stock_user"/>
@@ -218,6 +224,7 @@
                         <field name="of_forcer_date_inventaire" class="oe_inline"/>
                         <span>Permettre de forcer la date de l'inventaire</span>
                     </div>
+                    <field name="group_stock_inventory_group_advanced_quant_inventory" widget="radio"/>
                 </group>
                 <group name="bon_transfert"  string="Bons de transfert PDF">
                     <label for="group_of_bon_transfert_valorise"/>

@@ -19,8 +19,10 @@ Extension OpenFire du module stock
         "stock",
         "stock_account",
         "of_external",
+        "of_product_brand",
     ],
     "data": [
+        'security/of_stock_security.xml',
         'data/res_groups.xml',
         'views/of_stock_views.xml',
         'wizards/of_stock_date_confirmation_views.xml',
