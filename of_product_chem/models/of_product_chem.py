@@ -23,7 +23,7 @@ class OFProductTemplate(models.Model):
         module_self = self.env['ir.module.module'].search([('name', '=', 'of_product_chem')])
         if module_self:
             version = module_self.latest_version
-            if version < '10.0.4.2.0':
+            if version and version < '10.0.4.2.0':
                 cr = self.env.cr
                 cr.execute("UPDATE product_template SET of_efficacite_saison = of_efficacite_saison_moved0")
 

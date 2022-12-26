@@ -29,7 +29,7 @@ class OfService(models.Model):
             # installed_version est trompeur, il contient la version en cours d'installation
             # on utilise donc latest version à la place
             version = module_self.latest_version
-            if version < '10.0.2':
+            if version and version < '10.0.2':
                 # à partir de cette version, le champ company_id est obligatoire,
                 # on veut donc le remplir partout ou c'est possible
                 cr = self.env.cr
