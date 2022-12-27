@@ -67,8 +67,8 @@ class OfDatastoreConnector(models.AbstractModel):
     def _get_context(self):
         return {key: val for key, val in self._context.iteritems() if key in ('lang', 'tz', 'active_test')}
 
-    @api.multi
-    def of_datastore_connect(self):
+    @api.model
+    def get_connector(self, url, db_name, login, password):
         # Connexion à la base du fournisseur
         # Utilisation d'un thread pour stopper une connexion trop longue
         class FuncThread(threading.Thread):
@@ -78,7 +78,7 @@ class OfDatastoreConnector(models.AbstractModel):
 
             def run(self):
                 try:
-                    server_address = supplier.server_address
+                    server_address = url
                     # ============== Code à décommenter en cas de bug OVH IPV6 ==============
                     # Retrait du prefixe http:// et extraction du port (optionnel)
                     # address_split = server_address.split('://')[-1].split(':')  # [adresse, port]
@@ -108,9 +108,9 @@ class OfDatastoreConnector(models.AbstractModel):
                     else:
                         port = int(address[j+1:])
                         address = address[:j]
-                    cli = openerplib.get_connection(hostname=address, port=port, protocol=protocol,
-                                                    database=supplier.db_name,
-                                                    login=supplier.login, password=supplier.new_password or supplier.password)
+                    cli = openerplib.get_connection(
+                        hostname=address, port=port, protocol=protocol, database=db_name, login=login,
+                        password=password)
 
                     # Opération pour vérifier la connexion
                     self.result = cli.get_model('res.users').search([]) and cli or ''
@@ -118,10 +118,6 @@ class OfDatastoreConnector(models.AbstractModel):
                     self.result = exc.faultCode
                 except Exception, exc:
                     self.result = _(str(exc))
-        self.ensure_one()
-        # Call super() as no user shall have access right to this object
-        supplier = self.sudo()
-
         it = FuncThread()
         it.start()
         it.join(10)  # attente de 10 secondes ou jusqu'à la fin de l'opération
@@ -130,6 +126,14 @@ class OfDatastoreConnector(models.AbstractModel):
         else:
             client = it.result
         return client
+
+    @api.multi
+    def of_datastore_connect(self):
+        self.ensure_one()
+        # Call sudo() as no user shall have access right to this object
+        supplier = self.sudo()
+        return self.get_connector(
+            supplier.server_address, supplier.db_name, supplier.login, supplier.new_password or supplier.password)
 
     @api.model
     def of_datastore_get_model(self, ds_client, model_name):
@@ -203,6 +207,11 @@ class OfDatastoreConnector(models.AbstractModel):
     def of_datastore_create(self, ds_model, values):
         kwargs = {'context': self._get_context()}
         return ds_model.create(values, **kwargs)
+
+    @api.model
+    def of_datastore_write(self, ds_model, ids, values):
+        kwargs = {'context': self._get_context()}
+        return ds_model.write(ids, values, **kwargs)
 
     @api.model
     def of_datastore_func(self, ds_model, func, params, optional_params):
