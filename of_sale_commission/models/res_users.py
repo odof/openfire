@@ -7,4 +7,5 @@ from odoo import models, fields
 class ResUsers(models.Model):
     _inherit = 'res.users'
 
-    of_profcommi_id = fields.Many2one('of.sale.profcommi', string="Profil Commissions", ondelete='restrict')
+    of_profcommi_id = fields.Many2one(
+        comodel_name='of.sale.profcommi', string=u"Profil Commissions", ondelete='restrict')

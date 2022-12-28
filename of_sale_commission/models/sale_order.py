@@ -7,8 +7,9 @@ from odoo import models, fields, api
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    of_commi_ids = fields.One2many('of.sale.commi', 'order_id', string="Commissions vendeurs")
-    of_nb_commis = fields.Integer(compute='_compute_nb_commis', string="Nb. Commissions")
+    of_commi_ids = fields.One2many(
+        comodel_name='of.sale.commi', inverse_name='order_id', string=u"Commissions vendeurs")
+    of_nb_commis = fields.Integer(compute='_compute_nb_commis', string=u"Nb. Commissions")
 
     @api.depends('of_commi_ids')
     def _compute_nb_commis(self):
@@ -28,9 +29,7 @@ class SaleOrder(models.Model):
     @api.multi
     def of_verif_acomptes(self):
         order_paid = order_not_paid = self.browse([]).sudo()
-        for order in self:
-            if order.state != 'sale':
-                continue
+        for order in self.filtered(lambda o: o.state == 'sale'):
             if order.of_sale_commi_acompte_requis() \
                     and len(order.of_echeance_line_ids) > 1 \
                     and order.of_echeance_line_ids[0].amount > order.of_payment_amount:
@@ -102,17 +101,16 @@ class SaleOrder(models.Model):
                     # Les commissions annnulées sont restaurées
                     to_draft += commi
 
-            if not commi_vendeur:
-                if order.user_id.of_profcommi_id:
-                    commi_data = {
-                        'name': order.name,
-                        'state': 'draft',
-                        'user_id': order.user_id.id,
-                        'type': 'acompte',
-                        'order_id': order.id,
-                    }
-                    commi = commi_obj.create(commi_data)
-                    commi.create_lines(order.order_line)
+            if not commi_vendeur and order.user_id.of_profcommi_id:
+                commi_data = {
+                    'name': order.name,
+                    'state': 'draft',
+                    'user_id': order.user_id.id,
+                    'type': 'acompte',
+                    'order_id': order.id,
+                }
+                commi = commi_obj.create(commi_data)
+                commi.create_lines(order.order_line)
 
         if to_draft:
             to_draft.write({'state': 'draft'})
