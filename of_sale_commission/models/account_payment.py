@@ -5,7 +5,7 @@ from odoo import models, api
 
 
 class AccountPayment(models.Model):
-    _inherit = "account.payment"
+    _inherit = 'account.payment'
 
     @api.multi
     def write(self, vals):

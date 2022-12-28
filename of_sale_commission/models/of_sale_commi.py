@@ -6,54 +6,56 @@ from odoo.exceptions import UserError
 
 
 class OFSaleCommi(models.Model):
-    _name = "of.sale.commi"
-    _description = "Commissions sur les ventes"
+    _name = 'of.sale.commi'
+    _description = u"Commissions sur les ventes"
 
     @api.model
     def _auto_init(self):
         super(OFSaleCommi, self)._auto_init()
         module_self = self.env['ir.module.module'].search([('name', '=', 'of_sale_commission')])
-        if module_self:
-            version = module_self.latest_version
-            if version < '10.0.1.1.0':
-                cr = self.env.cr
-                cr.execute("UPDATE of_sale_commi SET state = 'to_pay' WHERE state = 'to_cancel'")
-                cr.execute("UPDATE of_sale_commi SET state = 'paid' WHERE state = 'paid_cancel'")
+        version = module_self and module_self.latest_version
+        if version and version < '10.0.1.1.0':
+            cr = self.env.cr
+            cr.execute("UPDATE of_sale_commi SET state = 'to_pay' WHERE state = 'to_cancel'")
+            cr.execute("UPDATE of_sale_commi SET state = 'paid' WHERE state = 'paid_cancel'")
 
     name = fields.Char(string=u"Libellé")
     type = fields.Selection(
-        [('acompte', "Acompte"), ('solde', "Solde"), ('avoir', "Avoir")], string="Type", required=True)
+        selection=[('acompte', u"Acompte"), ('solde', u"Solde"), ('avoir', u"Avoir")], string=u"Type", required=True)
     user_id = fields.Many2one(
-        'res.users', string="Commercial", required=True,
-        domain="[('of_profcommi_id', '!=', False)]")
-    partner_id = fields.Many2one('res.partner', string="Client", compute='_compute_partner_id', store=True)
-    company_id = fields.Many2one('res.company', string=u"Société", compute='_compute_company_id', store=True)
-    date_valid = fields.Date(string="Date de validation")
-    date_paiement = fields.Date(string="Date de paiement")
+        comodel_name='res.users', string=u"Commercial", required=True, domain="[('of_profcommi_id', '!=', False)]")
+    partner_id = fields.Many2one(
+        comodel_name='res.partner', string=u"Client", compute='_compute_partner_id', store=True)
+    company_id = fields.Many2one(
+        comodel_name='res.company', string=u"Société", compute='_compute_company_id', store=True)
+    date_valid = fields.Date(string=u"Date de validation")
+    date_paiement = fields.Date(string=u"Date de paiement")
     state = fields.Selection(
-        [
+        selection=[
             ('cancel', u"Annulé"),
-            ('draft', "Brouillon"),
+            ('draft', u"Brouillon"),
             ('to_pay', u"À payer"),
             ('paid', u"Payé"),
         ], string=u"État", required=True, default='draft')
-    total_vente = fields.Float(compute='_compute_total_vente', string="Total ventes HT")
-    total_commi = fields.Float(compute='_compute_total_commi', string="Total commissions")
+    total_vente = fields.Float(compute='_compute_total_vente', string=u"Total ventes HT")
+    total_commi = fields.Float(compute='_compute_total_commi', string=u"Total commissions")
     total_du = fields.Float(
-        string="Commission due", readonly=True,
+        string=u"Commission due", readonly=True,
         states={'draft': [('readonly', False)], 'to_pay': [('readonly', False)]})
-    commi_line_ids = fields.One2many('of.sale.commi.line', 'commi_id', string="Lignes commission")
-    order_id = fields.Many2one('sale.order', string="Bon de commande", readonly=True)
-    invoice_id = fields.Many2one('account.invoice', string="Facture", readonly=True)
-    inv_commi_id = fields.Many2one('of.sale.commi', u"Commission associée")
+    commi_line_ids = fields.One2many(
+        comodel_name='of.sale.commi.line', inverse_name='commi_id', string=u"Lignes commission")
+    order_id = fields.Many2one(comodel_name='sale.order', string=u"Bon de commande", readonly=True)
+    invoice_id = fields.Many2one(comodel_name='account.invoice', string=u"Facture", readonly=True)
+    inv_commi_id = fields.Many2one(comodel_name='of.sale.commi', string=u"Commission associée")
     cancel_commi_id = fields.Many2one(
         comodel_name='of.sale.commi', string=u"Commission annulée",
-        help="Commission sur acompte annulée par la commission courante.")
+        help=u"Commission sur acompte annulée par la commission courante.")
     # Champ O2M mais ne pointant que sur 1 enregistrement max (champ O2O)
     canceled_by_commi_ids = fields.One2many(
         comodel_name='of.sale.commi', inverse_name='cancel_commi_id', string=u"Annulée par",
-        help="Commissions annulant la commission sur acompte courante.")
-    order_commi_ids = fields.One2many('of.sale.commi', 'inv_commi_id', string=u'Commissions associées')
+        help=u"Commissions annulant la commission sur acompte courante.")
+    order_commi_ids = fields.One2many(
+        comodel_name='of.sale.commi', inverse_name='inv_commi_id', string=u"Commissions associées")
     compl_du = fields.Float(compute='_compute_compl_du', string=u"Commission versée", store=True)
 
     @api.depends('order_id', 'invoice_id', 'order_id.partner_id', 'invoice_id.partner_id')
@@ -128,11 +130,11 @@ class OFSaleCommi(models.Model):
 
     @api.multi
     def action_cancel(self):
+        if any(commi.state == 'cancel' for commi in self):
+            raise UserError(_(u"Vous ne pouvez pas annuler une commission qui est déjà à l'état \"annulé\""))
         to_cancel = self.env['of.sale.commi']
         new_commis = self.env['of.sale.commi']
         for commi in self:
-            if commi.state == 'cancel':
-                raise UserError(_(u"Vous ne pouvez pas annuler une commission qui est déjà à l'état \"annulé\""))
             if commi.type == 'acompte':
                 if commi.inv_commi_id and commi.inv_commi_id.state != 'cancel':
                     if commi.inv_commi_id.state == 'draft':
@@ -187,10 +189,10 @@ class OFSaleCommi(models.Model):
         if not profil:
             return 0
 
-        # Variable acompte utilisable dans les formules
+        # Variable acompte utilisable dans les formules de profil via le statement "exec"
         acompte = 0
         if len(self.order_id.of_echeance_line_ids) > 1:
-            acompte = self.order_id.of_echeance_line_ids[0].amount
+            acompte = self.order_id.of_echeance_line_ids[0].amount  # noqa F841
 
         taux_acompte = profil.taux_acompte
         for profil_line in profil.profcommi_line_ids.filtered(lambda line: line.type == 'acompte'):
@@ -207,8 +209,8 @@ class OFSaleCommi(models.Model):
 
     @api.multi
     def _create_line(self, src_line, taux_zero):
-        """
-        Cree une ligne de commission correspondant a src_line pour commi, sans mettre commi a jour
+        u"""
+        Crée une ligne de commission correspondant à src_line pour commi, sans mettre commi à jour
         """
         self.ensure_one()
         if taux_zero:
@@ -241,8 +243,8 @@ class OFSaleCommi(models.Model):
 
     @api.multi
     def create_lines(self, source_lines, taux_zero=False):
-        """
-        Cree pour commi les lignes de commission referencant source_lines, si inexistantes
+        u"""
+        Crée pour commi les lignes de commission référençant source_lines, si inexistantes
         """
         self.ensure_one()
         if self.type == 'acompte':
@@ -274,7 +276,7 @@ class OFSaleCommi(models.Model):
     @api.multi
     def make_commi_invoice_lines_from_old(self, commis_old, invoice, profil, commi_type='solde', inverse=False):
         u"""
-        Retourne les données des lignes de commissions a créer pour la commission courrante
+        Retourne les données des lignes de commissions à créer pour la commission courrante
             en se basant sur celles de la commission d'id commi_old_id
             et sur la facture associée à la nouvelle commission
         :param commis_old: liste des ids des commissions servant de modèles
@@ -329,8 +331,8 @@ class OFSaleCommi(models.Model):
 
     @api.onchange('user_id')
     def onchange_user_id(self):
-        """
-        Retourne les lignes de commission correspondant a la source "source" de type "type" pour le vendeur "vendeur"
+        u"""
+        Retourne les lignes de commission correspondant à la source "source" de type "type" pour le vendeur "vendeur"
         """
         commi_line_obj = self.env['of.sale.commi.line']
         if not self.user_id:
@@ -344,15 +346,14 @@ class OFSaleCommi(models.Model):
 
             # On rattache la commission à la première trouvée pour le même vendeur dans une facture liée.
             commi_inv_compl = False
-            for invoice in order.invoice_ids:
-                if invoice.type == 'out_invoice':
-                    for commi_solde in invoice.of_commi_ids:
-                        if commi_solde.user_id == self.user_id:
-                            commi_inv_compl = commi_solde.id
-                            break
-                    else:
-                        continue
-                    break
+            for invoice in order.invoice_ids.filtered(lambda inv: inv.type == 'out_invoice'):
+                for commi_solde in invoice.of_commi_ids:
+                    if commi_solde.user_id == self.user_id:
+                        commi_inv_compl = commi_solde.id
+                        break
+                else:  # Si aucune commission n'a été trouvée, on continue la recherche dans les factures liées
+                    continue
+                break
 
             # Les lignes de commissions sont régénérées
             commi_lines = commi_line_obj
@@ -438,10 +439,10 @@ class OFSaleCommi(models.Model):
 
     @api.multi
     def unlink(self):
+        if any(commi.state == 'paid' for commi in self):
+            raise UserError(u"Vous ne pouvez pas supprimer une commission qui a déjà été payée")
         to_cancel = self.env['of.sale.commi']
         for commi in self:
-            if commi.state == 'paid':
-                raise UserError(u'Vous ne pouvez pas supprimer une commission qui a déjà été payée')
             if commi.type == 'acompte' and commi.inv_commi_id:
                 if commi.inv_commi_id in self:
                     continue
@@ -463,23 +464,24 @@ class OFSaleCommi(models.Model):
                         to_cancel += ac_commi
         if to_cancel:
             to_cancel.action_cancel()
-        res = super(OFSaleCommi, self).unlink()
-        return res
+        return super(OFSaleCommi, self).unlink()
 
 
 class OFSaleCommiLine(models.Model):
-    _name = "of.sale.commi.line"
-    _description = "Lignes de commission"
+    _name = 'of.sale.commi.line'
+    _description = u"Lignes de commission"
 
-    commi_id = fields.Many2one('of.sale.commi', string="Commission", required=True, ondelete='cascade')
-    product_id = fields.Many2one('product.product', compute='_compute_product_id', string="Article")
+    commi_id = fields.Many2one(
+        comodel_name='of.sale.commi', string=u"Commission", required=True, ondelete='cascade')
+    product_id = fields.Many2one(
+        comodel_name='product.product', compute='_compute_product_id', string=u"Article")
     qty = fields.Float(compute='_compute_qty', string=u"Quantité")
-    prix_vente = fields.Float(compute='_compute_prix_vente', string="Prix de vente")
-    taux_commi = fields.Float(string='Taux Commission')
-    px_commi = fields.Float(string='Commission Totale')
-    order_line_id = fields.Many2one('sale.order.line', string="Ligne de commande", readonly=True)
-    invoice_line_id = fields.Many2one('account.invoice.line', string="Ligne de facture", readonly=True)
-    type = fields.Selection(related='commi_id.type', readonly=True, string="Type")
+    prix_vente = fields.Float(compute='_compute_prix_vente', string=u"Prix de vente")
+    taux_commi = fields.Float(string=u"Taux Commission")
+    px_commi = fields.Float(string=u"Commission Totale")
+    order_line_id = fields.Many2one(comodel_name='sale.order.line', string=u"Ligne de commande", readonly=True)
+    invoice_line_id = fields.Many2one(comodel_name='account.invoice.line', string=u"Ligne de facture", readonly=True)
+    type = fields.Selection(related='commi_id.type', readonly=True, string=u"Type")
 
     def _compute_product_id(self):
         for line in self:
@@ -504,17 +506,17 @@ class OFSaleCommiLine(models.Model):
 
     @api.onchange('taux_commi')
     def onchange_taux_commi(self):
-        mult = self.type == 'avoir' and -1 or 1
+        mult = -1 if self.type == 'avoir' else 1
         self.px_commi = mult * round(self.prix_vente * self.taux_commi / 100.0, 2)
 
     @api.onchange('px_commi')
     def onchange_prix_commi(self):
-        mult = self.type == 'avoir' and -1 or 1
+        mult = -1 if self.type == 'avoir' else 1
         self.taux_commi = self.prix_vente and mult * round(self.px_commi * 100.0 / self.prix_vente, 2)
 
     @api.multi
     def update_line(self, filtre=None):
-        """
+        u"""
         filtre contient les ids des lignes de facture dont le taux de commissionnement doit être recalculé
          (ex: le produit a changé)
         Si filtre n'existe pas, tous seront recalculés
@@ -527,7 +529,7 @@ class OFSaleCommiLine(models.Model):
                 'px_commi': 0
             })
         else:
-            signe = self.type == 'avoir' and -1 or 1
+            signe = -1 if self.type == 'avoir' else 1
             px_commi = signe * round(source.price_subtotal * self.taux_commi / 100.0, 2)
             taux_commi = signe * round(100.0 * self.px_commi / source.price_subtotal, 2)
 

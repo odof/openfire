@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import itertools
 from odoo import models, fields, api
 from odoo.exceptions import UserError
-import itertools
 
 
 class AccountInvoice(models.Model):
-    _inherit = "account.invoice"
+    _inherit = 'account.invoice'
 
-    of_commi_ids = fields.One2many('of.sale.commi', 'invoice_id', string="Commissions vendeurs")
-    of_nb_commis = fields.Integer(compute="_compute_nb_commis", string="Nb. Commissions")
+    of_commi_ids = fields.One2many(
+        comodel_name='of.sale.commi', inverse_name='invoice_id', string=u"Commissions vendeurs")
+    of_nb_commis = fields.Integer(compute='_compute_nb_commis', string=u"Nb. Commissions")
 
     @api.depends('of_commi_ids')
     def _compute_nb_commis(self):
