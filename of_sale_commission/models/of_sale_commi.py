@@ -169,6 +169,7 @@ class OFSaleCommi(models.Model):
                         u"Vous ne pouvez pas annuler une commission sur solde qui est déjà payée."
                         u"Une commission inverse se génèrera si vous réalisez un avoir depuis la facture concernée."))
                 to_cancel += commi
+            # else : Le bouton d'annulation n'est pas visible pour les commissions sur avoir
         to_cancel.write({'state': 'cancel'})
         if new_commis:
             # Si on a généré des commissions d'annulation, on renvoie une action d'affichage en vue liste
