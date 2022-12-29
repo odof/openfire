@@ -106,7 +106,7 @@
                             attrs="{'invisible':[('state','!=','cancel')]}"
                             help="Rouvre une commission qui est annulée"/>
                     <button name="action_cancel" string="Annuler" type="object"
-                            attrs="{'invisible':['|',('state','=','cancel'),'&amp;',('type','!=','acompte'),('state','=',('paid'))]}"
+                            attrs="{'invisible':['|', '|', ('type', '=', 'avoir'), ('state', '=', 'cancel'), '&amp;', ('type', '!=', 'acompte'), ('state', '=', 'paid')]}"
                             confirm="Cette action va annuler la commission "
                             help="Annule la commission ou génère une annulation de commission"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,to_pay,paid" readonly="1"/>
