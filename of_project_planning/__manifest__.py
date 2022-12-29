@@ -14,7 +14,7 @@
 
 {
     'name': u"OpenFire Projets - Activités et périodes planifiées",
-    'version': "10.0.1.0.0",
+    'version': "10.0.2.0.0",
     'author': "OpenFire",
     'website': "www.openfire.fr",
     'category': "projet",
@@ -37,11 +37,14 @@ Fonctionnalités
 """,
     'depends': [
         'of_project',
+        'of_hr_timesheet',
         ],
     'data': [
+        'views/account_views.xml',
         'views/of_periode_planifiee_views.xml',
         'views/of_project_planning_views.xml',
         'views/of_project_views.xml',
+        'views/of_hr_timesheet_views.xml',
         'security/ir.model.access.csv',
     ],
     'installable': True,
