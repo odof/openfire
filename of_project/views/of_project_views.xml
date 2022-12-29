@@ -133,7 +133,7 @@
                 <attribute name="default_group_by">stage_id</attribute>
             </xpath>
             <xpath expr="//kanban/field[last()]" position="after">
-                <field name="of_participant_ids"/>
+                <field name="of_user_ids"/>
                 <field name="of_participants"/>
                 <field name="of_dependencies"/>
             </xpath>
@@ -150,7 +150,7 @@
             <xpath expr="//kanban//div[@class='oe_kanban_content']/div[@class='oe_kanban_bottom_right']" position="inside">
                 <t t-value="JSON.parse(record.of_participants.raw_value)" t-set="participants"/>
                 <t t-foreach="participants" t-as="participant">
-                    <img t-att-src="kanban_image('res.users', 'image_small', participant['id'])"
+                    <img name="participant_img" t-att-src="kanban_image('res.users', 'image_small', participant['id'])"
                          t-if="participant['id'] != record.user_id.raw_value[0]"
                          t-attf-title="#{participant['name']}" width="24" height="24"
                          class="oe_kanban_avatar pull-right participant_ids"/>
@@ -175,7 +175,7 @@
             </xpath>
             <xpath expr="//field[@name='user_id']" position="after">
                 <field name="of_member_ids" invisible="1"/>
-                <field name="of_participant_ids" widget="many2many_tags" domain="of_member_ids and [('id', 'in', of_member_ids[0][2])] or []"/>
+                <field name="of_user_ids" widget="many2many_tags" domain="of_member_ids and [('id', 'in', of_member_ids[0][2])] or []"/>
             </xpath>
         </field>
     </record>
@@ -192,14 +192,10 @@
                 <filter string="Projets Produit" name="product_projects"
                         domain="[('project_id.partner_id', '=', False)]"/>
                 <separator/>
-                <filter string="Passé" name="this_week"
-                        domain="[('date_end', '&lt;', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d'))]"/>
-                <filter string="Cette semaine" name="last_week"
+                <filter string="Cette semaine" name="this_week"
                         domain="[('date_start', '&lt;', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d')),
                                   '|', ('date_end', '>=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
                                        ('date_end', '=', False)]"/>
-                <filter string="A venir" name="next_week"
-                        domain="[('date_start', '>=', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
             </xpath>
         </field>
     </record>
