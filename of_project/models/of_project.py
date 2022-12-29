@@ -43,7 +43,7 @@ class Project(models.Model):
     of_tag_ids = fields.Many2many(comodel_name='project.tags', string=u"Étiquettes")
     of_task_total_priority = fields.Integer(
         string=u"Priorité totale des tâches", compute='_compute_of_task_total_priority', store=True)
-    of_planned_hours = fields.Float(string=u"Durée Prévue", compute='_compute_planned_hours')
+    of_planned_hours = fields.Float(string=u"Durée initiale", compute='_compute_planned_hours')
 
     @api.depends('task_ids', 'task_ids.stage_id', 'task_ids.stage_id.state')
     def _compute_of_state(self):
@@ -126,13 +126,41 @@ class ProjectTask(models.Model):
     _name = 'project.task'
     _inherit = ['project.task', 'of.readgroup']
 
+    @api.model_cr_context
+    def _auto_init(self):
+        module_of_project_planning = self.env['ir.module.module'].search(
+            [('name', '=', 'of_project_planning'), ('state', 'in', ['installed', 'to upgrade'])])
+        if module_of_project_planning:
+            # installed_version est trompeur, il contient la version en cours d'installation
+            # on utilise donc latest version à la place
+            version = module_of_project_planning.latest_version
+            if version < '10.0.2':
+                # à cette version, des vues XML de modules enfants perdent leur accroche xpath,
+                # on les désactive donc pour permettre la MÀJ
+                cr = self.env.cr
+                id_tup = (
+                    self.env.ref('of_project_planning.of_project_planning_of_project_project_task_kanban_view').id,
+                    self.env.ref('of_project_planning.of_project_planning_project_task_kanban_view').id)
+                cr.execute("""
+        -- désactiver les vues problématiques
+        UPDATE ir_ui_view
+        SET active = 'f'
+        WHERE id in %s;
+                    """, (id_tup,))
+                cr.commit()
+
+        return super(ProjectTask, self)._auto_init()
+
     user_id = fields.Many2one(domain="[('share', '=', False)]")
     project_id = fields.Many2one(required=True)
     categ_id = fields.Many2one(string=u"Catégorie", required=True)
     of_member_ids = fields.Many2many('res.users', string=u"Membres", related='project_id.members', readonly=True)
-    of_participant_ids = fields.Many2many('res.users', string=u"Participants")
+    # Attributs explicités pour respect des normes OF, mais la table existait déjà en BDD, d'où les noms
+    of_user_ids = fields.Many2many(
+        comodel_name='res.users', relation='project_task_res_users_rel', column1='project_task_id',
+        column2='res_users_id', string=u"Ressource(s)", oldname='of_participant_ids')
     of_dependencies = fields.Text(string=u"Dépendances", compute='_compute_of_dependencies')
-    of_participants = fields.Text(string=u"Participants", compute='_compute_of_participants')
+    of_participants = fields.Text(string=u"Ressource(s)", compute='_compute_of_participants')
     of_intervention_count = fields.Integer(string=u"RDV", compute='_compute_of_intervention_ids')
     of_intervention_ids = fields.One2many(
         comodel_name='of.planning.intervention', inverse_name='task_id',
@@ -188,11 +216,11 @@ class ProjectTask(models.Model):
         stage_ids = stages._search(search_domain, order=order, access_rights_uid=SUPERUSER_ID)
         return stages.browse(stage_ids)
 
-    @api.depends('of_participant_ids')
+    @api.depends('of_user_ids')
     def _compute_of_participants(self):
         for task in self:
             participants = []
-            for user in task.of_participant_ids:
+            for user in task.of_user_ids:
                 participants.append({'id': user.id, 'name': user.name})
             task.of_participants = json.dumps(participants) if participants else False
 
@@ -252,11 +280,11 @@ class ProjectTask(models.Model):
     @api.model
     def create(self, vals):
         res = super(ProjectTask, self).create(vals)
-        if 'of_participant_ids' in vals or 'user_id' in vals:
+        if 'of_user_ids' in vals or 'user_id' in vals:
             user_obj = self.env['res.users']
             user_ids = []
-            if vals.get('of_participant_ids') and vals['of_participant_ids'][0][2]:
-                user_ids += vals['of_participant_ids'][0][2]
+            if vals.get('of_user_ids') and vals['of_user_ids'][0][2]:
+                user_ids += vals['of_user_ids'][0][2]
             if 'user_id' in vals and vals['user_id']:
                 user_ids += [vals['user_id']]
             users = user_obj.browse(user_ids)
@@ -272,11 +300,11 @@ class ProjectTask(models.Model):
             stage = self.env['project.task.type'].browse(vals['stage_id'])
             if stage.state == 'done':
                 vals.update({'date_end': datetime.now()})
-        if 'of_participant_ids' in vals or 'user_id' in vals:
+        if 'of_user_ids' in vals or 'user_id' in vals:
             user_obj = self.env['res.users']
             user_ids = []
-            if vals.get('of_participant_ids') and vals['of_participant_ids'][0][2]:
-                user_ids += vals['of_participant_ids'][0][2]
+            if vals.get('of_user_ids') and vals['of_user_ids'][0][2]:
+                user_ids += vals['of_user_ids'][0][2]
             if 'user_id' in vals and vals['user_id']:
                 user_ids += [vals['user_id']]
             users = user_obj.browse(user_ids)

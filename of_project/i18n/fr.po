@@ -183,10 +183,10 @@ msgid "Ouverts"
 msgstr "Ouverts"
 
 #. module: of_project
-#: model:ir.model.fields,field_description:of_project.field_project_task_of_participant_ids
+#: model:ir.model.fields,field_description:of_project.field_project_task_of_user_ids
 #: model:ir.model.fields,field_description:of_project.field_project_task_of_participants
-msgid "Participants"
-msgstr "Participants"
+msgid "Resource(s)"
+msgstr "Ressource(s)"
 
 #. module: of_project
 #: model:ir.model,name:of_project.model_res_partner

@@ -41,8 +41,8 @@
         <field name="model">project.task</field>
         <field name="inherit_id" ref="of_project.of_project_project_task_form_view"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='of_participant_ids']" position="attributes">
-                <attribute name="invisible">1</attribute>
+            <xpath expr="//field[@name='of_user_ids']" position="attributes">
+                <attribute name="invisible">0</attribute>
             </xpath>
         </field>
     </record>
@@ -52,8 +52,31 @@
         <field name="model">project.task</field>
         <field name="inherit_id" ref="hr_timesheet.view_task_form2_inherited"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='planned_hours']" position="attributes">
-                <attribute name="readonly">1</attribute>
+            <xpath expr="//field[@name='planned_hours']" position="replace"/>
+            <xpath expr="//field[@name='date_deadline']" position="after">
+                <label for="planned_hours" string="Durée initiale"/>
+                <div>
+                    <field name="planned_hours" widget="float_time" nolabel="1" class="oe_inline"/>
+                    <i class="oe_grey oe_inline"> dont </i>
+                    <field name="of_spec_hours" widget="float_time" nolabel="1" class="oe_inline"/>
+                    <i class="oe_grey oe_inline"> de specs, </i>
+                    <field name="of_dev_hours" widget="float_time" nolabel="1" class="oe_inline"/>
+                    <i class="oe_grey oe_inline"> de développement,</i>
+                    <field name="of_validation_hours" widget="float_time" nolabel="1" class="oe_inline"/>
+                    <i class="oe_grey oe_inline"> de validation</i>
+                </div>
+                <field name="of_planned_hours" widget="float_time"/>
+                <label for="done_hours" string="Durée réalisée"/>
+                <div>
+                    <field name="of_done_hours" widget="float_time" nolabel="1" class="oe_inline"/>
+                    <i class="oe_grey oe_inline"> dont </i>
+                    <field name="of_done_spec_hours" widget="float_time" nolabel="1" class="oe_inline"/>
+                    <i class="oe_grey oe_inline"> de specs, </i>
+                    <field name="of_done_dev_hours" widget="float_time" nolabel="1" class="oe_inline"/>
+                    <i class="oe_grey oe_inline"> de développement,</i>
+                    <field name="of_done_validation_hours" widget="float_time" nolabel="1" class="oe_inline"/>
+                    <i class="oe_grey oe_inline"> de validation</i>
+                </div>
             </xpath>
             <xpath expr="//page[@name='description_page']" position="after">
                 <page name="planning_page" string="Planification">
@@ -61,41 +84,37 @@
                         <tree editable="bottom">
                             <field name="type_id"/>
                             <field name="user_id"/>
+                            <field name="state"/>
                             <field name="period_id"/>
-                            <field name="duration"/>
+                            <field name="duration" widget="float_time"/>
+                            <field name="progress" widget="progressbar"/>
                             <field name="notes"/>
                         </tree>
                     </field>
                 </page>
             </xpath>
+            <xpath expr="//field[@name='timesheet_ids']" position="attributes">
+                <!-- context nécessaire pour le domain sur task_id lors de la création d'une ligne de feuille de temps -->
+                <attribute name="context" remove="}" separator="}"/>
+                <attribute name="context" add="'default_task_id': context.get('active_id'),}"/>
+            </xpath>
+            <xpath expr="//field[@name='timesheet_ids']//tree//field[@name='name']" position="before">
+                <field name="task_id" invisible="1"/>
+                <field name="of_planned_activity_id" options="{'no_open':True, 'no_create':True}"
+                    domain="[('user_id', '=', user_id), ('task_id', '=', task_id)]"/>
+            </xpath>
         </field>
     </record>
-
-    <record id="of_project_planning_project_task_kanban_view" model="ir.ui.view">
-        <field name="name">of_project_planning.project.task.kanban.view</field>
-        <field name="model">project.task</field>
-        <field name="inherit_id" ref="project.view_task_kanban"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='user_id']" position="replace">
-                <field name="of_ressources"/>
-            </xpath>
-            <xpath expr="//div[@class='oe_kanban_bottom_right']/img" position="replace">
-                <t t-value="JSON.parse(record.of_ressources.raw_value)" t-set="ressources"/>
-                <t t-foreach="ressources" t-as="ressource">
-                    <img t-att-src="kanban_image('res.users', 'image_small', ressource['id'])"
-                         t-attf-title="#{ressource['name']}" width="24" height="24"
-                         class="oe_kanban_avatar pull-right"/>
-                </t>
-            </xpath>
-         </field>
-     </record>
 
     <record id="of_project_planning_of_project_project_task_kanban_view" model="ir.ui.view">
         <field name="name">of_project_planning.of_project.project.task.kanban.view</field>
         <field name="model">project.task</field>
         <field name="inherit_id" ref="of_project.of_project_project_task_kanban_view"/>
         <field name="arch" type="xml">
-            <xpath expr="//img[contains(@class, 'participant_ids')]" position="attributes">
+            <xpath expr="//kanban/field[last()]" position="after">
+                <field name="of_planif_state"/>
+            </xpath>
+            <xpath expr="//img[@name='participant_img']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
         </field>
@@ -106,6 +125,55 @@
         <field name="model">project.task</field>
         <field name="inherit_id" ref="of_project.of_project_project_task_search_view"/>
         <field name="arch" type="xml">
+            <xpath expr="//filter[@name='my_tasks']" position="attributes">
+                <attribute name="domain">['|',('user_id', '=', uid),('of_user_ids', 'in', uid)]</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='draft']" position="before">
+                <filter string="Brouillon" name="planif_draft" domain="[('of_planif_state', '=', 'draft')]"/>
+                <filter string="En attente" name="planif_waiting" domain="[('of_planif_state', '=', 'waiting')]"/>
+                <filter string="À faire" name="planif_todo" domain="[('of_planif_state', '=', 'todo')]"/>
+                <filter string="Annulé" name="planif_cancel" domain="[('of_planif_state', '=', 'cancel')]"/>
+                <filter string="Terminé" name="planif_done" domain="[('of_planif_state', '=', 'done')]"/>
+            </xpath>
+            <xpath expr="//filter[@name='draft']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='this_week']" position="attributes">
+                <attribute name="domain">[
+                    ('of_planning_ids.period_id.dernier_jour', '&gt;', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
+                    ('of_planning_ids.period_id.premier_jour', '&lt;', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d'))]
+                </attribute>
+                <attribute name="string">Planif cette semaine</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='this_week']" position="before">
+                <filter string="Non planifiée" name="no_planif" domain="[('of_planning_ids', '=', False)]"/>
+            </xpath>
+            <xpath expr="//filter[@name='this_week']" position="after">
+                <filter string="Planif semaine prochaine" name="next_week"
+                    domain="[('of_planning_ids.period_id.dernier_jour', u'&gt;=', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d')),
+                             ('of_planning_ids.period_id.premier_jour', u'&lt;', (context_today() + datetime.timedelta(days=14-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                <filter string="Planif semaine dernière" name="last_week"
+                    domain="[('of_planning_ids.period_id.dernier_jour', u'&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday()+7)).strftime('%Y-%m-%d')),
+                             ('of_planning_ids.period_id.premier_jour', u'&lt;', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                <filter string="Planif mois en cours" name="this_month"
+                    domain="[('of_planning_ids.period_id.dernier_jour', u'&gt;=', context_today().strftime('%Y-%m-01')),
+                             ('of_planning_ids.period_id.premier_jour', u'&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Planif mois prochain" name="next_month"
+                    domain="[('of_planning_ids.period_id.dernier_jour', u'&gt;=', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
+                             ('of_planning_ids.period_id.premier_jour', u'&lt;', (context_today() + relativedelta(day=1,months=2)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Planif mois dernier" name="last_month"
+                    domain="[('of_planning_ids.period_id.dernier_jour', u'&gt;=', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
+                             ('of_planning_ids.period_id.premier_jour', u'&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d'))]"/>
+            </xpath>
+            <xpath expr="//filter[@name='unassigned']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='message_needaction']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='inactive']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
             <xpath expr="//group" position="inside">
                 <filter string="Période(s)" name="groupby_period" domain="[]" context="{'group_by':'of_gb_period_id'}"/>
             </xpath>
@@ -115,4 +183,7 @@
         </field>
     </record>
 
+    <record id="project.action_view_task" model="ir.actions.act_window">
+        <field name="context">{'search_default_my_tasks': 1, 'search_default_this_week': 1}</field>
+    </record>
 </odoo>

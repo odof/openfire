@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="of_hr_timesheet_categ_tree_view" model="ir.ui.view">
+        <field name="name">of.project.planning.hr.timesheet.categ.tree.view</field>
+        <field name="model">of.hr.timesheet.categ</field>
+        <field name="inherit_id" ref="of_hr_timesheet.of_hr_timesheet_categ_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='parent_id']" position="after">
+                <field name="timesheet_type"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_hr_timesheet_form_view" model="ir.ui.view">
+        <field name="name">of.project.planning.hr.timesheet.categ.form.view</field>
+        <field name="model">of.hr.timesheet.categ</field>
+        <field name="inherit_id" ref="of_hr_timesheet.of_hr_timesheet_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='parent_id']" position="after">
+                <field name="timesheet_type"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
