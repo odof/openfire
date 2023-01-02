@@ -31,7 +31,7 @@ class ResPartner(models.Model):
     of_referred_reward_id = fields.Many2one('of.referred.reward', string=u"Type de cadeau")
     of_referred_note = fields.Text(string="Notes")
     of_referred_reward_state = fields.Boolean(string="Clos")
-    of_referred_reward_date = fields.Date(string=u"Date de remise du cadeau")
+    of_referred_reward_date = fields.Date(string=u"Date de remise du dernier cadeau")
     of_referred_date = fields.Date(string="Date de parrainage")
     of_referee_date = fields.Date(string=u"Date de dernier parrainage", compute='_compute_of_referee_date', store=True)
 
