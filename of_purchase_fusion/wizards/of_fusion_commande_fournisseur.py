@@ -37,6 +37,7 @@ class OfFusionCommandeFournisseur(models.TransientModel):
     def button_merge_orders(self):
         procurement_order_obj = self.env['procurement.order']
         purchase_order_obj = self.env['purchase.order']
+        stock_move_obj = self.env['stock.move']
 
         purchase_orders = purchase_order_obj.browse(self._context['active_ids'])
         procurement_orders = procurement_order_obj.search([('purchase_id', 'in', purchase_orders._ids)])
@@ -72,6 +73,11 @@ class OfFusionCommandeFournisseur(models.TransientModel):
         delete_orders = purchase_orders - fuse_on
         for order in delete_orders:
             order.button_cancel()
+
+            # On met à jour l'origine des mouvements de stock
+            move_lines = stock_move_obj.search([('origin', '=', order.name)])
+            move_lines.write({'origin': fuse_on.name})
+
         delete_orders.unlink()
 
         return self.env['of.popup.wizard'].popup_return(
