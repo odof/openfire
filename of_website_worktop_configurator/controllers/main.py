@@ -1078,6 +1078,7 @@ class OFWebsiteWorktopConfigurator(http.Controller):
 
         if vals:
             quote.write(vals)
+            quote._compute_tax_id()
             self._compute_discount()
 
     def _get_product_price(self):
