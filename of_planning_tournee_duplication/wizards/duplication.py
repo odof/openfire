@@ -330,6 +330,9 @@ class OfDupplicationInterventionLine(models.TransientModel):
         # On ne conserve pas la commande.
         if 'order_id' in rdv_vals:
             del rdv_vals['order_id']
+        # On ne conserve pas le BL.
+            if 'picking_id' in rdv_vals:
+                del rdv_vals['picking_id']
         rdv_vals['verif_dispo'] = False
         # rdv_vals['employee_ids'] = [(4, self.employee_id.id, 0)]
         date_origine = rdv_vals['date']
