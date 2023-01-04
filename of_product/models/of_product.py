@@ -212,6 +212,37 @@ class ProductProduct(models.Model):
         help=u"Correspond au coût calculé par application des règles définies dans la marque ou dans les fichiers "
              u"d'import. Cette valeur de coût peut servir pour le calcul de la marge dans les devis et les factures ; "
              u"elle n'est en revanche jamais utilisée pour la valorisation de l'inventaire.")
+    of_forced_lst_price = fields.Float(string=u"Sale price (forced)", digits=dp.get_precision('Product Price'))
+
+    @api.depends('list_price', 'price_extra', 'of_forced_lst_price')
+    def _compute_product_lst_price(self):
+        if not self.env.user.has_group('of_product.group_product_variant_specific_price'):
+            return super(ProductProduct, self)._compute_product_lst_price()
+        to_uom = None
+        if 'uom' in self._context:
+            to_uom = self.env['product.uom'].browse([self._context['uom']])
+
+        for product in self:
+            list_price = product.of_forced_lst_price or product.list_price
+            if to_uom:
+                list_price = product.uom_id._compute_price(list_price, to_uom)
+            product.lst_price = list_price
+
+    def _set_product_lst_price(self):
+        if not self.env.user.has_group('of_product.group_product_variant_specific_price'):
+            return super(ProductProduct, self)._set_product_lst_price()
+        for product in self:
+            if self._context.get('uom'):
+                value = self.env['product.uom'].browse(self._context['uom'])._compute_price(product.lst_price, product.uom_id)
+            else:
+                value = product.lst_price
+            product.write({'of_forced_lst_price': value})
+
+    @api.multi
+    def price_compute(self, price_type, uom=False, currency=False, company=False):
+        if self.env.user.has_group('of_product.group_product_variant_specific_price'):
+            return super(ProductProduct, self).price_compute('lst_price', uom=uom, currency=currency, company=company)
+        return super(ProductProduct, self).price_compute(price_type, uom=uom, currency=currency, company=company)
 
     @api.model
     def _add_missing_default_values(self, values):

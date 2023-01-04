@@ -3,7 +3,7 @@
 
 {
     'name': u"OpenFire / Produits (articles)",
-    'version': '10.0.1.0.0',
+    'version': '10.0.1.1.0',
     'license': 'AGPL-3',
     'author': u"OpenFire",
     'website': u"openfire.fr",
@@ -23,9 +23,9 @@ Ce module apporte une personnalisation des produits :
         'of_utils',
     ],
     'data': [
-        'views/of_product_views.xml',
-        'security/ir.model.access.csv',
         'security/of_product_security.xml',
+        'security/ir.model.access.csv',
+        'views/of_product_views.xml',
     ],
     'installable': True,
 }
