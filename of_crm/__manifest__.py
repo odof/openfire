@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / CRM",
-    'version': "10.0.1.2.0",
+    'version': "10.0.1.3.0",
     'author': "OpenFire",
     'website': "http://openfire.fr",
     'category': 'Customer Relationship Management',

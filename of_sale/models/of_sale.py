@@ -492,9 +492,26 @@ class SaleOrder(models.Model):
                     percent -= echeance.percent
                     amount -= echeance.amount
 
+    @api.model
+    def create(self, vals):
+        mail_subtype = self.env.ref('of_base.mail_message_subtype_mail', raise_if_not_found=False)
+        record = super(SaleOrder, self).create(vals)
+        if mail_subtype:
+            record.message_subscribe(partner_ids=[vals['partner_id']], subtype_ids=[mail_subtype.id], force=False)
+        return record
+
     @api.multi
     def write(self, vals):
+        mail_subtype = self.env.ref('of_base.mail_message_subtype_mail', raise_if_not_found=False)
+        if mail_subtype and vals.get('partner_id'):
+            old_partner_ids = self.mapped('partner_id')._ids
         res = super(SaleOrder, self).write(vals)
+        if mail_subtype and vals.get('partner_id'):
+            # subscribe new partner and unsunscribe the old ones
+            self.message_subscribe(partner_ids=[vals['partner_id']], subtype_ids=[mail_subtype.id], force=False)
+            message_followers = self.mapped('message_follower_ids')
+            message_followers.filtered(lambda r: r.partner_id.id in old_partner_ids)\
+                             .write({'subtype_ids': [(3, mail_subtype.id)]})
         # Recalcul de la dernière échéance si besoin
         self.filtered('of_echeances_modified').of_recompute_echeance_last()
         return res
@@ -830,6 +847,14 @@ class SaleOrder(models.Model):
             values['base'] = round_curr(values['base'])
             values['amount'] = round_curr(values['amount'])
         return tax_grouped
+
+    @api.multi
+    def action_quotation_send(self):
+        mail_subtype = self.env.ref('of_base.mail_message_subtype_mail', raise_if_not_found=False)
+        action = super(SaleOrder, self).action_quotation_send()
+        if mail_subtype:
+            action['ctx'].update({'default_subtype_id': mail_subtype.id})
+        return action
 
 
 class SaleOrderLine(models.Model):

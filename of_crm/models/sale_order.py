@@ -420,6 +420,9 @@ class SaleOrder(models.Model):
             'default_composition_mode': 'comment',
             'custom_layout': "sale.mail_template_data_notification_email_sale_order"
         })
+        mail_subtype = self.env.ref('of_base.mail_message_subtype_mail', raise_if_not_found=False)
+        if mail_subtype:
+            ctx['default_subtype_id'] = mail_subtype.id
         return {
             'type': 'ir.actions.act_window',
             'view_type': 'form',

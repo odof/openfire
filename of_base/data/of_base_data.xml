@@ -17,6 +17,12 @@
             <field name="args">()</field>
         </record>
 
+        <record id="mail_message_subtype_mail" model="mail.message.subtype">
+            <field name="name">Mail</field>
+            <field name="sequence" eval="5"/>
+            <field name="default" eval="False"/>
+        </record>
+
     </data>
 
 </odoo>
