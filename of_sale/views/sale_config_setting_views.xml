@@ -16,7 +16,9 @@
                 <attribute name="string">Product catalogue</attribute>
                 <attribute name="name">products_catalogue</attribute>
             </xpath>
-
+            <xpath expr="//group/field[@name='group_product_variant']" position="after">
+                <field name="group_product_variant_specific_price" widget="radio" attrs="{'invisible': [('group_product_variant', '!=', 1)]}"/>
+            </xpath>
             <!-- Replace field to move them -->
             <xpath expr="//group[@name='products_catalogue']/field[@name='default_invoice_policy']" position="replace"/>
             <xpath expr="//group[@name='quotations_sales']/field[@name='group_sale_delivery_address']" position="replace"/>

@@ -66,6 +66,12 @@ class OFSaleConfiguration(models.TransientModel):
     of_sale_order_margin_control = fields.Boolean(
         string=u"(OF) Contrôle de marge", help=u"Activer le contrôle de marge à la validation des commandes")
 
+    group_product_variant_specific_price = fields.Selection(selection=[
+        (0, u"Handle pricing by attribute"),
+        (1, u"Handle pricing by variant")], string=u"(OF) Product variant pricing",
+        implied_group='of_product.group_product_variant_specific_price')
+
+
     @api.multi
     def set_stock_warning_defaults(self):
         return self.env['ir.values'].sudo().set_default(

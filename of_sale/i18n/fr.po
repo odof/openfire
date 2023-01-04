@@ -2285,3 +2285,18 @@ msgstr "Êtes-vous sûr de vouloir verrouiller la vente ? Une fois verrouillée,
 #: model:ir.ui.view,arch_db:of_sale.wizard_sales_set_printing_params_view_form
 msgid "<span class="text-muted">Will be also applied on the invoices.</span>"
 msgstr "<span class="text-muted">Sera également appliqué aux factures.</span>"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_group_product_variant_specific_price
+msgid "(OF) Product variant pricing"
+msgstr "(OF) Tarification des variantes"
+
+#. module: of_sale
+#: selection:sale.config.settings,group_product_variant_specific_price:0
+msgid "Handle pricing by attribute"
+msgstr "Standard (défaut)"
+
+#. module: of_sale
+#: selection:sale.config.settings,group_product_variant_specific_price:0
+msgid "Handle pricing by variant"
+msgstr "Manuelle"
