@@ -13,7 +13,7 @@
 
 {
     'name': u"OpenFire / Ventes",
-    'version': '10.0.3.1.0',
+    'version': '10.0.3.2.0',
     'license': '',
     'author': "OpenFire",
     'website': "www.openfire.fr",
