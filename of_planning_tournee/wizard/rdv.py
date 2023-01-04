@@ -1119,6 +1119,8 @@ class OfTourneeRdv(models.TransientModel):
             [(4, tag.id) for tag in service.tag_ids] \
             if not self.origin_intervention_id else [(6, 0, self.origin_intervention_id.tag_ids.ids)]
         order_id = service.order_id.id if not self.origin_intervention_id else self.origin_intervention_id.order_id.id
+        picking_list = service.order_id.picking_ids.ids if not self.origin_intervention_id \
+            else self.origin_intervention_id.order_id.picking_ids.ids
         name = self.name if not self.origin_intervention_id else self.origin_intervention_id.name
         values = {
             'partner_id': self.partner_id.id,
@@ -1137,6 +1139,7 @@ class OfTourneeRdv(models.TransientModel):
             'state': 'confirm',
             'verif_dispo': True,
             'order_id': order_id,
+            'picking_id': len(picking_list) == 1 and picking_list[0] or False,
             'origin_interface': u"Trouver un créneau (rdv.py)",
             'flexible': self.tache_id.flexible,
             'duration_one_way': self.res_line_id.duree_prec,

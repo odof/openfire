@@ -1270,6 +1270,8 @@ class OfPlanningIntervention(models.Model):
         picking_list = []
         if self.order_id:
             picking_list = self.order_id.picking_ids.ids
+            if len(picking_list) == 1:
+                self.picking_id = picking_list[0]
         self.picking_domain = picking_list
         if self.picking_id and self.picking_id.id not in picking_list:
             self.picking_id = False
@@ -2385,10 +2387,12 @@ class SaleOrder(models.Model):
         action = self.env.ref('of_planning.of_sale_order_open_interventions').read()[0]
 
         if len(self._ids) == 1:
+            picking_list = self.picking_ids.ids
             context = safe_eval(action['context'])
             context.update({
                 'default_address_id': self.partner_shipping_id.id or False,
                 'default_order_id': self.id,
+                'default_picking_id': len(picking_list) == 1 and picking_list[0] or False,
             })
             if self.intervention_ids:
                 context['force_date_start'] = self.intervention_ids[-1].date_date
