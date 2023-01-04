@@ -12,13 +12,13 @@ class OFInterventionSettings(models.TransientModel):
         string=u"Gérer les RDVs réguliers",
         implied_group='of_planning_recurring.of_group_planning_intervention_recurring')
 
-    @api.onchange('group_of_group_planning_intervention_recurring')
-    def _onchange_group_of_group_planning_intervention_recurring(self):
+    def execute(self):
         type_misc = self.env.ref('of_planning_recurring.of_service_type_misc')
         if type_misc and self.group_of_group_planning_intervention_recurring:
-            type_misc.write({'active': True})
+            type_misc.sudo().write({'active': True})
         elif type_misc:
-            type_misc.write({'active': False})
+            type_misc.sudo().write({'active': False})
+        return super(OFInterventionSettings, self).execute()
 
 
 class Attachment(models.Model):
