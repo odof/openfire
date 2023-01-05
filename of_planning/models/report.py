@@ -7,6 +7,7 @@ import tempfile
 from datetime import datetime
 
 from odoo import api, models, fields, _
+from odoo.tools.safe_eval import safe_eval
 
 try:
     import pypdftk
@@ -55,8 +56,7 @@ class Report(models.Model):
     def _check_attachment_use(self, docids, report):
         def attachment_filenames(records, report):
             # adapted from _attachment_filenames in odoo-ocb/addons/report/models/report.py
-            today = datetime.now().strftime('%d-%m-%Y')
-            return dict((record.id, u"Rapport d'intervention %s" % today) for record in records)
+            return dict((record.id, safe_eval(report.print_report_name, {'object': record})) for record in records)
 
         def attachment_stored(records, report, filenames):
             # adapted from _attachment_stored in odoo-ocb/addons/report/models/report.py
