@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vues des marques -->
+    <record id="of_product_brand_view_search" model="ir.ui.view">
+        <field name="name">of.product.brand.search.view</field>
+        <field name="model">of.product.brand</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="partner_id"/>
+                <filter string="Archived" name="inactive" domain="[('active','=',False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_product_brand_view_kanban" model="ir.ui.view">
+        <field name="name">of.product.brand.product.kanban</field>
+        <field name="model">of.product.brand</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="partner_id"/>
+                <field name="logo"/>
+                <templates>
+                    <t t-name="kanban-box">
+                       <div class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <t t-if="record.logo.raw_value">
+                                    <img t-att-src="kanban_image('of.product.brand', 'logo', record.id.value)"/>
+                                </t>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong>
+                                    <span>
+                                         <t t-esc="record.name.value"/>
+                                    </span>
+                                </strong>
+                                <ul>
+                                    <li>Code: <field name="code"></field></li>
+                                    <li>Supplier: <field name="partner_id"></field></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="of_brand_product_action" model="ir.actions.act_window">
+        <field name="name">Products</field>
+        <field name="res_model">product.template</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('brand_id','=',active_id)]</field>
+    </record>
+
+    <record id="of_product_brand_view_form" model="ir.ui.view">
+        <field name="name">of.product.brand.form.view</field>
+        <field name="model">of.product.brand</field>
+        <field name="arch" type="xml">
+            <form string="Product brand">
+                <header/>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{&quot;terminology&quot;: &quot;archive&quot;}"/>
+                        </button>
+                        <button name="%(of_brand_product_action)d" type="action" class="oe_stat_button" icon="fa-th-list"
+                                context="{'default_brand_id':id}">
+                            <field string="Products" name="product_count" widget="statinfo"/>
+                        </button>
+                    </div>
+                    <field name="logo" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="OpenFire"/></h1>
+                    </div>
+                    <group>
+                        <field name="code" placeholder="OPE"/>
+                        <field name="use_prefix"/>
+                        <field name="product_change_warn" invisible="1"/>
+                        <div attrs="{'invisible':[('product_change_warn', '=', False)]}" colspan="2" style="color:red;">
+                                The reference of this brand's products will be modified if you save these changes.
+                        </div>
+                        <newline/>
+                        <field name="partner_id"/>
+                        <field name="supplier_delay"/>
+                        <field name="show_in_sales"/>
+                        <label for="note" colspan="2"/>
+                        <field name="note" colspan="2" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_product_brand_view_tree" model="ir.ui.view">
+        <field name="name">of.product.brand.tree.view</field>
+        <field name="model">of.product.brand</field>
+        <field name="arch" type="xml">
+            <tree string="Product brand">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="partner_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_product_brand_action" model="ir.actions.act_window">
+        <field name="name">Brands</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.product.brand</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_type">form</field>
+    </record>
+
+    <menuitem id="of_menu_brand" name="Brands" action="of_product_brand_action" parent="sale.prod_config_main" sequence="15"/>
+
+    <!-- Regroupement des produits par marque -->
+    <record id="of_product_brand_product_template_search_view" model="ir.ui.view">
+        <field name="name">product.template.search</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <group expand="0" string="Group By">
+                    <filter string="Brand" name="groupby_brand" domain="[]" context="{'group_by': 'brand_id'}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Affichage des marques dans les produits -->
+    <record id="of_product_brand_product_template_only_form_view" model="ir.ui.view">
+        <field name="name">of.product.brand.product.template.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='default_code']" position="before">
+                <field name="of_previous_brand_id" invisible="1"/>
+                <field name="brand_id"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="of_product_brand_product_normal_form_view" model="ir.ui.view">
+        <field name="name">of.product.brand.product.product.form</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='default_code']" position="before">
+                <field name="of_previous_brand_id" invisible="1"/>
+                <field name="brand_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Affichage des marques dans les fournisseurs -->
+    <record id="act_res_partner_2_brands" model="ir.actions.act_window">
+        <field name="name">Brands</field>
+        <field name="res_model">of.product.brand</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_partner_id': active_id, 'default_partner_id': active_id}</field>
+    </record>
+
+    <record id="of_product_brand_view_partner_form" model="ir.ui.view">
+        <field name="name">of.product.brand.res.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" name="%(of_product_brand.act_res_partner_2_brands)d" type="action"
+                    attrs="{'invisible': [('supplier', '=', False)]}" icon="fa-pencil-square-o" help="Brands">
+                    <field string="Brands" name="supplier_brand_count" widget="statinfo"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Ajout des champs dans la vue liste afin qu'ils puissent être retournés par les on_change.
+         Sans ça, ces champs sont mis à 0/False quand les informations fournisseur sont crées à la sélection de la marque de l'article
+     -->
+    <record id="of_product_supplierinfo_tree_view" model="ir.ui.view">
+        <field name="name">of.product.supplierinfo.tree.view</field>
+        <field name="model">product.supplierinfo</field>
+        <field name="inherit_id" ref="product.product_supplierinfo_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="delay" invisible="1"/>
+                <field name="pp_ht" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Filtres par défault sur marques et fournisseurs dans la vue liste Articles -->
+    <record id="of_product_template_search_view" model="ir.ui.view">
+        <field name="name">of.product.template.search</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='categ_id']" position="after">
+                <field name="brand_id"/>
+                <field string="Supplier" name="of_seller_name"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Bulle d'aide des articles de lignes de commandes -->
+    <record id="of_product_vrand_view_order_form" model="ir.ui.view">
+        <field name="name">of.product.brand.sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="attributes">
+                <attribute name="help">
+                    Note: When searching for a product, typing "m:ABC" will filter products for brand "ABC".
+                </attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_product_brand_form_view" model="ir.ui.view">
+        <field name="name">of.product.brand.add.products.form.view</field>
+        <field name="model">of.product.brand.add.products</field>
+        <field name="arch" type="xml">
+            <form string="Add products to brand">
+                <sheet>
+                    <group>
+                        <field name="product_ids"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="add_products" type="object" string="Confirm" class="btn-primary"/>
+                    <button string="Cancel" class="btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_of_product_brand_add_products" model="ir.actions.act_window">
+        <field name="name">Link products</field>
+        <field name="res_model">of.product.brand.add.products</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_product_brand_form_view"/>
+        <field name="context">{'default_brand_id': active_id}</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>
