@@ -3009,3 +3009,10 @@ msgstr "Étiquettes d'intervention"
 #: model:ir.ui.view,arch_db:of_planning.of_planning_tache_view_form
 msgid "Êtes-vous sûr de vouloir archiver/activer cette tâche ?"
 msgstr "Êtes-vous sûr de vouloir archiver/activer cette tâche ?"
+
+#. module: of_planning
+#: code:addons/of_planning/models/of_planning_intervention_template.py:335
+#: code:addons/of_planning/models/of_planning_intervention_template.py:336
+#, python-format
+msgid " (copy)"
+msgstr " (copie)"

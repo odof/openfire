@@ -332,6 +332,14 @@ class OfPlanningInterventionTemplate(models.Model):
         return res
 
     @api.multi
+    def copy(self, default=None):
+        self.ensure_one()
+        # On modifie le nom et le code du modèle d'intervention
+        default['name'] = self.name + _(" (copy)")
+        default['code'] = self.code + _(" (copy)")
+        return super(OfPlanningInterventionTemplate, self).copy(default)
+
+    @api.multi
     def get_fi_mail_template_data(self, rdv):
         self.ensure_one()
         compose_mail_obj = self.env['of.compose.mail']
