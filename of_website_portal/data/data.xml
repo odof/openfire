@@ -6,7 +6,7 @@
         <field name="login">b2b</field>
         <field name="of_is_user_profile" eval="1"/>
         <field name="groups_id" eval="[(6,0,[ref('base.group_portal'), ref('sale.group_show_price_subtotal')])]"/>
-            <field name="of_pricelist_id" ref="product.list0"/>
+        <field name="of_pricelist_id" ref="product.list0"/>
         <field name="of_fiscal_position_id" eval="False"/>
     </record>
 
@@ -14,9 +14,9 @@
         <field name="name">Utilisateur portail B2C</field>
         <field name="login">b2c</field>
         <field name="of_is_user_profile" eval="1"/>
-        <field name="groups_id" eval="[(6,0,[ref('of_website_sale.group_portal_b2c'), ref('sale.group_show_price_total')])]"/>
-        <field name="of_pricelist_id" ref="of_website_sale.product_pricelist_b2c"/>
-        <field name="of_fiscal_position_id" ref="of_website_sale.account_fiscal_position_b2c"/>
+        <field name="groups_id" eval="[(6,0,[ref('base.group_portal'), ref('sale.group_show_price_subtotal')])]"/>
+        <field name="of_pricelist_id" ref="product.list0"/>
+        <field name="of_fiscal_position_id" eval="False"/>
     </record>
 
     <record id="of_tab_quotation" model="of.tab">
