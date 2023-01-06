@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- base on web.login_layout -->
+    <template id="of_base.inactive_user_layout" name="Inactive User Layout">
+        <t t-call="web.layout">
+            <t t-set="html_data" t-value="{'style': 'height: 100%;'}"/>
+            <t t-set="head">
+                <t t-call-assets="web.assets_common" t-js="false"/>
+                <t t-call-assets="web.assets_frontend" t-js="false"/>
+                <t t-call-assets="web.assets_common" t-css="false"/>
+                <t t-call-assets="web.assets_frontend" t-css="false"/>
+            </t>
+            <t t-set="body_classname" t-value="'container'"/>
+
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3 o_database_list">
+                    <div class="text-center">
+                        <img t-attf-src="/web/binary/company_logo{{ '?dbname='+db if db else '' }}"/>
+                    </div>
+                    <t t-raw="0"/>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- based on web.login -->
+    <template id="of_base.inactive_user" name="Inactive User">
+        <t t-call="of_base.inactive_user_layout">
+            <form class="oe_login_form" role="form" t-attf-action="/inactiveuser{{ '?debug' if debug else '' }}" method="post" onsubmit="this.action = this.action + location.hash">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                    <p class="alert alert-success" >
+                        <label>Vous ne pouvez pas accéder à l'application WEB OpenFire depuis un compte "Ressource inactive".</label>
+                    </p>
+
+                <input type="hidden" name="redirect" t-att-value="1"/>
+                <div class="clearfix oe_login_buttons text-center">
+                    <button type="submit" class="btn btn-primary">Se déconnecter</button>
+                </div>
+            </form>
+        </t>
+    </template>
+
+</odoo>
