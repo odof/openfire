@@ -1,0 +1,15 @@
+# dotfiles
+.*
+!.gitignore
+# compiled python and python cache files
+*.py[co]
+__pycache__/
+# setup.py egg_info
+*.egg-info
+# emacs backup files
+*~
+# vim swap files
+*.swp
+*.swo
+# sphinx build directories
+_build/
