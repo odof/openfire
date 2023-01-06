@@ -1,0 +1,10 @@
+<templates>
+
+    <!-- mettre tous les header des vues list en sticky -->
+    <t t-extend="ListView">
+        <t t-jquery="table" t-operation="attributes">
+            <attribute name="class">o_list_view table table-condensed table-striped of_table_fix_head of_thead_obl_color</attribute>
+        </t>
+    </t>
+
+</templates>
