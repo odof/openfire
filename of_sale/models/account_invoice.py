@@ -277,7 +277,7 @@ class AccountInvoice(models.Model):
         """ Surcharge pour que tout avoir soit pris en compte dans la commande
         """
         result = super(AccountInvoice, self)._refund_cleanup_lines(lines)
-        if self.env.context.get('of_mode') == 'cancel':
+        if self.env.context.get('of_refund_mode') == 'cancel':
             for i in xrange(0, len(lines)):
                 for name, field in lines[i]._fields.iteritems():
                     if name == 'sale_line_ids':

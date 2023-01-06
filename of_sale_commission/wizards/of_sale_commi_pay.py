@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 
 
 class OFSaleCommiPay(models.TransientModel):
@@ -20,12 +22,12 @@ class OFSaleCommiPay(models.TransientModel):
 
     @api.model
     def _default_paid(self):
-        return self._check_state(('paid', 'paid_cancel'))
+        return self._check_state(('paid', ))
 
     draft = fields.Boolean(default=lambda self: self._default_draft())
     cancel = fields.Boolean(default=lambda self: self._default_cancel())
     paid = fields.Boolean(default=lambda self: self._default_paid())
-    date = fields.Date(string='Date de paiement', required=True, default=fields.Date.today)
+    date = fields.Date(string="Date de paiement", required=True, default=fields.Date.today)
 
     @api.model
     def _check_state(self, states):
@@ -34,16 +36,17 @@ class OFSaleCommiPay(models.TransientModel):
 
     @api.multi
     def confirmer_paiement(self):
-        commi_obj = self.env['of.sale.commi']
-        commis = commi_obj.browse(self._context.get('active_ids', []))
-        to_pay = [commi_obj, commi_obj]
-        to_cancel = [commi_obj, commi_obj]
-        for commi in commis:
-            if commi.state in ('draft', 'to_pay'):
-                to_pay[not commi.date_valid] |= commi
-            elif commi.state == 'to_cancel':
-                to_cancel[not commi.date_valid] |= commi
-        to_pay[0].write({'state': 'paid', 'date_paiement': self.date})
-        to_pay[1].write({'state': 'paid', 'date_paiement': self.date, 'date_valid': self.date})
-        to_cancel[0].write({'state': 'paid_cancel', 'date_paiement': self.date})
-        to_cancel[1].write({'state': 'paid_cancel', 'date_paiement': self.date, 'date_valid': self.date})
+        commis = self.env['of.sale.commi']\
+            .browse(self._context.get('active_ids', []))\
+            .filtered(lambda c: c.state in ('draft', 'to_pay'))
+        dated_commis = commis.filtered('date_valid')
+        order_commis_not_paid = commis.mapped('order_commi_ids').filtered(lambda c: c.state != 'paid')
+        order_commis_not_paid = order_commis_not_paid - commis
+        if order_commis_not_paid:
+            raise UserError(_(
+                u"Pour valider des commissions sur solde, vous devez également valider les commissions sur acompte "
+                u"associées dont le paiement n'a pas encore été confirmé"))
+        if dated_commis:
+            dated_commis.write({'state': 'paid', 'date_paiement': self.date})
+        if len(dated_commis) != len(commis):
+            (commis - dated_commis).write({'state': 'paid', 'date_paiement': self.date, 'date_valid': self.date})
