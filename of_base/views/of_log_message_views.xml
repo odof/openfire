@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_log_message_search_view" model="ir.ui.view">
+        <field name="name">of.log.message.search</field>
+        <field name="model">of.log.message</field>
+        <field name="arch" type="xml">
+            <search string="Historique des imports/exports">
+                <field name="name"/>
+                <field name="type"/>
+                <field name="model"/>
+                <field name="function"/>
+                <separator/>
+                <filter string="Titre" context="{'group_by':'name'}"/>
+                <filter string="Type d'erreur" context="{'group_by':'type'}"/>
+                <filter string="Modèle" context="{'group_by':'model'}"/>
+                <filter string="Fonction" context="{'group_by':'function'}"/>
+                <filter string="Niveau de log" context="{'group_by':'log_level'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_log_message_view_form" model="ir.ui.view">
+        <field name="name">Log</field>
+        <field name="model">of.log.message</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="of_title">
+                        <b>
+                            <field name="name" nolabel="1" class="oe_inline"/>
+                        </b>
+                    </div>
+                    <group>
+                        <field name="create_date"/>
+                        <field name="log_level"/>
+                        <field name="type"/>
+                        <field name="model"/>
+                        <field name="function"/>
+                    </group>
+                    <group>
+                        <field name="message" nolabel="1"/>
+                    </group>
+                </sheet>
+
+            </form>
+        </field>
+    </record>
+
+    <record id="of_log_message_view_tree" model="ir.ui.view">
+        <field name="name">Messages de logs</field>
+        <field name="model">of.log.message</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="create_date"/>
+                <field name="log_level"/>
+                <field name="name"/>
+                <field name="type"/>
+                <field name="model"/>
+                <field name="function"/>
+                <field name="message"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_log_message_action" model="ir.actions.act_window">
+        <field name="name">Message de logs</field>
+        <field name="res_model">of.log.message</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="of_log_parent_menu" parent="base.menu_administration" name="Logs" sequence="2"/>
+    <menuitem id="of_log_message_menu" name="Message" parent="of_log_parent_menu" action="of_log_message_action" sequence="10"/>
+
+</odoo>

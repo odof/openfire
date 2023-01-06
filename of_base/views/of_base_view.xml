@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Page de connexion : remplacer email par indentifiant (login) -->
+    <template id="of_base_login" name="Connexion indentifiant" inherit_id="web.login">
+        <xpath expr="//div[@class='form-group field-login']/label" position="replace">
+            <label for="login" class="control-label">Login</label>
+        </xpath>
+    </template>
+
+    <!-- Vue form partenaires :
+    Ajouter onglet "Historique" dans formulaire partenaire et type adresse (livraison, facture, ...)
+    Enlever Etat fédéral et mettre code postal avant la ville
+    -->
+    <record id="of_base_partner_form" model="ir.ui.view">
+        <field name="name">of.base.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!-- Ajout header de vue form pour captain hook -->
+            <xpath expr="//sheet" position="before">
+                <header/>
+            </xpath>
+            <xpath expr="//page[@name='sales_purchases']" position="after">
+                <page name="historique" string="Historique"/>
+            </xpath>
+            <!-- Permet de voir les catégories du parent -->
+            <xpath expr="//field[@name='category_id']" position="before">
+                <field name="of_parent_category_id" widget="many2many_tags"
+                       attrs="{'invisible': [('parent_id', '=', False)]}"/>
+            </xpath>
+            <!-- Retirer le petit lien "(éditer)" qui permettait de modifier l'adresse quand il y a un parent -->
+            <xpath expr="//button[@name='open_parent']/.." position="attributes">
+                <attribute name="style">display: none;</attribute>
+            </xpath>
+            <!-- permettre l'éition de l'adresse quand il y a un parent -->
+            <xpath expr="//field[@name='street']" position="attributes">
+                <attribute name="attrs">{}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='street2']" position="attributes">
+                <attribute name="attrs">{}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='city']" position="attributes">
+                <attribute name="attrs">{}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='state_id']" position="attributes">
+                <attribute name="attrs">{}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='zip']" position="attributes">
+                <attribute name="attrs">{}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='country_id']" position="attributes">
+                <attribute name="attrs">{}</attribute>
+            </xpath>
+            <xpath expr="//form//notebook//page[@name='sales_purchases']//field[@name='customer']"
+                   position="attributes">
+                <attribute name="attrs">{'readonly': [('parent_id', '!=', False), ('is_company', '=', False)]}
+                </attribute>
+            </xpath>
+            <xpath expr="//form//notebook//page[@name='sales_purchases']//field[@name='supplier']"
+                   position="attributes">
+                <attribute name="attrs">{'readonly': [('parent_id', '!=', False), ('is_company', '=', False)]}
+                </attribute>
+            </xpath>
+            <xpath expr='//form/sheet/notebook/page/field/kanban/templates/t/div/div/field' position="after">
+                <t t-if="record.type.raw_value">(<field name="type"/>)
+                </t>
+            </xpath>
+            <xpath expr="//field[@name='state_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='city']" position="replace"/>
+            <xpath expr="//field[@name='zip']" position="after">
+                <field name="city" class="o_address_city" placeholder="City"
+                       attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+            </xpath>
+            <!-- Change placeholder Notes internes non difusées -->
+            <xpath expr="//notebook/page[2]//field[@name='comment']" position="replace">
+                <field name="comment" colspan="4" placeholder="Note interne (non diffusée)"/>
+            </xpath>
+            <!-- Ajout aide du champ comment (notes internes / notes client) -->
+            <xpath expr="//page[@name='internal_notes']//field[@name='comment']" position="attributes">
+                <attribute name='placeholder'>Notes client...</attribute>
+                <attribute name='help'>Ces notes seront affichées sous la rubrique 'Notes clients' dans le devis et le
+                    planning d'intervention.
+                </attribute>
+            </xpath>
+            <xpath expr="//page[@name='internal_notes']//field[@name='comment']" position="after">
+                <div class="oe_edit_only" colspan="4">
+                    * Les données saisies dans ce champ seront affichées sous la rubrique 'Notes clients' dans le devis
+                    et le planning d'intervention.
+                </div>
+            </xpath>
+
+            <!-- Gestion des numéros de téléphone -->
+            <xpath expr="//field[@name='title']" position="replace"/>
+            <xpath expr="//field[@name='type']" position="after">
+                <field name="title" options="{&quot;no_open&quot;: True}"
+                       attrs="{'invisible': [('is_company', '=', True)]}"/>
+            </xpath>
+            <xpath expr="//field[@name='function']" position="replace"/>
+            <xpath expr="//field[@name='email']" position="replace"/>
+            <xpath expr="//field[@name='lang']" position="replace"/>
+            <xpath expr="//field[@name='phone']" position="replace">
+                <group colspan="4">
+                    <field name="of_phone_number_ids" string="Téléphones" class="of_phone_table">
+                        <tree editable="bottom" colors="red: not is_valid">
+                            <field name="type" string="Type"/>
+                            <field name="title_id" string="Civilité" options="{'no_open': True}" widget="selection"/>
+                            <field name="number_display" string="Numéro" placeholder="Numéro" required="True"/>
+                            <field name="number" invisible="1" readonly="1"/>
+                            <field name="is_valid" invisible="1"/>
+                        </tree>
+                    </field>
+                    <field name="email" widget="email" attrs="{'required': [('user_ids','!=', [])]}"/>
+                    <field name="function" placeholder="e.g. Sales Director"
+                           attrs="{'invisible': [('is_company','=', True)]}"/>
+                    <field name="lang"/>
+                </group>
+            </xpath>
+            <xpath expr="//field[@name='mobile']" position="replace"/>
+            <xpath expr="//field[@name='fax']" position="replace"/>
+            <xpath expr="//field[@name='child_ids']/form/sheet//div[@name='div_address']/parent::node()"
+                   position="after">
+                <field name="of_default_address" attrs="{'invisible': [('type', 'not in', ('invoice', 'delivery'))]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_res_partner_tree" model="ir.ui.view">
+        <field name="name">of.res.partner.tree</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree" />
+        <field name="arch" type="xml">
+            <!-- Ajouts de champs -->
+            <xpath expr="//field[@name='display_name']" position="after">
+                <field name="street"/>
+                <field name="zip" string="CP"/>
+                <field name="city"/>
+            </xpath>
+            <xpath expr="//field[@name='phone']" position="after">
+                <field name="mobile"/>
+            </xpath>
+            <xpath expr="//field[@name='email']" position="after">
+                <field name="category_id"/>
+                <field name="user_id" string="Commercial"/>
+                <field name="type"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_res_partner_filter" model="ir.ui.view">
+        <field name="name">of.res.partner.select</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="street" string="Rue ou complément"
+                    filter_domain="['|',('street','ilike',self),('street2','ilike',self)]"/>
+                <field name="zip"/>
+                <field name="city"/>
+                <field name="phone" filter_domain="[('of_phone_number_ids.number', 'ilike', self)]"/>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="attributes">
+                <attribute name="string">Commercial</attribute>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="email"/>
+                <field name="company_id"/>
+                <field name="ref"/>
+                <field name="type"/>
+            </xpath>
+            <xpath expr="//filter[@name='inactive']" position="before">
+                <filter string="Doublons potentiels" name="duplications" domain="[('of_potential_duplication', '=', True)]"/>
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Ajouter type adresse (livraison, facture, ...) dans vue kanban quand est un contact -->
+    <record id="of_res_partner_kanban" model="ir.ui.view" >
+        <field name="name">of.res.partner.kanban</field>
+        <field name="inherit_id" ref="base.res_partner_kanban_view"/>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <xpath expr='//kanban/templates/t/div/div/strong/field' position="after">
+                <t t-if="record.type.raw_value and record.parent_id.raw_value"> (<field name="type"/>)</t>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Ajout onglet "Paramètres avancés" dans la fiche société -->
+    <record id="of_base_view_company_form" model="ir.ui.view">
+        <field name="name">of.base.company.form</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base_vat.company_form_vat" />
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[1]/group[1]/group[1]" position="before">
+                <separator string="Identification" colspan="4"/>
+            </xpath>
+            <xpath expr="//field[@name='phone']" position="replace"/>
+            <xpath expr="//field[@name='fax']" position="replace"/>
+            <xpath expr="//field[@name='email']" position="replace"/>
+            <xpath expr="//field[@name='vat']" position="replace"/>
+            <xpath expr="//field[@name='vat_check_vies']" position="replace"/>
+            <xpath expr="//field[@name='currency_id']" position="replace"/>
+            <xpath expr="//field[@name='website']" position="after">
+                <field name="phone"/>
+                <field name="fax"/>
+                <field name="email"/>
+            </xpath>
+            <xpath expr="//field[@name='company_registry']" position="before">
+                <field name="of_juridique"/>
+                <field name="of_capital"/>
+            </xpath>
+            <xpath expr="//field[@name='company_registry']" position="after">
+                <field name="vat"/>
+            </xpath>
+            <xpath expr="//notebook/page[1]/group[1]" position="inside">
+                <group string="Divers">
+                    <field name="of_general_id"/>
+                    <field name="of_accounting_id"/>
+                    <field name="vat_check_vies"/>
+                    <field name="currency_id" options="{'no_create': True}" id="company_currency"/>
+                    <label for="id"/>
+                    <p class="text-muted">
+                        Activer <a href="" type="action" name="%(base.action_currency_form_company)d">ici</a> une
+                        nouvelle devise avant la création d'une nouvelle société.
+                    </p>
+                </group>
+                <group string="Assurance &amp; Qualification">
+                    <field name="of_assu_dec"/>
+                    <field name="of_assu_multi"/>
+                    <field name="of_qualif"/>
+                </group>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Paramètres avancés" name="advanced_settings" invisible="1">
+                    <group name="advanced_settings_group_1" col="4"/>
+                    <group name="advanced_settings_group_2" col="4"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_base_action_view_company_form_link_2_currencies" model="ir.ui.view">
+        <field name="name">of.base.action.view.company.form.link.2.currencies</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.action_view_company_form_link_2_currencies"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[1]/group[1]/group[2]/label" position="replace"/>
+            <xpath expr="//notebook/page[1]/group[1]/group[2]/p" position="replace"/>
+        </field>
+    </record>
+
+    <!-- Permet de cacher le menu application pour tout le monde sauf admin -->
+    <record id="base.menu_management" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6,0,[ref('of_base.of_group_root_only')])]"/>
+    </record>
+
+    <!-- Permet de cacher le menu Groupes pour tout le monde sauf admin -->
+    <record id="base.menu_action_res_groups" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6,0,[ref('of_base.of_group_root_only')])]"/>
+    </record>
+
+    <record model="ir.ui.view" id="of_base_view_general_configuration">
+        <field name="name">of.base.view.general.configuration</field>
+        <field name="model">base.config.settings</field>
+        <field name="inherit_id" ref="base_setup.view_general_configuration"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='google']" position="before">
+                <div>
+                    <label for="of_ref_mode"/>
+                    <field name="of_ref_mode" widget="radio"/>
+                </div>
+                <div>
+                    <label for="of_affichage_ville"/>
+                    <field name="of_affichage_ville"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Vue tree par défaut pour les contacts -->
+    <record id="contacts.action_contacts_view_kanban" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+    </record>
+
+    <!-- Civilités - Vue formulaire -->
+    <record id="of_res_partner_title_form_view" model="ir.ui.view">
+        <field name="name">of.res.partner.title.form.view</field>
+        <field name="model">res.partner.title</field>
+        <field name="inherit_id" ref="base.view_partner_title_form"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="of_used_for_phone"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Comptes bancaires - Vue formulaire -->
+    <record id="of_view_partner_bank_form" model="ir.ui.view">
+        <field name="name">of.res.partner.bank.form</field>
+        <field name="model">res.partner.bank</field>
+        <field name="inherit_id" ref="base.view_partner_bank_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="/form/group" position="inside">
+                <field name="acc_type"/>
+            </xpath>
+        </field>
+    </record>
+
+    <menuitem name="Connecteurs" id="of_connector_menu" parent="base.menu_administration" groups="base.group_system"/>
+
+</odoo>

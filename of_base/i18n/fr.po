@@ -1,0 +1,110 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_base
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 9.0c\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-02-24 10:57+0000\n"
+"PO-Revision-Date: 2017-02-24 10:57+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_base
+#: model:ir.ui.view,arch_db:of_base.of_base_login
+msgid "Login"
+msgstr "Identifiant"
+
+#. module: of_base
+#: model:ir.ui.view,arch_db:of_base.of_base_partner_form
+msgid "e.g. Sales Director"
+msgstr "ex : Directeur Commercial"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:base.field_res_partner_bank_acc_type
+msgid "Acc type"
+msgstr "Type de compte"
+
+#. module: of_base
+#: model:ir.model.fields,help:base.field_res_partner_bank_acc_type
+msgid "Laissez le type de compte IBAN pour laisser le logiciel vérifier la validité du code saisi.\n"
+"Utiliser le type Banque pour tout autre type de compte, aucune vérification ne sera effectuée."
+msgstr "Laissez le type de compte IBAN pour laisser le logiciel vérifier la validité du code saisi.\n"
+"Utiliser le type Banque pour tout autre type de compte, aucune vérification ne sera effectuée."
+
+#. module: of_base
+#: model:ir.model.fields,field_description:base_setup.field_base_config_settings_company_share_partner
+msgid "Partager les clients entre toutes les sociétés"
+msgstr "Partager les clients entre toutes les sociétés"
+
+#. module: of_base
+#: model:ir.model.fields,help:base_setup.field_base_config_settings_company_share_partner
+msgid ""
+"Partagez vos clients avec toutes les sociétés définies dans votre base.\n"
+"* Coché : Les clients sont visibles par toutes les sociétés, "
+"même si une société est définie pour le client.\n"
+"* Non coché : Chaque société ne peut voir que ses clients (clients pour lesquels la société est "
+"définie). Les clients non reliés à une société sont visibles par toutes les sociétés."
+msgstr ""
+"Partagez vos clients avec toutes les sociétés définies dans votre base.\n"
+"* Coché : Les clients sont visibles par toutes les sociétés, "
+"même si une société est définie pour le client.\n"
+"* Non coché : Chaque société ne peut voir que ses clients (clients pour lesquels la société est "
+"définie). Les clients non reliés à une société sont visibles par toutes les sociétés."
+
+#. module: of_base
+#: selection:mail.compose.message,of_state:0
+#: selection:mail.message,of_state:0
+msgid "Outgoing"
+msgstr "Sortant"
+
+#. module: of_base
+#: selection:mail.compose.message,of_state:0
+#: selection:mail.message,of_state:0
+msgid "Received"
+msgstr "Reçu"
+
+#. module: of_base
+#: selection:mail.compose.message,of_state:0
+#: selection:mail.message,of_state:0
+msgid "Sent"
+msgstr "Envoyé"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_mail_compose_message_of_state
+#: model:ir.model.fields,field_description:of_base.field_mail_mail_of_state
+#: model:ir.model.fields,field_description:of_base.field_mail_message_of_state
+msgid "Status"
+msgstr "État"
+
+#. module: of_base
+#: selection:mail.compose.message,of_state:0
+#: selection:mail.message,of_state:0
+msgid "Delivery Failed"
+msgstr "Échec de l'envoi"
+
+#. module: of_base
+#: selection:mail.compose.message,of_state:0
+#: selection:mail.message,of_state:0
+msgid "Cancelled"
+msgstr "Annulé"
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_mail_compose_message_of_failure_reason
+#: model:ir.model.fields,help:of_base.field_mail_mail_of_failure_reason
+#: model:ir.model.fields,help:of_base.field_mail_message_of_failure_reason
+msgid "Failure reason. This is usually the exception thrown by the email server, stored to ease the debugging of mailing issues."
+msgstr "Raison de l'échec. Ceci est souvent l'exception envoyée par le serveur de messagerie, stockée pour faciliter le débogage des mails d'incidents."
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_mail_compose_message_of_failure_reason
+#: model:ir.model.fields,field_description:of_base.field_mail_mail_of_failure_reason
+#: model:ir.model.fields,field_description:of_base.field_mail_message_of_failure_reason
+#: model:ir.ui.view,arch_db:of_base.of_view_message_form
+msgid "Failure Reason"
+msgstr "Raison de l'échec"

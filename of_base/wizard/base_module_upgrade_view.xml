@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_base_view_module_upgrade" model="ir.ui.view">
+        <field name="name">of.base Module Upgrade</field>
+        <field name="model">base.module.upgrade</field>
+        <field name="inherit_id" ref="base.view_base_module_upgrade"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='module_info']" position="after">
+                <separator string="Confirmation de désinstallation" colspan="2"/>
+                <group>
+                    <field name="of_validation_code" string="Mot de passe" password="True"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
