@@ -11,6 +11,7 @@ class ResUsers(models.Model):
 
     of_user_type = fields.Selection(
         selection='_get_user_type_selection', string=u"Type d'utilisateur", default=lambda u: u._default_of_user_type())
+    of_reactivated_user = fields.Boolean(string=u"Utilisateur réactivé")
 
     @api.model
     def _get_user_type_selection(self):
@@ -18,6 +19,7 @@ class ResUsers(models.Model):
             ('web', u"Web"),
             ('technical', u"Technique"),
             ('external', u"Externe"),
+            ('inactive', u"Ressource inactive"),
         ]
 
     @api.model
@@ -51,6 +53,8 @@ class ResUsers(models.Model):
     def write(self, values):
         if SUPERUSER_ID in self._ids and self._uid != SUPERUSER_ID:
             raise AccessError(u'Seul le compte administrateur peut modifier les informations du compte administrateur.')
+        if len(self) == 1 and not self.active and values.get('active'):
+            values.update({'of_reactivated_user': True})
         result = super(ResUsers, self).write(values)
         group_root = self.env.ref('of_base.of_group_root_only').sudo()
         if not len(group_root.users):
