@@ -69,7 +69,8 @@ class OfDatastoreConnector(models.AbstractModel):
     def _get_context(self):
         return {key: val for key, val in self._context.copy().items() if key in ('lang', 'tz', 'active_test')}
 
-    def of_datastore_connect(self):
+    @api.model
+    def get_connector(self, url, db_name, login, password):
         # Connexion à la base du fournisseur
         # Utilisation d'un thread pour stopper une connexion trop longue
 
@@ -80,13 +81,20 @@ class OfDatastoreConnector(models.AbstractModel):
 
             def run(self):
                 try:
-                    server_address = connector.server_address
-                    # ======= Code à recommenter après la résolution du bug OVH =======
-                    # Retrait du prefixe http://
-                    ip_address = socket.gethostbyname(server_address.split('://')[1])
-                    # Sur s-alpha le port 8010 est utilisé pour la connexion xmlrpc v10
-                    server_address = f'http://{ip_address}:8010'
-                    # =================================================================
+                    server_address = url
+                    # ========== Code à recommenter après la résolution du bug OVH ==========
+                    # Retrait du prefixe http:// et extraction du port (optionnel)
+                    address_split = server_address.split('://')[-1].split(':')  # [adresse, port]
+                    ip_address = socket.gethostbyname(address_split[0])
+                    if len(address_split) == 2:
+                        port = f':{address_split[1]}'
+                    elif ip_address == socket.gethostbyname('s-alpha.openfire.fr'):
+                        # Sur s-alpha le port 8010 est utilisé pour la connexion xmlrpc v10
+                        port = ':8010'
+                    else:
+                        port = ''
+                    server_address = f'http://{ip_address}{port}'
+                    # =======================================================================
 
                     i = server_address.find('://')
                     if i == -1:
@@ -104,8 +112,8 @@ class OfDatastoreConnector(models.AbstractModel):
                         port = int(address[j + 1:])
                         address = address[:j]
                     cli = openerplib.get_connection(
-                        hostname=address, port=port, protocol=protocol, database=connector.db_name,
-                        login=connector.login, password=connector.new_password or connector.password)
+                        hostname=address, port=port, protocol=protocol, database=db_name, login=login,
+                        password=password)
 
                     # Opération pour vérifier la connexion
                     self.result = cli.get_model('res.users').search([]) and cli or ''
@@ -114,14 +122,18 @@ class OfDatastoreConnector(models.AbstractModel):
                 except Exception as exc:
                     self.result = _(str(exc))
 
-        self.ensure_one()
-        # Call super() as no user shall have access right to this object
-        connector = self.sudo()
-
         it = FuncThread()
         it.start()
         it.join(10)  # attente de 10 secondes ou jusqu'à la fin de l'opération
         return _("Connection timeout") if it.is_alive() else it.result
+
+    def of_datastore_connect(self):
+        self.ensure_one()
+        # Call sudo() as no user shall have access right to this object
+        connector = self.sudo()
+
+        return self.get_connector(
+            connector.server_address, connector.db_name, connector.login, connector.new_password or connector.password)
 
     @api.model
     def of_datastore_get_model(self, ds_client, model_name):
@@ -186,7 +198,25 @@ class OfDatastoreConnector(models.AbstractModel):
         # La fonction search_read de openerplib ne fonctionne pas bien et fonctionne par un appel search() puis read().
         # On reprend le même système, mais avec nos méthodes.
         record_ids = self.of_datastore_search(ds_model, domain, offset, limit, order, count=False)
-        if not record_ids:
-            return []
-        records = self.of_datastore_read(ds_model, record_ids, fields)
-        return records
+        return (
+            self.of_datastore_read(ds_model, record_ids, fields)
+            if record_ids
+            else []
+        )
+
+    @api.model
+    def of_datastore_create(self, ds_model, values):
+        kwargs = {'context': self._get_context()}
+        return ds_model.create(values, **kwargs)
+
+    @api.model
+    def of_datastore_write(self, ds_model, ids, values):
+        kwargs = {'context': self._get_context()}
+        return ds_model.write(ids, values, **kwargs)
+
+    @api.model
+    def of_datastore_func(self, ds_model, func, params, optional_params):
+        kwargs = {key: val for key, val in optional_params if val is not None}
+        kwargs['context'] = self._get_context()
+        args = tuple(params)
+        return getattr(ds_model, func)(*args, **kwargs)
