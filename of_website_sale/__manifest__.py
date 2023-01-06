@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': u"OpenFire / E-commerce",
-    'version': "10.0.1.0.0",
+    'version': "10.0.2.0.0",
     'author': "OpenFire",
     'license': "",
     'category': "OpenFire",
@@ -25,7 +25,6 @@ Module OpenFire pour e-commerce
         'views/product_views.xml',
         'views/payment_views.xml',
         'views/templates.xml',
-        'views/res_config_views.xml',
     ],
     'qweb': [
     ],
