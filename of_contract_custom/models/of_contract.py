@@ -537,6 +537,12 @@ class OfContract(models.Model):
             self.partner_id.property_product_pricelist.currency_id or
             self.company_id.currency_id
         )
+        # hasattr pour éviter une dépendance à of_tiers.
+        # Permet de générer le compte comptable avant de le tenter dans _onchange_partner_id
+        # Si la règle de génération est 'Sur toutes les sociétés comptables, dès qu'une société en a besoin'
+        # le fait de générer un compte comptable sur une autre société vide le NewRecord
+        if hasattr(self.partner_id, 'update_account'):
+            self.partner_id.update_account()
         invoice = self.env['account.invoice'].new({
             'reference': self.name,
             'type': 'out_invoice',

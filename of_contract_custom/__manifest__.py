@@ -2,7 +2,7 @@
 
 {
     "name": "OpenFire / Contrat Custom",
-    "version": "10.0.1.0.0",
+    "version": "10.0.1.1.0",
     "author": "OpenFire",
     'license': 'AGPL-3',
     'summary': u"Ajout des contrats OpenFire",
@@ -14,7 +14,7 @@ Création de nouveaux modèles:
  - Ligne de contrat
  - Indice
  - Ligne d'indice
- 
+
 Contrats :
 ----------
 
@@ -29,15 +29,15 @@ Ligne de contrat :
  - Adresse à laquelle les interventions seront réalisés
  - Nombres d'interventions par période ainsi que mois de références
  - Articles à facturer et fréquence de facturation
- 
- 
+
+
 Indices :
 ---------
 
 Indice :
  - Formule d'indexation d'origine
  - Catégories liées à l'indice
- 
+
 Ligne d'indice :
  - Date de début et date de fin d'application
  - Valeur d'indexation
