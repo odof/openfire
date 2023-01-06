@@ -13,7 +13,7 @@
     <template id="of_website_planning_booking_portal_my_home_menu" name="OF Website Planning Booking Portal Home Menu"
               inherit_id="website_portal.portal_layout" priority="30">
         <xpath expr="//ul[contains(@class,'o_portal_submenu')]" position="inside">
-            <li>
+            <li t-if="'installed_park' in tabs">
                 <a href="/my/of_installed_parks">Parcs installés</a>
             </li>
         </xpath>
@@ -22,7 +22,7 @@
     <template id="of_website_planning_booking_portal_my_home" name="OF Website Planning Booking Portal Home"
               inherit_id="website_portal.portal_my_home" priority="30">
         <xpath expr="//div[contains(@class,'o_my_home_content')]" position="inside">
-            <h3 class="page-header">
+            <h3 class="page-header" t-if="'installed_park' in tabs">
                 <a href="/my/of_installed_parks">Vos parcs installés
                     <small class="ml8">
                         <t t-if="installed_park_count">
