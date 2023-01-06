@@ -575,6 +575,7 @@ class OfPlanifCreneau(models.TransientModel):
         date_propos_dt = datetime.combine(date_da, datetime.min.time()) + td
         date_propos_dt = tz.localize(date_propos_dt, is_dst=None).astimezone(pytz.utc)  # datetime utc
         employee_ids = [self.employee_id.id] + self.employee_other_ids.ids
+        tag_ids = [(6, 0, service.tag_ids.ids)]
 
         values = {
             'partner_id': service.partner_id.id,
@@ -582,6 +583,7 @@ class OfPlanifCreneau(models.TransientModel):
             'template_id': service.template_id.id,
             'tache_id': service.tache_id.id,
             'service_id': service.id,
+            'tag_ids': tag_ids,
             'employee_ids': [(6, 0, employee_ids)],
             'date': fields.Datetime.to_string(date_propos_dt),
             'duree': self.duree_rdv,
