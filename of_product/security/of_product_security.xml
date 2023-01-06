@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo noupdate="1">
+
+    <!-- Inhibition des droits de modification/création/suppression des UOM -->
+    <record id="of_product_uom_rule_restrict" model="ir.rule">
+        <field name="name">OF Product UOM Restrict Rule</field>
+        <field name="model_id" ref="product.model_product_uom"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[(0, '=', 1)]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+</odoo>
