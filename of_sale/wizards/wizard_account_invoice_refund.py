@@ -2,6 +2,7 @@
 
 from odoo import models, api
 
+
 class AccountInvoiceRefund(models.TransientModel):
     """Refunds invoice"""
 
@@ -9,4 +10,4 @@ class AccountInvoiceRefund(models.TransientModel):
 
     @api.multi
     def compute_refund(self, mode='refund'):
-        return super(AccountInvoiceRefund, self.with_context(of_mode=mode)).compute_refund(mode)
+        return super(AccountInvoiceRefund, self.with_context(of_refund_mode=mode)).compute_refund(mode)
