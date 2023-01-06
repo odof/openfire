@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-
-    <menuitem name="Connecteurs" id="of_datastore_connector_menu" parent="base.menu_administration" groups="base.group_system"/>
-
-</odoo>

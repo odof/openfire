@@ -14,9 +14,7 @@
             'openerp-client-lib'
         ],
     },
-    'data': [
-        'views/of_datastore_connector_views.xml',
-    ],
+    'data': [],
     'installable': True,
     'application': False,
     'auto_install': False,
