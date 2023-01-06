@@ -61,5 +61,26 @@
             <value eval="{'noupdate': True}" />
         </function>
 
+        <!-- On modifie temporairement le noupdate du profil B2C pour lui ajouter le groupe, la position fiscale et la liste de prix B2C -->
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'of_website_portal'), ('name', 'in', ['res_users_portal_b2c'])]"/>
+            </function>
+            <value eval="{'noupdate': False}" />
+        </function>
+
+        <record id="of_website_portal.res_users_portal_b2c" model="res.users">
+            <field name="groups_id" eval="[(6,0,[ref('of_website_sale.group_portal_b2c'), ref('sale.group_show_price_total')])]"/>
+            <field name="of_pricelist_id" ref="of_website_sale.product_pricelist_b2c"/>
+            <field name="of_fiscal_position_id" ref="of_website_sale.account_fiscal_position_b2c"/>
+        </record>
+
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'of_website_portal'), ('name', 'in', ['res_users_portal_b2c'])]"/>
+            </function>
+            <value eval="{'noupdate': True}" />
+        </function>
+
     </data>
 </odoo>
