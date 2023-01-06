@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, models, fields
-from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
-import pytz
-import json
-from odoo.exceptions import UserError
-from odoo.tools.float_utils import float_compare
-from odoo.tools import config
-from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
-from odoo.addons.of_utils.models.of_utils import hours_to_strs, distance_points as voloiseau, arrondi_sup
-import urllib
-import requests
+
+
+class OfPlanifCreneau(models.TransientModel):
+    _inherit = 'of.planif.creneau'
+
+    @api.multi
+    def get_values_intervention_create(self):
+        res = super(OfPlanifCreneau, self).get_values_intervention_create()
+        service = self.selected_id.service_id
+        res['parc_installe_id'] = service.parc_installe_id.id
+        return res
+
 
 class OfPlanifCreneauProp(models.TransientModel):
     _inherit = 'of.planif.creneau.prop'
