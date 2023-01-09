@@ -23,4 +23,16 @@
     <button type="button" t-if="!widget.options.no_open" class="btn btn-default of_external_button" draggable="false"/>
 </t>
 
+<t t-name="KanbanView.Group" t-extend="KanbanView.Group">
+    <t t-jquery=".o_kanban_load_more" t-operation="attributes">
+        <attribute name="t-attf-style">padding: 12px;</attribute>
+    </t>
+</t>
+
+<t t-name="KanbanView.LoadMore" t-extend="KanbanView.LoadMore">
+    <t t-jquery="a" t-operation="replace">
+        <a href="#" t-attf-style="color: #222222" >Load more... (<t t-esc="widget.remaining"/> remaining)</a>
+    </t>
+</t>
+
 </templates>
