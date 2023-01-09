@@ -12,7 +12,6 @@ class WebsiteAccount(website_account):
 
     def _prepare_portal_layout_values(self):
         values = super(WebsiteAccount, self)._prepare_portal_layout_values()
-        user_profile = request.env.user.of_user_profile_id
         service_ids = request.env['of.service'].search([
             ('recurrence', '=', True),
             ('state', 'not in', ('draft', 'done', 'cancel')),
@@ -27,7 +26,7 @@ class WebsiteAccount(website_account):
         values.update({
             'recurrent_count': len(service_ids),
             'delivery_count': len(delivery_ids),
-            'tabs': user_profile.of_tab_ids.mapped('code'),
+            'tabs': request.env.user.of_tab_ids.mapped('code'),
         })
         return values
 
