@@ -15,13 +15,9 @@ class ProductTemplate(models.Model):
         sale_quote_line_obj = self.env['sale.quote.line']
         sale_quote_lines_to_update = sale_quote_line_obj
 
-        # Si l'on modifie un des champs suivants, la description sera modifiée
-        if any(field in vals for field in ['default_code', 'name', 'description_sale', 'attribute_value_ids']):
+        if any(field in vals for field in self.quote_template_description_fields()):
             for product in self.mapped('product_variant_ids'):
-                name = product.name_get()[0][1]
-                if product.description_sale:
-                    name += '\n' + product.description_sale
-
+                name = product.quote_template_sale_description()
                 # Si la description n'a pas été modifié sur les lignes de devis, on met ces lignes de côté
                 sale_quote_lines_to_update += sale_quote_line_obj.search(
                     [('product_id', '=', product.id), ('name', '=', name)])
@@ -30,15 +26,41 @@ class ProductTemplate(models.Model):
 
         # On met à jour ces lignes de devis avec la nouvelle description
         for line in sale_quote_lines_to_update:
-            res_name = line.product_id.name_get()[0][1]
-            if line.product_id.description_sale:
-                res_name += '\n' + line.product_id.description_sale
+            res_name = line.product_id.quote_template_sale_description()
             line.update({
                 'name': res_name,
             })
 
         return res
 
+    @api.model
+    def quote_template_description_fields(self):
+        # Si l'on modifie un des champs suivants, la description sur les ligne de modèle de devis sera modifiée
+        return ['default_code', 'name', 'description_sale', 'attribute_value_ids']
+
+    @api.multi
+    def quote_template_sale_description(self):
+        self.ensure_one()
+        name = self.name_get()[0][1]
+        if self.description_sale:
+            name += '\n' + self.description_sale
+        if self.brand_id.use_brand_description_sale:
+            # Recalcul du libellé de la ligne
+            name = self.name_get()[0][1]
+            brand_desc = self.env['mail.template'].with_context(safe=True).render_template(
+                self.brand_id.description_sale, self._name, self.id, post_process=False)
+            name += u'\n%s' % brand_desc
+        if self.brand_id.show_in_sales:
+            # Ajout de la marque dans le descriptif de l'article
+            brand_code = self.brand_id.name + ' - '
+            if name[0] == '[':
+                i = name.find(']') + 1
+                if name[i] == ' ':
+                    i += 1
+                name = name[:i] + brand_code + name[i:]
+            else:
+                name = brand_code + name
+        return name
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'
@@ -51,13 +73,9 @@ class ProductProduct(models.Model):
         sale_quote_line_obj = self.env['sale.quote.line']
         sale_quote_lines_to_update = sale_quote_line_obj
 
-        # Si l'on modifie un des champs suivants, la description sera modifiée
-        if any(field in vals for field in ['default_code', 'name', 'description_sale', 'attribute_value_ids']):
+        if any(field in vals for field in self.quote_template_description_fields()):
             for product in self:
-                name = product.name_get()[0][1]
-                if product.description_sale:
-                    name += '\n' + product.description_sale
-
+                name = product.quote_template_sale_description()
                 # Si la description n'a pas été modifié sur les lignes de devis, on met ces lignes de côté
                 sale_quote_lines_to_update += sale_quote_line_obj.search(
                     [('product_id', '=', product.id), ('name', '=', name)])
@@ -66,11 +84,38 @@ class ProductProduct(models.Model):
 
         # On met à jour ces lignes de devis avec la nouvelle description
         for line in sale_quote_lines_to_update:
-            res_name = line.product_id.name_get()[0][1]
-            if line.product_id.description_sale:
-                res_name += '\n' + line.product_id.description_sale
+            res_name = line.product_id.quote_template_sale_description()
             line.update({
                 'name': res_name,
             })
 
         return res
+
+    @api.model
+    def quote_template_description_fields(self):
+        # Si l'on modifie un des champs suivants, la description sur les ligne de modèle de devis sera modifiée
+        return ['default_code', 'name', 'description_sale', 'attribute_value_ids']
+
+    @api.multi
+    def quote_template_sale_description(self):
+        self.ensure_one()
+        name = self.name_get()[0][1]
+        if self.description_sale:
+            name += '\n' + self.description_sale
+        if self.brand_id.use_brand_description_sale:
+            # Recalcul du libellé de la ligne
+            name = self.name_get()[0][1]
+            brand_desc = self.env['mail.template'].with_context(safe=True).render_template(
+                self.brand_id.description_sale, self._name, self.id, post_process=False)
+            name += u'\n%s' % brand_desc
+        if self.brand_id.show_in_sales:
+            # Ajout de la marque dans le descriptif de l'article
+            brand_code = self.brand_id.name + ' - '
+            if name[0] == '[':
+                i = name.find(']') + 1
+                if name[i] == ' ':
+                    i += 1
+                name = name[:i] + brand_code + name[i:]
+            else:
+                name = brand_code + name
+        return name

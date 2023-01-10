@@ -143,6 +143,13 @@ class SaleQuoteTemplate(models.Model):
             'context': ctx,
         }
 
+    @api.multi
+    def reload_description_on_template_lines(self):
+        for record in self:
+            for line in record.quote_line:
+                if line.product_id:
+                    line.write({'name': line.product_id.quote_template_sale_description()})
+
 
 class SaleQuoteLine(models.Model):
     _name = "sale.quote.line"
@@ -193,9 +200,7 @@ class SaleQuoteLine(models.Model):
                     self.product_id = self._origin and self._origin.product_id or False
                     return result
 
-            name = self.product_id.name_get()[0][1]
-            if self.product_id.description_sale:
-                name += '\n' + self.product_id.description_sale
+            name = self.product_id.quote_template_sale_description()
             self.name = name
             self.price_unit = self.product_id.lst_price
             self.product_uom_id = self.product_id.uom_id.id

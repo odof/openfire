@@ -5,3 +5,4 @@ from . import of_sale_quote_tmpl_activity
 from . import of_sale_quote_template
 from . import sale_config_settings
 from . import product
+from . import of_product_brand
