@@ -28,12 +28,12 @@
                         <label for="of_seller_price"/>
                         <div col="3">
                             <field name="of_seller_price" class="oe_inline" attrs="{'readonly':[('seller_ids','=',[])]}"/>
-                            <span groups="product.group_uom"> / <field name="of_uom_po_id_display" class="oe_inline"/></span>
+                            <span groups="uom.group_uom"> / <field name="of_uom_po_id_display" class="oe_inline"/></span>
                         </div>
                         <label for="of_seller_pp_untaxed"/>
                         <div col="5">
                             <field name="of_seller_pp_untaxed" class="oe_inline" attrs="{'readonly':[('seller_ids','=',[])]}"/>
-                            <span groups="product.group_uom"> / <field name="of_uom_po_id_display2" class="oe_inline"/></span>
+                            <span groups="uom.group_uom"> / <field name="of_uom_po_id_display2" class="oe_inline"/></span>
                         </div>
                         <field name="of_seller_discount"/>
                     </group>
