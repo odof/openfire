@@ -41,6 +41,8 @@
                     </group>
                     <notebook>
                         <page string="Lignes de commande">
+                            <button class="oe_right" name="reload_description_on_template_lines" string="MÀJ descriptions" type="object"
+                                    confirm="La description de vos lignes va être actualisée pour reprendre les informations présentes dans leur fiche article. Les modifications manuelles apportées aux descriptions seront perdues. Voulez-vous continuer ?"/>
                             <field name="quote_line" mode="tree,kanban">
                                 <form string="Lignes de commande du modèle de devis">
                                     <group>
