@@ -33,4 +33,5 @@ class SaleQuoteTemplate(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    of_sale_type_id = fields.Many2one(related='order_id.of_sale_type_id', string="Sale order type")
+    of_sale_type_id = fields.Many2one(related='order_id.of_sale_type_id', string="Sale order type", readonly=True,
+                                      store=True)
