@@ -84,8 +84,15 @@ class OFWebsiteWorktopConfigurator(http.Controller):
                     quote = request.env['sale.order'].sudo().browse(request.session['worktop_quote_id'])
 
                     if quote.partner_id.id != request.session['vendor_address_id']:
-                        pricelist = request.env['res.partner'].browse(request.session['vendor_address_id']).\
-                            commercial_partner_id.property_product_pricelist or request.env.ref('product.list0', False)
+
+                        # On force la société du site web pour obtenir la liste de prix
+                        pricelist_obj = request.env['product.pricelist']
+                        pricelist_id = pricelist_obj._get_partner_pricelist(
+                            partner_id=request.env['res.partner'].browse(
+                                request.session['vendor_address_id']).commercial_partner_id.id,
+                            company_id=request.website.company_id.id)
+                        pricelist = pricelist_obj.browse(pricelist_id)
+
                         quote.write({'partner_id': request.session['vendor_address_id'],
                                      'pricelist_id': pricelist.id})
 
@@ -328,9 +335,13 @@ class OFWebsiteWorktopConfigurator(http.Controller):
         values['junction'] = values.get('junction') or (quote and (quote.of_junction and 'yes' or 'no'))
 
         # On restreint les positions fiscales en fonction de la liste de prix
-        pricelist = request.env['res.partner'].browse(
-            request.session['vendor_address_id']).commercial_partner_id.property_product_pricelist or request.env.ref(
-            'product.list0', False)
+        # On force la société du site web pour obtenir la liste de prix
+        pricelist_obj = request.env['product.pricelist']
+        pricelist_id = pricelist_obj._get_partner_pricelist(
+            partner_id=request.env['res.partner'].browse(request.session['vendor_address_id']).commercial_partner_id.id,
+            company_id=request.website.company_id.id)
+        pricelist = pricelist_obj.browse(pricelist_id)
+
         values['fiscal_pos'] = values.get('fiscal_pos_id') and \
             request.env['account.fiscal.position'].sudo().browse(int(values['fiscal_pos_id'])) or \
             quote.fiscal_position_id
@@ -575,7 +586,12 @@ class OFWebsiteWorktopConfigurator(http.Controller):
         values['vendor'] = vendor
 
         # On restreint les remises en fonction de la liste de prix
-        pricelist = vendor.commercial_partner_id.property_product_pricelist or request.env.ref('product.list0', False)
+        # On force la société du site web pour obtenir la liste de prix
+        pricelist_obj = request.env['product.pricelist']
+        pricelist_id = pricelist_obj._get_partner_pricelist(
+            partner_id=vendor.commercial_partner_id.id, company_id=request.website.company_id.id)
+        pricelist = pricelist_obj.browse(pricelist_id)
+
         values['discount'] = values.get('discount_id') and \
             request.env['of.worktop.configurator.discount'].browse(int(values['discount_id'])) or \
             quote.of_worktop_configurator_discount_id
@@ -693,8 +709,11 @@ class OFWebsiteWorktopConfigurator(http.Controller):
 
     @http.route(['/worktop_configurator/get_pricelist'], type='json', auth='user', website=True)
     def worktop_configurator_get_pricelist(self):
-        return request.env['res.partner'].browse(request.session['vendor_address_id']).\
-            commercial_partner_id.property_product_pricelist.id or request.env.ref('product.list0').id or False
+        # On force la société du site web pour obtenir la liste de prix
+        pricelist_obj = request.env['product.pricelist']
+        return pricelist_obj._get_partner_pricelist(
+            partner_id=request.env['res.partner'].browse(request.session['vendor_address_id']).commercial_partner_id.id,
+            company_id=request.website.company_id.id)
 
     @http.route(['/worktop_configurator/compute_price'], type='json', auth='user', website=True)
     def worktop_configurator_compute_price(self, base_price_id, length, width, material_id):
@@ -904,8 +923,12 @@ class OFWebsiteWorktopConfigurator(http.Controller):
             [('company_id', '=', request.website.company_id.id)], limit=1)
 
         # Liste de prix
-        pricelist = request.env['res.partner'].browse(vendor_address_id).\
-            commercial_partner_id.property_product_pricelist or request.env.ref('product.list0', False)
+        # On force la société du site web pour obtenir la liste de prix
+        pricelist_obj = request.env['product.pricelist']
+        pricelist_id = pricelist_obj._get_partner_pricelist(
+            partner_id=request.env['res.partner'].browse(vendor_address_id).commercial_partner_id.id,
+            company_id=request.website.company_id.id)
+        pricelist = pricelist_obj.browse(pricelist_id)
 
         # Prestation
         service = request.env['of.worktop.configurator.service'].sudo().browse(
@@ -1059,8 +1082,14 @@ class OFWebsiteWorktopConfigurator(http.Controller):
 
     def _get_product_price(self):
         params = request.params
-        pricelist = request.env['res.partner'].browse(request.session['vendor_address_id']). \
-            commercial_partner_id.property_product_pricelist or request.env.ref('product.list0')
+
+        # On force la société du site web pour obtenir la liste de prix
+        pricelist_obj = request.env['product.pricelist']
+        pricelist_id = pricelist_obj._get_partner_pricelist(
+            partner_id=request.env['res.partner'].browse(request.session['vendor_address_id']).commercial_partner_id.id,
+            company_id=request.website.company_id.id)
+        pricelist = pricelist_obj.browse(pricelist_id)
+
         config_price = request.env['of.worktop.configurator.price'].search(
             [('material_id', '=', int(params['material_id'])),
              ('finishing_id', '=', int(params['finishing_id'])),
