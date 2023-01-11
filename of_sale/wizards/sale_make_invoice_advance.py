@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import time
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError
 
@@ -35,7 +36,8 @@ class SaleAdvancePaymentInv(models.TransientModel):
     @api.depends('product_categ_id')
     def _compute_of_nb_products(self):
         categ = self._default_product_categ_id()
-        nb_products = categ and self.env['product.product'].search([('categ_id', '=', categ.id), ('type', '=', 'service')], count=True) or 0
+        nb_products = categ and self.env['product.product'].search(
+            [('categ_id', '=', categ.id), ('type', '=', 'service')], count=True) or 0
         self.update({'of_nb_products': nb_products})
 
     @api.multi
@@ -81,3 +83,24 @@ class SaleAdvancePaymentInv(models.TransientModel):
             invoice.payment_term_id = False
 
         return result
+
+    @api.onchange('advance_payment_method')
+    def onchange_advance_payment_method(self):
+        sale_orders = self.env['sale.order'].browse(self._context.get('active_ids', []))
+        categ_deposit_id = self.env['ir.values'].get_default(
+            'sale.config.settings', 'of_deposit_product_categ_id_setting')
+        for order in sale_orders:
+            nb_lines_deposit = len(order.mapped('order_line').filtered(
+                lambda line: line.product_id.categ_id.id == categ_deposit_id))
+            nb_lines_deadlines = len(order.of_echeance_line_ids)
+
+            if nb_lines_deadlines < 2 or nb_lines_deposit >= nb_lines_deadlines - 1:
+                return super(SaleAdvancePaymentInv, self).onchange_advance_payment_method()
+            if self.advance_payment_method == 'fixed':
+                acompte = order.of_echeance_line_ids[nb_lines_deposit].amount
+                return {'value': {'amount': acompte}}
+            elif self.advance_payment_method == 'percentage':
+                acompte = order.of_echeance_line_ids[nb_lines_deposit].percent
+                return {'value': {'amount': acompte}}
+            else:
+                return {}
