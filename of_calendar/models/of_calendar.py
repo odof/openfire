@@ -753,13 +753,15 @@ class Users(models.Model):
     @api.multi
     def write(self, vals):
         res = super(Users, self).write(vals)
-        employees = self.mapped('employee_ids')
-        if vals.get('of_color_ft', False) and not vals.get("no_rebounce", False):
-            employees.write({'of_color_ft': vals.get('of_color_ft', False), 'no_rebounce': True})
-        if vals.get('of_color_bg', False) and not vals.get("no_rebounce", False):
-            employees.write({'of_color_bg': vals.get('of_color_bg', False), 'no_rebounce': True})
-        if vals.get('tz', False) and not vals.get("no_rebounce", False):
-            employees.write({'of_tz': vals.get('tz', False)})
+        if not vals.get('no_rebounce') and (vals.get('of_color_ft') or vals.get('of_color_bg') or vals.get('tz')):
+            emp_vals = {}
+            if vals.get('of_color_ft'):
+                emp_vals.update({'of_color_ft': vals['of_color_ft'], 'no_rebounce': True})
+            if vals.get('of_color_bg'):
+                emp_vals.update({'of_color_bg': vals['of_color_bg'], 'no_rebounce': True})
+            if vals.get('tz'):
+                emp_vals.update({'of_tz': vals['tz']})
+            self.mapped('employee_ids').write(emp_vals)
         return res
 
     @api.model
