@@ -380,7 +380,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
             if service.state != service_state:
                 service.state = service_state
 
-    @api.depends('intervention_ids', 'intervention_ids.state')
+    @api.depends('intervention_ids', 'intervention_ids.state', 'intervention_ids.invoice_status')
     @api.multi
     def _compute_intervention_count(self):
         for service in self:
@@ -508,6 +508,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
         for service in self:
             invoices = service.line_ids.mapped('invoice_line_ids').mapped('invoice_id')
             invoices |= service.saleorder_ids.mapped('invoice_ids')
+            invoices |= service.intervention_ids.mapped('invoice_ids')
             service.invoice_count = len(invoices)
             service.invoice_ids = invoices
 
@@ -673,6 +674,9 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
     @api.multi
     def write(self, vals):
         res = super(OfService, self).write(vals)
+        # for service in self:
+        #     for rdv in service.intervention_ids:
+        #         invoices = rdv.line_ids.mapped('invoice_line_ids').mapped('quantity')
         if vals.get('base_state') == 'calculated':
             self._affect_number()
         return res
@@ -829,15 +833,10 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
             return self.env['of.popup.wizard'].popup_return(
                 message=u"Cette demande d'intervention n'a aucune ligne.")
 
-        # Ne pas créer de commande si toutes les lignes sont déjà associées à une commande
-        if not self.line_ids.filtered(lambda l: not l.saleorder_line_id):
+        # Ne pas créer de commande si toutes les lignes sont déjà associées à une commande ou à une facture
+        if not self.line_ids.filtered(lambda l: l.qty_orderable != 0):
             return self.env['of.popup.wizard'].popup_return(
-                message=u"Toutes les lignes sont déjà associées à une commande de vente.")
-
-        # Ne pas créer de commande si toutes les lignes sont déjà associées à une ou des factures
-        if not self.line_ids.filtered(lambda l: not l.invoice_line_ids):
-            return self.env['of.popup.wizard'].popup_return(
-                message=u"Toutes les lignes sont déjà associées à une ou plusieurs factures.")
+                message=u"Toutes les lignes sont déjà associées à une commande de vente ou à une facture.")
 
         # Ne pas créer de commande si la position fiscale n'est pas renseignée
         if not self.fiscal_position_id:
@@ -871,7 +870,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
     def orderable_lines(self):
         """ Fonction à surcharger si on veut retirer des lignes lors de la création de commande"""
         self.ensure_one()
-        return self.line_ids.filtered(lambda l: not l.saleorder_line_id and not l.invoice_line_ids)
+        return self.line_ids.filtered(lambda l: l.qty_orderable)
 
     @api.multi
     def _get_invoicing_company(self, partner):
@@ -883,7 +882,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
         lines_data = []
         error = ''
         for line in self.line_ids.filtered(
-                lambda l: not l.saleorder_line_id and not l.invoice_line_ids):
+                lambda l: not l.saleorder_line_id or not l.invoice_line_ids):
             line_data, line_error = line._prepare_invoice_line()
             lines_data.append((0, 0, line_data))
             error += line_error
@@ -1287,8 +1286,8 @@ class OfServiceLine(models.Model):
 
     service_id = fields.Many2one(
         comodel_name='of.service', string=u"Demande d'intervention", required=True, ondelete='cascade')
-    saleorder_line_id = fields.Many2one(
-        comodel_name='sale.order.line', string=u"Ligne de vente",
+    saleorder_line_id = fields.One2many(
+        comodel_name='sale.order.line', inverse_name='of_service_line_id', string=u"Ligne de commande",
         help=u"Utilisé pour savoir si une commande a été générée pour cette ligne.")
     so_number = fields.Char(
         string=u"Numéro de commande client", related='saleorder_line_id.order_id.name', readonly=True)
@@ -1318,6 +1317,8 @@ class OfServiceLine(models.Model):
     ], string=u"État de facturation", compute='_compute_invoice_status', store=True)
     qty_invoiced = fields.Float(string=u"Qté facturée", compute='_compute_qty_invoiced', store=True)
     qty_invoiceable = fields.Float(string=u"Qté a facturer", compute='_compute_qty_invoiceable', store=True)
+    qty_ordered = fields.Float(string=u"Qté Commandée", compute='_compute_qty_ordered', store=True)
+    qty_orderable = fields.Float(string=u"Qté à commander", compute='_compute_qty_orderable', store=True)
     invoice_line_ids = fields.One2many(
         'account.invoice.line', 'of_service_line_id', string=u"Ligne de facturation")
 
@@ -1370,19 +1371,33 @@ class OfServiceLine(models.Model):
                 taxes = fiscal_position.map_tax(taxes, product, partner)
             line.taxe_ids = taxes
 
+    @api.depends('saleorder_line_id', 'saleorder_line_id.order_id', 'saleorder_line_id.product_uom_qty',
+                 'saleorder_line_id.order_id')
+    def _compute_qty_ordered(self):
+        for line in self:
+            line.qty_ordered = sum(line.saleorder_line_id.mapped('product_uom_qty'))
+
+    @api.depends('qty', 'qty_ordered', 'qty_invoiced', 'saleorder_line_id', 'invoice_line_ids')
+    def _compute_qty_orderable(self):
+        for line in self:
+            if line.saleorder_line_id or line.invoice_line_ids:
+                line.qty_orderable = line.qty - line.qty_ordered - line.qty_invoiced
+            else:
+                line.qty_orderable = line.qty
+
     @api.depends('invoice_line_ids', 'invoice_line_ids.invoice_id', 'invoice_line_ids.quantity',
                  'invoice_line_ids.invoice_id')
     def _compute_qty_invoiced(self):
         for line in self:
             line.qty_invoiced = sum(line.invoice_line_ids.mapped('quantity'))
 
-    @api.depends('qty', 'qty_invoiced', 'saleorder_line_id')
+    @api.depends('qty', 'qty_ordered', 'qty_invoiced', 'saleorder_line_id', 'invoice_line_ids')
     def _compute_qty_invoiceable(self):
         for line in self:
-            if line.saleorder_line_id:
-                line.qty_invoiceable = 0.0
+            if line.saleorder_line_id or line.invoice_line_ids:
+                line.qty_invoiceable = line.qty - line.qty_ordered - line.qty_invoiced
             else:
-                line.qty_invoiceable = line.qty - line.qty_invoiced
+                line.qty_invoiceable = line.qty
 
     @api.depends('qty', 'qty_invoiced', 'saleorder_line_id', 'qty_invoiceable')
     def _compute_invoice_status(self):
@@ -1406,7 +1421,10 @@ class OfServiceLine(models.Model):
             'qty': self.qty,
             'name': self.name,
             'discount': self.discount,
-            'order_line_id': self.saleorder_line_id and self.saleorder_line_id.id or False,
+            'order_line_id': self.saleorder_line_id and self.saleorder_line_id.ids or False,
+            'invoice_line_ids': self.invoice_line_ids and self.invoice_line_ids.ids or False,
+            'qty_ordered': self.qty_ordered,
+            'qty_invoiced': self.qty_invoiced,
         }
         if self.taxe_ids:
             res['taxe_ids'] = [(6, 0, self.taxe_ids._ids)]
@@ -1424,7 +1442,7 @@ class OfServiceLine(models.Model):
         })
         order_line_new.product_id_change()
         order_line_new.product_uom_change()
-        order_line_new.update({'product_uom_qty': self.qty})
+        order_line_new.update({'product_uom_qty': self.qty_orderable})
         return order_line_new._convert_to_write(order_line_new._cache)
 
     @api.multi
@@ -1455,16 +1473,16 @@ class OfServiceLine(models.Model):
 
         line_name = self.name or product.name_get()[0][1]
         return {
-            'name': line_name,
-            'account_id': line_account.id,
-            'price_unit': self.price_unit,
-            'quantity': self.qty,
-            'discount': 0.0,
-            'uom_id': product.uom_id.id,
-            'product_id': product.id,
-            'invoice_line_tax_ids': [(6, 0, taxes._ids)],
-            'of_service_line_id': self.id
-        }, ""
+                   'name': line_name,
+                   'account_id': line_account.id,
+                   'price_unit': self.price_unit,
+                   'quantity': self.qty_invoiceable,
+                   'discount': 0.0,
+                   'uom_id': product.uom_id.id,
+                   'product_id': product.id,
+                   'invoice_line_tax_ids': [(6, 0, taxes._ids)],
+                   'of_service_line_id': self.id
+               }, ""
 
 
 class OfServiceType(models.Model):

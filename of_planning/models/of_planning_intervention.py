@@ -1489,7 +1489,7 @@ class OfPlanningIntervention(models.Model):
         msgs = []
         for interv in self:
             # toutes les lignes sont liées à une commande (au moins une avec commande et aucune sans commande)
-            if interv.lien_commande and not interv.line_ids.filtered(lambda l: not l.order_line_id):
+            if not interv.line_ids.filtered(lambda l: l.qty_invoiceable):
                 msgs.append(u"Les lignes facturables du rendez-vous %s étant liées à des lignes de commandes "
                             u"veuillez effectuer la facturation depuis le bon de commande." % interv.name)
                 continue
@@ -1889,7 +1889,7 @@ class OfPlanningIntervention(models.Model):
         self.ensure_one()
         lines_data = []
         error = ''
-        for line in self.line_ids.filtered(lambda l: l.invoice_status == 'to invoice' and not l.order_line_id):
+        for line in self.line_ids.filtered(lambda l: l.invoice_status == 'to invoice'):
             line_data, line_error = line._prepare_invoice_line()
             lines_data.append((0, 0, line_data))
             error += line_error
@@ -2068,7 +2068,8 @@ class OfPlanningInterventionLine(models.Model):
     name = fields.Text(string='Description')
     taxe_ids = fields.Many2many('account.tax', string="TVA")
     discount = fields.Float(string='Remise (%)', digits=dp.get_precision('Discount'), default=0.0)
-    qty_delivered = fields.Float(string=u"Qté livrée", copy=False)
+    qty_delivered = fields.Float(string=u"Qté livrée",)
+    qty_ordered = fields.Float(string=u"Qté commandée", )
     qty_invoiced = fields.Float(string=u"Qté facturée", compute='_compute_qty_invoiced', store=True)
     qty_invoiceable = fields.Float(string=u"Qté a facturer", compute='_compute_qty_invoiceable', store=True)
 
@@ -2137,28 +2138,26 @@ class OfPlanningInterventionLine(models.Model):
     @api.depends('invoice_line_ids', 'invoice_line_ids.invoice_id', 'invoice_line_ids.quantity')
     def _compute_qty_invoiced(self):
         for line in self:
-            line.qty_invoiced = sum(line.sudo().invoice_line_ids.mapped('quantity'))
+            line.qty_invoiced = sum(line.invoice_line_ids.mapped('quantity'))
 
     @api.depends('intervention_id.invoice_policy', 'intervention_id.state',
-                 'qty', 'qty_delivered', 'qty_invoiced', 'order_line_id')
+                 'qty', 'qty_delivered', 'qty_invoiced', 'order_line_id', 'qty_ordered')
     def _compute_qty_invoiceable(self):
         for line in self:
-            if line.intervention_id.state not in ('confirm', 'done') or line.order_line_id:
+            if line.intervention_id.state not in ('confirm', 'done') or line.qty_ordered + line.qty_invoiced == line.qty:
                 line.qty_invoiceable = 0.0
             elif line.invoice_policy == 'intervention':
-                line.qty_invoiceable = line.qty - line.qty_invoiced
+                line.qty_invoiceable = line.qty - line.qty_invoiced - line.qty_ordered
             elif self.invoice_policy == 'delivered':
-                line.qty_invoiceable = line.qty_delivered - line.qty_invoiced
+                line.qty_invoiceable = line.qty_delivered - line.qty_invoiced - line.qty_ordered
 
     @api.depends('intervention_id.state', 'qty', 'qty_delivered', 'qty_invoiced', 'order_line_id', 'qty_invoiceable')
     def _compute_invoice_status(self):
         precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
         for line in self:
-            if line.intervention_id.state not in ('confirm', 'done') or line.order_line_id:
-                line.invoice_status = 'no'
-            elif not float_is_zero(line.qty_invoiceable, precision_digits=precision):
+            if not float_is_zero(line.qty_invoiceable, precision_digits=precision):
                 line.invoice_status = 'to invoice'
-            elif float_compare(line.qty_invoiced, line.qty, precision_digits=precision) >= 0:
+            elif float_compare(line.qty_invoiced+line.qty_ordered, line.qty, precision_digits=precision) >= 0:
                 line.invoice_status = 'invoiced'
             else:
                 line.invoice_status = 'no'
