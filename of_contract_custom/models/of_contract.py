@@ -769,34 +769,7 @@ class OfContractLine(models.Model):
 
     @api.model_cr_context
     def _auto_init(self):
-        cr = self._cr
-        cr.execute(
-            "SELECT * FROM information_schema.columns "
-            "WHERE table_name = '%s' AND column_name = 'interv_frequency_nbr'" % (self._table,))
-        exist1 = bool(cr.fetchall())
-        cr.execute(
-            "SELECT * FROM information_schema.columns "
-            "WHERE table_name = '%s' AND column_name = 'nbr_interv'" % (self._table,))
-        exist2 = bool(cr.fetchall())
-        change_planif = False
-        if exist2 and not exist1:
-            cr.execute(
-                "SELECT ocl.id, ocl.nbr_interv, sub.nbr_month "
-                "FROM of_contract_line AS ocl "
-                "JOIN (SELECT rel.of_contract_line_id AS line_id, count(rel.of_mois_id) AS nbr_month "
-                "FROM of_contract_line_of_mois_rel AS rel "
-                "GROUP BY rel.of_contract_line_id) AS sub ON sub.line_id=ocl.id")
-            change_planif = cr.fetchall()
         res = super(OfContractLine, self)._auto_init()
-        if change_planif:
-            for line_id, nbr_interv, nbr_month in change_planif:
-                if (float(nbr_interv)/float(nbr_month)).is_integer():
-                    ratio = nbr_interv/nbr_month
-                    values = ('month', ratio, line_id)
-                else:
-                    values = ('year', nbr_interv, line_id)
-                cr.execute("UPDATE of_contract_line "
-                           "SET interv_frequency = %s, interv_frequency_nbr = %s WHERE id = %s", values)
         return res
 
     name = fields.Char(string="Nom", compute="_compute_name", store=True)
