@@ -2,7 +2,7 @@
 
 {
     "name": "OpenFire / Contrat Custom",
-    "version": "10.0.1.1.0",
+    "version": "10.0.2.0.0",
     "author": "OpenFire",
     'license': 'AGPL-3',
     'summary': u"Ajout des contrats OpenFire",
