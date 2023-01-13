@@ -103,6 +103,14 @@ class OfDatastoreCentralized(models.AbstractModel):
             'of_other_logistic_costs',
             'of_misc_taxes',
             'of_misc_costs',
+
+            # Champs de localisation d'inventaire
+            'property_stock_procurement',
+            'property_stock_production',
+            'property_stock_inventory',
+            'of_product_posx',
+            'of_product_posy',
+            'of_product_posz',
         ]
 
         # On ne veut pas non-plus les champs one2many ou many2many
