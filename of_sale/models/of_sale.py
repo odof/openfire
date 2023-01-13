@@ -522,22 +522,24 @@ class SaleOrder(models.Model):
         params = []
         request = "SELECT id FROM sale_order WHERE "
         if operator == '=':
-            request += "of_marge_pc >= %s AND of_marge_pc <= %s;"
+            request += "(100 * (margin / NULLIF(amount_untaxed, 0))) >= %s AND " \
+                "(100 * (margin / NULLIF(amount_untaxed, 0))) <= %s;"
             params = (down, top)
         elif operator == '!=':
-            request += "of_marge_pc <= %s OR of_marge_pc >= %s;"
+            request += "(100 * (margin / NULLIF(amount_untaxed, 0))) <= %s OR " \
+                "(100 * (margin / NULLIF(amount_untaxed, 0))) >= %s;"
             params = (down, top)
         elif operator == '>=':
-            request += "of_marge_pc >= %s;"
+            request += "(100 * (margin / NULLIF(amount_untaxed, 0))) >= %s;"
             params = (down,)
         elif operator == '>':
-            request += "of_marge_pc > %s;"
+            request += "(100 * (margin / NULLIF(amount_untaxed, 0))) > %s;"
             params = (top,)
         elif operator == '<=':
-            request += "of_marge_pc <= %s;"
+            request += "(100 * (margin / NULLIF(amount_untaxed, 0))) <= %s;"
             params = (top,)
         elif operator == '<':
-            request += "of_marge_pc < %s;"
+            request += "(100 * (margin / NULLIF(amount_untaxed, 0))) < %s;"
             params = (down,)
         else:
             raise NotImplementedError(_("Search operator %s not implemented for value %s") % (operator, value))
