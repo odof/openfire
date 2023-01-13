@@ -769,13 +769,18 @@ class OfContractLine(models.Model):
 
     @api.model_cr_context
     def _auto_init(self):
+        module_self = self.env['ir.module.module'].search([('name', '=', 'of_contract_custom')])
+        module_version = module_self.latest_version
         res = super(OfContractLine, self)._auto_init()
+        if module_version and module_version < '10.0.2':
+            self.env.add_todo(self._fields['department_id'], self.search([]))
+            self.recompute()
         return res
 
     name = fields.Char(string="Nom", compute="_compute_name", store=True)
     partner_id = fields.Many2one('res.partner', related="contract_id.partner_id", string="Client payeur", readonly=True)
     department_id = fields.Many2one(
-        'res.country.department', related='partner_id.department_id', string=u"Département", readonly=True, store=True)
+        'res.country.department', related='address_id.department_id', string=u"Département", readonly=True, store=True)
     address_id = fields.Many2one('res.partner', string="Adresse d'intervention", required=True)
     partner_code_magasin = fields.Char(string="Code magasin", related="address_id.of_code_magasin", readonly=True)
     address_street = fields.Char(string="Rue", related="address_id.street", readonly=True)
