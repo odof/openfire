@@ -30,6 +30,7 @@ Module de comptabilité OpenFire.
     ],
     'demo_xml': [],
     'data': [
+        'data/of_account_data.xml',
         'views/of_account_views.xml',
         'views/partner_views.xml',
         'wizards/wizard_edit_export_view.xml'

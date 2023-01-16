@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+
+    <record id="account_journal_remove_update_posted_journals" model="ir.cron">
+        <field name="name">Retirer automatiquement l'autorisation d'annulation des écritures des journaux de types choisis.</field>
+        <field name="model">account.journal</field>
+        <field name="function">remove_update_posted_from_journals</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d 2:00:00')"/>
+        <field name="active">True</field>
+        <field name="args">([['sale',]])</field>
+    </record>
+
+</odoo>

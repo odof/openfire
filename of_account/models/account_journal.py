@@ -67,3 +67,9 @@ class AccountJournal(models.Model):
             raise UserError(error)
         vals.update(data)
         return super(AccountJournal, self).write(vals)
+
+    @api.model
+    def remove_update_posted_from_journals(self, journal_types=[]):
+        journals = self.search([('type', 'in', journal_types), ('update_posted', '=', True)])
+        if journals:
+            journals.write({'update_posted': False})
