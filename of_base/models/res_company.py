@@ -53,11 +53,11 @@ class ResCompany(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        if self._uid != SUPERUSER_ID:
+        if self._uid not in [SUPERUSER_ID, self.env.ref('base.user_admin').id]:
             raise ValidationError(_("Only the administrator can create a new company."))
         return super().create(vals_list)
 
     def unlink(self):
-        if self._uid != SUPERUSER_ID:
+        if self._uid not in [SUPERUSER_ID, self.env.ref('base.user_admin').id]:
             raise ValidationError(_("Only the administrator can create a new company."))
         return super().unlink()
