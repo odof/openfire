@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_datastore_brand_view_search" model="ir.ui.view">
+        <field name="name">of.datastore.brand.view.search</field>
+        <field name="model">of.datastore.brand</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="state"/>
+                <separator/>
+                <filter string="Partenaire" name="partner_managed" domain="[('is_partner_managed','=',1)]"/>
+                <filter string="Non partenaire" name="not_partner_managed" domain="[('is_partner_managed','=',0)]"/>
+                <separator/>
+                <filter string="Disponible" name="state_available" domain="[('state','=','available')]"/>
+                <filter string="Connecté" name="state_connected" domain="[('state','=','connected')]"/>
+                <filter string="En attente" name="state_pending" domain="[('state','in',('pending_in', 'pending_out'))]"/>
+                <separator/>
+                <group expand="0" name="group_by" string="Group By">
+                   <filter name="group_state" string="État" context="{'group_by' : 'state'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_datastore_brand_view_kanban" model="ir.ui.view">
+        <field name="name">of.datastore.brand.view.kanban</field>
+        <field name="model">of.datastore.brand</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="fee"/>
+                <field name="is_partner_managed"/>
+                <field name="logo"/>
+                <field name="name"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <t t-if="record.logo.raw_value">
+                                    <img t-att-src="kanban_image('of.product.brand', 'logo', record.id.value)"/>
+                                </t>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong>
+                                    <span>
+                                         <t t-esc="record.name.value"/>
+                                    </span>
+                                </strong>
+                                <ul>
+                                    <li t-if="record.is_partner_managed.raw_value" class="text-success">Partenaire</li>
+                                    <li t-if="!record.is_partner_managed.raw_value" class="text-warning">Non partenaire</li>
+                                    <li t-if="record.fee.raw_value &gt; 0" class="text-warning">Abonnement : <field name="fee"/>€</li>
+                                    <li>
+                                        <field name="state" widget="kanban_label_selection"
+                                               options="{'classes': {'available': 'default', 'connected': 'success', 'pending_in': 'warning', 'pending_out': 'warning'}}"/>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="of_datastore_brand_view_form" model="ir.ui.view">
+        <field name="name">of.datastore.brand.view.form</field>
+        <field name="model">of.datastore.brand</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="%(of_datastore_brand_ask_wizard_action)d" type="action"
+                            string="Se connecter" states="available" class="btn-primary"
+                            context="{'default_action': 'connect', 'default_datastore_brand_id': active_id}"
+                            groups="of_base.of_group_openfire_contract"/>
+                    <button name="%(of_datastore_brand_ask_wizard_action)d" type="action"
+                            string="Se déconnecter" states="connected"
+                            context="{'default_action': 'disconnect', 'default_datastore_brand_id': active_id}"
+                            groups="of_base.of_group_openfire_contract"/>
+                    <button name="%(of_datastore_brand_ask_wizard_action)d" type="action"
+                            string="Annuler la demande" states="pending_in,pending_out"
+                            context="{'default_action': 'cancel', 'default_datastore_brand_id': active_id}"
+                            groups="of_base.of_group_openfire_contract"/>
+                    <field name="state" widget="statusbar" nolabel="1" statusbar_visible="available,connected"/>
+                </header>
+                <sheet>
+                    <field name="logo" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <field name="is_partner_managed"/>
+                        <field name="fee"/>
+                        <field name="brand_id"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_datastore_brand_view_tree" model="ir.ui.view">
+        <field name="name">of.datastore.brand.tree.view</field>
+        <field name="model">of.datastore.brand</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="state"/>
+                <field name="brand_id"/>
+                <field name="is_partner_managed"/>
+                <field name="fee"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_datastore_brand_action" model="ir.actions.act_window">
+        <field name="name">Connexions TC</field>
+        <field name="res_model">of.datastore.brand</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kanban,tree,form</field>
+    </record>
+
+    <menuitem name="Connexions TC" id="menu_of_datastore_brand" parent="sale.prod_config_main"
+              sequence="16" action="of_datastore_brand_action"/>
+
+</odoo>

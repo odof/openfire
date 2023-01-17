@@ -28,6 +28,9 @@ La mise à jour a aussi pour effet d'actualiser les liens des articles avec les 
 
 Une action permet de supprimer tous les produits inutilisés d'une marque.
 
+Un accès à la base de gestion (définie via le module of_base) permet de récupérer une liste de toutes les marques disponibles.
+Les utilisateurs peuvent demander une connexion ou déconnexion à ces marques, avec l'impact que cela aura sur leur contrat OpenFire.
+
 /!\\\\ Information OpenFire :
 Ce module nécessite l'installation de openerplib sur le serveur : sudo easy_install openerp-client-lib
 """,
@@ -51,9 +54,13 @@ Ce module nécessite l'installation de openerplib sur le serveur : sudo easy_ins
         'of_parc_installe',
     ],
     'data': [
+        'security/ir.model.access.csv',
+        'data/data.xml',
         'wizard/of_datastore_import_brand.xml',
         'wizard/of_datastore_update_product.xml',
         'wizard/of_remove_unused_products.xml',
+        'wizard/wizard_of_datastore_brand_ask.xml',
+        'views/of_datastore_brand_views.xml',
         'views/of_datastore_product_view.xml',
         'wizard/of_datastore_display_stock_wizard_views.xml',
     ],
