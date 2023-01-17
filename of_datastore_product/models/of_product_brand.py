@@ -18,6 +18,18 @@ class OfProductBrand(models.Model):
         string='# Products', compute='_compute_datastore_note_maj',
         help="The number of products of this brand")
 
+    datastore_brand_request_ids = fields.One2many(
+        comodel_name='of.datastore.brand', inverse_name='brand_id', string=u"Demande de marque TC")
+    datastore_brand_request_id = fields.Many2one(
+        comodel_name='of.datastore.brand', compute='_compute_datastore_brand_request_id', store=True,
+        string=u"Demande de marque TC")
+    datastore_brand_request_state = fields.Selection(related='datastore_brand_request_id.state')
+
+    @api.depends('datastore_brand_request_ids')
+    def _compute_datastore_brand_request_id(self):
+        for brand in self:
+            brand.datastore_brand_request_id = brand.datastore_brand_request_ids
+
     @api.multi
     def read(self, fields=None, load='_classic_read'):
         if self._context.get('of_datastore_update_categ') and fields and 'categ_ids' in fields:

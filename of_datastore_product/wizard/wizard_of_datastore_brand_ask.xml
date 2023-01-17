@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_datastore_brand_ask_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.datastore.brand.ask.wizard.view.form</field>
+        <field name="model">of.datastore.brand.ask.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="action" invisible="1"/>
+                <div name="connect" attrs="{'invisible': [('action', '!=', 'connect')]}">
+                    <span>Votre demande de connexion à la marque suivante va être transmise.</span><br/>
+                    <span>Un surcoût de <field name="fee" nolabel="1" class="oe_inline"/>€ sera appliqué sur votre abonnement.</span>
+                </div>
+                <div name="connect" attrs="{'invisible': [('action', '!=', 'disconnect')]}">
+                    <span>Votre demande de déconnexion de la marque suivante va être transmise.</span><br/>
+                    <span>Après traitement de la demande, <field name="fee2" nolabel="1" class="oe_inline"/>€ seront déduits de votre abonnement.</span>
+                </div>
+                <div attrs="{'invisible': [('action', '!=', 'cancel')]}">
+                    <span>Votre demande en attente concernant la marque suivante sera annulée.</span>
+                </div>
+                <group>
+                    <field name="datastore_brand_id" readonly="1"/>
+                    <field name="brand_id" attrs="{'invisible': [('action', '!=', 'connect')], 'required': [('action', '=', 'connect')]}"/>
+                </group>
+                <footer>
+                    <button name="action_process" string="Envoyer la demande" type="object" class="oe_highlight"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_datastore_brand_ask_wizard_action" model="ir.actions.act_window">
+        <field name="name">Demande de connexion au tarif centralisé</field>
+        <field name="res_model">of.datastore.brand.ask.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_datastore_brand_ask_wizard_view_form"/>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

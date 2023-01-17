@@ -30,6 +30,33 @@ class Users(models.Model):
         else:
             return ['|', ('of_user_profile_id', '=', False), ('of_user_profile_id', '!=', profile.id)]
 
+    @api.model
+    def of_create_new_distributor(self, login, password, name):
+        """
+        Cette fonction crée/met à jour un utilisateur en fonction de l'identifiant fourni.
+        Sa vocation est d'être appelée en xmlrpc pour alimenter dynamiquement la base fournisseur depuis notre
+          base de gestion.
+        """
+        user = self.with_context(of_distributor_test=False, active_test=False).search([('login', '=', login)])
+        if user:
+            # L'utilisateur existe déjà, on met à jour son mot de passe et son nom au besoin
+            vals = {}
+            if not self._crypt_context().verify(password, user.password_crypt):
+                vals['password'] = password
+            if name != user.name:
+                vals['name'] = name
+            if vals:
+                user.write(vals)
+        else:
+            profile = self.env.ref('of_datastore_supplier.user_profile_distributor', raise_if_not_found=False)
+            self.create({
+                'login': login,
+                'name': name,
+                'of_user_profile_id': profile.id,
+                'password': password,
+            })
+        return True
+
     # Fonctions permettant de traiter les distributeurs comme des utilisateurs inactifs (many2one, etc.)
     # mais leur permettant quand-même de se connecter
     @api.model

@@ -71,17 +71,27 @@ class OfDatastoreSupplierBrand(models.AbstractModel):
             old_brand = brand_obj.search(
                 [('datastore_supplier_id', '=', ds_supplier_id),
                  ('datastore_brand_id', '=', ds_brand_id)])
+            if new_brand_id == old_brand.id:
+                return True
             if old_brand:
-                if new_brand_id != old_brand.id:
-                    old_brand.write({'datastore_supplier_id': False, 'datastore_brand_id': False})
-                    # On vide le champ of_datastore_res_id des articles de la marque qui n'est plus liée au TC.
-                    old_brand.product_ids.write({'of_datastore_res_id': False})
-                    old_brand.product_variant_ids.write({'of_datastore_res_id': False})
-                    old_brand = False
-            if new_brand_id and not old_brand:
+                old_brand.write({'datastore_supplier_id': False, 'datastore_brand_id': False})
+                # On vide le champ of_datastore_res_id des articles de la marque qui n'est plus liée au TC.
+                old_brand.product_ids.write({'of_datastore_res_id': False})
+                old_brand.product_variant_ids.write({'of_datastore_res_id': False})
+            if new_brand_id:
                 new_brand = brand_obj.browse(new_brand_id)
                 new_brand.write({'datastore_supplier_id': ds_supplier_id, 'datastore_brand_id': ds_brand_id})
                 # On vide le champ of_datastore_res_id des articles de la marque nouvellement liée au TC.
                 new_brand.product_ids.write({'of_datastore_res_id': False})
                 new_brand.product_variant_ids.write({'of_datastore_res_id': False})
+
+            # Mise à jour des demandes de connexion TC
+            supplier = self.env['of.datastore.supplier'].browse(ds_supplier_id)
+            datastore_brand = self.env['of.datastore.brand'].search(
+                [('db_name', '=', supplier.db_name), ('datastore_brand_id', '=', ds_brand_id)])
+            if datastore_brand:
+                if new_brand_id:
+                    datastore_brand.write({'brand_id': new_brand_id, 'state': 'connected'})
+                else:
+                    datastore_brand.write({'brand_id': False, 'state': 'available'})
         return True
