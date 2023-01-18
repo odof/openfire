@@ -96,7 +96,7 @@ class ProductTemplate(models.Model):
         # doit donc être fait également dans ce unlink()
         ir_values_obj_sudo = self.env['ir.values'].sudo()
         deposit_product_id = ir_values_obj_sudo.get_default('sale.config.settings', 'deposit_product_id_setting')
-        ids_deleted = self.mapped('product_variant_ids')._ids
+        ids_deleted = self.with_context(active_test=False).mapped('product_variant_ids')._ids
         res = super(ProductTemplate, self).unlink()
         if deposit_product_id in ids_deleted:
             ir_values_obj_sudo.set_default('sale.config.settings', 'deposit_product_id_setting', False)
