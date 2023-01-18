@@ -659,6 +659,7 @@ class OFWebsiteWorktopConfigurator(http.Controller):
         acc_layout_category_id = request.env['ir.values'].sudo().get_default(
             'sale.config.settings', 'of_website_worktop_configurator_acc_layout_category_id')
         vals = quote._website_product_id_change(quote.id, int(product_id), qty=float(quantity))
+        vals['of_worktop_configurator_line_id'] = request.session['worktop_quote_line_id']
         vals['name'] = quote._get_line_description(quote.id, int(product_id))
         vals['layout_category_id'] = acc_layout_category_id
         vals['price_unit'] = float(price)
@@ -675,6 +676,8 @@ class OFWebsiteWorktopConfigurator(http.Controller):
         quote = quote_line.order_id
 
         if qty <= 0:
+            # Check if quote line to delete is linked to accessories
+            quote.order_line.filtered(lambda l: l.of_worktop_configurator_line_id.id == quote_line.id).unlink()
             quote_line.unlink()
             self._control_weight()
         else:
@@ -1236,6 +1239,26 @@ class OFWebsiteWorktopConfigurator(http.Controller):
             quote_line.of_no_coef_price = quote_line.price_unit
             quote_line.price_unit = quote_line.price_unit * quote_line.get_pricelist_coef()
             quote_line._compute_tax_id()
+
+            # On met à jour les accessoires en fonction du nouveau matériau
+            self._update_accessory_quote_line(quote_line.id)
+
+    def _update_accessory_quote_line(self, quote_line_id):
+        product_type = request.env['of.worktop.configurator.type'].browse(request.session['product_type_id'])
+        accessory_lines = request.env['sale.order.line'].search(
+            [('of_worktop_configurator_line_id', '=', quote_line_id)])
+
+        for line in accessory_lines:
+            alt_product_lines = product_type.product_line_ids.filtered(
+                lambda l: l.product_id.id == line.product_id.id and l.material_id.id == request.session['material_id'])
+            if alt_product_lines:
+                line.price_unit = alt_product_lines[0].price
+                line.of_no_coef_price = line.price_unit
+                line.price_unit = line.price_unit * line.get_pricelist_coef()
+                line._compute_tax_id()
+            else:
+                # S'il n'y a pas d'accessoire équivalent pour le nouveau matériau, on supprime la ligne de l'accessoire
+                line.unlink()
 
     def _control_weight(self):
         quote = request.env['sale.order'].sudo().browse(request.session['worktop_quote_id'])

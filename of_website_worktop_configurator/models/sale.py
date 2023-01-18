@@ -69,6 +69,29 @@ class SaleOrder(models.Model):
         return True
 
     @api.multi
+    def copy(self, default=None):
+        res = super(SaleOrder, self).copy(default=default)
+        for line in res.order_line:
+            if line.of_worktop_configurator_line_id:
+                old_line = line.of_worktop_configurator_line_id
+                # Search corresponding new line
+                corresponding_lines = res.order_line.filtered(
+                    lambda l: l.of_worktop_configurator_type_id.id == old_line.of_worktop_configurator_type_id.id
+                    and l.of_worktop_configurator_material_id.id == old_line.of_worktop_configurator_material_id.id
+                    and l.of_worktop_configurator_finishing_id.id == old_line.of_worktop_configurator_finishing_id.id
+                    and l.of_worktop_configurator_color_id.id == old_line.of_worktop_configurator_color_id.id
+                    and l.of_worktop_configurator_thickness_id.id == old_line.of_worktop_configurator_thickness_id.id
+                    and l.of_worktop_configurator_length == old_line.of_worktop_configurator_length
+                    and l.of_worktop_configurator_width == old_line.of_worktop_configurator_width
+                    and l.layout_category_id.id == old_line.layout_category_id.id
+                    and l.sequence == old_line.sequence)
+                if corresponding_lines:
+                    line.of_worktop_configurator_line_id = corresponding_lines[0]
+                else:
+                    line.of_worktop_configurator_line_id = False
+        return res
+
+    @api.multi
     def action_edit_online(self):
         self.ensure_one()
         return {
@@ -92,6 +115,8 @@ class SaleOrderLine(models.Model):
         comodel_name='of.worktop.configurator.color', string=u"Couleur de la pièce")
     of_worktop_configurator_thickness_id = fields.Many2one(
         comodel_name='of.worktop.configurator.thickness', string=u"Épaisseur & type de chant de la pièce")
+    of_worktop_configurator_line_id = fields.Many2one(
+        comodel_name='sale.order.line', string=u"Ligne de commande associée pour les accessoires")
     of_worktop_configurator_length = fields.Float(string=u"Longueur de la pièce (cm)")
     of_worktop_configurator_width = fields.Float(string=u"Largeur de la pièce (cm)")
     of_worktop_configurator_weight = fields.Float(string=u"Poids de la pièce (kg)")
