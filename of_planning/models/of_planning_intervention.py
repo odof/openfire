@@ -518,6 +518,8 @@ class OfPlanningIntervention(models.Model):
     line_ids = fields.One2many('of.planning.intervention.line', 'intervention_id', string='Lignes de facturation')
     lien_commande = fields.Boolean(string='Facturation sur commande', compute='_compute_lien_commande')
     fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale")
+    partner_pricelist_id = fields.Many2one(comodel_name='product.pricelist', string=u"Liste de prix",
+                                           related='partner_id.property_product_pricelist')
     currency_id = fields.Many2one('res.currency', string='Currency', readonly=True, related="company_id.currency_id")
 
     price_subtotal = fields.Monetary(compute='_compute_amount', string='Sous-total HT', readonly=True, store=True)
@@ -1109,9 +1111,11 @@ class OfPlanningIntervention(models.Model):
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
         self.ensure_one()
-        if self.partner_id and not self.address_id:
-            addresses = self.partner_id.address_get(['delivery'])
-            self.address_id = addresses['delivery']
+        if self.partner_id:
+            self.partner_pricelist_id = self.partner_id.property_product_pricelist
+            if not self.address_id:
+                addresses = self.partner_id.address_get(['delivery'])
+                self.address_id = addresses['delivery']
 
     @api.onchange('address_id')
     def _onchange_address_id(self):
@@ -1178,6 +1182,13 @@ class OfPlanningIntervention(models.Model):
                 new_lines.compute_taxes()
                 self.line_ids = new_lines
 
+    @api.onchange('partner_pricelist_id')
+    def _onchange_partner_pricelist_id(self):
+        if self.partner_pricelist_id:
+            for line in self.line_ids:
+                product = line.product_id
+                line.price_unit = line._get_display_price(product)
+
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
         planning_line_obj = self.env['of.planning.intervention.line']
@@ -1206,6 +1217,10 @@ class OfPlanningIntervention(models.Model):
                     'price_unit': self.tache_id.product_id.lst_price,
                     'name': self.tache_id.product_id.name,
                 })
+                if self.partner_pricelist_id:
+                    for line in lines:
+                        product = line.product_id
+                        line.price_unit = line._get_display_price(product)
                 lines.compute_taxes()
                 self.line_ids = lines
             self.flexible = self.tache_id.flexible
@@ -2111,7 +2126,10 @@ class OfPlanningInterventionLine(models.Model):
     def _onchange_product(self):
         product = self.product_id
         self.qty = 1
-        self.price_unit = product.lst_price
+        if self.intervention_id.partner_id and self.intervention_id.partner_pricelist_id:
+            self.price_unit = self._get_display_price(product)
+        else:
+            self.price_unit = product.lst_price
         if product:
             name = product.name_get()[0][1]
             if product.description_sale:
@@ -2121,6 +2139,10 @@ class OfPlanningInterventionLine(models.Model):
             self.name = ''
         if product:
             self.compute_taxes()
+
+    @api.multi
+    def _get_display_price(self, product):
+        return product.with_context(pricelist=self.intervention_id.partner_pricelist_id.id).price
 
     @api.multi
     def compute_taxes(self):

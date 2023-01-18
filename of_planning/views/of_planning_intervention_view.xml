@@ -398,6 +398,9 @@
                                     <field name="invoice_policy"/>
                                     <field name="fiscal_position_id" attrs="{'readonly': [('lien_commande', '!=', False)]}" options="{'no_create': True, 'no_open': True}"/>
                                 </group>
+                                <group>
+                                    <field name="partner_pricelist_id" groups="product.group_sale_pricelist"/>
+                                </group>
                                 <div class="oe_button_box">
                                     <button name="button_import_order_line" string="Importer"
                                             type="object"
