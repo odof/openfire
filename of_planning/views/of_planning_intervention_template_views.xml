@@ -396,6 +396,7 @@
         <field name="model">of.planning.intervention.template</field>
         <field name="arch" type="xml">
             <tree>
+                <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="tache_id"/>
             </tree>

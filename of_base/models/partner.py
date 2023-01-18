@@ -539,7 +539,9 @@ class ResPartnerBank(models.Model):
 
 class ResPartnerTitle(models.Model):
     _inherit = 'res.partner.title'
+    _order = "sequence"
 
+    sequence = fields.Integer(string="Sequence", default=1, help="Used to order titles. Lower is better.")
     of_used_for_phone = fields.Boolean(string="Utilisée pour les numéros de téléphone", default=True)
 
 

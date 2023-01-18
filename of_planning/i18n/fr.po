@@ -2922,6 +2922,21 @@ msgid "report.of_planning.report_planning_semaine"
 msgstr "report.of_planning.report_planning_semaine"
 
 #. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_of_planning_tache_sequence
+msgid "Used to order tasks. Lower is better."
+msgstr "Utilisé pour classer les tâches. Les valeurs basses passent avant."
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_of_planning_tag_sequence
+msgid "Used to order tags. Lower is better."
+msgstr "Utilisé pour classer les étiquettes. Les valeurs basses passent avant."
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_of_planning_intervention_template_sequence
+msgid "Used to order templates. Lower is better."
+msgstr "Utilisé pour classer les modèles. Les valeurs basses passent avant."
+
+#. module: of_planning
 #: model:ir.ui.view,arch_db:of_planning.of_fiche_intervention_report_template
 #: model:ir.ui.view,arch_db:of_planning.of_planning_fiche2_intervention_report_template
 #: model:ir.ui.view,arch_db:of_planning.of_rapport_intervention_report_template
