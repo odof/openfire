@@ -213,9 +213,11 @@ de calculer la date de fin une fois la date de début saisie. par défaut :\n
 class OfPlanningTache(models.Model):
     _name = "of.planning.tache"
     _description = u"Planning OpenFire : Tâches"
+    _order = 'sequence'
 
     name = fields.Char(string=u"Libellé", size=100, required=True)
     description = fields.Text("Description")
+    sequence = fields.Integer(string="Sequence", default=1, help="Used to order tasks. Lower is better.")
     affichage = fields.Selection([
         ('hide', u"Ne pas afficher"),
         ('internal_description', u"Dans la description interne"),
@@ -2408,8 +2410,10 @@ class SaleOrder(models.Model):
 class OfPlanningTag(models.Model):
     _description = u"Étiquettes d'intervention"
     _name = 'of.planning.tag'
+    _order = "sequence"
 
     name = fields.Char(string="Nom", required=True, translate=True)
+    sequence = fields.Integer('Sequence', default=1, help="Used to order tags. Lower is better.")
     color = fields.Integer(string="Index couleur")
     active = fields.Boolean(default=True, help=u"Permet de cacher l'étiquette sans la supprimer.")
     intervention_ids = fields.Many2many(

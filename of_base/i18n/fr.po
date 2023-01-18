@@ -120,3 +120,13 @@ msgstr "Numéro de compte (IBAN)"
 #: model:ir.model.fields,field_description:base.field_res_partner_bank_bank_bic
 msgid "Bank Identifier Code"
 msgstr "Code d'identification bancaire (BIC)"
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_res_partner_category_sequence
+msgid "Used to order categories. Lower is better."
+msgstr "Utilisé pour classer les catégories. Les valeurs basses passent avant."
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_res_partner_title_sequence
+msgid "Used to order titles. Lower is better."
+msgstr "Utilisé pour classer les civilités. Les valeurs basses passent avant."

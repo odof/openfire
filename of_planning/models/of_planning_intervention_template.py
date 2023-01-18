@@ -14,6 +14,7 @@ except ImportError:
 
 class OfPlanningInterventionTemplate(models.Model):
     _name = 'of.planning.intervention.template'
+    _order = 'sequence'
 
     @api.model_cr_context
     def _auto_init(self):
@@ -76,6 +77,7 @@ class OfPlanningInterventionTemplate(models.Model):
         return res
 
     name = fields.Char(string=u"Nom du modèle", required=True)
+    sequence = fields.Integer(string="Sequence", default=1, help="Used to order templates. Lower is better.")
     active = fields.Boolean(string="Active", default=True)
     code = fields.Char(string="Code", compute="_compute_code", inverse="_inverse_code", store=True, required=True)
     sequence_id = fields.Many2one('ir.sequence', string=u"Séquence", readonly=True)

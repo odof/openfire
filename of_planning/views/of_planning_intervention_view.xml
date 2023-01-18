@@ -724,6 +724,7 @@
         <field name="model">of.planning.tag</field>
         <field name="arch" type="xml" >
             <tree string="Liste des Étiquettes" colors="grey: active == False">
+                <field name="sequence" widget="handle"/>
                 <field name="name" string="Libellé"/>
                 <field name="active" invisible="1"/>
             </tree>
@@ -861,6 +862,7 @@
         <field name="model">of.planning.tache</field>
         <field name="arch" type="xml" >
             <tree string="Liste des tâches" >
+                <field name="sequence" widget="handle"/>
                 <field name="name" string="Libellé"/>
                 <field name="tache_categ_id" string="Catégorie"/>
                 <field name="product_id"/>
