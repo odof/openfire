@@ -20,17 +20,10 @@ class OFProductTemplate(models.Model):
 
         res = super(OFProductTemplate, self)._auto_init()
 
-        module_self = self.env['ir.module.module'].search([('name', '=', 'of_product_chem')])
-        if module_self:
-            version = module_self.latest_version
-            if version < '10.0.4.2.0':
-                cr = self.env.cr
-                cr.execute("UPDATE product_template SET of_efficacite_saison = of_efficacite_saison_moved0")
-
         if not exists:
-            product_brands = self.env['of.product.brand'].with_context(active_test=False).search([])
-            for product_brand in product_brands:
-                product_brand.write({'description_sale': """% if object.norme_id:
+            cr.execute(
+                "UPDATE of_product_brand SET description_sale = %s",
+                ("""% if object.norme_id:
 Norme : ${object.norme_id.name or ""}
 % endif
 % if object.of_flamme_verte:
@@ -65,7 +58,7 @@ Indice I : ${object.of_indice_i}
 % endif
 % if object.description_sale
 ${'\\n' + object.description_sale}
-% endif"""})
+% endif""",))
         return res
 
     of_flamme_verte = fields.Char(string=u"Flamme verte", help=u"Exprimé en nombre d'étoiles")
@@ -86,31 +79,6 @@ ${'\\n' + object.description_sale}
 
 class OfProductBrand(models.Model):
     _inherit = 'of.product.brand'
-
-    @api.model
-    def _auto_init(self):
-        module_self = self.env['ir.module.module'].search([('name', '=', 'of_product_chem')])
-        if module_self:
-            # installed_version est trompeur, il contient la version en cours d'installation
-            # on utilise donc latest version à la place
-            version = module_self.latest_version
-            if version < '10.0.4.1.0':
-                brands = self.search([('description_sale', '!=', False)])
-                # pour chaque marque, on essaye d'insérer dans la description si possible, ou à la fin sinon
-                # seulement si l'ajout n'est pas déjà présent
-                for brand in brands:
-                    descr = brand.description_sale
-                    insert_index = descr.find(u'% if object.of_emission_poussiere:')
-                    exist_index = descr.find(u'% if object.of_emission_co_mg:')
-                    to_add_str = u'''% if object.of_emission_co_mg:
-Émission CO : ${object.of_emission_co_mg} mg/m³
-% endif
-'''
-                    if insert_index != -1 and exist_index == -1:
-                        brand.description_sale = u"%s%s%s" % (descr[:insert_index], to_add_str, descr[insert_index:])
-                    elif exist_index == -1:
-                        brand.description_sale = descr.rstrip() + "\n" + to_add_str.rstrip()
-        return super(OfProductBrand, self)._auto_init()
 
     @api.model
     def _default_description_sale(self):
