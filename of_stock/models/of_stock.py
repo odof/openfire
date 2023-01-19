@@ -1008,6 +1008,15 @@ class StockMove(models.Model):
 class StockQuant(models.Model):
     _inherit = 'stock.quant'
 
+    of_brand_id = fields.Many2one(
+        comodel_name='of.product.brand', related='product_id.brand_id', string=u"Marque", store=True, readonly=True)
+    of_categ_id = fields.Many2one(
+        comodel_name='product.category', related='product_id.categ_id',
+        string=u"Catégorie d'article", store=True, readonly=True)
+    of_partner_id = fields.Many2one(
+        comodel_name='res.partner', related='reservation_id.location_dest_id.partner_id',
+        string=u"Adresse de destination du mouvement réservé associé", store=True, readonly=True)
+
     def _quants_get_reservation_domain(self, move, pack_operation_id=False, lot_id=False, company_id=False,
                                        initial_domain=None):
         force_date = self._context.get('force_date_done', False)
