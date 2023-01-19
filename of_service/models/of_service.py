@@ -389,7 +389,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
 
     @api.multi
     @api.depends(
-        'duree', 'intervention_ids', 'recurrence', 'intervention_ids.state', 'date_next', 'mois_ids', 'duree_planif',
+        'duree', 'intervention_ids', 'recurrence', 'intervention_ids.state', 'date_next', 'mois_ids',
         'tache_id', 'tache_id.fourchette_planif')
     def _compute_durees(self):
         for service in self:
