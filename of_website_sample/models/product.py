@@ -60,14 +60,14 @@ class ProductTemplate(models.Model):
 
         if not self._context.get('skip_sample'):
             unaffected_fields = self.sample_unaffected_fields()
-            any_field = any([field not in unaffected_fields for field in args.keys()])
+            any_field = any(field not in unaffected_fields for field in args.keys())
             for pt in self:
                 if pt.of_sample_available and not pt.of_sample_id:
                     args_sample = pt.get_sample_values()
                     # On crée of_sample_id
                     of_sample_id = pt.with_context(skip_sample=True).create(args_sample)
                     pt.with_context(skip_sample=True).of_sample_id = of_sample_id.id
-                elif any_field:
+                elif pt.of_sample_id and any_field:
                     args_sample = pt.get_sample_values()
                     if not pt.of_sample_available:
                         # si pt.active == False alors args_sample['active'] déjà à False donc pas besoin de vérifier
