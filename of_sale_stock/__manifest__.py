@@ -39,7 +39,6 @@ Paramètres de ventes
         'report/of_sale_stock_report_templates.xml',
         'report/of_report_deliveryslip.xml',
         'report/of_stock_reports.xml',
-        'report/of_sale_stock_picking_label_report.xml',
         'wizard/of_report_tableur_wizard_view.xml',
     ],
     'installable': True,
