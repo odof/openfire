@@ -30,7 +30,7 @@ class OFPlanningIntervention(models.Model):
 
     @api.model
     def create(self, vals):
-        analytic_line_obj = self.env['account.analytic.line']
+        analytic_line_obj = self.env['account.analytic.line'].sudo()
         res = super(OFPlanningIntervention, self).create(vals)
 
         if vals.get('employee_ids'):
@@ -74,7 +74,7 @@ class OFPlanningIntervention(models.Model):
                 line_to_delete = intervention.of_analytic_line_ids.filtered(lambda x: x.user_id not in users)
 
                 for user in user_to_add:
-                    analytic_line_obj.create({
+                    analytic_line_obj.sudo().create({
                         'of_intervention_id': intervention.id,
                         'name': intervention.name,
                         'partner_id': intervention.partner_id.id,
@@ -83,7 +83,7 @@ class OFPlanningIntervention(models.Model):
                         'account_id': intervention.of_account_id.id,
                     })
 
-                line_to_delete.unlink()
+                line_to_delete.sudo().unlink()
 
         return res
 

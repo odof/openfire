@@ -18,6 +18,7 @@ Module de gestion du temps sur les interventions
     ],
     "data": [
         'data/data.xml',
+        "security/ir.model.access.csv",
         'views/account_views.xml',
         'views/planning_views.xml',
     ],
