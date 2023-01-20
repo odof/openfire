@@ -359,6 +359,11 @@ msgid "Forcé"
 msgstr "Forcé"
 
 #. module: of_sale_quote_template
+#: model:ir.actions.act_window,name:of_sale_quote_template.action_make_sale_quote_template
+msgid "Generate Sale Quote Template"
+msgstr "Générer Modèle de devis"
+
+#. module: of_sale_quote_template
 #: model:ir.model,name:of_sale_quote_template.model_of_sale_order_gestion_prix
 msgid "Gestion des prix"
 msgstr "Gestion des prix"
