@@ -1094,6 +1094,16 @@ class SaleOrderLine(models.Model):
     @api.multi
     @api.onchange('product_id')
     def product_id_change(self):
+        if not self.product_id:
+            return
+        if not self.order_id.partner_id:
+            self.product_id = False
+            warning = {
+                'title': (_("Warning!")),
+                'message': (_("You must fill in the Customer field to go further."))
+            }
+            return {'warning': warning}
+
         res = super(SaleOrderLine, self).product_id_change()
         afficher_descr_fab = self.env.user.company_id.afficher_descr_fab
         afficher = afficher_descr_fab == 'devis' or afficher_descr_fab == 'devis_factures'

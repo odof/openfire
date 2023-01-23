@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-24 14:47+0000\n"
-"PO-Revision-Date: 2023-01-24 14:47+0000\n"
+"POT-Creation-Date: 2023-01-25 09:12+0000\n"
+"PO-Revision-Date: 2023-01-25 09:12+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -2162,9 +2162,21 @@ msgid "Vue client/vendeur"
 msgstr "Vue client/vendeur"
 
 #. module: of_sale
+#: code:addons/of_sale/models/of_sale.py:1102
+#, python-format
+msgid "Warning!"
+msgstr "Attention!"
+
+#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_wizard_id
 msgid "Wizard id"
 msgstr "Wizard id"
+
+#. module: of_sale
+#: code:addons/of_sale/models/of_sale.py:1103
+#, python-format
+msgid "You must fill in the Customer field to go further."
+msgstr "Vous devez remplir le champ Client pour aller plus loin."
 
 #. module: of_sale
 #: model:ir.model,name:of_sale.model_account_config_settings
