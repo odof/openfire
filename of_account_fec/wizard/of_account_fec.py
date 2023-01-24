@@ -97,7 +97,14 @@ class OFAccountFrFec(models.TransientModel):
         '''
         self.ensure_one()
         if self.export_type == 'official':  # use parent function instead
-            return super(OFAccountFrFec, self).generate_fec()
+            result = super(OFAccountFrFec, self).generate_fec()
+            if self.of_extension != 'csv':
+                old_filename = self.filename
+                # On remplace l'extension csv par celle choisie
+                new_filename = old_filename[:-3] + self.of_extension
+                self.write({'filename': new_filename})
+                result['url'] = result['url'].replace(old_filename, new_filename)
+            return result
         # We choose to implement the flat file instead of the XML
         # file for 2 reasons :
         # 1) the XSD file impose to have the label on the account.move
