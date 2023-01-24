@@ -2,7 +2,6 @@
 
 from itertools import groupby
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError
 import odoo.addons.decimal_precision as dp
 
 # Les classes sale.quote.template et sale.quote.line proviennent du module Odoo 11 website_quote/models/sale_quote.py
@@ -1263,13 +1262,9 @@ class SaleOrder(models.Model):
             activity_vals = line.prepare_sqt_activity_vals()
             activities_to_create.append((0, 0, activity_vals))
 
-        mails_to_create = [(5, 0, 0)]
-        mails_to_create.extend((4, doc.id) for doc in self.of_mail_template_ids)
-
         quote_template_values.update({
             'quote_line': lines_to_create,
             'of_sale_quote_tmpl_activity_ids': activities_to_create,
-            'of_mail_template_ids': mails_to_create
         })
         sale_quote_template = self.env['sale.quote.template'].create(quote_template_values)
         return {
