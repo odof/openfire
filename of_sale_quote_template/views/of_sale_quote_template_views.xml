@@ -455,4 +455,19 @@
         </field>
     </record>
 
+    <record id="action_make_sale_quote_template" model="ir.actions.server">
+        <field name="name">Generate Sale Quote Template</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code">action = obj.make_sale_quote_template()</field>
+
+    </record>
+    <record id="value_make_sale_quote_template" model="ir.values">
+        <field name="name">Generate Sale Quote Template</field>
+        <field name="key2">client_action_multi</field>
+        <field name="model">sale.order</field>
+        <field name="value" eval="'ir.actions.server,%d'%action_make_sale_quote_template"/>
+    </record>
+
+
 </odoo>
