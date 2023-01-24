@@ -1233,6 +1233,49 @@ class SaleOrder(models.Model):
 
         return res
 
+    @api.multi
+    def _prepare_sale_quote_templates_values(self):
+        self.ensure_one()
+        sale_quote_template = self.env['sale.quote.template']
+        sale_quote_template_new = sale_quote_template.new({
+            'name': self.name,
+            'of_sale_type_id': self.of_sale_type_id.id or False,
+            'property_of_fiscal_position_id': self.fiscal_position_id or False,
+            'of_payment_term_id': self.payment_term_id or False,
+            'of_note1': self.note1 or False,
+            'of_note2': self.note2 or False,
+        })
+        return sale_quote_template_new._convert_to_write(sale_quote_template_new._cache)
+
+    @api.multi
+    def make_sale_quote_template(self):
+        self.ensure_one()
+        quote_template_values = self._prepare_sale_quote_templates_values()
+
+        lines_to_create = []
+        for line in self.order_line:
+            line_vals = line.prepare_sqt_line_vals()
+            lines_to_create.append((0, 0, line_vals))
+
+        activities_to_create = []
+        for line in self.of_crm_activity_ids:
+            activity_vals = line.prepare_sqt_activity_vals()
+            activities_to_create.append((0, 0, activity_vals))
+
+        quote_template_values.update({
+            'quote_line': lines_to_create,
+            'of_sale_quote_tmpl_activity_ids': activities_to_create,
+        })
+        sale_quote_template = self.env['sale.quote.template'].create(quote_template_values)
+        return {
+            'name': u"Modèle de devis",
+            'view_mode': 'form',
+            'res_model': 'sale.quote.template',
+            'type': 'ir.actions.act_window',
+            'target': 'current',
+            'res_id': sale_quote_template.id,
+        }
+
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
@@ -1259,6 +1302,19 @@ class SaleOrderLine(models.Model):
         res = super(SaleOrderLine, self)._prepare_invoice_line(qty)
         res['of_layout_category_id'] = self.of_layout_category_id and self.of_layout_category_id.id or False
         return res
+
+    @api.multi
+    def prepare_sqt_line_vals(self):
+        self.ensure_one()
+        sale_quote_line_obj = self.env['sale.quote.line']
+        quote_line_new = sale_quote_line_obj.new({
+            'product_id': self.product_id.id,
+            'product_uom_id': self.product_uom.id,
+            'product_uom_qty': self.product_uom_qty,
+            'price_unit': self.price_unit,
+            'name': self.product_id.name,
+        })
+        return quote_line_new._convert_to_write(quote_line_new._cache)
 
 
 class AccountInvoice(models.Model):
@@ -1384,3 +1440,19 @@ class AccountInvoiceLine(models.Model):
         if 'of_layout_category_id' in data:
             del data['of_layout_category_id']
         return data
+
+
+class OFCRMActivity(models.Model):
+    _inherit = 'of.crm.activity'
+
+    @api.multi
+    def prepare_sqt_activity_vals(self):
+        self.ensure_one()
+        sale_quote_template_obj = self.env['of.sale.quote.tmpl.activity']
+        activity_line_new = sale_quote_template_obj.new({
+            'activity_id': self.type_id.id,
+            'compute_date': self.type_id.of_compute_date,
+            'days': self.type_id.days,
+            'description': self.description,
+        })
+        return activity_line_new._convert_to_write(activity_line_new._cache)
