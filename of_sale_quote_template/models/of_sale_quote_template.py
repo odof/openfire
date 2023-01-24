@@ -1252,15 +1252,6 @@ class SaleOrder(models.Model):
     def make_sale_quote_template(self):
         self.ensure_one()
         quote_template_values = self._prepare_sale_quote_templates_values()
-        sale_quote_template = self.env['sale.quote.template'].create(quote_template_values)
-
-        res = {
-            'name': u"Modèle de devis",
-            'view_mode': 'form',
-            'res_model': 'sale.quote.template',
-            'type': 'ir.actions.act_window',
-            'target': 'current',
-        }
 
         lines_to_create = []
         for line in self.order_line:
@@ -1273,15 +1264,22 @@ class SaleOrder(models.Model):
             activities_to_create.append((0, 0, activity_vals))
 
         mails_to_create = [(5, 0, 0)]
-        for doc in self.of_mail_template_ids:
-            mails_to_create.append((4, doc.id))
+        mails_to_create.extend((4, doc.id) for doc in self.of_mail_template_ids)
 
-        sale_quote_template.write({'quote_line': lines_to_create,
-                                   'of_sale_quote_tmpl_activity_ids': activities_to_create,
-                                   'of_mail_template_ids': mails_to_create})
-
-        res['res_id'] = sale_quote_template.id
-        return res
+        quote_template_values.update({
+            'quote_line': lines_to_create,
+            'of_sale_quote_tmpl_activity_ids': activities_to_create,
+            'of_mail_template_ids': mails_to_create
+        })
+        sale_quote_template = self.env['sale.quote.template'].create(quote_template_values)
+        return {
+            'name': u"Modèle de devis",
+            'view_mode': 'form',
+            'res_model': 'sale.quote.template',
+            'type': 'ir.actions.act_window',
+            'target': 'current',
+            'res_id': sale_quote_template.id,
+        }
 
 
 class SaleOrderLine(models.Model):
@@ -1458,6 +1456,8 @@ class OFCRMActivity(models.Model):
         sale_quote_template_obj = self.env['of.sale.quote.tmpl.activity']
         activity_line_new = sale_quote_template_obj.new({
             'activity_id': self.type_id.id,
+            'compute_date': self.type_id.of_compute_date,
+            'days': self.type_id.days,
             'description': self.description,
         })
         return activity_line_new._convert_to_write(activity_line_new._cache)
