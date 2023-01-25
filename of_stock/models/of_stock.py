@@ -1008,6 +1008,46 @@ class StockMove(models.Model):
 class StockQuant(models.Model):
     _inherit = 'stock.quant'
 
+    @api.model_cr_context
+    def _auto_init(self):
+        module_self = self.env['ir.module.module'].search([('name', '=', 'of_stock')])
+        cr = self._cr
+        if module_self.latest_version < '10.0.1.1.0':
+            # On crée les colonnes manuellement pour éviter le calcul sur toutes les lignes existantes (trop long)
+            cr.execute("ALTER TABLE stock_quant ADD COLUMN of_brand_id integer")
+            cr.execute("ALTER TABLE stock_quant ADD COLUMN of_categ_id integer")
+            cr.execute("ALTER TABLE stock_quant ADD COLUMN of_partner_id integer")
+        res = super(StockQuant, self)._auto_init()
+        if module_self.latest_version < '10.0.1.1.0':
+            # Calcul du champ of_brand_id manuel
+            cr.execute("UPDATE stock_quant AS sq "
+                       "SET of_brand_id = pt.brand_id "
+                       "FROM product_product AS pp "
+                       "INNER JOIN product_template AS pt ON pt.id=pp.product_tmpl_id "
+                       "WHERE sq.product_id = pp.id")
+            # Calcul du champ of_categ_id manuel
+            cr.execute("UPDATE stock_quant AS sq "
+                       "SET of_categ_id = pt.categ_id "
+                       "FROM product_product AS pp "
+                       "INNER JOIN product_template AS pt ON pt.id=pp.product_tmpl_id "
+                       "WHERE sq.product_id = pp.id")
+            # Calcul du champ of_partner_id manuel
+            cr.execute("UPDATE stock_quant AS sq "
+                       "SET of_partner_id = sp.partner_id "
+                       "FROM stock_move AS sm "
+                       "INNER JOIN stock_picking AS sp ON sp.id = sm.picking_id "
+                       "WHERE sm.id = sq.reservation_id AND sp.partner_id IS NOT NULL")
+        return res
+
+    of_brand_id = fields.Many2one(
+        comodel_name='of.product.brand', related='product_id.brand_id', string=u"Marque", store=True, readonly=True)
+    of_categ_id = fields.Many2one(
+        comodel_name='product.category', related='product_id.categ_id',
+        string=u"Catégorie d'article", store=True, readonly=True)
+    of_partner_id = fields.Many2one(
+        comodel_name='res.partner', related='reservation_id.picking_id.partner_id',
+        string=u"Adresse de destination du mouvement réservé associé", store=True, readonly=True)
+
     def _quants_get_reservation_domain(self, move, pack_operation_id=False, lot_id=False, company_id=False,
                                        initial_domain=None):
         force_date = self._context.get('force_date_done', False)
