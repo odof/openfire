@@ -193,7 +193,7 @@ class OFPlanningIntervention(models.Model):
 
         if state_interv or any(date_deadline_avant[rdv.id] != rdv.date_deadline for rdv in self):
             for intervention in self:
-                service = intervention.service_id
+                service = intervention.sudo().service_id
                 date_next = False
                 if not service or not service.recurrence:
                     continue
