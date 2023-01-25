@@ -52,6 +52,8 @@ class SaleAdvancePaymentInv(models.TransientModel):
         # Modification du libellé de la ligne d'acompte
         if self._context.get('of_acompte_line_name'):
             invoice.invoice_line_ids[0].name = self._context['of_acompte_line_name']
+        if self._context.get('of_acompte_sale_line_name'):
+            so_line.name = self._context['of_acompte_sale_line_name']
         return invoice
 
     @api.multi
@@ -66,16 +68,18 @@ class SaleAdvancePaymentInv(models.TransientModel):
             sale_orders = self.env['sale.order'].browse(self._context.get('active_ids', []))
             for order in sale_orders:
                 self.amount = amount * order.amount_total / order.amount_untaxed
-                result = super(SaleAdvancePaymentInv,
-                               self.with_context(active_ids=order.ids,
-                                                 of_acompte_line_name=_("Down payment of %s%%") % (amount,))
-                               ).create_invoices()
+                result = super(SaleAdvancePaymentInv, self.with_context(
+                    active_ids=order.ids,
+                    of_acompte_line_name=_("Down payment of %s%%") % amount,
+                    of_acompte_sale_line_name=_("Advance: %s") % time.strftime('%d/%m/%Y')
+                )).create_invoices()
             if len(sale_orders) > 1 and self._context.get('open_invoices', False):
                 result = sale_orders.action_view_invoice()
         else:
             if self.advance_payment_method in ['delivered', 'all'] and self.of_include_null_qty_lines:
                 self = self.with_context(of_include_null_qty_lines=True)
-            result = super(SaleAdvancePaymentInv, self).create_invoices()
+            result = super(SaleAdvancePaymentInv, self.with_context(
+                of_acompte_sale_line_name=_("Advance: %s") % time.strftime('%d/%m/%Y'))).create_invoices()
 
         # On ne propage pas les conditions de règlement si le paramètre de propagation n'est pas coché
         if not self.env['ir.values'].get_default('sale.config.settings', 'of_propagate_payment_term'):
