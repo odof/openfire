@@ -250,6 +250,42 @@
         </field>
     </record>
 
+    <record id="stock_quant_action" model="ir.actions.act_window">
+        <field name="name">Quant</field>
+        <field name="res_model">stock.quant</field>
+        <field name="view_mode">tree,form,pivot</field>
+        <field name="search_view_id" ref="stock.quant_search_view"/>
+    </record>
+
+    <menuitem id="stock_quant_menu"
+              name="Quant"
+              parent="stock.menu_warehouse_report"
+              action="stock_quant_action"
+              sequence="0"/>
+
+    <record id="stock_quant_view_search" model="ir.ui.view">
+        <field name="name">stock.quant.view.search</field>
+        <field name="model">stock.quant</field>
+        <field name="inherit_id" ref="stock.quant_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='location_id']" position="after">
+                <field name="of_partner_id"/>
+                <field name="of_brand_id"/>
+                <field name="of_categ_id"/>
+            </xpath>
+            <xpath expr="//group[1]/filter[last()]" position="after">
+                <separator/>
+                <filter name="reserved" string="Réservé" domain="[('reservation_id','!=', False)]"/>
+                <filter name="not_reserved" string="Non réservé" domain="[('reservation_id','=', False)]"/>
+            </xpath>
+            <xpath expr="//group[2]/filter[1]" position="before">
+                <filter string="Adresse de destination du mouvement réservé associé" name="of_partner_id_group" context="{'group_by': 'of_partner_id'}"/>
+                <filter string="Marque" name="of_brand_id_group" context="{'group_by': 'of_brand_id'}"/>
+                <filter string="Catégorie d'article" name="of_categ_id_group" context="{'group_by': 'of_categ_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Déplacer/renommer les menus -->
     <!-- Opérations -->
     <!-- Ajustements de stock -->
