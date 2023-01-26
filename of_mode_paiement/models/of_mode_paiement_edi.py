@@ -773,13 +773,16 @@ class OfPaiementEdi(models.Model):
             if montant_du > edi_ligne.invoice_id.residual:
                 raise UserError(u"Erreur ! (#ED305)\n\nLe montant à payer pour la facture " + edi_ligne.invoice_id.number + u" est supérieur au restant dû.\n\nLes paiements de cette facture ont dû changer depuis la génération du fichier.\n\nRectifiez le montant à prélever et générez à nouveau le fichier avant de valider les paiements.")
 
+            invoice = edi_ligne.invoice_id
+            orders = invoice.invoice_line_ids.mapped('sale_line_ids').mapped('order_id')
             paiements.append({
-                'invoice_ids': [(6, 0, [edi_ligne.invoice_id.id])],
+                'invoice_ids': [(6, 0, [invoice.id])],
+                'order_ids': [(6, 0, orders._ids)],
                 'amount': montant_du,
                 'payment_date': self.date_remise,
                 'communication': '',
-                'partner_id': edi_ligne.invoice_id.partner_id.id,
-                'partner_type': edi_ligne.invoice_id.type in ('out_invoice', 'out_refund') and 'customer' or 'supplier',
+                'partner_id': invoice.partner_id.id,
+                'partner_type': invoice.type in ('out_invoice', 'out_refund') and 'customer' or 'supplier',
                 'journal_id': self.mode_paiement_id.journal_id.id,
                 'payment_type': 'inbound',
                 'payment_method_id': self.env.ref('account.account_payment_method_manual_in').id,
