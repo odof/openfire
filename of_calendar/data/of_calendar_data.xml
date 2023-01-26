@@ -31,4 +31,24 @@
         </record>
 
     </data>
+
+    <!-- On modifie temporairement le noupdate de la règle pour pouvoir la désactiver -->
+    <function name="write" model="ir.model.data">
+        <function name="search" model="ir.model.data">
+            <value eval="[('module', '=', 'hr'), ('name', 'in', ['hr_job_comp_rule'])]"/>
+        </function>
+        <value eval="{'noupdate': False}" />
+    </function>
+
+    <record id="hr.hr_job_comp_rule" model="ir.rule">
+        <field name="active" eval="False"/>
+    </record>
+
+    <function name="write" model="ir.model.data">
+        <function name="search" model="ir.model.data">
+            <value eval="[('module', '=', 'hr'), ('name', 'in', ['hr_job_comp_rule'])]"/>
+        </function>
+        <value eval="{'noupdate': True}" />
+    </function>
+
 </odoo>
