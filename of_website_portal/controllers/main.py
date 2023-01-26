@@ -12,9 +12,14 @@ class WebsiteAccount(website_account):
 
     def _prepare_portal_layout_values(self):
         values = super(WebsiteAccount, self)._prepare_portal_layout_values()
-        service_ids = request.env['of.service'].search([
+        recurrent_ids = request.env['of.service'].search([
             ('recurrence', '=', True),
             ('state', 'not in', ('draft', 'done', 'cancel')),
+            '|',
+            ('partner_id', 'child_of', request.env.user.partner_id.id),
+            ('address_id', 'child_of', request.env.user.partner_id.id)
+        ])
+        service_ids = request.env['of.service'].search([
             '|',
             ('partner_id', 'child_of', request.env.user.partner_id.id),
             ('address_id', 'child_of', request.env.user.partner_id.id)
@@ -24,7 +29,8 @@ class WebsiteAccount(website_account):
             ('partner_id', 'child_of', request.env.user.partner_id.id)
         ])
         values.update({
-            'recurrent_count': len(service_ids),
+            'recurrent_count': len(recurrent_ids),
+            'service_count': len(service_ids),
             'delivery_count': len(delivery_ids),
             'tabs': request.env.user.of_tab_ids.mapped('code'),
         })
@@ -54,6 +60,35 @@ class WebsiteAccount(website_account):
         pdfhttpheaders = [
             ('Content-Type', 'application/pdf'), ('Content-Length', len(pdf)),
             ('Content-Disposition', 'attachment; filename=Bon_de_livraison.pdf;')
+        ]
+        return request.make_response(pdf, headers=pdfhttpheaders)
+
+    @http.route(['/my/services'], type='http', auth='user', website=True)
+    def portal_my_services(self):
+        values = self._prepare_portal_layout_values()
+        service_ids = request.env['of.service'].search([
+            '|',
+            ('partner_id', 'child_of', request.env.user.partner_id.id),
+            ('address_id', 'child_of', request.env.user.partner_id.id)
+        ])
+        values.update({
+            'services': service_ids,
+        })
+        return request.render('of_website_portal.of_website_portal_portal_my_services', values)
+
+    @http.route(['/my/services/pdf/<int:service_id>'], type='http', auth="user", website=True)
+    def portal_get_service(self, service_id=None, **kw):
+        service = request.env['of.service'].browse([service_id])
+        try:
+            service.check_access_rights('read')
+            service.check_access_rule('read')
+        except AccessError:
+            return request.render("website.403")
+
+        pdf = request.env['report'].sudo().get_pdf([service_id], 'of_service.report_demande_intervention')
+        pdfhttpheaders = [
+            ('Content-Type', 'application/pdf'), ('Content-Length', len(pdf)),
+            ('Content-Disposition', 'attachment; filename=Demande_intervention.pdf;')
         ]
         return request.make_response(pdf, headers=pdfhttpheaders)
 

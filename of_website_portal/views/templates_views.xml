@@ -289,6 +289,49 @@
         </t>
     </template>
 
+    <!-- Portail - Demande d'intervention -->
+    <template id="of_website_portal_portal_my_services" name="OF My Services">
+        <t t-call="website_portal.portal_layout">
+            <h3 class="page-header">Vos demandes d'intervention</h3>
+            <t t-if="not services">
+                <p>Il n'y a actuellement pas de demandes d'intervention pour votre compte.</p>
+            </t>
+            <t t-if="services">
+                <table class="table table-hover o_my_status_table" id="service_table">
+                    <thead>
+                        <tr class="active">
+                            <th>Demande d'intervention</th>
+                            <th>Tâche</th>
+                            <th>Durée</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <t t-foreach="services" t-as="service">
+                        <tr>
+                            <td>
+                                <a t-att-href="'/my/services/pdf/'+str(service.id)" t-att-title="service.display_name">
+                                    <span t-esc="service.titre or service.name"/>
+                                </a>
+                            </td>
+                            <td>
+                                <span t-esc="service.tache_id and service.tache_id.name"/>
+                            </td>
+                            <td>
+                                <span t-esc="service.duree and int(service.duree) or 0"/> h
+                            </td>
+                            <td>
+                                <span t-esc="service.date_next" t-options="{'widget': 'date'}"/>
+                            </td>
+                        </tr>
+                    </t>
+                </table>
+                <div t-if="pager" class="o_portal_pager text-center">
+                    <t t-call="website.pager" />
+                </div>
+            </t>
+        </t>
+    </template>
+
     <!-- Portail - Documents -->
     <template id="of_website_portal_portal_my_documents" name="OF My Documents">
         <t t-call="website_portal.portal_layout">
