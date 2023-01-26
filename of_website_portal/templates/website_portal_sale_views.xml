@@ -43,6 +43,9 @@
             <li t-if="'delivery' in tabs">
                 <a href="/my/deliveries">Livraisons</a>
             </li>
+            <li t-if="'service' in tabs">
+                <a href="/my/services">Demande d'intervention</a>
+            </li>
             <li groups="base.group_portal,base.group_user">
                 <a href="/my/documents">Mes documents</a>
             </li>
@@ -71,6 +74,18 @@
                         </t>
                         <t t-if="not delivery_count">
                             Il n'y a actuellement pas de livraisons pour votre compte.
+                        </t>
+                    </small>
+                </a>
+            </h3>
+            <h3 class="page-header" t-if="'service' in tabs">
+                <a href="/my/services">Vos demandes d'intervention
+                    <small class="ml8">
+                        <t t-if="service_count">
+                            <span class="badge"><t t-esc="service_count"/></span>
+                        </t>
+                        <t t-if="not service_count">
+                            Il n'y a actuellement pas de demande d'intervention pour votre compte.
                         </t>
                     </small>
                 </a>

@@ -6,8 +6,15 @@
         <field name="login">b2b</field>
         <field name="of_is_user_profile" eval="1"/>
         <field name="groups_id" eval="[(6,0,[ref('base.group_portal'), ref('sale.group_show_price_subtotal')])]"/>
+        <field name="of_field_ids" eval="[(6,0,[
+            ref('base.field_res_users_groups_id'),
+            ref('of_website_portal.field_res_users_of_tab_ids'),
+            ref('of_website_portal.field_res_users_of_pricelist_id'),
+            ref('of_website_portal.field_res_users_of_fiscal_position_id'),
+        ])]"/>
         <field name="of_pricelist_id" ref="product.list0"/>
         <field name="of_fiscal_position_id" eval="False"/>
+        <field name="active" eval="False"/>
     </record>
 
     <record id="res_users_portal_b2c" model="res.users">
@@ -15,8 +22,15 @@
         <field name="login">b2c</field>
         <field name="of_is_user_profile" eval="1"/>
         <field name="groups_id" eval="[(6,0,[ref('base.group_portal'), ref('sale.group_show_price_subtotal')])]"/>
+        <field name="of_field_ids" eval="[(6,0,[
+            ref('base.field_res_users_groups_id'),
+            ref('of_website_portal.field_res_users_of_tab_ids'),
+            ref('of_website_portal.field_res_users_of_pricelist_id'),
+            ref('of_website_portal.field_res_users_of_fiscal_position_id'),
+        ])]"/>
         <field name="of_pricelist_id" ref="product.list0"/>
         <field name="of_fiscal_position_id" eval="False"/>
+        <field name="active" eval="False"/>
     </record>
 
     <record id="of_tab_quotation" model="of.tab">
@@ -37,6 +51,11 @@
     <record id="of_tab_delivery" model="of.tab">
         <field name="name">Bon de livraison</field>
         <field name="code">delivery</field>
+    </record>
+
+    <record id="of_tab_service" model="of.tab">
+        <field name="name">Demande d'intervention</field>
+        <field name="code">service</field>
     </record>
 
     <record id="of_tab_parc_installed_park" model="of.tab">

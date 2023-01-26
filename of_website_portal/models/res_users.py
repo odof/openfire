@@ -7,11 +7,89 @@ from odoo import models, fields, api
 class ResUsers(models.Model):
     _inherit = 'res.users'
 
+    @api.model_cr_context
+    def _auto_init(self):
+        res = super(ResUsers, self)._auto_init()
+        module_self = self.env['ir.module.module'].search(
+            [('name', '=', 'of_website_portal'), ('state', 'in', ['installed', 'to upgrade'])])
+        actions_todo = module_self and module_self.latest_version < '10.0.2.1.0' or False
+        if actions_todo:
+            cr = self._cr
+            # On désactive les profils utilisateurs portail
+            cr.execute("""
+                UPDATE  res_users ru
+                SET     active = FALSE
+                FROM ir_model_data imd
+                WHERE ru.id = imd.res_id
+                AND imd.model = 'res.users'
+                AND imd.module = 'of_website_portal'
+                AND imd.name IN ('res_users_portal_b2b', 'res_users_portal_b2c'); """)
+            # On attribue toutes les sociétés les profils utilisateurs portail
+            cr.execute("""
+                DELETE FROM res_company_users_rel
+                WHERE       user_id IN (SELECT  imd.res_id
+                                        FROM    ir_model_data imd
+                                        WHERE   imd.model = 'res.users'
+                                        AND     imd.module = 'of_website_portal'
+                                        AND     imd.name IN ('res_users_portal_b2b', 'res_users_portal_b2c'));
+                INSERT INTO res_company_users_rel (cid, user_id)
+                SELECT      rc.id, ru.id
+                FROM        res_users ru,
+                            res_company rc,
+                            ir_model_data imd
+                WHERE       ru.id = imd.res_id
+                AND         imd.model = 'res.users'
+                AND         imd.module = 'of_website_portal'
+                AND         imd.name IN ('res_users_portal_b2b', 'res_users_portal_b2c'); """)
+            # On attribue des champs à mettre à jour pour les profils utilisateurs portail
+            cr.execute("""
+                DELETE FROM ir_model_fields_res_users_rel
+                WHERE       res_users_id IN (   SELECT  imd.res_id
+                                                FROM    ir_model_data imd
+                                                WHERE   imd.model = 'res.users'
+                                                AND     imd.module = 'of_website_portal'
+                                                AND     imd.name IN ('res_users_portal_b2b', 'res_users_portal_b2c'));
+                INSERT INTO ir_model_fields_res_users_rel (res_users_id, ir_model_fields_id)
+                SELECT      ru.id, imf.id
+                FROM        res_users ru,
+                            ir_model_fields imf,
+                            ir_model_data imd,
+                            ir_model_data imd2
+                WHERE       ru.id = imd.res_id
+                AND         imd.model = 'res.users'
+                AND         imd.module = 'of_website_portal'
+                AND         imd.name IN ('res_users_portal_b2b', 'res_users_portal_b2c')
+                AND         imf.id = imd2.res_id
+                AND         imd2.model = 'ir.model.fields'
+                AND         ((imd2.module = 'of_website_portal' AND imd2.name IN ('field_res_users_of_tab_ids', 'field_res_users_of_pricelist_id', 'field_res_users_of_fiscal_position_id'))
+                OR          (imd2.module = 'base' AND imd2.name IN ('field_res_users_groups_id'))); """)
+        return res
+
     of_pricelist_id = fields.Many2one(comodel_name='product.pricelist', string=u"Liste de prix par défaut")
     of_fiscal_position_id = fields.Many2one(
         comodel_name='account.fiscal.position', string=u"Position fiscale par défaut")
     of_tab_ids = fields.Many2many(
         comodel_name='of.tab', relation='res_users_of_tab_rel', column1='user_id', column2='tab_id', string="Onglets")
+
+    @api.model
+    def deactivate_portal_users(self):
+        self.env.ref('of_website_portal.res_users_portal_b2b').active = False
+        self.env.ref('of_website_portal.res_users_portal_b2c').active = False
+
+    @api.model
+    def create(self, vals):
+        res = super(ResUsers, self).create(vals)
+        if res.of_fiscal_position_id:
+            res.partner_id.property_account_position_id = res.of_fiscal_position_id.id
+        return res
+
+    @api.multi
+    def write(self, vals):
+        res = super(ResUsers, self).write(vals)
+        for user in self:
+            if user.of_fiscal_position_id:
+                user.partner_id.property_account_position_id = user.of_fiscal_position_id.id
+        return res
 
 
 class OFTab(models.Model):
