@@ -1009,6 +1009,26 @@
         <field name="search_view_id" ref="of_planning_tag_filter"/>
     </record>
 
+    <record id="of_planning_intervention_action_generate_delivery" model="ir.actions.server">
+        <field name="name">Générer le bon de livraison</field>
+        <field name="model_id" ref="of_planning.model_of_planning_intervention"/>
+        <field name="state">code</field>
+        <field name="code">new_procs = records.mapped('line_ids').with_context(verif_state=False).sudo()._action_procurement_create()
+# To return an action, assign: action = {...}
+if new_procs._context.get('errors'):
+    rdv_names = new_procs._context.get('errors')
+    message = u"Nous n'avons pas pu générer les BL pour les RDVs suivants car il n'ont pas d'adresses renseignées :\n%s" % u"\n".join(rdv_names)
+    action = env['of.popup.wizard'].popup_return(message=message)
+</field>
+    </record>
+
+    <record id="of_planning_intervention_action_generate_delivery_values" model="ir.values">
+        <field name="name">Générer le bon de livraison</field>
+        <field name="key2">client_action_multi</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="value" eval="'ir.actions.server,%d'%of_planning_intervention_action_generate_delivery"/>
+    </record>
+
 
 <!--#############################################______Copies d'actions_______#####################################################-->
 

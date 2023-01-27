@@ -2311,9 +2311,14 @@ class OfPlanningInterventionLine(models.Model):
         precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
         new_procs = self.env['procurement.order']  # Empty recordset
         do_deliveries = self.env['ir.values'].get_default('of.intervention.settings', 'do_deliveries')
+        verif_state = self._context.get('verif_state', True)
+        rdv_skipped = self.env['of.planning.intervention']
         for line in self:
-            if line.intervention_id.state not in ('confirm', 'done') or not line.product_id._need_procurement() \
-                    or line.order_line_id or not do_deliveries:
+            if (verif_state and line.intervention_id.state not in ('confirm', 'done')) \
+                    or not line.product_id._need_procurement() or line.order_line_id or not do_deliveries:
+                continue
+            if not line.intervention_id.address_id:
+                rdv_skipped |= line.intervention_id
                 continue
             qty = 0.0
             for proc in line.procurement_ids.filtered(lambda r: r.state != 'cancel'):
@@ -2333,7 +2338,7 @@ class OfPlanningInterventionLine(models.Model):
                                             subtype_id=self.env.ref('mail.mt_note').id)
             new_procs += new_proc
         new_procs.run()
-        return new_procs
+        return new_procs.with_context(errors=[rdv.name for rdv in rdv_skipped])
 
     @api.multi
     def _get_delivered_qty(self):
