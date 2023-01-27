@@ -1,14 +1,11 @@
-# -*- coding: utf-8 -*-
-
-import re
-from odoo import models, api, _
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+from odoo import models, _
 from odoo.exceptions import UserError
 
 
 class Module(models.Model):
     _inherit = 'ir.module.module'
 
-    @api.multi
     def write(self, vals):
         if vals.get('state', '') == 'to remove':
             forbidden_uninstall = {
@@ -19,5 +16,5 @@ class Module(models.Model):
             illegal_uninstall = forbidden_uninstall & set(self.mapped('name'))
             if illegal_uninstall:
                 raise UserError(
-                    _(u"Vous tentez de supprimer un ou plusieurs modules protégés : %s" + ", ".join(illegal_uninstall)))
+                    _("You are trying to remove one or more protected modules: %s") % ', '.join(illegal_uninstall))
         return super(Module, self).write(vals)

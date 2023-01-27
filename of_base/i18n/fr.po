@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-27 15:24+0000\n"
-"PO-Revision-Date: 2023-01-27 15:24+0000\n"
+"POT-Creation-Date: 2023-01-27 15:37+0000\n"
+"PO-Revision-Date: 2023-01-27 15:37+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -47,6 +47,11 @@ msgid ""
 msgstr ""
 "* Les données saisies dans ce champ seront affichées sous la rubrique 'Notes"
 " clients' dans le devis et le planning d'intervention."
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_3way_match
+msgid "3-way matching: purchases, receptions and bills"
+msgstr ""
 
 #. module: of_base
 #: model:ir.model,name:of_base.model_res_groups
@@ -100,6 +105,13 @@ msgid "Action Needed"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__group_stock_adv_location
+msgid ""
+"Add and customize route operations to process product moves in your warehouse(s): e.g. unload > quality control > stock for incoming products, pick > pack > ship for outgoing products. \n"
+" You can also set putaway strategies on warehouse locations in order to send incoming products into specific child locations straight away (e.g. specific bins, racks)."
+msgstr ""
+
+#. module: of_base
 #: model:res.groups,name:of_base.of_group_root_only
 msgid "Admin only"
 msgstr "Admin seulement"
@@ -115,6 +127,13 @@ msgid "Advanced settings"
 msgstr "Paramètres avancés"
 
 #. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__module_stock_landed_costs
+msgid ""
+"Affect landed costs on reception operations and split them among products to"
+" update their cost price."
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__alias_domain
 msgid "Alias Domain"
 msgstr ""
@@ -122,6 +141,11 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_product_margin
 msgid "Allow Product Margin"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__group_send_reminder
+msgid "Allow automatically send email to remind your vendor the receipt date"
 msgstr ""
 
 #. module: of_base
@@ -174,6 +198,18 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_analytic_accounting
 msgid "Analytic Accounting"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__annual_inventory_month
+msgid "Annual Inventory Month"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__annual_inventory_month
+msgid ""
+"Annual inventory month for products not in a location with a cyclic "
+"inventory date. Set to no month if no automatic annual inventory."
 msgstr ""
 
 #. module: of_base
@@ -258,8 +294,23 @@ msgid ""
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_stock_barcode
+msgid "Barcode Scanner"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__account_cash_basis_base_account_id
 msgid "Base Tax Received Account"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_stock_picking_batch
+msgid "Batch Transfers"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__default_purchase_method
+msgid "Bill Control"
 msgstr ""
 
 #. module: of_base
@@ -355,6 +406,11 @@ msgid "Company"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__company_currency_id
+msgid "Company Currency"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__company_informations
 msgid "Company Informations"
 msgstr ""
@@ -396,6 +452,11 @@ msgstr "Configurer les connecteurs"
 #: model:ir.ui.menu,name:of_base.of_connector_menu
 msgid "Connectors"
 msgstr "Connecteurs"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_stock_tracking_owner
+msgid "Consignment"
+msgstr ""
 
 #. module: of_base
 #: model:ir.model,name:of_base.model_res_partner
@@ -497,6 +558,28 @@ msgid "DHL Express Connector"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__annual_inventory_day
+msgid "Day of the month"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__annual_inventory_day
+msgid ""
+"Day of the month when the annual inventory should occur. If zero or negative, then the first day of the month will be selected instead.\n"
+"        If greater than the last day of a month, then the last day of the month will be selected instead."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__days_to_purchase
+msgid "Days needed to confirm a PO, define when a PO should be validated"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__days_to_purchase
+msgid "Days to Purchase"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_res_company__of_decennial_insurance
 msgid "Decennial insurance"
 msgstr "Assurance décennale"
@@ -555,7 +638,6 @@ msgstr ""
 #. module: of_base
 #: model:ir.actions.server,name:of_base.of_base_cron_delete_old_logs_ir_actions_server
 #: model:ir.cron,cron_name:of_base.of_base_cron_delete_old_logs
-#: model:ir.cron,name:of_base.of_base_cron_delete_old_logs
 msgid "Delete log messages"
 msgstr "Suppression des messages de logs"
 
@@ -594,6 +676,16 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_discount_per_so_line
 msgid "Discounts"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_lot_on_delivery_slip
+msgid "Display Lots & Serial Numbers on Delivery Slips"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_lot_on_invoice
+msgid "Display Lots & Serial Numbers on Invoices"
 msgstr ""
 
 #. module: of_base
@@ -647,6 +739,11 @@ msgid "Document Template"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_stock_dropshipping
+msgid "Dropshipping"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_reports
 msgid "Dynamic Reports"
 msgstr ""
@@ -670,6 +767,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_base.field_res_partner__email
 #: model:ir.model.fields,field_description:of_base.field_res_users__email
 msgid "Email"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__stock_move_email_validation
+msgid "Email Confirmation picking"
 msgstr ""
 
 #. module: of_base
@@ -726,6 +828,11 @@ msgstr "Erreur"
 #: model:ir.model.fields,field_description:of_base.field_of_log_message__type
 msgid "Error type"
 msgstr "Type d'erreur"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_product_expiry
+msgid "Expiration Dates"
+msgstr ""
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__fail_counter
@@ -850,6 +957,11 @@ msgstr "Le groupe \"%s\" ne peut être ajouté à un utilisateur !"
 #: model:res.groups,comment:of_base.of_group_root_only
 msgid "Group only for admin (root) user"
 msgstr "Groupe uniquement pour l'utilisateur admin (root)"
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__group_stock_picking_wave
+msgid "Group your move operations in wave transfer to process them together"
+msgstr ""
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__has_accounting_entries
@@ -1039,8 +1151,18 @@ msgid "Is a valid number ?"
 msgstr "Est un numéro est valide ?"
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__is_installed_sale
+msgid "Is the Sale Module Installed"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_auth_ldap
 msgid "LDAP Authentication"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_stock_landed_costs
+msgid "Landed Costs"
 msgstr ""
 
 #. module: of_base
@@ -1116,8 +1238,18 @@ msgid "Legal form"
 msgstr "Forme juridique"
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__po_double_validation
+msgid "Levels of Approvals *"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__show_line_subtotals_tax_selection
 msgid "Line Subtotals Tax Display"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__lock_confirmed_po
+msgid "Lock Confirmed Orders"
 msgstr ""
 
 #. module: of_base
@@ -1152,6 +1284,11 @@ msgid "Loss Account"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_stock_production_lot
+msgid "Lots & Serial Numbers"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model,name:of_base.model_ir_mail_server
 msgid "Mail Server"
 msgstr "Serveur d'email"
@@ -1177,6 +1314,22 @@ msgid ""
 "Manual assign allow to trigger assignment from team form view using an "
 "action button. Automatic configures a cron running repeatedly assignment in "
 "all teams."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__po_lead
+msgid ""
+"Margin of error for vendor lead times. When the system generates Purchase "
+"Orders for procuring products, they will be scheduled that many days earlier"
+" to cope with unexpected vendor delays."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__use_po_lead
+msgid ""
+"Margin of error for vendor lead times. When the system generates Purchase "
+"Orders for reordering products,they will be scheduled that many days earlier"
+" to cope with unexpected vendor delays."
 msgstr ""
 
 #. module: of_base
@@ -1223,6 +1376,16 @@ msgid "Messages"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__po_double_validation_amount
+msgid "Minimum Amount"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__po_double_validation_amount
+msgid "Minimum amount for which a double validation is required"
+msgstr ""
+
+#. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_view_company_form
 msgid "Miscellaneous"
 msgstr "Divers"
@@ -1253,6 +1416,11 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_multi_currency
 msgid "Multi-Currencies"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_stock_adv_location
+msgid "Multi-Step Routes"
 msgstr ""
 
 #. module: of_base
@@ -1427,6 +1595,11 @@ msgid "Outstanding Receipts Account"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_stock_tracking_lot
+msgid "Packages"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_res_partner__of_parent_category_id
 #: model:ir.model.fields,field_description:of_base.field_res_users__of_parent_category_id
 msgid "Parent labels"
@@ -1502,6 +1675,11 @@ msgid "Print"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_stock_lot_print_gs1
+msgid "Print GS1 Barcodes for Lots & Serial Numbers"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_proforma_sales
 msgid "Pro-Forma Invoice"
 msgstr ""
@@ -1509,7 +1687,7 @@ msgstr ""
 #. module: of_base
 #: model:ir.model,name:of_base.model_product_template
 msgid "Product"
-msgstr "Article"
+msgstr "Modèle d'article"
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_stock_packaging
@@ -1532,8 +1710,50 @@ msgid "Promotions, Coupons, Gift Card & Loyalty Program"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__po_double_validation
+msgid "Provide a double validation mechanism for purchases"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_purchase_requisition
+msgid "Purchase Agreements"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_purchase_product_matrix
+msgid "Purchase Grid Entry"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__po_lead
+msgid "Purchase Lead Time"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__po_order_approval
+msgid "Purchase Order Approval"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__po_lock
+msgid "Purchase Order Modification *"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__po_lock
+msgid ""
+"Purchase Order Modification used when you want to purchase order editable "
+"after confirm"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_show_purchase_receipts
 msgid "Purchase Receipt"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_warning_purchase
+msgid "Purchase Warnings"
 msgstr ""
 
 #. module: of_base
@@ -1547,13 +1767,33 @@ msgid "Qualifications"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_quality_control
+msgid "Quality"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_quality_control_worksheet
+msgid "Quality Worksheet"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__quick_edit_mode
 msgid "Quick encoding"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_send_reminder
+msgid "Receipt Reminder"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields.selection,name:of_base.selection__mail_message__of_state__received
 msgid "Received"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_stock_reception_report
+msgid "Reception Report"
 msgstr ""
 
 #. module: of_base
@@ -1579,6 +1819,11 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_sepa
 msgid "SEPA Credit Transfer (SCT)"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_stock_sms
+msgid "SMS Confirmation"
 msgstr ""
 
 #. module: of_base
@@ -1622,6 +1867,11 @@ msgid "Save & New"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__use_po_lead
+msgid "Security Lead Time for Purchase"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__invoice_is_email
 msgid "Send Email"
 msgstr ""
@@ -1657,6 +1907,11 @@ msgid "Show line subtotals without taxes (B2B)"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_stock_sign_delivery
+msgid "Signature"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_snailmail_account
 msgid "Snailmail"
 msgstr ""
@@ -1682,6 +1937,23 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_base.field_mail_mail__of_state
 #: model:ir.model.fields,field_description:of_base.field_mail_message__of_state
 msgid "Status"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_stock_storage_categories
+msgid "Storage Categories"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_stock_multi_locations
+msgid "Storage Locations"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__group_stock_multi_locations
+msgid ""
+"Store products in specific locations of your warehouse (e.g. bins, racks) "
+"and to track inventory accordingly."
 msgstr ""
 
 #. module: of_base
@@ -1789,7 +2061,7 @@ msgstr ""
 
 #. module: of_base
 #. odoo-python
-#: code:addons/of_base/models/partner.py:0
+#: code:addons/of_base/models/res_partner.py:0
 #, python-format
 msgid "The customer account number is already in use and must be unique (%s)."
 msgstr "Le n° de compte client est déjà utilisé et doit être unique (%s)."
@@ -1833,6 +2105,13 @@ msgid ""
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__default_purchase_method
+msgid ""
+"This default value is applied to any new product created. This can be "
+"changed in the product detail form."
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,help:of_base.field_of_connector_config_settings__account_default_credit_limit
 msgid ""
 "This is the default credit limit that will be used on partners that do not "
@@ -1845,6 +2124,13 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:of_base.of_log_message_search_view
 msgid "Title"
 msgstr "Titre"
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__module_product_expiry
+msgid ""
+"Track following dates on lots & serial numbers: best before, removal, end of life, alert. \n"
+" Such dates are set automatically at lot/serial number creation based on values set on the product (in days)."
+msgstr ""
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_base_gengo
@@ -1990,8 +2276,18 @@ msgid "Warning"
 msgstr "Avertissement"
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_warning_stock
+msgid "Warnings for Stock"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_warning_account
 msgid "Warnings in Invoices"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_stock_picking_wave
+msgid "Wave Transfers"
 msgstr ""
 
 #. module: of_base
@@ -2014,6 +2310,13 @@ msgstr ""
 #: code:addons/of_base/models/ir_module.py:0
 #, python-format
 msgid "You are trying to delete one or more protected modules : %s"
+msgstr "Vous tentez de supprimer un ou plusieurs modules protégés : %s"
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/models/module.py:0
+#, python-format
+msgid "You are trying to remove one or more protected modules: %s"
 msgstr "Vous tentez de supprimer un ou plusieurs modules protégés : %s"
 
 #. module: of_base
