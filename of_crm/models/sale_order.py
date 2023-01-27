@@ -129,7 +129,7 @@ class SaleOrder(models.Model):
             elif rec.intervention_ids:
                 installation_type = self.env.ref('of_service.of_service_type_installation')
                 inter_installation = rec.intervention_ids.filtered(
-                    lambda i: i.type_id == installation_type and i.state == 'confirm')
+                    lambda i: i.type_id == installation_type and i.state in ['draft', 'confirm'])
                 # by default Interventions are sorted by date (_order = 'date')
 
                 if inter_installation:
