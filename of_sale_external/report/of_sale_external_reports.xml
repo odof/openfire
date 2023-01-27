@@ -30,6 +30,58 @@
         <xpath expr="//t[@t-call='report.external_layout']" position="attributes">
             <attribute name="t-call">of_sale_external.saleorder_specific_external_layout</attribute>
         </xpath>
+        <!-- L'affichage des prix HT/TTC était géré par groupe, mais on ne peut pas récupérer ce mode de fonctionnement avec les modes d'impression-->
+        <xpath expr="//div[@class='page']" position="before">
+            <t t-set="pdf_sale_show_tax" t-value="doc.pdf_pdf_sale_show_tax()"/>
+        </xpath>
+        <xpath expr="//table[@name='order_lines_layouted']/thead//th[@name='price_unit_ht']" position="attributes">
+            <attribute name="groups"></attribute>
+            <attribute name="t-if">doc.of_price_printing == 'order_line' and pdf_sale_show_tax in ['subtotal', 'both']</attribute>
+        </xpath>
+        <xpath expr="//table[@name='order_lines_layouted']/thead//th[@name='price_unit_ttc']" position="attributes">
+            <attribute name="groups"></attribute>
+            <attribute name="t-if">doc.of_price_printing == 'order_line' and pdf_sale_show_tax in ['total', 'both']</attribute>
+        </xpath>
+        <xpath expr="//table[@name='order_lines_layouted']/tbody/t/t/tr/td[@name='price_unit_ht']" position="attributes">
+            <attribute name="groups"></attribute>
+            <attribute name="t-if">doc.of_price_printing == 'order_line' and pdf_sale_show_tax in ['subtotal', 'both']</attribute>
+        </xpath>
+        <xpath expr="//table[@name='order_lines_layouted']/tbody/t/t/tr/td[@name='price_unit_ttc']" position="attributes">
+            <attribute name="groups"></attribute>
+            <attribute name="t-if">doc.of_price_printing == 'order_line' and pdf_sale_show_tax in ['total', 'both']</attribute>
+        </xpath>
+        <xpath expr="//table[@name='order_lines_layouted']/tbody/t/t/t//tr/td[@name='price_unit_ht']" position="attributes">
+            <attribute name="groups"></attribute>
+            <attribute name="t-if">doc.of_price_printing == 'order_line' and pdf_sale_show_tax in ['subtotal', 'both']</attribute>
+        </xpath>
+        <xpath expr="//table[@name='order_lines_layouted']/tbody/t/t/t//tr/td[@name='price_unit_ttc']" position="attributes">
+            <attribute name="groups"></attribute>
+            <attribute name="t-if">doc.of_price_printing == 'order_line' and pdf_sale_show_tax in ['total', 'both']</attribute>
+        </xpath>
+        <xpath expr="//table[@name='order_lines_layouted']/thead//th[@name='price_ht']" position="attributes">
+            <attribute name="groups"></attribute>
+            <attribute name="t-if">doc.of_price_printing == 'order_line' and pdf_sale_show_tax in ['subtotal', 'both']</attribute>
+        </xpath>
+        <xpath expr="//table[@name='order_lines_layouted']/thead//th[@name='price_total']" position="attributes">
+            <attribute name="groups"></attribute>
+            <attribute name="t-if">doc.of_price_printing == 'order_line' and pdf_sale_show_tax in ['total', 'both']</attribute>
+        </xpath>
+        <xpath expr="//table[@name='order_lines_layouted']/tbody/t/t/tr/td[@name='price_ht']" position="attributes">
+            <attribute name="groups"></attribute>
+            <attribute name="t-if">doc.of_price_printing == 'order_line' and pdf_sale_show_tax in ['subtotal', 'both']</attribute>
+        </xpath>
+        <xpath expr="//table[@name='order_lines_layouted']/tbody/t/t/tr/td[@name='price_total']" position="attributes">
+            <attribute name="groups"></attribute>
+            <attribute name="t-if">doc.of_price_printing == 'order_line' and pdf_sale_show_tax in ['total', 'both']</attribute>
+        </xpath>
+        <xpath expr="//table[@name='order_lines_layouted']/tbody/t/t/t//tr/td[@name='price_ht']" position="attributes">
+            <attribute name="groups"></attribute>
+            <attribute name="t-if">doc.of_price_printing == 'order_line' and pdf_sale_show_tax in ['subtotal', 'both']</attribute>
+        </xpath>
+        <xpath expr="//table[@name='order_lines_layouted']/tbody/t/t/t//tr/td[@name='price_total']" position="attributes">
+            <attribute name="groups"></attribute>
+            <attribute name="t-if">doc.of_price_printing == 'order_line' and pdf_sale_show_tax in ['total', 'both']</attribute>
+        </xpath>
     </template>
 
     <template id="report_saleorder_specific">

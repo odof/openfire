@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 ##############################################################################
 #
@@ -36,7 +37,10 @@ devis/bon de commande.
         "of_external",
     ],
     'data' : [
+        'security/ir.model.access.csv',
         'views/sale_order_views.xml',
+        'views/account_invoice_views.xml',
+        'views/of_report_template_views.xml',
         'report/of_sale_external_reports.xml',
         'report/sale_order_reports.xml',
     ],

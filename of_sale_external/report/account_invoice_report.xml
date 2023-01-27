@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="of_sale_external_report_saleorder_document" inherit_id="account.report_invoice_document" priority="10">
+        <xpath expr="//div[@name='addresses']" position="after">
+            <h2 t-if="doc.company_id.of_position_header_lines == 'bandeau_totalite'" name="doc_name" style="margin-bottom: 10px;">
+                <span t-if="doc.state == 'draft'">Estimation</span>
+                <span t-if="doc.state == 'sent'">Devis</span>
+                <span t-if="doc.state not in ['draft','sent']">Bon de commande</span>
+                <t t-if="doc.name"><span>N°</span><span t-field="doc.name"/></t>
+                <t t-if="doc.state in ['draft', 'sent']"><span> du </span><span t-field="doc.date_order" t-options='{"widget": "date"}'/></t>
+                <t t-if="doc.state not in ['draft', 'sent']"><span> du </span><span t-field="doc.confirmation_date" t-options='{"widget": "date"}'/></t>
+            </h2>
+        </xpath>
+    </template>
+
+</odoo>

@@ -59,7 +59,7 @@
 
     <!-- menu -->
     <menuitem id="menu_of_sale_type" action="of_sale_type_action"
-              parent="sale.menu_sales_config" sequence="1" name="Sale order type"/>
+              parent="sale.menu_sales_config" sequence="3" name="Sale order type"/>
 
 
 </odoo>

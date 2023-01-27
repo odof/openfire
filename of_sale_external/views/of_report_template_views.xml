@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_report_template_view_tree" model="ir.ui.view">
+        <field name="name">of.report.template.view.tree</field>
+        <field name="model">of.report.template</field>
+        <field name="arch" type="xml">
+            <tree string="Printing Template">
+                <field name="name" />
+                <field name="model"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_report_template_view_form" model="ir.ui.view">
+        <field name="name">of.report.template.view.form</field>
+        <field name="model">of.report.template</field>
+        <field name="arch" type="xml">
+            <form string="Printing Template">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="model"/>
+                        </group>
+                    </group>
+                    <group string="Printing parameters" col="6">
+                        <group colspan="2" name="address_insert">
+                            <group colspan="2">
+                                <h4 class="of-printing-parameter-title" colspan="2">Address insert</h4>
+                                <field name="pdf_address_title"/>
+                                <field name="pdf_shipping_address_specific_title"/>
+                                <field name="pdf_address_contact_titles"/>
+                                <field name="pdf_address_contact_parent_name"/>
+                                <field name="pdf_address_contact_name"/>
+                                <field name="pdf_address_contact_phone" string="Phone"/>
+                                <field name="pdf_address_contact_mobile" string="Mobile"/>
+                                <field name="pdf_address_contact_fax" string="Fax"/>
+                                <field name="pdf_address_contact_email" string="Email"/>
+                            </group>
+                        </group>
+                        <group colspan="2" name="commercial_insert">
+                            <group colspan="2">
+                                <h4 class="of-printing-parameter-title" colspan="2">Inserts</h4>
+                                <field name="pdf_commercial_insert" class="of-printing-parameter-insert"/>
+                                <field name="pdf_commercial_contact" attrs="{'invisible': [('model', '=', 'account.invoice')]}"/>
+                                <field name="pdf_commercial_email" attrs="{'invisible': [('model', '=', 'account.invoice')]}" string="Email"/>
+                            </group>
+                            <group colspan="2" attrs="{'invisible': [('model', '=', 'account.invoice')]}">
+                                <field name="pdf_customer_insert"/>
+                                <field name="pdf_customer_phone" string="Phone"/>
+                                <field name="pdf_customer_mobile" string="Mobile"/>
+                                <field name="pdf_customer_fax" string="Fax"/>
+                                <field name="pdf_customer_email" string="Email"/>
+                            </group>
+                        </group>
+                        <group colspan="2" name="labels">
+                            <group colspan="2">
+                                <h4 class="of-printing-parameter-title" colspan="2">Labels</h4>
+                                <field name="pdf_payment_term_insert" attrs="{'invisible': [('model', '=', 'account.invoice')]}"/>
+                                <field name="pdf_requested_week" attrs="{'invisible': [('model', '=', 'account.invoice')]}"/>
+                                <field name="pdf_customer_ref_insert" attrs="{'invisible': [('model', '=', 'account.invoice')]}"/>
+                                <field name="pdf_display_incoterm" attrs="{'invisible': [('model', '=', 'account.invoice')]}"/>
+                                <field name="pdf_technical_visit_insert"/>
+                                <field name="pdf_validity_insert" attrs="{'invisible': [('model', '=', 'account.invoice')]}"/>
+                                <field name="pdf_legal_notice" attrs="{'invisible': [('model', '=', 'sale.order')]}"/>
+                            </group>
+                        </group>
+                    </group>
+                    <group col="6">
+                        <group colspan="2">
+                            <group colspan="2">
+                                <h4 class="of-printing-parameter-title" colspan="2">Section</h4>
+                                <field name="pdf_section_bg_color" widget="color"/>
+                                <field name="pdf_section_font_color" widget="color"/>
+                                <separator colspan="2"/>
+                                <h4 class="of-printing-parameter-title" colspan="2">Order lines</h4>
+                                <field name="pdf_product_reference"/>
+                                <field name="pdf_sale_show_tax" attrs="{'invisible': [('model', '=', 'account.invoice')]}"/>
+                            </group>
+                        </group>
+                        <group colspan="2">
+                            <group colspan="2" attrs="{'invisible': [('model', '=', 'account.invoice')]}">
+                                <field name="pdf_payment_schedule" class="of-printing-parameter-title"/>
+                            </group>
+                            <group colspan="2" attrs="{'invisible': [('model', '=', 'account.invoice')]}">
+                                <field name="pdf_taxes_detail" class="of-printing-parameter-title"/>
+                            </group>
+                            <group colspan="2" name="signatures" attrs="{'invisible': [('model', '=', 'account.invoice')]}">
+                                <field name="pdf_signatures_insert" class="of-printing-parameter-title"/>
+                                <field name="pdf_customer_signature"/>
+                                <field name="pdf_vendor_signature"/>
+                                <field name="pdf_signature_text"/>
+                            </group>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_report_template_view_search" model="ir.ui.view">
+        <field name="name">of.report.template.view.search</field>
+        <field name="model">of.report.template</field>
+        <field name="arch" type="xml">
+            <search string="Printing Template">
+                <field name="name"/>
+                <field name="model"/>
+                <separator/>
+                <filter string="Active" name="active" domain="[('active','=',True)]"/>
+                <filter string="Archived" name="archived" domain="[('active','=',False)]"/>
+                <separator/>
+                <filter string="Order" name="order" domain="[('model','in',['sale.order', False])]"/>
+                <filter string="Invoice" name="invoice" domain="[('model','in',['account.invoice', False])]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_of_report_template_tree" model="ir.actions.act_window">
+        <field name="name">Printing template</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.report.template</field>
+        <field name="view_id" ref="of_report_template_view_tree"/>
+        <field name="search_view_id" ref="of_report_template_view_search"/>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="sale.Report_configuration" sequence="4"/>
+    <menuitem id="menu_of_report_template" name="Printing Template" parent="sale.menu_sales_config" action="action_of_report_template_tree" sequence="2"/>
+
+</odoo>

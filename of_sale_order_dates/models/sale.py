@@ -26,8 +26,12 @@ class SaleOrder(models.Model):
                 order.of_requested_week = ""
 
     def pdf_requested_week(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_requested_week')
-
+        # Pour éviter de créer un module intermédiaire entre of_sale_external et of_sale_order_dates,
+        # on teste la présence d'un champ créé dans of_sale_external
+        if 'of_report_template_id' in self.env['sale.order']._fields and self.of_report_template_id:
+            return self.of_report_template_id.pdf_requested_week
+        else:
+            return self.env['ir.values'].get_default('sale.config.settings', 'pdf_requested_week')
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'

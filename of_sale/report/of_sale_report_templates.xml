@@ -472,6 +472,7 @@
                 </div>
             </div>
             <div name="adresse_facturation" class="col-xs-5 col-xs-offset-1" style="font-size: large">
+                <strong name="libelle_adr_fact_livraison" t-if="o.partner_shipping_id == o.partner_id"><span t-esc="pdf_shipping_address_specific_title"/> et de facturation&amp;nbsp;:</strong>
                 <strong name="libelle_adr_facturation" t-if="o.partner_shipping_id and o.partner_shipping_id != o.partner_id">Adresse de facturation</strong><br/>
                 <t t-set="the_address" t-value="o.partner_id"/>
                 <t t-if="o.pdf_afficher_nom_parent()">
