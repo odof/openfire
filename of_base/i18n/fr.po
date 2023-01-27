@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-27 15:37+0000\n"
-"PO-Revision-Date: 2023-01-27 15:37+0000\n"
+"POT-Creation-Date: 2023-01-27 15:54+0000\n"
+"PO-Revision-Date: 2023-01-27 15:54+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -833,6 +833,11 @@ msgstr "Type d'erreur"
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_product_expiry
 msgid "Expiration Dates"
 msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__res_users__of_user_type__external
+msgid "External"
+msgstr "Externe"
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__fail_counter
@@ -2009,6 +2014,11 @@ msgid "Tax setting"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__res_users__of_user_type__technical
+msgid "Technical"
+msgstr "Technique"
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__chart_template_id
 msgid "Template"
 msgstr ""
@@ -2288,6 +2298,11 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_stock_picking_wave
 msgid "Wave Transfers"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__res_users__of_user_type__web
+msgid "Web"
 msgstr ""
 
 #. module: of_base

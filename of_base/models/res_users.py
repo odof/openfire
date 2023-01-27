@@ -12,8 +12,10 @@ class ResUsers(models.Model):
         return 'web'
 
     of_user_type = fields.Selection(
-        selection='_get_user_type_selection', string="User type",
-        default=lambda u: u._default_of_type_selection())
+        selection=[
+            ('web', "Web"),
+            ('technical', "Technical"),
+            ('external', "External")], string="User type", default=lambda u: u._default_of_type_selection())
 
     @api.model
     @tools.ormcache('self._uid')
@@ -26,13 +28,6 @@ class ResUsers(models.Model):
         new_context = dict(frozen_context)
         new_context['mail_auto_subscribe_no_notify'] = 1
         return frozendict(new_context)
-
-    @api.model
-    def _get_user_type_selection(self):
-        return [
-            ('web', "Web"),
-            ('technical', "Technical"),
-        ]
 
     def _get_default_email(self):
         self.ensure_one()
