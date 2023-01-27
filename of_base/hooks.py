@@ -2,7 +2,7 @@
 from odoo import api, SUPERUSER_ID
 from odoo.exceptions import ValidationError
 from odoo.addons.base_iban.models.res_partner_bank import validate_iban
-from .models.partner import convert_phone_number
+from .models.res_partner import convert_phone_number
 
 
 def _set_partner_bank_account_type(env):

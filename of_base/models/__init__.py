@@ -12,7 +12,7 @@ from . import of_form_readonly
 from . import of_log_message
 from . import of_read_group
 from . import of_res_partner_phone
-from . import partner
+from . import res_partner
 from . import product_product
 from . import product_template
 from . import res_bank

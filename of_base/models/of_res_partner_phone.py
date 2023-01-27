@@ -1,7 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 from odoo import models, api, fields
-from .partner import PHONE_TYPES
-from .partner import convert_phone_number
+from .res_partner import PHONE_TYPES
+from .res_partner import convert_phone_number
 
 
 class OFResPartnerPhone(models.Model):

@@ -104,9 +104,7 @@ class ResPartner(models.Model):
         search='_search_of_potential_duplication')
 
     def _compute_old_phone_fields(self):
-        user = self.env.user
-        default_country = user.country_id or user.company_id.country_id
-        default_country_code = default_country and default_country.code or 'FR'
+        default_country_code = self._get_default_country_code()
         for rec in self:
             phone = rec.of_phone_number_ids.filtered(lambda p: p.type == '01_domicile')
             if not phone:
@@ -136,10 +134,13 @@ class ResPartner(models.Model):
             last_order = self.env['sale.order'].search([('partner_id', "=", partner.id)], order='id desc', limit=1)
             partner.of_last_order_date = last_order.date_order if last_order else False
 
-    def _of_set_number(self, number_field, number_type):
+    def _get_default_country_code(self):
         user = self.env.user
         default_country = user.country_id or user.company_id.country_id
-        default_country_code = default_country and default_country.code or 'FR'
+        return default_country and default_country.code or 'FR'
+
+    def _of_set_number(self, number_field, number_type):
+        default_country_code = self._get_default_country_code()
         for rec in self:
             number = convert_phone_number(rec[number_field], default_country_code, strict=True)
             if not number:
