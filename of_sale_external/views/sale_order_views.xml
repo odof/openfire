@@ -11,6 +11,7 @@
                 <group string="Impression spécifique" name="specific">
                     <field name="of_specific_title"/>
                     <field name="of_specific_date"/>
+                    <field name="of_report_template_id"/>
                 </group>
             </xpath>
         </field>
