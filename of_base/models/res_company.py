@@ -61,3 +61,7 @@ class ResCompany(models.Model):
         if self._uid not in [SUPERUSER_ID, self.env.ref('base.user_admin').id]:
             raise ValidationError(_("Only the administrator can create a new company."))
         return super().unlink()
+
+    @api.model
+    def get_allowed_company_ids(self):
+        return self.env.user.company_ids.ids
