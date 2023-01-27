@@ -1,5 +1,5 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-from odoo import models, fields
+from odoo import models, fields, api
 
 
 class MailMessage(models.Model):
@@ -32,3 +32,9 @@ class MailMessage(models.Model):
 
             message.of_state = mail.state
             message.of_failure_reason = mail.failure_reason
+
+    @api.model
+    def _get_default_from(self):
+        if not self.env.user.email:
+            self.env.user.email = self.env.user._get_default_email()
+        return super(MailMessage, self)._get_default_from()

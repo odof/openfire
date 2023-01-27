@@ -34,6 +34,10 @@ class ResUsers(models.Model):
             ('technical', "Technical"),
         ]
 
+    def _get_default_email(self):
+        self.ensure_one()
+        return self.partner_id.name.lower().replace(" ", "") + "@example.com"
+
     def write(self, values):
         if SUPERUSER_ID in self._ids and self._uid != SUPERUSER_ID:
             raise AccessError(
@@ -46,3 +50,11 @@ class ResUsers(models.Model):
         if 'groups_id' in values and (len(group_root.users) > 2 or group_root.users.id != admin_user_id):
             raise UserError(_("Group \"%s\" cannot be added to a user!") % group_root.name)
         return result
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        users = super(ResUsers, self).create(vals_list)
+        for user in users:
+            if not user.email:
+                user.email = user._get_default_email()
+        return user

@@ -349,9 +349,17 @@ class ResPartner(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        for vals in vals_list:
+            # Email field validation
+            if email_address := vals.get('email'):
+                if not tools.single_email_re.match(email_address):
+                    raise ValidationError(_("Email address %s is invalid") % (email_address))
+
         partner = super().create(vals_list)
+
         for vals in vals_list:
             self._check_no_ref_duplicate(vals.get('ref'))
+
         # Calcul de la ref en fonction de la configuration
         if partner.company_id.of_ref_mode == 'id' and not partner.ref:
             if self.env['res.partner'].with_context(active_test=False).search([('ref', '=', str(partner.id))]):
@@ -384,12 +392,18 @@ class ResPartner(models.Model):
         return True
 
     def write(self, vals):
+        # Email field validation
+        if email_address := vals.get('email'):
+            if not tools.single_email_re.match(email_address):
+                raise ValidationError(_("Email address %s is invalid") % (email_address))
+
         # Modification de la fonction write pour propager la modification de la référence aux enfants si besoin
         write_ref = 'ref' in vals
         if write_ref:
             # La référence est modifiée, il va falloir propager la nouvelle valeur aux enfants
             ref = vals['ref']
             partner_refs = [(partner, partner.ref) for partner in self if partner.ref != ref]
+
         # Permet la synchronisation des champs customer et supplier pour tout les contacts liés
         if ('customer' in vals or 'supplier' in vals) and self._context.get('partner_recursion', True):
             for partner in self:
@@ -403,7 +417,9 @@ class ResPartner(models.Model):
                 if 'supplier' in vals:
                     values['supplier'] = vals['supplier']
                 partners.with_context(partner_recursion=False).write(values)
+
         res = super().write(vals)
+
         if write_ref:
             self._update_refs(ref, partner_refs)
         # Calcul de la ref en fonction de la configuration
