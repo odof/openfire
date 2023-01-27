@@ -481,6 +481,7 @@ class OfPlanningIntervention(models.Model):
     alert_hors_creneau = fields.Boolean(string=u"RDV hors des créneaux", compute="_compute_date_deadline")
     alert_coherence_date = fields.Boolean(string=u"Incohérence dans les dates", compute="_compute_alert_coherence_date")
     alert_incapable = fields.Boolean(string="Aucun intervenant apte", compute="_compute_alert_incapable")
+    alert_wrong_company = fields.Boolean(string=u"Incohérence société", compute='_compute_alert_wrong_company')
 
     # Pour recherche
     gb_employee_id = fields.Many2one(
@@ -764,6 +765,15 @@ class OfPlanningIntervention(models.Model):
                 interv.alert_incapable = True
             else:
                 interv.alert_incapable = False
+
+    @api.depends('employee_ids', 'company_id')
+    def _compute_alert_wrong_company(self):
+        for interv in self:
+            if interv.company_id and interv.employee_ids.filtered(
+                    lambda emp: emp.user_id and interv.company_id not in emp.user_id.company_ids):
+                interv.alert_wrong_company = True
+            else:
+                interv.alert_wrong_company = False
 
     @api.depends('name', 'number')
     def _compute_calendar_name(self):
