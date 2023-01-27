@@ -256,6 +256,7 @@
                     <field name="alert_hors_creneau" invisible="1"/>
                     <field name="alert_incapable" invisible="1"/>
                     <field name="alert_coherence_date" invisible="1"/>
+                    <field name="alert_wrong_company" invisible="1"/>
                     <group name="main">
                         <group>
                             <field name="template_id" attrs="{'readonly': [('number', '!=', False), ('state', 'not in', ('draft', 'cancel'))]}"/>
@@ -276,6 +277,9 @@
                                            context="{'tache_prio_id': tache_id}"/>
                                     <div attrs="{'invisible': [('alert_incapable', '=', False)]}" class="of_red">
                                         <i class="fa fa-warning of_ws"/>Aucun intervenant ne peut réaliser cette tâche
+                                    </div>
+                                    <div attrs="{'invisible': [('alert_wrong_company', '=', False)]}" class="of_red">
+                                        <i class="fa fa-warning of_ws"/>Au moins un des intervenants n'a pas accès à la société de ce RDV, il ne pourra donc pas l'éditer.'
                                     </div>
                                 </div>
                                 <field name="company_id" options="{'no_create': True, 'no_edit': True}"/>
