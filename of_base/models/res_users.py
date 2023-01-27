@@ -1,4 +1,5 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+from unidecode import unidecode
 from odoo import api, models, fields, tools, SUPERUSER_ID, _
 from odoo.exceptions import AccessError, UserError
 from odoo.tools import frozendict
@@ -31,7 +32,7 @@ class ResUsers(models.Model):
 
     def _get_default_email(self):
         self.ensure_one()
-        return self.partner_id.name.lower().replace(" ", "") + "@example.com"
+        return unidecode(self.partner_id.name).lower().replace(" ", "") + "@example.com"
 
     def write(self, values):
         if SUPERUSER_ID in self._ids and self._uid != SUPERUSER_ID:
