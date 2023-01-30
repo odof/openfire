@@ -60,8 +60,8 @@
                             <strong>Livraison attendue&amp;nbsp;:</strong>
                             <p t-field="o.delivery_expected"/>
                         </div>
-                        <div t-if="o.date_planned" style="display: table-cell; width: 4px;"/>
-                        <div t-if="o.date_planned" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                        <div name="date_planned1" t-if="o.date_planned and all([l.date_planned == o.date_planned for l in o.order_line])" style="display: table-cell; width: 4px;"/>
+                        <div name="date_planned2" t-if="o.date_planned and all([l.date_planned == o.date_planned for l in o.order_line])" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                             <strong>Date prévue :</strong>
                             <p t-field="o.date_planned"/>
                         </div>
@@ -138,8 +138,8 @@
                             <strong>Livraison attendue&amp;nbsp;:</strong>
                             <p t-field="o.delivery_expected"/>
                         </div>
-                        <div t-if="o.date_planned" style="display: table-cell; width: 4px;"/>
-                        <div t-if="o.date_planned" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                        <div name="date_planned1" t-if="o.date_planned and all([l.date_planned == o.date_planned for l in o.order_line])" style="display: table-cell; width: 4px;"/>
+                        <div name="date_planned2" t-if="o.date_planned and all([l.date_planned == o.date_planned for l in o.order_line])" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                             <strong>Date prévue :</strong>
                             <p t-field="o.date_planned"/>
                         </div>
@@ -152,15 +152,31 @@
             <attribute name="style">display: none</attribute>
         </xpath>
         <!-- Retrait de dates souhaitées des lignes (info présente au niveau de la commande) -->
-        <xpath expr="//table/thead/tr/th[2]" position="replace"/>
-        <xpath expr="//table/tbody/tr/td[2]" position="replace"/>
+        <xpath expr="//table/thead/tr/th[2]" position="attributes">
+            <attribute name="name">date_planned</attribute>
+            <attribute name="invisible">0</attribute>
+            <attribute name="t-if">any([l.date_planned != docs.date_planned for l in docs.order_line])</attribute>
+        </xpath>
+        <xpath expr="//table/tbody/tr/td[2]" position="attributes">
+            <attribute name="name">date_planned</attribute>
+            <attribute name="invisible">0</attribute>
+            <attribute name="t-if">any([l.date_planned != docs.date_planned for l in docs.order_line])</attribute>
+        </xpath>
     </template>
 
     <!-- Modifications commande fournisseur sans prix -->
     <template id="of_report_purchaseorder_sans_prix_document" inherit_id="purchase.report_purchaseorder_document">
         <!-- Retrait de dates souhaitées des lignes (info présente au niveau de la commande) -->
-        <xpath expr="//table/thead/tr/th[3]" position="replace"/>
-        <xpath expr="//table/tbody/tr/td[3]" position="replace"/>
+        <xpath expr="//table/thead/tr/th[3]" position="attributes">
+            <attribute name="name">date_planned</attribute>
+            <attribute name="invisible">0</attribute>
+            <attribute name="t-if">any([l.date_planned != docs.date_planned for l in docs.order_line])</attribute>
+        </xpath>
+        <xpath expr="//table/tbody/tr/td[3]" position="attributes">
+            <attribute name="name">date_planned</attribute>
+            <attribute name="invisible">0</attribute>
+            <attribute name="t-if">any([l.date_planned != docs.date_planned for l in docs.order_line])</attribute>
+        </xpath>
         <!-- Retrait des prix pour la commande sans prix (interroger docs et non o, car le context de o a été écrasé dans la vue parente) -->
         <!-- Titres du tableau -->
         <xpath expr="//table/thead/tr/th[2]" position="attributes">
