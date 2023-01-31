@@ -30,6 +30,7 @@
         view_mode="form"
         view_type ="form"
         target="new"
+        groups="of_base.of_group_root_only"
         view_id="of_stock.of_picking_mass_validation_wizard_view_form"/>
 
 
