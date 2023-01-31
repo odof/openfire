@@ -107,7 +107,7 @@ class ProductTemplate(models.Model):
             if list_price != 0:
                 product.of_margin = (list_price - product.get_cost()) * 100.00 / list_price
             else:  # division par 0!
-                product.of_margin = -100
+                product.of_margin = 0
 
     def _get_default_category_id(self):
         return False
