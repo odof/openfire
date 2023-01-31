@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import json
 
@@ -8,17 +9,17 @@ from odoo import models, fields, api
 class Project(models.Model):
     _inherit = 'project.project'
 
-    of_total_planned_hours = fields.Float(string=u"Durée prévue", compute='_compute_time')
+    of_total_planned_hours = fields.Float(string=u"Durée planifiée", compute='_compute_time')
     of_total_done_hours = fields.Float(string=u"Durée réalisée", compute='_compute_time')
     of_ressources = fields.Text(string=u"Ressources", compute='_compute_of_ressources')
 
-    @api.depends('task_ids', 'task_ids.planned_hours', 'task_ids.effective_hours')
+    @api.depends('task_ids', 'task_ids.of_planned_hours', 'task_ids.effective_hours')
     def _compute_time(self):
         """
         Calcul les temps consolidés d'un projet en fonction des temps de ses tâches
         """
         for project in self:
-            project.of_total_planned_hours = sum(project.task_ids.mapped('planned_hours'))
+            project.of_total_planned_hours = sum(project.task_ids.mapped('of_planned_hours'))
             project.of_total_done_hours = sum(project.task_ids.mapped('effective_hours'))
 
     @api.depends('task_ids', 'task_ids.of_planning_ids', 'task_ids.of_planning_ids.user_id')
@@ -68,8 +69,12 @@ class ProjectTask(models.Model):
     # réécriture planned_hours
     # planned_hours = spec_hours + dev_hours + validation_hours
     # of_planned_hours = sum(of_planning_ids.mapped('duration'))
-    planned_hours = fields.Float(string=u"Durée initiale", compute='_compute_planned_hours', store=True)
-    of_planned_hours = fields.Float(string=u"Durée Planifiée", compute='_compute_of_planned_hours')
+    planned_hours = fields.Float(
+        string=u"Durée initiale", compute='_compute_planned_hours', store=True,
+        help=u"Calculée à partir des durées chiffrée")
+    of_planned_hours = fields.Float(
+        string=u"Durée Planifiée", compute='_compute_of_planned_hours', store=True,
+        help=u"Calculée à partir des activités planifiées")
     of_spec_hours = fields.Float(string=u"Planif specs")
     of_dev_hours = fields.Float(string=u"Planif dev")
     of_validation_hours = fields.Float(string=u"Planif validation")
