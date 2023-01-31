@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import logging
-from odoo import api, fields, models, SUPERUSER_ID
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -24,12 +24,9 @@ class OFPickingMassValidationWizard(models.TransientModel):
         picking_obj = self.env['stock.picking']
         transfer_obj = self.env['stock.immediate.transfer']
 
-        if self._uid != SUPERUSER_ID:
-            raise UserError(u"Seul l'administrateur peut effectuer cette opération.")
-
         unwanted_pickings = picking_obj
         keep_pickings = picking_obj.browse(active_ids).\
-            filtered(lambda r: r.state in ('waiting', 'partially_available', 'assigned'))
+            filtered(lambda r: r.state in ('waiting', 'partially_available', 'assigned', 'confirmed'))
 
         if self.user_has_groups('stock.group_production_lot'):
             unwanted_pickings = keep_pickings.mapped('pack_operation_product_ids').filtered(
