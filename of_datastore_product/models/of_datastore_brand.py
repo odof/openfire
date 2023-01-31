@@ -62,12 +62,17 @@ class OFDatastoreBrand(models.Model):
             for brand in self.search([])
         }
         for brand_data in data:
-            local_brand = local_brands_dict.get((brand_data['db_name'], brand_data['datastore_brand_id']))
-            if local_brand:
-                local_brand.write(brand_data)
-            else:
-                brand_data['state'] = 'available'
-                self.create(brand_data)
+            local_brand = local_brands_dict.pop((brand_data['db_name'], brand_data['datastore_brand_id']), False)
+            if 'name' in brand_data:
+                if local_brand:
+                    local_brand.write(brand_data)
+                else:
+                    brand_data['state'] = 'available'
+                    self.create(brand_data)
+        to_remove_ids = [brand.id for brand in local_brands_dict.itervalues()]
+        if to_remove_ids:
+            self.browse(to_remove_ids).unlink()
+
         self.env['ir.config_parameter'].set_param('of.datastore.brand.last.update', fields.Date.today())
 
         # S'il existe des marques connectées mais non liées à une marque de la base de gestion, on tente de les associer
