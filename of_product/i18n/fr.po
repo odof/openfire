@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-06 14:26+0000\n"
-"PO-Revision-Date: 2023-01-06 14:26+0000\n"
+"POT-Creation-Date: 2023-01-31 16:34+0000\n"
+"PO-Revision-Date: 2023-01-31 16:34+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -29,6 +29,17 @@ msgstr "%(user)s coût changé de %(previous)s à %(new_price)s - %(product)s"
 #, python-format
 msgid "%s (copy)"
 msgstr "%s (copie)"
+
+#. module: of_product
+#: model:ir.model.fields,field_description:of_product.field_of_connector_config_settings__group_product_variant_specific_price
+#: model:ir.model.fields,field_description:of_product.field_res_config_settings__group_product_variant_specific_price
+msgid "(OF) Handle pricing by variant"
+msgstr "(OF) Gérer les tarifs par variantes"
+
+#. module: of_product
+#: model:res.groups,name:of_product.group_product_variant_specific_price
+msgid "(OF) Product variant pricing"
+msgstr "(OF) Tarification des variantes"
 
 #. module: of_product
 #: model:ir.model.fields,field_description:of_product.field_product_tag__active
@@ -53,6 +64,11 @@ msgstr "Categorie"
 #: model:ir.model.fields,field_description:of_product.field_product_template__company_id
 msgid "Company"
 msgstr "Société"
+
+#. module: of_product
+#: model:ir.model,name:of_product.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de config"
 
 #. module: of_product
 #: model:ir.model.fields,help:of_product.field_product_product__of_uom_category_id
@@ -184,6 +200,11 @@ msgid ""
 msgstr ""
 
 #. module: of_product
+#: model_terms:ir.ui.view,arch_db:of_product.of_product_res_config_settings_view_form
+msgid "Manage price by variants"
+msgstr "Gérer le prix par variantes"
+
+#. module: of_product
 #: model:ir.model.fields,field_description:of_product.field_product_product__of_manufacturer_description
 #: model:ir.model.fields,field_description:of_product.field_product_template__of_manufacturer_description
 msgid "Manufacturer Description"
@@ -244,7 +265,7 @@ msgstr "Structure de prix"
 #. module: of_product
 #: model:ir.model,name:of_product.model_product_template
 msgid "Product"
-msgstr "Article"
+msgstr "Modèle d'article"
 
 #. module: of_product
 #: model:ir.model,name:of_product.model_product_category
@@ -318,6 +339,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_product.field_product_template__of_sale_coeff
 msgid "Sale coefficient"
 msgstr "Coefficient de vente"
+
+#. module: of_product
+#: model:ir.model.fields,field_description:of_product.field_product_product__of_forced_lst_price
+msgid "Sale price (forced)"
+msgstr "Prix de vente (forcé)"
 
 #. module: of_product
 #: model:ir.model.fields,help:of_product.field_product_category__property_cost_method
@@ -423,6 +449,11 @@ msgid ""
 msgstr ""
 "Le référence fournisseur de l'article sera utilisé lors de l'édition d'un "
 "devis. Laissez le champ vide si vous voulez utiliser la référence interne."
+
+#. module: of_product
+#: model_terms:ir.ui.view,arch_db:of_product.of_product_res_config_settings_view_form
+msgid "If checked this allow to set different prices for each variant. If not checked, the price of the template will be used. (standard behavior)"
+msgstr "Si coché, cela permet de définir des prix différents pour chaque variante. Si elle n'est pas cochée, le prix du modèle sera utilisé. (comportement standard)"
 
 #. module: of_product
 #: model:ir.model.fields,field_description:of_product.field_product_product__of_purchase_transport

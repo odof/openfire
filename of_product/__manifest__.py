@@ -11,7 +11,7 @@
     'depends': [
         'product',
         'purchase',
-        'stock_account',
+        'sale_stock',
         'of_utils',
     ],
     'data': [
@@ -20,6 +20,7 @@
         'views/product_supplierinfo_view.xml',
         'views/of_product_tag_views.xml',
         'views/product_category_views.xml',
+        'views/res_config_settings_views.xml'
     ],
     'installable': True,
 }

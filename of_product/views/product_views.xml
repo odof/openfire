@@ -186,4 +186,26 @@
         </field>
     </record>
 
+    <record id="of_produt_product_template_attribute_value_view_form" model="ir.ui.view">
+        <field name="name">of.product.product.template.attribute.value.view.form</field>
+        <field name="model">product.template.attribute.value</field>
+        <field name="inherit_id" ref="product.product_template_attribute_value_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='price_extra']" position="attributes">
+                <attribute name="groups">!of_product.group_product_variant_specific_price</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_produt_product_template_attribute_value_view_tree" model="ir.ui.view">
+        <field name="name">of.product.product.template.attribute.value.view.tree</field>
+        <field name="model">product.template.attribute.value</field>
+        <field name="inherit_id" ref="product.product_template_attribute_value_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='price_extra']" position="attributes">
+                <attribute name="groups">!of_product.group_product_variant_specific_price</attribute>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
