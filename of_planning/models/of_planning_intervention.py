@@ -1432,6 +1432,9 @@ class OfPlanningIntervention(models.Model):
         employee_before = {rec: rec.employee_ids for rec in self}
 
         result = super(OfPlanningIntervention, self).write(vals)
+        if vals.get('state', '') == 'confirm':
+            self.mapped('line_ids').sudo()._action_procurement_create()
+
 
         # Génération auto du rapport d'intervention
         if ri_report and vals.get('state', '') == 'done':
@@ -1584,7 +1587,6 @@ class OfPlanningIntervention(models.Model):
     @api.multi
     def button_confirm(self):
         self.write({'state': 'confirm'})
-        self.line_ids.sudo()._action_procurement_create()
         return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
