@@ -75,7 +75,7 @@ class AssignManualQuants(models.TransientModel):
             # On repasse également les mouvements de stock "disponibles" à "en attende de disponibilité"
             pack_op.linked_move_operation_ids.mapped('move_id').write({'state': 'confirmed'})
 
-        res = super(AssignManualQuants, self).assign_quants()
+        res = super(AssignManualQuants, self.with_context(contremarque=True)).assign_quants()
 
         # Partie 2 : Ajout/mise à jour des opérations pour le mouvement de stock bénéficiaire
         move = self.env['stock.move'].browse(self.env.context['active_id'])

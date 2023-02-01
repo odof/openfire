@@ -1048,6 +1048,18 @@ class StockQuant(models.Model):
     of_partner_id = fields.Many2one(
         comodel_name='res.partner', related='reservation_id.picking_id.partner_id',
         string=u"Adresse de destination du mouvement réservé associé", store=True, readonly=True, compute_sudo=True)
+    of_contremarque_id = fields.Many2one(comodel_name='res.partner', string=u"Partenaire")
+
+    @api.multi
+    def write(self, vals):
+        if self._context.get('contremarque') and vals.get('reservation_id'):
+            stock_move_obj = self.env['stock.move']
+            stock_move = stock_move_obj.browse(vals['reservation_id'])
+            partner = stock_move.picking_id.partner_id
+            if partner:
+                vals['of_contremarque_id'] = partner.id
+        res = super(StockQuant, self).write(vals)
+        return res
 
     def _quants_get_reservation_domain(self, move, pack_operation_id=False, lot_id=False, company_id=False,
                                        initial_domain=None):

@@ -25,6 +25,7 @@ Extension OpenFire du module stock
         'security/of_stock_security.xml',
         'data/res_groups.xml',
         'views/of_stock_views.xml',
+        'views/stock_quant_views.xml',
         'wizards/of_picking_mass_validation_wizard_views.xml',
         'wizards/of_stock_date_confirmation_views.xml',
         'wizards/stock_backorder_confirmation_views.xml',
