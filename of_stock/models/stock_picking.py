@@ -142,3 +142,7 @@ class StockPicking(models.Model):
             'target': 'new',
             'context': ctx,
         }
+
+    @api.multi
+    def do_transfer(self):
+        return super(StockPicking, self.with_context(contremarque=True)).do_transfer()
