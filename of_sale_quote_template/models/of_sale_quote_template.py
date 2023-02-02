@@ -1233,24 +1233,20 @@ class SaleOrder(models.Model):
 
         return res
 
-    @api.multi
-    def _prepare_sale_quote_templates_values(self):
-        self.ensure_one()
-        sale_quote_template = self.env['sale.quote.template']
-        sale_quote_template_new = sale_quote_template.new({
+    def _get_sale_quote_template_values(self):
+        return {
             'name': self.name,
-            'of_sale_type_id': self.of_sale_type_id.id or False,
             'property_of_fiscal_position_id': self.fiscal_position_id or False,
             'of_payment_term_id': self.payment_term_id or False,
             'of_note1': self.note1 or False,
-            'of_note2': self.note2 or False,
-        })
-        return sale_quote_template_new._convert_to_write(sale_quote_template_new._cache)
+            'of_note2': self.note2 or False}
 
     @api.multi
     def make_sale_quote_template(self):
         self.ensure_one()
-        quote_template_values = self._prepare_sale_quote_templates_values()
+        sale_quote_template = self.env['sale.quote.template']
+        sale_quote_template_new = sale_quote_template.new(self._get_sale_quote_template_values())
+        quote_template_values = sale_quote_template_new._convert_to_write(sale_quote_template_new._cache)
 
         lines_to_create = []
         for line in self.order_line:
