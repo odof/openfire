@@ -878,6 +878,13 @@ class SaleOrder(models.Model):
         """
         if not self.of_template_id:
             return
+        if not self.partner_id and self.of_template_id.quote_line:
+            self.of_template_id = False
+            warning = {
+                'title': (_("Warning!")),
+                'message': (_("You must fill in the Customer field to go further."))
+            }
+            return {'warning': warning}
         template = self.of_template_id.with_context(lang=self.partner_id.lang)
         order_line_obj = self.env['sale.order.line']
         of_crm_activity_obj = self.env['of.crm.activity']

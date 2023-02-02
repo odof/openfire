@@ -55,15 +55,3 @@ msgstr "Rechercher type de devis"
 #: model:ir.model.fields,field_description:of_sale_type.field_of_sale_type_sequence
 msgid "Sequence"
 msgstr "Séquence"
-
-#. module: of_sale_type
-#: code:addons/of_sale_type/models/sale.py:18
-#, python-format
-msgid "Warning!"
-msgstr "Attention!"
-
-#. module: of_sale_type
-#: code:addons/of_sale_type/models/sale.py:19
-#, python-format
-msgid "You must fill in the Customer field to go further."
-msgstr "Vous devez remplir le champ Client pour aller plus loin."
