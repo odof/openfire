@@ -260,7 +260,8 @@ class OfWizardSituation(models.TransientModel):
                 acompte_invoices.add(line.invoice_lines.mapped('invoice_id'))
         # Un second parcours pour récupérer toutes les lignes, acompte et prorata.
         for line in order.order_line:
-            if line.invoice_lines.mapped('invoice_id') in acompte_invoices and line.qty_to_invoice < 0:
+            if line.invoice_lines.mapped('invoice_id') in acompte_invoices and line.qty_to_invoice < 0 and \
+                line.product_id != product_situation:
                 line.invoice_line_create(invoice.id, line.qty_to_invoice)
 
         # --- Stockage du rapport de situation sur la facture ---
@@ -275,6 +276,8 @@ class OfWizardSituation(models.TransientModel):
         })
 
         invoice.compute_taxes()
+        if invoice.amount_total < 0:
+            self._add_additionnal_line(invoice)
         if invoice.amount_total < 0:
             raise UserError(u"Vous ne pouvez pas générer une facture de situation d'un montant négatif")
         # Alternative possible : mettre ce texte dans les notes de haut de page
@@ -395,6 +398,65 @@ class OfWizardSituation(models.TransientModel):
     def get_color_font(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_section_font_color') or "#000000"
 
+    @api.multi
+    def _add_additionnal_line(self, invoice):
+        self.ensure_one()
+        if invoice.amount_total >= 0:
+            raise UserError(u"This message should not be displayed, what have you done ?")
+        ir_property_obj = self.env['ir.property']
+        sale_line_obj = self.env['sale.order.line']
+
+        # Code adapté de sale.advance.payment.inv, méthodes create_invoices and _create_invoice
+        amount = abs(invoice.amount_total)
+        name = "Solde " + _('Down Payment')
+        order = self.order_id
+        product = self.env['sale.advance.payment.inv']._default_product_id()
+        account_id = False
+        if product:
+            account_id = product.property_account_income_id.id or \
+                         product.categ_id.property_account_income_categ_id.id
+        if not account_id:
+            inc_acc = ir_property_obj.get('property_account_income_categ_id', 'product.category')
+            account_id = order.fiscal_position_id.map_account(inc_acc).id if inc_acc else False
+        taxes = order.company_id._of_filter_taxes(product.taxes_id)
+        if order.fiscal_position_id and taxes:
+            tax_ids = order.fiscal_position_id.map_tax(taxes).ids
+        else:
+            tax_ids = taxes.ids
+
+        # Création de la sale.order.line
+        so_line = sale_line_obj.create({
+                    'name': name,
+                    'price_unit': amount,
+                    'product_uom_qty': 0.0,
+                    'order_id': order.id,
+                    'discount': 0.0,
+                    'product_uom': product.uom_id.id,
+                    'product_id': product.id,
+                    'tax_id': [(6, 0, tax_ids)],
+                })
+
+        # Création de la account.invoice.line
+        invoice.write({
+            'invoice_line_ids': [(0, 0, {
+                'name': name,
+                'origin': order.name,
+                'account_id': account_id,
+                'price_unit': amount,
+                'quantity': 1.0,
+                'discount': 0.0,
+                'uom_id': product.uom_id.id,
+                'product_id': product.id,
+                'sale_line_ids': [(6, 0, [so_line.id])],
+                'invoice_line_tax_ids': [(6, 0, tax_ids)],
+                'account_analytic_id': order.project_id.id or False,
+            })]
+        })
+        # Recalculer les taxes avec les règles OF
+        for line in invoice.invoice_line_ids:
+            line.onchange_tax_ids()
+        invoice._onchange_invoice_line_ids()
+        return True
 
 class OfWizardSituationLine(models.TransientModel):
     _name = "of.wizard.situation.line"
