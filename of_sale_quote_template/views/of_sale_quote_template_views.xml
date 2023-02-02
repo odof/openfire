@@ -469,5 +469,4 @@
         <field name="value" eval="'ir.actions.server,%d'%action_make_sale_quote_template"/>
     </record>
 
-
 </odoo>

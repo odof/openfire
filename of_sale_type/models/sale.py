@@ -32,6 +32,12 @@ class SaleOrder(models.Model):
             vals['of_sale_type_id'] = self.of_sale_type_id.id
         return vals
 
+    def _get_sale_quote_template_values(self):
+        values = super(SaleOrder, self)._get_sale_quote_template_values()
+        values.update({
+            'of_sale_type_id': self.of_sale_type_id.id or False,
+        })
+        return values
 
 class SaleQuoteTemplate(models.Model):
     _inherit = "sale.quote.template"
@@ -44,3 +50,4 @@ class SaleOrderLine(models.Model):
 
     of_sale_type_id = fields.Many2one(related='order_id.of_sale_type_id', string="Sale order type", readonly=True,
                                       store=True)
+
