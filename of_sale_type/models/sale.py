@@ -10,19 +10,11 @@ class SaleOrder(models.Model):
 
     @api.onchange('of_template_id')
     def onchange_template_id(self):
-        if not self.of_template_id:
-            return
-        if not self.partner_id:
-            self.of_template_id = False
-            warning = {
-                'title': (_("Warning!")),
-                'message': (_("You must fill in the Customer field to go further."))
-            }
-            return {'warning': warning}
         # Change the order type if the selected quote template has one
-        super(SaleOrder, self).onchange_template_id()
+        res = super(SaleOrder, self).onchange_template_id()
         if self.of_template_id and self.of_template_id.of_sale_type_id:
             self.of_sale_type_id = self.of_template_id.of_sale_type_id
+        return res
 
     @api.multi
     def _prepare_invoice(self):

@@ -921,3 +921,15 @@ msgstr "État de facturation"
 #: model:ir.model.fields,field_description:of_sale_quote_template.field_sale_order_of_layout_category_invoice_status
 msgid "État de facturation des lignes de section"
 msgstr "État de facturation des lignes de section"
+
+#. module: of_sale_quote_template
+#: code:addons/of_sale_quote_template/models/of_sale_quote_template.py:884
+#, python-format
+msgid "Warning!"
+msgstr "Attention!"
+
+#. module: of_sale_quote_template
+#: code:addons/of_sale_quote_template/models/of_sale_quote_template.py:885
+#, python-format
+msgid "You must fill in the Customer field to go further."
+msgstr "Vous devez remplir le champ Client pour aller plus loin."
