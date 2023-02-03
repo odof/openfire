@@ -1,0 +1,195 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_account_group
+#	* account_group
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-02-03 09:53+0000\n"
+"PO-Revision-Date: 2023-02-03 09:53+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: account_group
+#: model:ir.model,name:account_group.model_account_account
+msgid "Account"
+msgstr "Compte"
+
+#. module: account_group
+#: model:ir.model.fields,field_description:account_group.field_account_group_account_ids
+msgid "Accounts"
+msgstr "Comptes"
+
+#. module: account_group
+#: model:ir.ui.view,arch_db:account_group.view_account_group_form
+#: model:ir.ui.view,arch_db:account_group.view_account_group_search
+#: model:ir.ui.view,arch_db:account_group.view_account_group_tree
+msgid "Accounts Group"
+msgstr "Groupe de comptes"
+
+#. module: account_group
+#: model:ir.actions.act_window,name:account_group.action_account_group_tree
+#: model:ir.ui.menu,name:account_group.account_group_menu
+#: model:ir.ui.view,arch_db:account_group.view_account_group_search
+msgid "Accounts Groups"
+msgstr "Groupes de comptes"
+
+#. module: of_account_group
+#: model:ir.ui.view,arch_db:of_account_group.of_account_group_view_form
+msgid "Assign accounts"
+msgstr "Affecter les comptes"
+
+#. module: of_account_group
+#: model:ir.model.fields,help:of_account_group.field_account_group_of_account_type_ids
+msgid "Adds a filter on account types eligible for this group."
+msgstr "Ajoute un filtre sur les types de compte éligibles à ce groupe."
+
+#. module: account_group
+#: model:ir.model.fields,help:account_group.field_account_group_account_ids
+msgid "Assigned accounts."
+msgstr "Comptes associés."
+
+#. module: of_account_group
+#: model:ir.ui.view,arch_db:of_account_group.of_account_group_view_form
+msgid "This action may remove accounts from this group or take accounts from other groups."
+msgstr "Cette action peut retirer des comptes de ce groupe ou encore récupérer des comptes d'autres groupes."
+
+#. module: of_account_group
+#: model:ir.model.fields,field_description:of_account_group.field_of_account_group_code_code
+msgid "Code"
+msgstr "Code"
+
+#. module: of_account_group
+#: model:ir.model.fields,field_description:of_account_group.field_account_group_code_ids
+msgid "Code ids"
+msgstr "Code ids"
+
+#. module: account_group
+#: model:ir.model.fields,field_description:account_group.field_account_group_code_prefix
+msgid "Code prefixes"
+msgstr "Préfixes de code"
+
+#. modules: of_account_group, account_group
+#: model:ir.model.fields,field_description:account_group.field_account_group_create_uid
+#: model:ir.model.fields,field_description:of_account_group.field_of_account_group_code_create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. modules: of_account_group, account_group
+#: model:ir.model.fields,field_description:account_group.field_account_group_create_date
+#: model:ir.model.fields,field_description:of_account_group.field_of_account_group_code_create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. modules: of_account_group, account_group
+#: model:ir.model.fields,field_description:account_group.field_account_group_display_name
+#: model:ir.model.fields,field_description:of_account_group.field_of_account_group_code_display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: account_group
+#: model:ir.model.fields,field_description:account_group.field_account_account_group_id
+#: model:ir.model.fields,field_description:account_group.field_account_account_template_group_id
+msgid "Group"
+msgstr "Groupe"
+
+#. module: of_account_group
+#: model:ir.model.fields,field_description:of_account_group.field_of_account_group_code_group_id
+msgid "Groupe"
+msgstr "Groupe"
+
+#. modules: of_account_group, account_group
+#: model:ir.model.fields,field_description:account_group.field_account_group_id
+#: model:ir.model.fields,field_description:of_account_group.field_of_account_group_code_id
+msgid "ID"
+msgstr "ID"
+
+#. modules: of_account_group, account_group
+#: model:ir.model.fields,field_description:account_group.field_account_group___last_update
+#: model:ir.model.fields,field_description:of_account_group.field_of_account_group_code___last_update
+msgid "Last Modified on"
+msgstr "Dernière Modification le"
+
+#. modules: of_account_group, account_group
+#: model:ir.model.fields,field_description:account_group.field_account_group_write_uid
+#: model:ir.model.fields,field_description:of_account_group.field_of_account_group_code_write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. modules: of_account_group, account_group
+#: model:ir.model.fields,field_description:account_group.field_account_group_write_date
+#: model:ir.model.fields,field_description:of_account_group.field_of_account_group_code_write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: account_group
+#: model:ir.model.fields,field_description:account_group.field_account_group_parent_left
+msgid "Left Parent"
+msgstr "Parent gauche"
+
+#. module: account_group
+#: model:ir.model.fields,field_description:account_group.field_account_group_level
+msgid "Level"
+msgstr "Niveau"
+
+#. module: account_group
+#: model:ir.model.fields,field_description:account_group.field_account_group_name
+msgid "Name"
+msgstr "Nom"
+
+#. module: account_group
+#: model:ir.model.fields,field_description:account_group.field_account_group_parent_id
+msgid "Parent"
+msgstr "Parent"
+
+#. module: account_group
+#: model:ir.model.fields,help:account_group.field_account_group_code_prefix
+msgid "Account code prefixes, separated by a comma."
+msgstr "Préfixes des codes de comptes, séparés par une virgule."
+
+#. module: account_group
+#: model:ir.model.fields,field_description:account_group.field_account_group_parent_right
+msgid "Right Parent"
+msgstr "Parent à droite"
+
+#. module: of_account_group
+#: model:ir.model.fields,field_description:of_account_group.field_account_group_sequence
+msgid "Sequence"
+msgstr "Séquence"
+
+#. module: account_group
+#: model:ir.model,name:account_group.model_account_chart_template
+msgid "Templates for Account Chart"
+msgstr "Modèles pour le plan comptable"
+
+#. module: account_group
+#: model:ir.model,name:account_group.model_account_account_template
+msgid "Templates for Accounts"
+msgstr "Modèles pour les comptes"
+
+#. module: of_account_group
+#: model:ir.model.fields,field_description:of_account_group.field_account_group_of_account_type_ids
+msgid "Account types"
+msgstr "Types de comptes"
+
+#. module: of_account_group
+#: sql_constraint:of.account.group.code:0
+msgid "Another account already uses this prefix"
+msgstr "Un autre groupe utilise déjà ce préfixe"
+
+#. modules: of_account_group, account_group
+#: model:ir.model,name:account_group.model_account_group
+#: model:ir.model,name:of_account_group.model_account_group
+msgid "account.group"
+msgstr "account.group"
+
+#. module: of_account_group
+#: model:ir.model,name:of_account_group.model_of_account_group_code
+msgid "of.account.group.code"
+msgstr "of.account.group.code"

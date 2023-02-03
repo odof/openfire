@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_account_group_view_form" model="ir.ui.view">
+        <field name="name">of.account.group.view.form</field>
+        <field name="model">account.group</field>
+        <field name="inherit_id" ref="account_group.view_account_group_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="/form/group" position="before">
+                <header>
+                    <button name="of_action_recompute" string="Assign accounts" type="object"
+                            confirm="This action may remove accounts from this group or take accounts from other groups."/>
+                </header>
+            </xpath>
+            <xpath expr="//field[@name='code_prefix']" position="after">
+                <field name="of_account_type_ids" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_account_group_view_tree" model="ir.ui.view">
+        <field name="name">of.account.group.view.tree</field>
+        <field name="model">account.group</field>
+        <field name="inherit_id" ref="account_group.view_account_group_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='code_prefix']" position="before">
+                <field name="sequence"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

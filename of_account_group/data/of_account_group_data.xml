@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<odoo noupdate="1">
+
+    <function name="_inverse_code_prefix" model="account.group">
+        <function name="search" model="account.group">
+            <value eval="[]"/>
+        </function>
+    </function>
+
+</odoo>
