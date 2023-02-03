@@ -1,35 +1,37 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+from odoo import models, fields
 
-from odoo import models, fields, api
-from odoo.exceptions import UserError
+
+OF_CRM_STAGE_IDS = [
+    ('1', "1"),
+    ('2', "2"),
+    ('3', "3"),
+    ('4', "4"),
+    ('5', "5"),
+    ('6', "6"),
+    ('7', "7"),
+    ('8', "8"),
+    ('9', "9"),
+    ('10', "10"),
+    ('11', "11"),
+    ('12', "12"),
+    ('13', "13"),
+    ('14', "14"),
+    ('15', "15"),
+    ('16', "16"),
+    ('17', "17"),
+    ('18', "18"),
+    ('19', "19"),
+    ('20', "20")
+]
 
 
 class CrmStage(models.Model):
     _inherit = 'crm.stage'
 
-    of_crm_stage_id = fields.Selection(selection=[
-        ('1', u"1"),
-        ('2', u"2"),
-        ('3', u"3"),
-        ('4', u"4"),
-        ('5', u"5"),
-        ('6', u"6"),
-        ('7', u"7"),
-        ('8', u"8"),
-        ('9', u"9"),
-        ('10', u"10"),
-        ('11', u"11"),
-        ('12', u"12"),
-        ('13', u"13"),
-        ('14', u"14"),
-        ('15', u"15"),
-        ('16', u"16"),
-        ('17', u"17"),
-        ('18', u"18"),
-        ('19', u"19"),
-        ('20', u"20"),
-    ], string=u"Identifiant de l'étape de l'opportunité source", copy=False)
+    of_crm_stage_id = fields.Selection(
+        selection=OF_CRM_STAGE_IDS, string="Source Opportunity Stage ID", copy=False)
 
     _sql_constraints = [
-        ('of_crm_stage_id_uniq', 'unique (of_crm_stage_id)', u"Il existe déjà une étape kanban avec cet identifiant")
+        ('of_crm_stage_id_uniq', 'unique (of_crm_stage_id)', "There is already a kanban step with this identifier")
     ]
