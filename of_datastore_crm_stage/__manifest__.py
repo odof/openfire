@@ -1,21 +1,13 @@
-# -*- coding: utf-8 -*-
-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 {
-    'name': u"OpenFire / Connecteur CRM - Étape Kanban",
-    'version': "10.0.1.0.0",
+    'name': "OpenFire / Connecteur CRM - Étape Kanban",
+    'version': '16.0.1.0.0',
     'author': "OpenFire",
-    'website': "http://www.openfire.fr",
-    'category': "Openfire",
-    'license': '',
-    'summary': u"Openfire Connecteur commandes CRM - Étape Kanban",
-    'description': u"""
-Module OpenFire / Connecteur commandes CRM - Étape Kanban
-=========================================================
-
-Module permettant d'ajouter d'ajouter des infos sur les étapes kanban pour fonctionner avec le connecteur CRM
-""",
+    'website': 'http://www.openfire.fr',
+    'category': 'Openfire',
+    'description': """""",
     'depends': [
-        'of_crm',
+        'crm'
     ],
     'data': [
         'views/crm_views.xml'
@@ -23,4 +15,5 @@ Module permettant d'ajouter d'ajouter des infos sur les étapes kanban pour fonc
     'installable': True,
     'application': False,
     'auto_install': False,
+    'license': 'LGPL-3',
 }
