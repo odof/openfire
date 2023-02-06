@@ -130,3 +130,13 @@ msgstr "Utilisé pour classer les catégories. Les valeurs basses passent avant.
 #: model:ir.model.fields,help:of_base.field_res_partner_title_sequence
 msgid "Used to order titles. Lower is better."
 msgstr "Utilisé pour classer les civilités. Les valeurs basses passent avant."
+
+#. module: of_base
+#: model:ir.ui.view,arch_db:of_base.of_res_partner_filter
+msgid "Parent"
+msgstr "Parent"
+
+#. module: of_base
+#: model:ir.ui.view,arch_db:of_base.of_res_partner_filter
+msgid "Company"
+msgstr "Société"
