@@ -895,6 +895,18 @@ class SaleOrder(models.Model):
         product_obj = self.env['product.product']
         product_warn_ids = product_obj
         product_block_ids = product_obj
+
+        new_lines = self.order_line.filtered(lambda l: not l.sequence)
+        for line in new_lines:
+            if line.layout_category_id:
+                layout_new_line = line.layout_category_id
+                max_sequence = max(self.order_line.filtered(
+                    lambda l: l.layout_category_id.id == layout_new_line.id).mapped('sequence'))
+            else:
+                max_sequence = max(self.order_line.filtered(
+                    lambda l: not l.layout_category_id).mapped('sequence'))
+            line.sequence = max_sequence + 1
+
         for line in template.quote_line:
             discount = 0
             if not line.of_active:
@@ -924,6 +936,13 @@ class SaleOrder(models.Model):
                     if self.env.user.has_group('sale.group_sale_layout'):
                         if not new_line.layout_category_id and new_line.product_id.categ_id.of_layout_id:
                             new_line.layout_category_id = new_line.product_id.categ_id.of_layout_id
+
+                    if self.order_line.filtered(lambda l: l.layout_category_id.id == line.layout_category_id.id):
+                        new_line.sequence = max(self.order_line.filtered(
+                            lambda l: l.layout_category_id.id == line.layout_category_id.id).mapped('sequence')) + 1
+                    else:
+                        new_line.sequence = 0
+
                     order_lines += new_line
 
         self.order_line = order_lines
