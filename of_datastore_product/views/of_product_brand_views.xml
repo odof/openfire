@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Marque -->
+    <record id="of_datastore_brand_product_action" model="ir.actions.act_window">
+        <field name="name">Centralized products</field>
+        <field name="res_model">product.template</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{'search_default_brand_id':active_id, 'search_default_of_datastore_search':True}</field>
+    </record>
+
+    <record id="of_datastore_product_brand_view_form" model="ir.ui.view">
+        <field name="name">of.datastore.product.brand.form.view</field>
+        <field name="model">of.product.brand</field>
+        <field name="inherit_id" ref="of_import.of_product_brand_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[1]" position="before">
+                <button name="%(action_of_datastore_update_product_brand)d" type="action" string="Update products"
+                        attrs="{'invisible':[('datastore_supplier_id','=',False)]}"/>
+                <!-- Ajout du bouton d'import de tous les articles de la marque -->
+                <button name="%(action_of_datastore_import_product_brand)d" type="action" string="Import all products"
+                        attrs="{'invisible':[('datastore_supplier_id','=',False)]}"
+                        context="{'default_type': 'import'}"
+                        groups="of_base.of_group_root_only"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="%(of_datastore_brand_product_action)d" type="action" class="oe_stat_button" icon="fa-th-list">
+                    <field string="Centralized products" name="datastore_product_count" widget="statinfo"/>
+                </button>
+            </xpath>
+            <xpath expr="//notebook" position="before">
+                <div colspan="2" attrs="{'invisible':[('datastore_supplier_id', '=', False)]}">
+                    <span>This brand is connected to the centralized pricelist.</span>
+                </div>
+            </xpath>
+            <xpath expr="//page[@name='notes']" position="inside">
+                <separator string="Centralized products notes" colspan="2"/>
+                <group colspan="2" invisible="context.get('uid') != 1">
+                    <field name="datastore_supplier_id" readonly="1"/>
+                </group>
+                <field name="datastore_note_maj" colspan="2" nolabel="1"/>
+            </xpath>
+
+            <!-- Mise en couleur des catégories -->
+            <xpath expr="//field[@name='categ_ids']/tree" position="attributes">
+                <attribute name="colors">grey:is_datastore_matched==False</attribute>
+            </xpath>
+            <xpath expr="//field[@name='categ_ids']/tree" position="inside">
+                <field name="is_datastore_matched" invisible="1"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- Force le recalcul des catégories du fournisseur -->
+    <record id="of_product_brand.of_product_brand_action" model="ir.actions.act_window">
+        <field name="context">{'of_datastore_update_categ': True}</field>
+    </record>
+
+</odoo>
