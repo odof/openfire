@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 ##############################################################################
 #
@@ -14,7 +15,7 @@
 
 {
     'name': u"OpenFire Projets - Activités et périodes planifiées",
-    'version': "10.0.2.0.0",
+    'version': "10.0.2.1.0",
     'author': "OpenFire",
     'website': "www.openfire.fr",
     'category': "projet",
@@ -46,6 +47,7 @@ Fonctionnalités
         'views/of_project_views.xml',
         'views/of_hr_timesheet_views.xml',
         'security/ir.model.access.csv',
+        'hooks/hook_views.xml',
     ],
     'installable': True,
     'application': False,
