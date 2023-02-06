@@ -62,6 +62,7 @@ Ce module nécessite l'installation de openerplib sur le serveur : sudo easy_ins
         'wizard/wizard_of_datastore_brand_ask.xml',
         'views/of_datastore_brand_views.xml',
         'views/of_datastore_product_view.xml',
+        'views/of_product_brand_views.xml',
         'wizard/of_datastore_display_stock_wizard_views.xml',
     ],
     'qweb': [
