@@ -24,6 +24,9 @@ class OfProductBrand(models.Model):
     product_count = fields.Integer(
         u'# Products', compute='_compute_product_count',
         help=u"The number of products of this brand")
+    prices_date = fields.Date(
+        compute='_compute_prices_date', store=True,
+        help=u"Last price date of this brand's products.")
     note = fields.Text(string=u'Notes')
     product_change_warn = fields.Boolean(compute="_compute_product_change_warn")
     show_in_sales = fields.Boolean(
@@ -41,6 +44,14 @@ class OfProductBrand(models.Model):
         group_data = dict((data['brand_id'][0], data['brand_id_count']) for data in read_group_res)
         for categ in self:
             categ.product_count = group_data.get(categ.id, 0)
+
+    @api.depends('product_ids.date_tarif')
+    def _compute_prices_date(self):
+        product_obj = self.env['product.template']
+        for brand in self:
+            product = product_obj.search(
+                [('brand_id', '=', brand.id), ('date_tarif', '!=', False)], order='date_tarif desc', limit=1)
+            brand.prices_date = product.date_tarif
 
     @api.depends('code', 'use_prefix')
     def _compute_product_change_warn(self):

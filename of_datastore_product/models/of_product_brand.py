@@ -12,6 +12,7 @@ class OfProductBrand(models.Model):
 
     datastore_supplier_id = fields.Many2one('of.datastore.supplier', string='Centralized products connector')
     datastore_brand_id = fields.Integer(string='Centralized ID')
+    datastore_update_date = fields.Date(string='Update date', related='datastore_brand_request_ids.update_date')
 
     datastore_note_maj = fields.Text(string='Update notes', compute='_compute_datastore_note_maj')
     datastore_product_count = fields.Integer(
@@ -24,11 +25,39 @@ class OfProductBrand(models.Model):
         comodel_name='of.datastore.brand', compute='_compute_datastore_brand_request_id', store=True,
         string=u"Demande de marque TC")
     datastore_brand_request_state = fields.Selection(related='datastore_brand_request_id.state')
+    datastore_update_required = fields.Boolean(
+        string="To update", compute='_compute_datastore_update_required', search='_search_datastore_update_required')
 
     @api.depends('datastore_brand_request_ids')
     def _compute_datastore_brand_request_id(self):
         for brand in self:
             brand.datastore_brand_request_id = brand.datastore_brand_request_ids
+
+    @api.depends('prices_date', 'datastore_brand_request_id.state', 'datastore_brand_request_ids.update_date')
+    def _compute_datastore_update_required(self):
+        for brand in self:
+            brand.datastore_update_required =\
+                brand.datastore_brand_request_state == 'connected' and\
+                brand.datastore_update_date and brand.prices_date < brand.datastore_update_date
+
+    @api.model
+    def _search_datastore_update_required(self, operator, value):
+        """
+        Une marque a besoin d'une mise à jour si elle n'a pas au moins un article à la date de la mise à jour du tarif.
+        Pour cette recherche on exclue les articles qui ont été créés après cette date de mise à jour.
+        """
+        op = 'in' if (operator == '=') == value else 'not in'
+        self.env.cr.execute(
+            "SELECT brand.id "
+            "FROM of_product_brand AS brand "
+            "  INNER JOIN of_datastore_brand AS ds_brand ON ds_brand.brand_id = brand.id "
+            "  INNER JOIN product_template AS tmpl "
+            "    ON tmpl.brand_id = brand.id AND tmpl.create_date < ds_brand.update_date "
+            "WHERE brand.datastore_brand_id IS NOT NULL "
+            "GROUP BY brand.id, ds_brand.id "
+            "HAVING MAX(tmpl.date_tarif) < ds_brand.update_date")
+        brand_ids = [row[0] for row in self.env.cr.fetchall()]
+        return [('id', op, brand_ids)]
 
     @api.multi
     def read(self, fields=None, load='_classic_read'):

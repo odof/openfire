@@ -10,6 +10,33 @@
         <field name="context">{'search_default_brand_id':active_id, 'search_default_of_datastore_search':True}</field>
     </record>
 
+    <record id="of_product_brand_view_search" model="ir.ui.view">
+        <field name="name">of.product.brand.search.view</field>
+        <field name="model">of.product.brand</field>
+        <field name="inherit_id" ref="of_product_brand.of_product_brand_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="/search" position="inside">
+                <separator/>
+                <filter string="To update" name="datastore_update_required" domain="[('datastore_update_required', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_product_brand_view_kanban" model="ir.ui.view">
+        <field name="name">of.product.brand.product.kanban</field>
+        <field name="model">of.product.brand</field>
+        <field name="inherit_id" ref="of_product_brand.of_product_brand_view_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="/kanban/templates" position="before">
+                <field name="datastore_update_date"/>
+            </xpath>
+            <xpath expr="//div[@class='oe_kanban_details']/ul" position="inside">
+                <li>Prices date : <field name="prices_date"/></li>
+                <li t-if="record.datastore_update_date.raw_value">Prices date (TC) : <field name="datastore_update_date"/></li>
+            </xpath>
+        </field>
+    </record>
+
     <record id="of_datastore_product_brand_view_form" model="ir.ui.view">
         <field name="name">of.datastore.product.brand.form.view</field>
         <field name="model">of.product.brand</field>
@@ -35,11 +62,12 @@
                 </div>
             </xpath>
             <xpath expr="//page[@name='notes']" position="inside">
-                <separator string="Centralized products notes" colspan="2"/>
+                <separator string="Centralized products notes"/>
                 <group colspan="2" invisible="context.get('uid') != 1">
                     <field name="datastore_supplier_id" readonly="1"/>
+                    <field name="datastore_update_date" readonly="1"/>
                 </group>
-                <field name="datastore_note_maj" colspan="2" nolabel="1"/>
+                <field name="datastore_note_maj"/>
             </xpath>
 
             <!-- Mise en couleur des catégories -->
