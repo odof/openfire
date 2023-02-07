@@ -40,6 +40,7 @@
                                 <field name="datastore_brand_id" invisible="1"/>
                                 <field name="name"/>
                                 <field name="brand_id"/>
+                                <field name="prices_date"/>
                                 <field name="note_maj"/>
                                 <field name="product_count"/>
                             </tree>

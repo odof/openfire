@@ -13,6 +13,7 @@ class OfDatastoreSupplierBrand(models.AbstractModel):
     datastore_brand_id = fields.Integer(string='Supplier brand ID', required=True, readonly=True)
     brand_id = fields.Many2one('of.product.brand', string="Brand")
     product_count = fields.Integer(string='# Products', readonly=True)
+    prices_date = fields.Date(readonly=True)
     note_maj = fields.Text(string='Update notes', readonly=True)
 
     @api.multi
@@ -34,6 +35,7 @@ class OfDatastoreSupplierBrand(models.AbstractModel):
                 'brand_id': brand and brand.id or False,
                 'name': default_ds_brand_name,
                 'datastore_brand_id': False,
+                'update_date': False,
                 'note_maj': '',
                 'product_count': False,
             }
@@ -43,7 +45,7 @@ class OfDatastoreSupplierBrand(models.AbstractModel):
             if not isinstance(client, basestring):
                 ds_brand_obj = ds_supplier.of_datastore_get_model(client, 'of.product.brand')
                 ds_brand_data = ds_supplier.of_datastore_read(
-                    ds_brand_obj, [ds_brand_id], ['name', 'note_maj', 'product_count'])[0]
+                    ds_brand_obj, [ds_brand_id], ['name', 'prices_date', 'note_maj', 'product_count'])[0]
                 del ds_brand_data['id']
                 vals.update(ds_brand_data)
 

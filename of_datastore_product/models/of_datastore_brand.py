@@ -12,11 +12,13 @@ class OFDatastoreBrand(models.Model):
     _name = 'of.datastore.brand'
     _description = u"Marques accessibles via le tarif centralisé"
     _inherit = 'mail.thread'
+    _order = 'name'
 
     datastore_brand_id = fields.Integer(string=u"Centralized ID", help="ID de la marque sur la base fournisseur")
     db_name = fields.Char(string="Base fournisseur")
     name = fields.Char(string=u"Libellé", required=True)
     logo = fields.Binary(string=u"Logo", attachment=True)
+    update_date = fields.Date(string=u"Date de mise à jour", readonly=True)
     is_partner_managed = fields.Boolean(
         string=u"Fournisseur partenaire",
         help=u"Si le fournisseur est partenaire, il est responsable de la mise à jour de ses tarifs.\n"

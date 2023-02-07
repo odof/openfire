@@ -27,6 +27,11 @@ msgid "# Products"
 msgstr "Nb. Articles"
 
 #. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_prices_date
+msgid "Prices date"
+msgstr "Date du tarif"
+
+#. module: of_product_brand
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_active
 msgid "Active"
 msgstr "Actif"
@@ -237,6 +242,11 @@ msgstr "Fournisseur:"
 #: model:ir.model.fields,help:of_product_brand.field_of_product_brand_product_count
 msgid "The number of products of this brand"
 msgstr "Le nombre d'articles de cette marque"
+
+#. module: of_product_brand
+#: model:ir.model.fields,help:of_product_brand.field_of_product_brand_prices_date
+msgid "Last price date of this brand's products."
+msgstr "Dernière date de tarif des articles de la marque."
 
 #. module: of_product_brand
 #: model:ir.model.fields,help:of_product_brand.field_of_product_brand_use_prefix

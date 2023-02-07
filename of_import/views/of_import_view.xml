@@ -15,6 +15,7 @@
             <xpath expr="//field[@name='show_in_sales']" position="replace"/>
             <xpath expr="//label[@for='note']" position="replace"/>
             <xpath expr="//field[@name='note']" position="replace"/>
+            <xpath expr="//field[@name='prices_date']" position="replace"/>
             <xpath expr="//sheet" position="inside">
                 <notebook>
                     <page name="import_config" string="Import">
@@ -65,6 +66,9 @@ Cette action irréversible recalculera la catégorie, le prix d'achat et le prix
                         </group>
                     </page>
                     <page name="notes" string="Notes">
+                        <group>
+                            <field name="prices_date"/>
+                        </group>
                         <field name="note"/>
                     </page>
                     <page name="aide" string="Aide">

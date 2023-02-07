@@ -51,6 +51,7 @@
                                     <li t-if="record.is_partner_managed.raw_value" class="text-success">Partenaire</li>
                                     <li t-if="!record.is_partner_managed.raw_value" class="text-warning">Non partenaire</li>
                                     <li t-if="record.fee.raw_value &gt; 0" class="text-warning">Abonnement : <field name="fee"/>€</li>
+                                    <li>Dernière màj : <field name="update_date"/></li>
                                     <li>
                                         <field name="state" widget="kanban_label_selection"
                                                options="{'classes': {'available': 'default', 'connected': 'success', 'pending_in': 'warning', 'pending_out': 'warning'}}"/>
@@ -92,6 +93,7 @@
                     <group>
                         <field name="is_partner_managed"/>
                         <field name="fee"/>
+                        <field name="update_date"/>
                         <field name="brand_id"/>
                     </group>
                 </sheet>
@@ -111,6 +113,7 @@
                 <field name="name"/>
                 <field name="state"/>
                 <field name="brand_id"/>
+                <field name="update_date"/>
                 <field name="is_partner_managed"/>
                 <field name="fee"/>
             </tree>
