@@ -9,8 +9,8 @@ class OfDatastoreDisplayStock(models.TransientModel):
     @api.model
     def default_get(self, fields_list):
         res = super(OfDatastoreDisplayStock, self).default_get(fields_list)
-        if self._context.get('active_ids', []):
-            product = self.env['product.template'].browse(self._context['active_ids'][0])
+        if self._context.get('active_ids') and self._context.get('active_model'):
+            product = self.env[self._context['active_model']].browse(self._context['active_ids'][0])
             if product.of_datastore_res_id and product.brand_id.datastore_supplier_id:
                 supplier = product.brand_id.datastore_supplier_id
                 # Try except au cas où on ne peut pas atteindre la base centralisée,
