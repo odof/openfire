@@ -111,6 +111,7 @@ class CrmLead(models.Model):
         'res.partner.category', related="partner_id.category_id", string='Tags',
         help="Classify and analyze your lead/opportunity categories like: Training, Service", oldname="of_tag_ids")
     of_referred_id = fields.Many2one('res.partner', string=u"Apporté par", help="Nom de l'apporteur d'affaire")
+    title = fields.Many2one(related='partner_id.title')
     street = fields.Char(related='partner_id.street')
     street2 = fields.Char(related='partner_id.street2')
     zip = fields.Char(related='partner_id.zip')
