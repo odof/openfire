@@ -33,12 +33,10 @@ class ResPartner(models.Model):
     of_customer_state = fields.Selection([
         ('lead', u'Prospect'),
         ('customer', u'Client signé'),
-        ('other', u'Autre'),
-        ], string=u"État", default='other', required=True, help=u"""
+        ('other', u'Autre')], string=u"État", default='other', required=True, help=u"""
 Champ uniquement utile pour les partenaires clients.
 Un client est considéré comme prospect tant qu'il n'a ni commande confirmée ni facture validée.
-Ce champ se met à jour automatiquement sur confirmation de commande et sur validation de facture
-    """)
+Ce champ se met à jour automatiquement sur confirmation de commande et sur validation de facture""")
 
     @api.model
     def _init_prospects(self):
@@ -99,6 +97,7 @@ Ce champ se met à jour automatiquement sur confirmation de commande et sur vali
         comodel_name='utm.campaign', string=u"Campagne", compute='_compute_of_lead_utm')
     of_lead_medium_id = fields.Many2one(comodel_name='utm.medium', string=u"Canal", compute='_compute_of_lead_utm')
     of_lead_source_id = fields.Many2one(comodel_name='utm.source', string=u"Origine", compute='_compute_of_lead_utm')
+    of_is_lead_warn = fields.Boolean(string="Leads warning")
 
     def _compute_of_quotations_count(self):
         self.of_compute_sale_orders_count('of_quotations_count', [('state', 'in', ['draft', 'sent'])])
@@ -120,6 +119,14 @@ Ce champ se met à jour automatiquement sur confirmation de commande et sur vali
                 partner.of_lead_campaign_id = False
                 partner.of_lead_source_id = False
                 partner.of_lead_medium_id = False
+
+    @api.depends('of_is_lead_warn')
+    def _compute_of_is_warn(self):
+        has_warn = self.filtered(lambda p: p.of_is_lead_warn)
+        for partner in has_warn:
+            partner.of_is_warn = True
+        partners_left = self - has_warn
+        super(ResPartner, partners_left)._compute_of_is_warn()
 
     def of_compute_sale_orders_count(self, field, state_domain=[]):
         # retrieve all children partners and prefetch 'parent_id' on them

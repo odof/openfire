@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-16 13:01+0000\n"
-"PO-Revision-Date: 2022-11-16 13:01+0000\n"
+"POT-Creation-Date: 2023-02-27 16:19+0000\n"
+"PO-Revision-Date: 2023-02-27 16:19+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -405,7 +405,7 @@ msgid "Activity file"
 msgstr "Fichier"
 
 #. module: of_crm
-#: code:addons/of_crm/models/of_crm_activity.py:275
+#: code:addons/of_crm/models/of_crm_activity.py:277
 #, python-format
 msgid "Activity status change %s : %s -> %s"
 msgstr "Changement d'état de l'activité %s : %s -> %s"
@@ -498,7 +498,7 @@ msgid "Affichage du tunnel de conversion quantitatif"
 msgstr "Affichage du tunnel de conversion quantitatif"
 
 #. module: of_crm
-#: code:addons/of_crm/models/of_crm_activity.py:249
+#: code:addons/of_crm/models/of_crm_activity.py:251
 #, python-format
 msgid "An attachment is required to complete the activity"
 msgstr "Une pièce jointe est requise pour terminer l'activité"
@@ -594,14 +594,14 @@ msgstr "Assigné à"
 
 #. module: of_crm
 #: code:addons/of_crm/models/crm_activity.py:148
-#: code:addons/of_crm/models/of_crm_activity.py:217
+#: code:addons/of_crm/models/of_crm_activity.py:219
 #, python-format
 msgid "At creation"
 msgstr "À la création"
 
 #. module: of_crm
 #: code:addons/of_crm/models/crm_activity.py:149
-#: code:addons/of_crm/models/of_crm_activity.py:218
+#: code:addons/of_crm/models/of_crm_activity.py:220
 #, python-format
 msgid "At validation"
 msgstr "À la validation"
@@ -1611,6 +1611,12 @@ msgid "Leads Generation"
 msgstr "Génération de pistes"
 
 #. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_res_partner_of_is_lead_warn
+#: model:ir.model.fields,field_description:of_crm.field_res_users_of_is_lead_warn
+msgid "Leads warning"
+msgstr "Avertissement Leads"
+
+#. module: of_crm
 #: selection:sale.config.settings,of_sale_order_start_state:0
 msgid "Les commandes sont créées à l'étape initiale Devis"
 msgstr "Les commandes sont créées à l'étape initiale Devis"
@@ -2052,7 +2058,7 @@ msgstr "Odoo helps you easily track all activities related to\n"
 
 #. module: of_crm
 #: code:addons/of_crm/models/crm_activity.py:141
-#: code:addons/of_crm/models/of_crm_activity.py:210
+#: code:addons/of_crm/models/of_crm_activity.py:212
 #: model:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
 #, python-format
 msgid "Opportunity"
@@ -2426,7 +2432,7 @@ msgstr "Réunions"
 
 #. module: of_crm
 #: code:addons/of_crm/models/crm_activity.py:142
-#: code:addons/of_crm/models/of_crm_activity.py:211
+#: code:addons/of_crm/models/of_crm_activity.py:213
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_activity_order_id
 #, python-format
 msgid "Sale Order"
@@ -2795,7 +2801,7 @@ msgstr "Un même employé ne peut avoir deux objectifs pour le même mois !"
 #: code:addons/of_crm/reports/crm_opportunity_report.py:15
 #: code:addons/of_crm/reports/of_crm_funnel_conversion.py:50
 #: code:addons/of_crm/reports/of_crm_funnel_conversion.py:294
-#: code:addons/of_crm/reports/of_invoiced_revenue_analysis.py:53
+#: code:addons/of_crm/reports/of_invoiced_revenue_analysis.py:57
 #, python-format
 msgid "Unsupported search operator"
 msgstr "Opérateur de recherche non pris en charge"
@@ -2874,6 +2880,12 @@ msgid "Ville"
 msgstr "Ville"
 
 #. module: of_crm
+#: code:addons/of_crm/models/crm_lead.py:242
+#, python-format
+msgid "Warning for %s"
+msgstr "Avertissement pour %s"
+
+#. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead_of_website
 msgid "Website"
 msgstr "Site Web"
@@ -2891,7 +2903,7 @@ msgid "Won in Opportunities"
 msgstr "Nombre d'opportunités gagnées"
 
 #. module: of_crm
-#: code:addons/of_crm/models/sale_order.py:358
+#: code:addons/of_crm/models/sale_order.py:361
 #, python-format
 msgid "You cannot confirm the Order until the mandatory activities are completed.\n"
 "Please check the following activities :\n"
@@ -2956,6 +2968,11 @@ msgstr "of.crm.projet.modele"
 #: model:ir.model,name:of_crm.model_of_crm_stage_auto_update
 msgid "of.crm.stage.auto.update"
 msgstr "of.crm.stage.auto.update"
+
+#. module: of_crm
+#: model:ir.ui.view,arch_db:of_crm.of_view_partner_warning_opportunities_form
+msgid "opportunities"
+msgstr "opportunités"
 
 #. module: of_crm
 #. openerp-web
