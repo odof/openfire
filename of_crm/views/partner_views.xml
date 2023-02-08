@@ -38,6 +38,21 @@
             </field>
         </record>
 
+        <record id="of_view_partner_warning_opportunities_form" model="ir.ui.view">
+            <field name="name">of.view.partner.warning.opportunities.form</field>
+            <field name="model">res.partner</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="sale.res_partner_view_buttons"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='internal_notes']//div[@name='of_is_sale_warn']" position="before">
+                    <div name="of_is_lead_warn">
+                        <field name="of_is_lead_warn" nolabel="1" class="oe_inline"/>
+                        opportunities
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
         <!-- Partner Kanban View -->
         <record model="ir.ui.view" id="of_crm_res_partner_kanban_view">
             <field name="name">of.crm.res.partner.kanban</field>

@@ -5,7 +5,7 @@ import time
 from datetime import datetime
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 from odoo.tools.safe_eval import safe_eval
 
@@ -228,6 +228,30 @@ class CrmLead(models.Model):
     def onchange_partner_id(self):
         if self.partner_id.user_id:
             self.user_id = self.partner_id.user_id
+        warning = {}
+        partner = self.partner_id
+
+        # If partner has no warning, check its parents
+        # invoice_warn is shared between different objects
+        while not partner.of_is_lead_warn and partner.parent_id:
+            partner = partner.parent_id
+
+        if partner.of_is_lead_warn and partner.invoice_warn != 'no-message':
+            # Block if partner only has warning but parent company is blocked
+            if partner.invoice_warn != 'block' and partner.parent_id and partner.parent_id.invoice_warn == 'block':
+                partner = partner.parent_id
+            title = _("Warning for %s") % partner.name
+            message = partner.invoice_warn_msg
+            warning = {
+                'title': title,
+                'message': message,
+            }
+            if partner.invoice_warn == 'block':
+                self.update({'partner_id': False})
+                return {'warning': warning}
+
+        if warning:
+            return {'warning': warning}
 
     @api.onchange('zip_id')
     def onchange_zip_id(self):
