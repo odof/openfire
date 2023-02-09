@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>
+<odoo noupdate="1">
 
     <!-- Modèle de mail pour l'envoi du bon de transfert spécifique -->
     <record id="of_stock_specific_delivery_email_template" model="mail.template">
