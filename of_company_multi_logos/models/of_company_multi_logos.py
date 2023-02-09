@@ -1,21 +1,24 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 
 
 class ResCompany(models.Model):
-    _inherit = "res.company"
+    _inherit = 'res.company'
 
-    of_logo_ids = fields.Many2many('of.company.multi.logos', 'company_logo', 'company_id', 'logo_id', string='Logos')
+    of_logo_ids = fields.Many2many(
+        comodel_name='of.company.multi.logos', relation='company_logo', column1='company_id', column2='logo_id',
+        string=u"Logos")
     of_logo_footer = fields.Boolean(
         string=u"Logos en pied de page", compute='_compute_of_logo_footer', store=True,
         help=u"Cette société utilise des logos à positionner juste au dessus du pied de page")
 
-    @api.depends('of_logo_ids')
+    @api.depends('of_logo_ids', 'of_logo_ids.name')
     def _compute_of_logo_footer(self):
         for company in self:
             company.of_logo_footer = any(
-                [name.startswith(u"Logo_footer") for name in company.of_logo_ids.mapped('name')])
+                name.startswith(u"Logo_footer") for name in company.of_logo_ids.mapped('name'))
 
     @api.multi
     def _write(self, vals):
@@ -32,9 +35,7 @@ class ResCompany(models.Model):
 
     def get_logo_footer(self):
         self.ensure_one()
-        if not self.of_logo_footer:
-            return []
-        return [l.logo for l in self.of_logo_ids.filtered(lambda s: s.name.startswith(u"Logo_footer"))]
+        return self.of_logo_ids.filtered(lambda s: s.name.startswith(u"Logo_footer")).mapped('logo')
 
     @api.multi
     def getLogo(self, name):
@@ -46,19 +47,20 @@ class ResCompany(models.Model):
 
 
 class OfCompanyMultiLogos(models.Model):
-    _name = "of.company.multi.logos"
+    _name = 'of.company.multi.logos'
     _description = u"Contient les logos secondaires des sociétés"
 
     @api.model
     def _get_company(self):
         return self.env.user.company_id
 
-    company_ids = fields.Many2many('res.company', 'company_logo', 'logo_id', 'company_id',
-        string=u'Sociétés', required=True, default=lambda self: self._get_company())
-    logo = fields.Binary(string=u'Logo', required=True)
+    company_ids = fields.Many2many(
+        comodel_name='res.company', relation='company_logo', column1='logo_id', column2='company_id',
+        string=u"Sociétés", required=True, default=lambda self: self._get_company())
+    logo = fields.Binary(string=u"Logo", required=True)
     name = fields.Char(string=u"Libellé", required=True)
-    color = fields.Integer(string=u'Indexe couleur')
-    description = fields.Text(string=u"Description",translate=True)
+    color = fields.Integer(string=u"Index de couleur")
+    description = fields.Text(string=u"Description", translate=True)
     display_docs = fields.Boolean(string=u"Affiché dans les documents", default=True)
 
     def getLogo(self):
