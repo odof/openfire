@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="of_report_invoice_document" inherit_id="account.report_invoice_document">
+        <xpath expr="//td[@t-if='display_discount']//span[@t-field='line.discount']" position="replace">
+            <span class="text-nowrap" t-esc="line.of_discount_formula"/>
+        </xpath>
+    </template>
+
+</odoo>
