@@ -1,0 +1,104 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_sale_discount
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-02-10 15:35+0000\n"
+"PO-Revision-Date: 2023-02-10 15:35+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_sale_discount
+#: model:ir.model.fields,field_description:of_sale_discount.field_of_connector_config_settings__group_discount_on_invoice_line
+#: model:ir.model.fields,field_description:of_sale_discount.field_res_config_settings__group_discount_on_invoice_line
+msgid "(OF) Discount"
+msgstr "(OF) Remise"
+
+#. module: of_sale_discount
+#: model_terms:ir.ui.view,arch_db:of_sale_discount.of_sale_discount_res_config_settings_view_form
+msgid "Allow discounts on invoice lines"
+msgstr "Permettre les remises sur les lignes de facture"
+
+#. module: of_sale_discount
+#: model:res.groups,comment:of_sale_discount.of_group_discount_on_invoice_line
+msgid "Allows discounts on invoice lines"
+msgstr "Permet les remises sur les lignes de facture"
+
+#. module: of_sale_discount
+#: model:ir.model,name:of_sale_discount.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de config"
+
+#. module: of_sale_discount
+#: model:ir.model.fields,field_description:of_sale_discount.field_account_move_line__discount
+#: model:ir.model.fields,field_description:of_sale_discount.field_account_move_line__of_discount_formula
+#: model:ir.model.fields,field_description:of_sale_discount.field_sale_order_line__discount
+#: model:ir.model.fields,field_description:of_sale_discount.field_sale_order_line__of_discount_formula
+msgid "Discount (%)"
+msgstr "Remise (%)"
+
+#. module: of_sale_discount
+#: model:ir.model.fields,help:of_sale_discount.field_account_move_line__of_discount_formula
+#: model:ir.model.fields,help:of_sale_discount.field_product_pricelist_item__of_percent_price_formula
+#: model:ir.model.fields,help:of_sale_discount.field_sale_order_line__of_discount_formula
+msgid ""
+"Discount or amount of discounts.\n"
+"Eg. \"40 + 10.5\" equals \"46.3\""
+msgstr ""
+
+#. module: of_sale_discount
+#. odoo-python
+#: code:addons/of_sale_discount/models/account_move_line.py:0
+#: code:addons/of_sale_discount/models/product_pricelist_item.py:0
+#: code:addons/of_sale_discount/models/sale_order_line.py:0
+#, python-format
+msgid ""
+"Invalid discount formula:\n"
+"%s"
+msgstr ""
+"Formule de remise invalide :\n"
+"%s"
+
+#. module: of_sale_discount
+#: model:res.groups,name:of_sale_discount.of_group_discount_on_invoice_line
+msgid "Invoice line discount"
+msgstr "Remise sur ligne de facture"
+
+#. module: of_sale_discount
+#: model:ir.model,name:of_sale_discount.model_account_move_line
+msgid "Journal Item"
+msgstr "Écriture comptable"
+
+#. module: of_sale_discount
+#: model:ir.model.fields,field_description:of_sale_discount.field_product_pricelist_item__of_percent_price_formula
+msgid "Percentage (discount)"
+msgstr "Pourcentage (remise)"
+
+#. module: of_sale_discount
+#: model:ir.model.fields,field_description:of_sale_discount.field_product_pricelist_item__percent_price
+msgid "Percentage Price"
+msgstr "Pourcentage du prix"
+
+#. module: of_sale_discount
+#: model:ir.model,name:of_sale_discount.model_product_pricelist_item
+msgid "Pricelist Rule"
+msgstr "Règle des listes des prix"
+
+#. module: of_sale_discount
+#: model:ir.model,name:of_sale_discount.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de bons de commande"
+
+#. module: of_sale_discount
+#: model:ir.model.fields,help:of_sale_discount.field_product_pricelist_item__percent_price
+msgid "You can apply a mark-up by setting a negative discount."
+msgstr ""
+"Vous pouvez appliquer une marge commerciale en configurant une remise "
+"négative."
