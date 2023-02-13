@@ -334,6 +334,8 @@ class CrmLead(models.Model):
             self.partner_id.write(partner_vals)
         if vals.get('stage_id') and not self._context.get('crm_stage_auto_update'):
             stage = self.env['crm.stage'].browse(vals.get('stage_id'))
+            if stage.probability == 0:
+                self.mapped('order_ids').filtered(lambda o: o.state in ('draft', 'sent')).write({'state': 'cancel'})
             if stage.of_manual_activity_id:
                 # Mise à jour de l'état manuelle -> création d'une activité
                 for rec in self:
@@ -377,6 +379,7 @@ class CrmLead(models.Model):
                         'probability': 0,
                         'of_date_cloture': time.strftime(DEFAULT_SERVER_DATE_FORMAT),
                         })
+            lead.mapped('order_ids').filtered(lambda o: o.state in ('draft', 'sent')).write({'state': 'cancel'})
         return True
 
     @api.multi
