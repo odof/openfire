@@ -39,3 +39,8 @@ class Website(models.Model):
     of_pricelist_b2b_id = fields.Many2one(comodel_name='product.pricelist', string='Liste de prix B2B')
     of_fiscal_position_b2c_id = fields.Many2one(comodel_name='account.fiscal.position', string='Position fiscale B2C')
     of_fiscal_position_b2b_id = fields.Many2one(comodel_name='account.fiscal.position', string='Position fiscale B2B')
+
+    @api.multi
+    def sale_get_order(self, force_create=False, code=None, update_pricelist=False, force_pricelist=False):
+        return super(Website, self.with_context(website_order=True)).sale_get_order(
+            force_create, code, update_pricelist, force_pricelist)
