@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api, _
+from odoo import models, fields, api
 
 
 class OFReportTemplate(models.Model):
@@ -9,10 +9,10 @@ class OFReportTemplate(models.Model):
     _description = u"Modèle d'impression"
     _order = 'name'
 
-    active = fields.Boolean(string=u"Active", default=True)
-    name = fields.Char(string=u"Name", required=True)
+    active = fields.Boolean(string="Active", default=True)
+    name = fields.Char(string="Name", required=True)
     model = fields.Selection(
-        selection=[('sale.order', u"Devis"), ('account.invoice', u"Facture")], string=u"Model")
+        selection=[('sale.order', u"Devis"), ('account.invoice', u"Facture")], string="Model")
 
     # Address insert
     pdf_address_title = fields.Boolean(
@@ -49,9 +49,9 @@ class OFReportTemplate(models.Model):
         string="Email (commercial)", help="If checked, displays the email in the commercial insert")
 
     pdf_sale_show_tax = fields.Selection(selection=[
-        ('subtotal', u"Show line subtotals without taxes (B2B)"),
-        ('total', u"Show line subtotals with taxes included (B2C)"),
-        ('both', u"Show line subtotals without taxes (B2B) and with taxes included (B2C)")],
+        ('subtotal', "Show line subtotals without taxes (B2B)"),
+        ('total', "Show line subtotals with taxes included (B2C)"),
+        ('both', "Show line subtotals without taxes (B2B) and with taxes included (B2C)")],
         default='subtotal', required=True, string=u"Tax Display")
 
     # Customers insert
@@ -119,7 +119,7 @@ class OFReportTemplate(models.Model):
         help="Signature comment positioned below the titles \"Salesman signature\" and \"Customer signature\"")
 
     pdf_legal_notice = fields.Text(
-        string=u"Legal notice", help=u"Will be displayed un the bottom comment")
+        string="Legal notice", help="Will be displayed un the bottom comment")
 
     # Utilisé que lorsque of_sale_order_dates est installé
     pdf_requested_week = fields.Boolean(string="Requested week")

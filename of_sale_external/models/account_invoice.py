@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api, _
+from odoo import models, fields
 
 
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
     of_report_template_id = fields.Many2one(
-        comodel_name='of.report.template', string=u"Report template",
-        domain="[('model','in',['account.invoice', False])]")
+        comodel_name='of.report.template', string="Report template",
+        domain="[('model', 'in', ['account.invoice', False])]")
 
     def pdf_afficher_nom_parent(self):
         return self.of_report_template_id.pdf_address_contact_parent_name if self.of_report_template_id else super(
@@ -60,21 +60,24 @@ class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
     def of_get_line_name(self):
+        """ Return the name of the invoice line, formatted as a list of strings.
+        :return: Line name formatted as a list of strings.
+        :rtype: list
+        """
         self.ensure_one()
-        if self.invoice_id.of_report_template_id:
-            # inhiber l'affichage de la référence
-            afficher_ref = self.invoice_id.of_report_template_id.pdf_product_reference
-            le_self = self.with_context(
-                lang=self.invoice_id.partner_id.lang,
-                partner=self.invoice_id.partner_id.id,
-            )
-            name = le_self.name
-            if not afficher_ref:
-                if name.startswith("["):
-                    splitted = name.split("]")
-                    if len(splitted) > 1:
-                        splitted.pop(0)
-                        name = ']'.join(splitted).strip()
-            return name.split("\n")
-        else:
+        if not self.invoice_id.of_report_template_id:
             return super(AccountInvoiceLine, self).of_get_line_name()
+
+        # inhiber l'affichage de la référence
+        display_ref = self.invoice_id.of_report_template_id.pdf_product_reference
+        line = self.with_context(
+            lang=self.invoice_id.partner_id.lang,
+            partner=self.invoice_id.partner_id.id,
+        )
+        name = line.name
+        if not display_ref and name.startswith("["):
+            splitted = name.split("]")
+            if len(splitted) > 1:
+                splitted.pop(0)
+                name = ']'.join(splitted).strip()
+        return name.split("\n")  # used in a qweb report with for-each
