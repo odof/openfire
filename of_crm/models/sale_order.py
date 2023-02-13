@@ -288,14 +288,8 @@ class SaleOrder(models.Model):
 
         # On teste si l'utilisateur a le groupe quotation
         if self.env.user.has_group('of_crm.group_quotation_sale_order_state'):
-            # Si oui, on teste si la commande ne vient pas du site web/public user
-            public_partner = self.env.ref('base.public_partner')
-            partner_id = self.env['res.partner'].browse(vals.get('partner_id', False))
-
-            if partner_id == public_partner:
-                # La commande vient du site web, on laisse en estimation malgré le paramétrage
-                pass
-            else:
+            if not self.env.context.get('website_order'):
+                # La commande ne vient pas du site web, on peut la passer en état devis
                 start_state = 'quotation'
 
         if start_state == 'quotation':
