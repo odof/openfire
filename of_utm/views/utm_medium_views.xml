@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_utm_medium_view_form" model="ir.ui.view">
+        <field name="name">of.utm.medium.form</field>
+        <field name="model">utm.medium</field>
+        <field name="inherit_id" ref="utm.utm_medium_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='active']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="/form/sheet/group" position="before">
+                <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+            </xpath>
+            <xpath expr="/form/sheet/group" position="after">
+                <group name="sources" string="Sources">
+                    <field name="source_ids" mode="tree" nolabel="1" colspan="2">
+                        <tree editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="name"/>
+                        </tree>
+                        <form>
+                            <field name="sequence" widget="handle"/>
+                            <field name="name"/>
+                        </form>
+                    </field>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_utm_medium_view_tree" model="ir.ui.view">
+        <field name="name">of.utm.medium.view.tree</field>
+        <field name="model">utm.medium</field>
+        <field name="inherit_id" ref="utm.utm_medium_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <attribute name="decoration-muted">(not active)</attribute>
+                <attribute name="editable"></attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

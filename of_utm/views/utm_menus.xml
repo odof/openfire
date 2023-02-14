@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="utm.menu_link_tracker_root" groups="-base.group_no_one"/>
+    <menuitem id="utm.menu_utm_campaign_act" sequence="10" parent="utm.menu_link_tracker_root" groups="-base.group_no_one"/>
+    <menuitem id="utm.menu_utm_medium" sequence="20" parent="utm.menu_link_tracker_root" groups="-base.group_no_one"/>
+    <menuitem id="utm.menu_utm_source" sequence="30" parent="utm.menu_link_tracker_root" groups="-base.group_no_one"/>
+
+</odoo>

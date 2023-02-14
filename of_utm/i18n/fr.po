@@ -1,14 +1,14 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-#	* of_utm
+# 	* of_utm
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 10.0\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-23 14:03+0000\n"
-"PO-Revision-Date: 2020-04-23 14:03+0000\n"
-"Last-Translator: <>\n"
+"POT-Creation-Date: 2023-02-14 14:31+0000\n"
+"PO-Revision-Date: 2023-02-14 14:31+0000\n"
+"Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,42 +16,103 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_utm
-#: model:ir.actions.act_window,name:utm.utm_campaign_act
-#: model:ir.ui.menu,name:utm.menu_utm_campaign_act
-msgid "Campaigns"
-msgstr "Campagnes"
+#: model:ir.model.fields,field_description:of_utm.field_utm_campaign__active
+#: model:ir.model.fields,field_description:of_utm.field_utm_source__active
+msgid "Active"
+msgstr "Actif"
 
 #. module: of_utm
-#: model:ir.actions.act_window,name:utm.utm_medium_action
-#: model:ir.ui.menu,name:utm.menu_utm_medium
-msgid "Medium"
-msgstr "Canaux"
+#: model_terms:ir.ui.view,arch_db:of_utm.of_utm_campaign_view_form
+#: model_terms:ir.ui.view,arch_db:of_utm.of_utm_medium_view_form
+#: model_terms:ir.ui.view,arch_db:of_utm.of_utm_source_view_form
+#: model_terms:ir.ui.view,arch_db:of_utm.of_utm_source_view_search
+#: model_terms:ir.ui.view,arch_db:of_utm.of_view_utm_campaign_view_search
+msgid "Archived"
+msgstr "Archivé"
 
-#. module: utm
-#: model:ir.model.fields,field_description:utm.field_account_invoice_medium_id
-#: model:ir.model.fields,field_description:utm.field_crm_lead_medium_id
-#: model:ir.model.fields,field_description:utm.field_hr_applicant_medium_id
-#: model:ir.model.fields,field_description:utm.field_link_tracker_medium_id
-#: model:ir.model.fields,field_description:utm.field_sale_order_medium_id
-#: model:ir.model.fields,field_description:utm.field_utm_mixin_medium_id
-#: model:ir.ui.view,arch_db:utm.utm_medium_view_tree
-#: model:ir.ui.view,arch_db:utm.utm_source_view_tree
+#. module: of_utm
+#: model:ir.model.fields,field_description:of_utm.field_utm_source__medium_id
+msgid "Associated channel"
+msgstr "Canal associé"
+
+#. module: of_utm
+#: model:ir.model.fields,field_description:of_utm.field_utm_medium__source_ids
+msgid "Available sources"
+msgstr "Origines disponibles"
+
+#. module: of_utm
+#: model:ir.model.fields,field_description:of_utm.field_utm_mixin__medium_id
+msgid "Channel"
+msgstr "Canal"
+
+#. module: of_utm
+#: model:ir.model.fields,field_description:of_utm.field_utm_medium__name
+msgid "Channel Name"
+msgstr "Nom du canal"
+
+#. module: of_utm
+#: model_terms:ir.ui.view,arch_db:of_utm.of_utm_source_view_search
+msgid "Group By"
+msgstr ""
+
+#. module: of_utm
+#: model_terms:ir.ui.view,arch_db:of_utm.of_utm_source_view_search
 msgid "Medium"
 msgstr "Canal"
 
 #. module: of_utm
-#: model:ir.actions.act_window,name:utm.utm_source_action
-#: model:ir.ui.menu,name:utm.menu_utm_source
+#: model:ir.model.fields,field_description:of_utm.field_utm_mixin__source_id
+msgid "Origin"
+msgstr "Source"
+
+#. module: of_utm
+#: model:ir.model.fields,field_description:of_utm.field_utm_source__name
+msgid "Origin Name"
+msgstr "Nom de l'origine"
+
+#. module: of_utm
+#: model_terms:ir.ui.view,arch_db:of_utm.of_utm_source_view_search
+msgid "Search UTM Source"
+msgstr "Rechercher origine UTM"
+
+#. module: of_utm
+#: model:ir.model.fields,field_description:of_utm.field_utm_source__sequence
+msgid "Sequence"
+msgstr "Séquence"
+
+#. module: of_utm
+#: model_terms:ir.ui.view,arch_db:of_utm.of_utm_medium_view_form
 msgid "Sources"
 msgstr "Origines"
 
-#. module: utm
-#: model:ir.model,name:utm.model_utm_source
-#: model:ir.model.fields,field_description:utm.field_account_invoice_source_id
-#: model:ir.model.fields,field_description:utm.field_crm_lead_source_id
-#: model:ir.model.fields,field_description:utm.field_hr_applicant_source_id
-#: model:ir.model.fields,field_description:utm.field_link_tracker_source_id
-#: model:ir.model.fields,field_description:utm.field_sale_order_source_id
-#: model:ir.model.fields,field_description:utm.field_utm_mixin_source_id
-msgid "Source"
+#. module: of_utm
+#: model:ir.model.fields,help:of_utm.field_utm_mixin__medium_id
+msgid "This is the method of delivery, e.g. Postcard, Email, or Banner Ad"
+msgstr ""
+
+#. module: of_utm
+#: model:ir.model.fields,help:of_utm.field_utm_mixin__source_id
+msgid ""
+"This is the source of the link, e.g. Search Engine, another domain, or name "
+"of email list"
+msgstr ""
+
+#. module: of_utm
+#: model:ir.model,name:of_utm.model_utm_campaign
+msgid "UTM Campaign"
+msgstr "Campagne UTM"
+
+#. module: of_utm
+#: model:ir.model,name:of_utm.model_utm_medium
+msgid "UTM Medium"
+msgstr "Medium UTM"
+
+#. module: of_utm
+#: model:ir.model,name:of_utm.model_utm_mixin
+msgid "UTM Mixin"
+msgstr "Mélange UTM"
+
+#. module: of_utm
+#: model:ir.model,name:of_utm.model_utm_source
+msgid "UTM Source"
 msgstr "Origine"

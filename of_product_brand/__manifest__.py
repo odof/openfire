@@ -6,7 +6,7 @@
     'author': "OpenFire",
     'category': 'OpenFire',
     'sequence': 15,
-    'summary': "Base module for OpenFire",
+    'summary': "Generic Modules/Sales & Purchases",
     'website': 'https://www.openfire.fr',
     'description': "",
     'depends': [
