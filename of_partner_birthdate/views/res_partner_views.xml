@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_view_partner_form_birthdate" model="ir.ui.view">
+        <field name="name">of.res.partner.form.birthdate</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="partner_contact_birthdate.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='birthdate_date']" position="after">
+                <field name="of_birthdate_short" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_view_res_partner_filter_birthdate" model="ir.ui.view">
+        <field name="name">of.res.partner.select.birthday</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='phone']" position="after">
+                <field name="of_birthdate_short" />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
