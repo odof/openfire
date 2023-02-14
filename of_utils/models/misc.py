@@ -1,4 +1,5 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 import re
 import unicodedata
 from math import asin, sin, cos, sqrt, radians
@@ -34,7 +35,7 @@ def distance_between_points(lat1, lon1, lat2, lon2):
     @param: Coordonnées gps en degrés
     """
     lat1, lon1, lat2, lon2 = [radians(v) for v in (lat1, lon1, lat2, lon2)]
-    return 2 * asin(sqrt((sin((lat1 - lat2) / 2)) ** 2 + cos(lat1) * cos(lat2) * (sin((lon1-lon2) / 2)) ** 2)) * 6366
+    return 2 * asin(sqrt((sin((lat1 - lat2) / 2)) ** 2 + cos(lat1) * cos(lat2) * (sin((lon1 - lon2) / 2)) ** 2)) * 6366
 
 
 def format_date(date_eval, lang, with_year=True):
