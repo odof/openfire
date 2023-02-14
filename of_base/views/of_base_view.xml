@@ -104,7 +104,7 @@
             <xpath expr="//field[@name='phone']" position="replace">
                 <group colspan="4">
                     <field name="of_phone_number_ids" string="Téléphones" class="of_phone_table">
-                        <tree editable="bottom" colors="red: not is_valid">
+                        <tree editable="bottom" decoration-danger="not is_valid">
                             <field name="type" string="Type"/>
                             <field name="title_id" string="Civilité" options="{'no_open': True}" widget="selection"/>
                             <field name="number_display" string="Numéro" placeholder="Numéro" required="True"/>

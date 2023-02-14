@@ -1,4 +1,5 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 from odoo import models, api, fields, _
 from odoo.addons.base_iban.models.res_partner_bank import ResPartnerBank as ResPartnerBankBase
 

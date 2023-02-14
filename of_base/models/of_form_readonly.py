@@ -1,4 +1,5 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 from lxml import etree
 from odoo import api, models
 from odoo.tools.safe_eval import safe_eval
@@ -23,7 +24,7 @@ class OFFormReadonly(models.AbstractModel):
             if view_type == 'form':  # Applies only for form view
                 for node in doc.xpath("//field"):  # All the view fields to readonly
                     modifiers = node.get('modifiers', {})
-                    if modifiers and isinstance(modifiers, basestring):
+                    if modifiers and isinstance(modifiers, str):
                         modifiers = json.loads(modifiers)
                     if modifiers and isinstance(modifiers, dict) and 'readonly' in modifiers and \
                        isinstance(modifiers.get('readonly', None), bool) and modifiers.get('readonly'):
@@ -41,7 +42,7 @@ class OFFormReadonly(models.AbstractModel):
                         modifiers['readonly'] = safe_eval(read_only_domain)
 
                     attrs = node.get('attrs', {})
-                    if attrs and isinstance(attrs, basestring):
+                    if attrs and isinstance(attrs, str):
                         attrs = safe_eval(attrs)
                     if attrs and isinstance(attrs, dict) and attrs.get('form_readonly_exception', False):
                         continue
