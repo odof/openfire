@@ -22,6 +22,7 @@ Ce module nécessite l'installation de openerplib sur le serveur : sudo easy_ins
         'of_datastore_common_sp',
     ],
     'data': [
+        'data/of_sanitize_query.xml',
         'security/ir.model.access.csv',
         'views/of_datastore_purchase_views.xml',
         'views/purchase_views.xml',
