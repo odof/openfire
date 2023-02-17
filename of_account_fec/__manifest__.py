@@ -1,25 +1,22 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name' : 'OpenFire / FEC',
-    'author': 'OpenFire',
-    'version' : '10.0.1.0.0',
-    'summary': 'extension de l10n_fr_fec',
-    'description': """
-OpenFire / FEC\n
-======================\n
-- Ajout choix des journaux
-- Permettre à un module qui hériterait de ce module de prendre la date de création de l'écriture comptable à la place de sa date comme critère de sélection
-    """,
-    'category': 'OpenFire modules - Accounting',
-    'website': 'openfire.fr',
-    'depends' : ['l10n_fr_fec'],
+    'name': "OpenFire / FEC",
+    'version': '16.0.1.0.0',
+    'author': "OpenFire",
+    'category': 'OpenFire',
+    'sequence': 15,
+    'summary': "Modue d'extension de l10n_fr_fec",
+    'website': 'https://www.openfire.fr',
+    'description': "",
+    'depends': [
+        'l10n_fr_fec',
+    ],
     'data': [
         'wizard/of_account_fec_view.xml',
     ],
-    'demo': [],
-    'qweb': [],
     'installable': True,
     'application': False,
     'auto_install': False,
+    'license': 'LGPL-3',
 }
