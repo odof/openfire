@@ -9,7 +9,8 @@ class Website(models.Model):
 
     @api.model_cr_context
     def _auto_init(self):
-        module_self = self.env['ir.module.module'].search([('name', '=', 'of_website_sale')])
+        module_self = self.env['ir.module.module'].search(
+            [('name', '=', 'of_website_sale'), ('state', 'in', ['installed', 'to upgrade'])])
         actions_todo = module_self and module_self.latest_version < '10.0.2' or False
 
         if actions_todo:
