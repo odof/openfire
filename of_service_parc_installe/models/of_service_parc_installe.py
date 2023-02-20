@@ -190,6 +190,25 @@ class OfPlanningIntervention(models.Model):
                 interv.historique_parc_ids = interv.parc_installe_id.intervention_ids.filtered(
                     lambda i: interv.date_date > i.date_date)
 
+    @api.onchange('address_id')
+    def _onchange_address_id(self):
+        super(OfPlanningIntervention, self)._onchange_address_id()
+        if self.address_id and self.parc_installe_id.site_adresse_id != self.address_id:
+            parc_installe = False
+            parc_obj = self.env['of.parc.installe']
+            if not parc_obj.check_access_rights('read', raise_exception=False):
+                return
+            # limit = 2 to limit the number of records fetched by the search, we just need to know if there is more
+            # than one
+            found_records = parc_obj.search([('site_adresse_id', '=', self.address_id.id)], limit=2)
+            if not found_records:
+                found_records = parc_obj.search([('client_id', '=', self.address_id.id)], limit=2)
+            if not found_records and self.partner_id:
+                found_records = parc_obj.search([('client_id', '=', self.partner_id.id)], limit=2)
+            if found_records and len(found_records) == 1:
+                parc_installe = found_records[0]
+            self.parc_installe_id = parc_installe
+
     @api.model
     def create(self, vals):
         service_obj = self.env['of.service']
