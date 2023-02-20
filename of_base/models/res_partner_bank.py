@@ -1,21 +1,21 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import models, api, fields, _
-from odoo.addons.base_iban.models.res_partner_bank import ResPartnerBank as ResPartnerBankBase
-
-
-@api.model
-def _get_supported_account_types(self):
-    return [('bank', _('Bank')), ('iban', _('IBAN'))]
-
-
-ResPartnerBankBase._get_supported_account_types = _get_supported_account_types
 
 
 class ResPartnerBank(models.Model):
     _inherit = 'res.partner.bank'
 
+    @api.model
+    def get_supported_account_types(self):
+        return self._get_supported_account_types()
+
+    @api.model
+    def _get_supported_account_types(self):
+        return [('bank', _('Bank')), ('iban', _('IBAN'))]
+
     acc_type = fields.Selection(
+        selection=lambda x: x.env['res.partner.bank'].get_supported_account_types(),
         compute='_compute_acc_type', inverse='_inverse_acc_type', store=True,
         string="Type of account", required=True, default='iban',
         help="Leave the account type IBAN to let the software check the validity of the entered code."

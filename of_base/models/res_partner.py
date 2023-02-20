@@ -78,7 +78,7 @@ def convert_phone_number(value, default_country_code=None, new_format='e164', st
 
 
 class ResPartner(models.Model):
-    _inherit = "res.partner"
+    _inherit = 'res.partner'
 
     name = fields.Char(tracking=True)
     street = fields.Char(tracking=True)
