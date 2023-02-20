@@ -44,10 +44,21 @@ class OFPlanningIntervention(models.Model):
 
     @api.multi
     def write(self, vals):
+        # On récupère les valeurs actuelles des champs qui vont être modifiés
+        current_values = {
+            rec.id: {
+                'order_id': rec.order_id.id,
+                'state': rec.state,
+            }
+            for rec in self
+        }
         res = super(OFPlanningIntervention, self).write(vals)
         # les RDVs viennent d'être passés en "réalisé" ou on vient de rattacher une commande
         if vals.get('state', '') == 'done' or vals.get('order_id'):
-            for rec in self:
+            for rec in self.filtered(
+                    lambda i:
+                    (current_values[i.id]['state'] != i.state)
+                    or (current_values[i.id]['order_id'] != i.order_id.id)).sudo():
                 if rec.order_date_vt_need_update():
                     rec.order_id.of_date_vt = rec.date_date
         return res
