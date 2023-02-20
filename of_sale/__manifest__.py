@@ -13,7 +13,7 @@
 
 {
     'name': u"OpenFire / Ventes",
-    'version': '10.0.3.2.0',
+    'version': '10.0.3.3.0',
     'license': '',
     'author': "OpenFire",
     'website': "www.openfire.fr",
@@ -97,6 +97,7 @@ Droits utilisateurs:
         'data/assets.xml',
         'security/of_sale_security.xml',
         'security/ir.model.access.csv',
+        'hooks/post_hook.xml',
         'views/of_sale_view.xml',
         'views/sale_config_setting_views.xml',
         'report/of_report_sale_order_list.xml',

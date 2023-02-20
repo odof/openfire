@@ -67,7 +67,7 @@
                     <button name="action_verification_confirm" states="draft" string="Confirmer la vente" class="o_sale_confirm" type="object" />
                 </xpath>
                 <xpath expr="//header" position="inside">
-                    <button name="button_gestion_prix" type="object" string="Gestion prix"/>
+                    <button name="button_gestion_prix" type="object" string="Gestion prix" groups="of_sale.group_of_can_modify_sale_price_unit"/>
                     <field name="of_allow_quote_addition" invisible="1"/>
                     <button name="action_add_quote" string="Ajout devis" type="object" attrs="{'invisible': ['|', ('state', '!=', 'sale'), ('of_allow_quote_addition', '=', False)]}"/>
                 </xpath>
@@ -374,7 +374,7 @@
                     <label for="price_unit"/>
                     <div>
                         <field name="price_unit" class="oe_inline" style="max-width: 150px;"
-                               attrs="{'invisible': [('of_product_forbidden_discount', '=', True)]}"/>
+                               attrs="{'invisible': [('of_product_forbidden_discount', '=', True)]}" readonly="1"/>
                         <field name="of_price_unit_display" class="oe_inline" style="max-width: 150px;"
                                attrs="{'invisible': [('of_product_forbidden_discount', '=', False)]}"/>
                         (<field name="of_date_tarif" class="oe_inline"/>
@@ -432,6 +432,21 @@
                 <xpath expr="//field[@name='of_price_unit_display']" position="attributes">
                     <attribute name="attrs"/>
                     <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_sale_order_price_unit_no_readonly_view_form" model="ir.ui.view">
+            <field name="name">of.sale.order.price.unit.view.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="of_sale.of_sale_obsolete_sale_order_form_view"/>
+            <field name="groups_id" eval="[(4, ref('of_sale.group_of_can_modify_sale_price_unit'))]"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="attributes">
+                    <attribute name="readonly">0</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='price_unit']" position="attributes">
+                    <attribute name="readonly">0</attribute>
                 </xpath>
             </field>
         </record>
