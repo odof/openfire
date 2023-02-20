@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <function model="of.sale.hook" name="_init_group_of_can_modify_sale_price_unit">
+        <value eval="[]"/>
+    </function>
+
+</odoo>
