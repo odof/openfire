@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="of_view_move_template_tree" model="ir.ui.view">
+        <field name="name">account.move.template.tree</field>
+        <field name="model">account.move.template</field>
+        <field name="inherit_id"  ref="account_move_template.view_move_template_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="of_moves_last_date"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_view_move_template_form" model="ir.ui.view">
+        <field name="name">of.account.move.template.form</field>
+        <field name="model">account.move.template</field>
+        <field name="inherit_id"  ref="account_move_template.view_move_template_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@class='oe_title']" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button class="oe_stat_button" name="of_action_view_moves" type="object" icon="fa-bars">
+                        <field string="Pièces" name="of_moves_count" widget="statinfo"/>
+                    </button>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='company_id']" position="after">
+                <field name="of_recurring"/>
+            </xpath>
+            <xpath expr="//field[@name='template_line_ids']" position="before">
+                <group attrs="{'invisible':[('of_recurring','!=',True)]}">
+                    <group>
+                        <label for="of_rec_interval" string="Répéter tous les"/>
+                        <div>
+                            <field name="of_rec_interval" class="oe_inline"
+                                   style="width: 50px !important; margin-right: 10px;"/>
+                            <field name="of_rec_interval_type" class="oe_inline"/>
+                        </div>
+                        <field name="of_rec_number" string="Nombre de pièces"/>
+                        <field name="of_prorata" attrs="{'invisible':[('of_rec_interval_type','!=','months')]}"/>
+                    </group>
+                    <group>
+                        <field name="of_extourne"/>
+                        <field name="of_extourne_date" attrs="{'invisible':[('of_extourne', '!=', 'custom')]}"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>
