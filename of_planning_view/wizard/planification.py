@@ -459,29 +459,21 @@ class OfPlanifCreneau(models.TransientModel):
                       ('date_fin_contrat', '>', self.date_creneau),
         ]
         if self.secteur_id:
-            # dans le cas ou le secteur n'est pas renseigné, on regarde les codes postaux
-            for zip_range in self.secteur_id.zip_range_ids:
-                if zip_range.cp_min == zip_range.cp_max:
-                    service_domain.append('|')
-                    service_domain.append(('address_zip', '=', zip_range.cp_min))
-                else:
-                    service_domain.append('|')
-                    service_domain.append('&')
-                    service_domain.append(('address_zip', '>=', zip_range.cp_min))
-                    service_domain.append(('address_zip', '<=', zip_range.cp_max))
-            service_domain.append(('secteur_tech_id', '=', self.secteur_id.id))
-            # exclusion des secteurs intérieurs
-            secteurs_interieurs = self.secteur_id.get_secteurs_interieurs('tech')
-            if secteurs_interieurs:
-                zip_range_excluded = secteurs_interieurs.mapped('zip_range_ids')
-                for zip_range in zip_range_excluded:
-                    if zip_range.cp_min == zip_range.cp_max:
-                        service_domain.append(('address_zip', '!=', zip_range.cp_min))
-                    else:
+            if self.secteur_id.zip_range_ids:
+                # Recherche sur les DI n'ayant pas de secteur mais dont le CP est compris dans le secteur choisi
+                service_domain += ['|', '&', ('secteur_tech_id', '=', False)]
+                last_range = self.secteur_id.zip_range_ids[-1]
+                for zip_range in self.secteur_id.zip_range_ids:
+                    if zip_range != last_range:
                         service_domain.append('|')
-                        service_domain.append(('address_zip', '<', zip_range.cp_min))
-                        service_domain.append(('address_zip', '>', zip_range.cp_max))
-                service_domain.append(('address_zip', 'not in', zip_range_excluded.ids))  # à corriger
+                    if zip_range.cp_min == zip_range.cp_max:
+                        service_domain.append(('address_zip', '=', zip_range.cp_min))
+                    else:
+                        service_domain.append('&')
+                        service_domain.append(('address_zip', '>=', zip_range.cp_min))
+                        service_domain.append(('address_zip', '<=', zip_range.cp_max))
+            # Recherche sur les DI du secteurs
+            service_domain.append(('secteur_tech_id', '=', self.secteur_id.id))
         # services
         services = self.env['of.service'].search(service_domain).filter_state_poncrec_date(date_eval=self.date_creneau)
         rayon_max = self.rayon_max  # * 1.3  # approximation
