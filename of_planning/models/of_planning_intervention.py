@@ -9,7 +9,7 @@ import requests
 import urllib
 import base64
 
-from odoo import api, models, fields, _, tools
+from odoo import api, models, fields, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import config, DEFAULT_SERVER_DATETIME_FORMAT, float_is_zero
 from odoo.tools.float_utils import float_compare
@@ -1435,15 +1435,17 @@ class OfPlanningIntervention(models.Model):
         if vals.get('state', '') == 'confirm':
             self.mapped('line_ids').sudo()._action_procurement_create()
 
-
         # Génération auto du rapport d'intervention
         if ri_report and vals.get('state', '') == 'done':
             for record in self:
-                if (record.template_id and record.template_id.attach_report) or \
-                    (default_template and default_template.attach_report):
+                if (record.template_id and record.template_id.attach_report) or (
+                        default_template and default_template.attach_report):
                     self.env['report'].sudo().get_pdf(docids=record._ids, report_name=ri_report.report_name)
-        for picking in self.mapped('picking_ids').filtered(lambda p: p.state in ('partially_available', 'assigned')):
-            self.env['stock.immediate.transfer'].create({'pick_id': picking.id}).process()
+        # Validation auto des BL si l'intervention est passée à l'état "Réalisé"
+        if vals.get('state') == 'done':
+            for picking in self.sudo().mapped('picking_ids').filtered(
+                    lambda p: p.state in ('partially_available', 'assigned')):
+                self.env['stock.immediate.transfer'].create({'pick_id': picking.id}).process()
 
         self._affect_number()
         if vals.get('state', '') == 'done':
