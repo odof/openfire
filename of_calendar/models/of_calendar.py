@@ -81,19 +81,20 @@ class HREmployee(models.Model):
             if segments_perm:
                 segments_perm_futur = segments_perm.filtered(lambda s: s.date_deb > date_str)
                 segments_perm_passe = (segments_perm - segments_perm_futur)
-                segment_perm_cur = segments_perm_passe[-1]
+                if segments_perm_passe:
+                    segment_perm_cur = segments_perm_passe[-1]
 
-                if segment_perm_cur.date_deb != "1970-01-01":
-                    depuis_cur = u"le " + format_date(segment_perm_cur.date_deb)
-                else:
-                    depuis_cur = u"l'embauche"
-                if segment_perm_cur.motif:
-                    depuis_cur += u"(%s)" % segment_perm_cur.motif
+                    if segment_perm_cur.date_deb != "1970-01-01":
+                        depuis_cur = u"le " + format_date(segment_perm_cur.date_deb)
+                    else:
+                        depuis_cur = u"l'embauche"
+                    if segment_perm_cur.motif:
+                        depuis_cur += u"(%s)" % segment_perm_cur.motif
 
-                recap += u'<h3>Horaires depuis %s</h3>\n<p>\n%s</p>\n' % (depuis_cur, formate_segment(segment_perm_cur))
+                    recap += u'<h3>Horaires depuis %s</h3>\n<p>\n%s</p>\n' % (depuis_cur, formate_segment(segment_perm_cur))
 
                 for seg in segments_perm_futur:
-                    recap += u"<h3>Changement d'horaires à partir du " + format_date(seg.date_deb)
+                    recap += u"<h3>Horaires à partir du " + format_date(seg.date_deb)
                     if seg.motif:
                         recap += u" (%s)" % seg.motif
                     recap += u'</h3>\n<p>\n' + formate_segment(seg) + u'</p>\n'
