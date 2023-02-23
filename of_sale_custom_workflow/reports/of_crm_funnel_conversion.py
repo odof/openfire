@@ -754,7 +754,12 @@ class OFCRMFunnelConversion4(models.Model):
             ,       0                   AS previous_quotation_nb
             ,       0                   AS order_nb
             ,       0                   AS presale_order_nb
-            ,       1                   AS previous_order_nb
+            ,       CASE
+                        WHEN SO8.of_cancelled_order_id IS NULL THEN
+                            1
+                        ELSE
+                            -1
+                    END                 AS previous_order_nb
             ,       0                   AS lost_quotation_nb
             ,       0                   AS of_custom_confirmation_delta
             ,       0                   AS of_confirmation_delta
