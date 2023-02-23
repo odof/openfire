@@ -7,6 +7,7 @@ from odoo.exceptions import UserError
 from odoo.exceptions import ValidationError
 from odoo.addons.of_utils.models.of_utils import format_date, se_chevauchent
 from odoo.tools.safe_eval import safe_eval
+from odoo.tools.float_utils import float_compare
 
 
 class OfDocumentsJoints(models.AbstractModel):
@@ -1271,6 +1272,11 @@ class OfContractLine(models.Model):
 
         if not self._context.get('no_verification'):
             for line in self:
+                # Ajout d'une vérification des valeurs des floats,
+                # parfois ils sont renvoyés même quand ils n'ont pas été modifiés
+                for key in vals.keys():
+                    if line._fields[key].type == 'float' and not float_compare(line[key], vals[key], 2):
+                        fields_allowed.append(key)
                 if line.state == 'validated' and any([key not in fields_allowed for key in vals.keys()]):
                     fields_string = '\n'.join([self._fields[field].string for field in fields_allowed])
                     raise UserError(u'Pour les lignes de contrats validées, '
