@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="of_account_move_template_run_form" model="ir.ui.view">
+        <field name="name">of.account.move.template.run</field>
+        <field name="model">account.move.template.run</field>
+        <field name="inherit_id"  ref="account_move_template.account_move_template_run_form"/>
+        <field name="arch" type="xml">
+            <!-- Modifications pour les modèles multiples -->
+            <xpath expr="//field[@name='template_id']" position="before">
+                <field name="of_template_ids" invisible="1"/>
+            </xpath>
+            <xpath expr="//footer/button[@name='generate_move']" position="attributes">
+                <attribute name="name">generate_moves</attribute>
+            </xpath>
+            <xpath expr="//group[@name='lines']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <!-- Ajout des champs pour les écritures récurrentes -->
+            <xpath expr="//group[@name='lines']" position="before">
+                <group name="options" attrs="{'invisible':[('state','!=','template_selected')]}">
+                    <field name="of_date_start"/>
+                    <field name="of_recurring"/>
+               </group>
+                <group name="recurring" attrs="{'invisible':[('of_recurring','!=',True)]}">
+                    <group name="recurring_first">
+                        <label for="of_rec_interval"/>
+                        <div>
+                            <field name="of_rec_interval" class="oe_inline" style="width: 50px !important; margin-right: 10px;"/>
+                            <field name="of_rec_interval_type" class="oe_inline"/>
+                        </div>
+                        <field name="of_rec_number"/>
+                        <field name="of_prorata" attrs="{'invisible':[('of_rec_interval_type','!=','months')]}"/>
+                    </group>
+                    <group name="recurring_second">
+                        <field name="of_reversal"/>
+                        <field name="of_reversal_date" attrs="{'invisible':[('of_reversal', '!=', 'custom')]}"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_account_move_template_run_multi_form" model="ir.ui.view">
+        <field name="name">of.account.move.template.run.multi.form</field>
+        <field name="model">account.move.template.run</field>
+        <field name="arch" type="xml">
+            <form string="Move Template" >
+                <field name="template_id" invisible="1"/>
+                <field name="of_template_ids" invisible="1"/>
+                <group>
+                    <group>
+                        <field name="of_date_start"/>
+                    </group>
+                    <group>
+                        <field name="partner_id"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="generate_moves" class="btn-primary" string="Load" type="object"/>
+                    <button special="cancel" string="Cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_of_account_move_template_generate_moves" model="ir.actions.server">
+        <field name="name">Accounting : Generate accounting vouchers</field>
+        <field name="groups_id" eval="[(4, ref('account.group_account_manager'))]"/>
+        <field name="model_id" ref="account_move_template.model_account_move_template_run"/>
+        <field name="binding_model_id" ref="account_move_template.model_account_move_template"/>
+        <field name="state">code</field>
+        <field name="code">
+ctx = env.context.copy()
+action = env.ref('account_move_template.account_move_template_run_action').read()[0]
+action['context'] = ctx
+if len(ctx.get('active_ids', [])) > 1:
+    view_id = env.ref('of_account_move_template.of_account_move_template_run_multi_form').id
+    action['views'] = [(view_id, 'form')]
+    action['view_id'] = view_id
+        </field>
+    </record>
+
+</odoo>

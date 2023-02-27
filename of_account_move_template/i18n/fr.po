@@ -1,0 +1,254 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_account_move_template
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-02-27 12:50+0000\n"
+"PO-Revision-Date: 2023-02-27 12:50+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_account_move_template
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_move_template__of_move_ids
+msgid "Accounting vouchers"
+msgstr "Pièces comptables"
+
+#. module: of_account_move_template
+#: model_terms:ir.ui.view,arch_db:of_account_move_template.of_account_move_template_run_multi_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: of_account_move_template
+#: model:ir.model.fields.selection,name:of_account_move_template.selection__account_move_template__of_reversal__custom
+#: model:ir.model.fields.selection,name:of_account_move_template.selection__account_move_template_run__of_reversal__custom
+msgid "Chosen date"
+msgstr "Date choisie"
+
+#. module: of_account_move_template
+#: model:ir.model.fields.selection,name:of_account_move_template.selection__account_move_template__of_rec_interval_type__days
+#: model:ir.model.fields.selection,name:of_account_move_template.selection__account_move_template_run__of_rec_interval_type__days
+msgid "Days"
+msgstr "Jours"
+
+#. module: of_account_move_template
+#. odoo-python
+#: code:addons/of_account_move_template/wizards/account_move_template_run.py:0
+#, python-format
+msgid "Debit and credit of all lines are null."
+msgstr "Le débit et le crédit de toutes les lignes sont nuls."
+
+#. module: of_account_move_template
+#: model:ir.model.fields.selection,name:of_account_move_template.selection__account_move_template__of_reversal__last
+#: model:ir.model.fields.selection,name:of_account_move_template.selection__account_move_template_run__of_reversal__last
+msgid "End date"
+msgstr "Date de fin"
+
+#. module: of_account_move_template
+#. odoo-python
+#: code:addons/of_account_move_template/wizards/account_move_template_run.py:0
+#, python-format
+msgid "Entries generated from template%s"
+msgstr "Pièces générées depuis le modèle%s"
+
+#. module: of_account_move_template
+#. odoo-python
+#: code:addons/of_account_move_template/wizards/account_move_template_run.py:0
+#, python-format
+msgid "For a recurring entry, you must request at least 2 vouchers."
+msgstr "Pour une écriture récurrente, vous devez demander au moins 2 pièces."
+
+#. module: of_account_move_template
+#: model:ir.actions.server,name:of_account_move_template.action_of_account_move_template_generate_moves
+msgid "Accounting : Generate accounting vouchers"
+msgstr "Comptabilité : Générer des pièces comptables"
+
+#. module: of_account_move_template
+#. odoo-python
+#: code:addons/of_account_move_template/wizards/account_move_template_run.py:0
+#, python-format
+msgid ""
+"Generating from several models simultaneously requires that they do not have amounts in manual entry.\n"
+"Model(s) in error: %s"
+msgstr ""
+"La génération depuis plusieurs modèles simultanément nécessite qu'ils n'aient pas de montants en saisie manuelle.\n"
+"Modèle en erreur: %s"
+
+#. module: of_account_move_template
+#: model:ir.model,name:of_account_move_template.model_account_move
+msgid "Journal Entry"
+msgstr "Pièce comptable"
+
+#. module: of_account_move_template
+#: model:ir.model,name:of_account_move_template.model_account_move_template
+msgid "Journal Entry Template"
+msgstr "Modèle d'écriture"
+
+#. module: of_account_move_template
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_move_template__of_moves_last_date
+msgid "Last voucher"
+msgstr "Dernière pièce"
+
+#. module: of_account_move_template
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_move_template__line_ids
+msgid "Lines"
+msgstr "Lignes"
+
+#. module: of_account_move_template
+#: model_terms:ir.ui.view,arch_db:of_account_move_template.of_account_move_template_run_multi_form
+msgid "Load"
+msgstr "Charger"
+
+#. module: of_account_move_template
+#: model:ir.model.fields.selection,name:of_account_move_template.selection__account_move_template__of_rec_interval_type__months
+#: model:ir.model.fields.selection,name:of_account_move_template.selection__account_move_template_run__of_rec_interval_type__months
+msgid "Months"
+msgstr "Mois"
+
+#. module: of_account_move_template
+#: model_terms:ir.ui.view,arch_db:of_account_move_template.of_account_move_template_run_multi_form
+msgid "Move Template"
+msgstr ""
+
+#. module: of_account_move_template
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_move_template__of_moves_count
+msgid "Nb. vouchers"
+msgstr "Nb. Pièces"
+
+#. module: of_account_move_template
+#: model:ir.model.fields.selection,name:of_account_move_template.selection__account_move_template__of_reversal__none
+#: model:ir.model.fields.selection,name:of_account_move_template.selection__account_move_template_run__of_reversal__none
+msgid "No reversal"
+msgstr "Pas d'extourne"
+
+#. module: of_account_move_template
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_move_template__of_rec_number
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_move_template_run__of_rec_number
+msgid "Number of vouchers"
+msgstr "Nombre de pièces"
+
+#. module: of_account_move_template
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_bank_statement_line__of_template_id
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_move__of_template_id
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_payment__of_template_id
+msgid "Original template"
+msgstr ""
+
+#. module: of_account_move_template
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_move_template__of_prorata
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_move_template_run__of_prorata
+msgid "Prorata"
+msgstr ""
+
+#. module: of_account_move_template
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_move_template__of_recurring
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_move_template_run__of_recurring
+msgid "Recurring"
+msgstr "Récurrent"
+
+#. module: of_account_move_template
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_move_template__of_rec_interval
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_move_template_run__of_rec_interval
+#: model_terms:ir.ui.view,arch_db:of_account_move_template.of_account_move_template_form
+msgid "Repeat every"
+msgstr "Répéter tous les"
+
+#. module: of_account_move_template
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_move_template__of_reversal_date
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_move_template_run__of_reversal_date
+msgid "Reversal date"
+msgstr "Date extourne"
+
+#. module: of_account_move_template
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_move_template__of_reversal
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_move_template_run__of_reversal
+msgid "Reverse the entry"
+msgstr "Extourner"
+
+#. module: of_account_move_template
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_move_template_run__of_date_start
+#: model:ir.model.fields.selection,name:of_account_move_template.selection__account_move_template__of_reversal__first
+#: model:ir.model.fields.selection,name:of_account_move_template.selection__account_move_template_run__of_reversal__first
+msgid "Start date"
+msgstr "Date de début"
+
+#. module: of_account_move_template
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_move_template_run__of_template_ids
+msgid "Templates"
+msgstr ""
+
+#. module: of_account_move_template
+#: model:ir.model.fields,help:of_account_move_template.field_account_move_template__of_prorata
+msgid ""
+"The amount of the entries will be adjusted pro rata to the month for the "
+"first and last month."
+msgstr ""
+"Le montant des écritures sera ajusté au prorata du mois sur le premier et le"
+" dernier mois"
+
+#. module: of_account_move_template
+#: model:ir.model.fields,help:of_account_move_template.field_account_move_template_run__of_prorata
+msgid ""
+"The amount of the entries will be adjusted pro rata to the month on the "
+"first and last month."
+msgstr ""
+
+#. module: of_account_move_template
+#. odoo-python
+#: code:addons/of_account_move_template/wizards/account_move_template_run.py:0
+#, python-format
+msgid "The interval between two vouchers must be at least equal to 1."
+msgstr "L'intervalle entre deux pièces doit être au moins égal à 1."
+
+#. module: of_account_move_template
+#. odoo-python
+#: code:addons/of_account_move_template/wizards/account_move_template_run.py:0
+#, python-format
+msgid ""
+"The selected template (%(template)s) is not in the same company "
+"(%(company)s) as the current user (%(user_company)s)."
+msgstr ""
+"Le modèle sélectionné (%(template)s) n'est pas dans la même société "
+"(%(company)s) que l'utilisateur courant (%(user_company)s)."
+
+#. module: of_account_move_template
+#: model:ir.model.fields,help:of_account_move_template.field_account_move_template__of_reversal_date
+msgid ""
+"The year will be automatically recalculated in the accounting documents "
+"creation tool."
+msgstr ""
+
+#. module: of_account_move_template
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_move_template__of_rec_interval_type
+#: model:ir.model.fields,field_description:of_account_move_template.field_account_move_template_run__of_rec_interval_type
+msgid "Time unit"
+msgstr "Unité de temps"
+
+#. module: of_account_move_template
+#: model_terms:ir.ui.view,arch_db:of_account_move_template.of_account_move_template_form
+msgid "Vouchers"
+msgstr "Pièces"
+
+#. module: of_account_move_template
+#: model:ir.model,name:of_account_move_template.model_account_move_template_run
+msgid "Wizard to generate move from template"
+msgstr "Assistant pour générer un mouvement à partir d'un modèle"
+
+#. module: of_account_move_template
+#. odoo-python
+#: code:addons/of_account_move_template/wizards/account_move_template_run.py:0
+#, python-format
+msgid "Wrong value for recurring rule type."
+msgstr "Valeur erronée pour le type de règle de récurrence"
+
+#. module: of_account_move_template
+#: model:ir.model.fields.selection,name:of_account_move_template.selection__account_move_template__of_rec_interval_type__years
+#: model:ir.model.fields.selection,name:of_account_move_template.selection__account_move_template_run__of_rec_interval_type__years
+msgid "Years"
+msgstr "Années"

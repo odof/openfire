@@ -1,26 +1,23 @@
-# -*- coding: utf-8 -*-
-{
-    'name': u"OpenFire / Écritures récurrentes",
-    'version': "10.0.1.0.0",
-    'author': "OpenFire",
-    'license': '',
-    'website': "www.openfire.fr",
-    'category': "Generic Modules/Accounting",
-    'description': u"""
-Module des écritures récurrentes OpenFire.
-==========================================
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-Permet de charger un modèle de pièce comptable de façon récurrente sur une période donnée.
-- Option pour charger les écritures du premier/dernier mois au prorata des jours impactés.
-- Option pour générer automatiquement une extourne au début/à la fin de la récurrence.
-""",
+{
+    'name': "OpenFire / Écritures récurrentes",
+    'version': '16.0.1.0.0',
+    'author': "OpenFire",
+    'category': 'OpenFire',
+    'sequence': 15,
+    'summary': "Module d'extension de account_move_template",
+    'website': 'https://www.openfire.fr',
+    'description': "",
     'depends': [
         'account_move_template',
     ],
-    'demo_xml': [],
     'data': [
-        'views/account_move_template.xml',
-        'wizards/select_template.xml',
+        'views/account_move_template_views.xml',
+        'wizards/account_move_template_run_views.xml',
     ],
     'installable': True,
+    'application': False,
+    'auto_install': False,
+    'license': 'LGPL-3',
 }
