@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import re
 from unidecode import unidecode
 
 from odoo import models, api, tools, fields, SUPERUSER_ID, _
@@ -40,7 +41,7 @@ class ResUsers(models.Model):
     @api.multi
     def _get_default_email(self):
         self.ensure_one()
-        return unidecode(self.partner_id.name).lower().replace(" ", "") + "@example.com"
+        return re.sub('[^a-zA-Z0-9._%+-]', '', unidecode(self.partner_id.name)).lower() + "@example.com"
 
     @api.model
     def create(self, vals):
