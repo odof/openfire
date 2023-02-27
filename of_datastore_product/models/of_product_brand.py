@@ -270,7 +270,7 @@ class OfProductBrand(models.Model):
                     'category_id': categ.id,
                     'rounding':    ds_obj['rounding'],
                 }
-                result = obj_obj.create(uom_data)
+                result = obj_obj.sudo().create(uom_data)
         else:
             if obj_obj._rec_name:
                 result = obj_obj.search([(obj_obj._rec_name, '=', res_name)])
