@@ -95,6 +95,16 @@ class WizardSelectMoveTemplate(models.TransientModel):
             'context': self.env.context,
         }
 
+    def get_relative_delta(self, recurring_rule_type, interval, day=None):
+        if recurring_rule_type == 'days':
+            return relativedelta(days=interval)
+        elif recurring_rule_type == 'months':
+            return relativedelta(months=interval, day=day)
+        elif recurring_rule_type == 'years':
+            return relativedelta(years=interval)
+        else:
+            raise UserError(u"Valeur erronée pour le type de règle de récurrence.")
+
     @api.multi
     def load_template(self, input_lines, params, template):
         amounts = template.compute_lines(input_lines)
@@ -102,27 +112,30 @@ class WizardSelectMoveTemplate(models.TransientModel):
         name = template.name
         partner = self.partner_id.id
         moves = self.env['account.move']
-        date_start_da = fields.Date.from_string(self.of_date_start)
+        date_start = self.of_date_start
+        date_start_da = fields.Date.from_string(date_start)
         month_last_day = calendar.monthrange(date_start_da.year, date_start_da.month)[1]
         of_prorata = self.of_rec_interval_type == 'months' and self.of_prorata
 
         # Calcul des dates des pièces comptables.
-        dates = [self.of_date_start]
+        dates = [date_start]
         if params.of_recurring:
             if params.of_rec_interval < 1:
                 raise UserError(u"L'intervalle entre deux pièces doit être au moins égal à 1.")
             if params.of_rec_number < 2:
                 raise UserError(u"Pour une écriture récurrente, vous devez demander au moins 2 pièces.")
-            delta = relativedelta()
-            if params.of_rec_interval_type == 'months' and date_start_da.day == month_last_day:
+
+            force_day = None
+            interval = params.of_rec_interval
+            interval_type = params.of_rec_interval_type
+            if interval_type == 'months' and date_start_da.day == month_last_day:
                 # Les écritures seront au dernier jour du mois pour tous les mois de la récurrence.
-                delta = relativedelta(day=31)
+                force_day = 31
+            delta = self.get_relative_delta(recurring_rule_type=interval_type, interval=interval, day=force_day)
+            next_date = date_start_da
             for _ in xrange(params.of_rec_number - 1):
-                setattr(
-                    delta,
-                    params.of_rec_interval_type,
-                    getattr(delta, params.of_rec_interval_type) + params.of_rec_interval)
-                dates.append(fields.Date.to_string(date_start_da + delta))
+                next_date += delta
+                dates.append(fields.Date.to_string(next_date))
 
         # Génération des pièces
         imax = len(dates) - 1
