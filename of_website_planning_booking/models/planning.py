@@ -2,6 +2,7 @@
 
 from odoo import api, models, fields
 from odoo.addons.of_utils.models.of_utils import format_date
+from odoo.exceptions import ValidationError
 
 
 class OFParcInstalle(models.Model):
@@ -135,7 +136,7 @@ class OFInterventionSettings(models.TransientModel):
         column1='of_intervention_settings_id', column2='employee_id', string=u"(OF) Techniciens disponibles",
         domain=[('of_est_intervenant', '=', True)])
     website_booking_open_days_number = fields.Integer(
-        string=u"(OF) Nombre de jours ouverts à la réservation", default=60)
+        string=u"(OF) Nombre de jours ouverts à la réservation (max 180 jours)", default=60)
     website_booking_allow_empty_days = fields.Boolean(
         string=u"(OF) Autorise la réservation de créneau sur des journées vierges", default=True)
     website_booking_slot_size = fields.Selection(
@@ -163,6 +164,15 @@ class OFInterventionSettings(models.TransientModel):
     website_booking_terms_filename = fields.Char(
         related='website_id.website_booking_terms_filename',
         string=u"(OF) Nom du fichier PDF des Conditions Générales de Vente")
+
+    @api.constrains('website_booking_open_days_number')
+    def _check_website_booking_open_days_number_constaint(self):
+        for record in self:
+            if record.website_booking_open_days_number < 0:
+                raise ValidationError(u"Vous ne pouvez pas avoir un nombre de jours ouverts à la réservation négatif.")
+            if record.website_booking_open_days_number > 180:
+                raise ValidationError(u"Vous ne pouvez pas avoir un nombre de jours ouverts à la réservation supérieur "
+                                      u"à 180.")
 
     @api.multi
     def set_website_booking_allowed_month_ids_defaults(self):
