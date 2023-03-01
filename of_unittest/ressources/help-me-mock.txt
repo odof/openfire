@@ -1,0 +1,147 @@
+============
+Help-me-Mock
+============
+
+
+Common usecases
+_______________
+
+ - Something that i don't want to call will eventually be called. It's a safety measure
+ I want to simulate a specific return and see how my tests will react.
+
+1. @mock.patch('path.to.attribute')
+===================================
+ - Remplace tout appel a 'attribute' par un Mock.
+ - Peut être appliqué a une classe ou a des fonctions.
+ - Ajout X arguements à la fonction ou chaque fonction de la classe. X étant le nombre de @mock.patch
+
+Exemples
+-----
+
+Exemple de @mock.patch sur la classe
+
+Exemple python 1 ::
+
+    import mock
+
+    @mock.patch('requests.get')
+    class OFTestCase(TestCase):
+
+        def test_case_01(self, get):
+            # does something
+
+        def test_case_02(self, get):
+            # does something else
+
+Exemple de @mock.patch sur une fonction de la classe
+
+Exemple python 2 ::
+
+    import mock
+
+    class OFTestCase(TestCase):
+
+        @mock.patch('requests.put')
+        def test_case_01(self, put):
+            # does something
+
+        def test_case_02(self):
+            # does something else
+
+Exemple de @mock.patch sur la classe et fonction de la classe
+Quand on retrouve des @mock.patch sur fonctions et classes, les @mock.patch de la fonction ont la priorité dans les
+arguements de la fonction
+
+Exemple python 3 ::
+
+    import mock
+
+    @mock.patch('requests.get')
+    @mock.patch('requests.put')
+    class OFTestCase(TestCase):
+
+        @mock.patch('requests.patch')
+        def test_case_01(self, patch, put, get):
+            # does something
+
+        def test_case_02(self, put, get):
+            # does something else
+
+Exemple de @mock.patch que l'on ne souhaite pas utiliser.
+Utile quand on veut s'assurer que les fonctions d'une lib ne soient pas appelées et que nous n'avons pas besoin
+d'interagir avec dans nos cas de tests
+
+Exemple python 4 ::
+
+    import mock
+
+    @mock.patch('requests.get')
+    @mock.patch('requests.put')
+    class OFTestCase(TestCase):
+
+        @mock.patch('requests.patch')
+        def test_case_01(self, *args):
+            args[0]  # @mock.patch('requests.patch')
+            args[1]  # @mock.patch('requests.put')
+            args[2]  # @mock.patch('requests.get')
+            # does something
+
+        def test_case_02(self, *args):
+            args[0]  # @mock.patch('requests.put')
+            args[1]  # @mock.patch('requests.get')
+            # does something else
+
+
+2. with mock.patch.object(my_object, 'attribte') as m:
+======================================================
+ - Remplace tout appel a 'attribute' de 'my_object' par un Mock.
+
+Exemples
+-----
+
+Replace '_update_account' for 'partner'
+
+Exemple python 1 ::
+
+    import mock
+
+    class OFTestCase(TestCase):
+
+        def test_case_01(self):
+            partner = ResPartner()
+            # We temporarily replace '_update_account' for 'partner' by a Mock
+            with mock.patch.object(partner, '_update_account') as m:
+                # does something that should call partner._update_account()
+
+
+
+3. with mock.patch('path.to.my.module.using.import') as m:
+======================================================================
+ - Replace every call to 'import' done at 'path.to.my.module.using'
+
+Exemples
+--------
+
+I want datetime to replace every call to datetime in order to control an interaction
+
+
+Exemple python 1 ::
+
+    import mock
+
+    class OFTestCase(TestCase):
+
+        def test_case_01(self):
+            order = SaleOrder()
+            # any code using 'datetime' called from 'odoo.addons.of_unittest.models.sale' wil now use my Mock
+            with mock.patch('odoo.addons.sale.models.sale.datetime') as m:
+                # some code that needs me to Mock
+                order.button_confirm()  # will call datetime.now()
+                
+                
+                
+                
+#     # Mock the get response OK
+#     # requests.return_value = mock.Mock(status_code=200, json=lambda: {'code': 'CODE123'})
+#     # test_order._synchronize_status_code()
+#     # self.assertEqual(test_order.status_code, 'CODE123')

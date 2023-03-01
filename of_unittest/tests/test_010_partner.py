@@ -1,14 +1,24 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import mock
 from odoo.tests.common import at_install, post_install, TransactionCase
 
 
+# always mock requests so as to not make call to APIs
+@mock.patch('requests.request')
+@mock.patch('requests.get')
+@mock.patch('requests.post')
+@mock.patch('requests.patch')
+@mock.patch('requests.put')
+@mock.patch('requests.delete')
+@mock.patch('requests.head')
+@mock.patch('requests.options')
 @at_install(False)
 @post_install(True)
 class OFTestPartner(TransactionCase):
 
-    def test_00_create_partner(self):
+    def test_00_create_partner(self, *args):
         """ Test de création d'un partenaire.
         1 - Je prépare les valeurs par défaut du partenaire
         2 - Je crée le partenaire

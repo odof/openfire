@@ -1,12 +1,21 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 import mock
 from odoo.addons.of_unittest.tests.test_order_common import OFTestOrderTransactionCase
 
-
+ # always mock requests so as to not make call to APIs
+@mock.patch('requests.request')
+@mock.patch('requests.get')
+@mock.patch('requests.post')
+@mock.patch('requests.patch')
+@mock.patch('requests.put')
+@mock.patch('requests.delete')
+@mock.patch('requests.head')
+@mock.patch('requests.options')
 class OFTestOrder(OFTestOrderTransactionCase):
 
-    def test_00_create_order(self):
+    def test_00_create_order(self, *args):
         """ Test de création d'une commande.
         1 - Je crée une commande avec un client et une ligne de commande.
         2 - Je vérifie que la commande a bien été créée
@@ -48,7 +57,7 @@ class OFTestOrder(OFTestOrderTransactionCase):
         self.assertEqual(test_order.order_line[0].price_subtotal, 200)
         self.assertEqual(test_order.amount_total, 200)
 
-    def test_01_create_and_confirm_order(self):
+    def test_01_create_and_confirm_order(self, *args):
         """ Test de création d'une commande.
         1 - Je crée une commande avec un client et une ligne de commande.
         2 - Je vérifie que la commande a bien été créée
@@ -92,11 +101,7 @@ class OFTestOrder(OFTestOrderTransactionCase):
         self.assertEqual(test_order.order_line[0].product_uom_qty, 1)
         self.assertEqual(test_order.state, 'sent')
 
-        # Order confirmation
-        with mock.patch.object(test_order, '_send_sale_to_external_service') as m:
-            test_order.action_confirm()
-            m.assert_called_once()
-
+        test_order.action_confirm()
         self.assertEqual(test_order.state, 'sale')
 
         # Customer type change

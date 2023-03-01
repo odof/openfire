@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+import mock
 from odoo.tests.common import at_install, post_install, TransactionCase
 
 
@@ -8,8 +9,15 @@ from odoo.tests.common import at_install, post_install, TransactionCase
 class OFTestOrderTransactionCase(TransactionCase):
 
     def setUp(self):
+        """
+        Adding basic components needed for a sale.order
+        - self.test_supplier : supplier for the product
+        - self.test_partner : partner that will serve as customer for the sale.order
+        - self.test_category : category for the product
+        - self.test_brand : brand for the product
+        - self.test_product : product to use in the sale.order
+        """
         super(OFTestOrderTransactionCase, self).setUp()
-
         partner_obj = self.env['res.partner']
         product_obj = self.env['product.product']
         product_brand_obj = self.env['of.product.brand']
@@ -103,3 +111,46 @@ class OFTestOrderTransactionCase(TransactionCase):
         self.test_category = test_category
         self.test_brand = test_brand
         self.test_product = test_product
+
+
+@at_install(False)
+@post_install(True)
+class OFAdvancedTestOrderTransactionCase(OFTestOrderTransactionCase):
+
+    def setUp(self):
+        """
+        Making a basic sale.order to test functionnalities beyond it's creation
+        - self.test_order : sale.order for the tests
+        """
+        super(OFAdvancedTestOrderTransactionCase, self).setUp()
+        sale_order_obj = self.env['sale.order']
+        sale_order_line_obj = self.env['sale.order.line']
+
+        # Sale order creation
+        order_values = sale_order_obj.default_get(sale_order_obj.fields_get().keys())
+        order_values.update({
+            'partner_id': self.test_partner.id,
+        })
+        test_order = sale_order_obj.create(order_values)
+        test_order.onchange_partner_id()
+        self.assertNotEqual(test_order, sale_order_obj)
+        self.assertEqual(test_order.partner_id.name, 'Jean-michel Voixdechiotte')
+        self.assertEqual(test_order.partner_shipping_id.name, 'Livraison')
+        self.assertEqual(test_order.partner_invoice_id.name, 'Facturation')
+
+        # Order line creation
+        line_values = sale_order_line_obj.default_get(sale_order_line_obj.fields_get().keys())
+        line_values.update({
+            'order_id': test_order.id,
+            'product_id': self.test_product.id,
+            'product_uom_qty': 1,
+            'price_unit': 150,
+        })
+        test_order_line = sale_order_line_obj.create(line_values)
+        test_order_line.product_id_change()
+        self.assertEqual(test_order.order_line[0].product_id, self.test_product)
+        self.assertEqual(test_order.order_line[0].product_id.name, 'Test Product')
+        self.assertEqual(test_order.order_line[0].product_uom_qty, 1)
+        self.assertEqual(test_order.state, 'sent')
+        self.test_order = test_order
+

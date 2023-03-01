@@ -15,6 +15,10 @@ Module de démo pour la formation sur les tests unitaires
         'of_sale',
         'of_crm',
     ],
+    "external_dependencies": {
+        "python": ['mock'],
+        "bin": [],
+    },
     'demo_xml': [],
     'data': [],
     'installable': True,
