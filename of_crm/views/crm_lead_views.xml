@@ -102,6 +102,7 @@
                         <group>
                             <field name="origin" invisible="1"/>
                             <field name="date" required="1"/>
+                            <field name="deadline_date"/>
                             <field name="user_id"/>
                             <field name="vendor_id" required="1"/>
                         </group>
