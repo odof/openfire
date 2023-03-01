@@ -434,7 +434,7 @@ class OFSaleCommi(models.Model):
     @api.multi
     def _write(self, vals):
         res = super(OFSaleCommi, self)._write(vals)
-        if 'compl_du' in vals and 'total_du' not in vals:
+        if ('compl_du' in vals or 'commi_line_ids' in vals) and 'total_du' not in vals:
             self.filtered(lambda c: c.type == 'solde' and c.state != 'paid').recalc_total_du()
         return res
 
