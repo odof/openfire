@@ -1,7 +1,17 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+# 1: imports of python lib
+import pytz
+from datetime import timedelta
+from dateutil.relativedelta import relativedelta
+# 2:  imports of odoo
 from odoo import api, models, fields
+# 3:  imports from odoo modules
 from odoo.tools.float_utils import float_compare
+from odoo.addons.of_utils.models.of_utils import intersect_couple, arrondi_sup
+# 4: local imports
+# 5: Import of unknown third party lib
 
 SEARCH_MODES = [
     ('distance', u"Distance (km)"),
@@ -24,7 +34,17 @@ class OfTourneeRdv(models.TransientModel):
         fin_matinee_flo = 13.0  # -> à récupérer depuis de la config en backend?
         debut_aprem_flo = 14.0  # -> à récupérer depuis de la config en backend?
         compare_precision = 5
+        duree = self.tache_id.duree
+        if mode == 'manual':
+            segment = self.tache_id.sudo().segment_ids.convert_segments_to_list()
+            if not segment:
+                # pas de segment, pas de résultat
+                self.website_creneaux_ids = [(5,)]
+                return self.website_creneaux_ids
+            # convert_segments_to_list retourne une liste, les taches n'ont toujours qu'un segment
+            segment = segment[0]
 
+        creneau_count = 0
         creneau_dict = {}
         for creneau_b in self.planning_ids.filtered(lambda c: c.disponible).\
                 sorted(key=lambda c: c.employee_id.sudo().sequence):
@@ -73,6 +93,66 @@ class OfTourneeRdv(models.TransientModel):
                     # nouveau min
                     if distance_prec < creneau_dict[key]:
                         creneau_dict[key]['distance_min'] = distance_prec
+            elif mode == 'manual':
+                keys = []
+                creneaux_tache = segment[2]
+                day_int = fields.Date.from_string(creneau_b.date).isoweekday()
+                if day_int not in creneaux_tache:
+                    continue
+                creneaux_day = creneaux_tache[day_int]
+                # On démarre avec des dates naïves, on doit leurs donner la tz pour comparer aux créneaux de la tâche
+                tz = pytz.timezone(creneau_b.employee_id.sudo().of_tz or "Europe/Paris")
+                debut_naive = fields.Datetime.from_string(creneau_b.debut_dt)
+                debut = pytz.utc.localize(debut_naive)
+                debut_tz = debut.astimezone(tz)
+                fin_naive = fields.Datetime.from_string(creneau_b.fin_dt)
+                fin = pytz.utc.localize(fin_naive)
+                fin_tz = fin.astimezone(tz)
+                tz_difference = debut_tz.utcoffset().seconds / 3600
+                # on récupère les différents créneaux disponibles en fonction des couples (heure_debut, heure_fin)
+                # en comparant les créneaux de l'employé et de la tâche
+                hours_available = []
+                for hour_couple in creneaux_day:
+                    minute_start = debut_tz.minute and arrondi_sup(debut_tz.minute, 5) / 60.0 or 0.0
+                    minute_end = fin_tz.minute and arrondi_sup(fin_tz.minute, 5) / 60.0 or 0.0
+                    hour_start = float(debut_tz.hour) + minute_start
+                    hour_end = float(fin_tz.hour) + minute_end
+                    hours = intersect_couple(hour_couple1=hour_couple, hour_couple2=(hour_start, hour_end))
+                    if hours[0] or hours[1]:
+                        hours_available.append(hours)
+                # On trouve des créneaux, on tente de créer des créneaux web en fonction des heures dispo et de la
+                # durée de la tâche.
+                for hour_min, hour_max in hours_available:
+                    i = 0
+                    hours = hour_max - hour_min
+                    amount = int(hours / duree)
+                    # on peut faire jusqu'à [amount] créneaux, on tourne jusqu'à avoir tout créé
+                    while i < amount:
+                        key = creneau_b.date + '-%05d' % creneau_count
+                        if key not in creneau_dict:
+                            start = hour_min + i * duree
+                            end = hour_min + (i + 1) * duree
+                            hour_start_td = timedelta(hours=start)
+                            hour_start_str_li = str(hour_start_td).split(':')
+                            hour_end_str_li = str(timedelta(hours=end)).split(':')
+                            creneau_dict[key] = {
+                                'key': key,
+                                'date': creneau_b.date,
+                                'ids': [creneau_b.id],
+                                'selected': False,
+                                'distance_min': distance_prec,
+                                'description': u"%sh%s - %sh%s" % (hour_start_str_li[0], hour_start_str_li[1],
+                                                                   hour_end_str_li[0], hour_end_str_li[1]),
+                                'date_start': fields.Datetime.from_string(creneau_b.date) +
+                                              relativedelta(hour=int(hour_start_td.seconds / 3600 - tz_difference),
+                                                            minute=int(hour_start_td.seconds % 3600 / 60)),
+                            }
+                        if creneau_b.selected:
+                            creneau_dict[key]['selected'] = True
+                        if distance_prec < creneau_dict[key]:
+                            creneau_dict[key]['distance_min'] = distance_prec
+                        i += 1
+                        creneau_count += 1
 
         update_vals = [(5,)]
         for k in creneau_dict:
@@ -85,6 +165,9 @@ class OfTourneeRdv(models.TransientModel):
                     vals['description'] = u"Matin"
                 else:
                     vals['description'] = u"Après-midi"
+            elif mode == 'manual':
+                vals['description'] = creneau['description']
+                vals['date_start'] = creneau['date_start']
             vals['date'] = creneau['date']
             vals['distance_prec'] = creneau['distance_min']
             # if creneau['distance_min'] == 0:
@@ -113,6 +196,8 @@ class OFTourneeRdvLineWebsite(models.TransientModel):
         string=u"Créneaux d'employés", comodel_name='of.tournee.rdv.line', relation='of_tournee_rdv_line_website_rel')
     selected = fields.Boolean(string=u"Sélectionné")
     distance_prec = fields.Float(string=u"distance min")
+    date_start = fields.Datetime(
+        string=u"Date de début", help=u"Ne doit être rempli qu'en granularité de réservation manuelle")
 
     @api.depends('name', 'key', 'date')
     def _compute_display_name(self):

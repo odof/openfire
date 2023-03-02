@@ -23,7 +23,8 @@ class OFHoraireSegment(models.Model):
         deb = vals.get('date_deb')
         fin = vals.get('date_fin')
         res = super(OFHoraireSegment, self).create(vals)
-        self.recompute_is_full_tournee(employee_id, deb, fin)
+        if employee_id:
+            self.recompute_is_full_tournee(employee_id, deb, fin)
         return res
 
     @api.multi
@@ -32,7 +33,8 @@ class OFHoraireSegment(models.Model):
         deb = min(vals.get('date_deb', self.date_deb), self.date_deb)
         fin = max(vals.get('date_fin', self.date_fin), self.date_fin)
         res = super(OFHoraireSegment, self).write(vals)
-        self.recompute_is_full_tournee(employee_id, deb, fin)
+        if employee_id:
+            self.recompute_is_full_tournee(employee_id, deb, fin)
         return res
 
     @api.model
@@ -41,5 +43,6 @@ class OFHoraireSegment(models.Model):
         deb = self.date_deb
         fin = self.date_fin
         res = super(OFHoraireSegment, self).unlink()
-        self.recompute_is_full_tournee(employee_id, deb, fin)
+        if employee_id:
+            self.recompute_is_full_tournee(employee_id, deb, fin)
         return res

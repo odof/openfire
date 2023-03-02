@@ -1034,6 +1034,9 @@ class OFWebsitePlanningBooking(http.Controller):
                 time_str = hours_to_strs('time', debut_aprem_flo)
                 debut_local_dt = tz.localize(datetime.strptime(creneau.date + " %s:00" % time_str, "%Y-%m-%d %H:%M:%S"))
                 debut_dt = debut_local_dt.astimezone(pytz.utc).strftime("%Y-%m-%d %H:%M:%S")
+        # dans le cas du mode manuel, la date de début est déjà enregistrée
+        elif creneau.date_start:
+            debut_dt = creneau.date_start
         else:
             debut_dt = creneau_employee.debut_dt
         vals['date'] = debut_dt

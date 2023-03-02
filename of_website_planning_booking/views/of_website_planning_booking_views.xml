@@ -54,6 +54,39 @@
         </field>
     </record>
 
+    <!-- OF Planning Tache Form View -->
+    <record id="of_planning_tache_view_form" model="ir.ui.view">
+        <field name="name">of.planning.tache.view.form</field>
+        <field name="model">of.planning.tache</field>
+        <field name="inherit_id" ref="of_website_portal.of_website_planning_booking_of_planning_tache_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="horaire" string="Horaires" attrs="{'invisible': [('website_published', '=', False)]}">
+                    <span>
+                        <p><b class='of_red'><i class='fa fa-lg fa-warning'/> Attention, les créneaux ne sont utilisés que pour une granularité de réservation manuelle</b></p>
+                    </span>
+                    <group col="4">
+                        <group colspan="4">
+                            <field name="modele_id" />
+                            <field name="mode_horaires" />
+                            <field name="creneau_ids" attrs="{'invisible': [('mode_horaires', '!=', 'advanced')]}" widget="many2many_tags" />
+                        </group>
+                        <group name="easy" attrs="{'invisible': [('mode_horaires', '!=', 'easy')]}" col="4" colspan="4">
+                            <field name="hor_md" string="Matin" widget="float_time" colspan="2"/>
+                            <field name="hor_mf" widget="float_time" colspan="2" nolabel="1"/>
+                            <field name="hor_ad" string="Après-midi" widget="float_time" colspan="2"/>
+                            <field name="hor_af" widget="float_time" colspan="2" nolabel="1"/>
+                            <field name="jour_ids" widget="many2many_tags" options="{'no_create_edit': 1}"/>
+                        </group>
+                        <field name="segment_ids" invisible="1"/>
+                        <button name="button_new_booking_schedule" type="object" string="Mettre à jour les créneaux"/>
+                        <field name="horaire_recap" colspan="4" nolabel="1" readonly="1"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
     <!-- HR Employee Form View -->
     <record id="of_website_planning_booking_hr_employee_form_view" model="ir.ui.view">
         <field name="name">of.website.planning.booking.hr.employee.form.view</field>

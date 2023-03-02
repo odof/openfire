@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import api, models, fields
 from odoo.addons.of_utils.models.of_utils import format_date
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 
 
 class OFParcInstalle(models.Model):
@@ -19,6 +20,86 @@ class OFPlanningIntervention(models.Model):
     _inherit = 'of.planning.intervention'
 
     website_create = fields.Boolean(string=u"Créé par le portail web")
+
+
+class OFPlanningTache(models.Model):
+    _inherit = 'of.planning.tache'
+
+    modele_id = fields.Many2one(comodel_name='of.horaire.modele', string=u"Charger un modèle")
+    mode_horaires = fields.Selection(selection=[
+        ('easy', u"Facile"),
+        ('advanced', u"Avancé")], string=u"Mode de Sélection des créneaux", required=True, default='easy')
+    creneau_ids = fields.Many2many(comodel_name='of.horaire.creneau', string=u"Créneaux")
+    segment_ids = fields.One2many(
+        comodel_name='of.horaire.segment', inverse_name='tache_id', string=u"Horaires de planification",
+        domain=[('type', '=', 'regular')])
+    horaire_recap = fields.Html(compute='_compute_horaire_recap', string=u"Horaires de planification")
+    hor_md = fields.Float(string=u"Matin début", digits=(12, 5), default=9)
+    hor_mf = fields.Float(string=u"Matin fin", digits=(12, 5), default=12)
+    hor_ad = fields.Float(string=u"Après-midi début", digits=(12, 5), default=14)
+    hor_af = fields.Float(string=u"Après-midi fin", digits=(12, 5), default=18)
+    jour_ids = fields.Many2many(
+        comodel_name='of.jours', string=u"Jours à planifier", default=lambda self: self._default_jours_ids())
+
+    def _default_jours_ids(self):
+        # Lundi à vendredi comme valeurs par défaut
+        jours = self.env['of.jours'].search([('numero', 'in', (1, 2, 3, 4, 5))], order='numero')
+        res = [jour.id for jour in jours]
+        return res
+
+    @api.depends('segment_ids')
+    def _compute_horaire_recap(self):
+        def formate_segment(segment):
+            return u"<p>\n&nbsp;&nbsp;&nbsp;" + u"<br/>\n&nbsp;&nbsp;&nbsp;".join(segment.format_str_list()) + u"</p>\n"
+        for tache in self:
+            segments_perm = tache.segment_ids
+            if segments_perm:
+                recap = u"<h3>Créneaux disponibles </h3>\n<p>\n%s</p>\n" % (formate_segment(segments_perm))
+            else:
+                recap = u"<p><b class='of_red'><i class='fa fa-lg fa-warning'/> Aucun créneau n'est renseigné.</b></p>"
+            tache.horaire_recap = recap
+
+    @api.onchange('modele_id')
+    def onchange_modele_id(self):
+        self.ensure_one()
+        if self.modele_id:
+            self.creneau_ids = self.modele_id.creneau_ids.ids
+            self.mode_horaires = 'advanced'
+            self.modele_id = False
+
+    @api.multi
+    @api.onchange('hor_md', 'hor_mf', 'hor_ad', 'hor_af', 'mode_horaires')
+    def onchange_hor_ma_df(self):
+        self.ensure_one()
+        if self.mode_horaires == 'easy' and not (0 <= self.hor_md <= self.hor_mf <= self.hor_ad <= self.hor_af < 24):
+            raise UserError(u"Il y a une incohérence au niveau des horaires des créneaux.")
+
+    @api.multi
+    def button_new_booking_schedule(self):
+        # adapté de button_create_edit() de openfire/of_calendar/models/of_calendar.py pour fonctionnement sur tache
+        self.ensure_one()
+        self.onchange_hor_ma_df()
+        creneau_obj = self.env['of.horaire.creneau']
+        segment_obj = self.env['of.horaire.segment']
+        if self.mode_horaires == 'easy':
+            create_exist_ids = creneau_obj.create_if_necessary(
+                self.hor_md, self.hor_mf, self.hor_ad, self.hor_af, self.jour_ids.ids)
+            creneau_ids = create_exist_ids['create_ids'] + create_exist_ids['exist_ids']
+        else:
+            creneau_ids = self.creneau_ids.ids
+
+        self.remplacement = False
+        vals = {
+            'tache_id': self.id,
+            'creneau_ids': [(6, 0, creneau_ids)],
+        }
+        vals['date_deb'] = '1970-01-01'
+        vals['permanent'] = True
+        vals['type'] = 'regular'
+        self.segment_ids.unlink()
+        segment_obj.create(vals)
+        return {'type': 'ir.actions.do_nothing'}
+
 
 
 class HREmployee(models.Model):
@@ -140,8 +221,8 @@ class OFInterventionSettings(models.TransientModel):
     website_booking_allow_empty_days = fields.Boolean(
         string=u"(OF) Autorise la réservation de créneau sur des journées vierges", default=True)
     website_booking_slot_size = fields.Selection(
-        selection=[('half_day', u"Demi-journée")], string=u"(OF) Granularité de réservation", default='half_day',
-        required=True)
+        selection=[('half_day', u"Demi-journée"), ('manual', u"Manuelle")], string=u"(OF) Granularité de réservation",
+        default='half_day', required=True)
     group_website_booking_allow_park_creation = fields.Boolean(
         string=u"(OF) Création de parcs",
         implied_group='of_website_planning_booking.group_website_booking_allow_park_creation',
