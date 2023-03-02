@@ -789,27 +789,31 @@
                             <field name="name"/>
                         </h1>
                     </div>
-                    <group>
-                        <group>
-                                <field  name="product_id" string="Produit lié" attrs="{'readonly':[('verr', '=', True)]}"/>
-                                <field name="tache_categ_id" options="{'no_create':True, 'no_open': True}"/>
-                                <field name="category_id"/>
-                                <field name="duree" widget="float_time"/>
-                                <field name="fiscal_position_id"/>
+                    <notebook>
+                        <page name="description" string="Description">
+                            <group>
+                                <group>
+                                        <field  name="product_id" string="Produit lié" attrs="{'readonly':[('verr', '=', True)]}"/>
+                                        <field name="tache_categ_id" options="{'no_create':True, 'no_open': True}"/>
+                                        <field name="category_id"/>
+                                        <field name="duree" widget="float_time"/>
+                                        <field name="fiscal_position_id"/>
+                                    </group>
+                                <group>
+                                    <field name="flexible" groups="of_planning.of_group_planning_intervention_flexibility"/>
+                                    <field name="is_crm"/>
+                                    <field name="imp_detail"/>
+                                </group>
+                                <group colspan="2">
+                                    <field name="description" attrs="{'readonly':[('verr', '=', True)]}"/>
+                                </group>
+                                <group>
+                                    <field name="affichage"/>
+                                </group>
+                                <field name="verr" invisible="1"/>
                             </group>
-                        <group>
-                            <field name="flexible" groups="of_planning.of_group_planning_intervention_flexibility"/>
-                            <field name="is_crm"/>
-                            <field name="imp_detail"/>
-                        </group>
-                        <group colspan="2">
-                            <field name="description" attrs="{'readonly':[('verr', '=', True)]}"/>
-                        </group>
-                        <group>
-                            <field name="affichage"/>
-                        </group>
-                        <field name="verr" invisible="1"/>
-                    </group>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
