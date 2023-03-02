@@ -123,6 +123,24 @@ def is_valid_url(of_url):
     return of_url is not None and regex.search(of_url)
 
 
+def intersect_couple(hour_couple1, hour_couple2):
+    # on compare deux couples d'heures, si ce n'est pas un couple alors on ne compare pas
+    if not len(hour_couple1) == 2 or not len(hour_couple2) == 2:
+        return (0, 0)
+    hour_debut = 0
+    hour_fin = 0
+    # si hour_debut du couple 2 est supérieur à celui du couple 1, alors hour_debut = hour_couple2[0]
+    # sinon hour_debut = hour_couple1[0]
+    hour_debut = max(hour_couple1[0], hour_couple2[0])
+    # si hour_fin du couple 2 est inférieur à celui du couple 1, alors hour_fin = hour_couple2[1]
+    # sinon hour_fin = hour_couple1[1]
+    hour_fin = min(hour_couple1[1], hour_couple2[1])
+    # si hour_min > hour_max, ce n'est pas un créneau que l'on peut utiliser
+    if hour_debut > hour_fin:
+        hour_debut, hour_fin = (0, 0)
+    return (hour_debut, hour_fin)
+
+
 class BigInteger(fields.Integer):
     column_type = ('int8', 'int8')
 
