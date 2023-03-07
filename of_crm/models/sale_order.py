@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 
@@ -436,7 +436,8 @@ class SaleOrder(models.Model):
 
     @api.model
     def cron_recompute_activities_state(self):
-        for order in self.search([('of_crm_activity_ids', '!=', False)]):
+        yesterday = date.today() - timedelta(days=1)
+        for order in self.search([('of_crm_activity_ids.deadline_date', '=', fields.Date.to_string(yesterday))]):
             order._compute_of_activities_state()
 
     @api.multi
