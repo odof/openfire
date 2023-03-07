@@ -3,3 +3,4 @@
 
 from . import partner_merge
 from . import mail_compose
+from . import of_recompute_ged_partners_wizard

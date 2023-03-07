@@ -56,6 +56,7 @@ Module basé sur les modules Muk DMS avec les ajouts/modifications suivantes :
         'views/sale_views.xml',
         'views/of_document_templates.xml',
         'wizards/mail_compose.xml',
+        'wizards/of_recompute_ged_partners_wizard_views.xml',
     ],
     'installable': True,
     'application': True,
