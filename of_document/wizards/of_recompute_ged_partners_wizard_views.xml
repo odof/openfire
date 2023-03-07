@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_recompute_ged_partners_wizard_view_form" model="ir.ui.view">
+        <field name="name">Recalcul des infos GED</field>
+        <field name="model">of.recompute.ged.partners.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Recalcul des infos GED">
+                <group>
+                    <field name="field_directory_ids" widget="many2many_tags"/>
+                    <field name="field_file_ids" widget="many2many_tags"/>
+                    <span colspan="2">Laisser le champ partenaire vide pour faire tous les partenaires.</span>
+                    <field name="partner_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                </group>
+                <footer>
+                    <button string="Recalculer les infos GED" name="recompute_partners" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window id="action_of_recompute_ged_partners_wizard"
+            key2="client_action_multi"
+            name="Recalcul des infos GED"
+            res_model="of.recompute.ged.partners.wizard"
+            src_model="res.partner"
+            view_mode="form"
+            view_type="form"
+            view_id="of_recompute_ged_partners_wizard_view_form"
+            target="new"
+            groups="of_base.of_group_root_only"/>
+
+    <menuitem name="Recalcul des infos GED"
+              action="action_of_recompute_ged_partners_wizard"
+              id="menu_of_recompute_ged_partners_wizard"
+              parent="contacts.menu_contacts"
+              groups="of_base.of_group_root_only"
+              sequence="100"/>
+
+</odoo>
