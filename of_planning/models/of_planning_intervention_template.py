@@ -383,8 +383,8 @@ class OfPlanningInterventionTemplate(models.Model):
         # picking : stock.report_deliveryslip
         if rdv.order_id and self.fi_order_pdf:
             data.append(base64.b64encode(report_obj.get_pdf([rdv.order_id.id], 'sale.report_saleorder')))
-        if rdv.picking_id and self.fi_picking_pdf:
-            data.append(base64.b64encode(report_obj.get_pdf([rdv.picking_id.id], 'stock.report_deliveryslip')))
+        if rdv.picking_manual_ids and self.fi_picking_pdf:
+            data.append(base64.b64encode(report_obj.get_pdf([rdv.picking_manual_ids.ids], 'stock.report_deliveryslip')))
         if rdv.invoice_ids and self.fi_invoice_pdf:
             data.append(base64.b64encode(report_obj.get_pdf(rdv.invoice_ids.ids, 'account.report_invoice')))
         return data
@@ -436,8 +436,8 @@ class OfPlanningInterventionTemplate(models.Model):
         # picking : stock.report_deliveryslip
         if rdv.order_id and self.ri_order_pdf:
             data.append(base64.b64encode(report_obj.get_pdf([rdv.order_id.id], 'sale.report_saleorder')))
-        if rdv.picking_id and self.ri_picking_pdf:
-            data.append(base64.b64encode(report_obj.get_pdf([rdv.picking_id.id], 'stock.report_deliveryslip')))
+        if rdv.picking_manual_ids and self.ri_picking_pdf:
+            data.append(base64.b64encode(report_obj.get_pdf([rdv.picking_manual_ids.ids], 'stock.report_deliveryslip')))
         if rdv.invoice_ids and self.ri_invoice_pdf:
             data.append(base64.b64encode(report_obj.get_pdf(rdv.invoice_ids.ids, 'account.report_invoice')))
         return data
