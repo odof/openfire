@@ -170,7 +170,6 @@
                     <field name="employee_ids"/>
                     <field name="address_id"/>
                     <field name="order_id"/>
-                    <field name="picking_id"/>
                     <field name="company_id" widget="selection"/>
                 </group>
                 <newline/>
@@ -362,12 +361,17 @@
                                             account.group_account_invoice,
                                             stock.group_stock_user"/>
                                     <!-- widget many2many_tags car sinon le picking_domain[0][2] ne fonctionne pas
-                                        (dans le domain du champ picking_id) -->
+                                        (dans le domain du champ picking_manual_ids) -->
                                     <field name="picking_domain" invisible="1" widget="many2many_tags"
                                            context="{'force_read': True}"/>
-                                    <field name="picking_id" groups="sales_team.group_sale_salesman,
-                                                                   account.group_account_invoice,
-                                                                   stock.group_stock_user"/>
+                                    <field name="picking_manual_ids" mode="tree" string="Bons de livraison"
+                                           groups="sales_team.group_sale_salesman, account.group_account_invoice, stock.group_stock_user"
+                                           context="{'default_partner_id': address_id}">
+                                        <tree>
+                                            <field name="name"/>
+                                            <field name="state" invisible="1"/>
+                                        </tree>
+                                    </field>
                                 </group>
                                 <group colspan="2" name="misc" string="Divers">
                                 </group>

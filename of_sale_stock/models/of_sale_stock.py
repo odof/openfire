@@ -324,25 +324,24 @@ class StockPicking(models.Model):
 
     @api.multi
     def get_sale_value(self):
-        self.ensure_one()
 
         amount = 0.0
         kit_line_ids = []
-        for line in self.move_lines:
-            if line.procurement_id.sale_line_id:
-                amount += line.procurement_id.sale_line_id.of_price_unit_ttc * line.product_uom_qty
-            elif line.procurement_id.of_sale_comp_id and \
-                    line.procurement_id.of_sale_comp_id.kit_id.order_line_id.id not in kit_line_ids:
-                amount += line.procurement_id.of_sale_comp_id.kit_id.order_line_id.price_total
-                kit_line_ids.append(line.procurement_id.of_sale_comp_id.kit_id.order_line_id.id)
+        for record in self:
+            for line in record.move_lines:
+                if line.procurement_id.sale_line_id:
+                    amount += line.procurement_id.sale_line_id.of_price_unit_ttc * line.product_uom_qty
+                elif line.procurement_id.of_sale_comp_id and \
+                        line.procurement_id.of_sale_comp_id.kit_id.order_line_id.id not in kit_line_ids:
+                    amount += line.procurement_id.of_sale_comp_id.kit_id.order_line_id.price_total
+                    kit_line_ids.append(line.procurement_id.of_sale_comp_id.kit_id.order_line_id.id)
 
         if amount:
-            order = self.move_lines.mapped('procurement_id').mapped('sale_line_id').mapped('order_id')
+            order = self.mapped('move_lines.procurement_id.sale_line_id.order_id')
             if order:
                 currency = order[0].currency_id
             else:
-                currency = self.move_lines.mapped('procurement_id').mapped('of_sale_comp_id').mapped('kit_id').\
-                    mapped('order_line_id').mapped('order_id')[0].currency_id
+                currency = self.mapped('move_lines.procurement_id.of_sale_comp_id.kit_id.order_line_id.order_id')[0].currency_id
             return currency.round(amount)
         return amount
 

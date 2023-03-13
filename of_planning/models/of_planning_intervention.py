@@ -529,11 +529,12 @@ class OfPlanningIntervention(models.Model):
     invoice_ids = fields.One2many('account.invoice', string="Factures", compute="_compute_invoice_ids")
     invoice_count = fields.Integer(string="Nombre de factures", compute="_compute_invoice_ids")
 
-    picking_id = fields.Many2one(
-        comodel_name='stock.picking', string=u"Bon de livraison", copy=False,
-        domain="order_id and [('id', 'in', picking_domain and picking_domain[0] and picking_domain[0][2] or [])]"
-               "or [('picking_type_code', '=', 'outgoing')]")
     picking_domain = fields.Many2many(comodel_name='stock.picking', compute='_compute_picking_domain')
+    picking_manual_ids = fields.Many2many(
+        comodel_name='stock.picking', string="Bons de livraison (manuel)",
+        domain="order_id and [('id', 'in', picking_domain and picking_domain[0] and picking_domain[0][2] or [])]"
+               "or [('picking_type_code', '=', 'outgoing')]",
+        relation='of_planning_intervention_picking_manual_rel', column1='intervention_id', column2='picking_id')
     invoice_policy = fields.Selection(
         selection=[
             ('delivery', u'Quantités livrées'),
@@ -1020,11 +1021,11 @@ class OfPlanningIntervention(models.Model):
                 rdv.order_amount_total = total
                 rdv.order_still_due = still_due
 
-    @api.depends('picking_id')
+    @api.depends('picking_manual_ids')
     def _compute_picking_amounts(self):
         for rdv in self:
-            if rdv.picking_id:
-                rdv.picking_amount_total = rdv.picking_id.sudo().get_sale_value()
+            if rdv.picking_manual_ids:
+                rdv.picking_amount_total = rdv.picking_manual_ids.sudo().get_sale_value()
 
     # Search #
 
@@ -1297,11 +1298,10 @@ class OfPlanningIntervention(models.Model):
         picking_list = []
         if self.order_id:
             picking_list = self.order_id.picking_ids.ids
-            if len(picking_list) == 1:
-                self.picking_id = picking_list[0]
+            self.picking_manual_ids = self.order_id.picking_ids.ids
+        else:
+            self.picking_manual_ids = False
         self.picking_domain = picking_list
-        if self.picking_id and self.picking_id.id not in picking_list:
-            self.picking_id = False
         res = {}
         return res
 
@@ -1379,9 +1379,9 @@ class OfPlanningIntervention(models.Model):
         res._affect_number()
 
         # Si BL associé, on met à jour la date du BL en fonction de la date d'intervention
-        if 'picking_id' in vals and 'date' in vals:
-            if res.picking_id:
-                res.picking_id.min_date = res.date
+        if 'picking_manual_ids' in vals and 'date' in vals:
+            if res.picking_manual_ids:
+                res.picking_manual_ids.write({'min_date': res.date})
 
         if res.employee_ids:
             res.message_post(body=_(u"Intervenants: %s") % ', '.join(res.employee_ids.mapped('name')))
@@ -1451,11 +1451,11 @@ class OfPlanningIntervention(models.Model):
         if vals.get('state', '') == 'done':
             self._send_report()
 
-        # Si BL associé, on met à jour la date du BL en fonction de la date d'intervention
-        if 'picking_id' in vals or 'date' in vals:
+        # Si BL associés, on met à jour la date des BL en fonction de la date d'intervention
+        if 'picking_manual_ids' in vals or 'date' in vals:
             for rdv in self:
-                if rdv.picking_id:
-                    rdv.picking_id.min_date = rdv.date
+                if rdv.picking_manual_ids:
+                    rdv.picking_manual_ids.write({'min_date': rdv.date})
 
         if 'employee_ids' in vals:
             for rdv in self:
@@ -2025,7 +2025,7 @@ class OfPlanningIntervention(models.Model):
     def picking_lines_layouted(self):
         self.ensure_one()
         layouted = []
-        pickings = self.picking_id
+        pickings = self.picking_manual_ids
         for picking in pickings:
             layouted.append({'name': picking.name, 'lines': picking.move_lines})
         return layouted
@@ -2071,7 +2071,7 @@ class OfPlanningIntervention(models.Model):
     @api.multi
     def pickings_layouted(self):
         pickings_layouted = []
-        pickings = self.mapped('picking_id') + self.mapped('picking_ids')
+        pickings = self.mapped('picking_manual_ids') + self.mapped('picking_ids')
         for picking in pickings:
             if picking.pack_operation_product_ids:
                 pickings_layouted.append({
@@ -2435,7 +2435,7 @@ class SaleOrder(models.Model):
             context.update({
                 'default_address_id': self.partner_shipping_id.id or False,
                 'default_order_id': self.id,
-                'default_picking_id': len(picking_list) == 1 and picking_list[0] or False,
+                'default_picking_manual_ids': [(6, 0, picking_list)],
             })
             if self.intervention_ids:
                 context['force_date_start'] = self.intervention_ids[-1].date_date
@@ -2535,8 +2535,9 @@ class AccountInvoiceLine(models.Model):
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
-    of_intervention_ids = fields.One2many(
-        comodel_name='of.planning.intervention', inverse_name='picking_id', string=u"RDVs d'intervention liés")
+    of_intervention_ids = fields.Many2many(
+        comodel_name='of.planning.intervention', string=u"RDVs d'intervention liés",
+        relation='of_planning_intervention_picking_manual_rel', column1='picking_id', column2='intervention_id')
     of_intervention_count = fields.Integer(
         string=u"Nb de RDVs d'intervention liés", compute='_compute_of_intervention_count')
 
@@ -2567,12 +2568,12 @@ class StockPicking(models.Model):
             context.update({
                 'default_address_id': self.partner_id and self.partner_id.id or False,
                 'default_order_id': order and order.id or False,
-                'default_picking_id': self.id,
+                'default_picking_manual_ids': [(6, 0, [self.id])],
             })
             if self.of_intervention_ids:
                 context['force_date_start'] = self.of_intervention_ids[-1].date_date
-                context['search_default_picking_id'] = self.id
             action['context'] = str(context)
+            action['domain'] = "[('picking_manual_ids', 'in', %s)]" % self.id
         action = self.mapped('of_intervention_ids').get_action_views(self, action)
         return action
 
