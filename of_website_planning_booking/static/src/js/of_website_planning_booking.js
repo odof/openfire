@@ -7,6 +7,8 @@ odoo.define('of_website_planning_booking.planning_website', function (require) {
     var core = require('web.core');
     var config = require('web.config');
     var _t = core._t;
+    var Model = require("web.Model");
+
 
     if(!$('.oe_website_sale').length) {
         return $.Deferred().reject("DOM doesn't contain '.oe_website_sale'");
@@ -46,6 +48,19 @@ odoo.define('of_website_planning_booking.planning_website', function (require) {
             if (!event.isDefaultPrevented()) {
                 $(this).closest("form").submit();
             }
+        });
+        $('select#service_id', oe_website_sale).on('change', function (event) {
+            // Quand on selectionne le contrat, on vient affecter la prestation qui va avec
+            var tache_selector = $('select#tache_id');
+            var service_id = parseInt(this[this.selectedIndex].value);
+            var service_model = new Model('of.service');
+            if (service_id != null && service_id != undefined) {
+                service_model.call('read', [service_id, ["tache_id"]], {}).done(function (result) {
+                    if (result.length > 0) {
+                        tache_selector.val(result[0]["tache_id"][0].toString())
+                    }
+                });
+            };
         });
 
         // hightlight selected color

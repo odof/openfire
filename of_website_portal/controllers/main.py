@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import http, tools
+
+from odoo import http, tools, fields
 from odoo.http import request
 from odoo.exceptions import AccessError
 from odoo.addons.website_portal.controllers.main import website_account
 from odoo.addons.auth_signup.controllers.main import AuthSignupHome
-
+from odoo.addons.of_utils.models.of_utils import format_date
+from dateutil.relativedelta import relativedelta
+import datetime
 
 class WebsiteAccount(website_account):
 
@@ -28,13 +31,33 @@ class WebsiteAccount(website_account):
             ('state', 'not in', ('draft', 'cancel')),
             ('partner_id', 'child_of', request.env.user.partner_id.id)
         ])
+        rdv_ids = request.env['of.planning.intervention'].search([
+            ('state', 'not in', ['cancel', 'postponed']),
+            '|',
+            ('partner_id', 'child_of', request.env.user.partner_id.id),
+            ('address_id', 'child_of', request.env.user.partner_id.id)
+        ])
         values.update({
             'recurrent_count': len(recurrent_ids),
             'service_count': len(service_ids),
             'delivery_count': len(delivery_ids),
+            'rdv_count': len(rdv_ids),
             'tabs': request.env.user.of_tab_ids.mapped('code'),
         })
         return values
+
+    @http.route(['/my', '/my/home'], type='http', auth="user", website=True)
+    def account(self, **kw):
+        if kw.get('canceled_rdv_id'):
+            rdv = request.env['of.planning.intervention'].search([('id', '=', int(kw.get('canceled_rdv_id')))]).sudo()
+            rdv.button_cancel()
+            # Envoyer l'email de confirmation
+            mail_template = request.env['ir.model.data'].sudo().get_object(
+                'of_website_portal', 'of_website_portal_rdv_cancellation_mail_template')
+            mail_id = mail_template.send_mail(rdv.id)
+            mail = request.env['mail.mail'].sudo().browse(mail_id)
+            mail.send()
+        return super(WebsiteAccount, self).account(**kw)
 
     @http.route(['/my/deliveries'], type='http', auth='user', website=True)
     def portal_my_deliveries(self):
@@ -167,6 +190,43 @@ class WebsiteAccount(website_account):
             order.action_confirm()
 
         return request.redirect('/my/quotes')
+
+    @http.route(['/my/rdvs'], type='http', auth="user", website=True)
+    def of_portal_get_rdvs(self, **kw):
+        values = self._prepare_portal_layout_values()
+        rdv_ids = request.env['of.planning.intervention'].search([
+            ('state', 'not in', ['cancel', 'postponed']),
+            '|',
+            ('partner_id', 'child_of', 'request.env.user.partner_id.id'),
+            ('address_id', 'child_of', request.env.user.partner_id.id)
+        ])
+        values.update({
+            'rdvs': rdv_ids,
+        })
+        return request.render('of_website_portal.of_website_portal_portal_my_rdvs', values)
+
+
+    @http.route(['/rdv/<model("of.planning.intervention"):rdv>'], type='http', auth="user", website=True)
+    def of_portal_rdv(self, rdv=None, **kw):
+        values = {
+            'user': request.env.user,
+            'rdv': rdv,
+            'can_cancel':  rdv.can_cancel_from_website(),
+        }
+        return request.render('of_website_portal.of_website_portal_website_rdv', values)
+
+    @http.route(['/rdv/cancel'], type='http', auth='user', website=True)
+    def of_portal_cancel_rdv(self, rdv_id, **kw):
+        rdv = request.env['of.planning.intervention'].browse(int(rdv_id))
+        try:
+            rdv.check_access_rights('read')
+            rdv.check_access_rule('read')
+        except AccessError:
+            return request.render("website.403")
+        values = {
+            'rdv': rdv,
+        }
+        return request.render('of_website_portal.of_website_portal_website_rdv_cancel', values)
 
 
 class SignupVerifyEmail(AuthSignupHome):

@@ -78,4 +78,31 @@
         <field name="code">task</field>
     </record>
 
+    <record id="of_tab_intervention" model="of.tab">
+        <field name="name">Interventions</field>
+        <field name="code">rdv</field>
+    </record>
+
+
+    <!-- Modèle de mail -->
+    <record id="of_website_portal_rdv_cancellation_mail_template" model="mail.template">
+        <field name="name">Annulation de RDV en ligne</field>
+        <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
+        <field name="subject">Annulation de votre rendez-vous</field>
+        <field name="partner_to">${object.address_id.commercial_partner_id.id}</field>
+        <field name="model_id" ref="of_planning.model_of_planning_intervention"/>
+        <field name="auto_delete" eval="False"/>
+        <field name="lang">${object.address_id.commercial_partner_id.lang}</field>
+        <field name="body_html"><![CDATA[
+<p>Bonjour ${object.address_id.commercial_partner_id.title and object.address_id.commercial_partner_id.title.shortcut or ''} ${object.address_id.commercial_partner_id.name},</p>
+<p>
+L'annulation de votre rendez-vous du ${format_date(object.date)} a bien été enregistrée.
+</p>
+<p>
+Vous en souhaitant bonne réception.<br/>
+</p>
+]]>
+        </field>
+    </record>
+
 </odoo>

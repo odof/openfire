@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+from dateutil.relativedelta import relativedelta
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 
@@ -45,3 +46,13 @@ class OFPlanningTache(models.Model):
             if self.filtered(lambda t: t.website_published):
                 raise UserError(u"Vous ne pouvez pas supprimer la position fiscale d'une tâche publiée !")
         return super(OFPlanningTache, self).write(vals)
+
+
+class OFPlanningIntervention(models.Model):
+    _inherit = 'of.planning.intervention'
+
+    @api.multi
+    def can_cancel_from_website(self):
+        self.ensure_one()
+        date_limit = fields.Date.to_string(fields.Date.from_string(fields.Date.today()) + relativedelta(days=7))
+        return self.date_date > date_limit

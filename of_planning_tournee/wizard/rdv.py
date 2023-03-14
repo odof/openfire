@@ -1110,8 +1110,12 @@ class OfTourneeRdv(models.TransientModel):
             }
 
             if self.service_id and self.service_id.recurrence:
-                vals['date_next'] = self.service_id.get_next_date(first_res_da.strftime('%Y-%m-%d'))
-                vals['date_fin_planif'] = self.service_id.get_fin_date(vals['date_next'])
+                if sudo:
+                    vals['date_next'] = self.sudo().service_id.get_next_date(first_res_da.strftime('%Y-%m-%d'))
+                    vals['date_fin_planif'] = self.sudo().service_id.get_fin_date(vals['date_next'])
+                else:
+                    vals['date_next'] = self.service_id.get_next_date(first_res_da.strftime('%Y-%m-%d'))
+                    vals['date_fin_planif'] = self.service_id.get_fin_date(vals['date_next'])
             elif self.creer_recurrence:
                 vals['date_next'] = "%s-%02i-01" % (first_res_da.year + 1, first_res_da.month)
                 date_fin_planif_da = fields.Date.from_string(vals['date_next']) + relativedelta(months=1, days=-1)
