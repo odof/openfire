@@ -6,3 +6,4 @@ from . import planning
 from . import product
 from . import website
 from . import of_horaire
+from . import res_users

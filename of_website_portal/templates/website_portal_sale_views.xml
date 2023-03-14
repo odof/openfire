@@ -46,6 +46,9 @@
             <li t-if="'service' in tabs">
                 <a href="/my/services">Demande d'intervention</a>
             </li>
+            <li t-if="'rdv' in tabs">
+                <a href="/my/rdvs">Interventions</a>
+            </li>
             <li groups="base.group_portal,base.group_user">
                 <a href="/my/documents">Mes documents</a>
             </li>
@@ -86,6 +89,18 @@
                         </t>
                         <t t-if="not service_count">
                             Il n'y a actuellement pas de demande d'intervention pour votre compte.
+                        </t>
+                    </small>
+                </a>
+            </h3>
+            <h3 class="page-header" t-if="'rdv' in tabs">
+                <a href="/my/rdvs">Vos Interventions
+                    <small class="ml8">
+                        <t t-if="rdv_count">
+                            <span class="badge"><t t-esc="rdv_count"/></span>
+                        </t>
+                        <t t-if="not rdv_count">
+                            Il n'y a actuellement pas d'intervention pour votre compte.
                         </t>
                     </small>
                 </a>
