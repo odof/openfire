@@ -575,6 +575,18 @@
                         <h4 class="text-danger" t-esc="err"/>
                     </t>
                     <form action="/new_booking/service" method="post" class="checkout_autoformat">
+                        <div t-if="service_list" t-attf-class="form-group #{error_dict.get('service_id') and 'has-error' or ''} col-md-10">
+                            <label class="control-label label-optional" for="service_id">Contrat d'entretien</label>
+                            <select id="service_id" name="service_id" class="form-control">
+                                <option value="">Contrat d'entretien...</option>
+                                <t t-foreach="service_list" t-as="s">
+                                    <option t-att-value="s.id"
+                                            t-att-selected="s.id == (service and service.id or -1)">
+                                        <t t-esc="s.name"/>
+                                    </option>
+                                </t>
+                            </select>
+                        </div>
                         <div t-attf-class="form-group #{error_dict.get('tache_id') and 'has-error' or ''} col-md-10">
                             <label class="control-label label-optional" for="tache_id">Prestation *</label>
                             <select id="tache_id" name="tache_id" class="form-control">
@@ -865,5 +877,73 @@
             </div>
         </div>
     </template>
+
+    <template id="of_website_planning_booking_portal_my_of_contracts" name="OF My Contracts" inherit_id="of_website_portal.of_website_portal_portal_my_of_contracts" priority="25">
+        <xpath expr="//table/thead/tr" position="inside">
+            <th></th>
+        </xpath>
+        <xpath expr="//table/t/tr" position="inside">
+            <td>
+                <t t-if="contract.state in ['to_plan', 'progress', 'late']">
+                    <form action="/new_booking/service" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <input type="hidden" name="contract" t-att-value="contract.id"/>
+                        <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading" style="margin-top: 10px;">Prendre RDV</button>
+                    </form>
+                </t>
+            </td>
+        </xpath>
+    </template>
+
+    <template id="of_website_planning_booking_website_rdv_cancel" name="OF My Contracts" inherit_id="of_website_portal.of_website_portal_website_rdv_cancel" priority="25">
+        <xpath expr="//form[@action='/my/home']" position="replace">
+            <form action="/rdv/cancel/confirmation" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <input type="hidden" name="canceled_rdv_id" t-att-value="rdv.id"/>
+                <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading" style="margin-top: 10px;">Confirmer</button>
+            </form>
+        </xpath>
+    </template>
+
+    <template id="of_website_planning_booking_website_rdv_cancel_confirmation" name="OF Website Intervention">
+        <t t-call="website.layout">
+            <body data-spy="scroll" data-target=".navspy" data-offset="50">
+                <div class="container o_website_quote">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <ol class="breadcrumb mt8">
+                                <li><a href="/my/home"><i class="fa fa-home" /></a></li>
+                                <li><a href="/my/rdvs">Mes interventions</a></li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="row mt16">
+                        <!-- Page content -->
+                        <div id="of_rdv_page_content" class="col-md-12">
+                            <!-- Intro -->
+                            <div id="of_rdv_introduction" class="page-header mt16">
+                                <h1>
+                                    <label>Annulation de rendez-vous - confirmation</label>
+                                </h1>
+                            </div>
+                            <div class="col-md-16 col-xs-16">
+                                <label>Votre rendez-vous a été annulé, vous pouvez reprendre rendez-vous.</label>
+                            </div>
+                            <div class="oe_structure" />
+                        </div>
+                    </div>
+                    <form t-attf-action="/new_booking/installed_park_select" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading" style="margin-top: 10px;">Prendre rendez-vous</button>
+                    </form>
+                    <form action="/my/home" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading" style="margin-top: 10px;">Fermer</button>
+                    </form>
+                </div>
+            </body>
+        </t>
+    </template>
+
 
 </odoo>
