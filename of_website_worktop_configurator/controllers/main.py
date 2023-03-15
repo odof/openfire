@@ -417,13 +417,13 @@ class OFWebsiteWorktopConfigurator(http.Controller):
             error_message = []
             if values.get('length'):
                 try:
-                    float(values['length'].replace(',', '.'))
+                    values['length'] = float(values['length'].replace(',', '.'))
                 except ValueError:
                     error['length'] = True
                     error_message.append(u"La longueur indiquée ne correspond pas à un nombre valide.")
             if values.get('width'):
                 try:
-                    float(values['width'].replace(',', '.'))
+                    values['width'] = float(values['width'].replace(',', '.'))
                 except ValueError:
                     error['width'] = True
                     error_message.append(u"La largeur indiquée ne correspond pas à un nombre valide.")
@@ -659,7 +659,10 @@ class OFWebsiteWorktopConfigurator(http.Controller):
         acc_layout_category_id = request.env['ir.values'].sudo().get_default(
             'sale.config.settings', 'of_website_worktop_configurator_acc_layout_category_id')
         vals = quote._website_product_id_change(quote.id, int(product_id), qty=float(quantity))
-        vals['of_worktop_configurator_line_id'] = request.session['worktop_quote_line_id']
+        # Si l'on choisit d'ajouter un accessoire qui n'est pas lié à un plan de travail/dosseret/crédence,
+        # pas besoin de faire l'association
+        if 'worktop_quote_line_id' in request.session:
+            vals['of_worktop_configurator_line_id'] = request.session['worktop_quote_line_id']
         vals['name'] = quote._get_line_description(quote.id, int(product_id))
         vals['layout_category_id'] = acc_layout_category_id
         vals['price_unit'] = float(price)
@@ -1258,7 +1261,7 @@ class OFWebsiteWorktopConfigurator(http.Controller):
                 line._compute_tax_id()
             else:
                 # S'il n'y a pas d'accessoire équivalent pour le nouveau matériau, on supprime la ligne de l'accessoire
-                line.unlink()
+                line.sudo().unlink()
 
     def _control_weight(self):
         quote = request.env['sale.order'].sudo().browse(request.session['worktop_quote_id'])
