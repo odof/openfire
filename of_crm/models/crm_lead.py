@@ -304,19 +304,17 @@ class CrmLead(models.Model):
         return res
 
     def _of_get_fields_recompute_auto_activities(self):
-        """Helper function to return the list of fields that will trigger the recompute
-        the deadline date of activities"""
+        """Helper function to return the list of fields that will trigger a recompute on activities deadline date"""
         return ['of_date_projet', 'date_deadline']
 
     @api.multi
-    def _of_update_deadline_date_activities(self, activity_fields=None):
+    def _of_update_deadline_date_activities(self, activity_fields=None, stage_update=False):
         """Recomputes the deadline date of activities linked to the Opportunity.
         :param activity_fields: The list of fields that are updated to filter activities to update
         :type activity_fields: list
         """
         if activity_fields is None:
             activity_fields = []
-
         field_name = {
             'of_date_projet': 'project_date',
             'date_deadline': 'decision_date'
@@ -326,7 +324,7 @@ class CrmLead(models.Model):
             for crm_activity in crm.of_activity_ids.filtered(
                     lambda ca:
                     ca.state == 'planned' and ca.type_id and
-                    ca.type_id.of_compute_date in activities_filter and
+                    (stage_update or (ca.type_id.of_compute_date in activities_filter)) and
                     ca.type_id.of_automatic_recompute):
                 crm_activity.deadline_date = crm_activity._of_get_crm_activity_date_deadline()
 
@@ -383,8 +381,12 @@ class CrmLead(models.Model):
         # the activities.
         activity_fields = filter(
             lambda f: f, [f in self._of_get_fields_recompute_auto_activities() and f for f in vals.keys()])
-        if activity_fields:
-            self._of_update_deadline_date_activities(activity_fields)
+        # If stage_id is in vals and we create an activity, its deadline date may need a computation
+        stage_update = False
+        if 'stage_id' in vals:
+            stage_update = True
+        if activity_fields or stage_update:
+            self._of_update_deadline_date_activities(activity_fields, stage_update)
         return res
 
     # Recherche du code postal en mode préfixe
