@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- Vue form utilisateur :
+    - Ajout du champ "Type d'utilisateur"
+    - Ajout d'un onglet "Connexions" dans le formulaire utilisateur, invisible par défaut, pouvant être utilisé
+    par d'autres modules
+    -->
     <record id="res_users_view_form" model="ir.ui.view">
         <field name="name">res.users.view.form</field>
         <field name="model">res.users</field>
@@ -8,6 +13,11 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="of_user_type"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page name="connections" string="Connexions" invisible="1">
+                    <group/>
+                </page>
             </xpath>
         </field>
     </record>
