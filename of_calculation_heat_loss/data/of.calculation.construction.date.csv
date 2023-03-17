@@ -1,0 +1,10 @@
+id,sequence,name,coefficient
+construction_date_1,1,Maison passive (RT 2020),0.2
+construction_date_2,2,Maison BBC (aux normes RT 2012),0.5
+construction_date_3,3,Maison aux normes RT 2005,0.8
+construction_date_4,4,Maison construite entre 2000 et 2005,0.95
+construction_date_5,5,Maison construite entre 1990 et 2000,1.05
+construction_date_6,6,Maison construite entre 1983 et 1990,1.15
+construction_date_7,7,Maison construite entre 1974 et 1982,1.3
+construction_date_8,8,Maison construite avant 1975,1.5
+construction_date_9,9,Maison non isolée,1.8

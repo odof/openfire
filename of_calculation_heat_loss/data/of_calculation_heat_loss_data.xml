@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_calculation_heat_loss_sequence" model="ir.sequence">
+        <field name="name">Déperdition de chaleur</field>
+        <field name="code">of.calculation.heat.loss</field>
+        <field eval="5" name="padding"/>
+        <field name="prefix">DC</field>
+    </record>
+
+    <!--Email template -->
+    <record id="email_template_calcul_deperdition" model="mail.template">
+        <field name="name">Calcul de déperdition de chaleur</field>
+        <field name="partner_to">${object.create_uid.partner_id.id}</field>
+        <field name="subject">${object.name} : Votre calcul de déperdition de chaleur</field>
+        <field name="model_id" ref="of_calculation_heat_loss.model_of_calculation_heat_loss"/>
+        <field name="auto_delete" eval="True"/>
+        <field name="lang">${object.create_uid.partner_id.lang}</field>
+        <field name="body_html"><![CDATA[
+<p>
+Bonjour ${object.partner_name},
+</p>
+
+<p>
+Veuillez trouver ci-joint le résultat du calcul de déperdition de chaleur.
+</p>
+
+<p>
+Cordialement,
+</p>
+]]></field>
+    </record>
+
+</odoo>

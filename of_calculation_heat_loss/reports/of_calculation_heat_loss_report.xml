@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <report
+            id="of_report_calculation_heat_loss"
+            string="Rapport de déperdition de chaleur"
+            model="of.calculation.heat.loss"
+            report_type="qweb-pdf"
+            file="of_calculation_heat_loss.of_calculation_heat_loss_report"
+            name="of_calculation_heat_loss.of_calculation_heat_loss_report"
+    />
+
+    <template id="of_calculation_heat_loss_report">
+        <t t-call="report.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="of_calculation_heat_loss.of_calculation_heat_loss_report_document" t-lang="o.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="of_calculation_heat_loss_report_document">
+        <t t-call="report.external_layout">
+            <div class="page">
+                <div class="oe_structure"/>
+                <div name="addresses" class="row mt8">
+                    <div name="adresse_client" class="col-xs-5 col-xs-offset-7" style="font-size: large">
+                        <div t-field="o.partner_id" t-options="{'widget': 'contact', 'fields': ['name', 'address'], 'no_marker': true}"/>
+                    </div>
+                </div>
+
+                <div class="row mt32 mb32">
+                    <div class="col-xs-10 col-xs-offset-1">
+                        <h1 class="text-center">Calcul de la puissance idéale pour un appareil adapté à votre habitation</h1>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div style="border: 3px solid lightgray; padding: 15px;">
+                            <div class="mb32">
+                                <h2>Récapitulatif de vos données</h2>
+                                <ul style="list-style-type: none;">
+                                    <li>
+                                        Surface à chauffer (en m²) : <strong><span t-field="o.surface"/></strong>
+                                    </li>
+                                    <li>
+                                        Hauteur sous plafond (en m) : <strong><span t-field="o.height"/></strong>
+                                    </li>
+                                    <li>
+                                        Date de construction : <strong><span t-field="o.construction_date_id.name"/></strong>
+                                    </li>
+                                    <li>
+                                        Température de confort désirée : <strong><span t-field="o.temperature"/></strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt32">
+                    <div class="col-xs-3 col-xs-offset-6" style="padding-right: 0px;">
+                        <div style="height: 70px; border: 3px solid royalblue; padding: 15px;background-color: royalblue; color: white;">
+                            <strong>
+                                Déperdition de chaleur
+                            </strong>
+                        </div>
+                    </div>
+                    <div class="col-xs-3" style="padding-left: 0px;">
+                        <div style="height: 70px; border: 3px solid royalblue; padding: 15px; color: royalblue; border: 3px solid royalblue;">
+                            <strong>
+                                <span t-field="o.estimated_power_text"/>
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt16">
+                    <div class="col-md-12">
+                        <i style="color: grey">
+                            <i class="fa fa-warning of_ws"/>
+                            Le calcul de puissance est une estimation. OpenFire ne peut être tenu responsable des conséquences de son utilisation
+                        </i>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

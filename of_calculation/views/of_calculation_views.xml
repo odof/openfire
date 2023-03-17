@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <menuitem name="Calculs" id="of_calculation_menu" web_icon="of_calculation,static/description/icon.png"/>
+    <menuitem name="Configuration" id="of_calculation_configuration_menu" parent="of_calculation.of_calculation_menu"
+              groups="base.group_system" sequence="100"/>
+
+</odoo>
