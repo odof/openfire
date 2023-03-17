@@ -1,0 +1,11 @@
+id,sequence,temperature
+base_temperature_1,1,-2
+base_temperature_2,2,-4
+base_temperature_3,3,-5
+base_temperature_4,4,-6
+base_temperature_5,5,-7
+base_temperature_6,6,-8
+base_temperature_7,7,-9
+base_temperature_8,8,-10
+base_temperature_9,9,-12
+base_temperature_10,10,-15

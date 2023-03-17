@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--Form views-->
+
+    <record id="of_calculation_heat_loss_form_view" model="ir.ui.view">
+        <field name="name">of.calculation.heat.loss.form.view</field>
+        <field name="model">of.calculation.heat.loss</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="button_quick_send" type="object" string="Recevoir par email"/>
+                </header>
+                <sheet>
+                    <h1>
+                        <field name="name" readonly="1"/>
+                    </h1>
+                    <h2>Outil de simulation - Estimation de la puissance requise de l'appareil</h2>
+                    <group name="contact" string="Contact">
+                        <field name="partner_id"/>
+                        <field name="partner_name"/>
+                        <label for="partner_street" string="Adresse"/>
+                        <div class="o_address_format">
+                            <field name="partner_street" placeholder="Street..." class="o_address_street"/>
+                            <field name="partner_street2" placeholder="Street 2..." class="o_address_street"/>
+                            <field name="partner_city" placeholder="City" class="o_address_city"/>
+                            <field name="partner_state_id" class="o_address_state" placeholder="State" options="{'no_open': True}" context="{'country_id': country_id, 'zip': zip}"/>
+                            <field name="partner_zip" placeholder="ZIP" class="o_address_zip"/>
+                            <field name="partner_country_id" placeholder="Country" class="o_address_country" options="{'no_open': True, 'no_create': True}"/>
+                        </div>
+                        <field name="department_id"/>
+                        <field name="available_altitude_ids" widget="many2many_tags" invisible="1"/>
+                        <field name="altitude_id" domain="[('id', 'in', available_altitude_ids and available_altitude_ids[0] and available_altitude_ids[0][2] or False)]"/>
+                        <field name="base_temperature_line_id"/>
+                    </group>
+                    <group name="specifications" string="Caractéristiques">
+                        <field name="surface"/>
+                        <field name="height"/>
+                        <field name="construction_date_id" options="{'no_create': True, 'no_open': True, 'no_edit': True}"/>
+                        <field name="temperature"/>
+                    </group>
+                    <group name="commercial" string="Liens commerciaux">
+                        <field name="lead_id" context="{'partner_prio_id': partner_id}"/>
+                        <field name="order_id" context="{'partner_prio_id': partner_id}"/>
+                        <field name="parc_installe_id" context="{'partner_prio_id': partner_id}"/>
+                    </group>
+                    <group>
+                        <group class="oe_right" style="width: 30% !important;">
+                            <button string="Calculer" name="button_compute_estimated_power" type="object" class="oe_highlight mb16" colspan="2"/>
+                            <label for="estimated_power_text" string="Déperdition de chaleur" class="oe_highlight"
+                                   style="padding: 10px; 1px solid blue !important;"/>
+                            <field name="estimated_power_text" nolabel="1" style="font-size: 32px; border:"/>
+                        </group>
+                    </group>
+                    <i class="oe_grey">
+                        <i class="fa fa-warning of_ws"/>
+                        Le calcul de puissance est une estimation. OpenFire ne peut être tenu responsable des conséquences de son utilisation
+                    </i>
+                    <notebook>
+                        <page string="Appareils compatibles">
+                            <field name="product_ids">
+                                <tree default_order="of_puissance_nom_flo">
+                                    <field name="brand_id"/>
+                                    <field name="categ_id"/>
+                                    <field name="name"/>
+                                    <field name="standard_price"/>
+                                    <field name="list_price"/>
+                                    <field name="uom_id"/>
+                                    <field name="qty_available"/>
+                                    <field name="of_puissance_nom"/>
+                                    <field name="of_puissance_nom_flo" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_calculation_construction_date_form_view" model="ir.ui.view">
+        <field name="name">of.calculation.construction.date.form.view</field>
+        <field name="model">of.calculation.construction.date</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="coefficient"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_calculation_department_form_view" model="ir.ui.view">
+        <field name="name">of.calculation.department.form.view</field>
+        <field name="model">of.calculation.department</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="base_temperature_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_calculation_base_temperature_form_view" model="ir.ui.view">
+        <field name="name">of.calculation.base.temperature.form.view</field>
+        <field name="model">of.calculation.base.temperature</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="temperature"/>
+                    </group>
+                    <notebook>
+                        <page string="Lignes de température">
+                            <field name="line_ids" nolabel="1" context="{'default_base_temperature_id': active_id}"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_calculation_base_temperature_line_form_view" model="ir.ui.view">
+        <field name="name">of.calculation.base.temperature.line.form.view</field>
+        <field name="model">of.calculation.base.temperature.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <h1>
+                        <field name="name"/>
+                    </h1>
+                    <group>
+                        <field name="altitude_id"/>
+                        <field name="base_temperature_id"/>
+                        <field name="temperature"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_calculation_altitude_form_view" model="ir.ui.view">
+        <field name="name">of.calculation.altitude.form.view</field>
+        <field name="model">of.calculation.altitude</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!--Tree views-->
+
+    <record id="of_calculation_heat_loss_tree_view" model="ir.ui.view">
+        <field name="name">of.calculation.heat.loss.tree.view</field>
+        <field name="model">of.calculation.heat.loss</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_calculation_construction_date_tree_view" model="ir.ui.view">
+        <field name="name">of.calculation.construction.date.tree.view</field>
+        <field name="model">of.calculation.construction.date</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="coefficient"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_calculation_department_tree_view" model="ir.ui.view">
+        <field name="name">of.calculation.department.tree.view</field>
+        <field name="model">of.calculation.department</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="base_temperature_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_calculation_base_temperature_tree_view" model="ir.ui.view">
+        <field name="name">of.calculation.base.temperature.tree.view</field>
+        <field name="model">of.calculation.base.temperature</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="temperature"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_calculation_base_temperature_line_tree_view" model="ir.ui.view">
+        <field name="name">of.calculation.base.temperature.line.tree.view</field>
+        <field name="model">of.calculation.base.temperature.line</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="base_temperature_id" invisible="1"/>
+                <field name="altitude_id"/>
+                <field name="name"/>
+                <field name="temperature"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_calculation_altitude_tree_view" model="ir.ui.view">
+        <field name="name">of.calculation.altitude.tree.view</field>
+        <field name="model">of.calculation.altitude</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <!--Actions-->
+
+    <record id="of_calculation_construction_date_action" model="ir.actions.act_window">
+        <field name="name">Date de construction</field>
+        <field name="res_model">of.calculation.construction.date</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="of_calculation_department_action" model="ir.actions.act_window">
+        <field name="name">Département</field>
+        <field name="res_model">of.calculation.department</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="of_calculation_base_temperature_action" model="ir.actions.act_window">
+        <field name="name">Température extérieure de base</field>
+        <field name="res_model">of.calculation.base.temperature</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="of_calculation_altitude_action" model="ir.actions.act_window">
+        <field name="name">Altitude du site</field>
+        <field name="res_model">of.calculation.altitude</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="of_calculation_heat_loss_action" model="ir.actions.act_window">
+        <field name="name">Calcul de déperdition de chaleur</field>
+        <field name="res_model">of.calculation.heat.loss</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!--Menus-->
+
+    <menuitem name="Calcul de déperdition de chaleur" id="of_calculation_heat_loss_menu" action="of_calculation_heat_loss_action"
+              parent="of_calculation.of_calculation_menu" sequence="10"/>
+    <menuitem name="Déperdition de chaleur" id="of_calculation_heat_loss_configuration_menu" parent="of_calculation.of_calculation_configuration_menu" sequence="1"/>
+    <menuitem name="Altitude du site" id="of_calculation_altitude_menu" action="of_calculation_altitude_action" parent="of_calculation_heat_loss.of_calculation_heat_loss_configuration_menu" sequence="1"/>
+    <menuitem name="Date de construction" id="of_calculation_construction_date_menu" action="of_calculation_construction_date_action" parent="of_calculation_heat_loss.of_calculation_heat_loss_configuration_menu" sequence="2"/>
+    <menuitem name="Département" id="of_calculation_department_menu" action="of_calculation_department_action" parent="of_calculation_heat_loss.of_calculation_heat_loss_configuration_menu" sequence="3"/>
+    <menuitem name="Température extérieure de base" id="of_calculation_base_temperature_menu" action="of_calculation_base_temperature_action" parent="of_calculation_heat_loss.of_calculation_heat_loss_configuration_menu" sequence="4"/>
+
+</odoo>
