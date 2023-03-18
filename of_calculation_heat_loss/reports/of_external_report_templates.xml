@@ -9,7 +9,7 @@
                 <span t-if="not o.number">-</span>
             </t>
         </xpath>
-        <xpath expr="//div[@name='doc_name']//t[@t-elif=&quot;o._name == 'of.specific.delivery.report.wizard'&quot;]" position="after">
+        <xpath expr="//div[@name='doc_date']//t[@t-elif=&quot;o._name == 'of.specific.delivery.report.wizard'&quot;]" position="after">
             <t t-elif="o._name == 'of.calculation.heat.loss'">
                 <!-- si le document est de type calculateur de déperdition -->
                 <span t-field="o.create_date" t-options='{"widget": "date"}'/>
