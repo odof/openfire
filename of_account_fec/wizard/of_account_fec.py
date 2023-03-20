@@ -82,6 +82,8 @@ class OFAccountFrFec(models.TransientModel):
             '''
 
         company = self.env.user.company_id
+        while not company.chart_template_id and company.parent_id:
+            company = company.parent_id
         formatted_date_from = self.date_from.replace('-', '')
         self._cr.execute(
             sql_query, (self.of_ouv_code, self.of_ouv_name, self.of_ouv_name, formatted_date_from, formatted_date_from, formatted_date_from, company.id, self.journal_ids._ids, self.date_from))
@@ -135,6 +137,8 @@ class OFAccountFrFec(models.TransientModel):
             ]
 
         company = self.env.user.company_id
+        while not company.chart_template_id and company.parent_id:
+            company = company.parent_id
         if not company.vat:
             raise Warning(
                 _("Missing VAT number for company %s") % company.name)
