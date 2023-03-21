@@ -58,7 +58,7 @@ class OfTourneeRdv(models.TransientModel):
         compare_precision = 5
         duree = self.tache_id.duree
         if mode == 'manual':
-            segment = self.tache_id.segment_ids.convert_segments_to_list()
+            segment = self.tache_id.sudo().segment_ids.convert_segments_to_list()
             if not segment:
                 # pas de segment, pas de résultat
                 self.website_creneaux_ids = [(5,)]
@@ -123,7 +123,7 @@ class OfTourneeRdv(models.TransientModel):
                     continue
                 creneaux_day = creneaux_tache[day_int]
                 # On démarre avec des dates naïves, on doit leurs donner la tz pour comparer aux créneaux de la tache
-                tz = pytz.timezone(creneau_b.employee_id.of_tz or "Europe/Paris")
+                tz = pytz.timezone(creneau_b.employee_id.sudo().of_tz or "Europe/Paris")
                 debut_naive = fields.Datetime.from_string(creneau_b.debut_dt)
                 debut = pytz.utc.localize(debut_naive)
                 debut_tz = debut.astimezone(tz)
