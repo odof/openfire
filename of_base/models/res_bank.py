@@ -1,8 +1,9 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, api
-from odoo.exceptions import ValidationError
 from schwifty import BIC
+
+from odoo import api, models
+from odoo.exceptions import ValidationError
 
 
 class ResBank(models.Model):

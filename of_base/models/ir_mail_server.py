@@ -1,8 +1,9 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import re
 import logging
-from odoo import models, api, tools
+import re
+
+from odoo import api, models, tools
 
 _logger = logging.getLogger(__name__)
 

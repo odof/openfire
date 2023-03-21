@@ -1,0 +1,18 @@
+image: "python:3.9"
+
+before_script:
+  - python --version
+  - pip install flake8 flake8-print isort pylint black
+
+stages:
+  - linting
+
+isort:
+  stage: linting
+  script:
+    - isort . --check-only
+
+flake8:
+  stage: linting
+  script:
+    - flake8 .

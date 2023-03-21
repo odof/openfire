@@ -1,5 +1,9 @@
 # dotfiles
 .*
+!.pre-commit-config.yaml
+!.flake8
+!.isort.cfg
+!.gitlab-ci.yml
 !.gitignore
 # compiled python and python cache files
 *.py[co]

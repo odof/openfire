@@ -1,9 +1,10 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import re
 import logging
+import re
 import threading
-from odoo import models, api, tools, fields, _
+
+from odoo import _, api, fields, models, tools
 from odoo.exceptions import ValidationError
 from odoo.modules import get_module_resource
 

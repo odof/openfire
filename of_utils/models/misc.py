@@ -2,8 +2,9 @@
 
 import re
 import unicodedata
-from math import asin, sin, cos, sqrt, radians
-from odoo import fields, _
+from math import asin, cos, radians, sin, sqrt
+
+from odoo import _, fields
 from odoo.tools.safe_eval import safe_eval
 
 

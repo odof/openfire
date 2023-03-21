@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
 
 import re
 import unicodedata
-from math import asin, sin, cos, sqrt, radians
-from odoo import models, fields, _
+from math import asin, cos, radians, sin, sqrt
+
+from odoo import _, fields, models
 from odoo.tools.safe_eval import safe_eval
 
 
@@ -35,12 +35,12 @@ def distance_points(lat1, lon1, lat2, lon2):
     @param: Coordonnées gps en degrés
     """
     lat1, lon1, lat2, lon2 = [radians(v) for v in (lat1, lon1, lat2, lon2)]
-    return 2*asin(sqrt((sin((lat1-lat2)/2)) ** 2 + cos(lat1)*cos(lat2)*(sin((lon1-lon2)/2)) ** 2)) * 6366
+    return 2 * asin(sqrt((sin((lat1 - lat2) / 2)) ** 2 + cos(lat1) * cos(lat2) * (sin((lon1 - lon2) / 2)) ** 2)) * 6366
 
 
 def format_date(date_eval, lang, with_year=True):
     # Si la date est en string, la convertir en date puis lui appliquer le format. Sinon, lui appliquer le format
-    if isinstance(date_eval, basestring):
+    if isinstance(date_eval, str):
         res = fields.Date.from_string(date_eval).strftime(lang.date_format)
     else:
         res = date_eval.strftime(lang.date_format)
@@ -65,7 +65,7 @@ def hours_to_strs(*args):
     """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
     """
     # Si le premier argument est un string, c'est le mode
-    if args and isinstance(args[0], basestring):
+    if args and isinstance(args[0], str):
         mode = args[0]
         hours = args[1:]
     else:

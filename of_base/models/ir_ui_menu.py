@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, models, SUPERUSER_ID
+from odoo import SUPERUSER_ID, api, models
 
 
 class IrUiMenu(models.Model):

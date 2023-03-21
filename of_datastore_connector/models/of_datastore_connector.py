@@ -1,11 +1,11 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import logging
+import socket  # Ne pas supprimer cette ligne, voir fonction connect()
 import threading
 import xmlrpc.client
-import socket  # Ne pas supprimer cette ligne, voir fonction connect()
 
-from odoo import models, fields, api, _
+from odoo import _, api, fields, models
 
 _logger = logging.getLogger(__name__)
 

@@ -1,11 +1,11 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import logging
-from odoo import models, api, _
-from odoo.tools import OrderedSet
-from odoo.exceptions import UserError
-from odoo.models import regex_field_agg, VALID_AGGREGATE_FUNCTIONS
 
+from odoo import _, api, models
+from odoo.exceptions import UserError
+from odoo.models import VALID_AGGREGATE_FUNCTIONS, regex_field_agg
+from odoo.tools import OrderedSet
 
 _logger = logging.getLogger(__name__)
 

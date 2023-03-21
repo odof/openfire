@@ -1,7 +1,9 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from collections import defaultdict
+
 from odoo.tools import float_is_zero
+
 from odoo.addons.stock_account.models.stock_move import StockMove
 
 

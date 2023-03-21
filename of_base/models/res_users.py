@@ -1,7 +1,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from unidecode import unidecode
-from odoo import api, models, fields, tools, SUPERUSER_ID, _
+
+from odoo import SUPERUSER_ID, _, api, fields, models, tools
 from odoo.exceptions import AccessError, UserError
 from odoo.tools import frozendict
 

@@ -2,8 +2,10 @@
 
 import calendar
 from datetime import date as dt_date
+
 from dateutil.relativedelta import relativedelta
-from odoo import models, fields, api, _, Command
+
+from odoo import Command, _, api, fields, models
 from odoo.exceptions import UserError
 
 

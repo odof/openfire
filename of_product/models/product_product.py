@@ -1,8 +1,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, models, fields, _
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
-from odoo.tools import float_round, float_compare
+from odoo.tools import float_compare, float_round
 
 
 class ProductProduct(models.Model):

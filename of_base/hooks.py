@@ -2,13 +2,16 @@
 
 from lxml import etree
 from lxml.builder import E
-from odoo import api, SUPERUSER_ID, _
+
+from odoo import SUPERUSER_ID, _, api
 from odoo.exceptions import ValidationError
 from odoo.models import BaseModel
+
 from odoo.addons.base.models.ir_model import MODULE_UNINSTALL_FLAG
 from odoo.addons.base.models.res_partner import Partner
-from odoo.addons.base_iban.models.res_partner_bank import validate_iban
 from odoo.addons.base.models.res_users import GroupsView, name_boolean_group, name_selection_groups
+from odoo.addons.base_iban.models.res_partner_bank import validate_iban
+
 from .models.res_partner import convert_phone_number
 
 
