@@ -1,0 +1,669 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Web Assets -->
+    <template id="assent_front" name="OF Lab assets" inherit_id="website.assets_frontend">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" type="text/less" href="/of_lab/static/src/less/style.less"/>
+            <script type="text/javascript" src="/of_lab/static/src/js/of_lab.js"/>
+
+            <!-- Theme Laze style -->
+            <link href="/of_lab/static/src/less/as_snippets.less" rel="stylesheet" type="text/less"/>
+            <link href="/of_lab/static/src/less/as_variables.less" rel="stylesheet" type="text/less"/>
+        </xpath>
+    </template>
+
+    <!-- Login layout -->
+    <template id="login_layout" inherit_id="website.login_layout" name="OF Lab Website Login Layout">
+        <xpath expr="t" position="replace">
+            <t t-call="web.layout">
+                <head>
+                    <t t-call-assets="web.assets_common" t-js="false"/>
+                    <t t-call-assets="web.assets_frontend" t-js="false"/>
+                    <t t-call-assets="web.assets_common" t-css="false"/>
+                    <t t-call-assets="web.assets_frontend" t-css="false"/>
+                </head>
+                <div class="oe_website_login_container" t-raw="0"/>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="login" inherit_id="web.login" name="OF Lab Login">
+        <xpath expr="//form" position="before">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1 class="text-center">
+                        <img src="/of_lab/static/src/img/openfire.png" class="center-block" style="width: 15%;"/>
+                    </h1>
+                </div>
+            </div>
+            <div class="row mt32" of_style="LAB" style="text-align: center;">
+                <p style="background-color: #FFD814; color: black; border-radius: 20px; display: inline-block; padding: 6px 12px;">
+                    <span style="font-size: 36px;" data-original-title="" title="">Se connecter&amp;nbsp;<span class="fa fa-gamepad fa-1x" style=""/></span>
+                </p>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="signup" inherit_id="auth_signup.signup" name="OF Lab Sign Up">
+        <xpath expr="//form" position="before">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1 class="text-center">
+                        <img src="/of_lab/static/src/img/openfire.png" class="center-block" style="width: 15%;"/>
+                    </h1>
+                </div>
+            </div>
+            <div class="row mt32" of_style="LAB" style="text-align: center;">
+                <p style="background-color: #FFD814; color: black; border-radius: 20px; display: inline-block; padding: 6px 12px;">
+                    <span style="font-size: 36px;" data-original-title="" title="">Créer un compte&amp;nbsp;<span class="fa fa-gamepad fa-1x" style=""/></span>
+                </p>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Lab Layout -->
+    <template id="lab_layout" name="OF Lab Layout">
+        <t t-set="of_connected_user" t-value="1 if env['ir.ui.view'].user_has_groups('base.group_user') else None"/>
+        <t t-call="web.layout">
+            <head>
+                <t t-call-assets="web.assets_common" t-js="false"/>
+                <t t-call-assets="web.assets_frontend" t-js="false"/>
+                <t t-call-assets="web.assets_common" t-css="false"/>
+                <t t-call-assets="web.assets_frontend" t-css="false"/>
+            </head>
+            <body>
+                <div id="wrap" of_style="LAB">
+                    <div class="oe_structure"/>
+                    <div class="of_lab">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h1 class="text-center">
+                                    <img src="/of_lab/static/src/img/openfire.png" class="center-block" style="width: 15%;"/>
+                                </h1>
+                                <a t-if="of_connected_user" class="of_lab_log" href="/web/session/logout?redirect=/">
+                                    <img class="img img-responsive center-block" src="/of_lab/static/src/img/logout.png"/>
+                                </a>
+                                <a t-else="" class="of_lab_log" href="/web/login">
+                                    <img class="img img-responsive center-block" src="/of_lab/static/src/img/login.png"/>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <t t-raw="0"/>
+                </div>
+            </body>
+        </t>
+    </template>
+
+    <!-- Page Lab Homepage -->
+    <template id="lab_homepage" name="Lab' Accueil">
+        <t t-set="title" value="Lab' OpenFire - Accueil"/>
+        <t t-set="of_connected_user" t-value="1 if env['ir.ui.view'].user_has_groups('base.group_user') else None"/>
+        <t t-set="of_portal_user" t-value="1 if env['ir.ui.view'].user_has_groups('base.group_portal') else None"/>
+        <t t-att-call="'web.layout' if of_portal_user else 'website.layout'">
+            <head>
+                <t t-call-assets="web.assets_common" t-js="false"/>
+                <t t-call-assets="web.assets_frontend" t-js="false"/>
+                <t t-call-assets="web.assets_common" t-css="false"/>
+                <t t-call-assets="web.assets_frontend" t-css="false"/>
+            </head>
+            <body>
+                <div id="wrap" of_style="LAB">
+                    <div class="oe_structure"/>
+                    <div class="of_lab">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h1 class="text-center">
+                                    <img src="/of_lab/static/src/img/openfire.png" class="center-block" style="width: 15%;"/>
+                                </h1>
+                                <a t-if="of_connected_user" class="of_lab_log" href="/web/session/logout?redirect=/">
+                                    <img class="img img-responsive center-block" src="/of_lab/static/src/img/logout.png"/>
+                                </a>
+                                <a t-else="" class="of_lab_log" href="/web/login">
+                                    <img class="img img-responsive center-block" src="/of_lab/static/src/img/login.png"/>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="clinic-specialize speciality-boxs mt0 oe_img_bg oe_custom_bg" style="background-image: url('/of_lab/static/src/img/blue_background.jpg');">
+                            <div class="container" style="width: 1170px; height: 900px;">
+                                <div class="seaction-head-a">
+                                    <div class="s_well_content clearfix">
+                                        <a t-if="of_connected_user" href="/lab" class="btn button-style2" data-original-title="" title="" style="background-color: #FFD814; color: black;">
+                                            <span style="font-size: 36px;" data-original-title="" title="">Je teste&amp;nbsp;<span class="fa fa-gamepad fa-1x" style=""/></span>
+                                        </a>
+                                        <a t-else="" href="/web/signup" class="btn button-style2" data-original-title="" title="" style="background-color: #FFD814; color: black;">
+                                            <span style="font-size: 36px;" data-original-title="" title="">Je teste&amp;nbsp;<span class="fa fa-gamepad fa-1x" style=""/></span>
+                                        </a>
+                                    </div>
+                                    <p>
+                                        <font style="font-size: 24px;"><br/></font>
+                                    </p>
+                                    <p>
+                                        <font style="font-size: 24px;">Découvrez 7 nouvelles fonctionnalités OpenFire </font>
+                                    </p>
+                                </div>
+                                <div class="row">
+                                    <div class="box-3 col-md-4 col-sm-6">
+                                        <div class="boxs-col">
+                                            <span class="iicon" style="border-color: white;">
+                                              <span class="fa fa-1x fa-mobile-phone" style="color: white; font-size: 46px; margin-top: 5px;"/>
+                                            </span>
+                                            <h2>
+                                                <font style="font-size: 24px;">Application mobile</font>
+                                            </h2>
+                                            <p>
+                                                <font class="text-gray-darker" style="font-size: 18px;">Gérez toutes vos interventions dans une seule application : visite technique, installation, sav, maintenance...</font>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="box-3 col-md-4 col-sm-6">
+                                        <div class="boxs-col">
+                                            <span class="iicon" style="border-color: white;">
+                                                <span class="fa fa-1x fa-money" style="color: white; font-size: 46px; margin-top: 5px;"/>
+                                            </span>
+                                            <h2>
+                                                <font style="font-size: 24px;">Tarifs centralisés&amp;nbsp;</font>
+                                            </h2>
+                                            <p>
+                                                <font style="font-size: 18px;" class="text-gray-darker">Accédez à vos tarifs fabricants, consultez les données techniques et téléchargez vos mises à jour en quelques clics</font>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="box-3 col-md-4 col-sm-6">
+                                        <div class="boxs-col">
+                                            <span class="iicon" style="border-color: white;">
+                                                <span class="fa fa-1x fa-truck" style="color: white; font-size: 46px; margin-top: 5px;"/>
+                                            </span>
+                                            <h2>
+                                                <font style="font-size: 24px;">Optimisation des tournées&amp;nbsp;</font>
+                                            </h2>
+                                            <p>
+                                                <font style="font-size: 18px;" class="text-gray-darker">Optimisez vos km parcourus en optimisant l'ordre de vos RDV</font>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="box-3 col-md-4 col-sm-6">
+                                        <div class="boxs-col">
+                                            <span class="iicon" style="border-color: white;">
+                                                <span class="fa fa-1x fa-calendar" style="color: white; font-size: 46px; margin-top: 5px;"/>
+                                            </span>
+                                            <h2>
+                                                <font style="font-size: 24px;">Prise de RDV en ligne&amp;nbsp;</font>
+                                            </h2>
+                                            <p>
+                                                <font class="text-gray-darker" style="font-size: 18px;">Donnez la main à vos clients pour prendre RDV directement sur votre planning, tout en respectant leur géolocalisation</font>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="box-3 col-md-4 col-sm-6">
+                                        <div class="boxs-col">
+                                            <span class="iicon" style="border-color: white;">
+                                                <span class="fa fa-1x fa-home" style="color: white; font-size: 46px; margin-top: 5px;"/>
+                                            </span>
+                                            <h2>
+                                                <font style="font-size: 24px;">Déperdition de chaleur&amp;nbsp;</font>
+                                            </h2>
+                                            <p>
+                                                <font style="font-size: 18px;" class="text-gray-darker">Estimez la puissance requise d’une installation et&amp;nbsp;</font>
+                                                <font style="font-size: 18px;" class="text-gray-darker">sélectionnez un appareil adapté au projet de votre client</font>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="box-3 col-md-4 col-sm-6">
+                                        <div class="boxs-col">
+                                            <span class="iicon" style="border-color: white;">
+                                                <span class="fa fa-1x fa-sign-out" style="color: white; font-size: 46px; margin-top: 5px;"/>
+                                            </span>
+                                            <h2>
+                                                <font style="font-size: 24px;">Signature électronique youSign</font>
+                                            </h2>
+                                            <p>
+                                                <font style="font-size: 18px;" class="text-gray-darker">Engagez vos clients plus rapidement grâce à la signature certifiée YouSign&amp;nbsp;&amp;nbsp;</font>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="box-3 col-md-4 col-sm-6">
+                                        <div class="boxs-col">
+                                            <h2> </h2>
+                                        </div>
+                                    </div>
+
+                                    <div class="box-3 col-md-4 col-sm-6">
+                                        <div class="boxs-col">
+                                            <span class="iicon" style="border-color: white;">
+                                                <span class="fa fa-1x fa-dashboard" style="color: white; font-size: 46px; margin-top: 5px;"/>
+                                            </span>
+                                            <h2>
+                                                <font style="font-size: 24px;">Dashboards métier&amp;nbsp;</font>
+                                            </h2>
+                                            <p>
+                                                <font style="font-size: 18px;" class="text-gray-darker">Améliorez la productivité de vos collaborateurs en leur proposant des tableaux de bords opérationnels adaptés à leur métier</font>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="box-3 col-md-4 col-sm-6">
+                                        <div class="boxs-col">
+                                            <h2> </h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </body>
+        </t>
+    </template>
+
+    <!-- Page Lab -->
+    <template id="lab" name="Lab'">
+        <t t-call="web.layout">
+            <head>
+                <title>Le Lab' OpenFire</title>
+                <t t-call-assets="web.assets_common" t-js="false"/>
+                <t t-call-assets="web.assets_frontend" t-js="false"/>
+                <t t-call-assets="web.assets_common" t-css="false"/>
+                <t t-call-assets="web.assets_frontend" t-css="false"/>
+            </head>
+            <body>
+                <div id="wrap" of_style="LAB">
+                    <div class="oe_structure"/>
+                    <div class="of_lab">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h1 class="text-center">
+                                    <img src="/of_lab/static/src/img/openfire.png" class="center-block" style="width: 15%;"/>
+                                </h1>
+                                <a class="of_lab_log" href="/web/session/logout?redirect=/">
+                                    <img class="img img-responsive center-block" src="/of_lab/static/src/img/logout.png"/>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="clinic-specialize speciality-boxs mt0 oe_img_bg oe_custom_bg" style="background-image: url('/of_lab/static/src/img/blue_background.jpg');">
+                            <div class="container" style="width: 1170px; height: 900px;">
+                                <div class="seaction-head-a">
+                                    <p>
+                                        <font style="font-size: 24px;">Découvrez 7 nouvelles fonctionnalités OpenFire </font>
+                                    </p>
+                                </div>
+                                <div class="row">
+                                    <div class="box-3 col-md-4 col-sm-6">
+                                        <div class="boxs-col">
+                                            <span class="iicon" style="border-color: white;">
+                                              <span class="fa fa-1x fa-mobile-phone" style="color: white; font-size: 46px; margin-top: 5px;"/>
+                                            </span>
+                                            <h2>
+                                                <font style="font-size: 24px;">Application mobile</font>
+                                            </h2>
+                                            <p>
+                                                <font class="text-gray-darker" style="font-size: 18px;">Gérez toutes vos interventions dans une seule application : visite technique, installation, sav, maintenance...</font>
+                                            </p>
+                                            <div class="s_well_content clearfix">
+                                                <a href="#" class="btn button-style2 of_lab_1" data-original-title="" title="" style="background-color: #FFD814; color: black;">
+                                                    <span style="font-size: 16px;" data-original-title="" title="">Je teste&amp;nbsp;<span class="fa fa-gamepad fa-1x" style=""/></span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="box-3 col-md-4 col-sm-6">
+                                        <div class="boxs-col">
+                                            <span class="iicon" style="border-color: white;">
+                                                <span class="fa fa-1x fa-money" style="color: white; font-size: 46px; margin-top: 5px;"/>
+                                            </span>
+                                            <h2>
+                                                <font style="font-size: 24px;">Tarifs centralisés&amp;nbsp;</font>
+                                            </h2>
+                                            <p>
+                                                <font style="font-size: 18px;" class="text-gray-darker">Accédez à vos tarifs fabricants, consultez les données techniques et téléchargez vos mises à jour en quelques clics</font>
+                                            </p>
+                                            <div class="s_well_content clearfix">
+                                                <a href="/web#action=of_lab.of_datastore_product_demo_action" target="_blank" class="btn button-style2" data-original-title="" title="" style="background-color: #FFD814; color: black;">
+                                                    <span style="font-size: 16px;" data-original-title="" title="">Je teste&amp;nbsp;<span class="fa fa-gamepad fa-1x" style=""/></span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="box-3 col-md-4 col-sm-6">
+                                        <div class="boxs-col">
+                                            <span class="iicon" style="border-color: white;">
+                                                <span class="fa fa-1x fa-truck" style="color: white; font-size: 46px; margin-top: 5px;"/>
+                                            </span>
+                                            <h2>
+                                                <font style="font-size: 24px;">Optimisation des tournées&amp;nbsp;</font>
+                                            </h2>
+                                            <p>
+                                                <font style="font-size: 18px;" class="text-gray-darker">Optimisez vos km parcourus en optimisant l'ordre de vos RDV</font>
+                                            </p>
+                                            <div class="s_well_content clearfix">
+                                                <a href="/web#action=of_lab.of_planning_optimize_tour_demo_action" target="_blank" class="btn button-style2" data-original-title="" title="" style="background-color: #FFD814; color: black;">
+                                                    <span style="font-size: 16px;" data-original-title="" title="">Je teste&amp;nbsp;<span class="fa fa-gamepad fa-1x" style=""/></span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="box-3 col-md-4 col-sm-6">
+                                        <div class="boxs-col">
+                                            <span class="iicon" style="border-color: white;">
+                                                <span class="fa fa-1x fa-calendar" style="color: white; font-size: 46px; margin-top: 5px;"/>
+                                            </span>
+                                            <h2>
+                                                <font style="font-size: 24px;">Prise de RDV en ligne&amp;nbsp;</font>
+                                            </h2>
+                                            <p>
+                                                <font class="text-gray-darker" style="font-size: 18px;">Donnez la main à vos clients pour prendre RDV directement sur votre planning, tout en respectant leur géolocalisation</font>
+                                            </p>
+                                            <div class="s_well_content clearfix">
+                                                <a href="/new_booking" target="_blank" class="btn button-style2" data-original-title="" title="" style="background-color: #FFD814; color: black;">
+                                                    <span style="font-size: 16px;" data-original-title="" title="">Je teste&amp;nbsp;<span class="fa fa-gamepad fa-1x" style=""/></span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="box-3 col-md-4 col-sm-6">
+                                        <div class="boxs-col">
+                                            <span class="iicon" style="border-color: white;">
+                                                <span class="fa fa-1x fa-home" style="color: white; font-size: 46px; margin-top: 5px;"/>
+                                            </span>
+                                            <h2>
+                                                <font style="font-size: 24px;">Déperdition de chaleur&amp;nbsp;</font>
+                                            </h2>
+                                            <p>
+                                                <font style="font-size: 18px;" class="text-gray-darker">Estimez la puissance requise d’une installation et&amp;nbsp;</font>
+                                                <font style="font-size: 18px;" class="text-gray-darker">sélectionnez un appareil adapté au projet de votre client</font>
+                                            </p>
+                                            <div class="s_well_content clearfix">
+                                                <a href="/web#action=of_lab.of_calculation_heat_loss_demo_action" target="_blank" class="btn button-style2" data-original-title="" title="" style="background-color: #FFD814; color: black;">
+                                                    <span style="font-size: 16px;" data-original-title="" title="">Je teste&amp;nbsp;<span class="fa fa-gamepad fa-1x" style=""/></span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="box-3 col-md-4 col-sm-6">
+                                        <div class="boxs-col">
+                                            <span class="iicon" style="border-color: white;">
+                                                <span class="fa fa-1x fa-sign-out" style="color: white; font-size: 46px; margin-top: 5px;"/>
+                                            </span>
+                                            <h2>
+                                                <font style="font-size: 24px;">Signature électronique youSign</font>
+                                            </h2>
+                                            <p>
+                                                <font style="font-size: 18px;" class="text-gray-darker">Engagez vos clients plus rapidement grâce à la signature certifiée YouSign&amp;nbsp;&amp;nbsp;</font>
+                                            </p>
+                                            <div class="s_well_content clearfix">
+                                                <a href="#" class="btn button-style2 of_lab_2" data-original-title="" title="" style="background-color: #FFD814; color: black;">
+                                                    <span style="font-size: 16px;" data-original-title="" title="">Je teste&amp;nbsp;<span class="fa fa-gamepad fa-1x" style=""/></span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="box-3 col-md-4 col-sm-6">
+                                        <div class="boxs-col">
+                                            <h2> </h2>
+                                        </div>
+                                    </div>
+
+                                    <div class="box-3 col-md-4 col-sm-6">
+                                        <div class="boxs-col">
+                                            <span class="iicon" style="border-color: white;">
+                                                <span class="fa fa-1x fa-dashboard" style="color: white; font-size: 46px; margin-top: 5px;"/>
+                                            </span>
+                                            <h2>
+                                                <font style="font-size: 24px;">Dashboards métier&amp;nbsp;</font>
+                                            </h2>
+                                            <p>
+                                                <font style="font-size: 18px;" class="text-gray-darker">Améliorez la productivité de vos collaborateurs en leur proposant des tableaux de bords opérationnels adaptés à leur métier</font>
+                                            </p>
+                                            <div class="s_well_content clearfix">
+                                                <a href="/web#action=ks_dashboard_ninja.board_dashboard_action_window" target="_blank" class="btn button-style2" data-original-title="" title="" style="background-color: #FFD814; color: black;">
+                                                    <span style="font-size: 16px;" data-original-title="" title="">Je teste&amp;nbsp;<span class="fa fa-gamepad fa-1x" style=""/></span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="box-3 col-md-4 col-sm-6">
+                                        <div class="boxs-col">
+                                            <h2> </h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </body>
+        </t>
+    </template>
+
+    <!-- Lab Mobile App Modal -->
+    <template id="lab_mobile_app_modal" name="Lab' OpenFire - Application mobile">
+        <div id="modal_mobile_app" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="OpenFire - Application mobile">
+            <div class="modal-dialog" style="width: 1200px;">
+                <div class="modal-content oe_website_sale">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                        <h4 class="modal-title" id="myModalLabel" style="text-align: center;">OpenFire - Application mobile</h4>
+                    </div>
+                    <div class="oe_structure">
+                        <section class="s_image_text">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-4 col-md-offset-1 mt32 mb0">
+                                        <h1>
+                                            <b>Étape 1</b>
+                                        </h1>
+                                        <h2>Téléchargez votre application OpenFire</h2>
+                                        <h4>&amp;nbsp;</h4>
+                                        <p>
+                                            <br/>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6 col-md-offset-1 mt32 mb0">
+                                        <img class="img-responsive" src="/of_lab/static/src/img/popup_mobile1.png" alt="Image Application Mobile OpenFire 1" data-original-title="" title=""/>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <section class="s_image_text">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-6 mt32 mb0">
+                                        <img class="img img-responsive center-block mb16" src="/of_lab/static/src/img/popup_mobile2.png" alt="Image Application Mobile OpenFire 2" data-original-title="" title=""/>
+                                    </div>
+                                    <div class="col-md-6 mt64 mb32">
+                                        <h1 style="font-family: Roboto, sans-serif; color: rgb(51, 51, 51);">
+                                            <b>Étape 2</b>
+                                        </h1>
+                                        <h2 style="font-family: Roboto, sans-serif; color: rgb(51, 51, 51);">Connectez-vous avec les identifiants que vous venez de créer :&amp;nbsp;</h2>
+                                        <h2 style="font-family: Roboto, sans-serif; color: rgb(51, 51, 51);"><b>Serveur </b>: https://lab.openfire.fr</h2>
+                                        <h2 style="font-family: Roboto, sans-serif; color: rgb(51, 51, 51);"><b>Utilisateur </b>: l'email que vous venez d'utiliser pour créer votre compte</h2>
+                                        <h2 style="font-family: Roboto, sans-serif; color: rgb(51, 51, 51);"><b>Mot de passe</b> : le mot de passe que vous venez d'utiliser pour créer votre compte</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <section class="s_three_columns mb0">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h1 style="text-align: center; font-family: Roboto, sans-serif; color: rgb(51, 51, 51);">
+                                            <b>Étape 3</b>
+                                        </h1>
+                                        <h3 class="text-center text-muted">
+                                            <font style="color: rgb(0, 0, 0); font-size: 36px;">Créez votre propre intervention</font>
+                                        </h3>
+                                    </div>
+                                    <div class="col-md-4 mt32 mb48">
+                                        <img class="img img-responsive" src="/of_lab/static/src/img/popup_mobile3.png" alt="Image Application Mobile OpenFire 3" data-original-title="" title=""/>
+                                        <h4 class="mt16">1. Créez votre intervention</h4>
+                                        <p>&amp;nbsp;</p>
+                                    </div>
+                                    <div class="col-md-4 mt32 mb48">
+                                        <img class="img img-responsive" src="/of_lab/static/src/img/popup_mobile4.png" alt="Image Application Mobile OpenFire 4" data-original-title="" title=""/>
+                                        <h4 class="mt16">2. Choisissez votre type d'intervention</h4>
+                                        <p>&amp;nbsp;</p>
+                                    </div>
+                                    <div class="col-md-4 mt32 mb48">
+                                        <img class="img img-responsive" src="/of_lab/static/src/img/popup_mobile5.png" alt="Image Application Mobile OpenFire 5" data-original-title="" title=""/>
+                                        <h4 class="mt16">3. Validez votre intervention</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <section class="s_three_columns mb0">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h1 style="text-align: center; font-family: Roboto, sans-serif; color: rgb(51, 51, 51);">
+                                            <b>Étape 4</b>
+                                        </h1>
+                                        <h3 class="text-center text-muted">
+                                            <font style="color: rgb(0, 0, 0); font-size: 36px;">Réalisez votre intervention</font>
+                                        </h3>
+                                    </div>
+                                    <div class="col-md-4 mt32 mb48">
+                                        <img class="img img-responsive" src="/of_lab/static/src/img/popup_mobile6.png" alt="Image Application Mobile OpenFire 6" data-original-title="" title=""/>
+                                        <h4 class="mt16">1. Sélectionnez votre intervention</h4>
+                                        <p>&amp;nbsp;</p>
+                                    </div>
+                                    <div class="col-md-4 mt32 mb48">
+                                        <img class="img img-responsive" src="/of_lab/static/src/img/popup_mobile7.png" alt="Image Application Mobile OpenFire 7" data-original-title="" title=""/>
+                                        <h4 class="mt16">2. Choisissez la catégorie à renseigner</h4>
+                                        <p>&amp;nbsp;</p>
+                                    </div>
+                                        <div class="col-md-4 mt32 mb48">
+                                        <img class="img img-responsive" src="/of_lab/static/src/img/popup_mobile8.png" alt="Image Application Mobile OpenFire 8" data-original-title="" title=""/>
+                                        <h4 class="mt16">3. Renseignez les différentes informations</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Lab Yousign Modal -->
+    <template id="lab_yousign_modal" name="OpenFire - Signature électronique">
+        <div id="modal_yousign" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="OpenFire - Signature électronique">
+            <div class="modal-dialog modal-md">
+                <form class="form-horizontal" role="form" id="lab_yousign_modal_form">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                            <h4 class="modal-title" id="myModalLabel">OpenFire - Signature électronique</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p class="alert alert-danger o_hidden" id="modal_error"/>
+                            <h5>Pour tester la signature électronique, merci de renseigner ces informations :</h5>
+                            <i class="text-muted">Vos coordonnées sont utilisées pour vous envoyer l'email et le sms nécessaires au test de la signature électronique.</i>
+                            <div class="form-group mb0">
+                                <label for="email" class="col-sm-4 mt16">
+                                    <p>Courriel</p>
+                                </label>
+                                <div class="col-sm-8 mt16">
+                                    <input type="text" name="email" class="form-control" required="required" t-att-value='email'/>
+                                </div>
+                            </div>
+                            <div class="form-group mb0">
+                                <label for="mobile" class="col-sm-4 mt16">
+                                    <p>Numéro de mobile</p>
+                                </label>
+                                <div class="col-sm-8 mt16">
+                                    <input type="text" name="mobile" class="form-control" required="required" t-att-value='mobile'/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <input class="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <input type="submit" value="Confirmer" class="btn btn-primary"/>
+                            <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">Annuler</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </template>
+
+    <!-- OF Website Planning Booking -->
+
+    <template id="new_booking_installed_park_select" inherit_id="of_website_planning_booking.new_booking_installed_park_select">
+        <xpath expr="t" position="attributes">
+            <attribute name="t-call">of_lab.lab_layout</attribute>
+        </xpath>
+    </template>
+
+    <template id="new_booking_installed_park_create" inherit_id="of_website_planning_booking.new_booking_installed_park_create">
+        <xpath expr="t" position="attributes">
+            <attribute name="t-call">of_lab.lab_layout</attribute>
+        </xpath>
+    </template>
+
+    <template id="new_booking_address_select" inherit_id="of_website_planning_booking.new_booking_address_select">
+        <xpath expr="t" position="attributes">
+            <attribute name="t-call">of_lab.lab_layout</attribute>
+        </xpath>
+    </template>
+
+    <template id="new_booking_address_create_edit" inherit_id="of_website_planning_booking.new_booking_address_create_edit">
+        <xpath expr="t" position="attributes">
+            <attribute name="t-call">of_lab.lab_layout</attribute>
+        </xpath>
+    </template>
+
+    <template id="new_booking_localize" inherit_id="of_website_planning_booking.new_booking_localize">
+        <xpath expr="t" position="attributes">
+            <attribute name="t-call">of_lab.lab_layout</attribute>
+        </xpath>
+    </template>
+
+    <template id="new_booking_service" inherit_id="of_website_planning_booking.new_booking_service">
+        <xpath expr="t" position="attributes">
+            <attribute name="t-call">of_lab.lab_layout</attribute>
+        </xpath>
+    </template>
+
+    <template id="new_booking_slot" inherit_id="of_website_planning_booking.new_booking_slot">
+        <xpath expr="t" position="attributes">
+            <attribute name="t-call">of_lab.lab_layout</attribute>
+        </xpath>
+    </template>
+
+    <template id="new_booking_confirmation" inherit_id="of_website_planning_booking.new_booking_confirmation">
+        <xpath expr="t" position="attributes">
+            <attribute name="t-call">of_lab.lab_layout</attribute>
+        </xpath>
+    </template>
+
+    <template id="new_booking_thank_you" inherit_id="of_website_planning_booking.new_booking_thank_you">
+        <xpath expr="t" position="attributes">
+            <attribute name="t-call">of_lab.lab_layout</attribute>
+        </xpath>
+    </template>
+
+    <template id="new_booking_sorry" inherit_id="of_website_planning_booking.new_booking_sorry">
+        <xpath expr="t" position="attributes">
+            <attribute name="t-call">of_lab.lab_layout</attribute>
+        </xpath>
+    </template>
+
+</odoo>

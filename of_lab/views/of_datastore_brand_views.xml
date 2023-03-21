@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_datastore_brand_view_kanban" model="ir.ui.view">
+        <field name="name">of.datastore.brand.view.kanban</field>
+        <field name="model">of.datastore.brand</field>
+        <field name="inherit_id" ref="of_datastore_product.of_datastore_brand_view_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@class='oe_kanban_details']/strong" position="before">
+                <div style="float: right;" attrs="{'invisible': [('state', '!=', 'connected')]}">
+                    <button type="object" class="oe_kanban_button" name="action_open_centralized_products" string="Consulter">
+                        <span>Consulter</span>
+                    </button>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

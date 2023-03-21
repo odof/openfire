@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_calculation_heat_loss_portal_rule" model="ir.rule">
+        <field name="name">Calculation Heat Loss - Portal</field>
+        <field name="model_id" ref="of_calculation_heat_loss.model_of_calculation_heat_loss"/>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="domain_force">[('create_uid', '=', user.id)]</field>
+    </record>
+
+    <record id="of_hr_employee_portal_rule" model="ir.rule">
+        <field name="name">HR Employee - Portal</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="domain_force">['|', '|', ('user_id', '=', False), ('user_id', '=', user.id), ('user_id.of_portal', '=', False)]</field>
+    </record>
+
+    <record id="of_planning_tache_user_rule" model="ir.rule">
+        <field name="name">OF Planning Tache - User</field>
+        <field name="model_id" ref="of_planning.model_of_planning_tache"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="of_res_partner_user_rule" model="ir.rule">
+        <field name="name">User Contacts</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="0"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <function name="write" model="ir.model.data">
+        <function name="search" model="ir.model.data">
+            <value eval="[('module', '=', 'base'), ('name', '=', 'res_partner_rule_private_employee')]"/>
+        </function>
+        <value eval="{'noupdate': False}" />
+    </function>
+
+    <record id="base.res_partner_rule_private_employee" model="ir.rule">
+        <field name="domain_force">[('of_portal', '=', False), '|', ('type', '!=', 'private'), ('type', '=', False)]</field>
+    </record>
+
+    <function name="write" model="ir.model.data">
+        <function name="search" model="ir.model.data">
+            <value eval="[('module', '=', 'base'), ('name', '=', 'res_partner_rule_private_employee')]"/>
+        </function>
+        <value eval="{'noupdate': True}" />
+    </function>
+
+</odoo>

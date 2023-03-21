@@ -1,0 +1,13 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<odoo>
+
+    <record id="of_tour_planning_optimization_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.tour.planning.optimization.wizard.view.form</field>
+        <field name="model">of.tour.planning.optimization.wizard</field>
+        <field name="inherit_id" ref="of_planning_tournee.of_tour_planning_optimization_wizard_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_button_validate']" position="replace"/>
+        </field>
+    </record>
+
+</odoo>

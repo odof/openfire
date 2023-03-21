@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Actions -->
+
+    <record id="action_open_lab" model="ir.actions.act_url">
+        <field name="name">Lab' OpenFire</field>
+        <field name="target">self</field>
+        <field name="url">/lab</field>
+    </record>
+
+    <record id="of_datastore_product_demo_action" model="ir.actions.server">
+        <field name="name">Tarifs centralisés</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="of_datastore_product.model_of_datastore_brand"/>
+        <field name="state">code</field>
+        <field name="code">action = model.display_of_datastore_brand()</field>
+        <field name="condition">True</field>
+    </record>
+
+    <record id="of_planning_optimize_tour_demo_action" model="ir.actions.server">
+        <field name="name">Optimisation de tournées</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="of_planning_tournee.model_of_planning_tournee"/>
+        <field name="state">code</field>
+        <field name="code">action = model.of_planning_optimize_tour_demo()</field>
+        <field name="condition">True</field>
+    </record>
+
+    <record id="of_calculation_heat_loss_demo_action" model="ir.actions.server">
+        <field name="name">Calcul de déperdition de chaleur</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="of_calculation_heat_loss.model_of_calculation_heat_loss"/>
+        <field name="state">code</field>
+        <field name="code">action = model.of_calculation_heat_loss_demo()</field>
+        <field name="condition">True</field>
+    </record>
+
+    <record id="of_yousign_sale_demo_action" model="ir.actions.server">
+        <field name="name">Signature électronique</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code">action = model.of_yousign_sale_demo()</field>
+        <field name="condition">True</field>
+    </record>
+
+    <!-- Product -->
+    <record id="of_lab_fire_device" model="product.template">
+        <field name="default_code">APP001</field>
+        <field name="name">Mon appareil</field>
+        <field name="type">product</field>
+        <field name="brand_id" ref="of_product_brand.main_brand"/>
+    </record>
+
+    <!-- Sector -->
+    <record id="of_lab_sector_fr" model="of.secteur">
+        <field name="name">France</field>
+        <field name="type">tech_com</field>
+        <field name="zip_range_ids" eval="[(0, 0, {'cp_min': '01000', 'cp_max': '99999'})]"/>
+    </record>
+
+    <!-- Sale order template -->
+    <record id="of_lab_sale_quote_template" model="sale.quote.template">
+        <field name="name">Lab OpenFire - Modèle de devis</field>
+    </record>
+
+    <!-- only call function on installation of the module and not on update -->
+    <function model="res.users" name="_init_template_user"/>
+
+</odoo>
