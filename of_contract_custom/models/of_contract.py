@@ -789,7 +789,7 @@ class OfContractLine(models.Model):
     address_zip = fields.Char(string="Zip", related="address_id.zip", readonly=True)
     address_city = fields.Char(string="Ville", related="address_id.city", readonly=True)
     contract_id = fields.Many2one('of.contract', string=u"Contrat", required=True)
-    company_id = fields.Many2one('res.company', related="contract_id.company_id", string='Société')
+    company_id = fields.Many2one('res.company', related="contract_id.company_id", string='Société', readonly=True)
     supplier_id = fields.Many2one('res.partner', string="Prestataire", domain="[('supplier','=',True)]")
     supplier_tag_ids = fields.Many2many("res.partner.category", related="supplier_id.category_id",
                                         string=u"Étiquettes prestataire")
