@@ -1,0 +1,913 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Ajout du champ of_mail_template_ids pour ir.actions.report.xml -->
+    <record id="of_sale_ir_actions_report_xml_form_view" model="ir.ui.view">
+        <field name="name">of.sale.ir.actions.report.xml.form.view</field>
+        <field name="model">ir.actions.report.xml</field>
+        <field name="inherit_id" ref="base.act_report_xml_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='report_type']" position="after">
+                <field name="of_mail_template_ids" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+
+<!--##############################################################################-->
+<!--############################ ______ Ventes ______ ############################-->
+<!--##############################################################################-->
+
+        <!-- Filtres recherche devis / commande -->
+        <record id="of_sale_view_devis_search" model="ir.ui.view">
+            <field name="name">of.sale.view.devis.search</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    <field name="of_etiquette_partenaire_ids" string="Étiquettes client" widget="many2one"/>
+                </xpath>
+                <!-- Ajouter la recherche sur le partenaire en même temps que le nom -->
+                <xpath expr="//field[@name='name']" position="attributes">
+                    <attribute name="filter_domain">['|','|',('name','ilike',self),('client_order_ref','ilike',self),('partner_id','ilike',self)]</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_sale_order_view_search_inherit_sale" model="ir.ui.view">
+            <field name="name">of.sale.order.search.inherit.sale</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.sale_order_view_search_inherit_sale"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[3]" position="after">
+                    <filter string="À facturer entièrement" domain="[('of_to_invoice','=',True)]"/>
+                    <filter string="Livraison restante" domain="[('of_delivered', '=', False)]" name="delivered"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Ajout champ frais de port product.product -->
+        <record id="of_sale_view_order_form" model="ir.ui.view">
+            <field name="name">of.sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="of_sale_discount.of_sale_discount_view_order_form"/>
+            <field name="arch" type="xml">
+                <button name="action_done" states="sale" position="attributes">
+                    <attribute name="confirm">Êtes-vous sûr de vouloir verrouiller la vente ? Une fois verrouillée, vous ne pourrez plus rien modifier. Cette action est irréversible.</attribute>
+                </button>
+                <xpath expr="//button[@name='action_confirm'][1]" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_confirm'][1]" position="after">
+                    <button name="action_verification_confirm" states="sent" string="Confirmer la vente" class="btn-primary o_sale_confirm" type="object" />
+                </xpath>
+                <xpath expr="//button[@name='action_confirm'][2]" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_confirm'][2]" position="after">
+                    <button name="action_verification_confirm" states="draft" string="Confirmer la vente" class="o_sale_confirm" type="object" />
+                </xpath>
+                <xpath expr="//header" position="inside">
+                    <button name="button_gestion_prix" type="object" string="Gestion prix"/>
+                    <field name="of_allow_quote_addition" invisible="1"/>
+                    <button name="action_add_quote" string="Ajout devis" type="object" attrs="{'invisible': ['|', ('state', '!=', 'sale'), ('of_allow_quote_addition', '=', False)]}"/>
+                </xpath>
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <!-- Ajout d'un bouton pour switcher entre vue client et vue vendeur' -->
+                    <button name="toggle_view" type="object" class="oe_stat_button" icon="fa-pencil-square-o" groups="of_sale.of_group_sale_marge_manager">
+                        <field name="of_client_view" widget="boolean_button"
+                               options="{'terminology': {'string_true': 'Vue client',
+                                                         'hover_true': 'Vue client',
+                                                         'string_false': 'Vue vendeur',
+                                                         'hover_false': 'Vue vendeur' }}"/>
+                    </button>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <label string="Coordonnées client"/>
+                    <div>
+                        <field name="of_partner_phone" nolabel="1" style="margin-right:10px;" attrs="{'invisible': [('of_partner_phone', '=', False)]}"/>
+                        <field name="of_partner_mobile" nolabel="1"/><br/>
+                        <field name="of_partner_email" nolabel="1"/>
+                    </div>
+                </xpath>
+                <field name="date_order" position="attributes">
+                    <attribute name="widget">date</attribute>
+                </field>
+                <xpath expr="//group[@name='sale_pay']" position="inside">
+                    <field name="of_invoice_policy" invisible="context.get('hide_sale')" groups="account.group_account_invoice"/>
+                    <field name="of_invoice_date_prev" invisible="context.get('hide_sale')" attrs="{'readonly': [('of_invoice_policy', '!=', 'order')]}"/>
+                </xpath>
+                <field name="fiscal_position_id" position="attributes">
+                    <attribute name="domain">[('tax_ids.tax_src_id.type_tax_use', '=', 'sale')]</attribute>
+                    <attribute name="options">{'no_open': True}</attribute>
+                </field>
+                <xpath expr="//field[@name='date_order']" position="attributes">
+                    <attribute name="attrs">{}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='confirmation_date']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('state','in',['draft', 'sent', 'cancel']),('confirmation_date', '=', False)]}</attribute>
+                    <attribute name="widget">date</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form/group/group[2]" position="inside">
+                    <field name="of_article_principal" string="Est l'article principal"/>
+                </xpath>
+                <!-- Gestion de la remise interdite -->
+                <xpath expr="//field[@name='order_line']//form//field[@name='product_id']" position="after">
+                    <field name="of_product_forbidden_discount" groups="sales_team.group_sale_manager"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']//form//field[@name='price_unit']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('of_product_forbidden_discount', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']//form//field[@name='price_unit']" position="before">
+                    <field name="of_price_unit_display" attrs="{'invisible': [('of_product_forbidden_discount', '=', False)]}"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']//form//field[@name='of_discount_formula']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('of_product_forbidden_discount', '=', True)]}</attribute>
+                </xpath>
+                <!-- prix unitaire HT dans la vue form des lignes de commande -->
+                <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="before">
+                    <field name="of_price_unit_ht" string="Prix unitaire HT"
+                      attrs="{'invisible': [('of_price_unit_ht', '=', '_field_price_unit')]}"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form/group/group[2]" position="inside">
+                    <field name="of_invoice_policy" invisible="context.get('hide_sale')" groups="sales_team.group_sale_manager"/>
+                    <field name="of_invoice_date_prev" invisible="context.get('hide_sale')" groups="sales_team.group_sale_manager"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='price_total']" position="attributes">
+                    <attribute name="groups">sale.group_show_price_total,of_sale.group_of_afficher_total_ttc</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='product_uom_qty']" position="attributes">
+                    <attribute name="string">Qté(s) commandée(s)</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form//label[1]" position="attributes">
+                    <attribute name="string">Qté(s) commandée(s)</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='qty_delivered']" position="attributes">
+                    <attribute name="string">Qté(s) livrée(s)</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form//label[2]" position="attributes">
+                    <attribute name="string">Qté(s) livrée(s)</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='qty_invoiced']" position="attributes">
+                    <attribute name="string">Qté(s) facturée(s)</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form//label[3]" position="attributes">
+                    <attribute name="string">Qté(s) facturée(s)</attribute>
+                </xpath>
+                <!-- Ajout onglet Notes : client, facture, intervention -->
+                <xpath expr="//notebook" position="inside">
+                     <page string="Notes" name="notes">
+                        <!-- Notes client -->
+                        <group name="customer_notes" attrs="{'invisible':[('of_notes_client','=',False)]}">
+                            <separator string="Notes client" colspan="4"/>
+                            <field name="of_notes_client" colspan="4" nolabel="1" readonly="1"
+                                help="Ces notes proviennent de la fiche client sous la rubrique 'Notes internes'. Ils sont uniquement modifiables dans la fiche client."/>
+                         </group>
+                        <!-- Notes intervention -->
+                        <separator string="Notes intervention" colspan="4"/>
+                        <field name="of_notes_intervention" colspan="4" nolabel="1" widget="html"
+                            help="Ces notes sont visualisées dans planning d'intervention et imprimées dans la fiche d'intervention."/>
+                        <div class="oe_edit_only" colspan="4">
+                            * Les données saisies dans ce champ seront visualisées dans planning d'intervention et imprimées dans la fiche d'intervention.
+                        </div>
+                     </page>
+                     <page string="Impression" name="print">
+                         <group>
+                             <group string="Options d'impression">
+                                 <field name="of_price_printing" invisible="1"/>
+                                 <field name="of_apply_on_invoice"/>
+                             </group>
+                         </group>
+                     </page>
+                </xpath>
+                <!-- Ajout option Documents joints -->
+                <xpath expr="//page//group[@name='technical']" position="after">
+                    <group string="Documents joints" name="docs">
+                        <field name="of_mail_template_ids" widget="many2many_tags" nolabel="1"/>
+                    </group>
+                </xpath>
+                <xpath expr="//field[@name='confirmation_date']" position="after">
+                    <field name="of_date_vt"/>
+                </xpath>
+                <!-- Ajout échéances  invisible="1"-->
+                <xpath expr="//group[@name='sale_total']" position="before">
+                    <group col="1" style="width:60%">
+                        <separator string="Échéancier prévisionnel"/>
+                        <field name="of_echeances_modified" invisible="1"/>
+                        <field name="of_echeance_line_ids" nolabel="1">
+                            <tree editable="bottom" create="false" delete="false">
+                                <field name="sequence" invisible="1"/>
+                                <field name="last" invisible="1"/>
+                                <field name="name"/>
+                                <field name="date"/>
+                                <field name="percent" attrs="{'readonly': [('last','=',True)]}" sum="Total"/>
+                                <field name="amount" attrs="{'readonly': [('last','=',True)]}" sum="Total"/>
+                                <field name="currency_id" invisible="1"/>
+                            </tree>
+                        </field>
+                        <span>
+                        <button name="button_dummy"
+                            string="(mise à jour)" type="object" class="oe_edit_only oe_link oe_right"
+                            attrs="{'invisible': [('of_echeances_modified', '=', False)]}"/>
+                        </span>
+                    </group>
+                </xpath>
+                <!-- Ajout de la possibilité de forcer l'état de facturation de la commande -->
+                <xpath expr="//group[@name='sale_pay']//field[@name='invoice_status']" position="after">
+                    <field name="of_force_invoice_status" groups="account.group_account_invoice"
+                           attrs="{'invisible': [('state', 'not in', ('sale','done'))]}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_sale_order_manager_form_view" model="ir.ui.view">
+            <field name="name">of.sale.order.manager.form.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+            <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+            <field name="arch" type="xml">
+                <!-- Mettre le required uniquement sur cette vue permet de ne pas totalement bloquer les utilisateurs
+                     qui ne peuvent pas modifier la date de confirmation -->
+                <xpath expr="//field[@name='confirmation_date']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('state','in',['draft', 'sent', 'cancel']),('confirmation_date', '=', False)],
+'required': [('state','not in',['draft', 'sent', 'cancel']),('confirmation_date','=',False)]}</attribute>
+                    <attribute name="readonly">0</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Ajout etiquettes partenaire sur les devis -->
+        <record id="of_sale_view_devis" model="ir.ui.view">
+            <field name="name">of.sale.view.devis</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_crm.sale_view_inherit123"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='tag_ids']" position="after">
+                    <field name="of_etiquette_partenaire_ids" widget="many2many_tags" readonly="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Ajout des droits sur les marges/prix d'achats -->
+        <record id="of_sale_margin_sale_order_line" model="ir.ui.view">
+            <field name="name">of.sale.margin.sale.order.line</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_margin.sale_margin_sale_order_line"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="attributes">
+                    <attribute name="groups">-base.group_user, of_sale.of_group_sale_marge_manager</attribute>
+                    <attribute name="attrs">{'invisible': [('of_client_view', '=', True)]}</attribute>
+                    <attribute name="readonly">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="after">
+                    <field name="of_seller_price" groups="of_sale.of_group_sale_marge_manager+sales_team.group_sale_manager"
+                           invisible="context.get('hide_sale')" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                    <field name="of_order_line_option_id" options="{'no_create': True, 'no_open': True}"
+                           groups="of_sale.group_of_order_line_option"/>
+                    <field name="of_reset_option" groups="of_sale.group_of_order_line_option"/>
+                    <field name="of_client_view" invisible="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_sale_order_manager_purchase_price_form_view" model="ir.ui.view">
+            <field name="name">of.sale.order.manager.purchase.price.form.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="of_sale.of_sale_margin_sale_order_line"/>
+            <field name="groups_id" eval="[(4, ref('of_sale.group_of_can_modify_sale_purchase_price'))]"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="attributes">
+                    <attribute name="readonly">0</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Ajout des droits sur les marges/prix d'achats -->
+        <record id="of_sale_margin_sale_order_line_form" model="ir.ui.view">
+            <field name="name">of.sale.margin.sale.order.line.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_margin.sale_margin_sale_order_line_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/tree//field[@name='purchase_price']" position="attributes">
+                    <attribute name="groups">-base.group_user, of_sale.of_group_sale_marge_manager</attribute>
+                    <attribute name="attrs">{'invisible': [('of_client_view', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='purchase_price']" position="after">
+                    <field name="of_seller_price" groups="of_sale.of_group_sale_marge_manager+sales_team.group_sale_manager"
+                           invisible="context.get('hide_sale')" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                    <!-- Champs ajoutés en invisible pour ne pas modifier l'affichage actuel et permettre au list
+                         editor d'hériter des groups+attrs -->
+                    <field name="of_marge_pc"
+                           groups="-base.group_user, of_sale.of_group_sale_marge_manager"
+                           attrs="{'invisible': [('of_client_view', '=', True)]}"
+                           invisible="1"/>
+                    <field name="margin"
+                           groups="-base.group_user, of_sale.of_group_sale_marge_manager"
+                           attrs="{'invisible': [('of_client_view', '=', True)]}"
+                           invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree" position="inside">
+                    <field name="of_client_view" invisible="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_sale_view_of_product_image_form" model="ir.ui.view">
+            <field name="name">of.sale.of.product.image.form</field>
+            <field name="model">of.product.image</field>
+            <field name="arch" type="xml">
+                <form string="Product Images">
+                    <sheet>
+                        <field name="image" widget="image" class="oe_avatar"/>
+                        <div class="oe_title">
+                            <label class="oe_edit_only" for="name" string="Image Name"/>
+                            <h1><field name="name" placeholder="Image Name" required="True"/></h1>
+                            <field name="product_tmpl_id" invisible="1"/>
+                        </div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="of_sale_view_of_product_image_form" model="ir.ui.view">
+            <field name="name">of.sale.of.product.image.form</field>
+            <field name="model">of.product.image</field>
+            <field name="arch" type="xml">
+                <form string="Product Images">
+                    <sheet>
+                        <field name="image" widget="image" class="oe_avatar"/>
+                        <div class="oe_title">
+                            <label class="oe_edit_only" for="name" string="Image Name"/>
+                            <h1><field name="name" placeholder="Image Name" required="True"/></h1>
+                            <field name="product_tmpl_id" invisible="1"/>
+                        </div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Ajout des droits sur les marges/prix d'achats -->
+        <record id="of_sale_margin_sale_order" model="ir.ui.view">
+            <field name="name">of.sale.margin.sale.order</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_margin.sale_margin_sale_order"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='sale_margin_grp']//field[@name='margin']" position="attributes">
+                    <attribute name="groups">-base.group_user, of_sale.of_group_sale_marge_manager</attribute>
+                    <attribute name="attrs">{'invisible': [('of_client_view', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//group[@name='sale_margin_grp']//field[@name='margin']" position="after">
+                    <field name="of_marge_pc"
+                           groups="-base.group_user, of_sale.of_group_sale_marge_manager"
+                           attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_sale_obsolete_sale_order_form_view" model="ir.ui.view">
+            <field name="name">of.sale.obsolete.sale.order.form.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="priority">100</field>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/form//field[@name='of_price_unit_display']" position="replace"/>
+                <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="replace">
+                    <label for="price_unit"/>
+                    <div>
+                        <field name="price_unit" class="oe_inline" style="max-width: 150px;"
+                               attrs="{'invisible': [('of_product_forbidden_discount', '=', True)]}"/>
+                        <field name="of_price_unit_display" class="oe_inline" style="max-width: 150px;"
+                               attrs="{'invisible': [('of_product_forbidden_discount', '=', False)]}"/>
+                        (<field name="of_date_tarif" class="oe_inline"/>
+                        <span attrs="{'invisible': [('of_date_tarif', '!=', False)]}">Non daté</span>)
+                        <br/>
+                        <field name="of_obsolete" invisible="1"/>
+                        <span style="display: inline; color: white; border: 1px solid black; border-radius: 5px; background: red; padding-left: 5px; padding-right: 5px;"
+                            attrs="{'invisible': [('of_obsolete', '=', False)]}">
+                            Obsolète
+                        </span>
+                    </div>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form" position="inside">
+                    <label for="of_product_image_ids"
+                           groups="of_sale.group_of_sale_multiimage+of_sale.group_of_sale_print_multiimage,of_sale.group_of_sale_multiimage+of_sale.group_of_sale_print_one_image"/>
+                    <field name="of_product_image_ids" mode="kanban" context="{'default_name': name, 'default_product_tmpl_id': product_tmpl_id or active_id}"
+                           groups="of_sale.group_of_sale_multiimage+of_sale.group_of_sale_print_multiimage,of_sale.group_of_sale_multiimage+of_sale.group_of_sale_print_one_image">
+                        <kanban string="Product Images">
+                            <field name="name"/>
+                            <field name="image" />
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <div class="oe_kanban_global_click">
+                                        <a t-if="!read_only_mode" type="delete" class="fa fa-times pull-right"/>
+                                        <div class="o_kanban_image">
+                                            <img t-if="record.image.raw_value" t-att-src="'data:image/png;base64,'+record.image.raw_value"/>
+                                        </div>
+                                        <div class="oe_kanban_details">
+                                            <field name="name"/>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
+                    <field name="of_product_attachment_computed_ids" widget="many2many_tags" invisible="1"/>
+                    <label for="of_product_attachment_ids" groups="of_sale.group_of_sale_print_attachment"/>
+                    <field name="of_product_attachment_ids" widget="many2many_tags" groups="of_sale.group_of_sale_print_attachment" options="{'no_create': True}"
+                           domain="[('id', 'in', of_product_attachment_computed_ids and of_product_attachment_computed_ids[0] and of_product_attachment_computed_ids[0][2] or False)]"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="of_sale_order_manager2_form_view" model="ir.ui.view">
+            <field name="name">of.sale.order.manager2.form.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="of_sale.of_sale_obsolete_sale_order_form_view"/>
+            <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+            <field name="arch" type="xml">
+                <!-- Permettre la modification direct du prix pour les remises interdites -->
+                <xpath expr="//field[@name='price_unit']" position="attributes">
+                    <attribute name="attrs"/>
+                </xpath>
+                <xpath expr="//field[@name='of_price_unit_display']" position="attributes">
+                    <attribute name="attrs"/>
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_sale_echeance_form" model="ir.ui.view">
+            <field name="name">of.sale.echeance.form</field>
+            <field name="model">of.sale.echeance</field>
+            <field name="arch" type="xml">
+                <form>
+                    <field name="last" invisible="1"/>
+                    <field name="currency_id" invisible="1"/>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="percent"/>
+                            <field name="amount" attrs="{'readonly': [('last','=',True)]}"/>
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="of_sale_product_form_view" model="ir.ui.view">
+            <field name="name">of.sale.product.form.view</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="of_product.of_product_template_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='group_standard_price']/label[@for='of_seller_price']" position="attributes">
+                    <attribute name="groups">of_sale.of_group_sale_marge_manager</attribute>
+                </xpath>
+                <xpath expr="//group[@name='group_standard_price']/div[1]" position="attributes">
+                    <attribute name="groups">of_sale.of_group_sale_marge_manager</attribute>
+                </xpath>
+                <xpath expr="//group[@name='group_standard_price']/field[@name='of_seller_remise']" position="attributes">
+                    <attribute name="groups">of_sale.of_group_sale_marge_manager</attribute>
+                </xpath>
+                <xpath expr="//group[@name='group_general']/label[@for='standard_price']" position="attributes">
+                    <attribute name="groups">-base.group_user, of_sale.of_group_sale_marge_manager</attribute>
+                </xpath>
+                <xpath expr="//group[@name='group_general']/div[@name='standard_price_uom']" position="attributes">
+                    <attribute name="groups">-base.group_user, of_sale.of_group_sale_marge_manager</attribute>
+                </xpath>
+                <xpath expr="//group[@name='group_general']/field[@name='of_theoretical_cost']" position="attributes">
+                    <attribute name="groups">-base.group_user, of_sale.of_group_sale_marge_manager</attribute>
+                </xpath>
+                <xpath expr="//group[@name='group_general']/label[@for='marge']" position="attributes">
+                    <attribute name="groups">of_sale.of_group_sale_marge_manager</attribute>
+                </xpath>
+                <xpath expr="//group[@name='group_general']/span" position="attributes">
+                    <attribute name="groups">of_sale.of_group_sale_marge_manager</attribute>
+                </xpath>
+                <xpath expr="//field[@name='categ_id']" position="after">
+                    <field name="of_layout_category_id" options="{'no_open': True}"/>
+                </xpath>
+                <xpath expr="//notebook[last()]" position="inside">
+                    <page string="Images" name="of_sale_multiimage" groups="of_sale.group_of_sale_multiimage">
+                        <field name="of_product_image_ids" mode="kanban" context="{'default_name': name, 'default_product_tmpl_id': active_id}" >
+                            <kanban string="Product Images">
+                                <field name="name"/>
+                                <field name="image" />
+                                <templates>
+                                    <t t-name="kanban-box">
+                                        <div class="oe_kanban_global_click">
+                                            <a t-if="!read_only_mode" type="delete" class="fa fa-times pull-right"/>
+                                            <div class="o_kanban_image">
+                                                <img t-if="record.image.raw_value" t-att-src="'data:image/png;base64,'+record.image.raw_value"/>
+                                            </div>
+                                            <div class="oe_kanban_details">
+                                                <field name="name"/>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </templates>
+                            </kanban>
+                        </field>
+                    </page>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!-- Rendre visible le menu "Étiquettes de contact" sans le mode débogue. -->
+        <menuitem action="base.action_partner_category_form" id="sales_team.menu_partner_category_form" name="Contact Tags" sequence="1" parent="sales_team.menu_config_address_book" groups="-base.group_no_one"/>
+        <!-- Rendre visible le menu "Catégories d'articles" sans le mode débogue. -->
+        <menuitem action="product.product_category_action_form" id="sale.menu_product_category_action_form" parent="sale.prod_config_main" sequence="2" groups="-base.group_no_one"/>
+
+        <!-- Afficher la vue liste en cliquant sur le menu article au lieu de la vue kanban -->
+        <record id="product.product_template_action" model="ir.actions.act_window">
+            <field name="view_id" ref="product.product_template_tree_view"/>
+        </record>
+
+        <record id="of_sale_report_configuration_form_view" model="ir.ui.view">
+            <field name="name">of.sale.report.configuration.form.view</field>
+            <field name="model">sale.layout_category</field>
+            <field name="inherit_id" ref="sale.report_configuration_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group" position="before">
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
+                        </button>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="action_of_secteur_tree_sale" model="ir.actions.act_window">
+            <field name="name">Secteurs</field>
+            <field name="res_model">of.secteur</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="of_base_location.of_view_secteur_tree"/>
+            <field name="search_view_id" ref="of_base_location.of_view_secteur_filter"/>
+        </record>
+
+        <!--record id="action_of_secteur_zip_tree_sale" model="ir.actions.act_window">
+            <field name="name">CP des secteurs</field>
+            <field name="res_model">of.secteur.zip</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="of_base_location.of_view_secteur_zip_tree"/>
+            <field name="search_view_id" ref="of_base_location.of_view_secteur_zip_filter"/>
+        </record-->
+
+        <menuitem name="Secteurs" id="of_secteur_sale_menu" parent="sales_team.menu_localisation" action="action_of_secteur_tree_sale" sequence="10"/>
+        <!--menuitem name="CP des Secteurs" id="of_secteur_zip_sale_menu" parent="sales_team.menu_localisation" action="action_of_secteur_zip_tree_sale" sequence="11"/-->
+
+        <data noupdate="1">
+            <record model="ir.ui.view" id="of_sale_order_form_fiscal_position_required">
+                <field name="name">of.sale.order.form.fiscal.position.required</field>
+                <field name="model">sale.order</field>
+                <field name="active">False</field>
+                <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+                <field name="arch" type="xml">
+                    <xpath expr="//field[@name='fiscal_position_id']" position="attributes">
+                        <attribute name="required">True</attribute>
+                    </xpath>
+                </field>
+            </record>
+        </data>
+
+<!--##############################################################################-->
+<!--########################### ______ Compta ______ #############################-->
+<!--##############################################################################-->
+
+    <!-- Add setting 'of_color_bg_section' to account settings -->
+    <record id="of_account_config_settings_layouted_bg_color" model="ir.ui.view">
+        <field name="name">of account settings</field>
+        <field name="model">account.config.settings</field>
+        <field name="inherit_id" ref="of_account_invoice_report.of_view_account_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='pdf_display_product_ref']" position="after">
+                <label for="pdf_vt_pastille"/>
+                <div name="pdf_vt_pastille">
+                    <field name="pdf_vt_pastille" class="oe_inline"/>
+                    <span>Afficher la date de visite technique dans une pastille d'information dans le rapport PDF des factures</span>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='group_warning_account']" position="after">
+                <field name="of_validate_pickings" widget="radio" class="oe_inline"/>
+            </xpath>
+            <xpath expr="//div[@name='pdf_display_product_ref']" position="after">
+                <field name="of_color_bg_section" widget="color"/>
+                <field name="of_color_font" widget="color"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Ajout de la date visite technique dans la rubrique "Autres informations" de la vue formulaire de la facture -->
+    <record id="of_account_invoice_view_form" model="ir.ui.view">
+        <field name="name">of.account.invoice.view.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="of_is_locked" invisible="1"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button type="object" name="action_view_delivery" class="oe_stat_button" icon="fa-truck"
+                    attrs="{'invisible': [('of_picking_count', '=', 0)]}">
+                    <field name="of_picking_count" widget="statinfo" string="Livraisons"/>
+                </button>
+            </xpath>
+
+            <xpath expr="//field[@name='date_due']" position="after">
+                <field name="of_date_vt"/>
+            </xpath>
+            <xpath expr="//notebook/page[1]/group[@class='oe_subtotal_footer oe_right']/field[@name='outstanding_credits_debits_widget']" position="after">
+                <field name="of_residual_equal" invisible="1"/>
+                <div attrs="{'invisible': [('of_residual_equal', '!=', False)]}" class="oe_grey" colspan="4">
+                    Le total du montant des factures d'acompte est différent de celui des paiements.<br/>
+                    Vérifier que les factures d'acompte ont bien été payées.
+                </div>
+                <field name="of_residual" attrs="{'invisible': [('of_residual_equal', '!=', False)]}" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+            </xpath>
+            <xpath expr="//page[@name='other_info']//field[@name='name']" position="after">
+                <field name="of_suivi_interne"/>
+            </xpath>
+            <xpath expr="//page[@name='other_info']/group/group[last()]" position="inside">
+                <field name="of_mail_template_ids" widget="many2many_tags"/>
+            </xpath>
+            <xpath expr="//page[@name='other_info']/group/group[last()]" position="inside">
+                <field name="of_price_printing" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_account_invoice_picking_view_form" model="ir.ui.view">
+        <field name="name">of.account.invoice.picking.view.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="of_sale.of_account_invoice_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="of_waiting_delivery" invisible="1"/>
+                <button name="validate_pickings" type="object" string="Valider BL liés"
+                        attrs="{'invisible': ['|','|',('of_waiting_delivery','=',False),
+                                                      ('state','not in',['open','paid']),
+                                                  ('of_is_locked', '=', True)]}"
+                        confirm="Tous les bons de livraison liés aux commandes de cette facture vont être validés.
+Tous les articles seront considérés comme disponibles et marqués comme livrés."/>
+            </xpath>
+            <xpath expr="//notebook" position="before">
+                <div style="color:red;" attrs="{'invisible': ['|','|',('of_waiting_delivery','=',False),
+                                                                      ('state','not in',['open','paid']),
+                                                                  ('of_is_locked', '=', True)]}">
+                    <i>Il reste des bons de livraisons non validés.</i>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <function model="account.invoice" name="_of_function_active_picking"/>
+
+<!--##############################################################################-->
+<!--########################### ______ Sociétés ______ ###########################-->
+<!--##############################################################################-->
+
+        <record id="of_sale_view_company_form" model="ir.ui.view">
+            <field name="name">of.sale.company.form</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="of_base.of_base_view_company_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//notebook//page[@name='advanced_settings']" position="attributes">
+                    <attribute name="invisible">0</attribute>
+                </xpath>
+                <xpath expr="//notebook//page[@name='advanced_settings']/group[@name='advanced_settings_group_2']" position="inside">
+                    <group name="sales" colspan="2">
+                        <separator string="Ventes" colspan="2"/>
+                        <field name="afficher_descr_fab"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+<!--##############################################################################-->
+<!--########################### ______ Contacts ______ ###########################-->
+<!--##############################################################################-->
+
+    <record id="of_sale_view_partner_form" model="ir.ui.view">
+        <field name="name">of.sale.view.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="account.view_partner_property_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='property_payment_term_id']" position="after">
+                <field name="of_invoice_policy" groups="account.group_account_invoice"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 2 vues sont nécessaire car elles sont séparées dans le module account -->
+    <record id="of_view_partner_buttons_form" model="ir.ui.view">
+        <field name="name">of.view.partner.buttons.form</field>
+        <field name="model">res.partner</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="sale.res_partner_view_buttons"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='internal_notes']//group[@groups='sale.group_warning_sale']"
+                   position="replace">
+            </xpath>
+            <xpath expr="//page[@name='internal_notes']//div[@name='of_is_account_warn']" position="before">
+                <div name="of_is_sale_warn">
+                    <field name="of_is_sale_warn" nolabel="1" class="oe_inline"/>
+                    commandes de vente
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+<!--##############################################################################-->
+<!--########################## ______ Utilisateurs ______ ########################-->
+<!--##############################################################################-->
+
+    <record id="of_sale_view_users_simple_form" model="ir.ui.view">
+        <field name="name">of.sale.view.users.simple.form</field>
+        <field name="model">res.users</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="base.view_users_simple_form"/>
+        <field name="arch" type="xml">
+            <!-- déplacer le champ email qui était présent en invisible à un endroit moche -->
+            <xpath expr="//field[@name='email']" position="replace"/>
+            <xpath expr="//field[@name='fax']" position="after">
+                <field name="email"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="res_users_view_form_group_of_pdf_prefill_vendor_signature" model="ir.ui.view">
+        <field name="name">of.sale.res.users.view.form</field>
+        <field name="model">res.users</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="groups_id" eval="[(4, ref('of_sale.group_of_pdf_prefill_vendor_signature'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='signature']" position="attributes">
+                <attribute name="string">Email signatures</attribute>
+            </xpath>
+            <xpath expr="//field[@name='signature']" position="after">
+                <field name="of_vendor_signature" widget="image" class="oe_avatar"/>
+            </xpath>
+        </field>
+    </record>
+
+<!--##############################################################################-->
+<!--###################### ______ Lignes de commande ______ ######################-->
+<!--##############################################################################-->
+
+    <record id="of_sale_order_line_pivot" model="ir.ui.view">
+        <field name="name">of.sale.order.line.pivot</field>
+        <field name="model">sale.order.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Lignes à facturer" disable_linking="True">
+                <field name="salesman_id" type="col"/>
+                <field name="of_confirmation_date" interval="month" type="row"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="of_sale_order_line_tree" model="ir.ui.view">
+        <field name="name">of.sale.order.line.tree</field>
+        <field name="model">sale.order.line</field>
+        <field name="arch" type="xml">
+            <tree string="Lignes de commande" >
+                <field name="order_id"/>
+                <field name="order_partner_id"/>
+                <field name="of_confirmation_date"/>
+                <field name="product_id"/>
+                <field name="product_uom_qty" string="Qté(s) commandée(s)"/>
+                <field name="qty_delivered" string="Qté(s) livrée(s)"/>
+                <field name="qty_invoiced" string="Qté(s) facturée(s)"/>
+                <field name="price_subtotal"/>
+                <field name="of_invoice_policy"/>
+                <field name="invoice_status"/>
+                <field name="of_invoice_date_prev"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_sale_order_line_tree_all" model="ir.actions.act_window">
+        <field name="name">Lignes à facturer</field>
+        <field name="res_model">sale.order.line</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,pivot</field>
+        <field name="view_id" ref="of_sale_order_line_tree" />
+        <field name="domain">[('order_id.state', '=', 'sale'),
+                              ('invoice_status', '!=', 'invoiced')]</field>
+    </record>
+
+    <record id="sale.action_product_sale_list" model="ir.actions.act_window">
+        <field name="domain">[]</field>
+    </record>
+
+    <menuitem id="menu_sale_order_line_test" parent="sale.menu_sale_invoicing" action="action_sale_order_line_tree_all"
+              sequence="30"/>
+
+<!--##############################################################################-->
+<!--##################### ______ Catégorie d'article ______ ######################-->
+<!--##############################################################################-->
+
+    <record id="of_sale_product_category_form_view" model="ir.ui.view">
+        <field name="name">of.sale.product.category.form.view</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='first']" position="inside">
+                <field name="of_article_principal"/>
+                <field name="of_taux_marge"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- OF Order Line Option Views -->
+
+    <record id="of_sale_of_order_line_option_form_view" model="ir.ui.view">
+        <field name="name">of.sale.of.order.line.option.form.view</field>
+        <field name="model">of.order.line.option</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="description_update"/>
+                        </group>
+                        <group>
+                            <field name="purchase_price_update"/>
+                            <field name="purchase_price_update_type" string="Type" widget="radio"
+                                   attrs="{'invisible': [('purchase_price_update', '=', False)],
+                                           'required': [('purchase_price_update', '=', True)]}"/>
+                            <label for="purchase_price_update_value" string="Valeur"
+                                   attrs="{'invisible': [('purchase_price_update', '=', False)]}"/>
+                            <div attrs="{'invisible': [('purchase_price_update', '=', False)]}">
+                                <field name="purchase_price_update_value" class="oe_inline"/>
+                                <label string="€" class="oe_inline"
+                                       attrs="{'invisible': [('purchase_price_update_type', '!=', 'fixed')]}"/>
+                                <label string="%" class="oe_inline"
+                                       attrs="{'invisible': [('purchase_price_update_type', '!=', 'percent')]}"/>
+                            </div>
+                            <field name="sale_price_update"/>
+                            <field name="sale_price_update_type" string="Type" widget="radio"
+                                   attrs="{'invisible': [('sale_price_update', '=', False)],
+                                           'required': [('sale_price_update', '=', True)]}"/>
+                            <label for="sale_price_update_value" string="Valeur"
+                                   attrs="{'invisible': [('sale_price_update', '=', False)]}"/>
+                            <div attrs="{'invisible': [('sale_price_update', '=', False)]}">
+                                <field name="sale_price_update_value" class="oe_inline"/>
+                                <label string="€" class="oe_inline"
+                                       attrs="{'invisible': [('sale_price_update_type', '!=', 'fixed')]}"/>
+                                <label string="%" class="oe_inline"
+                                       attrs="{'invisible': [('sale_price_update_type', '!=', 'percent')]}"/>
+                            </div>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sale_of_order_line_option_tree_view" model="ir.ui.view">
+        <field name="name">of.sale.of.order.line.option.tree.view</field>
+        <field name="model">of.order.line.option</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_sale_of_order_line_option_action" model="ir.actions.act_window">
+        <field name="name">Options de ligne de commande</field>
+        <field name="res_model">of.order.line.option</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="of_sale_of_order_line_option_menu" name="Options de ligne de commande"
+              parent="sale.menu_sales_config" sequence="20" action="of_sale_of_order_line_option_action"
+              groups="of_sale.group_of_order_line_option"/>
+
+    <!-- Purchase Order Views -->
+
+    <record id="of_sale_purchase_order_form_view" model="ir.ui.view">
+        <field name="name">of.sale.purchase.order.form.view</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/tree/field[@name='name']" position="after">
+                <field name="of_order_line_option_id" groups="of_sale.group_of_order_line_option"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="after">
+                <field name="of_order_line_option_id" groups="of_sale.group_of_order_line_option"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

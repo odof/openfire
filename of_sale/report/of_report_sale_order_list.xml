@@ -1,0 +1,77 @@
+<odoo>
+
+<template id="of_report_saleorder_list">
+    <t t-call="report.html_container">
+    <div class="page">
+        <table class="table table-condensed" style="font-size: 12px;">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Numéro</th>
+                    <th>Client</th>
+                    <th>Ville</th>
+                    <th>État</th>
+                    <th class="text-right">HT</th>
+                    <th class="text-right">TTC</th>
+                </tr>
+            </thead>
+            <tbody class="sale_tbody">
+                <t t-foreach="docs" t-as="doc">
+                    <tr>
+                        <td>
+                            <span t-if="doc.state in ('sale', 'done')" t-field="doc.confirmation_date"
+                                t-options='{"widget": "date"}'/>
+                            <span t-if="doc.state not in ('sale', 'done')" t-field="doc.date_order"
+                                t-options='{"widget": "date"}'/>
+                        </td>
+                        <td><span t-field="doc.name"/></td>
+                        <td><span t-field="doc.partner_id"/> </td>
+                        <td><span t-field="doc.partner_id.city"/></td>
+                        <td><span t-field="doc.state"/> - <span t-field="doc.invoice_status"/></td>
+                        <td class="text-right">
+                            <span t-field="doc.amount_untaxed"
+                                t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
+                        </td>
+                        <td class="text-right">
+                            <span t-field="doc.amount_total"
+                                t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
+                        </td>
+                    </tr>
+                </t>
+                <tr>
+                    <td><strong>Total</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="text-right">
+                        <strong>
+                        <span t-esc="sum(docs.mapped('amount_untaxed'))"
+                            t-options='{"widget": "monetary", "display_currency": docs[0].pricelist_id.currency_id}'/>
+                        </strong>
+                    </td>
+                    <td class="text-right">
+                        <strong>
+                        <span t-esc="sum(docs.mapped('amount_total'))"
+                            t-options='{"widget": "monetary", "display_currency": docs[0].pricelist_id.currency_id}'/>
+                        </strong>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    </t>
+</template>
+
+<report
+    id="of_report_sale_order_list"
+    string="Liste des commandes"
+    model="sale.order"
+    report_type="qweb-pdf"
+    file="of_sale.of_report_saleorder_list"
+    name="of_sale.of_report_saleorder_list"
+    multi="True"
+    paperformat="of_base.paperformat_euro_internal"
+/>
+
+</odoo>
