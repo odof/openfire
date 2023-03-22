@@ -806,7 +806,7 @@ class OFWebsitePlanningBooking(http.Controller):
 
     @http.route(['/rdv/cancel/confirmation'], type='http', auth='user', website=True)
     def of_portal_cancel_rdv(self, canceled_rdv_id, **kw):
-        rdv = request.env['of.planning.intervention'].search([('id', '=', canceled_rdv_id)])
+        rdv = request.env['of.planning.intervention'].search([('id', '=', int(canceled_rdv_id))]).sudo()
         rdv.button_cancel()
         # Envoyer l'email de confirmation
         mail_template = request.env['ir.model.data'].sudo().get_object(

@@ -49,7 +49,7 @@ class WebsiteAccount(website_account):
     @http.route(['/my', '/my/home'], type='http', auth="user", website=True)
     def account(self, **kw):
         if kw.get('canceled_rdv_id'):
-            rdv = request.env['of.planning.intervention'].search([('id', '=', kw.get('canceled_rdv_id'))])
+            rdv = request.env['of.planning.intervention'].search([('id', '=', int(kw.get('canceled_rdv_id')))]).sudo()
             rdv.button_cancel()
             # Envoyer l'email de confirmation
             mail_template = request.env['ir.model.data'].sudo().get_object(
@@ -228,14 +228,15 @@ class WebsiteAccount(website_account):
             'user': request.env.user,
             'rdv': rdv,
             'date': date_formatted,
-            'can_cancel': date_limit < fields.Date.today(),
+            # 'can_cancel':  date_rdv < date_limit,
+            'can_cancel':  True,
             'duree': duree,
         }
         return request.render('of_website_portal.of_website_portal_website_rdv', values)
 
     @http.route(['/rdv/cancel'], type='http', auth='user', website=True)
     def of_portal_cancel_rdv(self, rdv_id, **kw):
-        rdv = request.env['of.planning.intervention'].browse(rdv_id)
+        rdv = request.env['of.planning.intervention'].browse(int(rdv_id))
         try:
             rdv.check_access_rights('read')
             rdv.check_access_rule('read')
