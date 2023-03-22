@@ -10,6 +10,25 @@
             <xpath expr="//form" position="inside">
                 <group name="rubrique_report" string="Factures PDF" invisible="1"/>
             </xpath>
+            <!-- Le choix d'autoriser un plan comptable est déplacé dans le formulaire de la société -->
+            <xpath expr="//field[@name='expects_chart_of_accounts']/.." position="attributes">
+                 <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Vue société form -->
+    <!-- Company form view (tab 'Localisation') -->
+    <record id="of_account_view_company_form" model="ir.ui.view">
+        <field name="name">of.account.res.company.form</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='parent_id']" position="before">
+                <field name="chart_template_id" invisible="1"/>
+                <field name="expects_chart_of_accounts" groups="of_base.of_group_root_only"
+                       attrs="{'invisible': [('chart_template_id','!=',False)]}"/>
+            </xpath>
         </field>
     </record>
 
