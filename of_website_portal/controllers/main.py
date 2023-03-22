@@ -214,7 +214,6 @@ class WebsiteAccount(website_account):
             date_formatted = fields.Datetime.from_string(rdv.date).strftime(lang.date_format)
         else:
             date_formatted = date_rdv
-        date_limit = (fields.Date.from_string(fields.Date.today()) - relativedelta(days=7)).strftime(lang.date_format)
         duree_seconds = datetime.timedelta(hours=rdv.duree).seconds
         duree_hours = duree_seconds / 3600
         duree_minutes = (duree_seconds % 3600) / 60
@@ -228,8 +227,8 @@ class WebsiteAccount(website_account):
             'user': request.env.user,
             'rdv': rdv,
             'date': date_formatted,
-            # 'can_cancel':  date_rdv < date_limit,
-            'can_cancel':  True,
+            'can_cancel':  rdv.can_cancel_from_website(),
+            # 'can_cancel':  True,
             'duree': duree,
         }
         return request.render('of_website_portal.of_website_portal_website_rdv', values)
