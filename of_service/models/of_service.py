@@ -602,7 +602,8 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
                 self.recurring_interval = self.tache_id.recurring_interval
             if self.tache_id.fiscal_position_id and not self.fiscal_position_id:
                 self.fiscal_position_id = self.tache_id.fiscal_position_id
-            if self.tache_id.product_id:
+            # ne pas créer de ligne si la tache a été affecté via le template
+            if self.tache_id.product_id and (not self.template_id or self.template_id.tache_id != self.tache_id):
                 new_line = self.env['of.service.line'].new({
                     'service_id': self.id,
                     'product_id': self.tache_id.product_id.id,

@@ -254,6 +254,22 @@ class OfPlanningInterventionTemplate(models.Model):
                 }
             template.sequence_id = self.env['ir.sequence'].sudo().create(sequence_data)
 
+    @api.onchange('tache_id')
+    def _onchange_tache_id(self):
+        self.ensure_one()
+        if self.tache_id:
+            if self.tache_id.fiscal_position_id and not self.fiscal_position_id:
+                self.fiscal_position_id = self.tache_id.fiscal_position_id
+            if self.tache_id.product_id:
+                new_line = self.env['of.planning.intervention.template.line'].new({
+                    'template_id': self.id,
+                    'product_id': self.tache_id.product_id.id,
+                    'qty': 1,
+                    'price_unit': self.tache_id.product_id.lst_price,
+                    'name': self.tache_id.product_id.name,
+                })
+                self.line_ids |= new_line
+
     @api.onchange('fi_default')
     def _onchange_ri_default(self):
         if self.fi_default:
