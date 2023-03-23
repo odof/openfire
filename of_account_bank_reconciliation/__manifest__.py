@@ -15,7 +15,6 @@ Permet le pointage des écritures bancaires.
     "website": "www.openfire.fr",
     "depends": [
         "account",
-        "of_base_multicompany",
     ],
     "data": [
         'views/of_account_bank_reconciliation_views.xml',
