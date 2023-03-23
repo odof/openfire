@@ -8,7 +8,7 @@
         <!--règle demandée-->
         <!--Si entité comptable (société) : voir rapprochements bancaires des sociétés / magasins enfants-->
         <!--Si entité non comptable (magasin) : voir rapprochements affectées à ma société comptable de rattachement-->
-        <field name="domain_force">['|',('company_id','=',False),('company_id',user.company_id.accounting_company_id.id == user.company_id.id and 'child_of' or 'in',[user.company_id.accounting_company_id.id])]</field>
+        <field name="domain_force">['|',('company_id','=',False), 'accounting_company_id' in user.company_id._fields and ('company_id',user.company_id.accounting_company_id.id == user.company_id.id and 'child_of' or 'in',[user.company_id.accounting_company_id.id]) or ('company_id', 'child_of', user.company_id.id)]</field>
     </record>
 
 </odoo>
