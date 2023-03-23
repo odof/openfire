@@ -1220,7 +1220,11 @@ class OfPlanningIntervention(models.Model):
                     change_fiscal_pos = True
             if tache_accounting.fiscal_position_id and (not self.fiscal_position_id or change_fiscal_pos):
                 self.fiscal_position_id = tache_accounting.fiscal_position_id
-            if self.tache_id.product_id:
+            # si le contexte contient of_import_service_lines,
+            # l'article de la tâche à déjà été ajouté comme ligne de facturation dans la DI.
+            # ne pas créer de ligne si la tache a été affecté via le template
+            if self.tache_id.product_id and not self._context.get('of_import_service_lines') and \
+                    (not self.template_id or self.template_id.tache_id != self.tache_id):
                 lines = self.line_ids
                 lines |= planning_line_obj.new({
                     'intervention_id': self.id,
