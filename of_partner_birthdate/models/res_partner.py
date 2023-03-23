@@ -1,10 +1,10 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import fields, models
+from odoo import fields, models, api
 
 
 class ResPartner(models.Model):
-    _inherit = "res.partner"
+    _inherit = 'res.partner'
 
     of_birthdate_short = fields.Char(
         string="Birthdate (MM-DD)", compute='_compute_of_birthdate_short', search='_search_of_birthdate_short',
@@ -14,6 +14,7 @@ class ResPartner(models.Model):
         for partner in self:
             partner.of_birthdate_short = partner.birthdate_date.strftime('%m-%d') if partner.birthdate_date else False
 
+    @api.model
     def _search_of_birthdate_short(self, operator, value):
         if operator == 'like':
             operator = 'ilike'

@@ -30,7 +30,7 @@ def arrondi_sup(val, mult):
 
 
 def distance_points(lat1, lon1, lat2, lon2):
-    u"""
+    """
     Retourne la distance entre deux points en Km, à vol d'oiseau
     @param: Coordonnées gps en degrés
     """
@@ -129,15 +129,15 @@ class BigInteger(fields.Integer):
 
 class OFMois(models.Model):
     _name = 'of.mois'
-    _description = u"Mois de l'année"
+    _description = "Mois de l'année"
     _order = 'id'
 
-    name = fields.Char('Mois', size=16)
-    abr = fields.Char(u'Abréviation', size=16)
-    numero = fields.Integer(string=u"Numéro", readonly=True)
+    name = fields.Char("Mois", size=16)
+    abr = fields.Char("Abréviation", size=16)
+    numero = fields.Integer(string="Numéro", readonly=True)
 
     _sql_constraints = [
-        ('numero_uniq', 'unique(numero)', u'Deux mois ne peuvent pas avoir le même numéro')
+        ('numero_uniq', 'unique(numero)', "Deux mois ne peuvent pas avoir le même numéro")
     ]
 
 
@@ -146,10 +146,10 @@ class OFJours(models.Model):
     _description = "Jours de la semaine"
     _order = 'id'
 
-    name = fields.Char('Jour', size=16)
-    abr = fields.Char(u'Abréviation', size=16)
-    numero = fields.Integer(string=u"Numéro", readonly=True)
+    name = fields.Char("Jour", size=16)
+    abr = fields.Char("Abréviation", size=16)
+    numero = fields.Integer(string="Numéro", readonly=True)
 
     _sql_constraints = [
-        ('numero_uniq', 'unique(numero)', u'Deux jours ne peuvent pas avoir le même numéro')
+        ('numero_uniq', 'unique(numero)', "Deux jours ne peuvent pas avoir le même numéro")
     ]

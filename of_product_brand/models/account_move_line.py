@@ -27,7 +27,7 @@ class AccountInvoiceLine(models.Model):
                 'product.product',
                 [self.product_id.id],
                 post_process=False)[self.product_id.id]
-            line_name += u'\n%s' % brand_desc
+            line_name += '\n%s' % brand_desc
         if self.product_id.brand_id.show_in_sales:
             # Ajout de la marque dans le descriptif de l'article
             brand_code = f'{self.product_id.brand_id.name} - '

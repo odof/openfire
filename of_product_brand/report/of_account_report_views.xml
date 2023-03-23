@@ -23,11 +23,11 @@
                         domain="[('invoice_date', '&gt;=', context_today().strftime('%Y-01-01')),
                                  ('invoice_date', '&lt;', (context_today() + relativedelta(day=1,years=1)).strftime('%Y-01-01'))]"/>
                 <filter string="Monthly accumulation" name="monthly_accumulation"
-                        domain="[('invoice_date', u'&gt;=', context_today().strftime('%Y-%m-01')),
-                                 ('invoice_date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                        domain="[('invoice_date', '&gt;=', context_today().strftime('%Y-%m-01')),
+                                 ('invoice_date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
                 <filter string="Yearly accumulation" name="yearly_accumulation"
-                        domain="[('invoice_date', u'&gt;=', context_today().strftime('%Y-01-01')),
-                                 ('invoice_date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                        domain="[('invoice_date', '&gt;=', context_today().strftime('%Y-01-01')),
+                                 ('invoice_date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
             </xpath>
         </field>
     </record>

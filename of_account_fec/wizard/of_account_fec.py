@@ -144,24 +144,24 @@ class OFAccountFrFec(models.TransientModel):
             return result
 
         header = [
-            u'JournalCode',    # 0
-            u'JournalLib',     # 1
-            u'EcritureNum',    # 2
-            u'EcritureDate',   # 3
-            u'CompteNum',      # 4
-            u'CompteLib',      # 5
-            u'CompAuxNum',     # 6  We use partner.id
-            u'CompAuxLib',     # 7
-            u'PieceRef',       # 8
-            u'PieceDate',      # 9
-            u'EcritureLib',    # 10
-            u'Debit',          # 11
-            u'Credit',         # 12
-            u'EcritureLet',    # 13
-            u'DateLet',        # 14
-            u'ValidDate',      # 15
-            u'Montantdevise',  # 16
-            u'Idevise',        # 17
+            'JournalCode',    # 0
+            'JournalLib',     # 1
+            'EcritureNum',    # 2
+            'EcritureDate',   # 3
+            'CompteNum',      # 4
+            'CompteLib',      # 5
+            'CompAuxNum',     # 6  We use partner.id
+            'CompAuxLib',     # 7
+            'PieceRef',       # 8
+            'PieceDate',      # 9
+            'EcritureLib',    # 10
+            'Debit',          # 11
+            'Credit',         # 12
+            'EcritureLet',    # 13
+            'DateLet',        # 14
+            'ValidDate',      # 15
+            'Montantdevise',  # 16
+            'Idevise',        # 17
         ]
         rows_to_write = [header]
 

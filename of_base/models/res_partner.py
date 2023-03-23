@@ -13,7 +13,7 @@ _logger = logging.getLogger(__name__)
 try:
     import phonenumbers
 except ImportError:
-    _logger.debug(u"Impossible d'importer la librairie Python 'phonenumbers'.")
+    _logger.debug("Impossible d'importer la librairie Python 'phonenumbers'.")
 
 PHONE_TYPES = [('01_domicile', "Home"),
                ('02_bureau', "Office"),
@@ -73,7 +73,7 @@ def convert_phone_number(value, default_country_code=None, new_format='e164', st
                 }
     except phonenumbers.phonenumberutil.NumberParseException:
         _logger.error(
-            u"Impossible de formater le numéro de téléphone '%s' au format international avec le code pays '%s'",
+            "Impossible de formater le numéro de téléphone '%s' au format international avec le code pays '%s'",
             value, default_country_code)
     return result
 

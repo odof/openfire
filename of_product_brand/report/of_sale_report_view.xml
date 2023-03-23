@@ -24,11 +24,11 @@
                         domain="[('date', '&gt;=', context_today().strftime('%Y-01-01')),
                                  ('date', '&lt;', (context_today() + relativedelta(day=1,years=1)).strftime('%Y-01-01'))]"/>
                 <filter string="Monthly accumulation" name="monthly_accumulation"
-                        domain="[('date', u'&gt;=', context_today().strftime('%Y-%m-01')),
-                                 ('date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                        domain="[('date', '&gt;=', context_today().strftime('%Y-%m-01')),
+                                 ('date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
                 <filter string="Yearly accumulation" name="yearly_accumulation"
-                        domain="[('date', u'&gt;=', context_today().strftime('%Y-01-01')),
-                                 ('date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                        domain="[('date', '&gt;=', context_today().strftime('%Y-01-01')),
+                                 ('date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
                 <separator/>
             </xpath>
         </field>

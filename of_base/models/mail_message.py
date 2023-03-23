@@ -16,9 +16,9 @@ class MailMessage(models.Model):
         ('received', 'Received'),
         ('exception', 'Delivery Failed'),
         ('cancel', 'Cancelled'),
-    ], string=u"Status", compute='_compute_of_state', search='_search_of_state')
+    ], string="Status", compute='_compute_of_state', search='_search_of_state')
     of_failure_reason = fields.Text(
-        string=u"Failure Reason", compute='_compute_of_state',
+        string="Failure Reason", compute='_compute_of_state',
         help="Failure reason. This is usually the exception thrown by the email server, "
              "stored to ease the debugging of mailing issues.")
 

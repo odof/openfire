@@ -10,7 +10,7 @@ class OFResPartnerCheckDuplications(models.TransientModel):
     def default_get(self, fields_list):
         result = super(OFResPartnerCheckDuplications, self).default_get(fields_list)
         if 'duplication_ids' in result:
-            info_txt = u""
+            info_txt = ""
             duplications = self.env['res.partner'].sudo().browse(result['duplication_ids'][0][2])
             for partner in duplications:
                 forbidden_access = False
@@ -25,7 +25,7 @@ class OFResPartnerCheckDuplications(models.TransientModel):
                         info_txt += \
                             "Potential duplicates exist but you do not have sufficient rights to view them." \
                             "Please contact your manager about this:\n"
-                    info_txt += u"- %s\n" % partner.sudo().name
+                    info_txt += "- %s\n" % partner.sudo().name
             result['duplication_ids'] = duplications.ids
             result['info_txt'] = info_txt
             result['display_list'] = bool(duplications)

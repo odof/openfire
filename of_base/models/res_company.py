@@ -37,7 +37,7 @@ class ResCompany(models.Model):
 
     @api.model
     def get_company_filter_ids(self):
-        u"""
+        """
         Cette fonction renvois les informations nécessaires à l'utilisation du bouton de filtrage par société.
         Ce bouton est présent dans les vues calendrier et planning du module of_planning_view.
         Ainsi que le tableau de bord du module ks_dashboard_ninja.
