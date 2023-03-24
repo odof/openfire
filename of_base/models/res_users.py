@@ -1,5 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import re
+
 from unidecode import unidecode
 
 from odoo import SUPERUSER_ID, _, api, fields, models, tools
@@ -8,7 +10,7 @@ from odoo.tools import frozendict
 
 
 class ResUsers(models.Model):
-    _inherit = "res.users"
+    _inherit = 'res.users'
 
     @api.model
     def _default_of_type_selection(self):
@@ -34,7 +36,7 @@ class ResUsers(models.Model):
 
     def _get_default_email(self):
         self.ensure_one()
-        return unidecode(self.partner_id.name).lower().replace(" ", "") + "@example.com"
+        return re.sub('[^a-zA-Z0-9._%+-]', '', unidecode(self.partner_id.name)).lower() + "@example.com"
 
     def write(self, values):
         if SUPERUSER_ID in self._ids and self._uid != SUPERUSER_ID:
