@@ -155,6 +155,7 @@ class SaleReport(models.Model):
             display_margin_percent = depends_mapping_margin.get('of_margin_percentage')
             if all(f'{val}:sum' in fields for val in display_margin_percent):
                 for entry in res:
-                    entry[display_margin_percent[0]] = \
-                        entry[display_margin_percent[1]] * 100 / (entry[display_margin_percent[2]] or 1)
+                    if entry[display_margin_percent[1]] is not None and entry[display_margin_percent[2]] is not None:
+                        entry[display_margin_percent[0]] = \
+                            entry[display_margin_percent[1]] * 100 / (entry[display_margin_percent[2]] or 1)
         return res
