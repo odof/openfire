@@ -153,7 +153,7 @@ class SaleReport(models.Model):
                     period_prec = period
 
             display_margin_percent = depends_mapping_margin.get('of_margin_percentage')
-            if all(val in fields for val in display_margin_percent):
+            if all(f'{val}:sum' in fields for val in display_margin_percent):
                 for entry in res:
                     entry[display_margin_percent[0]] = \
                         entry[display_margin_percent[1]] * 100 / (entry[display_margin_percent[2]] or 1)
