@@ -30,12 +30,15 @@ class ProductTemplate(models.Model):
         self.brand_id.update_products_default_code(products=self, remove_previous_prefix=self.of_previous_brand_id.code)
 
         # Création de la relation fournisseur
-        if self.brand_id and not self.seller_ids:
-            seller_data = {
-                'partner_id': self.brand_id.partner_id.id,
-            }
-            seller_data = self.env['product.supplierinfo']._add_missing_default_values(seller_data)
-            self.seller_ids = [(0, 0, seller_data)]
+        if self.brand_id:
+            if not self.seller_ids:
+                seller_data = {
+                    'partner_id': self.brand_id.partner_id.id,
+                }
+                seller_data = self.env['product.supplierinfo']._add_missing_default_values(seller_data)
+                self.seller_ids = [(0, 0, seller_data)]
+            elif len(self.seller_ids) == 1:
+                self.seller_ids.partner_id = self.brand_id.partner_id
 
     @api.onchange('default_code')
     def _onchange_default_code(self):
