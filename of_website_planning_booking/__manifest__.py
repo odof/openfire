@@ -30,6 +30,7 @@ Fonctionnalités additionnelles :
         'security/of_website_planning_booking_security.xml',
         'views/of_website_planning_booking_views.xml',
         'views/of_website_planning_booking_templates.xml',
+        'views/res_config_settings_views.xml',
         'wizards/of_horaire_wizard_views.xml',
     ],
     'qweb': [
