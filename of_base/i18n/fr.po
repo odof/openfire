@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-27 15:54+0000\n"
-"PO-Revision-Date: 2023-01-27 15:54+0000\n"
+"POT-Creation-Date: 2023-03-24 09:32+0000\n"
+"PO-Revision-Date: 2023-03-24 09:32+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -367,7 +367,7 @@ msgstr ""
 
 #. module: of_base
 #. odoo-python
-#: code:addons/of_base/models/base.py:0
+#: code:addons/of_base/hooks.py:0
 #, python-format
 msgid ""
 "Changing the company of a contact should only be done if it was never "
@@ -393,6 +393,11 @@ msgstr "Civilité du numéro"
 #: code:addons/of_base/static/src/js/of_form.js:0
 #, python-format
 msgid "Close"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
+msgid "Communication"
 msgstr ""
 
 #. module: of_base
@@ -434,7 +439,7 @@ msgstr "Contenu calculé"
 #. module: of_base
 #: model:ir.model,name:of_base.model_res_config_settings
 msgid "Config Settings"
-msgstr "Paramètres de config"
+msgstr "Paramètres de configuration"
 
 #. module: of_base
 #: model:ir.ui.menu,name:of_base.of_connector_config_settings_menu
@@ -447,6 +452,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:of_base.of_connector_config_settings_view
 msgid "Configure connectors"
 msgstr "Configurer les connecteurs"
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.view_users_form
+msgid "Connections"
+msgstr "Connexions"
 
 #. module: of_base
 #: model:ir.ui.menu,name:of_base.of_connector_menu
@@ -1720,6 +1730,11 @@ msgid "Provide a double validation mechanism for purchases"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model,name:of_base.model_publisher_warranty_contract
+msgid "Publisher Warranty Contract"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_purchase_requisition
 msgid "Purchase Agreements"
 msgstr ""
@@ -2279,7 +2294,7 @@ msgstr ""
 
 #. module: of_base
 #. odoo-python
-#: code:addons/of_base/models/base.py:0
+#: code:addons/of_base/hooks.py:0
 #: model:ir.model.fields.selection,name:of_base.selection__of_log_message__log_level__warning
 #, python-format
 msgid "Warning"
@@ -2325,13 +2340,6 @@ msgstr ""
 #: code:addons/of_base/models/ir_module.py:0
 #, python-format
 msgid "You are trying to delete one or more protected modules : %s"
-msgstr "Vous tentez de supprimer un ou plusieurs modules protégés : %s"
-
-#. module: of_base
-#. odoo-python
-#: code:addons/of_base/models/module.py:0
-#, python-format
-msgid "You are trying to remove one or more protected modules: %s"
 msgstr "Vous tentez de supprimer un ou plusieurs modules protégés : %s"
 
 #. module: of_base
