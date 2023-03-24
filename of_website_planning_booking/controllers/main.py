@@ -269,8 +269,8 @@ class OFWebsitePlanningBooking(http.Controller):
         values['product_category'] = 'product_category_id' in values and values['product_category_id'] != '' and \
                                      request.env['product.category'].browse(int(values['product_category_id'])) or \
                                      parc_installe.product_category_id
-        other_brand_id = request.env['ir.values'].sudo().get_default(
-            'of.intervention.settings', 'website_booking_default_product_brand_id')
+        other_brand_id = request.env['ir.values'].sudo().with_context(force_company=request.env.user.company_id.id)\
+            .get_default('of.intervention.settings', 'website_booking_default_product_brand_id')
         values['brand'] = 'brand_id' in values and values['brand_id'] != '' and values['brand_id'] != 'Autre marque' \
                           and request.env['of.product.brand'].browse(int(values['brand_id'])) or parc_installe.brand_id
         values['brand_id'] = values.get('brand_id') or parc_installe.brand_id.id == other_brand_id and 'Autre marque'
@@ -523,8 +523,8 @@ class OFWebsitePlanningBooking(http.Controller):
                     error['date_recherche_debut'] = True
                     error_message.append(u"La date de début de recherche doit être future.")
                 # La date de début doit être inférieur au paramètre de configuration
-                max_days = request.env['ir.values'].sudo().get_default(
-                    'of.intervention.settings', 'website_booking_open_days_number')
+                max_days = request.env['ir.values'].sudo().with_context(force_company=request.env.user.company_id.id)\
+                    .get_default('of.intervention.settings', 'website_booking_open_days_number')
                 max_search_date = fields.Date.from_string(fields.Date.today()) + timedelta(days=max_days)
                 if search_date > max_search_date:
                     error['date_recherche_debut'] = True
@@ -609,7 +609,8 @@ class OFWebsitePlanningBooking(http.Controller):
         values['step_number'] = STEP_NAME_NUMBER.get(current_step, 'new')
 
         # Recherche de créneaux
-        mode = request.env['ir.values'].sudo().get_default('of.intervention.settings', 'website_booking_slot_size')
+        mode = request.env['ir.values'].sudo().with_context(force_company=request.env.user.company_id.id)\
+            .get_default('of.intervention.settings', 'website_booking_slot_size')
         compute = ''
 
         # Wizard de recherche
@@ -657,8 +658,8 @@ class OFWebsitePlanningBooking(http.Controller):
             address = request.env['res.partner'].browse(request.session.get('rdv_site_adresse_id'))
 
             # Nombre de jours max ouverts à la réservation
-            max_days = request.env['ir.values'].sudo().get_default(
-                'of.intervention.settings', 'website_booking_open_days_number')
+            max_days = request.env['ir.values'].sudo().with_context(force_company=request.env.user.company_id.id)\
+                .get_default('of.intervention.settings', 'website_booking_open_days_number')
             max_search_date = fields.Date.from_string(request.session.get('rdv_date_recherche_debut')) + \
                 timedelta(days=max_days)
             max_search_date = fields.Date.to_string(max_search_date)
@@ -838,8 +839,8 @@ class OFWebsitePlanningBooking(http.Controller):
 
         # Marque extérieur
         if request.params['brand_id'] == 'Autre marque':
-            vals['brand_id'] = request.env['ir.values'].sudo().get_default(
-                'of.intervention.settings', 'website_booking_default_product_brand_id')
+            vals['brand_id'] = request.env['ir.values'].sudo().with_context(force_company=request.env.user.company_id.id)\
+                .get_default('of.intervention.settings', 'website_booking_default_product_brand_id')
             vals['note'] = u"Marque : %s" % request.params['extra_brand']
 
         vals['product_id'] = request.env.ref(
@@ -897,8 +898,8 @@ class OFWebsitePlanningBooking(http.Controller):
         parc_brand = parc_installe.brand_id
         param_brand_id = params.get('brand_id') and params['brand_id'] != 'Autre marque' and int(params['brand_id'])
         if params.get('brand_id') == 'Autre marque':
-            param_brand_id = request.env['ir.values'].sudo().get_default(
-                'of.intervention.settings', 'website_booking_default_product_brand_id')
+            param_brand_id = request.env['ir.values'].sudo().with_context(force_company=request.env.user.company_id.id)\
+                .get_default('of.intervention.settings', 'website_booking_default_product_brand_id')
         if param_brand_id and (not parc_brand or parc_brand.id != param_brand_id):
             update_vals['brand_id'] = param_brand_id
         if params.get('extra_brand') and params['extra_brand'] != parc_installe.website_extra_brand:
