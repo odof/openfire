@@ -96,6 +96,9 @@ class OFAccountFrFec(models.TransientModel):
             '''
 
         company = self.env.company
+        while not company.chart_template_id and company.parent_id:
+            company = company.parent_id
+
         formatted_date_from = fields.Date.to_string(self.date_from).replace('-', '')
         args = (
             self.of_opening_journal_code,
@@ -132,6 +135,8 @@ class OFAccountFrFec(models.TransientModel):
             raise UserError(_('The start date must be inferior to the end date.'))
 
         company = self.env.company
+        while not company.chart_template_id and company.parent_id:
+            company = company.parent_id
         company_legal_data = self._get_company_legal_data(company)
 
         if self.export_type == 'official':  # use parent function instead
