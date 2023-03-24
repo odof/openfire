@@ -11,7 +11,7 @@ class OfProductBrand(models.Model):
 
     active = fields.Boolean(string="Active", default=True)
     name = fields.Char(string="Name", required=True)
-    code = fields.Char(string="Code", required=True, oldname='prefix')
+    code = fields.Char(string="Code", required=True)
     use_prefix = fields.Boolean(
         string="Use code as prefix", default=True,
         help="The products internal references will be prefixed with the brand code")
@@ -27,6 +27,8 @@ class OfProductBrand(models.Model):
     logo = fields.Binary(string="Logo")
     product_count = fields.Integer(
         string="# Products", compute='_compute_product_count', help="The number of products of this brand")
+    price_date = fields.Date(
+        compute='_compute_price_date', store=True, help="Last price date of this brand's products.")
     note = fields.Text(string="Notes")
     product_change_warn = fields.Boolean(compute='_compute_product_change_warn')
     show_in_sales = fields.Boolean(
@@ -44,6 +46,14 @@ class OfProductBrand(models.Model):
         }
         for categ in self:
             categ.product_count = group_data.get(categ.id, 0)
+
+    @api.depends('product_ids.of_cost_date')
+    def _compute_price_date(self):
+        product_obj = self.env['product.template']
+        for brand in self:
+            product = product_obj.search(
+                [('brand_id', '=', brand.id), ('of_cost_date', '!=', False)], order='of_cost_date desc', limit=1)
+            brand.price_date = product.of_cost_date if product else False
 
     @api.depends('code', 'use_prefix')
     def _compute_product_change_warn(self):

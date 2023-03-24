@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-13 14:52+0000\n"
-"PO-Revision-Date: 2023-01-13 14:52+0000\n"
+"POT-Creation-Date: 2023-03-24 15:34+0000\n"
+"PO-Revision-Date: 2023-03-24 15:34+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -198,6 +198,11 @@ msgid "Last Updated on"
 msgstr ""
 
 #. module: of_product_brand
+#: model:ir.model.fields,help:of_product_brand.field_of_product_brand__price_date
+msgid "Last price date of this brand's products."
+msgstr "Dernière date de tarif des articles de la marque."
+
+#. module: of_product_brand
 #: model:ir.actions.act_window,name:of_product_brand.action_of_product_brand_add_products
 msgid "Link products"
 msgstr "Associer des articles"
@@ -266,6 +271,11 @@ msgid "Previous month"
 msgstr "Mois précédent"
 
 #. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__price_date
+msgid "Price Date"
+msgstr "Date du tarif"
+
+#. module: of_product_brand
 #: model:ir.model,name:of_product_brand.model_product_template
 msgid "Product"
 msgstr "Modèle d'article"
@@ -281,6 +291,7 @@ msgid "Product Variant"
 msgstr "Variante d'article"
 
 #. module: of_product_brand
+#: model:ir.model,name:of_product_brand.model_of_product_brand
 #: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_form
 #: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_tree
 msgid "Product brand"
@@ -323,7 +334,7 @@ msgstr "Rapport d'analyse des ventes"
 #. module: of_product_brand
 #: model:ir.model,name:of_product_brand.model_sale_order_line
 msgid "Sales Order Line"
-msgstr "Ligne de bons de commande"
+msgstr "Ligne de commande"
 
 #. module: of_product_brand
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__show_in_sales
@@ -384,7 +395,6 @@ msgstr "Année en cours"
 
 #. module: of_product_brand
 #. odoo-python
-#: code:addons/of_product_brand/report/of_account_report.py:0
 #: code:addons/of_product_brand/report/of_sale_report.py:0
 #, python-format
 msgid "Unsupported search operator"
@@ -417,11 +427,6 @@ msgstr "Fournisseurs"
 #: model_terms:ir.ui.view,arch_db:of_product_brand.of_sale_view_order_product_search
 msgid "Yearly accumulation"
 msgstr "Cumul à date - Annuel"
-
-#. module: of_product_brand
-#: model:ir.model,name:of_product_brand.model_of_product_brand
-msgid "of.product.brand"
-msgstr ""
 
 #. module: of_product_brand
 #: model:ir.model,name:of_product_brand.model_of_product_brand_add_products
