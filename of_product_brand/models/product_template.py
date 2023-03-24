@@ -6,17 +6,20 @@ from odoo import _, api, fields, models
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
+    @api.model
+    def _default_brand_id(self):
+        return self.env.ref('of_product_brand.main_brand', raise_if_not_found=False)
+
     brand_id = fields.Many2one(
-        comodel_name='of.product.brand', string="Brand", required=True, index=True,
+        comodel_name='of.product.brand',
+        string="Brand",
+        compute='_compute_brand_id',
+        store=True, readonly=False, required=True, index=True,
         default=lambda s: s._default_brand_id())
     of_seller_partner_id = fields.Many2one(related='seller_ids.partner_id')
     of_previous_brand_id = fields.Many2one(comodel_name='of.product.brand', compute='_compute_of_previous_brand_id')
     seller_ids = fields.One2many(
         comodel_name='product.supplierinfo', inverse_name='product_tmpl_id', string="Vendors", copy=True)
-
-    @api.model
-    def _default_brand_id(self):
-        return self.env.ref('of_product_brand.main_brand', raise_if_not_found=False)
 
     # dependancy on default_code to prevent recomputing it before _onchange_brand_id call
     @api.depends('default_code')
@@ -40,17 +43,19 @@ class ProductTemplate(models.Model):
             elif len(self.seller_ids) == 1:
                 self.seller_ids.partner_id = self.brand_id.partner_id
 
-    @api.onchange('default_code')
-    def _onchange_default_code(self):
-        if self.default_code:
-            ind = self.default_code.find('_')
-            code = self.default_code[:ind]
-            brand = self.env['of.product.brand'].search([('code', '=', code)], limit=1)
-            if brand:
-                if brand != self.brand_id:
-                    self.brand_id = brand
-            elif self.brand_id.use_prefix:
-                self.brand_id = False
+    @api.depends('default_code')
+    def _compute_brand_id(self):
+        for product in self:
+            if product.default_code:
+                ind = product.default_code.find('_')
+                code = product.default_code[:ind]
+                brand = self.env['of.product.brand'].search([('code', '=', code)], limit=1)
+                if brand:
+                    if brand != product.brand_id:
+                        product.brand_id = brand
+                elif product.brand_id.use_prefix:
+                    # Empty the brand if the product code doesn't match the current brand code
+                    product.brand_id = False
 
     @api.model
     def of_name_search_extract_brands(self, name):
