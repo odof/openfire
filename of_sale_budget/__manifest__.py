@@ -33,6 +33,7 @@ Module OpenFire / Ventes / Budget
         'security/ir.model.access.csv',
         'data/of_sale_budget_data.xml',
         'views/of_sale_budget_views.xml',
+        'wizards/of_sale_order_gestion_prix_views.xml',
     ],
     'installable': True,
     'application': False,

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_order_gestion_prix_view_form" model="ir.ui.view">
+        <field name="name">of.sale.order.gestion.prix.view.form</field>
+        <field name="model">of.sale.order.gestion.prix</field>
+        <field name="inherit_id" ref="of_sale_quote_template.of_view_sale_order_gestion_prix"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='line_ids']//field[@name='order_line_id']" position="after">
+                <field name="duration"/>
+                <field name="hour_worksite_id"/>
+            </xpath>
+            <xpath expr="//field[@name='layout_category_ids']//field[@name='cost']" position="replace">
+                <field name="cost" invisible="1"/>
+                <field name="cost_purchase"/>
+                <field name="cost_subcontracted_service"/>
+                <field name="duration"/>
+                <field name="labor_cost"/>
+            </xpath>
+            <xpath expr="//field[@name='layout_category_ids']//field[@name='margin']" position="replace">
+                <field name="budget_margin" string="Marge HT"/>
+            </xpath>
+            <xpath expr="//field[@name='layout_category_ids']//field[@name='pc_margin']" position="replace">
+                <field name="budget_margin_pc" string="% Marge"/>
+            </xpath>
+
+            <xpath expr="//field[@name='marge_initiale']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('of_client_view', '=', True), ('calculation_basis', '!=', 'order_line')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='marge_simul']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('of_client_view', '=', True), ('calculation_basis', '!=', 'order_line')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='pc_marge_initiale']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('of_client_view', '=', True), ('calculation_basis', '!=', 'order_line')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='pc_marge_simul']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('of_client_view', '=', True), ('calculation_basis', '!=', 'order_line')]}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='marge_simul']" position="after">
+                <field name="budget_init_margin" string="Marge initiale" groups="of_sale.of_group_sale_marge_manager"
+                       attrs="{'invisible': ['|', ('of_client_view', '=', True), ('calculation_basis', '!=', 'layout_category')]}"/>
+                <field name="budget_simu_margin" string="Marge simulée" groups="of_sale.of_group_sale_marge_manager"
+                       attrs="{'invisible': ['|', ('of_client_view', '=', True), ('calculation_basis', '!=', 'layout_category')]}"/>
+            </xpath>
+            <xpath expr="//field[@name='pc_marge_simul']" position="after">
+                <field name="budget_init_margin_pc" string="% Marge initial" groups="of_sale.of_group_sale_marge_manager"
+                       attrs="{'invisible': ['|', ('of_client_view', '=', True), ('calculation_basis', '!=', 'layout_category')]}"/>
+                <field name="budget_simu_margin_pc" string="% Marge simulé" groups="of_sale.of_group_sale_marge_manager"
+                       attrs="{'invisible': ['|', ('of_client_view', '=', True), ('calculation_basis', '!=', 'layout_category')]}"/>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>
