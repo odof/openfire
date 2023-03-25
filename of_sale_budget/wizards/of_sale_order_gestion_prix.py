@@ -9,9 +9,33 @@ class GestionPrix(models.TransientModel):
 
     cost_prorata = fields.Selection(selection_add=[('total_cost', u"Coût total")])
 
+    budget_init_margin = fields.Float(string=u"Marge initiale (budget)", compute='_compute_budget_margin')
+    budget_init_margin_pc = fields.Float(string=u"% Marge initial (budget)", compute='_compute_budget_margin')
+    budget_simu_margin = fields.Float(string=u"Marge simulée (budget)", compute='_compute_budget_margin')
+    budget_simu_margin_pc = fields.Float(string=u"% Marge simulé (budget)", compute='_compute_budget_margin')
+
+    @api.depends(
+        'layout_category_ids', 'layout_category_ids.cost', 'layout_category_ids.labor_cost', 'montant_total_ht_initial',
+        'montant_total_ht_simul')
+    def _compute_budget_margin(self):
+        for wizard in self:
+            categs = wizard.layout_category_ids
+            total_cost = sum(categs.mapped(lambda c: c.cost + c.labor_cost))
+            init_sell_price = wizard.montant_total_ht_initial
+            simu_sell_price = wizard.montant_total_ht_simul
+
+            wizard.budget_init_margin = init_sell_price - total_cost
+            wizard.budget_init_margin_pc = 100 * (1 - total_cost / init_sell_price) if init_sell_price else - total_cost
+            wizard.budget_simu_margin = simu_sell_price - total_cost
+            wizard.budget_simu_margin_pc = 100 * (1 - total_cost / simu_sell_price) if simu_sell_price else - total_cost
+
 
 class GestionPrixLine(models.TransientModel):
     _inherit = 'of.sale.order.gestion.prix.line'
+
+    duration = fields.Float(related='order_line_id.of_duration', string=u"Nombre d'heures", readonly=True)
+    hour_worksite_id = fields.Many2one(
+        related='order_line_id.of_hour_worksite_id', string=u"Type d'heures", readonly=True)
 
     def get_base_amount(self, order_line, cost_prorata, all_zero):
         """
@@ -26,3 +50,42 @@ class GestionPrixLine(models.TransientModel):
                 if order_line.product_uom_qty and order_line.of_total_labor_cost else 1.0
         else:
             return super(GestionPrixLine, self).get_base_amount(order_line, cost_prorata, all_zero)
+
+
+class GestionPrixLayoutCategory(models.TransientModel):
+    _inherit = 'of.sale.order.gestion.prix.layout.category'
+
+    duration = fields.Float(string=u"Nombre d'heures", compute='_compute_duration')
+    cost_purchase = fields.Float(string=u"Coût achats", compute='_compute_price')
+    cost_subcontracted_service = fields.Float(string=u"Coût sous-traitance", compute='_compute_price')
+    labor_cost = fields.Float(string=u"Coût main d'oeuvre", compute='_compute_price')
+
+    budget_margin = fields.Float(string=u"Marge HT (budget)", compute='_compute_budget_margin')
+    budget_margin_pc = fields.Float(string=u"% Marge (budget)", compute='_compute_budget_margin')
+
+    @api.depends('line_ids')
+    def _compute_duration(self):
+        for categ in self:
+            order_lines = categ.line_ids.mapped('order_line_id')
+            categ.duration = sum(order_lines.mapped('of_duration'))
+
+    @api.depends('line_ids')
+    def _compute_price(self):
+        super(GestionPrixLayoutCategory, self)._compute_price()
+        for categ in self:
+            order_lines = categ.line_ids.mapped('order_line_id')
+            standard_lines = order_lines.filtered(lambda l: not l.of_subcontracted_service)
+            subcontracted_service_lines = order_lines.filtered(lambda l: l.of_subcontracted_service)
+            categ.cost_purchase = sum(standard_lines.mapped(lambda l: l.product_uom_qty * l.purchase_price))
+            categ.cost_subcontracted_service = sum(
+                subcontracted_service_lines.mapped(lambda l: l.product_uom_qty * l.purchase_price))
+            categ.labor_cost = sum(order_lines.mapped('of_labor_cost'))
+
+    @api.depends('cost', 'labor_cost', 'simulated_price_subtotal')
+    def _compute_budget_margin(self):
+        for line in self:
+            buy_price = line.cost + line.labor_cost
+            sell_price = line.simulated_price_subtotal
+
+            line.budget_margin = sell_price - buy_price
+            line.budget_margin_pc = 100 * (1 - buy_price / sell_price) if sell_price else - buy_price
