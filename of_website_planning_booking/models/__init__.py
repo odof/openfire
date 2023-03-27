@@ -8,3 +8,4 @@ from . import website
 from . import tour
 from . import of_horaire
 from . import res_users
+from . import of_service

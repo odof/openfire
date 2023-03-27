@@ -13,8 +13,8 @@ class ResUsers(models.Model):
         module_self = self.env['ir.module.module'].search(
             [('name', '=', 'of_website_portal'), ('state', 'in', ['installed', 'to upgrade'])])
         actions_todo = module_self and module_self.latest_version < '10.0.2.1.0' or False
+        cr = self._cr
         if actions_todo:
-            cr = self._cr
             # On désactive les profils utilisateurs portail
             cr.execute("""
                 UPDATE  res_users ru
@@ -63,13 +63,36 @@ class ResUsers(models.Model):
                 AND         imd2.model = 'ir.model.fields'
                 AND         ((imd2.module = 'of_website_portal' AND imd2.name IN ('field_res_users_of_tab_ids', 'field_res_users_of_pricelist_id', 'field_res_users_of_fiscal_position_id'))
                 OR          (imd2.module = 'base' AND imd2.name IN ('field_res_users_groups_id'))); """)
+        # Ajouter les onglets RDV et CE pour tous les utilisateurs
+        if module_self and module_self.latest_version < '10.0.2.2.0':
+            cr.execute("""
+            INSERT INTO res_users_of_tab_rel (user_id, tab_id)
+            SELECT      ru.id, ot.id
+            FROM        res_users ru,
+                        of_tab ot,
+                        ir_model_data imd
+            WHERE       ot.id = imd.res_id
+            AND         imd.model = 'of.tab'
+            AND         imd.module = 'of_website_portal'
+            AND         imd.name IN ('of_tab_intervention', 'of_tab_contract')
+            ON CONFLICT DO NOTHING
+            """)
         return res
 
     of_pricelist_id = fields.Many2one(comodel_name='product.pricelist', string=u"Liste de prix par défaut")
     of_fiscal_position_id = fields.Many2one(
         comodel_name='account.fiscal.position', string=u"Position fiscale par défaut")
     of_tab_ids = fields.Many2many(
-        comodel_name='of.tab', relation='res_users_of_tab_rel', column1='user_id', column2='tab_id', string="Onglets")
+        comodel_name='of.tab', relation='res_users_of_tab_rel', column1='user_id', column2='tab_id', string="Onglets",
+        default=lambda r: r._get_default_tab_ids())
+
+    @api.model
+    def _get_default_tab_ids(self):
+        tabs = [
+            self.env.ref('of_website_portal.of_tab_contract', raise_if_not_found=False),
+            self.env.ref('of_website_portal.of_tab_intervention', raise_if_not_found=False),
+        ]
+        return [(4, tab.id) for tab in tabs if tab]
 
     @api.model
     def deactivate_portal_users(self):
