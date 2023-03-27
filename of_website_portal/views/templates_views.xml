@@ -252,7 +252,7 @@
                                                     <th>Date</th>
                                                     <th>Durée</th>
                                                     <th>Statut</th>
-                                                    <th>Annulation</th>
+                                                    <th style="text-align: center;">Actions</th>
                                                 </tr>
                                             </thead>
                                             <t t-foreach="rdvs.sorted(key='date', reverse=True)" t-as="rdv">
@@ -283,16 +283,14 @@
                                                         <span t-field="rdv.state"/>
                                                     </td>
                                                     <td>
-                                                        <t t-if="rdv.can_cancel_from_website()">
-                                                            <form action="/rdv/cancel" method="post" enctype="multipart/form-data">
-                                                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                                                                <input type="hidden" name="rdv_id" t-att-value="rdv.id"/>
-                                                                <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading" style="margin-top: 10px;">Annuler le RDV</button>
-                                                            </form>
-                                                        </t>
-                                                        <t t-else="">
-                                                            <span>Annulation impossible depuis le site web.</span>
-                                                        </t>
+                                                        <form action="/rdv/cancel" method="post" enctype="multipart/form-data" name="rdv_cancelable"
+                                                              t-att-class="rdv.can_edit_from_website() and 'btn' or 'btn of-no-click'"
+                                                              style="padding-right: 10px;padding-left: 10px;padding-top: 0px">
+                                                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                                            <input type="hidden" name="rdv_id" t-att-value="rdv.id"/>
+                                                            <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading fa fa-fg fa-close"
+                                                                    t-att-style="rdv.can_edit_from_website() and 'font-size: 20px;' or 'font-size: 20px;background-color: gray'"/>
+                                                        </form>
                                                     </td>
                                                 </tr>
                                             </t>
@@ -372,13 +370,16 @@
                                     </div>
                                 </div>
                             </div>
-                             <t t-if="rdv.can_cancel_from_website()">
-                                <form action="/rdv/cancel" method="post" enctype="multipart/form-data">
+                            <div class="mt32 mb64" style="text-align: center !important;">
+                                <form action="/rdv/cancel" method="post" enctype="multipart/form-data" name="rdv_cancelable"
+                                      t-att-class="rdv.can_edit_from_website() and 'btn' or 'btn of-no-click'"
+                                      style="padding-right: 10px;padding-left: 10px;">
                                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                                     <input type="hidden" name="rdv_id" t-att-value="rdv.id"/>
-                                    <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading" style="margin-top: 10px;">Annuler l'intervention</button>
+                                    <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading"
+                                            t-att-style="rdv.can_edit_from_website() and 'margin-top: 10px;' or 'margin-top: 10px;background-color: gray'">Annuler</button>
                                 </form>
-                            </t>
+                            </div>
                             <div class="oe_structure" />
                         </div>
                     </div>

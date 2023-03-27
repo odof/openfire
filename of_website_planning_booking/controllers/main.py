@@ -495,6 +495,22 @@ class OFWebsitePlanningBooking(http.Controller):
                 request.session['booking_parc_installe_id'] = service.parc_installe_id.id
             if service.address_id:
                 request.session['rdv_site_adresse_id'] =  service.address_id.id
+        if kw.get('rdv_id'):
+            rdv = request.env['of.planning.intervention'].browse(int(kw.get('rdv_id')))
+            try:
+                rdv.check_access_rights('read')
+                rdv.check_access_rule('read')
+            except AccessError:
+                return request.render("website.403")
+            request.session['rdv_service_id'] = rdv.service_id.id
+            request.session['rdv_tache_id'] = rdv.tache_id.id
+            request.session['booking_partner_id'] = rdv.partner_id.id
+            request.session['rdv_id'] = rdv.id
+            request.session['rdv_date_recherche_debut'] = rdv.date_date
+            if rdv.parc_installe_id:
+                request.session['booking_parc_installe_id'] = rdv.parc_installe_id.id
+            if rdv.address_id:
+                request.session['rdv_site_adresse_id'] =  rdv.address_id.id
 
         # Retour en arrière si les informations nécessaires ne sont pas présentes dans la session
         redirection = self.get_redirection(current_step)
@@ -769,8 +785,10 @@ class OFWebsitePlanningBooking(http.Controller):
                 request.session['rdv_search_wiz_id'] = False
                 request.session['rdv_date_recherche_debut'] = False
                 request.session['rdv_tache_id'] = False
+                request.session['rdv_service_id'] = False
                 request.session['rdv_site_address_id'] = False
                 request.session['booking_parc_installe_id'] = False
+                request.session['rdv_id'] = False
                 return request.redirect('/new_booking/thank_you')
             else:
                 return request.redirect('/new_booking/slot')
@@ -1113,7 +1131,11 @@ class OFWebsitePlanningBooking(http.Controller):
             creneau_employee.button_select(sudo=True)
             vals = self._get_intervention_vals(creneau, creneau_employee)
             try:
-                intervention = interv_obj.create(vals)
+                if request.session['rdv_id']:
+                    intervention = interv_obj.browse(request.session['rdv_id'])
+                    intervention.write(vals)
+                else:
+                    intervention = interv_obj.create(vals)
                 intervention = intervention.with_context(from_portal=True)
                 if intervention.line_ids:
                     intervention.line_ids.compute_taxes()
