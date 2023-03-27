@@ -895,6 +895,32 @@
         </xpath>
     </template>
 
+    <template id="of_website_planning_booking_portal_my_rdvs" name="OF My RDVs" inherit_id="of_website_portal.of_website_portal_portal_my_rdvs">
+        <xpath expr="//form[@name='rdv_cancelable']" position="before">
+            <form action="/new_booking/service" method="post" enctype="multipart/form-data" name="rdv_editable"
+                    t-att-class="rdv.website_create and rdv.can_edit_from_website() and 'btn' or 'btn of-no-click'"
+                    style="padding-right: 10px;padding-left: 10px;padding-top: 0px">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <input type="hidden" name="rdv_id" t-att-value="rdv.id"/>
+                <button type="submit" class="of-no-click btn btn-default btn-xs a-submit a-submit-disable a-submit-loading fa fa-fg fa-pencil"
+                        t-att-style="rdv.website_create and rdv.can_edit_from_website() and 'background-color: blue;font-size: 20px;' or 'font-size: 20px;background-color: gray'"/>
+            </form>
+        </xpath>
+    </template>
+
+    <template id="of_website_planning_booking_website_rdv" name="OF RDV" inherit_id="of_website_portal.of_website_portal_website_rdv">
+        <xpath expr="//form[@name='rdv_cancelable']" position="before">
+            <form action="/new_booking/service" method="post" enctype="multipart/form-data" name="rdv_editable"
+                    t-att-class="rdv.website_create and rdv.can_edit_from_website() and 'btn' or 'btn of-no-click'"
+                    style="padding-right: 10px;padding-left: 10px;">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <input type="hidden" name="rdv_id" t-att-value="rdv.id"/>
+                <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading"
+                        t-att-style="rdv.website_create and rdv.can_edit_from_website() and 'margin-top: 10px; background-color: blue;' or 'margin-top: 10px; background-color: gray;'">Modifier</button>
+            </form>
+        </xpath>
+    </template>
+
     <template id="of_website_planning_booking_website_rdv_cancel" name="OF My Contracts" inherit_id="of_website_portal.of_website_portal_website_rdv_cancel" priority="25">
         <xpath expr="//form[@action='/my/home']" position="replace">
             <form action="/rdv/cancel/confirmation" method="post" enctype="multipart/form-data">

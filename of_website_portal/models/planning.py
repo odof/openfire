@@ -61,7 +61,9 @@ class OFPlanningIntervention(models.Model):
     _inherit = 'of.planning.intervention'
 
     @api.multi
-    def can_cancel_from_website(self):
+    def can_edit_from_website(self):
         self.ensure_one()
-        date_limit = fields.Date.to_string(fields.Date.from_string(fields.Date.today()) + relativedelta(days=7))
+        ir_values_obj = self.env['ir.values']
+        days = ir_values_obj.env['ir.values'].get_default('of.intervention.settings', 'website_edit_days_limit')
+        date_limit = fields.Date.to_string(fields.Date.from_string(fields.Date.today()) + relativedelta(days=days))
         return self.date_date > date_limit
