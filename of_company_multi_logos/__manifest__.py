@@ -1,28 +1,28 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': 'OpenFire / Multi-logos',
-    'author': 'OpenFire',
-    'version': '10.0',
-    'category': 'OpenFire modules',
-    'summary': 'Multi-logos',
-    'description': """
-        Permet aux sociétés d'avoir plusieurs logos en tant que logos secondaires.
-        Ces logos sont affichés dans l'onglet "Logos" de la fiche société et dans les entêtes des rapports externes.
-
-        Allow a company to have several logos as secondary logos.
-        These logos are displayed in a tab named "Logos" in the company form and in external report headers.
-    """,
-    'website': 'openfire.fr',
+    'name': "OpenFire / Multi-logos",
+    'version': '16.0.1.0.0',
+    'author': "OpenFire",
+    'category': 'OpenFire',
+    'sequence': 15,
+    'summary': "Gestion des multi-logos",
+    'website': "https://www.openfire.fr",
+    'description': "",
     'depends': [
+        'web',
         'of_base',
-        'of_external',
-        ],
+    ],
     'data': [
-        'views/of_company_multi_logos_views.xml',
+        'data/report_paperformat_data.xml',
         'security/ir.model.access.csv',
-        'report/of_multi_logos_report_templates.xml',
+        'views/res_company_views.xml',
+        'views/of_company_multi_logos_views.xml',
+        'views/menuitems.xml',
+        'report/report_templates.xml'
     ],
     'installable': True,
+    'application': False,
     'auto_install': False,
+    'license': 'LGPL-3',
 }

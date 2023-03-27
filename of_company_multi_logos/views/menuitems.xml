@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <menuitem id="of_logos_menu" name="Logos société" sequence="100" parent="base.reporting_menuitem" groups="base.group_system" action="of_company_multi_logos.of_multi_logos_action"/>
+
+</odoo>

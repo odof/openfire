@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="of_external_layout_standard_with_logo" inherit_id="web.external_layout_standard">
+
+        <xpath expr="//div[@t-attf-class='footer o_standard_footer o_company_#{company.id}_layout']" position="replace">
+            <div id="footer" t-attf-class="footer o_standard_footer o_company_#{company.id}_layout">
+
+                <div style="text-align: center;  margin-bottom: 5px">
+                    <t t-foreach="company._get_footer_logos()" t-as="footer_logo">
+                        <img t-att-src="image_data_uri(footer_logo.logo)" style="margin-left: auto; margin-right: auto; display: inline-block; max-height: 70px;"/>
+                    </t>
+                </div>
+
+                <div class="text-center" style="border-top: 1px solid black;">
+                    <ul class="list-inline mb4">
+                        <div t-field="company.report_footer"/>
+                    </ul>
+
+                    <t t-set="footer_rcorner_logos" t-value="company._get_footer_right_corner_logos()"/>
+                    <div id="footer_logo_left" style="position: absolute">
+                        <t t-foreach="footer_rcorner_logos" t-as="footer_rcorner_logo">
+                            <img t-att-src="image_data_uri(footer_rcorner_logo.logo)" style="margin-left: auto; margin-right: auto; display: inline-block; max-height: 70px;"/>
+                        </t>
+                    </div>
+
+                    <t t-set="footer_lcorner_logos" t-value="company._get_footer_left_corner_logos()"/>
+                    <div id="footer_logo_right" t-if="footer_lcorner_logos" style="float: right;">
+                        <t t-foreach="footer_lcorner_logos" t-as="footer_lcorner_logo">
+                            <img t-att-src="image_data_uri(footer_lcorner_logo.logo)" style="margin-left: auto; margin-right: auto; display: inline-block; max-height: 70px;"/>
+                        </t>
+                    </div>
+
+                    <div t-if="report_type == 'pdf'" class="text-muted">
+                        Page: <span class="page"/> / <span class="topage"/>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="of_external_layout_striped" inherit_id="web.external_layout_striped">
+        <xpath expr="//div[@t-attf-class='o_company_#{company.id}_layout footer o_background_footer']" position="replace">
+            <div t-attf-class="o_company_#{company.id}_layout footer o_background_footer">
+                <div class="text-center">
+                    <t t-set="footer_rcorner_logos" t-value="company._get_footer_right_corner_logos()"/>
+                    <div id="footer_logo_left" style="position: absolute">
+                        <t t-foreach="footer_rcorner_logos" t-as="footer_rcorner_logo">
+                            <img t-att-src="image_data_uri(footer_rcorner_logo.logo)" style="margin-left: auto; margin-right: auto; display: inline-block; max-height: 50px;"/>
+                        </t>
+                    </div>
+                    <t t-foreach="company._get_footer_logos()" t-as="footer_logo">
+                        <img t-att-src="image_data_uri(footer_logo.logo)" style="margin-left: auto; margin-right: auto; display: inline-block; max-height: 50px;"/>
+                    </t>
+                    <t t-set="footer_lcorner_logos" t-value="company._get_footer_left_corner_logos()"/>
+                    <div id="footer_logo_right" t-if="footer_lcorner_logos" style="float: right;">
+                        <t t-foreach="footer_lcorner_logos" t-as="footer_lcorner_logo">
+                            <img t-att-src="image_data_uri(footer_lcorner_logo.logo)" style="margin-left: auto; margin-right: auto; display: inline-block; max-height: 50px;"/>
+                        </t>
+                    </div>
+                    <ul class="list-inline">
+                        <div t-field="company.report_footer"/>
+                    </ul>
+                    <div t-if="report_type == 'pdf'" class="text-muted">
+                        Page:
+                        <span class="page"/>
+                        of
+                        <span class="topage"/>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="of_external_layout_bold_with_logo" inherit_id="web.external_layout_bold">
+        <xpath expr="//div[@t-attf-class='footer o_clean_footer o_company_#{company.id}_layout']" position="replace">
+            <div t-attf-class="footer o_clean_footer o_company_#{company.id}_layout">
+                <div class="row" style="margin-top: 5px">
+                    <div class="col-4">
+                        <t t-set="footer_rcorner_logos" t-value="company._get_footer_right_corner_logos()"/>
+                        <div id="footer_logo_left" style="position: absolute">
+                            <t t-foreach="footer_rcorner_logos" t-as="footer_rcorner_logo">
+                                <img t-att-src="image_data_uri(footer_rcorner_logo.logo)" style="margin-left: auto; margin-right: auto; display: inline-block; max-height: 70px;"/>
+                            </t>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <t t-foreach="company._get_footer_logos()" t-as="footer_logo">
+                            <img t-att-src="image_data_uri(footer_logo.logo)" style="margin-left: auto; margin-right: auto; display: inline-block; max-height: 70px;"/>
+                        </t>
+                    </div>
+                    <div class="col-4">
+                        <t t-set="footer_lcorner_logos" t-value="company._get_footer_left_corner_logos()"/>
+                        <div id="footer_logo_right" t-if="footer_lcorner_logos" style="float: right;">
+                            <t t-foreach="footer_lcorner_logos" t-as="footer_lcorner_logo">
+                                <img t-att-src="image_data_uri(footer_lcorner_logo.logo)" style="margin-left: auto; margin-right: auto; display: inline-block; max-height: 70px;"/>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <span t-field="company.report_footer"/>
+                    </div>
+                    <div class="col-4">
+                        <span t-if="company.company_details" t-field="company.company_details"/>
+                    </div>
+                    <div class="col-3">
+                        <div class="mt0 mb0 h5" t-field="company.report_header"/>
+                    </div>
+                    <div class="col-1">
+                        <ul t-if="report_type == 'pdf'" class="list-inline pagenumber float-end text-center">
+                            <li class="list-inline-item"><strong><span class="page"/></strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="of_external_layout_boxed_with_logo" inherit_id="web.external_layout_boxed">
+        <xpath expr="//div[@t-attf-class='footer o_boxed_footer o_company_#{company.id}_layout']" position="replace">
+            <div t-attf-class="footer o_boxed_footer o_company_#{company.id}_layout">
+                <div class="text-center">
+                    <t t-set="footer_rcorner_logos" t-value="company._get_footer_right_corner_logos()"/>
+                    <div id="footer_logo_left" style="position: absolute">
+                        <t t-foreach="footer_rcorner_logos" t-as="footer_rcorner_logo">
+                            <img t-att-src="image_data_uri(footer_rcorner_logo.logo)" style="margin-left: auto; margin-right: auto; display: inline-block; max-height: 70px;"/>
+                        </t>
+                    </div>
+                    <t t-foreach="company._get_footer_logos()" t-as="footer_logo">
+                        <img t-att-src="image_data_uri(footer_logo.logo)" style="margin-left: auto; margin-right: auto; display: inline-block; max-height: 70px;"/>
+                    </t>
+                    <t t-set="footer_lcorner_logos" t-value="company._get_footer_left_corner_logos()"/>
+                    <div id="footer_logo_right" t-if="footer_lcorner_logos" style="float: right;">
+                        <t t-foreach="footer_lcorner_logos" t-as="footer_lcorner_logo">
+                            <img t-att-src="image_data_uri(footer_lcorner_logo.logo)" style="margin-left: auto; margin-right: auto; display: inline-block; max-height: 70px;"/>
+                        </t>
+                    </div>
+                    <div t-field="company.report_footer"/>
+                    <div t-if="report_type == 'pdf'">
+                        Page: <span class="page"/> / <span class="topage"/>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="of_external_layout_striped_with_logo" inherit_id="web.external_layout_striped">
+
+        <xpath expr="//div[@t-attf-class='o_company_#{company.id}_layout footer o_background_footer']" position="replace">
+            <div t-attf-class="o_company_#{company.id}_layout footer o_background_footer">
+                <div class="text-center">
+                    <t t-set="footer_rcorner_logos" t-value="company._get_footer_right_corner_logos()"/>
+                    <div id="footer_logo_left" style="position: absolute">
+                        <t t-foreach="footer_rcorner_logos" t-as="footer_rcorner_logo">
+                            <img t-att-src="image_data_uri(footer_rcorner_logo.logo)" style="margin-left: auto; margin-right: auto; display: inline-block; max-height: 50px;"/>
+                        </t>
+                    </div>
+                    <t t-foreach="company._get_footer_logos()" t-as="footer_logo">
+                        <img t-att-src="image_data_uri(footer_logo.logo)" style="margin-left: auto; margin-right: auto; display: inline-block; max-height: 50px;"/>
+                    </t>
+                    <t t-set="footer_lcorner_logos" t-value="company._get_footer_left_corner_logos()"/>
+                    <div id="footer_logo_right" t-if="footer_lcorner_logos" style="float: right;">
+                        <t t-foreach="footer_lcorner_logos" t-as="footer_lcorner_logo">
+                            <img t-att-src="image_data_uri(footer_lcorner_logo.logo)" style="margin-left: auto; margin-right: auto; display: inline-block; max-height: 50px;"/>
+                        </t>
+                    </div>
+                    <ul class="list-inline">
+                        <div t-field="company.report_footer"/>
+                    </ul>
+                    <div t-if="report_type == 'pdf'" class="text-muted">
+                        Page:
+                        <span class="page"/>
+                        of
+                        <span class="topage"/>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+
+    </template>
+
+</odoo>
