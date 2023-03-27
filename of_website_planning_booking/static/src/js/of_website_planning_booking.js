@@ -7,7 +7,7 @@ odoo.define('of_website_planning_booking.planning_website', function (require) {
     var core = require('web.core');
     var config = require('web.config');
     var _t = core._t;
-    var Model = require("web.Model");
+    var Model = require('web.Model');
 
 
     if(!$('.oe_website_sale').length) {
@@ -55,9 +55,9 @@ odoo.define('of_website_planning_booking.planning_website', function (require) {
             var service_id = parseInt(this[this.selectedIndex].value);
             var service_model = new Model('of.service');
             if (service_id != null && service_id != undefined) {
-                service_model.call('read', [service_id, ["tache_id"]], {}).done(function (result) {
+                service_model.call('read', [service_id, ['tache_id']], {}).done(function (result) {
                     if (result.length > 0) {
-                        tache_selector.val(result[0]["tache_id"][0].toString())
+                        tache_selector.val(result[0]['tache_id'][0].toString())
                     }
                 });
             };
