@@ -46,7 +46,7 @@ class WebsiteAccount(website_account):
         })
         return values
 
-    @http.route(['/my', '/my/home'], type='http', auth="user", website=True)
+    @http.route(['/my', '/my/home'], type='http', auth='user', website=True)
     def account(self, **kw):
         if kw.get('canceled_rdv_id'):
             rdv = request.env['of.planning.intervention'].search([('id', '=', int(kw.get('canceled_rdv_id')))]).sudo()
@@ -191,13 +191,13 @@ class WebsiteAccount(website_account):
 
         return request.redirect('/my/quotes')
 
-    @http.route(['/my/rdvs'], type='http', auth="user", website=True)
+    @http.route(['/my/rdvs'], type='http', auth='user', website=True)
     def of_portal_get_rdvs(self, **kw):
         values = self._prepare_portal_layout_values()
         rdv_ids = request.env['of.planning.intervention'].search([
             ('state', 'not in', ['cancel', 'postponed']),
             '|',
-            ('partner_id', 'child_of', 'request.env.user.partner_id.id'),
+            ('partner_id', 'child_of', request.env.user.partner_id.id),
             ('address_id', 'child_of', request.env.user.partner_id.id)
         ])
         values.update({
@@ -206,7 +206,7 @@ class WebsiteAccount(website_account):
         return request.render('of_website_portal.of_website_portal_portal_my_rdvs', values)
 
 
-    @http.route(['/rdv/<model("of.planning.intervention"):rdv>'], type='http', auth="user", website=True)
+    @http.route(['/rdv/<model("of.planning.intervention"):rdv>'], type='http', auth='user', website=True)
     def of_portal_rdv(self, rdv=None, **kw):
         values = {
             'user': request.env.user,
@@ -222,7 +222,7 @@ class WebsiteAccount(website_account):
             rdv.check_access_rights('read')
             rdv.check_access_rule('read')
         except AccessError:
-            return request.render("website.403")
+            return request.render('website.403')
         values = {
             'rdv': rdv,
         }
