@@ -513,8 +513,6 @@ class OFWebsitePlanningBooking(http.Controller):
             # Champs obligatoires
             if not values.get('tache_id'):
                 error['tache_id'] = True
-            if not values.get('service_id'):
-                error['service_id'] = True
             if not values.get('date_recherche_debut'):
                 error['date_recherche_debut'] = True
             else:
@@ -542,7 +540,8 @@ class OFWebsitePlanningBooking(http.Controller):
 
         if validated:
             request.session['rdv_tache_id'] = int(values['tache_id'])
-            request.session['rdv_service_id'] = int(values['service_id'])
+            if values.get('service_id'):
+                request.session['rdv_service_id'] = int(values['service_id'])
             request.session['rdv_date_recherche_debut'] = values['date_recherche_debut']
             # Marquer pour une nouvelle recherche. les perfs pourraient être améliorées en vérifiant
             # si l'adresse / la prestation / la date a effectivement changé depuis la denière recherche
