@@ -211,7 +211,6 @@ class WebsiteAccount(website_account):
         values = {
             'user': request.env.user,
             'rdv': rdv,
-            'can_cancel':  rdv.can_cancel_from_website(),
         }
         return request.render('of_website_portal.of_website_portal_website_rdv', values)
 

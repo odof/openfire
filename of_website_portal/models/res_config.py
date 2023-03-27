@@ -39,3 +39,19 @@ class BaseConfigSettings(models.TransientModel):
     def set_of_create_portal_users_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'base.config.settings', 'of_create_portal_users', self.of_create_portal_users)
+
+
+class OFInterventionSettings(models.TransientModel):
+    _inherit = 'of.intervention.settings'
+
+    @api.model
+    def _auto_init(self):
+        super(OFInterventionSettings, self)._auto_init()
+        self.env['ir.values'].set_default('of.intervention.settings', 'website_edit_days_limit', 7)
+
+    website_edit_days_limit = fields.Integer(string=u"(OF) Limite d'annulation", default=7)
+
+    @api.multi
+    def set_website_edit_days_limit_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings', 'website_edit_days_limit', self.website_edit_days_limit)
