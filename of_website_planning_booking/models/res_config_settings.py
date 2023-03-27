@@ -75,6 +75,8 @@ class OFInterventionSettings(models.TransientModel):
     website_booking_terms_filename = fields.Char(
         related='website_id.website_booking_terms_filename',
         string=u"(OF) Nom du fichier PDF des Conditions Générales de Vente")
+    website_edit_days_limit = fields.Integer(
+        string=u"(OF) Limite de modifications")
     website_booking_company_dependent = fields.Boolean(
         string=u"(OF) Définir une configuration spécifique à cette société")
 
@@ -133,6 +135,13 @@ class OFInterventionSettings(models.TransientModel):
             company_id=self.website_booking_company_dependent and self.company_id.id)
 
     @api.multi
+    def set_website_edit_days_limit_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings', 'website_edit_days_limit',
+            self.website_edit_days_limit,
+            company_id=self.website_edit_days_limit and self.company_id.id)
+
+    @api.multi
     def set_website_booking_company_dependent_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'of.intervention.settings', 'website_booking_company_dependent',
@@ -164,6 +173,8 @@ class OFInterventionSettings(models.TransientModel):
             'of.intervention.settings', 'website_booking_slot_size', company_id=cd and self.company_id.id),
             'website_booking_default_product_brand_id': ir_values_obj.env['ir.values'].get_default(
             'of.intervention.settings', 'website_booking_default_product_brand_id', company_id=cd and self.company_id.id),
+            'website_edit_days_limit': ir_values_obj.env['ir.values'].get_default(
+            'of.intervention.settings', 'website_edit_days_limit', company_id=cd and self.company_id.id),
         })
 
     @api.model
@@ -176,6 +187,7 @@ class OFInterventionSettings(models.TransientModel):
             'website_booking_allow_empty_days',
             'website_booking_slot_size',
             'website_booking_default_product_brand_id',
+            'website_edit_days_limit',
             ]
 
 
