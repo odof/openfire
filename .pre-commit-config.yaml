@@ -1,5 +1,5 @@
 default_language_version:
-    python: python3.11.2
+    python: python3
 repos:
 -   repo: https://github.com/PyCQA/flake8
     rev: 6.0.0  # pick a git hash / tag to point to
