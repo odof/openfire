@@ -24,6 +24,9 @@
                 </div>
                 <group invisible="context.get('invoice_status') == 'invoiced'">
                     <field name="order_id" invisible="1"/>
+                    <field name="discount_mode" required="1"/>
+                    <field name="discount_product_id"
+                           attrs="{'required': [('discount_mode', '=', 'total')], 'invisible': [('discount_mode', '!=', 'total')]}"/>
                     <field name="methode_remise" required="1"/>
                     <field name="valeur"
                            attrs="{'invisible':[('methode_remise','not in',('prix_ttc_cible','prix_ht_cible','montant_ttc','montant_ht','pc','pc_marge'))],
@@ -44,13 +47,15 @@
                     <tree string="Lignes de commande" colors="green:state=='included';grey:state!='included';" editable="bottom" create="false">
                         <field name="product_forbidden_discount" invisible="1"/>
                         <field name="state" invisible="context.get('invoice_status') == 'invoiced'" attrs="{'readonly': [('product_forbidden_discount', '=', True)]}"/>
-                        <field name="order_line_id"/>
+                        <field name="order_line_id" invisible="1"/>
+                        <field name="name"/>
                         <field name="cout_total_ht" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
                         <field name="cout_total_ht_simul" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
                         <field name="prix_total_ht"/>
                         <field name="prix_total_ht_simul" attrs="{'readonly': [('state', '!=', 'forced')]}"/>
                         <field name="marge" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
                         <field name="pc_marge" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)], 'readonly': ['|', ('state', '!=', 'forced'), ('cout_total_ht', '=', 0)]}"/>
+                        <field name="tax_ids" widget="many2many_tags"/>
                         <field name="prix_total_ttc"/>
                         <field name="prix_total_ttc_simul"/>
                         <field name="of_client_view" invisible="1"/>

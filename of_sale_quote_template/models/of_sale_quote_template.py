@@ -1252,7 +1252,16 @@ class SaleOrder(models.Model):
         if self.amount_untaxed:
             for vals in layout_category_vals:
                 vals['pc_sale_price'] = 100.0 * vals['simulated_price_subtotal'] / self.amount_untaxed
-
+        # on ajoute les catégories vide si on veut mettre les remises sur d'autres catégories
+        for layout_category in self.of_layout_category_ids.filtered(lambda r: not r.order_line_ids):
+            layout_category_vals.append({
+                'layout_category_id': layout_category.id,
+                'pc_sale_price': 0.0,
+                'product_forbidden_discount': False,
+                'simulated_price_subtotal': 0.0,
+                'simulated_price_total': 0.0,
+                'state': 'excluded',
+            })
         remise.write({
             'layout_category_ids': [(0, 0, vals) for vals in layout_category_vals],
         })
