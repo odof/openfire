@@ -16,6 +16,7 @@ class GestionPrix(models.TransientModel):
     layout_category_ids = fields.One2many(
         comodel_name='of.sale.order.gestion.prix.layout.category',
         inverse_name='wizard_id', string=u'Sections impactées')
+    layout_category_id = fields.Many2one(comodel_name='of.sale.order.layout.category', string=u"Section de la remise")
 
     @api.multi
     def bouton_inclure_tout(self):
@@ -31,6 +32,7 @@ class GestionPrix(models.TransientModel):
     def _calculer(self, total, mode, currency, cost_prorata, line_rounding):
         if self.calculation_basis != 'layout_category':
             return super(GestionPrix, self)._calculer(total, mode, currency, cost_prorata, line_rounding)
+        self.recompute_category_amounts()
         values = {}
         # Si on fonctionne par section, il n'y a pas de montant forcé par ligne de commande
         self.line_ids.filtered(lambda l: not l.state == 'included' and not l.product_forbidden_discount)\
@@ -42,13 +44,13 @@ class GestionPrix(models.TransientModel):
                 values.update(
                     category.line_ids.distribute_amount(
                         category.simulated_price_subtotal, 'ht', currency, cost_prorata, line_rounding))
+                for line in category.line_ids:
+                    line.state = 'forced'
             else:
                 for line in category.line_ids:
                     line.prix_total_ht_simul = line.order_line_id.price_subtotal
                     line.prix_total_ttc_simul = line.order_line_id.price_total
-
-            category.simulated_price_subtotal = sum(category.line_ids.mapped('prix_total_ht_simul'))
-            category.simulated_price_total = sum(category.line_ids.mapped('prix_total_ttc_simul'))
+                    line.state = 'excluded'
             total -= category[price_field]
         if total < 0:
             raise UserError(u"(Erreur #RG405)\nLe montant forcé dépasse le montant total à distribuer")
@@ -57,12 +59,76 @@ class GestionPrix(models.TransientModel):
         values.update(
             included_categories.mapped('line_ids').distribute_amount(total, mode, currency, cost_prorata, line_rounding)
         )
-        for category in included_categories:
+        if self.discount_mode == 'total' and self.methode_remise != 'reset':
+            old_res = values
+            res = {}
+
+            fake_id = 1
+            tax_dict = {}
+            # grouper les lignes par taxes. On utilise des tuples pour ne pas qu'une ligne se retrouve dans 2 groupes
+            for product_line in self.line_ids.filtered(lambda l: not l.is_discount and l.state == 'included'):
+                tax_tup = tuple(product_line.order_line_id.tax_id.ids)
+                if tax_tup in tax_dict:
+                    tax_dict[tax_tup] |= product_line
+                else:
+                    tax_dict[tax_tup] = product_line
+
+            category = self.layout_category_ids.filtered(
+                lambda r: r.layout_category_id.id == self.layout_category_id.id)
+            for tax_tup, associated_lines in tax_dict.iteritems():
+                price_unit = 0
+                uom = self.env.ref('product.product_uom_unit')
+                for order_line in associated_lines.mapped('order_line_id'):
+                    vals = old_res[order_line]
+                    price_unit -= (order_line.price_unit - vals['price_unit']) * \
+                        (1 - (order_line.discount or 0.0) / 100.0) * \
+                        order_line.product_uom._compute_quantity(order_line.product_uom_qty, uom)
+
+                line_vals = {
+                    'wizard_id': self.id,
+                    'is_discount': True,
+                    'discount_tax_ids': [(6, 0, list(tax_tup))],
+                    'prix_unit_create': price_unit,
+                    'layout_category_ids': [(4, category.id)],
+                }
+                new_line = self.env['of.sale.order.gestion.prix.line'].new(line_vals)
+                new_line.prix_total_ht_simul = sum(
+                    associated_lines.mapped('prix_total_ht_simul')) - sum(
+                    associated_lines.mapped('order_line_id.price_subtotal'))
+                new_line.prix_total_ttc_simul = sum(
+                    associated_lines.mapped('prix_total_ttc_simul')) - sum(
+                    associated_lines.mapped('order_line_id.price_total'))
+
+                res[fake_id] = new_line.get_values_order_line_create()
+                self.line_ids |= new_line
+                fake_id += 1
+
+            for product_line in self.line_ids.filtered(lambda l: not l.is_discount and l.state == 'included'):
+                product_line.prix_total_ht_simul = product_line.prix_total_ht
+                product_line.prix_total_ttc_simul = product_line.prix_total_ttc
+                product_line.cout_total_ht_simul = product_line.cout_total_ht
+
+            for forced_line in self.line_ids.filtered(lambda l: not l.is_discount and l.state == 'forced'):
+                if forced_line.order_line_id in old_res:
+                    res[forced_line.order_line_id] = old_res[forced_line.order_line_id]
+            return res
+        else:
+            return values
+
+    @api.multi
+    def calculer(self, simuler=False):
+        res = super(GestionPrix, self).calculer(simuler=simuler)
+        if self.calculation_basis == 'layout_category':
+            self.recompute_category_amounts()
+        return res
+
+    @api.multi
+    def recompute_category_amounts(self):
+        for category in self.layout_category_ids:
             category.write({
                 'simulated_price_subtotal': sum(category.line_ids.mapped('prix_total_ht_simul')),
                 'simulated_price_total': sum(category.line_ids.mapped('prix_total_ttc_simul')),
             })
-        return values
 
 
 class GestionPrixLayoutCategory(models.TransientModel):
@@ -131,3 +197,20 @@ class GestionPrixLayoutCategory(models.TransientModel):
                 line.simulated_price_subtotal = line.cost and line.cost * (100 / (100 - line.pc_margin))
                 factor = line.simulated_price_subtotal / line.price_subtotal if line.price_subtotal else 1
                 line.simulated_price_total = line.price_total * factor
+
+
+class GestionPrixLine(models.TransientModel):
+    """Liste des lignes dans le wizard"""
+    _inherit = 'of.sale.order.gestion.prix.line'
+
+    layout_category_ids = fields.Many2many(
+        comodel_name='of.sale.order.gestion.prix.layout.category',
+        relation='of_sale_order_gestion_prix_layout_category_line_rel',
+        string=u"Lignes impactées")
+
+    @api.multi
+    def get_values_order_line_create(self):
+        values = super(GestionPrixLine, self).get_values_order_line_create()
+        if values:
+            values['of_layout_category_id'] = self.wizard_id.layout_category_id.id
+        return values
