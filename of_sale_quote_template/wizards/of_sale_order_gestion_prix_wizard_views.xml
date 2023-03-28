@@ -13,6 +13,12 @@
             <xpath expr="//field[@name='line_ids']" position="attributes">
                 <attribute name="attrs">{'invisible': [('calculation_basis', '!=', 'order_line')]}</attribute>
             </xpath>
+            <xpath expr="//field[@name='discount_product_id']" position="after">
+                <field name="layout_category_id"
+                attrs="{'invisible': ['|', ('calculation_basis', '!=', 'layout_category'), ('discount_mode', '!=', 'total')], 'required': [('calculation_basis', '=', 'layout_category'), ('discount_mode', '=', 'total')]}"
+                options="{'no_create': True, 'no_edit': True}"
+                domain="[('order_id', '=', order_id)]"/>
+            </xpath>
             <xpath expr="//field[@name='line_ids']" position="after">
                 <field name="layout_category_ids" attrs="{'invisible': [('calculation_basis', '!=', 'layout_category')]}">
                     <tree string="Lignes de section" colors="green:state=='included';grey:state!='included';" editable="bottom" create="false">
