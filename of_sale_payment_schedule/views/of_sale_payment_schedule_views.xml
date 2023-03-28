@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_view_order_form" model="ir.ui.view">
+        <field name="name">of.sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Ajout échéances  invisible="1"-->
+            <xpath expr="//field[@name='note']" position="before">
+                <separator string="Payment schedule"/>
+                <newline/>
+                <field name="of_payment_schedule_ids" nolabel="1" colspan="2">
+                    <tree editable="bottom" create="false" delete="false">
+                        <field name="sequence" invisible="1"/>
+                        <field name="is_last" invisible="1"/>
+                        <field name="name"/>
+                        <field name="date"/>
+                        <field name="percent" attrs="{'readonly': [('is_last','=',True)]}" sum="Total"/>
+                        <field name="amount" attrs="{'readonly': [('is_last','=',True)]}" sum="Total"/>
+                        <field name="currency_id" invisible="1"/>
+                    </tree>
+                </field>
+                <newline/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_payment_schedule_form" model="ir.ui.view">
+        <field name="name">of.sale.payment.schedule.form</field>
+        <field name="model">of.sale.payment.schedule</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="is_last" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+                <group>
+                    <group>
+                        <field name="name"/>
+                        <field name="date"/>
+                    </group>
+                    <group>
+                        <field name="percent"/>
+                        <field name="amount" attrs="{'readonly': [('is_last','=',True)]}"/>
+                    </group>
+                </group>
+            </form>
+        </field>
+    </record>
+
+</odoo>

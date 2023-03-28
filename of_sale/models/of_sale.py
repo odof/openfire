@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import itertools
@@ -181,10 +180,6 @@ class SaleOrder(models.Model):
     of_date_vt = fields.Date(
         string="Date visite technique", help=u"Si renseignée apparaîtra sur le devis / Bon de commande"
     )
-    of_echeance_line_ids = fields.One2many('of.sale.echeance', 'order_id', string=u"Échéances")
-
-    of_echeances_modified = fields.Boolean(
-        u"Les échéances ont besoin d'être recalculées", compute="_compute_of_echeances_modified")
     of_force_invoice_status = fields.Selection([
         ('invoiced', 'Fully Invoiced'),
         ('no', 'Nothing to Invoice')], string=u"Forcer état de facturation",
@@ -231,14 +226,6 @@ class SaleOrder(models.Model):
         option = self.env['ir.values'].get_default('sale.config.settings', 'of_allow_quote_addition')
         for order in self:
             order.of_allow_quote_addition = option
-
-    @api.depends('of_echeance_line_ids', 'amount_total')
-    def _compute_of_echeances_modified(self):
-        for order in self:
-            order.of_echeances_modified = bool(order.of_echeance_line_ids
-                                               and float_compare(order.amount_total,
-                                                                 sum(order.of_echeance_line_ids.mapped('amount')),
-                                                                 precision_rounding=.01))
 
     @api.depends('order_line', 'order_line.qty_delivered', 'order_line.product_uom_qty')
     def _compute_delivered(self):
@@ -317,37 +304,6 @@ class SaleOrder(models.Model):
             values['amount'] = round_curr(values['amount'])
         return tax_grouped
 
-    @api.multi
-    def _of_compute_echeances(self):
-        self.ensure_one()
-        if not self.payment_term_id:
-            return False
-        dates = {
-            'order': self.state not in ('draft', 'sent', 'cancel') and self.confirmation_date,
-            'invoice': self.invoice_status == 'invoiced' and self.invoice_ids[0].date_invoice,
-            'default': False,
-        }
-        amounts = self.payment_term_id.compute(self.amount_total, dates=dates)[0]
-
-        amount_total = self.amount_total
-        pct_left = 100.0
-        pct = 0
-        result = [(5, )]
-        for term, (date, amount) in itertools.izip(self.payment_term_id.line_ids, amounts):
-            pct_left -= pct
-            pct = round(100 * amount / amount_total, 2) if amount_total else 0
-
-            line_vals = {
-                'name': term.name,
-                'percent': pct,
-                'amount': amount,
-                'date': date,
-            }
-            result.append((0, 0, line_vals))
-        if len(result) > 1:
-            result[-1][2]['percent'] = pct_left
-        return result
-
     @api.depends('state', 'order_line.invoice_status', 'of_force_invoice_status')
     def _get_invoiced(self):
         # Appel du super dans tous les cas pour le calcul de invoice_count et invoice_ids
@@ -418,38 +374,6 @@ class SaleOrder(models.Model):
             return super(SaleOrder, self).onchange_partner_id_warning()
         return
 
-    @api.onchange('payment_term_id')
-    def _onchange_payment_term_id(self):
-        if self.payment_term_id:
-            self.of_echeance_line_ids = self._of_compute_echeances()
-
-    @api.onchange('amount_total')
-    def _onchange_amount_total(self):
-        self._onchange_payment_term_id()
-
-    @api.multi
-    def of_update_dates_echeancier(self):
-        for order in self:
-            if not order.payment_term_id:
-                continue
-
-            date_invoice = order.invoice_status == 'invoiced' and order.invoice_ids and \
-                order.invoice_ids[0].date_invoice or False
-            dates = {
-                'order': order.confirmation_date,
-                'invoice': date_invoice,
-                'default': False,
-            }
-            force_dates = [echeance.date for echeance in order.of_echeance_line_ids]
-            echeances = order.payment_term_id.compute(order.amount_total, dates=dates, force_dates=force_dates)[0]
-
-            if len(echeances) != len(order.of_echeance_line_ids):
-                continue
-
-            for echeance, ech_calc in itertools.izip(order.of_echeance_line_ids, echeances):
-                if ech_calc[0] and not echeance.date:
-                    echeance.date = ech_calc[0]
-
     @api.multi
     def action_verification_confirm(self):
         """
@@ -467,30 +391,6 @@ class SaleOrder(models.Model):
         if action:
             return action
         return res
-
-    @api.multi
-    def action_confirm(self):
-        res = super(SaleOrder, self).action_confirm()
-        self.of_update_dates_echeancier()
-        return res
-
-    @api.multi
-    def of_recompute_echeance_last(self):
-        for order in self:
-            if not order.of_echeance_line_ids:
-                continue
-
-            percent = 100.0
-            amount = order.amount_total
-            for echeance in order.of_echeance_line_ids:
-                if echeance.last:
-                    echeance.write({
-                        'percent': percent,
-                        'amount': amount,
-                    })
-                else:
-                    percent -= echeance.percent
-                    amount -= echeance.amount
 
     @api.model
     def create(self, vals):
@@ -512,8 +412,6 @@ class SaleOrder(models.Model):
             message_followers = self.mapped('message_follower_ids')
             message_followers.filtered(lambda r: r.partner_id.id in old_partner_ids)\
                              .write({'subtype_ids': [(3, mail_subtype.id)]})
-        # Recalcul de la dernière échéance si besoin
-        self.filtered('of_echeances_modified').of_recompute_echeance_last()
         return res
 
     def _search_of_marge_pc(self, operator, value):

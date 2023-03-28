@@ -1,28 +1,27 @@
-# -*- coding: utf-8 -*-
-import odoo.addons.decimal_precision as dp
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 from odoo import models, fields, api
 from odoo.tools import float_compare
 
 
-class OFSaleEcheance(models.Model):
-    _name = "of.sale.echeance"
-    _order = "order_id, sequence, id"
+class OFSalePaymenSchedule(models.Model):
+    _name = 'of.sale.payment.schedule'
+    _order = 'order_id, sequence, id'
 
-    name = fields.Char(string="Nom", required=True, default=u"Échéance")
-    order_id = fields.Many2one("sale.order", string="Commande")
-    currency_id = fields.Many2one(related="order_id.currency_id", readonly=True)  # TODO ADAPT SALE
-    amount = fields.Monetary(string="Montant", currency_field='currency_id')
-    percent = fields.Float(string=u"Pourcentage", digits=dp.get_precision('Product Price'))
-    last = fields.Boolean(string=u"Dernière Échéance", compute="_compute_last")
+    name = fields.Char(required=True, default="Échéance")
+    order_id = fields.Many2one(comodel_name='sale.order', string="Sale order")
+    currency_id = fields.Many2one(related='order_id.currency_id', readonly=True)
+    amount = fields.Monetary(currency_field='currency_id')
+    percent = fields.Float(string="Percentage", digits='Product Price')
+    # :todo: rename depuis l'ancien nom : last
+    is_last = fields.Boolean(string="Last payment", compute='_compute_is_last')
+    sequence = fields.Integer()
+    date = fields.Date()
 
-    sequence = fields.Integer(default=10, help="Gives the sequence order when displaying a list of payment term lines.")
-    date = fields.Date(string='Date')
-
-    @api.multi
-    def _compute_last(self):
+    def _compute_is_last(self):
         for order in self.mapped('order_id'):
-            for echeance in order.of_echeance_line_ids:
-                echeance.last = echeance == order.of_echeance_line_ids[-1]
+            for payment in order.of_payment_schedule_ids:
+                payment.is_last = payment == order.of_payment_schedule_ids[-1]
 
     @api.onchange("amount")
     def _onchange_amount(self):
