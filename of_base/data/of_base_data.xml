@@ -27,7 +27,7 @@
 
     <record id="master_database_url" model="ir.config_parameter">
         <field name="key">of.openfire.database.url</field>
-        <field name="value">https://openfire10.openfire.fr</field>
+        <field name="value">https://openfire.fr</field>
     </record>
 
 </odoo>
