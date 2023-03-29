@@ -7,6 +7,8 @@
         <field name="name">view.of.intervention.settings.recurring</field>
         <field name="model">of.intervention.settings</field>
         <field name="inherit_id" ref="of_planning.view_of_intervention_settings"/>
+        <!-- pour héritage dans of_planning_google -->
+        <field name="priority">17</field>
         <field name="arch" type="xml">
             <xpath expr="//group[@name='intervention']" position="inside">
                 <label for="group_of_group_planning_intervention_recurring" string="(OF) RDVs réguliers"/>

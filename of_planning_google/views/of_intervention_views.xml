@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="of_planning_intervention_view_form" model="ir.ui.view">
+        <field name="name">of.planning.intervention.view.form.inh.google</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
+        <field name="priority">21</field>
+        <field name="groups_id" eval="[(6,0,[ref('of_planning_google.of_group_planning_intervention_google')])]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form//div[@class='oe_title']/h1" position="inside">
+                <br attrs="{'invisible': [('google_create', '=', False)]}"/>
+                <div class="label label-success" attrs="{'invisible': [('google_create', '=', False)]}">Google Calendar</div>
+                <field name="google_create" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='company_id']" position="before">
+                <label for="partner_ids"/>
+                <div>
+                    <field name="partner_ids" widget="many2many_tags" attrs="{'readonly': [('recurrency', '=', True)]}"/>
+                    <div attrs="{'invisible': [('recurrency', '=', False)]}" class="oe_grey">
+                        <i>Pour modifier les participants, éditez les règles de récurrence</i>
+                    </div>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="before">
+                <field name="google_address" readonly="1" attrs="{'invisible': [('google_address', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

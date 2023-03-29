@@ -115,13 +115,13 @@ class OFPlanningRecurringMixin(models.AbstractModel):
                     if meeting.th:
                         rrule_text += (u", " if first_day else u"") + u"jeudi"
                         first_day = True
-                    if meeting.tu:
+                    if meeting.fr:
                         rrule_text += (u", " if first_day else u"") + u"vendredi"
                         first_day = True
-                    if meeting.tu:
+                    if meeting.sa:
                         rrule_text += (u", " if first_day else u"") + u"samedi"
                         first_day = True
-                    if meeting.tu:
+                    if meeting.su:
                         rrule_text += (u", " if first_day else u"") + u"dimanche"
                 elif meeting.rrule_type == 'daily':
                     rrule_text += u"jours"
@@ -169,6 +169,11 @@ class OFPlanningRecurringMixin(models.AbstractModel):
                 data = self._rrule_default_values()
                 data['recurrency'] = True
                 data.update(self._rrule_parse(meeting.rrule, data, meeting.date))
+                if meeting.end_type == 'count' and data.get('end_type', '') == 'end_date':
+                    # quand on fait "modifier ce RDV et les suivants" le 'end_type' du RDV coupé passe à 'end_date'
+                    # il faut retirer 'count' des valeurs d'update sous peine de déclencher check_alert_count_zero
+                    # car au moment de màj 'count' (à 0), meeting.end_type est encore 'count'
+                    del data['count']
                 meeting.update(data)
 
     # @API.CONSTRAINS
@@ -272,6 +277,39 @@ class OFPlanningRecurringMixin(models.AbstractModel):
                 date = date + timedelta(hours=self.duree)
             # exclure la date de ce RDV des occurrences du RDV récurrent
             rset1._exdate.append(date)
+        def naive_tz_to_utc(d):
+            return timezone.localize(d).astimezone(pytz.UTC)
+
+        return [naive_tz_to_utc(d) if not use_naive_datetime else d for d in rset1]
+
+    @api.multi
+    def _get_all_recurrent_date_by_event(self, date_field='date'):
+        u""" Get recurrent dates based on Rule string
+
+        :param date_field: the field containing the reference date information for recurrency computation
+        """
+        self.ensure_one()
+        if date_field in self._fields.keys() and self._fields[date_field].type in ('date', 'datetime'):
+            reference_date = self[date_field]
+        else:
+            # date field stored in DB, NOT this occurence date
+            reference_date = self.date
+
+        timezone = pytz.timezone(self._context.get('tz') or 'UTC')
+        event_date = pytz.UTC.localize(fields.Datetime.from_string(reference_date))  # Add "+hh:mm" timezone
+        if not event_date:
+            event_date = datetime.now()
+
+        use_naive_datetime = self.all_day and self.rrule and 'UNTIL' in self.rrule and 'Z' not in self.rrule
+        if not use_naive_datetime:
+            # Convert the event date to saved timezone (or context tz) as it'll
+            # define the correct hour/day asked by the user to repeat for recurrence.
+            event_date = event_date.astimezone(timezone)  # transform "+hh:mm" timezone
+
+        # The start date is naive
+        # the timezone will be applied, if necessary, at the very end of the process
+        # to allow for DST timezone reevaluation
+        rset1 = rrule.rrulestr(str(self.rrule), dtstart=event_date.replace(tzinfo=None), forceset=True, ignoretz=True)
         def naive_tz_to_utc(d):
             return timezone.localize(d).astimezone(pytz.UTC)
 
@@ -428,14 +466,14 @@ class OFPlanningIntervention(models.Model):
 
     # @API.DEPENDS
 
-    @api.depends('recurrency', 'rrule')
+    @api.depends('rrule')
     def _compute_tournee_ids(self):
         tournee_obj = self.env['of.planning.tournee']
         unique_ids = list(set([calendar_id2real_id(interv_id) for interv_id in self.ids]))
         self = self.browse(unique_ids)
-        interv_rec = self.filtered(lambda i: i.recurrency)
+        interv_rec = self.filtered(lambda i: i.rrule)
         # le champ 'active' est passé à False uniquement lorsqu'on 'unlink' une occurence
-        interv_others = self.filtered(lambda i: not i.recurrency and i.active)
+        interv_others = self.filtered(lambda i: not i.rrule and i.active)
         super(OFPlanningIntervention, interv_others)._compute_tournee_ids()
         for intervention in interv_rec.filtered(lambda i: i.state not in ('cancel', 'postponed')):
             datetime_couples = intervention._get_recurrent_dates_by_event()
@@ -521,6 +559,18 @@ class OFPlanningIntervention(models.Model):
     def write(self, values):
         if not self.user_has_groups('of_planning_recurring.of_group_planning_intervention_recurring'):
             return super(OFPlanningIntervention, self).write(values)
+
+        # contournement rrule sans fin venant de google agenda
+        if values.get('rrule'):
+            data = self._rrule_default_values()
+            data['recurrency'] = True
+            data.update(self._rrule_parse(values['rrule'], data, values['date']))
+            values.update(data)
+            # sometimes final_date is a datetime instead of a date
+            if values.get('final_date'):
+                values['final_date'] = fields.Date.to_string(fields.Date.from_string(values['final_date']))
+            values['rrule'] = self._rrule_serialize(force_values=values)
+
         if values.get('recurrency'):
             values['verif_dispo'] = False
         # process events one by one
@@ -555,7 +605,23 @@ class OFPlanningIntervention(models.Model):
                     if real_meeting.recurrency and real_meeting.end_type in ('count', unicode('count')):
                         final_date = real_meeting._get_recurrency_end_date()
                         super(OFPlanningIntervention, real_meeting).write({'final_date': final_date})
+
+            # Check if some detached occurrences need to be cleaned
+            if meeting.recurrency and not is_calendar_id(meeting.id) and ('date' in values or 'rrule' in values):
+                # Get all detached occurrences
+                detached_meetings = meeting.sudo().with_context(active_test=False).occurrence_ids
+                all_dates = map(lambda dt: fields.Datetime.to_string(dt), meeting._get_all_recurrent_date_by_event())
+                records_to_unlink = self.env['of.planning.intervention']
+                for occ_meeting in detached_meetings:
+                    if occ_meeting.recurrent_id_date not in all_dates:
+                        records_to_unlink |= occ_meeting
+                if records_to_unlink:
+                    records_to_unlink.with_context(of_force_occ_unlink=True).unlink(can_be_deleted=True)
+
         return True
+
+    def need_recompute_tournee(self, vals):
+        return vals.get('rrule') or super(OFPlanningIntervention, self).need_recompute_tournee(vals)
 
     @api.multi
     def _write(self, vals):
@@ -586,6 +652,18 @@ class OFPlanningIntervention(models.Model):
     def create(self, values):
         if 'user_id' not in values:  # Else bug with quick_create when we are filter on an other user
             values['user_id'] = self.env.user.id
+
+        # contournement rrule sans fin
+        if values.get('rrule'):
+            data = self._rrule_default_values()
+            data['recurrency'] = True
+            data.update(self._rrule_parse(values['rrule'], data, values['date']))
+            values.update(data)
+            # sometimes final_date is a datetime instead of a date
+            if values.get('final_date'):
+                values['final_date'] = fields.Date.to_string(fields.Date.from_string(values['final_date']))
+            values['rrule'] = self._rrule_serialize(force_values=values)
+
         if values.get('recurrency'):
             values['verif_dispo'] = False
 
@@ -669,7 +747,7 @@ class OFPlanningIntervention(models.Model):
 
         for meeting in self:
             if can_be_deleted and not is_calendar_id(meeting.id):  # if  ID REAL
-                if meeting.recurrent_id:
+                if meeting.recurrent_id and not self._context.get('of_force_occ_unlink', False):
                     # ne pas supprimer les enregistrements détachés d'un RDV récurrent
                     # pour conserver l'information de l'occurrence à sauter
                     records_to_exclude |= meeting
@@ -755,16 +833,10 @@ class OFPlanningIntervention(models.Model):
         default = default or {}
         return super(OFPlanningIntervention, self.browse(calendar_id2real_id(self.id))).copy(default)
 
-    @api.model
-    def get_recompute_tournee_fields(self):
-        res = super(OFPlanningIntervention, self).get_recompute_tournee_fields()
-        res.append('rrule')
-        return res
-
     @api.multi
     def get_date_tournees(self):
         self.ensure_one()
-        if self.recurrency:
+        if self.rrule:
             datetime_couples = self._get_recurrent_dates_by_event()
             all_dates = []
             # pour chaque occurrence
@@ -975,17 +1047,28 @@ class OFPlanningIntervention(models.Model):
 
         real_id = calendar_id2real_id(self.id)
         meeting_origin = self.browse(real_id)
+        # workaround pour la connexion avec google agenda. Pour une raison inconnu,
+        # quand on détache une occurence l'id renvoyé peut être celui d'une autre occurence détachée
+        # ont regénère donc une occurence_id à la volée.
+        # Ce serait bien de trouver le souci plus profond quand même
+        # (quelque chose à voir avec base_event et <id>_<format-date>)
+        while not meeting_origin.recurrency and meeting_origin.recurrent_id:
+            meeting_origin = self.browse(meeting_origin.recurrent_id)
+        if real_id != meeting_origin.id and not occurence_id:
+            real_id = meeting_origin.id
+            occurence_id = '%d-%s' % (real_id, self.id.split('-')[1])
+
         if occurence_id:
             self = self.browse(occurence_id)
 
         data = self.read(['all_day', 'date_prompt', 'date_deadline_prompt', 'rrule', 'duree'])[0]
+        data.update(values)
         if data.get('rrule'):
             data.update(
-                values,
                 verif_dispo=False,  # inhiber la verif de chevauchement
                 recurrent_id=real_id,
                 recurrent_id_date=data.get('date_prompt'),
-                date=data.get('date_prompt'),
+                date=values.get('date', data.get('date_prompt')),
             )
             # si on a choisi "modifier uniquement ce RDV"
             if only_one:
@@ -996,18 +1079,25 @@ class OFPlanningIntervention(models.Model):
                     final_date=datetime.strptime(
                         data.get('date_prompt'),
                         DEFAULT_SERVER_DATETIME_FORMAT if data['all_day'] else DEFAULT_SERVER_DATETIME_FORMAT
-                    ) + timedelta(hours=values.get('duree', False) or data.get('duree'))
+                    ) + timedelta(hours=values.get('duree', data.get('duree')))
                 )
 
             # forcer les dates pour éviter une erreur due aux horaires
-            if data.get('date_deadline_prompt'):
+            deadline = values.get('date_deadline_forcee', values.get('date_deadline', data.get('date_deadline_prompt')))
+            if deadline:
                 data['forcer_dates'] = True
-                data['date_deadline_forcee'] = data['date_deadline_prompt']
-                del data['date_deadline_prompt']
+                data['date_deadline_forcee'] = deadline
 
             # do not copy the id
             if data.get('id'):
                 del data['id']
+
+            # Manage Google ID for Google Agenda connector
+            if self._context.get('google_internal_event_id', False):
+                data['google_internal_event_id'] = self._context.get('google_internal_event_id')
+            elif 'google_internal_event_id' not in data:
+                data['google_internal_event_id'] = False
+
             detached_meeting = meeting_origin.copy(default=data)
 
             # si on a choisi "modifier ce RDV et les suivants"
@@ -1028,3 +1118,5 @@ class OFPlanningIntervention(models.Model):
                 new_rec_vals['rrule'] = new_rrule
                 meeting_origin.write(new_rec_vals)
             return detached_meeting
+        # workaround pour le connecteur google agenda
+        return meeting_origin.copy(default=data)

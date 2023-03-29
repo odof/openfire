@@ -32,8 +32,6 @@ class HREmployee(models.Model):
     of_toutes_taches = fields.Boolean(string=u"Apte à toutes les tâches")
     of_equipe_ids = fields.Many2many(
         'of.planning.equipe', 'of_planning_employee_rel', 'employee_id', 'equipe_id', u"Équipes")
-    # api.depends dans of.planning.intervention
-    of_changed_intervention_id = fields.Many2one('of.planning.intervention', string=u"Dernier RDV modifié")
     of_est_intervenant = fields.Boolean(string=u"Est intervenant", default=False)
     of_est_commercial = fields.Boolean(string=u"Est commercial", default=False)
     of_impression_planning = fields.Boolean(string=u"Impression planning", default=True)
@@ -60,18 +58,18 @@ class HREmployee(models.Model):
             self.of_daily_email = False
 
     @api.multi
-    def peut_faire(self, tache_id, all_required=False):
+    def peut_faire(self, tache, all_required=False):
         """
         Renvoie True si les employés dans self peuvent réaliser la tâche. Sauf si all_required=True, il suffit qu'un
         des employés puisse réaliser la tâche pour que la fonction renvoie True
-        :param tache_id: La tâche en question
+        :param tache: La tâche en question
         :param all_required: True si tous les employés doivent savoir réaliser la tâche
         :return: True si peut faire, False sinon
         :rtype Boolean
         """
         if all_required:
-            return len(self.filtered(lambda e: (tache_id not in e.of_tache_ids) and not e.of_toutes_taches)) == 0
-        return len(self.filtered(lambda e: (tache_id in e.of_tache_ids) or e.of_toutes_taches))
+            return len(self.filtered(lambda e: (tache not in e.of_tache_ids) and not e.of_toutes_taches)) == 0
+        return len(self.filtered(lambda e: (tache in e.of_tache_ids) or e.of_toutes_taches))
 
     @api.multi
     def get_taches_possibles(self, en_commun=False):
@@ -801,59 +799,6 @@ class OfPlanningIntervention(models.Model):
             cleantext = re.sub(cleanr, '', interv.order_id.of_notes_intervention or '')
             interv.cleantext_intervention = cleantext
 
-    @api.depends('employee_main_id')
-    def _compute_interventions_before_after(self):
-        return  # Temporary 'fix'
-        # Cette fonction n'a jamais eu le fonctionnement voulu à cause d'une erreur sur le comparateur
-        # Nous devons modifier soit le compute pour avoir un calcul plus précis ne prenant que les rdv impactés
-        # Soit modifier l'appel du calcul pour ne plus être un compute.
-        interv_obj = self.env['of.planning.intervention']
-        for interv in self:
-            if compare_date(interv.date, fields.Datetime.now(), compare="<") or \
-                    not compare_date(interv.date, interv.employee_main_id.of_changed_intervention_id.date):
-                continue
-            if interv.interv_before_id\
-                    and interv.interv_before_id == interv.employee_main_id.of_changed_intervention_id:
-                limit_date = fields.Datetime.to_string(fields.Datetime.from_string(interv.date)
-                                                       + relativedelta(hour=0, minute=0, second=0))
-                interv.interv_before_id = interv_obj.search(
-                    [
-                        ('date_deadline', '<=', interv.date),
-                        ('date', '>=', limit_date),
-                        ('employee_main_id', '=', interv.employee_main_id.id)
-                    ], order='date DESC', limit=1)
-            if interv.interv_after_id and interv.interv_after_id == interv.employee_main_id.of_changed_intervention_id:
-                limit_date = fields.Datetime.to_string(fields.Datetime.from_string(interv.date)
-                                                       + relativedelta(days=1, hour=0, minute=0, second=0))
-                interv.interv_after_id = interv_obj.search(
-                    [
-                        ('date', '>=', interv.date_deadline),
-                        ('date', '<=', limit_date),
-                        ('employee_main_id', '=', interv.employee_main_id.id)
-                    ], order='date ASC', limit=1)
-            if not interv.interv_before_id or interv == interv.employee_main_id.of_changed_intervention_id:
-                limit_date = fields.Datetime.to_string(fields.Datetime.from_string(interv.date)
-                                                       + relativedelta(hour=0, minute=0, second=0))
-                res = interv_obj.search(
-                    [
-                        ('date_deadline', '<=', interv.date),
-                        ('date', '>=', limit_date),
-                        ('employee_main_id', '=', interv.employee_main_id.id)
-                    ], order='date DESC', limit=1)
-                if res:
-                    interv.interv_before_id = res
-            if not interv.interv_after_id or interv == interv.employee_main_id.of_changed_intervention_id:
-                limit_date = fields.Datetime.to_string(fields.Datetime.from_string(interv.date)
-                                                       + relativedelta(days=1, hour=0, minute=0, second=0))
-                res = interv_obj.search(
-                    [
-                        ('date', '>=', interv.date_deadline),
-                        ('date', '<=', limit_date),
-                        ('employee_main_id', '=', interv.employee_main_id.id)
-                    ], order='date ASC', limit=1)
-                if res:
-                    interv.interv_after_id = res
-
     @api.depends('interv_before_id')
     def _compute_interval(self):
         for interv in self:
@@ -1134,11 +1079,6 @@ class OfPlanningIntervention(models.Model):
         name = False
         address = self._context.get('from_portal') and self.address_id.sudo() or self.address_id
         if address:
-            name = [address.name_get()[0][1]]
-            for field in ('zip', 'city'):
-                val = getattr(self.address_id, field)
-                if val:
-                    name.append(val)
             if not self.fiscal_position_id:
                 self.fiscal_position_id = address.commercial_partner_id.property_account_position_id
             # Pour les objets du planning, le choix de la société se fait par un paramètre de config
@@ -1159,7 +1099,7 @@ class OfPlanningIntervention(models.Model):
         else:
             self.company_id = self.env.user.company_id.id
         self.onchange_company_id()  # forcer l'appel
-        self.name = name and " ".join(name) or "Intervention"
+        self.name = self.get_name_for_update()
 
     @api.onchange('template_id')
     def onchange_template_id(self):
@@ -2084,6 +2024,20 @@ class OfPlanningIntervention(models.Model):
                     'lines': picking.pack_operation_product_ids,
                 })
         return pickings_layouted
+
+    def get_name_for_update(self):
+        u"""This function is inherited in of_planning_google"""
+        self.ensure_one()
+        name = u""
+        address = self._context.get('from_portal') and self.address_id.sudo() or self.address_id
+        if address:
+            name = [address.name_get()[0][1]]
+            for field in ('zip', 'city'):
+                val = getattr(self.address_id, field)
+                if val:
+                    name.append(val)
+        name = name and " ".join(name) or "Intervention"
+        return name
 
 
 class OfPlanningInterventionLine(models.Model):

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_update_rec_rules_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.update.rec.rules.wizard.view.form</field>
+        <field name="model">of.update.rec.rules.wizard</field>
+        <field name="inherit_id" ref="of_planning_recurring.of_update_rec_rules_wizard_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='employee_ids']" position="after">
+                <field name="partner_ids" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

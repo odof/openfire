@@ -2,8 +2,8 @@
 <!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl) -->
 <odoo>
 
-    <record id="of_group_planning_intervention_recurring" model="res.groups">
-        <field name="name">Gérer les RDVs réguliers</field>
+    <record id="of_group_planning_intervention_google" model="res.groups">
+        <field name="name">Manage Google calendar events</field>
         <field name="category_id" ref="base.module_category_hidden"/>
     </record>
 

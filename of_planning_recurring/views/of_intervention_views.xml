@@ -22,6 +22,9 @@
             <xpath expr="//field[@name='partner_id']" position="attributes">
                 <attribute name="attrs">{'invisible': [('recurrency', '=', True)]}</attribute>
             </xpath>
+            <xpath expr="//field[@name='partner_tag_ids']" position="attributes">
+                <attribute name="attrs">{'invisible': [('recurrency', '=', True)]}</attribute>
+            </xpath>
             <xpath expr="//field[@name='secteur_id']" position="attributes">
                 <attribute name="attrs">{'readonly': [('recurrency', '=', True)]}</attribute>
             </xpath>
