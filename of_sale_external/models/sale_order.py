@@ -16,7 +16,17 @@ class SaleOrder(models.Model):
     def pdf_pdf_sale_show_tax(self):
         # L'affichage des prix HT/TTC était géré par groupe, mais on ne peut pas récupérer
         # ce mode de fonctionnement avec les modes d'impression
-        return self.of_report_template_id.pdf_sale_show_tax if self.of_report_template_id else False
+        res = False
+        if self.of_report_template_id:
+            res = self.of_report_template_id.pdf_sale_show_tax
+        elif self.env.user.has_group('sale.group_show_price_total'):
+            if self.env.user.has_group('sale.group_show_price_subtotal'):
+                res = 'both'
+            else:
+                res = 'total'
+        elif self.env.user.has_group('sale.group_show_price_subtotal'):
+            res = 'subtotal'
+        return res
 
     def pdf_payment_schedule(self):
         return self.of_report_template_id.pdf_payment_schedule if self.of_report_template_id else super(
