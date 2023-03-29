@@ -62,7 +62,7 @@ class SaleOrder(models.Model):
                 commi.total_du = commi.get_total_du()
             orders.of_verif_acomptes()
         if vals.get('state') == 'done':
-            orders.filtered(lambda o: o.state == 'draft').action_to_pay()
+            orders.mapped('of_commi_ids').action_to_pay()
         return result
 
     @api.multi
