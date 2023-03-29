@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Intervention config wizard -->
+    <record id="view_of_intervention_settings" model="ir.ui.view">
+        <field name="name">view.of.intervention.settings.google</field>
+        <field name="model">of.intervention.settings</field>
+        <field name="inherit_id" ref="of_planning.view_of_intervention_settings"/>
+        <field name="priority">18</field>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='intervention']" position="inside">
+                <label for="group_of_group_planning_intervention_google" string="(OF) Google Calendar"
+                       attrs="{'invisible': [('group_of_group_planning_intervention_recurring', '=', False)]}"/>
+                <div name="group_of_group_planning_intervention_google"
+                     attrs="{'invisible': [('group_of_group_planning_intervention_recurring', '=', False)]}">
+                    <field name="group_of_group_planning_intervention_google" class="oe_inline"/>
+                    <span> Activate Google Calendar connector.</span>
+                    <br/>
+                    <i class="oe_grey">/!\ this parameter is shared between companies</i>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="base_config_settings_view_form" model="ir.ui.view">
+        <field name="name">base.config.settings.view.form</field>
+        <field name="model">base.config.settings</field>
+        <field name="inherit_id" ref="google_calendar.view_calendar_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='google_calendar']" position="replace">
+                <div name="google_calendar">
+                    <label for="google_cal_sync"/>
+                    <field name="google_cal_sync"/>
+                    <div attrs="{'invisible':[('google_cal_sync','=',False)]}">
+                        <br/><h2>Pour configurer le processus de connexion avec Google, vous devez d'abord effectuer les étapes suivantes</h2>
+                        <ul>
+                            <li> Connectez-vous sur votre compte Google et allez sur <a href='https://console.developers.google.com/' target='_blank'>https://console.developers.google.com/</a> </li>
+                            <li>
+                                Cliquez sur <b>"CRÉER UN PROJET"</b> et entrez un nom de projet. Vous pouvez changer votre id de projet si vous le souhaitez
+                                <br/><br/><img src='/of_planning_google/static/src/img/setup_01.png' class='calendar_img_tuto'/>
+                            </li>
+                            <li>  Dans le menu du côté gauche, sélectionnez le sous-menu "API et services activés" et cliquez sur <b>"+ ACTIVER LES API ET LES SERVICES"</b>
+                                <br/><br/> <img src='/of_planning_google/static/src/img/setup_02.png' class='calendar_img_tuto' style="max-height: 400px;"/>
+                                <br/> Tapez dans la barre de recherche le mot clé "calendar" et sélectionnez l'API "Google Calendar API"
+                                <br/><br/> <img src='/of_planning_google/static/src/img/setup_03.png' class='calendar_img_tuto' style="max-height: 400px;"/>
+                                <br/> <img src='/of_planning_google/static/src/img/setup_04.png' class='calendar_img_tuto' style="max-height: 400px;"/>
+                                <br/> Activez l'API Calendar en cliquant sur le bouton bleu <b>"ACTIVER"</b>
+                                <br/><br/> <img src='/of_planning_google/static/src/img/setup_05.png' class='calendar_img_tuto' style="max-height: 400px;"/>
+                                <br/> Lorsque c'est fait, les détails de l'API Calendar seront disponible
+                                <br/><br/> <img src='/of_planning_google/static/src/img/setup_06.png' class='calendar_img_tuto' style="max-height: 400px;"/>
+                            </li>
+                            <li>
+                                Sur la page des détails de l'API, cliquez sur le bouton bleu <b>"CRÉER DES IDENTIFIANTS"</b>
+                                <br/><br/> <img src='/of_planning_google/static/src/img/setup_07.png' class='calendar_img_tuto' style="max-height: 400px;"/>
+                                <br/> Vérifiez que l'API sélectionnée est bien <b>"Google Calendar API"</b>, ensuite sélectionnez <b>"Données utilisateurs"</b> et cliquez sur le bouton <b>"SUIVANT"</b>
+                                <br/><br/> <img src='/of_planning_google/static/src/img/setup_08.png' class='calendar_img_tuto' style="max-height: 400px;"/>
+                                <br/> Spécifiez ensuite un nom d'application (par exemple "OpenFire"), ainsi qu'une adresse courriel dans les champs "Adresse e-mail d'assistance utilisateur" et "Adresses e-mail" de la partie "Coordonnées du développeur"
+                                <br/> Enfin, cliquez sur le bouton <b>"ENREGISTRER ET CONTINUER"</b>
+                                <br/><br/> <img src='/of_planning_google/static/src/img/setup_09.png' class='calendar_img_tuto' style="max-height: 400px;"/>
+                                <br/> Passez directement à l'étape suivante en cliquant sur le bouton <b>"ENREGISTRER ET CONTINUER"</b>
+                                <br/><br/> <img src='/of_planning_google/static/src/img/setup_10.png' class='calendar_img_tuto' style="max-height: 400px;"/>
+                                <br/> Vérifiez que le type d'application est mis sur <b>"Application Web"</b>, ensuite renseignez un nom (par exemple "OpenFire")
+                                <br/><br/> <img src='/of_planning_google/static/src/img/setup_11.png' class='calendar_img_tuto' style="max-height: 400px;"/>
+                                <br/> Cliquez sur le bouton "+ AJOUTER UN URI" de la partie "Origines JavaScript autorisées", et renseignez l'URL de votre environnement OpenFire
+                                <br/><br/> <img src='/of_planning_google/static/src/img/setup_12.png' class='calendar_img_tuto' style="max-height: 400px;"/>
+                                <br/> <img src='/of_planning_google/static/src/img/setup_13.png' class='calendar_img_tuto' style="max-height: 400px;"/>
+                                <br/> Vous devez maintenant configurer les pages autorisées sur lesquelles vous serez redirigé
+                                <br/> Pour cela, cliquez sur le bouton "+ AJOUTER UN URI" de la partie "URI de redirection autorisés", et renseignez l'URL de votre environnement OpenFire suivie par <i>'/google_account/authentication'</i>
+                                <br/> Réitérez l'opération 2 fois en cliquant de nouveau sur le bouton "+ AJOUTER UN URI" et en renseignant l'URL de votre environnement OpenFire suivie par <i>'/google_calendar/sync_data'</i> et par <i>'/google_calendar/remove_references'</i>
+                                <br/> Vous devez ainsi vous retrouver avec une liste de 3 URI comme ci-dessous
+                                <br/><br/> <img src='/of_planning_google/static/src/img/setup_14.png' class='calendar_img_tuto' style="max-height: 400px;"/>
+                                <br/> <img src='/of_planning_google/static/src/img/setup_15.png' class='calendar_img_tuto' style="max-height: 400px;"/>
+                                <br/> Enfin, cliquez sur le bouton <b>"CRÉER"</b> juste en dessous, puis sur le bouton <b>"OK"</b> en bas de page
+                                <br/><br/> <img src='/of_planning_google/static/src/img/setup_16.png' class='calendar_img_tuto' style="max-height: 400px;"/>
+                                <br/> <img src='/of_planning_google/static/src/img/setup_17.png' class='calendar_img_tuto' style="max-height: 400px;"/>
+                            </li>
+                            <li>Dès que c'est fait, retournez sur la page de l'ID clients OAuth 2.0 en cliquant sur le menu "Identifiants" du côté gauche, puis sur le nom de votre authentification
+                                <br/> Vous aurez enfin les deux informations (<b>ID client</b> et <b>Code secret du client</b>) que vous devez ajouter dans les 2 champs ci-dessous
+                                <br/><br/> <img src='/of_planning_google/static/src/img/setup_18.png' class='calendar_img_tuto' style="max-height: 400px;"/>
+                                <br/> <img src='/of_planning_google/static/src/img/setup_19.png' class='calendar_img_tuto' style="max-height: 400px;"/>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <label for="cal_client_id" string="Identifiant client Google"/>
+                        <field name="cal_client_id" nolabel="1" class="oe_inline"/>
+                    </div>
+                    <div>
+                        <label for="cal_client_secret" string="Secret client Google"/>
+                        <field name="cal_client_secret" password="True" nolabel="1" class="oe_inline"/>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
