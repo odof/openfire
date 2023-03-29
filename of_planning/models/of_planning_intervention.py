@@ -424,7 +424,8 @@ class OfPlanningIntervention(models.Model):
     tag_ids = fields.Many2many('of.planning.tag', column1='intervention_id', column2='tag_id', string=u"Étiquettes")
 
     # Rubrique Planification
-    template_id = fields.Many2one('of.planning.intervention.template', string=u"Modèle d'intervention")
+    template_id = fields.Many2one(
+        comodel_name='of.planning.intervention.template', string=u"Modèle d'intervention", change_default=True)
     tache_id = fields.Many2one('of.planning.tache', string=u"Tâche", required=True)
     tache_categ_id = fields.Many2one(related="tache_id.tache_categ_id", readonly=True)
     all_day = fields.Boolean(string=u"Toute la journée")
