@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <template id="assets_frontend" inherit_id="website.assets_frontend">
-        <xpath expr="." position="inside">
-            <link rel="stylesheet" href="/of_website_sample_stock/static/src/less/style.less"/>
-        </xpath>
-    </template>
-
     <!-- /shop/product product page -->
     <template id="product" inherit_id="of_website_sample.product" name="Product (of_website_sample_stock)">
         <xpath expr="//form[@id='form_sample_to_cart']" position="replace">
@@ -41,29 +35,8 @@
 
     <!-- /shop/cart page -->
     <template id="of_cart_lines_inherit" inherit_id="of_website_stock.cart_lines_inherit" name="OF Show Qty Validation">
-        <xpath expr="//div[contains(@class, 'oe_website_spinner')]/t[1]/input" position="attributes">
-            <attribute name="t-if">not line.product_id.product_tmpl_id.of_is_sample</attribute>
-        </xpath>
-        <xpath expr="//div[contains(@class, 'oe_website_spinner')]/t[1]/input" position="after">
-            <input type="text" class="js_quantity form-control quantity"
-                   readonly="readonly"
-                   t-if="line.product_id.product_tmpl_id.of_is_sample"
-                   t-att-data-line-id="line.id"
-                   t-att-data-product-id="line.product_id.id"
-                   t-att-data-qty="int(line.product_id.qty_available)"
-                   t-att-value="int(line.product_uom_qty)"/>
-        </xpath>
-        <xpath expr="//div[contains(@class, 'oe_website_spinner')]/t[2]/input" position="attributes">
-            <attribute name="t-if">not line.product_id.product_tmpl_id.of_is_sample</attribute>
-        </xpath>
-        <xpath expr="//div[contains(@class, 'oe_website_spinner')]/t[2]/input" position="after">
-            <input type="text" class="js_quantity form-control quantity"
-                   readonly="readonly"
-                   t-if="line.product_id.product_tmpl_id.of_is_sample"
-                   t-att-data-line-id="line.id"
-                   t-att-data-product-id="line.product_id.id"
-                   t-att-data-qty="int(line.product_id.qty_available)"
-                   t-att-value="int(line.product_uom_qty)"/>
+        <xpath expr="//div[contains(@class, 'oe_website_spinner')]/input" position="attributes">
+            <attribute name="t-att-data-qty">line.product_id.qty_available if (line.product_id.product_tmpl_id.of_is_sample) else (product_quantity if (website.get_website_config() != 'none' and website.get_of_unavailability_management() == 'notify' and line.product_id.availability is False) else 'None')</attribute>
         </xpath>
         <xpath expr="//div[contains(@class, 'oe_website_spinner')]/a[1]" position="attributes">
             <attribute name="t-attf-class">mb8 input-group-addon js_add_cart_json btn #{line.product_id.product_tmpl_id.of_is_sample and 'disabled'}</attribute>

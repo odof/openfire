@@ -130,39 +130,16 @@
     <!--    /shop/cart    -->
 
     <template id="cart_lines_inherit" inherit_id="website_sale.cart_lines"  name="Shopping Cart">
-        <xpath expr="//*[@id='td-qty']" position='replace'>
-            <td class="text-center" id="td-qty">
-                <div class="input-group oe_website_spinner">
-                    <a t-attf-href="#" class="mb8 input-group-addon js_add_cart_json" data-no-instant="">
-                        <i class="fa fa-minus"></i>
-                    </a>
-
-                    <t t-if="website.get_website_config() == 'none'">
-                        <input type="text" class="js_quantity form-control quantity"
-                               t-att-data-line-id="line.id"
-                               t-att-data-product-id="line.product_id.id"
-                               t-att-value="int(line.product_uom_qty) == line.product_uom_qty and int(line.product_uom_qty) or line.product_uom_qty" />
-                    </t>
-
-                    <t t-if="not website.get_website_config() == 'none'">
-                        <t t-if="website.get_website_config() == 'on_hand'">
-                            <t t-set="product_quantity" t-value="line.product_id.qty_available"/>
-                        </t>
-                        <t t-if="website.get_website_config() == 'forecast'">
-                            <t t-set="product_quantity" t-value="line.product_id.qty_available - line.product_id.outgoing_qty + line.product_id.incoming_qty"/>
-                        </t>
-                        <input type="text" class="js_quantity form-control"
-                               t-att-data-line-id="line.id"
-                               t-att-data-product-id="line.product_id.id"
-                               t-att-data-qty="int(product_quantity) if website.get_of_unavailability_management() == 'notify' and line.product_id.availability is False else 'None'"
-                               t-att-value="int(line.product_uom_qty)"/>
-                    </t>
-
-                    <a t-attf-href="#" class="mb8 input-group-addon float_left js_add_cart_json" data-no-instant="">
-                        <i class="fa fa-plus"></i>
-                    </a>
-                </div>
-            </td>
+        <xpath expr="//*[@id='td-qty']//input" position='before'>
+            <t t-if="website.get_website_config() == 'on_hand'">
+                <t t-set="product_quantity" t-value="line.product_id.qty_available"/>
+            </t>
+            <t t-if="website.get_website_config() == 'forecast'">
+                <t t-set="product_quantity" t-value="line.product_id.qty_available - line.product_id.outgoing_qty + line.product_id.incoming_qty"/>
+            </t>
+        </xpath>
+        <xpath expr="//*[@id='td-qty']//input" position='attributes'>
+            <attribute name="t-att-data-qty">product_quantity if (website.get_website_config() != 'none' and website.get_of_unavailability_management() == 'notify' and line.product_id.availability is False) else 'None'</attribute>
         </xpath>
     </template>
 
