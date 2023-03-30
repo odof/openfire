@@ -17,9 +17,7 @@ OpenFire / Website Sample Stock
     'data': [
         'templates/website_sale.xml',
     ],
-    'qweb': [
-        'static/src/xml/*.xml',
-    ],
+    'qweb': [],
     'installable': True,
     'application': False,
     'auto_install': True,

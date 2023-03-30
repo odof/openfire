@@ -18,15 +18,8 @@
             <attribute name="t-attf-href">#{line.product_id.product_tmpl_id.of_is_sample and '/shop/product/'+slug(line.product_id.product_tmpl_id.of_sample_parent_id) or '/shop/product/'+slug(line.product_id.product_tmpl_id)}</attribute>
         </xpath>
         <xpath expr="//div[contains(@class, 'oe_website_spinner')]/input" position="attributes">
-            <attribute name="t-if">not line.product_id.product_tmpl_id.of_is_sample</attribute>
-        </xpath>
-        <xpath expr="//div[contains(@class, 'oe_website_spinner')]/input" position="after">
-            <input type="text" class="js_quantity form-control quantity"
-                   t-if="line.product_id.product_tmpl_id.of_is_sample"
-                   readonly="readonly"
-                   t-att-data-line-id="line.id"
-                   t-att-data-product-id="line.product_id.id"
-                   t-att-value="int(line.product_uom_qty) == line.product_uom_qty and int(line.product_uom_qty) or line.product_uom_qty"/>
+            <!-- L'attribut readonly des inputs qui ont readonly=0 sera supprimer par une surcharge de la fonction render_template -->
+            <attribute name="t-att-readonly">'1' if line.product_id.product_tmpl_id.of_is_sample else '0'</attribute>
         </xpath>
         <xpath expr="//div[contains(@class, 'oe_website_spinner')]/a[1]" position="attributes">
             <attribute name="t-attf-class">mb8 input-group-addon js_add_cart_json btn #{line.product_id.product_tmpl_id.of_is_sample and 'disabled'}</attribute>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="assets_frontend" inherit_id="website_sale.assets_frontend">
+        <xpath expr="//link[last()]" position="after">
+            <link rel="stylesheet" href="/of_website_sale_packaging/static/src/less/website_sale.less" />
+        </xpath>
+        <xpath expr="//script[@src='/website_sale/static/src/js/website_sale.js']" position="attributes">
+            <attribute name="src">/of_website_sale_packaging/static/src/js/website_sale.js</attribute>
+        </xpath>
+    </template>
+
+</odoo>
