@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
 from odoo.exceptions import AccessError
@@ -26,6 +25,7 @@ class OFSaleConfiguration(models.TransientModel):
         help=u"Affiche les sous-totaux TTC par ligne de commande. Uniquement dans le formulaire et non dans les "
              u"rapports.", implied_group='of_sale.group_of_afficher_total_ttc', group='base.group_user')
 
+    # Laisser l'option avec lien sur installation du module ?
     group_of_order_line_option = fields.Boolean(
         string=u"(OF) Options de ligne de commande", implied_group='of_sale.group_of_order_line_option',
         group='base.group_portal,base.group_user,base.group_public')

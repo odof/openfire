@@ -1,0 +1,145 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_order_line_option
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-03-30 13:14+0000\n"
+"PO-Revision-Date: 2023-03-30 13:14+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_order_line_option
+#: model:ir.model.fields,field_description:of_order_line_option.field_of_order_line_option__purchase_price_update
+msgid "Alters purchase price"
+msgstr "Modification du prix d'achat"
+
+#. module: of_order_line_option
+#: model:ir.model.fields,field_description:of_order_line_option.field_of_order_line_option__sale_price_update
+msgid "Alters sale price"
+msgstr "Modification du prix de vente"
+
+#. module: of_order_line_option
+#: model:ir.model.fields,field_description:of_order_line_option.field_of_order_line_option__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: of_order_line_option
+#: model:ir.model.fields,field_description:of_order_line_option.field_of_order_line_option__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: of_order_line_option
+#: model:ir.model.fields,field_description:of_order_line_option.field_of_order_line_option__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: of_order_line_option
+#: model:ir.model.fields,field_description:of_order_line_option.field_of_order_line_option__id
+msgid "ID"
+msgstr ""
+
+#. module: of_order_line_option
+#: model:ir.model.fields,field_description:of_order_line_option.field_of_order_line_option____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_order_line_option
+#: model:ir.model.fields,field_description:of_order_line_option.field_of_order_line_option__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_order_line_option
+#: model:ir.model.fields,field_description:of_order_line_option.field_of_order_line_option__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_order_line_option
+#: model:ir.model.fields,field_description:of_order_line_option.field_of_order_line_option__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_order_line_option
+#: model:ir.model.fields,field_description:of_order_line_option.field_purchase_order_line__of_order_line_option_id
+#: model:ir.model.fields,field_description:of_order_line_option.field_sale_order_line__of_order_line_option_id
+msgid "Option"
+msgstr "Option"
+
+#. module: of_order_line_option
+#: model:ir.model,name:of_order_line_option.model_of_order_line_option
+msgid "Option for sale and purchase order lines"
+msgstr "Option pour les lignes de commande (achat et vente)"
+
+#. module: of_order_line_option
+#: model:ir.model.fields,field_description:of_order_line_option.field_of_order_line_option__description_update
+msgid "Order line description"
+msgstr "Description de la ligne de commande"
+
+#. module: of_order_line_option
+#: model:ir.actions.act_window,name:of_order_line_option.of_order_line_option_action
+#: model:ir.ui.menu,name:of_order_line_option.of_order_line_option_menu
+msgid "Order line options"
+msgstr "Options de ligne de commande"
+
+#. module: of_order_line_option
+#: model:ir.model.fields.selection,name:of_order_line_option.selection__of_order_line_option__purchase_price_update_type__percent
+#: model:ir.model.fields.selection,name:of_order_line_option.selection__of_order_line_option__sale_price_update_type__percent
+msgid "Percentage"
+msgstr ""
+
+#. module: of_order_line_option
+#: model:ir.model,name:of_order_line_option.model_purchase_order_line
+msgid "Purchase Order Line"
+msgstr "Ligne de commande d'achat"
+
+#. module: of_order_line_option
+#: model:ir.model.fields,field_description:of_order_line_option.field_of_order_line_option__purchase_price_update_type
+msgid "Purchase price alteration type"
+msgstr "Type de modification du prix d'achat"
+
+#. module: of_order_line_option
+#: model:ir.model.fields,field_description:of_order_line_option.field_of_order_line_option__purchase_price_update_value
+msgid "Purchase price alteration value"
+msgstr "Valeur de modification du prix d'achat"
+
+#. module: of_order_line_option
+#: model:ir.model.fields,field_description:of_order_line_option.field_sale_order_line__of_reset_option
+msgid "Reset option"
+msgstr "Réinitialiser les options"
+
+#. module: of_order_line_option
+#: model:ir.model.fields,field_description:of_order_line_option.field_of_order_line_option__sale_price_update_type
+msgid "Sale price alteration type"
+msgstr "Type de modification du prix de vente"
+
+#. module: of_order_line_option
+#: model:ir.model.fields,field_description:of_order_line_option.field_of_order_line_option__sale_price_update_value
+msgid "Sale price alteration value"
+msgstr "aleur de modification du prix de vente"
+
+#. module: of_order_line_option
+#: model:ir.model,name:of_order_line_option.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de commande"
+
+#. module: of_order_line_option
+#: model:ir.model.fields.selection,name:of_order_line_option.selection__of_order_line_option__purchase_price_update_type__fixed
+#: model:ir.model.fields.selection,name:of_order_line_option.selection__of_order_line_option__sale_price_update_type__fixed
+msgid "Set amount"
+msgstr "Montant fixe"
+
+#. module: of_order_line_option
+#: model_terms:ir.ui.view,arch_db:of_order_line_option.of_order_line_option_form_view
+msgid "Type"
+msgstr "Type"
+
+#. module: of_order_line_option
+#: model_terms:ir.ui.view,arch_db:of_order_line_option.of_order_line_option_form_view
+msgid "Value"
+msgstr "Valeur"

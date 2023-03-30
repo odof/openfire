@@ -92,11 +92,6 @@ msgid "(OF) Multi Images"
 msgstr "(OF) Images multiples dans l’article"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_group_of_order_line_option
-msgid "(OF) Options de ligne de commande"
-msgstr "(OF) Options de ligne de commande"
-
-#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_of_position_fiscale
 msgid "(OF) Position fiscale"
 msgstr "(OF) Position fiscale"
@@ -191,11 +186,6 @@ msgid "<span>Displays TTC subtotals by command line.</span>\n"
 msgstr "<span>Affiche les sous-totaux TTC par ligne de commande.</span>\n"
 "                        <br/>\n"
 "                        <span class=\"text-muted\">Uniquement dans le formulaire et non dans les rapports.</span>"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
-msgid "<span>Enable command line options</span>"
-msgstr "<span>Activer les options de ligne de commande</span>"
 
 #. module: of_sale
 #: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
@@ -583,7 +573,6 @@ msgid "Coût total HT simulé"
 msgstr "Coût total HT simulé"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_order_line_option_create_uid
 #: model:ir.model.fields,field_description:of_sale.field_of_product_image_create_uid
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_create_uid
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_create_uid
@@ -596,7 +585,6 @@ msgid "Created by"
 msgstr "Créé par"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_order_line_option_create_date
 #: model:ir.model.fields,field_description:of_sale.field_of_product_image_create_date
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_create_date
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_create_date
@@ -725,11 +713,6 @@ msgid "Dernière Échéance"
 msgstr "Dernière Échéance"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_order_line_option_description_update
-msgid "Description de la ligne de commande"
-msgstr "Description de la ligne de commande"
-
-#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_quote_id
 msgid "Devis à ajouter"
 msgstr "Devis à ajouter"
@@ -746,7 +729,6 @@ msgstr "Remise (%)"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_documents_joints_display_name
-#: model:ir.model.fields,field_description:of_sale.field_of_order_line_option_display_name
 #: model:ir.model.fields,field_description:of_sale.field_of_product_image_display_name
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_display_name
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_display_name
@@ -913,7 +895,6 @@ msgstr "HT"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_documents_joints_id
-#: model:ir.model.fields,field_description:of_sale.field_of_order_line_option_id
 #: model:ir.model.fields,field_description:of_sale.field_of_product_image_id
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_id
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_id
@@ -1155,7 +1136,6 @@ msgstr "Pastilles"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_documents_joints___last_update
-#: model:ir.model.fields,field_description:of_sale.field_of_order_line_option___last_update
 #: model:ir.model.fields,field_description:of_sale.field_of_product_image___last_update
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance___last_update
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard___last_update
@@ -1168,7 +1148,6 @@ msgid "Last Modified on"
 msgstr "Dernière Modification le"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_order_line_option_write_uid
 #: model:ir.model.fields,field_description:of_sale.field_of_product_image_write_uid
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_write_uid
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_write_uid
@@ -1181,7 +1160,6 @@ msgid "Last Updated by"
 msgstr "Dernière mise à jour par"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_order_line_option_write_date
 #: model:ir.model.fields,field_description:of_sale.field_of_product_image_write_date
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_write_date
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_write_date
@@ -1307,25 +1285,9 @@ msgid "Mode de calcul"
 msgstr "Mode de calcul"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_order_line_option_purchase_price_update
-msgid "Modification du prix d'achat"
-msgstr "Modification du prix d'achat"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_order_line_option_sale_price_update
-msgid "Modification du prix de vente"
-msgstr "Modification du prix de vente"
-
-#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_amount
 msgid "Montant"
 msgstr "Montant"
-
-#. module: of_sale
-#: selection:of.order.line.option,purchase_price_update_type:0
-#: selection:of.order.line.option,sale_price_update_type:0
-msgid "Montant fixe"
-msgstr "Montant fixe"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_unit_price_variation
@@ -1358,7 +1320,6 @@ msgid "Ne pas gérer les BL depuis la facture"
 msgstr "Ne pas gérer les BL depuis la facture"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_order_line_option_name
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_name
 msgid "Nom"
 msgstr "Nom"
@@ -1441,27 +1402,9 @@ msgid "Opportunité de montée en gamme"
 msgstr "Opportunité de montée en gamme"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_purchase_order_line_of_order_line_option_id
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_order_line_option_id
-msgid "Option"
-msgstr "Option"
-
-#. module: of_sale
-#: model:ir.model,name:of_sale.model_of_order_line_option
-msgid "Option pour les lignes de commande (Achat et Vente)"
-msgstr "Option pour les lignes de commande (Achat et Vente)"
-
-#. module: of_sale
 #: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
 msgid "Options d'impression"
 msgstr "Options d'impression"
-
-#. module: of_sale
-#: model:ir.actions.act_window,name:of_sale.of_sale_of_order_line_option_action
-#: model:ir.ui.menu,name:of_sale.of_sale_of_order_line_option_menu
-#: model:res.groups,name:of_sale.group_of_order_line_option
-msgid "Options de ligne de commande"
-msgstr "Options de ligne de commande"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation_order_id
@@ -1547,8 +1490,6 @@ msgstr "Politique de facturation"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_percent
-#: selection:of.order.line.option,purchase_price_update_type:0
-#: selection:of.order.line.option,sale_price_update_type:0
 msgid "Pourcentage"
 msgstr "Pourcentage"
 
@@ -1844,11 +1785,6 @@ msgid "Référence article"
 msgstr "Référence article"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_reset_option
-msgid "Réinitialiser l'option ?"
-msgstr "Réinitialiser l'option ?"
-
-#. module: of_sale
 #: model:ir.model,name:of_sale.model_sale_advance_payment_inv
 msgid "Sales Advance Payment Invoice"
 msgstr "Facture de paiement d'avance"
@@ -2058,19 +1994,8 @@ msgstr "Tout inclure"
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification_type
 #: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
-#: model:ir.ui.view,arch_db:of_sale.of_sale_of_order_line_option_form_view
 msgid "Type"
 msgstr "Type"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_order_line_option_purchase_price_update_type
-msgid "Type de modification du prix d'achat"
-msgstr "Type de modification du prix d'achat"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_order_line_option_sale_price_update_type
-msgid "Type de modification du prix de vente"
-msgstr "Type de modification du prix de vente"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_price_unit_ht
@@ -2094,19 +2019,8 @@ msgstr "Unit price without taxes"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_valeur
-#: model:ir.ui.view,arch_db:of_sale.of_sale_of_order_line_option_form_view
 msgid "Valeur"
 msgstr "Valeur"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_order_line_option_purchase_price_update_value
-msgid "Valeur de modification du prix d'achat"
-msgstr "Valeur de modification du prix d'achat"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_order_line_option_sale_price_update_value
-msgid "Valeur de modification du prix de vente"
-msgstr "Valeur de modification du prix de vente"
 
 #. module: of_sale
 #: model:ir.ui.view,arch_db:of_sale.of_sale_order_verification_wizard_view_form

@@ -820,8 +820,6 @@ class SaleOrderLine(models.Model):
         compute='_compute_of_marge', string=u"Marge %", store=True)
 
     of_product_default_code = fields.Char(related='product_id.default_code', string=u"Référence article", readonly=True)
-    of_order_line_option_id = fields.Many2one(comodel_name='of.order.line.option', string=u"Option")
-    of_reset_option = fields.Boolean(string=u"Réinitialiser l'option ?")
 
     of_confirmation_date = fields.Datetime(
         string="Date de confirmation", related="order_id.confirmation_date", store=True)
@@ -1078,47 +1076,6 @@ class SaleOrderLine(models.Model):
         price = frm_cur.with_context(ctx).compute(seller_price, to_cur, round=False)
         return {'of_seller_price': price}
 
-    @api.onchange('of_order_line_option_id')
-    def _onchange_of_order_line_option_id(self):
-        if self.of_order_line_option_id and self.product_id:
-            option = self.of_order_line_option_id
-            if option.sale_price_update and self.price_unit:
-                if option.sale_price_update_type == 'fixed':
-                    self.price_unit = self.price_unit + option.sale_price_update_value
-                elif option.sale_price_update_type == 'percent':
-                    self.price_unit = self.price_unit + self.price_unit * (option.sale_price_update_value / 100)
-                self.price_unit = self.order_id.currency_id.round(self.price_unit)
-            if option.purchase_price_update and self.purchase_price:
-                if option.purchase_price_update_type == 'fixed':
-                    self.purchase_price = self.purchase_price + option.purchase_price_update_value
-                elif option.purchase_price_update_type == 'percent':
-                    self.purchase_price = \
-                        self.purchase_price + self.purchase_price * (option.purchase_price_update_value / 100)
-                self.purchase_price = self.order_id.currency_id.round(self.purchase_price)
-            if option.description_update:
-                self.name = self.name + "\n%s" % option.description_update
-
-    @api.onchange('of_reset_option')
-    def _onchange_of_reset_option(self):
-        if self.of_reset_option:
-            product = self.product_id.with_context(
-                lang=self.order_id.partner_id.lang,
-                partner=self.order_id.partner_id.id,
-                quantity=self.product_uom_qty,
-                date=self.order_id.date_order,
-                pricelist=self.order_id.pricelist_id.id,
-                uom=self.product_uom.id
-            )
-
-            if self.order_id.pricelist_id and self.order_id.partner_id:
-                self.price_unit = self.env['account.tax']._fix_tax_included_price_company(
-                    self._get_display_price(product), product.taxes_id, self.tax_id, self.company_id)
-            self.purchase_price = product.get_cost()
-            if self.of_order_line_option_id.description_update:
-                self.name = self.name.replace(self.of_order_line_option_id.description_update, '')
-            self.of_order_line_option_id = False
-            self.of_reset_option = False
-
     @api.onchange('of_product_forbidden_discount')
     def _onchange_of_product_forbidden_discount(self):
         if self.of_product_forbidden_discount and self.product_id:
@@ -1322,21 +1279,3 @@ class SaleLayoutCategory(models.Model):
     _inherit = 'sale.layout_category'
 
     active = fields.Boolean(string="Active", default=True)
-
-
-class OFOrderLineOption(models.Model):
-    _name = 'of.order.line.option'
-    _description = u"Option pour les lignes de commande (Achat et Vente)"
-
-    name = fields.Char(string=u"Nom", required=True)
-    purchase_price_update = fields.Boolean(string=u"Modification du prix d'achat")
-    purchase_price_update_type = fields.Selection(
-        selection=[('fixed', u"Montant fixe"),
-                   ('percent', u"Pourcentage")], string=u"Type de modification du prix d'achat")
-    purchase_price_update_value = fields.Float(string=u"Valeur de modification du prix d'achat")
-    sale_price_update = fields.Boolean(string=u"Modification du prix de vente")
-    sale_price_update_type = fields.Selection(
-        selection=[('fixed', u"Montant fixe"),
-                   ('percent', u"Pourcentage")], string=u"Type de modification du prix de vente")
-    sale_price_update_value = fields.Float(string=u"Valeur de modification du prix de vente")
-    description_update = fields.Text(string=u"Description de la ligne de commande")

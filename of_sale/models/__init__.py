@@ -10,7 +10,6 @@ from . import payment_term
 from . import partner
 from . import product
 from . import procurement
-from . import purchase
 from . import sale_config_settings
 from . import account_invoice
 from . import res_users
