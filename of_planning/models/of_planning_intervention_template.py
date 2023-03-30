@@ -21,18 +21,29 @@ class OfPlanningInterventionTemplate(models.Model):
         """ A supprimer après mise en ligne
             Les anciens template n'ont plus besoin d'exister vu les modifications
         """
-        cr = self._cr
-        cr.execute("SELECT * FROM information_schema.columns WHERE table_name = '%s' "
-                   "AND column_name = 'fi_partner_id'" % (self._table,))
-        missing_fields = not cr.fetchall()
         res = super(OfPlanningInterventionTemplate, self)._auto_init()
-        if missing_fields:
-            default1 = self.env.ref('of_mobile.of_planning_default_intervention_template', raise_if_not_found=False)
-            default2 = self.env.ref('of_planning.of_planning_default_intervention_template', raise_if_not_found=False)
-            if default1:
-                default1.unlink()  # Supression de l'ancien enregistrement par défaut
-            if default2:
-                default2.unlink()  # Supression de l'ancien enregistrement par défaut
+        module_self = self.env['ir.module.module'].search(
+            [('name', '=', 'of_planning'), ('state', 'in', ['installed', 'to upgrade'])])
+        if module_self:
+            # installed_version est trompeur, il contient la version en cours d'installation
+            # on utilise donc latest version à la place
+            version = module_self.latest_version
+            if version < '10.0.1.1.1':
+                cr = self.env.cr
+                cr.execute('''
+INSERT INTO of_planning_intervention_template_line (template_id, product_id, qty, price_unit, name)
+SELECT templ.id, prod.id, 1, prodtemp.list_price, prodtemp.name 
+FROM of_planning_intervention_template AS templ
+    INNER JOIN of_planning_tache tache
+    ON tache.id = templ.tache_id
+    LEFT JOIN of_planning_intervention_template_line AS line
+    ON line.template_id = templ.id AND line.product_id = tache.product_id
+    INNER JOIN product_product AS prod
+    ON prod.id = tache.product_id
+    INNER JOIN product_template AS prodtemp
+    ON prodtemp.id = prod.product_tmpl_id
+WHERE line.id IS NULL
+                ''')
         return res
 
     @api.model
