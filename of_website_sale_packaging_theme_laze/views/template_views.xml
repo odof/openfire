@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="product_details" inherit_id="theme_laze.product_details">
+        <xpath expr="//input[@name='product_id']" position="after">
+            <input class="packaging_unit" t-if="product.of_packaging_unit" type="hidden" name="packaging_unit" t-att-value="product.of_packaging_unit"/>
+        </xpath>
+        <xpath expr="//a[@id='add_to_cart']" position="before">
+            <div id="packaging" t-if="product.of_packaging_unit" class="mb8">
+                <span>
+                    Packaging : <span t-esc="product.of_packaging_unit"/> <span t-esc="product.of_uom_id_display.name"/> / <span t-esc="product.of_packaging_type"/>
+                </span>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="products_add_to_cart" inherit_id="theme_laze.products_add_to_cart">
+        <xpath expr="//input[@name='product_id']" position="after">
+            <input class="packaging_unit" t-if="product.product_variant_id.of_packaging_unit" type="hidden" name="packaging_unit" t-att-value="product.product_variant_id.of_packaging_unit"/>
+        </xpath>
+    </template>
+
+</odoo>
