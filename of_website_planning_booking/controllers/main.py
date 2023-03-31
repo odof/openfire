@@ -487,7 +487,7 @@ class OFWebsitePlanningBooking(http.Controller):
                 service.check_access_rights('read')
                 service.check_access_rule('read')
             except AccessError:
-                return request.render("website.403")
+                return request.render('website.403')
             request.session['rdv_service_id'] = service.id
             request.session['rdv_tache_id'] = service.tache_id.id
             request.session['booking_partner_id'] = request.env.user.partner_id.id
@@ -555,7 +555,7 @@ class OFWebsitePlanningBooking(http.Controller):
         taches = request.env['of.planning.tache'].search([])
         values['tache_list'] = taches
         values['service_list'] = request.env['of.service'].search([
-            ('type_id','=',service_type.id),
+            ('type_id', '=', service_type.id),
             ('base_state', '=', 'calculated'),
             '|',
             ('partner_id', 'child_of', request.env.user.partner_id.id),
