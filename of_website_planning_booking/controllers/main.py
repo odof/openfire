@@ -1073,6 +1073,8 @@ class OFWebsitePlanningBooking(http.Controller):
                 description += u"<br/>"
             description += u"Commentaires additionnels du client : %s" % request.params.get('comment')
 
+        booking_state = request.env['ir.values'].get_default(
+            'of.intervention.settings', 'website_booking_intervention_state')
         vals = {
             'name': u"Intervention",
             'parc_installe_id': parc_installe.id,
@@ -1082,7 +1084,7 @@ class OFWebsitePlanningBooking(http.Controller):
             'employee_ids': [(4, creneau_employee.employee_id.id, 0)],
             'duree': tache.duree,
             'company_id': request.website.company_id.id,
-            'state': 'draft',
+            'state': booking_state,
             'fiscal_position_id': tache.fiscal_position_id.id or False,
             'verif_dispo': True,
             'line_ids': tache.product_id and [(0, 0, {'product_id': tache.product_id.id,
