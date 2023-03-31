@@ -18,11 +18,15 @@ class OFTestOrderTransactionCase(TransactionCase):
         - self.test_product : product to use in the sale.order
         """
         super(OFTestOrderTransactionCase, self).setUp()
-        partner_obj = self.env['res.partner']
-        product_obj = self.env['product.product']
-        product_brand_obj = self.env['of.product.brand']
-        product_category_obj = self.env['product.category']
+        self.setUpSupplier()
+        self.setUpPartner()
+        self.setUpProductCategory()
+        self.setUpProductBrand()
+        self.setUpProduct()
 
+    def setUpSupplier(self):
+        """ Supplier creation """
+        partner_obj = self.env['res.partner']
         partner_default_values = partner_obj.default_get(partner_obj.fields_get().keys())
         # Supplier creation
         values = {
@@ -35,10 +39,16 @@ class OFTestOrderTransactionCase(TransactionCase):
         self.assertEqual(test_supplier.name, 'Jean-michel Fournisseur')
         self.assertEqual(test_supplier.is_company, True)
         self.assertEqual(test_supplier.supplier, True)
+        # affectation
+        self.test_supplier = test_supplier
 
+    def setUpPartner(self):
+        """ Partner creation """
+        partner_obj = self.env['res.partner']
+        partner_default_values = partner_obj.default_get(partner_obj.fields_get().keys())
         # Partner creation
         values = {
-            'name': 'Jean-michel Voixdechiotte',
+            'name': 'Jean-michel client',
             'child_ids': [
                 (0, 0, {
                     'name': 'Livraison', 'type': 'delivery', 'street': '1 rue de la livraison', 'zip': '35000',
@@ -47,17 +57,23 @@ class OFTestOrderTransactionCase(TransactionCase):
                     'name': 'Facturation', 'type': 'invoice', 'street': '2 rue de la facturation', 'zip': '35000',
                     'city': 'Rennes'}),
             ],
+            'user_id': self.env.user.id,
         }
         partner_default_values.update(values)
         test_partner = partner_obj.create(values)
-        self.assertEqual(test_partner.name, 'Jean-michel Voixdechiotte')
+        self.assertEqual(test_partner.name, 'Jean-michel client')
         self.assertEqual(test_partner.of_customer_state, 'other')
         self.assertEqual(test_partner.child_ids[0].name, 'Facturation')
         self.assertEqual(test_partner.child_ids[1].name, 'Livraison')
         self.assertLessEqual(len(test_partner.child_ids), 2)
         test_partner._onchange_customer()
         self.assertEqual(test_partner.of_customer_state, 'lead')
+        # affectation
+        self.test_partner = test_partner
 
+    def setUpProductCategory(self):
+        """ Product category creation """
+        product_category_obj = self.env['product.category']
         # Category creation
         default_values = product_category_obj.default_get(product_category_obj.fields_get().keys())
         values = {
@@ -66,14 +82,20 @@ class OFTestOrderTransactionCase(TransactionCase):
         default_values.update(values)
         test_category = product_category_obj.create(values)
         self.assertNotEqual(test_category, product_category_obj)
+        # affectation
+        self.test_category = test_category
 
-        # Brand creation
+    def setUpProductBrand(self):
+        """ Brand creation """
+        if not hasattr(self, 'test_supplier') or not hasattr(self, 'test_category'):
+            return
+        product_brand_obj = self.env['of.product.brand']
         default_values = product_brand_obj.default_get(product_brand_obj.fields_get().keys())
         values = {
             'name': 'Brand Test',
             'code': 'BT',
-            'partner_id': test_supplier.id,
-            'of_import_categ_id': test_category.id,
+            'partner_id': self.test_supplier.id,
+            'of_import_categ_id': self.test_category.id,
             'of_import_remise': 40,
             'of_import_price': 'ppht',
             'of_import_cout': 'pa',
@@ -81,8 +103,14 @@ class OFTestOrderTransactionCase(TransactionCase):
         default_values.update(values)
         test_brand = product_brand_obj.create(values)
         self.assertNotEqual(test_brand, product_brand_obj)
+        # affectation
+        self.test_brand = test_brand
 
-        # Product creation
+    def setUpProduct(self):
+        """ Product creation """
+        if not hasattr(self, 'test_brand'):
+            return
+        product_obj = self.env['product.product']
         default_values = product_obj.default_get(product_obj.fields_get().keys())
         values = {
             'name': 'Test Product',
@@ -91,25 +119,20 @@ class OFTestOrderTransactionCase(TransactionCase):
             'list_price': 100,
             'of_seller_price': 80,
             'of_seller_pp_ht': 100,
-            'brand_id': test_brand.id,
+            'brand_id': self.test_brand.id,
         }
         default_values.update(values)
         test_product = product_obj.create(values)
         self.assertNotEqual(test_product, product_obj)
         test_product._onchange_brand_id()
         test_product.default_code = 'BT_TEST'
-
         self.assertEqual(test_product.list_price, 100)
         self.assertEqual(test_product.marge, 20.0)
         self.assertEqual(len(test_product.seller_ids), 1)
         test_product.seller_ids[0].price = 80
         test_product.seller_ids[0].pp_ht = 100
         self.assertEqual(test_product.of_seller_remise, 20.0)
-
-        self.test_supplier = test_supplier
-        self.test_partner = test_partner
-        self.test_category = test_category
-        self.test_brand = test_brand
+        # affectation
         self.test_product = test_product
 
 
@@ -123,6 +146,11 @@ class OFAdvancedTestOrderTransactionCase(OFTestOrderTransactionCase):
         - self.test_order : sale.order for the tests
         """
         super(OFAdvancedTestOrderTransactionCase, self).setUp()
+        self.setUpOrder()
+
+    def setUpOrder(self):
+        if not hasattr(self, 'test_partner') or not hasattr(self, 'test_product'):
+            return
         sale_order_obj = self.env['sale.order']
         sale_order_line_obj = self.env['sale.order.line']
 
@@ -134,7 +162,7 @@ class OFAdvancedTestOrderTransactionCase(OFTestOrderTransactionCase):
         test_order = sale_order_obj.create(order_values)
         test_order.onchange_partner_id()
         self.assertNotEqual(test_order, sale_order_obj)
-        self.assertEqual(test_order.partner_id.name, 'Jean-michel Voixdechiotte')
+        self.assertEqual(test_order.partner_id.name, 'Jean-michel client')
         self.assertEqual(test_order.partner_shipping_id.name, 'Livraison')
         self.assertEqual(test_order.partner_invoice_id.name, 'Facturation')
 

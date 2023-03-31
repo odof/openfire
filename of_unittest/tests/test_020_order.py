@@ -37,7 +37,7 @@ class OFTestOrder(OFTestOrderTransactionCase):
         test_order = sale_order_obj.create(order_values)
         test_order.onchange_partner_id()
         self.assertNotEqual(test_order, sale_order_obj)
-        self.assertEqual(test_order.partner_id.name, 'Jean-michel Voixdechiotte')
+        self.assertEqual(test_order.partner_id.name, 'Jean-michel client')
         self.assertEqual(test_order.partner_shipping_id.name, 'Livraison')
         self.assertEqual(test_order.partner_invoice_id.name, 'Facturation')
 
@@ -82,7 +82,7 @@ class OFTestOrder(OFTestOrderTransactionCase):
         test_order = sale_order_obj.create(order_values)
         test_order.onchange_partner_id()
         self.assertNotEqual(test_order, sale_order_obj)
-        self.assertEqual(test_order.partner_id.name, 'Jean-michel Voixdechiotte')
+        self.assertEqual(test_order.partner_id.name, 'Jean-michel client')
         self.assertEqual(test_order.partner_shipping_id.name, 'Livraison')
         self.assertEqual(test_order.partner_invoice_id.name, 'Facturation')
 

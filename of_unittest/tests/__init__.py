@@ -5,3 +5,4 @@ from . import test_010_partner
 from . import test_020_order
 from . import test_021_order_pickings
 from . import test_022_order_invoicing
+from . import test_025_order_access_rights
