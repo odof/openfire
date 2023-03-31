@@ -13,7 +13,8 @@ class SaleOrder(models.Model):
                    ('invoiced', u"Facturé")],
         compute='_compute_of_cee_invoice_status', string=u"État de facturation CEE", store=True)
 
-    @api.depends('order_line', 'order_line.product_id', 'order_line.product_id.categ_id', 'order_line.invoice_lines')
+    @api.depends(
+        'state', 'order_line', 'order_line.product_id', 'order_line.product_id.categ_id', 'order_line.invoice_lines')
     def _compute_of_cee_invoice_status(self):
         cee_product_categ_id = self.env['ir.values'].get_default('sale.config.settings', 'of_cee_product_categ_id')
         for order in self:
