@@ -24,6 +24,8 @@ class OFInterventionSettings(models.TransientModel):
             self.env['ir.values'].set_default('of.intervention.settings', 'website_booking_allow_empty_days', True)
         if self.env['ir.values'].get_default('of.intervention.settings', 'website_booking_slot_size') is None:
             self.env['ir.values'].set_default('of.intervention.settings', 'website_booking_slot_size', 'half_day')
+        if self.env['ir.values'].get_default('of.intervention.settings', 'website_booking_intervention_state') is None:
+            self.env['ir.values'].set_default('of.intervention.settings', 'website_booking_intervention_state', 'draft')
 
     def _default_website(self):
         return self.env['website'].search([], limit=1)
@@ -50,6 +52,10 @@ class OFInterventionSettings(models.TransientModel):
         string=u"(OF) Nombre de jours ouverts à la réservation (max 180 jours)", default=60)
     website_booking_allow_empty_days = fields.Boolean(
         string=u"(OF) Autorise la réservation de créneau sur des journées vierges", default=True)
+    website_booking_intervention_state = fields.Selection(selection=[
+        ('draft', u"Brouillon"),
+        ('confirm', u"Confirmé")
+        ], string=u"(OF) État des RDV à la prise de RDV en ligne", default='draft', required=True)
     website_booking_slot_size = fields.Selection(
         selection=[('half_day', u"Demi-journée"), ('manual', u"Manuelle")], string=u"(OF) Granularité de réservation", default='half_day',
         required=True)
@@ -122,6 +128,12 @@ class OFInterventionSettings(models.TransientModel):
             company_id=self.website_booking_company_dependent and self.company_id.id)
 
     @api.multi
+    def set_website_booking_intervention_state_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings', 'website_booking_intervention_state', self.website_booking_intervention_state,
+            company_id=self.website_booking_company_dependent and self.company_id.id)
+
+    @api.multi
     def set_website_booking_slot_size_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'of.intervention.settings', 'website_booking_slot_size', self.website_booking_slot_size,
@@ -169,6 +181,8 @@ class OFInterventionSettings(models.TransientModel):
             'of.intervention.settings', 'website_booking_open_days_number', company_id=cd and self.company_id.id),
             'website_booking_allow_empty_days': ir_values_obj.env['ir.values'].get_default(
             'of.intervention.settings', 'website_booking_allow_empty_days', company_id=cd and self.company_id.id),
+            'website_booking_intervention_state': ir_values_obj.env['ir.values'].get_default(
+            'of.intervention.settings', 'website_booking_intervention_state', company_id=cd and self.company_id.id),
             'website_booking_slot_size': ir_values_obj.env['ir.values'].get_default(
             'of.intervention.settings', 'website_booking_slot_size', company_id=cd and self.company_id.id),
             'website_booking_default_product_brand_id': ir_values_obj.env['ir.values'].get_default(
@@ -185,6 +199,7 @@ class OFInterventionSettings(models.TransientModel):
             'website_booking_allowed_employee_ids',
             'website_booking_open_days_number',
             'website_booking_allow_empty_days',
+            'website_booking_intervention_state',
             'website_booking_slot_size',
             'website_booking_default_product_brand_id',
             'website_edit_days_limit',
