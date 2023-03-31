@@ -261,7 +261,7 @@
                                                         <a t-attf-href="/rdv/#{slug(rdv)}"><t t-esc="rdv.display_name" /></a>
                                                     </td>
                                                     <td>
-                                                        <span t-field="rdv.tache_id.name"/>
+                                                        <span t-field="rdv.sudo().tache_id.name"/>
                                                     </td>
                                                     <td>
                                                         <t t-foreach="rdv.sudo().employee_ids" t-as="employee">
@@ -338,7 +338,7 @@
                                     <div class="row">
                                         <label class="col-sm-4 col-xs-4 text-right">Tâche :</label>
                                         <div class="col-sm-8 col-xs-8">
-                                            <div t-field="rdv.tache_id.name" />
+                                            <div t-field="rdv.sudo().tache_id.name" />
                                         </div>
                                     </div>
                                 </div>

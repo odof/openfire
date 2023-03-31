@@ -557,6 +557,7 @@ class OFWebsitePlanningBooking(http.Controller):
         values['service_list'] = request.env['of.service'].search([
             ('type_id', '=', service_type.id),
             ('base_state', '=', 'calculated'),
+            ('recurrence', '=', True),
             '|',
             ('partner_id', 'child_of', request.env.user.partner_id.id),
             ('address_id', 'child_of', request.env.user.partner_id.id),

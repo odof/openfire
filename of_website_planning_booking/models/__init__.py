@@ -7,3 +7,4 @@ from . import product
 from . import website
 from . import of_horaire
 from . import res_users
+from . import of_service
