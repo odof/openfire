@@ -5,3 +5,4 @@ from . import of_stock
 from . import stock_picking
 from . import procurement
 from . import sale
+from . import purchase
