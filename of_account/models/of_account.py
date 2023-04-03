@@ -143,7 +143,7 @@ class AccountAccount(models.Model):
         if 'code' in vals and self._uid != SUPERUSER_ID:
             move_line_obj = self.env['account.move.line'].sudo()
             for account in self:
-                if move_line_obj.search([('account_id', '=', account.id)]):
+                if vals['code'] != account.code and move_line_obj.search([('account_id', '=', account.id)]):
                     raise UserError(
                         u"Vous ne pouvez pas changer le code d'un compte ayant déjà des écritures. : %s"
                         % account.code)
