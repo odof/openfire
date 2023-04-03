@@ -18,6 +18,7 @@
                     <field name="website_booking_open_days_number" class="oe_inline"/>
                     <field name="website_booking_allow_empty_days" class="oe_inline"/>
                     <field name="website_booking_intervention_state" class="oe_inline"/>
+                    <field name="website_booking_tache_price" class="oe_inline"/>
                     <field name="website_booking_slot_size" class="oe_inline"/>
                     <label for="website_edit_days_limit"/>
                     <div>

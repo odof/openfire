@@ -101,6 +101,16 @@ class OFPlanningTache(models.Model):
         segment_obj.create(vals)
         return {'type': 'ir.actions.do_nothing'}
 
+    @api.multi
+    def get_price_ttc(self):
+        self.ensure_one()
+        company = self.env.user.company_id
+        product = self.sudo().product_id
+        price = product.list_price
+        taxes = self.sudo().fiscal_position_id.default_tax_ids.compute_all(price, company.currency_id, 1,
+                                                                           product=product,
+                                                                           partner=self.env.user.partner_id)
+        return taxes['total_included']
 
 
 class HREmployee(models.Model):

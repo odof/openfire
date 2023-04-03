@@ -600,6 +600,8 @@ class OFWebsitePlanningBooking(http.Controller):
         if not values.get('date_recherche_debut') and request.session.get('rdv_date_recherche_debut'):
             values['date_recherche_debut'] = request.session.get('rdv_date_recherche_debut')
 
+        values['display_price'] = request.env['ir.values'].get_default(
+            'of.intervention.settings', 'website_booking_tache_price') or False
         return request.render('of_website_planning_booking.new_booking_service', values)
 
     @http.route(['/new_booking/slot'], type='http', auth='user', website=True)
