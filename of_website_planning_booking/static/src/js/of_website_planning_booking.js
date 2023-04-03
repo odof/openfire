@@ -9,7 +9,6 @@ odoo.define('of_website_planning_booking.planning_website', function (require) {
     var _t = core._t;
     var Model = require('web.Model');
 
-
     if(!$('.oe_website_sale').length) {
         return $.Deferred().reject("DOM doesn't contain '.oe_website_sale'");
     }
@@ -62,6 +61,18 @@ odoo.define('of_website_planning_booking.planning_website', function (require) {
                 });
             };
         });
+        $('select#tache_id', oe_website_sale).on('change', function (event) {
+            console.log("hello")
+            // Quand on selectionne la tache, on vient affecter le prix qui va avec
+            var tache_id = parseInt(this[this.selectedIndex].value);
+            var tache_model = new Model('of.planning.tache');
+            if (tache_id != null && tache_id != undefined) {
+                tache_model.call('get_price_ttc', [tache_id], {}).done(function (result) {
+                    document.getElementById("tache_price").value = (Math.round(result * 100) / 100).toString() + " €";
+                });
+            };
+        });
+
 
         // hightlight selected color
         $('.css_attribute_color input', oe_website_sale).on('change', function () {

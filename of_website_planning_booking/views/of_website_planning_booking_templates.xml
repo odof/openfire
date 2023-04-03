@@ -599,6 +599,13 @@
                                 </t>
                             </select>
                         </div>
+                        <t t-if="display_price">
+                            <div class="clearfix"/>
+                            <div class="form-group  col-md-5">
+                                <label class="control-label label-optional" for="tache_price">Prix de la prestation</label>
+                                <input type="text" id="tache_price" class="form-control" t-att-value="'0.0 €'" readonly="1"/>
+                            </div>
+                        </t>
                         <div class="clearfix"/>
                         <div t-attf-class="form-group #{error_dict.get('date_recherche_debut') and 'has-error' or ''} col-md-5">
                             <label class="control-label label-optional" for="date_recherche_debut">
