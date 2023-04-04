@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_view_sale_order_price_management" model="ir.ui.view">
+        <field name="name">of.sale.price.management.wizard.form.view</field>
+        <field name="model">of.sale.price.management.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Prices management">
+                <header>
+                    <button name="action_button_simulate" class="oe_highlight" string="Simulate"
+                        type="object" invisible="context.get('invoice_status') == 'invoiced'" />
+                    <button name="action_bouton_validate" class="oe_highlight"
+                        string="Apply to quotation/order form (not reversible)" type="object"
+                        confirm="Do you confirm application of the new prices calculated in the quotation/order (non-reversible)?"
+                        invisible="context.get('invoice_status') == 'invoiced'" />
+                    <button name="action_button_cancel" string="Back to the order" type="object" />
+                    <button name="action_price_management_print" string="Print" type="object" />
+                </header>
+                <div class="oe_button_box" name="button_box">
+                    <field name="customer_view" invisible="1"/>
+                    <button name="toggle_view_mode" class="oe_stat_button" type="object" icon="fa-code">
+                        <div class="o_stat_info o_field_widget" attrs="{'invisible': [('customer_view', '=', True)]}">
+                            <span class="text-danger">Vendor view</span>
+                        </div>
+                        <div class="o_stat_info o_field_widget" attrs="{'invisible': [('customer_view', '=', False)]}">
+                            <span class="text-success">Customer view</span>
+                        </div>
+                    </button>
+                </div>
+                <group name="options" invisible="context.get('invoice_status') == 'invoiced'">
+                    <field name="order_id" invisible="1" />
+                    <field name="discount_type" required="1" />
+                    <field name="value"
+                        attrs="{
+                            'invisible':[('discount_type','not in',('total_target_amnt_tax_incl','total_target_amnt_tax_excl','amount_tax_incl','amount_tax_excl','percentage','margin_percent'))],
+                            'required': [('discount_type','in',('total_target_amnt_tax_incl','total_target_amnt_tax_excl','amount_tax_incl','amount_tax_excl','percentage','margin_percent'))]}" />
+                    <label for="rounding_mode" />
+                    <div name="rounding">
+                        <field name="rounding_mode" class="oe_inline" attrs="{'invisible':[('discount_type','=',False)]}" />
+                        <field name="rounding_precision" class="oe_inline" nolabel="1"
+                                attrs="{'invisible':['|', ('discount_type','=',False), ('rounding_mode','=','no_rounding')], 'required': [('discount_type','!=',False), ('rounding_mode','in',('amount_tax_excl', 'total_included'))]}" />
+                    </div>
+                    <field name="calculation_basis" class="oe_inline"
+                        attrs="{'invisible':[('discount_type', 'not in', ['total_target_amnt_tax_incl', 'total_target_amnt_tax_excl', 'amount_tax_incl', 'amount_tax_excl'])]}" />
+                    <field name="display_discount" />
+                </group>
+                <field name="line_ids" nolabel="1">
+                    <tree string="Order lines" decoration-sucess="state =='included'" decoration-muted="state != 'included'" editable="bottom" create="false">
+                        <field name="product_forbidden_discount" invisible="1" />
+                        <field name="state"
+                            invisible="context.get('invoice_status') == 'invoiced'"
+                            attrs="{'readonly': [('product_forbidden_discount', '=', True)]}" />
+                        <field name="order_line_id" />
+                        <field name="total_cost_tax_excl"
+                            groups="of_sale_price_management.of_group_sale_margin_manager"
+                            attrs="{'invisible': [('customer_view', '=', True)]}" />
+                        <field name="sim_total_cost_tax_excl"
+                            groups="of_sale_price_management.of_group_sale_margin_manager"
+                            attrs="{'invisible': [('customer_view', '=', True)]}" />
+                        <field name="total_price_tax_excl" />
+                        <field name="sim_total_price_tax_excl"
+                            attrs="{'readonly': [('state', '!=', 'forced')]}" />
+                        <field name="margin"
+                            groups="of_sale_price_management.of_group_sale_margin_manager"
+                            attrs="{'invisible': [('customer_view', '=', True)]}" />
+                        <field name="margin_percent"
+                            groups="of_sale_price_management.of_group_sale_margin_manager"
+                            attrs="{'invisible': [('customer_view', '=', True)], 'readonly': ['|', ('state', '!=', 'forced'), ('total_cost_tax_excl', '=', 0)]}" />
+                        <field name="total_price_tax_incl" />
+                        <field name="sim_total_price_tax_incl" />
+                        <field name="customer_view" invisible="1" />
+                    </tree>
+                </field>
+                <group colspan="4" name="action_button_bottom">
+                    <button colspan="2" name="action_button_include_all" type="object" class="oe_left btn-default" string="Include all" invisible="context.get('invoice_status') == 'invoiced'" />
+                    <button colspan="2" name="action_button_exclude_all" type="object" class="oe_left btn-default" string="Exclude all" invisible="context.get('invoice_status') == 'invoiced'" />
+                </group>
+                <group colspan="4" name="totals" string="Total quotation/order">
+                    <group>
+                        <field name="init_total_amount_tax_excl" />
+                        <field name="init_total_amount_tax_incl" />
+                        <field name="initial_margin" groups="of_sale_price_management.of_group_sale_margin_manager" attrs="{'invisible': [('customer_view', '=', True)]}" />
+                        <field name="initial_margin_percent" widget="percentage" groups="of_sale_price_management.of_group_sale_margin_manager" attrs="{'invisible': [('customer_view', '=', True)]}" />
+                    </group>
+                    <group>
+                        <field name="total_amount_sim_tax_excl" />
+                        <field name="total_amount_sim_tax_incl" />
+                        <field name="simulated_margin" groups="of_sale_price_management.of_group_sale_margin_manager" attrs="{'invisible': [('customer_view', '=', True)]}" />
+                        <field name="simulated_margin_percent" widget="percentage" groups="of_sale_price_management.of_group_sale_margin_manager" attrs="{'invisible': [('customer_view', '=', True)]}" />
+                    </group>
+                </group>
+            </form>
+        </field>
+    </record>
+
+</odoo>

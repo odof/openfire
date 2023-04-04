@@ -1,0 +1,663 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_sale_price_management
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-04-13 14:14+0000\n"
+"PO-Revision-Date: 2023-04-13 14:14+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__margin_percent
+#, python-format
+msgid "% Margin"
+msgstr "% Marge"
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#, python-format
+msgid "% Overall discount"
+msgstr "% Remise globale"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_view_sale_order_price_management
+msgid "<span class=\"text-danger\">Vendor view</span>"
+msgstr "<span class=\"text-danger\">Vue vendeur</span>"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_view_sale_order_price_management
+msgid "<span class=\"text-success\">Customer view</span>"
+msgstr "<span class=\"text-success\">Vue client</span>"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_report_sale_price_management
+msgid "<strong>Company / Shop : </strong>"
+msgstr "<strong>Société / magasin : </strong>"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_report_sale_price_management
+msgid "<strong>Confirmation date :</strong>"
+msgstr "<strong>Date confirmation :</strong>"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_report_sale_price_management
+msgid "<strong>Customer's name :</strong>"
+msgstr "<strong>Nom du client :</strong>"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_report_sale_price_management
+msgid "<strong>Order Status :</strong>"
+msgstr "<strong>État de la commande :</strong>"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_report_sale_price_management
+msgid "<strong>Order number :</strong>"
+msgstr "<strong>N° commande :</strong>"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_report_sale_price_management
+msgid "<strong>Seller's name :</strong>"
+msgstr "<strong>Nom du vendeur :</strong>"
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#, python-format
+msgid "Amount excl. VAT to be deducted"
+msgstr "Montant HT à déduire"
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#, python-format
+msgid "Amount incl. VAT to be deducted"
+msgstr "Montant TTC à déduire"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_view_sale_order_price_management
+msgid "Apply to quotation/order form (not reversible)"
+msgstr "Appliquer au devis/bon de commande (non réversible)"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_view_sale_order_price_management
+msgid "Back to the order"
+msgstr "Retour à la commande"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__calculation_basis
+msgid "Calculation basis"
+msgstr "Base de calcul"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__discount_type
+msgid "Calculation mode"
+msgstr "Mode de calcul"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields.selection,name:of_sale_price_management.selection__of_sale_price_management_wizard__calculation_basis__cost
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_report_sale_price_management
+msgid "Cost"
+msgstr "Coût"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__create_uid
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__create_date
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__currency_id
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__currency_id
+msgid "Currency"
+msgstr "Devise"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__customer_view
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__customer_view
+#: model:ir.model.fields,field_description:of_sale_price_management.field_sale_order__customer_view
+msgid "Customer/Vendor view"
+msgstr "Vue Client/Vendeur"
+
+#. module: of_sale_price_management
+#: model:ir.module.category,description:of_sale_price_management.of_sale_margin
+msgid "Defines access rights to margins."
+msgstr "Définit les droits d'accès aux marges."
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,help:of_sale_price_management.field_of_sale_price_management_wizard__discount_type
+msgid ""
+"Determines how the discount is calculated on the selected lines of the "
+"estimate"
+msgstr ""
+"Détermine comment est calculée la remise sur les lignes sélectionnées du "
+"devis"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__discount
+msgid "Discount (%)"
+msgstr "Remise (%)"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__product_forbidden_discount
+#: model:ir.model.fields,field_description:of_sale_price_management.field_sale_order__of_product_forbidden_discount
+#: model:ir.model.fields,field_description:of_sale_price_management.field_sale_order_line__of_product_forbidden_discount
+msgid "Discount not allowed for this product"
+msgstr "Remise interdite pour cet article"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__display_name
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__display_discount
+msgid "Display in notes"
+msgstr "Afficher dans les notes"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,help:of_sale_price_management.field_of_sale_price_management_wizard__display_discount
+msgid "Displays the amount of discount made in the quote/order notes."
+msgstr ""
+"Affiche le montant de la remise effectuée dans les notes du devis/de la "
+"commande."
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_view_sale_order_price_management
+msgid ""
+"Do you confirm application of the new prices calculated in the "
+"quotation/order (non-reversible)?"
+msgstr ""
+"Confirmez-vous l'application des nouveaux prix calculés au devis/bon de "
+"commande (non réversible) ?"
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#, python-format
+msgid "Exceptional discount deducted of %s.\n"
+msgstr "Remise exceptionnelle déduite de %s.\n"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_view_sale_order_price_management
+msgid "Exclude all"
+msgstr "Exclure tout"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields.selection,name:of_sale_price_management.selection__of_sale_price_management_wizard_line__state__excluded
+msgid "Excluded"
+msgstr "Exclus"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields.selection,name:of_sale_price_management.selection__of_sale_price_management_wizard_line__state__forced
+msgid "Forced"
+msgstr "Forcé"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__id
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__id
+msgid "ID"
+msgstr ""
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__line_ids
+msgid "Impacted lines"
+msgstr "Lignes impactées"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_view_sale_order_price_management
+msgid "Include all"
+msgstr "Include tout"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields.selection,name:of_sale_price_management.selection__of_sale_price_management_wizard_line__state__included
+msgid "Included"
+msgstr "Inclus"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__initial_margin
+msgid "Initial margin"
+msgstr "Marge initiale"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__initial_margin_percent
+msgid "Initial margin %"
+msgstr "% Marge initiale"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__init_total_amount_tax_excl
+msgid "Initial total amount excl. VAT"
+msgstr "Total HT initial"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__init_total_amount_tax_incl
+msgid "Initial total amount incl. VAT"
+msgstr "Total TTC initial"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__total_price_tax_excl
+msgid "Initial total price excl. VAT"
+msgstr "Prix total HT initial"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__total_price_tax_incl
+msgid "Initial total price incl. VAT"
+msgstr "Prix total TTC initial"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__price_unit_tax_excl
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__price_unit_tax_incl
+msgid "Initial unit price excl. VAT"
+msgstr "Prix unit. HT initial"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard____last_update
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__write_uid
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__write_date
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_sale_price_management
+#: model:res.groups,name:of_sale_price_management.of_group_sale_margin_manager
+msgid "Manager"
+msgstr "Responsable"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_report_sale_price_management
+msgid "Margin"
+msgstr "Marge"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_report_sale_price_management
+msgid "Margin %"
+msgstr "Marge %"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__margin
+msgid "Margin excl. VAT"
+msgstr "Marge HT"
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: model:ir.actions.report,name:of_sale_price_management.of_action_report_sale_price_management
+#, python-format
+msgid "Margin sheet"
+msgstr "Feuille de marge"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields.selection,name:of_sale_price_management.selection__of_sale_price_management_wizard__rounding_mode__no_rounding
+msgid "No rounding"
+msgstr "Pas d'arrondi"
+
+#. module: of_sale_price_management
+#: model:ir.module.category,name:of_sale_price_management.of_sale_margin
+msgid "OF Margin"
+msgstr "OF Marge"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_view_sale_order_price_management
+msgid "Order lines"
+msgstr "Lignes de commande"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_sale_price_management_view_order_form
+msgid "Price management"
+msgstr "Gestion prix"
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#, python-format
+msgid "Price management applied."
+msgstr "Gestion de prix appliquée."
+
+#. module: of_sale_price_management
+#: model:ir.model,name:of_sale_price_management.model_of_sale_price_management_wizard
+msgid "Price management wizard"
+msgstr "Gestion des prix"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_report_sale_price_management
+msgid "Price/U excl VAT."
+msgstr "Prix/U HT"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_view_sale_order_price_management
+msgid "Prices management"
+msgstr "Gestion des prix"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_view_sale_order_price_management
+msgid "Print"
+msgstr "Imprimer"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__order_line_id
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_report_sale_price_management
+msgid "Product"
+msgstr "Produit"
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#, python-format
+msgid "Products"
+msgstr "Produits"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_report_sale_price_management
+msgid "Qty"
+msgstr "Qté"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__quantity
+msgid "Quantity"
+msgstr "Quantité"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__order_id
+msgid "Quotation/Order"
+msgstr "Devis/commande"
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#, python-format
+msgid "Restore at store price"
+msgstr "Remettre au prix magasin"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields.selection,name:of_sale_price_management.selection__of_sale_price_management_wizard__rounding_precision__1
+msgid "Round to the nearest 10 cents"
+msgstr "Arrondir aux 10 centimes les plus proches"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields.selection,name:of_sale_price_management.selection__of_sale_price_management_wizard__rounding_precision__0
+msgid "Round to the nearest euro"
+msgstr "Arrondir à l'euro le plus proche"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields.selection,name:of_sale_price_management.selection__of_sale_price_management_wizard__rounding_precision__-1
+msgid "Round up to the nearest €10"
+msgstr "Arrondir aux 10 € les plus proches"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__rounding_mode
+msgid "Rounding by line"
+msgstr "Arrondi par ligne"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields.selection,name:of_sale_price_management.selection__of_sale_price_management_wizard__rounding_mode__total_excluded
+msgid "Rounding on amount excl. VAT"
+msgstr "Arrondir sur le montant HT"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields.selection,name:of_sale_price_management.selection__of_sale_price_management_wizard__rounding_mode__total_included
+msgid "Rounding on amount incl. VAT"
+msgstr "Arrondir sur le montant TTC"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__rounding_precision
+msgid "Rounding precision"
+msgstr "Précision d'arrondi"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_report_sale_price_management
+msgid "Reference"
+msgstr "Référence"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_report_sale_price_management
+msgid "Sale"
+msgstr "Vente"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields.selection,name:of_sale_price_management.selection__of_sale_price_management_wizard__calculation_basis__price
+msgid "Sale price"
+msgstr "Prix de vente"
+
+#. module: of_sale_price_management
+#: model:ir.model,name:of_sale_price_management.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_sale_price_management
+#: model:ir.model,name:of_sale_price_management.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de commande"
+
+#. module: of_sale_price_management
+#: model:ir.model,name:of_sale_price_management.model_of_sale_price_management_wizard_line
+msgid "Selection of products from a quote/order form"
+msgstr "Sélection des produits d'un devis/bon de commande"
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#, python-format
+msgid "Services"
+msgstr "Services"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_view_sale_order_price_management
+msgid "Simulate"
+msgstr "Simuler"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__simulated_margin
+msgid "Simulated margin"
+msgstr "Marge simulée"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__simulated_margin_percent
+msgid "Simulated margin %"
+msgstr "% Marge simulée"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__sim_total_cost_tax_excl
+msgid "Simulated total cost excl. VAT"
+msgstr "Coût Total HT simulé"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__sim_total_price_tax_excl
+msgid "Simulated total price excl. VAT"
+msgstr "Prix total TTC simulé"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__sim_total_price_tax_incl
+msgid "Simulated total price incl. VAT"
+msgstr "Prix total TTC simulé"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__state
+msgid "State"
+msgstr "État"
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#, python-format
+msgid ""
+"The amount excluding VAT to be deducted is greater than the total amount "
+"excluding VAT of items on which the discount is applied."
+msgstr ""
+"Le montant HT à déduire est supérieur au montant total HT des articles sur "
+"lesquels s'applique la remise."
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#, python-format
+msgid ""
+"The amount including VAT to be deducted is greater than the total amount "
+"including VAT of items to which the discount applies."
+msgstr ""
+"Le montant TTC à déduire est supérieur au montant total TTC des articles sur"
+" lesquels s'applique la remise."
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#, python-format
+msgid ""
+"The discount percentage must be greater than 0 and less than or equal to "
+"100."
+msgstr ""
+"Le pourcentage de remise doit être supérieur à 0 et inférieur ou égal à 100."
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#, python-format
+msgid "The margin percentage must be less than 100."
+msgstr "Le pourcentage de marge doit être inférieur à 100."
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#, python-format
+msgid "Total"
+msgstr ""
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_sale_order__of_total_cost
+msgid "Total cost price"
+msgstr "Prix de revient"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__total_cost_tax_excl
+msgid "Total initial cost excl. VAT"
+msgstr "Coût total HT initial"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_report_sale_price_management
+msgid "Total price VAT excl."
+msgstr "Prix total HT"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_report_sale_price_management
+msgid "Total price incl. VAT"
+msgstr "Prix total TTC"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_view_sale_order_price_management
+msgid "Total quotation/order"
+msgstr "Total devis/commande"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__total_simulated_cost_tax_excl
+msgid "Total simulated cost excl. VAT"
+msgstr "Coût Total HT simulé"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__total_amount_sim_tax_excl
+msgid "Total simulated excl. VAT"
+msgstr "Total HT simulé"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__total_amount_sim_tax_incl
+msgid "Total simulated incl. VAT"
+msgstr "Total TTC simulé"
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#, python-format
+msgid "Total target amount excl. VAT"
+msgstr "Montant total HT cible"
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#, python-format
+msgid "Total target amount incl. VAT"
+msgstr "Montant total TTC cible"
+
+#. module: of_sale_price_management
+#: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_report_sale_price_management
+msgid "Type"
+msgstr ""
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_sale_order_line__of_price_management_variation
+msgid "Unit amount of price change related to price management"
+msgstr "Montant unitaire de la variation de prix liée à la gestion de prix"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_sale_order_line__of_unit_price_variation
+msgid "Unit amount of the price variation"
+msgstr "Montant unitaire de la variation de prix"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__value
+msgid "Value"
+msgstr "Valeur"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__wizard_id
+msgid "Wizard"
+msgstr ""
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#, python-format
+msgid "You must enter a target total amount excl. VAT."
+msgstr "Vous devez saisir un montant total HT cible."
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#, python-format
+msgid "You must enter a target total amount incl. VAT."
+msgstr "Vous devez saisir un montant total TTC cible."
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#, python-format
+msgid "You must enter an amount incl. VAT to deduct."
+msgstr "Vous devez saisir un montant TTC à déduire."
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#, python-format
+msgid "You must enter an amount to be deducted."
+msgstr "Vous devez saisir un montant HT à déduire."
+
+#. module: of_sale_price_management
+#. odoo-python
+#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#, python-format
+msgid "You must select the rounding precision"
+msgstr "Vous devez sélectionner la précision d'arrondi"

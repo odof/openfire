@@ -731,10 +731,6 @@ class SaleOrderLine(models.Model):
                 """)
         return res
 
-    of_price_management_variation = fields.Float(
-        string=u"Montant unitaire de la variation de prix liée à la gestion de prix")
-    of_unit_price_variation = fields.Float(string=u"Montant unitaire de la variation de prix")
-
     @api.depends('price_subtotal', 'margin')
     def _compute_of_marge(self):
         for line in self:
@@ -1066,21 +1062,6 @@ class SaleOrderLine(models.Model):
                     line.qty_to_invoice = line.qty_delivered - line.qty_invoiced
             else:
                 line.qty_to_invoice = 0
-
-    def of_get_price_unit(self):
-        """Renvoi le prix unitaire type."""
-        self.ensure_one()
-        product = self.product_id.with_context(
-            lang=self.order_id.partner_id.lang,
-            partner=self.order_id.partner_id.id,
-            quantity=self.product_uom_qty,
-            date=self.order_id.date_order,
-            pricelist=self.order_id.pricelist_id.id,
-            uom=self.product_uom.id,
-            fiscal_position=self.env.context.get('fiscal_position')
-        )
-        return self.env['account.tax']._fix_tax_included_price_company(
-            self._get_display_price(product), product.taxes_id, self.tax_id, self.company_id)
 
     @api.model
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):

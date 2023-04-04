@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="of_report_sale_price_management">
+        <t t-call="web.internal_layout">
+            <div class="page">
+                <div class="oe_structure"/>
+                <div class="col-xs-6" style="font-size: large; margin-bottom: 30px; width: 100%; margin-top: 20px">
+                    <div class="row">
+                        <div class="col-xs-12" style="display: table; padding: 0px;">
+                            <div style="display: table-cell; width: 50%;">
+                                <t style="display: inline-block;">
+                                    <strong>Customer's name :</strong>
+                                    <span t-field="o.order_id.partner_id.name"/><br/>
+                                </t>
+                                <t style="display: inline-block;">
+                                    <strong>Seller's name :</strong>
+                                    <span t-field="o.order_id.user_id.name"/><br/>
+                                </t>
+                                <t style="display: inline-block;">
+                                    <strong>Company / Shop : </strong>
+                                    <span t-field="o.order_id.company_id.name"/><br/>
+                                </t>
+                            </div>
+                            <div style="display: table-cell; width: 50%; vertical-align: middle;">
+                                <t style="display: inline-block;">
+                                    <strong>Order number :</strong>
+                                    <span t-field="o.order_id.name"/><br/>
+                                </t>
+                                <t style="display: inline-block;">
+                                    <strong>Order Status :</strong>
+                                    <span t-field="o.order_id.state"/><br/>
+                                </t>
+                                <t style="display: inline-block;">
+                                    <strong>Confirmation date :</strong>
+                                    <span t-if="o.order_id.date_order" t-field="o.order_id.date_order" t-options="{'widget': 'date'}"/><br/>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <table name="order_lines_layouted" class="table table-condensed">
+                    <thead>
+                        <tr>
+                            <th name="code">Reference</th>
+                            <th name="descr" style="width: 40%">Product</th>
+                            <th name="quant" class="text-right">Qty</th>
+                            <th name="price_unit_ht" class="text-right">Price/U excl VAT.</th>
+                            <th name="cost" class="text-right">Cost</th>
+                            <th name="price_total_tax_excl" class="text-right">Total price VAT excl.</th>
+                            <th name="price_total_tax_incl" class="text-right">Total price incl. VAT</th>
+                            <th name="marge_ht" class="text-right">Margin</th>
+                            <th name="parge_pc" class="text-right">Margin %</th>
+                        </tr>
+                    </thead>
+                    <tbody class="sale_tbody">
+                        <t t-foreach="o.report_get_lines()" t-as="line">
+                            <tr>
+                                <td name="code">
+                                    <span t-field="line.order_line_id.product_id.default_code"/>
+                                </td>
+                                <td name="descr">
+                                    <span t-field="line.order_line_id.product_id.name"/>
+                                </td>
+                                <td class="text-right" name="qty">
+                                    <span t-esc="(str(line.order_line_id.product_uom_qty)).rstrip('0').rstrip('.').replace('.', ',')"/>
+                                    <span t-field="line.order_line_id.product_uom" groups="product.group_uom"/>
+                                </td>
+                                <td class="text-right" name="price_unit">
+                                    <span t-field="line.order_line_id.price_unit" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                </td>
+                                <td class="text-right" name="total_cost_tax_excl">
+                                    <span t-field="line.total_cost_tax_excl" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                </td>
+                                <td class="text-right" name="total_cost_tax_excl">
+                                    <span t-field="line.total_cost_tax_excl" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                </td>
+                                <td class="text-right" name="total_price_tax_incl">
+                                    <span t-field="line.total_price_tax_incl" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                </td>
+                                <td class="text-right" name="margin">
+                                    <span t-field="line.margin" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                </td>
+                                <td class="text-right" name="margin_percent">
+                                    <t t-set="margin_percent" t-value="'%0.2f' % line.margin_percent"/>
+                                    <span t-esc="margin_percent" /> %
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+                <table style="width: 60%; page-break-inside: avoid" class="table table-condensed">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th class="text-right">Cost</th>
+                            <th class="text-right">Sale</th>
+                            <th class="text-right">Margin</th>
+                            <th class="text-right">Margin %</th>
+                        </tr>
+                    </thead>
+                    <tbody class="sale_tbody">
+                        <t t-foreach="o.report_get_summary_lines()" t-as="summary_line">
+                            <tr>
+                                <td name="summary_line_name">
+                                    <span t-esc="summary_line['name']"/>
+                                </td>
+                                <td class="text-right" name="summary_line_cout">
+                                    <span t-esc="summary_line['cost']" />
+                                </td>
+                                <td class="text-right" name="summary_line_vente">
+                                    <span t-esc="summary_line['sale']" />
+                                </td>
+                                <td class="text-right" name="summary_line_marge">
+                                    <span t-esc="summary_line['margin']" />
+                                </td>
+                                <td class="text-right" name="summary_line_marge_pc">
+                                    <span t-esc="summary_line['margin_percent']" />
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_of_report_sale_price_management">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="of_sale_price_management.of_report_sale_price_management" t-lang="o.order_id.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <record id="of_action_report_sale_price_management" model="ir.actions.report">
+        <field name="name">Margin sheet</field>
+        <field name="model">of.sale.price.management.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">of_sale_price_management.report_of_report_sale_price_management</field>
+        <field name="report_file">of_sale_price_management.report_of_report_sale_price_management</field>
+        <field name="binding_model_id" ref="model_of_sale_price_management_wizard" />
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

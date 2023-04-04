@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_sale_price_management_view_order_form" model="ir.ui.view">
+        <field name="name">of.sale.price.management.sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_button_price_management" type="object" string="Price management" />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

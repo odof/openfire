@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-28 09:12+0000\n"
-"PO-Revision-Date: 2023-03-28 09:12+0000\n"
+"POT-Creation-Date: 2023-04-14 10:06+0000\n"
+"PO-Revision-Date: 2023-04-14 10:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -20,6 +20,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:of_sale_payment_schedule.report_saleorder_document
 msgid "Amount"
 msgstr "Montant"
+
+#. module: of_sale_payment_schedule
+#: model:ir.model,name:of_sale_payment_schedule.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
 
 #. module: of_sale_payment_schedule
 #: model:ir.model.fields,field_description:of_sale_payment_schedule.field_of_sale_payment_schedule__create_uid
@@ -40,12 +45,19 @@ msgstr "Devise"
 #: model:ir.model.fields,field_description:of_sale_payment_schedule.field_of_sale_payment_schedule__date
 #: model_terms:ir.ui.view,arch_db:of_sale_payment_schedule.report_saleorder_document
 msgid "Date"
-msgstr "Date"
+msgstr ""
 
 #. module: of_sale_payment_schedule
 #: model:ir.model.fields,field_description:of_sale_payment_schedule.field_of_sale_payment_schedule__display_name
 msgid "Display Name"
 msgstr "Nom affiché"
+
+#. module: of_sale_payment_schedule
+#. odoo-python
+#: code:addons/of_sale_payment_schedule/models/of_sale_payment_schedule.py:0
+#, python-format
+msgid "Due"
+msgstr "Échéance"
 
 #. module: of_sale_payment_schedule
 #: model:ir.model.fields,field_description:of_sale_payment_schedule.field_of_sale_payment_schedule__id
@@ -85,15 +97,36 @@ msgid "Payment #%s"
 msgstr "Paiement n°%s"
 
 #. module: of_sale_payment_schedule
+#: model_terms:ir.ui.view,arch_db:of_sale_payment_schedule.report_saleorder_document
+msgid "Payment Schedule"
+msgstr "Vos échéances"
+
+#. module: of_sale_payment_schedule
+#: model:ir.model.fields,field_description:of_sale_payment_schedule.field_of_connector_config_settings__pdf_payment_schedule
+#: model:ir.model.fields,field_description:of_sale_payment_schedule.field_res_config_settings__pdf_payment_schedule
 #: model:ir.model.fields,field_description:of_sale_payment_schedule.field_sale_order__of_payment_schedule_ids
-#: model_terms:ir.ui.view,arch_db:of_sale_payment_schedule.of_sale_view_order_form
+#: model_terms:ir.ui.view,arch_db:of_sale_payment_schedule.of_sale_view_order_payment_schedule_form
 msgid "Payment schedule"
-msgstr "Échéancier prévisionnel"
+msgstr "Échéancier de paiement"
+
+#. module: of_sale_payment_schedule
+#: model:ir.model.fields,field_description:of_sale_payment_schedule.field_sale_order__of_show_update_payment_schedule
+msgid "Payment schedule needs to be updated"
+msgstr "Le calendrier des paiements doit être mis à jour"
 
 #. module: of_sale_payment_schedule
 #: model:ir.model.fields,field_description:of_sale_payment_schedule.field_of_sale_payment_schedule__percent
 msgid "Percentage"
 msgstr "Pourcentage"
+
+#. module: of_sale_payment_schedule
+#: model_terms:ir.ui.view,arch_db:of_sale_payment_schedule.of_sale_view_order_payment_schedule_form
+msgid ""
+"Recompute the payment schedule based on the current pricelist and the "
+"payment terms."
+msgstr ""
+"Recalculer l'échéancier de paiement sur la base de la liste de prix actuelle"
+" et des conditions de paiement."
 
 #. module: of_sale_payment_schedule
 #: model:ir.model.fields,field_description:of_sale_payment_schedule.field_of_sale_payment_schedule__order_id
@@ -111,26 +144,25 @@ msgid "Sequence"
 msgstr "Séquence"
 
 #. module: of_sale_payment_schedule
-#: model_terms:ir.ui.view,arch_db:of_sale_payment_schedule.of_sale_view_order_form
+#: model_terms:ir.ui.view,arch_db:of_sale_payment_schedule.of_sale_view_order_payment_schedule_form
+msgid ""
+"This will update the payment schedule based on the current pricelist and the"
+" payment terms. Do you want to continue ?"
+msgstr ""
+"Cette opération mettra à jour l'échéancier de paiement sur la base de la "
+"liste de prix actuelle et des conditions de paiement. Voulez-vous continuer ?"
+
+#. module: of_sale_payment_schedule
+#: model_terms:ir.ui.view,arch_db:of_sale_payment_schedule.of_sale_view_order_payment_schedule_form
 msgid "Total"
-msgstr "Total"
+msgstr ""
+
+#. module: of_sale_payment_schedule
+#: model_terms:ir.ui.view,arch_db:of_sale_payment_schedule.of_sale_view_order_payment_schedule_form
+msgid "Update Payment Schedule"
+msgstr "Mise à jour de l'échéancier de paiements"
 
 #. module: of_sale_payment_schedule
 #: model:ir.model,name:of_sale_payment_schedule.model_of_sale_payment_schedule
 msgid "of.sale.payment.schedule"
 msgstr ""
-
-#. module: of_sale_payment_schedule
-#: model:ir.model.fields,field_description:of_sale_payment_schedule.field_res_config_settings__pdf_payment_schedule
-msgid "Payment schedule"
-msgstr "Échéancier de paiement"
-
-#. module: of_sale_payment_schedule
-#: model_terms:ir.ui.view,arch_db:of_sale_payment_schedule.res_config_settings_sale_printing_params_view_form
-msgid "Displays the Payment schedule in the report"
-msgstr "Affiche l'échéancier dans le rapport"
-
-#. module: of_sale_payment_schedule
-#: model_terms:ir.ui.view,arch_db:of_sale_payment_schedule.report_saleorder_document
-msgid "Payment Schedule"
-msgstr "Vos échéances"

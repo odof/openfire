@@ -99,8 +99,6 @@ Droits utilisateurs:
         'report/of_report_sale_order_list.xml',
         'report/of_sale_report_templates.xml',
         'report/sale_report_views.xml',
-        'wizards/of_sale_order_gestion_prix_views.xml',
-        'wizards/of_sale_order_gestion_prix_report.xml',
         'wizards/sale_make_invoice_advance_views.xml',
         'wizards/of_sale_order_confirmation_views.xml',
         'wizards/of_sale_order_add_quote_views.xml',
