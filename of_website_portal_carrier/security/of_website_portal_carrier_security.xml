@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="group_of_carrier_portal" model="res.groups">
+        <field name="name">Groupe portail transporteur</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+    <!-- Ir Rules -->
+
+    <record id="of_stock_picking_carrier_rule" model="ir.rule">
+        <field name="name">OF Bon de réception Transporteur</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="domain_force">[('picking_type_id.warehouse_id.partner_id', '=', user.partner_id.id)]</field>
+        <field name="groups" eval="[(4, ref('of_website_portal_carrier.group_of_carrier_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="of_stock_pack_operation_carrier_rule" model="ir.rule">
+        <field name="name">OF Stock Pack Operation Transporteur</field>
+        <field name="model_id" ref="stock.model_stock_pack_operation"/>
+        <field name="domain_force">[('picking_id.picking_type_id.warehouse_id.partner_id', 'parent_of', user.partner_id.id)]</field>
+        <field name="groups" eval="[(4, ref('of_website_portal_carrier.group_of_carrier_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="of_stock_pack_operation_lot_carrier_rule" model="ir.rule">
+        <field name="name">OF Stock Pack Operation Lot Transporteur</field>
+        <field name="model_id" ref="stock.model_stock_pack_operation_lot"/>
+        <field name="domain_force">[('operation_id.picking_id.picking_type_id.warehouse_id.partner_id', '=', user.partner_id.id)]</field>
+        <field name="groups" eval="[(4, ref('of_website_portal_carrier.group_of_carrier_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+</odoo>

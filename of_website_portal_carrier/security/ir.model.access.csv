@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_stock_pack_operation_carrier,access.of.stock.pack.operation.carrier,stock.model_stock_pack_operation,of_website_portal_carrier.group_of_carrier_portal,1,1,0,0
+access_of_stock_pack_operation_lot_carrier,access.of.stock.pack.operation.lot.carrier,stock.model_stock_pack_operation_lot,of_website_portal_carrier.group_of_carrier_portal,1,1,0,0
+access_of_stock_warehouse_carrier,access.of.stock.warehouse.carrier,stock.model_stock_warehouse,of_website_portal_carrier.group_of_carrier_portal,1,0,0,0
+access_of_product_product_carrier,access.of.product.product.carrier,product.model_product_product,of_website_portal_carrier.group_of_carrier_portal,1,0,0,0
+access_of_product_template_carrier,access.of.product.template.carrier,product.model_product_template,of_website_portal_carrier.group_of_carrier_portal,1,0,0,0
+access_of_product_brand_carrier,access.of.product.brand.carrier,of_product_brand.model_of_product_brand,of_website_portal_carrier.group_of_carrier_portal,1,0,0,0
+access_of_stock_production_lot_carrier,access.of.stock.production.lot.carrier,stock.model_stock_production_lot,of_website_portal_carrier.group_of_carrier_portal,1,0,0,0
