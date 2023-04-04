@@ -1,0 +1,215 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_website_portal_carrier
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-04-11 15:32+0000\n"
+"PO-Revision-Date: 2023-04-11 15:32+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "<span class=\"sr-only\">Toggle navigation</span>\n"
+"                            <span class=\"icon-bar\"/>\n"
+"                            <span class=\"icon-bar\"/>"
+msgstr "<span class=\"sr-only\">Basculer la navigation</span>\n"
+"                            <span class=\"icon-bar\"/>\n"
+"                            <span class=\"icon-bar\"/>"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Annuler"
+msgstr "Annuler"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Bon de livraison"
+msgstr "Bon de livraison"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Créer un reliquat"
+msgstr "Créer un reliquat"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Créer un reliquat ?"
+msgstr "Créer un reliquat ?"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Créer un reliquat, si vous prévoyez de traiter les produits restants plus tard. Ne créez pas de reliquat si vous n'allez jamais livrer le solde."
+msgstr "Créer un reliquat, si vous prévoyez de traiter les produits restants plus tard. Ne créez pas de reliquat si vous n'allez jamais livrer le solde."
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipts
+msgid "Date de livraison"
+msgstr "Date de livraison"
+
+#. module: of_website_portal_carrier
+#: model:ir.model,name:of_website_portal_carrier.model_of_service
+msgid "Demande d'intervention"
+msgstr "Demande d'intervention"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipts
+msgid "Fournisseur"
+msgstr "Fournisseur"
+
+#. module: of_website_portal_carrier
+#: model:res.groups,name:of_website_portal_carrier.group_of_carrier_portal
+msgid "Groupe portail transporteur"
+msgstr "Groupe portail transporteur"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipts
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.portal_my_home_sale_b2c
+msgid "Il n'y a actuellement pas de réceptions pour votre compte."
+msgstr "Il n'y a actuellement pas de réceptions pour votre compte."
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Imprimer"
+msgstr "Imprimer"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Imprimer <span class=\"caret\"/>"
+msgstr "Imprimer <span class=\"caret\"/>"
+
+#. module: of_website_portal_carrier
+#: model:ir.model,name:of_website_portal_carrier.model_account_invoice
+msgid "Invoice"
+msgstr "Facture"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Marque"
+msgstr "Marque"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "My Account"
+msgstr "Mon compte"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "N° série"
+msgstr "N° série"
+
+#. module: of_website_portal_carrier
+#: model:ir.model,name:of_website_portal_carrier.model_of_tab
+msgid "Onglet"
+msgstr "Onglet"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Opération"
+msgstr "Opération"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipts
+msgid "Origine"
+msgstr "Origine"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Pas de reliquat"
+msgstr "Pas de reliquat"
+
+#. module: of_website_portal_carrier
+#: model:ir.model,name:of_website_portal_carrier.model_of_planning_tache
+msgid "Planning OpenFire : Tâches"
+msgstr "Planning OpenFire : Tâches"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Produit"
+msgstr "Produit"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Qté prévue"
+msgstr "Qté prévue"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Qté reçue"
+msgstr "Qté reçue"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Quelles lignes souhaitez vous imprimer ?"
+msgstr "Quelles lignes souhaitez vous imprimer ?"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.portal_my_home_menu_sale_b2c
+msgid "Réceptions"
+msgstr "Réceptions"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipts
+msgid "Référence"
+msgstr "Référence"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipts
+msgid "Société"
+msgstr "Société"
+
+#. module: of_website_portal_carrier
+#: model:ir.model,name:of_website_portal_carrier.model_res_users
+msgid "Users"
+msgstr "Utilisateurs"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Valider"
+msgstr "Valider"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Validé"
+msgstr "Validé"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipts
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.portal_my_home_sale_b2c
+msgid "Vos réceptions"
+msgstr "Vos réceptions"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Vous avez traité moins d'articles que la demande initiale."
+msgstr "Vous avez traité moins d'articles que la demande initiale."
+
+#. module: of_website_portal_carrier
+#: model:ir.model,name:of_website_portal_carrier.model_website
+msgid "Website"
+msgstr "Site Web"
+
+#. module: of_website_portal_carrier
+#: model:ir.model,name:of_website_portal_carrier.model_sale_config_settings
+msgid "sale.config.settings"
+msgstr "sale.config.settings"
+
+#. module: of_website_portal_carrier
+#: model:ir.model,name:of_website_portal_carrier.model_website_config_settings
+msgid "website.config.settings"
+msgstr "website.config.settings"
+
+#. module: of_website_portal_carrier
+#: model:ir.actions.report.xml,name:of_website_portal_carrier.receipt_label_report
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Étiquette"
+msgstr "Étiquette"
+
