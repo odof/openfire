@@ -28,7 +28,7 @@ class ProductProduct(models.Model):
         # Création de la relation fournisseur
         if self.brand_id and not self.seller_ids:
             seller_data = {
-                'name': self.brand_id.partner_id.id,
+                'partner_id': self.brand_id.partner_id.id,
             }
             seller_data = self.env['product.supplierinfo']._add_missing_default_values(seller_data)
             self.seller_ids = [(0, 0, seller_data)]
