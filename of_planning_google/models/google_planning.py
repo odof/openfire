@@ -555,7 +555,7 @@ class GooglePlanning(models.AbstractModel):
                 else:
                     end_time_str = hours_to_strs('time', end_time)[0]
 
-                tz = pytz.timezone(interv.tz or self.env.context.get('tz'))
+                tz = pytz.timezone(interv and interv.tz or self.env.context.get('tz'))
 
                 start_datetime_str = '%s %s:00' % (start, start_time_str)
                 start_datetime = tz.localize(datetime.strptime(start_datetime_str, '%Y-%m-%d %H:%M:%S'))
