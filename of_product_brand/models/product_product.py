@@ -33,17 +33,19 @@ class ProductProduct(models.Model):
             seller_data = self.env['product.supplierinfo']._add_missing_default_values(seller_data)
             self.seller_ids = [(0, 0, seller_data)]
 
-    @api.onchange('default_code')
-    def _onchange_default_code(self):
-        if self.default_code:
-            ind = self.default_code.find('_')
-            code = self.default_code[:ind]
-            brand = self.env['of.product.brand'].search([('code', '=', code)], limit=1)
-            if brand:
-                if brand != self.brand_id:
-                    self.brand_id = brand
-            elif self.brand_id.use_prefix:
-                self.brand_id = False
+    @api.depends('default_code')
+    def _compute_brand_id(self):
+        for product in self:
+            if product.default_code:
+                ind = product.default_code.find('_')
+                code = product.default_code[:ind]
+                brand = self.env['of.product.brand'].search([('code', '=', code)], limit=1)
+                if brand:
+                    if brand != product.brand_id:
+                        product.brand_id = brand
+                elif product.brand_id.use_prefix:
+                    # Empty the brand if the product code doesn't match the current brand code
+                    product.brand_id = False
 
     @api.model
     def _name_search(self, name, args=None, operator='ilike', limit=100, name_get_uid=None):
