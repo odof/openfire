@@ -131,6 +131,7 @@ class ProductTemplate(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        category_all = self.env.ref('product.product_category_all', raise_if_not_found=False)
         for vals in vals_list:
             if vals.get('of_url') and not is_valid_url(vals['of_url']):
                 raise UserError(_("The entered URL is not correct !"))
@@ -141,8 +142,7 @@ class ProductTemplate(models.Model):
                 # sans préciser leur catégorie
                 categ_id = self._context.get('categ_id') or self._context.get('default_categ_id')
                 if not categ_id:
-                    category = self.env.ref('product.product_category_all', raise_if_not_found=False)
-                    categ_id = category and category.type == 'normal' and category.id
+                    categ_id = category_all and category_all.id
                 if categ_id:
                     vals['categ_id'] = categ_id
 
