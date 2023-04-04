@@ -12,7 +12,7 @@ from os import path
 from odoo import api, fields, models
 from odoo.tools.translate import _
 from odoo.tools.safe_eval import safe_eval
-from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT, config
 from odoo.exceptions import except_orm, UserError, ValidationError
 
 try:
@@ -1473,12 +1473,18 @@ class OfImport(models.Model):
         else:
             doublons[key] = [1, str(i)]
 
-        file_path = ligne['store_fname']
+        allowed_paths = config.get('of_access_folders', '')
+        allowed_paths = allowed_paths and allowed_paths.split(',') or []
+        file_path = path.abspath(path.expanduser(path.expandvars(ligne['store_fname'])))
         value = ''
         try:
-            value = open(file_path, 'rb').read().encode('base64')
-            if not value:
-                erreur(u"Ligne %s : le fichier est vide : %s" % (i, file_path))
+            if not any(file_path.startswith(p) for p in allowed_paths):
+                erreur(u"Ligne %s : vous n'avez pas le droit d'accéder à ce fichier : %s" % (i, file_path))
+                value = False
+            else:
+                value = open(file_path, 'rb').read().encode('base64')
+                if not value:
+                    erreur(u"Ligne %s : le fichier est vide : %s" % (i, file_path))
         except (IOError, OSError):
             if path.exists(file_path):
                 erreur(u"Ligne %s : impossible d'ouvrir le fichier : %s" % (i, file_path))
