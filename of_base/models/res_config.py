@@ -9,4 +9,5 @@ class OFConnectorConfigSettings(models.TransientModel):
     _description = "Configure connectors"
 
     company_id = fields.Many2one(
-        comodel_name='res.company', string='Company', required=True, default=lambda self: self.env.user.company_id)
+        comodel_name='res.company', string='Company', required=True, default=lambda self: self.env.user.company_id
+    )

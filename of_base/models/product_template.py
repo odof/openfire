@@ -12,11 +12,15 @@ class ProductTemplate(models.Model):
         args2 = []
         i = 0
         while i < len(args):
-            if args[i] == '|' \
-                    and isinstance(args[i + 1], (list)) and args[i + 1][0] == 'default_code' \
-                    and isinstance(args[i + 2], (list)) and args[i + 2][0] == 'name' \
-                    and args[i + 1][1] in ('like', 'ilike') \
-                    and args[i + 1][2] == args[i + 2][2]:
+            if (
+                args[i] == '|'
+                and isinstance(args[i + 1], (list))
+                and args[i + 1][0] == 'default_code'
+                and isinstance(args[i + 2], (list))
+                and args[i + 2][0] == 'name'
+                and args[i + 1][1] in ('like', 'ilike')
+                and args[i + 1][2] == args[i + 2][2]
+            ):
                 operator = args[i + 1][1]
                 mots = args[i + 1][2].split()
                 args2 += ['&'] * (len(mots) - 1)

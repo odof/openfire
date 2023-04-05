@@ -7,18 +7,27 @@ class ResCompany(models.Model):
     _inherit = 'res.company'
 
     of_logo_ids = fields.Many2many(
-        comodel_name='of.company.multi.logos', relation='res_company_of_logo_rel', column1='company_id',
-        column2='logo_id', string="Logos")
+        comodel_name='of.company.multi.logos',
+        relation='res_company_of_logo_rel',
+        column1='company_id',
+        column2='logo_id',
+        string="Logos",
+    )
     of_use_logo_footer = fields.Boolean(
-        string="Footer logos", compute='_compute_of_use_logo_footer', store=True,
-        help="This company uses logos to be positioned just above the footer")
+        string="Footer logos",
+        compute='_compute_of_use_logo_footer',
+        store=True,
+        help="This company uses logos to be positioned just above the footer",
+    )
 
     @api.depends('of_logo_ids', 'of_logo_ids.logo_position')
     def _compute_of_use_logo_footer(self):
         for company in self:
             company.of_use_logo_footer = bool(
                 company.of_logo_ids.filtered(
-                    lambda s: s.logo_position in ('footer', 'footer_right_corner', 'footer_left_corner')))
+                    lambda s: s.logo_position in ('footer', 'footer_right_corner', 'footer_left_corner')
+                )
+            )
 
     def _compute_field_value(self, field):
         super()._compute_field_value(field)
@@ -51,6 +60,4 @@ class ResCompany(models.Model):
 
     def _get_company_logo(self, name):
         """Get the logo from a given name"""
-        return next(
-            (logos.logo for logos in self.of_logo_ids if logos.name == name), False
-        )
+        return next((logos.logo for logos in self.of_logo_ids if logos.name == name), False)

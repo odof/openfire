@@ -10,17 +10,24 @@ class MailMessage(models.Model):
         messages = self.env['mail.mail'].search([('state', operator, value)]).mapped('mail_message_id')
         return [('id', 'in', messages.ids)]
 
-    of_state = fields.Selection(selection=[
-        ('outgoing', 'Outgoing'),
-        ('sent', 'Sent'),
-        ('received', 'Received'),
-        ('exception', 'Delivery Failed'),
-        ('cancel', 'Cancelled'),
-    ], string="Status", compute='_compute_of_state', search='_search_of_state')
+    of_state = fields.Selection(
+        selection=[
+            ('outgoing', "Outgoing"),
+            ('sent', "Sent"),
+            ('received', "Received"),
+            ('exception', "Delivery Failed"),
+            ('cancel', "Cancelled"),
+        ],
+        string="Status",
+        compute='_compute_of_state',
+        search='_search_of_state',
+    )
     of_failure_reason = fields.Text(
-        string="Failure Reason", compute='_compute_of_state',
+        string="Failure Reason",
+        compute='_compute_of_state',
         help="Failure reason. This is usually the exception thrown by the email server, "
-             "stored to ease the debugging of mailing issues.")
+        "stored to ease the debugging of mailing issues.",
+    )
 
     def _compute_of_state(self):
         mail_obj = self.env['mail.mail']

@@ -11,6 +11,4 @@ class OFDays(models.Model):
     abbreviation = fields.Char(string="Abbreviation", size=16)
     number = fields.Integer(string="Number", readonly=True)
 
-    _sql_constraints = [
-        ('days_number_uniq', 'unique(number)', "Two days cannot have the same number")
-    ]
+    _sql_constraints = [('days_number_uniq', 'unique(number)', "Two days cannot have the same number")]

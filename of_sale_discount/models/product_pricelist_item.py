@@ -8,15 +8,15 @@ class PricelistItem(models.Model):
     _inherit = 'product.pricelist.item'
 
     percent_price = fields.Float(
-        string="Percentage Price", compute='_compute_percent_price', readonly=False, store=True)
+        string="Percentage Price", compute='_compute_percent_price', readonly=False, store=True
+    )
     of_percent_price_formula = fields.Char(
-        string="Percentage (discount)",
-        help="Discount or amount of discounts.\nEg. \"40 + 10.5\" equals \"46.3\"")
+        string="Percentage (discount)", help="Discount or amount of discounts.\nEg. \"40 + 10.5\" equals \"46.3\""
+    )
 
     @api.depends('of_percent_price_formula')
     def _compute_percent_price(self):
-        """ Évalue la formule of_percent_price_formula pour remplir le champ percent_price
-        """
+        """Évalue la formule of_percent_price_formula pour remplir le champ percent_price"""
         for line in self:
             price_percent = 100.0
             if line.of_percent_price_formula:

@@ -10,10 +10,13 @@ class ProductProduct(models.Model):
 
     standard_price = fields.Float(of_unify_companies=True)
     of_theoretical_cost = fields.Float(
-        string="Theoretical cost", digits='Product Price', groups="base.group_user",
+        string="Theoretical cost",
+        digits='Product Price',
+        groups="base.group_user",
         help="Corresponds to the cost calculated by applying the rules defined in the brand or in the import files."
-             " This cost value can be used for margin calculation in quotes and invoices; however, it is never used "
-             "for inventory valuation.")
+        " This cost value can be used for margin calculation in quotes and invoices; however, it is never used "
+        "for inventory valuation.",
+    )
     of_forced_lst_price = fields.Float(string="Sale price (forced)", digits='Product Price')
 
     @api.depends('list_price', 'price_extra', 'of_forced_lst_price')
@@ -38,8 +41,9 @@ class ProductProduct(models.Model):
             return super()._set_product_lst_price()
         for product in self:
             if self._context.get('uom'):
-                value = self.env['uom.uom'].browse(self._context['uom'])._compute_price(
-                    product.lst_price, product.uom_id)
+                value = (
+                    self.env['uom.uom'].browse(self._context['uom'])._compute_price(product.lst_price, product.uom_id)
+                )
             else:
                 value = product.lst_price
             product.write({'of_forced_lst_price': value})
@@ -68,15 +72,19 @@ class ProductProduct(models.Model):
         """
         # Handle stock valuation layers.
 
-        if self.filtered(
-                lambda p: p.valuation == 'real_time') and not \
-                self.env['stock.valuation.layer'].check_access_rights('read', raise_exception=False):
-            raise UserError(_(
-                "You cannot update the cost of a product in automated valuation as it leads to the "
-                "creation of a journal entry, for which you don't have the access rights."))
+        if self.filtered(lambda p: p.valuation == 'real_time') and not self.env[
+            'stock.valuation.layer'
+        ].check_access_rights('read', raise_exception=False):
+            raise UserError(
+                _(
+                    "You cannot update the cost of a product in automated valuation as it leads to the "
+                    "creation of a journal entry, for which you don't have the access rights."
+                )
+            )
 
         companies = self.env['res.company'].search(  # OF
-            ['|', ('chart_template_id', '!=', False), ('parent_id', '=', False)])
+            ['|', ('chart_template_id', '!=', False), ('parent_id', '=', False)]
+        )
         for company in companies:  # OF
             svl_vals_list = []
             company_id = company.id  # OF
@@ -96,8 +104,8 @@ class ProductProduct(models.Model):
                 svl_vals = {
                     'company_id': company_id.id,
                     'product_id': product.id,
-                    'description': _('Product value manually modified (from %s to %s)') % (
-                        product.standard_price, rounded_new_price),
+                    'description': _('Product value manually modified (from %s to %s)')
+                    % (product.standard_price, rounded_new_price),
                     'value': value,
                     'quantity': 0,
                 }
@@ -116,12 +124,14 @@ class ProductProduct(models.Model):
 
                 # Sanity check.
                 if not product_accounts[product.id].get('expense'):
-                    raise UserError(
-                        _("You must set a counterpart account on your product category."))
+                    raise UserError(_("You must set a counterpart account on your product category."))
                 if not product_accounts[product.id].get('stock_valuation'):
-                    raise UserError(_(
-                        "You don\'t have any stock valuation account defined on your product category."
-                        "You must define one before processing this operation."))
+                    raise UserError(
+                        _(
+                            "You don\'t have any stock valuation account defined on your product category."
+                            "You must define one before processing this operation."
+                        )
+                    )
 
                 if value < 0:
                     debit_account_id = product_accounts[product.id]['expense'].id
@@ -136,31 +146,42 @@ class ProductProduct(models.Model):
                     'ref': product.default_code,
                     'stock_valuation_layer_ids': [(6, None, [stock_valuation_layer.id])],
                     'move_type': 'entry',
-                    'line_ids': [(0, 0, {
-                        'name': _(
-                            '%(user)s changed cost from %(previous)s to %(new_price)s - %(product)s',
-                            user=self.env.user.name,
-                            previous=product.standard_price,
-                            new_price=new_price,
-                            product=product.display_name
+                    'line_ids': [
+                        (
+                            0,
+                            0,
+                            {
+                                'name': _(
+                                    '%(user)s changed cost from %(previous)s to %(new_price)s - %(product)s',
+                                    user=self.env.user.name,
+                                    previous=product.standard_price,
+                                    new_price=new_price,
+                                    product=product.display_name,
+                                ),
+                                'account_id': debit_account_id,
+                                'debit': abs(value),
+                                'credit': 0,
+                                'product_id': product.id,
+                            },
                         ),
-                        'account_id': debit_account_id,
-                        'debit': abs(value),
-                        'credit': 0,
-                        'product_id': product.id,
-                    }), (0, 0, {
-                        'name': _(
-                            '%(user)s changed cost from %(previous)s to %(new_price)s - %(product)s',
-                            user=self.env.user.name,
-                            previous=product.standard_price,
-                            new_price=new_price,
-                            product=product.display_name
+                        (
+                            0,
+                            0,
+                            {
+                                'name': _(
+                                    '%(user)s changed cost from %(previous)s to %(new_price)s - %(product)s',
+                                    user=self.env.user.name,
+                                    previous=product.standard_price,
+                                    new_price=new_price,
+                                    product=product.display_name,
+                                ),
+                                'account_id': credit_account_id,
+                                'debit': 0,
+                                'credit': abs(value),
+                                'product_id': product.id,
+                            },
                         ),
-                        'account_id': credit_account_id,
-                        'debit': 0,
-                        'credit': abs(value),
-                        'product_id': product.id,
-                    })],
+                    ],
                 }
                 am_vals_list.append(move_vals)
 
@@ -202,11 +223,15 @@ class ProductProduct(models.Model):
 
             # FIXME: of_purchase_coeff_cost_propagation is from of_purchase module (not migrated yet)
             if 'of_purchase_coeff_cost_propagation' in dir(product):
-                if (product.cost_method == 'standard' or product.categ_id.of_sale_cost == 'standard') and \
-                        'standard_price' in values:
+                if (
+                    product.cost_method == 'standard' or product.categ_id.of_sale_cost == 'standard'
+                ) and 'standard_price' in values:
                     product.of_purchase_coeff_cost_propagation(product.standard_price)
-                elif product.cost_method == 'standard' and product.categ_id.of_sale_cost == 'theoretical' and \
-                        'of_theoretical_cost' in values:
+                elif (
+                    product.cost_method == 'standard'
+                    and product.categ_id.of_sale_cost == 'theoretical'
+                    and 'of_theoretical_cost' in values
+                ):
                     product.of_purchase_coeff_cost_propagation(product.of_theoretical_cost)
 
         return res

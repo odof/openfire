@@ -9,8 +9,12 @@ class AccountInvoiceLine(models.Model):
     _inherit = 'account.move.line'
 
     of_product_brand_id = fields.Many2one(
-        comodel_name='of.product.brand', related='product_id.brand_id', string="Brand",
-        store=True, index=True, readonly=True
+        comodel_name='of.product.brand',
+        related='product_id.brand_id',
+        string="Brand",
+        store=True,
+        index=True,
+        readonly=True,
     )
 
     @api.depends('product_id', 'journal_id')
@@ -23,10 +27,8 @@ class AccountInvoiceLine(models.Model):
             # Only inline templates are supported here.
             # ie: {{ description_sale and '\n' + description_sale or '' }}
             brand_desc = self.env['mail.template']._render_template(
-                self.product_id.brand_id.description_sale,
-                'product.product',
-                [self.product_id.id],
-                post_process=False)[self.product_id.id]
+                self.product_id.brand_id.description_sale, 'product.product', [self.product_id.id], post_process=False
+            )[self.product_id.id]
             line_name += '\n%s' % brand_desc
         if self.product_id.brand_id.show_in_sales:
             # Ajout de la marque dans le descriptif de l'article

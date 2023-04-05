@@ -17,17 +17,19 @@ class AccountInvoiceReport(models.Model):
 
     @api.depends()
     def _compute_dummy(self):
-        """ Dummy method to allow to search on computed fields.
+        """Dummy method to allow to search on computed fields.
         Thoses fields should be comptued on the fly after with the values of the previous period
         """
         pass
 
     def _select(self):
         select_str = super()._select()
-        select_str += """,
+        select_str += (
+            """,
             template.brand_id as of_brand_id,
-            CASE WHEN line.company_id = %s THEN True ELSE False END AS of_my_company""" \
+            CASE WHEN line.company_id = %s THEN True ELSE False END AS of_my_company"""
             % self.env.user.company_id.id
+        )
         return select_str
 
     def _from(self):
@@ -46,23 +48,13 @@ class AccountInvoiceReport(models.Model):
             'of_diff_qty': ('of_diff_qty', 'quantity'),
         }
         of_compute_fields = [
-            f.name
-            for f in self._fields.values()
-            if f.name in depends_mapping and not f.store and not f.search
+            f.name for f in self._fields.values() if f.name in depends_mapping and not f.store and not f.search
         ]
-        fields_copy = [
-            f
-            for f in fields
-            if f not in tuple(map(lambda e: f'{e}:sum', of_compute_fields))
-        ]
+        fields_copy = [f for f in fields if f not in tuple(map(lambda e: f'{e}:sum', of_compute_fields))]
         res = super()._read_group_raw(domain, fields_copy, groupby, offset, limit, orderby, lazy)
         time_groupbys = ('invoice_date:month', 'invoice_date:year', 'invoice_date')
         # Les deltas dépendent d'un champ qui doit être calculé
-        diff_percent = [
-            v
-            for v in depends_mapping.values()
-            if f'{v[0]}:sum' in fields and f'{v[1]}:sum' in fields
-        ]
+        diff_percent = [v for v in depends_mapping.values() if f'{v[0]}:sum' in fields and f'{v[1]}:sum' in fields]
         diff = []
         if groupby and (diff or diff_percent) and any(gb in time_groupbys for gb in groupby[-2:]):
             # Regroupement des résultats par période pour calcul des deltas
@@ -76,8 +68,9 @@ class AccountInvoiceReport(models.Model):
 
             # Liste de toutes les périodes de temps affichée, par ordre croissant
             # On filtre les valeurs False pour les périodes qui n'ont pas de données
-            periods = sorted(
-                list({r[time_gb] for r in res if r[time_gb]})) + list({False for r in res if not r[time_gb]})
+            periods = sorted(list({r[time_gb] for r in res if r[time_gb]})) + list(
+                {False for r in res if not r[time_gb]}
+            )
             others = other_gb and sorted(list({r[other_gb] for r in res})) or [other_gb]
 
             # Mise en ordre des données pour traitement
@@ -98,8 +91,10 @@ class AccountInvoiceReport(models.Model):
                             r[field1] = r[field2] - values[period_prec][other][field2]
                         for field1, field2 in diff_percent:
                             r[field1] = (
-                                (r[field2] / values[period_prec][other][field2] - 1)
-                            ) * 100 if values[period_prec][other][field2] else 100
+                                ((r[field2] / values[period_prec][other][field2] - 1)) * 100
+                                if values[period_prec][other][field2]
+                                else 100
+                            )
                 period_prec = period
 
         return res

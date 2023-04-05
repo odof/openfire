@@ -42,7 +42,7 @@ def _set_partner_phones(env, cr):
 
 
 def post_init_hook(cr, registry):
-    """ Migrate data from old fields to new ones.
+    """Migrate data from old fields to new ones.
 
     We are also 🐒-patching the following methods:
     - base.user_has_groups()
@@ -57,7 +57,7 @@ def post_init_hook(cr, registry):
     # monkey-patching
     @api.model
     def user_has_groups(self, groups):
-        """ Return true if the user is member of at least one of the groups in
+        """Return true if the user is member of at least one of the groups in
         ``groups``, and is not a member of any of the groups in ``groups``
         preceded by ``!``. Typically used to resolve ``groups`` attribute in
         view and model definitions.
@@ -73,6 +73,7 @@ def post_init_hook(cr, registry):
             preceded by ``!``
         """
         from odoo.http import request
+
         user = self.env.user
 
         has_groups = []
@@ -139,7 +140,8 @@ def post_init_hook(cr, registry):
             user_type_field_name = ''
             user_type_readonly = str({})
             sorted_tuples = sorted(
-                self.get_groups_by_application(), key=lambda t: t[0].xml_id != 'base.module_category_user_type')
+                self.get_groups_by_application(), key=lambda t: t[0].xml_id != 'base.module_category_user_type'
+            )
             for app, kind, gs, category_name in sorted_tuples:  # we process the user type first
                 attrs = {}
                 # hide groups in categories 'Hidden' and 'Extra' (except for group_no_one)
@@ -213,17 +215,23 @@ def post_init_hook(cr, registry):
                 xml3.append(E.group(*(xml_by_category[xml_cat]), string=master_category_name))
 
             field_name = 'user_group_warning'
-            user_group_warning_xml = E.div({
-                'class': "alert alert-warning",
-                'role': "alert",
-                'colspan': "2",
-                'attrs': str({'invisible': [(field_name, '=', False)]})
-            })
-            user_group_warning_xml.append(E.label({
-                'for': field_name,
-                'string': "Access Rights Mismatch",
-                'class': "text text-warning fw-bold",
-            }))
+            user_group_warning_xml = E.div(
+                {
+                    'class': "alert alert-warning",
+                    'role': "alert",
+                    'colspan': "2",
+                    'attrs': str({'invisible': [(field_name, '=', False)]}),
+                }
+            )
+            user_group_warning_xml.append(
+                E.label(
+                    {
+                        'for': field_name,
+                        'string': "Access Rights Mismatch",
+                        'class': "text text-warning fw-bold",
+                    }
+                )
+            )
             user_group_warning_xml.append(E.field(name=field_name))
             xml2.append(user_group_warning_xml)
 
@@ -232,8 +240,10 @@ def post_init_hook(cr, registry):
                 E.group(*(xml1), groups="base.group_no_one"),
                 E.group(*(xml2), attrs=str(user_type_attrs)),
                 E.group(*(xml3), attrs=str(user_type_attrs)),
-                E.group(*(xml4), attrs=str(user_type_attrs), groups="base.group_no_one"), name="groups_id",
-                position="replace")
+                E.group(*(xml4), attrs=str(user_type_attrs), groups="base.group_no_one"),
+                name="groups_id",
+                position="replace",
+            )
             xml.addprevious(etree.Comment("GENERATED AUTOMATICALLY BY GROUPS"))
 
         # serialize and update the view
@@ -258,7 +268,9 @@ def post_init_hook(cr, registry):
                     'Changing the company of a contact should only be done if it '
                     'was never correctly set. If an existing contact starts working for a new '
                     'company then a new contact should be created under that new '
-                    'company. You can use the "Discard" button to abandon this change.')}
+                    'company. You can use the "Discard" button to abandon this change.'
+                ),
+            }
         # OPENFIRE : On avait ici un remplacement de l'adresse par celle du parent
         return result
 
@@ -279,7 +291,7 @@ def post_init_hook(cr, registry):
 
 
 def uninstall_hook(cr, registry):
-    """ Restore original methods """
+    """Restore original methods"""
     BaseModel._revert_method('user_has_groups')
     GroupsView._revert_method('_update_user_groups_view')
     Partner._revert_method('onchange_parent_id')

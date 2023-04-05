@@ -24,8 +24,7 @@ class SaleReport(models.Model):
             FROM sale_report
             WHERE
             company_id = %s"""
-        self.env.cr.execute(
-            req, (self.env.user.company_id.id,))
+        self.env.cr.execute(req, (self.env.user.company_id.id,))
         line_ids = [r[0] for r in self.env.cr.fetchall()]
         return [('id', 'in', line_ids)]
 
@@ -35,7 +34,7 @@ class SaleReport(models.Model):
 
     @api.depends()
     def _compute_dummy(self):
-        """ Dummy method to allow to search on computed fields.
+        """Dummy method to allow to search on computed fields.
         Thoses fields should be comptued on the fly after with the values of the previous period
         """
         pass
@@ -45,13 +44,15 @@ class SaleReport(models.Model):
         res['of_brand_id'] = "t.brand_id"
         # FIXME: This field is defined in a non migrated module yet
         res['of_confirmation_date'] = "NULL"
-        res['of_delivery_date'] = \
-            "CASE WHEN sm.qty = sum(l.product_uom_qty / u.factor * u2.factor) " \
-            "    THEN sm.date ELSE NULL END"
-        res['of_delivered_amount'] = "CASE WHEN sum(l.product_uom_qty / u.factor * u2.factor) != 0 THEN " \
-            "    sum(l.price_subtotal / COALESCE(currency_table.rate, 1.0)) * " \
-            "    sm.qty / sum(l.product_uom_qty / u.factor * u2.factor) " \
+        res['of_delivery_date'] = (
+            "CASE WHEN sm.qty = sum(l.product_uom_qty / u.factor * u2.factor) " "    THEN sm.date ELSE NULL END"
+        )
+        res['of_delivered_amount'] = (
+            "CASE WHEN sum(l.product_uom_qty / u.factor * u2.factor) != 0 THEN "
+            "    sum(l.price_subtotal / COALESCE(currency_table.rate, 1.0)) * "
+            "    sm.qty / sum(l.product_uom_qty / u.factor * u2.factor) "
             "    ELSE 0 END"
+        )
         return res
 
     def _from_sale(self):
@@ -95,26 +96,24 @@ class SaleReport(models.Model):
         }
         fields_keys = list(depends_mapping.keys()) + list(depends_mapping_margin.keys())
         of_compute_fields = [
-            f.name
-            for f in self._fields.values()
-            if f.name in fields_keys and not f.store and not f.search
+            f.name for f in self._fields.values() if f.name in fields_keys and not f.store and not f.search
         ]
-        fields_copy = [
-            f
-            for f in fields
-            if f not in tuple(map(lambda e: f'{e}:sum', of_compute_fields))
-        ]
+        fields_copy = [f for f in fields if f not in tuple(map(lambda e: f'{e}:sum', of_compute_fields))]
         res = super()._read_group_raw(domain, fields_copy, groupby, offset, limit, orderby, lazy)
         if res:
             time_groupbys = (
-                'date:month', 'date:year', 'date', 'of_confirmation_date', 'of_confirmation_date:month',
-                'of_confirmation_date:year', 'of_date_livraison', 'of_date_livraison:month', 'of_date_livraison:year')
+                'date:month',
+                'date:year',
+                'date',
+                'of_confirmation_date',
+                'of_confirmation_date:month',
+                'of_confirmation_date:year',
+                'of_date_livraison',
+                'of_date_livraison:month',
+                'of_date_livraison:year',
+            )
             # Les deltas dépendent d'un champ qui doit être calculé
-            diff_percent = [
-                v
-                for v in depends_mapping.values()
-                if f'{v[0]}:sum' in fields and f'{v[1]}:sum' in fields
-            ]
+            diff_percent = [v for v in depends_mapping.values() if f'{v[0]}:sum' in fields and f'{v[1]}:sum' in fields]
             diff = []
             if groupby and (diff or diff_percent) and any(gb in time_groupbys for gb in groupby[-2:]):
                 # Regroupement des résultats par période pour calcul des deltas
@@ -148,14 +147,17 @@ class SaleReport(models.Model):
                                 r[field1] = r[field2] - values[period_prec][other][field2]
                             for field1, field2 in diff_percent:
                                 r[field1] = (
-                                    (r[field2] / values[period_prec][other][field2] - 1)
-                                ) * 100 if values[period_prec][other][field2] else 100
+                                    ((r[field2] / values[period_prec][other][field2] - 1)) * 100
+                                    if values[period_prec][other][field2]
+                                    else 100
+                                )
                     period_prec = period
 
             display_margin_percent = depends_mapping_margin.get('of_margin_percentage')
             if all(f'{val}:sum' in fields for val in display_margin_percent):
                 for entry in res:
                     if entry[display_margin_percent[1]] is not None and entry[display_margin_percent[2]] is not None:
-                        entry[display_margin_percent[0]] = \
+                        entry[display_margin_percent[0]] = (
                             entry[display_margin_percent[1]] * 100 / (entry[display_margin_percent[2]] or 1)
+                        )
         return res

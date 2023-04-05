@@ -63,8 +63,7 @@ def intervals_overlap(min_1, max_1, min_2, max_2, strict=True):
 
 
 def hours_to_strs(*args):
-    """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
-    """
+    """Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'"""
     # Si le premier argument est un string, c'est le mode
     if args and isinstance(args[0], str):
         mode = args[0]
@@ -96,8 +95,8 @@ def compare_date(date1, date2, compare="==", isdatetime=False):
         f"date1 {compare} date2",
         {
             'date1': date1.strftime("%d/%m/%Y %H:%M:%S") if isdatetime else date1.strftime("%d/%m/%Y"),
-            'date2': date2.strftime("%d/%m/%Y %H:%M:%S") if isdatetime else date2.strftime("%d/%m/%Y")
-        }
+            'date2': date2.strftime("%d/%m/%Y %H:%M:%S") if isdatetime else date2.strftime("%d/%m/%Y"),
+        },
     )
 
 
@@ -124,7 +123,9 @@ def is_valid_url(of_url):
         r'localhost|'  # localhost...
         r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
         r'(?::\d+)?'  # optional port
-        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+        r'(?:/?|[/?]\S+)$',
+        re.IGNORECASE,
+    )
     return of_url is not None and regex.search(of_url)
 
 

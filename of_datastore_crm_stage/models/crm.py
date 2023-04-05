@@ -22,15 +22,14 @@ OF_CRM_STAGE_IDS = [
     ('17', "17"),
     ('18', "18"),
     ('19', "19"),
-    ('20', "20")
+    ('20', "20"),
 ]
 
 
 class CrmStage(models.Model):
     _inherit = 'crm.stage'
 
-    of_crm_stage_id = fields.Selection(
-        selection=OF_CRM_STAGE_IDS, string="Source Opportunity Stage ID", copy=False)
+    of_crm_stage_id = fields.Selection(selection=OF_CRM_STAGE_IDS, string="Source Opportunity Stage ID", copy=False)
 
     _sql_constraints = [
         ('of_crm_stage_id_uniq', 'unique (of_crm_stage_id)', "There is already a kanban step with this identifier")

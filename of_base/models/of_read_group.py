@@ -19,6 +19,7 @@ class OfReadGroup(models.AbstractModel):
     Il faut ensuite surcharger _read_group_process_groupby afin de modifier la query et de retourner les
     éléments nécessaire à son interprétation.
     """
+
     _name = 'of.readgroup'
 
     @api.model
@@ -39,20 +40,25 @@ class OfReadGroup(models.AbstractModel):
             if gb not in self._fields:
                 raise UserError(_("Unknown field %r in 'groupby'", gb))
             if not self._fields[gb].base_field.groupable:
-                raise UserError(_(
-                    "Field %s is not a stored field, only stored fields (regular or "
-                    "many2many) are valid for the 'groupby' parameter", self._fields[gb],
-                ))
+                raise UserError(
+                    _(
+                        "Field %s is not a stored field, only stored fields (regular or "
+                        "many2many) are valid for the 'groupby' parameter",
+                        self._fields[gb],
+                    )
+                )
             # Modification OpenFire : Un champ custom peut ne pas être présent en base de données
             gb_field = self._fields[gb].base_field
             if not getattr(gb_field, 'of_custom_groupby', False):
-                assert gb_field.store and gb_field.column_type, "Fields in 'groupby' must be regular " \
+                assert gb_field.store and gb_field.column_type, (
+                    "Fields in 'groupby' must be regular "
                     "database-persisted fields (no function or related fields), or function fields with store=True"
+                )
             # Fin modification OpenFire
 
         aggregated_fields = []
         select_terms = []
-        fnames = []                     # list of fields to flush
+        fnames = []  # list of fields to flush
 
         for fspec in fields:
             if fspec == 'sequence':
@@ -81,8 +87,7 @@ class OfReadGroup(models.AbstractModel):
                 field = self._fields.get(name)
                 if not field:
                     raise ValueError("Invalid field %r on model %r" % (name, self._name))
-                if not (field.base_field.store and
-                        field.base_field.column_type and field.group_operator):
+                if not (field.base_field.store and field.base_field.column_type and field.group_operator):
                     continue
                 func, fname = field.group_operator, name
 
@@ -167,8 +172,7 @@ class OfReadGroup(models.AbstractModel):
             # want to display empty columns anyway, so we should apply the fill_temporal logic
             if not isinstance(fill_temporal, dict):
                 fill_temporal = {}
-            data = self._read_group_fill_temporal(data, groupby, aggregated_fields,
-                                                  annotated_groupbys, **fill_temporal)
+            data = self._read_group_fill_temporal(data, groupby, aggregated_fields, annotated_groupbys, **fill_temporal)
 
         result = [self._read_group_format_result(d, annotated_groupbys, groupby, domain) for d in data]
 
@@ -178,8 +182,13 @@ class OfReadGroup(models.AbstractModel):
             # method _read_group_fill_results need to be completely reimplemented
             # in a sane way
             result = self._read_group_fill_results(
-                domain, groupby_fields[0], groupby[len(annotated_groupbys):],
-                aggregated_fields, count_field, result, read_group_order=order,
+                domain,
+                groupby_fields[0],
+                groupby[len(annotated_groupbys):],
+                aggregated_fields,
+                count_field,
+                result,
+                read_group_order=order,
             )
         return result
 
@@ -238,7 +247,8 @@ class OfReadGroup(models.AbstractModel):
                     if key not in seen:
                         seen.add(key)
                         order_by_elements += self.of_custom_groupby_generate_order(
-                            alias, order_field, query, do_reverse, seen)
+                            alias, order_field, query, do_reverse, seen
+                        )
                 # Fin modification OpenFire
                 else:
                     _logger.warning("Model %r cannot be sorted on field %r (not a column)", self._name, order_field)

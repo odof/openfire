@@ -11,8 +11,11 @@ class ProductTemplate(models.Model):
 
     of_model = fields.Char(string="Model")
     of_margin = fields.Float(
-        string="Margin", digits=(4, 2), compute='_compute_of_margin',
-        help="Margin calculated on the basis of the sale price")
+        string="Margin",
+        digits=(4, 2),
+        compute='_compute_of_margin',
+        help="Margin calculated on the basis of the sale price",
+    )
     of_manufacturer_description = fields.Text(string="Manufacturer Description", translate=True)
     of_cost_date = fields.Date(string="Cost date")
 
@@ -42,8 +45,12 @@ class ProductTemplate(models.Model):
     of_seller_delay = fields.Integer(related='seller_ids.delay')
 
     of_linked_product_ids = fields.Many2many(
-        comodel_name='product.template', column1='of_product_template1_id', column2='of_product_template2_id',
-        relation='linked_product_rel', string="Related products")
+        comodel_name='product.template',
+        column1='of_product_template1_id',
+        column2='of_product_template2_id',
+        relation='linked_product_rel',
+        string="Related products",
+    )
 
     of_forbidden_discount = fields.Boolean(string="Forbiden discount")
 
@@ -60,19 +67,23 @@ class ProductTemplate(models.Model):
 
     # Gestion du coût standard et du coût théorique
     of_theoretical_cost = fields.Float(
-        string="Theoretical cost", compute='_compute_of_theoretical_cost',
-        inverse='_set_of_theoretical_cost', search='_search_of_theoretical_cost',
-        digits='Product Price', groups='base.group_user',
+        string="Theoretical cost",
+        compute='_compute_of_theoretical_cost',
+        inverse='_set_of_theoretical_cost',
+        search='_search_of_theoretical_cost',
+        digits='Product Price',
+        groups='base.group_user',
         help="Corresponds to the cost calculated by applying the rules defined in the brand or in the import files. "
-             "This cost value can be used for margin calculation in quotes and invoices; however, it is never used for "
-             "inventory valuation.")
+        "This cost value can be used for margin calculation in quotes and invoices; however, it is never used for "
+        "inventory valuation.",
+    )
 
     @api.depends('product_variant_ids', 'product_variant_ids.of_theoretical_cost')
     def _compute_of_theoretical_cost(self):
         unique_variants = self.filtered(lambda template: len(template.product_variant_ids) == 1)
         for template in unique_variants:
             template.of_theoretical_cost = template.product_variant_ids.of_theoretical_cost
-        for template in (self - unique_variants):
+        for template in self - unique_variants:
             template.of_theoretical_cost = 0.0
 
     def _set_of_theoretical_cost(self):

@@ -16,11 +16,16 @@ class OfLogMessage(models.Model):
     type = fields.Char(string="Error type", default="error")
     message = fields.Text(string="Message", required=True)
     function = fields.Char(string="Function")
-    log_level = fields.Selection(selection=[
-        ('info', 'Info'),
-        ('warning', 'Warning'),
-        ('error', 'Error'),
-    ], string="Log level", required=True, default='warning')
+    log_level = fields.Selection(
+        selection=[
+            ('info', "Info"),
+            ('warning', "Warning"),
+            ('error', "Error"),
+        ],
+        string="Log level",
+        required=True,
+        default='warning',
+    )
 
     @api.model
     def delete_old_logs(self, day_limit=7):
@@ -33,11 +38,13 @@ class OfLogMessage(models.Model):
     @api.model
     def new_log(self, obj, name, type, message, function, log_level='warning'):
         model = hasattr(obj, "_name") and obj._name or ""
-        self.env['of.log.message'].create({
-            'name': name,
-            'model': model,
-            'type': type,
-            'message': message,
-            'function': function,
-            'log_level': log_level,
-        })
+        self.env['of.log.message'].create(
+            {
+                'name': name,
+                'model': model,
+                'type': type,
+                'message': message,
+                'function': function,
+                'log_level': log_level,
+            }
+        )

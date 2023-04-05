@@ -15,17 +15,15 @@ try:
 except ImportError:
     _logger.debug("Impossible d'importer la librairie Python 'phonenumbers'.")
 
-PHONE_TYPES = [('01_domicile', "Home"),
-               ('02_bureau', "Office"),
-               ('03_mobile', "Mobile"),
-               ('04_fax', "Fax")]
+PHONE_TYPES = [('01_domicile', "Home"), ('02_bureau', "Office"), ('03_mobile', "Mobile"), ('04_fax', "Fax")]
 
 
 # Regex qui valide un texte comme une suite d'adresses email séparées par des espaces et/ou virgules
 # La partie identifiant une adresse email est récupérée de single_email_re, définie dans odoo/tools/mail.py
 multiple_emails_re = re.compile(
     r"""^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,63}([ ,]+[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,63})*$""",
-    re.VERBOSE)
+    re.VERBOSE,
+)
 
 
 def convert_phone_number(value, default_country_code=None, new_format='e164', strict=False):
@@ -74,7 +72,9 @@ def convert_phone_number(value, default_country_code=None, new_format='e164', st
     except phonenumbers.phonenumberutil.NumberParseException:
         _logger.error(
             "Impossible de formater le numéro de téléphone '%s' au format international avec le code pays '%s'",
-            value, default_country_code)
+            value,
+            default_country_code,
+        )
     return result
 
 
@@ -92,18 +92,22 @@ class ResPartner(models.Model):
     mobile = fields.Char(compute='_compute_old_phone_fields', inverse='_inverse_mobile')
     fax = fields.Char(compute='_compute_old_phone_fields', inverse='_inverse_fax')
     of_phone_number_ids = fields.One2many(
-        comodel_name='of.res.partner.phone', inverse_name='partner_id', string="Phone numbers")
+        comodel_name='of.res.partner.phone', inverse_name='partner_id', string="Phone numbers"
+    )
     of_phone_error = fields.Boolean(
-        string="Badly formatted phone numbers", compute='_compute_of_phone_error', search='_search_of_phone_error')
+        string="Badly formatted phone numbers", compute='_compute_of_phone_error', search='_search_of_phone_error'
+    )
     of_parent_category_id = fields.Many2many(
-        comodel_name='res.partner.category', string="Parent labels", compute='_compute_parent_category')
+        comodel_name='res.partner.category', string="Parent labels", compute='_compute_parent_category'
+    )
     of_default_address = fields.Boolean(string="Default address")
 
-    of_last_order_date = fields.Date(
-        string="Last quote date", compute='_compute_of_last_order_date', compute_sudo=True)
+    of_last_order_date = fields.Date(string="Last quote date", compute='_compute_of_last_order_date', compute_sudo=True)
     of_potential_duplication = fields.Boolean(
-        string="Potential duplicate ?", compute='_compute_of_potential_duplication',
-        search='_search_of_potential_duplication')
+        string="Potential duplicate ?",
+        compute='_compute_of_potential_duplication',
+        search='_search_of_potential_duplication',
+    )
 
     def _compute_old_phone_fields(self):
         default_country_code = self._get_default_country_code()
@@ -162,8 +166,9 @@ class ResPartner(models.Model):
 
     def _inverse_phone(self):
         for rec in self:
-            if rec.of_phone_number_ids.filtered(lambda p: p.type == '01_domicile') or \
-                    not rec.of_phone_number_ids.filtered(lambda p: p.type == '02_bureau'):
+            if rec.of_phone_number_ids.filtered(
+                lambda p: p.type == '01_domicile'
+            ) or not rec.of_phone_number_ids.filtered(lambda p: p.type == '02_bureau'):
                 rec._of_set_number('phone', '01_domicile')
             else:
                 rec._of_set_number('phone', '02_bureau')
@@ -201,8 +206,9 @@ class ResPartner(models.Model):
         """
         # get the information that will be injected into the display format
         # get the address format
-        address_format = self.country_id.address_format or \
-            "%(street)s\n%(street2)s\n%(zip)s %(city)s\n%(country_name)s"  # Ligne changée par OpenFire
+        address_format = (
+            self.country_id.address_format or "%(street)s\n%(street2)s\n%(zip)s %(city)s\n%(country_name)s"
+        )  # Ligne changée par OpenFire
         args = {
             'state_code': self.state_id.code or '',
             'state_name': self.state_id.name or '',
@@ -222,19 +228,25 @@ class ResPartner(models.Model):
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
         return super(ResPartner, self.with_context(of_show_address_line=True)).name_search(
-            name=name, args=args, operator=operator, limit=limit)
+            name=name, args=args, operator=operator, limit=limit
+        )
 
     def name_get(self):
-        """ Permet de renvoyer le nom + la ville du client quand valeur du contexte 'of_show_address_line' présent """
+        """Permet de renvoyer le nom + la ville du client quand valeur du contexte 'of_show_address_line' présent"""
         name = self._rec_name
-        if self._context.get('of_show_address_line') \
-                and name in self._fields \
-                and self.env['ir.config_parameter'].sudo().get_param('of.partner.display_city'):
+        if (
+            self._context.get('of_show_address_line')
+            and name in self._fields
+            and self.env['ir.config_parameter'].sudo().get_param('of.partner.display_city')
+        ):
             convert = self._fields[name].convert_to_display_name
-            result = [(
-                record.id,
-                f"{convert(record[name], record)}{''.join([' (', record.city, ')']) if record.city else ''}"
-            ) for record in self]
+            result = [
+                (
+                    record.id,
+                    f"{convert(record[name], record)}{''.join([' (', record.city, ')']) if record.city else ''}",
+                )
+                for record in self
+            ]
 
         elif self._context.get('show_email'):
             result = []
@@ -286,8 +298,7 @@ class ResPartner(models.Model):
     def _add_missing_default_values(self, values):
         # La référence par défaut est celle du parent.
         parent_id = values.get('parent_id')
-        if parent_id and isinstance(parent_id, int) and not values.get('ref') and \
-                'default_ref' not in self._context:
+        if parent_id and isinstance(parent_id, int) and not values.get('ref') and 'default_ref' not in self._context:
             values['ref'] = self.browse(parent_id).ref
         return super()._add_missing_default_values(values)
 
@@ -306,7 +317,8 @@ class ResPartner(models.Model):
                 elif parent_id:
                     if id != parent_id:
                         raise ValidationError(
-                            _("The customer account number is already in use and must be unique (%s).") % (ref,))
+                            _("The customer account number is already in use and must be unique (%s).") % (ref,)
+                        )
                 else:
                     parent_id = id
             if not ids:
@@ -330,7 +342,8 @@ class ResPartner(models.Model):
                 "                             FROM    res_partner RP2"
                 "                             WHERE   RP2.id      != RP.id"
                 "                             AND     RP2.email   = RP.email"
-                "                         )")
+                "                         )"
+            )
             same_email_ids = [x[0] for x in self._cr.fetchall()]
             self._cr.execute(
                 "   SELECT    DISTINCT ORPP.partner_id"
@@ -339,7 +352,8 @@ class ResPartner(models.Model):
                 "                                           FROM    of_res_partner_phone    ORPP2"
                 "                                           WHERE   ORPP2.partner_id        != ORPP.partner_id"
                 "                                           AND     ORPP2.number            = ORPP.number"
-                "                                       )")
+                "                                       )"
+            )
             same_phone_ids = [x[0] for x in self._cr.fetchall()]
             return [('id', 'in', same_email_ids + same_phone_ids)]
 
@@ -353,8 +367,11 @@ class ResPartner(models.Model):
         same_phone_ids = self.env['res.partner']
         if self.of_phone_number_ids:
             numbers_list = self.of_phone_number_ids.mapped('number')
-            same_phone_ids = self.env['of.res.partner.phone'].\
-                search([('number', 'in', numbers_list), ('partner_id', '!=', self.id)]).mapped('partner_id')
+            same_phone_ids = (
+                self.env['of.res.partner.phone']
+                .search([('number', 'in', numbers_list), ('partner_id', '!=', self.id)])
+                .mapped('partner_id')
+            )
         duplication_ids = same_email_ids | same_phone_ids
         return duplication_ids.ids if duplication_ids else False
 
@@ -375,8 +392,11 @@ class ResPartner(models.Model):
         if partner.company_id.of_ref_mode == 'id' and not partner.ref:
             if self.env['res.partner'].with_context(active_test=False).search([('ref', '=', str(partner.id))]):
                 i = 2
-                while self.env['res.partner'].with_context(active_test=False).search(
-                        [('ref', '=', f'{str(partner.id)}-{i}')]):
+                while (
+                    self.env['res.partner']
+                    .with_context(active_test=False)
+                    .search([('ref', '=', f'{str(partner.id)}-{i}')])
+                ):
                     i += 1
                 partner.ref = f'{str(partner.id)}-{i}'
             else:
@@ -405,7 +425,8 @@ class ResPartner(models.Model):
     def write(self, vals):
         # Email field validation
         if (email_address := vals.get('email')) and (
-                not self._context.get('from_of_mobile') or (len(self) == 1 and self.email != vals['email'])):
+            not self._context.get('from_of_mobile') or (len(self) == 1 and self.email != vals['email'])
+        ):
             if not multiple_emails_re.match(email_address):
                 raise ValidationError(_("Email address %s is invalid") % (email_address))
 
@@ -440,8 +461,11 @@ class ResPartner(models.Model):
                 partner.ref = str(partner.id)
             else:
                 i = 2
-                while self.env['res.partner'].with_context(active_test=False).search([
-                        ('ref', '=', f'{str(partner.id)}-{i}')]):
+                while (
+                    self.env['res.partner']
+                    .with_context(active_test=False)
+                    .search([('ref', '=', f'{str(partner.id)}-{i}')])
+                ):
                     i += 1
                 partner.ref = f'{str(partner.id)}-{i}'
         return res
@@ -453,12 +477,15 @@ class ResPartner(models.Model):
         # Auparavant, Odoo éliminait l'auteur du mail comme destinataire.
         # On empêche cette éliminination et l'appel du super ajoute les autres destinataires.
         if self._context.get('mail_notify_author'):
-            self.sudo().search([
-                '|',
-                ('id', 'in', self.ids),
-                ('channel_ids', 'in', email_channels.ids),
-                ('email', '=', message_sudo.author_id and message_sudo.author_id.email or message.email_from),
-                ('notify_email', '!=', 'none')])._notify_by_email(message, force_send=force_send,
-                                                                  send_after_commit=send_after_commit,
-                                                                  user_signature=user_signature)
+            self.sudo().search(
+                [
+                    '|',
+                    ('id', 'in', self.ids),
+                    ('channel_ids', 'in', email_channels.ids),
+                    ('email', '=', message_sudo.author_id and message_sudo.author_id.email or message.email_from),
+                    ('notify_email', '!=', 'none'),
+                ]
+            )._notify_by_email(
+                message, force_send=force_send, send_after_commit=send_after_commit, user_signature=user_signature
+            )
         return super()._notify(message, force_send, send_after_commit, user_signature)

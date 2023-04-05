@@ -13,37 +13,45 @@ class OfProductBrand(models.Model):
     name = fields.Char(string="Name", required=True)
     code = fields.Char(string="Code", required=True)
     use_prefix = fields.Boolean(
-        string="Use code as prefix", default=True,
-        help="The products internal references will be prefixed with the brand code")
+        string="Use code as prefix",
+        default=True,
+        help="The products internal references will be prefixed with the brand code",
+    )
     partner_id = fields.Many2one(
-        comodel_name='res.partner', string="Supplier", domain=[('supplier_rank', '>', 0)], required=True)
+        comodel_name='res.partner', string="Supplier", domain=[('supplier_rank', '>', 0)], required=True
+    )
     supplier_delay = fields.Integer(
         string="Delivery Delay (days)",
-        help="The number of days it takes for the supplier to deliver products of this brand")
+        help="The number of days it takes for the supplier to deliver products of this brand",
+    )
     product_ids = fields.One2many(
-        comodel_name='product.template', inverse_name='brand_id', string="Products", readonly=True)
+        comodel_name='product.template', inverse_name='brand_id', string="Products", readonly=True
+    )
     product_variant_ids = fields.One2many(
-        comodel_name='product.product', inverse_name='brand_id', string="Product variants", readonly=True)
+        comodel_name='product.product', inverse_name='brand_id', string="Product variants", readonly=True
+    )
     logo = fields.Binary(string="Logo")
     product_count = fields.Integer(
-        string="# Products", compute='_compute_product_count', help="The number of products of this brand")
+        string="# Products", compute='_compute_product_count', help="The number of products of this brand"
+    )
     price_date = fields.Date(
-        compute='_compute_price_date', store=True, help="Last price date of this brand's products.")
+        compute='_compute_price_date', store=True, help="Last price date of this brand's products."
+    )
     note = fields.Text(string="Notes")
     product_change_warn = fields.Boolean(compute='_compute_product_change_warn')
     show_in_sales = fields.Boolean(
         string="Show in sales order lines",
         help="If this option is checked, the brand will be added at the beginning of the description "
-             "of order and invoice lines")
+        "of order and invoice lines",
+    )
     description_sale = fields.Text(string="Description for quotations")
     use_brand_description_sale = fields.Boolean(string="Use brand-level sales description")
 
     def _compute_product_count(self):
         read_group_res = self.env['product.template'].read_group(
-            [('brand_id', 'in', self.ids)], ['brand_id'], ['brand_id'])
-        group_data = {
-            data['brand_id'][0]: data['brand_id_count'] for data in read_group_res
-        }
+            [('brand_id', 'in', self.ids)], ['brand_id'], ['brand_id']
+        )
+        group_data = {data['brand_id'][0]: data['brand_id_count'] for data in read_group_res}
         for categ in self:
             categ.product_count = group_data.get(categ.id, 0)
 
@@ -52,7 +60,8 @@ class OfProductBrand(models.Model):
         product_obj = self.env['product.template']
         for brand in self:
             product = product_obj.search(
-                [('brand_id', '=', brand.id), ('of_cost_date', '!=', False)], order='of_cost_date desc', limit=1)
+                [('brand_id', '=', brand.id), ('of_cost_date', '!=', False)], order='of_cost_date desc', limit=1
+            )
             brand.price_date = product.of_cost_date if product else False
 
     @api.depends('code', 'use_prefix')
@@ -106,8 +115,11 @@ class OfProductBrand(models.Model):
             if products is False:
                 products = self.with_context(active_test=False).product_variant_ids
             product_prefix = f"{self.code}_"
-        if remove_previous_prefix and isinstance(remove_previous_prefix, str) \
-                and not remove_previous_prefix.endswith('_'):
+        if (
+            remove_previous_prefix
+            and isinstance(remove_previous_prefix, str)
+            and not remove_previous_prefix.endswith('_')
+        ):
             remove_previous_prefix += '_'
         for product in products.with_context(skip_default_code_lock=True):
             # update_products_default_code() can be called from onchange, when default_code is not already filled

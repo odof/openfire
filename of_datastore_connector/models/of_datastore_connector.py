@@ -30,8 +30,11 @@ class OfDatastoreConnector(models.AbstractModel):
     login = fields.Char(string="Login", required=True)
     password = fields.Char(string="Password")
     new_password = fields.Char(
-        string="Set Password", compute='_compute_new_password', inverse='_inverse_new_password',
-        help="Specify a value only when changing the password, otherwise leave empty")
+        string="Set Password",
+        compute='_compute_new_password',
+        inverse='_inverse_new_password',
+        help="Specify a value only when changing the password, otherwise leave empty",
+    )
     error_msg = fields.Char(string="Error", compute='_compute_error_msg')
 
     @api.depends()
@@ -56,8 +59,12 @@ class OfDatastoreConnector(models.AbstractModel):
                     # Le nouveau mot de passe n'est obligatoire que s'il n'en existe pas déjà un
                     continue
                 if not connector[field_name]:
-                    error_msg = _("You must fill the field \"%s\"") % self.env['ir.model.fields'].search(
-                        [('model', '=', self._name), ('name', '=', field_name)]).name_get()[0][1]
+                    error_msg = (
+                        _("You must fill the field \"%s\"")
+                        % self.env['ir.model.fields']
+                        .search([('model', '=', self._name), ('name', '=', field_name)])
+                        .name_get()[0][1]
+                    )
                     break
             else:
                 error_msg = connector.of_datastore_connect()
@@ -112,8 +119,8 @@ class OfDatastoreConnector(models.AbstractModel):
                         port = int(address[j + 1:])
                         address = address[:j]
                     cli = openerplib.get_connection(
-                        hostname=address, port=port, protocol=protocol, database=db_name, login=login,
-                        password=password)
+                        hostname=address, port=port, protocol=protocol, database=db_name, login=login, password=password
+                    )
 
                     # Opération pour vérifier la connexion
                     self.result = cli.get_model('res.users').search([]) and cli or ''
@@ -133,7 +140,8 @@ class OfDatastoreConnector(models.AbstractModel):
         connector = self.sudo()
 
         return self.get_connector(
-            connector.server_address, connector.db_name, connector.login, connector.new_password or connector.password)
+            connector.server_address, connector.db_name, connector.login, connector.new_password or connector.password
+        )
 
     @api.model
     def of_datastore_get_model(self, ds_client, model_name):
@@ -143,24 +151,30 @@ class OfDatastoreConnector(models.AbstractModel):
     def of_datastore_search(self, ds_model, args, offset=None, limit=None, order=None, count=None):
         kwargs = {
             key: val
-            for key, val in [('offset', offset),
-                             ('limit', limit),
-                             ('order', order),
-                             ('count', count),
-                             ('context', self._get_context())]
-            if val is not None}
+            for key, val in [
+                ('offset', offset),
+                ('limit', limit),
+                ('order', order),
+                ('count', count),
+                ('context', self._get_context()),
+            ]
+            if val is not None
+        }
         return ds_model.search(args, **kwargs)
 
     @api.model
     def of_datastore_name_search(self, ds_model, name=None, args=None, operator=None, limit=None):
         kwargs = {
             key: val
-            for key, val in [('name', name),
-                             ('args', args),
-                             ('operator', operator),
-                             ('limit', limit),
-                             ('context', self._get_context())]
-            if val is not None}
+            for key, val in [
+                ('name', name),
+                ('args', args),
+                ('operator', operator),
+                ('limit', limit),
+                ('context', self._get_context()),
+            ]
+            if val is not None
+        }
         return ds_model.name_search(**kwargs)
 
     @api.model
@@ -174,23 +188,26 @@ class OfDatastoreConnector(models.AbstractModel):
             fields = [f for f in fields if f in ds_fields]
         kwargs = {
             key: val
-            for key, val in [('fields', fields),
-                             ('load', load),
-                             ('context', self._get_context())]
-            if val is not None}
+            for key, val in [('fields', fields), ('load', load), ('context', self._get_context())]
+            if val is not None
+        }
         return ds_model.read(ids, **kwargs)
 
     @api.model
     def of_datastore_read_group(
-            self, ds_model, domain, fields, groupby, offset=None, limit=None, orderby=None, lazy=None):
+        self, ds_model, domain, fields, groupby, offset=None, limit=None, orderby=None, lazy=None
+    ):
         kwargs = {
             key: val
-            for key, val in [('offset', offset),
-                             ('limit', limit),
-                             ('orderby', orderby),
-                             ('lazy', lazy),
-                             ('context', self._get_context())]
-            if val is not None}
+            for key, val in [
+                ('offset', offset),
+                ('limit', limit),
+                ('orderby', orderby),
+                ('lazy', lazy),
+                ('context', self._get_context()),
+            ]
+            if val is not None
+        }
         return ds_model.read_group(domain, fields, groupby, **kwargs)
 
     @api.model
@@ -198,11 +215,7 @@ class OfDatastoreConnector(models.AbstractModel):
         # La fonction search_read de openerplib ne fonctionne pas bien et fonctionne par un appel search() puis read().
         # On reprend le même système, mais avec nos méthodes.
         record_ids = self.of_datastore_search(ds_model, domain, offset, limit, order, count=False)
-        return (
-            self.of_datastore_read(ds_model, record_ids, fields)
-            if record_ids
-            else []
-        )
+        return self.of_datastore_read(ds_model, record_ids, fields) if record_ids else []
 
     @api.model
     def of_datastore_create(self, ds_model, values):

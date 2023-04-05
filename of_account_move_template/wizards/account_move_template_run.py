@@ -13,21 +13,32 @@ class WizardSelectMoveTemplate(models.TransientModel):
     _inherit = 'account.move.template.run'
 
     of_template_ids = fields.Many2many(
-        comodel_name='account.move.template', relation='account_move_template_run_template_rel', column1='wizard_id',
-        column2='template_id', string="Templates")
+        comodel_name='account.move.template',
+        relation='account_move_template_run_template_rel',
+        column1='wizard_id',
+        column2='template_id',
+        string="Templates",
+    )
     of_recurring = fields.Boolean(string="Recurring")
     of_rec_interval = fields.Integer(string="Repeat every", default=1, required=True)
     of_rec_interval_type = fields.Selection(
         selection=[('days', "Days"), ('months', "Months"), ('years', "Years")],
-        string="Time unit", default='months', required=True)
+        string="Time unit",
+        default='months',
+        required=True,
+    )
     of_rec_number = fields.Integer(string="Number of vouchers", default=12, required=True)
     of_date_start = fields.Date(string="Start date", default=fields.Date.today, required=True)
     of_prorata = fields.Boolean(
         string="Prorata",
-        help="The amount of the entries will be adjusted pro rata to the month on the first and last month.")
-    of_reversal = fields.Selection(selection=[
-        ('none', "No reversal"), ('first', "Start date"), ('last', "End date"), ('custom', "Chosen date")],
-        string="Reverse the entry", default='none', required=True)
+        help="The amount of the entries will be adjusted pro rata to the month on the first and last month.",
+    )
+    of_reversal = fields.Selection(
+        selection=[('none', "No reversal"), ('first', "Start date"), ('last', "End date"), ('custom', "Chosen date")],
+        string="Reverse the entry",
+        default='none',
+        required=True,
+    )
     of_reversal_date = fields.Date(string="Reversal date")
 
     @api.model
@@ -41,18 +52,25 @@ class WizardSelectMoveTemplate(models.TransientModel):
             template_ids = self._context['active_ids'] or []
             if len(template_ids) > 1:
                 # La génération depuis des modèles multiples n'est autorisée que si ils sont entièrement calculés
-                templates = self.env['account.move.template'].browse(template_ids).filtered(
-                    lambda t: t.line_ids.filtered(lambda line: line.type == 'input'))
+                templates = (
+                    self.env['account.move.template']
+                    .browse(template_ids)
+                    .filtered(lambda t: t.line_ids.filtered(lambda line: line.type == 'input'))
+                )
                 if templates:
-                    raise UserError(_(
-                        "Generating from several models simultaneously requires that they do not have amounts "
-                        "in manual entry.\nModel(s) in error: %s") % ', '.join(templates.mapped('name')))
+                    raise UserError(
+                        _(
+                            "Generating from several models simultaneously requires that they do not have amounts "
+                            "in manual entry.\nModel(s) in error: %s"
+                        )
+                        % ', '.join(templates.mapped('name'))
+                    )
             result['of_template_ids'] = template_ids
             result['template_id'] = template_ids and template_ids[0] or False
         return result
 
     def load_lines(self):
-        """ Override the function to not automatically generate accounting pieces when there is no line with
+        """Override the function to not automatically generate accounting pieces when there is no line with
         "manual" amount and the model indicates a recurrence.
         """
         self.ensure_one()
@@ -81,9 +99,17 @@ class WizardSelectMoveTemplate(models.TransientModel):
             'state': 'set_lines',
         }
         # Update values with openfire specific values
-        data = self.template_id.read([
-            'of_recurring', 'of_rec_interval', 'of_rec_interval_type', 'of_rec_number', 'of_prorata',
-            'of_reversal', 'of_reversal_date'])[0]
+        data = self.template_id.read(
+            [
+                'of_recurring',
+                'of_rec_interval',
+                'of_rec_interval_type',
+                'of_rec_number',
+                'of_prorata',
+                'of_reversal',
+                'of_reversal_date',
+            ]
+        )[0]
         if data['of_reversal_date']:
             reversal_date = fields.Date.from_string(data['of_reversal_date'])
             month_start = dt_date.today() + relativedelta(day=1)
@@ -154,10 +180,7 @@ class WizardSelectMoveTemplate(models.TransientModel):
                     amt0 = date_amounts
             elif i == imax and of_prorata:
                 if params.of_recurring:
-                    date_amounts = {
-                        sequence: amount - amt0[sequence]
-                        for sequence, amount in date_amounts.items()
-                    }
+                    date_amounts = {sequence: amount - amt0[sequence] for sequence, amount in date_amounts.items()}
 
             for sequence, amount in date_amounts.items():
                 totals[sequence] += amount
@@ -166,9 +189,7 @@ class WizardSelectMoveTemplate(models.TransientModel):
             for line in template.line_ids:
                 amount = date_amounts[line.sequence]
                 if not company_cur.is_zero(amount):
-                    move_vals['line_ids'].append(
-                        Command.create(self._prepare_move_line(line, amount))
-                    )
+                    move_vals['line_ids'].append(Command.create(self._prepare_move_line(line, amount)))
             moves |= move_obj.create(move_vals)
 
         if params.of_recurring and params.of_reversal != 'none':
@@ -186,9 +207,7 @@ class WizardSelectMoveTemplate(models.TransientModel):
                 if not company_cur.is_zero(amount):
                     line_values = self._prepare_move_line(line, amount)
                     line_values['credit'], line_values['debit'] = line_values['debit'], line_values['credit']
-                    move_vals['line_ids'].append(
-                        Command.create(line_values)
-                    )
+                    move_vals['line_ids'].append(Command.create(line_values))
             moves |= move_obj.create(move_vals)
         return moves
 
@@ -201,10 +220,7 @@ class WizardSelectMoveTemplate(models.TransientModel):
                 sequence2amount = {}
                 moves |= self.generate_move(sequence2amount, template, template)
         else:
-            sequence2amount = {
-                template_line.sequence: template_line.amount
-                for template_line in self.line_ids
-            }
+            sequence2amount = {template_line.sequence: template_line.amount for template_line in self.line_ids}
             name = f" : {self.template_id.name}"
             moves |= self.generate_move(sequence2amount, self, self.template_id)
 
@@ -214,7 +230,7 @@ class WizardSelectMoveTemplate(models.TransientModel):
         return action
 
     def _prepare_move(self, name=False, template_id=False, date=False, journal_id=False):
-        """ Prepare the values to create the move from the template.
+        """Prepare the values to create the move from the template.
 
         :param name: The name of the move.
         :param template_id: The id of the template.
@@ -234,8 +250,7 @@ class WizardSelectMoveTemplate(models.TransientModel):
         return move_vals
 
     def _fill_move_dates_list(self, params, date_start, month_last_day, dates):
-        """ Fill the list of dates given in arguments depending on the recurring parameters.
-        """
+        """Fill the list of dates given in arguments depending on the recurring parameters."""
         if params.of_rec_interval < 1:
             raise UserError(_("The interval between two vouchers must be at least equal to 1."))
         if params.of_rec_number < 2:

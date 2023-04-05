@@ -33,8 +33,9 @@ class IrModuleModule(models.Model):
         }
 
     def _check_uninstall(self):
-        """ Checks that the modules to be uninstalled are not base modules """
+        """Checks that the modules to be uninstalled are not base modules"""
         illegal_uninstall = FORBIDDEN_UNINSTALL & set(self.mapped('name'))
         if illegal_uninstall:
             raise UserError(
-                _("You are trying to delete one or more protected modules : %s") % ", ".join(illegal_uninstall))
+                _("You are trying to delete one or more protected modules : %s") % ", ".join(illegal_uninstall)
+            )

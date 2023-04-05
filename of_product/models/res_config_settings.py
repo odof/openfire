@@ -7,5 +7,5 @@ class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
     group_product_variant_specific_price = fields.Boolean(
-        string="(OF) Handle pricing by variant",
-        implied_group='of_product.group_product_variant_specific_price')
+        string="(OF) Handle pricing by variant", implied_group='of_product.group_product_variant_specific_price'
+    )

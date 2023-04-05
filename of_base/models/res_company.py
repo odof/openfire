@@ -14,23 +14,34 @@ class ResCompany(models.Model):
     of_qualif = fields.Char(string="Qualifications")
     of_general_id = fields.Char(string="General ID")
     of_accounting_id = fields.Char(string="Accountant ID")
-    of_ref_mode = fields.Selection(selection=[
-        ('no', "Do not fill"),
-        ('id', "Use Partner ID"),
-    ], string="Customer reference", required=True, default='no')
+    of_ref_mode = fields.Selection(
+        selection=[
+            ('no', "Do not fill"),
+            ('id', "Use Partner ID"),
+        ],
+        string="Customer reference",
+        required=True,
+        default='no',
+    )
 
     def write(self, vals):
         if vals.get('of_ref_mode') == 'id':
             # On met à jour les contacts existants qui ont une référence vide
-            partners = self.env['res.partner'].with_context(active_test=False).search(
-                [('ref', '=', False), ('company_id', 'in', self._ids)])
+            partners = (
+                self.env['res.partner']
+                .with_context(active_test=False)
+                .search([('ref', '=', False), ('company_id', 'in', self._ids)])
+            )
             for partner in partners:
                 if not self.env['res.partner'].with_context(active_test=False).search([('ref', '=', str(partner.id))]):
                     partner.ref = str(partner.id)
                 else:
                     i = 2
-                    while self.env['res.partner'].with_context(active_test=False).search([
-                            ('ref', '=', f'{str(partner.id)}-{i}')]):
+                    while (
+                        self.env['res.partner']
+                        .with_context(active_test=False)
+                        .search([('ref', '=', f'{str(partner.id)}-{i}')])
+                    ):
                         i += 1
                     partner.ref = f'{str(partner.id)}-{i}'
         return super().write(vals)

@@ -27,14 +27,27 @@ class OFFormReadonly(models.AbstractModel):
                     modifiers = node.get('modifiers', {})
                     if modifiers and isinstance(modifiers, str):
                         modifiers = json.loads(modifiers)
-                    if modifiers and isinstance(modifiers, dict) and 'readonly' in modifiers and \
-                       isinstance(modifiers.get('readonly', None), bool) and modifiers.get('readonly'):
+                    if (
+                        modifiers
+                        and isinstance(modifiers, dict)
+                        and 'readonly' in modifiers
+                        and isinstance(modifiers.get('readonly', None), bool)
+                        and modifiers.get('readonly')
+                    ):
                         continue
-                    elif modifiers and isinstance(modifiers, dict) and 'readonly' in modifiers and isinstance(
-                            modifiers.get('readonly', None), list):
+                    elif (
+                        modifiers
+                        and isinstance(modifiers, dict)
+                        and 'readonly' in modifiers
+                        and isinstance(modifiers.get('readonly', None), list)
+                    ):
                         modifiers['readonly'] = ['|'] + modifiers['readonly'] + safe_eval(read_only_domain)
-                    elif modifiers and isinstance(modifiers, dict) and 'readonly' in modifiers and isinstance(
-                            modifiers.get('readonly', None), list):
+                    elif (
+                        modifiers
+                        and isinstance(modifiers, dict)
+                        and 'readonly' in modifiers
+                        and isinstance(modifiers.get('readonly', None), list)
+                    ):
                         if modifiers.get('readonly'):  # gère le cas attrs="{'readonly': 1}"
                             continue
                         else:  # gère le cas attrs="{'readonly': 0}"
@@ -47,14 +60,27 @@ class OFFormReadonly(models.AbstractModel):
                         attrs = safe_eval(attrs)
                     if attrs and isinstance(attrs, dict) and attrs.get('form_readonly_exception', False):
                         continue
-                    if attrs and isinstance(attrs, dict) and 'readonly' in attrs and \
-                       isinstance(attrs.get('readonly', None), bool) and attrs.get('readonly'):
+                    if (
+                        attrs
+                        and isinstance(attrs, dict)
+                        and 'readonly' in attrs
+                        and isinstance(attrs.get('readonly', None), bool)
+                        and attrs.get('readonly')
+                    ):
                         continue
-                    elif attrs and isinstance(attrs, dict) and 'readonly' in attrs and isinstance(
-                            attrs.get('readonly', None), list):
+                    elif (
+                        attrs
+                        and isinstance(attrs, dict)
+                        and 'readonly' in attrs
+                        and isinstance(attrs.get('readonly', None), list)
+                    ):
                         attrs['readonly'] = ['|'] + attrs['readonly'] + safe_eval(read_only_domain)
-                    elif attrs and isinstance(attrs, dict) and 'readonly' in attrs and isinstance(
-                            attrs.get('readonly', None), int):
+                    elif (
+                        attrs
+                        and isinstance(attrs, dict)
+                        and 'readonly' in attrs
+                        and isinstance(attrs.get('readonly', None), int)
+                    ):
                         if attrs.get('readonly'):  # gère le cas attrs="{'readonly': 1}"
                             continue
                         else:  # gère le cas attrs="{'readonly': 0}"

@@ -9,8 +9,13 @@ class SaleOrderLine(models.Model):
 
     discount = fields.Float(compute='_compute_discount')
     of_discount_formula = fields.Char(
-        string="Discount (%)", compute='_compute_of_discount_formula', store=True, readonly=False, precompute=True,
-        help="Discount or amount of discounts.\nEg. \"40 + 10.5\" equals \"46.3\"")
+        string="Discount (%)",
+        compute='_compute_of_discount_formula',
+        store=True,
+        readonly=False,
+        precompute=True,
+        help="Discount or amount of discounts.\nEg. \"40 + 10.5\" equals \"46.3\"",
+    )
 
     @api.depends('product_id', 'product_uom', 'product_uom_qty', 'of_discount_formula')
     def _compute_discount(self):

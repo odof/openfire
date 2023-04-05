@@ -17,10 +17,10 @@ class ResUsers(models.Model):
         return 'web'
 
     of_user_type = fields.Selection(
-        selection=[
-            ('web', "Web"),
-            ('technical', "Technical"),
-            ('external', "External")], string="User type", default=lambda u: u._default_of_type_selection())
+        selection=[('web', "Web"), ('technical', "Technical"), ('external', "External")],
+        string="User type",
+        default=lambda u: u._default_of_type_selection(),
+    )
 
     @api.model
     @tools.ormcache('self._uid')
@@ -41,7 +41,8 @@ class ResUsers(models.Model):
     def write(self, values):
         if SUPERUSER_ID in self._ids and self._uid != SUPERUSER_ID:
             raise AccessError(
-                _("Only the administrator account can modify the information of the administrator account."))
+                _("Only the administrator account can modify the information of the administrator account.")
+            )
         result = super().write(values)
         group_root = self.env.ref('of_base.of_group_root_only').sudo()
         admin_user_id = self.env.ref('base.user_admin').id

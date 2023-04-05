@@ -14,12 +14,17 @@ class ProductTemplate(models.Model):
         comodel_name='of.product.brand',
         string="Brand",
         compute='_compute_brand_id',
-        store=True, readonly=False, required=True, index=True,
-        default=lambda s: s._default_brand_id())
+        store=True,
+        readonly=False,
+        required=True,
+        index=True,
+        default=lambda s: s._default_brand_id(),
+    )
     of_seller_partner_id = fields.Many2one(related='seller_ids.partner_id')
     of_previous_brand_id = fields.Many2one(comodel_name='of.product.brand', compute='_compute_of_previous_brand_id')
     seller_ids = fields.One2many(
-        comodel_name='product.supplierinfo', inverse_name='product_tmpl_id', string="Vendors", copy=True)
+        comodel_name='product.supplierinfo', inverse_name='product_tmpl_id', string="Vendors", copy=True
+    )
 
     # dependancy on default_code to prevent recomputing it before _onchange_brand_id call
     @api.depends('default_code')

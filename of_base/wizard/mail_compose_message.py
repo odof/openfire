@@ -21,8 +21,8 @@ class MailComposer(models.TransientModel):
 
     # Store True pour éviter le recalcul lors de l'appui sur n'importe quel bouton.
     of_computed_body = fields.Html(
-        string="Computed body", compute='_compute_of_computed_body', sanitize_style=True,
-        strip_classes=True, store=True)
+        string="Computed body", compute='_compute_of_computed_body', sanitize_style=True, strip_classes=True, store=True
+    )
 
     # Calcul des champs dans mail, mail_compose_message.py : render_message()
     @api.depends('res_id', 'body')
@@ -39,6 +39,6 @@ class MailComposer(models.TransientModel):
 
     # Permet à l'auteur du mail de le recevoir en copie si le paramètre du modèle est vrai.
     def action_send_mail(self):
-        return super(MailComposer, self.with_context(
-            mail_notify_author=self.template_id and self.template_id.of_copy_to_sender
-        )).action_send_mail()
+        return super(
+            MailComposer, self.with_context(mail_notify_author=self.template_id and self.template_id.of_copy_to_sender)
+        ).action_send_mail()

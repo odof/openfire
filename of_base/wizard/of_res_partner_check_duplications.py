@@ -22,9 +22,10 @@ class OFResPartnerCheckDuplications(models.TransientModel):
                 if forbidden_access:
                     duplications -= partner
                     if not info_txt:
-                        info_txt += \
-                            "Potential duplicates exist but you do not have sufficient rights to view them." \
+                        info_txt += (
+                            "Potential duplicates exist but you do not have sufficient rights to view them."
                             "Please contact your manager about this:\n"
+                        )
                     info_txt += "- %s\n" % partner.sudo().name
             result['duplication_ids'] = duplications.ids
             result['info_txt'] = info_txt
@@ -44,5 +45,5 @@ class OFResPartnerCheckDuplications(models.TransientModel):
             'view_mode': 'form',
             'res_model': 'base.partner.merge.automatic.wizard',
             'context': {'active_ids': (self.duplication_ids + self.new_partner_id).ids},
-            'target': 'new'
+            'target': 'new',
         }

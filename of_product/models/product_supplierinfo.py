@@ -7,8 +7,12 @@ class ProductSupplierInfo(models.Model):
     _inherit = 'product.supplierinfo'
 
     of_public_price_untaxed = fields.Float(
-        string="Public price excl.", default=1.0, digits='Product Price',
-        required=True, help="Public price excluding VAT recommended by the manufacturer")
+        string="Public price excl.",
+        default=1.0,
+        digits='Product Price',
+        required=True,
+        help="Public price excluding VAT recommended by the manufacturer",
+    )
     pp_currency_id = fields.Many2one(related='currency_id')
     of_discount = fields.Float(string="Discount", digits=(4, 2), compute='_compute_of_discount')
     of_product_category_name = fields.Char(string="Supplier Category")

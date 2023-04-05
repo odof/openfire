@@ -16,10 +16,15 @@ class ResPartnerBank(models.Model):
 
     acc_type = fields.Selection(
         selection=lambda x: x.env['res.partner.bank'].get_supported_account_types(),
-        compute='_compute_acc_type', inverse='_inverse_acc_type', store=True,
-        string="Type of account", required=True, default='iban',
+        compute='_compute_acc_type',
+        inverse='_inverse_acc_type',
+        store=True,
+        string="Type of account",
+        required=True,
+        default='iban',
         help="Leave the account type IBAN to let the software check the validity of the entered code."
-             "Use the Bank type for any other type of account, no verification will be performed.")
+        "Use the Bank type for any other type of account, no verification will be performed.",
+    )
 
     def _inverse_acc_type(self):
         pass

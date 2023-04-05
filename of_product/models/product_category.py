@@ -7,18 +7,28 @@ class ProductCategory(models.Model):
     _inherit = 'product.category'
 
     route_ids = fields.Many2many(
-        comodel_name='stock.route', relation='stock_location_route_categ', column1='categ_id',
-        column2='route_id', string="Routes", domain=[('product_categ_selectable', '=', True)], copy=True)
+        comodel_name='stock.route',
+        relation='stock_location_route_categ',
+        column1='categ_id',
+        column2='route_id',
+        string="Routes",
+        domain=[('product_categ_selectable', '=', True)],
+        copy=True,
+    )
     of_layout_id = fields.Many2one(comodel_name='sale.layout_category', string="Layout")
     # Uniformisation de la méthode de coût sur les sociétés (effectif si of_base_multicompany est installé)
     property_cost_method = fields.Selection(of_unify_companies=True)
     of_stock_update_standard_price = fields.Boolean(
-        string="Update the cost of items following stock movements", default=True)
+        string="Update the cost of items following stock movements", default=True
+    )
     of_import_update_standard_price = fields.Boolean(string="Update the cost of items following imports")
     of_sale_cost = fields.Selection(
-        selection=[('theoretical', "Theoretical cost"), ('standard', "Standard cost")], string="Cost to sales",
-        help="The chosen cost will be included in sales orders and invoices.", required=True,
-        default='theoretical')
+        selection=[('theoretical', "Theoretical cost"), ('standard', "Standard cost")],
+        string="Cost to sales",
+        help="The chosen cost will be included in sales orders and invoices.",
+        required=True,
+        default='theoretical',
+    )
 
     def copy_data(self, default=None):
         new_defaults = {

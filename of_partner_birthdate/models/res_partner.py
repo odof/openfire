@@ -7,8 +7,11 @@ class ResPartner(models.Model):
     _inherit = 'res.partner'
 
     of_birthdate_short = fields.Char(
-        string="Birthdate (MM-DD)", compute='_compute_of_birthdate_short', search='_search_of_birthdate_short',
-        help="Birthdate in format MM-DD (for search purpose only)")
+        string="Birthdate (MM-DD)",
+        compute='_compute_of_birthdate_short',
+        search='_search_of_birthdate_short',
+        help="Birthdate in format MM-DD (for search purpose only)",
+    )
 
     def _compute_of_birthdate_short(self):
         for partner in self:

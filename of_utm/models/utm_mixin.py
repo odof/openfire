@@ -8,8 +8,12 @@ class UtmMixin(models.AbstractModel):
 
     medium_id = fields.Many2one(string="Channel")
     source_id = fields.Many2one(
-        string="Origin", domain="[('medium_id', '=', medium_id)]",
-        compute='_compute_source_id', store=True, readonly=False)
+        string="Origin",
+        domain="[('medium_id', '=', medium_id)]",
+        compute='_compute_source_id',
+        store=True,
+        readonly=False,
+    )
 
     @api.onchange('medium_id')
     def _compute_source_id(self):
