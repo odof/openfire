@@ -111,12 +111,12 @@ class OfDatastoreConnector(models.AbstractModel):
                     else:
                         # Protocole xmlrpc ou xmlrpcs en fonction de http ou https
                         protocol = server_address[:i].replace('http', 'xmlrpc')
-                        address = server_address[i + 3:]
+                        address = server_address[i + 3 :]
                     j = address.find(':')
                     if j == -1:
                         port = 443 if server_address[:i] == 'https' else 80
                     else:
-                        port = int(address[j + 1:])
+                        port = int(address[j + 1 :])
                         address = address[:j]
                     cli = openerplib.get_connection(
                         hostname=address, port=port, protocol=protocol, database=db_name, login=login, password=password

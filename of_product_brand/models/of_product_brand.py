@@ -127,16 +127,16 @@ class OfProductBrand(models.Model):
             if remove_previous_prefix:
                 if isinstance(remove_previous_prefix, str):
                     if default_code.startswith(remove_previous_prefix):
-                        default_code = default_code[len(remove_previous_prefix):]
+                        default_code = default_code[len(remove_previous_prefix) :]
                 else:
                     # This part is dangerous as it may erase a part of the product default_code
                     ind = default_code.find("_")
-                    default_code = default_code[ind + 1:]
+                    default_code = default_code[ind + 1 :]
             if self and default_code.startswith(product_prefix) != self.use_prefix:
                 if self.use_prefix:
                     default_code = product_prefix + default_code
                 else:
                     # @todo: is this part usefull?
-                    default_code = product.default_code[len(product_prefix):]
+                    default_code = product.default_code[len(product_prefix) :]
             if product.default_code != default_code:
                 product.default_code = default_code

@@ -184,7 +184,7 @@ class OfReadGroup(models.AbstractModel):
             result = self._read_group_fill_results(
                 domain,
                 groupby_fields[0],
-                groupby[len(annotated_groupbys):],
+                groupby[len(annotated_groupbys) :],
                 aggregated_fields,
                 count_field,
                 result,

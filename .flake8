@@ -4,7 +4,8 @@ max-complexity = 16
 select = E,W,F
 # W503: Line break occurred before a binary operator
 # W504: Line break occurred after a binary operator (W504)
-ignore = W503,W504
+# E203: whitespace before ':' is no more PEP8 compliant and it enter in conflict with Black
+ignore = W503,W504,E203
 per-file-ignores=
     __init__.py:F401
 exclude =

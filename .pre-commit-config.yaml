@@ -6,7 +6,8 @@ repos:
     hooks:
     -   id: flake8
         additional_dependencies: [flake8-print]
-        args: ['--enable=T', '--max-line-length=120', '--select=E,W,F', '--ignore=W503,W504']
+        # E203: whitespace before ':' is no more PEP8 compliant and it enter in conflict with Black
+        args: ['--enable=T', '--max-line-length=120', '--select=E,W,F', '--ignore=W503,W504,E203']
         exclude: __(init|manifest)__.py
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
