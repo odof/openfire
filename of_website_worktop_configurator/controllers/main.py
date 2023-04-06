@@ -1248,7 +1248,7 @@ class OFWebsiteWorktopConfigurator(http.Controller):
 
     def _update_accessory_quote_line(self, quote_line_id):
         product_type = request.env['of.worktop.configurator.type'].browse(request.session['product_type_id'])
-        accessory_lines = request.env['sale.order.line'].search(
+        accessory_lines = request.env['sale.order.line'].sudo().search(
             [('of_worktop_configurator_line_id', '=', quote_line_id)])
 
         for line in accessory_lines:
@@ -1261,7 +1261,7 @@ class OFWebsiteWorktopConfigurator(http.Controller):
                 line._compute_tax_id()
             else:
                 # S'il n'y a pas d'accessoire équivalent pour le nouveau matériau, on supprime la ligne de l'accessoire
-                line.sudo().unlink()
+                line.unlink()
 
     def _control_weight(self):
         quote = request.env['sale.order'].sudo().browse(request.session['worktop_quote_id'])
