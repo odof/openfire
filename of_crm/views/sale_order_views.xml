@@ -62,6 +62,7 @@
                                         <field name="load_attachment" invisible="1"/>
                                         <field name="uploaded_attachment_id" invisible="1"/>
                                         <field name="user_id" invisible="1"/>
+                                        <field name="description" invisible="1"/>
                                         <field name="title"/>
                                         <field name="type_id"/>
                                         <field name="deadline_date"/>

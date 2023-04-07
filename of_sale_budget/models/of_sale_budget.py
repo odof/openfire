@@ -156,12 +156,13 @@ class SaleOrder(models.Model):
 
     @api.onchange('of_template_id')
     def onchange_template_id(self):
-        super(SaleOrder, self).onchange_template_id()
+        res = super(SaleOrder, self).onchange_template_id()
         for line in self.order_line:
             if line.product_id:
                 line.of_hour_worksite_id = \
                     line.product_id.of_hour_worksite_id.id \
                     or self.env.ref('of_sale_budget.of_sale_order_hour_worksite_data').id
+        return res
 
     def action_of_budget_ids(self):
         """Met à jour l'onglet Budget"""
