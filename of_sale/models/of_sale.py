@@ -834,7 +834,6 @@ class SaleOrderLine(models.Model):
 
     of_date_tarif = fields.Date(string="Date du tarif", related="product_id.date_tarif", readonly=True)
     of_obsolete = fields.Boolean(string=u"Article obsolète", related="product_id.of_obsolete", readonly=True)
-    of_product_image_ids = fields.Many2many('of.product.image', string='Images')
     of_product_attachment_ids = fields.Many2many("ir.attachment", string="Documents joints")
     # Champ servant au calcul du domain de of_product_attachment_ids
     of_product_attachment_computed_ids = fields.Many2many(
@@ -1025,11 +1024,6 @@ class SaleOrderLine(models.Model):
                     self.layout_category_id = product.of_layout_category_id
                 elif self.product_id.categ_id.of_layout_id:
                     self.layout_category_id = self.product_id.categ_id.of_layout_id
-            if self.env.user.has_group('of_sale.group_of_sale_multiimage'):
-                if self.product_id.product_tmpl_id.of_product_image_ids:
-                    of_product_image_ids = self.product_id.product_tmpl_id.of_product_image_ids
-                    self.of_product_image_ids = self.product_id.product_tmpl_id.of_product_image_ids
-                    res['domain']['of_product_image_ids'] = [('id', 'in', of_product_image_ids.ids)]
             if self.env.user.has_group('of_sale.group_of_sale_print_attachment'):
                 attachment_ids = self.env['ir.attachment'].search(
                     [('id', 'in', self.of_product_attachment_computed_ids.ids)])
@@ -1135,8 +1129,6 @@ class SaleOrderLine(models.Model):
             max_sequence = order._of_get_max_or_min_seq_by_layout().get(vals['layout_category_id'], 0)
             vals['sequence'] = max_sequence + 1
         res = super(SaleOrderLine, self).create(vals)
-        if 'of_product_image_ids' in vals.keys() and vals['of_product_image_ids'] and not res.of_product_image_ids:
-            res.with_context(already_tried=True).of_product_image_ids = vals['of_product_image_ids']
         return res
 
     @api.multi
@@ -1154,12 +1146,6 @@ class SaleOrderLine(models.Model):
             locked_invoice_lines = line.mapped('invoice_lines').filtered(lambda l: l.of_is_locked)
             if locked_invoice_lines and blocked and not force:
                 raise UserError(u"""Cette ligne ne peut être modifiée : %s""" % line.name)
-
-        # Au moment de la sauvegarde de la commande, les images articles ne sont pas toujours sauvegardées, car
-        # renseignées par un onchange et affichage en vue en kanban. Du coup, on surcharge le write
-        if 'already_tried' not in self._context:
-            if 'of_product_image_ids' in vals.keys() and vals['of_product_image_ids'] and not self.of_product_image_ids:
-                self.with_context(already_tried=True).of_product_image_ids = vals['of_product_image_ids']
 
         if vals.get('layout_category_id') and 'sequence' not in vals:
             new_layout = self.env['sale.layout_category'].browse(vals['layout_category_id'])

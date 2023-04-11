@@ -1,2 +1,0 @@
-"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
-access_of_product_image_user,access.of.product.image.user,model_of_product_image,base.group_user,1,1,1,1

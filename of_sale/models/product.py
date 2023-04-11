@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import models, fields, api
@@ -61,7 +60,6 @@ class ProductPricelist(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    of_product_image_ids = fields.One2many('of.product.image', 'product_tmpl_id', string=u'Images')
     of_layout_category_id = fields.Many2one(
         comodel_name='sale.layout_category', string=u"Section", groups='sale.group_sale_layout')
 
@@ -156,12 +154,3 @@ class ProductProduct(models.Model):
         if deposit_product_id in ids_deleted:
             ir_values_obj_sudo.set_default('sale.config.settings', 'deposit_product_id_setting', False)
         return res
-
-
-class OfProductImage(models.Model):
-    _name = 'of.product.image'
-    _description = 'Product Images'
-
-    name = fields.Char('Name')
-    image = fields.Binary('Image', attachment=True)
-    product_tmpl_id = fields.Many2one('product.template', 'Related Product', copy=True)

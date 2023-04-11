@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 ##############################################################################
 #
@@ -96,7 +95,6 @@ Droits utilisateurs:
     'data': [
         'data/assets.xml',
         'security/of_sale_security.xml',
-        'security/ir.model.access.csv',
         'views/of_sale_view.xml',
         'views/sale_config_setting_views.xml',
         'report/of_report_sale_order_list.xml',

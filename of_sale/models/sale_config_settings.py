@@ -30,12 +30,6 @@ class OFSaleConfiguration(models.TransientModel):
         string=u"(OF) Options de ligne de commande", implied_group='of_sale.group_of_order_line_option',
         group='base.group_portal,base.group_user,base.group_public')
 
-    group_of_sale_multiimage = fields.Selection([
-        (0, 'One image per product'),
-        (1, 'Several images per product')],
-        string='(OF) Multi Images', implied_group='of_sale.group_of_sale_multiimage',
-        group='base.group_portal,base.group_user,base.group_public')
-
     of_sale_print_multiimage_level = fields.Selection([
         (0, 'Do not print'),
         (1, 'Print on each line'),

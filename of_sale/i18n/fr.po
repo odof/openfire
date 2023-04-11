@@ -87,11 +87,6 @@ msgid "(OF) Modifier le coût dans les lignes de commande"
 msgstr "(OF) Modifier le coût dans les lignes de commande"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_group_of_sale_multiimage
-msgid "(OF) Multi Images"
-msgstr "(OF) Images multiples dans l’article"
-
-#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_of_position_fiscale
 msgid "(OF) Position fiscale"
 msgstr "(OF) Position fiscale"
@@ -149,8 +144,8 @@ msgstr "<i>Il reste des bons de livraisons non validés.</i>"
 
 #. module: of_sale
 #: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
-msgid "<span attrs=\"{                                 'invisible': ['|',                                     ('of_sale_print_multiimage_level', '!=', 1),                                     ('group_of_sale_multiimage', '=', 0)]}\">A first image of the article will be displayed on the line and all in the appendix</span>"
-msgstr "<span attrs=\"{                             'invisible': ['|',                                 ('of_sale_print_multiimage_level', '!=', 1),                                 ('group_of_sale_multiimage', '=', 0)]}\">Une première image de l'article sera affichée à la ligne et le tout en annexe</span>"
+msgid "<span attrs=\"{                                 'invisible': ['|',                                     ('of_sale_print_multiimage_level', '!=', 1),                                 ]}\">A first image of the article will be displayed on the line and all in the appendix</span>"
+msgstr "<span attrs=\"{                             'invisible': ['|',                                 ('of_sale_print_multiimage_level', '!=', 1),                             ]}\">Une première image de l'article sera affichée à la ligne et le tout en annexe</span>"
 
 #. module: of_sale
 #: model:ir.ui.view,arch_db:of_sale.of_sale_obsolete_sale_order_form_view
@@ -573,7 +568,6 @@ msgid "Coût total HT simulé"
 msgstr "Coût total HT simulé"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_product_image_create_uid
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_create_uid
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_create_uid
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation_create_uid
@@ -585,7 +579,6 @@ msgid "Created by"
 msgstr "Créé par"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_product_image_create_date
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_create_date
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_create_date
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation_create_date
@@ -729,7 +722,6 @@ msgstr "Remise (%)"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_documents_joints_display_name
-#: model:ir.model.fields,field_description:of_sale.field_of_product_image_display_name
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_display_name
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_display_name
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation_display_name
@@ -895,7 +887,6 @@ msgstr "HT"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_documents_joints_id
-#: model:ir.model.fields,field_description:of_sale.field_of_product_image_id
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_id
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_id
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation_id
@@ -1047,24 +1038,6 @@ msgid "If checked, the printed reports will display the incoterms for the sales 
 msgstr "Si coché, les rapports imprimés afficheront les incoterms pour les bons de commande et les factures liées"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_product_image_image
-msgid "Image"
-msgstr "Image"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_of_product_image_form
-msgid "Image Name"
-msgstr "Nom de l'image"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_product_product_of_product_image_ids
-#: model:ir.model.fields,field_description:of_sale.field_product_template_of_product_image_ids
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_product_image_ids
-#: model:ir.ui.view,arch_db:of_sale.of_sale_product_form_view
-msgid "Images"
-msgstr "Images"
-
-#. module: of_sale
 #: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
 msgid "Impression"
 msgstr "Impression"
@@ -1136,7 +1109,6 @@ msgstr "Pastilles"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_documents_joints___last_update
-#: model:ir.model.fields,field_description:of_sale.field_of_product_image___last_update
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance___last_update
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard___last_update
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation___last_update
@@ -1148,7 +1120,6 @@ msgid "Last Modified on"
 msgstr "Dernière Modification le"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_product_image_write_uid
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_write_uid
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_write_uid
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation_write_uid
@@ -1160,7 +1131,6 @@ msgid "Last Updated by"
 msgstr "Dernière mise à jour par"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_product_image_write_date
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_write_date
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_write_date
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation_write_date
@@ -1300,16 +1270,6 @@ msgid "Montant unitaire de la variation de prix liée à la gestion de prix"
 msgstr "Montant unitaire de la variation de prix liée à la gestion de prix"
 
 #. module: of_sale
-#: model:res.groups,name:of_sale.group_of_sale_multiimage
-msgid "Multi image on product"
-msgstr "Nombreuses images par article"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_product_image_name
-msgid "Name"
-msgstr "Nom"
-
-#. module: of_sale
 #: selection:res.company,afficher_descr_fab:0
 msgid "Ne pas afficher"
 msgstr "Ne pas afficher"
@@ -1385,11 +1345,6 @@ msgstr "Of product attachment computed"
 #: model:ir.model.fields,field_description:of_sale.field_account_invoice_of_residual_equal
 msgid "Of residual equal"
 msgstr "Of residual equal"
-
-#. module: of_sale
-#: selection:sale.config.settings,group_of_sale_multiimage:0
-msgid "One image per product"
-msgstr "Une image par article"
 
 #. module: of_sale
 #: model:ir.ui.view,arch_db:of_sale.of_sale_order_confirmation_view_form
@@ -1640,14 +1595,6 @@ msgid "Product Category"
 msgstr "Catégorie d'article"
 
 #. module: of_sale
-#: model:ir.model,name:of_sale.model_of_product_image
-#: model:ir.ui.view,arch_db:of_sale.of_sale_obsolete_sale_order_form_view
-#: model:ir.ui.view,arch_db:of_sale.of_sale_product_form_view
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_of_product_image_form
-msgid "Product Images"
-msgstr "Images du produit"
-
-#. module: of_sale
 #: model:ir.model,name:of_sale.model_product_template
 msgid "Product Template"
 msgstr "Modèle d'article"
@@ -1749,11 +1696,6 @@ msgid "Quotations &amp; Orders"
 msgstr "Devis et commandes"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_product_image_product_tmpl_id
-msgid "Related Product"
-msgstr "Related Product"
-
-#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_product_forbidden_discount
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_product_forbidden_discount
 msgid "Remise interdite pour cet article"
@@ -1842,11 +1784,6 @@ msgstr "Sélectionnez la catégorie de l'article actuel"
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_sequence
 msgid "Sequence"
 msgstr "Séquence"
-
-#. module: of_sale
-#: selection:sale.config.settings,group_of_sale_multiimage:0
-msgid "Several images per product"
-msgstr "Nombreuses images par article"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_wizard_set_printing_params_pdf_shipping_address_specific_title
