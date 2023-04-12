@@ -215,94 +215,69 @@
     <!-- Portail - RDVs -->
 
     <template id="of_website_portal_portal_my_rdvs" name="OF Website Interventions">
-       <t t-call="website.layout">
-            <body data-spy="scroll" data-target=".navspy" data-offset="50">
-                <div class="container o_website_quote">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <ol class="breadcrumb mt8">
-                                <li><a href="/my/home"><i class="fa fa-home" /></a></li>
-                                <li><a t-attf-href="/my/rdvs">Mes interventions</a></li>
-
-                            </ol>
-                        </div>
-                    </div>
-                    <div class="row mt16">
-                        <!-- Page content -->
-                        <div id="of_rdv_page_content" class="col-md-12">
-                            <!-- Intro -->
-                            <div id="of_rdv_introduction" class="page-header mt16">
-                                <h1>
-                                    Vos rendez-vous
-                                </h1>
-                            </div>
-                            <!-- Informations RDV -->
-                            <div class="row mt32">
-                                <div class="col-md-12 col-xs-12">
-                                    <t t-if="not rdvs">
-                                        <p>Il n'y a actuellement pas d'intervention pour votre compte.</p>
-                                    </t>
-                                    <t t-else="">
-                                        <table class="table">
-                                            <thead>
-                                                <tr class="active">
-                                                    <th>Libellé</th>
-                                                    <th>Tâche</th>
-                                                    <th>Intervenants</th>
-                                                    <th>Date</th>
-                                                    <th>Durée</th>
-                                                    <th>Statut</th>
-                                                    <th style="text-align: center;">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <t t-foreach="rdvs.sorted(key='date', reverse=True)" t-as="rdv">
-                                                <tr>
-                                                    <td>
-                                                        <a t-attf-href="/rdv/#{slug(rdv)}"><t t-esc="rdv.display_name" /></a>
-                                                    </td>
-                                                    <td>
-                                                        <span t-field="rdv.sudo().tache_id.name"/>
-                                                    </td>
-                                                    <td>
-                                                        <t t-foreach="rdv.sudo().employee_ids" t-as="employee">
-                                                            <span t-field="employee.name"/>
-                                                        </t>
-                                                    </td>
-                                                    <td>
-                                                        <t t-if="rdv.state not in ('draft', 'cancel', 'postponed')">
-                                                            <span t-field="rdv.with_context(tz='Europe/Paris').date"/>
-                                                        </t>
-                                                        <t t-else="">
-                                                            <span t-field="rdv.with_context(tz='Europe/Paris').date_date"/>
-                                                        </t>
-                                                    </td>
-                                                    <td>
-                                                        <span t-esc="'%02dh%02d' % (int(rdv.duree), rdv.duree % 1 * 60)"/>
-                                                    </td>
-                                                    <td>
-                                                        <span t-field="rdv.state"/>
-                                                    </td>
-                                                    <td>
-                                                        <form action="/rdv/cancel" method="post" enctype="multipart/form-data" name="rdv_cancelable"
-                                                              t-att-class="rdv.can_edit_from_website() and 'btn' or 'btn of-no-click'"
-                                                              style="padding-right: 10px;padding-left: 10px;padding-top: 0px">
-                                                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                                                            <input type="hidden" name="rdv_id" t-att-value="rdv.id"/>
-                                                            <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading fa fa-fg fa-close"
-                                                                    t-att-style="rdv.can_edit_from_website() and 'font-size: 20px;' or 'font-size: 20px;background-color: gray'"/>
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                            </t>
-                                        </table>
-                                    </t>
-                                </div>
-                            </div>
-                            <div class="oe_structure" />
-                        </div>
-                    </div>
+        <t t-call="website_portal.portal_layout">
+            <h3 class="page-header">Vos rendez-vous</h3>
+            <t t-if="not rdvs">
+                <p>Il n'y a actuellement pas d'intervention pour votre compte.</p>
+            </t>
+            <t t-if="rdvs">
+                <table class="table">
+                    <thead>
+                        <tr class="active">
+                            <th>Libellé</th>
+                            <th>Tâche</th>
+                            <th>Intervenants</th>
+                            <th>Date</th>
+                            <th>Durée</th>
+                            <th>Statut</th>
+                            <th style="text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <t t-foreach="rdvs.sorted(key='date', reverse=True)" t-as="rdv">
+                        <tr>
+                            <td>
+                                <a t-attf-href="/rdv/#{slug(rdv)}"><t t-esc="rdv.display_name" /></a>
+                            </td>
+                            <td>
+                                <span t-field="rdv.sudo().tache_id.name"/>
+                            </td>
+                            <td>
+                                <t t-foreach="rdv.sudo().employee_ids" t-as="employee">
+                                    <span t-field="employee.name"/>
+                                </t>
+                            </td>
+                            <td>
+                                <t t-if="rdv.state not in ('draft', 'cancel', 'postponed')">
+                                    <span t-field="rdv.with_context(tz='Europe/Paris').date"/>
+                                </t>
+                                <t t-else="">
+                                    <span t-field="rdv.with_context(tz='Europe/Paris').date_date"/>
+                                </t>
+                            </td>
+                            <td>
+                                <span t-esc="'%02dh%02d' % (int(rdv.duree), rdv.duree % 1 * 60)"/>
+                            </td>
+                            <td>
+                                <span t-field="rdv.state"/>
+                            </td>
+                            <td>
+                                <form action="/rdv/cancel" method="post" enctype="multipart/form-data" name="rdv_cancelable"
+                                        t-att-class="rdv.can_edit_from_website() and 'btn' or 'btn of-no-click'"
+                                        style="padding: 0px; padding-bottom: 2px; padding-left: 10px;">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <input type="hidden" name="rdv_id" t-att-value="rdv.id"/>
+                                    <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading fa fa-fg fa-close"
+                                            t-att-title="not rdv.can_edit_from_website() and 'Impossible d\'annuler ce RDV' or ''"
+                                            t-att-style="rdv.can_edit_from_website() and 'font-size: 20px;' or 'font-size: 20px;background-color: gray'"/>
+                                </form>
+                            </td>
+                        </tr>
+                    </t>
+                </table>
+                <div t-if="pager" class="o_portal_pager text-center">
+                    <t t-call="website.pager" />
                 </div>
-            </body>
+            </t>
         </t>
     </template>
 
@@ -377,6 +352,7 @@
                                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                                     <input type="hidden" name="rdv_id" t-att-value="rdv.id"/>
                                     <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading"
+                                            t-att-title="not rdv.can_edit_from_website() and 'Impossible d\'annuler ce RDV' or ''"
                                             t-att-style="rdv.can_edit_from_website() and 'margin-top: 10px;' or 'margin-top: 10px;background-color: gray'">Annuler</button>
                                 </form>
                             </div>
@@ -515,7 +491,7 @@
         </t>
     </template>
 
-    <!-- Portail - Demande d'intervention -->
+    <!-- Portail - Demandes d'intervention -->
     <template id="of_website_portal_portal_my_services" name="OF My Services">
         <t t-call="website_portal.portal_layout">
             <h3 class="page-header">Vos demandes d'intervention</h3>
@@ -526,10 +502,10 @@
                 <table class="table table-hover o_my_status_table" id="service_table">
                     <thead>
                         <tr class="active">
-                            <th>Demande d'intervention</th>
+                            <th>Demandes d'intervention</th>
                             <th>Tâche</th>
                             <th>Durée</th>
-                            <th>Date</th>
+                            <th>À partir du</th>
                         </tr>
                     </thead>
                     <t t-foreach="services" t-as="service">
@@ -543,7 +519,7 @@
                                 <span t-esc="service.tache_id and service.tache_id.name"/>
                             </td>
                             <td>
-                                <span t-esc="service.duree and int(service.duree) or 0"/> h
+                                <span t-esc="'%02dh%02d' % (int(service.duree), service.duree % 1 * 60)"/>
                             </td>
                             <td>
                                 <span t-esc="service.date_next" t-options="{'widget': 'date'}"/>

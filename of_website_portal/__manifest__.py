@@ -40,6 +40,7 @@ Module OpenFire pour le portail du site internet
         'views/res_config_views.xml',
         'wizards/portal_user_wizard_views.xml',
         'templates/website_portal_sale_views.xml',
+        'data/post_update.xml',
     ],
     'qweb': [
     ],
