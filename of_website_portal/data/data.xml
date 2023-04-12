@@ -54,7 +54,7 @@
     </record>
 
     <record id="of_tab_service" model="of.tab">
-        <field name="name">Demande d'intervention</field>
+        <field name="name">Demandes d'intervention</field>
         <field name="code">service</field>
     </record>
 

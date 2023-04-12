@@ -44,7 +44,7 @@
                 <a href="/my/deliveries">Livraisons</a>
             </li>
             <li t-if="'service' in tabs">
-                <a href="/my/services">Demande d'intervention</a>
+                <a href="/my/services">Demandes d'intervention</a>
             </li>
             <li t-if="'rdv' in tabs">
                 <a href="/my/rdvs">Interventions</a>
