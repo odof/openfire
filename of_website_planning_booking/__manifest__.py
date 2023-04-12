@@ -3,7 +3,7 @@
 
 {
     'name': u"OpenFire / Prise de RDV en ligne",
-    'version': '10.0.1.0.0',
+    'version': '10.0.1.1.0',
     'author': u"OpenFire",
     'category': u"OpenFire",
     'summary': u"Prise de RDV en ligne",
@@ -34,6 +34,7 @@ Fonctionnalités additionnelles :
         'views/res_users_views.xml',
         'views/res_config_settings_views.xml',
         'wizards/of_horaire_wizard_views.xml',
+        'data/post_update.xml',
     ],
     'qweb': [
         'static/src/xml/*.xml',

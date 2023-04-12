@@ -39,12 +39,13 @@ class OFPlanningTache(models.Model):
     hor_ad = fields.Float(string=u"Après-midi début", digits=(12, 5), default=14)
     hor_af = fields.Float(string=u"Après-midi fin", digits=(12, 5), default=18)
     jour_ids = fields.Many2many(
-        comodel_name='of.jours', string=u"Jours à planifier", default=lambda self: self._default_jours_ids())
+        comodel_name='of.jours', relation='of_planning_tache_jours_rel', column1='tache_id', column2='jour_id',
+        string=u"Jours à planifier", default=lambda self: self._default_jours_ids())
 
     def _default_jours_ids(self):
         # Lundi à vendredi comme valeurs par défaut
         jours = self.env['of.jours'].search([('numero', 'in', (1, 2, 3, 4, 5))], order='numero')
-        res = [jour.id for jour in jours]
+        res = [(4, jour.id) for jour in jours]
         return res
 
     @api.depends('segment_ids')

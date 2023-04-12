@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <function
+        id="put_default_days"
+        model="of.planning.tache"
+        name="_update_version_10_0_1_1_0">
+    </function>
+
+</odoo>
