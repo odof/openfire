@@ -466,7 +466,7 @@ class OFWebsitePlanningBooking(http.Controller):
         except Exception, e:
             _logger.error(
                 u"Erreur lors de l'affichage de la carte de l'adresse d'installation : %s" % tools.ustr(e))
-            return request.render("website.403")
+            return request.render('website.403')
 
         values.update({
             'googleAPIKey': google_maps_api_key,
@@ -1133,7 +1133,7 @@ class OFWebsitePlanningBooking(http.Controller):
             creneau_employee.button_select(sudo=True)
             vals = self._get_intervention_vals(creneau, creneau_employee)
             try:
-                if request.session['rdv_id']:
+                if request.session.get('rdv_id'):
                     intervention = interv_obj.browse(request.session['rdv_id'])
                     intervention.write(vals)
                 else:

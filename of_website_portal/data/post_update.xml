@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <function
+        id="put_tabs_by_default"
+        model="res.users"
+        name="_update_version_10_0_2_2_0">
+    </function>
+
+</odoo>

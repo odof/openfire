@@ -63,20 +63,6 @@ class ResUsers(models.Model):
                 AND         imd2.model = 'ir.model.fields'
                 AND         ((imd2.module = 'of_website_portal' AND imd2.name IN ('field_res_users_of_tab_ids', 'field_res_users_of_pricelist_id', 'field_res_users_of_fiscal_position_id'))
                 OR          (imd2.module = 'base' AND imd2.name IN ('field_res_users_groups_id'))); """)
-        # Ajouter les onglets RDV et CE pour tous les utilisateurs
-        if module_self and module_self.latest_version < '10.0.2.2.0':
-            cr.execute("""
-            INSERT INTO res_users_of_tab_rel (user_id, tab_id)
-            SELECT      ru.id, ot.id
-            FROM        res_users ru,
-                        of_tab ot,
-                        ir_model_data imd
-            WHERE       ot.id = imd.res_id
-            AND         imd.model = 'of.tab'
-            AND         imd.module = 'of_website_portal'
-            AND         imd.name IN ('of_tab_intervention', 'of_tab_contract')
-            ON CONFLICT DO NOTHING
-            """)
         return res
 
     of_pricelist_id = fields.Many2one(comodel_name='product.pricelist', string=u"Liste de prix par défaut")
