@@ -10,9 +10,9 @@ var core = require('web.core');
 var data = require('web.data');
 var Model = require('web.DataModel');
 var Dialog = require('web.Dialog');
-var ViewManager = require('web.ViewManager');
 var ControlPanel = require('web.ControlPanel');
 
+var X2ManyViewManager = form_relational.X2ManyViewManager;
 var FieldMany2One = form_relational.FieldMany2One;
 var FieldOne2Many = core.form_widget_registry.get('one2many');
 var Many2ManyListView = core.view_registry.get('many2many_list');
@@ -43,7 +43,8 @@ form_widgets.WidgetButton.include({
  */
 FormView.include({
     render_buttons: function($node) {
-        if (this.options && this.options.action && this.options.action.context["hide_action_buttons"]) {
+        if (this.options && this.options.action && this.options.action.context &&
+                this.options.action.context["hide_action_buttons"]) {
             this.options.action_buttons = false;
         }
         this._super($node)
@@ -160,61 +161,28 @@ var Localizable = FieldMany2One.extend({
 /**
  *  Copy from form_relational_widget for FieldOne2Many.load_views
  */
-var X2ManyViewManager = ViewManager.extend({
+X2ManyViewManager.include({
     custom_events: {
         // Catch event scrollTo to prevent scrolling to the top when using the
         // pager of List and Kanban views in One2Many fields
         'scrollTo': function() {},
     },
     init: function(parent, dataset, views, flags, x2many_views) {
+        var context = dataset.context.eval();
+        if (context['display_search_view']) {
+            var search_view = true;
+        }else{
+            var search_view = false;
+        }
         // By default, render buttons and pager in X2M fields, but no sidebar
         flags = _.extend({}, flags, {
             headless: false,
-            search_view: false,
+            search_view: search_view,
             action_buttons: true,
             pager: true,
             sidebar: false,
         });
-        this.control_panel = new ControlPanel(parent, "X2ManyControlPanel");
-        this.set_cp_bus(this.control_panel.get_bus());
         this._super(parent, dataset, views, flags);
-        this.registry = core.view_registry.extend(x2many_views);
-    },
-    start: function() {
-        this.control_panel.prependTo(this.$el);
-        return this._super();
-    },
-    switch_mode: function(mode, unused) {
-        if (mode !== 'form') {
-            return this._super(mode, unused);
-        }
-        var self = this;
-        var id = self.x2m.dataset.index !== null ? self.x2m.dataset.ids[self.x2m.dataset.index] : null;
-        var pop = new form_common.FormViewDialog(this, {
-            res_model: self.x2m.field.relation,
-            res_id: id,
-            context: self.x2m.build_context(),
-            title: _t("Open: ") + self.x2m.string,
-            create_function: function(data, options) {
-                return self.x2m.data_create(data, options);
-            },
-            write_function: function(id, data, options) {
-                return self.x2m.data_update(id, data, options).done(function() {
-                    self.x2m.reload_current_view();
-                });
-            },
-            alternative_form_view: self.x2m.field.views ? self.x2m.field.views.form : undefined,
-            parent_view: self.x2m.view,
-            child_name: self.x2m.name,
-            read_function: function(ids, fields, options) {
-                return self.x2m.data_read(ids, fields, options);
-            },
-            form_view_options: {'not_interactible_on_create':true},
-            readonly: self.x2m.get("effective_readonly")
-        }).open();
-        pop.on("elements_selected", self, function() {
-            self.x2m.reload_current_view();
-        });
     },
 });
 
@@ -416,13 +384,31 @@ return FieldOne2One;
 odoo.define('of_web_widgets.Many2ManyListView', function (require) {
 "use strict";
 
+var Model = require('web.DataModel');
 var form_common = require('web.form_common');
 var core = require('web.core');
 var data = require('web.data')
-
+var ListView = require('web.ListView');
 var Many2ManyListView = core.view_registry.get('many2many_list');
 
 var _t = core._t;
+
+ListView.include({
+    init: function () {
+        this._super.apply(this, arguments);
+        this.options.selectable = false;
+    },
+    do_search: function (domain, context, group_by) {
+        if (this.x2m) {
+            if (!this.x2m_origin_ids) {
+                this.x2m_origin_ids = this.dataset.ids
+            }
+            domain.push(['id', 'in', this.x2m_origin_ids])
+            console.log(domain);
+        }
+        return this._super.apply(this, [domain, context, group_by]);
+    },
+});
 
 Many2ManyListView.include({
     init: function () {
