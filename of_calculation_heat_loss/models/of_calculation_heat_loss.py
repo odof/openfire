@@ -40,7 +40,7 @@ class OFCalculationHeatLoss(models.Model):
     base_temperature_line_id = fields.Many2one(
         comodel_name='of.calculation.base.temperature.line', string=u"Ligne de température",
         compute='_compute_base_temperature_line_id')
-    temperature = fields.Float(string=u"Température de confort désirée", default=20.0)
+    temperature = fields.Float(string=u"Température de confort désirée", default=19.0)
     estimated_power = fields.Float(string=u"Puissance estimée de l’appareil (nombre)")
     estimated_power_text = fields.Char(string=u"Puissance estimée de l’appareil (texte)")
     product_ids = fields.Many2many(
