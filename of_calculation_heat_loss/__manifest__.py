@@ -26,6 +26,7 @@ Gestion du calcul de déperdition de chaleur
         'data/of.calculation.altitude.csv',
         'data/of.calculation.base.temperature.line.csv',
         'hooks/hook.xml',
+        'views/assets.xml',
         'views/of_calculation_heat_loss_views.xml',
         'views/of_parc_installe_views.xml',
         'views/sale_views.xml',
