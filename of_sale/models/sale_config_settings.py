@@ -224,13 +224,3 @@ class OFSaleConfiguration(models.TransientModel):
             'type': 'ir.actions.client',
             'tag': 'reload',
         }
-
-    @api.multi
-    def action_printings_params(self):
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'of.sale.wizard.set.printing.params',
-            'view_mode': 'form',
-            'view_type': 'form',
-            'target': 'new'
-        }

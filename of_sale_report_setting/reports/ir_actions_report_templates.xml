@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_saleorder_document" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//t[@t-set='forced_vat']" position="after">
+            <t t-set="pdf_address_title" t-value="doc.pdf_address_title()"/>
+            <t t-set="pdf_address_contact_titles" t-value="doc.pdf_address_contact_titles()"/>
+            <t t-set="pdf_address_contact_parent_name" t-value="doc.pdf_address_contact_parent_name()"/>
+            <t t-set="pdf_address_contact_name" t-value="doc.pdf_address_contact_name()"/>
+            <t t-set="pdf_address_contact_phone" t-value="doc.pdf_address_contact_phone()"/>
+            <t t-set="pdf_address_contact_mobile" t-value="doc.pdf_address_contact_mobile()"/>
+            <t t-set="pdf_address_contact_fax" t-value="doc.pdf_address_contact_fax()"/>
+            <t t-set="pdf_address_contact_email" t-value="doc.pdf_address_contact_email()"/>
+            <t t-set="pdf_invoicing_address_specific_title" t-value="doc.pdf_invoicing_address_specific_title()"/>
+            <t t-set="pdf_invoicing_address_specific_title_label" t-value="doc.pdf_invoicing_address_specific_title_label()"/>
+            <t t-set="pdf_shipping_address_specific_title" t-value="doc.pdf_shipping_address_specific_title()"/>
+            <t t-set="pdf_shipping_address_specific_title_label" t-value="doc.pdf_shipping_address_specific_title_label()"/>
+            <t t-set="pdf_invoicing_shipping_address_specific_title" t-value="doc.pdf_invoicing_shipping_address_specific_title()"/>
+            <t t-set="pdf_invoicing_shipping_address_specific_title_label" t-value="doc.pdf_invoicing_shipping_address_specific_title_label()"/>
+            <t t-set="pdf_salesperson_name" t-value="doc.pdf_salesperson_name()"/>
+            <t t-set="pdf_salesperson_phone" t-value="doc.pdf_salesperson_phone()"/>
+            <t t-set="pdf_salesperson_mobile" t-value="doc.pdf_salesperson_mobile()"/>
+            <t t-set="pdf_salesperson_fax" t-value="doc.pdf_salesperson_fax()"/>
+            <t t-set="pdf_salesperson_email" t-value="doc.pdf_salesperson_email()"/>
+            <t t-set="pdf_salesperson_info" t-value="doc.pdf_salesperson_info() and (pdf_salesperson_name or pdf_salesperson_phone or pdf_salesperson_mobile or pdf_salesperson_fax or pdf_salesperson_email)"/>
+            <t t-set="pdf_customer_phone" t-value="doc.pdf_customer_phone()"/>
+            <t t-set="pdf_customer_mobile" t-value="doc.pdf_customer_mobile()"/>
+            <t t-set="pdf_customer_fax" t-value="doc.pdf_customer_fax()"/>
+            <t t-set="pdf_customer_email" t-value="doc.pdf_customer_email()"/>
+            <t t-set="pdf_customer_info" t-value="doc.pdf_customer_info() and (pdf_customer_phone or pdf_customer_mobile or pdf_customer_fax or pdf_customer_email)"/>
+            <t t-set="pdf_payment_term_info" t-value="doc.pdf_payment_term_info()"/>
+            <t t-set="pdf_order_ref_info" t-value="doc.pdf_order_ref_info()"/>
+            <t t-set="pdf_customer_ref_info" t-value="doc.pdf_customer_ref_info()"/>
+            <t t-set="pdf_technical_visit_info" t-value="doc.pdf_technical_visit_info()"/>
+            <t t-set="pdf_validity_info" t-value="doc.pdf_validity_info()"/>
+            <t t-set="pdf_price_taxexcl" t-value="doc.pdf_price_taxexcl()"/>
+            <t t-set="pdf_price_taxinc" t-value="doc.pdf_price_taxinc()"/>
+            <t t-set="pdf_vendor_signature" t-value="doc.pdf_vendor_signature()"/>
+            <t t-set="pdf_customer_signature" t-value="doc.pdf_customer_signature()"/>
+            <t t-set="pdf_signature_insert" t-value="doc.pdf_signatures_insert() and (pdf_vendor_signature or pdf_customer_signature)"/>
+            <t t-set="pdf_prefill_vendor_signature" t-value="doc.pdf_prefill_vendor_signature()"/>
+            <t t-set="pdf_signature_text" t-value="doc.pdf_signature_text()"/>
+            <t t-set="pdf_signature_text_label" t-value="doc.pdf_signature_text_label()"/>
+        </xpath>
+
+        <xpath expr="//t[@t-set='address']" position="replace">
+            <t t-set="address">
+                <div name="invoicing_address">
+                    <strong name="invoicing_shipping_address_label" t-if="pdf_address_title and doc.partner_shipping_id == doc.partner_invoice_id">
+                        <t t-if="pdf_invoicing_shipping_address_specific_title and pdf_invoicing_shipping_address_specific_title_label">
+                            <span t-esc="pdf_invoicing_shipping_address_specific_title_label"/>
+                        </t>
+                        <t t-else="">
+                            <span>Invoicing and Shipping Address:</span>
+                        </t>
+                    </strong>
+                    <strong name="invoicing_address_label" t-if="pdf_address_title and doc.partner_shipping_id != doc.partner_invoice_id">
+                        <t t-if="pdf_invoicing_address_specific_title and pdf_invoicing_address_specific_title_label">
+                            <span t-esc="pdf_invoicing_address_specific_title_label"/>
+                        </t>
+                        <t t-else="">
+                            <span>Invoicing Address:</span>
+                        </t>
+                    </strong>
+                    <br/>
+                    <t t-if="pdf_address_contact_parent_name and doc.partner_invoice_id.parent_id">
+                        <span t-if="pdf_address_contact_titles and doc.partner_invoice_id.parent_id.title" t-field="doc.partner_invoice_id.parent_id.title"/>
+                        <span t-field="doc.partner_invoice_id.parent_id.name"/>
+                    </t>
+                    <span t-if="pdf_address_contact_titles and doc.partner_invoice_id.title" t-field="doc.partner_invoice_id.title"/>
+                    <t t-if="pdf_address_contact_name">
+                        <span t-if="not doc.partner_invoice_id.name and doc.partner_invoice_id.parent_id and not pdf_address_contact_parent_name" t-field="doc.partner_invoice_id.parent_id.name"/>
+                        <span t-if="doc.partner_invoice_id.name" t-field="doc.partner_invoice_id.name"/>
+                    </t>
+                    <div t-field="doc.partner_invoice_id" t-options="{'widget': 'contact', 'fields': ['address'], 'no_marker': true}"/>
+                    <t t-if="doc.partner_invoice_id.phone and pdf_address_contact_phone">
+                        <i class='fa fa-phone fa-fw' role="img" aria-label="Phone" title="Phone"/>
+                        <span class="o_force_ltr" itemprop="telephone" t-esc="doc.partner_invoice_id.phone"/>
+                        <br/>
+                    </t>
+                    <t t-if="doc.partner_invoice_id.mobile and pdf_address_contact_mobile">
+                        <i class='fa fa-mobile fa-fw' role="img" aria-label="Mobile" title="Mobile"/>
+                        <span class="o_force_ltr" itemprop="telephone" t-esc="doc.partner_invoice_id.mobile"/>
+                        <br/>
+                    </t>
+                    <t t-if="doc.partner_invoice_id.fax and pdf_address_contact_fax">
+                        <i class='fa fa-fax fa-fw' role="img" aria-label="Fax" title="Fax"/>
+                        <span class="o_force_ltr" itemprop="telephone" t-esc="doc.partner_invoice_id.fax"/>
+                        <br/>
+                    </t>
+                    <t t-if="doc.partner_invoice_id.email and pdf_address_contact_email"><span t-field="doc.partner_invoice_id.email"/><br/></t>
+                    <p t-if="doc.partner_id.vat"><t t-out="doc.company_id.account_fiscal_country_id.vat_label or 'Tax ID'"/>: <span t-field="doc.partner_id.vat"/></p>
+                </div>
+            </t>
+        </xpath>
+
+        <xpath expr="//t[@t-set='information_block']/.." position="replace">
+            <t t-if="doc.partner_shipping_id != doc.partner_invoice_id">
+                <t t-set="information_block">
+                    <div name="shipping_address">
+                        <strong name="shipping_address_label" t-if="pdf_address_title">
+                            <t t-if="pdf_shipping_address_specific_title and pdf_shipping_address_specific_title_label">
+                                <span t-esc="pdf_shipping_address_specific_title_label"/>
+                            </t>
+                            <t t-else="">
+                                <span>Shipping Address:</span>
+                            </t>
+                        </strong>
+                        <br/>
+                        <t t-if="pdf_address_contact_parent_name and doc.partner_shipping_id.parent_id">
+                            <span t-if="pdf_address_contact_titles and doc.partner_shipping_id.parent_id.title" t-field="doc.partner_shipping_id.parent_id.title"/>
+                            <span t-field="doc.partner_shipping_id.parent_id.name"/>
+                        </t>
+                        <span t-if="pdf_address_contact_titles and doc.partner_shipping_id.title" t-field="doc.partner_shipping_id.title"/>
+                        <t t-if="pdf_address_contact_name">
+                            <span t-if="not doc.partner_shipping_id.name and doc.partner_shipping_id.parent_id and not pdf_address_contact_parent_name" t-field="doc.partner_shipping_id.parent_id.name"/>
+                            <span t-if="doc.partner_shipping_id.name" t-field="doc.partner_shipping_id.name"/>
+                        </t>
+                        <div t-field="doc.partner_shipping_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;], &quot;no_marker&quot;: true}"/>
+                        <t t-if="doc.partner_shipping_id.phone and pdf_address_contact_phone">
+                            <i class='fa fa-phone fa-fw' role="img" aria-label="Phone" title="Phone"/>
+                            <span class="o_force_ltr" itemprop="telephone" t-esc="doc.partner_shipping_id.phone"/>
+                            <br/>
+                        </t>
+                        <t t-if="doc.partner_shipping_id.mobile and pdf_address_contact_mobile">
+                            <i class='fa fa-mobile fa-fw' role="img" aria-label="Mobile" title="Mobile"/>
+                            <span class="o_force_ltr" itemprop="telephone" t-esc="doc.partner_shipping_id.mobile"/>
+                            <br/>
+                        </t>
+                        <t t-if="doc.partner_shipping_id.fax and pdf_address_contact_fax">
+                            <i class='fa fa-fax fa-fw' role="img" aria-label="Fax" title="Fax"/>
+                            <span class="o_force_ltr" itemprop="telephone" t-esc="doc.partner_shipping_id.fax"/>
+                            <br/>
+                        </t>
+                        <t t-if="doc.partner_shipping_id.email and pdf_address_contact_email"><span t-field="doc.partner_shipping_id.email"/><br/></t>
+                    </div>
+                </t>
+            </t>
+        </xpath>
+
+        <xpath expr="//div[@id='informations']" position="replace">
+            <div class="col-12 mt-4 mb-4" id="informations">
+                <div t-if="doc.date_order" class="col-3 mw-100 mb-2 mr-3" name="informations_date" style="float: left; padding-right: 10px;">
+                    <strong t-if="doc.state in ['draft', 'sent']">Quotation Date:</strong>
+                    <strong t-else="">Order Date:</strong>
+                    <p class="m-0" t-field="doc.date_order" t-options='{"widget": "date"}'/>
+                </div>
+                <div t-if="pdf_order_ref_info and doc.client_order_ref" class="col-3 mw-100 mb-2 mr-3" name="informations_reference" style="float: left; padding-right: 10px;">
+                    <strong>Your Reference:</strong>
+                    <p class="m-0" t-field="doc.client_order_ref"/>
+                </div>
+                <div t-if="pdf_customer_ref_info and doc.partner_id.ref" class="col-3 mw-100 mb-2 mr-3" name="informations_customer_reference" style="float: left; padding-right: 10px;">
+                    <strong>Customer Reference:</strong>
+                    <p class="m-0" t-field="doc.partner_id.ref"/>
+                </div>
+                <div t-if="pdf_validity_info and doc.validity_date and doc.state in ['draft', 'sent']" class="col-3 mw-100 mb-2 mr-3" name="expiration_date" style="float: left; padding-right: 10px;">
+                    <strong>Expiration:</strong>
+                    <p class="m-0" t-field="doc.validity_date"/>
+                </div>
+                <div t-if="pdf_salesperson_info and doc.user_id" class="col-3 mw-100 mb-2 mr-3" name="salesperson_information" style="float: left; padding-right: 10px;">
+                    <strong>Salesperson:</strong>
+                    <p class="m-0">
+                        <t t-if="pdf_salesperson_name and doc.user_id.name">
+                            <span t-field="doc.user_id.name"/>
+                            <br/>
+                        </t>
+                        <t t-if="pdf_salesperson_phone and doc.user_id.phone">
+                            <i class='fa fa-phone fa-fw' role="img" aria-label="Phone" title="Phone"/>
+                            <span class="o_force_ltr" itemprop="telephone" t-esc="doc.user_id.phone"/>
+                            <br/>
+                        </t>
+                        <t t-if="pdf_salesperson_mobile and doc.user_id.mobile">
+                            <i class='fa fa-mobile fa-fw' role="img" aria-label="Mobile" title="Mobile"/>
+                            <span class="o_force_ltr" itemprop="telephone" t-esc="doc.user_id.mobile"/>
+                            <br/>
+                        </t>
+                        <t t-if="pdf_salesperson_fax and doc.user_id.fax">
+                            <i class='fa fa-fax fa-fw' role="img" aria-label="Fax" title="Fax"/>
+                            <span class="o_force_ltr" itemprop="telephone" t-esc="doc.user_id.fax"/>
+                            <br/>
+                        </t>
+                        <t t-if="pdf_salesperson_email and doc.user_id.email">
+                            <span t-field="doc.user_id.email"/>
+                        </t>
+                    </p>
+                </div>
+                <div t-if="pdf_customer_info" class="col-3 mw-100 mb-2 mr-3" name="customer_information" style="float: left; padding-right: 10px;">
+                    <strong>Customer:</strong>
+                    <p class="m-0">
+                        <t t-if="pdf_customer_phone and doc.partner_id.phone">
+                            <i class='fa fa-phone fa-fw' role="img" aria-label="Phone" title="Phone"/>
+                            <span class="o_force_ltr" itemprop="telephone" t-esc="doc.partner_id.phone"/>
+                            <br/>
+                        </t>
+                        <t t-if="pdf_customer_mobile and doc.partner_id.mobile">
+                            <i class='fa fa-mobile fa-fw' role="img" aria-label="Mobile" title="Mobile"/>
+                            <span class="o_force_ltr" itemprop="telephone" t-esc="doc.partner_id.mobile"/>
+                            <br/>
+                        </t>
+                        <t t-if="pdf_customer_fax and doc.partner_id.fax">
+                            <i class='fa fa-fax fa-fw' role="img" aria-label="Fax" title="Fax"/>
+                            <span class="o_force_ltr" itemprop="telephone" t-esc="doc.partner_id.fax"/>
+                            <br/>
+                        </t>
+                        <t t-if="pdf_customer_email and doc.partner_id.email">
+                            <span t-field="doc.partner_id.email"/>
+                        </t>
+                    </p>
+                </div>
+                <div t-if="pdf_payment_term_info and doc.payment_term_id" class="col-3 mw-100 mb-2 mr-3" name="payment_term_information" style="float: left; padding-right: 10px;">
+                    <strong>Payment Terms:</strong>
+                    <p class="m-0" t-field="doc.payment_term_id"/>
+                </div>
+                <div t-if="pdf_technical_visit_info and doc.of_technical_visit_date" class="col-3 mw-100 mb-2 mr-3" name="technical_visit_information" style="float: left; padding-right: 10px;">
+                    <strong>Technical Visit Date:</strong>
+                    <p class="m-0" t-field="doc.of_technical_visit_date"/>
+                </div>
+            </div>
+        </xpath>
+
+        <xpath expr="//th[@name='th_priceunit']" position="replace">
+            <th name="th_priceunit_taxexcl" class="text-end" t-if="pdf_price_taxexcl">Unit Price Tax excl.</th>
+            <th name="th_priceunit_taxinc" class="text-end" t-if="pdf_price_taxinc">Unit Price Tax incl.</th>
+        </xpath>
+
+        <xpath expr="//th[@name='th_subtotal']" position="replace">
+            <th name="th_subtotal_taxexcl" class="text-end" t-if="pdf_price_taxexcl">Price Tax excl.</th>
+            <th name="th_subtotal_taxinc" class="text-end" t-if="pdf_price_taxinc">Price Tax incl.</th>
+        </xpath>
+
+        <xpath expr="//td[@name='td_priceunit']" position="replace">
+            <td name="td_priceunit_taxexcl" class="text-end" t-if="pdf_price_taxexcl">
+                <span t-field="line.of_price_unit_taxexcl"/>
+            </td>
+            <td name="td_priceunit_taxinc" class="text-end" t-if="pdf_price_taxinc">
+                <span t-field="line.of_price_unit_taxinc"/>
+            </td>
+        </xpath>
+
+        <xpath expr="//td[@name='td_subtotal']" position="replace">
+            <td t-if="not line.is_downpayment and pdf_price_taxexcl" name="td_subtotal_taxexcl" class="text-end o_price_total">
+                <span t-field="line.price_subtotal"/>
+            </td>
+            <td t-if="not line.is_downpayment and pdf_price_taxinc" name="td_subtotal_taxinc" class="text-end o_price_total">
+                <span t-field="line.price_total"/>
+            </td>
+        </xpath>
+
+        <xpath expr="//t[@t-set='current_subtotal'][@t-value='0'][1]" position="replace">
+            <t t-set="current_subtotal_taxexcl" t-value="0"/>
+            <t t-set="current_subtotal_taxinc" t-value="0"/>
+        </xpath>
+
+        <xpath expr="//t[@t-set='current_subtotal'][@t-value='0'][1]" position="replace">
+            <t t-set="current_subtotal_taxexcl" t-value="0"/>
+            <t t-set="current_subtotal_taxinc" t-value="0"/>
+        </xpath>
+
+        <xpath expr="//t[@t-set='current_subtotal'][@t-value='current_subtotal + line.price_subtotal']" position="replace">
+            <t t-set="current_subtotal_taxexcl" t-value="current_subtotal_taxexcl + line.price_subtotal"/>
+        </xpath>
+
+        <xpath expr="//t[@t-set='current_subtotal'][@t-value='current_subtotal + line.price_total']" position="replace">
+            <t t-set="current_subtotal_taxinc" t-value="current_subtotal_taxinc + line.price_total"/>
+        </xpath>
+
+        <xpath expr="//td[@name='td_section_subtotal']" position="replace">
+            <td name="td_section_subtotal" colspan="99">
+                <strong class="mr16">Subtotal Tax Excl.</strong>
+                <span
+                    t-out="current_subtotal_taxexcl"
+                    t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'
+                />
+                <strong class="mr16">Subtotal Tax Incl.</strong>
+                <span
+                    t-out="current_subtotal_taxinc"
+                    t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'
+                />
+            </td>
+        </xpath>
+
+        <xpath expr="//td[@name='td_section_line']" position="attributes">
+            <attribute name="t-att-style">'background-color: ' + doc.get_color_section() + ' !important; color: ' + doc.get_color_font() + ' !important;'</attribute>
+        </xpath>
+
+        <xpath expr="//td[@name='td_name']/span" position="replace">
+            <span t-field="line.of_display_name"/>
+        </xpath>
+
+        <xpath expr="//p[@name='order_note']" position="after">
+            <p t-if="not pdf_technical_visit_info and doc.of_technical_visit_date">
+                <strong>Technical Visit Date:&amp;nbsp;</strong><span t-field="doc.of_technical_visit_date"/>
+            </p>
+        </xpath>
+
+        <xpath expr="//div[@name='signature']" position="replace">
+            <div t-if="pdf_signature_insert" class="mt-4 mb-4" name="signature">
+                <div name="customer_signature" class="col-6" style="float: left; page-break-inside: avoid; padding-right: 10px;">
+                    <t t-if="pdf_customer_signature">
+                        <div class="signature_insert_title h4 mb4">
+                            <div>
+                                <strong>Customer Signature</strong>
+                            </div>
+                            <div t-if="pdf_signature_text">
+                                <span t-esc="pdf_signature_text_label" style="font-size: 14px; font-style: italic;"/>
+                            </div>
+                        </div>
+                        <div class="signature_insert">
+                            <t t-if="doc.signature">
+                                <div style="height: 100px; padding: 10px;">
+                                    <img t-att-src="image_data_uri(doc.signature)" style="max-height: 80px; margin: auto;"/>
+                                </div>
+                            </t>
+                            <div>
+                                <p t-field="doc.signed_by"/>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+                <div name="vendor_signature" class="col-6"
+                     t-att-style="'float: left; page-break-inside: avoid;' + (' padding-left: 10px;' if pdf_customer_signature else ' padding-right: 10px;')">
+                    <t t-if="pdf_vendor_signature">
+                        <div class="signature_insert_title h4 mb4">
+                            <div>
+                                <strong>Salesperson Signature</strong>
+                            </div>
+                            <div t-if="pdf_signature_text">
+                                <span t-esc="pdf_signature_text_label" style="font-size: 14px; font-style: italic;"/>
+                            </div>
+                        </div>
+                        <div class="signature_insert">
+                            <t t-if="pdf_prefill_vendor_signature and doc.user_id.of_vendor_signature">
+                                <div style="height: 130px; padding: 10px;">
+                                    <img t-att-src="image_data_uri(doc.user_id.of_vendor_signature)" style="max-height: 110px; margin: auto;"/>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                </div>
+                <div class="clearfix"/>
+            </div>
+        </xpath>
+
+    </template>
+
+</odoo>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="sale_stock.report_saleorder_document_inherit_sale_stock" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//div[@name='expiration_date']" position="after">
+            <div t-if="doc.incoterm" groups="sale_stock.group_display_incoterm" class="col-3 mw-100 mb-2 mr-3" name="incoterm_information" style="float: left; padding-right: 10px;">
+                <strong>Incoterm:</strong>
+                <p t-if="doc.incoterm_location" t-out="'%s %s' % (doc.incoterm.code, doc.incoterm_location)" class="m-0"/>
+                <p t-else="" t-field="doc.incoterm.code" class="m-0"/>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>

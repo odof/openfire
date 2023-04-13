@@ -130,9 +130,6 @@
 
                 <!-- PDF Printing -->
                 <group string="PDF Printing" id="pdf_printing" name="pdf_printing">
-                    <group colspan="4">
-                        <button type="object" name="action_printings_params" string="Define fields to display" class="oe_inline oe_link"/>
-                    </group>
                     <group name="field_parameters">
                         <field name="group_of_sale_print_attachment" widget="radio"/>
                         <label for="of_sale_print_multiimage_level"/>

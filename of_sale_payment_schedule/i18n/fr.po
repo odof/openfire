@@ -17,6 +17,7 @@ msgstr ""
 
 #. module: of_sale_payment_schedule
 #: model:ir.model.fields,field_description:of_sale_payment_schedule.field_of_sale_payment_schedule__amount
+#: model_terms:ir.ui.view,arch_db:of_sale_payment_schedule.report_saleorder_document
 msgid "Amount"
 msgstr "Montant"
 
@@ -37,6 +38,7 @@ msgstr "Devise"
 
 #. module: of_sale_payment_schedule
 #: model:ir.model.fields,field_description:of_sale_payment_schedule.field_of_sale_payment_schedule__date
+#: model_terms:ir.ui.view,arch_db:of_sale_payment_schedule.report_saleorder_document
 msgid "Date"
 msgstr "Date"
 
@@ -117,3 +119,18 @@ msgstr "Total"
 #: model:ir.model,name:of_sale_payment_schedule.model_of_sale_payment_schedule
 msgid "of.sale.payment.schedule"
 msgstr ""
+
+#. module: of_sale_payment_schedule
+#: model:ir.model.fields,field_description:of_sale_payment_schedule.field_res_config_settings__pdf_payment_schedule
+msgid "Payment schedule"
+msgstr "Échéancier de paiement"
+
+#. module: of_sale_payment_schedule
+#: model_terms:ir.ui.view,arch_db:of_sale_payment_schedule.res_config_settings_sale_printing_params_view_form
+msgid "Displays the Payment schedule in the report"
+msgstr "Affiche l'échéancier dans le rapport"
+
+#. module: of_sale_payment_schedule
+#: model_terms:ir.ui.view,arch_db:of_sale_payment_schedule.report_saleorder_document
+msgid "Payment Schedule"
+msgstr "Vos échéances"

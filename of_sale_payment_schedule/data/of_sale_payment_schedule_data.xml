@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="pdf_payment_schedule" model="ir.config_parameter" forcecreate="False">
+        <field name="key">of.sale.report.setting.pdf_payment_schedule</field>
+        <field name="value">True</field>
+    </record>
+
+</odoo>

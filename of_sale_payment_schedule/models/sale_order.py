@@ -109,6 +109,9 @@ class SaleOrder(models.Model):
                     percent -= payment.percent
                     amount -= payment.amount
 
+    def pdf_payment_schedule(self):
+        return self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_payment_schedule')
+
     def write(self, vals):
         def payment_schedule_needs_recompute(order):
             return order.of_payment_schedule_ids \

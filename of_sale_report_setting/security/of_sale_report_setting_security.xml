@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="group_of_pdf_prefill_vendor_signature" model="res.groups">
+        <field name="name">Pre-populated salesman signature group</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+</odoo>

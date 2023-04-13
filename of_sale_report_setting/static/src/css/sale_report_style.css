@@ -1,0 +1,21 @@
+.signature_insert_title {
+    width: 100%;
+    padding: 8px;
+    height: 40px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.signature_insert {
+    height: 130px;
+    max-height: 130px;
+    padding: 0px 16px;
+    margin-bottom: 15px;
+    border: 1px solid lightgray;
+    border-top: 2px solid black;
+    background-color: lightgray;
+    text-align: center;
+    overflow: hidden;
+}

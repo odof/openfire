@@ -1,22 +1,19 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': "OpenFire / Sale Payment Schedule",
+    'name': "OpenFire / Sale Stock",
     'version': '16.0.1.0.0',
     'author': "OpenFire",
     'category': 'OpenFire',
-    'sequence': 15,
-    'summary': "Payment schedule for sale orders",
+    'summary': "Delivery management for sale orders",
     'website': 'https://www.openfire.fr',
     'description': "",
     'depends': [
+        'sale_stock',
         'of_sale_report_setting',
     ],
     'data': [
-        'data/of_sale_payment_schedule_data.xml',
         'reports/ir_actions_report_templates.xml',
-        'security/ir.model.access.csv',
-        'views/of_sale_payment_schedule_views.xml',
     ],
     'installable': True,
     'application': False,

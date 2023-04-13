@@ -1,0 +1,685 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_sale_report_setting
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-04-07 12:46+0000\n"
+"PO-Revision-Date: 2023-04-07 12:46+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "<i class=\"fa fa-fax fa-fw\" role=\"img\" aria-label=\"Fax\" title=\"Fax\"/>"
+msgstr "<i class=\"fa fa-fax fa-fw\" role=\"img\" aria-label=\"Fax\" title=\"Fax\"/>"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "<i class=\"fa fa-mobile fa-fw\" role=\"img\" aria-label=\"Mobile\" title=\"Mobile\"/>"
+msgstr "<i class=\"fa fa-mobile fa-fw\" role=\"img\" aria-label=\"Mobile\" title=\"Mobile\"/>"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "<i class=\"fa fa-phone fa-fw\" role=\"img\" aria-label=\"Phone\" title=\"Phone\"/>"
+msgstr "<i class=\"fa fa-phone fa-fw\" role=\"img\" aria-label=\"Téléphone\" title=\"Téléphone\"/>"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "<span>Invoicing Address:</span>"
+msgstr "<span>Adresse de Facturation&nbsp;:</span>"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "<span>Invoicing and Shipping Address:</span>"
+msgstr "<span>Adresse de Facturation et de Livraison&nbsp;:</span>"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "<span>Shipping Address:</span>"
+msgstr "<span>Adresse de Livraison&nbsp;:</span>"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "<strong class=\"mr16\">Subtotal Tax Excl.</strong>"
+msgstr "<strong class=\"mr16\">Sous-Total HT</strong>"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "<strong class=\"mr16\">Subtotal Tax Incl.</strong>"
+msgstr "<strong class=\"mr16\">Sous-Total TTC</strong>"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "<strong>Customer Reference:</strong>"
+msgstr "<strong>Référence client&nbsp;:</strong>"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "<strong>Customer Signature</strong>"
+msgstr "<strong>Signature Client</strong>"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "<strong>Customer:</strong>"
+msgstr "<strong>Client&nbsp;:</strong>"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "<strong>Expiration:</strong>"
+msgstr "<strong>Date de validité&nbsp;:</strong>"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "<strong>Payment Terms:</strong>"
+msgstr "<strong>Conditions de règlement&nbsp;:</strong>"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "<strong>Salesperson Signature</strong>"
+msgstr "<strong>Signature Vendeur</strong>"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "<strong>Salesperson:</strong>"
+msgstr "<strong>Vendeur&nbsp;:</strong>"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "<strong>Technical Visit Date:&amp;nbsp;</strong>"
+msgstr "<strong>Date de Visite Technique&nbsp;:&amp;nbsp;</strong>"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "<strong>Technical Visit Date:</strong>"
+msgstr "<strong>Date de Visite Technique&nbsp;:</strong>"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "<strong>Your Reference:</strong>"
+msgstr "<strong>Votre Référence&nbsp;:</strong>"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Address Title..."
+msgstr "Titre adresse..."
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Address insert"
+msgstr "Encart adresse"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_address_title
+msgid "Address title"
+msgstr "Titre adresse"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid ""
+"Allow to define invoicing address specific title, else it displays "
+"\"Invoicing Address:\""
+msgstr ""
+"Permet de définir un titre d'adresse de facturation spécifique, sinon affiche "
+"\"Adresse de Facturation&nbsp;:\""
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid ""
+"Allow to define invoicing and shipping address specific title, else it "
+"displays \"Invoicing and Shipping Address:\""
+msgstr ""
+"Permet de définir un titre d'adresse de facturation et de livraison spécifique, sinon affiche "
+"displays \"Adresse de Facturation et de Livraison&nbsp;\""
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid ""
+"Allow to define shipping address specific title, else it displays \"Shipping"
+" Address:\""
+msgstr ""
+"Permet de définir un titre d'adresse de livraison spécifique, sinon affiche "
+"displays \"Adresse de Livraison&nbsp;\""
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid ""
+"Allows you to load a signature image in the user form view. This image will "
+"be used as a pre-filled signature in the PDF documents."
+msgstr ""
+"Permet de charger une image de signature dans la vue du formulaire utilisateur. Cette image sera "
+"utilisée comme signature pré-remplie dans les documents PDF."
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Apply"
+msgstr "Appliquer"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_section_bg_color
+msgid "Background color"
+msgstr "Couleur de fond"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,help:of_sale_report_setting.field_res_config_settings__pdf_section_bg_color
+msgid "Background color of the section headings. Default is white."
+msgstr "Couleur de fond des titres de section. La valeur par défaut est blanc."
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: of_sale_report_setting
+#: model:ir.model,name:of_sale_report_setting.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de config"
+
+#. module: of_sale_report_setting
+#. odoo-python
+#: code:addons/of_sale_report_setting/models/res_config_settings.py:0
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+#, python-format
+msgid "Configure PDF printing"
+msgstr "Configurer l'impression PDF"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_address_contact_name
+msgid "Contact's name"
+msgstr "Nom du contact"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_address_contact_parent_name
+msgid "Contact's parent name"
+msgstr "Nom du parent du contact"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_customer_email
+msgid "Customer Email"
+msgstr "Courriel Client"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_customer_fax
+msgid "Customer Fax"
+msgstr "Fax Client"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_customer_info
+msgid "Customer Information"
+msgstr "Informations Client"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_customer_mobile
+msgid "Customer Mobile"
+msgstr "Mobile Client"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_customer_phone
+msgid "Customer Phone"
+msgstr "Téléphone Client"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_customer_ref_info
+msgid "Customer reference"
+msgstr "Référence Client"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_customer_signature
+msgid "Customer signature"
+msgstr "Signature Client"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_technical_visit_info
+msgid "Technical visit date"
+msgstr "Date de visite technique"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_view_form
+msgid "Define fields to display"
+msgstr "Définir les champs à afficher"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_sale_order_line__of_display_name
+msgid "Display name for reports"
+msgstr "Nom affiché pour les rapports"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays signature insert in the report"
+msgstr "Affiche l'encart signature dans le rapport"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the contact's fax in the address insert"
+msgstr "Affiche le numéro de fax du contact dans l'encart d'adresse"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the contact's mail in the address insert"
+msgstr "Affiche le courriel du contact dans l'encart d'adresse"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the contact's mobile in the address insert"
+msgstr "Affiche le numéro de mobile du contact dans l'encart d'adresse"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the contact's name in the address insert"
+msgstr "Affiche le nom du contact dans l'encart d'adresse"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the contact's parent name in the address insert"
+msgstr "Affiche le nom du parent du contact dans l'encart d'adresse"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the contact's phone in the address insert"
+msgstr "Affiche le numéro de téléphone du contact dans l'encart d'adresse"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the customer information"
+msgstr "Affiche les informations client"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the customer reference in top information block"
+msgstr "Affiche la référence client dans les informations du haut"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid ""
+"Displays the customer signature insert"
+msgstr ""
+"Affiche l'encart signature client"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the different address labels"
+msgstr "Affiche les différents libellés d'adresse"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the email in the customer information"
+msgstr ""
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the email in the salesperson information"
+msgstr "Affiche le courriel dans les informations vendeur"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the fax number in the customer information"
+msgstr "Affiche le numéro de fax dans les informations client"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the fax number in the salesperson information"
+msgstr "Affiche le numéro de fax dans les informations vendeur"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the mobile number in the customer information"
+msgstr "Affiche le numéro de mobile dans les informations client"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the mobile number in the salesperson information"
+msgstr "Affiche le numéro de mobile dans les informations vendeur"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the name in the salesperson information"
+msgstr "Affiche le nom dans les informations vendeur"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the order reference in top information block"
+msgstr "Affiche la référence commande dans les informations du haut"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the payment terms in top information block"
+msgstr "Affiche les conditions de règlement dans les informations du haut"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the phone number in the customer information"
+msgstr "Affiche le numéro de téléphone dans les informations client"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the phone number in the salesperson information"
+msgstr "Affiche le numéro de téléphone dans les informations vendeur"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the product reference in the order lines on the report"
+msgstr "Affiche la référence article dans les lignes de commande sur la rapport"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the salesman signature insert"
+msgstr "Affiche l'encart signature vendeur"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the salesperson information"
+msgstr "Affiche les informations vendeur"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the tax excluded prices on the report"
+msgstr "Affiche les montants HT sur le rapport"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the tax included prices on the report"
+msgstr "Affiche les montants TTC sur le rapport"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid ""
+"Displays the technical visit date in top information block, else it will be "
+"displayed at the end of the report"
+msgstr "Affiche la date de visite technique dans les informations du haut, sinon elle sera affichée à la fin du rapport"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the titles in the address insert"
+msgstr "Affiche les civilités dans l'encart adresse"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Displays the validity date in top information block"
+msgstr "Affiche la date de validité dans les informations du haut"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_address_contact_email
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Email"
+msgstr "Courriel"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_address_contact_fax
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Fax"
+msgstr "Fax"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_section_font_color
+msgid "Font color"
+msgstr "Couleur du texte"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,help:of_sale_report_setting.field_res_config_settings__pdf_section_font_color
+msgid "Font color of the section headings. Default is black."
+msgstr "Couleur du texte des titres de section. La valeur par défaut est noir."
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,help:of_sale_report_setting.field_sale_order__of_technical_visit_date
+msgid "If filled, it will be displayed in quotation/order report"
+msgstr "Si renseignée, apparaîtra dans le rapport devis/commande"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_invoicing_address_specific_title
+msgid "Invoicing Address Specific Title"
+msgstr "Titre spécifique d'adresse de facturation"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_invoicing_address_specific_title_label
+msgid "Invoicing Address Specific Title Label"
+msgstr "Libellé du titre spécifique d'adresse de facturation"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_invoicing_shipping_address_specific_title
+msgid "Invoicing and Shipping Address Specific Title"
+msgstr "Titre spécifique d'adresse de facturation et de livraison"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_invoicing_shipping_address_specific_title_label
+msgid "Invoicing and Shipping Address Specific Title Label"
+msgstr "Libellé du titre spécifique d'adresse de facturation et de livraison"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_address_contact_mobile
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Mobile"
+msgstr "Mobile"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "Order Date:"
+msgstr "Date de commande&nbsp;:"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Order lines"
+msgstr "Lignes de commande"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_order_ref_info
+msgid "Order reference"
+msgstr "Référence commande"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Other information"
+msgstr "Autres informations"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_view_form
+msgid "PDF Printing"
+msgstr "Impression PDF"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_payment_term_info
+msgid "Payment terms"
+msgstr "Conditions de règlement"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_address_contact_phone
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Phone"
+msgstr "Téléphone"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__group_pdf_prefill_vendor_signature
+msgid "Pre-filled salesman signature"
+msgstr "Signature vendeur pré-remplie"
+
+#. module: of_sale_report_setting
+#: model:res.groups,name:of_sale_report_setting.group_of_pdf_prefill_vendor_signature
+msgid "Pre-populated salesman signature group"
+msgstr "Groupe signature vendeur pré-remplie"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_price_taxexcl
+msgid "Price Tax Excl."
+msgstr "Montant HT"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_price_taxinc
+msgid "Price Tax Incl."
+msgstr "Montant TTC"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "Price Tax excl."
+msgstr "Montant HT"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "Price Tax incl."
+msgstr "Montant TTC"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_product_reference
+msgid "Product reference"
+msgstr "Référence article"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "Quotation Date:"
+msgstr "Date de devis&nbsp;:"
+
+#. module: of_sale_report_setting
+#: model:ir.model,name:of_sale_report_setting.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_sale_report_setting
+#: model:ir.model,name:of_sale_report_setting.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de bons de commande"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_vendor_signature
+msgid "Salesman signature"
+msgstr "Signature vendeur"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_users__of_vendor_signature
+msgid "Salesman signature in sales report"
+msgstr "Signature vendeur dans le rapport ventes"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_salesperson_email
+msgid "Salesperson Email"
+msgstr "Courriel vendeur"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_salesperson_fax
+msgid "Salesperson Fax"
+msgstr "Fax vendeur"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_salesperson_info
+msgid "Salesperson Information"
+msgstr "Informations vendeur"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_salesperson_mobile
+msgid "Salesperson Mobile"
+msgstr "Mobile vendeur"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_salesperson_name
+msgid "Salesperson Name"
+msgstr "Nom vendeur"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_salesperson_phone
+msgid "Salesperson Phone"
+msgstr "Téléphone vendeur"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Sections"
+msgstr "Sections"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_shipping_address_specific_title
+msgid "Shipping Address Specific Title"
+msgstr "Titre spécifique d'adresse de livraison"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_shipping_address_specific_title_label
+msgid "Shipping Address Specific Title Label"
+msgstr "Libellé du titre spécifique d'adresse de livraison"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid ""
+"Signature comment positioned below the titles \"Salesman signature\" and "
+"\"Customer signature\""
+msgstr "Commentaire de signature placé sous les titres \"Signature vendeur\" et \"Signature client\""
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_signature_text
+msgid "Signature statement"
+msgstr "Mention de signature"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_signature_text_label
+msgid "Signature statement label"
+msgstr "Libellé de la mention de signature"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Signature text..."
+msgstr "Texte de signature..."
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_signatures_insert
+msgid "Signatures"
+msgstr "Signatures"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_sale_order__of_technical_visit_date
+msgid "Technical Visit Date"
+msgstr "Date de visite technique"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_address_contact_titles
+msgid "Titles"
+msgstr "Civilités"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_sale_order_line__of_price_unit_taxexcl
+msgid "Unit Price Tax excl"
+msgstr "Prix/U HT"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "Unit Price Tax excl."
+msgstr "Prix/U HT"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_sale_order_line__of_price_unit_taxinc
+msgid "Unit Price Tax incl"
+msgstr "Prix/U TTC"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "Unit Price Tax incl."
+msgstr "Prix/U TTC"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,help:of_sale_report_setting.field_sale_order_line__of_price_unit_taxinc
+msgid "Unit price with taxes"
+msgstr "Prix unitaire TTC"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,help:of_sale_report_setting.field_sale_order_line__of_price_unit_taxexcl
+msgid "Unit price without taxes"
+msgstr "Prix unitaire HT"
+
+#. module: of_sale_report_setting
+#: model:ir.model,name:of_sale_report_setting.model_res_users
+msgid "User"
+msgstr "Utilisateur"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_validity_info
+msgid "Validity date"
+msgstr "Date de validité"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Will be also applied on the invoices."
+msgstr "Sera également appliquée aux factures"

@@ -93,7 +93,6 @@ Droits utilisateurs:
         'python': ['pdfminer', 'pypdftk', 'pyPdf'],
     },
     'data': [
-        'data/assets.xml',
         'security/of_sale_security.xml',
         'views/of_sale_view.xml',
         'views/sale_config_setting_views.xml',
@@ -106,7 +105,6 @@ Droits utilisateurs:
         'wizards/of_sale_order_confirmation_views.xml',
         'wizards/of_sale_order_add_quote_views.xml',
         'wizards/of_sale_order_verification_views.xml',
-        'wizards/sale_set_printing_params_view.xml',
     ],
     'installable': True,
     'application': False,

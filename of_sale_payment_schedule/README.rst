@@ -7,5 +7,6 @@ OF sale payment schedule
 * Ajout d'un échéancier de paiements visible dans le devis/bon de commande client.
 
   L'échéancier se calcule en fonction des conditions de règlement du devis/bon de commande client.
+* Possibilité d'afficher l'échéancier dans le rapport Devis/Commande
 
 

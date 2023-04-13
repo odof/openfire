@@ -1,7 +1,5 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import itertools
-import json
 from odoo import models, fields, api, _
 from odoo.addons.sale.models.sale import SaleOrderLine as SOL
 from odoo.addons.sale.models.sale import SaleOrder as SO
@@ -46,96 +44,6 @@ class SaleOrder(models.Model):
     _name = 'sale.order'
     _inherit = ['sale.order', 'of.documents.joints']
 
-    def pdf_payment_schedule(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_payment_schedule')
-
-    def pdf_address_contact_parent_name(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_address_contact_parent_name')
-
-    def pdf_address_contact_titles(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_address_contact_titles')
-
-    def pdf_address_contact_name(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_address_contact_name')
-
-    def pdf_address_contact_phone(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_address_contact_phone') or False
-
-    def pdf_address_contact_mobile(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_address_contact_mobile') or False
-
-    def pdf_address_contact_fax(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_address_contact_fax') or False
-
-    def pdf_address_contact_email(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_address_contact_email') or False
-
-    def pdf_technical_visit_insert(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_technical_visit_insert')
-
-    def pdf_validity_insert(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_validity_insert')
-
-    def pdf_address_title(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_address_title')
-
-    def pdf_shipping_address_specific_title(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_shipping_address_specific_title') or False
-
-    def pdf_commercial_insert(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_commercial_insert')
-
-    def pdf_commercial_contact(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_commercial_contact')
-
-    def pdf_commercial_email(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_commercial_email')
-
-    def pdf_customer_insert(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_customer_insert')
-
-    def pdf_customer_phone(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_customer_phone')
-
-    def pdf_customer_mobile(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_customer_mobile')
-
-    def pdf_customer_fax(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_customer_fax')
-
-    def pdf_customer_email(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_customer_email')
-
-    def pdf_payment_term_insert(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_payment_term_insert')
-
-    def pdf_customer_ref_insert(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_customer_ref_insert')
-
-    def pdf_taxes_detail(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_taxes_detail')
-
-    def pdf_signatures_insert(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_signatures_insert')
-
-    def pdf_vendor_signature(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_vendor_signature')
-
-    def pdf_prefill_vendor_signature(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_prefill_vendor_signature')
-
-    def pdf_customer_signature(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_customer_signature')
-
-    def pdf_signature_text(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_signature_text')
-
-    def get_color_section(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_section_bg_color') or '#FFFFFF'
-
-    def get_color_font(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_section_font_color') or "#000000"
-
     def _search_of_to_invoice(self, operator, value):
         # Récupération des bons de commande non entièrement livrés
         self._cr.execute("SELECT DISTINCT order_id\n"
@@ -177,9 +85,6 @@ class SaleOrder(models.Model):
         'res.partner.category', related='partner_id.category_id', string=u"Étiquettes client")
     of_client_view = fields.Boolean(string='Vue client/vendeur')
 
-    of_date_vt = fields.Date(
-        string="Date visite technique", help=u"Si renseignée apparaîtra sur le devis / Bon de commande"
-    )
     of_force_invoice_status = fields.Selection([
         ('invoiced', 'Fully Invoiced'),
         ('no', 'Nothing to Invoice')], string=u"Forcer état de facturation",
@@ -748,36 +653,6 @@ class SaleOrder(models.Model):
         }
 
     @api.multi
-    def of_get_taxes_display(self):
-        tax_obj = self.env['account.tax']
-        tax_grouped = []
-        round_curr = self.currency_id.round
-        for line in self.order_line:
-            price_unit = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-
-            taxes = line.tax_id.compute_all(price_unit, self.currency_id, line.product_uom_qty,
-                                            product=line.product_id, partner=self.partner_shipping_id)['taxes']
-            for val in taxes:
-                key = val['id']
-                tax = tax_obj.browse(key)
-                for values in tax_grouped:
-                    if values['id'] == key:
-                        values['amount'] += val['amount']
-                        values['base'] += round_curr(val['base'])
-                        break
-                else:
-                    tax_grouped.append({
-                        'id': key,
-                        'name': tax.description,
-                        'amount': val['amount'],
-                        'base': round_curr(val['base'])
-                    })
-        for values in tax_grouped:
-            values['base'] = round_curr(values['base'])
-            values['amount'] = round_curr(values['amount'])
-        return tax_grouped
-
-    @api.multi
     def action_quotation_send(self):
         mail_subtype = self.env.ref('of_base.mail_message_subtype_mail', raise_if_not_found=False)
         action = super(SaleOrder, self).action_quotation_send()
@@ -810,12 +685,6 @@ class SaleOrderLine(models.Model):
     of_price_unit_display = fields.Float(related='price_unit', string=u"Prix unitaire", readonly=True)
     of_product_forbidden_discount = fields.Boolean(string=u"Remise interdite pour cet article")
 
-    of_price_unit_ht = fields.Float(
-        string='Unit Price excl', compute='_compute_of_price_unit', help="Unit price without taxes", store=True
-    )
-    of_price_unit_ttc = fields.Float(
-        string='Unit Price incl', compute='_compute_of_price_unit', help="Unit price with taxes", store=True
-    )
     of_marge_pc = fields.Float(
         compute='_compute_of_marge', string=u"Marge %", store=True)
 
@@ -896,19 +765,6 @@ class SaleOrderLine(models.Model):
             ]
             attachment_ids = attachment_obj.search(domain)
             line.of_product_attachment_computed_ids = attachment_ids
-
-    @api.depends('price_unit', 'order_id.currency_id', 'order_id.partner_shipping_id', 'product_id',
-                 'price_subtotal', 'product_uom_qty')
-    def _compute_of_price_unit(self):
-        """
-        @ TODO: à fusionner avec _compute_amount
-        :return:
-        """
-        for line in self:
-            taxes = line.tax_id.compute_all(line.price_unit, line.order_id.currency_id, 1,
-                                            product=line.product_id, partner=line.order_id.partner_shipping_id)
-            line.of_price_unit_ht = taxes['total_excluded']
-            line.of_price_unit_ttc = taxes['total_included']
 
     @api.depends('product_id', 'product_id.invoice_policy',
                  'order_id', 'order_id.of_invoice_policy',
@@ -1074,23 +930,6 @@ class SaleOrderLine(models.Model):
     def _onchange_of_product_forbidden_discount(self):
         if self.of_product_forbidden_discount and self.product_id:
             self.price_unit = self.product_id.list_price
-
-    def of_get_line_name(self):
-        self.ensure_one()
-        # inhiber l'affichage de la référence
-        afficher_ref = self.env['ir.values'].get_default('sale.config.settings', 'pdf_product_reference')
-        le_self = self.with_context(
-            lang=self.order_id.partner_id.lang,
-            partner=self.order_id.partner_id.id,
-        )
-        name = le_self.name
-        if not afficher_ref:
-            if name.startswith("["):
-                splitted = name.split("]")
-                if len(splitted) > 1:
-                    splitted.pop(0)
-                    name = ']'.join(splitted).strip()
-        return name.split("\n")  # utilisation t-foreach dans template qweb
 
     def _write(self, vals):
         for field in vals:
