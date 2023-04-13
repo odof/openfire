@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+
+    <t t-extend="X2ManyControlPanel">
+        <t t-jquery=".o_x2m_control_panel" t-operation="prepend">
+            <div class="o_cp_searchview"/>
+            <div class="btn-group o_search_options"/>
+        </t>
+    </t>
+
+</templates>

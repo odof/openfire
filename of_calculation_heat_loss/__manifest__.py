@@ -26,6 +26,7 @@ Gestion du calcul de déperdition de chaleur
         'data/of_calculation_construction_date.xml',
         'data/of_calculation_department.xml',
         'hooks/hook.xml',
+        'views/assets.xml',
         'views/of_calculation_heat_loss_views.xml',
         'views/of_parc_installe_views.xml',
         'views/sale_views.xml',

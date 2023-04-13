@@ -59,8 +59,8 @@
                         </group>
                     </group>
                     <group>
-                        <group class="oe_right" style="width: 30% !important;">
-                            <button string="Calculer" name="button_compute_estimated_power" type="object" class="oe_highlight mb16" colspan="2"/>
+                        <group class="oe_right group_estimated_power">
+                            <button string="Calculer" name="button_compute_estimated_power" type="object" class="btn btn-sm btn-primary mb16" colspan="2"/>
                             <label for="estimated_power_text" string="Déperdition de chaleur" class="oe_highlight"
                                    style="padding: 10px; 1px solid blue !important;"/>
                             <field name="estimated_power_text" nolabel="1" style="font-size: 32px; border:"/>
@@ -74,9 +74,10 @@
                         Le calcul de puissance est une estimation. OpenFire ne peut être tenu responsable des conséquences de son utilisation
                     </i>
                     <notebook>
-                        <page string="Appareils compatibles">
-                            <field name="product_ids">
-                                <tree default_order="of_puissance_nom_flo">
+                        <page string="Appareils">
+                            <separator string="Appareils compatibles" name="compatible"/>
+                            <field name="product_ids" context="{'display_search_view': 1, 'validate_function': 'action_select_products', 'auto_open': 0}">
+                                <tree default_order="of_puissance_nom_flo" editable="bottom">
                                     <field name="brand_id"/>
                                     <field name="categ_id"/>
                                     <field name="name"/>
