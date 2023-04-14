@@ -9,4 +9,16 @@
         </xpath>
     </template>
 
+    <record id="stock_picking_view_search" model="ir.ui.view">
+        <field name="name">of.website.portal.carrier.stock.picking.internal.search</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_internal_search" />
+        <field name="arch" type="xml">
+            <xpath expr="//filter[last()]" position="after">
+                <separator/>
+                <filter name="of_validated_by_carrier" string="Validé par le transporteur" domain="[('of_validated_by_carrier','=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>

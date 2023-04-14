@@ -175,6 +175,9 @@
                 <attribute name="context" remove="}" separator="}"/>
                 <attribute name="context" add="'show_only_default_code': True,}"/>
             </xpath>
+            <xpath expr="//field[@name='pack_operation_product_ids']/tree" position="inside">
+                <button name="print_label" string="Imprimer" type="object" icon="fa-print"/>
+            </xpath>
         </field>
     </record>
 

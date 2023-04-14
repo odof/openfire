@@ -87,6 +87,30 @@
                     </div>
                     <div class="collapse navbar-collapse" id="oe-help-navbar-collapse">
                         <ul class="nav navbar-nav o_portal_submenu">
+                            <li t-if="'contract' in tabs">
+                                <a href="/my/contracts">Contracts</a>
+                            </li>
+                            <li t-if="'quotation' in tabs">
+                                <a href="/my/quotes">Quotes</a>
+                            </li>
+                            <li t-if="'order' in tabs">
+                                <a href="/my/orders">Orders</a>
+                            </li>
+                            <li t-if="'invoice' in tabs">
+                                <a href="/my/invoices">Invoices</a>
+                            </li>
+                            <li t-if="'delivery' in tabs">
+                                <a href="/my/deliveries">Livraisons</a>
+                            </li>
+                            <li t-if="'receipt' in tabs">
+                                <a href="/my/receipts">Réceptions</a>
+                            </li>
+                            <li t-if="'service' in tabs">
+                                <a href="/my/services">Demande d'intervention</a>
+                            </li>
+                            <li groups="base.group_portal,base.group_user">
+                                <a href="/my/documents">Mes documents</a>
+                            </li>
                         </ul>
                     </div>
                 </div>
