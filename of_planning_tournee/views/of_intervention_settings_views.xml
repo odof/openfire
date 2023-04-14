@@ -22,6 +22,13 @@
                         attrs="{'invisible': [('enable_quick_scheduling', '=', False)], 'required': [('enable_quick_scheduling', '=', True)]}"/>
                 </group>
             </xpath>
+            <xpath expr="//group[@name='planning']" position="after">
+                <group name="tour" string="Tour">
+                    <field name="nbr_days_tour_creation" />
+                    <field name="tour_employee_ids" widget="many2many_tags"/>
+                    <field name="tour_day_ids" widget="many2many_tags"/>
+                </group>
+            </xpath>
         </field>
     </record>
 

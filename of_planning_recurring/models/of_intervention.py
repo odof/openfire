@@ -555,6 +555,16 @@ class OFPlanningIntervention(models.Model):
         return super(OFPlanningIntervention, self)._name_search(
             name=name, args=args, operator=operator, limit=limit, name_get_uid=name_get_uid)
 
+    def _is_recurrency_changed(self, vals):
+        """ Helper function to check if the recurrency has changed.
+        """
+        return self.filtered(lambda r: r.recurrency != vals.get('recurrency')) if 'recurrency' in vals else None
+
+    def _is_active_changed(self, vals):
+        """ Helper function to check if the recurrency has been deactivated.
+        """
+        return self.filtered(lambda r: r.recurrency != vals.get('active')) if 'active' in vals else None
+
     @api.multi
     def write(self, values):
         if not self.user_has_groups('of_planning_recurring.of_group_planning_intervention_recurring'):
@@ -573,6 +583,13 @@ class OFPlanningIntervention(models.Model):
 
         if values.get('recurrency'):
             values['verif_dispo'] = False
+
+        # get interventions for which the recurrency has changed
+        records_recurrency_changed = self._is_recurrency_changed(values)
+
+        # get deactivated interventions
+        records_active_changed = self._is_active_changed(values)
+
         # process events one by one
         for meeting in self:
             # special write of complex IDS
@@ -596,7 +613,7 @@ class OFPlanningIntervention(models.Model):
                         meeting.with_context(dont_notify=True).detach_recurring_event(values)
 
             real_meetings = self.browse(real_ids)
-            super(OFPlanningIntervention, real_meetings).write(values)
+            result = super(OFPlanningIntervention, real_meetings).write(values)
 
             # set end_date for calendar searching
             if any(field in values
@@ -618,15 +635,74 @@ class OFPlanningIntervention(models.Model):
                 if records_to_unlink:
                     records_to_unlink.with_context(of_force_occ_unlink=True).unlink(can_be_deleted=True)
 
-        return True
+        # if we are changing the recurrency flag, we need to add/remove interventions from tours
+        # limit to the case where we actually change the value
+        if records_recurrency_changed and 'recurrency' in values:
+            recurrency_set_true = records_recurrency_changed.filtered(lambda r: r.recurrency)
+            recurrency_set_true and recurrency_set_true._detach_interventions_from_tour()
+            recurrency_set_false = records_recurrency_changed.filtered(lambda r: not r.recurrency)
+            recurrency_set_false and recurrency_set_false._attach_interventions_to_tour()
+
+        # if we are deactivating an intervention, we need to remove it from tours
+        if records_active_changed and 'active' in values:  # limit to the case where we actually change the value
+            records_active_changed._detach_interventions_from_tour()
+        return result
 
     def need_recompute_tournee(self, vals):
         return vals.get('rrule') or super(OFPlanningIntervention, self).need_recompute_tournee(vals)
 
     @api.multi
+    def _detach_interventions_from_tour(self):
+        """ Remove interventions from the tours lines where they are attached to.
+        Only tours that are not done and that are in the future are updated.
+        """
+        tours = self.mapped('tournee_ids').filtered(lambda t: t.state != 'done' and t.date >= fields.Date.today())
+        tours.mapped('tour_line_ids').filtered(lambda l: l.intervention_id in self).unlink()
+        tours.action_compute_osrm_data()
+
+    @api.multi
+    def _attach_interventions_to_tour(self):
+        """ Add interventions to the tours lines.
+        Only tours that are not done and that are in the future are updated.
+        """
+        tours = self.mapped('tournee_ids').filtered(lambda t: t.state != 'done' and t.date >= fields.Date.today())
+        tours._populate_tour_lines()
+        tours.action_compute_osrm_data()
+
+    @api.multi
+    def _get_tours_to_update_on_write(self):
+        """ Override to filter out recurring interventions
+
+        :return: recordset of tours to update
+        """
+        return self.filtered(lambda i: i.state != 'cancel' and not i.recurrency).mapped('tournee_ids')
+
+    @api.multi
+    def _get_interventions_geodata_updated(self, vals):
+        """ Inherit to filter out recurring interventions
+        """
+        interventions = super(OFPlanningIntervention, self)._get_interventions_geodata_updated(vals)
+        return interventions.filtered(lambda i: not i.recurrency)
+
+    @api.multi
+    def _get_interventions_date_changed(self, vals):
+        """ Inherit to filter out recurring interventions
+        """
+        interventions = super(OFPlanningIntervention, self)._get_interventions_date_changed(vals)
+        return interventions.filtered(lambda i: not i.recurrency)
+
+    @api.multi
+    def _get_interventions_only_hours_changed(self, vals):
+        """ Inherit to filter out recurring interventions
+        """
+        interventions = super(OFPlanningIntervention, self)._get_interventions_only_hours_changed(vals)
+        return interventions.filtered(lambda i: not i.recurrency)
+
+    @api.multi
     def _write(self, vals):
         if not self.user_has_groups('of_planning_recurring.of_group_planning_intervention_recurring'):
             return super(OFPlanningIntervention, self)._write(vals)
+
         # process events one by one
         for meeting in self:
             # special write of complex IDS
@@ -644,9 +720,9 @@ class OFPlanningIntervention(models.Model):
                     real_ids = [real_event_id]
 
             real_meetings = self.browse(real_ids)
-            super(OFPlanningIntervention, real_meetings)._write(vals)
+            result = super(OFPlanningIntervention, real_meetings)._write(vals)
 
-        return True
+        return result
 
     @api.model
     def create(self, values):

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-29 10:57+0000\n"
-"PO-Revision-Date: 2022-07-29 10:57+0000\n"
+"POT-Creation-Date: 2023-01-04 16:07+0000\n"
+"PO-Revision-Date: 2023-01-04 16:07+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -615,7 +615,6 @@ msgstr "Annuler"
 #. module: of_planning
 #: model:ir.ui.view,arch_db:of_planning.of_planning_intervention_filter
 #: model:ir.ui.view,arch_db:of_planning.of_planning_intervention_view_form
-#: selection:of.planning.intervention,state:0
 msgid "Annulé"
 msgstr "Annulé"
 
@@ -653,13 +652,13 @@ msgid "Articles supplémentaires"
 msgstr "Articles supplémentaires"
 
 #. module: of_planning
-#: code:addons/of_planning/models/of_planning_intervention.py:1094
+#: code:addons/of_planning/models/of_planning_intervention.py:1074
 #, python-format
 msgid "Attention /!\\ la date de fin doit être au moins égale à la date de début + la durée"
 msgstr "Attention /!\\ la date de fin doit être au moins égale à la date de début + la durée"
 
 #. module: of_planning
-#: code:addons/of_planning/models/of_planning_intervention.py:1091
+#: code:addons/of_planning/models/of_planning_intervention.py:1071
 #, python-format
 msgid "Attention /!\\ la durée est trop longue considérant les date de début et de fin"
 msgstr "Attention /!\\ la durée est trop longue considérant les date de début et de fin"
@@ -685,7 +684,7 @@ msgid "Au mois"
 msgstr "Au mois"
 
 #. module: of_planning
-#: code:addons/of_planning/models/of_planning_intervention.py:1110
+#: code:addons/of_planning/models/of_planning_intervention.py:1090
 #, python-format
 msgid "Aucun des intervenants sélectionnés ne peut réaliser cette tâche"
 msgstr "Aucun des intervenants sélectionnés ne peut réaliser cette tâche"
@@ -711,6 +710,11 @@ msgid "Before to this"
 msgstr "Before to this"
 
 #. module: of_planning
+#: selection:of.planning.intervention,state:0
+msgid "Being optimized"
+msgstr "En cours d'optimisation"
+
+#. module: of_planning
 #: report:of_planning.attestation_ramonage:0
 msgid "Boisseau"
 msgstr "Boisseau"
@@ -734,7 +738,6 @@ msgstr "Bons de livraisons"
 #. module: of_planning
 #: model:ir.ui.view,arch_db:of_planning.of_planning_intervention_filter
 #: model:ir.ui.view,arch_db:of_planning.of_planning_intervention_view_form
-#: selection:of.planning.intervention,state:0
 msgid "Brouillon"
 msgstr "Brouillon"
 
@@ -764,6 +767,11 @@ msgstr "Calendar Name"
 #: model:ir.ui.view,arch_db:of_planning.of_planning_intervention_view_calendar_with_jump
 msgid "Calendrier"
 msgstr "Calendrier"
+
+#. module: of_planning
+#: selection:of.planning.intervention,state:0
+msgid "Cancelled"
+msgstr "Annulé"
 
 #. module: of_planning
 #: model:ir.ui.view,arch_db:of_planning.of_planning_tache_view_tree
@@ -941,9 +949,13 @@ msgid "Configure Interventions"
 msgstr "Configure Interventions"
 
 #. module: of_planning
+#: selection:of.planning.intervention,state:0
+msgid "Confirmed"
+msgstr "Confirmé"
+
+#. module: of_planning
 #: model:ir.ui.view,arch_db:of_planning.of_planning_intervention_filter
 #: model:ir.ui.view,arch_db:of_planning.of_planning_intervention_view_form
-#: selection:of.planning.intervention,state:0
 msgid "Confirmé"
 msgstr "Confirmé"
 
@@ -1170,6 +1182,16 @@ msgstr "Documents internes"
 #: model:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Documents joints"
 msgstr "Documents joints"
+
+#. module: of_planning
+#: selection:of.planning.intervention,state:0
+msgid "Done"
+msgstr "Réalisé"
+
+#. module: of_planning
+#: selection:of.planning.intervention,state:0
+msgid "Draft"
+msgstr "Brouillon"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template_fi_rdv_duree
@@ -1553,7 +1575,6 @@ msgstr "Imprimer le planning des interventions"
 #. module: of_planning
 #: model:ir.ui.view,arch_db:of_planning.of_planning_intervention_filter
 #: model:ir.ui.view,arch_db:of_planning.of_planning_intervention_view_form
-#: selection:of.planning.intervention,state:0
 msgid "Inachevé"
 msgstr "Inachevé"
 
@@ -1694,7 +1715,7 @@ msgid "LIVRAISONS"
 msgstr "LIVRAISONS"
 
 #. module: of_planning
-#: code:addons/of_planning/models/of_planning_intervention.py:1103
+#: code:addons/of_planning/models/of_planning_intervention.py:1083
 #, python-format
 msgid "La date de début des travaux est en dehors des horaires de travail: \n"
 "%s"
@@ -1702,7 +1723,7 @@ msgstr "La date de début des travaux est en dehors des horaires de travail: \n"
 "%s"
 
 #. module: of_planning
-#: code:addons/of_planning/models/of_planning_intervention.py:1115
+#: code:addons/of_planning/models/of_planning_intervention.py:1095
 #: sql_constraint:of.planning.intervention:0
 #, python-format
 msgid "La durée du RDV d'intervention doit être supérieure à 0!"
@@ -2247,6 +2268,11 @@ msgid "Position fiscale"
 msgstr "Position fiscale"
 
 #. module: of_planning
+#: selection:of.planning.intervention,state:0
+msgid "Postponed"
+msgstr "Reporté"
+
+#. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_of_intervention_settings_company_choice
 msgid "Pour la création des RDVs, demandes d'interventions, SAV et parcs installés."
 msgstr "Pour la création des RDVs, demandes d'interventions, SAV et parcs installés."
@@ -2489,7 +2515,6 @@ msgstr "Rapport"
 #. module: of_planning
 #: model:ir.ui.view,arch_db:of_planning.of_planning_intervention_filter
 #: model:ir.ui.view,arch_db:of_planning.of_planning_intervention_view_form
-#: selection:of.planning.intervention,state:0
 msgid "Reporté"
 msgstr "Reporté"
 
@@ -2528,7 +2553,6 @@ msgstr "Ré-ouvrir"
 #. module: of_planning
 #: model:ir.ui.view,arch_db:of_planning.of_planning_intervention_filter
 #: model:ir.ui.view,arch_db:of_planning.of_planning_intervention_view_form
-#: selection:of.planning.intervention,state:0
 msgid "Réalisé"
 msgstr "Réalisé"
 
@@ -2633,6 +2657,11 @@ msgstr "Sous-total HT"
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_price_total
 msgid "Sous-total TTC"
 msgstr "Sous-total TTC"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_state
+msgid "State"
+msgstr "État"
 
 #. module: of_planning
 #: model:ir.model,name:of_planning.model_stock_move
@@ -2758,6 +2787,11 @@ msgid "Téléphone"
 msgstr "Téléphone"
 
 #. module: of_planning
+#: selection:of.planning.intervention,state:0
+msgid "Unfinished"
+msgstr "Inachevé"
+
+#. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_user_id
 #: model:ir.ui.view,arch_db:of_planning.of_planning_intervention_filter
 msgid "Utilisateur"
@@ -2820,7 +2854,7 @@ msgid "Zip"
 msgstr "Code postal"
 
 #. module: of_planning
-#: code:addons/of_planning/models/of_planning_intervention.py:337
+#: code:addons/of_planning/models/of_planning_intervention.py:333
 #: sql_constraint:of.planning.equipe:0
 #, python-format
 msgid "contrainte vide"
@@ -2992,7 +3026,6 @@ msgstr "Équipes qualifiées"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line_intervention_state
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_state
 msgid "État"
 msgstr "État"
 

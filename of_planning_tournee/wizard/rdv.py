@@ -17,10 +17,10 @@ from odoo.addons.of_planning_tournee.models.of_intervention_settings import SELE
 from odoo.addons.of_planning_tournee.models.of_intervention_settings import SELECTION_SEARCH_MODES
 from odoo.addons.of_utils.models.of_utils import distance_points, hours_to_strs
 from odoo.addons.calendar.models.calendar import calendar_id2real_id
+from odoo.addons.of_planning_tournee.models.of_planning_tournee import WEEKDAYS_TR
+from odoo.addons.of_planning_tournee.models.of_planning_tournee import AM_LIMIT_FLOAT
 
 _logger = logging.getLogger(__name__)
-
-AM_LIMIT_FLOAT = 12.0
 
 
 """
@@ -80,7 +80,7 @@ class OfTourneeRdv(models.TransientModel):
         res['service_id'] = service and service.id or False
         res['origin_intervention_id'] = intervention and intervention.id or False
         if service:
-            res['days_ids'] = [(6, 0, service.jour_ids.ids)]
+            res['day_ids'] = [(6, 0, service.jour_ids.ids)]
         if intervention:
             res['date_recherche_debut'] = fields.Date.today()
         elif service and service.date_next and service.date_next >= date.today().strftime(DEFAULT_SERVER_DATE_FORMAT):
@@ -89,7 +89,7 @@ class OfTourneeRdv(models.TransientModel):
         return res
 
     @api.model
-    def _default_days(self):
+    def _default_day_ids(self):
         # added sudo() to avoid access rights issues from the website (no access for of.planning.tournee)
         days = self.env['of.jours'].sudo().search([('numero', 'in', (1, 2, 3, 4, 5))], order="numero")
         return [day.id for day in days]
@@ -169,9 +169,9 @@ class OfTourneeRdv(models.TransientModel):
         selection=SELECTION_SEARCH_MODES, string="Search mode", required=True,
         default=lambda s: s._default_search_mode())
     search_period_in_days = fields.Integer(string="Search period (in days)", default=7, required=True)
-    days_ids = fields.Many2many(
+    day_ids = fields.Many2many(
         comodel_name='of.jours', relation='wizard_plan_intervention_days_rel', column1='wizard_id',
-        column2='jour_id', string="Days", required=True, default=lambda s: s._default_days())
+        column2='jour_id', string="Days", required=True, default=lambda s: s._default_day_ids())
     orthodromique = fields.Boolean(string=u"Distances à vol d'oiseau")
 
     # Champs de résultat
@@ -192,13 +192,15 @@ class OfTourneeRdv(models.TransientModel):
     res_line_id = fields.Many2one(comodel_name='of.tournee.rdv.line', string=u"Créneau Sélectionné")
     map_line_id = fields.Many2one(comodel_name='of.tournee.rdv.line', string="Line selected for the map preview")
     map_tour_id = fields.Many2one(comodel_name='of.planning.tournee', string="Tour")
-    additional_record = fields.Char(
-        string="Data for the additional record to preview", compute='_compute_additional_record')
-    map_description_html = fields.Html(
-        string="Map description", compute='_compute_intervention_map_data', compute_sudo=True)
-    intervention_map_ids = fields.One2many(
-        comodel_name='of.planning.intervention', compute='_compute_intervention_map_data', string="Interventions",
-        compute_sudo=True)
+    additional_records = fields.Char(
+        string="Data for displaying additional records", compute='_compute_additional_records')
+    additional_record_geojson_data = fields.Text(
+        string="Geojson data",
+        help="Geojson data used to draw the route on the map between the meeting we are trying to plan and "
+        "the previous/next coordinates")
+    map_description_html = fields.Html(string="Map description", compute='_compute_intervention_map_data')
+    map_tour_line_ids = fields.One2many(
+        comodel_name='of.planning.tour.line', compute='_compute_map_tour_line_ids', string="Tour lines")
 
     name = fields.Char(string=u"Libellé", size=64, required=False)
     description = fields.Text(string="Description")
@@ -381,9 +383,9 @@ class OfTourneeRdv(models.TransientModel):
     @api.depends(
         'geo_lat', 'geo_lng', 'service_id', 'service_id.geo_lat', 'service_id.geo_lng', 'origin_intervention_id',
         'origin_intervention_id.geo_lat', 'origin_intervention_id.geo_lng')
-    def _compute_additional_record(self):
-        """Builds a dict to display an additional record on the map, containing information about the field operation
-        to be planned.
+    def _compute_additional_records(self):
+        """Builds a list of dict to display additional records on the map, containing information about the field
+        operation to be planned.
         """
         for wizard in self:
             additionnal_record = wizard.service_id or wizard.origin_intervention_id
@@ -391,12 +393,18 @@ class OfTourneeRdv(models.TransientModel):
                 wizard.additional_record = json.dumps({})
                 continue
 
+            records = []
+            if wizard.map_tour_id:
+                start_marker, end_marker = wizard.map_tour_id._get_start_stop_markers_data_for_tour()
+                records.extend([start_marker, end_marker])
+
             date_preview = \
                 wizard.map_line_id.debut_dt and \
                 fields.Datetime.from_string(wizard.map_line_id.debut_dt).strftime('%Y-%m-%d %H:%M:%S') or False
-            wizard.additional_record = json.dumps({
+            records.append({
                 'id': additionnal_record.id * -1,  # Negative id to avoid conflict with real interventions on the map
                 'map_color_tour': 'green',
+                'iconUrl': 'green',
                 'address_city': wizard.partner_address_city,
                 'partner_name': wizard.partner_id.name,
                 'tour_number': False,
@@ -409,6 +417,16 @@ class OfTourneeRdv(models.TransientModel):
                 'address_zip': wizard.partner_address_zip,
                 'rendered': True
             })
+            wizard.additional_records = json.dumps(records)
+
+    @api.depends('map_tour_id', 'map_line_id')
+    def _compute_map_tour_line_ids(self):
+        # added sudo() to avoid access rights issues from the website (no access for of.planning.tournee)
+        self_sudo = self.sudo()
+        for wizard in self_sudo:
+            tour = wizard.map_tour_id
+            wizard.map_tour_line_ids = tour.map_tour_line_ids if tour else []
+        return True
 
     @api.depends('res_line_id', 'map_tour_id', 'map_line_id')
     def _compute_intervention_map_data(self):
@@ -427,7 +445,7 @@ class OfTourneeRdv(models.TransientModel):
                     "<span style=\"font-size: x-small;font-weight: bold;%s\">Tour of %s, on %s</span>") % (
                         color, line_employee.name, line_day_str)
             wizard.map_description_html = map_description_html
-            wizard.intervention_map_ids = tour.intervention_map_ids if tour else []
+            wizard.map_tour_line_ids = tour.map_tour_line_ids if tour else []
 
     # @api.onchange
     @api.onchange('search_period_in_days')
@@ -533,6 +551,30 @@ class OfTourneeRdv(models.TransientModel):
         start_date = fields.Date.from_string(self.date_recherche_debut) - timedelta(days=1)
         end_date = fields.Date.from_string(self.date_recherche_fin)
         self.search_period_in_days = (end_date - start_date).days
+
+    @api.model
+    def _get_additional_record_geojson_data(self, line):
+        """ Get the additional geojson data for the current intervention we are planning which will be added to the
+        tour route.
+        That data will be used to display the route to go to the intervention on the map within the current tour route.
+        """
+        tour = line.tour_id
+        previous_geo_lat = line.previous_geo_lat
+        previous_geo_lng = line.previous_geo_lng
+        next_geo_lat = line.next_geo_lat
+        next_geo_lng = line.next_geo_lng
+        if not tour or not previous_geo_lat or not previous_geo_lng or not next_geo_lat or not next_geo_lng:
+            return False
+        osrm_base_url = tour and tour._get_osrm_base_url() or False
+        geojson_data = False
+        coords_str = "%s,%s;%s,%s;%s,%s" % (
+            line.previous_geo_lng, line.previous_geo_lat, line.wizard_id.geo_lng, line.wizard_id.geo_lat,
+            line.next_geo_lng, line.next_geo_lat)
+        full_query = '%s/%s?geometries=geojson&steps=true&overview=false' % (osrm_base_url, coords_str)
+        steps, _null, _null = self.env['of.planning.tour.line']._get_osrm_steps_data(full_query)
+        geojson_data = [step['geometry'] for step in steps]
+        geojson_data = geojson_data and json.dumps(geojson_data)
+        return geojson_data
 
     # Actions
     @api.multi
@@ -725,7 +767,7 @@ class OfTourneeRdv(models.TransientModel):
                         u"Aucun des intervenants sélectionnés n'a la compétence pour réaliser cette prestation.")
 
         # Jours du service, jours travaillés des équipes et horaires de travail
-        jours_service = sudo and range(1, 8) or [jour.numero for jour in self.days_ids] or range(1, 8)
+        jours_service = sudo and range(1, 8) or [jour.numero for jour in self.day_ids] or range(1, 8)
 
         jours_feries = self.company_id.get_jours_feries(self.date_recherche_debut, self.date_recherche_fin)
         passer_jours_feries = self.env['ir.values'].get_default('of.intervention.settings', 'ignorer_jours_feries')
@@ -892,7 +934,7 @@ class OfTourneeRdv(models.TransientModel):
                     tournee = tournee_obj.search([
                         ('date', '=', date_recherche_da),
                         ('employee_id', '=', employee.id),
-                        ('secteur_id', '=', secteur_id)], limit=1)
+                        ('sector_ids', 'in', [secteur_id])], limit=1)
                     if not tournee:
                         # si pas de tournée on prend un autre employé
                         continue
@@ -1081,6 +1123,9 @@ class OfTourneeRdv(models.TransientModel):
             self.map_line_id = self.res_line_id.id
             # force the map to be recomputed
             self.sudo()._compute_intervention_map_data()
+            # get the route between the previous/next interventions and the one we are trying to schedule
+            additional_geojson_data = self._get_additional_record_geojson_data(self.res_line_id)
+            self.additional_record_geojson_data = additional_geojson_data
 
     @api.multi
     def _get_service_data(self, mois):
@@ -1191,9 +1236,9 @@ class OfTourneeRdv(models.TransientModel):
         else:
             # Take the tour's departure address if it exists else take the employee's departure address
             # otherwise take the company's departure address
-            if tournee and tournee.address_depart_id and tournee.address_depart_id.geo_lat and \
-                    tournee.address_depart_id.geo_lng:
-                origine = tournee.address_depart_id
+            if tournee and tournee.start_address_id and tournee.start_address_id.geo_lat and \
+                    tournee.start_address_id.geo_lng:
+                origine = tournee.start_address_id
             elif employee.of_address_depart_id and employee.of_address_depart_id.geo_lat and \
                     employee.of_address_depart_id.geo_lng:
                 origine = employee.of_address_depart_id
@@ -1203,9 +1248,9 @@ class OfTourneeRdv(models.TransientModel):
 
             # Take the tour's arrival address if it exists else take the employee's arrival address
             # otherwise take the company's arrival address
-            if tournee and tournee.address_retour_id and tournee.address_retour_id.geo_lat and \
-                    tournee.address_retour_id.geo_lng:
-                arrivee = tournee.address_retour_id
+            if tournee and tournee.return_address_id and tournee.return_address_id.geo_lat and \
+                    tournee.return_address_id.geo_lng:
+                arrivee = tournee.return_address_id
             elif employee.of_address_retour_id and employee.of_address_retour_id.geo_lat and \
                     employee.of_address_retour_id.geo_lng:
                 arrivee = employee.of_address_retour_id
@@ -1275,10 +1320,41 @@ class OfTourneeRdv(models.TransientModel):
 
                 # Créneaux et interventions
                 non_loc = False
-                for line in creneaux:
+                # Get the coordinates of the previous and next interventions to store them in the wizard_line
+                # to be able to draw the route on the map to this slot in the tour's map view
+                previous_line = False
+                previous_geo_lng = origine.geo_lng
+                previous_geo_lat = origine.geo_lat
+                next_geo_lng = arrivee.geo_lng
+                next_geo_lat = arrivee.geo_lat
+                for index, line in enumerate(creneaux):
                     line_geo_lat = line.intervention_id.geo_lat if line.intervention_id else line.wizard_id.geo_lat
                     line_geo_lng = line.intervention_id.geo_lng if line.intervention_id else line.wizard_id.geo_lng
-
+                    if index > 0 and creneaux[index - 1].intervention_id:
+                        previous_line = creneaux[index - 1]
+                        previous_geo_lng = previous_line.intervention_id.geo_lng
+                        previous_geo_lat = previous_line.intervention_id.geo_lat
+                    if not line.intervention_id:  # free slot
+                        if index > 0 and index < len(creneaux) - 1:
+                            next_line = creneaux[index + 1]
+                            index_next = index + 1
+                            while next_line.intervention_id is False:
+                                index_next += 1
+                                next_line = creneaux[index_next]
+                                if index_next >= len(creneaux):
+                                    break
+                            if next_line.intervention_id:
+                                next_geo_lng = next_line.intervention_id.geo_lng
+                                next_geo_lat = next_line.intervention_id.geo_lat
+                        elif index == len(creneaux) - 1:
+                            next_geo_lng = arrivee.geo_lng
+                            next_geo_lat = arrivee.geo_lat
+                        line.write({
+                            'previous_geo_lng': previous_geo_lng,
+                            'previous_geo_lat': previous_geo_lat,
+                            'next_geo_lng': next_geo_lng,
+                            'next_geo_lat': next_geo_lat,
+                        })
                     if line_geo_lat == line_geo_lng == 0:
                         non_loc = True
                         break
@@ -1416,11 +1492,15 @@ class OfTourneeRdvLineMixin(models.AbstractModel):
         """Update the map on the right side of the list view. That should display the tour of the current intervenant"""
         self.ensure_one()
         self.wizard_id.map_tour_id = self.tour_id.id or False
-        # if we are on a delegated object we must use the id of parent object
         self.wizard_id.map_line_id = self.id
         # force the map to be recomputed
         self.wizard_id.sudo()._compute_intervention_map_data()
         self.toggl_map_preview()
+        # update OSRM data of the tour
+        self.tour_id and self.tour_id.sudo()._check_missing_osrm_data()
+        # get the route between the previous/next interventions and the meet we are trying to schedule
+        additional_geojson_data = self.wizard_id._get_additional_record_geojson_data(self)
+        self.wizard_id.additional_record_geojson_data = additional_geojson_data
         return self.wizard_id.action_open_wizard()
 
     @api.multi
@@ -1481,7 +1561,16 @@ class OfTourneeRdvLine(models.TransientModel):
     _description = u"Propositions des RDVs"
     _inherit = ['of.calendar.mixin', 'of.tournee.rdv.line.mixin']
 
-    weekday = fields.Char(string="Weekday", compute='_compute_date_weekday', store=True)
+    weekday = fields.Selection(
+        selection=[
+            ('mon', "Monday"),
+            ('tue', "Tuesday"),
+            ('wed', "Wednesday"),
+            ('thu', "Thursday"),
+            ('fri', "Friday"),
+            ('sat', "Saturday"),
+            ('sun', "Sunday")
+        ], string="Weekday", compute='_compute_date_weekday', store=True)
     tour_id = fields.Many2one(
         comodel_name='of.planning.tournee', string="Tour", compute='_compute_tour_id', store=True)
     date = fields.Date(string="Date", index=True)
@@ -1505,6 +1594,10 @@ class OfTourneeRdvLine(models.TransientModel):
     dist_ortho_prec = fields.Float(string='Dist.tot. (km)', digits=(12, 0), help="distance prec + distance suiv")
     dist_ortho_suiv = fields.Float(string='Dist.tot. (km)', digits=(12, 0), help="distance prec + distance suiv")
     duree = fields.Float(string=u'Durée.tot. (min)', default=-1, digits=(12, 0), help=u"durée prec + durée suiv")
+    previous_geo_lat = fields.Float(string="Latitude of the previous intervention")
+    previous_geo_lng = fields.Float(string="Longitude of the previous intervention")
+    next_geo_lat = fields.Float(string="Latitude of the next intervention")
+    next_geo_lng = fields.Float(string="Longitude of the next intervention")
     duree_prec = fields.Float(string=u'Durée.Prec. (min)', digits=(12, 0))
     duree_suiv = fields.Float(string=u'Durée.Suiv. (min)', digits=(12, 0))
     distance_utile = fields.Float(string=u"Dist. utile (km)", digits=(12, 0))
@@ -1525,25 +1618,13 @@ class OfTourneeRdvLine(models.TransientModel):
     @api.multi
     @api.depends('date')
     def _compute_date_weekday(self):
-        weekdays = {
-            'Monday': _("Monday"),
-            'Tuesday': _("Tuesday"),
-            'Wednesday': _("Wednesday"),
-            'Thursday': _("Thursday"),
-            'Friday': _("Friday"),
-            'Saturday': _("Saturday"),
-            'Sunday': _("Sunday"),
-            # add french keys to avoid error on servers with french language
-            'lundi': _("Monday"),
-            'mardi': _("Tuesday"),
-            'mercredi': _("Wednesday"),
-            'jeudi': _("Thursday"),
-            'vendredi': _("Friday"),
-            'samedi': _("Saturday"),
-            'dimanche': _("Sunday"),
-        }
         for record in self:
-            record.weekday = weekdays[fields.Date.from_string(record.date).strftime('%A')]
+            if not self._context.get('tz'):
+                self = self.with_context(tz='Europe/Paris')
+            day_value = False
+            if record.date:
+                day_value = WEEKDAYS_TR[fields.Date.from_string(record.date).strftime('%A').capitalize()]
+            record.weekday = day_value
 
     # @api.depends
 
