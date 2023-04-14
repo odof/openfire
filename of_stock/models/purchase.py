@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, api
+from odoo import models, api, fields
+from odoo.exceptions import UserError
 
 
 class PurchaseOrder(models.Model):
@@ -16,6 +17,50 @@ class PurchaseOrder(models.Model):
         orders_with_serial_management.generate_serial_number()
         orders_with_serial_management.preassign_serial_number()
         return res
+
+    of_production_lot_ids = fields.One2many(
+        comodel_name='stock.production.lot', string=u"Numéros de série", compute='_compute_of_production_lot_ids')
+    of_production_lot_count = fields.Integer(
+        string=u"Nombre de numéros de série", compute='_compute_of_production_lot_ids')
+    of_display_production_lot = fields.Boolean(
+        string=u"Afficher numéros de série dans les rapports", compute='_compute_of_production_lot_ids')
+
+    @api.multi
+    def _compute_of_production_lot_ids(self):
+        company_ids = self.env['ir.values'].get_default(
+            'stock.config.settings', 'of_serial_management_company_ids') or []
+        for order in self:
+            order.of_production_lot_ids = order.mapped('order_line.of_production_lot_ids')
+            order.of_production_lot_count = len(order.of_production_lot_ids)
+            order.of_display_production_lot = order.of_production_lot_count and order.company_id.id in company_ids
+
+    @api.onchange('picking_type_id')
+    def _onchange_picking_type_id(self):
+        self.of_transporter_id = self.picking_type_id.warehouse_id.partner_id.id
+
+    @api.multi
+    def action_view_production_lot(self):
+        action = self.env.ref('stock.action_production_lot_form')
+        result = action.read()[0]
+
+        if len(self.of_production_lot_ids) > 1:
+            result['domain'] = [('id', 'in', self.of_production_lot_ids._ids)]
+        elif len(self.of_production_lot_ids) == 1:
+            res = self.env.ref('stock.view_production_lot_form', False)
+            result['views'] = [(res and res.id or False, 'form')]
+            result['res_id'] = self.of_production_lot_ids and self.of_production_lot_ids[0] or False
+        return result
+
+    @api.multi
+    def button_generate_serial_number(self):
+        self.ensure_one()
+        company_ids = self.env['ir.values'].get_default(
+            'stock.config.settings', 'of_serial_management_company_ids') or []
+        if self.company_id.id in company_ids:
+            self.generate_serial_number()
+        else:
+            raise UserError(
+                "La génération de numéro de série n'est pas disponible pour la société de cette commande fournisseur.")
 
     @api.multi
     def action_generate_serial_number(self):
@@ -98,3 +143,16 @@ class PurchaseOrder(models.Model):
                                 'qty_todo': 1,
                                 'lot_id': lot.id,
                             })
+
+class PurchaseOrderLine(models.Model):
+    _inherit = 'purchase.order.line'
+
+    of_production_lot_ids = fields.One2many(
+        comodel_name='stock.production.lot', string=u"Numéros de série", compute='_compute_of_production_lot_ids')
+
+    @api.multi
+    def _compute_of_production_lot_ids(self):
+        production_lot_obj = self.env['stock.production.lot']
+        for line in self:
+            line.of_production_lot_ids = production_lot_obj.search(
+                [('name', 'ilike', line.order_id.name), ('product_id', '=', line.product_id.id)])
