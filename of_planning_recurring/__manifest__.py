@@ -14,6 +14,7 @@
      la fonctionnalité s'active dans la configuration des interventions.""",
     'depends': [
         'of_questionnaire',
+        'of_planning_tournee'
     ],
     'init_xml': [],
     'demo_xml': [],

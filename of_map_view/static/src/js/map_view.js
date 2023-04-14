@@ -28,6 +28,16 @@ var TILE_SERVER_ADDR = '//{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png';
 // ratio to get marker width out of marker height
 var H2W_RATIO = 1.64
 
+var ROUTE_AVAILABLE_COLORS = [
+    '#008080', '#ff6347', '#6a5acd', '#2e8b57', '#8b4513', '#ff1493', '#00bfff', '#ff4500', '#ff8c00',
+    '#36dee6', '#d23d56', '#61c26e', '#c36cc8', '#9bb03f', '#6678dc', '#d49c3b', '#543789', '#45bc8d',
+    '#c9467e', '#6a8c3e', '#852768', '#a67e3a', '#8687d0', '#c35d2f', '#d774b3', '#882f1c', '#e07c60',
+    '#0066cc', '#ff0000', '#00ff00', '#0000ff', '#ff00ff', '#00ffff', '#ffff00', '#d2691e', '#7cfc00',
+    '#b44f65', '#bf5055'];
+var DEFAULT_POLYLINE_COLOR = '#0066cc';
+var DEFAULT_TOUR_START_STOP_COLOR = '#333333';
+var DEFAULT_ADDITIONNAL_RECORD_COLOR = '#25aa22';
+
 var Class = core.Class;
 var _t = core._t;
 var _lt = core._lt;
@@ -84,15 +94,23 @@ var MapView = View.extend({
         this.lng_field = this.fields_view.arch.attrs.longitude_field;
         this.number_field = this.fields_view.arch.attrs.number_field;
         this.hide_pager = this.fields_view.arch.attrs.hide_pager || '0';
+        this.geojson_data = this.fields_view.arch.attrs.geojson_data || '0';
+        this.endpoint_geojson_data = this.fields_view.arch.attrs.endpoint_geojson_data;
         this.name = "" + this.fields_view.arch.attrs.string;
         this.legend_context = JSON.parse(this.fields_view.arch.attrs.legend_context || "{}");
         this.fields = this.fields_view.fields;
         this.fields_keys = _.keys(this.fields_view.fields);
-        if (this.dataset.get_context().eval().additional_record) {
+        if (this.dataset.get_context().eval().additional_records) {
             // Data that we want to display on the map with a fake record marker.
-            this.additional_record = JSON.parse(this.dataset.get_context().eval().additional_record);
+            this.additional_records = JSON.parse(this.dataset.get_context().eval().additional_records);
         } else {
-            this.additional_record = false;
+            this.additional_records = false;
+        }
+        if (this.dataset.get_context().eval().additional_record_geojson_data) {
+            // Data that we want to display on the map with fake routes to/from the fake record marker.
+            this.additional_record_geojson_data = JSON.parse(this.dataset.get_context().eval().additional_record_geojson_data);
+        } else {
+            this.additional_record_geojson_data = false;
         }
         this.grouped = undefined;  // later implementation
         this.group_by_field = undefined;  // later implementation
@@ -138,9 +156,14 @@ var MapView = View.extend({
         this.record_options.latitude_field = this.lat_field;
         this.record_options.longitude_field = this.lng_field;
         this.record_options.number_field = this.number_field;
-        this.record_options.additional_record = this.additional_record;
+        this.record_options.geojson_data = this.geojson_data;
+        this.record_options.endpoint_geojson_data = this.endpoint_geojson_data;
+        this.record_options.additional_records = this.additional_records;
+        this.record_options.additional_record_geojson_data = this.additional_record_geojson_data;
         this.record_options.color_field = this.fields_view.arch.attrs.color_field;
+        this.record_options.draw_routes = this.fields_view.arch.attrs.draw_routes || '0';
         this.record_options.connect_markers = this.fields_view.arch.attrs.connect_markers || '0';
+        this.record_options.draw_routes = this.fields_view.arch.attrs.draw_routes || '0';
         var ir_config = new Model('ir.config_parameter');
         ir_config.call('get_param', ['Map_Marker_Size']).then(function(res){
             if (['x-small', 'small', 'medium', 'large'].includes(res)) {
@@ -333,7 +356,7 @@ var MapView = View.extend({
                         self.map.reset_layer_groups();
                     })
                     .then(function() {
-                        if (self.records.length || self.record_options.additional_record !== undefined) {
+                        if (self.records.length || self.record_options.additional_records !== undefined) {
                             // if there is no records to display but there is an additional record, display it
                             self.map.add_layer_group(self.records,self.record_options);
                             self.map.nocontent_displayer.do_hide();
@@ -484,11 +507,15 @@ var MapView = View.extend({
         if (this.dataset.select_id(event.data.id)) {
             this.do_switch_view('form', options);
         } else {
-            // We are using a fake record marker to display an additional record on the map with the other reals
-            // markers based on real records of the O2M. So there is a fake id on the record that is not in the dataset.
+            // We are using fake records markers to display additional records on the map with the other reals
+            // markers based on real records of the O2M. So there are fakes ids on the record that are not in the dataset.
             // We don't want to display the warning message in this case.
-            if (event.target.options.additional_record === undefined || event.target.options.additional_record.id != event.data.id) {
+            if (event.target.options != undefined && (event.target.options.additional_records === undefined || event.target.options.additional_records[0].id != event.data.id)) {
                 this.do_warn("Map: could not find id#" + event.data.id);
+            }
+            // Fake records start and stop markers
+            if (event.target.options === undefined || event.target.record === undefined || (event.target.record.number === 'start' || event.target.record.number === 'stop')) {
+                return;
             }
         }
     },
@@ -1044,9 +1071,18 @@ MapView.LayerGroup = Widget.extend({
                 console.log("undefined record at index ",i);
                 return;
             }
-            var lat, lng, marker, icon, id, number, manyNumbers;
+            var lat, lng, marker, icon, id, number, geojson, endpoint_geojson, manyNumbers;
             lat = this.records[i][this.options.latitude_field];
             lng = this.records[i][this.options.longitude_field];
+            geojson = this.records[i][this.options.geojson_data];
+            endpoint_geojson = this.records[i][this.options.endpoint_geojson_data] || false;
+            latlngs.push([lat, lng]);
+            if (geojson) {
+                geojsonLines.push(JSON.parse(geojson));
+            }
+            if (endpoint_geojson) {
+                endpointGeojsonLines.push(JSON.parse(endpoint_geojson));
+            }
             number = this.records[i][this.options.number_field] || false;
             manyNumbers = number && number.split(',').length > 1 || false;
             if (this.options.custom_icon) {
@@ -1074,7 +1110,6 @@ MapView.LayerGroup = Widget.extend({
             }
             this.the_layer.addLayer(marker);
             marker.set_ids_dict_ref();
-
             this.records[i]["rendered"] = true;
         }else{
             //console.log("mode not yet implemented")
@@ -1093,16 +1128,25 @@ MapView.LayerGroup = Widget.extend({
             this.the_layer.clearLayers();
         }
         this.the_layer = new L.LayerGroup();
-        var lat, lng, marker, icon, id, number, additionnalRecord, manyNumbers;
+        var lat, lng, marker, icon, id, number, geojson, endpoint_geojson, additionnalRecords, manyNumbers;
         var latlngs = [];
+        var geojsonLines = [];
+        var endpointGeojsonLines = [];
         for (var i=0; i<this.records.length; i++) {
-            //console.log(this.records[i]);
             if (this.records[i] == undefined || this.records[i].rendered) {
                 continue;
             }
             lat = this.records[i][this.options.latitude_field];
             lng = this.records[i][this.options.longitude_field];
+            geojson = this.records[i][this.options.geojson_data];
+            endpoint_geojson = this.records[i][this.options.endpoint_geojson_data] || false;
             latlngs.push([lat, lng]);
+            if (geojson) {
+                geojsonLines.push(JSON.parse(geojson));
+            }
+            if (endpoint_geojson) {
+                endpointGeojsonLines.push(JSON.parse(endpoint_geojson));
+            }
             number = this.records[i][this.options.number_field] || false;
             manyNumbers = number && number.split(',').length > 1 || false;
             if (this.options.custom_icon) {
@@ -1133,24 +1177,43 @@ MapView.LayerGroup = Widget.extend({
             this.records[i]["rendered"] = true;
         }
         // Add the current marker if there is an additionnal record
-        additionnalRecord = this.options.additional_record || false;
-        if (additionnalRecord && (additionnalRecord.geo_lat || additionnalRecord.geo_lng)){
-            var options = this.options.icon_options.unselected;
-            // this id is a negative value to avoid conflict with existing ids of real markers
-            options['id'] = 'icon_' + this.options.additional_record.id;
-            options['iconUrl'] = this.get_color_url(false, 'green');
-            options['prefix'] = 'mdi';
-            options['glyph'] = 'radiobox-blank';
-            icon = L.icon.glyph(options);
-            marker = new MapView.Marker([additionnalRecord.geo_lat, additionnalRecord.geo_lng],this,additionnalRecord,{icon:icon});
-            this.the_layer.addLayer(marker);
-            marker.set_ids_dict_ref();
+        additionnalRecords = this.options.additional_records || false;
+        if (additionnalRecords){
+            for (var i = 0; i < this.options.additional_records.length; i++) {
+                let additionnalRecord = this.options.additional_records[i]
+                if (additionnalRecord.geo_lat || additionnalRecord.geo_lng){
+                    var options = this.options.icon_options.unselected;
+                    // this id is a negative value to avoid conflict with existing ids of real markers
+                    number = additionnalRecord.number || false;
+                    options['id'] = 'icon_' + additionnalRecord.id;
+                    options['iconUrl'] = this.get_color_url(false, additionnalRecord.iconUrl);
+                    options['prefix'] = 'mdi';
+                    options['number'] = number;
+                    if (number == 'start' || number == 'stop') {
+                        options['glyph'] = 'home-circle-outline';
+                    } else {
+                        options['glyph'] = 'radiobox-blank';
+                    }
+                    icon = L.icon.glyph(options);
+                    marker = new MapView.Marker([additionnalRecord.geo_lat, additionnalRecord.geo_lng], this, additionnalRecord, {icon:icon});
+                    this.the_layer.addLayer(marker);
+                    marker.set_ids_dict_ref();
+                }
+            }
+            // if we have additionnal record we draw the route between the previous/next marker and the current fake one
+            if (this.options.draw_routes == '1' && this.options.additional_record_geojson_data.length > 0) {
+                this.do_draw_routes_addtionnal_record(this.options.additional_record_geojson_data);
+            }
         }
         if (this.options.auto_addTo) {
             this.the_layer.addTo(this.map.the_map);
             this.visible = true;
             if (this.options.connect_markers == '1' && latlngs.length > 0) {
                 this.do_connect_dot(latlngs);  // Add simple lines between the markers on the map
+            }
+            if (this.options.draw_routes == '1') {
+                // Draw routes get by the geojson data for the endpoint
+                this.do_draw_routes_from_records();
             }
             this.do_show_range(this.map.view.current_min-1,false,true,set_bounds);
         }
@@ -1236,9 +1299,12 @@ MapView.LayerGroup = Widget.extend({
                 break;
             }
         }
-        // If there is a fake marker, we need to check it too
-        if (this.options.additional_record != undefined && this.options.additional_record.id === id) {
-            found = true;
+        // If there are fake markers, we need to check them too
+        for (var i=0; i<this.options.additional_records.length && found === false; i++) {
+            if (this.options.additional_records[i] != undefined && this.options.additional_records[i].id === id) {
+                found = true;
+                break;
+            }
         }
         return found;
     },
@@ -1344,7 +1410,54 @@ MapView.LayerGroup = Widget.extend({
         }
     },
     do_connect_dot: function (latlngs) {
-        L.polyline(latlngs, {color: '#0066cc'}).addTo(this.map.the_map);
+        L.polyline(latlngs, {color: DEFAULT_POLYLINE_COLOR}).addTo(this.map.the_map);
+    },
+    do_draw_routes_from_list: function (geojsonLines, endpoint = false) {
+        // Draw route between markers on the map from a list of geojson lines, can be used to draw a route between markers from a list of geojson lines
+        var self = this;
+        let listAvailableColors = ROUTE_AVAILABLE_COLORS;
+        var lastColor = false;
+        geojsonLines.forEach(function(geoline, index) {
+            let color;
+            if (!endpoint && index > 0) {
+                // If the route is not the startpoint/endpoint, we draw it with a different color
+                color = listAvailableColors[index % listAvailableColors.length];
+                while (color == lastColor) {
+                    color = listAvailableColors[Math.floor(Math.random() * listAvailableColors.length)];
+                }
+                lastColor = color;
+            } else {
+                color = DEFAULT_TOUR_START_STOP_COLOR;
+            }
+            L.geoJSON(geoline, {'color': color}).addTo(self.map.the_map);
+        });
+    },
+    do_draw_routes_addtionnal_record: function (geojsonLines) {
+        var self = this;
+        geojsonLines.forEach(function(geoline) {
+            L.geoJSON(geoline, {'color': DEFAULT_ADDITIONNAL_RECORD_COLOR}).addTo(self.map.the_map);
+        });
+    },
+    do_draw_routes_from_records: function () {
+        // Draw route between markers on the map from records in the layer
+        var self = this;
+        for (var i = 0; i < self.records.length; i++) {
+            if (self.records[i].geojson_data) {
+                let geoline = JSON.parse(self.records[i].geojson_data);
+                let color;
+                if (i > 0) {
+                    // If the route is not the startpoint/endpoint, we draw it with a different color
+                    color = self.records[i].hexa_color;
+                } else {
+                    color = DEFAULT_TOUR_START_STOP_COLOR;
+                }
+                L.geoJSON(geoline, {'color': color}).addTo(self.map.the_map);
+
+            }
+            if (self.records[i].endpoint_geojson_data) {
+                L.geoJSON(JSON.parse(self.records[i].endpoint_geojson_data), {'color': DEFAULT_TOUR_START_STOP_COLOR}).addTo(self.map.the_map);
+            }
+        }
     },
     /**
      *  Override method from Widget.
@@ -1545,8 +1658,13 @@ MapView.Marker = L.Marker.extend({
                 selected_glyph_class = this.group.options.icon_options.selected.prefix + "-" + this.group.options.icon_options.selected.glyph;
                 unselected_glyph_class = this.group.options.icon_options.unselected.prefix + "-" + this.group.options.icon_options.unselected.glyph;
             } else {  // MDI numeric icon selectors
-                selected_glyph_class = `${this.options.icon.options['prefix']}-${this.group.options.icon_options.selected.glyphPrefix}-${this.options.icon.options['number']}-${this.group.options.icon_options.selected.glyphSuffix}`;
-                unselected_glyph_class = `${this.options.icon.options['prefix']}-${this.group.options.icon_options.unselected.glyphPrefix}-${this.options.icon.options['number']}-${this.group.options.icon_options.unselected.glyphSuffix}`;
+                if (this.options.icon.options['number'] == 'start' || this.options.icon.options['number'] == 'stop') {
+                    selected_glyph_class = this.group.options.icon_options.selected.prefix + '-home-circle';
+                    unselected_glyph_class = this.group.options.icon_options.unselected.prefix + '-home-circle-outline';
+                } else {
+                    selected_glyph_class = `${this.options.icon.options['prefix']}-${this.group.options.icon_options.selected.glyphPrefix}-${this.options.icon.options['number']}-${this.group.options.icon_options.selected.glyphSuffix}`;
+                    unselected_glyph_class = `${this.options.icon.options['prefix']}-${this.group.options.icon_options.unselected.glyphPrefix}-${this.options.icon.options['number']}-${this.group.options.icon_options.unselected.glyphSuffix}`;
+                }
             }
             var $glyph = $(glyph_id);
             if ($glyph.length>0) {

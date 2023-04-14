@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_tournee_view_form" model="ir.ui.view">
+        <field name="name">of.planning.tournee.form.website.booking</field>
+        <field name="model">of.planning.tournee</field>
+        <field name="inherit_id" ref="of_planning_tournee.of_planning_tournee_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='hide_action_buttons']" position="after">
+                <field name="website_intervention" invisible="1"/>
+            </xpath>
+            <xpath expr="//div[@name='geodata_alert']" position="after">
+                <div name="created_from_website_alert" attrs="{'invisible': [('website_intervention', '=', False)]}">
+                    <p class="alert alert-warning">
+                        This tour contains interventions created from the website. You should consider to no optimize the tour because you will risk moving a slot validated by the customer on the website.
+                    </p>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='tour_line_ids']//tree//field[@name='intervention_id']" position="before">
+                <field name="created_from_website" invisible="1"/>
+                <button icon="fa-globe" name="dummy" string="Created from website" attrs="{'invisible': [('created_from_website', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
