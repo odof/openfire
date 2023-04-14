@@ -943,6 +943,10 @@ class StockPackOperation(models.Model):
         return action
     split_lot = action_split_lots
 
+    @api.multi
+    def print_label(self):
+        return self.env['report'].get_action(self.ids, 'of_website_portal_carrier.report_receipt_label')
+
 
 class StockPackOperationLot(models.Model):
     _inherit = 'stock.pack.operation.lot'

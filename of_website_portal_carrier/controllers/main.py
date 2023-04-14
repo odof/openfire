@@ -71,6 +71,9 @@ class WebsiteAccount(website_account):
 
         if action:
             attributes.append('modal=1')
+        else:
+            # On flag le BR comme validé par le transporteur
+            receipt.of_validated_by_carrier = True
         if attributes:
             redirect = '%s?%s' % (redirect, '&'.join(attributes))
 
@@ -121,6 +124,9 @@ class WebsiteAccount(website_account):
                         'lot_id': data['lot_id'].id,
                     })
 
+        # On flag le BR comme validé par le transporteur
+        wizard.pick_id.of_validated_by_carrier = True
+
         # On met à jour le RSE avec les infos de l'utilisateur
         messages = mail_message_obj.search(
             [('model', '=', 'stock.picking'), ('res_id', 'in', [wizard.pick_id.id, backorder.id]),
@@ -136,7 +142,7 @@ class WebsiteAccount(website_account):
                 type='http', auth='user', methods=['POST'], website=True, csrf=False)
     def portal_my_receipt_no_backorder(self, receipt_id, wizard_id, **kw):
         kw.pop('csrf_token')
-        wizard = request.env['stock.backorder.confirmation'].browse(wizard_id)
+        wizard = request.env['stock.backorder.confirmation'].sudo().browse(wizard_id)
         mail_message_obj = request.env['mail.message'].sudo()
         attributes = []
 
@@ -145,9 +151,12 @@ class WebsiteAccount(website_account):
             [('model', '=', 'stock.picking'), ('res_id', '=', wizard.pick_id.id)], order='id desc', limit=1)
 
         try:
-            wizard.sudo().process_cancel_backorder()
+            wizard.process_cancel_backorder()
         except Exception:
             attributes.append('error=1')
+
+        # On flag le BR comme validé par le transporteur
+        wizard.pick_id.of_validated_by_carrier = True
 
         # On met à jour le RSE avec les infos de l'utilisateur
         messages = mail_message_obj.search(
