@@ -1,15 +1,15 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import json
 
-from odoo import models, fields, api
+from odoo import api, fields, models
 
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     of_technical_visit_date = fields.Date(  # TODO: move me to of_sale module when it will migrated
-        string="Technical Visit Date", help=u"If filled, it will be displayed in quotation/order report")
+        string="Technical Visit Date", help=u"If filled, it will be displayed in quotation/order report"
+    )
 
     def pdf_address_title(self):
         return self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_address_title')
@@ -18,8 +18,9 @@ class SaleOrder(models.Model):
         return self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_address_contact_titles')
 
     def pdf_address_contact_parent_name(self):
-        return self.env['ir.config_parameter'].sudo().get_param(
-            'of.sale.report.setting.pdf_address_contact_parent_name')
+        return (
+            self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_address_contact_parent_name')
+        )
 
     def pdf_address_contact_name(self):
         return self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_address_contact_name')
@@ -37,28 +38,46 @@ class SaleOrder(models.Model):
         return self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_address_contact_email')
 
     def pdf_invoicing_address_specific_title(self):
-        return self.env['ir.config_parameter'].sudo().get_param(
-            'of.sale.report.setting.pdf_invoicing_address_specific_title')
+        return (
+            self.env['ir.config_parameter']
+            .sudo()
+            .get_param('of.sale.report.setting.pdf_invoicing_address_specific_title')
+        )
 
     def pdf_invoicing_address_specific_title_label(self):
-        return self.env['ir.config_parameter'].sudo().get_param(
-            'of.sale.report.setting.pdf_invoicing_address_specific_title_label')
+        return (
+            self.env['ir.config_parameter']
+            .sudo()
+            .get_param('of.sale.report.setting.pdf_invoicing_address_specific_title_label')
+        )
 
     def pdf_shipping_address_specific_title(self):
-        return self.env['ir.config_parameter'].sudo().get_param(
-            'of.sale.report.setting.pdf_shipping_address_specific_title')
+        return (
+            self.env['ir.config_parameter']
+            .sudo()
+            .get_param('of.sale.report.setting.pdf_shipping_address_specific_title')
+        )
 
     def pdf_shipping_address_specific_title_label(self):
-        return self.env['ir.config_parameter'].sudo().get_param(
-            'of.sale.report.setting.pdf_shipping_address_specific_title_label')
+        return (
+            self.env['ir.config_parameter']
+            .sudo()
+            .get_param('of.sale.report.setting.pdf_shipping_address_specific_title_label')
+        )
 
     def pdf_invoicing_shipping_address_specific_title(self):
-        return self.env['ir.config_parameter'].sudo().get_param(
-            'of.sale.report.setting.pdf_invoicing_shipping_address_specific_title')
+        return (
+            self.env['ir.config_parameter']
+            .sudo()
+            .get_param('of.sale.report.setting.pdf_invoicing_shipping_address_specific_title')
+        )
 
     def pdf_invoicing_shipping_address_specific_title_label(self):
-        return self.env['ir.config_parameter'].sudo().get_param(
-            'of.sale.report.setting.pdf_invoicing_shipping_address_specific_title_label')
+        return (
+            self.env['ir.config_parameter']
+            .sudo()
+            .get_param('of.sale.report.setting.pdf_invoicing_shipping_address_specific_title_label')
+        )
 
     def pdf_salesperson_info(self):
         return self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_salesperson_info')
@@ -109,12 +128,14 @@ class SaleOrder(models.Model):
         return self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_validity_info')
 
     def get_color_section(self):
-        return self.env['ir.config_parameter'].sudo().get_param(
-            'of.sale.report.setting.pdf_section_bg_color', '#FFFFFF')
+        return (
+            self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_section_bg_color', '#FFFFFF')
+        )
 
     def get_color_font(self):
-        return self.env['ir.config_parameter'].sudo().get_param(
-            'of.sale.report.setting.pdf_section_font_color', '#000000')
+        return (
+            self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_section_font_color', '#000000')
+        )
 
     def pdf_price_taxexcl(self):
         return self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_price_taxexcl')
@@ -145,11 +166,19 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     of_price_unit_taxexcl = fields.Float(  # TODO: move me to of_sale module when it will be migrated
-        string='Unit Price Tax excl', compute='_compute_of_price_unit', digits='Product Price', store=True,
-        help="Unit price without taxes")
+        string='Unit Price Tax excl',
+        compute='_compute_of_price_unit',
+        digits='Product Price',
+        store=True,
+        help="Unit price without taxes",
+    )
     of_price_unit_taxinc = fields.Float(  # TODO: move me to of_sale module when it will be migrated
-        string='Unit Price Tax incl', compute='_compute_of_price_unit', digits='Product Price', store=True,
-        help="Unit price with taxes")
+        string='Unit Price Tax incl',
+        compute='_compute_of_price_unit',
+        digits='Product Price',
+        store=True,
+        help="Unit price with taxes",
+    )
     of_display_name = fields.Text(string="Display name for reports", compute='_compute_of_display_name')
 
     # TODO: move me to of_sale module when it will migrated
@@ -157,8 +186,12 @@ class SaleOrderLine(models.Model):
     def _compute_of_price_unit(self):
         for line in self:
             prices = line.tax_id.compute_all(
-                line.price_unit, currency=line.currency_id, quantity=1, product=line.product_id,
-                partner=line.order_id.partner_shipping_id)
+                line.price_unit,
+                currency=line.currency_id,
+                quantity=1,
+                product=line.product_id,
+                partner=line.order_id.partner_shipping_id,
+            )
             line.of_price_unit_taxexcl = prices['total_excluded']
             line.of_price_unit_taxinc = prices['total_included']
 
@@ -167,10 +200,9 @@ class SaleOrderLine(models.Model):
         display_ref = self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_product_reference')
         for line in self:
             name = line.with_context(lang=line.order_id.partner_id.lang, partner=line.order_id.partner_id.id).name
-            if not display_ref:
-                if name.startswith("["):
-                    splitted = name.split("]")
-                    if len(splitted) > 1:
-                        splitted.pop(0)
-                        name = ']'.join(splitted).strip()
+            if not display_ref and name.startswith("["):
+                splitted = name.split("]")
+                if len(splitted) > 1:
+                    splitted.pop(0)
+                    name = ']'.join(splitted).strip()
             line.of_display_name = name

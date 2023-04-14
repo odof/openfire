@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api, _
+from odoo import _, api, fields, models
 
 
 class ResConfigSettings(models.TransientModel):
@@ -8,107 +8,152 @@ class ResConfigSettings(models.TransientModel):
 
     # Address insert
     pdf_address_title = fields.Boolean(
-        string="Address title", config_parameter='of.sale.report.setting.pdf_address_title')
+        string="Address title", config_parameter='of.sale.report.setting.pdf_address_title'
+    )
     pdf_address_contact_titles = fields.Boolean(
-        string="Titles", config_parameter='of.sale.report.setting.pdf_address_contact_titles')
+        string="Titles", config_parameter='of.sale.report.setting.pdf_address_contact_titles'
+    )
     pdf_address_contact_parent_name = fields.Boolean(
-        string="Contact's parent name", config_parameter='of.sale.report.setting.pdf_address_contact_parent_name')
+        string="Contact's parent name", config_parameter='of.sale.report.setting.pdf_address_contact_parent_name'
+    )
     pdf_address_contact_name = fields.Boolean(
-        string="Contact's name", config_parameter='of.sale.report.setting.pdf_address_contact_name')
+        string="Contact's name", config_parameter='of.sale.report.setting.pdf_address_contact_name'
+    )
     pdf_address_contact_phone = fields.Boolean(
-        string="Phone", config_parameter='of.sale.report.setting.pdf_address_contact_phone')
+        string="Phone", config_parameter='of.sale.report.setting.pdf_address_contact_phone'
+    )
     pdf_address_contact_mobile = fields.Boolean(
-        string="Mobile", config_parameter='of.sale.report.setting.pdf_address_contact_mobile')
+        string="Mobile", config_parameter='of.sale.report.setting.pdf_address_contact_mobile'
+    )
     pdf_address_contact_fax = fields.Boolean(
-        string="Fax", config_parameter='of.sale.report.setting.pdf_address_contact_fax')
+        string="Fax", config_parameter='of.sale.report.setting.pdf_address_contact_fax'
+    )
     pdf_address_contact_email = fields.Boolean(
-        string="Email", config_parameter='of.sale.report.setting.pdf_address_contact_email')
+        string="Email", config_parameter='of.sale.report.setting.pdf_address_contact_email'
+    )
     pdf_invoicing_address_specific_title = fields.Boolean(
         string="Invoicing Address Specific Title",
-        config_parameter='of.sale.report.setting.pdf_invoicing_address_specific_title')
+        config_parameter='of.sale.report.setting.pdf_invoicing_address_specific_title',
+    )
     pdf_invoicing_address_specific_title_label = fields.Char(
-        string="Invoicing Address Specific Title Label", size=30,
-        config_parameter='of.sale.report.setting.pdf_invoicing_address_specific_title_label')
+        string="Invoicing Address Specific Title Label",
+        size=30,
+        config_parameter='of.sale.report.setting.pdf_invoicing_address_specific_title_label',
+    )
     pdf_shipping_address_specific_title = fields.Boolean(
         string="Shipping Address Specific Title",
-        config_parameter='of.sale.report.setting.pdf_shipping_address_specific_title')
+        config_parameter='of.sale.report.setting.pdf_shipping_address_specific_title',
+    )
     pdf_shipping_address_specific_title_label = fields.Char(
-        string="Shipping Address Specific Title Label", size=30,
-        config_parameter='of.sale.report.setting.pdf_shipping_address_specific_title_label')
+        string="Shipping Address Specific Title Label",
+        size=30,
+        config_parameter='of.sale.report.setting.pdf_shipping_address_specific_title_label',
+    )
     pdf_invoicing_shipping_address_specific_title = fields.Boolean(
         string="Invoicing and Shipping Address Specific Title",
-        config_parameter='of.sale.report.setting.pdf_invoicing_shipping_address_specific_title')
+        config_parameter='of.sale.report.setting.pdf_invoicing_shipping_address_specific_title',
+    )
     pdf_invoicing_shipping_address_specific_title_label = fields.Char(
-        string="Invoicing and Shipping Address Specific Title Label", size=30,
-        config_parameter='of.sale.report.setting.pdf_invoicing_shipping_address_specific_title_label')
+        string="Invoicing and Shipping Address Specific Title Label",
+        size=30,
+        config_parameter='of.sale.report.setting.pdf_invoicing_shipping_address_specific_title_label',
+    )
 
     # Salesperson information
     pdf_salesperson_info = fields.Boolean(
-        string="Salesperson Information", config_parameter='of.sale.report.setting.pdf_salesperson_info')
+        string="Salesperson Information", config_parameter='of.sale.report.setting.pdf_salesperson_info'
+    )
     pdf_salesperson_name = fields.Boolean(
-        string="Salesperson Name", config_parameter='of.sale.report.setting.pdf_salesperson_name')
+        string="Salesperson Name", config_parameter='of.sale.report.setting.pdf_salesperson_name'
+    )
     pdf_salesperson_phone = fields.Boolean(
-        string="Salesperson Phone", config_parameter='of.sale.report.setting.pdf_salesperson_phone')
+        string="Salesperson Phone", config_parameter='of.sale.report.setting.pdf_salesperson_phone'
+    )
     pdf_salesperson_mobile = fields.Boolean(
-        string="Salesperson Mobile", config_parameter='of.sale.report.setting.pdf_salesperson_mobile')
+        string="Salesperson Mobile", config_parameter='of.sale.report.setting.pdf_salesperson_mobile'
+    )
     pdf_salesperson_fax = fields.Boolean(
-        string="Salesperson Fax", config_parameter='of.sale.report.setting.pdf_salesperson_fax')
+        string="Salesperson Fax", config_parameter='of.sale.report.setting.pdf_salesperson_fax'
+    )
     pdf_salesperson_email = fields.Boolean(
-        string="Salesperson Email", config_parameter='of.sale.report.setting.pdf_salesperson_email')
+        string="Salesperson Email", config_parameter='of.sale.report.setting.pdf_salesperson_email'
+    )
 
     # Customer information
     pdf_customer_info = fields.Boolean(
-        string="Customer Information", config_parameter='of.sale.report.setting.pdf_customer_info')
+        string="Customer Information", config_parameter='of.sale.report.setting.pdf_customer_info'
+    )
     pdf_customer_phone = fields.Boolean(
-        string="Customer Phone", config_parameter='of.sale.report.setting.pdf_customer_phone')
+        string="Customer Phone", config_parameter='of.sale.report.setting.pdf_customer_phone'
+    )
     pdf_customer_mobile = fields.Boolean(
-        string="Customer Mobile", config_parameter='of.sale.report.setting.pdf_customer_mobile')
+        string="Customer Mobile", config_parameter='of.sale.report.setting.pdf_customer_mobile'
+    )
     pdf_customer_fax = fields.Boolean(string="Customer Fax", config_parameter='of.sale.report.setting.pdf_customer_fax')
     pdf_customer_email = fields.Boolean(
-        string="Customer Email", config_parameter='of.sale.report.setting.pdf_customer_email')
+        string="Customer Email", config_parameter='of.sale.report.setting.pdf_customer_email'
+    )
 
     # Other information
     pdf_payment_term_info = fields.Boolean(
-        string="Payment terms", config_parameter='of.sale.report.setting.pdf_payment_term_info')
+        string="Payment terms", config_parameter='of.sale.report.setting.pdf_payment_term_info'
+    )
     pdf_order_ref_info = fields.Boolean(
-        string="Order reference", config_parameter='of.sale.report.setting.pdf_order_ref_info')
+        string="Order reference", config_parameter='of.sale.report.setting.pdf_order_ref_info'
+    )
     pdf_customer_ref_info = fields.Boolean(
-        string="Customer reference", config_parameter='of.sale.report.setting.pdf_customer_ref_info')
+        string="Customer reference", config_parameter='of.sale.report.setting.pdf_customer_ref_info'
+    )
     pdf_technical_visit_info = fields.Boolean(
-        string="Technical visit date", config_parameter='of.sale.report.setting.pdf_technical_visit_info')
+        string="Technical visit date", config_parameter='of.sale.report.setting.pdf_technical_visit_info'
+    )
     pdf_validity_info = fields.Boolean(
-        string="Validity date", config_parameter='of.sale.report.setting.pdf_validity_info')
+        string="Validity date", config_parameter='of.sale.report.setting.pdf_validity_info'
+    )
 
     # Sections
     pdf_section_bg_color = fields.Char(
-        string="Background color", config_parameter='of.sale.report.setting.pdf_section_bg_color',
-        help="Background color of the section headings. Default is white.")
+        string="Background color",
+        config_parameter='of.sale.report.setting.pdf_section_bg_color',
+        help="Background color of the section headings. Default is white.",
+    )
     pdf_section_font_color = fields.Char(
-        string="Font color", config_parameter='of.sale.report.setting.pdf_section_font_color',
-        help="Font color of the section headings. Default is black.")
+        string="Font color",
+        config_parameter='of.sale.report.setting.pdf_section_font_color',
+        help="Font color of the section headings. Default is black.",
+    )
 
     # Order lines
     pdf_product_reference = fields.Boolean(
-        string="Product reference", config_parameter='of.sale.report.setting.pdf_product_reference')
+        string="Product reference", config_parameter='of.sale.report.setting.pdf_product_reference'
+    )
     pdf_price_taxexcl = fields.Boolean(
-        string="Price Tax Excl.", config_parameter='of.sale.report.setting.pdf_price_taxexcl')
+        string="Price Tax Excl.", config_parameter='of.sale.report.setting.pdf_price_taxexcl'
+    )
     pdf_price_taxinc = fields.Boolean(
-        string="Price Tax Incl.", config_parameter='of.sale.report.setting.pdf_price_taxinc')
+        string="Price Tax Incl.", config_parameter='of.sale.report.setting.pdf_price_taxinc'
+    )
 
     # Signatures insert
     pdf_signatures_insert = fields.Boolean(
-        string="Signatures", config_parameter='of.sale.report.setting.pdf_signatures_insert')
+        string="Signatures", config_parameter='of.sale.report.setting.pdf_signatures_insert'
+    )
     pdf_customer_signature = fields.Boolean(
-        string="Customer signature", config_parameter='of.sale.report.setting.pdf_customer_signature')
+        string="Customer signature", config_parameter='of.sale.report.setting.pdf_customer_signature'
+    )
     pdf_vendor_signature = fields.Boolean(
-        string="Salesman signature", config_parameter='of.sale.report.setting.pdf_vendor_signature')
+        string="Salesman signature", config_parameter='of.sale.report.setting.pdf_vendor_signature'
+    )
     group_pdf_prefill_vendor_signature = fields.Boolean(
         string="Pre-filled salesman signature",
-        implied_group='of_sale_report_setting.group_of_pdf_prefill_vendor_signature')
+        implied_group='of_sale_report_setting.group_of_pdf_prefill_vendor_signature',
+    )
     pdf_signature_text = fields.Boolean(
-        string="Signature statement", config_parameter='of.sale.report.setting.pdf_signature_text')
+        string="Signature statement", config_parameter='of.sale.report.setting.pdf_signature_text'
+    )
     pdf_signature_text_label = fields.Char(
-        string="Signature statement label", config_parameter='of.sale.report.setting.pdf_signature_text_label')
+        string="Signature statement label", config_parameter='of.sale.report.setting.pdf_signature_text_label'
+    )
 
     @api.onchange('pdf_salesperson_info')
     def onchange_pdf_salesperson_info(self):
@@ -140,7 +185,6 @@ class ResConfigSettings(models.TransientModel):
             'res_model': 'res.config.settings',
             'view_mode': 'form',
             'view_type': 'form',
-            'view_id': self.env.ref(
-                'of_sale_report_setting.res_config_settings_sale_printing_params_view_form').id,
-            'target': 'new'
+            'view_id': self.env.ref('of_sale_report_setting.res_config_settings_sale_printing_params_view_form').id,
+            'target': 'new',
         }
