@@ -1,19 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!--###########################################______Création de la categorie______###################################################-->
-
-        <record model="ir.module.category" id="of_sale_marge">
-            <field name="name">OF Marge</field>
-            <field name="description">Définit les droits d'accès aux marges.</field>
-            <field name="sequence">92</field>
-        </record>
 
     <!--#############################################______Création des groupes______#####################################################-->
-
-        <record id="of_group_sale_marge_manager" model="res.groups">
-            <field name="name">Responsable</field>
-            <field name="category_id" ref="of_sale_marge"/>
-        </record>
 
         <record id="group_of_order_line_option" model="res.groups">
             <field name="name">Options de ligne de commande</field>
@@ -24,7 +12,7 @@
         <record id="group_of_afficher_total_ttc" model="res.groups">
             <field name="name">Afficher les sous-totaux TTC par ligne de commande client</field>
             <field name="category_id" ref="base.module_category_hidden"/>
-            <field name="comment">Affiche, dans le formualire (et non dans les rapports), les sous-totaux TTC par ligne dans les commandes clients</field>
+            <field name="comment">Affiche, dans le formulaire (et non dans les rapports), les sous-totaux TTC par ligne dans les commandes clients</field>
         </record>
 
         <record id="group_of_sale_print_one_image" model="res.groups">
@@ -40,15 +28,6 @@
         <record id="group_of_sale_print_attachment" model="res.groups">
             <field name="name">Print product attachments on Sale Order</field>
             <field name="category_id" ref="base.module_category_hidden"/>
-        </record>
-
-        <!-- Modification of the purchase price in the Order lines-->
-        <record id="group_of_can_modify_sale_purchase_price" model="res.groups">
-            <field name="name">(OF) Modifier le coût dans les lignes de commande</field>
-            <field name="category_id" ref="base.module_category_hidden"/>
-        </record>
-        <record id="sales_team.group_sale_manager" model="res.groups">
-            <field name="implied_ids" eval="[(4, ref('of_sale.group_of_can_modify_sale_purchase_price'))]"/>
         </record>
 
 </odoo>

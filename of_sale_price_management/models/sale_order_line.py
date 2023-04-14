@@ -4,14 +4,20 @@ from odoo import fields, models
 
 
 class SaleOrderLine(models.Model):
-    _inherit = "sale.order.line"
-
-    of_product_forbidden_discount = fields.Boolean(  # TODO: move me to of_sale module when it will be migrated to v16
-        string="Discount not allowed for this product", readonly=True
-    )
+    _inherit = 'sale.order.line'
 
     of_price_management_variation = fields.Float(string="Unit amount of price change related to price management")
     of_unit_price_variation = fields.Float(string="Unit amount of the price variation")
+
+    def _prepare_price_management_line_values(self):
+        self.ensure_one()
+        return {
+            'order_line_id': self.id,
+            'state': 'included',
+            'sim_total_cost_tax_excl': self.purchase_price * self.product_uom_qty,
+            'sim_total_price_tax_excl': self.price_subtotal,
+            'sim_total_price_tax_incl': self.price_total,
+        }
 
     def of_get_price_unit(self):  # TODO: move me to of_sale module when it will be migrated to v16
         """Return the price unit of the line, taking into account the price management"""

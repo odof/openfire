@@ -1,0 +1,63 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_sale_no_discount
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-04-19 06:40+0000\n"
+"PO-Revision-Date: 2023-04-19 06:40+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_sale_no_discount
+#: model:res.groups,name:of_sale_no_discount.group_of_can_modify_sale_purchase_price
+msgid "(OF) Change the cost in the order lines"
+msgstr "(OF) Modifier le coût dans les lignes de commande"
+
+#. module: of_sale_no_discount
+#: model:res.groups,name:of_sale_no_discount.group_of_can_modify_sale_price_unit
+msgid "(OF) Change the sales price in the order lines"
+msgstr "(OF) Modifier le prix de vente dans les lignes de commande"
+
+#. module: of_sale_no_discount
+#: model:ir.model.fields,field_description:of_sale_no_discount.field_sale_order__of_product_forbidden_discount
+#: model:ir.model.fields,field_description:of_sale_no_discount.field_sale_order_line__of_product_forbidden_discount
+msgid "Discount not allowed for this product"
+msgstr "Remise interdite pour cet article"
+
+#. module: of_sale_no_discount
+#: model:ir.model.fields,field_description:of_sale_no_discount.field_product_product__of_forbidden_discount
+#: model:ir.model.fields,field_description:of_sale_no_discount.field_product_template__of_forbidden_discount
+msgid "Forbiden discount"
+msgstr "Remise interdite"
+
+#. module: of_sale_no_discount
+#: model:ir.model.fields,field_description:of_sale_no_discount.field_sale_order_line__of_is_price_unit_readonly
+msgid "Is Unit price readonly ?"
+msgstr "Le prix de l'unité est-il en lecture seule ?"
+
+#. module: of_sale_no_discount
+#: model:ir.model,name:of_sale_no_discount.model_product_template
+msgid "Product"
+msgstr "Modèle d'article"
+
+#. module: of_sale_no_discount
+#: model:res.groups,name:of_sale_no_discount.of_group_sale_responsible
+msgid "Responsible"
+msgstr "Responsable"
+
+#. module: of_sale_no_discount
+#: model:ir.model,name:of_sale_no_discount.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_sale_no_discount
+#: model:ir.model,name:of_sale_no_discount.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de commande"

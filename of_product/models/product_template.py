@@ -52,8 +52,6 @@ class ProductTemplate(models.Model):
         string="Related products",
     )
 
-    of_forbidden_discount = fields.Boolean(string="Forbiden discount")
-
     of_obsolete = fields.Boolean(string="Obsolete item")
 
     # Structure de prix

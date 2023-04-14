@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_price_management_forbidden_discount_view" model="ir.ui.view">
+        <field name="name">of.sale.price.management.forbidden.discount_view</field>
+        <field name="model">of.sale.price.management.wizard</field>
+        <field name="inherit_id" ref="of_sale_price_management.of_view_sale_order_price_management" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='line_ids']/tree/field[@name='state']" position="before">
+                <field name="product_forbidden_discount" invisible="1" />
+            </xpath>
+            <xpath expr="//field[@name='line_ids']/tree/field[@name='state']" position="attributes">
+                <attribute name="attrs">{'readonly': [('product_forbidden_discount', '=', True)]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

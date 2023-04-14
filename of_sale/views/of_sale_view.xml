@@ -110,19 +110,6 @@
                 <xpath expr="//field[@name='order_line']/form/group/group[2]" position="inside">
                     <field name="of_article_principal" string="Est l'article principal"/>
                 </xpath>
-                <!-- Gestion de la remise interdite -->
-                <xpath expr="//field[@name='order_line']//form//field[@name='product_id']" position="after">
-                    <field name="of_product_forbidden_discount" groups="sales_team.group_sale_manager"/>
-                </xpath>
-                <xpath expr="//field[@name='order_line']//form//field[@name='price_unit']" position="attributes">
-                    <attribute name="attrs">{'invisible': [('of_product_forbidden_discount', '=', True)]}</attribute>
-                </xpath>
-                <xpath expr="//field[@name='order_line']//form//field[@name='price_unit']" position="before">
-                    <field name="of_price_unit_display" attrs="{'invisible': [('of_product_forbidden_discount', '=', False)]}"/>
-                </xpath>
-                <xpath expr="//field[@name='order_line']//form//field[@name='of_discount_formula']" position="attributes">
-                    <attribute name="attrs">{'invisible': [('of_product_forbidden_discount', '=', True)]}</attribute>
-                </xpath>
                 <!-- prix unitaire HT dans la vue form des lignes de commande -->
                 <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="before">
                     <field name="of_price_unit_ht" string="Prix unitaire HT"
@@ -313,10 +300,7 @@
                 <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="replace">
                     <label for="price_unit"/>
                     <div>
-                        <field name="price_unit" class="oe_inline" style="max-width: 150px;"
-                               attrs="{'invisible': [('of_product_forbidden_discount', '=', True)]}"/>
-                        <field name="of_price_unit_display" class="oe_inline" style="max-width: 150px;"
-                               attrs="{'invisible': [('of_product_forbidden_discount', '=', False)]}"/>
+                        <field name="price_unit" class="oe_inline" style="max-width: 150px;"/>
                         (<field name="of_date_tarif" class="oe_inline"/>
                         <span attrs="{'invisible': [('of_date_tarif', '!=', False)]}">Non daté</span>)
                         <br/>
@@ -334,23 +318,6 @@
                            domain="[('id', 'in', of_product_attachment_computed_ids and of_product_attachment_computed_ids[0] and of_product_attachment_computed_ids[0][2] or False)]"/>
                 </xpath>
 
-            </field>
-        </record>
-
-        <record id="of_sale_order_manager2_form_view" model="ir.ui.view">
-            <field name="name">of.sale.order.manager2.form.view</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="of_sale.of_sale_obsolete_sale_order_form_view"/>
-            <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
-            <field name="arch" type="xml">
-                <!-- Permettre la modification direct du prix pour les remises interdites -->
-                <xpath expr="//field[@name='price_unit']" position="attributes">
-                    <attribute name="attrs"/>
-                </xpath>
-                <xpath expr="//field[@name='of_price_unit_display']" position="attributes">
-                    <attribute name="attrs"/>
-                    <attribute name="invisible">1</attribute>
-                </xpath>
             </field>
         </record>
 

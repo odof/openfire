@@ -1387,7 +1387,6 @@ msgstr "Devis et commandes"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_product_forbidden_discount
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_product_forbidden_discount
 msgid "Remise interdite pour cet article"
 msgstr "Remise interdite pour cet article"
 

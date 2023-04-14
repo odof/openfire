@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <!-- TODO : Move me to of_sale module when it will be migrated -->
+    <record id="group_of_can_modify_sale_purchase_price" model="res.groups">
+        <field name="name">(OF) Change the cost in the order lines</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+    <!-- TODO : Move me to of_sale module when it will be migrated -->
+    <record id="of_group_sale_responsible" model="res.groups">
+        <field name="name">Responsible</field>
+        <field name="category_id" ref="base.module_category_sales_sales"/>
+        <field name="implied_ids" eval="[
+            (4, ref('sales_team.group_sale_salesman_all_leads')),
+            (4, ref('of_sale_no_discount.group_of_can_modify_sale_purchase_price'))]"/>
+    </record>
+
+    <!-- TODO : Move me to of_sale module when it will be migrated -->
+    <record id="sales_team.group_sale_manager" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('of_sale_no_discount.of_group_sale_responsible'))]"/>
+    </record>
+
+    <!-- TODO : Move me to of_sale module when it will be migrated -->
+    <record id="sales_team.group_sale_manager" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('of_sale_no_discount.group_of_can_modify_sale_purchase_price'))]"/>
+    </record>
+
+    <record id="group_of_can_modify_sale_price_unit" model="res.groups">
+        <field name="name">(OF) Change the sales price in the order lines</field>
+        <field name="category_id" ref="base.module_category_hidden" />
+    </record>
+
+</odoo>

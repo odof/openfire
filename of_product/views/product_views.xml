@@ -71,9 +71,8 @@
                     <field name="list_price" class="oe_inline" widget='monetary'
                     options="{'currency_field': 'currency_id', 'field_digits': True}"/>
                 </div>
-                <label for="of_margin"/>
-                <span><field name="of_margin" class="oe_inline"/>%</span>
-                <field name="of_forbidden_discount"/>
+                <label id="of_margin" for="of_margin"/>
+                <span id="of_margin"><field name="of_margin" class="oe_inline"/>%</span>
             </xpath>
             <xpath expr="//page[@name='general_information']//field[@name='description']/.." position="attributes">
                 <attribute name="name">group_internal_note</attribute>

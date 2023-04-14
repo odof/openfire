@@ -347,11 +347,6 @@ class OFPriceManagementWizardLine(models.TransientModel):
     margin = fields.Float(string="Margin excl. VAT", compute='_compute_margins')
     margin_percent = fields.Float(string="% Margin", compute='_compute_margins')
     customer_view = fields.Boolean(string="Customer/Vendor view", related="wizard_id.customer_view")
-    product_forbidden_discount = fields.Boolean(
-        related='order_line_id.of_product_forbidden_discount',
-        string="Discount not allowed for this product",
-        readonly=True,
-    )
 
     @api.depends('order_line_id')
     def _compute_total_cost_tax_excl(self):

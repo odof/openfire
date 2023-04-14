@@ -12,7 +12,6 @@ class SaleOrder(models.Model):
     of_total_cost = fields.Monetary(  # TODO: move me to of_sale module when it will be migrated to v16
         compute='_compute_of_total_cost', string="Total cost price"
     )
-    of_product_forbidden_discount = fields.Boolean(string="Discount not allowed for this product")
 
     @api.depends('margin', 'amount_untaxed')
     def _compute_of_total_cost(self):
@@ -23,19 +22,7 @@ class SaleOrder(models.Model):
         self.ensure_one()
 
         price_management_obj = self.env['of.sale.price.management.wizard']
-        line_vals = []
-        for line in self.order_line:
-            values = {
-                'order_line_id': line.id,
-                'state': 'included'
-                if not line.of_product_forbidden_discount and bool(line.product_uom_qty and line.price_unit)
-                else 'excluded',
-                'sim_total_cost_tax_excl': line.purchase_price * line.product_uom_qty,
-                'sim_total_price_tax_excl': line.price_subtotal,
-                'sim_total_price_tax_incl': line.price_total,
-            }
-            line_vals.append(Command.create(values))
-
+        line_vals = [Command.create(line._prepare_price_management_line_values()) for line in self.order_line]
         price_management = price_management_obj.create(
             {
                 'order_id': self.id,

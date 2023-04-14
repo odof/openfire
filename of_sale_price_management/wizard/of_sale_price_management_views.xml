@@ -46,10 +46,7 @@
                 </group>
                 <field name="line_ids" nolabel="1">
                     <tree string="Order lines" decoration-sucess="state =='included'" decoration-muted="state != 'included'" editable="bottom" create="false">
-                        <field name="product_forbidden_discount" invisible="1" />
-                        <field name="state"
-                            invisible="context.get('invoice_status') == 'invoiced'"
-                            attrs="{'readonly': [('product_forbidden_discount', '=', True)]}" />
+                        <field name="state" invisible="context.get('invoice_status') == 'invoiced'" />
                         <field name="order_line_id" />
                         <field name="total_cost_tax_excl"
                             groups="of_sale_price_management.of_group_sale_margin_manager"
