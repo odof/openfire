@@ -582,6 +582,8 @@ class InventoryLine(models.Model):
         comodel_name='of.product.brand', string=u"Brand", related='product_id.brand_id', readonly=True)
     of_product_categ_id = fields.Many2one(
         comodel_name='product.category', string=u"Product category", related='product_id.categ_id', readonly=True)
+    of_internal_serial_number = fields.Char(
+        string=u"Numéro de série interne", readonly=True, related='prod_lot_id.of_internal_serial_number')
 
     @api.depends('of_theoretical_qty', 'product_qty')
     def _compute_of_inventory_gap(self):
@@ -857,6 +859,16 @@ class StockConfigSettings(models.TransientModel):
         (1, u"Choose between all quantities and only unreserved quantities.")
         ], u"(OF) Stock inventory quantities",
         implied_group='of_stock.stock_inventory_group_advanced_quant_inventory')
+    of_serial_management_company_ids = fields.Many2many(
+        comodel_name='res.company', relation='config_settings_res_company_rel', column1='config_id',
+        column2='company_id', string=u"(OF) Sociétés gérant la traçabilté interne",
+        help=u"Sociétés pour lesquelles la gestion de la traçabilité interne et la "
+             u"génération automatique des numéros de série est activée")
+
+    @api.onchange('group_stock_production_lot')
+    def _onchange_group_stock_production_lot(self):
+        if self.group_stock_production_lot == 0:
+            self.update({'of_serial_management_company_ids': [(6, 0, [])]})
 
     @api.multi
     def set_of_forcer_date_inventaire_defaults(self):
@@ -873,6 +885,21 @@ class StockConfigSettings(models.TransientModel):
         return self.env['ir.values'].sudo().set_default(
             'stock.config.settings', 'pdf_mention_legale', self.pdf_mention_legale
         )
+
+    @api.multi
+    def set_of_serial_management_company_ids_defaults(self):
+        # On met à jour les types d'opérations Réceptions des sociétés qui gère la traçabilité interne pour pouvoir
+        # sélectionner un numéro de série préalablement créé dans les BR
+        picking_types = self.env['stock.picking.type'].search([('code', '=', 'incoming')])
+        picking_types.filtered(
+            lambda p: p.sequence_id.company_id.id in self.of_serial_management_company_ids.ids).write(
+            {'use_existing_lots': True})
+        picking_types.filtered(
+            lambda p: p.sequence_id.company_id.id not in self.of_serial_management_company_ids.ids).write(
+            {'use_existing_lots': False})
+
+        return self.env['ir.values'].sudo().set_default(
+            'stock.config.settings', 'of_serial_management_company_ids', self.of_serial_management_company_ids.ids)
 
 
 class StockPackOperation(models.Model):
@@ -906,6 +933,22 @@ class StockPackOperation(models.Model):
             'of.intervention.settings', 'picking_product_id')
         for pack in self:
             pack.of_editable_record = pack.product_qty == 0 and pack.product_id.id == picking_product_id
+
+    @api.multi
+    def action_split_lots(self):
+        action = super(StockPackOperation, self).action_split_lots()
+        company_ids = self.env['ir.values'].get_default(
+            'stock.config.settings', 'of_serial_management_company_ids') or []
+        action['context'].update({'display_internal_serial_number': self.env.user.company_id.id in company_ids})
+        return action
+    split_lot = action_split_lots
+
+
+class StockPackOperationLot(models.Model):
+    _inherit = 'stock.pack.operation.lot'
+
+    of_internal_serial_number = fields.Char(
+        string=u"Numéro de série interne", readonly=True, related='lot_id.of_internal_serial_number')
 
 
 class StockMove(models.Model):
@@ -1509,6 +1552,8 @@ class StockWarehouseOrderpoint(models.Model):
 class StockProductionLot(models.Model):
     _inherit = 'stock.production.lot'
 
+    of_internal_serial_number = fields.Char(string=u"Numéro de série interne", readonly=True)
+
     @api.multi
     def name_get(self):
         location_id = self._context.get('prio_location_id')
@@ -1541,3 +1586,14 @@ class StockProductionLot(models.Model):
                 limit) or []
             return res
         return super(StockProductionLot, self).name_search(name, args, operator, limit)
+
+    @api.multi
+    def generate_missing_internal_serial_number(self):
+        sequence_obj = self.env['ir.sequence']
+        barcode_nomenclature_obj = self.env['barcode.nomenclature']
+        production_lots = self.filtered(lambda l: not l.of_internal_serial_number)
+
+        for lot in production_lots:
+            next_by_code = sequence_obj.next_by_code('stock.lot.serial')
+            ean13 = barcode_nomenclature_obj.sudo().sanitize_ean("%0.13s" % next_by_code)
+            lot.of_internal_serial_number = ean13
