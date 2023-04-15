@@ -23,7 +23,6 @@ Extension OpenFire du module stock
     ],
     "data": [
         'security/of_stock_security.xml',
-        'data/res_groups.xml',
         'views/of_stock_views.xml',
         'views/stock_quant_views.xml',
         'wizards/of_picking_mass_validation_wizard_views.xml',

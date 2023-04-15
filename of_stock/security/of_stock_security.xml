@@ -6,4 +6,10 @@
         <field name="category_id" ref="base.module_category_hidden"/>
     </record>
 
+    <record id="group_of_bon_transfert_valorise" model="res.groups">
+        <field name="name">Valorisation des lignes de BL</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="comment">Afficher la valeur du mouvement de stock dans les bons de livraison</field>
+    </record>
+
 </odoo>
