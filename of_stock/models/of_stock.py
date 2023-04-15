@@ -1586,3 +1586,14 @@ class StockProductionLot(models.Model):
                 limit) or []
             return res
         return super(StockProductionLot, self).name_search(name, args, operator, limit)
+
+    @api.multi
+    def generate_missing_internal_serial_number(self):
+        sequence_obj = self.env['ir.sequence']
+        barcode_nomenclature_obj = self.env['barcode.nomenclature']
+        production_lots = self.filtered(lambda l: not l.of_internal_serial_number)
+
+        for lot in production_lots:
+            next_by_code = sequence_obj.next_by_code('stock.lot.serial')
+            ean13 = barcode_nomenclature_obj.sudo().sanitize_ean("%0.13s" % next_by_code)
+            lot.of_internal_serial_number = ean13

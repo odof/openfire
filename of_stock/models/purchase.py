@@ -9,18 +9,21 @@ class PurchaseOrder(models.Model):
 
     @api.multi
     def button_confirm(self):
-        super(PurchaseOrder, self).button_confirm()
+        res = super(PurchaseOrder, self).button_confirm()
         company_ids = self.env['ir.values'].get_default(
             'stock.config.settings', 'of_serial_management_company_ids') or []
-        order_with_serial_management = self.filtered(lambda o: o.company_id.id in company_ids)
-        order_with_serial_management.generate_serial_number()
-        return True
+        orders_with_serial_management = self.filtered(
+            lambda o: o.company_id.id in company_ids and o.state == 'purchase')
+        orders_with_serial_management.generate_serial_number()
+        return res
 
     @api.multi
     def action_generate_serial_number(self):
         company_ids = self.env['ir.values'].get_default(
             'stock.config.settings', 'of_serial_management_company_ids') or []
-        self.filtered(lambda o: o.company_id.id in company_ids).generate_serial_number()
+        orders_with_serial_management = self.filtered(
+            lambda o: o.company_id.id in company_ids and o.state == 'purchase')
+        orders_with_serial_management.generate_serial_number()
 
     @api.multi
     def generate_serial_number(self):
@@ -29,21 +32,27 @@ class PurchaseOrder(models.Model):
         barcode_nomenclature_obj = self.env['barcode.nomenclature']
         operation_lot_obj = self.env['stock.pack.operation.lot']
 
-        # Pour chaque ligne avec suivi par numéro de série
+        # On parcourt les articles des commandes avec suivi par numéro de série
         for order in self:
             for product in order.mapped('order_line.product_id').filtered(lambda p: p.tracking == 'serial'):
 
-                # On identifie quelle quantité a déjà été traitée pour cet article et cette commande
                 qty_todo = sum(order.order_line.filtered(lambda l: l.product_id.id == product.id).mapped('product_qty'))
 
-                # Il est possible d'avoir plusieurs lignes avec le même article,
-                # donc on ne doit pas les prendre en compte
+                # On identifie quelle quantité a déjà été traitée pour cet article et cette commande
                 qty_done = production_lot_obj.search_count(
                     [('name', 'ilike', order.name), ('product_id', '=', product.id)])
 
                 number = qty_todo - qty_done
 
-                # On crée autant de numéro de série que de quantité non traitée sur la ligne
+                # On récupère l'opération de réception liée à l'article en vue de l'attribution des lots générés.
+                # Plusieurs lignes de commande avec un même article ne créées qu'une operation.
+                pack_operation = order.mapped(
+                    'order_line.move_ids.linked_move_operation_ids.operation_id').filtered(
+                    lambda o: o.product_id.id == product.id)
+                if len(pack_operation) > 1:
+                    pack_operation = pack_operation[0]
+
+                    # On crée autant de numéro de série que de quantité non traitée sur la ligne
                 while number > 0:
                     next_by_code = sequence_obj.next_by_code('stock.lot.serial')
                     name = '%s %s %s' % (
@@ -56,11 +65,8 @@ class PurchaseOrder(models.Model):
                         'product_id': product.id,
                         'of_internal_serial_number': ean13,
                     })
-                    # Plusieurs lignes de commande avec un même article ne créées qu'une operation.
-                    # On la récupère pour y ajouter le lot à faire.
-                    pack_operation = order.mapped(
-                        'order_line.move_ids.linked_move_operation_ids.operation_id').filtered(
-                        lambda o: o.product_id.id == product.id)[0]
+
+                    # On attribue le lot à l'opération associée
                     if pack_operation:
                         operation_lot_obj.create({
                             'operation_id': pack_operation.id,
