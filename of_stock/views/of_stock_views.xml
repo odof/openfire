@@ -1,6 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <record id="view_production_lot_form" model="ir.ui.view">
+        <field name="name">of.stock.production.lot.form</field>
+        <field name="model">stock.production.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="before">
+                <field name="of_internal_serial_number" attrs="{'invisible': [('of_internal_serial_number', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_pack_operation_lot_form" model="ir.ui.view">
+        <field name="name">of.stock.pack.operation.lots.form</field>
+        <field name="model">stock.pack.operation</field>
+        <field name="inherit_id" ref="stock.view_pack_operation_lot_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree/field[@name='lot_id']" position="after">
+                <field name="of_internal_serial_number" invisible="context.get('display_internal_serial_number') == False"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="stock_inventory_line_tree2" model="ir.ui.view">
+        <field name="name">of.stock.inventory.line.tree2</field>
+        <field name="model">stock.inventory.line</field>
+        <field name="inherit_id" ref="stock.stock_inventory_line_tree2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='prod_lot_id']" position="after">
+                <field name="of_internal_serial_number" invisible="context.get('display_internal_serial_number') == False"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="stock_inventory_line_search" model="ir.ui.view">
+        <field name="name">of.stock.inventory.line.search</field>
+        <field name="model">stock.inventory.line</field>
+        <field name="inherit_id" ref="stock.stock_inventory_line_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='prod_lot_id']" position="after">
+                <field name="of_internal_serial_number" domain="[('product_id', '=', product_id)]" context="{'default_product_id': product_id}" groups="stock.group_production_lot"/>
+            </xpath>
+        </field>
+    </record>
+
     <record id="of_stock_view_inventory_form" model="ir.ui.view">
         <field name="name">of.sale.stock.inventory.form</field>
         <field name="model">stock.inventory</field>
@@ -53,6 +97,9 @@
             <xpath expr="//notebook//field[@name='line_ids']/tree/field[@name='prod_lot_id']" position="before">
                 <field name="of_product_lot_serial_management_copy" invisible="1"/>
                 <field name="of_product_lot_serial_management" readonly="1"/>
+            </xpath>
+            <xpath expr="//notebook//field[@name='line_ids']/tree/field[@name='prod_lot_id']" position="after">
+                <field name="of_internal_serial_number" invisible="context.get('display_internal_serial_number') == False"/>
             </xpath>
             <xpath expr="//notebook//field[@name='line_ids']/tree/field[@name='prod_lot_id']" position="attributes">
                 <attribute name="attrs">{'required': [('of_product_lot_serial_management', '=', True)]}</attribute>
@@ -220,6 +267,15 @@
         <field name="model">stock.config.settings</field>
         <field name="inherit_id" ref="stock.view_stock_config_settings"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='group_stock_production_lot']" position="after">
+                <label for="of_serial_management_company_ids" attrs="{'invisible':[('group_stock_production_lot', '!=', 1)]}"/>
+                <div attrs="{'invisible':[('group_stock_production_lot', '!=', 1)]}">
+                    <div>
+                        <field name="of_serial_management_company_ids" widget="many2many_tags"/>
+                        <span>Sociétés pour lesquelles la gestion de la traçabilité interne et la génération automatique des numéros de série est activée</span>
+                    </div>
+                </div>
+            </xpath>
             <xpath expr="//group[last()]" position="after">
                 <group name="inventory" string="Inventaire">
                     <label for="of_forcer_date_inventaire"/>
@@ -402,6 +458,55 @@
     <record id="stock.product_template_action_product" model="ir.actions.act_window">
         <field name="view_mode">tree,kanban,form</field>
         <field name="tree_view_ref" ref="of_stock.of_stock_product_template_tree_view"/>
+    </record>
+
+    <record id="action_generate_serial_number" model="ir.actions.server">
+        <field name="name">Générer les n° de série</field>
+        <field name="model_id" ref="purchase.model_purchase_order" />
+        <field name="state">code</field>
+        <field name="code">records.action_generate_serial_number()</field>
+        <field name="condition">record.company_id.id in (env['ir.values'].get_default('stock.config.settings', 'of_serial_management_company_ids') or [])</field>
+    </record>
+
+    <record id="value_generate_serial_number" model="ir.values">
+        <field eval="'client_action_multi'" name="key2" />
+        <field eval="'purchase.order'" name="model" />
+        <field name="name">Générer les n° de série</field>
+        <field eval="'ir.actions.server,%d'%action_generate_serial_number" name="value" />
+    </record>
+
+    <record id="action_server_inventory_form" model="ir.actions.server">
+        <field name="name">Ajustements de stock</field>
+        <field name="model_id" ref="stock.model_stock_inventory" />
+        <field name="state">code</field>
+        <field name="code">
+act = env.ref('stock.action_inventory_form')
+result = act.read()[0]
+company_ids = env['ir.values'].get_default(
+    'stock.config.settings', 'of_serial_management_company_ids') or []
+result['context'] = {'display_internal_serial_number': env.user.company_id.id in company_ids}
+action = result
+        </field>
+    </record>
+
+    <record id="stock.menu_action_inventory_form" model="ir.ui.menu">
+        <field name="action" ref="action_server_inventory_form" />
+    </record>
+
+    <record id="of_generate_miss_int_serial_num_action_server" model="ir.actions.server">
+        <field name="name">Générer les numéros de série internes</field>
+        <field name="model_id" ref="stock.model_stock_production_lot"/>
+        <field name="state">code</field>
+        <field name="code">
+action = records.generate_missing_internal_serial_number()
+        </field>
+    </record>
+
+    <record id="of_generate_miss_int_serial_num_value" model="ir.values">
+        <field name="name">Générer les numéros de série internes</field>
+        <field name="key2">client_action_multi</field>
+        <field name="model">stock.production.lot</field>
+        <field name="value" eval="'ir.actions.server,%d'%of_generate_miss_int_serial_num_action_server"/>
     </record>
 
 </odoo>
