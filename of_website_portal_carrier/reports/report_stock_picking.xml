@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="receipt_label_paperformat" model="report.paperformat">
+        <field name="name">Format étiquette 12x10</field>
+        <field name="default" eval="True"/>
+        <field name="format">custom</field>
+        <field name="page_height">100</field>
+        <field name="page_width">120</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">5</field>
+        <field name="margin_bottom">5</field>
+        <field name="margin_left">6</field>
+        <field name="margin_right">6</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">10</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <report id="receipt_label_report"
+            model="stock.pack.operation"
+            string="Étiquette"
+            report_type="qweb-pdf"
+            name="of_website_portal_carrier.report_receipt_label"
+            file="of_website_portal_carrier.report_receipt_label"
+            paperformat="of_website_portal_carrier.receipt_label_paperformat"
+    />
+
+    <template id="report_receipt_label">
+        <t t-call="report.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="of_website_portal_carrier.report_receipt_label_document" t-lang="doc.picking_id.sudo().partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <report id="receipt_stock_picking_label_report"
+            model="stock.picking"
+            string="Étiquettes"
+            report_type="qweb-pdf"
+            name="of_website_portal_carrier.report_stock_picking_receipt_label"
+            file="of_website_portal_carrier.report_stock_picking_receipt_label"
+            paperformat="of_website_portal_carrier.receipt_label_paperformat"
+    />
+
+    <template id="report_stock_picking_receipt_label">
+        <t t-call="report.html_container">
+            <t t-foreach="docs.mapped('pack_operation_product_ids')" t-as="doc">
+                <t t-call="of_website_portal_carrier.report_receipt_label_document" t-lang="doc.picking_id.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_receipt_label_document">
+        <t t-if="doc.pack_lot_ids">
+            <t t-foreach="doc.pack_lot_ids" t-as="lot">
+                <t t-call="of_website_portal_carrier.label_template"/>
+            </t>
+        </t>
+        <t t-else="">
+            <t t-call="of_website_portal_carrier.label_template"/>
+        </t>
+    </template>
+
+    <template id="label_template">
+        <div class="page" style="page-break-after: always; font-size: 22px;">
+            <div class="row text-center">
+                <div class="col-xs-6" style="height: 80px; margin-top: 30px;">
+                    <span t-esc="doc.picking_id.company_id.name"/>
+                </div>
+                <div class="col-xs-6" style="height: 80px; margin-top: 30px;">
+                    <span t-esc="doc.product_id.brand_id.name"/>
+                </div>
+                <div class="col-xs-6" style="height: 80px;">
+                    <span t-esc="doc.picking_id.name"/>
+                </div>
+                <div class="col-xs-6" style="height: 80px;">
+                    <span t-esc="doc.product_id.default_code"/>
+                </div>
+                <div class="col-xs-12" style="height: 60px;">
+                    <span t-esc="lot and lot.lot_id.name"/>
+                </div>
+                <div class="col-xs-12">
+                    <img t-if="lot and lot.lot_id.of_internal_serial_number" style="width:500px;height:120px"
+                         t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('EAN13', lot.lot_id.of_internal_serial_number, 600, 50)"/>
+                    <div t-esc="lot and lot.lot_id.of_internal_serial_number" style="letter-spacing: 12px;"/>
+                </div>
+            </div>
+        </div>
+    </template>
+
+</odoo>

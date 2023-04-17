@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_tab_receipt" model="of.tab">
+        <field name="name">Réception</field>
+        <field name="code">receipt</field>
+    </record>
+
+    <record id="res_users_portal_carrier" model="res.users">
+        <field name="name">Transporteur</field>
+        <field name="login">carrier</field>
+        <field name="of_is_user_profile" eval="1"/>
+        <field name="groups_id" eval="[(6,0,[ref('base.group_portal'), ref('of_website_portal_carrier.group_of_carrier_portal')])]"/>
+        <field name="of_field_ids" eval="[(6,0,[
+            ref('base.field_res_users_groups_id'),
+            ref('of_website_portal.field_res_users_of_tab_ids'),
+            ref('of_website_portal.field_res_users_of_pricelist_id'),
+            ref('of_website_portal.field_res_users_of_fiscal_position_id'),
+        ])]"/>
+        <field name="of_tab_ids" eval="[(6,0,[
+            ref('of_website_portal_carrier.of_tab_receipt'),
+        ])]"/>
+        <field name="of_pricelist_id" ref="product.list0"/>
+        <field name="of_fiscal_position_id" eval="False"/>
+        <field name="active" eval="False"/>
+    </record>
+
+</odoo>
