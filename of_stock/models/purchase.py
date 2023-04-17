@@ -8,12 +8,11 @@ class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
     @api.multi
-    def button_confirm(self):
-        res = super(PurchaseOrder, self).button_confirm()
+    def button_approve(self):
+        res = super(PurchaseOrder, self).button_approve()
         company_ids = self.env['ir.values'].get_default(
             'stock.config.settings', 'of_serial_management_company_ids') or []
-        orders_with_serial_management = self.filtered(
-            lambda o: o.company_id.id in company_ids and o.state == 'purchase')
+        orders_with_serial_management = self.filtered(lambda o: o.company_id.id in company_ids)
         orders_with_serial_management.generate_serial_number()
         orders_with_serial_management.preassign_serial_number()
         return res

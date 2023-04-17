@@ -465,7 +465,6 @@
         <field name="model_id" ref="purchase.model_purchase_order" />
         <field name="state">code</field>
         <field name="code">records.action_generate_serial_number()</field>
-        <field name="condition">record.company_id.id in (env['ir.values'].get_default('stock.config.settings', 'of_serial_management_company_ids') or [])</field>
     </record>
 
     <record id="value_generate_serial_number" model="ir.values">
@@ -480,7 +479,6 @@
         <field name="model_id" ref="purchase.model_purchase_order"/>
         <field name="state">code</field>
         <field name="code">records.action_preassign_serial_number()</field>
-        <field name="condition">record.company_id.id in (env['ir.values'].get_default('stock.config.settings', 'of_serial_management_company_ids') or [])</field>
     </record>
 
     <record id="of_preassign_serial_number_value" model="ir.values">
