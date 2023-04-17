@@ -66,7 +66,12 @@ class OFResPartner(models.Model):
         }
 
     def _is_geodata_changed(self, vals):
-        return self.filtered(lambda r: r.geo_lat != vals.get('geo_lat') or r.geo_lng != vals.get('geo_lng'))
+        def _is_real_id(id):
+            return isinstance(id, (int, long)) and id > 0
+        partners = self.filtered(lambda r: _is_real_id(r.id))
+        return partners.filtered(
+            lambda r: 'geo_lat' in vals and r.geo_lat != vals['geo_lat'] or
+                      'geo_lng' in vals and r.geo_lng != vals['geo_lng'])
 
     @api.multi
     def write(self, vals):
