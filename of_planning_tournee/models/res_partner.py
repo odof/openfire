@@ -66,12 +66,22 @@ class OFResPartner(models.Model):
         }
 
     def _is_geodata_changed(self, vals):
-        def _is_real_id(id):
-            return isinstance(id, (int, long)) and id > 0
-        partners = self.filtered(lambda r: _is_real_id(r.id))
-        return partners.filtered(
+        return self.filtered(
             lambda r: 'geo_lat' in vals and r.geo_lat != vals['geo_lat'] or
                       'geo_lng' in vals and r.geo_lng != vals['geo_lng'])
+
+    def _search_tours_for_geodata_changed(self, geodata_changed):
+        context = self._context.copy()
+        if 'virtual_id' in context:
+            # remove virtual_id from context to avoid error in search. It's not needed here, we don't want fake records
+            del context['virtual_id']
+        return (
+            self.env['of.planning.tour.line']
+            .sudo()
+            .with_context(context)
+            .search([('address_id', 'in', geodata_changed.ids)])
+            .mapped('tour_id')
+        )
 
     @api.multi
     def write(self, vals):
@@ -80,9 +90,7 @@ class OFResPartner(models.Model):
         # if geodata changed, we need to recompute tours routes with an intervention planned on this address
         if geodata_changed:
             self.invalidate_cache(['geo_lat', 'geo_lng'], geodata_changed.ids)
-            tours_to_recompute = self.env['of.planning.tour.line'].sudo().search([
-                ('address_id', 'in', geodata_changed.ids)
-            ]).mapped('tour_id')
+            tours_to_recompute = self._search_tours_for_geodata_changed(geodata_changed)
             if tours_to_recompute:
                 # we only recompute tours that aren't confirmed and not in the past
                 tours_to_recompute = tours_to_recompute.filtered(
