@@ -286,7 +286,7 @@ class OFPlanningTournee(models.Model):
         :rtype: recordset res.partner
         """
         self.ensure_one()
-        return self.employee_id.of_address_depart_id or self.employee_id.company_id.partner_id or False
+        return self.employee_id.of_address_depart_id or self.employee_id.company_id.partner_id
 
     @api.multi
     def _get_return_address(self):
@@ -298,7 +298,7 @@ class OFPlanningTournee(models.Model):
         :rtype: recordset res.partner
         """
         self.ensure_one()
-        return self.employee_id.of_address_retour_id or self.employee_id.company_id.partner_id or False
+        return self.employee_id.of_address_retour_id or self.employee_id.company_id.partner_id
 
     @api.model
     def _get_tour_addresses_vals(self, vals):
@@ -890,10 +890,12 @@ class OFPlanningTournee(models.Model):
     @api.multi
     def write(self, vals):
         if ('start_address_id' in vals and not vals.get('start_address_id')) or (
-                'end_address_id' in vals and not vals.get('end_address_id')):
+                'return_address_id' in vals and not vals.get('return_address_id')):
             # we don't want to remove the start or end address of a tour
-            del vals['start_address_id']
-            del vals['end_address_id']
+            if 'start_address_id' in vals:
+                del vals['start_address_id']
+            if 'return_address_id' in vals:
+                del vals['return_address_id']
 
         intervention_obj = self.env['of.planning.intervention']
         for tournee in self:
