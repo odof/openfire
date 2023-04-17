@@ -100,8 +100,8 @@ class HookOFPlanningTour(models.Model):
             start_address = tour._get_start_address()
             return_address = tour._get_return_address()
             tour.with_context(skip_osrm_data_compute=True).write({
-                'start_address_id': start_address.id or False,
-                'return_address_id': return_address.id or False,
+                'start_address_id': start_address.id,
+                'return_address_id': return_address.id,
                 'tour_line_ids': lines_values
             })
         # Transfert areas to the new field
