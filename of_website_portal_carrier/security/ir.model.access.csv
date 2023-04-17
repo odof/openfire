@@ -1,4 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_stock_picking_carrier,access.of.stock.picking.carrier,stock.model_stock_picking,of_website_portal_carrier.group_of_carrier_portal,1,1,0,0
 access_of_stock_pack_operation_carrier,access.of.stock.pack.operation.carrier,stock.model_stock_pack_operation,of_website_portal_carrier.group_of_carrier_portal,1,1,0,0
 access_of_stock_pack_operation_lot_carrier,access.of.stock.pack.operation.lot.carrier,stock.model_stock_pack_operation_lot,of_website_portal_carrier.group_of_carrier_portal,1,1,0,0
 access_of_stock_warehouse_carrier,access.of.stock.warehouse.carrier,stock.model_stock_warehouse,of_website_portal_carrier.group_of_carrier_portal,1,0,0,0
