@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-11 15:32+0000\n"
-"PO-Revision-Date: 2023-04-11 15:32+0000\n"
+"POT-Creation-Date: 2023-04-17 15:38+0000\n"
+"PO-Revision-Date: 2023-04-17 15:38+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -31,8 +31,8 @@ msgstr "Annuler"
 
 #. module: of_website_portal_carrier
 #: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
-msgid "Bon de livraison"
-msgstr "Bon de livraison"
+msgid "Contracts"
+msgstr "Contrats"
 
 #. module: of_website_portal_carrier
 #: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
@@ -55,7 +55,7 @@ msgid "Date de livraison"
 msgstr "Date de livraison"
 
 #. module: of_website_portal_carrier
-#: model:ir.model,name:of_website_portal_carrier.model_of_service
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
 msgid "Demande d'intervention"
 msgstr "Demande d'intervention"
 
@@ -86,14 +86,24 @@ msgid "Imprimer <span class=\"caret\"/>"
 msgstr "Imprimer <span class=\"caret\"/>"
 
 #. module: of_website_portal_carrier
-#: model:ir.model,name:of_website_portal_carrier.model_account_invoice
-msgid "Invoice"
-msgstr "Facture"
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Invoices"
+msgstr "Factures"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Livraisons"
+msgstr "Livraisons"
 
 #. module: of_website_portal_carrier
 #: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
 msgid "Marque"
 msgstr "Marque"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Mes documents"
+msgstr "Mes documents"
 
 #. module: of_website_portal_carrier
 #: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
@@ -106,14 +116,14 @@ msgid "N° série"
 msgstr "N° série"
 
 #. module: of_website_portal_carrier
-#: model:ir.model,name:of_website_portal_carrier.model_of_tab
-msgid "Onglet"
-msgstr "Onglet"
-
-#. module: of_website_portal_carrier
 #: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
 msgid "Opération"
 msgstr "Opération"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Orders"
+msgstr "Commandes"
 
 #. module: of_website_portal_carrier
 #: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipts
@@ -121,14 +131,14 @@ msgid "Origine"
 msgstr "Origine"
 
 #. module: of_website_portal_carrier
+#: model:ir.model,name:of_website_portal_carrier.model_stock_pack_operation
+msgid "Packing Operation"
+msgstr "Colisage"
+
+#. module: of_website_portal_carrier
 #: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
 msgid "Pas de reliquat"
 msgstr "Pas de reliquat"
-
-#. module: of_website_portal_carrier
-#: model:ir.model,name:of_website_portal_carrier.model_of_planning_tache
-msgid "Planning OpenFire : Tâches"
-msgstr "Planning OpenFire : Tâches"
 
 #. module: of_website_portal_carrier
 #: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
@@ -151,6 +161,12 @@ msgid "Quelles lignes souhaitez vous imprimer ?"
 msgstr "Quelles lignes souhaitez vous imprimer ?"
 
 #. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Quotes"
+msgstr "Devis"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
 #: model:ir.ui.view,arch_db:of_website_portal_carrier.portal_my_home_menu_sale_b2c
 msgid "Réceptions"
 msgstr "Réceptions"
@@ -166,9 +182,14 @@ msgid "Société"
 msgstr "Société"
 
 #. module: of_website_portal_carrier
-#: model:ir.model,name:of_website_portal_carrier.model_res_users
-msgid "Users"
-msgstr "Utilisateurs"
+#: model:ir.model,name:of_website_portal_carrier.model_stock_picking
+msgid "Transfer"
+msgstr "Transfert"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Une erreur s'est produite"
+msgstr "Une erreur s'est produite"
 
 #. module: of_website_portal_carrier
 #: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
@@ -179,6 +200,12 @@ msgstr "Valider"
 #: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
 msgid "Validé"
 msgstr "Validé"
+
+#. module: of_website_portal_carrier
+#: model:ir.model.fields,field_description:of_website_portal_carrier.field_stock_picking_of_validated_by_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.stock_picking_view_search
+msgid "Validé par le transporteur"
+msgstr "Validé par le transporteur"
 
 #. module: of_website_portal_carrier
 #: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
@@ -193,23 +220,18 @@ msgid "Vous avez traité moins d'articles que la demande initiale."
 msgstr "Vous avez traité moins d'articles que la demande initiale."
 
 #. module: of_website_portal_carrier
-#: model:ir.model,name:of_website_portal_carrier.model_website
-msgid "Website"
-msgstr "Site Web"
-
-#. module: of_website_portal_carrier
-#: model:ir.model,name:of_website_portal_carrier.model_sale_config_settings
-msgid "sale.config.settings"
-msgstr "sale.config.settings"
-
-#. module: of_website_portal_carrier
-#: model:ir.model,name:of_website_portal_carrier.model_website_config_settings
-msgid "website.config.settings"
-msgstr "website.config.settings"
-
-#. module: of_website_portal_carrier
 #: model:ir.actions.report.xml,name:of_website_portal_carrier.receipt_label_report
 #: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
 msgid "Étiquette"
 msgstr "Étiquette"
 
+#. module: of_website_portal_carrier
+#: model:ir.actions.report.xml,name:of_website_portal_carrier.receipt_stock_picking_label_report
+#: model:ir.actions.report.xml,name:of_website_portal_carrier.receipt_stock_production_lot_label_report
+msgid "Étiquettes"
+msgstr "Étiquettes"
+
+#. module: of_website_portal_carrier
+#: model:ir.ui.view,arch_db:of_website_portal_carrier.of_website_portal_portal_my_receipt
+msgid "Étiquettes d'articles"
+msgstr "Étiquettes d'articles"

@@ -51,6 +51,48 @@
         </t>
     </template>
 
+    <report id="receipt_stock_production_lot_label_report"
+            model="stock.production.lot"
+            string="Étiquettes"
+            report_type="qweb-pdf"
+            name="of_website_portal_carrier.report_stock_production_lot_receipt_label"
+            file="of_website_portal_carrier.report_stock_production_lot_receipt_label"
+            paperformat="of_website_portal_carrier.receipt_label_paperformat"
+    />
+
+    <template id="report_stock_production_lot_receipt_label">
+        <t t-call="report.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="of_website_portal_carrier.report_receipt_lot_label_document" t-lang="doc.picking_id.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_receipt_lot_label_document">
+        <div class="page" style="page-break-after: always; font-size: 22px;">
+            <div class="row text-center">
+                <div class="col-xs-6" style="height: 80px; margin-top: 30px;">
+                </div>
+                <div class="col-xs-6" style="height: 80px; margin-top: 30px;">
+                    <span t-esc="doc.product_id.brand_id.name"/>
+                </div>
+                <div class="col-xs-6" style="height: 80px;">
+                </div>
+                <div class="col-xs-6" style="height: 80px;">
+                    <span t-esc="doc.product_id.default_code"/>
+                </div>
+                <div class="col-xs-12" style="height: 60px;">
+                    <span t-esc="doc.name"/>
+                </div>
+                <div class="col-xs-12">
+                    <img t-if="doc.of_internal_serial_number" style="width:500px;height:120px"
+                         t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('EAN13', doc.of_internal_serial_number, 600, 50)"/>
+                    <div t-esc="doc.of_internal_serial_number" style="letter-spacing: 12px;"/>
+                </div>
+            </div>
+        </div>
+    </template>
+
     <template id="report_receipt_label_document">
         <t t-if="doc.pack_lot_ids">
             <t t-foreach="doc.pack_lot_ids" t-as="lot">
