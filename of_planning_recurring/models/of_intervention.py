@@ -590,6 +590,7 @@ class OFPlanningIntervention(models.Model):
         # get deactivated interventions
         records_active_changed = self._is_active_changed(values)
 
+        result = True
         # process events one by one
         for meeting in self:
             # special write of complex IDS
@@ -703,6 +704,7 @@ class OFPlanningIntervention(models.Model):
         if not self.user_has_groups('of_planning_recurring.of_group_planning_intervention_recurring'):
             return super(OFPlanningIntervention, self)._write(vals)
 
+        result = True
         # process events one by one
         for meeting in self:
             # special write of complex IDS
