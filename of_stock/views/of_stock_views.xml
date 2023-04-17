@@ -465,7 +465,6 @@
         <field name="model_id" ref="purchase.model_purchase_order" />
         <field name="state">code</field>
         <field name="code">records.action_generate_serial_number()</field>
-        <field name="condition">record.company_id.id in (env['ir.values'].get_default('stock.config.settings', 'of_serial_management_company_ids') or [])</field>
     </record>
 
     <record id="value_generate_serial_number" model="ir.values">
@@ -473,6 +472,20 @@
         <field eval="'purchase.order'" name="model" />
         <field name="name">Générer les n° de série</field>
         <field eval="'ir.actions.server,%d'%action_generate_serial_number" name="value" />
+    </record>
+
+    <record id="of_preassign_serial_number_action" model="ir.actions.server">
+        <field name="name">Pré-assigner les n° de série</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="state">code</field>
+        <field name="code">records.action_preassign_serial_number()</field>
+    </record>
+
+    <record id="of_preassign_serial_number_value" model="ir.values">
+        <field eval="'client_action_multi'" name="key2" />
+        <field eval="'purchase.order'" name="model" />
+        <field name="name">Pré-assigner les n° de série</field>
+        <field eval="'ir.actions.server,%d'%of_preassign_serial_number_action" name="value"/>
     </record>
 
     <record id="action_server_inventory_form" model="ir.actions.server">
