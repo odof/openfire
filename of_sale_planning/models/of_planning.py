@@ -37,9 +37,9 @@ class OFPlanningIntervention(models.Model):
 
     @api.model
     def create(self, vals):
-        rec = super(OFPlanningIntervention, self).create(vals).sudo()
-        if rec.order_date_vt_need_update():
-            rec.order_id.of_date_vt = rec.date_date
+        rec = super(OFPlanningIntervention, self).create(vals)
+        if rec.sudo().order_date_vt_need_update():
+            rec.sudo().order_id.of_date_vt = rec.date_date
         return rec
 
     @api.multi
