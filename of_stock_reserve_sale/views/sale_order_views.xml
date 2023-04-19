@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sale_order_view_form" model="ir.ui.view">
+        <field name="name">sale.order.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_view_delivery']" position="before">
+                <button type="object"
+                    name="action_view_reservations"
+                    class="oe_stat_button"
+                    icon="fa-arrow-down"
+                    attrs="{'invisible': [('of_reservation_count', '=', 0)]}">
+                    <field name="of_reservation_count" widget="statinfo" string="Réservations"/>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form/group[1]" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <field name="of_reservation_ids" invisible="1"/>
+                    <field name="of_qty_unreserved" invisible="1"/>
+                    <button name="%(action_of_stock_reserve_sale)d"
+                        type="action"
+                        string="Pré-réservation"
+                        attrs="{'invisible': ['|', '|', ('of_qty_unreserved', '&lt;=', 0),
+                                                        ('state', 'not in', ('draft', 'sent', 'presale')),
+                                                        ('of_is_kit', '!=', False)]}"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
