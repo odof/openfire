@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    
+    <record id="of_secteur_update_delete_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.secteur.update.delete.wizard.view.form</field>
+        <field name="model">of.secteur.update.delete.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group invisible="context.get('update_and_delete', 0)">
+                    <p class="text-warning">Cette action va mettre à jour tous les partenaires sans secteur
+                        qui correspondent aux codes postaux, êtes-vous sûr de vouloir continuer ?</p>
+                </group>
+                <group invisible="context.get('update', 0)">
+                    <p class="text-warning">Cette action va mettre à jour tous les partenaires sans secteur
+                        qui correspondent aux codes postaux et exclure ceux qui n'y correspondent pas,
+                        êtes-vous sûr de vouloir continuer ?</p>
+                </group>
+                <footer>
+                    <button string="Accepter" name="button_validate" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window id="of_secteur_update_action"
+        key2="client_action_multi"
+        name="Actualiser"
+        res_model="of.secteur.update.delete.wizard"
+        src_model="of.secteur"
+        view_mode="form"
+        view_type ="form"
+        target="new"
+        context="{'update': 1}"
+        view_id="of_base_location.of_secteur_update_delete_wizard_view_form"/>
+
+    <act_window id="of_secteur_update_delete_action"
+        key2="client_action_multi"
+        name="Actualiser et supprimer"
+        res_model="of.secteur.update.delete.wizard"
+        src_model="of.secteur"
+        view_mode="form"
+        view_type ="form"
+        target="new"
+        context="{'update_and_delete': 1}"
+        view_id="of_base_location.of_secteur_update_delete_wizard_view_form"/>
+</odoo>

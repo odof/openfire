@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="of_better_zip_form" model="ir.ui.view">
+        <field name="name">of.res.better.zip.form</field>
+        <field name="model">res.better.zip</field>
+        <field name="inherit_id" ref="base_location.better_zip_form"/>
+        <field name="arch" type="xml">
+            <group position="inside">
+                <newline/>
+                <field name="geo_lat"/>
+                <field name="geo_lng"/>
+            </group>
+        </field>
+    </record>
+
+    <record id="of_view_better_zip_filter" model="ir.ui.view">
+        <field name="name">of.res.better.zip.select</field>
+        <field name="model">res.better.zip</field>
+        <field name="inherit_id" ref="base_location.view_better_zip_filter"/>
+        <field name="arch" type="xml">
+            <field name="name" position="attributes">
+                <attribute name="filter_domain">[('name','=like',self+'%')]</attribute>
+            </field>
+        </field>
+    </record>
+
+<!-- #################################################################################### -->
+<!-- ########################### SECTEURS ############################################### -->
+<!-- #################################################################################### -->
+
+    <record id="of_view_secteur_form" model="ir.ui.view">
+        <field name="name">of.secteur.form</field>
+        <field name="model">of.secteur</field>
+        <field name="arch" type="xml">
+            <form string="Secteur">
+                <header>
+                    <button string="Actualiser" type="object" name="action_update" class="oe_highlight"
+                            confirm="Cette action va mettre à jour tous les partenaires sans secteur qui correspondent aux codes postaux, êtes-vous sûr de vouloir continuer ?"/>
+                    <button string="Actualiser et Supprimer" type="object" name="action_update_delete" class="oe_highlight"
+                            confirm="Cette action va mettre à jour tous les partenaires sans secteur qui correspondent aux codes postaux et exclure ceux qui n'y correspondent pas, êtes-vous sûr de vouloir continuer ?"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object"
+                                class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"
+                                options='{"terminology": "archive"}'/>
+                        </button>
+                        <button name="action_view_partner" type="object" class="oe_stat_button" icon="fa-users">
+                            <field name="partner_count" widget="statinfo" string="Partenaire(s)"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="type"/>
+                        </group>
+                        <group>
+                            <separator string="Codes postaux du secteur" colspan="2"/>
+                            <field name="zip_range_ids" nolabel="1" colspan="2">
+                                <tree editable="top">
+                                    <field name="cp_min"/>
+                                    <field name="cp_max"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_view_secteur_kanban" model="ir.ui.view">
+        <field name="name">of.secteur.kanban</field>
+        <field name="model">of.secteur</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="type"/>
+                <field name="zip_range_ids"/>
+                <field name="active"/>
+                <templates>
+                    <t t-name="kanban-box">
+                       <div class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <strong>
+                                    <span>
+                                         <t t-esc="record.name.value"/>
+                                    </span>
+                                </strong>
+                                <field name="code"/>
+                                <field name="type"/>
+                                <field name="zip_range_ids" widget="many2many_tags"/>
+                                <field name="active" invisible="1"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="of_view_secteur_tree" model="ir.ui.view">
+        <field name="name">of.secteur.tree</field>
+        <field name="model">of.secteur</field>
+        <field name="arch" type="xml">
+            <tree string="Secteurs" colors="#A0A0A0:active==False;">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="type"/>
+                <field name="zip_range_ids"/>
+                <field name="active" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_view_secteur_filter" model="ir.ui.view">
+        <field name="name">of.secteur.filter</field>
+        <field name="model">of.secteur</field>
+        <field name="arch" type="xml">
+            <search string="Recherche de secteur">
+                <field name="name"/>
+                <field name="code"/>
+                <separator/>
+                <filter string="Commercial" name="com" domain="[('type', 'in', ('com', 'tech_com'))]"/>
+                <filter string="Technique" name="tech" domain="[('type', 'in', ('tech', 'tech_com'))]"/>
+                <separator/>
+                <filter string="Actif" name="active" domain="[('active','=',True)]"/>
+                <filter string="Archivé" name="inactive" domain="[('active','=',False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_of_secteur_tree" model="ir.actions.act_window">
+        <field name="name">Secteurs</field>
+        <field name="res_model">of.secteur</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_id" ref="of_view_secteur_tree"/>
+        <field name="search_view_id" ref="of_view_secteur_filter"/>
+    </record>
+
+    <menuitem
+        name="Secteurs"
+        id="of_secteur_menu"
+        parent="base_location.locations_root_menu"
+        action="action_of_secteur_tree"
+        sequence="20"
+        />
+
+<!-- #################################################################################### -->
+<!-- ########################## PARTENAIRES ############################################# -->
+<!-- #################################################################################### -->
+
+    <record id="of_base_location_partner_form" model="ir.ui.view">
+        <field name="name">of.base.location.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="of_base.of_base_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='website']" position="before">
+                <field name="of_secteur_com_id"/>
+                <field name="of_secteur_tech_id"/>
+            </xpath>
+        </field>
+    </record>
+
+   <record id="of_res_partner_filter" model="ir.ui.view">
+        <field name="name">of.base.location.res.partner.select</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="of_base.of_res_partner_filter" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='city']" position="after">
+                <field name="of_secteur_com_id"/>
+                <field name="of_secteur_tech_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
