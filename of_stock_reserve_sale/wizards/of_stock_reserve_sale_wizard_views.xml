@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_stock_reserve_sale_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.stock.reserve.sale.wizard.view.form</field>
+        <field name="model">of.stock.reserve.sale.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <p class="oe_grey">
+                    Des pré-réservations internes de stock seront créées pour cet article
+                    dans les emplacements avec une quantité à réserver de renseignée.
+                    Si une date de validité est indiquée, les réservations seront
+                    annulées une fois la date passée.
+                </p>
+                <group>
+                    <field name="product_id" readonly="1" options="{'no_open': True}"/>
+                    <field name="qty_ordered" readonly="1"/>
+                    <field name="qty_unreserved" readonly="1"/>
+                    <field name="date_validity"/>
+                </group>
+                <group>
+                    <field name="line_ids" nolabel="1">
+                        <tree editable="top" create="0" delete="0"
+                              decoration-info="qty_to_reserve and qty_to_reserve &gt; 0 and qty_to_reserve &lt;= qty_available"
+                              decoration-danger="qty_to_reserve and qty_to_reserve &gt; qty_available">
+                            <field name="location_id" readonly="1" options="{'no_open': True}"/>
+                            <field name="of_internal_serial_number" readonly="1"/>
+                            <field name="qty_available" readonly="1"/>
+                            <field name="qty_to_reserve"/>
+                        </tree>
+                    </field>
+                </group>
+                <footer>
+                    <button string="Pré-réserver" name="action_reserve" type="object" class="oe_highlight"/>
+                    <button string="Annuler" special="cancel" class="oe_link"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_of_stock_reserve_sale" model="ir.actions.act_window">
+        <field name="name">Pré-réservation interne pour les lignes de commandes</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.stock.reserve.sale.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>
