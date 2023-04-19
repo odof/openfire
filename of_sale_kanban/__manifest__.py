@@ -31,7 +31,7 @@ Modification de la vue kanban des devis/commandes + ajout d'un champ étapes kan
         'sale',
         'of_crm'
     ],
-    'external_dependancies': {
+    'external_dependencies': {
         'python': ['pdfminer', 'pypdftk', 'pyPdf'],
     },
     'data': [

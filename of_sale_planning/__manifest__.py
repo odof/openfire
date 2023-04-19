@@ -33,7 +33,7 @@ Module de lien entre of_sale et of_planning permettant la facturation sur quanti
         'of_sale_report',
         'of_sale_quote_template_kit',
         ],
-    'external_dependancies': {
+    'external_dependencies': {
         'python': ['pdfminer', 'pypdftk', 'pyPdf'],
     },
     'data': [
