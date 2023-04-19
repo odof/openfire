@@ -90,7 +90,7 @@ Droits utilisateurs:
         "of_utils",
         "res_config_settings_enterprise_remove",
     ],
-    'external_dependancies': {
+    'external_dependencies': {
         'python': ['pdfminer', 'pypdftk', 'pyPdf'],
     },
     'data': [
