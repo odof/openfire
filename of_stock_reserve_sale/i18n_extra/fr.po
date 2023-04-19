@@ -1,0 +1,59 @@
+#. module: stock_reserve
+#: model:ir.actions.act_window,help:stock_reserve.action_stock_reservation_tree
+msgid "Click to create a stock reservation."
+msgstr "Cliquer pour créer une réservation de stock."
+
+#. module: stock_reserve
+#: model:ir.ui.view,arch_db:stock_reserve.view_stock_reservation_form
+#: model:ir.ui.view,arch_db:stock_reserve.view_stock_reservation_tree
+msgid "Release"
+msgstr "Annuler la réservation"
+
+#. module: stock_reserve
+#: model:ir.ui.view,arch_db:stock_reserve.view_stock_reservation_search
+msgid "Released"
+msgstr "Annulé"
+
+#. module: stock_reserve
+#: code:addons/stock_reserve/model/stock_reserve.py:192
+#: model:ir.model.fields,field_description:stock_reserve.field_stock_reservation_move_id
+#, python-format
+msgid "Reservation Move"
+msgstr "Mouvement de réservation"
+
+#. module: stock_reserve
+#: model:stock.location,name:stock_reserve.stock_location_reservation
+msgid "Reservation Stock"
+msgstr "Stock réservé"
+
+#. module: stock_reserve
+#: model:ir.ui.view,arch_db:stock_reserve.view_stock_reservation_search
+msgid "Reservations have been released."
+msgstr "Réservations annulées."
+
+#. module: stock_reserve
+#: model:ir.model,name:stock_reserve.model_stock_reservation
+msgid "Stock Reservation"
+msgstr "Réservation de stock"
+
+#. module: stock_reserve
+#: model:ir.actions.act_window,name:stock_reserve.action_stock_reservation_tree
+#: model:ir.ui.menu,name:stock_reserve.menu_action_stock_reservation
+#: model:ir.ui.view,arch_db:stock_reserve.product_product_form_view_reservation_button
+#: model:ir.ui.view,arch_db:stock_reserve.product_template_form_view_reservation_button
+#: model:ir.ui.view,arch_db:stock_reserve.view_stock_reservation_form
+#: model:ir.ui.view,arch_db:stock_reserve.view_stock_reservation_search
+#: model:ir.ui.view,arch_db:stock_reserve.view_stock_reservation_tree
+msgid "Stock Reservations"
+msgstr "Réservations de stock"
+
+#. module: stock_reserve
+#: model:ir.actions.act_window,help:stock_reserve.action_stock_reservation_tree
+msgid "This menu allow you to prepare and reserve some quantities\n"
+"            of products."
+msgstr "Ce menu vous permet de préparer et réserver des quantités d'articles."
+
+#. module: stock_reserve
+#: model:ir.ui.view,arch_db:stock_reserve.view_stock_reservation_form
+msgid "View Reservation Move"
+msgstr "Voir le mouvement de réservation"

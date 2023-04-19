@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="stock_reservation_view_form" model="ir.ui.view">
+        <field name="name">stock.reservation.view.form</field>
+        <field name="model">stock.reservation</field>
+        <field name="inherit_id" ref="stock_reserve.view_stock_reservation_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='location']" position="replace">
+                <group name="location" string="Emplacements">
+                    <field name="location_id"/>
+                    <field name="location_dest_id" invisible="1"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

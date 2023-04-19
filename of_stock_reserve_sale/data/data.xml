@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="seq_picking_type_reserve" model="ir.sequence">
+        <field name="name">Reservation</field>
+        <field name="prefix">RS</field>
+        <field name="padding">6</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="picking_type_reserve" model="stock.picking.type">
+        <field name="name">Pré-réservation interne</field>
+        <field name="sequence_id" ref="seq_picking_type_reserve"/>
+        <field name="code">internal</field>
+        <field name="warehouse_id" eval="False"/>
+        <field name="default_location_src_id" eval="False"/>
+        <field name="default_location_dest_id" ref="stock_reserve.stock_location_reservation"/>
+    </record>
+
+    <function model="stock.location" name="_init_res_loc"/>
+
+</odoo>
