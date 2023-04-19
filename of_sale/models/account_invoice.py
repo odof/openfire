@@ -17,24 +17,33 @@ class AccountInvoice(models.Model):
         """
         view = self.env.ref('of_sale.of_account_invoice_picking_view_form')
         if view:
-            view.write({
-                'active': self.env['ir.values'].get_default('account.config.settings', 'of_validate_pickings') in (2, 3)
-            })
+            view.write(
+                {
+                    'active': self.env['ir.values'].get_default('account.config.settings', 'of_validate_pickings')
+                    in (2, 3)
+                }
+            )
 
     of_date_vt = fields.Date(string="Date visite technique")
     of_sale_order_ids = fields.Many2many('sale.order', compute="_compute_of_sale_order_ids", string="Bons de commande")
     of_residual = fields.Float(
         string=u"Somme du montant non payé des factures d'acompte et de la facture finale",
-        compute="_compute_of_residual")
+        compute="_compute_of_residual",
+    )
     of_residual_equal = fields.Boolean(compute="_compute_of_residual")
     of_suivi_interne = fields.Char(string="Suivi interne")
     of_is_locked = fields.Boolean(compute="_compute_of_is_locked")
     of_waiting_delivery = fields.Boolean(string="Livraison en attente", compute="_compute_of_picking_ids")
     of_picking_ids = fields.Many2many('stock.picking', compute='_compute_of_picking_ids')
     of_picking_count = fields.Integer(string="Bon de livraisons", compute='_compute_of_picking_ids')
-    of_price_printing = fields.Selection([
-        ('order_line', u'Prix par ligne de commande'),
-    ], string=u"Impressions des prix", default='order_line', required=True)
+    of_price_printing = fields.Selection(
+        [
+            ('order_line', u'Prix par ligne de commande'),
+        ],
+        string=u"Impressions des prix",
+        default='order_line',
+        required=True,
+    )
 
     @api.depends('invoice_line_ids')
     def _compute_of_sale_order_ids(self):
@@ -64,8 +73,9 @@ class AccountInvoice(models.Model):
             order_lines = lines.mapped('sale_line_ids')
             invoices = invoice | order_lines.mapped('invoice_lines').mapped('invoice_id')
             invoice.of_residual = sum(invoices.mapped('residual'))
-            invoice.of_residual_equal = invoice.state == 'draft' or \
-                float_compare(invoice.of_residual, invoice.residual, 2) == 0
+            invoice.of_residual_equal = (
+                invoice.state == 'draft' or float_compare(invoice.of_residual, invoice.residual, 2) == 0
+            )
 
     @api.depends('invoice_line_ids', 'invoice_line_ids.of_is_locked')
     def _compute_of_is_locked(self):
@@ -74,8 +84,12 @@ class AccountInvoice(models.Model):
                 invoice.of_is_locked = True
 
     @api.multi
-    @api.depends('invoice_line_ids', 'invoice_line_ids.sale_line_ids', 'invoice_line_ids.sale_line_ids.order_id',
-                 'invoice_line_ids.sale_line_ids.order_id.picking_ids')
+    @api.depends(
+        'invoice_line_ids',
+        'invoice_line_ids.sale_line_ids',
+        'invoice_line_ids.sale_line_ids.order_id',
+        'invoice_line_ids.sale_line_ids.order_id.picking_ids',
+    )
     def _compute_of_picking_ids(self):
         """
         Calcule le nombre de BL liés à la facture.
@@ -84,8 +98,9 @@ class AccountInvoice(models.Model):
         for invoice in self:
             pickings = invoice.of_sale_order_ids.mapped('picking_ids')
             if pickings:
-                invoice.of_waiting_delivery = pickings.filtered(
-                    lambda p: p.state not in ['draft', 'cancel', 'done']) and True or False
+                invoice.of_waiting_delivery = (
+                    pickings.filtered(lambda p: p.state not in ['draft', 'cancel', 'done']) and True or False
+                )
                 invoice.of_picking_ids = pickings
                 invoice.of_picking_count = len(pickings)
 
@@ -116,7 +131,8 @@ class AccountInvoice(models.Model):
         """Mise à jour des dates de l'échéancier"""
         res = super(AccountInvoice, self).action_invoice_open()
         acompte_categ_id = self.env['ir.values'].get_default(
-            'sale.config.settings', 'of_deposit_product_categ_id_setting')
+            'sale.config.settings', 'of_deposit_product_categ_id_setting'
+        )
         lines = self.mapped('invoice_line_ids').filtered(lambda line: line.product_id.categ_id.id != acompte_categ_id)
         orders = lines.mapped('sale_line_ids').mapped('order_id')
         orders.of_update_dates_echeancier()
@@ -142,7 +158,7 @@ class AccountInvoice(models.Model):
 
     @api.multi
     def _of_get_linked_invoices(self):
-        """ [IMPRESSION]
+        """[IMPRESSION]
         Retourne les factures liées à la facture courante.
         Les factures liées sont celles dont une ligne est liée à la même ligne de commande qu'une ligne de lines.
         Toute facture liée à une facture liée est également retournée.
@@ -162,19 +178,21 @@ class AccountInvoice(models.Model):
             return self
 
         invoices = self
-        to_check = (group_paiements_lines
-                    .mapped('sale_line_ids')
-                    .mapped('invoice_lines')
-                    .mapped('invoice_id')
-                    .filtered(lambda i: i.state != 'cancel')) - self
+        to_check = (
+            group_paiements_lines.mapped('sale_line_ids')
+            .mapped('invoice_lines')
+            .mapped('invoice_id')
+            .filtered(lambda i: i.state != 'cancel')
+        ) - self
         while to_check:
             invoices |= to_check
-            to_check = (to_check
-                        .mapped('invoice_line_ids')
-                        .mapped('sale_line_ids')
-                        .mapped('invoice_lines')
-                        .mapped('invoice_id')
-                        .filtered(lambda i: i.state != 'cancel')) - invoices
+            to_check = (
+                to_check.mapped('invoice_line_ids')
+                .mapped('sale_line_ids')
+                .mapped('invoice_lines')
+                .mapped('invoice_id')
+                .filtered(lambda i: i.state != 'cancel')
+            ) - invoices
 
         refunds = invoices.filtered(lambda inv: inv.type != self.type)
         invoices -= refunds
@@ -183,7 +201,8 @@ class AccountInvoice(models.Model):
             move_ids = refund.payment_move_line_ids.mapped('move_id')
             if len(move_ids) == 1:
                 invoice = invoices.filtered(
-                    lambda inv: inv.move_id == move_ids and inv.amount_total == refund.amount_total)
+                    lambda inv: inv.move_id == move_ids and inv.amount_total == refund.amount_total
+                )
                 if invoice:
                     if invoice == self:
                         # La facture en cours est annulée par un avoir
@@ -207,7 +226,7 @@ class AccountInvoice(models.Model):
 
     @api.multi
     def _of_get_printable_payments(self):
-        """ [IMPRESSION]
+        """[IMPRESSION]
         Renvoie les lignes à afficher.
         """
         account_move_line_obj = self.env['account.move.line']
@@ -230,7 +249,7 @@ class AccountInvoice(models.Model):
 
     @api.multi
     def _of_get_recap_taxes(self, invoices):
-        """ [IMPRESSION]
+        """[IMPRESSION]
         Retourne la liste des taxes à afficher dans le récapitulatif de la facture pdf.
         """
         tax_vals = []
@@ -274,8 +293,7 @@ class AccountInvoice(models.Model):
 
     @api.model
     def _refund_cleanup_lines(self, lines):
-        """ Surcharge pour que tout avoir soit pris en compte dans la commande
-        """
+        """Surcharge pour que tout avoir soit pris en compte dans la commande"""
         result = super(AccountInvoice, self)._refund_cleanup_lines(lines)
         if self.env.context.get('of_refund_mode') == 'cancel':
             for i in xrange(0, len(lines)):
@@ -300,8 +318,7 @@ class AccountInvoiceLine(models.Model):
         Fait dans une fonction pour faciliter l'héritage.
         :return: Ids des catégories dont le montant des articles ne doit pas changer des bons de commandes
         """
-        return [self.env['ir.values'].get_default('sale.config.settings',
-                                                  'of_deposit_product_categ_id_setting')]
+        return [self.env['ir.values'].get_default('sale.config.settings', 'of_deposit_product_categ_id_setting')]
 
     @api.model
     def get_locked_product_ids(self):
@@ -320,8 +337,10 @@ class AccountInvoiceLine(models.Model):
         locked_category_ids = self.get_locked_category_ids()
         locked_product_ids = self.get_locked_product_ids()
         for invoice_line in self:
-            if invoice_line.product_id.categ_id.id not in locked_category_ids and \
-               invoice_line.product_id.id not in locked_product_ids:
+            if (
+                invoice_line.product_id.categ_id.id not in locked_category_ids
+                and invoice_line.product_id.id not in locked_product_ids
+            ):
                 invoice_line.of_is_locked = False
             else:
                 invoice_line.of_is_locked = True
@@ -346,13 +365,16 @@ class AccountInvoiceLine(models.Model):
             'uom_id': 'product_uom',
             'discount': 'discount',
             'of_discount_formula': 'of_discount_formula',
-            'invoice_line_tax_ids': 'tax_id'
+            'invoice_line_tax_ids': 'tax_id',
         }
         res = super(AccountInvoiceLine, self).write(vals)
         if res:
             for line in self.filtered('of_is_locked'):
-                if line.invoice_id.invoice_line_ids.filtered('of_is_locked') == line.invoice_id.invoice_line_ids \
-                   and len(line.sale_line_ids) == 1 and line.sale_line_ids.invoice_lines == line:
+                if (
+                    line.invoice_id.invoice_line_ids.filtered('of_is_locked') == line.invoice_id.invoice_line_ids
+                    and len(line.sale_line_ids) == 1
+                    and line.sale_line_ids.invoice_lines == line
+                ):
                     sync = [x for x in fields_to_sync.keys() if x in vals.keys()]
                     vals_order_line = {}
                     for field in sync:

@@ -28,7 +28,8 @@ class ResPartner(models.Model):
             cr.execute(
                 "UPDATE res_partner SET invoice_warn_msg = sale_warn_msg "
                 "WHERE (invoice_warn_msg IS NULL OR invoice_warn_msg = '') and id in %s",
-                (partner_sale_warn_ids,))
+                (partner_sale_warn_ids,),
+            )
         if partner_sale_block_ids:
             cr.execute("UPDATE res_partner SET of_warn_block = 't' WHERE id in %s", (partner_sale_block_ids,))
 
@@ -37,8 +38,8 @@ class ResPartner(models.Model):
     sale_warn_msg = fields.Text(related='invoice_warn_msg', readonly=True)
     of_is_sale_warn = fields.Boolean(string=u"Avertissement ventes")
     of_invoice_policy = fields.Selection(
-        [('order', u'Quantités commandées'), ('delivery', u'Quantités livrées')],
-        string="Politique de facturation")
+        [('order', u'Quantités commandées'), ('delivery', u'Quantités livrées')], string="Politique de facturation"
+    )
 
     @api.depends('of_is_sale_warn')
     def _compute_of_is_warn(self):
@@ -55,8 +56,7 @@ class ResPartner(models.Model):
         all_partners.read(['parent_id'])
 
         sale_order_groups = self.env['sale.order'].read_group(
-            domain=[('partner_id', 'in', all_partners.ids)],
-            fields=['partner_id'], groupby=['partner_id']
+            domain=[('partner_id', 'in', all_partners.ids)], fields=['partner_id'], groupby=['partner_id']
         )
         for group in sale_order_groups:
             partner = self.browse(group['partner_id'][0])

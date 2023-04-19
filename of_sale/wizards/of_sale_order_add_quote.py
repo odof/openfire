@@ -16,10 +16,13 @@ class OFSaleOrderAddQuoteWizard(models.TransientModel):
         for rec in self:
             if rec.order_id:
                 rec.addable_quote_ids = self.env['sale.order'].search(
-                    [('partner_invoice_id', '=', rec.order_id.partner_invoice_id.id),
-                     ('partner_shipping_id', '=', rec.order_id.partner_shipping_id.id),
-                     ('company_id', '=', rec.order_id.company_id.id),
-                     ('state', 'in', ['draft', 'sent'])])
+                    [
+                        ('partner_invoice_id', '=', rec.order_id.partner_invoice_id.id),
+                        ('partner_shipping_id', '=', rec.order_id.partner_shipping_id.id),
+                        ('company_id', '=', rec.order_id.company_id.id),
+                        ('state', 'in', ['draft', 'sent']),
+                    ]
+                )
             else:
                 rec.addable_quote_ids = False
 
@@ -29,16 +32,21 @@ class OFSaleOrderAddQuoteWizard(models.TransientModel):
         # On copie les lignes du devis dans le bon de commande
         for line in self.quote_id.order_line:
             new_line = line.copy(
-                {'order_id': self.order_id.id,
-                 'name': line.name + u"\n\nLigne ajoutée depuis le devis complémentaire %s" % self.quote_id.name})
+                {
+                    'order_id': self.order_id.id,
+                    'name': line.name + u"\n\nLigne ajoutée depuis le devis complémentaire %s" % self.quote_id.name,
+                }
+            )
             # On change le nom des lignes de kit
             if new_line.of_is_kit:
                 for kit_line in new_line.kit_id.kit_line_ids:
-                    kit_line.name = kit_line.name + u" - Ligne ajoutée depuis le devis complémentaire %s" \
-                                    % self.quote_id.name
+                    kit_line.name = (
+                        kit_line.name + u" - Ligne ajoutée depuis le devis complémentaire %s" % self.quote_id.name
+                    )
                     for move in kit_line.procurement_ids.mapped('move_ids'):
-                        move.name = move.name + u" - Ligne ajoutée depuis le devis complémentaire %s" \
-                                    % self.quote_id.name
+                        move.name = (
+                            move.name + u" - Ligne ajoutée depuis le devis complémentaire %s" % self.quote_id.name
+                        )
         # On annule le devis
         self.quote_id.action_cancel()
         return True

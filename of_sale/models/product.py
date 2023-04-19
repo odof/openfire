@@ -7,13 +7,16 @@ from odoo.exceptions import UserError
 class ProductCategory(models.Model):
     _inherit = 'product.category'
 
-    of_article_principal = fields.Boolean(string="Article principal",
-                                          help=u"Les articles de cette catégorie seront considérés comme articles"
-                                               u" principaux sur les commandes / factures clients")
+    of_article_principal = fields.Boolean(
+        string="Article principal",
+        help=u"Les articles de cette catégorie seront considérés comme articles"
+        u" principaux sur les commandes / factures clients",
+    )
     of_taux_marge = fields.Integer(
         string="Taux de marge",
         help=u"Taux de marge en % minimum recommandé quand l'article principal d'un devis fait partie"
-             u" de la catégorie.")
+        u" de la catégorie.",
+    )
 
     @api.constrains('of_taux_marge')
     def _constraint_taux_marge(self):
@@ -28,9 +31,9 @@ class ProductPricelist(models.Model):
     @api.multi
     def of_is_quantity_dependent(self, product_id, date_eval=fields.Date.today()):
         u"""
-            :param: product_id Produit évalué
-            :param: date_eval Date d'évaluation de la liste de prix
-            :return: True si le produit évalué est contenu dans cette liste et que son prix dépend de la quantité
+        :param: product_id Produit évalué
+        :param: date_eval Date d'évaluation de la liste de prix
+        :return: True si le produit évalué est contenu dans cette liste et que son prix dépend de la quantité
         """
         self.ensure_one()
         product = self.env['product.product'].browse(product_id)
@@ -43,12 +46,18 @@ class ProductPricelist(models.Model):
                 if item.date_end and date_eval > item.date_end:
                     continue
                 # l'item s'applique sur une catégorie d'article différente de celle de l'article évalué
-                if item.applied_on == '2_product_category' and item.categ_id \
-                        and item.categ_id != product.product_tmpl_id.categ_id:
+                if (
+                    item.applied_on == '2_product_category'
+                    and item.categ_id
+                    and item.categ_id != product.product_tmpl_id.categ_id
+                ):
                     continue
                 # l'item s'applique sur un article différent de l'article évalué
-                if item.applied_on == '1_product' and item.product_tmpl_id \
-                        and item.product_tmpl_id != product.product_tmpl_id:
+                if (
+                    item.applied_on == '1_product'
+                    and item.product_tmpl_id
+                    and item.product_tmpl_id != product.product_tmpl_id
+                ):
                     continue
                 # l'item s'applique sur une variante différente de la variante évaluée
                 if item.applied_on == '0_product_variant' and item.product_id and item.product_id != product:
@@ -61,14 +70,16 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     of_layout_category_id = fields.Many2one(
-        comodel_name='sale.layout_category', string=u"Section", groups='sale.group_sale_layout')
+        comodel_name='sale.layout_category', string=u"Section", groups='sale.group_sale_layout'
+    )
 
     @api.multi
     @api.depends('product_variant_ids.sales_count')
     def _sales_count(self):
         for product in self:
             product.sales_count = sum(
-                p.sales_count for p in product.with_context(active_test=False).product_variant_ids)
+                p.sales_count for p in product.with_context(active_test=False).product_variant_ids
+            )
 
     @api.multi
     def action_view_sales(self):

@@ -2,6 +2,7 @@
 
 from odoo import api, fields, models
 
+
 class OfSaleOrderConfirmation(models.TransientModel):
     _name = 'of.sale.order.confirmation'
 
@@ -51,14 +52,17 @@ class OFSaleConfiguration(models.TransientModel):
         if not self.env['ir.values'].get_default('sale.config.settings', 'of_recalcul_date_confirmation'):
             self.env['ir.values'].sudo().set_default('sale.config.settings', 'of_recalcul_date_confirmation', 1)
 
-    of_recalcul_date_confirmation = fields.Selection(selection=[(1, 'Automatique'), (2, 'Manuel')],
-                                                     string="(OF) Recalcul de la date de confirmation")
+    of_recalcul_date_confirmation = fields.Selection(
+        selection=[(1, 'Automatique'), (2, 'Manuel')], string="(OF) Recalcul de la date de confirmation"
+    )
 
     @api.multi
     def set_of_recalcul_date_confirmation(self):
         view = self.env.ref('of_sale.of_sale_view_confirmation_date_order_form')
         if view:
             view.write({'active': self.of_recalcul_date_confirmation == 2})
-        return self.env['ir.values'].sudo().set_default(
-                'sale.config.settings', 'of_recalcul_date_confirmation',
-                self.of_recalcul_date_confirmation)
+        return (
+            self.env['ir.values']
+            .sudo()
+            .set_default('sale.config.settings', 'of_recalcul_date_confirmation', self.of_recalcul_date_confirmation)
+        )

@@ -20,8 +20,9 @@ class ProcurementOrder(models.Model):
                 if option.purchase_price_update_type == 'fixed':
                     res['price_unit'] = res['price_unit'] + option.purchase_price_update_value
                 elif option.purchase_price_update_type == 'percent':
-                    res['price_unit'] = res['price_unit'] + (res['price_unit'] *
-                                                             (option.purchase_price_update_value / 100))
+                    res['price_unit'] = res['price_unit'] + (
+                        res['price_unit'] * (option.purchase_price_update_value / 100)
+                    )
                 res['price_unit'] = po.currency_id.round(res['price_unit'])
 
         return res

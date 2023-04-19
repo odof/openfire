@@ -17,10 +17,13 @@ class OFInvoiceReportTotalGroup(models.Model):
         #   (seul un paiement d'une facture antérieure doit figurer sur une facture)
         if lines._name == 'account.invoice.line':
             allowed_order_lines = invoices.mapped('invoice_line_ids').mapped('sale_line_ids')
-            lines = lines.filtered(lambda l: ((l.product_id in self.product_ids
-                                               or l.product_id.categ_id in self.categ_ids)
-                                              and l.sale_line_ids
-                                              and l.sale_line_ids in allowed_order_lines))
+            lines = lines.filtered(
+                lambda l: (
+                    (l.product_id in self.product_ids or l.product_id.categ_id in self.categ_ids)
+                    and l.sale_line_ids
+                    and l.sale_line_ids in allowed_order_lines
+                )
+            )
             # Si une facture d'acompte possède plusieurs lignes, il est impératif de les gérer de la même façon
             invoices = lines.mapped('invoice_id')
             sale_lines = lines.mapped('sale_line_ids')
@@ -31,5 +34,6 @@ class OFInvoiceReportTotalGroup(models.Model):
                         lines |= sale_line2.invoice_lines.filtered(lambda l: l.invoice_id in invoices)
             return lines
         else:
-            return lines.filtered(lambda l: (l.product_id in self.product_ids or
-                                             l.product_id.categ_id in self.categ_ids))
+            return lines.filtered(
+                lambda l: (l.product_id in self.product_ids or l.product_id.categ_id in self.categ_ids)
+            )
