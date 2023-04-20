@@ -45,7 +45,7 @@ Ce module nécessite la librairie mapbox : pip install mapbox
         'of_web_widgets',  # ordre des héritages FieldMany2one
     ],
     'external_dependencies': {
-        'python': ['requests', 'googlemaps', 'mapbox'],
+        'python': ['requests', 'mapbox'],
     },
     'data': [
         'wizards/of_geo_wizard_views.xml',
