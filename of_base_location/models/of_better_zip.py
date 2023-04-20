@@ -53,15 +53,6 @@ class ResPartner(models.Model):
         if self.of_secteur_com_id and self.of_secteur_com_id.type == 'tech_com':
             self.of_secteur_tech_id = self.of_secteur_com_id.id
 
-    @api.onchange('zip')
-    def _onchange_zip(self):
-        self.ensure_one()
-        if self.zip and self.env['ir.values'].get_default('of.intervention.settings', 'automatic_areas'):
-            self.of_secteur_com_id = self.env['of.secteur'].get_secteur_from_cp(self.zip).filtered(
-                lambda sec: sec.type in ('com', 'tech_com'))
-            self.of_secteur_tech_id = self.env['of.secteur'].get_secteur_from_cp(self.zip).filtered(
-                lambda sec: sec.type in ('tech', 'tech_com'))
-
 
 class OfSecteur(models.Model):
     _name = "of.secteur"
