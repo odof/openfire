@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 {
     'name': u"OpenFire / Stock",
-    'version': '10.0.1.1.0',
+    'version': '10.0.1.2.0',
     'license': 'AGPL-3',
     'author': u"OpenFire",
     'category': u"OpenFire",
@@ -37,6 +37,7 @@ Extension OpenFire du module stock
         'reports/of_valued_delivery_report.xml',
         'reports/purchase_order_report.xml',
         'data/mail_template_data.xml',
+        'hooks/post_hook.xml',
     ],
     'installable': True,
     'application': False,

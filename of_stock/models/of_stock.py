@@ -958,6 +958,17 @@ class StockPackOperationLot(models.Model):
 class StockMove(models.Model):
     _inherit = 'stock.move'
 
+    @api.model_cr_context
+    def _auto_init(self):
+        module_self = self.env['ir.module.module'].search([('name', '=', 'of_stock')])
+        actions_todo = module_self and module_self.latest_version < '10.0.1.2.0' or False
+        if actions_todo:
+            cr = self._cr
+            # On crée les colonnes manuellement pour éviter le calcul sur toutes les lignes existantes (trop long)
+            cr.execute("ALTER TABLE stock_move ADD COLUMN of_brand_id integer")
+            cr.execute("ALTER TABLE stock_move ADD COLUMN of_categ_id integer")
+        return super(StockMove, self)._auto_init()
+
     of_has_reordering_rule = fields.Boolean(
         string=u"Règle de stock", compute="_compute_of_of_has_reordering_rule",
         help=u"L'article dispose de règles de réapprovisionnement."
@@ -977,6 +988,11 @@ class StockMove(models.Model):
         string=u"Total HT", currency_field='company_currency_id', compute="_compute_of_amount_untaxed")
     company_currency_id = fields.Many2one(
         'res.currency', related='company_id.currency_id', string="Company currency", readonly=True)
+    of_brand_id = fields.Many2one(
+        comodel_name='of.product.brand', compute='_compute_of_brand_id', string="Marque", store=True)
+    of_categ_id = fields.Many2one(
+        comodel_name='product.category', compute='_compute_of_categ_id', string="Catégorie interne", store=True)
+    of_default_code = fields.Char(related='product_id.default_code', string="Référence interne", readonly=True)
 
     def _inverse_of_price_unit(self):
         for move in self:
@@ -997,6 +1013,16 @@ class StockMove(models.Model):
                     link.operation_id._compute_of_price_unit()
             else:
                 move.of_computed_price_unit = move.of_price_unit or move.product_id.list_price
+
+    @api.depends('product_id.brand_id')
+    def _compute_of_brand_id(self):
+        for move in self:
+            move.of_brand_id = move.product_id.brand_id.id
+
+    @api.depends('product_id.categ_id')
+    def _compute_of_categ_id(self):
+        for move in self:
+            move.of_categ_id = move.product_id.categ_id.id
 
     @api.depends('of_computed_price_unit', 'product_uom_qty')
     def _compute_of_amount_untaxed(self):
