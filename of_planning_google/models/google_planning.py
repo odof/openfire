@@ -86,10 +86,11 @@ class SyncEvent(object):
                                  'The event has been deleted from one side, we delete on other side !')
             #If event is not deleted !
             elif self.OE.status and self.GG.status:
-                if self.OE.update.split('.')[0] != self.GG.update.split('.')[0]:
-                    if self.OE.update < self.GG.update:
+                if not self.OE.update or not self.GG.update or \
+                        self.OE.update.split('.')[0] != self.GG.update.split('.')[0]:
+                    if not self.OE.update or (self.GG.update and self.OE.update < self.GG.update):
                         tmpSrc = 'GG'
-                    elif self.OE.update > self.GG.update:
+                    elif not self.GG.update or self.OE.update > self.GG.update:
                         tmpSrc = 'OE'
                     assert tmpSrc in ['GG', 'OE']
 
