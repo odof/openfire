@@ -11,3 +11,4 @@ from . import res_users
 from . import of_service
 from . import res_config_settings
 from . import post_update
+from . import res_company

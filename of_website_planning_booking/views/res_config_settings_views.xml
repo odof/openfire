@@ -41,8 +41,8 @@
                            attrs="{'invisible': [('group_website_booking_allow_park_brand_creation', '=', False)],
                                    'required': [('group_website_booking_allow_park_brand_creation', '=', True)]}"/>
                     <field name="website_id" invisible="1"/>
-                    <field name="website_booking_terms_file" filename="website_booking_terms_filename" class="oe_inline"/>
-                    <field name="website_booking_terms_filename" invisible="1"/>
+                    <field name="website_booking_terms_file" filename="website_booking_terms_filename" class="oe_inline" readonly="0"/>
+                    <field name="website_booking_terms_filename" invisible="1" readonly="0"/>
                 </group>
             </xpath>
         </field>

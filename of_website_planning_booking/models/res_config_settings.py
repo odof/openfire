@@ -76,15 +76,41 @@ class OFInterventionSettings(models.TransientModel):
             'of_website_planning_booking.of_website_planning_booking_brand_default'))
     website_id = fields.Many2one(comodel_name='website', string=u"Site web", default=_default_website, required=True)
     website_booking_terms_file = fields.Binary(
-        related='website_id.website_booking_terms_file', string=u"(OF) Fichier PDF des Conditions Générales de Vente",
-        filename='website_booking_terms_filename')
+        string=u"(OF) Fichier PDF des Conditions Générales de Vente",
+        filename='website_booking_terms_filename',
+        compute='_compute_website_booking_terms_file',
+        inverse='_inverse_website_booking_terms_file')
     website_booking_terms_filename = fields.Char(
-        related='website_id.website_booking_terms_filename',
-        string=u"(OF) Nom du fichier PDF des Conditions Générales de Vente")
+        string=u"(OF) Nom du fichier PDF des Conditions Générales de Vente",
+        compute='_compute_website_booking_terms_file',
+        inverse='_inverse_website_booking_terms_filename')
     website_edit_days_limit = fields.Integer(
         string=u"(OF) Limite de modifications")
     website_booking_company_dependent = fields.Boolean(
         string=u"(OF) Définir une configuration spécifique à cette société")
+
+    @api.depends('website_booking_company_dependent')
+    def _compute_website_booking_terms_file(self):
+        if not self.website_booking_company_dependent:
+            self.website_booking_terms_file = self.website_id.company_id.of_website_booking_terms_file
+            self.website_booking_terms_filename = self.website_id.company_id.of_website_booking_terms_filename
+        else:
+            self.website_booking_terms_file = self.env.user.company_id.of_website_booking_terms_file
+            self.website_booking_terms_filename = self.env.user.company_id.of_website_booking_terms_filename
+
+    def _inverse_website_booking_terms_file(self):
+        if not self.website_booking_company_dependent:
+            company_id = self.website_id.company_id
+        else:
+            company_id = self.env.user.company_id
+        company_id.of_website_booking_terms_file = self.website_booking_terms_file
+
+    def _inverse_website_booking_terms_filename(self):
+        if not self.website_booking_company_dependent:
+            company_id = self.website_id.company_id
+        else:
+            company_id = self.env.user.company_id
+        company_id.of_website_booking_terms_filename = self.website_booking_terms_filename
 
 
     @api.constrains('website_booking_open_days_number')
