@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_res_partner_update_sector_wizard_form_view" model="ir.ui.view">
+        <field name="name">of.res.partner.update.sector.wizard.form.view</field>
+        <field name="model">of.res.partner.update.sector.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <div>
+                    <p class="text-warning">This action will update the sectors of all selected partners, are you sure you want to continue ?</p>
+                </div>
+                <footer>
+                    <button string="Accept" name="action_button_validate" type="object" class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_res_partner_update_area_wizard_action" model="ir.actions.act_window">
+        <field name="name">Update sectors</field>
+        <field name="res_model">of.res.partner.update.sector.wizard</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_res_partner_update_sector_wizard_form_view"/>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="base.model_res_partner" />
+        <field name="binding_view_types">list</field>
+    </record>
+
+</odoo>

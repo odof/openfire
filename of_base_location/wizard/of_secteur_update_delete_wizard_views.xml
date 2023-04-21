@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_secteur_update_delete_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.sector.update.delete.wizard.view.form</field>
+        <field name="model">of.sector.update.delete.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <div invisible="context.get('update_and_delete', 0)">
+                    <p class="text-warning">This action will update all partners without sectors that match the zip codes, are you sure you want to continue ?</p>
+                </div>
+                <div invisible="context.get('update', 0)">
+                    <p class="text-warning">This action will update all partners without sectors that match the zip codes and exclude those that do not, are you sure you want to continue ?</p>
+                </div>
+                <footer>
+                    <button string="Validate" name="action_button_validate" type="object" class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_secteur_update_action" model="ir.actions.act_window">
+        <field name="name">Update</field>
+        <field name="res_model">of.sector.update.delete.wizard</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_base_location.of_secteur_update_delete_wizard_view_form"/>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="of_base_location.model_of_sector" />
+        <field name="binding_view_types">list</field>
+        <field name="context">{'update': 1}</field>
+    </record>
+
+    <record id="of_sector_update_delete_action" model="ir.actions.act_window">
+        <field name="name">Update and delete</field>
+        <field name="res_model">of.sector.update.delete.wizard</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_base_location.of_secteur_update_delete_wizard_view_form"/>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="of_base_location.model_of_sector" />
+        <field name="binding_view_types">list</field>
+        <field name="context">{'update_and_delete': 1}</field>
+    </record>
+
+</odoo>

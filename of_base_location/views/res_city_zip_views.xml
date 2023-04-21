@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_city_zip_form" model="ir.ui.view">
+        <field name="name">res.city.zip.form</field>
+        <field name="model">res.city.zip</field>
+        <field name="inherit_id" ref="base_location.city_zip_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='city_id']/.." position="after">
+                <group name="coordinantes">
+                    <field name="geo_lat"/>
+                    <field name="geo_lng"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_city_zip_tree" model="ir.ui.view">
+        <field name="name">res.city.zip.tree</field>
+        <field name="model">res.city.zip</field>
+        <field name="inherit_id" ref="base_location.city_zip_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='city_id']" position="after">
+                <field name="geo_lat" optional="hide" />
+                <field name="geo_lng" optional="hide" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_city_zip_filter" model="ir.ui.view">
+        <field name="name">of.res.city.zip.select</field>
+        <field name="model">res.city.zip</field>
+        <field name="inherit_id" ref="base_location.view_city_zip_filter"/>
+        <field name="arch" type="xml">
+            <field name="name" position="attributes">
+                <attribute name="string" values="Prout"/> <!-- TODO TEST REMOVE ME-->
+                <attribute name="filter_domain">[('name','=like',self+'%')]</attribute>
+            </field>
+        </field>
+    </record>
+
+</odoo>

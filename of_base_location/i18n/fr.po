@@ -1,0 +1,337 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_base_location
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-04-24 12:01+0000\n"
+"PO-Revision-Date: 2023-04-24 12:01+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_base_location
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_view_sector_form
+msgid "<span class=\"text-danger\">Unarchive</span>"
+msgstr "<span class=\"text-danger\">Désarchiver</span>"
+
+#. module: of_base_location
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_view_sector_form
+msgid "<span class=\"text-success\">Archive</span>"
+msgstr "<span class=\"text-danger\">Archiver</span>"
+
+#. module: of_base_location
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_res_partner_update_sector_wizard_form_view
+msgid "Accept"
+msgstr "Accepter"
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector__active
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_view_sector_search
+msgid "Active"
+msgstr "Actif"
+
+#. module: of_base_location
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_view_sector_form
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_view_sector_search
+msgid "Archived"
+msgstr "Archivé"
+
+#. module: of_base_location
+#: model:ir.actions.act_window,name:of_base_location.of_res_partner_assign_sector_wizard_action
+msgid "Assign a sector"
+msgstr "Assigner un secteur"
+
+#. module: of_base_location
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_res_partner_update_sector_wizard_form_view
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_secteur_update_delete_wizard_view_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: of_base_location
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_res_partner_assign_sector_wizard_form_view
+msgid "Canceled"
+msgstr "Annulé"
+
+#. module: of_base_location
+#: model:ir.model,name:of_base_location.model_res_city_zip
+msgid "City/locations completion object"
+msgstr "Objet de compléte de Ville / lieux"
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector__code
+msgid "Code"
+msgstr ""
+
+#. module: of_base_location
+#: model:ir.model.fields.selection,name:of_base_location.selection__of_res_partner_assign_sector_wizard__sector_type__commercial
+#: model:ir.model.fields.selection,name:of_base_location.selection__of_sector__type__commercial
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_view_sector_search
+msgid "Commercial"
+msgstr ""
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_res_partner__of_com_sector_id
+#: model:ir.model.fields,field_description:of_base_location.field_res_users__of_com_sector_id
+msgid "Commercial sector"
+msgstr "Secteur commercial"
+
+#. module: of_base_location
+#: model:ir.model,name:of_base_location.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_of_res_partner_assign_sector_wizard__create_uid
+#: model:ir.model.fields,field_description:of_base_location.field_of_res_partner_update_sector_wizard__create_uid
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector__create_uid
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector_update_delete_wizard__create_uid
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector_zip_range__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_of_res_partner_assign_sector_wizard__create_date
+#: model:ir.model.fields,field_description:of_base_location.field_of_res_partner_update_sector_wizard__create_date
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector__create_date
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector_update_delete_wizard__create_date
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector_zip_range__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_of_res_partner_assign_sector_wizard__display_name
+#: model:ir.model.fields,field_description:of_base_location.field_of_res_partner_update_sector_wizard__display_name
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector__display_name
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector_update_delete_wizard__display_name
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector_zip_range__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_of_res_partner_assign_sector_wizard__id
+#: model:ir.model.fields,field_description:of_base_location.field_of_res_partner_update_sector_wizard__id
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector__id
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector_update_delete_wizard__id
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector_zip_range__id
+msgid "ID"
+msgstr ""
+
+#. module: of_base_location
+#: model:ir.model,name:of_base_location.model_city_zip_geonames_import
+msgid "Import City Zips from Geonames"
+msgstr "Importer les codes postaux de Geonames"
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_of_res_partner_assign_sector_wizard____last_update
+#: model:ir.model.fields,field_description:of_base_location.field_of_res_partner_update_sector_wizard____last_update
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector____last_update
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector_update_delete_wizard____last_update
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector_zip_range____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_of_res_partner_assign_sector_wizard__write_uid
+#: model:ir.model.fields,field_description:of_base_location.field_of_res_partner_update_sector_wizard__write_uid
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector__write_uid
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector_update_delete_wizard__write_uid
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector_zip_range__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_of_res_partner_assign_sector_wizard__write_date
+#: model:ir.model.fields,field_description:of_base_location.field_of_res_partner_update_sector_wizard__write_date
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector__write_date
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector_update_delete_wizard__write_date
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector_zip_range__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_res_city_zip__geo_lat
+msgid "Latitude"
+msgstr ""
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_res_city_zip__geo_lng
+msgid "Longitude"
+msgstr ""
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector_zip_range__name
+msgid "Name displayed"
+msgstr "Nom affiché"
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector__partner_count
+msgid "Number of partners"
+msgstr "Nombre de partenaires"
+
+#. module: of_base_location
+#: model:ir.model.constraint,message:of_base_location.constraint_of_sector_name_uniq
+msgid "Oops! Looks like this area already exists..."
+msgstr "Oops ! Il semble que cette zone existe déjà..."
+
+#. module: of_base_location
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_view_sector_form
+msgid "Partner(s)"
+msgstr "Partenaire(s)"
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_of_res_partner_assign_sector_wizard__partner_ids
+msgid "Partners to update"
+msgstr "Partenaires à mettre à jour"
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector__zip_range_ids
+msgid "Postal codes"
+msgstr "Codes postaux"
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_of_res_partner_assign_sector_wizard__sector_id
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector_zip_range__sector_id
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_view_sector_form
+msgid "Sector"
+msgstr "Secteur"
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_of_res_partner_assign_sector_wizard__sector_type
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector__type
+msgid "Sector type"
+msgstr "Type de secteur"
+
+#. module: of_base_location
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_view_sector_form
+msgid "Sector zip codes"
+msgstr "Codes postaux du secteur"
+
+#. module: of_base_location
+#: model:ir.actions.act_window,name:of_base_location.action_of_sector_act_widow
+#: model:ir.ui.menu,name:of_base_location.of_sector_menu
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_view_sector_search
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_view_sector_tree
+msgid "Sectors"
+msgstr "Secteurs"
+
+#. module: of_base_location
+#: model:ir.model.fields.selection,name:of_base_location.selection__of_res_partner_assign_sector_wizard__sector_type__technical
+#: model:ir.model.fields.selection,name:of_base_location.selection__of_sector__type__technical
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_view_sector_search
+msgid "Technical"
+msgstr "Technique"
+
+#. module: of_base_location
+#: model:ir.model.fields.selection,name:of_base_location.selection__of_res_partner_assign_sector_wizard__sector_type__technical_commercial
+#: model:ir.model.fields.selection,name:of_base_location.selection__of_sector__type__technical_commercial
+msgid "Technical & Commercial"
+msgstr "Technique & Commercial"
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_res_partner__of_tech_sector_id
+#: model:ir.model.fields,field_description:of_base_location.field_res_users__of_tech_sector_id
+msgid "Technical sector"
+msgstr "Secteur technique"
+
+#. module: of_base_location
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_secteur_update_delete_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_view_sector_form
+msgid ""
+"This action will update all partners without sectors that match the zip "
+"codes and exclude those that do not, are you sure you want to continue ?"
+msgstr ""
+"Cette action va mettre à jour tous les partenaires sans secteur qui "
+"correspondent aux codes postaux et exclure ceux qui n'y correspondent pas, "
+"êtes-vous sûr de vouloir continuer ?"
+
+#. module: of_base_location
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_secteur_update_delete_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_view_sector_form
+msgid ""
+"This action will update all partners without sectors that match the zip "
+"codes, are you sure you want to continue ?"
+msgstr ""
+"Cette action va mettre à jour tous les partenaires sans secteur qui "
+"correspondent aux codes postaux, êtes-vous sûr de vouloir continuer ?"
+
+#. module: of_base_location
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_res_partner_update_sector_wizard_form_view
+msgid ""
+"This action will update the sectors of all selected partners, are you sure "
+"you want to continue ?"
+msgstr ""
+"Cette action va mettre à jour les secteurs de tous les partenaires "
+"sélectionnés, êtes-vous sûr de vouloir continuer ?"
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector__name
+msgid "Title"
+msgstr "Libellé"
+
+#. module: of_base_location
+#: model:ir.actions.act_window,name:of_base_location.of_secteur_update_action
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_view_sector_form
+msgid "Update"
+msgstr "Actualiser"
+
+#. module: of_base_location
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_view_sector_form
+msgid "Update and Delete"
+msgstr "Actualiser et Supprimer"
+
+#. module: of_base_location
+#: model:ir.actions.act_window,name:of_base_location.of_sector_update_delete_action
+msgid "Update and delete"
+msgstr "Actualiser et Supprimer"
+
+#. module: of_base_location
+#: model:ir.actions.act_window,name:of_base_location.of_res_partner_update_area_wizard_action
+msgid "Update sectors"
+msgstr "Actualiser les secteurs"
+
+#. module: of_base_location
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_res_partner_assign_sector_wizard_form_view
+#: model_terms:ir.ui.view,arch_db:of_base_location.of_secteur_update_delete_wizard_view_form
+msgid "Validate"
+msgstr "Valider"
+
+#. module: of_base_location
+#: model:ir.model,name:of_base_location.model_of_res_partner_assign_sector_wizard
+msgid "Wizard for assigning sectors to partners"
+msgstr "Assistant permettant l'affectation des secteurs aux partenaires"
+
+#. module: of_base_location
+#: model:ir.model,name:of_base_location.model_of_res_partner_update_sector_wizard
+msgid "Wizard for automatic assignment of sectors to partners"
+msgstr "Assistant pour l'attribution automatique des secteurs aux partenaires"
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector_zip_range__zip_code_max
+msgid "Zip code end"
+msgstr "Code postal fin"
+
+#. module: of_base_location
+#: model:ir.model.fields,field_description:of_base_location.field_of_sector_zip_range__zip_code_min
+msgid "Zip code start"
+msgstr "Code postal début"
+
+#. module: of_base_location
+#: model:ir.model,name:of_base_location.model_of_sector
+msgid "of.sector"
+msgstr ""
+
+#. module: of_base_location
+#: model:ir.model,name:of_base_location.model_of_sector_update_delete_wizard
+msgid "of.sector.update.delete.wizard"
+msgstr ""
+
+#. module: of_base_location
+#: model:ir.model,name:of_base_location.model_of_sector_zip_range
+msgid "of.sector.zip.range"
+msgstr ""

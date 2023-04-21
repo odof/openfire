@@ -1,30 +1,26 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': 'OpenFire / Géolocalisation des communes',
-    'version': '10.0.1.0.0',
-    'category': 'Extra Tools',
+    'name': "OpenFire / Géolocalisation des communes",
+    'version': '16.0.1.0.0',
     'license': 'AGPL-3',
-    'summary': 'Coordonnées GPS des villes et lieux',
-    'description': """
-Ajout des coordonnées GPS à la structure des villes importées
-
-Nécessite l'installation du module base_location_geonames_import du dépôt partner-contact de l'OCA.
-
-Pour faire l'import, aller dans Configuration -> Technique -> Cities/Locations Management -> importer de Geonames
-""",
     'author': "OpenFire",
-    'website': 'http://www.akretion.com',
+    'website': "https://www.openfire.fr",
+    'category': 'OpenFire',
+    'summary': "Extension module for base_location",
+    'description': "",
     'depends': [
         'of_base',
         'base_location_geonames_import',
-        'l10n_fr_base_location_geonames_import',  # Dépendance inutile pour le module. Sert uniquement à ne pas oublier d'installer ce module
     ],
     'data': [
-        'views/of_better_zip_view.xml',
-        'wizards/of_secteur_update_delete_wizard_views.xml',
-        'wizards/of_res_partner_assign_area_wizard_views.xml',
         'security/ir.model.access.csv',
+        'views/res_city_zip_views.xml',
+        'views/of_sector_views.xml',
+        'views/res_partner_views.xml',
+        'wizard/of_res_partner_assign_sector_wizard_views.xml',
+        'wizard/of_res_partner_update_sector_wizard_views.xml',
+        'wizard/of_secteur_update_delete_wizard_views.xml',
     ],
     'installable': True,
 }

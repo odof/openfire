@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_res_partner_assign_sector_wizard_form_view" model="ir.ui.view">
+        <field name="name">of.res.partner.assign.sector.wizard.form.view</field>
+        <field name="model">of.res.partner.assign.sector.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="sector_id"/>
+                    <field name="sector_type"/>
+                </group>
+                <footer>
+                    <button string="Validate" name="action_button_update" type="object" class="btn-primary"/>
+                    <button string="Canceled" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_res_partner_assign_sector_wizard_action" model="ir.actions.act_window">
+        <field name="name">Assign a sector</field>
+        <field name="res_model">of.res.partner.assign.sector.wizard</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_res_partner_assign_sector_wizard_form_view"/>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="base.model_res_partner" />
+        <field name="binding_view_types">list</field>
+    </record>
+
+</odoo>

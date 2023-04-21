@@ -1,3 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_of_secteur_user,of.secteur.user,model_of_secteur,base.group_user,1,0,0,0
-access_of_secteur_zip_range_user,of.secteur.zip.range.user,model_of_secteur_zip_range,base.group_user,1,0,0,0
+of_base_location.access_of_sector_user,of.secteur.user,of_base_location.model_of_sector,base.group_user,1,0,0,0
+of_base_location.access_of_sector_manager,of.secteur.manager,of_base_location.model_of_sector,base.group_partner_manager,1,1,1,1
+of_base_location.access_of_sector_zip_range_user,of.secteur.zip.range.user,of_base_location.model_of_sector_zip_range,base.group_user,1,0,0,0
+of_base_location.access_of_sector_zip_range_manager,of.secteur.zip.range.manager,of_base_location.model_of_sector_zip_range,base.group_partner_manager,1,1,1,1
+of_base_location.access_of_res_partner_assign_sector_wizard,access_of_res_partner_assign_sector_wizard,of_base_location.model_of_res_partner_assign_sector_wizard,base.group_user,1,1,1,0
+of_base_location.access_of_res_partner_update_sector_wizard,access_of_res_partner_update_sector_wizard,of_base_location.model_of_res_partner_update_sector_wizard,base.group_user,1,1,1,0
+of_base_location.access_of_sector_update_delete_wizard,access_of_sector_update_delete_wizard,of_base_location.model_of_sector_update_delete_wizard,base.group_user,1,1,1,0
