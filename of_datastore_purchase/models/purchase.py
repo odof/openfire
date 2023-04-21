@@ -99,7 +99,7 @@ class PurchaseOrder(models.Model):
 
             user_id = ds_partner_data['user_id'] and ds_partner_data['user_id'][0]
             if not user_id:
-                user_id = client.user_id.id
+                user_id = client.user_id
 
             company_id = ds_partner_data['company_id'] and ds_partner_data['company_id'][0]
             if not company_id:
