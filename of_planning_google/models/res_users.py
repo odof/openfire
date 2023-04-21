@@ -7,8 +7,7 @@ from odoo import api, fields, models
 class ResUsers(models.Model):
     _inherit = 'res.users'
 
-    of_google_company_id = fields.Many2one(
-        string=u"Google calendar company", comodel_name='res.company', default=lambda u: u.company_id.id)
+    of_google_company_id = fields.Many2one(string=u"Google calendar company", comodel_name='res.company')
     of_google_calendar_last_sync_date = fields.Datetime(
         string=u"Last synchro date", copy=False, hel=u"For field operations planning")
 

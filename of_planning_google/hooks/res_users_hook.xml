@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <function model="res.users" name="_init_of_google_company_id"/>
+
+</odoo>
