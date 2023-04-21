@@ -2544,6 +2544,16 @@ class StockPicking(models.Model):
         action = self.mapped('of_intervention_ids').get_action_views(self, action)
         return action
 
+    @api.multi
+    def button_open_picking_manual(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'stock.picking',
+            'res_id': self.id,
+            'view_mode': 'form',
+        }
+
 
 class StockMove(models.Model):
     _inherit = 'stock.move'
