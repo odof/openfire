@@ -3,7 +3,7 @@
 
 {
     'name': "OpenFire / Planning x Google",
-    'version': "10.0.1.0.0",
+    'version': "10.0.1.0.1",
     'author': "OpenFire",
     'website': "www.openfire.fr",
     'category': "Generic Modules",
@@ -29,6 +29,7 @@ Une fois activée, un bouton "synchronisez avec Google" apparait dans le calendr
         'views/of_intervention_views.xml',
         'views/of_planning_google_templates.xml',
         'wizards/of_update_rec_rules_wizard_views.xml',
+        'hooks/res_users_hook.xml',
     ],
     'demo': [],
     'installable': True,
