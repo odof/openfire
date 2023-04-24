@@ -33,6 +33,7 @@ Paramètres de ventes
     "data": [
         'security/of_sale_stock_security.xml',
         'wizard/of_delivery_division_wizard_views.xml',
+        'wizard/of_additional_delivery_wizard_views .xml',
         'views/of_sale_stock_views.xml',
         'views/stock_pack_operation_views.xml',
         'report/of_report_stockinventory_valued.xml',
