@@ -10,7 +10,7 @@
     'website': 'https://www.openfire.fr',
     'description': "",
     'depends': [
-        'sale',
+        'of_sale',
     ],
     'data': [
         'security/res_groups.xml',

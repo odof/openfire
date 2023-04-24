@@ -22,8 +22,12 @@
                 <field name="of_parent_category_id" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"
                        attrs="{'invisible': [('parent_id', '=', False)]}"/>
             </xpath>
+            <xpath expr="//kanban//field[@name='display_name']" position="after">
+                <field name="of_default_address"/>
+            </xpath>
             <xpath expr="//field[@name='child_ids']/kanban/templates/t//div[hasclass('oe_kanban_details')]/field[@name='name']" position="after">
                 <t t-if="record.type.raw_value"> (<field name="type"/>)</t>
+                <t t-if="record.of_default_address.raw_value"> <span class="fa fa-star">&amp;nbsp;</span></t>
             </xpath>
             <xpath expr="//field[@name='state_id']" position="attributes">
                 <attribute name="invisible">1</attribute>

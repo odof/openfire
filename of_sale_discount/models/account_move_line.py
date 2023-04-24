@@ -38,3 +38,8 @@ class AccountMoveLine(models.Model):
         if not vals.get('of_discount_formula') and vals.get('discount'):
             vals['of_discount_formula'] = f"{vals['discount']}"
         return super().write(vals)
+
+    def _get_fields_sync_mapping(self):
+        res = super()._get_fields_sync_mapping()
+        res['of_discount_formula'] = 'of_discount_formula'
+        return res

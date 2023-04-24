@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-31 16:34+0000\n"
-"PO-Revision-Date: 2023-01-31 16:34+0000\n"
+"POT-Creation-Date: 2023-05-22 07:07+0000\n"
+"PO-Revision-Date: 2023-05-22 07:07+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -53,6 +53,29 @@ msgid "Advanced information"
 msgstr "Informations avancées"
 
 #. module: of_product
+#: model_terms:ir.ui.view,arch_db:of_product.of_product_res_config_settings_view_form
+msgid "Allows you to manage the price of a product by its variants."
+msgstr "Permet de gérer le prix d'un produit par ses variantes."
+
+#. module: of_product
+#: model_terms:ir.ui.view,arch_db:of_product.of_product_res_config_settings_view_form
+msgid ""
+"By attribute : The sale price is driven by the Product template and you can "
+"add an extra price to the variant (standard behaviour)"
+msgstr ""
+"Par attribut : Le prix de vente est géré par le modèle de produit et vous "
+"pouvez ajouter un prix supplémentaire à la variante (comportement standard)"
+
+#. module: of_product
+#: model_terms:ir.ui.view,arch_db:of_product.of_product_res_config_settings_view_form
+msgid ""
+"By variant : You can specify a forced sale price by variant. There is no "
+"more extra price."
+msgstr ""
+"Par variante : Vous pouvez spécifier un prix de vente forcé par variante. Il "
+"n'y a plus de prix supplémentaire."
+
+#. module: of_product
 #: model:ir.model.fields,field_description:of_product.field_product_product__of_uom_category_id
 #: model:ir.model.fields,field_description:of_product.field_product_template__of_uom_category_id
 msgid "Category"
@@ -68,7 +91,7 @@ msgstr "Société"
 #. module: of_product
 #: model:ir.model,name:of_product.model_res_config_settings
 msgid "Config Settings"
-msgstr "Paramètres de config"
+msgstr "Paramètres de configuration"
 
 #. module: of_product
 #: model:ir.model.fields,help:of_product.field_product_product__of_uom_category_id
@@ -162,10 +185,16 @@ msgid "Distributor information"
 msgstr "Informations fournisseur"
 
 #. module: of_product
-#: model:ir.model.fields,field_description:of_product.field_product_product__of_forbidden_discount
-#: model:ir.model.fields,field_description:of_product.field_product_template__of_forbidden_discount
-msgid "Forbiden discount"
-msgstr "Remise interdite"
+#: model:ir.model.fields.selection,name:of_product.selection__of_connector_config_settings__of_product_variant_specific_price__by_attribute
+#: model:ir.model.fields.selection,name:of_product.selection__res_config_settings__of_product_variant_specific_price__by_attribute
+msgid "Handle pricing by attribute"
+msgstr "Gérer la tarification par attribut"
+
+#. module: of_product
+#: model:ir.model.fields.selection,name:of_product.selection__of_connector_config_settings__of_product_variant_specific_price__by_variant
+#: model:ir.model.fields.selection,name:of_product.selection__res_config_settings__of_product_variant_specific_price__by_variant
+msgid "Handle pricing by variant"
+msgstr "Gérer la tarification par variante"
 
 #. module: of_product
 #: model:ir.model.fields,help:of_product.field_product_product__standard_price
@@ -186,11 +215,6 @@ msgid "Inactive"
 msgstr ""
 
 #. module: of_product
-#: model:ir.model.fields,field_description:of_product.field_product_category__of_layout_id
-msgid "Layout"
-msgstr ""
-
-#. module: of_product
 #: model:ir.model.fields,help:of_product.field_product_product__of_seller_delay
 #: model:ir.model.fields,help:of_product.field_product_template__of_seller_delay
 msgid ""
@@ -198,6 +222,12 @@ msgid ""
 "receipt of the products in your warehouse. Used by the scheduler for "
 "automatic computation of the purchase order planning."
 msgstr ""
+
+#. module: of_product
+#: model:ir.model.fields,field_description:of_product.field_of_connector_config_settings__of_product_variant_specific_price
+#: model:ir.model.fields,field_description:of_product.field_res_config_settings__of_product_variant_specific_price
+msgid "(OF) Manage Product variant pricing"
+msgstr "(OF) Gérer la tarification des variantes de produit"
 
 #. module: of_product
 #: model_terms:ir.ui.view,arch_db:of_product.of_product_res_config_settings_view_form
@@ -273,17 +303,17 @@ msgstr "Modèle d'article"
 #: model:ir.model.fields,field_description:of_product.field_product_template__categ_id
 #: model_terms:ir.ui.view,arch_db:of_product.of_product_template_form_view
 msgid "Product Category"
-msgstr "Catégorie d'article"
+msgstr "Catégorie de produit"
 
 #. module: of_product
 #: model:ir.model,name:of_product.model_product_tag
 msgid "Product Tag"
-msgstr "Étiquette du produit"
+msgstr "Étiquette de produit"
 
 #. module: of_product
 #: model:ir.model,name:of_product.model_product_product
 msgid "Product Variant"
-msgstr "Variante d'article"
+msgstr "Variante de produit"
 
 #. module: of_product
 #. odoo-python
@@ -449,11 +479,6 @@ msgid ""
 msgstr ""
 "Le référence fournisseur de l'article sera utilisé lors de l'édition d'un "
 "devis. Laissez le champ vide si vous voulez utiliser la référence interne."
-
-#. module: of_product
-#: model_terms:ir.ui.view,arch_db:of_product.of_product_res_config_settings_view_form
-msgid "If checked this allow to set different prices for each variant. If not checked, the price of the template will be used. (standard behavior)"
-msgstr "Si coché, cela permet de définir des prix différents pour chaque variante. Si elle n'est pas cochée, le prix du modèle sera utilisé. (comportement standard)"
 
 #. module: of_product
 #: model:ir.model.fields,field_description:of_product.field_product_product__of_purchase_transport

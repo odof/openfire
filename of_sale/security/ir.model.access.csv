@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+of_sale.access_of_sale_order_add_quote_wizard,access_of_sale_order_add_quote_wizard,of_sale.model_of_sale_order_add_quote_wizard,base.group_user,1,1,1,1
+of_sale.access_of_sale_order_verification,access_of_sale_order_verification,of_sale.model_of_sale_order_verification,base.group_user,1,1,1,1
+of_sale.access_of_sale_order_confirmation,access_of_sale_order_confirmation,of_sale.model_of_sale_order_confirmation,base.group_user,1,1,1,1

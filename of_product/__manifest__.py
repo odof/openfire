@@ -15,7 +15,9 @@
         'of_utils',
     ],
     'data': [
-        'security/of_product_security.xml',
+        'data/ir_config_parameter.xml',
+        'security/ir_rule.xml',
+        'security/res_groups.xml',
         'views/product_views.xml',
         'views/product_supplierinfo_view.xml',
         'views/of_product_tag_views.xml',

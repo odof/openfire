@@ -4,16 +4,32 @@
 
     <template id="report_saleorder_document" inherit_id="of_sale_report_setting.report_saleorder_document">
         <xpath expr="//t[@t-set='forced_vat']" position="after">
+            <t t-set="pdf_technical_visit_info" t-value="doc.pdf_technical_visit_info()"/>
             <t t-set="pdf_requested_week" t-value="doc.pdf_requested_week()"/>
         </xpath>
-        <xpath expr="//div[@name='technical_visit_information']" position="before">
+
+        <!-- Header block -->
+        <xpath expr="//div[@name='payment_term_information']" position="after">
             <div t-if="pdf_requested_week and doc.of_requested_week" name="requested_week"
                     style="float: left; padding-right: 10px;">
                 <strong>Requested week:</strong>
                 <p class="m-0" t-field="doc.of_requested_week"/>
             </div>
             <div t-if="pdf_requested_week and doc.of_requested_week" style="display: table-cell; width: 4px;"/>
+            <div t-if="pdf_technical_visit_info and doc.of_technical_visit_date" class="col-3 mw-100 mb-2 mr-3" name="technical_visit_information" style="float: left; padding-right: 10px;">
+                <strong>Technical Visit Date:</strong>
+                <p class="m-0" t-field="doc.of_technical_visit_date"/>
+            </div>
         </xpath>
+        <!-- /Header block -->
+
+        <!-- Footer block -->
+        <xpath expr="//p[@name='order_note']" position="after">
+            <p t-if="not pdf_technical_visit_info and doc.of_technical_visit_date">
+                <strong>Technical Visit Date:</strong><span t-field="doc.of_technical_visit_date"/>
+            </p>
+        </xpath>
+        <!-- /Footer block -->
     </template>
 
 </odoo>

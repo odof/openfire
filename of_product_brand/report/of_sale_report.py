@@ -20,13 +20,7 @@ class SaleReport(models.Model):
     def _search_is_my_company(self, operator, value):
         if operator != '=' or not value:
             raise ValueError(_("Unsupported search operator"))
-        req = """SELECT id
-            FROM sale_report
-            WHERE
-            company_id = %s"""
-        self.env.cr.execute(req, (self.env.user.company_id.id,))
-        line_ids = [r[0] for r in self.env.cr.fetchall()]
-        return [('id', 'in', line_ids)]
+        return [('company_id', '=', self.env.user.company_id.id)]
 
     def _get_is_my_company(self):
         for rec in self:
@@ -85,7 +79,7 @@ class SaleReport(models.Model):
     def _read_group_raw(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
         # FIXME: Is that ok ?
         # Workarround to remove unstored computed field of the fields list, beacause we can't send non stored
-        # field no more here. Thoses fields should be comptued on the fly after with the values of the previous period
+        # field no more here. Theses fields should be comptued on the fly after with the values of the previous period
         depends_mapping = {
             'of_diff_price': ('of_diff_price', 'price_subtotal'),
             'of_diff_margin': ('of_diff_margin', 'margin'),

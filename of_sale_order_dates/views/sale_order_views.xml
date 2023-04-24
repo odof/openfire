@@ -2,22 +2,42 @@
 <odoo>
 
     <!-- Sale Order Form View -->
-    <record id="view_order_form" model="ir.ui.view">
+    <record id="of_sale_order_dates_form_view" model="ir.ui.view">
         <field name="name">of.sale.order.dates.sale.order.form.view</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//group[@name='sale_header']/group[@name='order_details']//field[@name='show_update_pricelist']" position="before">
+                <field name="of_technical_visit_date"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="of_sale_stock_order_dates_form_view" model="ir.ui.view">
+        <field name="name">of.sale.stock.order.dates.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
+        <field name="arch" type="xml">
+            <!-- add div's name to xpath -->
+            <xpath expr="//field[@name='commitment_date']/.." position="attributes">
+                <attribute name="name">commitment_date_div</attribute>
+            </xpath>
             <!-- Informations de date déplacées dans le haut du formulaire -->
             <xpath expr="//label[@for='commitment_date']" position="replace"/>
             <xpath expr="//div[@name='commitment_date_div']" position="replace"/>
+            <xpath expr="//field[@name='effective_date']" position="replace"/>
             <xpath expr="//field[@name='show_update_pricelist']" position="before">
                 <label for="commitment_date" string="Delivery Date"/>
                 <div name="commitment_date_div" class="o_row">
                     <field name="commitment_date"/>
-                    <span name="expected_date_span" class="text-muted">
+                    <span class="text-muted" attrs="{'invisible': [('effective_date', '!=', False), ('commitment_date', '!=', False)]}">
                         Expected: <field name="expected_date" class="oe_inline" widget="date"/>
                     </span>
                 </div>
+                <field name="effective_date" attrs="{'invisible': [('effective_date', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//field[@name='effective_date']" position="after">
                 <field name="of_requested_week"/>
             </xpath>
         </field>

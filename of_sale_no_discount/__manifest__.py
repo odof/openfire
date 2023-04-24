@@ -9,7 +9,6 @@
     'website': 'https://www.openfire.fr',
     'description': "",
     'depends': [
-        'sale',
         'of_product',
         'of_sale_discount',
     ],

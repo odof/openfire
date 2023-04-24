@@ -185,6 +185,20 @@
         </field>
     </record>
 
+    <record id="of_product_variant_easy_edit_lst_price_view" model="ir.ui.view">
+        <field name="name">of.product.product.view.form.easy.lst.price</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='lst_price']" position="attributes">
+                <attribute name="groups">!of_product.group_product_variant_specific_price</attribute>
+            </xpath>
+            <xpath expr="//field[@name='lst_price']" position="after">
+                <field name="lst_price" class="oe_inline" widget="monetary" options="{'currency_field': 'currency_id', 'field_digits': True}" groups="of_product.group_product_variant_specific_price"/>
+            </xpath>
+        </field>
+    </record>
+
     <record id="of_produt_product_template_attribute_value_view_form" model="ir.ui.view">
         <field name="name">of.product.product.template.attribute.value.view.form</field>
         <field name="model">product.template.attribute.value</field>

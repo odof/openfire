@@ -8,4 +8,4 @@ Ce module permet de créer des documents personnalisés et de les rendre imprima
 
 Le document peut être un document PDF, un formulaire PDF éditable, une image ou corps de message HTML.
 
-Une clase abstraite permet également d'associer un objet à plusieurs documents personnalisés.
+Une classe abstraite permet également d'associer un objet à plusieurs documents personnalisés.

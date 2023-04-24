@@ -6,10 +6,6 @@ from odoo import Command, api, fields, models
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    of_technical_visit_date = fields.Date(  # TODO: move me to of_sale module when it will migrated
-        string="Technical Visit Date", help=u"If filled, it will be displayed in quotation/order report"
-    )
-
     def pdf_address_title(self):
         return self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_address_title')
 
@@ -120,9 +116,6 @@ class SaleOrder(models.Model):
     def pdf_customer_ref_info(self):
         return self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_customer_ref_info')
 
-    def pdf_technical_visit_info(self):
-        return self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_technical_visit_info')
-
     def pdf_validity_info(self):
         return self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_validity_info')
 
@@ -167,20 +160,6 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    of_price_unit_taxexcl = fields.Float(  # TODO: move me to of_sale module when it will be migrated
-        string='Unit Price Tax excl',
-        compute='_compute_of_price_unit',
-        digits='Product Price',
-        store=True,
-        help="Unit price without taxes",
-    )
-    of_price_unit_taxinc = fields.Float(  # TODO: move me to of_sale module when it will be migrated
-        string='Unit Price Tax incl',
-        compute='_compute_of_price_unit',
-        digits='Product Price',
-        store=True,
-        help="Unit price with taxes",
-    )
     of_display_name = fields.Text(string="Display name for reports", compute='_compute_of_display_name')
     of_product_attachment_domain_ids = fields.One2many(
         comodel_name='ir.attachment',
@@ -195,20 +174,6 @@ class SaleOrderLine(models.Model):
         store=True,
         domain="[('id', 'in', of_product_attachment_domain_ids)]",
     )
-
-    # TODO: move me to of_sale module when it will migrated
-    @api.depends('price_unit', 'product_id', 'tax_id', 'currency_id', 'order_id.partner_shipping_id')
-    def _compute_of_price_unit(self):
-        for line in self:
-            prices = line.tax_id.compute_all(
-                line.price_unit,
-                currency=line.currency_id,
-                quantity=1,
-                product=line.product_id,
-                partner=line.order_id.partner_shipping_id,
-            )
-            line.of_price_unit_taxexcl = prices['total_excluded']
-            line.of_price_unit_taxinc = prices['total_included']
 
     def _compute_of_display_name(self):
         # Inhiber l'affichage de la référence

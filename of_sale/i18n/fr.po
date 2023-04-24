@@ -1,14 +1,14 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-#	* of_sale
+# 	* of_sale
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 10.0\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-25 09:12+0000\n"
-"PO-Revision-Date: 2023-01-25 09:12+0000\n"
-"Last-Translator: <>\n"
+"POT-Creation-Date: 2023-06-14 15:22+0000\n"
+"PO-Revision-Date: 2023-06-14 15:22+0000\n"
+"Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,439 +16,332 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_sale_order_line_of_price_unit_display
-msgid "\n"
-"    Prix unitaire de l'article.\n"
-"    À entrer HT ou TTC suivant la TVA de la ligne de commande.\n"
-"    "
-msgstr "\n"
-"    Prix unitaire de l'article.\n"
-"    À entrer HT ou TTC suivant la TVA de la ligne de commande.\n"
-"    "
+#: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__of_allow_quote_addition
+#: model:ir.model.fields,field_description:of_sale.field_res_config_settings__of_allow_quote_addition
+msgid "(OF) Additional quotes"
+msgstr "(OF) Devis supplémentaires"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_pc_marge
-msgid "% Marge"
-msgstr "% Marge"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
+msgid "(OF) Category of items used for down payments"
+msgstr "(OF) Catégorie d'articles utilisés pour les acomptes"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_pc_marge_initiale
-msgid "% marge initiale"
-msgstr "% marge initiale"
+#: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__of_validate_pickings_on_move
+#: model:ir.model.fields,field_description:of_sale.field_res_config_settings__of_validate_pickings_on_move
+msgid "(OF) Delivery notes management in Customer Invoice"
+msgstr "(OF) Gestion des bons de livraison dans la facture client"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_pc_marge_simul
-msgid "% marge simulée"
-msgstr "% marge simulée"
+#: model:res.groups,name:of_sale.of_group_display_tax_exclued_total_in_so_lines
+msgid "(OF) Display subtotals taxes excl. by sales order line"
+msgstr ""
+"(OF) Affichage des sous-totaux taxes excluses par ligne de commande client"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_group_of_afficher_total_ttc
-msgid "(OF) Afficher les sous-totaux TTC par ligne de commande"
-msgstr "(OF) Afficher les sous-totaux TTC par ligne de commande"
+#: model:res.groups,name:of_sale.of_group_display_tax_inclued_total_in_so_lines
+msgid "(OF) Display subtotals taxes incl. by sales order line"
+msgstr ""
+"(OF) Affichage des sous-totaux taxes incluses par ligne de commande client"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_of_deposit_product_categ_id_setting
-msgid "(OF) Catégorie des acomptes"
+#: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__of_deposit_product_categ_id
+#: model:ir.model.fields,field_description:of_sale.field_res_config_settings__of_deposit_product_categ_id
+msgid "(OF) Down payment product category"
 msgstr "(OF) Catégorie des acomptes"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_of_sale_order_margin_control
-msgid "(OF) Contrôle de marge"
-msgstr "(OF) Contrôle de marge"
+#: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__of_sale_mail_subtype_subscribtion
+#: model:ir.model.fields,field_description:of_sale.field_res_config_settings__of_sale_mail_subtype_subscribtion
+msgid "(OF) Enable subscription of subtype E-Mail for sale orders"
+msgstr ""
+"(OF) Activer l'abonnement au sous-type E-Mail pour les commandes de ventes"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_account_config_settings_of_color_bg_section
-msgid "(OF) Couleur fond titres section"
-msgstr "(OF) Couleur fond titres section"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_account_config_settings_of_color_font
-msgid "(OF) Couleur police titre section"
-msgstr "(OF) Couleur police titre section"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_account_config_settings_pdf_vt_pastille
-msgid "(OF) Date VT pastille"
-msgstr "(OF) Date VT pastille"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_of_allow_quote_addition
-msgid "(OF) Devis complémentaires"
-msgstr "(OF) Devis complémentaires"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_of_invoice_grouped
-msgid "(OF) Facturation groupée"
-msgstr "(OF) Facturation groupée"
-
-#. module: of_sale
-#: model:res.groups,name:of_sale.group_of_can_modify_sale_purchase_price
-msgid "(OF) Modifier le coût dans les lignes de commande"
-msgstr "(OF) Modifier le coût dans les lignes de commande"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_of_position_fiscale
-msgid "(OF) Position fiscale"
+#: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__of_fiscal_position_required
+#: model:ir.model.fields,field_description:of_sale.field_res_config_settings__of_fiscal_position_required
+msgid "(OF) Fiscal position"
 msgstr "(OF) Position fiscale"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_of_recalcul_date_confirmation
-msgid "(OF) Recalcul de la date de confirmation"
-msgstr "(OF) Recalcul de la date de confirmation"
+#: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__of_grouped_invoicing
+#: model:ir.model.fields,field_description:of_sale.field_res_config_settings__of_grouped_invoicing
+msgid "(OF) Grouped invoicing"
+msgstr "(OF) Facturation groupée"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_of_propagate_payment_term
-msgid "(OF) Terms of payment"
-msgstr "(OF) Conditions de réglement"
+#: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__of_sale_confirmation_date_mode
+#: model:ir.model.fields,field_description:of_sale.field_res_config_settings__of_sale_confirmation_date_mode
+msgid "(OF) Mode of confirmation date on Sales"
+msgstr "(OF) Mode de date de confirmation sur les ventes"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_account_config_settings_of_validate_pickings
-msgid "(OF) Validation des BL"
-msgstr "(OF) Validation des BL"
+#: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__module_of_order_line_option
+#: model:ir.model.fields,field_description:of_sale.field_res_config_settings__module_of_order_line_option
+msgid "(OF) Order line option"
+msgstr "(OF) Option de ligne de commande"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "(mise à jour)"
-msgstr "(mise à jour)"
+#: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__of_stop_payment_term_propagation
+#: model:ir.model.fields,field_description:of_sale.field_res_config_settings__of_stop_payment_term_propagation
+msgid "(OF) Stop payment term propagation"
+msgstr "(OF) Arrêter la propagation des conditions de paiement"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "* Les données saisies dans ce champ seront visualisées dans planning d'intervention et imprimées dans la fiche d'intervention."
-msgstr "* Les données saisies dans ce champ seront visualisées dans planning d'intervention et imprimées dans la fiche d'intervention."
+#. odoo-python
+#: code:addons/of_sale/models/sale_order_line.py:0
+#, python-format
+msgid "(Undated)"
+msgstr "(Non daté)"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_order_confirmation_view_form
-msgid "<i class=\"oe_grey\">\n"
-"                        Oui : la date de confirmation devient la date d'aujourd'hui. <br/>\n"
-"                        Non : la date de confirmation existante est conservée.\n"
-"                    </i>"
-msgstr "<i class=\"oe_grey\">\n"
-"                        Oui : la date de confirmation devient la date d'aujourd'hui. <br/>\n"
-"                        Non : la date de confirmation existante est conservée.\n"
-"                    </i>"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid ""
+"* The data entered in this field will be visualized in the intervention "
+"planning and printed in the intervention form."
+msgstr ""
+"* Les données saisies dans ce champ seront visualisées dans planning "
+"d'intervention et imprimées dans la fiche d'intervention."
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_account_invoice_picking_view_form
-msgid "<i>Il reste des bons de livraisons non validés.</i>"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid ""
+"* These notes come from the customer's file. They can only be modified in "
+"the customer form."
+msgstr ""
+"* Ces notes proviennent de la fiche client. Elles ne peuvent être modifiées "
+"que dans la fiche client."
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_account_move_delivery_notes_view_form
+msgid "<i>There are still outstanding delivery notes.</i>"
 msgstr "<i>Il reste des bons de livraisons non validés.</i>"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_obsolete_sale_order_form_view
-msgid "<span attrs=\"{'invisible': [('of_date_tarif', '!=', False)]}\">Non daté</span>)\n"
-"                        <br/>"
-msgstr "<span attrs=\"{'invisible': [('of_date_tarif', '!=', False)]}\">Non daté</span>)\n"
-"                        <br/>"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_account_res_config_settings_view_form
+msgid "<span class=\"d-block w-75 py-2\">Background color</span>"
+msgstr "<span class=\"d-block w-75 py-2\">Couleur de fond</span>"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_obsolete_sale_order_form_view
-msgid "<span style=\"display: inline; color: white; border: 1px solid black; border-radius: 5px; background: red; padding-left: 5px; padding-right: 5px;\" attrs=\"{'invisible': [('of_obsolete', '=', False)]}\">\n"
-"                            Obsolète\n"
-"                        </span>"
-msgstr "<span style=\"display: inline; color: white; border: 1px solid black; border-radius: 5px; background: red; padding-left: 5px; padding-right: 5px;\" attrs=\"{'invisible': [('of_obsolete', '=', False)]}\">\n"
-"                            Obsolète\n"
-"                        </span>"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_account_res_config_settings_view_form
+msgid "<span class=\"d-block w-75 py-2\">Font Color</span>"
+msgstr "<span class=\"d-block w-75 py-2\">Couleur de police</span>"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_account_config_settings_layouted_bg_color
-msgid "<span>Afficher la date de visite technique dans une pastille d'information dans le rapport PDF des factures</span>"
-msgstr "<span>Afficher la date de visite technique dans une pastille d'information dans le rapport PDF des factures</span>"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_account_res_config_settings_view_form
+msgid ""
+"<span class=\"o_form_label\">(OF) Delivery notes management in Customer "
+"Invoice</span>"
+msgstr ""
+"<span class=\"o_form_label\">(OF) Gestion des bons de livraison dans la facture "
+"client</span>"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
-msgid "<span>Allow additional quotes to be added to sale orders</span>"
-msgstr "<span>Autoriser l'ajout de devis complémentaire aux bons de commandes</span>"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
+msgid ""
+"<span class=\"o_form_label\">(OF) Manage the display of the total tax "
+"excl./incl. by command line in sales order forms</span>"
+msgstr ""
+"<span class=\"o_form_label\">(OF) Gérer l'affichage des sous-totaux HT/TTC "
+"par ligne de commande dans les formulaires de commande de vente</span>"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
-msgid "<span>Displays TTC subtotals by command line.</span>\n"
-"                        <br/>\n"
-"                        <span class=\"text-muted\">Only in the form and not in the reports.</span>"
-msgstr "<span>Affiche les sous-totaux TTC par ligne de commande.</span>\n"
-"                        <br/>\n"
-"                        <span class=\"text-muted\">Uniquement dans le formulaire et non dans les rapports.</span>"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_account_res_config_settings_view_form
+msgid "<span class=\"o_form_label\">Section headings</span>"
+msgstr "<span class=\"o_form_label\">Titres de section</span>"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
-msgid "<span>Enable margin control on order validation</span>"
-msgstr "<span>Activer le contrôle de marge à la validation des commandes</span>"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "<span class=\"text-danger\">Vendor view</span>"
+msgstr "<span class=\"text-danger\">Vue vendeur</span>"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
-msgid "<span>Force the use of tax positions in quotes/orders</span>"
-msgstr "<span>Forcer l'utilisation des positions fiscales dans les devis/commandes</span>"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "<span class=\"text-success\">Customer view</span>"
+msgstr "<span class=\"text-success\">Vue client</span>"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
-msgid "<span>Propagate payment terms in invoice</span>"
-msgstr "<span>Propager les conditions de reglement dans la facture</span>"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_report_saleorder_document
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_report_invoice_document
+msgid ""
+"<span groups=\"account.group_show_line_subtotals_tax_excluded\">Amount</span>\n"
+"                <span groups=\"account.group_show_line_subtotals_tax_included\">Total Price</span>"
+msgstr ""
+"<span groups=\"account.group_show_line_subtotals_tax_excluded\">Montant</span>\n"
+"                                    <span groups=\"account.group_show_line_subtotals_tax_included\">Prix Total</span>"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
-msgid "<span>Show stock warning messages</span>"
-msgstr "<span>Afficher les messages d'avertissement de stock</span>"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_report_saleorder_document
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_report_invoice_document
+msgid "<span>Disc.%</span>"
+msgstr "<span>Rem.(%)</span>"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
-msgid "<strong>Date&amp;nbsp;de&amp;nbsp;confirmation&amp;nbsp;:&amp;nbsp;</strong>"
-msgstr "<strong>Date&amp;nbsp;de&amp;nbsp;confirmation&amp;nbsp;:&amp;nbsp;</strong>"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_report_invoice_document
+msgid "<span>Taxes</span>"
+msgstr ""
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
-msgid "<strong>Nom&amp;nbsp;du&amp;nbsp;client&amp;nbsp;:&amp;nbsp;</strong>"
-msgstr "<strong>Nom&amp;nbsp;du&amp;nbsp;client&amp;nbsp;:&amp;nbsp;</strong>"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_report_invoice_document
+msgid "<span>Unit Price</span>"
+msgstr "<span>Prix unitaire</span>"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
-msgid "<strong>Nom&amp;nbsp;du&amp;nbsp;vendeur&amp;nbsp;:&amp;nbsp;</strong>"
-msgstr "<strong>Nom&amp;nbsp;du&amp;nbsp;vendeur&amp;nbsp;:&amp;nbsp;</strong>"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
-msgid "<strong>N°&amp;nbsp;commande&amp;nbsp;:&amp;nbsp;</strong>"
-msgstr "<strong>N°&amp;nbsp;commande&amp;nbsp;:&amp;nbsp;</strong>"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
-msgid "<strong>Société&amp;nbsp;/&amp;nbsp;magasin&amp;nbsp;:&amp;nbsp;</strong>"
-msgstr "<strong>Société&amp;nbsp;/&amp;nbsp;magasin&amp;nbsp;:&amp;nbsp;</strong>"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
-msgid "<strong>Total</strong>"
-msgstr "<strong>Total</strong>"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_invoice_document_inherit_sale
-msgid "<strong>Visite technique:</strong>"
-msgstr "<strong>Visite technique:</strong>"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
-msgid "<strong>État&amp;nbsp;de&amp;nbsp;la&amp;nbsp;commande&amp;nbsp;:&amp;nbsp;</strong>"
-msgstr "<strong>État&amp;nbsp;de&amp;nbsp;la&amp;nbsp;commande&amp;nbsp;:&amp;nbsp;</strong>"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_layout_category_active
-msgid "Active"
-msgstr "Actif"
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_sale_config_settings_of_sale_order_margin_control
-msgid "Activer le contrôle de marge à la validation des commandes"
-msgstr "Activer le contrôle de marge à la validation des commandes"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_addable_quote_ids
-msgid "Addable quote ids"
-msgstr "Addable quote ids"
-
-#. module: of_sale
-#: code:addons/of_sale/wizards/sale_make_invoice_advance.py:74
-#: code:addons/of_sale/wizards/sale_make_invoice_advance.py:82
-#, python-format
-msgid "Advance: %s"
-msgstr "Avance : %s"
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_sale_order_gestion_prix_afficher_remise
-msgid "Affiche le montant de la remise effectuée dans les notes du devis/de la commande."
-msgstr "Affiche le montant de la remise effectuée dans les notes du devis/de la commande."
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_sale_config_settings_group_of_afficher_total_ttc
-msgid "Affiche les sous-totaux TTC par ligne de commande. Uniquement dans le formulaire et non dans les rapports."
-msgstr "Affiche les sous-totaux TTC par ligne de commande. Uniquement dans le formulaire et non dans les rapports."
-
-#. module: of_sale
-#: model:res.groups,comment:of_sale.group_of_afficher_total_ttc
-msgid "Affiche, dans le formualire (et non dans les rapports), les sous-totaux TTC par ligne dans les commandes clients"
-msgstr "Affiche, dans le formualire (et non dans les rapports), les sous-totaux TTC par ligne dans les commandes clients"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_afficher_remise
-msgid "Afficher dans notes"
-msgstr "Afficher dans notes"
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_account_config_settings_pdf_vt_pastille
-msgid "Afficher la date de visite technique dans une pastille dans le rapport PDF des factures ?"
-msgstr "Afficher la date de visite technique dans une pastille dans le rapport PDF des factures ?"
-
-#. module: of_sale
-#: model:res.groups,name:of_sale.group_of_afficher_total_ttc
-msgid "Afficher les sous-totaux TTC par ligne de commande client"
-msgstr "Afficher les sous-totaux TTC par ligne de commande client"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "Ajout devis"
-msgstr "Ajout devis"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_order_add_quote_wizard_form_view
-msgid "Ajouter"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_add_quote_wizard_form_view
+msgid "Add"
 msgstr "Ajouter"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_allow_quote_addition
-msgid "Allows the addition of additional quotes"
-msgstr "Permet l'ajout de devis complémentaires"
+#. odoo-python
+#: code:addons/of_sale/models/sale_order.py:0
+#, python-format
+msgid "Add a complementary quote"
+msgstr "Ajouter un devis complémentaire"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_order_add_quote_wizard_form_view
-#: model:ir.ui.view,arch_db:of_sale.of_sale_order_confirmation_view_form
-msgid "Annuler"
-msgstr "Annuler"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "Add quotation"
+msgstr "Ajout devis"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_view_sale_order_gestion_prix
-msgid "Appliquer au devis/bon de commande (non réversible)"
-msgstr "Appliquer au devis/bon de commande (non réversible)"
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard__addable_quote_ids
+msgid "Addable quotes"
+msgstr "Devis ajoutables"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_apply_on_invoice
-msgid "Appliquer aux factures"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
+msgid ""
+"Adds a new subtype E-Mail for sale orders. Only the recipients and "
+"subscribers to this document subtype will receive emails."
+msgstr ""
+"Ajoute un nouveau sous-type E-Mail pour les commandes de vente. Seuls les "
+"destinataires et abonnés à ce sous-type de document recevront les e-mails."
+
+#. module: of_sale
+#. odoo-python
+#: code:addons/of_sale/wizard/sale_make_invoice_advance.py:0
+#, python-format
+msgid "Advance: %s"
+msgstr "Acompte: %s"
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_account_move_delivery_notes_view_form
+msgid ""
+"All delivery notes related to orders on this invoice will be released. All "
+"items will be considered available and marked as delivered."
+msgstr ""
+"Tous les bons de livraison liés aux commandes de cette facture vont être "
+"validés. Tous les articles seront considérés comme disponibles et marqués "
+"comme livrés."
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
+msgid "Allow additional quotes to be added to sale orders"
+msgstr "Permettre l'ajout de devis supplémentaires aux commandes de vente"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_connector_config_settings__of_stop_payment_term_propagation
+#: model:ir.model.fields,help:of_sale.field_res_config_settings__of_stop_payment_term_propagation
+msgid ""
+"Allow to stop the propagation of the payment term from the sale order to the"
+" invoice"
+msgstr ""
+"Permettre d'arrêter la propagation des conditions de paiement de la commande"
+" de vente à la facture"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_order__of_allow_quote_addition
+msgid "Allows you to add additional quotes"
+msgstr "Permettre l'ajout de devis supplémentaires aux commandes de vente"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_sale_order__of_force_invoice_status
+msgid ""
+"Allows you to force the billing status of the order.Useful for invoiced "
+"orders that refuse to change status (e.g. a line has been deleted in the "
+"invoice)."
+msgstr ""
+"Permet de forcer le statut de facturation de la commande. Utile pour les "
+"commandes facturées qui refusent de changer de statut (par exemple, une "
+"ligne a été supprimée dans la facture)."
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_order__of_estimated_invoicing_date
+msgid "Estimated invoicing date"
+msgstr "Date de facturation prévisionnelle"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_order__of_printing_apply_on_move
+msgid "Apply to invoices"
 msgstr "Appliquer aux factures"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_arrondi_mode
-msgid "Arrondi par ligne"
-msgstr "Arrondi par ligne"
+#: model:ir.model.fields.selection,name:of_sale.selection__of_connector_config_settings__of_sale_confirmation_date_mode__default
+#: model:ir.model.fields.selection,name:of_sale.selection__res_config_settings__of_sale_confirmation_date_mode__default
+msgid "Automatic (default)"
+msgstr "Automatique (par défaut)"
 
 #. module: of_sale
-#: selection:of.sale.order.gestion.prix,arrondi_mode:0
-msgid "Arrondi sur le montant HT"
-msgstr "Arrondi sur le montant HT"
+#: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__of_color_bg_section
+#: model:ir.model.fields,field_description:of_sale.field_res_config_settings__of_color_bg_section
+msgid "Background color of section headings"
+msgstr "Couleur d'arrière-plan des titres de section"
 
 #. module: of_sale
-#: selection:of.sale.order.gestion.prix,arrondi_mode:0
-msgid "Arrondi sur le montant TTC"
-msgstr "Arrondi sur le montant TTC"
+#: model:ir.model,name:of_sale.model_of_sale_order_verification
+msgid ""
+"Base Transient model to do specific verifications on Sale Order "
+"confirmation."
+msgstr ""
+"Base du wizard pour effectuer des vérifications spécifiques à la "
+"confirmation de commande."
 
 #. module: of_sale
-#: selection:of.sale.order.gestion.prix,arrondi_prec:0
-msgid "Arrondir aux 10 centimes les plus proches"
-msgstr "Arrondir aux 10 centimes les plus proches"
+#: model:ir.model.fields,field_description:of_sale.field_res_partner__of_warn_block
+#: model:ir.model.fields,field_description:of_sale.field_res_users__of_warn_block
+msgid "Blocking"
+msgstr "Bloquant"
 
 #. module: of_sale
-#: selection:of.sale.order.gestion.prix,arrondi_prec:0
-msgid "Arrondir aux 10 € les plus proches"
-msgstr "Arrondir aux 10 € les plus proches"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_add_quote_wizard_form_view
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_confirmation_view_form
+msgid "Cancel"
+msgstr "Annuler"
 
 #. module: of_sale
-#: selection:of.sale.order.gestion.prix,arrondi_prec:0
-msgid "Arrondir à l'euro le plus proche"
-msgstr "Arrondir à l'euro le plus proche"
+#. odoo-python
+#: code:addons/of_sale/monkeypatch.py:0
+#, python-format
+msgid ""
+"Cannot find a chart of accounts for this company, You should configure it. \n"
+"Please go to Account Configuration."
+msgstr ""
+"Impossible de trouver un plan comptable pour cette société. Il vous faut le configurer.\n"
+"Veuillez aller dans les configurations comptables"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_order_line_id
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
-msgid "Article"
-msgstr "Article"
+#: model:ir.model.fields,help:of_sale.field_of_connector_config_settings__of_deposit_product_categ_id
+#: model:ir.model.fields,help:of_sale.field_res_config_settings__of_deposit_product_categ_id
+msgid "Category of items used for down payments"
+msgstr "Catégorie d'articles utilisés pour les acomptes"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.view_sale_advance_payment_inv
-msgid "Article d'acompte"
-msgstr "Article d'acompte"
+#: model:ir.model.fields,help:of_sale.field_of_connector_config_settings__of_color_bg_section
+#: model:ir.model.fields,help:of_sale.field_res_config_settings__of_color_bg_section
+msgid "Choose a background color for the section headings"
+msgstr "Choisissez une couleur d'arrière-plan pour les titres de section"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_obsolete
-msgid "Article obsolète"
-msgstr "Article obsolète"
+#: model:ir.model.fields,help:of_sale.field_of_connector_config_settings__of_color_font_section
+#: model:ir.model.fields,help:of_sale.field_res_config_settings__of_color_font_section
+msgid "Choose a font color for the section headings"
+msgstr "Choisissez une couleur de police pour les titres de section"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_account_invoice_line_of_is_locked
-#: model:ir.model.fields,field_description:of_sale.field_account_invoice_of_is_locked
-msgid "Article particulier"
-msgstr "Article particulier"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_product_category_of_article_principal
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_article_principal
-msgid "Article principal"
-msgstr "Article principal"
-
-#. module: of_sale
-#: model:ir.model,name:of_sale.model_of_sale_order_add_quote_wizard
-msgid "Assistant d'ajout de devis complémentaire"
-msgstr "Assistant d'ajout de devis complémentaire"
-
-#. module: of_sale
-#: selection:sale.config.settings,of_recalcul_date_confirmation:0
-msgid "Automatique"
-msgstr "Automatique"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_res_partner_of_is_sale_warn
-#: model:ir.model.fields,field_description:of_sale.field_res_users_of_is_sale_warn
-msgid "Avertissement ventes"
-msgstr "Avertissement ventes"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_order_id
-msgid "Bon de commande"
-msgstr "Bon de commande"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_account_invoice_of_picking_count
-msgid "Bon de livraisons"
-msgstr "Bon de livraisons"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_account_invoice_of_sale_order_ids
-msgid "Bons de commande"
-msgstr "Bons de commande"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_product_categ_id
-msgid "Catégorie d'article"
-msgstr "Catégorie d'article"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_advance_payment_inv_product_categ_id
-msgid "Catégorie des articles d'acompte"
-msgstr "Catégorie des articles d'acompte"
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_sale_config_settings_of_deposit_product_categ_id_setting
-msgid "Catégorie des articles utilisés pour les acomptes"
-msgstr "Catégorie des articles utilisés pour les acomptes"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "Ces notes proviennent de la fiche client sous la rubrique 'Notes internes'. Ils sont uniquement modifiables dans la fiche client."
-msgstr "Ces notes proviennent de la fiche client sous la rubrique 'Notes internes'. Ils sont uniquement modifiables dans la fiche client."
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "Ces notes sont visualisées dans planning d'intervention et imprimées dans la fiche d'intervention."
-msgstr "Ces notes sont visualisées dans planning d'intervention et imprimées dans la fiche d'intervention."
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_sale_order_line_of_article_principal
-msgid "Cet article est l'article principal de la commande"
-msgstr "Cet article est l'article principal de la commande"
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_account_config_settings_of_color_bg_section
-msgid "Choisissez une couleur de fond pour les titres de section"
-msgstr "Choisissez une couleur de fond pour les titres de section"
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_account_config_settings_of_color_font
-msgid "Choisissez une couleur pour les titres de section"
-msgstr "Choisissez une couleur pour les titres de section"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
-msgid "Client"
-msgstr "Client"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_order_id
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification_order_id
-msgid "Commande"
-msgstr "Commande"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
+msgid "Choose the mode of the confirmation date of the sale order."
+msgstr ""
+"Choisissez le mode de la date de confirmation de la commande de vente."
 
 #. module: of_sale
 #: model:ir.model,name:of_sale.model_res_company
@@ -456,908 +349,754 @@ msgid "Companies"
 msgstr "Sociétés"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_confirmation_date_order_form
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "Confirmer la vente"
-msgstr "Confirmer la vente"
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_order_company_id
+msgid "Company"
+msgstr ""
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_view_sale_order_gestion_prix
-msgid "Confirmez-vous l'application des nouveaux prix calculés au devis/bon de commande (non réversible) ?"
-msgstr "Confirmez-vous l'application des nouveaux prix calculés au devis/bon de commande (non réversible) ?"
+#: model:ir.model,name:of_sale.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
 
 #. module: of_sale
-#: selection:of.sale.order.verification,type:0
-msgid "Contrôle de marge"
-msgstr "Contrôle de marge"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "Confirm"
+msgstr "Confirmer"
 
 #. module: of_sale
-#: model:ir.model,name:of_sale.model_of_compose_mail
-msgid "Courrier"
-msgstr "Courrier"
+#. odoo-python
+#: code:addons/of_sale/models/sale_order.py:0
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_confirmation_date_order_form
+#, python-format
+msgid "Confirm sale"
+msgstr "Confirmer la commande"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
-msgid "Coût"
-msgstr "Coût"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_cout_total_ht_simul
-msgid "Coût Total HT simulé"
-msgstr "Coût Total HT simulé"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_cout_total_ht
-msgid "Coût total HT initial"
-msgstr "Coût total HT initial"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_cout_total_ht_simul
-msgid "Coût total HT simulé"
-msgstr "Coût total HT simulé"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_create_uid
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_create_uid
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation_create_uid
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_create_uid
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_create_uid
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification_create_uid
-msgid "Created by"
-msgstr "Créé par"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_create_date
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_create_date
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation_create_date
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_create_date
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_create_date
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification_create_date
-msgid "Created on"
-msgstr "Créé le"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_currency_id
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_currency_id
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_currency_id
-msgid "Currency"
-msgstr "Devise"
-
-#. module: of_sale
-#: selection:res.company,afficher_descr_fab:0
-msgid "Dans les devis"
-msgstr "Dans les devis"
-
-#. module: of_sale
-#: selection:res.company,afficher_descr_fab:0
-msgid "Dans les devis et les factures"
-msgstr "Dans les devis et les factures"
-
-#. module: of_sale
-#: selection:res.company,afficher_descr_fab:0
-msgid "Dans les factures"
-msgstr "Dans les factures"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_date
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
-msgid "Date"
-msgstr "Date "
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_confirmation_date
-msgid "Date de confirmation"
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation__confirmation_date
+msgid "Confirmation date"
 msgstr "Date de confirmation"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_confirmation_date_order
-msgid "Date de confirmation de commande"
-msgstr "Date de confirmation de commande"
+#: model:ir.model,name:of_sale.model_res_partner
+msgid "Contact"
+msgstr ""
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_date_order
-msgid "Date de commande"
-msgstr "Date de commande"
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard__create_uid
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation__create_uid
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification__create_uid
+msgid "Created by"
+msgstr ""
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_fixed_invoice_date
-msgid "Date de facturation fixe"
-msgstr "Date de facturation fixe"
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard__create_date
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation__create_date
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification__create_date
+msgid "Created on"
+msgstr ""
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_invoice_date_prev
-msgid "Date de facturation prévisionnelle"
-msgstr "Date de facturation prévisionnelle"
+#: model:ir.model.fields,help:of_sale.field_sale_order_line__date_order
+msgid ""
+"Creation date of draft/sent orders,\n"
+"Confirmation date of confirmed orders."
+msgstr ""
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_invoice_date_prev
-msgid "Date de facturation prévisonnelle"
-msgstr "Date de facturation prévisonnelle"
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_order_partner_id
+msgid "Customer"
+msgstr "Client"
 
 #. module: of_sale
-#: selection:of.sale.order.verification,type:0
-msgid "Date de pose prévisionnelle"
-msgstr "Date de pose prévisionnelle"
+#: model:ir.model.fields,field_description:of_sale.field_sale_order__client_order_ref
+msgid "Customer Reference"
+msgstr "Référence client"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_date_tarif
-msgid "Date du tarif"
-msgstr "Date du tarif"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "Customer details"
+msgstr "Détails client"
 
 #. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_sale_order_line_confirmation_date_order
-#: model:ir.model.fields,help:of_sale.field_sale_order_line_of_confirmation_date
-msgid "Date on which the sale order is confirmed."
-msgstr "Date à laquelle le bon de commande est confirmé."
+#: model:ir.model.fields,field_description:of_sale.field_sale_order__of_customer_notes
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "Customer notes"
+msgstr "Notes client"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_specific_date
-msgid "Date spécifique"
-msgstr "Date spécifique"
+#: model:ir.model.fields,field_description:of_sale.field_sale_order__of_customer_category_ids
+msgid "Customer tags"
+msgstr "Étiquettes client"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_account_invoice_of_date_vt
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_date_vt
-msgid "Date visite technique"
-msgstr "Date visite technique"
+#: model:ir.model.fields,field_description:of_sale.field_sale_order__of_partner_email
+msgid "Customer's e-mail"
+msgstr "E-mail du client"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
-msgid "Define fields to display"
-msgstr "Définir les champs à afficher"
+#: model:ir.model.fields,field_description:of_sale.field_sale_order__of_partner_mobile
+msgid "Customer's mobile"
+msgstr "Mobile du client"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_last
-msgid "Dernière Échéance"
-msgstr "Dernière Échéance"
+#: model:ir.model.fields,field_description:of_sale.field_sale_order__of_partner_phone
+msgid "Customer's phone"
+msgstr "Téléphone du client"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_quote_id
-msgid "Devis à ajouter"
-msgstr "Devis à ajouter"
+#: model:ir.model.fields,field_description:of_sale.field_sale_order__of_customer_view
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_customer_view
+msgid "Customer/Vendor view"
+msgstr "Vue client/fournisseur"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_order_id
-msgid "Devis/commande"
-msgstr "Devis/commande"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_account_res_config_settings_view_form
+msgid "Customize the background color and the font of your sections headings"
+msgstr "Customisez la couleur de fond et la police de vos titres de section"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_remise
-msgid "Discount (%)"
-msgstr "Remise (%)"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_view
+msgid "Delivered"
+msgstr ""
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_documents_joints_display_name
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_display_name
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_display_name
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation_display_name
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_display_name
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_display_name
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification_display_name
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_tree
+msgid "Delivered qty(ies)"
+msgstr "Qté(s) livrée(s)"
+
+#. module: of_sale
+#: model:ir.model.fields.selection,name:of_sale.selection__res_partner__of_invoice_policy__delivery
+#: model:ir.model.fields.selection,name:of_sale.selection__sale_order__of_invoice_policy__delivery
+#: model:ir.model.fields.selection,name:of_sale.selection__sale_order_line__of_invoice_policy__delivery
+msgid "Delivered quantities"
+msgstr "Quantités livrées"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_account_bank_statement_line__of_picking_ids
+#: model:ir.model.fields,field_description:of_sale.field_account_move__of_picking_ids
+#: model:ir.model.fields,field_description:of_sale.field_account_payment__of_picking_ids
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_account_move_delivery_notes_view_form
+msgid "Deliveries"
+msgstr "Livraisons"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_account_bank_statement_line__of_waiting_delivery
+#: model:ir.model.fields,field_description:of_sale.field_account_move__of_waiting_delivery
+#: model:ir.model.fields,field_description:of_sale.field_account_payment__of_waiting_delivery
+msgid "Delivery on hold"
+msgstr "Livraison en attente"
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_view
+msgid "Description"
+msgstr ""
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard__display_name
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation__display_name
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification__display_name
 msgid "Display Name"
-msgstr "Nom affiché"
+msgstr ""
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_account_invoice_of_mail_template_ids
-#: model:ir.model.fields,field_description:of_sale.field_ir_act_report_xml_of_mail_template_ids
-#: model:ir.model.fields,field_description:of_sale.field_of_documents_joints_of_mail_template_ids
-#: model:ir.model.fields,field_description:of_sale.field_of_planning_intervention_of_mail_template_ids
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_mail_template_ids
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "Documents joints"
-msgstr "Documents joints"
+#: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__group_of_display_tax_exclued_total_in_so_lines
+#: model:ir.model.fields,field_description:of_sale.field_res_config_settings__group_of_display_tax_exclued_total_in_so_lines
+msgid "Display subtotals taxes excl. per order line"
+msgstr "Afficher les sous-totaux HT par ligne de commande"
 
 #. module: of_sale
-#: code:addons/of_sale/wizards/sale_make_invoice_advance.py:73
+#: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__group_of_display_tax_inclued_total_in_so_lines
+#: model:ir.model.fields,field_description:of_sale.field_res_config_settings__group_of_display_tax_inclued_total_in_so_lines
+msgid "Display subtotals taxes incl. per order line"
+msgstr "Afficher les sous-totaux TTC par ligne de commande"
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
+msgid "Displays subtotals tax excl. by command line in sales order forms."
+msgstr "Affiche les sous-totaux taxes excluses par ligne de commande client."
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
+msgid "Displays subtotals tax incl. by command line in sales order forms."
+msgstr "Affiche les sous-totaux taxes incluses par ligne de commande client."
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_connector_config_settings__group_of_display_tax_exclued_total_in_so_lines
+#: model:ir.model.fields,help:of_sale.field_res_config_settings__group_of_display_tax_exclued_total_in_so_lines
+msgid ""
+"Displays the subtotals excluding VAT per order line. Only in the form and "
+"not in the reports."
+msgstr ""
+"Affiche les sous-totaux hors taxes par ligne de commande client. Seulement "
+"dans le formulaire et non dans les rapports."
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_connector_config_settings__group_of_display_tax_inclued_total_in_so_lines
+#: model:ir.model.fields,help:of_sale.field_res_config_settings__group_of_display_tax_inclued_total_in_so_lines
+msgid ""
+"Displays the subtotals including VAT per order line. Only in the form and "
+"not in the reports."
+msgstr ""
+"Affiche les sous-totaux taxes incluses par ligne de commande client. "
+"Seulement dans le formulaire et non dans les rapports."
+
+#. module: of_sale
+#: model:res.groups,comment:of_sale.of_group_display_tax_exclued_total_in_so_lines
+msgid ""
+"Displays, in the form (not in the reports), the subtotals exckuding VAT per "
+"line in the sales orders"
+msgstr ""
+"Affiche, dans le formulaire (pas dans les rapports), les sous-totaux hors "
+"taxes par ligne dans les commandes clients"
+
+#. module: of_sale
+#: model:res.groups,comment:of_sale.of_group_display_tax_inclued_total_in_so_lines
+msgid ""
+"Displays, in the form (not in the reports), the subtotals including VAT per "
+"line in the sales orders"
+msgstr ""
+"Affiche, dans le formulaire (pas dans les rapports), les sous-totaux taxes "
+"incluses par ligne dans les commandes clients"
+
+#. module: of_sale
+#: model:ir.model.fields.selection,name:of_sale.selection__of_connector_config_settings__of_validate_pickings_on_move__no
+#: model:ir.model.fields.selection,name:of_sale.selection__res_config_settings__of_validate_pickings_on_move__no
+msgid "Do not manage delivery notes from the invoice"
+msgstr "Ne pas gérer les BL depuis la facture"
+
+#. module: of_sale
+#: model:ir.model.fields.selection,name:of_sale.selection__res_company__show_manufacturer_description__no
+msgid "Do not show"
+msgstr "Ne pas afficher"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_advance_payment_inv__product_id
+msgid "Down Payment Product"
+msgstr "Montant de l'acompte"
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_view_sale_advance_payment_inv
+msgid "Down payment item"
+msgstr "Article d'acompte"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_advance_payment_inv__product_categ_id
+msgid "Down payment items category"
+msgstr "Catégorie des articles d'acompte"
+
+#. module: of_sale
+#. odoo-python
+#: code:addons/of_sale/wizard/sale_make_invoice_advance.py:0
 #, python-format
 msgid "Down payment of %s%%"
 msgstr "Acompte de %s%%"
 
 #. module: of_sale
-#: model:ir.module.category,description:of_sale.of_sale_marge
-msgid "Définit les droits d'accès aux marges."
-msgstr "Définit les droits d'accès aux marges."
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
+msgid "Enable order line options"
+msgstr "Activer les options de la ligne de commande"
 
 #. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_sale_order_gestion_prix_methode_remise
-msgid "Détermine comment est calculée la remise sur les lignes sélectionnées du devis"
-msgstr "Détermine comment est calculée la remise sur les lignes sélectionnées du devis"
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_estimated_invoicing_date
+msgid "Estimated invoicing date"
+msgstr "Date de facturation prévisionnelle"
 
 #. module: of_sale
-#: model:ir.actions.act_window,name:of_sale.action_of_sale_confirmation_devis
-msgid "Confirmer la vente"
-msgstr "Confirmer la vente"
+#: model:ir.model.fields,field_description:of_sale.field_sale_order__of_fixed_invoice_date
+msgid "Fixed invoice date"
+msgstr "Date de facturation fixe"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_to_invoice
-msgid "Entièrement facturable"
+#: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__of_color_font_section
+#: model:ir.model.fields,field_description:of_sale.field_res_config_settings__of_color_font_section
+msgid "Font color of section headings"
+msgstr "Couleur de police des titres de section"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_order__of_force_invoice_status
+msgid "Force Invoice Status"
+msgstr "Forcer le statut de facturation"
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
+msgid "Force the use of tax positions in quotes/orders"
+msgstr "Forcer l'utilisation des positions fiscales dans les devis/commandes"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_order__of_date_order
+msgid "Forced confirmation date"
+msgstr "Date de confirmation forcée"
+
+#. module: of_sale
+#: model:ir.model.fields.selection,name:of_sale.selection__sale_order__of_force_invoice_status__invoiced
+msgid "Fully Invoiced"
+msgstr "Entièrement facturée"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_order__of_fully_invoicable
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_sales_order_filter
+msgid "Fully invoicable"
 msgstr "Entièrement facturable"
 
 #. module: of_sale
-#: selection:of.sale.margin.regulator,invoice_status:0
-msgid "Entièrement facturé"
-msgstr "Entièrement facturé"
+#. odoo-python
+#: code:addons/of_sale/monkeypatch.py:0
+#, python-format
+msgid "Go to the configuration panel"
+msgstr "Aller au panneau de configuration"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "Est l'article principal"
-msgstr "Est l'article principal"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
+msgid "Group invoicing on sale orders"
+msgstr "Groupement des factures sur les commandes clients"
 
 #. module: of_sale
-#: selection:of.sale.order.gestion.prix.line,state:0
-msgid "Exclus"
-msgstr "Exclus"
+#: model:ir.model.fields.selection,name:of_sale.selection__of_connector_config_settings__of_grouped_invoicing__default_grouping
+#: model:ir.model.fields.selection,name:of_sale.selection__res_config_settings__of_grouped_invoicing__default_grouping
+msgid "Grouping by company, partner, currency (default mode)"
+msgstr "Groupement par société, partenaire, devise (mode par défaut)"
 
 #. module: of_sale
-#: model:ir.actions.report.xml,name:of_sale.of_report_sale_order_gestion_prix
-msgid "Feuille de marge"
-msgstr "Feuille de marge"
+#: model:ir.model.fields.selection,name:of_sale.selection__of_connector_config_settings__of_grouped_invoicing__sale_order
+#: model:ir.model.fields.selection,name:of_sale.selection__res_config_settings__of_grouped_invoicing__sale_order
+msgid "Grouping by sale order"
+msgstr "Groupement par commande client"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
-msgid "Fonctionnalities"
-msgstr "Fonctionnalités"
+#: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__show_warning_b2b_to_b2c
+#: model:ir.model.fields,field_description:of_sale.field_res_config_settings__show_warning_b2b_to_b2c
+msgid "Has B2B/B2C field changed (from b2b to b2c)"
+msgstr "Le champ B2B/B2C a-t-il changé (de b2b à b2c)"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_force_invoice_status
-msgid "Forcer état de facturation"
-msgstr "Forcer état de facturation"
+#: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__show_warning_b2c_to_b2b
+#: model:ir.model.fields,field_description:of_sale.field_res_config_settings__show_warning_b2c_to_b2b
+msgid "Has B2B/B2C field changed (from b2c to b2b)"
+msgstr "Le champ B2B/B2C a-t-il changé (de b2c à b2b)"
 
 #. module: of_sale
-#: selection:of.sale.order.gestion.prix.line,state:0
-msgid "Forcé"
-msgstr "Forcé"
-
-#. module: of_sale
-#: selection:sale.order,of_force_invoice_status:0
-msgid "Fully Invoiced"
-msgstr "Entièrement facturé"
-
-#. module: of_sale
-#: model:ir.model,name:of_sale.model_of_sale_order_gestion_prix
-#: model:ir.ui.view,arch_db:of_sale.of_view_sale_order_gestion_prix
-msgid "Gestion des prix"
-msgstr "Gestion des prix"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "Gestion prix"
-msgstr "Gestion prix"
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_sale_echeance_sequence
-msgid "Gives the sequence order when displaying a list of payment term lines."
-msgstr "Donne l'ordre lors de l'affichage des lignes des conditions de paiement."
-
-#. module: of_sale
-#: selection:sale.config.settings,of_invoice_grouped:0
-msgid "Groupement par commande"
-msgstr "Groupement par commande"
-
-#. module: of_sale
-#: selection:sale.config.settings,of_invoice_grouped:0
-msgid "Groupement par partenaire + devise"
-msgstr "Groupement par partenaire + devise"
-
-#. module: of_sale
-#: selection:account.config.settings,of_validate_pickings:0
-msgid "Gérer les BL après la validation de la facture"
-msgstr "Gérer les BL après la validation de la facture"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
-msgid "HT"
-msgstr "HT"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_documents_joints_id
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_id
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_id
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation_id
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_id
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_id
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification_id
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard__id
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation__id
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification__id
 msgid "ID"
-msgstr "ID"
+msgstr ""
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "Impression"
-msgstr "Impression"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
+msgid ""
+"If checked that will stop the propagation of the payment term from the sale "
+"order to the invoice"
+msgstr ""
+"Si coché, arrête la propagation des conditions de paiement de la commande "
+"client vers la facture"
 
 #. module: of_sale
-#: model:ir.model,name:of_sale.model_of_invoice_report_total_group
-msgid "Impression des totaux de factures et commandes de vente"
-msgstr "Impression des totaux de factures et commandes de vente"
+#: model:ir.model.fields,help:of_sale.field_sale_order_line__of_order_pricelist_id
+msgid "If you change the pricelist, only newly added lines will be affected."
+msgstr ""
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_account_invoice_of_price_printing
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_price_printing
-msgid "Impressions des prix"
-msgstr "Impressions des prix"
+#: model:ir.model.fields.selection,name:of_sale.selection__res_company__show_manufacturer_description__invoices
+msgid "In Invoices"
+msgstr "Dans les factures"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_view_sale_order_gestion_prix
-msgid "Imprimer"
-msgstr "Imprimer"
+#: model:ir.model.fields.selection,name:of_sale.selection__res_company__show_manufacturer_description__sales
+msgid "In Sales Orders"
+msgstr "Dans les devis"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_advance_payment_inv_of_include_null_qty_lines
-msgid "Inclure les lignes en quantité 0 ?"
-msgstr "Inclure les lignes en quantité 0 ?"
+#: model:ir.model.fields.selection,name:of_sale.selection__res_company__show_manufacturer_description__both
+msgid "In Sales Orders and Invoices"
+msgstr "Dans les devis et les factures"
 
 #. module: of_sale
-#: selection:of.sale.order.gestion.prix.line,state:0
-msgid "Inclus"
-msgstr "Inclus"
+#: model:ir.model.fields,field_description:of_sale.field_sale_advance_payment_inv__of_include_null_qty_lines
+msgid "Include lines in quantity 0 ?"
+msgstr "Inclure les lignes à quantité 0 ?"
 
 #. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_account_invoice_of_mail_template_ids
-#: model:ir.model.fields,help:of_sale.field_ir_act_report_xml_of_mail_template_ids
-#: model:ir.model.fields,help:of_sale.field_of_documents_joints_of_mail_template_ids
-#: model:ir.model.fields,help:of_sale.field_of_planning_intervention_of_mail_template_ids
-#: model:ir.model.fields,help:of_sale.field_sale_order_of_mail_template_ids
-msgid "Intégrer des documents pdf au devis/bon de commande (exemple : CGV)"
-msgstr "Intégrer des documents pdf au devis/bon de commande (exemple : CGV)"
+#: model:ir.model.fields,field_description:of_sale.field_account_bank_statement_line__of_internal_followup
+#: model:ir.model.fields,field_description:of_sale.field_account_move__of_internal_followup
+#: model:ir.model.fields,field_description:of_sale.field_account_payment__of_internal_followup
+msgid "Internal follow-up"
+msgstr "Suivi interne"
 
 #. module: of_sale
-#: model:ir.model,name:of_sale.model_account_invoice
+#: model:ir.model.fields,field_description:of_sale.field_sale_order__of_intervention_notes
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "Intervention notes"
+msgstr "Notes intervention"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_res_partner__invoice_warn
+#: model:ir.model.fields,field_description:of_sale.field_res_users__invoice_warn
 msgid "Invoice"
 msgstr "Facture"
 
 #. module: of_sale
-#: model:ir.model,name:of_sale.model_account_invoice_line
-msgid "Invoice Line"
-msgstr "Ligne de facture"
+#: model:ir.model.fields.selection,name:of_sale.selection__account_payment_term_line__of_option_date__invoice
+msgid "Invoice date"
+msgstr "Date de facture"
 
 #. module: of_sale
-#: model:ir.model,name:of_sale.model_account_invoice_refund
-msgid "Invoice Refund"
-msgstr "Avoir"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_view
+msgid "Invoiced"
+msgstr ""
 
 #. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_sale_order_gestion_prix_marge_initiale
-msgid "It gives profitability by calculating the difference between the Unit Price and the cost."
-msgstr "Il donne la rentabilité en calculant la différence entre le prix unitaire et le coût."
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_tree
+msgid "Invoiced qty(ies)"
+msgstr "Qté(s) facturée(s)"
 
 #. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_res_company_afficher_descr_fab
-msgid "La description du fabricant d'un article sera ajoutée à la description de l'article dans les documents."
-msgstr "La description du fabricant d'un article sera ajoutée à la description de l'article dans les documents."
+#: model:ir.model.fields,field_description:of_sale.field_res_partner__of_is_account_warn
+#: model:ir.model.fields,field_description:of_sale.field_res_users__of_is_account_warn
+msgid "Invoices warning"
+msgstr "Avertissement factures"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_documents_joints___last_update
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance___last_update
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard___last_update
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation___last_update
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix___last_update
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line___last_update
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification___last_update
-msgid "Last Modified on"
-msgstr "Dernière Modification le"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_write_uid
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_write_uid
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation_write_uid
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_write_uid
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_write_uid
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification_write_uid
-msgid "Last Updated by"
-msgstr "Dernière mise à jour par"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_write_date
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard_write_date
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation_write_date
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_write_date
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_write_date
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification_write_date
-msgid "Last Updated on"
-msgstr "Dernière mise à jour le"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_account_invoice_view_form
-msgid "Le total du montant des factures d'acompte est différent de celui des paiements.<br/>\n"
-"                    Vérifier que les factures d'acompte ont bien été payées."
-msgstr "Le total du montant des factures d'acompte est différent de celui des paiements.<br/>\n"
-"                    Vérifier que les factures d'acompte ont bien été payées."
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_product_category_of_article_principal
-msgid "Les articles de cette catégorie seront considérés comme articles principaux sur les commandes / factures clients"
-msgstr "Les articles de cette catégorie seront considérés comme articles principaux sur les commandes / factures clients"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_echeances_modified
-msgid "Les échéances ont besoin d'être recalculées"
-msgstr "Les échéances ont besoin d'être recalculées"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_order_line_tree
-#: model:ir.ui.view,arch_db:of_sale.of_view_sale_order_gestion_prix
-msgid "Lignes de commande"
-msgstr "Lignes de commande"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_ids
-msgid "Lignes impactées"
-msgstr "Lignes impactées"
-
-#. module: of_sale
-#: model:ir.actions.act_window,name:of_sale.action_sale_order_line_tree_all
-#: model:ir.ui.menu,name:of_sale.menu_sale_order_line_test
-#: model:ir.ui.view,arch_db:of_sale.of_sale_order_line_pivot
-msgid "Lignes à facturer"
-msgstr "Lignes à facturer"
-
-#. module: of_sale
-#: model:ir.actions.report.xml,name:of_sale.of_report_sale_order_list
-msgid "Liste des commandes"
-msgstr "Liste des commandes"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_account_invoice_of_waiting_delivery
-msgid "Livraison en attente"
-msgstr "Livraison en attente"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_order_view_search_inherit_sale
-msgid "Livraison restante"
-msgstr "Livraison restante"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_account_invoice_view_form
-msgid "Livraisons"
-msgstr "Livraisons"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_delivered
-msgid "Livrée"
-msgstr "Livrée"
-
-#. module: of_sale
-#: selection:sale.config.settings,of_recalcul_date_confirmation:0
-msgid "Manuel"
-msgstr "Manuel"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
-msgid "Manufacturing"
-msgstr "Fabrication"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
-msgid "Marge"
-msgstr "Marge"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_marge_pc
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_marge_pc
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
-msgid "Marge %"
-msgstr "Marge %"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_marge
-msgid "Marge HT"
-msgstr "Marge HT"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
-msgid "Marge&amp;nbsp;"
-msgstr "Marge&amp;nbsp;"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
-msgid "Marge&amp;nbsp;%"
-msgstr "Marge&amp;nbsp;%"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification_message
-msgid "Message"
-msgstr "Message"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_methode_remise
-msgid "Mode de calcul"
-msgstr "Mode de calcul"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_amount
-msgid "Montant"
-msgstr "Montant"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_unit_price_variation
-msgid "Montant unitaire de la variation de prix"
-msgstr "Montant unitaire de la variation de prix"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_price_management_variation
-msgid "Montant unitaire de la variation de prix liée à la gestion de prix"
-msgstr "Montant unitaire de la variation de prix liée à la gestion de prix"
-
-#. module: of_sale
-#: selection:res.company,afficher_descr_fab:0
-msgid "Ne pas afficher"
-msgstr "Ne pas afficher"
-
-#. module: of_sale
-#: selection:account.config.settings,of_validate_pickings:0
-msgid "Ne pas gérer les BL depuis la facture"
-msgstr "Ne pas gérer les BL depuis la facture"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_name
-msgid "Nom"
-msgstr "Nom"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_order_confirmation_view_form
-msgid "Non"
-msgstr "Non"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "Notes"
-msgstr "Notes"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_notes_client
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "Notes client"
-msgstr "Notes client"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_notes_facture
-msgid "Notes facture"
-msgstr "Notes facture"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_notes_intervention
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "Notes intervention"
-msgstr "Notes intervention"
-
-#. module: of_sale
-#: selection:sale.order,of_force_invoice_status:0
-msgid "Nothing to Invoice"
-msgstr "Rien à facturer"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
-msgid "Numéro"
-msgstr "Numéro"
-
-#. module: of_sale
-#: model:ir.module.category,name:of_sale.of_sale_marge
-msgid "OF Marge"
-msgstr "OF Marge"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_advance_payment_inv_of_nb_products
-msgid "Of nb products"
-msgstr "Of nb products"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_account_invoice_of_picking_ids
-msgid "Of picking ids"
-msgstr "Of picking ids"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_account_invoice_of_residual_equal
-msgid "Of residual equal"
-msgstr "Of residual equal"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_order_confirmation_view_form
-msgid "Openflam report"
-msgstr "Openflam report"
-
-#. module: of_sale
-#: selection:of.sale.margin.regulator,invoice_status:0
-msgid "Opportunité de montée en gamme"
-msgstr "Opportunité de montée en gamme"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "Options d'impression"
-msgstr "Options d'impression"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation_order_id
-msgid "Order id"
-msgstr "Order id"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_order_confirmation_view_form
-msgid "Oui"
-msgstr "Oui"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
-msgid "Parameters"
-msgstr "Paramètres"
-
-#. module: of_sale
-#: model:ir.model,name:of_sale.model_res_partner
-msgid "Partner"
-msgstr "Partenaire"
-
-#. module: of_sale
-#: selection:of.sale.order.gestion.prix,arrondi_mode:0
-msgid "Pas d'arrondi"
-msgstr "Pas d'arrondi"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_order_verification_wizard_view_form
-msgid "Passer"
-msgstr "Passer"
-
-#. module: of_sale
-#: model:ir.model,name:of_sale.model_account_payment_term_line
-msgid "Payment Term Line"
-msgstr "Ligne de conditions de paiement"
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_sale_order_of_force_invoice_status
-msgid "Permet de forcer l'état de facturation de la commande.\n"
-"Utile pour les commandes facturées qui refusent de changer d'état (e.g. une ligne a été supprimée dans la facture)."
-msgstr "Permet de forcer l'état de facturation de la commande.\n"
-"Utile pour les commandes facturées qui refusent de changer d'état (e.g. une ligne a été supprimée dans la facture)."
-
-#. module: of_sale
-#: model:res.groups,comment:of_sale.group_of_order_line_option
-msgid "Permet l'activation des options de ligne de commande"
-msgstr "Permet l'activation des options de ligne de commande"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_res_partner_of_invoice_policy
-#: model:ir.model.fields,field_description:of_sale.field_res_users_of_invoice_policy
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_invoice_policy
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_invoice_policy
-msgid "Politique de facturation"
+#: model:ir.model.fields,field_description:of_sale.field_res_partner__of_invoice_policy
+#: model:ir.model.fields,field_description:of_sale.field_res_users__of_invoice_policy
+#: model:ir.model.fields,field_description:of_sale.field_sale_order__of_invoice_policy
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_invoice_policy
+msgid "Invoicing policy"
 msgstr "Politique de facturation"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_percent
-msgid "Pourcentage"
-msgstr "Pourcentage"
+#: model:ir.model.fields,field_description:of_sale.field_sale_order__of_is_delivered
+msgid "Is the order delivered ?"
+msgstr "La commande est-elle livrée ?"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_product_category__of_main_product
+msgid ""
+"Items in this category will be considered as main items on customer "
+"orders/invoices"
+msgstr ""
+"Les articles de cette catégorie seront considérés comme articles principaux "
+"sur les commandes / factures clients"
+
+#. module: of_sale
+#: model:ir.model,name:of_sale.model_account_move
+msgid "Journal Entry"
+msgstr "Pièce comptable"
+
+#. module: of_sale
+#: model:ir.model,name:of_sale.model_account_move_line
+msgid "Journal Item"
+msgstr "Écriture comptable"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard____last_update
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation____last_update
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard__write_uid
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation__write_uid
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard__write_date
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation__write_date
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_sale
+#. odoo-python
+#: code:addons/of_sale/wizard/of_sale_order_add_quote.py:0
+#, python-format
+msgid "Line added from the complementary quote %s"
+msgstr "Ligne ajoutée depuis le devis complémentaire %s"
+
+#. module: of_sale
+#: model:ir.actions.act_window,name:of_sale.action_of_sale_order_line_to_invoice
+#: model:ir.ui.menu,name:of_sale.of_sale_order_line_to_invoice_menu
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_pivot
+msgid "Lines to invoice"
+msgstr "Lignes à facturer"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_account_bank_statement_line__of_is_locked
+#: model:ir.model.fields,field_description:of_sale.field_account_move__of_is_locked
+#: model:ir.model.fields,field_description:of_sale.field_account_move_line__of_is_locked
+#: model:ir.model.fields,field_description:of_sale.field_account_payment__of_is_locked
+msgid "Locked"
+msgstr "Verrouillé"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_product_category__of_main_product
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_main_product
+msgid "Main product"
+msgstr "Article principal"
+
+#. module: of_sale
+#: model:ir.model.fields.selection,name:of_sale.selection__of_connector_config_settings__of_validate_pickings_on_move__manage
+#: model:ir.model.fields.selection,name:of_sale.selection__res_config_settings__of_validate_pickings_on_move__manage
+msgid "Manage delivery notes after invoice validation"
+msgstr "Gérer les BL après la validation de la facture"
+
+#. module: of_sale
+#: model:ir.model.fields.selection,name:of_sale.selection__of_connector_config_settings__of_sale_confirmation_date_mode__manual
+#: model:ir.model.fields.selection,name:of_sale.selection__res_config_settings__of_sale_confirmation_date_mode__manual
+msgid "Manual"
+msgstr "Manuel"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification__message
+#: model_terms:ir.ui.view,arch_db:of_sale.of_res_partner_warnings_form_view
+msgid "Message"
+msgstr ""
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_res_partner__sale_warn_msg
+#: model:ir.model.fields,field_description:of_sale.field_res_users__sale_warn_msg
+msgid "Message for Sales Order"
+msgstr "Message pour la commande client"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_account_bank_statement_line__of_picking_count
+#: model:ir.model.fields,field_description:of_sale.field_account_move__of_picking_count
+#: model:ir.model.fields,field_description:of_sale.field_account_payment__of_picking_count
+msgid "Nbr of deliveries"
+msgstr "Nbr de livraisons"
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_view
+msgid "Note"
+msgstr ""
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "Notes"
+msgstr ""
+
+#. module: of_sale
+#: model:ir.model.fields.selection,name:of_sale.selection__sale_order__of_force_invoice_status__no
+msgid "Nothing to Invoice"
+msgstr ""
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_res_partner_warnings_form_view
+msgid "Object(s)"
+msgstr "Objet(s)"
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_view
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "Obsolete"
+msgstr "Obsolète"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_obsolete
+msgid "Obsolete Product"
+msgstr "Produit obsolète"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_advance_payment_inv__of_nb_products
+msgid "Of Nb Products"
+msgstr "Nombre de produits"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_of_connector_config_settings__of_sale_mail_subtype_subscribtion
+#: model:ir.model.fields,help:of_sale.field_res_config_settings__of_sale_mail_subtype_subscribtion
+msgid ""
+"Only the recipients and subscribers to this document subtype will receive "
+"the emails."
+msgstr ""
+"Seuls les destinataires et abonnés à ce sous-type de document recevront les "
+"e-mails."
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "Open sale order line"
+msgstr ""
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation__order_id
+msgid "Order"
+msgstr "Commande"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__date_order
+msgid "Order Date"
+msgstr ""
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_order_state
+msgid "Order State"
+msgstr "État de la commande"
+
+#. module: of_sale
+#: model:ir.model.fields.selection,name:of_sale.selection__account_payment_term_line__of_option_date__order
+msgid "Order date"
+msgstr "Date de commande"
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_tree
+msgid "Ordered qty(ies)"
+msgstr "Qté(s) commandée(s)"
+
+#. module: of_sale
+#: model:ir.model.fields.selection,name:of_sale.selection__res_partner__of_invoice_policy__order
+#: model:ir.model.fields.selection,name:of_sale.selection__sale_order__of_invoice_policy__order
+#: model:ir.model.fields.selection,name:of_sale.selection__sale_order_line__of_invoice_policy__order
+msgid "Ordered quantities"
+msgstr "Quantités commandées"
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_account_res_config_settings_view_form
+msgid "PDF Printing"
+msgstr "Impression PDF"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_gb_partner_tag_id
+msgid "Partner tag"
+msgstr "Étiquette partenaire"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_report__of_partner_tags
+#: model_terms:ir.ui.view,arch_db:of_sale.of_view_sales_order_line_filter
+msgid "Partner tags"
+msgstr "Étiquettes partenaire"
+
+#. module: of_sale
+#: model:ir.model,name:of_sale.model_account_payment_term_line
+msgid "Payment Terms Line"
+msgstr "Détail des conditions de paiement"
+
+#. module: of_sale
+#: model:ir.model.fields.selection,name:of_sale.selection__account_payment_term_line__of_option_date__previous
+msgid "Previous term"
+msgstr "Échéance précédente"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_price_date_display
+msgid "Price date"
+msgstr "Date tarif"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_account_bank_statement_line__of_price_printing
+#: model:ir.model.fields,field_description:of_sale.field_account_move__of_price_printing
+#: model:ir.model.fields,field_description:of_sale.field_account_payment__of_price_printing
+#: model:ir.model.fields,field_description:of_sale.field_sale_order__of_price_printing
+msgid "Price printing"
+msgstr "Impressions des prix"
 
 #. module: of_sale
 #: model:ir.model,name:of_sale.model_product_pricelist
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_order_pricelist_id
 msgid "Pricelist"
 msgstr "Liste de prix"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_seller_price
-msgid "Prix d'achat"
-msgstr "Prix d'achat"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "Printing"
+msgstr "Impression"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_total_cout
-msgid "Prix de revient"
-msgstr "Prix de revient"
-
-#. module: of_sale
-#: selection:account.invoice,of_price_printing:0
-#: selection:sale.order,of_price_printing:0
-msgid "Prix par ligne de commande"
-msgstr "Prix par ligne de commande"
-
-#. module: of_sale
-#: selection:account.invoice,of_price_printing:0
-#: selection:sale.order,of_price_printing:0
-msgid "Prix par sections"
-msgstr "Prix par sections"
-
-#. module: of_sale
-#: selection:account.invoice,of_price_printing:0
-#: selection:sale.order,of_price_printing:0
-msgid "Prix par sections avec articles"
-msgstr "Prix par sections avec articles"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_prix_total_ht
-msgid "Prix total HT initial"
-msgstr "Prix total HT initial"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_prix_total_ht_simul
-msgid "Prix total HT simulé"
-msgstr "Prix total HT simulé"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_prix_total_ttc
-msgid "Prix total TTC initial"
-msgstr "Prix total TTC initial"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_prix_total_ttc_simul
-msgid "Prix total TTC simulé"
-msgstr "Prix total TTC simulé"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_prix_unit_ht
-msgid "Prix unit. HT initial"
-msgstr "Prix unit. HT initial"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_prix_unit_ttc
-msgid "Prix unit. TTC initial"
-msgstr "Prix unit. TTC initial"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_price_unit_display
-msgid "Prix unitaire"
-msgstr "Prix unitaire"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "Prix unitaire HT"
-msgstr "Prix unitaire HT"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
-msgid "Prix&amp;nbsp;total&amp;nbsp;HT"
-msgstr "Prix&amp;nbsp;total&amp;nbsp;HT"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
-msgid "Prix&amp;nbsp;total&amp;nbsp;TTC"
-msgstr "Prix&amp;nbsp;total&amp;nbsp;TTC"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
-msgid "Prix/U&amp;nbsp;HT"
-msgstr "Prix/U&amp;nbsp;HT"
-
-#. module: of_sale
-#: model:ir.model,name:of_sale.model_procurement_order
-msgid "Procurement"
-msgstr "Approvisionnement"
-
-#. module: of_sale
-#: model:ir.model,name:of_sale.model_product_product
-msgid "Product"
-msgstr "Article"
-
-#. module: of_sale
-#: model:ir.model,name:of_sale.model_product_category
-msgid "Product Category"
-msgstr "Catégorie d'article"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_account_move_view_form
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "Printing settings"
+msgstr "Paramètres d'impression"
 
 #. module: of_sale
 #: model:ir.model,name:of_sale.model_product_template
-msgid "Product Template"
-msgstr "Modèle d'article"
+msgid "Product"
+msgstr "Produit"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
-msgid "Product catalogue"
-msgstr "Catalogue d'article"
+#: model:ir.ui.menu,name:of_sale.of_product_category_config_menu
+msgid "Product Categories"
+msgstr "Catégories de produits"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
-msgid "Product configuration"
-msgstr "Configuration d'article"
+#: model:ir.model,name:of_sale.model_product_category
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_product_categ_id
+msgid "Product Category"
+msgstr "Catégorie de produit"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_cost_prorata
-msgid "Prorata"
-msgstr "Prorata"
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_product_default_code
+msgid "Product Reference"
+msgstr "Référence article"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_arrondi_prec
-msgid "Précision d'arrondi"
-msgstr "Précision d'arrondi"
+#: model:ir.model,name:of_sale.model_product_product
+msgid "Product Variant"
+msgstr "Variante de produit"
 
 #. module: of_sale
-#: model:ir.model,name:of_sale.model_purchase_order_line
-msgid "Purchase Order Line"
-msgstr "Ligne de commande d'achat"
+#: model:ir.model.fields,field_description:of_sale.field_sale_report__of_product_tags
+msgid "Product tags"
+msgstr "Étiquettes produit"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
-msgid "Purchases stock"
-msgstr "Achats stock"
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard__quote_id
+msgid "Quote to add"
+msgstr "Devis à ajouter"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
-msgid "Qté"
-msgstr "Qté"
+#: model:ir.model.fields,field_description:of_sale.field_account_payment_term_line__of_option_date
+msgid "Reference date"
+msgstr "Date de référence"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_order_line_tree
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "Qté(s) commandée(s)"
-msgstr "Qté(s) commandée(s)"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_sales_order_filter
+msgid "Remaining delivery"
+msgstr "Livraison restante"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_order_line_tree
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "Qté(s) facturée(s)"
-msgstr "Qté(s) facturée(s)"
+#: model:ir.model.fields,field_description:of_sale.field_account_bank_statement_line__of_residual_equal
+#: model:ir.model.fields,field_description:of_sale.field_account_move__of_residual_equal
+#: model:ir.model.fields,field_description:of_sale.field_account_payment__of_residual_equal
+msgid "Residual equal"
+msgstr "Résidu égal"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_order_line_tree
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "Qté(s) livrée(s)"
-msgstr "Qté(s) livrée(s)"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_quantity
-msgid "Quantité"
-msgstr "Quantité"
-
-#. module: of_sale
-#: selection:res.partner,of_invoice_policy:0
-#: selection:sale.order,of_invoice_policy:0
-#: selection:sale.order.line,of_invoice_policy:0
-msgid "Quantités commandées"
-msgstr "Quantités commandées"
-
-#. module: of_sale
-#: selection:res.partner,of_invoice_policy:0
-#: selection:sale.order,of_invoice_policy:0
-#: selection:sale.order.line,of_invoice_policy:0
-msgid "Quantités commandées à date de livraison"
-msgstr "Quantités commandées à date de livraison"
-
-#. module: of_sale
-#: selection:res.partner,of_invoice_policy:0
-#: selection:sale.order,of_invoice_policy:0
-#: selection:sale.order.line,of_invoice_policy:0
-msgid "Quantités livrées"
-msgstr "Quantités livrées"
-
-#. module: of_sale
-#: selection:res.partner,of_invoice_policy:0
-#: selection:sale.order,of_invoice_policy:0
-#: selection:sale.order.line,of_invoice_policy:0
-msgid "Quantités planifiées"
-msgstr "Quantités planifiées"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
-msgid "Quotations &amp; Orders"
-msgstr "Devis et commandes"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_product_forbidden_discount
-msgid "Remise interdite pour cet article"
-msgstr "Remise interdite pour cet article"
-
-#. module: of_sale
-#: model:ir.model,name:of_sale.model_report
-msgid "Report"
-msgstr "Rapport"
-
-#. module: of_sale
-#: model:res.groups,name:of_sale.of_group_sale_marge_manager
-msgid "Responsable"
+#: model:res.groups,name:of_sale.of_group_sale_responsible
+msgid "Responsible"
 msgstr "Responsable"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_view_sale_order_gestion_prix
-msgid "Retour à la commande"
-msgstr "Retour à la commande"
+#. odoo-python
+#: code:addons/of_sale/models/sale_order_line.py:0
+#, python-format
+msgid "Sale Order Line"
+msgstr "Ligne de commande de vente"
 
 #. module: of_sale
-#: selection:of.sale.margin.regulator,invoice_status:0
-msgid "Rien à facturer"
-msgstr "Rien à facturer"
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification__order_id
+msgid "Sale order"
+msgstr "Commande de vente"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_product_default_code
-msgid "Référence article"
-msgstr "Référence article"
+#: model:ir.model.fields,field_description:of_sale.field_account_bank_statement_line__of_sale_order_ids
+#: model:ir.model.fields,field_description:of_sale.field_account_move__of_sale_order_ids
+#: model:ir.model.fields,field_description:of_sale.field_account_payment__of_sale_order_ids
+msgid "Sale orders"
+msgstr "Commandes de vente"
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_company_form
+msgid "Sales"
+msgstr "Ventes"
 
 #. module: of_sale
 #: model:ir.model,name:of_sale.model_sale_advance_payment_inv
 msgid "Sales Advance Payment Invoice"
 msgstr "Facture de paiement d'avance"
+
+#. module: of_sale
+#: model:ir.model,name:of_sale.model_sale_report
+msgid "Sales Analysis Report"
+msgstr "Rapport d'analyse des ventes"
 
 #. module: of_sale
 #: model:ir.model,name:of_sale.model_sale_order
@@ -1367,367 +1106,297 @@ msgstr "Bon de commande"
 #. module: of_sale
 #: model:ir.model,name:of_sale.model_sale_order_line
 msgid "Sales Order Line"
-msgstr "Ligne de bons de commande"
+msgstr "Ligne de commande"
 
 #. module: of_sale
-#: model:ir.model,name:of_sale.model_sale_report
-msgid "Sales Orders Statistics"
-msgstr "Statistiques sur les commandes de ventes"
+#: model:ir.model.fields,field_description:of_sale.field_res_partner__sale_warn
+#: model:ir.model.fields,field_description:of_sale.field_res_users__sale_warn
+msgid "Sales Warnings"
+msgstr "Avertissements sur les ventes"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_res_users_of_vendor_signature
-msgid "Salesman signature in sales report"
-msgstr "Signature vendeur rapport de vente"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_tree
+msgid "Sales order lines"
+msgstr "Lignes de commande de vente"
 
 #. module: of_sale
-#: code:addons/of_sale/models/of_sale.py:545
-#, python-format
-msgid "Search operator %s not implemented for value %s"
-msgstr "Opérateur de recherche %s non implémenté pour la valeur %s"
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard__order_id
+msgid "Sales order to update"
+msgstr "Commande client à mettre à jour"
 
 #. module: of_sale
-#: model:ir.actions.act_window,name:of_sale.action_of_secteur_tree_sale
-#: model:ir.ui.menu,name:of_sale.of_secteur_sale_menu
-msgid "Secteurs"
-msgstr "Secteurs"
+#: model:ir.model.fields,field_description:of_sale.field_res_partner__of_is_sale_warn
+#: model:ir.model.fields,field_description:of_sale.field_res_users__of_is_sale_warn
+msgid "Sales warning"
+msgstr "Avertissement sur les ventes"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_product_product_of_layout_category_id
-#: model:ir.model.fields,field_description:of_sale.field_product_template_of_layout_category_id
-msgid "Section"
-msgstr "Section"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_view
+msgid "Section Name (eg. Products, Services)"
+msgstr ""
 
 #. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_sale_order_line_of_product_categ_id
-msgid "Select category for the current product"
-msgstr "Sélectionnez la catégorie de l'article actuel"
+#: model:ir.model.fields,help:of_sale.field_res_partner__sale_warn
+#: model:ir.model.fields,help:of_sale.field_res_users__sale_warn
+msgid ""
+"Selecting the \"Warning\" option will notify user with the message, "
+"Selecting \"Blocking Message\" will throw an exception with the message and "
+"block the flow. The Message has to be written in the next field."
+msgstr ""
+"Sélectionner l'option 'Avertissement' notifiera l'utilisateur avec le "
+"message. Sélectionner 'Message bloquant' lancera une exception avec le "
+"message et bloquera le flux. Le message doit être encodé dans le champ "
+"suivant."
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_sequence
-msgid "Sequence"
-msgstr "Séquence"
+#: model:ir.model.fields,field_description:of_sale.field_res_company__show_manufacturer_description
+msgid "Show manufacturer descriptions"
+msgstr "Afficher les descriptions des fabricants"
 
 #. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_sale_config_settings_of_propagate_payment_term
-msgid "Si décoché, les conditions de règlement ne sont pas propagées aux factures"
-msgstr "Si décoché, les conditions de règlement ne sont pas propagées aux factures"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_verification_wizard_view_form
+msgid "Skip"
+msgstr "Passer"
 
 #. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_sale_order_of_date_vt
-msgid "Si renseignée apparaîtra sur le devis / Bon de commande"
-msgstr "Si renseignée apparaîtra sur le devis / Bon de commande"
+#: model:ir.model.fields,help:of_sale.field_account_move_line__of_is_locked
+msgid ""
+"Special product. That field allows you to know if an invoice line should "
+"prevent its counterpart on asale order from being deleted"
+msgstr ""
+"Produit spécial. Ce champ vous permet de savoir si une ligne de facture doit"
+" empêcher la suppression de son équivalent sur une commande de vente"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_view_sale_order_gestion_prix
-msgid "Simuler"
-msgstr "Simuler"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_account_invoice_of_residual
-msgid "Somme du montant non payé des factures d'acompte et de la facture finale"
+#: model:ir.model.fields,field_description:of_sale.field_account_bank_statement_line__of_residual
+#: model:ir.model.fields,field_description:of_sale.field_account_move__of_residual
+#: model:ir.model.fields,field_description:of_sale.field_account_payment__of_residual
+msgid "Sum of the unpaid amount of the deposit invoices and the final invoice"
 msgstr "Somme du montant non payé des factures d'acompte et de la facture finale"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_account_invoice_of_suivi_interne
-msgid "Suivi interne"
-msgstr "Suivi interne"
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_order_tax_country_id
+msgid "Tax Country"
+msgstr "Pays de taxe"
 
 #. module: of_sale
-#: model:ir.model,name:of_sale.model_of_sale_order_gestion_prix_line
-msgid "Sélection des produits d'un devis/bon de commande"
-msgstr "Sélection des produits d'un devis/bon de commande"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_report_saleorder_document
+msgid "Taxes"
+msgstr ""
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
-msgid "TTC"
-msgstr "TTC"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
+msgid ""
+"The mail composer will automatically select this subtype when sending a "
+"message from a sale order."
+msgstr ""
+"L'assistant de courriel sélectionnera automatiquement ce sous-type lors de "
+"l'envoi d'un message à partir d'une commande client."
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_product_category_of_taux_marge
-msgid "Taux de marge"
-msgstr "Taux de marge"
+#: model:ir.model.fields,help:of_sale.field_res_company__show_manufacturer_description
+msgid ""
+"The manufacturer's description of an item will be added to the item "
+"description in the documents."
+msgstr ""
 
 #. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_product_category_of_taux_marge
-msgid "Taux de marge en % minimum recommandé quand l'article principal d'un devis fait partie de la catégorie."
-msgstr "Taux de marge en % minimum recommandé quand l'article principal d'un devis fait partie de la catégorie."
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_account_move_view_form
+msgid ""
+"The total amount of down-payment invoices is different from the total amount of payments.\n"
+"                        Check that down-payment invoices have been paid."
+msgstr ""
+"Le total du montant des factures d'acompte est différent de celui des paiements."
+"Vérifier que les factures d'acompte ont bien été payées."
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
-msgid "Taxes et facturation"
-msgstr "Taxes et facturation"
+#: model:ir.model.fields,help:of_sale.field_sale_order__of_intervention_notes
+msgid ""
+"These notes are visualized in the intervention planning and printed in the "
+"intervention form."
+msgstr ""
+"Ces notes sont visualisées dans le planning des interventions et imprimées "
+"dans le formulaire d'intervention."
 
 #. module: of_sale
-#: code:addons/of_sale/models/sale_config_settings.py:151
+#. odoo-python
+#: code:addons/of_sale/models/sale_order_line.py:0
 #, python-format
-msgid "This setting can only be enabled by the administrator, please contact support to enable this option."
-msgstr "Ce paramètre ne peut être activé que par l'administrateur, veuillez contacter le support pour activer cette option."
+msgid "This line cannot be modified: %s"
+msgstr "Cette ligne ne peut pas être modifiée : %s"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_specific_title
-msgid "Titre spécifique"
-msgstr "Titre spécifique"
+#: model:ir.model.fields,help:of_sale.field_sale_order_line__of_main_product
+msgid "This line is the main product of the order"
+msgstr "Cette ligne est le produit principal de la commande"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "Total"
-msgstr "Total"
+#: model:ir.model.fields,field_description:of_sale.field_sale_order__of_total_cost
+msgid "Total cost price"
+msgstr "Prix de revient"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_montant_total_ht_initial
-msgid "Total HT initial"
-msgstr "Total HT initial"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_montant_total_ht_simul
-msgid "Total HT simulé"
-msgstr "Total HT simulé"
-
-#. module: of_sale
-#: code:addons/of_sale/models/of_sale.py:715
-#, python-format
-msgid "Total TTC"
-msgstr "Total TTC"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_montant_total_ttc_initial
-msgid "Total TTC initial"
-msgstr "Total TTC initial"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_montant_total_ttc_simul
-msgid "Total TTC simulé"
-msgstr "Total TTC simulé"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_view_sale_order_gestion_prix
-msgid "Total devis/commande"
-msgstr "Total devis/commande"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_account_invoice_picking_view_form
-msgid "Tous les bons de livraison liés aux commandes de cette facture vont être validés. Tous les articles seront considérés comme disponibles et marqués comme livrés."
-msgstr "Tous les bons de livraison liés aux commandes de cette facture vont être validés. Tous les articles seront considérés comme disponibles et marqués comme livrés."
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_view_sale_order_gestion_prix
-msgid "Tout exclure"
-msgstr "Tout exclure"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_view_sale_order_gestion_prix
-msgid "Tout inclure"
-msgstr "Tout inclure"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification_type
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification__type
 msgid "Type"
-msgstr "Type"
+msgstr ""
 
 #. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_sale_order_line_of_price_unit_ttc
+#: model:ir.model.fields,field_description:of_sale.field_account_move_line__price_unit
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__price_unit
+#: model_terms:ir.ui.view,arch_db:of_sale.of_report_saleorder_document
+msgid "Unit Price"
+msgstr "Prix unitaire"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_price_unit_taxexcl
+msgid "Unit Price Tax excl"
+msgstr "Prix/U HT"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_price_unit_taxinc
+msgid "Unit Price Tax incl"
+msgstr "Prix/U TTC"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_sale_order_line__price_unit
+msgid ""
+"Unit price of the article. To enter without VAT or with VAT according to the"
+" order line."
+msgstr ""
+"Prix unitaire de l'article. À saisir HT ou TTC selon la TVA de la ligne de "
+"commande."
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_sale_order_line__of_price_unit_taxinc
 msgid "Unit price with taxes"
-msgstr "Unit price with taxes"
+msgstr "Prix unitaire TTC"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_valeur
-msgid "Valeur"
-msgstr "Valeur"
+#: model:ir.model.fields,help:of_sale.field_sale_order_line__of_price_unit_taxexcl
+msgid "Unit price without taxes"
+msgstr "Prix unitaire HT"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_order_verification_wizard_view_form
-msgid "Valider"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_confirmation_view_form
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_verification_wizard_view_form
+msgid "Validate"
 msgstr "Valider"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_account_invoice_picking_view_form
-msgid "Valider BL liés"
-msgstr "Valider BL liés"
-
-#. module: of_sale
-#: selection:account.config.settings,of_validate_pickings:0
-msgid "Valider les BL au moment de la validation de la facture"
+#: model:ir.model.fields.selection,name:of_sale.selection__of_connector_config_settings__of_validate_pickings_on_move__validate
+#: model:ir.model.fields.selection,name:of_sale.selection__res_config_settings__of_validate_pickings_on_move__validate
+msgid "Validate delivery notes at the time of invoice validation"
 msgstr "Valider les BL au moment de la validation de la facture"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
-msgid "Vente"
-msgstr "Vente"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_account_move_delivery_notes_view_form
+msgid "Validate linked Pickings"
+msgstr "Valider les BL liés"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_company_form
-msgid "Ventes"
-msgstr "Ventes"
+#. odoo-python
+#: code:addons/of_sale/monkeypatch.py:0
+#, python-format
+msgid "Warning for %s"
+msgstr "Avertissement pour %s"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
-msgid "Ville"
-msgstr "Ville"
+#: model:ir.model.fields,field_description:of_sale.field_res_partner__of_is_warn
+#: model:ir.model.fields,field_description:of_sale.field_res_users__of_is_warn
+msgid "Warning on at least one object"
+msgstr "Avertissement sur au moins un objet"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_order_confirmation_view_form
-msgid "Voulez-vous mettre à jour la date de confirmation du devis ? <br/>"
-msgstr "Voulez-vous mettre à jour la date de confirmation du devis ? <br/>"
+#: model:ir.model.fields,help:of_sale.field_res_partner__invoice_warn
+#: model:ir.model.fields,help:of_sale.field_res_users__invoice_warn
+msgid "Warning type"
+msgstr "Type d'avertissement"
 
 #. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.view_sale_advance_payment_inv
-msgid "Vous devez d'abord configurer un article d'acompte"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
+msgid ""
+"Warning: We have changed the \"Line subtotals tax display\" option in the "
+"accounting settings (from B2B to B2C)"
+msgstr ""
+"Avertissement : Nous avons changé l'option \"Affichage des sous-totaux de "
+"ligne\" dans les paramètres de comptabilité (de B2B à B2C)"
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
+msgid ""
+"Warning: We have changed the \"Line subtotals tax display\" option in the "
+"accounting settings (from B2C to B2B)"
+msgstr ""
+"Avertissement : Nous avons changé l'option \"Affichage des sous-totaux de "
+"ligne\" dans les paramètres de comptabilité (de B2C à B2B)"
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_res_partner_warnings_form_view
+msgid "Warnings"
+msgstr "Avertissements"
+
+#. module: of_sale
+#: model:ir.model,name:of_sale.model_of_sale_order_add_quote_wizard
+msgid "Wizard to add a quote to a sales order"
+msgstr "Assistant pour ajouter un devis à une commande de vente"
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_confirmation_view_form
+msgid ""
+"You are about to confirm the sale order. Please enter a new confirmation date if you want to\n"
+"                    override the default one."
+msgstr ""
+"Vous êtes sur le point de confirmer la commande de vente. Veuillez entrer "
+"une nouvelle date de confirmation si vous souhaitez remplacer celle par "
+"défaut."
+
+#. module: of_sale
+#. odoo-python
+#: code:addons/of_sale/models/sale_order_line.py:0
+#, python-format
+msgid ""
+"You cannot delete an item line linked to an invoice.\n"
+"Please cancel your changes."
+msgstr ""
+"Vous ne pouvez supprimer une ligne d'article liée à une facture.\n"
+"Veuillez annuler vos modifications."
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_view_sale_advance_payment_inv
+msgid "You must first set up a down payment item."
 msgstr "Vous devez d'abord configurer un article d'acompte"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_of_client_view
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_of_client_view
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_client_view
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_client_view
-msgid "Vue client/vendeur"
-msgstr "Vue client/vendeur"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_view
+msgid "days"
+msgstr ""
 
 #. module: of_sale
-#: code:addons/of_sale/models/of_sale.py:1102
-#, python-format
-msgid "Warning!"
-msgstr "Attention!"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_res_partner_warnings_form_view
+msgid "invoices"
+msgstr "factures"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_wizard_id
-msgid "Wizard id"
-msgstr "Wizard id"
+#: model:ir.model,name:of_sale.model_of_account_move_hooks_installed
+msgid "of.account.move.hooks.installed"
+msgstr ""
 
 #. module: of_sale
-#: code:addons/of_sale/models/of_sale.py:1103
-#, python-format
-msgid "You must fill in the Customer field to go further."
-msgstr "Vous devez remplir le champ Client pour aller plus loin."
-
-#. module: of_sale
-#: model:ir.model,name:of_sale.model_account_config_settings
-msgid "account.config.settings"
-msgstr "account.config.settings"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_res_company_afficher_descr_fab
-msgid "afficher descr. fabricant"
-msgstr "afficher descr. fabricant"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_view_partner_buttons_form
-msgid "commandes de vente"
-msgstr "commandes de vente"
-
-#. module: of_sale
-#: model:ir.model,name:of_sale.model_ir_actions_report_xml
-msgid "ir.actions.report.xml"
-msgstr "ir.actions.report.xml"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_marge_initiale
-msgid "marge initiale"
-msgstr "marge initiale"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_marge_simul
-msgid "marge simulée"
-msgstr "marge simulée"
-
-#. module: of_sale
-#: model:ir.model,name:of_sale.model_of_documents_joints
-msgid "of.documents.joints"
-msgstr "of.documents.joints"
-
-#. module: of_sale
-#: model:ir.model,name:of_sale.model_of_sale_echeance
-msgid "of.sale.echeance"
-msgstr "of.sale.echeance"
+#: model:ir.model,name:of_sale.model_of_sale_hooks_installed
+msgid "of.sale.hooks.installed"
+msgstr ""
 
 #. module: of_sale
 #: model:ir.model,name:of_sale.model_of_sale_order_confirmation
 msgid "of.sale.order.confirmation"
-msgstr "of.sale.order.confirmation"
-
-#. module: of_sale
-#: model:ir.model,name:of_sale.model_of_sale_order_verification
-msgid "of.sale.order.verification"
-msgstr "of.sale.order.verification"
+msgstr ""
 
 #. module: of_sale
 #: model:ir.actions.act_window,name:of_sale.action_of_sale_order_verification
 msgid "of.sale.order.verification.wizard.action"
-msgstr "of.sale.order.verification.wizard.action"
+msgstr ""
 
 #. module: of_sale
-#: model:ir.model,name:of_sale.model_sale_config_settings
-msgid "sale.config.settings"
-msgstr "sale.config.settings"
-
-#. module: of_sale
-#: model:ir.model,name:of_sale.model_sale_layout_category
-msgid "sale.layout_category"
-msgstr "sale.layout_category"
-
-#. module: of_sale
-#: selection:of.sale.margin.regulator,invoice_status:0
-msgid "À facturer"
-msgstr "À facturer"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_order_view_search_inherit_sale
-msgid "À facturer entièrement"
-msgstr "À facturer entièrement"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_echeance_line_ids
-msgid "Échéances"
-msgstr "Échéances"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "Échéancier prévisionnel"
-msgstr "Échéancier prévisionnel"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_state
-#: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
-msgid "État"
-msgstr "État"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_gb_partner_tag_id
-msgid "Étiquette client"
-msgstr "Étiquette client"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_etiquette_partenaire_ids
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_devis_search
-msgid "Étiquettes client"
-msgstr "Étiquettes client"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_report_of_partner_tags
-msgid "Étiquettes du partenaire"
-msgstr "Étiquettes du partenaire"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_report_of_product_tags
-msgid "Étiquettes du produit"
-msgstr "Étiquettes du produit"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "Êtes-vous sûr de vouloir verrouiller la vente ? Une fois verrouillée, vous ne pourrez plus rien modifier. Cette action est irréversible."
-msgstr "Êtes-vous sûr de vouloir verrouiller la vente ? Une fois verrouillée, vous ne pourrez plus rien modifier. Cette action est irréversible."
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_group_product_variant_specific_price
-msgid "(OF) Product variant pricing"
-msgstr "(OF) Tarification des variantes"
-
-#. module: of_sale
-#: selection:sale.config.settings,group_product_variant_specific_price:0
-msgid "Handle pricing by attribute"
-msgstr "Standard (défaut)"
-
-#. module: of_sale
-#: selection:sale.config.settings,group_product_variant_specific_price:0
-msgid "Handle pricing by variant"
-msgstr "Manuelle"
+#: model_terms:ir.ui.view,arch_db:of_sale.of_view_res_partner_sale_warn_form
+msgid "sales order"
+msgstr "commande de vente"

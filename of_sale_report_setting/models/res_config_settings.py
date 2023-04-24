@@ -104,9 +104,6 @@ class ResConfigSettings(models.TransientModel):
     pdf_customer_ref_info = fields.Boolean(
         string="Customer reference", config_parameter='of.sale.report.setting.pdf_customer_ref_info'
     )
-    pdf_technical_visit_info = fields.Boolean(
-        string="Technical visit date", config_parameter='of.sale.report.setting.pdf_technical_visit_info'
-    )
     pdf_validity_info = fields.Boolean(
         string="Validity date", config_parameter='of.sale.report.setting.pdf_validity_info'
     )

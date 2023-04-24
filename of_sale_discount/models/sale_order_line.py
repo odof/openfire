@@ -48,11 +48,6 @@ class SaleOrderLine(models.Model):
             if line.pricelist_item_id.compute_price == 'percentage':
                 line.of_discount_formula = line.pricelist_item_id.of_percent_price_formula
 
-    def _prepare_invoice_line(self, **optional_values):
-        values = super()._prepare_invoice_line(**optional_values)
-        values['of_discount_formula'] = self.of_discount_formula
-        return values
-
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
@@ -64,3 +59,12 @@ class SaleOrderLine(models.Model):
         if not vals.get('of_discount_formula') and vals.get('discount'):
             vals['of_discount_formula'] = f"{vals['discount']}"
         return super().write(vals)
+
+    def _get_blocked_fields_on_write(self):
+        fields = super()._get_blocked_fields_on_write()
+        return fields + ['of_discount_formula']
+
+    def _prepare_invoice_line(self, **optional_values):
+        values = super()._prepare_invoice_line(**optional_values)
+        values['of_discount_formula'] = self.of_discount_formula
+        return values

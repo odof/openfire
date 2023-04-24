@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_sale_order_dates_account_move_view_form" model="ir.ui.view">
+        <field name="name">of.sale.order.dates.account.move.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="of_sale.of_sale_account_move_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='sale_info_group']/field[@name='of_internal_followup']" position="after">
+                <field name="of_technical_visit_date" />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

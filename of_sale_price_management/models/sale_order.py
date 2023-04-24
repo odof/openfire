@@ -1,22 +1,10 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import Command, api, fields, models
+from odoo import Command, models
 
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
-
-    customer_view = fields.Boolean(  # TODO: move me to of_sale module when it will be migrated to v16
-        string="Customer/Vendor view"
-    )
-    of_total_cost = fields.Monetary(  # TODO: move me to of_sale module when it will be migrated to v16
-        compute='_compute_of_total_cost', string="Total cost price"
-    )
-
-    @api.depends('margin', 'amount_untaxed')
-    def _compute_of_total_cost(self):
-        for order in self:
-            order.of_total_cost = order.amount_untaxed - order.margin
 
     def action_button_price_management(self):
         self.ensure_one()

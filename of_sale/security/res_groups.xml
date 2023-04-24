@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_sale.of_group_sale_responsible" model="res.groups">
+        <field name="name">Responsible</field>
+        <field name="category_id" ref="base.module_category_sales_sales"/>
+        <field name="implied_ids" eval="[
+            (4, ref('sales_team.group_sale_salesman_all_leads'))]"/>
+    </record>
+
+    <record id="sales_team.group_sale_manager" model="res.groups">
+        <field name="implied_ids" eval="[
+            (4, ref('of_sale.of_group_sale_responsible'))]"/>
+    </record>
+
+    <record id="of_group_display_tax_inclued_total_in_so_lines" model="res.groups">
+        <field name="name">(OF) Display subtotals taxes incl. by sales order line</field>
+        <field name="comment">Displays, in the form (not in the reports), the subtotals including VAT per line in the sales orders</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+    <record id="of_group_display_tax_exclued_total_in_so_lines" model="res.groups">
+        <field name="name">(OF) Display subtotals taxes excl. by sales order line</field>
+        <field name="comment">Displays, in the form (not in the reports), the subtotals exckuding VAT per line in the sales orders</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+</odoo>

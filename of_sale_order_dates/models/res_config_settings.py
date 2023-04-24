@@ -6,6 +6,17 @@ from odoo import fields, models
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
+    # Invoice settings
+    pdf_technical_visit_info_move = fields.Boolean(
+        string="(OF) Technical visit date",
+        help="Displays the technical visit in top information block in Invoice PDF report ?",
+        config_parameter='of.sale.report.setting.account.move.pdf_technical_visit_info',
+    )
+
+    # Sale settings
+    pdf_technical_visit_info = fields.Boolean(
+        string="Technical visit date", config_parameter='of.sale.report.setting.pdf_technical_visit_info'
+    )
     pdf_requested_week = fields.Boolean(
-        string="Requested week", config_parameter='of.sale.order.dates.pdf_requested_week'
+        string="Requested week", config_parameter='of.sale.report.setting.pdf_requested_week'
     )

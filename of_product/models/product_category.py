@@ -15,7 +15,6 @@ class ProductCategory(models.Model):
         domain=[('product_categ_selectable', '=', True)],
         copy=True,
     )
-    of_layout_id = fields.Many2one(comodel_name='sale.layout_category', string="Layout")
     # Uniformisation de la méthode de coût sur les sociétés (effectif si of_base_multicompany est installé)
     property_cost_method = fields.Selection(of_unify_companies=True)
     of_stock_update_standard_price = fields.Boolean(

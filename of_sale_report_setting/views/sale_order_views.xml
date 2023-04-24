@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="sale_order_view_form" model="ir.ui.view">
-        <field name="name">sale.order.view.form</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_form"/>
+    <record id="of_sale_order_line_view" model="ir.ui.view">
+        <field name="name">sale.order.line.view.form</field>
+        <field name="model">sale.order.line</field>
+        <field name="inherit_id" ref="of_sale.of_sale_order_line_view"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='order_line']/tree" position="attributes">
-                <attribute name="editable"/>
-            </xpath>
-            <xpath expr="//field[@name='order_line']/form" position="inside">
-                <group>
+            <xpath expr="//div[@name='invoice_lines']" position="after">
+                <group name="attachments">
                     <field name="of_product_attachment_domain_ids" widget="many2many_tags" invisible="1"/>
                     <label for="of_product_attachment_ids" groups="of_sale_report_setting.group_of_sale_report_print_attachment"/>
                     <field name="of_product_attachment_ids" nolabel="1" widget="many2many_tags" groups="of_sale_report_setting.group_of_sale_report_print_attachment" options="{'no_create': True}"/>

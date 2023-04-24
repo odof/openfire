@@ -1,13 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- Account -->
+    <record id="of_sale_order_date_account_res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">of.sale.order.dates.res.config.settings.view.form.inherit.account</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="42"/>  <!-- parent view has priority 41 -->
+        <field name="inherit_id" ref="of_sale.of_sale_account_res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Align elements by their vertical borderline for a smoother display -->
+            <xpath expr="//div[@id='of_sections_headings_config']" position="attributes">
+                <attribute name="style" separator=";" add="margin-left: 40px"></attribute>
+            </xpath>
+            <xpath expr="//div[@id='of_sections_headings_config']" position="after">
+                <div class="col-12 col-lg-6 o_setting_box" id="pdf_technical_visit_info_move">
+                    <div class="o_setting_left_pane">
+                        <field name="pdf_technical_visit_info_move"/>
+                    </div>
+                    <div class="o_setting_right_pane" id="snailmail_settings">
+                        <label for="pdf_technical_visit_info_move"/>
+                        <div class="text-muted">
+                            Displays the technical visit in top information block in Invoice PDF report.
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Sales -->
     <record id="res_config_settings_sale_printing_params_view_form" model="ir.ui.view">
         <field name="name">of.sale.order.dates.res.config.settings.sale.printing.params.view.form</field>
         <field name="model">res.config.settings</field>
         <field name="inherit_id" ref="of_sale_report_setting.res_config_settings_sale_printing_params_view_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='pdf_customer_ref_info']/../.." position="after">
+                <div id="pdf_technical_visit_info">
+                    <div class="o_setting_left_pane">
+                        <field name="pdf_technical_visit_info"/>
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="pdf_technical_visit_info"/>
+                        <div class="text-muted">
+                            Displays the technical visit date in top information block, else it will be displayed at the end of the report
+                        </div>
+                    </div>
+                </div>
+            </xpath>
             <xpath expr="//field[@name='pdf_payment_term_info']/../.." position="after">
-                <div>
+                <div id="pdf_requested_week">
                     <div class="o_setting_left_pane">
                         <field name="pdf_requested_week"/>
                     </div>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_view_sale_advance_payment_inv" model="ir.ui.view">
+        <field name="name">of.sale.advance.payment.inv.form.view</field>
+        <field name="model">sale.advance.payment.inv</field>
+        <field name="inherit_id" ref="sale.view_sale_advance_payment_inv"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="replace">
+                <field name="product_categ_id" invisible="1"/>
+                <field name="of_nb_products" invisible="1"/>
+                <field name="product_id"
+                    string="Down payment item"
+                    context="{'search_default_services': 1, 'default_type': 'service', 'search_default_categ_id': product_categ_id, 'default_categ_id': product_categ_id, 'default_invoice_policy': 'order'}"
+                    attrs="{'invisible': ['|', ('advance_payment_method', 'not in', ('fixed','percentage')), ('of_nb_products', '&lt;=', 1)], 'required': [('advance_payment_method', 'in', ('fixed','percentage'))]}"
+                    class="oe_inline"/>
+            </xpath>
+            <xpath expr="//field[@name='deposit_account_id']" position="before">
+                <div colspan="2" style="color: red" attrs="{'invisible': ['|', ('advance_payment_method', 'not in', ('fixed','percentage')), ('of_nb_products', '!=', 0)]}">
+                    You must first set up a down payment item.
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='deposit_account_id']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('product_id', '!=', False), ('of_nb_products', '&gt;', 1)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='deposit_taxes_id']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('product_id', '!=', False), ('of_nb_products', '&gt;', 1)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='deposit_account_id']" position="after">
+                <field name="product_categ_id" required="1"
+                    attrs="{'invisible': ['|', ('product_id', '!=', False), ('of_nb_products', '&gt;', 1)]}"/>
+            </xpath>
+            <xpath expr="//field[@name='advance_payment_method']" position="after">
+                <field name="of_include_null_qty_lines" class="oe_inline" attrs="{'invisible': [('advance_payment_method', 'not in', ('delivered', 'all'))]}"/>
+                <field name="deduct_down_payments"/>
+            </xpath>
+            <xpath expr="//label[@for='deduct_down_payments'][1]" position="replace"/>
+            <xpath expr="//div[@id='down_payment_details']" position="replace"/>
+        </field>
+    </record>
+
+</odoo>

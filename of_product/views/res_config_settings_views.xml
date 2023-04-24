@@ -9,13 +9,26 @@
         <field name="arch" type="xml">
             <xpath expr="//div//div[@name='catalog_setting_container']//div[@id='stock_packaging']" position="after">
                 <div class="col-12 col-lg-6 o_setting_box" id="stock_packaging" title="Manage price by variants">
-                    <div class="o_setting_left_pane">
-                        <field name="group_product_variant_specific_price"/>
-                    </div>
                     <div class="o_setting_right_pane">
-                        <label for="group_product_variant_specific_price"/>
+                        <label for="of_product_variant_specific_price"/>
                         <div class="text-muted">
-                            If checked this allow to set different prices for each variant. If not checked, the price of the template will be used. (standard behavior)
+                            <p>Allows you to manage the price of a product by its variants.</p>
+                            <p>
+                                <ul>
+                                    <li>
+                                        By attribute : The sale price is driven by the Product template and you can add an extra price to the variant (standard behaviour)
+                                    </li>
+                                    <li>
+                                        By variant : You can specify a forced sale price by variant. There is no more extra price.
+                                    </li>
+                                </ul>
+                            </p>
+                        </div>
+                        <div class="content-group">
+                            <div class="mt16" style="display: inline">
+                                <field name="of_product_variant_specific_price" widget="radio"/>
+                                <field name="group_product_variant_specific_price" invisible="1"/>
+                            </div>
                         </div>
                     </div>
                 </div>

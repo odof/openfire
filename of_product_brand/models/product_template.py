@@ -54,8 +54,7 @@ class ProductTemplate(models.Model):
             if product.default_code:
                 ind = product.default_code.find('_')
                 code = product.default_code[:ind]
-                brand = self.env['of.product.brand'].search([('code', '=', code)], limit=1)
-                if brand:
+                if brand := self.env['of.product.brand'].search([('code', '=', code)], limit=1):
                     if brand != product.brand_id:
                         product.brand_id = brand
                 elif product.brand_id.use_prefix:

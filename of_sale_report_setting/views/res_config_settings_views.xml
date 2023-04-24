@@ -49,7 +49,7 @@
                                 <div class="content-group"  attrs="{'invisible': [('pdf_invoicing_address_specific_title','=', False)]}">
                                     <div class="mt16">
                                         <field name="pdf_invoicing_address_specific_title_label" placeholder="Address Title..."
-                                               attrs="{'required': [('pdf_invoicing_address_specific_title', '=', True)]}"/>
+                                                attrs="{'required': [('pdf_invoicing_address_specific_title', '=', True)]}"/>
                                     </div>
                                     <div class="text-muted">
                                         Will be also applied on the invoices.
@@ -69,7 +69,7 @@
                                 <div class="content-group"  attrs="{'invisible': [('pdf_shipping_address_specific_title','=', False)]}">
                                     <div class="mt16">
                                         <field name="pdf_shipping_address_specific_title_label" placeholder="Address Title..."
-                                               attrs="{'required': [('pdf_shipping_address_specific_title', '=', True)]}"/>
+                                                attrs="{'required': [('pdf_shipping_address_specific_title', '=', True)]}"/>
                                     </div>
                                     <div class="text-muted">
                                         Will be also applied on the invoices.
@@ -89,7 +89,7 @@
                                 <div class="content-group"  attrs="{'invisible': [('pdf_invoicing_shipping_address_specific_title','=', False)]}">
                                     <div class="mt16">
                                         <field name="pdf_invoicing_shipping_address_specific_title_label" placeholder="Address Title..."
-                                               attrs="{'required': [('pdf_invoicing_shipping_address_specific_title', '=', True)]}"/>
+                                                attrs="{'required': [('pdf_invoicing_shipping_address_specific_title', '=', True)]}"/>
                                     </div>
                                     <div class="text-muted">
                                         Will be also applied on the invoices.
@@ -328,17 +328,6 @@
                                 <label for="pdf_customer_ref_info"/>
                                 <div class="text-muted">
                                     Displays the customer reference in top information block
-                                </div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="o_setting_left_pane">
-                                <field name="pdf_technical_visit_info"/>
-                            </div>
-                            <div class="o_setting_right_pane">
-                                <label for="pdf_technical_visit_info"/>
-                                <div class="text-muted">
-                                    Displays the technical visit date in top information block, else it will be displayed at the end of the report
                                 </div>
                             </div>
                         </div>

@@ -37,7 +37,7 @@ class SaleOrder(models.Model):
 
     def _of_compute_payment_schedule(self):
         self.ensure_one()
-        if not self.payment_term_id:
+        if not self.payment_term_id or not self.currency_id:
             return False
 
         # Aujourd'hui, dans les lignes de contitions de règlement, on n'a
@@ -86,33 +86,35 @@ class SaleOrder(models.Model):
     def _onchange_amount_total(self):
         self._compute_of_payment_schedule_ids()
 
+    # TODO: Uncomment me and continue the migration when `of_account` module is migrated
     # TODO Calcul des dates de l'échéancier à décommenter et retravailler quand on saura comment on les gère
     # def of_update_payment_schedule_dates(self):
     #     for order in self:
     #         if not order.payment_term_id:
     #             continue
-    #
-    #         date_invoice = order.invoice_status == 'invoiced' and order.invoice_ids and \
-    #             order.invoice_ids[0].date_invoice or False
+
+    #         invoice_date = order.invoice_status == 'invoiced' and order.invoice_ids and \
+    #             order.invoice_ids[0].invoice_date or False
     #         dates = {
-    #             'order': order.confirmation_date,
-    #             'invoice': date_invoice,
+    #             'order': order.date_order,
+    #             'invoice': invoice_date,
     #             'default': False,
     #         }
-    #         force_dates = [echeance.date for echeance in order.of_echeance_line_ids]
-    #         echeances = order.payment_term_id.compute(order.amount_total, dates=dates, force_dates=force_dates)[0]
-    #
-    #         if len(echeances) != len(order.of_echeance_line_ids):
+    #         force_dates = [echeance.date for echeance in order.of_payment_schedule_ids]
+    #         milestones = order.payment_term_id.compute(order.amount_total, dates=dates, force_dates=force_dates)[0]
+
+    #         if len(milestones) != len(order.of_payment_schedule_ids):
     #             continue
-    #
-    #         for echeance, ech_calc in itertools.izip(order.of_echeance_line_ids, echeances):
-    #             if ech_calc[0] and not echeance.date:
-    #                 echeance.date = ech_calc[0]
+
+    #         for payment_schedule, milestone in zip(order.of_payment_schedule_ids, milestones):
+    #             if milestone[0] and not payment_schedule.date:
+    #                 payment_schedule.date = milestone[0]
 
     # def action_confirm(self):
-    #     res = super(SaleOrder, self).action_confirm()
-    #     self.of_update_dates_echeancier()
+    #     res = super().action_confirm()
+    #     self.of_update_payment_schedule_dates()
     #     return res
+    # TODO: End of uncomment me
 
     def of_recompute_last_payment_schedule(self):
         for order in self:
@@ -160,4 +162,9 @@ class SaleOrder(models.Model):
         # Recalcul de la dernière échéance si besoin
         if order_needs_recompute := self._get_payment_schedule_needs_recompute():
             order_needs_recompute.of_recompute_last_payment_schedule()
+        return res
+
+    def copy(self, default=None):
+        res = super().copy(default=default)
+        res._onchange_payment_term_id()
         return res

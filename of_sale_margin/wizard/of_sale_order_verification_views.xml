@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_order_verification_wizard_margin_view_form" model="ir.ui.view">
+        <field name="name">of.sale.order.verification.wizard.margin.form</field>
+        <field name="model">of.sale.order.verification</field>
+        <field name="inherit_id" ref="of_sale.of_sale_order_verification_wizard_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='message']" position="attributes">
+                <attribute name="attrs">{'invisible': [('type','!=','margin')]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

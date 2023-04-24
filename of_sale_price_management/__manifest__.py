@@ -10,11 +10,9 @@
     'website': 'https://www.openfire.fr',
     'description': "",
     'depends': [
-        'sale',
-        'sale_margin',
+        'of_sale_margin',
     ],
     'data': [
-        'security/res_groups.xml',
         'security/ir.model.access.csv',
         'views/sale_order_views.xml',
         'wizard/of_sale_price_management_views.xml',

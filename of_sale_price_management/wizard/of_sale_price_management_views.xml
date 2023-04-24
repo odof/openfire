@@ -18,7 +18,7 @@
                 </header>
                 <div class="oe_button_box" name="button_box">
                     <field name="customer_view" invisible="1"/>
-                    <button name="toggle_view_mode" class="oe_stat_button" type="object" icon="fa-code">
+                    <button name="action_button_toggle_view_mode" class="oe_stat_button" type="object" icon="fa-pencil-square-o" groups="of_sale_margin.of_group_sale_margin_manager">
                         <div class="o_stat_info o_field_widget" attrs="{'invisible': [('customer_view', '=', True)]}">
                             <span class="text-danger">Vendor view</span>
                         </div>
@@ -49,19 +49,19 @@
                         <field name="state" invisible="context.get('invoice_status') == 'invoiced'" />
                         <field name="order_line_id" />
                         <field name="total_cost_tax_excl"
-                            groups="of_sale_price_management.of_group_sale_margin_manager"
+                            groups="of_sale_margin.of_group_sale_margin_manager"
                             attrs="{'invisible': [('customer_view', '=', True)]}" />
                         <field name="sim_total_cost_tax_excl"
-                            groups="of_sale_price_management.of_group_sale_margin_manager"
+                            groups="of_sale_margin.of_group_sale_margin_manager"
                             attrs="{'invisible': [('customer_view', '=', True)]}" />
                         <field name="total_price_tax_excl" />
                         <field name="sim_total_price_tax_excl"
                             attrs="{'readonly': [('state', '!=', 'forced')]}" />
                         <field name="margin"
-                            groups="of_sale_price_management.of_group_sale_margin_manager"
+                            groups="of_sale_margin.of_group_sale_margin_manager"
                             attrs="{'invisible': [('customer_view', '=', True)]}" />
                         <field name="margin_percent"
-                            groups="of_sale_price_management.of_group_sale_margin_manager"
+                            groups="of_sale_margin.of_group_sale_margin_manager"
                             attrs="{'invisible': [('customer_view', '=', True)], 'readonly': ['|', ('state', '!=', 'forced'), ('total_cost_tax_excl', '=', 0)]}" />
                         <field name="total_price_tax_incl" />
                         <field name="sim_total_price_tax_incl" />
@@ -76,14 +76,14 @@
                     <group>
                         <field name="init_total_amount_tax_excl" />
                         <field name="init_total_amount_tax_incl" />
-                        <field name="initial_margin" groups="of_sale_price_management.of_group_sale_margin_manager" attrs="{'invisible': [('customer_view', '=', True)]}" />
-                        <field name="initial_margin_percent" widget="percentage" groups="of_sale_price_management.of_group_sale_margin_manager" attrs="{'invisible': [('customer_view', '=', True)]}" />
+                        <field name="initial_margin" groups="of_sale_margin.of_group_sale_margin_manager" attrs="{'invisible': [('customer_view', '=', True)]}" />
+                        <field name="initial_margin_percent" widget="percentage" groups="of_sale_margin.of_group_sale_margin_manager" attrs="{'invisible': [('customer_view', '=', True)]}" />
                     </group>
                     <group>
                         <field name="total_amount_sim_tax_excl" />
                         <field name="total_amount_sim_tax_incl" />
-                        <field name="simulated_margin" groups="of_sale_price_management.of_group_sale_margin_manager" attrs="{'invisible': [('customer_view', '=', True)]}" />
-                        <field name="simulated_margin_percent" widget="percentage" groups="of_sale_price_management.of_group_sale_margin_manager" attrs="{'invisible': [('customer_view', '=', True)]}" />
+                        <field name="simulated_margin" groups="of_sale_margin.of_group_sale_margin_manager" attrs="{'invisible': [('customer_view', '=', True)]}" />
+                        <field name="simulated_margin_percent" widget="percentage" groups="of_sale_margin.of_group_sale_margin_manager" attrs="{'invisible': [('customer_view', '=', True)]}" />
                     </group>
                 </group>
             </form>

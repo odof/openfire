@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <template id="of_sale_report_invoice_document" inherit_id="account.report_invoice_document">
+        <xpath expr="//t[@t-set='forced_vat']" position="after">
+            <t t-set="pdf_address_title" t-value="o.pdf_address_title()"/>
+            <t t-set="pdf_invoicing_address_specific_title" t-value="o.pdf_invoicing_address_specific_title()"/>
+            <t t-set="pdf_invoicing_address_specific_title_label" t-value="o.pdf_invoicing_address_specific_title_label()"/>
+            <t t-set="pdf_shipping_address_specific_title" t-value="o.pdf_shipping_address_specific_title()"/>
+            <t t-set="pdf_shipping_address_specific_title_label" t-value="o.pdf_shipping_address_specific_title_label()"/>
+            <t t-set="pdf_invoicing_shipping_address_specific_title" t-value="o.pdf_invoicing_shipping_address_specific_title()"/>
+            <t t-set="pdf_invoicing_shipping_address_specific_title_label" t-value="o.pdf_invoicing_shipping_address_specific_title_label()"/>
+        </xpath>
+
+        <!-- Invoicing and Shipping Address -->
+        <xpath expr="//div[hasclass('row')]//t[@t-set='information_block']" position="replace">
+            <t t-set="information_block">
+                <div groups="account.group_delivery_invoice_address" name="shipping_address_block">
+                    <t t-if="pdf_address_title">
+                        <t t-if="pdf_shipping_address_specific_title and pdf_shipping_address_specific_title_label">
+                            <strong t-esc="pdf_shipping_address_specific_title_label"/>
+                        </t>
+                        <t t-else="">
+                            <strong>Shipping Address:</strong>
+                        </t>
+                    </t>
+                    <t t-else="">
+                        <strong>Shipping Address:</strong>
+                    </t>
+                    <div t-field="o.partner_shipping_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                </div>
+            </t>
+        </xpath>
+        <xpath expr="//div[hasclass('row')]//div[@name='address_not_same_as_shipping']" position="replace">
+            <div class="col-6" name="address_not_same_as_shipping">
+                <t t-set="address">
+                    <t t-if="pdf_address_title">
+                        <t t-if="pdf_address_title and pdf_invoicing_address_specific_title and pdf_invoicing_address_specific_title_label">
+                            <strong t-esc="pdf_invoicing_address_specific_title_label"/>
+                        </t>
+                    </t>
+                    <address class="mb-0" t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                    <div t-if="o.partner_id.vat">
+                        <t t-if="o.company_id.account_fiscal_country_id.vat_label" t-esc="o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>
+                        <t t-else="">Tax ID</t>: <span t-field="o.partner_id.vat"/>
+                    </div>
+                </t>
+            </div>
+        </xpath>
+        <xpath expr="//div[hasclass('row')]//div[@name='address_same_as_shipping']" position="replace">
+            <div class="offset-col-6 col-6" name="address_same_as_shipping">
+                <t t-set="address">
+                    <t t-if="pdf_address_title">
+                        <t t-if="pdf_address_title and pdf_invoicing_shipping_address_specific_title and pdf_invoicing_shipping_address_specific_title_label">
+                            <strong t-esc="pdf_invoicing_shipping_address_specific_title_label"/>
+                        </t>
+                    </t>
+                    <address class="mb-0" t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                    <div t-if="o.partner_id.vat">
+                        <t t-if="o.company_id.account_fiscal_country_id.vat_label" t-esc="o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>
+                        <t t-else="">Tax ID</t>: <span t-field="o.partner_id.vat"/>
+                    </div>
+                </t>
+            </div>
+        </xpath>
+        <!-- /Invoicing and Shipping Address -->
+    </template>
+
+</odoo>

@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+        <record id="of_sale_margin_sale_order_line_view" model="ir.ui.view">
+            <field name="name">of.sale.margin.sale.order.line.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_margin.sale_margin_sale_order_line_form"/>
+            <field name="priority">17</field>
+            <field name="arch" type="xml">
+                <!-- Purchase price -->
+                <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="attributes">
+                    <attribute name="groups">of_sale_margin.of_group_sale_margin_manager</attribute>
+                    <attribute name="attrs">{'invisible': [('of_customer_view', '=', True)]}</attribute>
+                    <attribute name="readonly">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='purchase_price']" position="attributes">
+                    <attribute name="groups">of_sale_margin.of_group_sale_margin_manager+!of_sale_margin.group_of_can_modify_sale_purchase_price</attribute>
+                    <attribute name="attrs">{'invisible': [('of_customer_view', '=', True)]}</attribute>
+                    <attribute name="readonly">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='purchase_price']" position="after">
+                    <field name="purchase_price" attrs="{'invisible': [('of_customer_view', '=', True)]}"
+                        groups="of_sale_margin.group_of_can_modify_sale_purchase_price+of_sale_margin.of_group_sale_margin_manager" readonly="0" optional="hide"/>
+                </xpath>
+                <!-- /Purchase price -->
+                <!-- Margin and margin percent -->
+                <xpath expr="//field[@name='order_line']/tree//field[@name='margin']" position="attributes">
+                    <attribute name="groups">of_sale_margin.of_group_sale_margin_manager</attribute>
+                    <attribute name="attrs">{'invisible': [('of_customer_view', '=', True)]}</attribute>
+                    <attribute name="invisible">0</attribute>  <!-- FIXME ?: in V10, was set to 1 -->
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='margin_percent']" position="attributes">
+                    <attribute name="groups">of_sale_margin.of_group_sale_margin_manager</attribute>
+                    <attribute name="attrs">{'invisible': [('of_customer_view', '=', True)]}</attribute>
+                    <attribute name="invisible">0</attribute>  <!-- FIXME ?: in V10, was set to 1 -->
+                </xpath>
+                <!-- /Margin and margin percent -->
+
+                <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="after">
+                    <field name="of_customer_view" invisible="1"/>
+                    <field name="of_seller_price" groups="of_sale_margin.of_group_sale_margin_manager+sales_team.group_sale_manager"
+                        attrs="{'column_invisible': [('parent.state', 'not in', ['sale', 'done'])], 'invisible': [('of_customer_view', '=', True)]}"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='purchase_price']" position="after">
+                    <field name="of_customer_view" invisible="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Also modify the specific form view for sale.order.line to open be opened from `action_button_open_sale_order_line` -->
+        <record id="of_sale_order_line_margin_view" model="ir.ui.view">
+            <field name="name">of.sale.order.line.margin.view</field>
+            <field name="model">sale.order.line</field>
+            <field name="inherit_id" ref="of_sale.of_sale_order_line_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='price_unit']" position="after">
+                    <field name="purchase_price" attrs="{'invisible': [('of_customer_view', '=', True)]}"
+                        readonly="1" groups="of_sale_margin.of_group_sale_margin_manager+!of_sale_margin.group_of_can_modify_sale_purchase_price"/>
+                    <field name="purchase_price" attrs="{'invisible': [('of_customer_view', '=', True)]}"
+                        groups="of_sale_margin.group_of_can_modify_sale_purchase_price+of_sale_margin.of_group_sale_margin_manager" readonly="0" optional="hide"/>
+                    <field name="of_customer_view" invisible="1"/>
+                    <field name="of_seller_price" groups="of_sale_margin.of_group_sale_margin_manager+sales_team.group_sale_manager"
+                        attrs="{'column_invisible': [('parent.state', 'not in', ['sale', 'done'])], 'invisible': [('of_customer_view', '=', True)]}"/>
+                </xpath>
+            </field>
+        </record>
+
+</odoo>

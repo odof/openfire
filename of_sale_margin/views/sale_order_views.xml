@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+        <record id="of_sale_view_order_margin_manager" model="ir.ui.view">
+            <field name="name">of.sale.view.order.form.margin.manager</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']//button[@name='action_button_toggle_view_mode']" position="attributes">
+                    <attribute name="groups">of_sale_margin.of_group_sale_margin_manager</attribute>
+                </xpath>
+
+                <!-- Margin and margin percent -->
+                <xpath expr="//group[@name='sale_total']//label[@for='margin']" position="attributes">
+                    <attribute name="groups">of_sale_margin.of_group_sale_margin_manager</attribute>
+                    <attribute name="attrs">{'invisible': [('of_customer_view', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//group[@name='sale_total']//field[@name='margin']" position="attributes">
+                    <attribute name="groups">of_sale_margin.of_group_sale_margin_manager</attribute>
+                    <attribute name="attrs">{'invisible': [('of_customer_view', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//group[@name='sale_total']//field[@name='margin_percent']/.." position="attributes">
+                    <attribute name="groups">of_sale_margin.of_group_sale_margin_manager</attribute>
+                    <attribute name="attrs">{'invisible': [('of_customer_view', '=', True)]}</attribute>
+                </xpath>
+                <!-- /Margin and margin percent -->
+            </field>
+        </record>
+
+</odoo>

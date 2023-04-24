@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_sale_product_category_margin_rate_form_view" model="ir.ui.view">
+        <field name="name">of.sale.product.category.margin.rate.form</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="of_sale.of_sale_product_category_main_product_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_main_product']" position="after">
+                <field name="of_margin_rate"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

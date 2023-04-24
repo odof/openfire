@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Sale -->
+    <record id="of_fiscal_position_required" model="ir.config_parameter" forcecreate="False">
+        <field name="key">of.sale.of_fiscal_position_required</field>
+        <field name="value">False</field>
+    </record>
+
+    <record id="of_allow_quote_addition" model="ir.config_parameter" forcecreate="False">
+        <field name="key">of.sale.of_allow_quote_addition</field>
+        <field name="value">False</field>
+    </record>
+
+    <record id="of_grouped_invoicing" model="ir.config_parameter">
+        <field name="key">of.sale.of_grouped_invoicing</field>
+        <field name="value">default_grouping</field>
+    </record>
+
+    <record id="of_stop_payment_term_propagation" model="ir.config_parameter" forcecreate="False">
+        <field name="key">of.sale.of_stop_payment_term_propagation</field>
+        <field name="value">False</field>
+    </record>
+
+    <record id="of_sale_subtype" model="ir.config_parameter" forcecreate="False">
+        <field name="key">of.sale.of_sale_mail_subtype_subscribtion</field>
+        <field name="value">False</field>
+    </record>
+
+    <record id="of_sale_confirmation_date_mode" model="ir.config_parameter">
+        <field name="key">of.sale.of_sale_confirmation_date_mode</field>
+        <field name="value">default</field>
+    </record>
+
+    <!-- Account -->
+    <record id="of_validate_pickings_on_move" model="ir.config_parameter">
+        <field name="key">of.sale.of_validate_pickings_on_move</field>
+        <field name="value">no</field>
+    </record>
+
+    <record id="of_color_bg_section_account_move" model="ir.config_parameter" >
+        <field name="key">of.sale.report.account.move.of_color_bg_section</field>
+        <field name="value">#FFFFFF</field>
+    </record>
+
+    <record id="of_color_font_section_account_move" model="ir.config_parameter" >
+        <field name="key">of.sale.report.account.move.of_color_font_section</field>
+        <field name="value">#000000</field>
+    </record>
+
+</odoo>

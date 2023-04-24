@@ -6,13 +6,15 @@ from odoo import api, fields, models
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    of_technical_visit_date = fields.Date(
+        string="Technical Visit Date", help="If filled, it will be displayed in quotation/order report"
+    )
     of_requested_week = fields.Char(string="Requested week", compute='_compute_of_requested_week')
 
     @api.depends('commitment_date', 'expected_date')
     def _compute_of_requested_week(self):
         for order in self:
-            requested_date = order.commitment_date or order.expected_date
-            if requested_date:
+            if requested_date := order.commitment_date or order.expected_date:
                 requested_date_dt = fields.Datetime.to_datetime(requested_date)
                 tz_requested_date = fields.Datetime.context_timestamp(order, requested_date_dt)
                 order.of_requested_week = "%s - S%02d" % (
@@ -22,10 +24,18 @@ class SaleOrder(models.Model):
             else:
                 order.of_requested_week = ""
 
+    def _prepare_invoice(self):
+        values = super()._prepare_invoice()  # <- self.ensure_one()
+        values['of_technical_visit_date'] = self.of_technical_visit_date
+        return values
+
+    def pdf_technical_visit_info(self):
+        return self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_technical_visit_info')
+
     def pdf_requested_week(self):
         # Pour éviter de créer un module intermédiaire entre of_sale_external et of_sale_order_dates,
         # on teste la présence d'un champ créé dans of_sale_external
         if 'of_report_template_id' in self.env['sale.order']._fields and self.of_report_template_id:
             return self.of_report_template_id.pdf_requested_week
         else:
-            return self.env['ir.config_parameter'].sudo().get_param('of.sale.order.dates.pdf_requested_week')
+            return self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_requested_week')

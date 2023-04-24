@@ -111,11 +111,6 @@
         <field name="value">True</field>
     </record>
 
-    <record id="pdf_technical_visit_info" model="ir.config_parameter" forcecreate="False">
-        <field name="key">of.sale.report.setting.pdf_technical_visit_info</field>
-        <field name="value">True</field>
-    </record>
-
     <record id="pdf_validity_info" model="ir.config_parameter" forcecreate="False">
         <field name="key">of.sale.report.setting.pdf_validity_info</field>
         <field name="value">True</field>

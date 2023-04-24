@@ -39,7 +39,8 @@ class OfReadGroup(models.AbstractModel):
         for gb in groupby_fields:
             if gb not in self._fields:
                 raise UserError(_("Unknown field %r in 'groupby'", gb))
-            if not self._fields[gb].base_field.groupable:
+            gb_field = self._fields[gb].base_field
+            if not getattr(gb_field, 'of_custom_groupby', False) and not gb_field.groupable:
                 raise UserError(
                     _(
                         "Field %s is not a stored field, only stored fields (regular or "
@@ -47,14 +48,6 @@ class OfReadGroup(models.AbstractModel):
                         self._fields[gb],
                     )
                 )
-            # Modification OpenFire : Un champ custom peut ne pas être présent en base de données
-            gb_field = self._fields[gb].base_field
-            if not getattr(gb_field, 'of_custom_groupby', False):
-                assert gb_field.store and gb_field.column_type, (
-                    "Fields in 'groupby' must be regular "
-                    "database-persisted fields (no function or related fields), or function fields with store=True"
-                )
-            # Fin modification OpenFire
 
         aggregated_fields = []
         select_terms = []
@@ -130,7 +123,7 @@ class OfReadGroup(models.AbstractModel):
             %(orderby)s
             %(limit)s
             %(offset)s
-        """ % {
+        """ % {  # nosec B608
             'table': self._table,
             'count_field': count_field,
             'extra_fields': prefix_terms(',', select_terms),
@@ -146,20 +139,6 @@ class OfReadGroup(models.AbstractModel):
 
         if not groupby_fields:
             return fetched_data
-
-        # # Modif OpenFire : Recherche directe du nom par name_get sur l'objet ciblé
-        # #  (la méthode standart Odoo procédait par lecture du champ sur l'objet courant,
-        # #   ce qui est impossible dans le cadre d'un champ one2many)
-        # for gb in annotated_groupbys:
-        #     if gb['type'] == 'many2one':
-        #         gb_field = gb['field']
-        #         rel = self._fields[gb_field].base_field.comodel_name
-        #         gb_obj = self.env[rel]
-        #         gb_ids = [r[gb_field] for r in fetched_data if r[gb_field]]
-        #         gb_dict = {d[0]: d for d in gb_obj.browse(gb_ids).name_get()}
-        #         for d in fetched_data:
-        #             d[gb_field] = gb_dict.get(d[gb_field], False)
-        # # Fin modif OpenFire
 
         self._read_group_resolve_many2x_fields(fetched_data, annotated_groupbys)
 
@@ -192,16 +171,6 @@ class OfReadGroup(models.AbstractModel):
             )
         return result
 
-    def _field_create(self):
-        """
-        Ajoute la mise à jour de of_custom_groupby dans la table ir_model_fields
-        """
-        super(OfReadGroup, self)._field_create()
-        cr = self._cr
-        query = "UPDATE ir_model_fields SET of_custom_groupby=%s WHERE model=%s AND name=%s"
-        for field in self._fields.itervalues():
-            cr.execute(query, (getattr(field, 'of_custom_groupby', False), self._name, field.name))
-
     @api.model
     def _generate_order_by_inner(self, alias, order_spec, query, reverse_direction=False, seen=None):
         """
@@ -224,10 +193,10 @@ class OfReadGroup(models.AbstractModel):
 
             field = self._fields.get(order_field)
             if not field:
-                raise ValueError(_("Sorting field %s not found on model %s") % (order_field, self._name))
+                raise ValueError("Invalid field %r on model %r" % (order_field, self._name))
 
             if order_field == 'id':
-                order_by_elements.append('"%s"."%s" %s' % (alias, order_field, order_direction))
+                order_by_elements.append(f'"{alias}"."{order_field}" {order_direction}')
             else:
                 if field.inherited:
                     field = field.base_field
@@ -237,7 +206,7 @@ class OfReadGroup(models.AbstractModel):
                         seen.add(key)
                         order_by_elements += self._generate_m2o_order_by(alias, order_field, query, do_reverse, seen)
                 elif field.store and field.column_type:
-                    qualifield_name = self._inherits_join_calc(alias, order_field, query, implicit=False, outer=True)
+                    qualifield_name = self._inherits_join_calc(alias, order_field, query)
                     if field.type == 'boolean':
                         qualifield_name = f"COALESCE({qualifield_name}, false)"
                     order_by_elements.append(f"{qualifield_name} {order_direction}")

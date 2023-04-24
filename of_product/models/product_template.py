@@ -97,7 +97,7 @@ class ProductTemplate(models.Model):
         return [('id', 'in', products.mapped('product_tmpl_id').ids)]
 
     def _set_standard_price(self):
-        super(ProductTemplate, self)._set_standard_price()
+        super()._set_standard_price()
         # On répercute le changement sur le coût théorique
         for template in self:
             if len(template.product_variant_ids) == 1 and template.cost_method == 'standard':
@@ -134,7 +134,7 @@ class ProductTemplate(models.Model):
             self.seller_ids[0].price = self.of_seller_price
 
     def _get_related_fields_variant_template(self):
-        related_fields = super(ProductTemplate, self)._get_related_fields_variant_template()
+        related_fields = super()._get_related_fields_variant_template()
         related_fields.append('of_theoretical_cost')
         return related_fields
 
@@ -150,19 +150,22 @@ class ProductTemplate(models.Model):
                 raise UserError(_("The entered URL is not correct !"))
 
             if not vals.get('categ_id'):
-                # Récupération de la catégorie par défaut, basée sur la fonction _get_default_category_id du module
-                # product. Ceci afin d'éviter des erreurs à l'installation de modules qui veulent créer des articles
-                # sans préciser leur catégorie
-                categ_id = self._context.get('categ_id') or self._context.get('default_categ_id')
-                if not categ_id:
-                    categ_id = category_all and category_all.id
-                if categ_id:
+                # if no category is given at creation (that sould not be possible from the backend interface because
+                # its required), we are trying to find one from the context
+                if (
+                    categ_id := self._context.get('categ_id')
+                    or self._context.get('default_categ_id')
+                    or category_all
+                    and category_all.id
+                ):
                     vals['categ_id'] = categ_id
-
-        # On désactive le log dans le RSE pour gagner du temps lors d'import d'articles
-        return super(ProductTemplate, self.with_context(mail_create_nolog=True)).create(vals_list)
+        if self._context.get('of_no_log'):
+            # old V10 stuff to desactivate log creation for product creation (was usefull for import), but it now
+            # driven by a context key to keep the possibility to log product creation if needed
+            return super(ProductTemplate, self.with_context(mail_create_nolog=True)).create(vals_list)
+        return super().create(vals_list)
 
     def write(self, vals):
         if vals.get('of_url') and not is_valid_url(vals['of_url']):
             raise UserError(_("The entered URL is not correct !"))
-        return super(ProductTemplate, self).write(vals)
+        return super().write(vals)

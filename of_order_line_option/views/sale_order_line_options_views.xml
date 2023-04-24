@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_order_line_option_form_view" model="ir.ui.view">
+        <field name="name">of.order.line.option.form.view</field>
+        <field name="model">of.order.line.option</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group name="header">
+                            <field name="name"/>
+                            <field name="description_update"/>
+                        </group>
+                        <group name="options">
+                            <field name="purchase_price_update"/>
+                            <field name="purchase_price_update_type" string="Type" widget="radio"
+                                    attrs="{'invisible': [('purchase_price_update', '=', False)], 'required': [('purchase_price_update', '=', True)]}"/>
+                            <label for="purchase_price_update_value" string="Value"
+                                    attrs="{'invisible': [('purchase_price_update', '=', False)]}"/>
+                            <div attrs="{'invisible': [('purchase_price_update', '=', False)]}">
+                                <field name="purchase_price_update_value" class="oe_inline"/>
+                                <span class="o_form_label oe_inline"
+                                        attrs="{'invisible': [('purchase_price_update_type', '!=', 'fixed')]}">€</span>
+                                <span class="o_form_label oe_inline"
+                                        attrs="{'invisible': [('purchase_price_update_type', '!=', 'percent')]}">%</span>
+                            </div>
+                            <field name="sale_price_update"/>
+                            <field name="sale_price_update_type" string="Type" widget="radio"
+                                    attrs="{'invisible': [('sale_price_update', '=', False)],'required': [('sale_price_update', '=', True)]}"/>
+                            <label for="sale_price_update_value" string="Value"
+                                    attrs="{'invisible': [('sale_price_update', '=', False)]}"/>
+                            <div attrs="{'invisible': [('sale_price_update', '=', False)]}">
+                                <field name="sale_price_update_value" class="oe_inline"/>
+                                <span class="o_form_label oe_inline" attrs="{'invisible': [('sale_price_update_type', '!=', 'fixed')]}">€</span>
+                                <span class="o_form_label oe_inline" attrs="{'invisible': [('sale_price_update_type', '!=', 'percent')]}">%</span>
+                            </div>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_order_line_option_tree_view" model="ir.ui.view">
+        <field name="name">of.order.line.option.tree.view</field>
+        <field name="model">of.order.line.option</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_order_line_option_action" model="ir.actions.act_window">
+        <field name="name">Order line options</field>
+        <field name="res_model">of.order.line.option</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="of_order_line_option_menu" name="Order line options"
+                parent="sale.menu_sales_config" sequence="20" action="of_order_line_option_action"/>
+
+</odoo>

@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <template id="of_sale_report_invoice_document" inherit_id="account.report_invoice_document">
+
+        <xpath expr="//t[@t-set='forced_vat']" position="after">
+            <t t-set="pdf_technical_visit_info" t-value="o.pdf_technical_visit_info()"/>
+        </xpath>
+
+        <!-- Add Technical Visit Date to the invoice -->
+        <xpath expr="//div[@id='informations']//div[@name='due_date']" position="after">
+            <div class="col-auto col-3 mw-100 mb-2" t-if="pdf_technical_visit_info and o.of_technical_visit_date" name="technical_visit_date">
+                <strong>Technical Visit Date:</strong>
+                <span t-field="o.of_technical_visit_date"/>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>

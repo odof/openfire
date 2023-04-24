@@ -1,0 +1,155 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_sale_margin
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-06-14 13:18+0000\n"
+"PO-Revision-Date: 2023-06-14 13:18+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_sale_margin
+#: model:res.groups,name:of_sale_margin.group_of_can_modify_sale_purchase_price
+msgid "(OF) Change the cost in the order lines"
+msgstr "(OF) Modifier le coût dans les lignes de commande"
+
+#. module: of_sale_margin
+#: model:ir.model.fields,field_description:of_sale_margin.field_of_connector_config_settings__of_sale_order_margin_control
+#: model:ir.model.fields,field_description:of_sale_margin.field_res_config_settings__of_sale_order_margin_control
+msgid "(OF) Margin control"
+msgstr "(OF) Contrôle de marge"
+
+#. module: of_sale_margin
+#: model:ir.model,name:of_sale_margin.model_of_sale_order_verification
+msgid ""
+"Base Transient model to do specific verifications on Sale Order "
+"confirmation."
+msgstr ""
+"Base du wizard pour effectuer des vérifications spécifiques à la "
+"confirmation de commande."
+
+#. module: of_sale_margin
+#: model:ir.model,name:of_sale_margin.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
+
+#. module: of_sale_margin
+#: model:ir.module.category,description:of_sale_margin.of_sale_margin
+msgid "Defines access rights to margins."
+msgstr "Définit les droits d'accès aux marges."
+
+#. module: of_sale_margin
+#: model:ir.model.fields,help:of_sale_margin.field_of_connector_config_settings__of_sale_order_margin_control
+#: model:ir.model.fields,help:of_sale_margin.field_res_config_settings__of_sale_order_margin_control
+msgid "Enable margin control at order validation"
+msgstr "Activer le contrôle de marge à la validation de la commande"
+
+#. module: of_sale_margin
+#: model_terms:ir.ui.view,arch_db:of_sale_margin.of_sale_margin_res_config_settings_view_form
+msgid "Enable margin control on sale order validation"
+msgstr "Activer le contrôle de marge à la validation de la commande"
+
+#. module: of_sale_margin
+#: model:res.groups,name:of_sale_margin.of_group_sale_margin_manager
+msgid "Responsible"
+msgstr "Responsable"
+
+#. module: of_sale_margin
+#: model:ir.model.fields.selection,name:of_sale_margin.selection__of_sale_order_verification__type__margin
+msgid "Margin"
+msgstr "Marge"
+
+#. module: of_sale_margin
+#: model:ir.model.fields,field_description:of_sale_margin.field_sale_order__of_margin_percent
+msgid "Margin %"
+msgstr "Marge %"
+
+#. module: of_sale_margin
+#: model:ir.model.fields,field_description:of_sale_margin.field_product_category__of_margin_rate
+msgid "Margin rate"
+msgstr "Taux de marge"
+
+#. module: of_sale_margin
+#: model:ir.model.fields,help:of_sale_margin.field_product_category__of_margin_rate
+msgid ""
+"Minimum recommended % margin rate when the main product of a quote is in the"
+" category."
+msgstr ""
+"Taux de marge minimum recommandé en % lorsque le produit principal d'un "
+"devis est dans la catégorie."
+
+#. module: of_sale_margin
+#: model:ir.module.category,name:of_sale_margin.of_sale_margin
+msgid "OF Margin"
+msgstr "OF Marge"
+
+#. module: of_sale_margin
+#: model:ir.model,name:of_sale_margin.model_product_category
+msgid "Product Category"
+msgstr "Catégorie de produit"
+
+#. module: of_sale_margin
+#: model:ir.model.fields,field_description:of_sale_margin.field_sale_order_line__of_seller_price
+msgid "Purchase price"
+msgstr "Prix d'achat"
+
+#. module: of_sale_margin
+#: model:ir.model,name:of_sale_margin.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_sale_margin
+#: model:ir.model,name:of_sale_margin.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de commande"
+
+#. module: of_sale_margin
+#. odoo-python
+#: code:addons/of_sale_margin/models/sale_order.py:0
+#, python-format
+msgid "Search operator %s not implemented for value %s"
+msgstr ""
+
+#. module: of_sale_margin
+#. odoo-python
+#: code:addons/of_sale_margin/wizard/of_sale_order_verification_wizard.py:0
+#, python-format
+msgid ""
+"The margin amount of the order \"%s\" is %.2f%% while the category \"%s\" of"
+" the main product \"%s\" %s a minimum margin of %s%%."
+msgstr ""
+"Le montant de marge de la commande \"%s\" est de %.2f%% alors que la "
+"catégorie \"%s\" de l'article principal \"%s\" %s une marge minimum de %s%%"
+
+#. module: of_sale_margin
+#. odoo-python
+#: code:addons/of_sale_margin/models/product_category.py:0
+#, python-format
+msgid "The margin rate must be between 0% and 100%."
+msgstr "Le taux de marge doit être compris entre 0% et 100%."
+
+#. module: of_sale_margin
+#: model:ir.model.fields,field_description:of_sale_margin.field_of_sale_order_verification__type
+msgid "Type"
+msgstr ""
+
+#. module: of_sale_margin
+#. odoo-python
+#: code:addons/of_sale_margin/wizard/of_sale_order_verification_wizard.py:0
+#, python-format
+msgid "request"
+msgstr "demande"
+
+#. module: of_sale_margin
+#. odoo-python
+#: code:addons/of_sale_margin/wizard/of_sale_order_verification_wizard.py:0
+#, python-format
+msgid "requires"
+msgstr "requiert"

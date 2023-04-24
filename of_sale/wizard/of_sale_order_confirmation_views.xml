@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_order_confirmation_view_form" model="ir.ui.view">
+        <field name="name">of.sale.order.confirmation.view.form</field>
+        <field name="model">of.sale.order.confirmation</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="order_id" invisible="1"/>
+                <div class="alert alert-info" role="alert">
+                    You are about to confirm the sale order. Please enter a new confirmation date if you want to
+                    override the default one.
+                </div>
+                <group>
+                    <group col="1">
+                        <field name="confirmation_date"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="Validate" name="action_bouton_validate" type="object" class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

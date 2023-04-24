@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <data>
+
+        <record id="of_sale_account_move_view_form" model="ir.ui.view">
+            <field name="name">of.sale.account.move.form</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='sale_info_group']/field[@name='ref']" position="after">
+                    <field name="of_internal_followup"/>
+                </xpath>
+                <xpath expr="//group[@name='accounting_info_group']" position="after">
+                    <group string="Printing settings" name="printing_settings">
+                        <field name="of_price_printing" invisible="1"/>
+                    </group>
+                </xpath>
+                <!-- TODO: Uncomment me and continue the migration when `of_account` module is migrated -->
+                <!-- <xpath expr="//notebook/page[@name='invoice_tab']/group[hasclass('oe_invoice_lines_tab')]/group/field[@name='invoice_outstanding_credits_debits_widget']" position="after">
+                    <field name="of_residual_equal" invisible="1"/>
+                    <div attrs="{'invisible': [('of_residual_equal', '!=', False)]}" class="oe_grey" colspan="4">
+                        The total amount of down-payment invoices is different from the total amount of payments.
+                        Check that down-payment invoices have been paid.
+                    </div>
+                    <label for="of_residual" attrs="{'invisible': [('of_residual_equal', '!=', False)]}" class="oe_inline"/>
+                    <field name="of_residual"
+                        attrs="{'invisible': [('of_residual_equal', '!=', False)]}" />
+                </xpath> -->
+                <!-- /TODO: Uncomment me and continue the migration when `of_account` module is migrated -->
+            </field>
+        </record>
+
+    </data>
+
+    <data noupdate="1">
+        <!-- This view is managed by res.config.settings : it can be enabled or disabled by the user -->
+        <record id="of_sale_account_move_delivery_notes_view_form" model="ir.ui.view">
+            <field name="name">of.sale.account.move.delivery.notes.form</field>
+            <field name="model">account.move</field>
+            <field name="active">False</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <!-- Invisible fields (at top of the form) -->
+                <xpath expr="//field[@name='quick_encoding_vals']" position="after">
+                    <field name="of_is_locked" invisible="1"/>
+                    <field name="of_waiting_delivery" invisible="1"/>
+                </xpath>
+                <!-- Validate linked delivery notes -->
+                <xpath expr="//header//button[@name='button_set_checked']" position="after">
+                    <button name="action_button_validate_pickings" type="object" string="Validate linked Pickings"
+                            attrs="{'invisible': [
+                                '|','|','|',
+                                ('of_waiting_delivery','=',False),
+                                ('move_type', 'not in', ('out_invoice', 'out_refund')),
+                                ('state','not in', ['open','posted']),
+                                ('of_is_locked', '=', True)]}"
+                            confirm="All delivery notes related to orders on this invoice will be released. All items will be considered available and marked as delivered."/>
+                </xpath>
+                <xpath expr="//notebook" position="before">
+                    <div style="color:red;"
+                            attrs="{'invisible': [
+                                '|', '|', '|',
+                                ('of_waiting_delivery','=', False),
+                                ('move_type', 'not in', ('out_invoice', 'out_refund')),
+                                ('state','not in',['open','posted']),
+                                ('of_is_locked', '=', True)]}">
+                        <i>There are still outstanding delivery notes.</i>
+                    </div>
+                </xpath>
+                <!-- Delivery notes -->
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button type="object" name="action_button_view_delivery" class="oe_stat_button" icon="fa-truck" attrs="{'invisible': [('of_picking_count', '&lt;=', 0)]}">
+                        <field name="of_picking_count" widget="statinfo" string="Deliveries"/>
+                    </button>
+                </xpath>
+            </field>
+        </record>
+    </data>
+
+</odoo>

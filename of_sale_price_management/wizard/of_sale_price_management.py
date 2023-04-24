@@ -17,7 +17,7 @@ class OFPriceManagementWizard(models.TransientModel):
             ('amount_tax_excl', _("Amount excl. VAT to be deducted")),
             ('percentage', _("% Overall discount")),
         ]
-        if self.user_has_groups('of_sale_price_management.of_group_sale_margin_manager'):
+        if self.user_has_groups('of_sale_margin.of_group_sale_margin_manager'):
             selection.append(('margin_percent', _("% Margin")))
         selection.append(('restore', _("Restore at store price")))
         return selection
@@ -44,9 +44,7 @@ class OFPriceManagementWizard(models.TransientModel):
         string="Initial total amount excl. VAT", related='order_id.amount_untaxed', readonly=True
     )
     currency_id = fields.Many2one(related='order_id.currency_id')
-    simulated_margin = fields.Monetary(
-        string="Simulated margin", digits='Sale Price', compute='_compute_simulated_amounts'
-    )
+    simulated_margin = fields.Monetary(string="Simulated margin", compute='_compute_simulated_amounts')
     simulated_margin_percent = fields.Float(string="Simulated margin %", compute='_compute_simulated_amounts')
     total_amount_sim_tax_incl = fields.Monetary(
         string="Total simulated incl. VAT", compute='_compute_simulated_amounts'
@@ -246,11 +244,11 @@ class OFPriceManagementWizard(models.TransientModel):
     def action_button_exclude_all(self):
         self.line_ids.filtered(lambda line: line.state == 'included').write({'state': 'excluded'})
 
-    def toggle_view_mode(self):
+    def action_button_toggle_view_mode(self):
         """Allows you to switch between the vendor/customer view"""
         for record in self:
             record.customer_view = not record.customer_view
-            record.order_id.customer_view = record.customer_view
+            record.order_id.of_customer_view = record.customer_view
 
     def action_price_management_print(self):
         self.ensure_one()
@@ -265,14 +263,8 @@ class OFPriceManagementWizard(models.TransientModel):
         return ' / '.join(docs.mapped('order_id').mapped('name'))
 
     @api.model
-    def report_get_report_date(self, docs):
-        return ' / '.join(
-            [
-                fields.Date.to_string(fields.Date.from_string(gestion.order_id.confirmation_date))
-                or fields.Date.to_string(fields.Date.from_string(gestion.order_id.date_order))
-                for gestion in docs
-            ]
-        )
+    def report_get_report_date(self, records):
+        return ' / '.join([fields.Date.to_string(rec.order_id.date_order) for rec in records])
 
     def report_get_lines(self):
         """Returns data for the lines table in the report."""
@@ -288,9 +280,9 @@ class OFPriceManagementWizard(models.TransientModel):
         currency_symbol = self.currency_id.symbol
         res = []
         for name, lines in [
-            (_('Products'), order_lines_product),
-            (_('Services'), order_lines_service),
-            (_('Total'), order_lines),
+            (_("Products"), order_lines_product),
+            (_("Services"), order_lines_service),
+            (_("Total"), order_lines),
         ]:
             lines_dict = {'name': name}
             total_purchase = 0.0
@@ -673,8 +665,7 @@ class OFPriceManagementWizardLine(models.TransientModel):
         :param order_line: order line on which we retrieve the information
         :param calculation_basis: Type of prorata used
         :param all_zero: True if calculation_basis == 'cost' and all purchase prices are 0,
-                                 if calculation_basis == 'price' and all price units are 0,
-                            False in other cases
+            if calculation_basis == 'price' and all price units are 0, False in other cases
         :return: the base amount
         :rtype: float
         """

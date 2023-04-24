@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_order_line_option_margin_sale_order_line" model="ir.ui.view">
+        <field name="name">of.order.line.option.margin.sale.order.line</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_margin.sale_margin_sale_order_line"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="after">
+                <field name="of_order_line_option_id" options="{'no_create': True, 'no_open': True}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_order_line_margin_option_view" model="ir.ui.view">
+        <field name="name">of.sale.order.line.margin.option</field>
+        <field name="model">sale.order.line</field>
+        <field name="inherit_id" ref="of_sale_margin.of_sale_order_line_margin_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='purchase_price']" position="after">
+                <label for="of_order_line_option_id"/>
+                <div name="order_line_option">
+                    <field name="of_order_line_option_id" class="oe_inline" options="{'no_create': True, 'no_open': True}"/>
+                    <button name="action_button_reset_option_form" type="object" icon="fa-arrow-circle-left" class="oe_inline"
+                            title="Reset the option" attrs="{'invisible': [('of_order_line_option_id', '=', False)]}"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_order_line_option_margin_sale_order_line_form" model="ir.ui.view">
+        <field name="name">of.order.line.option.margin.sale.order.line</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_margin.sale_margin_sale_order_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/tree/field[@name='name']" position="after">
+                <field name="of_order_line_option_id" options="{'no_create': True, 'no_open': True}"/>
+                <button name="action_button_reset_option" type="object" icon="fa-arrow-circle-left" title="Reset the option" attrs="{'invisible': [('of_order_line_option_id', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

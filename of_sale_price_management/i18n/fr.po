@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-14 15:16+0000\n"
-"PO-Revision-Date: 2023-04-14 15:16+0000\n"
+"POT-Creation-Date: 2023-05-24 09:24+0000\n"
+"PO-Revision-Date: 2023-05-24 09:24+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -131,7 +131,6 @@ msgstr "Devise"
 #. module: of_sale_price_management
 #: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__customer_view
 #: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__customer_view
-#: model:ir.model.fields,field_description:of_sale_price_management.field_sale_order__customer_view
 msgid "Customer/Vendor view"
 msgstr "Vue Client/Vendeur"
 
@@ -540,11 +539,6 @@ msgstr "Le pourcentage de marge doit être inférieur à 100."
 #, python-format
 msgid "Total"
 msgstr ""
-
-#. module: of_sale_price_management
-#: model:ir.model.fields,field_description:of_sale_price_management.field_sale_order__of_total_cost
-msgid "Total cost price"
-msgstr "Prix de revient"
 
 #. module: of_sale_price_management
 #: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__total_cost_tax_excl

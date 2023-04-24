@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_product_variant_specific_price" model="ir.config_parameter">
+        <field name="key">of.product.of_product_variant_specific_price</field>
+        <field name="value">by_attribute</field>
+    </record>
+
+</odoo>

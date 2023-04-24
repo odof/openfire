@@ -1,0 +1,5 @@
+schwifty==2022.9.0
+openerp-client-lib==1.1.2
+pdfminer.six==20200726
+pypdftk==0.5
+pypdf==3.8.1

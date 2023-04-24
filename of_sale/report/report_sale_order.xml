@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <template id="of_report_saleorder_document" inherit_id="sale.report_saleorder_document">
+        <!-- Lines and totals block -->
+        <xpath expr="//th[@name='th_priceunit']" position="replace">
+            <th name="th_priceunit" t-if="doc.of_price_printing == 'order_line'" class="text-end">Unit Price</th>
+        </xpath>
+
+        <xpath expr="//th[@name='th_discount']" position="replace">
+            <th name="th_discount" t-if="doc.of_price_printing == 'order_line' and display_discount" class="text-end" groups="product.group_discount_per_so_line">
+                <span>Disc.%</span>
+            </th>
+        </xpath>
+
+        <xpath expr="//th[@name='th_taxes']" position="replace">
+            <th name="th_taxes" t-if="doc.of_price_printing == 'order_line'" class="text-end">Taxes</th>
+        </xpath>
+
+        <xpath expr="//th[@name='th_subtotal']" position="replace">
+            <th t-if="doc.of_price_printing == 'order_line'" name="th_subtotal" class="text-end">
+                <span groups="account.group_show_line_subtotals_tax_excluded">Amount</span>
+                <span groups="account.group_show_line_subtotals_tax_included">Total Price</span>
+            </th>
+        </xpath>
+
+        <xpath expr="//td[@name='td_priceunit']" position="replace">
+            <td name="td_priceunit" t-if="doc.of_price_printing == 'order_line'" class="text-end">
+                <span t-field="line.price_unit"/>
+            </td>
+        </xpath>
+
+        <xpath expr="//td[@t-if='display_discount']" position="replace">
+            <td name="td_discount" t-if="doc.of_price_printing == 'order_line' and display_discount" class="text-end" groups="product.group_discount_per_so_line">
+                <span t-field="line.discount"/>
+            </td>
+        </xpath>
+
+        <xpath expr="//td[@name='td_subtotal']" position="replace">
+            <td t-if="not line.is_downpayment and doc.of_price_printing == 'order_line'" name="td_subtotal" class="text-end o_price_total">
+                <span t-field="line.price_subtotal" groups="account.group_show_line_subtotals_tax_excluded"/>
+                <span t-field="line.price_total" groups="account.group_show_line_subtotals_tax_included"/>
+            </td>
+        </xpath>
+
+        <xpath expr="//td[@name='td_taxes']" position="replace">
+            <td name="td_taxes" t-if="doc.of_price_printing == 'order_line'" class="text-end">
+                <span t-out="', '.join(map(lambda x: (x.description or x.name), line.tax_id))"/>
+            </td>
+        </xpath>
+
+        <xpath expr="//div[@id='total']" position="replace">
+            <div id="total" t-if="doc.of_price_printing == 'order_line'" class="row" name="total">
+                <div t-attf-class="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ms-auto">
+                    <table class="table table-sm table-borderless">
+                        <!-- Tax totals -->
+                        <t t-set="tax_totals" t-value="doc.tax_totals"/>
+                        <t t-call="account.document_tax_totals"/>
+                    </table>
+                </div>
+            </div>
+        </xpath>
+        <!-- /Lines and totals block -->
+    </template>
+
+</odoo>

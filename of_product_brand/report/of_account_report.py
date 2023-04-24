@@ -42,7 +42,7 @@ class AccountInvoiceReport(models.Model):
     def _read_group_raw(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
         # FIXME: Is that ok ?
         # Workarround to remove unstored computed field of the fields list, beacause we can't send non stored
-        # field no more here. Thoses fields should be comptued on the fly after with the values of the previous period
+        # field no more here. Theses fields should be comptued on the fly after with the values of the previous period
         depends_mapping = {
             'of_diff_price': ('of_diff_price', 'price_subtotal'),
             'of_diff_qty': ('of_diff_qty', 'quantity'),

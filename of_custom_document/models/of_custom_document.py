@@ -30,28 +30,30 @@ except ImportError:
 class OfCustomDocument(models.Model):
     """Modèles de documents à imprimer en PDF"""
 
-    _name = "of.custom.document"
+    _name = 'of.custom.document'
     _inherit = 'mail.render.mixin'
-    _description = 'Custom pdf report'
+    _description = "Custom pdf report"
     _order = 'sequence'
 
     name = fields.Char(size=250, required=True)
     print_address = fields.Boolean()
     print_header = fields.Boolean()
-    body_html = fields.Html('Body', render_engine='qweb', translate=True, prefetch=True, sanitize=False)
+    body_html = fields.Html(string='Body', render_engine='qweb', translate=True, prefetch=True, sanitize=False)
     file_name = fields.Char()
     file = fields.Binary()
     fillable = fields.Boolean(string="Keep fillable", help="The pdf document will be fillable")
     sequence = fields.Integer(default=10)
     model_id = fields.Many2one(comodel_name='ir.model', string="Applies to")
-    model = fields.Char('Related Document Model', related='model_id.model', index=True, store=True, readonly=True)
+    model = fields.Char(
+        string='Related Document Model', related='model_id.model', index=True, store=True, readonly=True
+    )
     pdf_field_ids = fields.One2many(
         comodel_name='of.custom.document.field', inverse_name='document_id', string="PDF fields", copy=True
     )
     # contextual action
     ref_ir_act_report = fields.Many2one(
         comodel_name='ir.actions.report',
-        string='Print action',
+        string="Print action",
         readonly=True,
         copy=False,
         help="Sidebar action to make this template available on records of the related document model",
@@ -65,16 +67,15 @@ class OfCustomDocument(models.Model):
     def copy(self, default=None):
         default = dict(default or {})
         default['name'] = _('%s (copy)') % self.name
-        res = super(OfCustomDocument, self).copy(default)
-        return res
+        return super().copy(default)
 
     def get_pdf_fields_values(self, record):
         self.ensure_one()
-        values = {}
-        for pdf_field in self.pdf_field_ids:
-            if pdf_field.to_export:
-                values[pdf_field.name] = pdf_field._render_field('value', record.ids)[record.id]
-        return values
+        return {
+            pdf_field.name: pdf_field._render_field('value', record.ids)[record.id]
+            for pdf_field in self.pdf_field_ids
+            if pdf_field.to_export
+        }
 
     def format_html(self, record):
         self.ensure_one()
@@ -144,15 +145,15 @@ class OfCustomDocument(models.Model):
         pdf_field_obj = self.env['of.custom.document.field']
         pdf_fields = pdf_field_obj
         if self.file:
-            # Si le document est de type pdf, on cherche s'il contient des champs éditables
-            file_name = self.file_name
-            mimetype = False
-            if file_name:
+            if file_name := self.file_name:
                 mimetype = mimetypes.guess_type(file_name)[0]
+            else:
+                mimetype = False
             if not mimetype:
                 mimetype = guess_mimetype(base64.b64decode(self.file))
 
             if mimetype == 'application/pdf':
+                # Si le document est de type pdf, on cherche s'il contient des champs éditables
                 pre_vals = {f.name: f.value for f in self.pdf_field_ids}
                 pf = io.BytesIO(base64.b64decode(self.file))
                 parser = PDFParser(pf)
@@ -217,9 +218,8 @@ class OfCustomDocument(models.Model):
                     'name': document.name,
                     'report_type': 'qweb-pdf',
                     'model': document.model_id.model,
-                    'print_report_name': '"%s"' % document.name,
-                    'report_name': 'of_custom_document.%s' % document.id,
-                    # Ajout dans le menu "imprimer"
+                    'print_report_name': f'"{document.name}"',
+                    'report_name': f'of_custom_document.{document.id}',
                     'binding_model_id': document.model_id.id,
                     'binding_type': 'report',
                 }
@@ -237,21 +237,3 @@ class OfCustomDocument(models.Model):
     def unlink(self):
         self.unlink_action()
         return super().unlink()
-
-
-class OfCustomDocumentField(models.Model):
-    _name = 'of.custom.document.field'
-    _description = 'PDF field'
-    _inherit = 'mail.render.mixin'
-
-    name = fields.Char(string='PDF field name', required=True, readonly=True)
-    value = fields.Char()
-    document_id = fields.Many2one(comodel_name='of.custom.document', string="Document")
-    to_export = fields.Boolean(string='Export', default=True)
-    to_import = fields.Boolean(string='Import')
-    lang = fields.Char(related='document_id.lang')
-
-    @api.depends('document_id', 'document_id.render_model')
-    def _compute_render_model(self):
-        for doc_field in self:
-            doc_field.render_model = doc_field.document_id.render_model

@@ -2,7 +2,7 @@
 <odoo>
 
     <template id="of_report_saleorder_document" inherit_id="sale.report_saleorder_document">
-        <xpath expr="//td[@t-if='display_discount']//span[@t-field='line.discount']" position="replace">
+        <xpath expr="//td[@name='td_discount']//span[@t-field='line.discount']" position="replace">
             <span t-esc="line.of_discount_formula"/>
         </xpath>
     </template>

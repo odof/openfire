@@ -1,7 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': "OpenFire / Sale Report Setting",
+    'name': "OpenFire / Paramétrage du rapport de vente",
     'version': '16.0.1.0.0',
     'author': "OpenFire",
     'category': 'OpenFire',
@@ -9,13 +9,13 @@
     'website': 'https://www.openfire.fr',
     'description': "",
     'depends': [
-        'sale',  # TODO : A remplacer par of_sale
-        'of_base',  # TODO : A supprimer car induit par of_sale
+        'of_sale',
     ],
     'data': [
         'data/of_sale_report_setting_data.xml',
         'security/of_sale_report_setting_security.xml',
-        'reports/ir_actions_report_templates.xml',
+        'report/ir_actions_report_templates.xml',
+        'report/report_account_move.xml',
         'views/res_config_settings_views.xml',
         'views/res_users_views.xml',
         'views/sale_order_views.xml',

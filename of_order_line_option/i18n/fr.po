@@ -6,14 +6,28 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-30 13:14+0000\n"
-"PO-Revision-Date: 2023-03-30 13:14+0000\n"
+"POT-Creation-Date: 2023-05-11 09:59+0000\n"
+"PO-Revision-Date: 2023-05-11 09:59+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: of_order_line_option
+#: model_terms:ir.ui.view,arch_db:of_order_line_option.of_order_line_option_form_view
+msgid ""
+"<span class=\"o_form_label oe_inline\" attrs=\"{'invisible': [('purchase_price_update_type', '!=', 'fixed')]}\">€</span>\n"
+"                                <span class=\"o_form_label oe_inline\" attrs=\"{'invisible': [('purchase_price_update_type', '!=', 'percent')]}\">%</span>"
+msgstr ""
+
+#. module: of_order_line_option
+#: model_terms:ir.ui.view,arch_db:of_order_line_option.of_order_line_option_form_view
+msgid ""
+"<span class=\"o_form_label oe_inline\" attrs=\"{'invisible': [('sale_price_update_type', '!=', 'fixed')]}\">€</span>\n"
+"                                <span class=\"o_form_label oe_inline\" attrs=\"{'invisible': [('sale_price_update_type', '!=', 'percent')]}\">%</span>"
+msgstr ""
 
 #. module: of_order_line_option
 #: model:ir.model.fields,field_description:of_order_line_option.field_of_order_line_option__purchase_price_update
@@ -69,7 +83,7 @@ msgstr "Nom"
 #: model:ir.model.fields,field_description:of_order_line_option.field_purchase_order_line__of_order_line_option_id
 #: model:ir.model.fields,field_description:of_order_line_option.field_sale_order_line__of_order_line_option_id
 msgid "Option"
-msgstr "Option"
+msgstr ""
 
 #. module: of_order_line_option
 #: model:ir.model,name:of_order_line_option.model_of_order_line_option
@@ -109,9 +123,10 @@ msgid "Purchase price alteration value"
 msgstr "Valeur de modification du prix d'achat"
 
 #. module: of_order_line_option
-#: model:ir.model.fields,field_description:of_order_line_option.field_sale_order_line__of_reset_option
-msgid "Reset option"
-msgstr "Réinitialiser les options"
+#: model_terms:ir.ui.view,arch_db:of_order_line_option.of_sale_margin_sale_order_line
+#: model_terms:ir.ui.view,arch_db:of_order_line_option.of_sale_margin_sale_order_line_form
+msgid "Reset the option"
+msgstr "Réinitialiser l'option"
 
 #. module: of_order_line_option
 #: model:ir.model.fields,field_description:of_order_line_option.field_of_order_line_option__sale_price_update_type
@@ -137,7 +152,7 @@ msgstr "Montant fixe"
 #. module: of_order_line_option
 #: model_terms:ir.ui.view,arch_db:of_order_line_option.of_order_line_option_form_view
 msgid "Type"
-msgstr "Type"
+msgstr ""
 
 #. module: of_order_line_option
 #: model_terms:ir.ui.view,arch_db:of_order_line_option.of_order_line_option_form_view

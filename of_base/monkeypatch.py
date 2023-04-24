@@ -1,18 +1,23 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import ast
+
 from lxml import etree  # nosec - We are not parsing XML from untrusted sources
 from lxml.builder import E  # nosec - We are not parsing XML from untrusted sources
 
 from odoo import _, api, models
 from odoo.models import BaseModel
+from odoo.tools.view_validation import get_dict_asts, get_variable_names
 
 from odoo.addons.base.models.ir_model import MODULE_UNINSTALL_FLAG
+from odoo.addons.base.models.ir_ui_view import View
 from odoo.addons.base.models.res_partner import Partner
 from odoo.addons.base.models.res_users import GroupsView, name_boolean_group, name_selection_groups
 
 
 # We are 🐒-patching the following methods :
 #    - base.user_has_groups()
+#    - ir.ui.view._validate_attrs()
 #    - res.group._update_user_groups_view()
 #    - res.partner.onchange_parent_id()
 class OfBaseHooks(models.AbstractModel):
@@ -28,6 +33,7 @@ class OfBaseHooks(models.AbstractModel):
 
 # Save the original methods
 user_has_groups_original = BaseModel.user_has_groups
+_validate_attrs_original = View._validate_attrs
 _update_user_groups_view_original = GroupsView._update_user_groups_view
 onchange_parent_id_original = Partner.onchange_parent_id
 
@@ -91,6 +97,103 @@ def user_has_groups(self, groups):
             return True
 
     return not has_groups
+
+
+def _validate_attrs(self, node, name_manager, node_info):
+    """Generic validation of node attrs.
+
+    OpenFire Addition: manage the use of '+' in group's name.
+    """
+    if self.env.get('of.base.hooks.installed') is None:
+        return _validate_attrs_original(self, node, name_manager, node_info)
+
+    for attr, expr in node.items():
+        if attr in ('class', 't-att-class', 't-attf-class'):
+            self._validate_classes(node, expr)
+
+        elif attr == 'attrs':
+            for key, val_ast in get_dict_asts(expr).items():
+                if isinstance(val_ast, ast.List):
+                    # domains in attrs are used for readonly, invisible, ...
+                    # and thus are only executed client side
+                    fnames, vnames = self._get_domain_identifiers(node, val_ast, attr, expr)
+                    name_manager.must_have_fields(node, fnames | vnames, f"attrs ({expr})")
+                else:
+                    vnames = get_variable_names(val_ast)
+                    if vnames:
+                        name_manager.must_have_fields(node, vnames, f"attrs ({expr})")
+
+        elif attr == 'context':
+            for key, val_ast in get_dict_asts(expr).items():
+                if key == 'group_by':  # only in context
+                    if not isinstance(val_ast, ast.Str):
+                        msg = _(
+                            '"group_by" value must be a string %(attribute)s=%(value)r',
+                            attribute=attr,
+                            value=expr,
+                        )
+                        self._raise_view_error(msg, node)
+                    group_by = val_ast.s
+                    fname = group_by.split(':')[0]
+                    if fname not in name_manager.model._fields:
+                        msg = _(
+                            'Unknown field "%(field)s" in "group_by" value in %(attribute)s=%(value)r',
+                            field=fname,
+                            attribute=attr,
+                            value=expr,
+                        )
+                        self._raise_view_error(msg, node)
+                else:
+                    vnames = get_variable_names(val_ast)
+                    if vnames:
+                        name_manager.must_have_fields(node, vnames, f"context ({expr})")
+
+        elif attr == 'groups':
+            # OF : allow use of '+' to specify several groups user must belong to, replace `+` by `,` to avoid an error
+            # with the `ir.model.data` search
+            for group in expr.replace('!', '').replace('+', ',').split(','):
+                # further improvement: add all groups to name_manager in
+                # order to batch check them at the end
+                if not self.env['ir.model.data']._xmlid_to_res_id(group.strip(), raise_if_not_found=False):
+                    msg = "The group %r defined in view does not exist!"
+                    self._log_view_warning(msg % group, node)
+
+        elif attr in ('col', 'colspan'):
+            # col check is mainly there for the tag 'group', but previous
+            # check was generic in view form
+            if not expr.isdigit():
+                self._raise_view_error(
+                    _('%(attribute)r value must be an integer (%(value)s)', attribute=attr, value=expr),
+                    node,
+                )
+
+        elif attr.startswith('decoration-'):
+            vnames = get_variable_names(expr)
+            if vnames:
+                name_manager.must_have_fields(node, vnames, f"{attr}={expr}")
+
+        elif attr == 'data-bs-toggle' and expr == 'tab':
+            if node.get('role') != 'tab':
+                msg = 'tab link (data-bs-toggle="tab") must have "tab" role'
+                self._log_view_warning(msg, node)
+            aria_control = node.get('aria-controls') or node.get('t-att-aria-controls')
+            if not aria_control and not node.get('t-attf-aria-controls'):
+                msg = 'tab link (data-bs-toggle="tab") must have "aria_control" defined'
+                self._log_view_warning(msg, node)
+            if aria_control and '#' in aria_control:
+                msg = 'aria-controls in tablink cannot contains "#"'
+                self._log_view_warning(msg, node)
+
+        elif attr == "role" and expr in ('presentation', 'none'):
+            msg = (
+                "A role cannot be `none` or `presentation`. "
+                "All your elements must be accessible with screen readers, describe it."
+            )
+            self._log_view_warning(msg, node)
+
+        elif attr == 'group':
+            msg = "attribute 'group' is not valid.  Did you mean 'groups'?"
+            self._log_view_warning(msg, node)
 
 
 @api.model
@@ -264,5 +367,6 @@ def onchange_parent_id(self):
 
 # Replace the original methods with the new ones
 BaseModel.user_has_groups = user_has_groups
+View._validate_attrs = _validate_attrs
 GroupsView._update_user_groups_view = _update_user_groups_view
 Partner.onchange_parent_id = onchange_parent_id

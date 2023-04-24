@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-23 13:57+0000\n"
-"PO-Revision-Date: 2023-05-23 13:57+0000\n"
+"POT-Creation-Date: 2023-06-07 14:37+0000\n"
+"PO-Revision-Date: 2023-06-07 14:37+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,9 +16,21 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_sale_order_dates
+#: model:ir.model.fields,field_description:of_sale_order_dates.field_of_connector_config_settings__pdf_technical_visit_info_move
+#: model:ir.model.fields,field_description:of_sale_order_dates.field_res_config_settings__pdf_technical_visit_info_move
+msgid "(OF) Technical visit date"
+msgstr "(OF) Date de visite technique"
+
+#. module: of_sale_order_dates
 #: model_terms:ir.ui.view,arch_db:of_sale_order_dates.report_saleorder_document
 msgid "<strong>Requested week:</strong>"
-msgstr "<strong>Semaine demandée:</strong>"
+msgstr "<strong>Semaine demandée :</strong>"
+
+#. module: of_sale_order_dates
+#: model_terms:ir.ui.view,arch_db:of_sale_order_dates.of_sale_report_invoice_document
+#: model_terms:ir.ui.view,arch_db:of_sale_order_dates.report_saleorder_document
+msgid "<strong>Technical Visit Date:</strong>"
+msgstr "<strong>Date visite technique :</strong>"
 
 #. module: of_sale_order_dates
 #: model:ir.model,name:of_sale_order_dates.model_res_config_settings
@@ -26,7 +38,7 @@ msgid "Config Settings"
 msgstr "Paramètres de configuration"
 
 #. module: of_sale_order_dates
-#: model_terms:ir.ui.view,arch_db:of_sale_order_dates.view_order_form
+#: model_terms:ir.ui.view,arch_db:of_sale_order_dates.of_sale_stock_order_dates_form_view
 msgid "Delivery Date"
 msgstr "Date de livraison"
 
@@ -36,9 +48,45 @@ msgid "Displays the requested week in top information block"
 msgstr "Affiche la semaine demandée dans les informations du haut"
 
 #. module: of_sale_order_dates
-#: model_terms:ir.ui.view,arch_db:of_sale_order_dates.view_order_form
+#: model_terms:ir.ui.view,arch_db:of_sale_order_dates.res_config_settings_sale_printing_params_view_form
+msgid ""
+"Displays the technical visit date in top information block, else it will be "
+"displayed at the end of the report"
+msgstr ""
+"Affiche la date de visite technique dans les informations du haut, sinon "
+"elle sera affichée à la fin du rapport"
+
+#. module: of_sale_order_dates
+#: model:ir.model.fields,help:of_sale_order_dates.field_of_connector_config_settings__pdf_technical_visit_info_move
+#: model:ir.model.fields,help:of_sale_order_dates.field_res_config_settings__pdf_technical_visit_info_move
+msgid ""
+"Displays the technical visit in top information block in Invoice PDF report "
+"?"
+msgstr ""
+"Affiche la visite technique dans le bloc d'information supérieur du rapport "
+"PDF de la facture ?"
+
+#. module: of_sale_order_dates
+#: model_terms:ir.ui.view,arch_db:of_sale_order_dates.of_sale_order_date_account_res_config_settings_view_form
+msgid ""
+"Displays the technical visit in top information block in Invoice PDF report."
+msgstr ""
+"Affiche la visite technique dans le bloc d'information supérieur du rapport"
+
+#. module: of_sale_order_dates
+#: model_terms:ir.ui.view,arch_db:of_sale_order_dates.of_sale_stock_order_dates_form_view
 msgid "Expected:"
 msgstr "Prévu :"
+
+#. module: of_sale_order_dates
+#: model:ir.model.fields,help:of_sale_order_dates.field_sale_order__of_technical_visit_date
+msgid "If filled, it will be displayed in quotation/order report"
+msgstr "Si renseignée, apparaîtra dans le rapport devis/commande"
+
+#. module: of_sale_order_dates
+#: model:ir.model,name:of_sale_order_dates.model_account_move
+msgid "Journal Entry"
+msgstr "Pièce comptable"
 
 #. module: of_sale_order_dates
 #: model:ir.model.fields,field_description:of_sale_order_dates.field_of_connector_config_settings__pdf_requested_week
@@ -56,4 +104,18 @@ msgstr "Bon de commande"
 #. module: of_sale_order_dates
 #: model:ir.model,name:of_sale_order_dates.model_sale_order_line
 msgid "Sales Order Line"
-msgstr "Ligne de commande"
+msgstr "Ligne de bons de commande"
+
+#. module: of_sale_order_dates
+#: model:ir.model.fields,field_description:of_sale_order_dates.field_sale_order__of_technical_visit_date
+msgid "Technical Visit Date"
+msgstr "Date de visite technique"
+
+#. module: of_sale_order_dates
+#: model:ir.model.fields,field_description:of_sale_order_dates.field_account_bank_statement_line__of_technical_visit_date
+#: model:ir.model.fields,field_description:of_sale_order_dates.field_account_move__of_technical_visit_date
+#: model:ir.model.fields,field_description:of_sale_order_dates.field_account_payment__of_technical_visit_date
+#: model:ir.model.fields,field_description:of_sale_order_dates.field_of_connector_config_settings__pdf_technical_visit_info
+#: model:ir.model.fields,field_description:of_sale_order_dates.field_res_config_settings__pdf_technical_visit_info
+msgid "Technical visit date"
+msgstr "Date de visite technique"
