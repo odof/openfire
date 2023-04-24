@@ -48,7 +48,7 @@ class PurchaseOrder(models.Model):
         elif len(self.of_production_lot_ids) == 1:
             res = self.env.ref('stock.view_production_lot_form', False)
             result['views'] = [(res and res.id or False, 'form')]
-            result['res_id'] = self.of_production_lot_ids and self.of_production_lot_ids[0] or False
+            result['res_id'] = self.of_production_lot_ids.id
         return result
 
     @api.multi
