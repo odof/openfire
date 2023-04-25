@@ -200,7 +200,7 @@ class OfTourneeRdv(models.TransientModel):
         "the previous/next coordinates")
     map_description_html = fields.Html(string="Map description", compute='_compute_intervention_map_data')
     map_tour_line_ids = fields.One2many(
-        comodel_name='of.planning.tour.line', compute='_compute_map_tour_line_ids', string="Tour lines")
+        comodel_name='of.planning.tour.line', related='map_tour_id.tour_line_ids', string="Tour lines")
 
     name = fields.Char(string=u"Libellé", size=64, required=False)
     description = fields.Text(string="Description")
@@ -418,15 +418,6 @@ class OfTourneeRdv(models.TransientModel):
                 'rendered': True
             })
             wizard.additional_records = json.dumps(records)
-
-    @api.depends('map_tour_id', 'map_line_id')
-    def _compute_map_tour_line_ids(self):
-        # added sudo() to avoid access rights issues from the website (no access for of.planning.tournee)
-        self_sudo = self.sudo()
-        for wizard in self_sudo:
-            tour = wizard.map_tour_id
-            wizard.map_tour_line_ids = tour.map_tour_line_ids if tour else []
-        return True
 
     @api.depends('res_line_id', 'map_tour_id', 'map_line_id')
     def _compute_intervention_map_data(self):
@@ -1123,6 +1114,8 @@ class OfTourneeRdv(models.TransientModel):
             self.map_line_id = self.res_line_id.id
             # force the map to be recomputed
             self.sudo()._compute_intervention_map_data()
+            # update OSRM data of the tour
+            self.map_tour_id and self.map_tour_id.sudo()._check_missing_osrm_data()
             # get the route between the previous/next interventions and the one we are trying to schedule
             additional_geojson_data = self._get_additional_record_geojson_data(self.res_line_id)
             self.additional_record_geojson_data = additional_geojson_data

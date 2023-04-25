@@ -793,9 +793,11 @@ class OFPlanningTournee(models.Model):
         """
         self.ensure_one()
         # get the tour route from OSRM if at least one tour line has missing data
-        if force or self.need_optimization_update or any(
-                not self.total_distance or not self.total_duration or not line.distance_one_way
-                or not line.duration_one_way for line in self.tour_line_ids):
+        if not self.start_address_id or not self.return_address_id:
+            self._check_and_update_tour_addresses()  # will call action_compute_osrm_data if needed
+        elif force or self.need_optimization_update or not self.total_distance or not self.total_duration or any(
+                not line.geojson_data or not line.distance_one_way or not line.duration_one_way
+                for line in self.tour_line_ids):
             self.action_compute_osrm_data()
 
     @api.multi
