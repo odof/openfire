@@ -79,7 +79,10 @@ class OFResPartner(models.Model):
             self.env['of.planning.tour.line']
             .sudo()
             .with_context(context)
-            .search([('address_id', 'in', geodata_changed.ids)])
+            .search([
+                ('address_id', 'in', geodata_changed.ids),
+                ('tour_id.date', '>=', fields.Date.today())
+            ])
             .mapped('tour_id')
         )
 
