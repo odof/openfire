@@ -1095,6 +1095,8 @@ class StockQuant(models.Model):
     of_partner_id = fields.Many2one(
         comodel_name='res.partner', related='reservation_id.picking_id.partner_id',
         string=u"Adresse de destination du mouvement réservé associé", store=True, readonly=True, compute_sudo=True)
+    of_internal_serial_number = fields.Char(
+        string=u"Numéro de série interne", readonly=True, related='lot_id.of_internal_serial_number')
     of_contremarque_id = fields.Many2one(comodel_name='res.partner', string=u"Partenaire")
 
     @api.multi

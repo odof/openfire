@@ -9,6 +9,9 @@
             <xpath expr="//field[@name='reservation_id']" position="after">
                 <field name="of_contremarque_id" readonly="1"/>
             </xpath>
+            <xpath expr="//field[@name='lot_id']" position="after">
+                <field name="of_internal_serial_number" attrs="{'invisible': [('of_internal_serial_number', '=', False)]}"/>
+            </xpath>
         </field>
     </record>
 
