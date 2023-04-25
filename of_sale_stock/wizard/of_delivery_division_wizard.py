@@ -8,6 +8,7 @@ class OFDeliveryDivisionWizard(models.TransientModel):
     _name = 'of.delivery.division.wizard'
     _description = "Assistant de division de bon de transfert"
 
+    picking_type_id = fields.Many2one(comodel_name='stock.picking.type', string=u"Type de préparation", required=True)
     picking_id = fields.Many2one(comodel_name='stock.picking', string=u"Bon de transfert à diviser")
     line_ids = fields.One2many(
         comodel_name='of.delivery.division.wizard.line', inverse_name='wizard_id', string=u"Lignes à diviser")
@@ -25,7 +26,7 @@ class OFDeliveryDivisionWizard(models.TransientModel):
             raise Warning(u"Vous avez saisi des quantités négatives !")
         else:
             # On copie le Bon de transfert
-            new_delivery = self.picking_id.copy()
+            new_delivery = self.picking_id.copy({'picking_type_id': self.picking_type_id.id})
 
             # On met à jour les lignes des 2 Bon de transfert
             for line_to_divide in self.line_ids:
@@ -73,3 +74,13 @@ class OFDeliveryDivisionWizardLine(models.TransientModel):
     name = fields.Char(string=u"Description", related='move_id.name', readonly=True)
     product_uom_qty = fields.Float(related='move_id.product_uom_qty', string=u"Quantité initiale", readonly=True)
     qty_to_divide = fields.Float(string=u"Quantité à diviser")
+    qty_available = fields.Float(string=u"Stock disponible", compute='_compute_qty_available')
+
+    @api.depends('wizard_id.picking_type_id')
+    def _compute_qty_available(self):
+        quant_obj = self.env['stock.quant']
+        for line in self:
+            quants = quant_obj.search(
+                [('product_id', '=', line.product_id.id),
+                 ('location_id', '=', line.wizard_id.picking_type_id.default_location_src_id.id)])
+            line.qty_available = sum(quants.mapped('qty'))
