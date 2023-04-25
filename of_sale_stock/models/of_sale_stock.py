@@ -300,6 +300,7 @@ class StockPicking(models.Model):
         wizard = self.env['of.delivery.division.wizard'].create({
             'picking_id': self.id,
             'line_ids': line_vals,
+            'picking_type_id': self.picking_type_id.id,
             })
 
         return {

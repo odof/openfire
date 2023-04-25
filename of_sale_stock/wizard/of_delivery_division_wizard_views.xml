@@ -8,14 +8,16 @@
         <field name="arch" type="xml">
             <form>
                 <group>
-                    <field name="line_ids" nolabel="1" colspan="4">
-                        <tree delete="false" create="false" editable="bottom">
-                            <field name="product_id" options="{'no_open': True}"/>
-                            <field name="product_uom_qty"/>
-                            <field name="qty_to_divide"/>
-                        </tree>
-                    </field>
+                    <field name="picking_type_id" options="{'no_create': True, 'no_open': True}"/>
                 </group>
+                <field name="line_ids" nolabel="1" colspan="4">
+                    <tree delete="false" create="false" editable="bottom">
+                        <field name="product_id" options="{'no_open': True}"/>
+                        <field name="product_uom_qty"/>
+                        <field name="qty_to_divide"/>
+                        <field name="qty_available"/>
+                    </tree>
+                </field>
                 <footer>
                     <button string="Diviser" name="action_delivery_division" type="object" class="btn-primary"/>
                     <button string="Annuler" special="cancel" class="btn-default"/>
