@@ -58,7 +58,7 @@ class SaleOrderLine(models.Model):
         for vals in vals_list:
             if not vals.get('of_discount_formula') and vals.get('discount'):
                 vals['of_discount_formula'] = f"{vals['discount']}"
-        return super().create(vals)
+        return super().create(vals_list)
 
     def write(self, vals):
         if not vals.get('of_discount_formula') and vals.get('discount'):
