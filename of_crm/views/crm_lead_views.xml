@@ -11,7 +11,7 @@
                 <field name="load_attachment" invisible="1"/>
                 <field name="uploaded_attachment_id" invisible="1"/>
                 <header>
-                    <button name="action_add_attachment" icon="fa-upload" type="object" string="Add attachments" 
+                    <button name="action_add_attachment" icon="fa-upload" type="object" string="Add attachments"
                         attrs="{'invisible': ['|', ('load_attachment', '=', False), ('uploaded_attachment_id', '!=', False)]}"/>
                     <button string="Plan" name="action_plan" type="object" states="cancelled,done"/>
                     <button name="action_complete" string="Réaliser" type="object" class="oe_highlight"
@@ -76,7 +76,7 @@
                 <field name="load_attachment" invisible="1"/>
                 <field name="uploaded_attachment_id" invisible="1"/>
                 <header>
-                    <button name="action_add_attachment" icon="fa-upload" type="object" string="Add attachments" 
+                    <button name="action_add_attachment" icon="fa-upload" type="object" string="Add attachments"
                         attrs="{'invisible': ['|', ('load_attachment', '=', False), ('uploaded_attachment_id', '!=', False)]}"/>
                     <button string="Plan" name="action_plan" type="object" states="cancelled,done"/>
                     <button name="action_complete" string="Réaliser" type="object" class="oe_highlight"
@@ -189,9 +189,9 @@
                 <field name="user_id"/>
                 <field name="vendor_id"/>
                 <field name="state"/>
-                <button name="action_add_attachment" icon="fa-upload" type="object" string="Add attachments" 
+                <button name="action_add_attachment" icon="fa-upload" type="object" string="Add attachments"
                     attrs="{'invisible': ['|', ('load_attachment', '=', False), ('uploaded_attachment_id', '!=', False)]}"/>
-                <button name="action_plan" icon="fa-undo" type="object" string="Plan" 
+                <button name="action_plan" icon="fa-undo" type="object" string="Plan"
                     attrs="{'invisible': [('state', '=', 'planned')]}"/>
                 <button name="action_complete" type="object" string="Réaliser" icon="fa-check"
                         attrs="{'invisible': [('state', '!=', 'planned')]}"/>
@@ -221,9 +221,9 @@
                 <field name="vendor_id" string="Assigned to"/>
                 <field name="report"/>
                 <field name="state"/>
-                <button name="action_add_attachment" icon="fa-upload" type="object" string="Add attachments" 
+                <button name="action_add_attachment" icon="fa-upload" type="object" string="Add attachments"
                     attrs="{'invisible': ['|', ('load_attachment', '=', False), ('uploaded_attachment_id', '!=', False)]}"/>
-                <button name="action_plan" icon="fa-undo" type="object" string="Plan" 
+                <button name="action_plan" icon="fa-undo" type="object" string="Plan"
                     attrs="{'invisible': [('state', '=', 'planned')]}"/>
                 <button name="action_complete" type="object" string="Complete" icon="fa-check"
                         attrs="{'invisible': [('state', '!=', 'planned')]}"/>
@@ -826,7 +826,7 @@
                                         <field name="user_id"/>
                                         <field name="vendor_id"/>
                                         <field name="state"/>
-                                        <button name="action_add_attachment" icon="fa-upload" type="object" string="Add attachments" 
+                                        <button name="action_add_attachment" icon="fa-upload" type="object" string="Add attachments"
                                                 attrs="{'invisible': ['|', ('load_attachment', '=', False), ('uploaded_attachment_id', '!=', False)]}"/>
                                         <button name="action_complete" type="object" string="Réaliser" icon="fa-check"
                                                 attrs="{'invisible': [('state', '!=', 'planned')]}"/>
