@@ -50,6 +50,12 @@ def _store_average_cost_price(self):
                 {'standard_price': average_valuation_price})
         move.write({'price_unit': average_valuation_price})
 
+    for move in self.filtered(lambda move: move.product_id.cost_method != 'real' and not move.origin_returned_move_id):
+        # Unit price of the move should be the current standard price, taking into account
+        # price fluctuations due to products received between move creation (e.g. at SO
+        # confirmation) and move set to done (delivery completed).
+        move.write({'price_unit': move.product_id.standard_price})
+
 
 StockMove.product_price_update_before_done = product_price_update_before_done
 StockMove._store_average_cost_price = _store_average_cost_price
