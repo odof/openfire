@@ -507,7 +507,7 @@
                             <group name='prospect'>
                                 <separator string="Prospect" colspan="2"/>
                                 <field name="of_check_duplications" invisible="1"/>
-                                <field name="partner_id" domain="[('parent_id','=',False)]"/>
+                                <field name="partner_id" domain="[('parent_id','=',False)]" context="{'form_view_ref': 'of_crm.res_partner_view_form'}"/>
                                 <label for="contact_name" string="Nom du Client"/>
                                 <div>
                                     <div class="o_row " >
@@ -759,7 +759,7 @@
                             <group name='prospect'>
                                 <separator string="Prospect" colspan="2"/>
                                 <field name="of_check_duplications" invisible="1"/>
-                                <field name="partner_id" domain="[('parent_id','=',False)]"/>
+                                <field name="partner_id" domain="[('parent_id','=',False)]" context="{'form_view_ref': 'of_crm.res_partner_view_form'}"/>
                                 <label for="contact_name" string="Nom du Client"/>
                                 <div>
                                     <div class="o_row " >

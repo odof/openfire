@@ -41,7 +41,7 @@
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
             <xpath expr="//label[@for='street']" position="before">
-                <div col="2" colspan="2" attrs="{'invisible': [('geocoding', 'not in', ('not_tried', 'failure'))]}">
+                <div name="geocode_button" col="2" colspan="2" attrs="{'invisible': [('geocoding', 'not in', ('not_tried', 'failure'))]}">
                     <div colspan="1"/>
                     <button name="%(action_geocode_mono)d" string="Géolocaliser" type="action"
                         class="btn-primary" icon="fa-map-marker" colspan="1"
