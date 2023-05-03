@@ -48,6 +48,12 @@
                             <i>(entrez les heures voulues séparées par des virgules)</i>
                         </span>
                     </div>
+                    <h4 colspan="2"><u>Recherche de Demande d'intervention</u></h4>
+                    <label for="planningview_intervention_state"/>
+                    <div name="planningview_intervention_state">
+                        <field name="planningview_intervention_state" class="oe_inline"/>
+                        <span></span>
+                    </div>
                 </group>
             </xpath>
         </field>

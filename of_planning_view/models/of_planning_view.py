@@ -464,6 +464,12 @@ class OfPlanningIntervention(models.Model):
 class OFInterventionConfiguration(models.TransientModel):
     _inherit = 'of.intervention.settings'
 
+    @api.model
+    def _auto_init(self):
+        super(OFInterventionConfiguration, self)._auto_init()
+        if self.env['ir.values'].get_default('of.intervention.settings', 'planningview_intervention_state') is None:
+            self.env['ir.values'].set_default('of.intervention.settings', 'planningview_intervention_state', 'confirm')
+
     planningview_employee_exclu_ids = fields.Many2many(
         'hr.employee', string=u"(OF) Exculsion d'intervenants", help=u"Employés à NE PAS montrer en vue planning",
         domain=['|', ('of_est_intervenant', '=', True), ('of_est_commercial', '=', True)])
@@ -474,6 +480,9 @@ class OFInterventionConfiguration(models.TransientModel):
     planningview_max_time = fields.Integer(string='(OF) Heure max', help=u"Heure maximale affichée")
     planningview_time_line = fields.Char(
         string="(OF) lignes d'heures", help=u"Entrez les heures sous forme d'entiers séparées par des virgules")
+    planningview_intervention_state = fields.Selection(
+        selection=[('draft', u"Brouillon"),('confirm', u"Confirmé")],
+        string=u"(OF) État des RDV en passant par la recherche de DI", default='confirm', required=True)
 
     @api.onchange('planningview_calendar')
     def _onchange_planningview_calendar(self):
@@ -529,6 +538,11 @@ class OFInterventionConfiguration(models.TransientModel):
     def set_planningview_time_line_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'of.intervention.settings', 'planningview_time_line', self.planningview_time_line)
+
+    @api.multi
+    def set_planningview_intervention_state_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings', 'planningview_intervention_state', self.planningview_intervention_state)
 
 
 class IrUIView(models.Model):
