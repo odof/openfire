@@ -2,7 +2,7 @@
 
 from odoo import api, fields, models
 from odoo.exceptions import Warning
-
+from odoo.tools.float_utils import float_is_zero
 
 class OFDeliveryDivisionWizard(models.TransientModel):
     _name = 'of.delivery.division.wizard'
@@ -18,47 +18,55 @@ class OFDeliveryDivisionWizard(models.TransientModel):
         self.ensure_one()
 
         # On vérifie qu'il y ait des quantités à diviser
-        if not self.line_ids.filtered(lambda line: line.qty_to_divide > 0):
+        lines = self.line_ids.filtered(lambda line: line.qty_to_divide > 0)
+        if not lines:
             raise Warning(u"Vous n'avez saisi aucune quantité à diviser !")
-        elif self.line_ids.filtered(lambda line: line.qty_to_divide > line.product_uom_qty):
+        elif any(line.qty_to_divide > line.product_uom_qty for line in lines):
             raise Warning(u"Vous avez saisi trop de quantité à diviser par rapport à la quantité initiale !")
-        elif self.line_ids.filtered(lambda line: line.qty_to_divide < 0):
+        elif any(line.qty_to_divide < 0 for line in self.line_ids):
             raise Warning(u"Vous avez saisi des quantités négatives !")
         else:
-            # On copie le Bon de transfert
-            new_delivery = self.picking_id.copy({'picking_type_id': self.picking_type_id.id})
+            with self.env.norecompute():
+                # On copie le Bon de transfert (sans les mouvements)
+                new_picking = self.picking_id.copy(
+                    {'picking_type_id': self.picking_type_id.id, 'move_lines': []})
+                new_picking.onchange_picking_type()
 
-            # On met à jour les lignes des 2 Bon de transfert
-            for line_to_divide in self.line_ids:
-                if line_to_divide.qty_to_divide == 0:
-                    # On supprime la ligne du nouveau Bon de transfert
-                    line_to_delete = new_delivery.move_lines.filtered(
-                        lambda line: line.procurement_id == line_to_divide.move_id.procurement_id)
-                    line_to_delete.action_cancel()
-                    line_to_delete.unlink()
-                else:
+                # On met à jour les lignes des 2 Bons de transfert
+                moves_to_move = self.env['stock.move']
+                for line_to_divide in lines:
                     initial_qty = line_to_divide.product_uom_qty - line_to_divide.qty_to_divide
-                    if initial_qty == 0:
-                        # On supprime la ligne du Bon de transfert initial
-                        line_to_divide.move_id.action_cancel()
-                        line_to_divide.move_id.unlink()
+                    if float_is_zero(initial_qty, precision_rounding=line_to_divide.product_id.uom_id.rounding):
+                        moves_to_move += line_to_divide.move_id
                     else:
-                        # On diminue les quantités de la ligne d'origine
-                        line_to_divide.move_id.write({'product_uom_qty': initial_qty,
-                                                      'of_ordered_qty': initial_qty})
-                        # On diminue les quantités de la nouvelle ligne
-                        new_delivery.move_lines.filtered(
-                            lambda line: line.procurement_id == line_to_divide.move_id.procurement_id).\
-                            write({'product_uom_qty': line_to_divide.qty_to_divide,
-                                   'of_ordered_qty': line_to_divide.qty_to_divide})
+                        # On copie le mouvement pour le nouveau transfert
+                        line_to_divide.move_id.copy(
+                            {'picking_id': new_picking.id,
+                             'location_id': new_picking.location_id.id,
+                             'location_dest_id': new_picking.location_dest_id.id,
+                             'picking_type_id': self.picking_type_id.id,
+                             'product_uom_qty': line_to_divide.qty_to_divide,
+                             'of_ordered_qty': line_to_divide.qty_to_divide})
+                        # On diminue les quantités du mouvement d'origine
+                        line_to_divide.move_id.write(
+                            {'product_uom_qty': initial_qty, 'of_ordered_qty': initial_qty})
 
-            self.picking_id.action_assign()
-            new_delivery.action_assign()
+                # On déplace les mouvements vers le nouveau transfert
+                moves_to_move.write(
+                    {'picking_id': new_picking.id,
+                     'location_id': new_picking.location_id.id,
+                     'location_dest_id': new_picking.location_dest_id.id,
+                     'picking_type_id': self.picking_type_id.id})
+
+                self.picking_id.action_assign()
+                new_picking.action_assign()
+
+            self.recompute()
 
             # On renvoie sur le nouveau Bon de transfert
             action = self.env.ref('stock.action_picking_tree_all').read()[0]
             action['views'] = [(self.env.ref('stock.view_picking_form').id, 'form')]
-            action['res_id'] = new_delivery.id
+            action['res_id'] = new_picking.id
 
         return action
 
