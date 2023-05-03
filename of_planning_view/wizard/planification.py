@@ -583,7 +583,7 @@ class OfPlanifCreneau(models.TransientModel):
             'company_id': service.address_id.company_id and service.address_id.company_id.id,
             'name': service.name,
             'description': self.description_rdv or '',
-            'state': 'confirm',
+            'state': self.env['ir.values'].get_default('of.intervention.settings', 'planningview_intervention_state'),
             'verif_dispo': True,
             'order_id': service.order_id.id,
             'origin_interface': u"Remplir un créneau (wizard planif)",
