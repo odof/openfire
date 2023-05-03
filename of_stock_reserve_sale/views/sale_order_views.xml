@@ -21,9 +21,9 @@
                     <field name="of_qty_unreserved" invisible="1"/>
                     <button name="%(action_of_stock_reserve_sale)d"
                         type="action"
-                        string="Pré-réservation"
+                        string="Réserver"
                         attrs="{'invisible': ['|', '|', ('of_qty_unreserved', '&lt;=', 0),
-                                                        ('state', 'not in', ('draft', 'sent', 'presale')),
+                                                        ('state', 'not in', ('draft', 'sent')),
                                                         ('of_is_kit', '!=', False)]}"/>
                 </div>
             </xpath>
