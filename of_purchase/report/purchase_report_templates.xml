@@ -65,6 +65,11 @@
                             <strong>Date prévue :</strong>
                             <p t-field="o.date_planned"/>
                         </div>
+                        <div t-if="o.company_id" style="display: table-cell; width: 4px;"/>
+                        <div t-if="o.company_id" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                            <strong>Commande passée par&amp;nbsp;:</strong>
+                            <p t-field="o.company_id.display_name"/>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -142,6 +147,11 @@
                         <div name="date_planned2" t-if="o.date_planned and all([l.date_planned == o.date_planned for l in o.order_line])" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                             <strong>Date prévue :</strong>
                             <p t-field="o.date_planned"/>
+                        </div>
+                        <div t-if="o.company_id" style="display: table-cell; width: 4px;"/>
+                        <div t-if="o.company_id" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                            <strong>Commande passée par&amp;nbsp;:</strong>
+                            <p t-field="o.company_id.display_name"/>
                         </div>
                     </div>
                 </div>
