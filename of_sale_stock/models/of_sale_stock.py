@@ -331,7 +331,14 @@ class StockPicking(models.Model):
         for record in self:
             for line in record.move_lines:
                 if line.procurement_id.sale_line_id:
-                    amount += line.procurement_id.sale_line_id.of_price_unit_ttc * line.product_uom_qty
+                    sale_line = line.procurement_id.sale_line_id
+                    tax = sale_line.tax_id
+                    price = sale_line.price_unit * (1 - (sale_line.discount or 0.0) / 100.0)
+                    amounts = tax.compute_all(
+                        price, sale_line.order_id.currency_id,
+                        line.product_uom_qty, product=sale_line.product_id,
+                        partner=sale_line.order_id.partner_shipping_id)
+                    amount += amounts['total_included']
                 elif line.procurement_id.of_sale_comp_id and \
                         line.procurement_id.of_sale_comp_id.kit_id.order_line_id.id not in kit_line_ids:
                     amount += line.procurement_id.of_sale_comp_id.kit_id.order_line_id.price_total
