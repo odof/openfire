@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+<record id="of_custom_document_act_report_xml_view" model="ir.ui.view">
+    <field name="name">of.custom.document.ir.actions.report</field>
+    <field name="model">ir.actions.report</field>
+    <field name="inherit_id" ref="base.act_report_xml_view"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='report_type']" position="after">
+            <field name="of_custom_document_ids" widget="many2many_tags"/>
+        </xpath>
+    </field>
+</record>
+
+</odoo>

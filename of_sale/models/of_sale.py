@@ -43,8 +43,7 @@ SO._compute_tax_id = _compute_tax_id
 
 
 class SaleOrder(models.Model):
-    _name = 'sale.order'
-    _inherit = ['sale.order', 'of.documents.joints']
+    _inherit = 'sale.order'
 
     def _search_of_to_invoice(self, operator, value):
         # Récupération des bons de commande non entièrement livrés

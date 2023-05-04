@@ -1,123 +1,68 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import logging
 
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 
-import tempfile
-import os
-import base64
-
-try:
-    import pypdftk
-except ImportError:
-    pypdftk = None
+_logger = logging.getLogger(__name__)
 
 
 class IrActionsReportXml(models.Model):
-    _inherit = 'ir.actions.report.xml'
+    _name = 'ir.actions.report'
+    _inherit = ['ir.actions.report', 'of.custom.document.mixin']
 
-    def print_acrobat(self, template, model):
-        """
-        Impression de modèle de courrier avec fichier joint. Calcul de champs si PDF éditable
-        :param template: Modèle de courrier utilisé
-        :param model: objet sur lequel le calcul de champ est basé
-        :return: PDF sous forme de chaine de caractères
-        """
-        template_file = False
-        compose_mail_obj = self.env['of.compose.mail']
-        attachment_obj = self.env['ir.attachment']
-        if not template.chp_ids:
-            template_file = base64.b64decode(template.file)
-        else:
-            attachment = attachment_obj.search([('res_model', '=', template._name),
-                                                ('res_field', '=', 'file'),
-                                                ('res_id', '=', template.id)])
-            datas = dict(compose_mail_obj.eval_champs(model, template.chp_ids))
-            file_path = attachment_obj._full_path(attachment.store_fname)
-            fd, generated_pdf = tempfile.mkstemp(prefix='doc_joint_', suffix='.pdf')
-            try:
-                pypdftk.fill_form(file_path, datas, out_file=generated_pdf, flatten=not template.fillable)
-                with open(generated_pdf, "rb") as encode:
-                    template_file = encode.read()
-            finally:
-                os.close(fd)
-                try:
-                    os.remove(generated_pdf)
-                except Exception:
-                    pass
+    of_custom_document_ids = fields.Many2many(comodel_name='of.custom.document', domain="[('model', '=', model)]")
 
-        return template_file
+    @api.model
+    def _render_qweb_pdf(self, report_ref, res_ids=None, data=None):
+        report_sudo = self._get_report(report_ref)
+        # Cas des rapports personnalisés à partir d'un fichier (pdf, formulaire pdf ou image)
+        if report_sudo.report_name.startswith('of_custom_document.'):
+            document = self.env['of.custom.document'].browse(int(report_sudo.report_name.split('.')[1]))
+            if document.file:
+                return self._render_pdf_form(report_ref, res_ids=res_ids, data=data)
 
-    def print_report(self, template, model):
-        """
-        Impression de modèle de courrier plein texte
-        :param template: Modèle de courrier utilisé
-        :param model: objet sur lequel le calcul de champ est basé
-        :return: PDF sous forme de chaine de caractères
-        """
-        compose_mail_obj = self.env['of.compose.mail']
-        report_obj = self.env['ir.actions.report.xml']
-        content = compose_mail_obj.eval_text(model, template.body_text)
-        data = {
-            'ids': model._ids,
-            'model': model._name,
-            'form': {
-                'lettre_id': (template.id, template.name),
-                'content': content
-                },
-            }
-        act = compose_mail_obj._get_model_action_dict().get(data['model'], '')
-        if template.sans_header:
-            act += '_sehead'
-        elif template.sans_add:
-            act += '_se'
-        report = report_obj.render_report(model._ids, act, data)[0]
-        return report
+        pdf_content, file_type = super()._render_qweb_pdf(report_ref, res_ids=res_ids, data=data)
 
-    @api.multi
-    def get_courrier(self, model, modelids=[]):
-        self.ensure_one()
-        try:
-            template_id = int(self.report_file.replace(model, '').replace('courrier', '').replace('/', ''))
-        except:
-            template_id = False
-        if not template_id:
-            return False, False
-        model_ids = [int(id_str) for id_str in modelids]
-        models = self.env[model].browse(model_ids)
-        template = self.env['of.mail.template'].browse(template_id)
-        all_files = []
-        generated_file = False
-        for model in models:
-            if template.file:
-                generated_file = self.print_acrobat(template, model)
-            else:
-                generated_file = self.print_report(template, model)
-            all_files.append(generated_file)
-        if len(all_files) > 1:
-            temp_file = all_files.pop()
-            fd, order_pdf = tempfile.mkstemp()
-            os.write(fd, temp_file)
-            os.close(fd)
-            file_paths = [order_pdf]
+        # Ajout de documents personnalisés à la fin d'un rapport pdf
+        if res_ids and (isinstance(res_ids, int) or len(res_ids) == 1):
+            record = self.env[report_sudo.model].browse(res_ids)
+            # On prend en priotirté les documents
+            if report_sudo.of_custom_document_ids:
+                pdf_content = report_sudo.join_custom_documents(pdf_content, record)
+            if hasattr(record, 'join_custom_documents') and record.is_allowed_report(report_sudo):
+                pdf_content = record.join_custom_documents(pdf_content)
+        return pdf_content, file_type
 
-            for mail_data in all_files:
-                fd, mail_pdf = tempfile.mkstemp()
-                os.write(fd, mail_data)
-                os.close(fd)
-                file_paths.append(mail_pdf)
+    def _render_template(self, template, values=None):
+        if template.startswith('of_custom_document.'):
+            document = self.env['of.custom.document'].browse(int(template.split('.')[1]))
+            if values is None:
+                values = {}
+            values['of_custom_document'] = document
+            template = 'of_custom_document.report_of_custom_document'
+        return super()._render_template(template, values=values)
 
-            result_file_path = self.env['report']._merge_pdf(file_paths)
-            try:
-                result_file = file(result_file_path, "rb")
-                generated_file = result_file.read()
-                result_file.close()
-                for file_path in file_paths:
-                    os.remove(file_path)
-                os.remove(result_file_path)
-            except Exception:
-                pass
+    @api.model
+    def _render_pdf_form(self, report_ref, res_ids=None, data=None):
+        if not data:
+            data = {}
+        if isinstance(res_ids, int):
+            res_ids = [res_ids]
+        data.setdefault('report_type', 'pdf')
 
-        filename = "%s.%s" % (template.name, "pdf")
+        # access the report details with sudo() but keep evaluation context as current user
+        report_sudo = self._get_report(report_ref)
 
-        return generated_file, filename
+        doc_model, doc_id = report_sudo.report_name.rsplit('.', 1)
+        doc_model = doc_model.replace('_', '.')
+        doc_id = int(doc_id)
+        doc = self.env[doc_model].browse(doc_id)
+        pdf_content = doc.render_file(res_ids)
+
+        if res_ids:
+            _logger.info(
+                "The PDF report has been generated for model: %s, records %s.", report_sudo.model, str(res_ids)
+            )
+
+        return pdf_content, 'pdf'
