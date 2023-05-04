@@ -1072,6 +1072,9 @@ MapView.LayerGroup = Widget.extend({
                 return;
             }
             var lat, lng, marker, icon, id, number, geojson, endpoint_geojson, manyNumbers;
+            var latlngs = [];
+            var geojsonLines = [];
+            var endpointGeojsonLines = [];
             lat = this.records[i][this.options.latitude_field];
             lng = this.records[i][this.options.longitude_field];
             geojson = this.records[i][this.options.geojson_data];
