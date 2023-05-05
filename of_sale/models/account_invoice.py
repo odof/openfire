@@ -111,6 +111,9 @@ class AccountInvoice(models.Model):
     def pdf_shipping_address_specific_title(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_shipping_address_specific_title') or False
 
+    def pdf_address_title(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_address_title')
+
     @api.multi
     def action_invoice_open(self):
         """Mise à jour des dates de l'échéancier"""

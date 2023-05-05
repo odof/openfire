@@ -55,6 +55,15 @@ class AccountInvoice(models.Model):
         return self.of_report_template_id.pdf_section_font_color if self.of_report_template_id else super(
             AccountInvoice, self).get_color_font()
 
+    def pdf_address_title(self):
+        return self.of_report_template_id.pdf_address_title if self.of_report_template_id else super(
+            AccountInvoice, self).pdf_address_title()
+
+    def pdf_shipping_address_specific_title(self):
+        return self.of_report_template_id.pdf_shipping_address_specific_title \
+            if self.of_report_template_id and self.of_report_template_id.pdf_shipping_address_specific_title \
+            else super(AccountInvoice, self).pdf_shipping_address_specific_title()
+
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
