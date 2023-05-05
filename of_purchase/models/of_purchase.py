@@ -87,6 +87,26 @@ class PurchaseOrder(models.Model):
             self._update_purchase_price()
 
     @api.multi
+    def button_draft(self):
+        """
+        Surcharge basée sur ce que fait button_cancel mais on tente de faire l'inverse
+        """
+        res = super(PurchaseOrder, self).button_draft()
+        for order in self:
+            # on va chercher les procurement.order à l'état annulé uniquement
+            procurements = order.order_line.mapped('procurement_ids').filtered(lambda r: r.state == 'cancel')
+            moves = procurements.filtered(lambda r: r.rule_id.propagate).mapped('move_dest_id')
+            moves_filtered = moves.filtered(lambda r: r.state == 'cancel')
+            procurements |= moves_filtered.mapped('procurement_id').filtered(lambda r: r.state == 'cancel')
+            # on a trouvé tous les procurement.order, on les repasse à l'état confirmé si possible
+            procurements.reset_to_confirmed()
+            # ceux qui ont réussi vont remettre l'état du stock.move à waiting
+            procurements.filtered(lambda r: r.state == 'confirmed').mapped('move_dest_id').write({'state': 'waiting'})
+            # le check final pour confirmer que tout est correct
+            procurements.check()
+        return res
+
+    @api.multi
     def button_update_purchase_price(self):
         self._update_purchase_price()
 
