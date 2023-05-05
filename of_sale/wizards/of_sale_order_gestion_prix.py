@@ -164,28 +164,30 @@ class GestionPrix(models.TransientModel):
                 price_unit = 0
                 uom = self.env.ref('product.product_uom_unit')
                 for order_line in associated_lines.mapped('order_line_id'):
-                    vals = old_res[order_line]
-                    price_unit -= (order_line.price_unit - vals['price_unit']) * \
-                        (1 - (order_line.discount or 0.0) / 100.0) * \
-                        order_line.product_uom._compute_quantity(order_line.product_uom_qty, uom)
+                    if order_line in old_res:
+                        vals = old_res[order_line]
+                        price_unit -= (order_line.price_unit - vals['price_unit']) * \
+                            (1 - (order_line.discount or 0.0) / 100.0) * \
+                            order_line.product_uom._compute_quantity(order_line.product_uom_qty, uom)
 
-                line_vals = {
-                    'wizard_id': self.id,
-                    'is_discount': True,
-                    'discount_tax_ids': [(6, 0, list(tax_tup))],
-                    'prix_unit_create': price_unit,
-                }
-                new_line = self.env['of.sale.order.gestion.prix.line'].new(line_vals)
-                new_line.prix_total_ht_simul = sum(
-                    associated_lines.mapped('prix_total_ht_simul')) - sum(
-                    associated_lines.mapped('order_line_id.price_subtotal'))
-                new_line.prix_total_ttc_simul = sum(
-                    associated_lines.mapped('prix_total_ttc_simul')) - sum(
-                    associated_lines.mapped('order_line_id.price_total'))
+                if price_unit:
+                    line_vals = {
+                        'wizard_id': self.id,
+                        'is_discount': True,
+                        'discount_tax_ids': [(6, 0, list(tax_tup))],
+                        'prix_unit_create': price_unit,
+                    }
+                    new_line = self.env['of.sale.order.gestion.prix.line'].new(line_vals)
+                    new_line.prix_total_ht_simul = sum(
+                        associated_lines.mapped('prix_total_ht_simul')) - sum(
+                        associated_lines.mapped('order_line_id.price_subtotal'))
+                    new_line.prix_total_ttc_simul = sum(
+                        associated_lines.mapped('prix_total_ttc_simul')) - sum(
+                        associated_lines.mapped('order_line_id.price_total'))
 
-                res[fake_id] = new_line.get_values_order_line_create()
-                self.line_ids |= new_line
-                fake_id += 1
+                    res[fake_id] = new_line.get_values_order_line_create()
+                    self.line_ids |= new_line
+                    fake_id += 1
 
             for product_line in self.line_ids.filtered(lambda l: not l.is_discount and l.state == 'included'):
                 product_line.prix_total_ht_simul = product_line.prix_total_ht
