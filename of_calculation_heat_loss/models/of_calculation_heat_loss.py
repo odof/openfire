@@ -21,14 +21,15 @@ class OFCalculationHeatLoss(models.Model):
     partner_name = fields.Char(string=u"Nom du contact", related='partner_id.name', required=True)
     partner_zip = fields.Char(string=u"Code postal du contact", related='partner_id.zip', required=True)
     partner_city = fields.Char(string=u"Ville du contact", related='partner_id.city')
-    partner_street = fields.Char(string=u"Rue du contact", related='partner_id.street')
+    partner_street = fields.Char(string=u"Rue du contact", related='partner_id.street', required=True)
     partner_street2 = fields.Char(string=u"Rue du contact", related='partner_id.street2')
     partner_state_id = fields.Many2one(comodel_name='res.country.state', related='partner_id.state_id', string=u"État")
     partner_country_id = fields.Many2one(comodel_name='res.country', related='partner_id.country_id', string=u"Pays")
-    surface = fields.Float(string=u"Surface à chauffer (en m²)", help=u"Surface de la ou des pièces à chauffer")
-    height = fields.Float(string=u"Hauteur de plafond (en m)")
+    surface = fields.Float(
+        string=u"Surface à chauffer (en m²)", help=u"Surface de la ou des pièces à chauffer", required=True)
+    height = fields.Float(string=u"Hauteur de plafond (en m)", required=True)
     construction_date_id = fields.Many2one(
-        comodel_name='of.calculation.construction.date', string=u"Date de construction")
+        comodel_name='of.calculation.construction.date', string=u"Date de construction", required=True)
     department_id = fields.Many2one(
         comodel_name='of.calculation.department', string=u"Département", compute='_compute_department_id')
     available_altitude_ids = fields.Many2many(
@@ -36,11 +37,11 @@ class OFCalculationHeatLoss(models.Model):
         column1='calculation_id', column2='altitude_id', string="Altitudes disponibles",
         compute='_compute_department_id')
     altitude_id = fields.Many2one(
-        comodel_name='of.calculation.altitude', string=u"Altitude")
+        comodel_name='of.calculation.altitude', string=u"Altitude", required=True)
     base_temperature_line_id = fields.Many2one(
         comodel_name='of.calculation.base.temperature.line', string=u"Ligne de température",
         compute='_compute_base_temperature_line_id')
-    temperature = fields.Float(string=u"Température de confort désirée", default=19.0)
+    temperature = fields.Float(string=u"Température de confort désirée", default=19.0, required=True)
     estimated_power = fields.Float(string=u"Puissance estimée de l’appareil (nombre)")
     estimated_power_text = fields.Char(string=u"Puissance estimée de l’appareil (texte)")
     product_ids = fields.Many2many(
