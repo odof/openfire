@@ -25,4 +25,16 @@
         <field name="active" eval="False"/>
     </record>
 
+    <record id="ir_cron_carrier_picking_validation" model="ir.cron">
+        <field name="name">Validation des BL de transporteur</field>
+        <field name="model">stock.picking</field>
+        <field name="function">validate_picking_from_carriers</field>
+        <field name="interval_number">10</field>
+        <field name="interval_type">minutes</field>
+        <field name="nextcall">2023-05-10 00:00:00</field>
+        <field name="numbercall">-1</field>
+        <field name="active">true</field>
+        <field name="args">()</field>
+    </record>
+
 </odoo>

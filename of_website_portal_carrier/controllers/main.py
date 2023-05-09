@@ -5,6 +5,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 from odoo import http
+from odoo import fields
 from odoo.http import request
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 from odoo.addons.website_portal.controllers.main import website_account
@@ -60,8 +61,13 @@ class WebsiteAccount(website_account):
                 type='http', auth='user', methods=['POST'], website=True, csrf=False)
     def portal_my_receipt_validate(self, receipt_id, **kw):
         kw.pop('csrf_token')
+        rollback = 'rollback' in kw and kw.pop('rollback')
         values = kw
         receipt = request.env['stock.picking'].browse(receipt_id)
+        if rollback:
+            receipt.of_carrier_validation_date = False
+            redirect = '/my/receipt/%s' % receipt_id
+            return request.redirect(redirect)
 
         for key in values:
             model, id = key.split('-')
@@ -77,11 +83,17 @@ class WebsiteAccount(website_account):
 
         redirect = '/my/receipt/%s' % receipt_id
         attributes = []
-        action = receipt.sudo().do_new_transfer()
+        delay = request.env['ir.values'].sudo().get_default('website.config.settings', 'of_picking_rollback_delay')
+        if not delay:
+            action = receipt.sudo().do_new_transfer()
+        else:
+            action = receipt.sudo().check_backorder()
+            if not action:
+                receipt.of_carrier_validation_date = fields.Datetime.now()
 
         if action:
             attributes.append('modal=1')
-        else:
+        elif not delay:
             # On flag le BR comme validé par le transporteur
             receipt.of_validated_by_carrier = True
         if attributes:
@@ -93,6 +105,14 @@ class WebsiteAccount(website_account):
                 type='http', auth='user', methods=['POST'], website=True, csrf=False)
     def portal_my_receipt_create_backorder(self, receipt_id, wizard_id, **kw):
         kw.pop('csrf_token')
+        delay = request.env['ir.values'].sudo().get_default('website.config.settings', 'of_picking_rollback_delay')
+        if delay:
+            # Un délai existe, il faut taguer le BL pour que le backorder soit créé puis renvoyer le picking
+            receipt = request.env['stock.picking'].browse(receipt_id)
+            receipt.of_need_backorder = True
+            receipt.of_carrier_validation_date = fields.Datetime.now()
+            redirect = '/my/receipt/%s' % receipt_id
+            return request.redirect(redirect)
         wizard = request.env['stock.backorder.confirmation'].sudo().browse(wizard_id)
         operation_lot_obj = request.env['stock.pack.operation.lot'].sudo()
         mail_message_obj = request.env['mail.message'].sudo()
@@ -152,6 +172,14 @@ class WebsiteAccount(website_account):
                 type='http', auth='user', methods=['POST'], website=True, csrf=False)
     def portal_my_receipt_no_backorder(self, receipt_id, wizard_id, **kw):
         kw.pop('csrf_token')
+        delay = request.env['ir.values'].sudo().get_default('website.config.settings', 'of_picking_rollback_delay')
+        if delay:
+            # Un délai existe, juste renvoyer le picking
+            receipt = request.env['stock.picking'].browse(receipt_id)
+            receipt.of_need_backorder = False
+            receipt.of_carrier_validation_date = fields.Datetime.now()
+            redirect = '/my/receipt/%s' % receipt_id
+            return request.redirect(redirect)
         wizard = request.env['stock.backorder.confirmation'].sudo().browse(wizard_id)
         mail_message_obj = request.env['mail.message'].sudo()
         attributes = []

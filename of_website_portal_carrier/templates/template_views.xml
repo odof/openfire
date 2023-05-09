@@ -57,7 +57,7 @@
                                 <span t-esc="receipt.sudo().partner_id.name"/>
                             </td>
                             <td t-att-data-order="receipt.min_date">
-                                <span t-esc="receipt.min_date" t-options="{'widget': 'date'}"/>
+                                <span t-esc="receipt.min_date" style="display: none;"/> <span t-esc="receipt.min_date" t-options="{'widget': 'date'}"/>
                             </td>
                             <td>
                                 <span t-field="receipt.origin"/>
@@ -273,9 +273,14 @@
                                 </tbody>
                             </table>
                             <div style="text-align: right;">
-                                <t t-if="receipt.state != 'done'">
+                                <t t-if="receipt.state != 'done' and not receipt.of_carrier_validation_date">
                                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                                     <button type="submit" class="btn btn-primary" data-toggle="modal" data-target=".modal_create_backorder">Valider</button>
+                                </t>
+                                <t t-elif="receipt.state != 'done' and receipt.of_carrier_validation_date">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <input type="hidden" name="rollback" t-att-value="True"/>
+                                    <button type="submit" class="btn btn-primary" data-toggle="modal" data-target=".modal_create_backorder">Modifier</button>
                                 </t>
                                 <t t-else="">
                                     <div class="btn btn-success">Validé</div>
@@ -323,7 +328,7 @@
                     </t>
                 </t>
                 <t t-else="">
-                    <t t-if="receipt.state != 'done' and line.qty_done != line.product_qty">
+                    <t t-if="receipt.state != 'done' and line.qty_done != line.product_qty and not receipt.of_carrier_validation_date">
                         <input t-att-name="'stock.pack.operation-%s' % line.id" type="number" min="0" t-att-max="line.product_qty" t-attf-value="#{line.qty_done or 0}" class="form-control" style="width: 80px;"/>
                     </t>
                     <t t-else="">
