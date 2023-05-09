@@ -57,7 +57,7 @@
                                 <span t-esc="receipt.sudo().partner_id.name"/>
                             </td>
                             <td t-att-data-order="receipt.min_date">
-                                <span t-esc="receipt.min_date" t-options="{'widget': 'date'}"/>
+                                <span t-esc="receipt.min_date" style="display: none;"/> <span t-esc="receipt.min_date" t-options="{'widget': 'date'}"/>
                             </td>
                             <td>
                                 <span t-field="receipt.origin"/>
@@ -272,10 +272,20 @@
                                     </t>
                                 </tbody>
                             </table>
+                            <tr t-if="receipt.of_error_message">
+                                <td>
+                                    <span style="color: red;" t-field="receipt.of_error_message"/>
+                                </td>
+                            </tr>
                             <div style="text-align: right;">
-                                <t t-if="receipt.state != 'done'">
+                                <t t-if="receipt.state != 'done' and not receipt.of_carrier_validation_date">
                                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                                     <button type="submit" class="btn btn-primary" data-toggle="modal" data-target=".modal_create_backorder">Valider</button>
+                                </t>
+                                <t t-elif="receipt.state != 'done' and receipt.of_carrier_validation_date">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <input type="hidden" name="rollback" t-att-value="True"/>
+                                    <button type="submit" class="btn btn-primary" data-toggle="modal" data-target=".modal_create_backorder">Modifier</button>
                                 </t>
                                 <t t-else="">
                                     <div class="btn btn-success">Validé</div>
@@ -312,18 +322,21 @@
             </td>
             <td class="text-right" style="width: 100px;">
                 <t t-if="line.product_id.tracking == 'serial'">
-                    <t t-if="lot and not lot.qty">
-                        <input t-att-name="'stock.pack.operation.lot-%s' % lot.id" type="checkbox"/>
-                    </t>
-                    <t t-elif="lot">
-                        <input type="checkbox" checked="checked"/>
+                    <t t-if="lot">
+                    <!-- Deux input avec le même name,
+                         si la checkbox est coché -> renvoi 'on'
+                         si la checkbox n'est pas cochée -> renvoi '0'
+                         Permet de prendre en compte le fait que la chebox est décochée (autrement ne renvoi rien)
+                         l'ordre est important, si le champ hidden est en premier renvoi toujours '0' -->
+                        <input t-att-name="'stock.pack.operation.lot-%s' % lot.id" type="checkbox" t-att-checked="lot.qty and 'checked' or None" t-att-disabled="receipt.of_carrier_validation_date"/>
+                        <input t-att-name="'stock.pack.operation.lot-%s' % lot.id" type="hidden" value="0"/>
                     </t>
                     <t t-else="">
                         <input type="checkbox" disabled="disabled"/>
                     </t>
                 </t>
                 <t t-else="">
-                    <t t-if="receipt.state != 'done' and line.qty_done != line.product_qty">
+                    <t t-if="receipt.state != 'done' and not receipt.of_carrier_validation_date">
                         <input t-att-name="'stock.pack.operation-%s' % line.id" type="number" min="0" t-att-max="line.product_qty" t-attf-value="#{line.qty_done or 0}" class="form-control" style="width: 80px;"/>
                     </t>
                     <t t-else="">
