@@ -1187,7 +1187,11 @@ class GooglePlanning(models.AbstractModel):
                             else:
                                 recs.create_from_google(event)
                         elif interv_id:
-                            google_synchro_date = datetime.strptime(event.GG.event['updated'], '%Y-%m-%dT%H:%M:%S.%fz')
+                            if event.GG.found:
+                                google_synchro_date = datetime.strptime(
+                                    event.GG.event['updated'], '%Y-%m-%dT%H:%M:%S.%fz')
+                            else:
+                                google_synchro_date = False
                             interv_obj.browse(interv_id).\
                                 with_context(
                                 google_internal_event_id=event.GG.event.get('id'),
