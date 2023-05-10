@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- wizard for sending a mail: first step -->
+        <record id="view_courrier_wizard" model="ir.ui.view">
+            <field name="name">Envoyer un mailing</field>
+            <field name="model">of.compose.mail</field>
+            <field name="arch" type="xml">
+                <form string="Envoyer un Courrier">
+                    <group>
+                        <separator string="Envoyer un Courrier" colspan="2"/>
+                        <field name="lettre_id"/>
+                    </group>
+                    <!-- Partie courrier classique -->
+                    <group attrs="{'invisible':['|',('lettre_id','=',False),'&amp;',('chp_tmp_ids','!=',[]),('chp_tmp_ids','!=',False)]}">
+                        <separator colspan="4" string="Contenu"/>
+                        <field name="content" colspan="4" nolabel="1" attrs="{'required':['|',('chp_tmp_ids','=',[]),('chp_tmp_ids','=',False)]}"/>
+                    </group>
+                    <!-- Partie document pdf éditable -->
+                    <group attrs="{'invisible':['|',('chp_tmp_ids','=',[]),('chp_tmp_ids','=',False)]}">
+                        <group invisible="1">
+                            <field name="res_file_name"/>
+                        </group>
+                        <field name="chp_tmp_ids" nolabel="1" colspan="2">
+                            <tree string="Champs PDF" create="false" delete="false" editable="bottom">
+                                <field name="name"/>
+                                <field name="value_openfire"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <footer>
+                        <button string="Générer Fichier PDF" name="print_report_acrobat" type="object" class="btn-primary" attrs="{'invisible':['|',('chp_tmp_ids','=',[]),('chp_tmp_ids','=',False)]}"/>
+                        <button string="Imprimer" name="print_report" type="object" class="btn-primary" attrs="{'invisible':['|',('lettre_id','=',False),'&amp;',('chp_tmp_ids','!=',[]),('chp_tmp_ids','!=',False)]}"/>
+                        <button string="Annuler" special="cancel" class="btn-default"/>
+                        <field name="res_file" nolabel="1" filename="res_file_name" attrs="{'invisible': [('res_file','=',False)]}"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <act_window
+            name="Envoyer un courrier"
+            res_model="of.compose.mail"
+            src_model="res.partner"
+            view_mode="form"    
+            key2="client_print_multi"
+            view_id="view_courrier_wizard"
+            id="action_view_courrier_wizard"
+            target="new"        
+            context="{'model':'res.partner'}"
+        />
+
+        <act_window
+            name="Envoyer un courrier"
+            res_model="of.compose.mail"
+            src_model="sale.order"
+            view_mode="form"    
+            key2="client_print_multi"
+            view_id="view_courrier_wizard"
+            id="action_view_courrier_wizard_sale"
+            target="new"        
+            context="{'model':'sale.order'}"
+        />
+
+        <!-- <act_window
+            name="Envoyer un courrier"
+            res_model="of.compose.mail"
+            src_model="crm.lead"
+            view_mode="form"    
+            key2="client_print_multi"
+            view_id="view_courrier_wizard"
+            id="action_view_courrier_wizard_crm"
+            context="{'model':'crm.lead'}"
+        /> -->
+
+         <act_window
+            name="Envoyer un courrier"
+            res_model="of.compose.mail"
+            src_model="account.invoice"
+            view_mode="form"    
+            key2="client_print_multi"
+            view_id="view_courrier_wizard"
+            id="action_view_courrier_wizard_account"
+            target="new"        
+            context="{'model':'account.invoice'}"
+        />
+
+    </data>
+</openerp>  
