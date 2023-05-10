@@ -146,6 +146,11 @@
         <field name="value">True</field>
     </record>
 
+    <record id="pdf_print_image_level" model="ir.config_parameter" forcecreate="False">
+        <field name="key">of.sale.report.setting.pdf_print_image_level</field>
+        <field name="value">no</field>
+    </record>
+
     <record id="pdf_signatures_insert" model="ir.config_parameter" forcecreate="False">
         <field name="key">of.sale.report.setting.pdf_signatures_insert</field>
         <field name="value">True</field>

@@ -392,6 +392,30 @@
                                 </div>
                             </div>
                         </div>
+                        <div>
+                            <div class="o_setting_left_pane"/>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_print_image_level"/>
+                                <div class="text-muted">
+                                    How product images are displayed in report
+                                </div>
+                                 <div class="content-group">
+                                     <field name="pdf_print_image_level" class="o_light_label" widget="radio"/>
+                                     <field name="module_of_sale_report_setting_product_multi_image" invisible="1"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="o_setting_left_pane">
+                                <field name="group_of_sale_report_print_attachment"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="group_of_sale_report_print_attachment"/>
+                                <div class="text-muted">
+                                    Print product attachments in report appendix
+                                </div>
+                            </div>
+                        </div>
                         <div class="mt32">
                             <div class="o_setting_left_pane">
                                 <field name="pdf_signatures_insert"/>

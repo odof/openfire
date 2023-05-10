@@ -92,16 +92,6 @@ msgid "(OF) Position fiscale"
 msgstr "(OF) Position fiscale"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_group_of_sale_print_attachment
-msgid "(OF) Print product attachments on Sale Order"
-msgstr "(OF) Impression PJ de l’article"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_of_sale_print_multiimage_level
-msgid "(OF) Print product images on Sale Order"
-msgstr "(OF) Impression images de l’article"
-
-#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_of_recalcul_date_confirmation
 msgid "(OF) Recalcul de la date de confirmation"
 msgstr "(OF) Recalcul de la date de confirmation"
@@ -141,11 +131,6 @@ msgstr "<i class=\"oe_grey\">\n"
 #: model:ir.ui.view,arch_db:of_sale.of_account_invoice_picking_view_form
 msgid "<i>Il reste des bons de livraisons non validés.</i>"
 msgstr "<i>Il reste des bons de livraisons non validés.</i>"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
-msgid "<span attrs=\"{                                 'invisible': ['|',                                     ('of_sale_print_multiimage_level', '!=', 1),                                 ]}\">A first image of the article will be displayed on the line and all in the appendix</span>"
-msgstr "<span attrs=\"{                             'invisible': ['|',                                 ('of_sale_print_multiimage_level', '!=', 1),                             ]}\">Une première image de l'article sera affichée à la ligne et le tout en annexe</span>"
 
 #. module: of_sale
 #: model:ir.ui.view,arch_db:of_sale.of_sale_obsolete_sale_order_form_view
@@ -653,18 +638,10 @@ msgid "Display Name"
 msgstr "Nom affiché"
 
 #. module: of_sale
-#: selection:sale.config.settings,group_of_sale_print_attachment:0
-#: selection:sale.config.settings,of_sale_print_multiimage_level:0
-msgid "Do not print"
-msgstr "Pas d’impression dans le devis"
-
-#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_account_invoice_of_mail_template_ids
 #: model:ir.model.fields,field_description:of_sale.field_ir_act_report_xml_of_mail_template_ids
 #: model:ir.model.fields,field_description:of_sale.field_of_documents_joints_of_mail_template_ids
 #: model:ir.model.fields,field_description:of_sale.field_of_planning_intervention_of_mail_template_ids
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_product_attachment_computed_ids
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_product_attachment_ids
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_of_mail_template_ids
 #: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
 msgid "Documents joints"
@@ -1069,11 +1046,6 @@ msgid "Of picking ids"
 msgstr "Of picking ids"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_product_attachment_computed
-msgid "Of product attachment computed"
-msgstr "Of product attachment computed"
-
-#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_account_invoice_of_residual_equal
 msgid "Of residual equal"
 msgstr "Of residual equal"
@@ -1102,11 +1074,6 @@ msgstr "Order id"
 #: model:ir.ui.view,arch_db:of_sale.of_sale_order_confirmation_view_form
 msgid "Oui"
 msgstr "Oui"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
-msgid "PDF Printing"
-msgstr "Impression PDF"
 
 #. module: of_sale
 #: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
@@ -1162,34 +1129,6 @@ msgstr "Pourcentage"
 #: model:ir.model,name:of_sale.model_product_pricelist
 msgid "Pricelist"
 msgstr "Liste de prix"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_group_of_sale_print_multiimage
-#: selection:sale.config.settings,group_of_sale_print_attachment:0
-#: selection:sale.config.settings,of_sale_print_multiimage_level:0
-msgid "Print on appendix"
-msgstr "Impression en annexe"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_group_of_sale_print_one_image
-#: selection:sale.config.settings,of_sale_print_multiimage_level:0
-msgid "Print on each line"
-msgstr "Impression à la ligne"
-
-#. module: of_sale
-#: model:res.groups,name:of_sale.group_of_sale_print_one_image
-msgid "Print one product image per line on Sale Order"
-msgstr "Impression d'une image article par ligne sur Devis/Commande"
-
-#. module: of_sale
-#: model:res.groups,name:of_sale.group_of_sale_print_attachment
-msgid "Print product attachments on Sale Order"
-msgstr "Impression de PJ article sur Devis/Commande"
-
-#. module: of_sale
-#: model:res.groups,name:of_sale.group_of_sale_print_multiimage
-msgid "Print product images on Sale Order"
-msgstr "Impression de plusieurs images article sur Devis/Commande"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_line_of_seller_price

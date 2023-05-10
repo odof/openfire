@@ -127,23 +127,6 @@
 
                 <!-- Manufacturing -->
                 <group string="Manufacturing" id="manufacturing" name="manufacturing"/>
-
-                <!-- PDF Printing -->
-                <group string="PDF Printing" id="pdf_printing" name="pdf_printing">
-                    <group name="field_parameters">
-                        <field name="group_of_sale_print_attachment" widget="radio"/>
-                        <label for="of_sale_print_multiimage_level"/>
-                        <div name="of_sale_print_multiimage_level">
-                            <field name="of_sale_print_multiimage_level" widget="radio"/>
-                            <span attrs="{
-                                'invisible': [
-                                    ('of_sale_print_multiimage_level', '!=', 1),
-                                ]}">A first image of the article will be displayed on the line and all in the appendix</span>
-                        </div>
-                        <field name="group_of_sale_print_one_image" invisible="1"/>
-                        <field name="group_of_sale_print_multiimage" invisible="1"/>
-                    </group>
-                </group>
             </xpath>
 
             <xpath expr="//field[@name='deposit_product_id_setting']" position="attributes">

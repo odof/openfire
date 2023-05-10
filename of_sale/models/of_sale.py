@@ -763,13 +763,6 @@ class SaleOrderLine(models.Model):
 
     of_date_tarif = fields.Date(string="Date du tarif", related="product_id.date_tarif", readonly=True)
     of_obsolete = fields.Boolean(string=u"Article obsolète", related="product_id.of_obsolete", readonly=True)
-    of_product_attachment_ids = fields.Many2many("ir.attachment", string="Documents joints")
-    # Champ servant au calcul du domain de of_product_attachment_ids
-    of_product_attachment_computed_ids = fields.Many2many(
-        "ir.attachment", string="Documents joints", compute='_compute_of_product_attachment_computed_ids'
-    )
-    # A supprimer après la prochaine màj
-    of_product_attachment_computed = fields.Boolean(compute=lambda s: None)
 
     @api.model_cr_context
     def _auto_init(self):
@@ -800,29 +793,6 @@ class SaleOrderLine(models.Model):
                 line.of_marge_pc = line.margin * 100.0 / line.price_subtotal
             else:
                 line.of_marge_pc = 0.0
-
-    @api.depends('product_id')
-    def _compute_of_product_attachment_computed_ids(self):
-        product_obj = self.env['product.product']
-        attachment_obj = self.env['ir.attachment']
-        for line in self:
-            # On récupère toutes les variantes du modèle d'article
-            product_ids = product_obj.search([('product_tmpl_id', '=', line.product_id.product_tmpl_id.id)])
-
-            # On récupère toutes les PJ pdf du modèle d'article et de ses variantes
-            domain = [
-                '&',
-                '|',
-                '&',
-                ('res_model', '=', 'product.template'),
-                ('res_id', '=', line.product_id.product_tmpl_id.id),
-                '&',
-                ('res_model', '=', 'product.product'),
-                ('res_id', 'in', product_ids.ids),
-                ('mimetype', '=', 'application/pdf'),
-            ]
-            attachment_ids = attachment_obj.search(domain)
-            line.of_product_attachment_computed_ids = attachment_ids
 
     @api.depends(
         'product_id',
@@ -952,11 +922,6 @@ class SaleOrderLine(models.Model):
                     self.layout_category_id = product.of_layout_category_id
                 elif self.product_id.categ_id.of_layout_id:
                     self.layout_category_id = self.product_id.categ_id.of_layout_id
-            if self.env.user.has_group('of_sale.group_of_sale_print_attachment'):
-                attachment_ids = self.env['ir.attachment'].search(
-                    [('id', 'in', self.of_product_attachment_computed_ids.ids)]
-                )
-                self.of_product_attachment_ids = attachment_ids
 
         return res
 
@@ -1031,10 +996,6 @@ class SaleOrderLine(models.Model):
 
     @api.model
     def create(self, vals):
-        """
-        Au moment de la sauvegarde de la commande, les images articles ne sont pas toujours sauvegardées
-        car renseignées par un onchange et affichage en vue en kanban, du coup on surcharge le create
-        """
         if vals.get('layout_category_id') and 'sequence' not in vals:
             order = self.env['sale.order'].browse(vals['order_id'])
             max_sequence = order._of_get_max_or_min_seq_by_layout().get(vals['layout_category_id'], 0)

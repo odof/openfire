@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sale_order_view_form" model="ir.ui.view">
+        <field name="name">sale.order.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale_report_setting.sale_order_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/form//field[@name='of_product_attachment_ids']/parent::group" position="after">
+                <field name="product_template_id" invisible="1"/>
+                <field name="of_product_image_domain_ids" invisible="1"/>
+                <label for="of_product_image_ids"/>
+                <field name="of_product_image_ids"
+                       nolabel="1"
+                       context="{'default_owner_model': 'product.template',
+                                 'default_owner_id': product_template_id,
+                                 'form_view_ref': 'product_multi_image.image_form_view',
+                                 'kanban_view_ref': 'product_multi_image.image_kanban_view',
+                                }"
+                       mode="kanban"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

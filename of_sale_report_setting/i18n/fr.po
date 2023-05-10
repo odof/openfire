@@ -309,7 +309,7 @@ msgstr "Affiche les différents libellés d'adresse"
 #. module: of_sale_report_setting
 #: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
 msgid "Displays the email in the customer information"
-msgstr ""
+msgstr "Affiche le courriel dans les informations client"
 
 #. module: of_sale_report_setting
 #: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
@@ -404,6 +404,11 @@ msgid "Displays the validity date in top information block"
 msgstr "Affiche la date de validité dans les informations du haut"
 
 #. module: of_sale_report_setting
+#: model:ir.model.fields.selection,name:of_sale_report_setting.selection__res_config_settings__pdf_print_image_level__no
+msgid "Do not print"
+msgstr "Ne pas imprimer"
+
+#. module: of_sale_report_setting
 #: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_address_contact_email
 #: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
 msgid "Email"
@@ -426,9 +431,19 @@ msgid "Font color of the section headings. Default is black."
 msgstr "Couleur du texte des titres de section. La valeur par défaut est noir."
 
 #. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "How product images are displayed in report"
+msgstr "Comment les images d'article sont affichées dans le rapport"
+
+#. module: of_sale_report_setting
 #: model:ir.model.fields,help:of_sale_report_setting.field_sale_order__of_technical_visit_date
 msgid "If filled, it will be displayed in quotation/order report"
 msgstr "Si renseignée, apparaîtra dans le rapport devis/commande"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "Image"
+msgstr "Image"
 
 #. module: of_sale_report_setting
 #: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_invoicing_address_specific_title
@@ -455,6 +470,11 @@ msgstr "Libellé du titre spécifique d'adresse de facturation et de livraison"
 #: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
 msgid "Mobile"
 msgstr "Mobile"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__module_of_sale_report_setting_product_multi_image
+msgid "Module Of Sale Report Setting Product Multi Image"
+msgstr "Module Of Sale Report Setting Product Multi Image"
 
 #. module: of_sale_report_setting
 #: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
@@ -526,6 +546,47 @@ msgstr "Montant HT"
 #: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
 msgid "Price Tax incl."
 msgstr "Montant TTC"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields.selection,name:of_sale_report_setting.selection__res_config_settings__pdf_print_image_level__line_appendix
+msgid "Print first image on line and others on appendix"
+msgstr "Imprimer la première image à la ligne et les autres en annexe"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields.selection,name:of_sale_report_setting.selection__res_config_settings__pdf_print_image_level__appendix
+msgid "Print on appendix"
+msgstr "Imprimer en annexe"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields.selection,name:of_sale_report_setting.selection__res_config_settings__pdf_print_image_level__line
+msgid "Print on each line"
+msgstr "Imprimer à la ligne"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_sale_printing_params_view_form
+msgid "Print product attachments in report appendix"
+msgstr "Imprimer les pièces jointes d'article en annexe du rapport"
+
+#. module: of_sale_report_setting
+#: model:res.groups,name:of_sale_report_setting.group_of_sale_report_print_attachment
+msgid "Print product attachments on sale order report"
+msgstr "Imprimer les pièces jointes d'article avec le rapport devis/commande"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_sale_order_line__of_product_attachment_ids
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__group_of_sale_report_print_attachment
+msgid "Product attachments"
+msgstr "Pièces jointes d'article"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_sale_order_line__of_product_attachment_domain_ids
+msgid "Product attachments domain"
+msgstr "Domaine des pièces jointes d'article"
+
+#. module: of_sale_report_setting
+#: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_print_image_level
+msgid "Product images"
+msgstr "Images d'article"
 
 #. module: of_sale_report_setting
 #: model:ir.model.fields,field_description:of_sale_report_setting.field_res_config_settings__pdf_product_reference

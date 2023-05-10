@@ -1,7 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-
-from odoo import api, fields, models
+from odoo import Command, api, fields, models
 
 
 class SaleOrder(models.Model):
@@ -143,6 +142,9 @@ class SaleOrder(models.Model):
     def pdf_price_taxinc(self):
         return self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_price_taxinc')
 
+    def pdf_print_image_level(self):
+        return self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_print_image_level')
+
     def pdf_signatures_insert(self):
         return self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_signatures_insert')
 
@@ -180,6 +182,19 @@ class SaleOrderLine(models.Model):
         help="Unit price with taxes",
     )
     of_display_name = fields.Text(string="Display name for reports", compute='_compute_of_display_name')
+    of_product_attachment_domain_ids = fields.One2many(
+        comodel_name='ir.attachment',
+        string="Product attachments domain",
+        compute='_compute_of_product_attachment_domain_ids',
+    )
+    of_product_attachment_ids = fields.Many2many(
+        comodel_name='ir.attachment',
+        string="Product attachments",
+        compute='_compute_of_product_attachment_ids',
+        readonly=False,
+        store=True,
+        domain="[('id', 'in', of_product_attachment_domain_ids)]",
+    )
 
     # TODO: move me to of_sale module when it will migrated
     @api.depends('price_unit', 'product_id', 'tax_id', 'currency_id', 'order_id.partner_shipping_id')
@@ -206,3 +221,39 @@ class SaleOrderLine(models.Model):
                     splitted.pop(0)
                     name = ']'.join(splitted).strip()
             line.of_display_name = name
+
+    @api.depends('product_id')
+    def _compute_of_product_attachment_domain_ids(self):
+        if self.env.user.has_group('of_sale_report_setting.group_of_sale_report_print_attachment'):
+            for line in self:
+                product_ids = self.env['product.product'].search(
+                    [('product_tmpl_id', '=', line.product_template_id.id)]
+                )
+                domain = [
+                    '&',
+                    ('mimetype', '=', 'application/pdf'),
+                    '|',
+                    '&',
+                    ('res_model', '=', 'product.template'),
+                    ('res_id', '=', line.product_template_id.id),
+                    '&',
+                    ('res_model', '=', 'product.product'),
+                    ('res_id', 'in', product_ids.ids),
+                ]
+                attachments = self.env['ir.attachment'].search(domain)
+                line.of_product_attachment_domain_ids = attachments
+        else:
+            for line in self:
+                line.of_product_attachment_domain_ids = False
+
+    @api.depends('product_id')
+    def _compute_of_product_attachment_ids(self):
+        if self.env.user.has_group('of_sale_report_setting.group_of_sale_report_print_attachment'):
+            for line in self:
+                attachment_ids = self.env['ir.attachment'].search(
+                    [('id', 'in', line.of_product_attachment_domain_ids.ids)]
+                )
+                line.of_product_attachment_ids = [Command.set(attachment_ids.ids)]
+        else:
+            for line in self:
+                line.of_product_attachment_ids = False

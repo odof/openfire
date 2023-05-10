@@ -133,6 +133,24 @@ class ResConfigSettings(models.TransientModel):
     pdf_price_taxinc = fields.Boolean(
         string="Price Tax Incl.", config_parameter='of.sale.report.setting.pdf_price_taxinc'
     )
+    pdf_print_image_level = fields.Selection(
+        selection=[
+            ('no', "Do not print"),
+            ('line', "Print on each line"),
+            ('appendix', "Print on appendix"),
+            ('line_appendix', "Print first image on line and others on appendix"),
+        ],
+        string="Product images",
+        config_parameter='of.sale.report.setting.pdf_print_image_level',
+        default='no',
+    )
+    module_of_sale_report_setting_product_multi_image = fields.Boolean(
+        compute='_compute_module_of_sale_report_setting_product_multi_image', store=True, readonly=False
+    )
+
+    group_of_sale_report_print_attachment = fields.Boolean(
+        string="Product attachments", implied_group='of_sale_report_setting.group_of_sale_report_print_attachment'
+    )
 
     # Signatures insert
     pdf_signatures_insert = fields.Boolean(
@@ -172,6 +190,12 @@ class ResConfigSettings(models.TransientModel):
             self.pdf_customer_signature = True
         if not origin_value and self.pdf_signatures_insert and not self.pdf_vendor_signature:
             self.pdf_vendor_signature = True
+
+    @api.depends('pdf_print_image_level')
+    def _compute_module_of_sale_report_setting_product_multi_image(self):
+        for wizard in self:
+            if wizard.pdf_print_image_level in ['appendix', 'line_appendix']:
+                wizard.module_of_sale_report_setting_product_multi_image = True
 
     @api.onchange('pdf_vendor_signature')
     def _onchange_pdf_vendor_signature(self):
