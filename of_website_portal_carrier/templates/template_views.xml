@@ -40,6 +40,7 @@
                             <th>Fournisseur</th>
                             <th>Date de livraison</th>
                             <th>Origine</th>
+                            <th style="display: none;">N° série interne</th>
                         </tr>
                     </thead>
                     <t t-foreach="receipts" t-as="receipt">
@@ -60,6 +61,9 @@
                             </td>
                             <td>
                                 <span t-field="receipt.origin"/>
+                            </td>
+                            <td style="display: none;">
+                                <span t-esc="receipt.sudo().mapped('pack_operation_product_ids.pack_lot_ids.lot_id.of_internal_serial_number')"/>
                             </td>
                         </tr>
                     </t>
