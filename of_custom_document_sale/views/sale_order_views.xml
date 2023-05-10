@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+<record id="of_custom_document_sale_view_order_form" model="ir.ui.view">
+    <field name="name">of.custom.document.sale.order.form</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//notebook/page[@name='other_information']//group[@name='sales_person']" position="inside">
+            <field name="of_custom_document_ids" widget="many2many_tags"/>
+        </xpath>
+    </field>
+</record>
+
+</odoo>
