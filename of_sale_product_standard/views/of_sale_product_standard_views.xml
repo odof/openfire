@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data>
+
+<!--##############################################################################-->
+<!--########################### ______ Produits ______ ###########################-->
+<!--##############################################################################-->
+<record id="product_template_view_form" model="ir.ui.view">
+    <field name="name">of.sale.product_standard.product.template.form</field>
+    <field name="model">product.template</field>
+    <field name="inherit_id" ref="product.product_template_form_view"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='categ_id']" position="before">
+            <field name="of_standard_id" widget="selection"/>
+        </xpath>
+        <xpath expr="//group[@name='description']" position="after">
+            <group string="Standards description" name="of_group_description_standard">
+                <field colspan="2" name="of_description_standard" nolabel="1"
+                       placeholder="This note describes the product standards and is added to sales orders and invoices."/>
+            </group>
+        </xpath>
+    </field>
+</record>
+
+<!--##############################################################################-->
+<!--########################### ______ Normes ______ #############################-->
+<!--##############################################################################-->
+
+<record id="of_product_standard_view_form" model="ir.ui.view">
+    <field name="name">of.product.standard.form</field>
+    <field name="model">of.product.standard</field>
+    <field name="arch" type="xml">
+        <form string="Product standard">
+        <sheet>
+            <div class="oe_button_box" name="button_box">
+                <button name="toggle_active" type="object"
+                        class="oe_stat_button" icon="fa-archive">
+                    <field name="active" widget="boolean_button"
+                           options='{"terminology": "archive"}'/>
+                </button>
+            </div>
+            <div class="oe_title">
+                <label class="oe_edit_only" for="code" string="Code"/>
+                <h1><field name="code" placeholder="Code of the standard"/></h1>
+                <div name="options" groups="base.group_user">
+                    <div>
+                        <field name="display_docs"/>
+                        <label for="display_docs"/>
+                    </div>
+                </div>
+            </div>
+            <group>
+                <group>
+                    <field name="name"/>
+                </group>
+            </group>
+            <separator name="description" string="Description"/>
+            <field name="description" nolabel="1"/>
+        </sheet>
+        </form>
+    </field>
+</record>
+
+<record id="of_product_standard_view_tree" model="ir.ui.view">
+    <field name="name">of.product.standard.tree</field>
+    <field name="model">of.product.standard</field>
+    <field name="arch" type="xml">
+        <tree string="Product standard" decoration-muted="not active">
+            <field name="code"/>
+            <field name="name"/>
+            <field name="description"/>
+            <field name="display_docs"/>
+            <field name="active" invisible="1"/>
+        </tree>
+    </field>
+</record>
+
+<record id="of_product_standard_view_search" model="ir.ui.view">
+    <field name="name">of.product.standard.search</field>
+    <field name="model">of.product.standard</field>
+    <field name="arch" type="xml">
+        <search string="Product standard">
+            <field name="code"/>
+            <field name="name"/>
+            <separator/>
+            <filter name="active" domain="[('active','=',True)]"/>
+            <filter name="inactive" domain="[('active','=',False)]"/>
+        </search>
+    </field>
+</record>
+
+<record id="of_product_standard_action" model="ir.actions.act_window">
+    <field name="name">Products Standards</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">of.product.standard</field>
+    <field name="view_mode">tree,form</field>
+    <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+            Create a new product standard
+        </p>
+    </field>
+</record>
+
+<menuitem id="menu_product_standard" name="Products standards" action="of_product_standard_action" parent="sale.prod_config_main" sequence="20"/>
+
+</data>
+</odoo>

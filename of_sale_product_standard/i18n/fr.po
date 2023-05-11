@@ -1,0 +1,164 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_sale_product_standard
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-05-11 16:05+0000\n"
+"PO-Revision-Date: 2023-05-11 16:05+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_sale_product_standard
+#. odoo-python
+#: code:addons/of_sale_product_standard/models/account_move_line.py:0
+#: code:addons/of_sale_product_standard/models/sale_order_line.py:0
+#, python-format
+msgid "%s compliant: %s"
+msgstr "Conforme à la norme %s : %s"
+
+#. module: of_sale_product_standard
+#: model:ir.model.fields,field_description:of_sale_product_standard.field_of_product_standard__active
+msgid "Active"
+msgstr "Actif"
+
+#. module: of_sale_product_standard
+#: model:ir.model.fields,field_description:of_sale_product_standard.field_of_product_standard__code
+#: model_terms:ir.ui.view,arch_db:of_sale_product_standard.of_product_standard_view_form
+msgid "Code"
+msgstr "Code"
+
+#. module: of_sale_product_standard
+#: model_terms:ir.ui.view,arch_db:of_sale_product_standard.of_product_standard_view_form
+msgid "Code of the standard"
+msgstr "Code de la norme"
+
+#. module: of_sale_product_standard
+#: model_terms:ir.actions.act_window,help:of_sale_product_standard.of_product_standard_action
+msgid "Create a new product standard"
+msgstr "Créer une nouvelle norme"
+
+#. module: of_sale_product_standard
+#: model:ir.model.fields,field_description:of_sale_product_standard.field_of_product_standard__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: of_sale_product_standard
+#: model:ir.model.fields,field_description:of_sale_product_standard.field_of_product_standard__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: of_sale_product_standard
+#: model:ir.model.fields,field_description:of_sale_product_standard.field_of_product_standard__description
+#: model_terms:ir.ui.view,arch_db:of_sale_product_standard.of_product_standard_view_form
+msgid "Description"
+msgstr "Description"
+
+#. module: of_sale_product_standard
+#: model:ir.model.fields,field_description:of_sale_product_standard.field_of_product_standard__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_sale_product_standard
+#: model:ir.model.fields,field_description:of_sale_product_standard.field_of_product_standard__display_docs
+msgid "Display in documents"
+msgstr "Afficher dans les documents"
+
+#. module: of_sale_product_standard
+#: model:ir.model.fields,field_description:of_sale_product_standard.field_of_product_standard__id
+msgid "ID"
+msgstr "ID"
+
+#. module: of_sale_product_standard
+#: model:ir.model,name:of_sale_product_standard.model_account_move_line
+msgid "Journal Item"
+msgstr "Écriture comptable"
+
+#. module: of_sale_product_standard
+#: model:ir.model.fields,field_description:of_sale_product_standard.field_of_product_standard____last_update
+msgid "Last Modified on"
+msgstr "Date de mise à jour"
+
+#. module: of_sale_product_standard
+#: model:ir.model.fields,field_description:of_sale_product_standard.field_of_product_standard__write_uid
+msgid "Last Updated by"
+msgstr "Dernière modification par"
+
+#. module: of_sale_product_standard
+#: model:ir.model.fields,field_description:of_sale_product_standard.field_of_product_standard__write_date
+msgid "Last Updated on"
+msgstr "Dernière modification le"
+
+#. module: of_sale_product_standard
+#: model:ir.model.fields,field_description:of_sale_product_standard.field_of_product_standard__name
+msgid "Name"
+msgstr "Libellé"
+
+#. module: of_sale_product_standard
+#: model:ir.model,name:of_sale_product_standard.model_product_template
+msgid "Product"
+msgstr "Produit"
+
+#. module: of_sale_product_standard
+#: model:ir.model,name:of_sale_product_standard.model_product_product
+msgid "Product Variant"
+msgstr "Variante de produit"
+
+#. module: of_sale_product_standard
+#: model:ir.model,name:of_sale_product_standard.model_of_product_standard
+#: model_terms:ir.ui.view,arch_db:of_sale_product_standard.of_product_standard_view_form
+#: model_terms:ir.ui.view,arch_db:of_sale_product_standard.of_product_standard_view_search
+#: model_terms:ir.ui.view,arch_db:of_sale_product_standard.of_product_standard_view_tree
+msgid "Product standard"
+msgstr "Norme de produit"
+
+#. module: of_sale_product_standard
+#: model:ir.model.fields,field_description:of_sale_product_standard.field_of_product_standard__product_ids
+msgid "Products"
+msgstr "Produits"
+
+#. module: of_sale_product_standard
+#: model:ir.actions.act_window,name:of_sale_product_standard.of_product_standard_action
+msgid "Products Standards"
+msgstr "Normes de produits"
+
+#. module: of_sale_product_standard
+#: model:ir.ui.menu,name:of_sale_product_standard.menu_product_standard
+msgid "Products standards"
+msgstr "Normes de produits"
+
+#. module: of_sale_product_standard
+#: model:ir.model,name:of_sale_product_standard.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de commande"
+
+#. module: of_sale_product_standard
+#: model:ir.model.fields,field_description:of_sale_product_standard.field_product_product__of_standard_id
+#: model:ir.model.fields,field_description:of_sale_product_standard.field_product_template__of_standard_id
+msgid "Standard"
+msgstr "Norme"
+
+#. module: of_sale_product_standard
+#: model:ir.model.fields,field_description:of_sale_product_standard.field_product_product__of_description_standard
+#: model:ir.model.fields,field_description:of_sale_product_standard.field_product_template__of_description_standard
+msgid "Standard description"
+msgstr "Description de la norme"
+
+#. module: of_sale_product_standard
+#: model_terms:ir.ui.view,arch_db:of_sale_product_standard.product_template_view_form
+msgid "Standards description"
+msgstr "Description de la norme"
+
+#. module: of_sale_product_standard
+#: model_terms:ir.ui.view,arch_db:of_sale_product_standard.product_template_view_form
+msgid ""
+"This note describes the product standards and is added to sales orders and "
+"invoices."
+msgstr ""
+"Cette note décrit la norme de l'article et sera ajoutée dans les devis et factures"
