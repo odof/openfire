@@ -6,11 +6,27 @@
         <field name="model">stock.reservation</field>
         <field name="inherit_id" ref="stock_reserve.view_stock_reservation_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="of_sale_order_id" attrs="{'invisible': [('of_sale_order_id', '=', False)]}"/>
+                <field name="of_sale_partner_id" attrs="{'invisible': [('of_sale_partner_id', '=', False)]}"/>
+            </xpath>
             <xpath expr="//group[@name='location']" position="replace">
                 <group name="location" string="Emplacements">
                     <field name="location_id"/>
                     <field name="location_dest_id" invisible="1"/>
                 </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="stock_reservation_view_tree" model="ir.ui.view">
+        <field name="name">stock.reservation.view.tree</field>
+        <field name="model">stock.reservation</field>
+        <field name="inherit_id" ref="stock_reserve.view_stock_reservation_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="of_sale_order_id"/>
+                <field name="of_sale_partner_id"/>
             </xpath>
         </field>
     </record>
