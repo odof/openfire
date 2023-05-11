@@ -759,12 +759,7 @@ class InventoryLine(models.Model):
             AND     SQ.qty                      > 0
             AND     SM.state                    = 'done'
             AND     SL1.usage                   IN ('internal', 'transit')
-            AND     (NOT    (   SL2.company_id  IS NULL
-                            AND SL1.company_id  IS NULL
-                            )
-                    OR      SL2.company_id      != SL1.company_id
-                    OR      SL2.usage           NOT IN ('internal', 'transit')
-                    )
+            AND     SL1.id                      != SL2.id
             AND     SM.date                     <= %s
             AND     SL1.id                      = %s
             AND     PP.id                       = %s
@@ -786,12 +781,7 @@ class InventoryLine(models.Model):
             AND     SQ.qty                      > 0
             AND     SM.state                    = 'done'
             AND     SL2.usage                   IN ('internal', 'transit')
-            AND     (NOT    (   SL2.company_id  IS NULL
-                            AND SL1.company_id  IS NULL
-                            )
-                    OR      SL2.company_id      != SL1.company_id
-                    OR      SL1.usage           NOT IN ('internal', 'transit')
-                    )
+            AND     SL1.id                      != SL2.id
             AND     SM.date                     <= %s
             AND     SL2.id                      = %s
             AND     PP.id                       = %s
