@@ -95,7 +95,7 @@ class AccountInvoice(models.Model):
         for invoice in self.filtered(lambda i: not i.of_is_locked):
             pickings = invoice.of_picking_ids
             # force_assign() ne fonctionne pas bien si des articles sont déjà considérés comme fait
-            pickings.pack_operation_product_ids.write({'qty_done': 0.0})
+            pickings.mapped('pack_operation_product_ids').write({'qty_done': 0.0})
             pickings.force_assign()
             for picking in pickings:
                 new_transfer = transfer_obj.create({'pick_id': picking.id})
