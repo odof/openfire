@@ -636,7 +636,7 @@ class OFWebsitePlanningBooking(http.Controller):
             # Il faut générer un nouveau wizard de recherche
             tache = request.env['of.planning.tache'].browse(request.session.get('rdv_tache_id'))
             wizard_vals = {
-                'company_id': request.website.company_id.id,
+                'company_id': request.env.user.company_id.id,
                 'partner_id': request.env.user.partner_id.id,
                 'partner_address_id': request.session.get('rdv_site_adresse_id'),
                 'tache_id': request.session.get('rdv_tache_id'),
