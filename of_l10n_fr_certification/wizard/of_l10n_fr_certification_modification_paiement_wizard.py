@@ -51,6 +51,10 @@ class OFAccountPaymentWizard(models.TransientModel):
             'default_communication': payment.communication or False,
             'default_partner_type': payment.partner_type
         }
+        # On vérifie si le module of_mobile est installé (existence du champ of_intervention_id).
+        # Si oui, on ajoute les valeurs des champs supplémentaires qu'il a ajouté.
+        if getattr(payment, 'of_intervention_id', False):
+            context['default_of_intervention_id'] = payment.of_intervention_id.id
 
         # On vérifie si le module of_account_payment_mode est installé (existence du champ of_payment_mode_id).
         # Si oui, on ajoute les valeurs des champs supplémentaires qu'il a ajouté.
@@ -131,7 +135,7 @@ class OFAccountPaymentWizard(models.TransientModel):
 
                 # Annulation
                 if self.type_modification_payment == 'cancel':
-                    # Pour annuler le paiement, on crée une contrepartie comptable. 
+                    # Pour annuler le paiement, on crée une contrepartie comptable.
                     for move in payment.move_line_ids.mapped('move_id'):
                         rev_move = move.create_reversals(reconcile=True)
                         rev_move.ref = form.description or move.name
