@@ -9,6 +9,15 @@ class StockReservation(models.Model):
 
     of_sale_line_id = fields.Many2one(
         comodel_name='sale.order.line', string=u"Ligne de commande", ondelete='cascade', copy=False)
+    of_sale_order_id = fields.Many2one(comodel_name='sale.order', string=u"Commande", compute='_compute_order_fields')
+    of_sale_partner_id = fields.Many2one(
+        comodel_name='res.partner', string=u"partenaire", compute='_compute_order_fields')
+
+    @api.depends('of_sale_line_id')
+    def _compute_order_fields(self):
+        for record in self:
+            record.of_sale_order_id = record.of_sale_line_id.order_id
+            record.of_sale_partner_id = record.of_sale_line_id.order_id.partner_id
 
     @api.model
     def _default_picking_type_id(self):
