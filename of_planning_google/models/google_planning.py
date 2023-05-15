@@ -1187,7 +1187,7 @@ class GooglePlanning(models.AbstractModel):
                             else:
                                 recs.create_from_google(event)
                         elif interv_id:
-                            if event.GG.found:
+                            if event.GG.found and event.GG.event.get('updated'):
                                 google_synchro_date = datetime.strptime(
                                     event.GG.event['updated'], '%Y-%m-%dT%H:%M:%S.%fz')
                             else:
@@ -1222,7 +1222,7 @@ class GooglePlanning(models.AbstractModel):
                         if recurrent_inter and inter.recurrent_id_date not in all_dates:
                             inter.with_context(of_force_occ_unlink=True).unlink(can_be_deleted=True)
                         else:
-                            if event.GG.found:
+                            if event.GG.found and event.GG.event.get('updated'):
                                 google_synchro_date = datetime.strptime(
                                     event.GG.event['updated'], '%Y-%m-%dT%H:%M:%S.%fz')
                             else:
