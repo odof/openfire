@@ -95,7 +95,7 @@ class OFDeliveryDivisionWizardLine(models.TransientModel):
     name = fields.Char(string=u"Description", related='move_id.name', readonly=True)
     product_uom_qty = fields.Float(related='move_id.product_uom_qty', string=u"Quantité initiale", readonly=True)
     qty_to_divide = fields.Float(string=u"Quantité à diviser")
-    qty_available = fields.Float(string=u"Stock disponible", compute='_compute_qty_available')
+    qty_available = fields.Float(string=u"Stock disponible", compute='_compute_qty_available', store=True)
     state = fields.Selection(related='move_id.state', readonly=True)
 
     @api.depends('wizard_id.picking_type_id')
