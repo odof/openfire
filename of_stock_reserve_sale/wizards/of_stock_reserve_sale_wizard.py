@@ -72,7 +72,7 @@ class OFStockReserveSaleWizard(models.TransientModel):
         if self.line_ids.filtered(lambda l: l.qty_to_reserve < 0):
             raise UserError(u"Vous ne pouvez pas saisir de quantité négative.")
 
-        if self.line_ids.filtered(lambda l: l.qty_to_reserve > l.qty_available):
+        if self.line_ids.filtered(lambda l: l.qty_to_reserve > 0 and l.qty_to_reserve > l.qty_available):
             raise UserError(u"Vous ne pouvez pas saisir une quantité supérieure à la quantité disponible.")
 
         total_qty = sum(self.line_ids.mapped('qty_to_reserve'))
