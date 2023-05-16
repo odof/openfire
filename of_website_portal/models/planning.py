@@ -65,5 +65,8 @@ class OFPlanningIntervention(models.Model):
         self.ensure_one()
         ir_values_obj = self.env['ir.values']
         days = ir_values_obj.env['ir.values'].get_default('of.intervention.settings', 'website_edit_days_limit')
-        date_limit = fields.Date.to_string(fields.Date.from_string(fields.Date.today()) + relativedelta(days=days))
-        return self.date_date > date_limit
+        if days:
+            date_limit = fields.Date.to_string(fields.Date.from_string(fields.Date.today()) + relativedelta(days=days))
+            return self.date_date > date_limit
+        else:
+            return self.date_date > fields.Date.today()

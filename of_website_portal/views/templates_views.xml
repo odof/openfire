@@ -267,7 +267,7 @@
                                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                                     <input type="hidden" name="rdv_id" t-att-value="rdv.id"/>
                                     <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading fa fa-fg fa-close"
-                                            t-att-title="not rdv.can_edit_from_website() and 'Impossible d\'annuler ce RDV' or ''"
+                                            t-att-title="rdv.can_edit_from_website() and 'Annuler' or 'Impossible d\'annuler ce RDV'"
                                             t-att-style="rdv.can_edit_from_website() and 'font-size: 20px;' or 'font-size: 20px;background-color: gray'"/>
                                 </form>
                             </td>
@@ -352,7 +352,7 @@
                                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                                     <input type="hidden" name="rdv_id" t-att-value="rdv.id"/>
                                     <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading"
-                                            t-att-title="not rdv.can_edit_from_website() and 'Impossible d\'annuler ce RDV' or ''"
+                                            t-att-title="rdv.can_edit_from_website() and 'Annuler' or 'Impossible d\'annuler ce RDV'"
                                             t-att-style="rdv.can_edit_from_website() and 'margin-top: 10px;' or 'margin-top: 10px;background-color: gray'">Annuler</button>
                                 </form>
                             </div>
