@@ -103,6 +103,9 @@ class OFWebsitePlanningBooking(http.Controller):
     @http.route(['/new_booking'], type='http', auth='user', website=True)
     def new_booking(self, **kw):
         redirection = self.get_redirection('new')
+        # Reset de la valeur si l'utilisateur n'est pas allé au bout de la modification d'un RDV et va vers
+        # la prise de RDV
+        request.session['rdv_id'] = False
         if redirection:
             return redirection
 
@@ -811,7 +814,8 @@ class OFWebsitePlanningBooking(http.Controller):
         taxes = task.product_id.sudo().taxes_id
         if request.env.user.partner_id.company_id:
             taxes = taxes.filtered(lambda r: r.company_id == request.env.user.partner_id.company_id)
-        taxes = task.fiscal_position_id.sudo().map_tax(taxes, task.product_id, request.env.user.partner_id) or []
+        taxes = task.fiscal_position_id.sudo().map_tax(taxes, task.product_id, request.env.user.partner_id) or \
+                request.env['account.tax']
         amounts = taxes.compute_all(
             price_unit, pricelist.currency_id, 1.0, product=task.product_id, partner=request.env.user.partner_id)
         values['price'] = amounts['total_included']
@@ -1085,7 +1089,7 @@ class OFWebsitePlanningBooking(http.Controller):
             'flexible': tache.flexible,
             'employee_ids': [(4, creneau_employee.employee_id.id, 0)],
             'duree': tache.duree,
-            'company_id': request.website.company_id.id,
+            'company_id': adresse.company_id.id,
             'state': booking_state,
             'fiscal_position_id': tache.fiscal_position_id.id or False,
             'verif_dispo': True,
