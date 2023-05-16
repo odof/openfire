@@ -46,7 +46,8 @@ class OFDeliveryDivisionWizard(models.TransientModel):
                              'location_dest_id': new_picking.location_dest_id.id,
                              'picking_type_id': self.picking_type_id.id,
                              'product_uom_qty': line_to_divide.qty_to_divide,
-                             'of_ordered_qty': line_to_divide.qty_to_divide})
+                             'of_ordered_qty': line_to_divide.qty_to_divide,
+                             'warehouse_id': self.picking_type_id.warehouse_id.id})
                         # On diminue les quantités du mouvement d'origine
                         line_to_divide.move_id.write(
                             {'product_uom_qty': initial_qty, 'of_ordered_qty': initial_qty})
@@ -58,8 +59,9 @@ class OFDeliveryDivisionWizard(models.TransientModel):
                      'location_dest_id': new_picking.location_dest_id.id,
                      'picking_type_id': self.picking_type_id.id})
 
-                self.picking_id.action_assign()
-                new_picking.action_assign()
+                if self.env['ir.module.module'].search([('name', '=', 'procurement_jit'), ('state', '=', 'installed')]):
+                    self.picking_id.action_assign()
+                    new_picking.action_assign()
 
             self.recompute()
 
