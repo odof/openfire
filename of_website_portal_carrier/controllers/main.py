@@ -13,7 +13,7 @@ class WebsiteAccount(website_account):
         values = super(WebsiteAccount, self)._prepare_portal_layout_values()
         receipt_ids = request.env['stock.picking'].search([
             ('picking_type_id.warehouse_id.partner_id', '=', request.env.user.partner_id.id),
-            ('state', 'not in', ('draft', 'cancel')),
+            ('state', 'not in', ('draft', 'cancel', 'done')),
             ('picking_type_id.code', '=', 'incoming'),
         ])
         values.update({
@@ -25,7 +25,7 @@ class WebsiteAccount(website_account):
         values = self._prepare_portal_layout_values()
         receipt_ids = request.env['stock.picking'].search([
             ('picking_type_id.warehouse_id.partner_id', '=', request.env.user.partner_id.id),
-            ('state', 'not in', ('draft', 'cancel')),
+            ('state', 'not in', ('draft', 'cancel', 'done')),
             ('picking_type_id.code', '=', 'incoming'),
         ])
         values.update({
