@@ -261,15 +261,18 @@
                                 <span t-field="rdv.state"/>
                             </td>
                             <td>
-                                <form action="/rdv/cancel" method="post" enctype="multipart/form-data" name="rdv_cancelable"
-                                        t-att-class="rdv.can_edit_from_website() and 'btn' or 'btn of-no-click'"
-                                        style="padding: 0px; padding-bottom: 2px; padding-left: 10px;">
-                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                                    <input type="hidden" name="rdv_id" t-att-value="rdv.id"/>
-                                    <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading fa fa-fg fa-close"
-                                            t-att-title="rdv.can_edit_from_website() and 'Annuler' or 'Impossible d\'annuler ce RDV'"
-                                            t-att-style="rdv.can_edit_from_website() and 'font-size: 20px;' or 'font-size: 20px;background-color: gray'"/>
-                                </form>
+                                <div style="display: flex;">
+                                    <t t-set="can_edit_from_website" t-value="rdv.can_edit_from_website()"/>
+                                    <form action="/rdv/cancel" method="post" enctype="multipart/form-data" name="rdv_cancelable">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <input type="hidden" name="rdv_id" t-att-value="rdv.id"/>
+                                        <button type="submit"
+                                                t-att-class="can_edit_from_website and 'btn btn-default btn-xs loading' or 'btn btn-default btn-xs loading disabled'"
+                                                t-att-title="can_edit_from_website and 'Annuler' or 'Impossible d\'annuler ce RDV'">
+                                            <i class="fa fa-close"/>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     </t>
@@ -345,16 +348,19 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="mt32 mb64" style="text-align: center !important;">
-                                <form action="/rdv/cancel" method="post" enctype="multipart/form-data" name="rdv_cancelable"
-                                      t-att-class="rdv.can_edit_from_website() and 'btn' or 'btn of-no-click'"
-                                      style="padding-right: 10px;padding-left: 10px;">
-                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                                    <input type="hidden" name="rdv_id" t-att-value="rdv.id"/>
-                                    <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading"
-                                            t-att-title="rdv.can_edit_from_website() and 'Annuler' or 'Impossible d\'annuler ce RDV'"
-                                            t-att-style="rdv.can_edit_from_website() and 'margin-top: 10px;' or 'margin-top: 10px;background-color: gray'">Annuler</button>
-                                </form>
+                            <div class="row mt32 mb64">
+                                <div class="col-md-4 col-md-offset-4" style="display: flex;">
+                                    <t t-set="can_edit_from_website" t-value="rdv.can_edit_from_website()"/>
+                                    <form action="/rdv/cancel" method="post" enctype="multipart/form-data" name="rdv_cancelable" style="margin: auto;">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <input type="hidden" name="rdv_id" t-att-value="rdv.id"/>
+                                        <button type="submit"
+                                                t-att-class="can_edit_from_website and 'btn btn-default loading' or 'btn btn-default loading disabled'"
+                                                t-att-title="can_edit_from_website and 'Annuler' or 'Impossible d\'annuler ce RDV'">
+                                            <i class="fa fa-close"/>&amp;nbsp;Annuler
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                             <div class="oe_structure" />
                         </div>

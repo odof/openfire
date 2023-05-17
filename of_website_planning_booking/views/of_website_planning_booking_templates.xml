@@ -930,28 +930,28 @@
 
     <template id="of_website_planning_booking_portal_my_rdvs" name="OF My RDVs" inherit_id="of_website_portal.of_website_portal_portal_my_rdvs">
         <xpath expr="//form[@name='rdv_cancelable']" position="before">
-            <form action="/new_booking/service" method="post" enctype="multipart/form-data" name="rdv_editable"
-                    t-att-class="rdv.website_create and rdv.can_edit_from_website() and 'btn' or 'btn of-no-click'"
-                    style="padding: 0px; padding-bottom: 2px; padding-left: 10px;">
+            <form action="/new_booking/service" method="post" enctype="multipart/form-data" name="rdv_editable" style="margin-right: 5px;">
                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                 <input type="hidden" name="rdv_id" t-att-value="rdv.id"/>
-                <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading fa fa-fg fa-pencil"
-                        t-att-title="rdv.website_create and rdv.can_edit_from_website() and 'Modifier' or 'Impossible de modifier ce RDV'"
-                        t-att-style="rdv.website_create and rdv.can_edit_from_website() and 'background-color: blue;font-size: 20px;' or 'font-size: 20px;background-color: gray'"/>
+                <button type="submit"
+                        t-att-class="rdv.website_create and can_edit_from_website and 'btn btn-primary btn-xs loading' or 'btn btn-default btn-xs loading disabled'"
+                        t-att-title="rdv.website_create and can_edit_from_website and 'Modifier' or 'Impossible de modifier ce RDV'">
+                    <i class="fa fa-pencil"/>
+                </button>
             </form>
         </xpath>
     </template>
 
     <template id="of_website_planning_booking_website_rdv" name="OF RDV" inherit_id="of_website_portal.of_website_portal_website_rdv">
         <xpath expr="//form[@name='rdv_cancelable']" position="before">
-            <form action="/new_booking/service" method="post" enctype="multipart/form-data" name="rdv_editable"
-                    t-att-class="rdv.website_create and rdv.can_edit_from_website() and 'btn' or 'btn of-no-click'"
-                    style="padding-right: 10px;padding-left: 10px;">
+            <form action="/new_booking/service" method="post" enctype="multipart/form-data" name="rdv_editable" style="margin: auto;">
                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                 <input type="hidden" name="rdv_id" t-att-value="rdv.id"/>
-                <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading"
-                        t-att-title="rdv.website_create and rdv.can_edit_from_website() and 'Modifier' or 'Impossible de modifier ce RDV'"
-                        t-att-style="rdv.website_create and rdv.can_edit_from_website() and 'margin-top: 10px; background-color: blue;' or 'margin-top: 10px; background-color: gray;'">Modifier</button>
+                <button type="submit"
+                        t-att-class="rdv.website_create and can_edit_from_website and 'btn btn-primary loading' or 'btn btn-default loading disabled'"
+                        t-att-title="rdv.website_create and can_edit_from_website and 'Modifier' or 'Impossible de modifier ce RDV'">
+                    <i class="fa fa-pencil"/>&amp;nbsp;Modifier
+                </button>
             </form>
         </xpath>
     </template>

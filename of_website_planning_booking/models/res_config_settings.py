@@ -182,9 +182,8 @@ class OFInterventionSettings(models.TransientModel):
     @api.multi
     def set_website_edit_days_limit_defaults(self):
         return self.env['ir.values'].sudo().set_default(
-            'of.intervention.settings', 'website_edit_days_limit',
-            self.website_edit_days_limit,
-            company_id=self.website_edit_days_limit and self.company_id.id)
+            'of.intervention.settings', 'website_edit_days_limit', self.website_edit_days_limit,
+            company_id=self.website_booking_company_dependent and self.company_id.id)
 
     @api.multi
     def set_website_booking_company_dependent_defaults(self):
