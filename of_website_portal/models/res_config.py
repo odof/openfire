@@ -47,7 +47,13 @@ class OFInterventionSettings(models.TransientModel):
     @api.model
     def _auto_init(self):
         super(OFInterventionSettings, self)._auto_init()
-        self.env['ir.values'].set_default('of.intervention.settings', 'website_edit_days_limit', 7)
+        module_self = self.env['ir.module.module'].search(
+            [('name', '=', 'of_website_portal'), ('state', '=', 'installed')])
+        if module_self:
+            # installed_version est trompeur, il contient la version en cours d'installation
+            # on utilise donc latest version à la place
+            if module_self.latest_version < '10.0.2.2.0':
+                self.env['ir.values'].set_default('of.intervention.settings', 'website_edit_days_limit', 7)
 
     website_edit_days_limit = fields.Integer(string=u"(OF) Limite d'annulation", default=7)
 
