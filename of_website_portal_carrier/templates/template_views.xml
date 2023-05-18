@@ -55,7 +55,7 @@
                             <td>
                                 <span t-esc="receipt.sudo().partner_id.name"/>
                             </td>
-                            <td>
+                            <td t-att-data-order="receipt.min_date">
                                 <span t-esc="receipt.min_date" t-options="{'widget': 'date'}"/>
                             </td>
                             <td>
