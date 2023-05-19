@@ -57,7 +57,8 @@ class OFDeliveryDivisionWizard(models.TransientModel):
                     {'picking_id': new_picking.id,
                      'location_id': new_picking.location_id.id,
                      'location_dest_id': new_picking.location_dest_id.id,
-                     'picking_type_id': self.picking_type_id.id})
+                     'picking_type_id': self.picking_type_id.id,
+                     'warehouse_id': self.picking_type_id.warehouse_id.id})
 
                 if self.env['ir.module.module'].sudo().search(
                         [('name', '=', 'procurement_jit'), ('state', 'in', ('installed', 'to install', 'to upgrade'))]):
