@@ -40,7 +40,7 @@ class OFDeliveryDivisionWizard(models.TransientModel):
                         moves_to_move += line_to_divide.move_id
                     else:
                         # On copie le mouvement pour le nouveau transfert
-                        line_to_divide.move_id.copy(
+                        new_move = line_to_divide.move_id.copy(
                             {'picking_id': new_picking.id,
                              'location_id': new_picking.location_id.id,
                              'location_dest_id': new_picking.location_dest_id.id,
@@ -48,6 +48,8 @@ class OFDeliveryDivisionWizard(models.TransientModel):
                              'product_uom_qty': line_to_divide.qty_to_divide,
                              'of_ordered_qty': line_to_divide.qty_to_divide,
                              'warehouse_id': self.picking_type_id.warehouse_id.id})
+                        # On marque le nouveau mouvement "à faire"
+                        new_move.action_confirm()
                         # On diminue les quantités du mouvement d'origine
                         line_to_divide.move_id.write(
                             {'product_uom_qty': initial_qty, 'of_ordered_qty': initial_qty})
