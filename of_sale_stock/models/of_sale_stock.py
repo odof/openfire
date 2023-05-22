@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from datetime import datetime
 
@@ -311,6 +312,28 @@ class StockPicking(models.Model):
             'res_id': wizard.id,
             'target': 'new',
             }
+
+    @api.multi
+    def action_additional_delivery(self):
+        self.ensure_one()
+
+        line_vals = []
+        for line in self.move_lines:
+            line_vals.append((0, 0, {'move_id': line.id}))
+
+        wizard = self.env['of.additional.delivery.wizard'].create({
+            'picking_id': self.id,
+            'line_ids': line_vals,
+            })
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': "Bon de livraison complémentaire",
+            'view_mode': 'form',
+            'res_model': 'of.additional.delivery.wizard',
+            'res_id': wizard.id,
+            'target': 'new',
+        }
 
     @api.depends('min_date')
     def _compute_of_min_week(self):

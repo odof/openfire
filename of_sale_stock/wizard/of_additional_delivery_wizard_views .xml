@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_additional_delivery_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.additional.delivery.wizard.view.form</field>
+        <field name="model">of.additional.delivery.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="line_ids" nolabel="1" colspan="4">
+                        <tree delete="false" create="false" editable="bottom">
+                            <field name="product_id" options="{'no_open': True}"/>
+                            <field name="qty"/>
+                        </tree>
+                    </field>
+                </group>
+                <footer>
+                    <button string="Créer" name="action_additional_delivery" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
