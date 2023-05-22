@@ -7,9 +7,9 @@ from odoo.exceptions import Warning
 
 class OFAdditionalDeliveryWizard(models.TransientModel):
     _name = 'of.additional.delivery.wizard'
-    _description = "Assistant de création de bon de transfert supplémentaire"
+    _description = "Assistant de création de bon de livraison complémentaire"
 
-    picking_id = fields.Many2one(comodel_name='stock.picking', string=u"Bon de transfert complémentaire")
+    picking_id = fields.Many2one(comodel_name='stock.picking', string=u"Bon de livraison d'originie")
     line_ids = fields.One2many(
         comodel_name='of.additional.delivery.wizard.line', inverse_name='wizard_id', string=u"Lignes à diviser")
 
@@ -22,7 +22,7 @@ class OFAdditionalDeliveryWizard(models.TransientModel):
         with self.env.norecompute():
             # On copie le Bon de transfert (sans les mouvements)
             new_picking = self.picking_id.copy(
-                {'move_lines': []})
+                {'move_lines': [], 'backorder_id': self.picking_id.id})
             new_picking.onchange_picking_type()
 
             # On met à jour les lignes du nouveau Bon de transfert
@@ -34,12 +34,12 @@ class OFAdditionalDeliveryWizard(models.TransientModel):
                     # On copie le mouvement pour le nouveau transfert avec les nouvelles qtés
                     line.move_id.copy(
                         {'picking_id': new_picking.id,
-                            'location_id': new_picking.location_id.id,
-                            'location_dest_id': new_picking.location_dest_id.id,
-                            'picking_type_id': new_picking.picking_type_id.id,
-                            'product_uom_qty': line.qty,
-                            'of_ordered_qty': line.qty})
-            new_picking.action_assign()
+                        'location_id': new_picking.location_id.id,
+                        'location_dest_id': new_picking.location_dest_id.id,
+                        'picking_type_id': new_picking.picking_type_id.id,
+                        'product_uom_qty': line.qty,
+                        'of_ordered_qty': line.qty,
+                        'state': 'draft'})
 
         self.recompute()
 

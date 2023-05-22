@@ -328,12 +328,12 @@ class StockPicking(models.Model):
 
         return {
             'type': 'ir.actions.act_window',
-            'name': "Bon de transfert supplémentaire",
+            'name': "Bon de livraison complémentaire",
             'view_mode': 'form',
             'res_model': 'of.additional.delivery.wizard',
             'res_id': wizard.id,
             'target': 'new',
-            }
+        }
 
     @api.depends('min_date')
     def _compute_of_min_week(self):
