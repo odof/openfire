@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import http, tools
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
+from odoo import http
 from odoo.http import request
 from odoo.exceptions import AccessError
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 from odoo.addons.website_portal.controllers.main import website_account
 
 
@@ -15,6 +19,8 @@ class WebsiteAccount(website_account):
             ('picking_type_id.warehouse_id.partner_id', '=', request.env.user.partner_id.id),
             ('state', 'not in', ('draft', 'cancel', 'done')),
             ('picking_type_id.code', '=', 'incoming'),
+            ('min_date', '>', (datetime.today() - relativedelta(months=6)).strftime(DEFAULT_SERVER_DATE_FORMAT)),
+            ('min_date', '<', (datetime.today() + relativedelta(months=6)).strftime(DEFAULT_SERVER_DATE_FORMAT)),
         ])
         values.update({
             'receipt_count': len(receipt_ids),
@@ -27,6 +33,8 @@ class WebsiteAccount(website_account):
             ('picking_type_id.warehouse_id.partner_id', '=', request.env.user.partner_id.id),
             ('state', 'not in', ('draft', 'cancel', 'done')),
             ('picking_type_id.code', '=', 'incoming'),
+            ('min_date', '>', (datetime.today() - relativedelta(months=6)).strftime(DEFAULT_SERVER_DATE_FORMAT)),
+            ('min_date', '<', (datetime.today() + relativedelta(months=6)).strftime(DEFAULT_SERVER_DATE_FORMAT)),
         ])
         values.update({
             'receipts': receipt_ids,
