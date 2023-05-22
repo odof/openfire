@@ -5,6 +5,7 @@ import re
 import base64
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError, ValidationError, RedirectWarning
 
 
 class OFCalculationHeatLoss(models.Model):
@@ -117,7 +118,17 @@ class OFCalculationHeatLoss(models.Model):
 
     @api.multi
     def button_compute_estimated_power(self):
+        errors = []
         for rec in self:
+            error = False
+            if rec.surface <= 0.0:
+                error = True
+                errors.append(u"La surface à chauffer (en m²) doit être supérieur a 0 pour le calcul %s." % rec.name)
+            if rec.height <= 0.0:
+                error = True
+                errors.append(u"La hauteur de plafond (en m) doit être supérieur a 0 pour le calcul %s ." % rec.name)
+            if error:
+                continue
             reference_temperature = rec.base_temperature_line_id.temperature
             estimated_power = rec.surface * rec.height * rec.construction_date_id.coefficient * (
                     rec.temperature - reference_temperature)
@@ -125,6 +136,8 @@ class OFCalculationHeatLoss(models.Model):
                 'estimated_power': estimated_power,
                 'estimated_power_text': "%s %s" % (estimated_power/1000, "kWatt/h"),
             })
+        if errors:
+            return self.env['of.popup.wizard'].popup_return(message=u"\n".join(errors), titre="Erreur(s)")
 
     @api.multi
     def button_quick_send(self):
