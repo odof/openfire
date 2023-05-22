@@ -14,6 +14,7 @@ class StockPicking(models.Model):
     of_validated_by_carrier = fields.Boolean(string=u"Validé par le transporteur")
     of_carrier_validation_date = fields.Datetime(string=u"Validé par le transporteur le")
     of_need_backorder = fields.Boolean(string=u"Créer le reliquat")
+    of_error_message = fields.Text(string=u"Message d'erreur")
 
     @api.model
     def validate_picking_from_carriers(self):
@@ -38,3 +39,10 @@ class StockPicking(models.Model):
                 continue
         if pickings_done:
             pickings_done.write({'of_validated_by_carrier': True})
+
+    @api.multi
+    def write(self, vals):
+        # Vider le message d'erreur si il y en a un
+        if 'of_error_message' not in vals and self.mapped('of_error_message'):
+            vals['of_error_message'] = False
+        return super(StockPicking, self).write(vals)

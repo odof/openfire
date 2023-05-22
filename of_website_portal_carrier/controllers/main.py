@@ -4,7 +4,7 @@
 from odoo import http, tools
 from odoo import fields
 from odoo.http import request
-from odoo.exceptions import AccessError
+from odoo.exceptions import AccessError, ValidationError, UserError
 from odoo.addons.website_portal.controllers.main import website_account
 
 
@@ -40,9 +40,18 @@ class WebsiteAccount(website_account):
             values = super(WebsiteAccount, self)._prepare_portal_layout_values()
             receipt = request.env['stock.picking'].browse([receipt_id])
             if 'modal' in kw:
-                action = receipt.sudo().do_new_transfer()
-                wizard = request.env[action['res_model']].browse(action['res_id'])
-                values.update({'wizard': wizard})
+                action = False
+                try:
+                    action = receipt.sudo().do_new_transfer()
+                except UserError as e:
+                    receipt.sudo().write({'of_error_message': u"Attention, pour réceptionner des articles identifiés "
+                                                              u"par N° de série, veuillez cocher la case Qté reçue."})
+                if action:  # validation works
+                    wizard = request.env[action['res_model']].browse(action['res_id'])
+                    values.update({'wizard': wizard})
+                else:  # error while validating, need to redirect
+                    values.update({'receipt': receipt})
+                    return request.redirect('/my/receipt/%i' % receipt_id)
             values.update({'receipt': receipt})
             return request.render('of_website_portal_carrier.of_website_portal_portal_my_receipt', values)
         return request.redirect('/my/receipts')
@@ -74,8 +83,13 @@ class WebsiteAccount(website_account):
         redirect = '/my/receipt/%s' % receipt_id
         attributes = []
         delay = request.env['ir.values'].sudo().get_default('website.config.settings', 'of_picking_rollback_delay')
+        action = False
         if not delay:
-            action = receipt.sudo().do_new_transfer()
+            try:
+                action = receipt.sudo().do_new_transfer()
+            except UserError as e:
+                receipt.sudo().write({'of_error_message': u"Attention, pour réceptionner des articles identifiés par N°"
+                                                          u" de série, veuillez cocher la case Qté reçue."})
         else:
             action = receipt.sudo().check_backorder()
             if not action:

@@ -268,6 +268,11 @@
                                     </t>
                                 </tbody>
                             </table>
+                            <tr t-if="receipt.of_error_message">
+                                <td>
+                                    <span style="color: red;" t-field="receipt.of_error_message"/>
+                                </td>
+                            </tr>
                             <div style="text-align: right;">
                                 <t t-if="receipt.state != 'done' and not receipt.of_carrier_validation_date">
                                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
