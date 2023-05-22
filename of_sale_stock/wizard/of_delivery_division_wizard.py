@@ -4,6 +4,7 @@ from odoo import api, fields, models
 from odoo.exceptions import Warning
 from odoo.tools.float_utils import float_is_zero
 
+
 class OFDeliveryDivisionWizard(models.TransientModel):
     _name = 'of.delivery.division.wizard'
     _description = "Assistant de division de bon de transfert"
@@ -12,6 +13,12 @@ class OFDeliveryDivisionWizard(models.TransientModel):
     picking_id = fields.Many2one(comodel_name='stock.picking', string=u"Bon de transfert à diviser")
     line_ids = fields.One2many(
         comodel_name='of.delivery.division.wizard.line', inverse_name='wizard_id', string=u"Lignes à diviser")
+    locked_lines = fields.Boolean(compute='_compute_locked_lines')
+
+    @api.depends('line_ids', 'line_ids.state')
+    def _compute_locked_lines(self):
+        for wiz in self:
+            wiz.locked_lines = any(line.state == 'assigned' for line in wiz.line_ids)
 
     @api.multi
     def action_delivery_division(self):
@@ -89,6 +96,7 @@ class OFDeliveryDivisionWizardLine(models.TransientModel):
     product_uom_qty = fields.Float(related='move_id.product_uom_qty', string=u"Quantité initiale", readonly=True)
     qty_to_divide = fields.Float(string=u"Quantité à diviser")
     qty_available = fields.Float(string=u"Stock disponible", compute='_compute_qty_available')
+    state = fields.Selection(related='move_id.state', readonly=True)
 
     @api.depends('wizard_id.picking_type_id')
     def _compute_qty_available(self):
