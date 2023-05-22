@@ -9,7 +9,8 @@
             <xpath expr="//group[@name='portals']" position="inside">
                 <label for="of_picking_rollback_delay"/>
                 <div>
-                    <field name="of_picking_rollback_delay"/> minutes après la validation par le transporteur
+                    <field name="of_picking_rollback_delay" class="oe_inline"/>
+                    <span>minutes après la validation par le transporteur</span>
                 </div>
             </xpath>
         </field>
