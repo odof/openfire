@@ -1,0 +1,496 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_calculation_heat_loss
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-05-23 15:57+0000\n"
+"PO-Revision-Date: 2023-05-23 15:57+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_calculation_heat_loss
+#: model:mail.template,body_html:of_calculation_heat_loss.email_template_calcul_deperdition
+msgid "\n"
+"<p>\n"
+"Bonjour ${object.partner_name},\n"
+"</p>\n"
+"\n"
+"<p>\n"
+"Veuillez trouver ci-joint le résultat du calcul de déperdition de chaleur.\n"
+"</p>\n"
+"\n"
+"<p>\n"
+"Cordialement,\n"
+"</p>\n"
+""
+msgstr "\n"
+"<p>\n"
+"Bonjour ${object.partner_name},\n"
+"</p>\n"
+"\n"
+"<p>\n"
+"Veuillez trouver ci-joint le résultat du calcul de déperdition de chaleur.\n"
+"</p>\n"
+"\n"
+"<p>\n"
+"Cordialement,\n"
+"</p>\n"
+""
+
+#. module: of_calculation_heat_loss
+#: model:mail.template,subject:of_calculation_heat_loss.email_template_calcul_deperdition
+msgid "${object.name} : Votre calcul de déperdition de chaleur"
+msgstr "${object.name} : Votre calcul de déperdition de chaleur"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_form_view
+msgid "<i class=\"oe_grey\">\n"
+"                        <i class=\"fa fa-warning of_ws\"/>\n"
+"                        Le calcul de puissance est une estimation. OpenFire ne peut être tenu responsable des conséquences de son utilisation\n"
+"                    </i>"
+msgstr "<i class=\"oe_grey\">\n"
+"                        <i class=\"fa fa-warning of_ws\"/>\n"
+"                        Le calcul de puissance est une estimation. OpenFire ne peut être tenu responsable des conséquences de son utilisation\n"
+"                    </i>"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_report_document
+msgid "<i style=\"color: grey\">\n"
+"                            <i class=\"fa fa-warning of_ws\"/>\n"
+"                            Le calcul de puissance est une estimation. OpenFire ne peut être tenu responsable des conséquences de son utilisation\n"
+"                        </i>"
+msgstr "<i style=\"color: grey\">\n"
+"                            <i class=\"fa fa-warning of_ws\"/>\n"
+"                            Le calcul de puissance est une estimation. OpenFire ne peut être tenu responsable des conséquences de son utilisation\n"
+"                        </i>"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_report_document
+msgid "<strong>\n"
+"                                Déperdition de chaleur\n"
+"                            </strong>"
+msgstr "<strong>\n"
+"                                Déperdition de chaleur\n"
+"                            </strong>"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_form_view
+msgid "Adresse"
+msgstr "Adresse"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_line_altitude_id
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_altitude_id
+msgid "Altitude"
+msgstr "Altitude"
+
+#. module: of_calculation_heat_loss
+#: model:ir.actions.act_window,name:of_calculation_heat_loss.of_calculation_altitude_action
+#: model:ir.model,name:of_calculation_heat_loss.model_of_calculation_altitude
+#: model:ir.ui.menu,name:of_calculation_heat_loss.of_calculation_altitude_menu
+msgid "Altitude du site"
+msgstr "Altitude du site"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_available_altitude_ids
+msgid "Altitudes disponibles"
+msgstr "Altitudes disponibles"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_form_view
+msgid "Appareils compatibles"
+msgstr "Appareils compatibles"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_product_ids
+msgid "Articles compatibles"
+msgstr "Articles compatibles"
+
+#. module: of_calculation_heat_loss
+#: model:ir.actions.act_window,name:of_calculation_heat_loss.of_calculation_heat_loss_action
+#: model:ir.model,name:of_calculation_heat_loss.model_of_calculation_heat_loss
+#: model:ir.ui.menu,name:of_calculation_heat_loss.of_calculation_heat_loss_menu
+msgid "Calcul de déperdition de chaleur"
+msgstr "Calcul de déperdition de chaleur"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_report_document
+msgid "Calcul de la puissance idéale pour un appareil adapté à votre habitation"
+msgstr "Calcul de la puissance idéale pour un appareil adapté à votre habitation"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_form_view
+msgid "Calculer"
+msgstr "Calculer"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_form_view
+msgid "Caractéristiques"
+msgstr "Caractéristiques"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_form_view
+msgid "City"
+msgstr "Ville"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_department_code
+msgid "Code"
+msgstr "Code"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_partner_zip
+msgid "Code postal du contact"
+msgstr "Code postal du contact"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_construction_date_coefficient
+msgid "Coefficient G"
+msgstr "Coefficient G"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_partner_id
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_form_view
+msgid "Contact"
+msgstr "Contact"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_form_view
+msgid "Country"
+msgstr "Pays"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_altitude_create_uid
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_create_uid
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_line_create_uid
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_construction_date_create_uid
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_department_create_uid
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_altitude_create_date
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_create_date
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_line_create_date
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_construction_date_create_date
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_department_create_date
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: of_calculation_heat_loss
+#: model:ir.actions.act_window,name:of_calculation_heat_loss.of_calculation_construction_date_action
+#: model:ir.model,name:of_calculation_heat_loss.model_of_calculation_construction_date
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_construction_date_id
+#: model:ir.ui.menu,name:of_calculation_heat_loss.of_calculation_construction_date_menu
+msgid "Date de construction"
+msgstr "Date de construction"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_report_document
+msgid "Date de construction :"
+msgstr "Date de construction :"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_order_id
+msgid "Devis / Bon de commande"
+msgstr "Devis / Bon de commande"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_altitude_display_name
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_display_name
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_line_display_name
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_construction_date_display_name
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_department_display_name
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_calculation_heat_loss
+#: model:ir.actions.act_window,name:of_calculation_heat_loss.of_calculation_department_action
+#: model:ir.model,name:of_calculation_heat_loss.model_of_calculation_department
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_department_id
+#: model:ir.ui.menu,name:of_calculation_heat_loss.of_calculation_department_menu
+msgid "Département"
+msgstr "Département"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.menu,name:of_calculation_heat_loss.of_calculation_heat_loss_configuration_menu
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_form_view
+msgid "Déperdition de chaleur"
+msgstr "Déperdition de chaleur"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_height
+msgid "Hauteur de plafond (en m)"
+msgstr "Hauteur de plafond (en m)"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_report_document
+msgid "Hauteur sous plafond (en m) :"
+msgstr "Hauteur sous plafond (en m) :"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_altitude_id
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_id
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_line_id
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_construction_date_id
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_department_id
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_id
+msgid "ID"
+msgstr "ID"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_altitude___last_update
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature___last_update
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_line___last_update
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_construction_date___last_update
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_department___last_update
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss___last_update
+msgid "Last Modified on"
+msgstr "Dernière Modification le"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_altitude_write_uid
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_line_write_uid
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_write_uid
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_construction_date_write_uid
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_department_write_uid
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_altitude_write_date
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_line_write_date
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_write_date
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_construction_date_write_date
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_department_write_date
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model,name:of_calculation_heat_loss.model_crm_lead
+msgid "Lead/Opportunity"
+msgstr "Piste/opportunité"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_form_view
+msgid "Liens commerciaux"
+msgstr "Liens commerciaux"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_base_temperature_line_id
+msgid "Ligne de température"
+msgstr "Ligne de température"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_line_ids
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_base_temperature_form_view
+msgid "Lignes de température"
+msgstr "Lignes de température"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_altitude_name
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_line_name
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_name
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_construction_date_name
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_department_name
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_name
+msgid "Nom"
+msgstr "Nom"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_partner_name
+msgid "Nom du contact"
+msgstr "Nom du contact"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_number
+msgid "Numéro"
+msgstr "Numéro"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_lead_id
+msgid "Opportunité"
+msgstr "Opportunité"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_form_view
+msgid "Outil de simulation - Estimation de la puissance requise de l'appareil"
+msgstr "Outil de simulation - Estimation de la puissance requise de l'appareil"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model,name:of_calculation_heat_loss.model_of_parc_installe
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_parc_installe_id
+msgid "Parc installé"
+msgstr "Parc installé"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_partner_country_id
+msgid "Pays"
+msgstr "Pays"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model,name:of_calculation_heat_loss.model_product_template
+msgid "Product Template"
+msgstr "Modèle d'article"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_estimated_power
+msgid "Puissance estimée de l’appareil (nombre)"
+msgstr "Puissance estimée de l’appareil (nombre)"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_estimated_power_text
+msgid "Puissance estimée de l’appareil (texte)"
+msgstr "Puissance estimée de l’appareil (texte)"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_product_product_of_puissance_nom_flo
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_product_template_of_puissance_nom_flo
+msgid "Puissance nominale (nombre flottant)"
+msgstr "Puissance nominale (nombre flottant)"
+
+#. module: of_calculation_heat_loss
+#: model:ir.actions.report.xml,name:of_calculation_heat_loss.of_report_calculation_heat_loss
+msgid "Rapport de déperdition de chaleur"
+msgstr "Rapport de déperdition de chaleur"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_form_view
+msgid "Recevoir par email"
+msgstr "Recevoir par email"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_partner_street
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_partner_street2
+msgid "Rue du contact"
+msgstr "Rue du contact"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_report_document
+msgid "Récapitulatif de vos données"
+msgstr "Récapitulatif de vos données"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model,name:of_calculation_heat_loss.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_altitude_sequence
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_line_sequence
+msgid "Sequence"
+msgstr "Séquence"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_line_base_temperature_id
+msgid "Site"
+msgstr "Site"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_form_view
+msgid "State"
+msgstr "État"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_form_view
+msgid "Street 2..."
+msgstr "Rue 2..."
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_form_view
+msgid "Street..."
+msgstr "Rue..."
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,help:of_calculation_heat_loss.field_of_calculation_heat_loss_surface
+msgid "Surface de la ou des pièces à chauffer"
+msgstr "Surface de la ou des pièces à chauffer"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_surface
+msgid "Surface à chauffer (en m²)"
+msgstr "Surface à chauffer (en m²)"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_report_document
+msgid "Surface à chauffer (en m²) :"
+msgstr "Surface à chauffer (en m²) :"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_sequence
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_construction_date_sequence
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_sequence
+msgid "Séquence"
+msgstr "Séquence"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_line_temperature
+msgid "Température"
+msgstr "Température"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_temperature
+msgid "Température de confort désirée"
+msgstr "Température de confort désirée"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_report_document
+msgid "Température de confort désirée :"
+msgstr "Température de confort désirée :"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model,name:of_calculation_heat_loss.model_of_calculation_base_temperature_line
+msgid "Température en fonction de l'altitude pour un site"
+msgstr "Température en fonction de l'altitude pour un site"
+
+#. module: of_calculation_heat_loss
+#: model:ir.actions.act_window,name:of_calculation_heat_loss.of_calculation_base_temperature_action
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_temperature
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_department_base_temperature_id
+#: model:ir.ui.menu,name:of_calculation_heat_loss.of_calculation_base_temperature_menu
+msgid "Température extérieure de base"
+msgstr "Température extérieure de base"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model,name:of_calculation_heat_loss.model_of_calculation_base_temperature
+msgid "Température extérieure de base au niveau de la mer"
+msgstr "Température extérieure de base au niveau de la mer"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,help:of_calculation_heat_loss.field_of_calculation_base_temperature_line_ids
+msgid "Température extérieure de base en fonction de l'altitude"
+msgstr "Température extérieure de base en fonction de l'altitude"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,help:of_calculation_heat_loss.field_of_calculation_base_temperature_temperature
+#: model:ir.model.fields,help:of_calculation_heat_loss.field_of_calculation_department_base_temperature_id
+msgid "Température extérieure de base ramenée au niveau de la mer"
+msgstr "Température extérieure de base ramenée au niveau de la mer"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_partner_city
+msgid "Ville du contact"
+msgstr "Ville du contact"
+
+#. module: of_calculation_heat_loss
+#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_form_view
+msgid "ZIP"
+msgstr "Code postal"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_partner_state_id
+msgid "État"
+msgstr "État"
+
