@@ -1,39 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="of_sale_planning_sale_order_form_view" model="ir.ui.view">
-        <field name="name">of.sale.budget.sale.order.form.view</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="of_sale_planning.of_sale_planning_sale_order_form_view"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='of_duration_total']/.." position="after">
-                <field name="of_hour_worksite_id"/>
-            </xpath>
-        </field>
-    </record>
-
-    <record id="of_sale_order_view_order_form" model="ir.ui.view">
-        <field name="name">of.sale.order.view.order.form</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//notebook" position="inside">
-                <page string="Budget">
-                    <button icon="fa-refresh" class="btn btn-lg oe_link" name="action_of_budget_ids" type="object" style ="position: absolute; left: 125px; margin-top: 22px;"/>
-                    <group string="Budget">
-                        <field name="of_budget_ids" mode="tree" options="{'reload_on_button': true}" nolabel="1" context="{'default_order_id': active_id}"/>
-                    </group>
-                    <group string="Frais indirects">
-                        <field name="of_indirect_cost_ids" mode="tree" options="{'reload_on_button': true}" nolabel="1" context="{'default_order_id': active_id}"/>
-                    </group>
-                    <group string="Frais de main d'oeuvre">
-                        <field name="of_labor_cost_ids" mode="tree" options="{'reload_on_button': true}" nolabel="1" context="{'default_order_id': active_id}"/>
-                    </group>
-                </page>
-            </xpath>
-        </field>
-    </record>
-
     <record id="of_sale_order_budget_view_tree" model="ir.ui.view">
         <field name="name">of.sale.order.budget.view.tree</field>
         <field name="model">of.sale.order.budget</field>
@@ -213,29 +180,6 @@
         <field name="inherit_id" ref="of_sale_planning.of_sale_planning_product_template_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='of_duration_per_unit']/.." position="after">
-                <field name="of_hour_worksite_id"/>
-            </xpath>
-        </field>
-    </record>
-
-    <record id="of_sale_margin_sale_order_line" model="ir.ui.view">
-        <field name="name">of.sale.budget.sale.order.line</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="of_sale.of_sale_margin_sale_order_line"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="after">
-                <field name="of_labor_cost"/>
-                <field name="of_total_labor_cost"/>
-            </xpath>
-        </field>
-    </record>
-
-    <record id="of_sale_order_layout_category_view_form" model="ir.ui.view">
-        <field name="name">of.sale.order.layout.category.view.form</field>
-        <field name="model">of.sale.order.layout.category</field>
-        <field name="inherit_id" ref="of_sale_planning.view_of_sale_order_layout_category_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='of_duration_per_unit']" position="after">
                 <field name="of_hour_worksite_id"/>
             </xpath>
         </field>
