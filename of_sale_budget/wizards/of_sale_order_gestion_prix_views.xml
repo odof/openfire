@@ -16,6 +16,8 @@
                 <field name="cost_subcontracted_service"/>
                 <field name="duration"/>
                 <field name="labor_cost"/>
+                <field name="theorical_price"/>
+                <field name="theorical_coef"/>
             </xpath>
             <xpath expr="//field[@name='layout_category_ids']//field[@name='margin']" position="replace">
                 <field name="budget_margin" string="Marge HT"/>

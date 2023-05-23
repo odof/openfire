@@ -48,6 +48,38 @@ class OFSaleOrderBudget(models.Model):
         for budget in self:
             budget.real_coeff = budget.real_price / budget.cost if budget.cost else 1
 
+    @api.model
+    def get_purchase_budget_vals(self, order):
+        return {
+            'name': 'purchase',
+            'order_id': order.id,
+            'margin_coeff': self.env['ir.values'].get_default('sale.config.settings', 'of_budget_purchase'),
+        }
+
+    @api.model
+    def get_outsourcing_budget_vals(self, order):
+        return {
+            'name': 'outsourcing',
+            'order_id': order.id,
+            'margin_coeff': self.env['ir.values'].get_default('sale.config.settings', 'of_budget_outsourcing'),
+        }
+
+    @api.model
+    def get_indirect_cost_budget_vals(self, order):
+        return {
+            'name': 'indirect_cost',
+            'order_id': order.id,
+            'margin_coeff': self.env['ir.values'].get_default('sale.config.settings', 'of_budget_indirect_cost'),
+        }
+
+    @api.model
+    def get_labor_cost_budget_vals(self, order):
+        return {
+            'name': 'labor_cost',
+            'order_id': order.id,
+            'margin_coeff': self.env['ir.values'].get_default('sale.config.settings', 'of_budget_labor_cost'),
+        }
+
 
 class OFSaleOrderIndirectCost(models.Model):
     _name = 'of.sale.order.indirect.cost'
@@ -172,16 +204,16 @@ class SaleOrder(models.Model):
 
         # On crée les lignes de budget si elles ne sont pas déjà créées
         if 'purchase' not in budget_lines_type:
-            budget_line = budget_obj.create({'name': 'purchase', 'order_id': self.id})
+            budget_line = budget_obj.create(budget_obj.get_purchase_budget_vals(self))
             budget_lines += budget_line
         if 'outsourcing' not in budget_lines_type:
-            budget_line = budget_obj.create({'name': 'outsourcing', 'order_id': self.id})
+            budget_line = budget_obj.create(budget_obj.get_outsourcing_budget_vals(self))
             budget_lines += budget_line
         if 'indirect_cost' not in budget_lines_type:
-            budget_line = budget_obj.create({'name': 'indirect_cost', 'order_id': self.id})
+            budget_line = budget_obj.create(budget_obj.get_indirect_cost_budget_vals(self))
             budget_lines += budget_line
         if 'labor_cost' not in budget_lines_type:
-            budget_line = budget_obj.create({'name': 'labor_cost', 'order_id': self.id})
+            budget_line = budget_obj.create(budget_obj.get_labor_cost_budget_vals(self))
             budget_lines += budget_line
 
         # On met à jour les valeurs de chaque ligne
@@ -248,6 +280,12 @@ class SaleOrderLine(models.Model):
         string=u"Coût main d'oeuvre", digits=dp.get_precision('Product Price'), compute='_compute_of_labor_cost')
     of_total_labor_cost = fields.Float(
         string=u"Total coût", digits=dp.get_precision('Product Price'), compute='_compute_of_labor_cost')
+    of_theorical_price = fields.Float(
+        string=u"Prix de vente théorique", digits=dp.get_precision('Product Price'),
+        compute='_compute_of_theorical_prices', store=True)
+    of_theorical_coef = fields.Float(
+        string=u"Coefficient total théorique", digits=dp.get_precision('Product Price'),
+        compute='_compute_of_theorical_prices', store=True)
 
     @api.depends('of_hour_worksite_id', 'of_hour_worksite_id.hourly_cost',
                  'of_duration_total', 'purchase_price', 'product_uom_qty')
@@ -255,6 +293,29 @@ class SaleOrderLine(models.Model):
         for line in self:
             line.of_labor_cost = line.of_hour_worksite_id.hourly_cost * line.of_duration_total
             line.of_total_labor_cost = line.of_labor_cost + (line.purchase_price * line.product_uom_qty)
+
+    @api.depends('of_hour_worksite_id', 'of_hour_worksite_id.hourly_cost',
+                 'of_duration', 'purchase_price', 'product_uom_qty',
+                 'order_id.of_budget_ids', 'order_id.of_budget_ids.margin_coeff')
+    def _compute_of_theorical_prices(self):
+        for line in self:
+            labor_cost = line.of_hour_worksite_id.hourly_cost * line.of_duration
+            total_cost = labor_cost + (line.purchase_price * line.product_uom_qty)
+            budget_lines = line.order_id.of_budget_ids
+            # Si ligne en sous-traitance : [Qté * purchase_price * Coeff sous-traitance]
+            if line.of_product_type == 'service' and line.of_subcontracted_service:
+                outsourcing_budget_line = budget_lines.filtered(lambda line: line.name == 'outsourcing')
+                line.of_theorical_price = \
+                    line.product_uom_qty * line.purchase_price * outsourcing_budget_line.margin_coeff
+            # Sinon : [Qté * purchase_price * Coeff marchandise] + [Coût main d'oeuvre * Coeff main d’oeuvre]
+            else:
+                purchase_budget_line = budget_lines.filtered(lambda line: line.name == 'purchase')
+                labor_cost_budget_line = budget_lines.filtered(lambda line: line.name == 'labor_cost')
+                purchase = line.product_uom_qty * line.purchase_price * purchase_budget_line.margin_coeff
+                labor = labor_cost * labor_cost_budget_line.margin_coeff
+                line.of_theorical_price = purchase + labor
+            # Coefficient total théorique = [Prix de vente théorique] / [coût total]
+            line.of_theorical_coef = (total_cost and line.of_theorical_price / total_cost) or 1.0
 
     @api.multi
     @api.onchange('product_id')
@@ -284,6 +345,12 @@ class OFSaleOrderLayoutCategory(models.Model):
         string=u"Total coût", digits=dp.get_precision('Product Price'), compute='_compute_labor_cost')
     margin = fields.Float(string=u"Marge HT", compute='_compute_margin')
     pc_margin = fields.Float(string=u"% Marge", compute='_compute_margin')
+    theorical_price = fields.Float(
+        string=u"Prix de vente ht théorique", digits=dp.get_precision('Product Price'),
+        compute='_compute_theorical_prices')
+    theorical_coef = fields.Float(
+        string=u"Coefficient total théorique", digits=dp.get_precision('Product Price'),
+        compute='_compute_theorical_prices')
 
     @api.depends('order_line_ids')
     def _compute_labor_cost(self):
@@ -297,6 +364,17 @@ class OFSaleOrderLayoutCategory(models.Model):
             layout_category.margin = layout_category.prix_vente - layout_category.total_labor_cost
             layout_category.pc_margin = 100 * (1 - layout_category.total_labor_cost / layout_category.prix_vente) \
                 if layout_category.prix_vente else - layout_category.total_labor_cost
+
+    @api.depends('order_line_without_child_ids', 'order_id')
+    def _compute_theorical_prices(self):
+        for category in self:
+            cost = 0.0
+            price = 0.0
+            for line in category.order_line_ids:
+                cost += line.of_total_labor_cost
+                price += line.of_theorical_price
+            category.theorical_price = price
+            category.theorical_coef = cost and price / cost or 1.0
 
 
 class ProductTemplate(models.Model):

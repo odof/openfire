@@ -7,7 +7,8 @@ from odoo import models, fields, api
 class GestionPrix(models.TransientModel):
     _inherit = 'of.sale.order.gestion.prix'
 
-    cost_prorata = fields.Selection(selection_add=[('total_cost', u"Coût total")])
+    cost_prorata = fields.Selection(
+        selection_add=[('total_cost', u"Coût total"), ('theorical_price', u"Prix théorique")])
 
     budget_init_margin = fields.Float(string=u"Marge initiale (budget)", compute='_compute_budget_margin')
     budget_init_margin_pc = fields.Float(string=u"% Marge initial (budget)", compute='_compute_budget_margin')
@@ -48,6 +49,9 @@ class GestionPrixLine(models.TransientModel):
         if cost_prorata == 'total_cost':
             return order_line.of_total_labor_cost / order_line.product_uom_qty \
                 if order_line.product_uom_qty and order_line.of_total_labor_cost else 1.0
+        elif cost_prorata == 'theorical_price':
+            return order_line.of_theorical_price / order_line.product_uom_qty \
+                if order_line.product_uom_qty and order_line.of_theorical_price else 1.0
         else:
             return super(GestionPrixLine, self).get_base_amount(order_line, cost_prorata, all_zero)
 
@@ -59,6 +63,10 @@ class GestionPrixLayoutCategory(models.TransientModel):
     cost_purchase = fields.Float(string=u"Coût achats", compute='_compute_price')
     cost_subcontracted_service = fields.Float(string=u"Coût sous-traitance", compute='_compute_price')
     labor_cost = fields.Float(string=u"Coût main d'oeuvre", compute='_compute_price')
+    theorical_price = fields.Float(
+        string=u"Prix de vente ht théorique", compute='_compute_price')
+    theorical_coef = fields.Float(
+        string=u"Coefficient total théorique", compute='_compute_price')
 
     budget_margin = fields.Float(string=u"Marge HT (budget)", compute='_compute_budget_margin')
     budget_margin_pc = fields.Float(string=u"% Marge (budget)", compute='_compute_budget_margin')
@@ -80,6 +88,10 @@ class GestionPrixLayoutCategory(models.TransientModel):
             categ.cost_subcontracted_service = sum(
                 subcontracted_service_lines.mapped(lambda l: l.product_uom_qty * l.purchase_price))
             categ.labor_cost = sum(order_lines.mapped('of_labor_cost'))
+            theorical_price = sum(order_lines.mapped('of_theorical_price'))
+            total_cost = sum(order_lines.mapped('of_total_labor_cost'))
+            categ.theorical_price = theorical_price
+            categ.theorical_coef = total_cost and theorical_price / total_cost or 1.0
 
     @api.depends('cost', 'labor_cost', 'simulated_price_subtotal')
     def _compute_budget_margin(self):
