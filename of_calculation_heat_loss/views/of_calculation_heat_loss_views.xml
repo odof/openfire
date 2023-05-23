@@ -17,32 +17,38 @@
                     </h1>
                     <h2>Outil de simulation - Estimation de la puissance requise de l'appareil</h2>
                     <group name="contact" string="Contact">
-                        <field name="partner_id" groups="!base.group_portal"/>
-                        <field name="partner_name"/>
-                        <label for="partner_street" string="Adresse"/>
-                        <div class="o_address_format">
-                            <field name="partner_street" placeholder="Street..." class="o_address_street"/>
-                            <field name="partner_street2" placeholder="Street 2..." class="o_address_street"/>
-                            <field name="partner_city" placeholder="City" class="o_address_city"/>
-                            <field name="partner_state_id" class="o_address_state" placeholder="State" options="{'no_open': True}" context="{'country_id': country_id, 'zip': zip}"/>
-                            <field name="partner_zip" placeholder="ZIP" class="o_address_zip"/>
-                            <field name="partner_country_id" placeholder="Country" class="o_address_country" options="{'no_open': True, 'no_create': True}"/>
-                        </div>
-                        <field name="department_id"/>
-                        <field name="available_altitude_ids" widget="many2many_tags" invisible="1"/>
-                        <field name="altitude_id" domain="[('id', 'in', available_altitude_ids and available_altitude_ids[0] and available_altitude_ids[0][2] or False)]"/>
-                        <field name="base_temperature_line_id"/>
+                        <group>
+                            <field name="partner_id" groups="!base.group_portal"/>
+                            <field name="partner_name"/>
+                            <label for="partner_street" string="Adresse"/>
+                            <div class="o_address_format">
+                                <field name="partner_street" placeholder="Street..." class="o_address_street"/>
+                                <field name="partner_street2" placeholder="Street 2..." class="o_address_street"/>
+                                <field name="partner_city" placeholder="City" class="o_address_city"/>
+                                <field name="partner_state_id" class="o_address_state" placeholder="State" options="{'no_open': True}" context="{'country_id': country_id, 'zip': zip}"/>
+                                <field name="partner_zip" placeholder="ZIP" class="o_address_zip"/>
+                                <field name="partner_country_id" placeholder="Country" class="o_address_country" options="{'no_open': True, 'no_create': True}"/>
+                            </div>
+                            <field name="department_id"/>
+                            <field name="available_altitude_ids" widget="many2many_tags" invisible="1"/>
+                            <field name="altitude_id" domain="[('id', 'in', available_altitude_ids and available_altitude_ids[0] and available_altitude_ids[0][2] or False)]"/>
+                            <field name="base_temperature_line_id"/>
+                        </group>
                     </group>
                     <group name="specifications" string="Caractéristiques">
-                        <field name="surface"/>
-                        <field name="height"/>
-                        <field name="construction_date_id" options="{'no_create': True, 'no_open': True, 'no_edit': True}"/>
-                        <field name="temperature"/>
+                        <group>
+                            <field name="surface"/>
+                            <field name="height"/>
+                            <field name="construction_date_id" options="{'no_create': True, 'no_open': True, 'no_edit': True}"/>
+                            <field name="temperature"/>
+                        </group>
                     </group>
                     <group name="commercial" string="Liens commerciaux">
-                        <field name="lead_id" context="{'partner_prio_id': partner_id}"/>
-                        <field name="order_id" context="{'partner_prio_id': partner_id}"/>
-                        <field name="parc_installe_id" context="{'partner_prio_id': partner_id}"/>
+                        <group>
+                            <field name="lead_id" context="{'partner_prio_id': partner_id}"/>
+                            <field name="order_id" context="{'partner_prio_id': partner_id}"/>
+                            <field name="parc_installe_id" context="{'partner_prio_id': partner_id}"/>
+                        </group>
                     </group>
                     <group>
                         <group class="oe_right" style="width: 30% !important;">
