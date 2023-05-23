@@ -1,26 +1,16 @@
-# -*- coding: utf-8 -*-
 {
-    'name': u"OpenFire / Dates sur Commandes de Vente",
-    'version': "10.0.2.0.0",
+    'name': "OpenFire / Dates on Sale Orders",
+    'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
     'author': "OpenFire",
-    'website': "www.openfire.fr",
+    'website': "https://www.openfire.fr",
     'category': "OpenFire",
-    'description': u"""
-Module Dates sur Commandes de Vente OpenFire
-============================================
-
-Ce module surcharge le module standard Dates sur Commandes de Vente
-""",
     'depends': [
-        'sale_order_dates',
-        'of_sale_stock',
+        'of_sale_report_setting',
     ],
     'data': [
         'reports/sale_report_templates.xml',
-        'views/sale_views.xml',
-        'wizards/sale_set_printing_params_view.xml',
+        'views/res_config_settings_views.xml',
+        'views/sale_order_views.xml',
     ],
-    'installable': True,
-    'application': False,
-    'auto_install': True,
 }
