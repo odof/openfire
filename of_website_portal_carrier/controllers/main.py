@@ -14,47 +14,54 @@ class WebsiteAccount(website_account):
 
     def _prepare_portal_layout_values(self):
         values = super(WebsiteAccount, self)._prepare_portal_layout_values()
-        receipt_ids = request.env['stock.picking'].search([
-            ('picking_type_id.warehouse_id.partner_id', '=', request.env.user.partner_id.id),
-            ('state', 'not in', ('draft', 'cancel', 'done')),
-            ('picking_type_id.code', '=', 'incoming'),
-            ('min_date', '>', (datetime.today() - relativedelta(months=2)).strftime(DEFAULT_SERVER_DATE_FORMAT)),
-            ('min_date', '<', (datetime.today() + relativedelta(months=2)).strftime(DEFAULT_SERVER_DATE_FORMAT)),
-        ])
-        values.update({
-            'receipt_count': len(receipt_ids),
-        })
+        if request.env.user.has_group('of_website_portal_carrier.group_of_carrier_portal'):
+            receipt_ids = request.env['stock.picking'].search([
+                ('picking_type_id.warehouse_id.partner_id', '=', request.env.user.partner_id.id),
+                ('state', 'not in', ('draft', 'cancel', 'done')),
+                ('picking_type_id.code', '=', 'incoming'),
+                ('min_date', '>', (datetime.today() - relativedelta(months=2)).strftime(DEFAULT_SERVER_DATE_FORMAT)),
+                ('min_date', '<', (datetime.today() + relativedelta(months=2)).strftime(DEFAULT_SERVER_DATE_FORMAT)),
+            ])
+            values.update({
+                'receipt_count': len(receipt_ids),
+            })
         return values
 
     @http.route(['/my/receipts'], type='http', auth='user', website=True)
     def portal_my_receipts(self):
-        values = self._prepare_portal_layout_values()
-        receipt_ids = request.env['stock.picking'].search([
-            ('picking_type_id.warehouse_id.partner_id', '=', request.env.user.partner_id.id),
-            ('state', 'not in', ('draft', 'cancel', 'done')),
-            ('picking_type_id.code', '=', 'incoming'),
-            ('min_date', '>', (datetime.today() - relativedelta(months=2)).strftime(DEFAULT_SERVER_DATE_FORMAT)),
-            ('min_date', '<', (datetime.today() + relativedelta(months=2)).strftime(DEFAULT_SERVER_DATE_FORMAT)),
-        ])
-        values.update({
-            'receipts': receipt_ids,
-        })
-        return request.render('of_website_portal_carrier.of_website_portal_portal_my_receipts', values)
+        if request.env.user.has_group('of_website_portal_carrier.group_of_carrier_portal'):
+            values = self._prepare_portal_layout_values()
+            receipt_ids = request.env['stock.picking'].search([
+                ('picking_type_id.warehouse_id.partner_id', '=', request.env.user.partner_id.id),
+                ('state', 'not in', ('draft', 'cancel', 'done')),
+                ('picking_type_id.code', '=', 'incoming'),
+                ('min_date', '>', (datetime.today() - relativedelta(months=2)).strftime(DEFAULT_SERVER_DATE_FORMAT)),
+                ('min_date', '<', (datetime.today() + relativedelta(months=2)).strftime(DEFAULT_SERVER_DATE_FORMAT)),
+            ])
+            values.update({
+                'receipts': receipt_ids,
+            })
+            return request.render('of_website_portal_carrier.of_website_portal_portal_my_receipts', values)
+        else:
+            return request.redirect('/my/home')
 
     @http.route(['/my/receipt/<int:receipt_id>'], type='http', auth='user', website=True)
     def portal_my_receipt(self, receipt_id=None, **kw):
-        if receipt_id:
-            values = super(WebsiteAccount, self)._prepare_portal_layout_values()
-            receipt = request.env['stock.picking'].search([('id', '=', receipt_id)])
-            if receipt:
-                receipt = receipt.sudo()
-                if 'modal' in kw:
-                    action = receipt.do_new_transfer()
-                    wizard = request.env[action['res_model']].browse(action['res_id'])
-                    values.update({'wizard': wizard})
-                values.update({'receipt': receipt})
-                return request.render('of_website_portal_carrier.of_website_portal_portal_my_receipt', values)
-        return request.redirect('/my/receipts')
+        if request.env.user.has_group('of_website_portal_carrier.group_of_carrier_portal'):
+            if receipt_id:
+                values = super(WebsiteAccount, self)._prepare_portal_layout_values()
+                receipt = request.env['stock.picking'].search([('id', '=', receipt_id)])
+                if receipt:
+                    receipt = receipt.sudo()
+                    if 'modal' in kw:
+                        action = receipt.do_new_transfer()
+                        wizard = request.env[action['res_model']].browse(action['res_id'])
+                        values.update({'wizard': wizard})
+                    values.update({'receipt': receipt})
+                    return request.render('of_website_portal_carrier.of_website_portal_portal_my_receipt', values)
+            return request.redirect('/my/receipts')
+        else:
+            return request.redirect('/my/home')
 
     @http.route(['/my/receipt/<int:receipt_id>/validate'],
                 type='http', auth='user', methods=['POST'], website=True, csrf=False)
