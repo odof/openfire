@@ -8,7 +8,7 @@
         </xpath>
         <xpath expr="//div[@name='technical_visit_information']" position="before">
             <div t-if="pdf_requested_week and doc.of_requested_week" name="requested_week"
-                 style="float: left; padding-right: 10px;">
+                    style="float: left; padding-right: 10px;">
                 <strong>Requested week:</strong>
                 <p class="m-0" t-field="doc.of_requested_week"/>
             </div>
