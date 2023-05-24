@@ -6,7 +6,6 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import http
 from odoo.http import request
-from odoo.exceptions import AccessError
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 from odoo.addons.website_portal.controllers.main import website_account
 
@@ -19,13 +18,14 @@ class WebsiteAccount(website_account):
             ('picking_type_id.warehouse_id.partner_id', '=', request.env.user.partner_id.id),
             ('state', 'not in', ('draft', 'cancel', 'done')),
             ('picking_type_id.code', '=', 'incoming'),
-            ('min_date', '>', (datetime.today() - relativedelta(months=6)).strftime(DEFAULT_SERVER_DATE_FORMAT)),
-            ('min_date', '<', (datetime.today() + relativedelta(months=6)).strftime(DEFAULT_SERVER_DATE_FORMAT)),
+            ('min_date', '>', (datetime.today() - relativedelta(months=2)).strftime(DEFAULT_SERVER_DATE_FORMAT)),
+            ('min_date', '<', (datetime.today() + relativedelta(months=2)).strftime(DEFAULT_SERVER_DATE_FORMAT)),
         ])
         values.update({
             'receipt_count': len(receipt_ids),
         })
         return values
+
     @http.route(['/my/receipts'], type='http', auth='user', website=True)
     def portal_my_receipts(self):
         values = self._prepare_portal_layout_values()
@@ -33,8 +33,8 @@ class WebsiteAccount(website_account):
             ('picking_type_id.warehouse_id.partner_id', '=', request.env.user.partner_id.id),
             ('state', 'not in', ('draft', 'cancel', 'done')),
             ('picking_type_id.code', '=', 'incoming'),
-            ('min_date', '>', (datetime.today() - relativedelta(months=6)).strftime(DEFAULT_SERVER_DATE_FORMAT)),
-            ('min_date', '<', (datetime.today() + relativedelta(months=6)).strftime(DEFAULT_SERVER_DATE_FORMAT)),
+            ('min_date', '>', (datetime.today() - relativedelta(months=2)).strftime(DEFAULT_SERVER_DATE_FORMAT)),
+            ('min_date', '<', (datetime.today() + relativedelta(months=2)).strftime(DEFAULT_SERVER_DATE_FORMAT)),
         ])
         values.update({
             'receipts': receipt_ids,
@@ -45,13 +45,15 @@ class WebsiteAccount(website_account):
     def portal_my_receipt(self, receipt_id=None, **kw):
         if receipt_id:
             values = super(WebsiteAccount, self)._prepare_portal_layout_values()
-            receipt = request.env['stock.picking'].browse([receipt_id])
-            if 'modal' in kw:
-                action = receipt.sudo().do_new_transfer()
-                wizard = request.env[action['res_model']].browse(action['res_id'])
-                values.update({'wizard': wizard})
-            values.update({'receipt': receipt})
-            return request.render('of_website_portal_carrier.of_website_portal_portal_my_receipt', values)
+            receipt = request.env['stock.picking'].search([('id', '=', receipt_id)])
+            if receipt:
+                receipt = receipt.sudo()
+                if 'modal' in kw:
+                    action = receipt.do_new_transfer()
+                    wizard = request.env[action['res_model']].browse(action['res_id'])
+                    values.update({'wizard': wizard})
+                values.update({'receipt': receipt})
+                return request.render('of_website_portal_carrier.of_website_portal_portal_my_receipt', values)
         return request.redirect('/my/receipts')
 
     @http.route(['/my/receipt/<int:receipt_id>/validate'],
@@ -179,16 +181,13 @@ class WebsiteAccount(website_account):
 
     @http.route(['/my/receipt/pdf/<int:receipt_id>'], type='http', auth="user", website=True)
     def portal_get_receipt_pdf(self, receipt_id=None, **kw):
-        receipt = request.env['stock.picking'].browse([receipt_id])
-        try:
-            receipt.check_access_rights('read')
-            receipt.check_access_rule('read')
-        except AccessError:
+        receipt = request.env['stock.picking'].search([('id', '=', receipt_id)])
+        if not receipt:
             return request.render('website.403')
 
         pack_ids = [int(key) for key in kw.keys()]
-        packs = receipt.pack_operation_product_ids.filtered(lambda p: p.id in pack_ids)
-        pdf = request.env['report'].get_pdf(packs.ids, 'of_website_portal_carrier.report_receipt_label')
+        packs = receipt.sudo().pack_operation_product_ids.filtered(lambda p: p.id in pack_ids)
+        pdf = request.env['report'].sudo().get_pdf(packs.ids, 'of_website_portal_carrier.report_receipt_label')
         pdfhttpheaders = [
             ('Content-Type', 'application/pdf'), ('Content-Length', len(pdf)),
             ('Content-Disposition', 'attachment; filename=Etiquette.pdf;')
@@ -197,14 +196,11 @@ class WebsiteAccount(website_account):
 
     @http.route(['/my/receipt/pdf/line/<int:pack_id>'], type='http', auth="user", website=True)
     def portal_get_receipt_line_pdf(self, pack_id=None, **kw):
-        pack = request.env['stock.pack.operation'].browse([pack_id])
-        try:
-            pack.check_access_rights('read')
-            pack.check_access_rule('read')
-        except AccessError:
+        pack = request.env['stock.pack.operation'].search([('id', '=', pack_id)])
+        if not pack:
             return request.render('website.403')
 
-        pdf = request.env['report'].get_pdf([pack_id], 'of_website_portal_carrier.report_receipt_label')
+        pdf = request.env['report'].sudo().get_pdf([pack_id], 'of_website_portal_carrier.report_receipt_label')
         pdfhttpheaders = [
             ('Content-Type', 'application/pdf'), ('Content-Length', len(pdf)),
             ('Content-Disposition', 'attachment; filename=Etiquette.pdf;')
