@@ -169,10 +169,10 @@
                                 </div>
 
                                 <div class="modal-body mb32">
-                                    <table class="table table-hover" id="receipt_table">
+                                    <table class="table table-hover">
                                         <thead>
                                             <tr class="active">
-                                                <th>
+                                                <th style="width: 30px;">
                                                     <input id="check_all" type="checkbox" class="form-control"/>
                                                 </th>
                                                 <th>Marque</th>
@@ -240,7 +240,7 @@
                         </div>
 
                         <form t-att-action="'/my/receipt/%s/validate' % receipt.id" method="post" data-model_name="stock.picking" class="s_website_form" enctype="multipart/form-data">
-                            <table class="table table-hover" id="receipt_table">
+                            <table class="table table-hover">
                                 <thead>
                                     <tr class="active">
                                         <th>Marque</th>
