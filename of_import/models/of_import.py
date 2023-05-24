@@ -1412,9 +1412,15 @@ class OfImport(models.Model):
                 # L'enregistrement n'existe pas dans la base, on l'importe (création)
                 try:
                     if not simuler:
+                        # Pour améliorer les performances ,on désactive le logging dans mail.message
                         # Pour gérer les traductions, on importe d'abord avec la langue par défaut (en_US),
                         # puis on met à jour les champs pour chaque valeur traduite importée.
-                        res_objet = model_obj.with_context(lang='en_US').create(valeurs)
+                        res_objet = model_obj.with_context(
+                            mail_create_nolog=True,
+                            mail_create_nosubscribe=True,
+                            mail_notrack=True,
+                            lang='en_US'
+                        ).create(valeurs)
                         for lang, vals in valeurs_trad.iteritems():
                             res_objet.with_context(lang=lang).write(vals)
                     code = CODE_IMPORT_CREATION
