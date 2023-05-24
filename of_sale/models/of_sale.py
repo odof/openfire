@@ -366,9 +366,9 @@ class SaleOrder(models.Model):
 
         # Si la nouvelle valeur est vide, on remet l'ancienne
         if fiscal_position != self.fiscal_position_id and not self.fiscal_position_id:
-            self.fiscal_position_id = fiscal_position.id,
+            self.fiscal_position_id = fiscal_position.id
         if payment_term != self.payment_term_id and not self.payment_term_id:
-            self.payment_term_id = payment_term.id,
+            self.payment_term_id = payment_term.id
 
         if self.partner_id:
             # Référence client
@@ -400,7 +400,7 @@ class SaleOrder(models.Model):
         super(SaleOrder, self).onchange_partner_shipping_id()
         # Si la nouvelle valeur est vide, on remet l'ancienne
         if fiscal_position != self.fiscal_position_id and not self.fiscal_position_id:
-            self.fiscal_position_id = fiscal_position.id,
+            self.fiscal_position_id = fiscal_position.id
         return {}
 
     @api.onchange('partner_id')
