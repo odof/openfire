@@ -7,5 +7,5 @@ from odoo import api, models, fields, _
 class ResUsers(models.Model):
     _inherit = 'res.users'
 
-    of_online_booking = fields.Boolean(name=u"RDV en ligne", default=True)
+    of_online_booking = fields.Boolean(string=u"RDV en ligne", default=True)
 
