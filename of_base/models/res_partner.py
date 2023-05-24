@@ -383,25 +383,26 @@ class ResPartner(models.Model):
                 if not multiple_emails_re.match(email_address):
                     raise ValidationError(_("Email address %s is invalid") % (email_address))
 
-        partner = super().create(vals_list)
+        partners = super().create(vals_list)
 
         for vals in vals_list:
-            self._check_no_ref_duplicate(vals.get('ref'))
+            self._check_no_ref_duplicate(vals.get('ref'))  # can raise ValidationError if ref is not unique
 
-        # Calcul de la ref en fonction de la configuration
-        if partner.company_id.of_ref_mode == 'id' and not partner.ref:
-            if self.env['res.partner'].with_context(active_test=False).search([('ref', '=', str(partner.id))]):
-                i = 2
-                while (
-                    self.env['res.partner']
-                    .with_context(active_test=False)
-                    .search([('ref', '=', f'{str(partner.id)}-{i}')])
-                ):
-                    i += 1
-                partner.ref = f'{str(partner.id)}-{i}'
-            else:
-                partner.ref = str(partner.id)
-        return partner
+        for partner in partners:
+            # Calcul de la ref en fonction de la configuration
+            if partner.company_id.of_ref_mode == 'id' and not partner.ref:
+                if self.env['res.partner'].with_context(active_test=False).search([('ref', '=', str(partner.id))]):
+                    i = 2
+                    while (
+                        self.env['res.partner']
+                        .with_context(active_test=False)
+                        .search([('ref', '=', f'{str(partner.id)}-{i}')])
+                    ):
+                        i += 1
+                    partner.ref = f'{str(partner.id)}-{i}'
+                else:
+                    partner.ref = str(partner.id)
+        return partners
 
     @api.model
     def _update_refs(self, new_ref, partner_refs):
