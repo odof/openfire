@@ -8,7 +8,8 @@
         <field name="arch" type="xml">
             <form>
                 <group>
-                    <field name="picking_type_id" options="{'no_create': True, 'no_open': True}"/>
+                    <field name="picking_type_code" invisible="1"/>
+                    <field name="picking_type_id" options="{'no_create': True, 'no_open': True}" domain="[('code', '=', picking_type_code)]"/>
                     <field name="locked_lines" invisible="True"/>
                     <div colspan="2" attrs="{'invisible': [('locked_lines', '=', False)]}">
                         Certaines lignes ont déjà été réservées et ne peuvent pas être divisées.<br/>

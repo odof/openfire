@@ -11,6 +11,7 @@ class OFDeliveryDivisionWizard(models.TransientModel):
 
     picking_type_id = fields.Many2one(comodel_name='stock.picking.type', string=u"Type de préparation", required=True)
     picking_id = fields.Many2one(comodel_name='stock.picking', string=u"Bon de transfert à diviser")
+    picking_type_code = fields.Selection(related='picking_id.picking_type_code', readonly=True)
     line_ids = fields.One2many(
         comodel_name='of.delivery.division.wizard.line', inverse_name='wizard_id', string=u"Lignes à diviser")
     locked_lines = fields.Boolean(compute='_compute_locked_lines')
