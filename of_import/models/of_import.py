@@ -1479,7 +1479,7 @@ class OfImport(models.Model):
         else:
             doublons[key] = [1, str(i)]
 
-        allowed_paths = config.get('of_access_folders', '')
+        allowed_paths = unicode(config.get('of_access_folders', ''), 'utf-8')
         allowed_paths = allowed_paths and allowed_paths.split(',') or []
         file_path = path.abspath(path.expanduser(path.expandvars(ligne['store_fname'])))
         value = ''
