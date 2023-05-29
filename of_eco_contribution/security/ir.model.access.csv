@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_eco_organism_user,access.of.eco.organism.user,model_of_eco_organism,base.group_user,1,0,0,0
+access_of_eco_organism_manager,access.of.eco.organism.manager,model_of_eco_organism,of_eco_contribution.group_of_eco_contribution,1,1,1,1
+access_of_eco_contribution_user,access.of.eco.contribution.user,model_of_eco_contribution,base.group_user,1,0,0,0
+access_of_eco_contribution_manager,access.of.eco.contribution.manager,model_of_eco_contribution,of_eco_contribution.group_of_eco_contribution,1,1,1,1

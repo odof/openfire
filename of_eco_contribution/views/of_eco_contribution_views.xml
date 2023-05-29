@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_eco_organism_view_tree" model="ir.ui.view">
+        <field name="name">of.eco.organism.view.tree</field>
+        <field name="model">of.eco.organism</field>
+        <field name="arch" type="xml">
+            <tree string="Éco-organisme">
+                <field name="name"/>
+                <field name="account_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_eco_organism_view_form" model="ir.ui.view">
+        <field name="name">of.eco.organism.view.form</field>
+        <field name="model">of.eco.organism</field>
+        <field name="arch" type="xml">
+            <form string="Éco-organisme">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="account_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="eco-contribution" string="Éco-contribution">
+                            <group>
+                                <field name="contribution_ids" nolabel="1" context="{'active_test': False}">
+                                    <tree>
+                                        <field name="code"/>
+                                        <field name="description"/>
+                                        <field name="price"/>
+                                        <field name="type"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_eco_organism_view_search" model="ir.ui.view">
+        <field name="name">of.eco.organism.view.search</field>
+        <field name="model">of.eco.organism</field>
+        <field name="arch" type="xml">
+            <search string="Éco-organisme">
+                <field name="name"/>
+                <separator/>
+                <filter string="Active" name="active" domain="[('active','=',True)]"/>
+                <filter string="Archived" name="archived" domain="[('active','=',False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_of_eco_organism_tree" model="ir.actions.act_window">
+        <field name="name">Éco-organisme</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.eco.organism</field>
+        <field name="view_id" ref="of_eco_organism_view_tree"/>
+        <field name="search_view_id" ref="of_eco_organism_view_search"/>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_of_eco_organism"
+              name="Éco-organisme"
+              parent="account.account_account_menu"
+              action="action_of_eco_organism_tree"
+              sequence="48"/>
+
+<!-- ############################################################################################################### -->
+
+    <record id="of_eco_contribution_view_tree" model="ir.ui.view">
+        <field name="name">of.eco.contribution.view.tree</field>
+        <field name="model">of.eco.contribution</field>
+        <field name="arch" type="xml">
+            <tree string="Éco-contribution" editable="top">
+                <field name="organism_id"/>
+                <field name="code"/>
+                <field name="description"/>
+                <field name="type"/>
+                <field name="price"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_eco_contribution_view_form" model="ir.ui.view">
+        <field name="name">of.eco.contribution.view.form</field>
+        <field name="model">of.eco.contribution</field>
+        <field name="arch" type="xml">
+            <form string="Éco-contribution">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="description"/>
+                            <field name="price"/>
+                            <field name="type"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_eco_contribution_view_search" model="ir.ui.view">
+        <field name="name">of.eco.contribution.view.search</field>
+        <field name="model">of.eco.contribution</field>
+        <field name="arch" type="xml">
+            <search string="Éco-contribution">
+                <field name="code"/>
+                <field name="organism_id"/>
+                <field name="type"/>
+                <separator/>
+                <filter string="Active" name="active" domain="[('active','=',True)]"/>
+                <filter string="Archived" name="archived" domain="[('active','=',False)]"/>
+                <group expand="0" name="group_by" string="Group By">
+                    <filter name="group_organism" string="Éco-organisme" domain="[]" context="{'group_by' : 'organism_id'}"/>
+                    <filter name="group_type" string="Type de tarif" context="{'group_by': 'type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_of_eco_contribution_tree" model="ir.actions.act_window">
+        <field name="name">Éco-contribution</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.eco.contribution</field>
+        <field name="view_id" ref="of_eco_contribution_view_tree"/>
+        <field name="search_view_id" ref="of_eco_contribution_view_search"/>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_of_eco_contribution"
+              name="Éco-contribution"
+              parent="account.account_account_menu"
+              action="action_of_eco_contribution_tree"
+              sequence="49"/>
+
+</odoo>
