@@ -79,12 +79,14 @@
             <li t-att-class="step_number==10 and 'text-primary' or 'text-muted'" id="step_parc">
                 <t t-if="step_number&gt;10">
                     <a href="/new_booking/installed_park_select" class="text-primary">
-                        Équipement
+                        <span t-if="service_list or request.session.get('rdv_service_id')">Contrat</span>
+                        <span t-else="">Équipement</span>
                         <span class="chevron"/>
                     </a>
                 </t>
                 <t t-if="not step_number&gt;10">
-                    Équipement
+                    <span t-if="service_list or request.session.get('rdv_service_id')">Contrat</span>
+                    <span t-else="">Équipement</span>
                     <span class="chevron"/>
                 </t>
             </li>
@@ -151,8 +153,22 @@
                 <div class="container oe_website_sale">
                     <div class="row">
                         <t t-call="of_website_planning_booking.new_booking_breadcrumb_trail"/>
-                        <h1 class="col-md-10 page-header text-primary">Sélectionner mon équipement</h1>
-                        <t t-if="display_add_button">
+                        <h1 t-if="service_list and parc_installe_list" class="col-md-10 page-header text-primary">Sélectionner mon contrat ou mon équipement</h1>
+                        <h1 t-if="service_list" class="col-md-10 page-header text-primary">Sélectionner mon contrat</h1>
+                        <h1 t-else="" class="col-md-10 page-header text-primary">Sélectionner mon équipement</h1>
+                        <t t-if="service_list and parc_installe_list and display_add_button">
+                            <b><span class="col-md-10">Séletionnez le contrat ou l'équipement pour lequel vous souhaitez prévoir une intervention, ou ajoutez un nouvel équipement.</span></b>
+                        </t>
+                        <t t-elif="service_list and parc_installe_list">
+                            <b><span class="col-md-10">Séletionnez le contrat ou l'équipement pour lequel vous souhaitez prévoir une intervention.</span></b>
+                        </t>
+                        <t t-elif="service_list and display_add_button">
+                            <b><span class="col-md-10">Séletionnez le contrat pour lequel vous souhaitez prévoir une intervention, ou ajoutez un nouvel équipement.</span></b>
+                        </t>
+                        <t t-elif="service_list">
+                            <b><span class="col-md-10">Séletionnez le contrat pour lequel vous souhaitez prévoir une intervention.</span></b>
+                        </t>
+                        <t t-elif="display_add_button">
                             <b><span class="col-md-10">Vous avez au moins un équipement installé chez vous, sélectionnez celui pour lequel vous souhaitez prévoir une intervention, ou ajoutez en un nouveau.</span></b>
                         </t>
                         <t t-else="">
@@ -161,7 +177,20 @@
                         <div class="clearfix"/>
                         <br/>
                         <form action="/new_booking/installed_park_select" method="post">
-                            <div t-attf-class="form-group form-field o_website_form_required_custom col-md-6 #{error_dict.get('parc_installe_id') and 'has-error' or ''}">
+                            <div t-if="service_list" t-attf-class="form-group col-md-7 #{error_dict.get('service_id') and 'has-error' or ''} ">
+                                <label class="control-label label-optional" for="service_id">Contrat d'entretien</label>
+                                <select id="service_id" name="service_id" class="form-control">
+                                    <option value="">Entretien non contractuel</option>
+                                    <t t-foreach="service_list" t-as="s">
+                                        <option t-att-value="s.id"
+                                                t-att-selected="s.id == (service and service.id or -1)">
+                                            <t t-esc="s.website_planning_booking_name()"/>
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+                            <div t-if="parc_installe_list" t-attf-class="form-group form-field col-md-7 #{error_dict.get('parc_installe_id') and 'has-error' or ''}">
+                                <label class="control-label label-optional" for="parc_installe_id">Équipement</label>
                                 <select id="parc_installe_id" name="parc_installe_id" class="form-control">
                                     <option value="">La référence de votre équipement...</option>
                                     <t t-foreach="parc_installe_list" t-as="pi">
@@ -173,6 +202,16 @@
                                         </option>
                                     </t>
                                 </select>
+                            </div>
+                            <div class="form-group col-md-10">
+                                <span t-if="service_list and parc_installe_list"> ATTENTION : sélectionner un contrat va automatiquement sélectionner l'équipement associé et inversement.
+                                    <br/>Si vous renseignez un contrat sans équipement, la valeur de l'équipement sera "La référence de votre équipement...""
+                                    <br/>Si vous renseignez un équipement qui n'est lié a aucun contrat, la valeur du contrat sera "Entretien non contractuel"
+
+                                </span>
+                                <span t-if="service_list and parc_installe_list and (error_dict.get('service_id') or error_dict.get('parc_installe_id'))" t-attf-style="#{(error_dict.get('service_id') or error_dict.get('parc_installe_id')) and 'color: red' or ''}">
+                                    <br/>Au moins une des deux informations demandées doit être renseignée.
+                                </span>
                             </div>
                             <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                             <input type="hidden" name="submitted" value="1"/>
@@ -188,13 +227,15 @@
                                                 name="create" value="address_create">
                                             Ajouter un équipement
                                         </button>
-                                        &amp;nbsp;&amp;nbsp;&amp;nbsp;/&amp;nbsp;&amp;nbsp;&amp;nbsp;
-                                        <button type="submit" class="btn btn-default a-submit a-submit-disable a-submit-loading"
-                                                name="update" value="address_update">
-                                            Modifier un équipement
-                                        </button>
-                                        &amp;nbsp;&amp;nbsp;&amp;nbsp;ou&amp;nbsp;&amp;nbsp;&amp;nbsp;
-                                    </t>
+                                        <t t-if="parc_installe_list">
+                                                &amp;nbsp;&amp;nbsp;&amp;nbsp;/&amp;nbsp;&amp;nbsp;&amp;nbsp;
+                                                <button type="submit" class="btn btn-default a-submit a-submit-disable a-submit-loading"
+                                                        name="update" value="address_update">
+                                                    Modifier un équipement
+                                                </button>
+                                        </t>
+                                            &amp;nbsp;&amp;nbsp;&amp;nbsp;ou&amp;nbsp;&amp;nbsp;&amp;nbsp;
+                                        </t>
                                     <button type="submit" class="btn btn-primary a-submit a-submit-disable a-submit-loading"
                                             name="next_step" value="address_select">
                                         Suivant
@@ -367,7 +408,7 @@
                                     Annuler
                                 </a>
                                 <span name="buttons_right" class="pull-right">
-                                    <t t-if="not parc_installe.site_adresse_id">
+                                    <t t-if="(service and not service.address_id) or (parc_installe and not parc_installe.site_adresse_id)">
                                         <form action="/new_booking/address_create_edit" method="post" style="display:inline-block">
                                             <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                                             <input type="hidden" name="mode" value="new"/>
@@ -592,21 +633,9 @@
                         <h4 class="text-danger" t-esc="err"/>
                     </t>
                     <form action="/new_booking/service" method="post" class="checkout_autoformat">
-                        <div t-if="service_list" t-attf-class="form-group #{error_dict.get('service_id') and 'has-error' or ''} col-md-10">
-                            <label class="control-label label-optional" for="service_id">Contrat d'entretien</label>
-                            <select id="service_id" name="service_id" class="form-control">
-                                <option value="">Contrat d'entretien...</option>
-                                <t t-foreach="service_list" t-as="s">
-                                    <option t-att-value="s.id"
-                                            t-att-selected="s.id == (service and service.id or -1)">
-                                        <t t-esc="s.website_planning_booking_name()"/>
-                                    </option>
-                                </t>
-                            </select>
-                        </div>
                         <div t-attf-class="form-group #{error_dict.get('tache_id') and 'has-error' or ''} col-md-10">
                             <label class="control-label label-optional" for="tache_id">Prestation *</label>
-                            <select id="tache_id" name="tache_id" class="form-control">
+                            <select id="tache_id" name="tache_id" class="form-control" t-att-disabled="request.session.get('rdv_service_id') and 1 or 0">
                                 <option value="">Prestation...</option>
                                 <t t-foreach="tache_list" t-as="t">
                                     <option t-att-value="t.id"
@@ -620,7 +649,7 @@
                             <div class="clearfix"/>
                             <div class="form-group  col-md-5">
                                 <label class="control-label label-optional" for="tache_price">Prix de la prestation</label>
-                                <input type="text" id="tache_price" class="form-control" t-att-value="'0.0 €'" readonly="1"/>
+                                <input type="text" id="tache_price" class="form-control" t-att-value="tache_price or '0.0 €'" readonly="1"/>
                             </div>
                         </t>
                         <div class="clearfix"/>
@@ -733,10 +762,18 @@
                         </t>
                     </div>
                     <div class="clearfix"/>
-                    <h2 class="col-md-10">Mon équipement</h2>
-                    <div class="col-md-4 one_kanban">
-                        <t t-call="of_website_planning_booking.new_booking_device_kanban"/>
-                    </div>
+                    <t t-if="service">
+                        <h2 class="col-md-10">Mon contrat</h2>
+                        <div class="col-md-4 one_kanban">
+                            <t t-call="of_website_planning_booking.new_booking_service_kanban"/>
+                        </div>
+                    </t>
+                    <t t-if="parc_installe">
+                        <h2 class="col-md-10">Mon équipement</h2>
+                        <div class="col-md-4 one_kanban">
+                            <t t-call="of_website_planning_booking.new_booking_device_kanban"/>
+                        </div>
+                    </t>
                     <div class="clearfix"/>
                     <h2 class="col-md-10">Mon rendez-vous</h2>
                     <div class="col-md-4 one_kanban">
@@ -884,6 +921,17 @@
                 </b>
                 <br/>
                 <i t-if="extra_info" t-esc="extra_info"/>
+            </div>
+        </div>
+    </template>
+
+    <!-- OF Website Planning Booking - Kanban contrat -->
+    <template id="new_booking_service_kanban" name="Prise de RDV en ligne - Service Kanban">
+        <div class="panel panel-default of_border_primary">
+            <div class='panel-body'>
+                <div>
+                    <b t-esc="service.website_planning_booking_name()"/>
+                </div>
             </div>
         </div>
     </template>

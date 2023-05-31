@@ -51,22 +51,39 @@ odoo.define('of_website_planning_booking.planning_website', function (require) {
         $('select#service_id', oe_website_sale).on('change', function (event) {
             // Quand on selectionne le contrat, on vient affecter la prestation qui va avec
             var tache_selector = $('select#tache_id');
+            var parc_selector = $('select#parc_installe_id');
             var service_id = parseInt(this[this.selectedIndex].value);
             var service_model = new Model('of.service');
-            if (service_id != null && service_id != undefined) {
-                service_model.call('read', [service_id, ['tache_id']], {}).done(function (result) {
+            if (service_id != null && service_id != undefined && !Number.isNaN(service_id) && parc_selector != undefined && parc_selector != null) {
+                service_model.call('read', [service_id, ['parc_installe_id']], {}).done(function (result) {
+                    if (result.length > 0 && result[0]['parc_installe_id'] != false) {
+                        parc_selector.val(result[0]['parc_installe_id'][0].toString());
+                    } else {
+                        parc_selector.val('');
+                    };
+                });
+            };
+        });
+        $('select#parc_installe_id', oe_website_sale).on('change', function (event) {
+            // Quand on selectionne le contrat, on vient affecter la prestation qui va avec
+            var service_selector = $('select#service_id');
+            var parc_installe_id = parseInt(this[this.selectedIndex].value);
+            var service_model = new Model('of.service');
+            if (parc_installe_id != null && parc_installe_id != undefined && !Number.isNaN(parc_installe_id) && service_selector != undefined && service_selector != null) {
+                service_model.call('search', [[['parc_installe_id','=',parc_installe_id]]], {}).done(function (result) {
                     if (result.length > 0) {
-                        tache_selector.val(result[0]['tache_id'][0].toString())
-                    }
+                        service_selector.val(result[0].toString());
+                    } else {
+                        service_selector.val('');
+                    };
                 });
             };
         });
         $('select#tache_id', oe_website_sale).on('change', function (event) {
-            console.log("hello")
             // Quand on selectionne la tache, on vient affecter le prix qui va avec
             var tache_id = parseInt(this[this.selectedIndex].value);
             var tache_model = new Model('of.planning.tache');
-            if (tache_id != null && tache_id != undefined) {
+            if (tache_id != null && tache_id != undefined && !Number.isNaN(tache_id)) {
                 tache_model.call('get_price_ttc', [tache_id], {}).done(function (result) {
                     document.getElementById("tache_price").value = (Math.round(result * 100) / 100).toString() + " €";
                 });

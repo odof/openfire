@@ -193,7 +193,8 @@ class OfPlanningIntervention(models.Model):
     @api.onchange('address_id')
     def _onchange_address_id(self):
         super(OfPlanningIntervention, self)._onchange_address_id()
-        if self.address_id and self.parc_installe_id.site_adresse_id != self.address_id:
+        if self.address_id and self.parc_installe_id.site_adresse_id != self.address_id and \
+           not self._context.get('from_portal'):
             parc_installe = False
             parc_obj = self.env['of.parc.installe']
             if not parc_obj.check_access_rights('read', raise_exception=False):
