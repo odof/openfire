@@ -103,14 +103,7 @@ class OFCRMFunnelConversion4(models.Model):
     def _search_is_my_company(self, operator, value):
         if operator != '=' or not value:
             raise ValueError(_("Unsupported search operator"))
-        req = """SELECT id
-            FROM of_crm_funnel_conversion4
-            WHERE
-            company_id = %s"""
-        self.env.cr.execute(
-            req, (self.env.user.company_id.id,))
-        lead_ids = [r[0] for r in self.env.cr.fetchall()]
-        return [('id', 'in', lead_ids)]
+        return [('company_id', '=', self.env.user.company_id.id)]
 
     def _get_is_my_company(self):
         for rec in self:
