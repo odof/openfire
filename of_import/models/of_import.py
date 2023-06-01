@@ -416,7 +416,7 @@ class ProductTemplate(models.Model):
                         product.uom_po_id,
                         product,
                         seller.price,
-                        product.get_cost(),
+                        cost=product.get_cost(),
                         based_on_price=product.of_is_net_price,
                     )
                     values = {key: val for key, val in values.iteritems()
