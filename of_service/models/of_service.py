@@ -1471,7 +1471,7 @@ class OfServiceLine(models.Model):
 class OfServiceType(models.Model):
     _name = 'of.service.type'
 
-    name = fields.Char(string="Type de service")
+    name = fields.Char(string=u"Nom", required=True)
     kanban_ids = fields.Many2many(comodel_name='of.service.stage', string=u"Étapes autorisées")
 
 
