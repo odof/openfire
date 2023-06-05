@@ -169,7 +169,7 @@ class File(dms_base.DMSModel):
         default='normal')
     of_related_model = fields.Char(string=u"Modèle de document concerné")
     of_related_id = fields.Integer(string=u"ID du document associé")
-    of_attachment_id = fields.Many2one(comodel_name='ir.attachment', string=u"Pièce jointe associée")
+    of_attachment_id = fields.Many2one(comodel_name='ir.attachment', string=u"Pièce jointe associée", index=True)
     of_category_id = fields.Many2one(comodel_name='of.document.file.category', string=u"Catégorie")
     of_tag_ids = fields.Many2many(comodel_name='of.document.file.tag', string=u"Étiquettes")
     of_partner_id = fields.Many2one(comodel_name='res.partner', related='directory.of_partner_id', readonly=True)
