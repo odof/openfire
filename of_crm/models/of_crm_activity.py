@@ -113,7 +113,7 @@ class OFCRMActivity(models.Model):
     email = fields.Char(related='opportunity_id.email_from', string=u"Courriel", readonly=True)
     is_late = fields.Boolean(string=u"Activité en retard", compute="_compute_is_late", search="_search_is_late")
     load_attachment = fields.Boolean(string='Load an attachment')
-    uploaded_attachment_id = fields.Many2one(comodel_name='ir.attachment', string='Uploaded attachment')
+    uploaded_attachment_id = fields.Many2one(comodel_name='ir.attachment', string='Uploaded attachment', index=True)
     trigger_type = fields.Selection(selection='_get_trigger_selection', string='Trigger')
     # Couleurs
     of_color_ft = fields.Char(string=u"Couleur de texte", compute='_compute_custom_colors')
