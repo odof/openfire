@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- #######################################################################################
+                                        VENTES
+############################################################################################ -->
+        <record id="of_crm_view_order_form" model="ir.ui.view">
+            <field name="name">of.crm.sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_crm.sale_view_inherit123"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='print_quotation'][1]" position="after">
+                    <button name="action_confirm_estimation" string="Confirmer l'estimation" type="object" states="draft" class="btn-primary"/>
+                </xpath>
+                <xpath expr="//div[hasclass('oe_title')]/h1" position="inside">
+                    <field name="of_priority" widget="priority" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                </xpath>
+                <xpath expr="//sheet/group/group[1]" position="inside">
+                    <field name="of_sent_quotation"/>
+                </xpath>
+                <xpath expr="//form//sheet//notebook//group[@name='technical']/../.." position="attributes">
+                    <!-- donner le nom 'other_info' à la page concernée-->
+                    <attribute name="name">other_info</attribute>
+                </xpath>
+
+                <!-- Afficher champs document d'origine, campagne, moyen, source et opportunité en dehors du mode développeur -->
+                <xpath expr="//group[@name='technical']" position="attributes">
+                    <attribute name="groups">sales_team.group_sale_salesman</attribute>
+                </xpath>
+                <xpath expr="//group[@name='technical']/field[@name='origin']" position="attributes">
+                    <attribute name="groups">sales_team.group_sale_salesman</attribute>
+                </xpath>
+                <xpath expr="//group[@name='technical']/field[@name='campaign_id']" position="attributes">
+                    <attribute name="groups">sales_team.group_sale_salesman</attribute>
+                </xpath>
+                <xpath expr="//group[@name='technical']/field[@name='medium_id']" position="attributes">
+                    <attribute name="groups">sales_team.group_sale_salesman</attribute>
+                </xpath>
+                <xpath expr="//group[@name='technical']/field[@name='source_id']" position="attributes">
+                    <attribute name="groups">sales_team.group_sale_salesman</attribute>
+                </xpath>
+                <xpath expr="//group[@name='technical']/field[@name='opportunity_id']" position="attributes">
+                    <attribute name="groups">sales_team.group_sale_salesman</attribute>
+                </xpath>
+                <xpath expr="//page[@name='notes']" position="after">
+                    <page string="Follow-up" name="followup">
+                        <group name="followup_tags">
+                            <field name="of_sale_followup_tag_ids" widget="many2many_tags"/>
+                        </group>
+                        <group name="activities">
+                            <group>
+                                <field name="of_activities_state" />
+                            </group>
+                            <group colspan="4">
+                                <field name="of_crm_activity_ids" nolabel="1" options="{'reload_on_button': True}"
+                                        context="{'active_test': False, 'default_order_id': active_id, 'default_partner_id': partner_id, 'default_origin': 'sale_order', 'form_view_ref':'of_crm.of_crm_activity_from_sale_form_view'}">
+                                    <tree string="Activities" decoration-muted="state=='canceled' or not active" decoration-danger="is_late">
+                                        <field name="origin" invisible="1"/>
+                                        <field name="is_late" invisible="1"/>
+                                        <field name="active" invisible="1"/>
+                                        <field name="trigger_type" invisible="1"/>
+                                        <field name="load_attachment" invisible="1"/>
+                                        <field name="uploaded_attachment_id" invisible="1"/>
+                                        <field name="user_id" invisible="1"/>
+                                        <field name="description" invisible="1"/>
+                                        <field name="title"/>
+                                        <field name="type_id"/>
+                                        <field name="deadline_date"/>
+                                        <field name="vendor_id" string="Assigned to"/>
+                                        <field name="report"/>
+                                        <field name="state"/>
+                                        <button name="action_add_attachment" icon="fa-upload" type="object" string="Add attachments"
+                                            attrs="{'invisible': ['|', ('load_attachment', '=', False), ('uploaded_attachment_id', '!=', False)]}"/>
+                                        <button name="action_plan" icon="fa-undo" type="object" string="Plan" attrs="{'invisible': [('state', '=', 'planned')]}"/>
+                                        <button name="action_complete" type="object" string="Complete" icon="fa-check" attrs="{'invisible': [('state', '!=', 'planned')]}"/>
+                                        <button name="action_cancel" type="object" string="Annuler" icon="fa-close" attrs="{'invisible': [('state', '!=', 'planned')]}"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </group>
+                     </page>
+                </xpath>
+                <!-- Ajout champ "Apporté par" dans devis/commande -->
+                <xpath expr="//group[@name='technical']" position="after">
+                    <group string="Divers" name="Misc">
+                        <field name="of_referred_id" />
+                    </group>
+                </xpath>
+                <xpath expr="//field[@name='user_id']" position="after">
+                    <field name="of_canvasser_id"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_crm_of_sale_report_view_order_form_inherit_sale_stock" model="ir.ui.view">
+            <field name="name">of.crm.of.sale.order.form.sale.stock</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="of_sale_report.of_sale_report_view_order_form_inherit_sale_stock"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='of_date_de_pose']" position="after">
+                    <field name="of_reference_laying_date" attrs="{'invisible': [('of_force_laying_date', '!=', False)]}"/>
+                    <field name="of_manual_laying_date" attrs="{'invisible': [('of_force_laying_date', '=', False)]}"/>
+                    <field name="of_force_laying_date"/>
+                    <field name="of_laying_week"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_crm_sale_order_quotation_form_view" model="ir.ui.view">
+            <field name="name">of.crm.sale.order.quotation.form.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="groups_id" eval="[(4, ref('of_crm.group_quotation_sale_order_state'))]"/>
+            <field name="arch" type="xml">
+                <field name="state" position="replace">
+                    <field name="state" widget="statusbar" statusbar_visible="sent,sale"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="of_crm_sale_order_search_view" model="ir.ui.view">
+            <field name="name">of.crm.sale.order.search.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.sale_order_view_search_inherit_quotation"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='draft']" position="replace">
+                    <filter string="Estimations" name="draft" domain="[('state', '=', 'draft')]"/>
+                    <filter string="Devis" name="quotation" domain="[('state', '=', 'sent')]"/>
+                </xpath>
+                <xpath expr="//filter[@name='sent']" position="replace">
+                    <filter string="Devis envoyés" name="sent" domain="[('state', '=', 'sent'), ('of_sent_quotation', '=', True)]"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_crm_sale_view_sales_order_filter" model="ir.ui.view">
+            <field name="name">of.crm.sale.view.sales.order.filter</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='message_needaction']" position="after">
+                    <separator/>
+                    <filter string="In Progress" name="activities_in_progress" domain="[('of_activities_state', '=', 'in_progress')]"/>
+                    <filter string="Late" name="activities_late" domain="[('of_activities_state', '=', 'late')]"/>
+                    <filter string="Done" name="activities_done" domain="[('of_activities_state', '=', 'done')]"/>
+                    <filter string="Canceled" name="activities_canceled" domain="[('of_activities_state', '=', 'canceled')]"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_crm_quotation_sale_order_search_view" model="ir.ui.view">
+            <field name="name">of.crm.quotation.sale.order.quotation.form.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="of_crm.of_crm_sale_order_search_view"/>
+            <field name="groups_id" eval="[(4, ref('of_crm.group_quotation_sale_order_state'))]"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='draft']" position="replace">
+                    <filter string="Devis" name="draft" domain="[('state', '=', 'sent')]"/>
+                </xpath>
+                <xpath expr="//filter[@name='quotation']" position="replace"/>
+            </field>
+        </record>
+
+        <record id="of_crm_of_sale_view_order_form" model="ir.ui.view">
+            <field name="name">of.crm.of.sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='customer_notes']" position="after">
+                    <group col="4" colspan="4" name="followup_notes" string="Follow-up notes">
+                        <field name="of_notes" nolabel="1"/>
+                    </group>
+                </xpath>
+                <xpath expr="//field[@name='payment_term_id']" position="after">
+                        <field name="of_info"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_crm_of_sale_order_line_tree" model="ir.ui.view">
+            <field name="name">of.crm.of.sale.order.line.tree</field>
+            <field name="model">sale.order.line</field>
+            <field name="inherit_id" ref="of_sale.of_sale_order_line_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='price_subtotal']" position="after">
+                    <field name="of_amount_to_invoice"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Sale config wizard -->
+        <record id="of_cr_sale_config_settings_form_view" model="ir.ui.view">
+            <field name="name">of.crm.sale.config.settings.form.view</field>
+            <field name="model">sale.config.settings</field>
+            <field name="inherit_id" ref="of_sale.of_sale_view_sale_config_settings"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='quotations_sales']//field[@name='auto_done_setting']" position="after">
+                    <label for="of_sale_order_start_state"/>
+                    <div>
+                        <field name="of_sale_order_start_state" class="oe_inline" widget="radio"/>
+                        <field name="group_estimation_sale_order_state" class="oe_inline" invisible="1"/>
+                        <field name="group_quotation_sale_order_state" class="oe_inline" invisible="1"/>
+                    </div>
+                </xpath>
+                <xpath expr="//group[@name='config_alias']" position="inside">
+                    <field name="of_lost_opportunity_stage_id" class="oe_inline"/>
+                    <label for="of_display_funnel_conversion1"/>
+                    <div>
+                        <field name="of_display_funnel_conversion1" class="oe_inline"/>
+                        <p class="text-muted">Tunnel basé sur l'analyse qualitative des données commerciales.<br/>
+                            La valeur de référence est l'opportunité source.
+                            Seules les données rattachées à une opportunité sont analysées.<br/>
+                            Certains indicateurs sont interprétés (Nombre de devis, montant de devis, etc).</p>
+                        <field name="group_funnel_conversion1" class="oe_inline" invisible="1"/>
+                    </div>
+                    <label for="of_display_funnel_conversion2"/>
+                    <div>
+                        <field name="of_display_funnel_conversion2" class="oe_inline"/>
+                        <p class="text-muted">Tunnel basé sur l'analyse quantitative des données commerciales.<br/>
+                            La valeur de référence est la date de chaque évènement.
+                            Seules les données rattachées à une opportunité sont analysées.<br/>
+                            Certains indicateurs sont interprétés (Nombre de devis, montant de devis, etc).</p>
+                        <field name="group_funnel_conversion2" class="oe_inline" invisible="1"/>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+    <!-- Account Invoice Form View -->
+    <record id="of_crm_account_invoice_form_view" model="ir.ui.view">
+        <field name="name">of.crm.account.invoice.form.view</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="of_canvasser_id"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
