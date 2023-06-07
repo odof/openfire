@@ -87,6 +87,14 @@ class SaleOrder(models.Model):
                         order.of_invoice_date_prev = fields.Date.to_string(
                             fields.Date.from_string(pickings[-1].min_date))
 
+    def _compute_picking_ids(self):
+        for order in self:
+            domain = [('origin', '=', order.name)]
+            if order.procurement_group_id:
+                domain = ['|', ('group_id', '=', order.procurement_group_id.id), ('origin', '=', order.name)]
+            order.picking_ids = self.env['stock.picking'].search(domain)
+            order.delivery_count = len(order.picking_ids)
+
 
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
