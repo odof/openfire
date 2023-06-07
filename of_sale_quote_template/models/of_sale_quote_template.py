@@ -474,7 +474,7 @@ class OfSaleOrderLayoutCategory(models.Model):
     depth = fields.Integer(string=u"Profondeur", compute='_compute_depth')
     parent_id = fields.Many2one(
         comodel_name='of.sale.order.layout.category',
-        string=u"Parent", domain=lambda self: self._get_domain_parent_id())
+        string=u"Parent", domain=lambda self: self._get_domain_parent_id(), ondelete='cascade')
     quote_section_line_id = fields.Many2one(
         comodel_name='of.sale.quote.template.layout.category', string=u"Ligne d'origine")
     order_id = fields.Many2one(comodel_name='sale.order', string=u"Bon de commande", ondelete='cascade')
@@ -781,19 +781,19 @@ class SaleOrder(models.Model):
         ('summary', u"Récapitulatif des prix par sections"),
     ])
 
-    # Onchange nécessaire, car lors de la suppression d'une ligne de section, cette ligne de section est toujours
-    # renseignée dans les lignes de commande. Du coup, Odoo bloque sur la sauvegarde.
-    # Le ondelete = set null ne fonctionne pas sur un même formulaire.
+    # Onchange nécessaire, car lors de la suppression d'une ligne de section, les lignes de commande associées ne sont
+    # pas supprimé. Du coup, Odoo bloque sur la sauvegarde.
+    # Le ondelete = cascade ne fonctionne pas sur un même formulaire.
     @api.onchange('of_layout_category_ids')
     def onchange_of_layout_category_ids(self):
-        order_id = self._origin.id
-        order_lines = self.env['sale.order.line'].search(
-            [('order_id', '=', order_id),
-             ('of_layout_category_id', '!=', False),
-             ('of_layout_category_id', 'not in', self.of_layout_category_ids.ids)])
-        order_lines.update({
-            'of_layout_category_id': False,
-        })
+        order_lines = []
+        order = self.env['sale.order'].browse(self._origin.id)
+        order_line_to_delete = order.of_layout_category_ids.filtered(
+            lambda lc: lc.id not in self.of_layout_category_ids.ids).mapped('order_line_ids')
+        for ol in order.order_line.filtered(lambda ol: ol.id not in order_line_to_delete.ids):
+            if isinstance(ol.id, int):
+                order_lines.append((4, ol.id))
+        self.order_line = order_lines
 
     @api.model
     def create(self, vals):
