@@ -11,10 +11,10 @@ from odoo import models, api, fields
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
-    of_validated_by_carrier = fields.Boolean(string=u"Validé par le transporteur")
-    of_carrier_validation_date = fields.Datetime(string=u"Validé par le transporteur le")
-    of_need_backorder = fields.Boolean(string=u"Créer le reliquat")
-    of_error_message = fields.Text(string=u"Message d'erreur")
+    of_validated_by_carrier = fields.Boolean(string=u"Validé par le transporteur", copy=False)
+    of_carrier_validation_date = fields.Datetime(string=u"Validé par le transporteur le", copy=False)
+    of_need_backorder = fields.Boolean(string=u"Créer le reliquat", copy=False)
+    of_error_message = fields.Text(string=u"Message d'erreur", copy=False)
 
     @api.model
     def validate_picking_from_carriers(self):
