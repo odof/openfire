@@ -46,7 +46,7 @@ class OFStockReserveSaleWizard(models.TransientModel):
     qty_ordered = fields.Float(string=u"Quantité commandée", digits=dp.get_precision('Product Unit of Measure'))
     qty_unreserved = fields.Float(string=u"Quantité non réservée", digits=dp.get_precision('Product Unit of Measure'))
     line_ids = fields.One2many(
-        comodel_name='of.stock.reserve.sale.wizard.line',inverse_name='wizard_id', string=u"Lignes")
+        comodel_name='of.stock.reserve.sale.wizard.line',inverse_name='wizard_id', string=u"Lignes de stock")
     date_validity = fields.Date(
         string=u"Date de validité", help=u"Si renseignée, la réservation sera annulée après cette date.")
 

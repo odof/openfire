@@ -18,18 +18,20 @@
                     <field name="qty_unreserved" readonly="1"/>
                     <field name="date_validity"/>
                 </group>
-                <group>
-                    <field name="line_ids" nolabel="1">
-                        <tree editable="top" create="0" delete="0"
-                              decoration-info="qty_to_reserve and qty_to_reserve &gt; 0 and qty_to_reserve &lt;= qty_available"
-                              decoration-danger="qty_to_reserve and qty_to_reserve &gt; qty_available">
-                            <field name="location_id" readonly="1" options="{'no_open': True}"/>
-                            <field name="of_internal_serial_number" readonly="1"/>
-                            <field name="qty_available" readonly="1"/>
-                            <field name="qty_to_reserve"/>
-                        </tree>
-                    </field>
-                </group>
+                <notebook>
+                    <page string="Stock réel" name="real_stock">
+                        <field name="line_ids" nolabel="1">
+                            <tree editable="top" create="0" delete="0"
+                                  decoration-info="qty_to_reserve and qty_to_reserve &gt; 0 and qty_to_reserve &lt;= qty_available"
+                                  decoration-danger="qty_to_reserve and qty_to_reserve &gt; qty_available">
+                                <field name="location_id" readonly="1" options="{'no_open': True}"/>
+                                <field name="of_internal_serial_number" readonly="1"/>
+                                <field name="qty_available" readonly="1"/>
+                                <field name="qty_to_reserve"/>
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
                 <footer>
                     <button string="Pré-réserver" name="action_reserve" type="object" class="oe_highlight"/>
                     <button string="Annuler" special="cancel" class="oe_link"/>
