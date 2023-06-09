@@ -248,7 +248,7 @@
                                 </t>
                             </t>
 
-                            <t t-if="(layout_category_size > 1 or page_size > 1) and layout_category['subtotal']" groups="sale.group_sale_layout">
+                            <t t-if="(layout_category_size > 1 or page_size > 1) and layout_category['subtotal']" groups="sale.group_sale_layout" name="layout_subtotal">
                                 <tr class="text-right">
                                     <td colspan="100">
                                         <strong>Subtotal&amp;nbsp;: </strong>
@@ -654,7 +654,7 @@ Sinon :
                             </t>
                         </t>
 
-                        <t t-if="(layout_category_size > 1 or page_size > 1) and layout_category['subtotal']" groups="sale.group_sale_layout">
+                        <t t-if="(layout_category_size > 1 or page_size > 1) and layout_category['subtotal']" groups="sale.group_sale_layout" name="layout_subtotal">
                             <tr class="text-right">
                                 <td colspan="100">
                                     <strong>Sous-total: </strong>
