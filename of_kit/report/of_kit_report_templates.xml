@@ -18,7 +18,7 @@
         <!-- Mode étendu -->
         <xpath expr="//table[@groups='!sale.group_sale_layout']//tr[@t-as='l']" position="inside">
             <t t-if="l.of_is_kit and o.of_kit_display_mode == 'expand'">
-                <t t-foreach="l.kit_id.kit_line_ids" t-as="comp">
+                <t t-foreach="l.kit_id.kit_line_ids" t-as="comp" name="comp_no_layout">
                     <tr>
                         <td>
                             <span style="padding: 0 8px;">-&gt;</span><span t-esc="comp.get_report_name()"/>
@@ -60,7 +60,7 @@
         <!-- Mode étendu -->
         <xpath expr="//t[@groups='sale.group_sale_layout']//t[@t-as='l']" position="inside">
             <t t-if="l.of_is_kit and o.of_kit_display_mode == 'expand'">
-                <t t-foreach="l.kit_id.kit_line_ids" t-as="comp">
+                <t t-foreach="l.kit_id.kit_line_ids" t-as="comp" name="comp_layout">
                     <tr>
                         <td>
                             <span style="padding: 0 8px;">-&gt;</span><span t-esc="comp.get_report_name()"/>

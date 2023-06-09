@@ -14,12 +14,17 @@ Gestion des Éco contributions
     'website': u"www.openfire.fr",
     'depends': [
         'of_conditionnement',
+        'of_sale_quote_template_kit',
     ],
     'category': u"OpenFire",
     'data': [
         'security/of_sale_stock_security.xml',
         'security/ir.model.access.csv',
         'views/of_eco_contribution_views.xml',
+        'views/product_views.xml',
+        'views/sale_order_views.xml',
+        'views/account_invoice_views.xml',
+        'report/of_eco_contribution_templates.xml',
     ],
     'installable': True,
     'application': False,
