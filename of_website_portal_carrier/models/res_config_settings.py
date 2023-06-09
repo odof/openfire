@@ -15,7 +15,7 @@ class WebsiteConfigSettings(models.TransientModel):
             self.env['ir.values'].sudo().set_default('website.config.settings', 'of_picking_rollback_delay', 1440)
         return res
 
-    of_picking_rollback_delay = fields.Integer(string=u"(OF) Délais de modification des BL")
+    of_picking_rollback_delay = fields.Integer(string=u"(OF) Délais de modification des BR")
 
     @api.onchange('of_picking_rollback_delay')
     def _onhcnage_of_picking_rollback_delay(self):
