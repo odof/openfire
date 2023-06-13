@@ -19,6 +19,10 @@ class ProductProduct(models.Model):
     )
     of_forced_lst_price = fields.Float(string="Sale price (forced)", digits='Product Price')
 
+    # --------------------------------------------------------------------------
+    # Compute methods
+    # --------------------------------------------------------------------------
+
     @api.depends('list_price', 'price_extra', 'of_forced_lst_price')
     @api.depends_context('uom')
     def _compute_product_lst_price(self):
@@ -47,6 +51,56 @@ class ProductProduct(models.Model):
             else:
                 value = product.lst_price
             product.write({'of_forced_lst_price': value})
+
+    # --------------------------------------------------------------------------
+    # CRUD methods
+    # --------------------------------------------------------------------------
+
+    def _valid_field_parameter(self, field, name):
+        # EXTENDS models
+        return name == 'of_unify_companies' or super()._valid_field_parameter(field, name)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        products = super(ProductProduct, self).create(vals_list)
+        for product in products:
+            if product.cost_method == 'standard':
+                product.of_theoretical_cost = product.standard_price
+
+            # FIXME: of_purchase_coeff_cost_propagation is from of_purchase module (not migrated yet)
+            if 'of_purchase_coeff_cost_propagation' in dir(product):
+                product.of_purchase_coeff_cost_propagation(product.get_cost())
+
+        return products
+
+    def write(self, values):
+        res = super(ProductProduct, self).write(values)
+
+        for product in self:
+            if product.cost_method == 'standard':
+                if 'standard_price' in values and values['standard_price'] != product.of_theoretical_cost:
+                    product.of_theoretical_cost = product.standard_price
+                elif 'of_theoretical_cost' in values and values['of_theoretical_cost'] != product.standard_price:
+                    product.standard_price = product.of_theoretical_cost
+
+            # FIXME: of_purchase_coeff_cost_propagation is from of_purchase module (not migrated yet)
+            if 'of_purchase_coeff_cost_propagation' in dir(product):
+                if (
+                    product.cost_method == 'standard' or product.categ_id.of_sale_cost == 'standard'
+                ) and 'standard_price' in values:
+                    product.of_purchase_coeff_cost_propagation(product.standard_price)
+                elif (
+                    product.cost_method == 'standard'
+                    and product.categ_id.of_sale_cost == 'theoretical'
+                    and 'of_theoretical_cost' in values
+                ):
+                    product.of_purchase_coeff_cost_propagation(product.of_theoretical_cost)
+
+        return res
+
+    # --------------------------------------------------------------------------
+    # Business methods
+    # --------------------------------------------------------------------------
 
     def price_compute(self, price_type, uom=None, currency=None, company=None, date=False):
         if self.env.user.has_group('of_product.group_product_variant_specific_price'):
@@ -197,41 +251,3 @@ class ProductProduct(models.Model):
             return self.standard_price
         else:
             return self.of_theoretical_cost
-
-    @api.model_create_multi
-    def create(self, vals_list):
-        products = super(ProductProduct, self).create(vals_list)
-        for product in products:
-            if product.cost_method == 'standard':
-                product.of_theoretical_cost = product.standard_price
-
-            # FIXME: of_purchase_coeff_cost_propagation is from of_purchase module (not migrated yet)
-            if 'of_purchase_coeff_cost_propagation' in dir(product):
-                product.of_purchase_coeff_cost_propagation(product.get_cost())
-
-        return products
-
-    def write(self, values):
-        res = super(ProductProduct, self).write(values)
-
-        for product in self:
-            if product.cost_method == 'standard':
-                if 'standard_price' in values and values['standard_price'] != product.of_theoretical_cost:
-                    product.of_theoretical_cost = product.standard_price
-                elif 'of_theoretical_cost' in values and values['of_theoretical_cost'] != product.standard_price:
-                    product.standard_price = product.of_theoretical_cost
-
-            # FIXME: of_purchase_coeff_cost_propagation is from of_purchase module (not migrated yet)
-            if 'of_purchase_coeff_cost_propagation' in dir(product):
-                if (
-                    product.cost_method == 'standard' or product.categ_id.of_sale_cost == 'standard'
-                ) and 'standard_price' in values:
-                    product.of_purchase_coeff_cost_propagation(product.standard_price)
-                elif (
-                    product.cost_method == 'standard'
-                    and product.categ_id.of_sale_cost == 'theoretical'
-                    and 'of_theoretical_cost' in values
-                ):
-                    product.of_purchase_coeff_cost_propagation(product.of_theoretical_cost)
-
-        return res

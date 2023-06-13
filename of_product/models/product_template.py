@@ -140,6 +140,10 @@ class ProductTemplate(models.Model):
         related_fields.append('of_theoretical_cost')
         return related_fields
 
+    def _valid_field_parameter(self, field, name):
+        # EXTENDS models
+        return name == 'of_unify_companies' or super()._valid_field_parameter(field, name)
+
     @api.model_create_multi
     def create(self, vals_list):
         category_all = self.env.ref('product.product_category_all', raise_if_not_found=False)

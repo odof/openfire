@@ -61,11 +61,11 @@
                 <field name="active"/>
                 <templates>
                     <t t-name="kanban-box">
-                       <div class="oe_kanban_global_click">
+                        <div class="oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <strong>
                                     <span>
-                                         <t t-esc="record.name.value"/>
+                                            <t t-esc="record.name.value"/>
                                     </span>
                                 </strong>
                                 <field name="code"/>

@@ -65,7 +65,7 @@
                     </span>
                 </div>
                 <field name="of_theoretical_cost" groups="base.group_user" widget='monetary' options="{'currency_field': 'currency_id'}"
-                       attrs="{'invisible': [('cost_method' , '=', 'standard')]}"/>
+                        attrs="{'invisible': [('cost_method' , '=', 'standard')]}"/>
                 <label for="list_price" class="mt-1"/>
                 <div name="pricing">
                     <field name="list_price" class="oe_inline" widget='monetary'
@@ -159,7 +159,7 @@
             </xpath>
         </field>
     </record>
-    
+
     <!-- Ajout de la recherche sur étiquettes -->
     <record id="of_product_template_search_view" model="ir.ui.view">
         <field name="name">of.product.template.search</field>

@@ -42,4 +42,8 @@ class ProductCategory(models.Model):
             'property_stock_journal': self.property_stock_journal,
         }
         default = dict(new_defaults, **(default or {}))
-        return super(ProductCategory, self).copy_data(default)
+        return super().copy_data(default)
+
+    def _valid_field_parameter(self, field, name):
+        # EXTENDS models
+        return name == 'of_unify_companies' or super()._valid_field_parameter(field, name)
