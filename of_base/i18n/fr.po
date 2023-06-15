@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-15 13:42+0000\n"
-"PO-Revision-Date: 2023-06-15 13:42+0000\n"
+"POT-Creation-Date: 2023-06-15 14:04+0000\n"
+"PO-Revision-Date: 2023-06-15 14:04+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -1681,6 +1681,11 @@ msgid "Model"
 msgstr ""
 
 #. module: of_base
+#: model:res.groups,name:of_base.of_group_openfire_contract
+msgid "Modify OpenFire contract"
+msgstr "Modifier le contrat OpenFire"
+
+#. module: of_base
 #: model:ir.model,name:of_base.model_ir_module_module
 msgid "Module"
 msgstr ""
@@ -2806,6 +2811,11 @@ msgstr "Utilisateur"
 #: model:ir.model.fields,field_description:of_base.field_res_users__of_user_type
 msgid "User type"
 msgstr "Type d'utilisateur"
+
+#. module: of_base
+#: model:res.groups,comment:of_base.of_group_openfire_contract
+msgid "Users who can make changes affecting the OpenFire contract"
+msgstr "Utilisateurs pouvant opérer des modifications impactant le contrat OpenFire"
 
 #. module: of_base
 #: model:ir.model.fields,help:of_base.field_of_connector_config_settings__restrict_template_rendering

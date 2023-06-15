@@ -20,6 +20,7 @@
     ],
     'data': [
         'data/ir_cron.xml',
+        'data/ir_config_parameter.xml',
         'data/mail_message_subtype.xml',
         'data/report_paperformat.xml',
         'security/of_base_security.xml',
