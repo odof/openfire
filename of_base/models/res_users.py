@@ -17,10 +17,16 @@ class ResUsers(models.Model):
         return 'web'
 
     of_user_type = fields.Selection(
-        selection=[('web', "Web"), ('technical', "Technical"), ('external', "External")],
+        selection=[
+            ('web', "Web"),
+            ('technical', "Technical"),
+            ('external', "External"),
+            ('inactive', "Inactive resource"),
+        ],
         string="User type",
         default=lambda u: u._default_of_type_selection(),
     )
+    of_reactivated_user = fields.Boolean(string="Reactivated user")
 
     @api.model
     @tools.ormcache('self._uid')
@@ -43,13 +49,21 @@ class ResUsers(models.Model):
             raise AccessError(
                 _("Only the administrator account can modify the information of the administrator account.")
             )
+        # save current inactive users to check if they are reactivated
+        inactive_users = self.browse()
+        if values.get('active'):
+            inactive_users = self.filtered(lambda u: not u.active)
         result = super().write(values)
+        # mark reactivated users as such
+        if inactive_users and values.get('active'):
+            inactive_users.write({'of_reactivated_user': True})
         group_root = self.env.ref('of_base.of_group_root_only').sudo()
         admin_user_id = self.env.ref('base.user_admin').id
         if not len(group_root.users):
             raise UserError(_("The group \"%s\" cannot be removed from the administrator account.") % group_root.name)
         if 'groups_id' in values and (len(group_root.users) > 2 or group_root.users.id != admin_user_id):
             raise UserError(_("Group \"%s\" cannot be added to a user!") % group_root.name)
+
         return result
 
     @api.model_create_multi

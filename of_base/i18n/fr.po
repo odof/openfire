@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-24 09:38+0000\n"
-"PO-Revision-Date: 2023-03-24 09:38+0000\n"
+"POT-Creation-Date: 2023-06-15 13:06+0000\n"
+"PO-Revision-Date: 2023-06-15 13:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -20,6 +20,20 @@ msgstr ""
 #: code:addons/of_base/static/src/js/of_form.js:0
 #, python-format
 msgid " & Close"
+msgstr ""
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/monkeypatch.py:0
+#, python-format
+msgid "\"group_by\" value must be a string %(attribute)s=%(value)r"
+msgstr ""
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/monkeypatch.py:0
+#, python-format
+msgid "%(attribute)r value must be an integer (%(value)s)"
 msgstr ""
 
 #. module: of_base
@@ -51,6 +65,11 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_3way_match
 msgid "3-way matching: purchases, receptions and bills"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
+msgid "<span class=\"fa fa-star\">&amp;nbsp;</span>"
 msgstr ""
 
 #. module: of_base
@@ -100,8 +119,27 @@ msgid "Accounting"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__pos_invoice_journal_id
+msgid "Accounting journal used to create invoices."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__pos_journal_id
+msgid ""
+"Accounting journal used to post POS session journal entries and POS invoice "
+"payments."
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__message_needaction
 msgid "Action Needed"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__point_of_sale_use_ticket_qr_code
+msgid ""
+"Add a QR code on the ticket, which the user can scan to request the invoice "
+"linked to its order."
 msgstr ""
 
 #. module: of_base
@@ -117,6 +155,11 @@ msgid "Admin only"
 msgstr "Admin seulement"
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_cash_control
+msgid "Advanced Cash Control"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_sale_pricelist
 msgid "Advanced Pricelists"
 msgstr ""
@@ -125,6 +168,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_view_company_form
 msgid "Advanced settings"
 msgstr "Paramètres avancés"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_pos_adyen
+msgid "Adyen Payment Terminal"
+msgstr ""
 
 #. module: of_base
 #: model:ir.model.fields,help:of_base.field_of_connector_config_settings__module_stock_landed_costs
@@ -196,6 +244,11 @@ msgid "Amazon Sync"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_amount_authorized_diff
+msgid "Amount Authorized Difference"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_analytic_accounting
 msgid "Analytic Accounting"
 msgstr ""
@@ -233,6 +286,13 @@ msgid "Asterisk (VoIP)"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__update_stock_quantities
+msgid ""
+"At the session closing: A picking is created for the entire session when it's closed\n"
+" In real time: Each order sent to the server create its own picking"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__message_attachment_count
 msgid "Attachment Count"
 msgstr ""
@@ -260,6 +320,21 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__automatic_invoice
 msgid "Automatic Invoice"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_iface_print_auto
+msgid "Automatic Receipt Printing"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_iface_available_categ_ids
+msgid "Available PoS Product Categories"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_available_pricelist_ids
+msgid "Available Pricelists"
 msgstr ""
 
 #. module: of_base
@@ -324,6 +399,14 @@ msgid "Button Color"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__pos_limited_partners_loading
+msgid ""
+"By default, 100 partners are loaded.\n"
+"When the session is open, we keep on loading all remaining partners in the background.\n"
+"In the meantime, you can use the 'Load Customers' button to load partners from database."
+msgstr ""
+
+#. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_res_partner_tree
 msgid "CP"
 msgstr ""
@@ -366,14 +449,34 @@ msgid "Cash Rounding"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_cash_rounding
+msgid "Cash Rounding (PoS)"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_rounding_method
+msgid "Cash rounding"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_iface_cashdrawer
+msgid "Cashdrawer"
+msgstr ""
+
+#. module: of_base
 #. odoo-python
-#: code:addons/of_base/hooks.py:0
+#: code:addons/of_base/monkeypatch.py:0
 #, python-format
 msgid ""
 "Changing the company of a contact should only be done if it was never "
 "correctly set. If an existing contact starts working for a new company then "
 "a new contact should be created under that new company. You can use the "
 "\"Discard\" button to abandon this change."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__pos_cash_control
+msgid "Check the amount of the cashbox at opening and closing."
 msgstr ""
 
 #. module: of_base
@@ -393,6 +496,11 @@ msgstr "Civilité du numéro"
 #: code:addons/of_base/static/src/js/of_form.js:0
 #, python-format
 msgid "Close"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_default_bill_ids
+msgid "Coins/Bills"
 msgstr ""
 
 #. module: of_base
@@ -432,6 +540,11 @@ msgid "Company has a chart of accounts"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_company_has_template
+msgid "Company has chart of accounts"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_account_invoice_send__of_computed_body
 #: model:ir.model.fields,field_description:of_base.field_mail_compose_message__of_computed_body
 msgid "Computed body"
@@ -453,6 +566,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:of_base.of_connector_config_settings_view
 msgid "Configure connectors"
 msgstr "Configurer les connecteurs"
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__pos_other_devices
+msgid "Connect devices to your PoS without an IoT Box."
+msgstr ""
 
 #. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.view_users_form
@@ -534,6 +652,11 @@ msgid "Custom Email Servers"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_is_header_or_footer
+msgid "Custom Header & Footer"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__report_footer
 msgid "Custom Report Footer"
 msgstr ""
@@ -551,6 +674,11 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_sale_delivery_address
 msgid "Customer Addresses"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_iface_customer_facing_display_via_proxy
+msgid "Customer Facing Display"
 msgstr ""
 
 #. module: of_base
@@ -601,8 +729,23 @@ msgid "Default Access Rights"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__account_default_pos_receivable_account_id
+msgid "Default Account Receivable (PoS)"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__account_default_credit_limit
 msgid "Default Credit Limit"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_default_fiscal_position_id
+msgid "Default Fiscal Position"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_pricelist_id
+msgid "Default Pricelist"
 msgstr ""
 
 #. module: of_base
@@ -775,6 +918,11 @@ msgid "Easypost Connector"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_iface_electronic_scale
+msgid "Electronic Scale"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_res_partner__email
 #: model:ir.model.fields,field_description:of_base.field_res_users__email
 msgid "Email"
@@ -902,6 +1050,11 @@ msgid "Fiscal Country Code"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_fiscal_position_ids
+msgid "Fiscal Positions"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__message_follower_ids
 msgid "Followers"
 msgstr ""
@@ -914,6 +1067,11 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,help:of_base.field_of_connector_config_settings__report_footer
 msgid "Footer text displayed at the bottom of all reports."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__pos_iface_big_scrollbars
+msgid "For imprecise industrial touchscreens."
 msgstr ""
 
 #. module: of_base
@@ -953,6 +1111,11 @@ msgid "Get product pictures using barcode"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_module_pos_discount
+msgid "Global Discounts"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__google_gmail_client_identifier
 msgid "Gmail Client Id"
 msgstr ""
@@ -982,6 +1145,11 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__has_accounting_entries
 msgid "Has Accounting Entries"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_has_active_session
+msgid "Has Active Session"
 msgstr ""
 
 #. module: of_base
@@ -1026,6 +1194,11 @@ msgid "ID"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_proxy_ip
+msgid "IP Address"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,help:of_base.field_of_res_partner_phone__message_needaction
 msgid "If checked, new messages require your attention."
 msgstr ""
@@ -1033,6 +1206,14 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,help:of_base.field_of_res_partner_phone__message_has_error
 msgid "If checked, some messages have a delivery error."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__pos_picking_policy
+msgid ""
+"If you deliver all products at once, the delivery order will be scheduled "
+"based on the greatest product lead time. Otherwise, it will be based on the "
+"shortest."
 msgstr ""
 
 #. module: of_base
@@ -1073,6 +1254,11 @@ msgid "Import/export history"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__res_users__of_user_type__inactive
+msgid "Inactive resource"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,help:of_base.field_of_connector_config_settings__account_journal_payment_debit_account_id
 msgid ""
 "Incoming payments are posted on an Outstanding Receipts Account. In the bank reconciliation widget, they appear as blue lines.\n"
@@ -1087,6 +1273,11 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_check_duplications__info_txt
 msgid "Info text"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_iface_start_categ_id
+msgid "Initial Category"
 msgstr ""
 
 #. module: of_base
@@ -1147,6 +1338,11 @@ msgid "Invoice Email Template"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_invoice_journal_id
+msgid "Invoice Journal"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_payment
 msgid "Invoice Online Payment"
 msgstr ""
@@ -1157,8 +1353,18 @@ msgid "Invoicing Policy"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__is_default_pricelist_displayed
+msgid "Is Default Pricelist Displayed"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__message_is_follower
 msgid "Is Follower"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_module_pos_restaurant
+msgid "Is a Bar/Restaurant"
 msgstr ""
 
 #. module: of_base
@@ -1179,6 +1385,11 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_stock_landed_costs
 msgid "Landed Costs"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_iface_big_scrollbars
+msgid "Large Scrollbars"
 msgstr ""
 
 #. module: of_base
@@ -1259,8 +1470,38 @@ msgid "Levels of Approvals *"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_limited_partners_amount
+msgid "Limited Partners Amount"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_limited_partners_loading
+msgid "Limited Partners Loading"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_limited_products_loading
+msgid "Limited Product Loading"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_limited_products_amount
+msgid "Limited Products Amount"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_manual_discount
+msgid "Line Discounts"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__show_line_subtotals_tax_selection
 msgid "Line Subtotals Tax Display"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_iface_customer_facing_display_local
+msgid "Local Customer Facing Display"
 msgstr ""
 
 #. module: of_base
@@ -1285,8 +1526,18 @@ msgid "Log messages"
 msgstr ""
 
 #. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.inactive_user
+msgid "Log out"
+msgstr "Se déconnecter"
+
+#. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_login
 msgid "Login"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.inactive_user_layout
+msgid "Logo"
 msgstr ""
 
 #. module: of_base
@@ -1302,6 +1553,11 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_stock_production_lot
 msgid "Lots & Serial Numbers"
+msgstr ""
+
+#. module: of_base
+#: model:mail.message.subtype,name:of_base.mt_of_sale_mail_subscribtion
+msgid "Mail"
 msgstr ""
 
 #. module: of_base
@@ -1351,6 +1607,11 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_sale_margin
 msgid "Margins"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_is_margins_costs_accessible_to_every_user
+msgid "Margins & Costs"
 msgstr ""
 
 #. module: of_base
@@ -1425,6 +1686,11 @@ msgid "Module"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_module_pos_hr
+msgid "Module Pos Hr"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__is_membership_multi
 msgid "Multi Teams"
 msgstr ""
@@ -1461,6 +1727,11 @@ msgstr "Nom"
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_check_duplications__new_partner_id
 msgid "New partner"
 msgstr "Nouveau partenaire"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__barcode_nomenclature_id
+msgid "Nomenclature"
+msgstr ""
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__number
@@ -1546,6 +1817,11 @@ msgid "Online Signature"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_only_round_cash_method
+msgid "Only apply rounding on cash"
+msgstr ""
+
+#. module: of_base
 #. odoo-python
 #: code:addons/of_base/models/res_groups.py:0
 #, python-format
@@ -1572,6 +1848,13 @@ msgid "Only the administrator can create a new company."
 msgstr "Seul l'administrateur peut créer une nouvelle société."
 
 #. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__pos_restrict_price_control
+msgid ""
+"Only users with Manager access rights for PoS app can modify the product "
+"prices on orders."
+msgstr ""
+
+#. module: of_base
 #: model:res.groups,comment:of_base.of_group_intranet
 msgid "OpenFire rights: gives access rights to the intranet"
 msgstr "Droits OpenFire : donne les droits d'accès à l'intranet"
@@ -1580,6 +1863,21 @@ msgstr "Droits OpenFire : donne les droits d'accès à l'intranet"
 #: model:res.groups,comment:of_base.of_group_hidden
 msgid "OpenFire special group : allows to hide some menu items"
 msgstr "Groupe spécial OpenFire : permet de cacher certains éléments de menu"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_picking_type_id
+msgid "Operation Type"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_sequence_id
+msgid "Order IDs Sequence"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_other_devices
+msgid "Other Devices"
+msgstr ""
 
 #. module: of_base
 #: model:ir.model.fields.selection,name:of_base.selection__mail_message__of_state__outgoing
@@ -1618,7 +1916,7 @@ msgstr ""
 #. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_res_partner_filter
 msgid "Parent"
-msgstr "Parent"
+msgstr ""
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_res_partner__of_parent_category_id
@@ -1637,6 +1935,11 @@ msgid "Partner Autocomplete"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_partner_load_background
+msgid "Partner Load Background"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model,name:of_base.model_res_partner_title
 msgid "Partner Title"
 msgstr "Titre du partenaire"
@@ -1645,6 +1948,16 @@ msgstr "Titre du partenaire"
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_view_module_upgrade
 msgid "Password"
 msgstr "Mot de passe"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pay_invoices_online
+msgid "Pay Invoices Online"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_payment_method_ids
+msgid "Payment Methods"
+msgstr ""
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_res_partner__phone
@@ -1662,6 +1975,31 @@ msgstr "Numéros de téléphone"
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
 msgid "Phones"
 msgstr "Téléphones"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_config_id
+msgid "Point of Sale"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_journal_id
+msgid "Point of Sale Journal"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_allowed_pricelist_ids
+msgid "Pos Allowed Pricelist"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_selectable_categ_ids
+msgid "Pos Selectable Categ"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_is_posbox
+msgid "PosBox"
+msgstr ""
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_res_partner__of_potential_duplication
@@ -1701,6 +2039,11 @@ msgid "Print GS1 Barcodes for Lots & Serial Numbers"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_iface_print_via_proxy
+msgid "Print via Proxy"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_proforma_sales
 msgid "Pro-Forma Invoice"
 msgstr ""
@@ -1711,6 +2054,11 @@ msgid "Product"
 msgstr "Modèle d'article"
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_product_load_background
+msgid "Product Load Background"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_stock_packaging
 msgid "Product Packagings"
 msgstr ""
@@ -1718,7 +2066,12 @@ msgstr ""
 #. module: of_base
 #: model:ir.model,name:of_base.model_product_product
 msgid "Product Variant"
-msgstr "Variante d'article"
+msgstr "Variante de produit"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_iface_tipproduct
+msgid "Product tips"
+msgstr ""
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__profiling_enabled_until
@@ -1808,6 +2161,21 @@ msgid "Quick encoding"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_users__of_reactivated_user
+msgid "Reactivated user"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_receipt_footer
+msgid "Receipt Footer"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_receipt_header
+msgid "Receipt Header"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_send_reminder
 msgid "Receipt Reminder"
 msgstr ""
@@ -1830,6 +2198,16 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__crm_auto_assignment_interval_number
 msgid "Repeat every"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_limit_categories
+msgid "Restrict Categories"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_restrict_price_control
+msgid "Restrict Price Modifications to Managers"
 msgstr ""
 
 #. module: of_base
@@ -1893,6 +2271,11 @@ msgid "Save & New"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_iface_scan_via_proxy
+msgid "Scan via Proxy"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__use_po_lead
 msgid "Security Lead Time for Purchase"
 msgstr ""
@@ -1918,8 +2301,40 @@ msgid "Sent"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_set_maximum_difference
+msgid "Set Maximum Difference"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__pos_set_maximum_difference
+msgid ""
+"Set a maximum difference allowed between the expected and counted money "
+"during the closing of the session."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_ship_later
+msgid "Ship Later"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_picking_policy
+msgid "Shipping Policy"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__show_effect
 msgid "Show Effect"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__pos_iface_customer_facing_display_local
+msgid "Show checkout to customers."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__pos_module_pos_hr
+msgid "Show employee login screen"
 msgstr ""
 
 #. module: of_base
@@ -1938,6 +2353,16 @@ msgid "Signature"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_pos_six
+msgid "Six Payment Terminal"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_iface_print_skip_screen
+msgid "Skip Preview Screen"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_snailmail_account
 msgid "Snailmail"
 msgstr ""
@@ -1948,15 +2373,18 @@ msgid "Social capital"
 msgstr "Capital social"
 
 #. module: of_base
-#. odoo-python
-#: code:addons/of_base/models/of_read_group.py:0
-#, python-format
-msgid "Sorting field %s not found on model %s"
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_product_email_template
+msgid "Specific Email"
 msgstr ""
 
 #. module: of_base
-#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_product_email_template
-msgid "Specific Email"
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_route_id
+msgid "Spefic route for products delivered later."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_start_category
+msgid "Start Category"
 msgstr ""
 
 #. module: of_base
@@ -2005,6 +2433,11 @@ msgid "Street2"
 msgstr "Rue 2"
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_pos_stripe
+msgid "Stripe Payment Terminal"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_google_gmail
 msgid "Support Gmail Authentication"
 msgstr ""
@@ -2022,6 +2455,16 @@ msgstr "Suspicion de doublons !"
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__tax_cash_basis_journal_id
 msgid "Tax Cash Basis Journal"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_iface_tax_included
+msgid "Tax Display"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_tax_regime_selection
+msgid "Tax Regime Selection value"
 msgstr ""
 
 #. module: of_base
@@ -2113,6 +2556,46 @@ msgid ""
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__pos_iface_print_skip_screen
+msgid ""
+"The receipt screen will be skipped if the receipt can be printed "
+"automatically."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__pos_iface_print_auto
+msgid "The receipt will automatically be printed at the end of each order."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__module_pos_adyen
+msgid ""
+"The transactions are processed by Adyen. Set your Adyen credentials on the "
+"related payment method."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__module_pos_six
+msgid ""
+"The transactions are processed by Six. Set the IP address of the terminal on"
+" the related payment method."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__module_pos_stripe
+msgid ""
+"The transactions are processed by Stripe. Set your Stripe credentials on the"
+" related payment method."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__module_pos_mercury
+msgid ""
+"The transactions are processed by Vantiv. Set your Vantiv credentials on the"
+" related payment method."
+msgstr ""
+
+#. module: of_base
 #. odoo-python
 #: code:addons/of_base/wizard/base_module_upgrade.py:0
 #, python-format
@@ -2143,10 +2626,31 @@ msgid ""
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__pos_amount_authorized_diff
+msgid ""
+"This field depicts the maximum difference allowed between the ending balance"
+" and the theoretical cash when closing a session, for non-POS managers. If "
+"this maximum is reached, the user will have an error message at the closing "
+"of his session saying that he needs to contact his manager."
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,help:of_base.field_of_connector_config_settings__account_default_credit_limit
 msgid ""
 "This is the default credit limit that will be used on partners that do not "
 "have a specific limit on them."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__pos_sequence_id
+msgid ""
+"This sequence is automatically created by Odoo but you can change it to "
+"customize the reference numbers of your orders."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_tip_product_id
+msgid "Tip Product"
 msgstr ""
 
 #. module: of_base
@@ -2216,6 +2720,13 @@ msgstr ""
 
 #. module: of_base
 #. odoo-python
+#: code:addons/of_base/monkeypatch.py:0
+#, python-format
+msgid "Unknown field \"%(field)s\" in \"group_by\" value in %(attribute)s=%(value)r"
+msgstr ""
+
+#. module: of_base
+#. odoo-python
 #: code:addons/of_base/models/of_read_group.py:0
 #, python-format
 msgid "Unknown field %r in 'groupby'"
@@ -2224,6 +2735,11 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_web_unsplash
 msgid "Unsplash Image Library"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__update_stock_quantities
+msgid "Update quantities in stock"
 msgstr ""
 
 #. module: of_base
@@ -2237,6 +2753,11 @@ msgid "Use Partner ID"
 msgstr "Utiliser l'id du partenaire"
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__point_of_sale_use_ticket_qr_code
+msgid "Use QR code on ticket"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_sepa_direct_debit
 msgid "Use SEPA Direct Debit"
 msgstr ""
@@ -2244,6 +2765,11 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__use_twilio_rtc_servers
 msgid "Use Twilio ICE servers"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_use_pricelist
+msgid "Use a pricelist."
 msgstr ""
 
 #. module: of_base
@@ -2284,6 +2810,11 @@ msgid "Validation code"
 msgstr "Code de validation"
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_pos_mercury
+msgid "Vantiv Payment Terminal"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_product_variant
 msgid "Variants"
 msgstr ""
@@ -2299,8 +2830,13 @@ msgid "Volume unit of measure"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_warehouse_id
+msgid "Warehouse (PoS)"
+msgstr ""
+
+#. module: of_base
 #. odoo-python
-#: code:addons/of_base/hooks.py:0
+#: code:addons/of_base/monkeypatch.py:0
 #: model:ir.model.fields.selection,name:of_base.selection__of_log_message__log_level__warning
 #, python-format
 msgid "Warning"
@@ -2342,11 +2878,27 @@ msgid "Weight unit of measure"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__pos_is_margins_costs_accessible_to_every_user
+msgid ""
+"When disabled, only PoS manager can view the margin and cost of product "
+"among the Product info."
+msgstr ""
+
+#. module: of_base
 #. odoo-python
 #: code:addons/of_base/models/ir_module.py:0
 #, python-format
 msgid "You are trying to delete one or more protected modules : %s"
 msgstr "Vous tentez de supprimer un ou plusieurs modules protégés : %s"
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.inactive_user
+msgid ""
+"You cannot access the OpenFire WEB application from an \"Inactive resource\""
+" account."
+msgstr ""
+"Vous ne pouvez pas accéder à l'application WEB OpenFire depuis un compte"
+" \"Ressource inactive\"."
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_res_partner__zip
@@ -2367,6 +2919,11 @@ msgstr ""
 #. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
 msgid "e.g. Sales Director"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_of_base_hooks_installed
+msgid "of.base.hooks.installed"
 msgstr ""
 
 #. module: of_base
@@ -2407,4 +2964,12 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_google_recaptcha
 msgid "reCAPTCHA"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__pos_limited_products_loading
+msgid ""
+"we load all starred products (favorite), all services, recent inventory movements of products, and the most recently updated products.\n"
+"When the session is open, we keep on loading all remaining products in the background.\n"
+"In the meantime, you can click on the 'database icon' in the searchbar to load products from database."
 msgstr ""
