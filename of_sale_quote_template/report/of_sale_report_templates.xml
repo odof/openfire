@@ -2,6 +2,9 @@
 <odoo>
 
     <template id="of_report_saleorder_document"  inherit_id="sale.report_saleorder_document">
+        <xpath expr="//table[@name='order_lines_layouted']" position="attributes">
+            <attribute name="t-att-style">'' if doc.of_price_printing in ['order_line', 'layout_category_with_products', 'summary'] else 'display:none;'</attribute>
+        </xpath>
         <xpath expr="//table[@name='order_lines_layouted']//td[1]" position="attributes">
             <attribute name="t-att-style">'background-color: ' + layout_category['color'] + ';color: ' + doc.get_color_font() + '; font-weight:  bold; border-bottom: 1px solid black;'</attribute>
         </xpath>
@@ -15,14 +18,14 @@
             <attribute name="t-att-style">'' if doc.of_price_printing in ['order_line', 'layout_category_with_products', 'summary'] else 'display:none;'</attribute>
         </xpath>
         <xpath expr="//table[@name='order_lines_layouted']/tbody/t/t[3]/tr" position="attributes">
-            <attribute name="t-att-style">'' if doc.of_price_printing in ['order_line', 'layout_category', 'layout_category_with_products'] else 'display:none;'</attribute>
+            <attribute name="t-att-style">'' if doc.of_price_printing in ['order_line', 'layout_category_with_products'] else 'display:none;'</attribute>
         </xpath>
         <xpath expr="//div[@name='total']" position="attributes">
             <attribute name="t-att-style">'page-break-inside:avoid;' if doc.of_price_printing in ['order_line', 'layout_category_with_products', 'summary'] else 'display:none;'</attribute>
         </xpath>
         <xpath expr="//div[@name='total']" position="before">
             <t t-foreach="doc.order_lines_layouted()" t-as="page">
-                <div class="row mt16" name="summary" t-att-style="'' if doc.of_price_printing == 'summary' else 'display:none;'">
+                <div class="row mt16" name="summary" t-att-style="'' if doc.of_price_printing in ['layout_category', 'summary'] else 'display:none;'">
                     <div class="col-xs-12">
                         <table class="table table-condensed">
                             <thead>
@@ -39,8 +42,16 @@
                                         </span>
                                     </td>
                                     <td class="text-right">
-                                        <t t-set="subtotal" t-value="sum(line.price_subtotal for line in layout_category['lines'])" groups="sale.group_show_price_subtotal"/>
-                                        <t t-set="subtotal" t-value="sum(line.price_total for line in layout_category['lines'])" groups="sale.group_show_price_total"/>
+                                        <t t-if="doc.of_price_printing == 'layout_category'">
+                                            <t t-set="subtotal" t-value="sum(line.price_subtotal for line in layout_category['lines'])" groups="sale.group_show_price_subtotal"/>
+                                            <t t-set="subtotal" t-value="sum(line.price_total for line in layout_category['lines'])" groups="sale.group_show_price_total"/>
+                                        </t>
+                                        <t t-elif="doc.of_price_printing == 'summary'">
+                                            <t t-set="subtotal" t-value="layout_category['subtotal']"/>
+                                        </t>
+                                        <t t-else="">
+                                            <t t-set="subtotal" t-value="0"/>
+                                        </t>
                                         <span t-esc="subtotal" t-options="{'widget': 'monetary', 'display_currency': doc.pricelist_id.currency_id}"/>
                                     </td>
                                 </tr>
@@ -53,6 +64,9 @@
     </template>
 
     <template id="of_report_invoice_layouted"  inherit_id="sale.report_invoice_layouted">
+        <xpath expr="//table[@name='invoice_lines_layouted']" position="attributes">
+            <attribute name="t-att-style">'' if o.of_price_printing in ['order_line', 'layout_category_with_products', 'summary'] else 'display:none;'</attribute>
+        </xpath>
         <xpath expr="//table[@name='invoice_lines_layouted']/tbody/t/t[1]/tr/td" position="attributes">
             <attribute name="t-att-style">'background-color: ' + layout_category['color'] + ';color: ' + o.get_color_font() + '; font-weight:  bold; border-bottom: 1px solid black;'</attribute>
         </xpath>
@@ -66,14 +80,14 @@
             <attribute name="t-att-style">'' if o.of_price_printing in ['order_line', 'layout_category_with_products', 'summary'] else 'display:none;'</attribute>
         </xpath>
         <xpath expr="//table[@name='invoice_lines_layouted']/tbody/t/t[3]/tr" position="attributes">
-            <attribute name="t-att-style">'' if o.of_price_printing in ['order_line', 'layout_category', 'layout_category_with_products'] else 'display:none;'</attribute>
+            <attribute name="t-att-style">'' if o.of_price_printing in ['order_line', 'layout_category_with_products'] else 'display:none;'</attribute>
         </xpath>
         <xpath expr="//div[@name='subdivision']" position="attributes">
             <attribute name="t-att-style">'' if o.of_price_printing in ['order_line', 'layout_category_with_products', 'summary'] else 'display:none;'</attribute>
         </xpath>
         <xpath expr="//div[@name='subdivision']/.." position="before">
             <t t-foreach="o.order_lines_layouted()" t-as="page">
-                <div class="row mt16" name="summary" t-att-style="'' if o.of_price_printing == 'summary' else 'display:none;'">
+                <div class="row mt16" name="summary" t-att-style="'' if o.of_price_printing in ['layout_category', 'summary'] else 'display:none;'">
                     <div class="col-xs-12">
                         <table class="table table-condensed">
                             <thead>
@@ -91,8 +105,16 @@
                                         </span>
                                     </td>
                                     <td class="text-right">
-                                        <t t-set="subtotal" t-value="sum(line.price_subtotal for line in layout_category['lines'])" groups="sale.group_show_price_subtotal"/>
-                                        <t t-set="subtotal" t-value="sum(line.price_total for line in layout_category['lines'])" groups="sale.group_show_price_total"/>
+                                        <t t-if="o.of_price_printing == 'layout_category'">
+                                            <t t-set="subtotal" t-value="sum(line.price_subtotal for line in layout_category['lines'])" groups="sale.group_show_price_subtotal"/>
+                                            <t t-set="subtotal" t-value="sum(line.price_total for line in layout_category['lines'])" groups="sale.group_show_price_total"/>
+                                        </t>
+                                        <t t-elif="o.of_price_printing == 'summary'">
+                                            <t t-set="subtotal" t-value="layout_category['subtotal']"/>
+                                        </t>
+                                        <t t-else="">
+                                            <t t-set="subtotal" t-value="0"/>
+                                        </t>
                                         <span t-esc="subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
                                     </td>
                                 </tr>

@@ -1139,10 +1139,7 @@ class SaleOrder(models.Model):
 
             # On crée une liste de lignes de commande pour chaque section avancée, y compris celles vides
             for index, layout_category in enumerate(of_layout_category_ids_sorted):
-                if self.of_price_printing == 'summary':
-                    domain = [('of_layout_category_id', 'child_of', layout_category.id)]
-                else:
-                    domain = [('of_layout_category_id', '=', layout_category.id)]
+                domain = [('of_layout_category_id', '=', layout_category.id)]
 
                 lines = self.order_line.search(domain)
                 new_dict[index] = {
@@ -1373,10 +1370,7 @@ class AccountInvoice(models.Model):
 
             # On crée une liste de lignes de facture pour chaque section avancée, y compris celles vides
             for index, layout_category in enumerate(of_layout_category_ids_sorted):
-                if self.of_price_printing == 'summary':
-                    domain = [('of_layout_category_id', 'child_of', layout_category.id)]
-                else:
-                    domain = [('of_layout_category_id', '=', layout_category.id)]
+                domain = [('of_layout_category_id', '=', layout_category.id)]
 
                 lines = self.invoice_line_ids.search(domain)
                 new_dict[index] = {
@@ -1430,7 +1424,6 @@ class AccountInvoice(models.Model):
             for page in report_pages:
                 for group in page:
                     group['color'] = section_color
-
         return report_pages
 
     @api.multi
