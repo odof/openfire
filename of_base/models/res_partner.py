@@ -112,16 +112,13 @@ class ResPartner(models.Model):
     def _compute_old_phone_fields(self):
         default_country_code = self._get_default_country_code()
         for rec in self:
-            phone = rec.of_phone_number_ids.filtered(lambda p: p.type == '01_domicile')
-            if not phone:
-                phone = rec.of_phone_number_ids.filtered(lambda p: p.type == '02_bureau')
-            if phone:
+            if phone := rec.of_phone_number_ids.filtered(
+                lambda p: p.type == '01_domicile'
+            ) or rec.of_phone_number_ids.filtered(lambda p: p.type == '02_bureau'):
                 rec.phone = convert_phone_number(phone[0].number, default_country_code, new_format='country')
-            mobile = rec.of_phone_number_ids.filtered(lambda p: p.type == '03_mobile')
-            if mobile:
+            if mobile := rec.of_phone_number_ids.filtered(lambda p: p.type == '03_mobile'):
                 rec.mobile = convert_phone_number(mobile[0].number, default_country_code, new_format='country')
-            fax = rec.of_phone_number_ids.filtered(lambda p: p.type == '04_fax')
-            if fax:
+            if fax := rec.of_phone_number_ids.filtered(lambda p: p.type == '04_fax'):
                 rec.fax = convert_phone_number(fax[0].number, default_country_code, new_format='country')
 
     @api.depends('parent_id', 'parent_id.category_id')
@@ -157,8 +154,7 @@ class ResPartner(models.Model):
                 continue
 
             # On remplace la valeur actuelle s'il y en a une
-            current_phone = rec.of_phone_number_ids.filtered(lambda p: p.type == number_type)
-            if current_phone:
+            if current_phone := rec.of_phone_number_ids.filtered(lambda p: p.type == number_type):
                 rec.of_phone_number_ids = [(1, current_phone[0].id, {'number': number})]
             # Sinon on crée le nouveau numéro si la valeur est non vide
             elif number:
@@ -380,6 +376,8 @@ class ResPartner(models.Model):
         for vals in vals_list:
             # Email field validation
             if email_address := vals.get('email'):
+                email_address = email_address.strip()
+                vals['email'] = email_address
                 if not multiple_emails_re.match(email_address):
                     raise ValidationError(_("Email address %s is invalid") % (email_address))
 
@@ -428,6 +426,8 @@ class ResPartner(models.Model):
         if (email_address := vals.get('email')) and (
             not self._context.get('from_of_mobile') or (len(self) == 1 and self.email != vals['email'])
         ):
+            email_address = email_address.strip()
+            vals['email'] = email_address
             if not multiple_emails_re.match(email_address):
                 raise ValidationError(_("Email address %s is invalid") % (email_address))
 
