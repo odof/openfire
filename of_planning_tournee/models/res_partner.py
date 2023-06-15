@@ -17,6 +17,9 @@ class OFResPartner(models.Model):
         planning_task_obj = self.env['of.planning.tache']
         tour_meetup_obj = self.env['of.tournee.rdv']
         context = self._context.copy()
+        # In case we came from a wizard (for instance 'of.asterisk.number.not.found'),
+        # we add partner id in context manually
+        context['of_default_partner_id'] = self.id
 
         enable_quick_scheduling = ir_values_obj.get_default('of.intervention.settings', 'enable_quick_scheduling')
         default_planning_task_id = ir_values_obj.get_default('of.intervention.settings', 'default_planning_task_id')
