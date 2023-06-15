@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-15 13:06+0000\n"
-"PO-Revision-Date: 2023-06-15 13:06+0000\n"
+"POT-Creation-Date: 2023-06-15 13:42+0000\n"
+"PO-Revision-Date: 2023-06-15 13:42+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -2301,6 +2301,11 @@ msgid "Sent"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_partner_title__sequence
+msgid "Sequence"
+msgstr "Séquence"
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__pos_set_maximum_difference
 msgid "Set Maximum Difference"
 msgstr ""
@@ -2788,6 +2793,11 @@ msgid "Used for phone numbers"
 msgstr "Utilisée pour les numéros de téléphone"
 
 #. module: of_base
+#: model:ir.model.fields,help:of_base.field_res_partner_title__sequence
+msgid "Used to order titles. Lower is better."
+msgstr "Utilisé pour classer les civilités. Les valeurs basses passent avant."
+
+#. module: of_base
 #: model:ir.model,name:of_base.model_res_users
 msgid "User"
 msgstr "Utilisateur"
@@ -2897,8 +2907,8 @@ msgid ""
 "You cannot access the OpenFire WEB application from an \"Inactive resource\""
 " account."
 msgstr ""
-"Vous ne pouvez pas accéder à l'application WEB OpenFire depuis un compte"
-" \"Ressource inactive\"."
+"Vous ne pouvez pas accéder à l'application WEB OpenFire depuis un compte "
+"\"Ressource inactive\"."
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_res_partner__zip

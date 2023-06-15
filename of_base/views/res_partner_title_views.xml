@@ -1,12 +1,25 @@
 <?xml version='1.0' encoding='utf-8'?>
 <odoo>
 
-    <!-- Civilités - Vue formulaire -->
+    <record id="of_res_partner_title_tree_view" model="ir.ui.view">
+        <field name="name">of.res.partner.title.tree.view</field>
+        <field name="model">res.partner.title</field>
+        <field name="inherit_id" ref="base.view_partner_title_tree"/>
+        <field name="arch" type="xml">
+            <field name="name" position="before">
+                <field name="sequence" widget="handle"/>
+            </field>
+        </field>
+    </record>
+
     <record id="of_res_partner_title_form_view" model="ir.ui.view">
         <field name="name">of.res.partner.title.form.view</field>
         <field name="model">res.partner.title</field>
         <field name="inherit_id" ref="base.view_partner_title_form"/>
         <field name="arch" type="xml">
+            <field name="name" position="before">
+                <field name="sequence" widget="handle"/>
+            </field>
             <field name="name" position="after">
                 <field name="of_used_for_phone"/>
             </field>
