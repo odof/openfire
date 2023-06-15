@@ -68,6 +68,12 @@ class OfTourneeRdv(models.TransientModel):
             if not service:
                 service = service_obj.search([('partner_id', '=', partner.id)], limit=1)
             address = order.partner_shipping_id or order.partner_id
+        elif self._context.get('of_default_partner_id'):
+            active_model = 'res.partner'
+            partner_id = self._context.get('of_default_partner_id')
+            partner = partner_obj.browse(partner_id)
+            service = service_obj.search([('partner_id', '=', partner.id), ('recurrence', '=', True)], limit=1)
+            address = partner_obj.browse(partner.address_get(['delivery'])['delivery'])
 
         if address and not address.geo_lat and not address.geo_lng:
             address = partner_obj.search(['|', ('id', '=', partner.id), ('parent_id', '=', partner.id),
