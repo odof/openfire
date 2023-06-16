@@ -20,11 +20,11 @@
     'summary': u"OpenFire Purchases",
     'description': u"""
 Module OpenFire / Achats
-==========================
+========================
 Modifications OpenFire pour les commandes fournisseur
 
 Fonctionnalités
-----------------
+---------------
 - Ajout de la date souhaitée de livraison (champ texte) pour les commandes client et fournisseur
 - Ajout du client final dans les commandes fournisseur, auto-alimenté depuis la commande client
 - Modification des documents imprimés pour l'ajout de ces informations
@@ -42,9 +42,11 @@ Fonctionnalités
     ],
     'data': [
         'security/of_purchase_security.xml',
+        'hooks/pre_hook.xml',
         'report/purchase_report_templates.xml',
         'report/purchase_reports.xml',
         'views/of_purchase_view.xml',
+        'views/stock_views.xml',
     ],
     'installable': True,
     'application': False,

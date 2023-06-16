@@ -37,6 +37,43 @@ class StockPicking(models.Model):
 class StockMove(models.Model):
     _inherit = 'stock.move'
 
+    of_procurement_purchase_id = fields.Many2one(comodel_name='purchase.order',
+        string="Commande d'achat lié", compute='_compute_of_procurement_purchase_id')
+    of_procurement_purchase_line_id = fields.Many2one(comodel_name='purchase.order.line',
+        string="Ligne de commande d'achat lié", compute='_compute_of_procurement_purchase_line_id', store=True)
+    of_check = fields.Boolean(string="Contrôle", compute='_compute_of_check', store=True)
+
+    @api.depends('state', 'group_id', 'picking_type_id')
+    def _compute_of_procurement_purchase_line_id(self):
+        sale_order_obj = self.env['sale.order']
+        purchase_order_obj = self.env['purchase.order']
+        for move in self.filtered(lambda m: m.picking_type_id.code == 'outgoing'):
+            sale_order = sale_order_obj.search(
+                [('name', '=', move.group_id.name), ('partner_id', '=', move.partner_id.id)])
+            if sale_order:
+                purchase_orders = purchase_order_obj.search([('sale_order_id', '=', sale_order.id)])
+                purchase_order_lines = purchase_orders.mapped('order_line').filtered(
+                    lambda pol: pol.product_id == move.product_id)
+                if purchase_order_lines:
+                    move.of_procurement_purchase_line_id = purchase_order_lines[0].id
+
+    @api.depends('of_procurement_purchase_line_id')
+    def _compute_of_procurement_purchase_id(self):
+        for move in self.filtered(lambda m: m.of_procurement_purchase_line_id):
+            move.of_procurement_purchase_id = move.of_procurement_purchase_line_id.order_id.id
+
+    @api.depends('of_procurement_purchase_line_id', 'reserved_quant_ids')
+    def _compute_of_check(self):
+        stock_move_obj = self.env['stock.move']
+        for move in self.filtered(lambda m: m.of_procurement_purchase_line_id):
+            purchase_stock_move = stock_move_obj.search(
+                [('purchase_line_id', '=', move.of_procurement_purchase_line_id.id), ('purchase_line_id', '!=', False)])
+            if purchase_stock_move:
+                move.of_check = any(quant.id in move.reserved_quant_ids.ids for quant in purchase_stock_move.mapped(
+                    'quant_ids'))
+            else:
+                move.of_check = False
+
     def _get_new_picking_values(self):
         res = super(StockMove, self)._get_new_picking_values()
         if isinstance(res, dict):
