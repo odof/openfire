@@ -1,7 +1,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import logging
-import socket  # Ne pas supprimer cette ligne, voir fonction connect()
+
+# import socket  # Ne pas supprimer cette ligne, voir fonction connect()
 import threading
 import xmlrpc.client
 
@@ -40,7 +41,7 @@ class OfDatastoreConnector(models.AbstractModel):
     @api.depends()
     def _compute_new_password(self):
         for connector in self:
-            connector.new_password = ''
+            connector.new_password = ''  # nosec B105:hardcoded_password_string
 
     # Fonctions récupérées depuis le champ new_password défini pour res_users.
     def _inverse_new_password(self):
@@ -91,16 +92,16 @@ class OfDatastoreConnector(models.AbstractModel):
                     server_address = url
                     # ========== Code à recommenter après la résolution du bug OVH ==========
                     # Retrait du prefixe http:// et extraction du port (optionnel)
-                    address_split = server_address.split('://')[-1].split(':')  # [adresse, port]
-                    ip_address = socket.gethostbyname(address_split[0])
-                    if len(address_split) == 2:
-                        port = f':{address_split[1]}'
-                    elif ip_address == socket.gethostbyname('s-alpha.openfire.fr'):
-                        # Sur s-alpha le port 8010 est utilisé pour la connexion xmlrpc v10
-                        port = ':8010'
-                    else:
-                        port = ''
-                    server_address = f'http://{ip_address}{port}'
+                    # address_split = server_address.split('://')[-1].split(':')  # [adresse, port]
+                    # ip_address = socket.gethostbyname(address_split[0])
+                    # if len(address_split) == 2:
+                    #     port = f':{address_split[1]}'
+                    # elif ip_address == socket.gethostbyname('s-alpha.openfire.fr'):
+                    #     # Sur s-alpha le port 8010 est utilisé pour la connexion xmlrpc v10
+                    #     port = ':8010'
+                    # else:
+                    #     port = ''
+                    # server_address = f'http://{ip_address}{port}'
                     # =======================================================================
 
                     i = server_address.find('://')
