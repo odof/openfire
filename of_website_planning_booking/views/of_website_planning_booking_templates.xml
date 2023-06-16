@@ -196,9 +196,7 @@
                                     <t t-foreach="parc_installe_list" t-as="pi">
                                         <option t-att-value="pi.id"
                                                 t-att-selected="pi.id == parc_installe_id">
-                                            <t t-esc="pi.modele"/>
-                                            <t t-if="pi.modele and pi.name" t-esc="'-'"/>
-                                            <t t-esc="pi.name"/>
+                                            <t t-esc="pi.get_website_name()"/>
                                         </option>
                                     </t>
                                 </select>

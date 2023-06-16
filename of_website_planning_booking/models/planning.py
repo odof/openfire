@@ -15,6 +15,16 @@ class OFParcInstalle(models.Model):
     website_installer_name = fields.Char(string=u"Nom de l'installateur du portail web")
     website_installer_email = fields.Char(string=u"E-mail de l'installateur du portail web")
 
+    @api.multi
+    def get_website_name(self):
+        # Called from website so user might not have all access necessary
+        self_sudo = self.sudo()
+        names = [
+            self_sudo.product_id.name,
+            self_sudo.name or u"N° de série non renseigné"
+        ]
+        return u" - ".join(names)
+
 
 class OFPlanningIntervention(models.Model):
     _inherit = 'of.planning.intervention'
