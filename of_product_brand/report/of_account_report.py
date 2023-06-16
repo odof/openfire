@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 
 
 class AccountInvoiceReport(models.Model):
@@ -9,7 +9,13 @@ class AccountInvoiceReport(models.Model):
     of_brand_id = fields.Many2one(comodel_name='of.product.brand', string="Brand", readonly=True)
     of_diff_price = fields.Float(string="Δ% HT", compute='_compute_dummy')
     of_diff_qty = fields.Float(string="Δ% Qty", compute='_compute_dummy')
-    of_my_company = fields.Boolean(string="Is my store ?")
+    of_my_company = fields.Boolean(string="Is my store ?", compute='_get_is_my_company', search='_search_is_my_company')
+
+    @api.model
+    def _search_is_my_company(self, operator, value):
+        if operator != '=' or not value:
+            raise ValueError(_("Unsupported search operator"))
+        return [('company_id', '=', self.env.user.company_id.id)]
 
     def _get_is_my_company(self):
         for rec in self:
@@ -21,16 +27,6 @@ class AccountInvoiceReport(models.Model):
         Thoses fields should be comptued on the fly after with the values of the previous period
         """
         pass
-
-    def _select(self):
-        select_str = super()._select()
-        select_str += (
-            """,
-            template.brand_id as of_brand_id,
-            CASE WHEN line.company_id = %s THEN True ELSE False END AS of_my_company"""
-            % self.env.user.company_id.id
-        )
-        return select_str
 
     def _from(self):
         from_str = super()._from()

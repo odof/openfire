@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-24 15:34+0000\n"
-"PO-Revision-Date: 2023-03-24 15:34+0000\n"
+"POT-Creation-Date: 2023-06-16 08:42+0000\n"
+"PO-Revision-Date: 2023-06-16 08:42+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -288,7 +288,7 @@ msgstr ""
 #. module: of_product_brand
 #: model:ir.model,name:of_product_brand.model_product_product
 msgid "Product Variant"
-msgstr "Variante d'article"
+msgstr "Variante de produit"
 
 #. module: of_product_brand
 #: model:ir.model,name:of_product_brand.model_of_product_brand
@@ -395,6 +395,7 @@ msgstr "Année en cours"
 
 #. module: of_product_brand
 #. odoo-python
+#: code:addons/of_product_brand/report/of_account_report.py:0
 #: code:addons/of_product_brand/report/of_sale_report.py:0
 #, python-format
 msgid "Unsupported search operator"
