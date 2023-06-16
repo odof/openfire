@@ -154,7 +154,7 @@
                     <div class="row">
                         <t t-call="of_website_planning_booking.new_booking_breadcrumb_trail"/>
                         <h1 t-if="service_list and parc_installe_list" class="col-md-10 page-header text-primary">Sélectionner mon contrat ou mon équipement</h1>
-                        <h1 t-if="service_list" class="col-md-10 page-header text-primary">Sélectionner mon contrat</h1>
+                        <h1 t-elif="service_list" class="col-md-10 page-header text-primary">Sélectionner mon contrat</h1>
                         <h1 t-else="" class="col-md-10 page-header text-primary">Sélectionner mon équipement</h1>
                         <t t-if="service_list and parc_installe_list and display_add_button">
                             <b><span class="col-md-10">Séletionnez le contrat ou l'équipement pour lequel vous souhaitez prévoir une intervention, ou ajoutez un nouvel équipement.</span></b>
@@ -963,13 +963,11 @@
         </xpath>
         <xpath expr="//table/t/tr" position="inside">
             <td>
-                <t t-if="contract.state in ['to_plan', 'progress', 'late']">
-                    <form action="/new_booking/service" method="post" enctype="multipart/form-data">
-                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                        <input type="hidden" name="contract" t-att-value="contract.id"/>
-                        <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading" style="margin-top: 10px;">Prendre RDV</button>
-                    </form>
-                </t>
+                <form action="/new_booking/service" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <input type="hidden" name="contract" t-att-value="contract.id"/>
+                    <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading" style="margin-top: 10px;">Prendre RDV</button>
+                </form>
             </td>
         </xpath>
     </template>
