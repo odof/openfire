@@ -982,7 +982,7 @@
                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                 <input type="hidden" name="rdv_id" t-att-value="rdv.id"/>
                 <button type="submit"
-                        t-att-class="rdv.website_create and can_edit_from_website and 'btn btn-primary btn-xs loading' or 'btn btn-default btn-xs loading disabled'"
+                        t-att-class="rdv.website_create and can_edit_from_website and 'btn btn-primary btn-xs loading' or 'btn btn-default btn-xs loading disabled of-no-click'"
                         t-att-title="rdv.website_create and can_edit_from_website and 'Modifier' or 'Impossible de modifier ce RDV'">
                     <i class="fa fa-pencil"/>
                 </button>
@@ -996,7 +996,7 @@
                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                 <input type="hidden" name="rdv_id" t-att-value="rdv.id"/>
                 <button type="submit"
-                        t-att-class="rdv.website_create and can_edit_from_website and 'btn btn-primary loading' or 'btn btn-default loading disabled'"
+                        t-att-class="rdv.website_create and can_edit_from_website and 'btn btn-primary loading' or 'btn btn-default loading disabled of-no-click'"
                         t-att-title="rdv.website_create and can_edit_from_website and 'Modifier' or 'Impossible de modifier ce RDV'">
                     <i class="fa fa-pencil"/>&amp;nbsp;Modifier
                 </button>
