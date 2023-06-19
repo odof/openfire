@@ -224,7 +224,7 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="of_sale_planning.of_sale_planning_sale_order_form_view"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='of_duration_total']/.." position="after">
+            <xpath expr="//field[@name='of_duration']/.." position="after">
                 <field name="of_hour_worksite_id"/>
             </xpath>
         </field>
@@ -235,7 +235,7 @@
         <field name="model">of.sale.order.layout.category</field>
         <field name="inherit_id" ref="of_sale_planning.view_of_sale_order_layout_category_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='of_duration_per_unit']" position="after">
+            <xpath expr="//field[@name='of_duration']" position="after">
                 <field name="of_hour_worksite_id"/>
             </xpath>
         </field>
