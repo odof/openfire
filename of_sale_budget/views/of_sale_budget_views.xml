@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <record id="of_sale_planning_sale_order_form_view" model="ir.ui.view">
+        <field name="name">of.sale.budget.sale.order.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale_planning.of_sale_planning_sale_order_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_duration_total']/.." position="after">
+                <field name="of_hour_worksite_id"/>
+            </xpath>
+        </field>
+    </record>
+
     <record id="of_sale_order_view_order_form" model="ir.ui.view">
         <field name="name">of.sale.order.view.order.form</field>
         <field name="model">sale.order</field>
@@ -215,17 +226,6 @@
             <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="after">
                 <field name="of_labor_cost"/>
                 <field name="of_total_labor_cost"/>
-            </xpath>
-        </field>
-    </record>
-
-    <record id="of_sale_planning_sale_order_form_view" model="ir.ui.view">
-        <field name="name">of.sale.budget.sale.order.form.view</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="of_sale_planning.of_sale_planning_sale_order_form_view"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='of_duration_total']/.." position="after">
-                <field name="of_hour_worksite_id"/>
             </xpath>
         </field>
     </record>
