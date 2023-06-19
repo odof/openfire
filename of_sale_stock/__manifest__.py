@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 {
     "name": "OpenFire / Stock ventes",
-    "version": "10.0.1.1.0",
+    "version": "10.0.2.0.0",
     "author": "OpenFire",
     'license': 'AGPL-3',
     'category': 'OpenFire modules',
@@ -32,6 +33,7 @@ Paramètres de ventes
     ],
     "data": [
         'security/of_sale_stock_security.xml',
+        'hooks/post_hook.xml',
         'wizard/of_delivery_division_wizard_views.xml',
         'wizard/of_additional_delivery_wizard_views .xml',
         'views/of_sale_stock_views.xml',
