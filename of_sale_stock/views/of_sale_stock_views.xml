@@ -86,6 +86,21 @@
         </field>
     </record>
 
+    <record id="stock_move_view_form" model="ir.ui.view">
+        <field name="name">stock.move.view.form</field>
+        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="stock.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='origin_grp']" position="inside">
+                <field name="procurement_id"/>
+                <field name="of_procurement_purchase_id"/>
+                <field name="of_procurement_purchase_line_id"/>
+                <field name="of_check"/>
+            </xpath>
+        </field>
+    </record>
+
+
     <!-- Afficher la description article dans le bon de livraison (onglet Operations) -->
     <record id="of_pack_operation_product_ids" model="ir.ui.view">
         <field name="name">of.stock.picking.operation.form</field>

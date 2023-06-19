@@ -514,9 +514,40 @@ class ProcurementOrder(models.Model):
 class StockMove(models.Model):
     _inherit = 'stock.move'
 
+    @api.model_cr_context
+    def _auto_init(self):
+        self.env['of.sale.stock.hook']._create_fields_procurement_purchase()
+        return super(StockMove, self)._auto_init()
+
     of_ordered_qty = fields.Float(string=u"(OF) Quantité commandée", digits=dp.get_precision('Product Unit of Measure'))
     of_unit_cost = fields.Float(
         compute='_compute_of_unit_cost', string=u"Coût unitaire", digits=dp.get_precision('Product Price'), store=True)
+    of_procurement_purchase_id = fields.Many2one(comodel_name='purchase.order',
+        string="Commande d'achat lié", related='of_procurement_purchase_line_id.order_id', readonly=True)
+    of_procurement_purchase_line_id = fields.Many2one(
+        comodel_name='purchase.order.line', string="Ligne de commande d'achat lié",
+        compute='_compute_of_procurement_purchase_line_id', store=True)
+    of_check = fields.Boolean(string="Contrôle", compute='_compute_of_check', store=True, readonly=True)
+
+    @api.depends('state')
+    def _compute_of_procurement_purchase_line_id(self):
+        stock_move_obj = self.env['stock.move']
+        for move in self:
+            move_dest = stock_move_obj.search([('move_dest_id', '=', move.id)])
+            if move_dest:
+                move.of_procurement_purchase_line_id = move_dest[0].purchase_line_id.id
+
+    @api.depends('of_procurement_purchase_line_id', 'reserved_quant_ids')
+    def _compute_of_check(self):
+        stock_move_obj = self.env['stock.move']
+        for move in self:
+            purchase_stock_move = stock_move_obj.search(
+                [('purchase_line_id', '=', move.of_procurement_purchase_line_id.id)])
+            if purchase_stock_move:
+                move.of_check = any(
+                    quant.id in move.reserved_quant_ids.ids for quant in purchase_stock_move.mapped('quant_ids'))
+            else:
+                move.of_check = False
 
     @api.depends('state')
     def _compute_of_unit_cost(self):
