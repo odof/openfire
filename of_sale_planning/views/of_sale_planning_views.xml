@@ -8,14 +8,9 @@
         <field name="arch" type="xml">
             <!-- Ajout du temps de pose prévisionnel sur les lignes de commande -->
             <xpath expr="//field[@name='order_line']/form/group/group[2]" position="inside">
-                <label for="of_duration_per_unit"/>
+                <label for="of_duration"/>
                 <div>
-                    <field name="of_duration_per_unit" class="oe_inline" widget="float_time"/>
-                    <span> h</span>
-                </div>
-                <label for="of_duration_total"/>
-                <div>
-                    <field name="of_duration_total" class="oe_inline" widget="float_time"/>
+                    <field name="of_duration" class="oe_inline" widget="float_time"/>
                     <span> h</span>
                 </div>
             </xpath>
@@ -140,7 +135,7 @@
         <field name="inherit_id" ref="of_sale_quote_template.view_of_sale_order_layout_category_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='purchase_price']" position="after">
-                <field name="of_duration_per_unit" widget="float_time"/>
+                <field name="of_duration" widget="float_time"/>
             </xpath>
         </field>
     </record>

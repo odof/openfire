@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
-from odoo.exceptions import UserError
 
 
 class SaleOrder(models.Model):
@@ -10,10 +9,10 @@ class SaleOrder(models.Model):
     of_duration = fields.Float(string=u"Durée de pose prévisionnelle", compute="_compute_of_duration")
     of_invoice_policy = fields.Selection(selection_add=[('intervention', u'Quantités planifiées')])
 
-    @api.depends('order_line', 'order_line.of_duration_total')
+    @api.depends('order_line', 'order_line.of_duration')
     def _compute_of_duration(self):
         for order in self:
-            order.of_duration = sum(order.order_line.mapped('of_duration_total'))
+            order.of_duration = sum(order.order_line.mapped('of_duration'))
 
     @api.depends('of_invoice_policy', 'order_line', 'order_line.of_invoice_date_prev',
                  'order_line.procurement_ids', 'order_line.procurement_ids.move_ids',
@@ -32,24 +31,7 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    @api.model
-    def _auto_init(self):
-        res = super(SaleOrderLine, self)._auto_init()
-        module_self = self.env['ir.module.module'].search([('name', '=', 'of_sale_planning')])
-        if module_self:
-            # installed_version est trompeur, il contient la version en cours d'installation
-            # on utilise donc latest version à la place
-            version = module_self.latest_version
-            if version < '10.0.2':
-                cr = self.env.cr
-                cr.execute("UPDATE sale_order_line SET of_duration_per_unit = (of_duration / product_uom_qty) "
-                           "WHERE of_duration != 0 AND product_uom_qty != 0;")
-        return res
-
-    of_duration = fields.Float(string=u"Durée de pose prévisionnelle") # A supprimer à l'avenir
-    of_duration_per_unit = fields.Float(string=u"Durée de pose prévisionnelle unitaire")
-    of_duration_total = fields.Float(
-        string=u"Durée de pose prévisionnelle totale", compute='_compute_of_duration_total', store=True)
+    of_duration = fields.Float(string=u"Durée de pose prévisionnelle")
     of_invoice_policy = fields.Selection(selection_add=[('intervention', u'Quantités planifiées')])
 
     @api.depends('qty_invoiced', 'qty_delivered', 'product_uom_qty', 'order_id.state',
@@ -79,20 +61,6 @@ class SaleOrderLine(models.Model):
                 if interventions:
                     line.of_invoice_date_prev = interventions[0].date_date
 
-    @api.depends('of_is_kit', 'product_id', 'of_duration_per_unit', 'product_uom_qty')
-    def _compute_of_duration_total(self):
-        for line in self:
-            if line.of_is_kit:
-                line.of_duration_total = line.of_duration_per_unit * line.product_uom_qty
-            elif line.product_id:
-                original_uom = line.product_id.uom_id
-                current_uom = line.product_uom
-                try:
-                    line.of_duration_total = line.of_duration_per_unit * current_uom._compute_quantity(
-                        line.product_uom_qty, original_uom, round=False)
-                except UserError:
-                    line.of_duration_total = line.of_duration_per_unit * line.product_uom_qty
-
     @api.multi
     def calculate_duration(self):
         if self.of_is_kit and self.kit_id:
@@ -104,9 +72,12 @@ class SaleOrderLine(models.Model):
                 qty = kit_line.qty_per_kit
                 product_duration = kit_line.product_id.of_duration_per_unit
                 total_duration += (product_duration * current_uom._compute_quantity(qty, original_uom, round=False))
-            self.of_duration_per_unit = total_duration
+            self.of_duration = total_duration * self.product_uom_qty
         elif self.product_id:
-            self.of_duration_per_unit = self.product_id.of_duration_per_unit
+            original_uom = self.product_id.uom_id
+            current_uom = self.product_uom
+            self.of_duration = self.product_id.of_duration_per_unit * \
+                current_uom._compute_quantity(self.product_uom_qty, original_uom, round=False)
 
     @api.multi
     @api.onchange('product_id')
@@ -145,7 +116,7 @@ class OFSaleOrderLayoutCategory(models.Model):
     @api.multi
     def _compute_of_duration(self):
         for line in self:
-            line.of_duration = sum(line.order_line_ids.mapped('of_duration_total'))
+            line.of_duration = sum(line.order_line_ids.mapped('of_duration'))
 
 
 class SaleConfiguration(models.TransientModel):

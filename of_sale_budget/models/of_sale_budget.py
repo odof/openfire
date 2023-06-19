@@ -101,14 +101,14 @@ class OFSaleOrderLaborCost(models.Model):
         for cost in self:
             cost.total_cost = cost.hourly_cost * cost.product_uom_qty
 
-    @api.depends('order_id.order_line.of_hour_worksite_id', 'order_id.order_line.of_duration_total',
+    @api.depends('order_id.order_line.of_hour_worksite_id', 'order_id.order_line.of_duration',
                  'inverse_product_uom_qty')
     def _compute_product_uom_qty(self):
         for cost in self:
             if cost.type == 'computed':
                 cost.product_uom_qty = sum(
                     cost.order_id.order_line.filtered(
-                        lambda l: l.of_hour_worksite_id == cost.hour_worksite_id).mapped('of_duration_total'))
+                        lambda l: l.of_hour_worksite_id == cost.hour_worksite_id).mapped('of_duration'))
             else:
                 cost.product_uom_qty = cost.inverse_product_uom_qty
 
@@ -250,10 +250,10 @@ class SaleOrderLine(models.Model):
         string=u"Total coût", digits=dp.get_precision('Product Price'), compute='_compute_of_labor_cost')
 
     @api.depends('of_hour_worksite_id', 'of_hour_worksite_id.hourly_cost',
-                 'of_duration_total', 'purchase_price', 'product_uom_qty')
+                 'of_duration', 'purchase_price', 'product_uom_qty')
     def _compute_of_labor_cost(self):
         for line in self:
-            line.of_labor_cost = line.of_hour_worksite_id.hourly_cost * line.of_duration_total
+            line.of_labor_cost = line.of_hour_worksite_id.hourly_cost * line.of_duration
             line.of_total_labor_cost = line.of_labor_cost + (line.purchase_price * line.product_uom_qty)
 
     @api.multi
