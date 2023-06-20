@@ -514,6 +514,11 @@ class ProcurementOrder(models.Model):
 class StockMove(models.Model):
     _inherit = 'stock.move'
 
+    @api.model_cr_context
+    def _auto_init(self):
+        self.env['of.sale.stock.hook']._create_fields_procurement_purchase()
+        return super(StockMove, self)._auto_init()
+
     of_ordered_qty = fields.Float(string=u"(OF) Quantité commandée", digits=dp.get_precision('Product Unit of Measure'))
     of_unit_cost = fields.Float(
         compute='_compute_of_unit_cost', string=u"Coût unitaire", digits=dp.get_precision('Product Price'), store=True)
