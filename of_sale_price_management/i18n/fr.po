@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-24 09:24+0000\n"
-"PO-Revision-Date: 2023-05-24 09:24+0000\n"
+"POT-Creation-Date: 2023-06-20 13:36+0000\n"
+"PO-Revision-Date: 2023-06-20 13:36+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -85,6 +85,16 @@ msgid "Amount incl. VAT to be deducted"
 msgstr "Montant TTC à déduire"
 
 #. module: of_sale_price_management
+#: model:ir.model.fields.selection,name:of_sale_price_management.selection__of_sale_price_management_wizard__discount_mode__line
+msgid "Apply price management to lines"
+msgstr "Appliquer la gestion de prix dans les lignes"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields.selection,name:of_sale_price_management.selection__of_sale_price_management_wizard__discount_mode__total
+msgid "Apply price management to totals"
+msgstr "Appliquer la gestion de prix dans les totaux"
+
+#. module: of_sale_price_management
 #: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_view_sale_order_price_management
 msgid "Apply to quotation/order form (not reversible)"
 msgstr "Appliquer au devis/bon de commande (non réversible)"
@@ -135,11 +145,6 @@ msgid "Customer/Vendor view"
 msgstr "Vue Client/Vendeur"
 
 #. module: of_sale_price_management
-#: model:ir.module.category,description:of_sale_price_management.of_sale_margin
-msgid "Defines access rights to margins."
-msgstr "Définit les droits d'accès aux marges."
-
-#. module: of_sale_price_management
 #: model:ir.model.fields,help:of_sale_price_management.field_of_sale_price_management_wizard__discount_type
 msgid ""
 "Determines how the discount is calculated on the selected lines of the "
@@ -152,6 +157,16 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__discount
 msgid "Discount (%)"
 msgstr "Remise (%)"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__discount_product_id
+msgid "Discount item"
+msgstr "Article de remise"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__discount_mode
+msgid "Discount mode"
+msgstr "Mode de remise"
 
 #. module: of_sale_price_management
 #: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__display_name
@@ -260,6 +275,11 @@ msgid "Initial unit price excl. VAT"
 msgstr "Prix unit. HT initial"
 
 #. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__is_discount
+msgid "Is a discount line"
+msgstr "Est une ligne de remise"
+
+#. module: of_sale_price_management
 #: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard____last_update
 #: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line____last_update
 msgid "Last Modified on"
@@ -276,11 +296,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__write_date
 msgid "Last Updated on"
 msgstr ""
-
-#. module: of_sale_price_management
-#: model:res.groups,name:of_sale_price_management.of_group_sale_margin_manager
-msgid "Manager"
-msgstr "Responsable"
 
 #. module: of_sale_price_management
 #: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_report_sale_price_management
@@ -306,14 +321,14 @@ msgid "Margin sheet"
 msgstr "Feuille de marge"
 
 #. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_sale_price_management
 #: model:ir.model.fields.selection,name:of_sale_price_management.selection__of_sale_price_management_wizard__rounding_mode__no_rounding
 msgid "No rounding"
 msgstr "Pas d'arrondi"
-
-#. module: of_sale_price_management
-#: model:ir.module.category,name:of_sale_price_management.of_sale_margin
-msgid "OF Margin"
-msgstr "OF Marge"
 
 #. module: of_sale_price_management
 #: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_view_sale_order_price_management
@@ -354,6 +369,7 @@ msgstr "Imprimer"
 
 #. module: of_sale_price_management
 #: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__order_line_id
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__product_id
 #: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_report_sale_price_management
 msgid "Product"
 msgstr "Produit"
@@ -445,7 +461,7 @@ msgstr "Bon de commande"
 #. module: of_sale_price_management
 #: model:ir.model,name:of_sale_price_management.model_sale_order_line
 msgid "Sales Order Line"
-msgstr "Ligne de commande"
+msgstr "Ligne de bons de commande"
 
 #. module: of_sale_price_management
 #: model:ir.model,name:of_sale_price_management.model_of_sale_price_management_wizard_line
@@ -493,6 +509,21 @@ msgstr "Prix total TTC simulé"
 #: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__state
 msgid "State"
 msgstr "État"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__discount_tax_ids
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__tax_ids
+msgid "Taxes"
+msgstr ""
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,help:of_sale_price_management.field_of_sale_price_management_wizard_line__prix_unit_create
+msgid ""
+"Technical field to store the unit price of the product when creating a new "
+"order line"
+msgstr ""
+"Champ technique pour stocker le prix unitaire du produit lors de la création"
+" d'une nouvelle ligne de commande"
 
 #. module: of_sale_price_management
 #. odoo-python
@@ -603,6 +634,11 @@ msgstr "Montant unitaire de la variation de prix liée à la gestion de prix"
 #: model:ir.model.fields,field_description:of_sale_price_management.field_sale_order_line__of_unit_price_variation
 msgid "Unit amount of the price variation"
 msgstr "Montant unitaire de la variation de prix"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__prix_unit_create
+msgid "Unit price"
+msgstr "Prix unitaire"
 
 #. module: of_sale_price_management
 #: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard__value

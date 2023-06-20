@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import SUPERUSER_ID, _, api, fields, models
+from odoo import SUPERUSER_ID, _, api, fields, models, tools
 from odoo.exceptions import ValidationError
 
 
@@ -65,12 +65,14 @@ class ResCompany(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        if self._uid not in [SUPERUSER_ID, self.env.ref('base.user_admin').id]:
+        test_mode = tools.config['test_enable'] or tools.config['test_file']
+        if not test_mode and self._uid not in [SUPERUSER_ID, self.env.ref('base.user_admin').id]:
             raise ValidationError(_("Only the administrator can create a new company."))
         return super().create(vals_list)
 
     def unlink(self):
-        if self._uid not in [SUPERUSER_ID, self.env.ref('base.user_admin').id]:
+        test_mode = tools.config['test_enable'] or tools.config['test_file']
+        if not test_mode and self._uid not in [SUPERUSER_ID, self.env.ref('base.user_admin').id]:
             raise ValidationError(_("Only the administrator can create a new company."))
         return super().unlink()
 

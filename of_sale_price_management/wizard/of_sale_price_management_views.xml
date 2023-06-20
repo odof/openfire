@@ -29,6 +29,9 @@
                 </div>
                 <group name="options" invisible="context.get('invoice_status') == 'invoiced'">
                     <field name="order_id" invisible="1" />
+                    <field name="discount_mode" required="1"/>
+                    <field name="discount_product_id"
+                            attrs="{'required': [('discount_mode', '=', 'total')], 'invisible': [('discount_mode', '!=', 'total')]}"/>
                     <field name="discount_type" required="1" />
                     <field name="value"
                         attrs="{
@@ -47,7 +50,8 @@
                 <field name="line_ids" nolabel="1">
                     <tree string="Order lines" decoration-sucess="state =='included'" decoration-muted="state != 'included'" editable="bottom" create="false">
                         <field name="state" invisible="context.get('invoice_status') == 'invoiced'" />
-                        <field name="order_line_id" />
+                        <field name="order_line_id" invisible="1"/>
+                        <field name="name"/>
                         <field name="total_cost_tax_excl"
                             groups="of_sale_margin.of_group_sale_margin_manager"
                             attrs="{'invisible': [('customer_view', '=', True)]}" />
@@ -63,9 +67,11 @@
                         <field name="margin_percent"
                             groups="of_sale_margin.of_group_sale_margin_manager"
                             attrs="{'invisible': [('customer_view', '=', True)], 'readonly': ['|', ('state', '!=', 'forced'), ('total_cost_tax_excl', '=', 0)]}" />
+                        <field name="tax_ids" widget="many2many_tags"/>
                         <field name="total_price_tax_incl" />
                         <field name="sim_total_price_tax_incl" />
                         <field name="customer_view" invisible="1" />
+                        <field name="currency_id" invisible="1" />
                     </tree>
                 </field>
                 <group colspan="4" name="action_button_bottom">

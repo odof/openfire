@@ -23,8 +23,18 @@ class OFPriceManagementWizard(models.TransientModel):
         return selection
 
     order_id = fields.Many2one(comodel_name='sale.order', string="Quotation/Order", required=True, ondelete='cascade')
+    discount_mode = fields.Selection(
+        selection=[
+            ('line', "Apply price management to lines"),
+            ('total', "Apply price management to totals"),
+        ],
+        string="Discount mode",
+        required=True,
+        default='line',
+    )
+    discount_product_id = fields.Many2one(comodel_name='product.product', string="Discount item")
     discount_type = fields.Selection(
-        selection=_get_selection_discount_type,
+        selection='_get_selection_discount_type',
         default='total_target_amnt_tax_incl',
         string="Calculation mode",
         help="Determines how the discount is calculated on the selected lines of the estimate",
@@ -126,11 +136,71 @@ class OFPriceManagementWizard(models.TransientModel):
         return {'type': 'ir.actions.client', 'tag': 'history_back'}
 
     def _do_apply(self, values):
+        line_obj = self.env['sale.order.line']
         for line, vals in values.items():
-            line.write(vals)
+            if isinstance(line, int):  # should be a new line
+                line = line_obj.create(vals)
+            else:
+                line.write(vals)
 
     def _do_compute(self, total, mode, currency, calculation_basis, line_rounding):
-        return self.line_ids.distribute_amount(total, mode, currency, calculation_basis, line_rounding)
+        values = self.line_ids.distribute_amount(total, mode, currency, calculation_basis, line_rounding)
+        # on conserve la fonction de calcul des prix simulés, pour se servir des résultats pour les montant de remise
+        # puis on réinitialise les montants simulés des lignes pour ne pas induire en erreur les utilisateurs
+        # ne pas créer de ligne de remise quand on remet au prix magasin
+        if self.discount_mode == 'total' and self.discount_type != 'reset':
+            self._do_compute_discount_total(values)
+        return values
+
+    def _do_compute_discount_total(self, values):
+        old_res = values
+        values = {}
+
+        line_by_tax = {}
+        # grouper les lignes par taxes. On utilise des tuples pour ne pas qu'une ligne se retrouve dans 2 groupes
+        for product_line in self.line_ids.filtered(lambda line: not line.is_discount and line.state == 'included'):
+            taxes_ids = tuple(product_line.order_line_id.tax_id.ids)
+            if taxes_ids in line_by_tax:
+                line_by_tax[taxes_ids] |= product_line
+            else:
+                line_by_tax[taxes_ids] = product_line
+
+        for idx, (taxes_ids, associated_lines) in enumerate(line_by_tax.items(), start=1):
+            price_unit = 0
+            product_uom = self.env.ref('uom.product_uom_unit')
+            for order_line in associated_lines.mapped('order_line_id'):
+                vals = old_res[order_line]
+                price_unit -= (
+                    (order_line.price_unit - vals['price_unit'])
+                    * (1 - (order_line.discount or 0.0) / 100.0)
+                    * order_line.product_uom._compute_quantity(order_line.product_uom_qty, product_uom)
+                )
+
+            line_vals = {
+                'wizard_id': self.id,
+                'is_discount': True,
+                'discount_tax_ids': [(6, 0, list(taxes_ids))],
+                'prix_unit_create': price_unit,
+            }
+            new_line = self.env['of.sale.price.management.wizard.line'].new(line_vals)
+            new_line.sim_total_price_tax_excl = sum(associated_lines.mapped('sim_total_price_tax_excl')) - sum(
+                associated_lines.mapped('order_line_id.price_subtotal')
+            )
+            new_line.sim_total_price_tax_incl = sum(associated_lines.mapped('sim_total_price_tax_incl')) - sum(
+                associated_lines.mapped('order_line_id.price_total')
+            )
+
+            values[idx] = new_line.get_values_order_line_create()
+            self.line_ids |= new_line
+
+        for product_line in self.line_ids.filtered(lambda line: not line.is_discount and line.state == 'included'):
+            product_line.sim_total_price_tax_excl = product_line.total_price_tax_excl
+            product_line.sim_total_price_tax_incl = product_line.total_price_tax_incl
+            product_line.sim_total_cost_tax_excl = product_line.total_cost_tax_excl
+
+        for forced_line in self.line_ids.filtered(lambda line: not line.is_discount and line.state == 'forced'):
+            if forced_line.order_line_id in old_res:
+                values[forced_line.order_line_id] = old_res[forced_line.order_line_id]
 
     def _check_data(self):
         if self.discount_type == 'total_target_amnt_tax_incl':
@@ -176,6 +246,9 @@ class OFPriceManagementWizard(models.TransientModel):
 
         # Check data entered by the user
         self._check_data()
+
+        # Remove old discount lines if any
+        self.line_ids.filtered(lambda line: line.is_discount).unlink()
 
         # Paramètre d'arrondi
         if self.rounding_mode == 'no_rounding':
@@ -310,41 +383,93 @@ class OFPriceManagementWizardLine(models.TransientModel):
         default='included',
     )
     wizard_id = fields.Many2one(comodel_name='of.sale.price.management.wizard', required=True, ondelete='cascade')
-    order_line_id = fields.Many2one(
-        comodel_name='sale.order.line', string="Product", required=True, readonly=True, ondelete='cascade'
+    order_line_id = fields.Many2one(comodel_name='sale.order.line', string="Product", readonly=True, ondelete='cascade')
+    product_id = fields.Many2one(comodel_name='product.product', string="Product", compute='_compute_product_id')
+    name = fields.Char(string="Name", compute='_compute_product_id')
+    currency_id = fields.Many2one(compute='_compute_currency_id', comodel_name='res.currency', string="Currency")
+    quantity = fields.Float(string="Quantity", compute='_compute_quantity')
+    tax_ids = fields.Many2many(
+        comodel_name='account.tax',
+        string="Taxes",
+        relation='of_sale_order_gestion_prix_line_discount_tax_rel',
+        column1='line_id',
+        column2='tax_id',
+        compute='_compute_tax_ids',
     )
-    currency_id = fields.Many2one(related='order_line_id.currency_id')
-    quantity = fields.Float(string="Quantity", related='order_line_id.product_uom_qty', readonly=True)
 
-    total_cost_tax_excl = fields.Monetary(string="Total initial cost excl. VAT", compute='_compute_total_cost_tax_excl')
-    price_unit_tax_excl = fields.Monetary(
-        string="Initial unit price excl. VAT", related='order_line_id.price_reduce_taxexcl', readonly=True
-    )
-    price_unit_tax_incl = fields.Monetary(
-        string="Initial unit price excl. VAT", related='order_line_id.price_reduce_taxinc', readonly=True
-    )
-    total_price_tax_excl = fields.Monetary(
-        string="Initial total price excl. VAT", related='order_line_id.price_subtotal', readonly=True
-    )
-    total_price_tax_incl = fields.Monetary(
-        string="Initial total price incl. VAT", related='order_line_id.price_total', readonly=True
-    )
+    total_cost_tax_excl = fields.Monetary(string="Total initial cost excl. VAT", compute='_compute_prices')
+    price_unit_tax_excl = fields.Monetary(string="Initial unit price excl. VAT", compute='_compute_prices')
+    price_unit_tax_incl = fields.Monetary(string="Initial unit price excl. VAT", compute='_compute_prices')
+    total_price_tax_excl = fields.Monetary(string="Initial total price excl. VAT", compute='_compute_prices')
+    total_price_tax_incl = fields.Monetary(string="Initial total price incl. VAT", compute='_compute_prices')
     discount = fields.Float(related='order_line_id.discount', readonly=True)
 
-    sim_total_price_tax_incl = fields.Float(
-        string="Simulated total price incl. VAT", compute='_compute_sim_total_price_tax_incl', store=True
-    )
-    sim_total_price_tax_excl = fields.Float(string="Simulated total price excl. VAT")
-    sim_total_cost_tax_excl = fields.Float(string="Simulated total cost excl. VAT", readonly=True)
-    margin = fields.Float(string="Margin excl. VAT", compute='_compute_margins')
+    sim_total_price_tax_incl = fields.Monetary(string="Simulated total price incl. VAT", readonly=True)
+    sim_total_price_tax_excl = fields.Monetary(string="Simulated total price excl. VAT")
+    sim_total_cost_tax_excl = fields.Monetary(string="Simulated total cost excl. VAT", readonly=True)
+    margin = fields.Monetary(string="Margin excl. VAT", compute='_compute_margins')
     margin_percent = fields.Float(string="% Margin", compute='_compute_margins')
     customer_view = fields.Boolean(string="Customer/Vendor view", related="wizard_id.customer_view")
+    discount_tax_ids = fields.Many2many(
+        comodel_name='account.tax',
+        string="Taxes",
+        relation='of_sale_order_price_management_line_discount_tax_rel',
+        column1='line_id',
+        column2='tax_id',
+    )
+    is_discount = fields.Boolean(string="Is a discount line")
+    prix_unit_create = fields.Monetary(
+        string="Unit price",
+        help="Technical field to store the unit price of the product when creating a new order line",
+    )
 
-    @api.depends('order_line_id')
-    def _compute_total_cost_tax_excl(self):
+    def _compute_currency_id(self):
+        for line in self:
+            line.currency_id = line.order_line_id.currency_id or line.wizard_id.currency_id
+
+    @api.depends('order_line_id', 'is_discount', 'discount_tax_ids')
+    def _compute_product_id(self):
         for line in self:
             order_line = line.order_line_id
             line.total_cost_tax_excl = order_line.purchase_price * order_line.product_uom_qty
+            if not line.is_discount:
+                line.product_id = line.order_line_id.product_id.id
+                line.name = line.order_line_id.name
+            else:
+                line.product_id = line.wizard_id.discount_product_id.id
+                line.name = (
+                    f"{line.wizard_id.discount_product_id.name} "
+                    f"({' + '.join(line.discount_tax_ids.mapped('name'))})"
+                )
+
+    @api.depends('order_line_id', 'is_discount')
+    def _compute_quantity(self):
+        for line in self:
+            line.quantity = 1 if line.is_discount else line.order_line_id.product_uom_qty
+
+    @api.depends('order_line_id', 'discount_tax_ids')
+    def _compute_tax_ids(self):
+        for line in self:
+            if line.order_line_id:
+                line.tax_ids = line.order_line_id.tax_id.ids
+            else:
+                line.tax_ids = line.discount_tax_ids.ids
+
+    @api.depends('order_line_id', 'is_discount')
+    def _compute_prices(self):
+        for product_line in self.filtered(lambda line: line.is_discount):
+            product_line.total_cost_tax_excl = 0
+            product_line.price_unit_tax_excl = 0
+            product_line.price_unit_tax_incl = 0
+            product_line.total_price_tax_excl = 0
+            product_line.total_price_tax_incl = 0
+        for product_line in self.filtered(lambda line: not line.is_discount):
+            order_line = product_line.order_line_id
+            product_line.total_cost_tax_excl = order_line.purchase_price * order_line.product_uom_qty
+            product_line.price_unit_tax_excl = order_line.price_reduce_taxexcl
+            product_line.price_unit_tax_incl = order_line.price_reduce_taxinc
+            product_line.total_price_tax_excl = order_line.price_subtotal
+            product_line.total_price_tax_incl = order_line.price_total
 
     @api.depends('sim_total_price_tax_excl', 'sim_total_cost_tax_excl')
     def _compute_margins(self):
@@ -367,7 +492,7 @@ class OFPriceManagementWizardLine(models.TransientModel):
     def _onchange_margin_percent(self):
         for line in self:
             # Margin percent cannot be greater than 100% if the initial price is not null
-            margin_percent_max = 100.0 if line.cout_total_ht == 0 else 99.99
+            margin_percent_max = 100.0 if line.total_cost_tax_excl == 0 else 99.99
             line.margin_percent = min(line.margin_percent, margin_percent_max)
             margin_percent = (
                 100.0 * (1 - line.sim_total_cost_tax_excl / line.sim_total_price_tax_excl)
@@ -378,6 +503,20 @@ class OFPriceManagementWizardLine(models.TransientModel):
                 line.sim_total_price_tax_excl = line.sim_total_cost_tax_excl and line.sim_total_cost_tax_excl * (
                     100 / (100 - line.margin_percent)
                 )
+
+    def get_values_order_line_create(self):
+        self.ensure_one()
+        if not self.is_discount:
+            return {}
+        return {
+            'order_id': self.wizard_id.order_id.id,
+            'name': self.name,
+            'product_id': self.product_id.id,
+            'product_uom': self.env.ref('uom.product_uom_unit').id,
+            'price_unit': self.prix_unit_create,
+            'tax_id': [(6, 0, [self.discount_tax_ids.ids])],
+            'customer_lead': 0,
+        }
 
     def _get_distributed_amount(
         self, to_distribute, total, currency, calculation_basis, rounding, line_rounding, all_zero

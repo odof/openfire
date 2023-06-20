@@ -31,10 +31,10 @@ class ProductTemplate(models.Model):
             deposit_categ_id = deposit_categ_id and int(deposit_categ_id) or False
             if deposit_categ_id and vals.get('categ_id') == deposit_categ_id:
                 raise UserError(_("Only the administrator has the right to place items in the down payment category."))
-        if self.with_context(prefetch_fields=False).search(
-            [('id', 'in', self.ids), ('categ_id', '=', deposit_categ_id)], limit=1
-        ):
-            raise UserError(_("Only the administrator has the right to modify deposit items."))
+            if self.with_context(prefetch_fields=False).search(
+                [('id', 'in', self.ids), ('categ_id', '=', deposit_categ_id)], limit=1
+            ):
+                raise UserError(_("Only the administrator has the right to modify deposit items."))
         return super().write(vals)
 
     def unlink(self):
