@@ -33,7 +33,7 @@ class TestOFPriceManagementWizard(TransactionCase):
             )
         )
         # Company and accounting data
-        coa = cls.env.user.company_id.chart_template_id
+        coa = cls.env.ref('l10n_fr.l10n_fr_pcg_chart_template')
         cls.company_fr = cls.create_company(
             {
                 'name': "Openfire FR",

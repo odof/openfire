@@ -169,29 +169,31 @@ class OFPriceManagementWizard(models.TransientModel):
             price_unit = 0
             product_uom = self.env.ref('uom.product_uom_unit')
             for order_line in associated_lines.mapped('order_line_id'):
-                vals = old_res[order_line]
-                price_unit -= (
-                    (order_line.price_unit - vals['price_unit'])
-                    * (1 - (order_line.discount or 0.0) / 100.0)
-                    * order_line.product_uom._compute_quantity(order_line.product_uom_qty, product_uom)
+                if order_line in old_res:
+                    vals = old_res[order_line]
+                    price_unit -= (
+                        (order_line.price_unit - vals['price_unit'])
+                        * (1 - (order_line.discount or 0.0) / 100.0)
+                        * order_line.product_uom._compute_quantity(order_line.product_uom_qty, product_uom)
+                    )
+
+            if price_unit:
+                line_vals = {
+                    'wizard_id': self.id,
+                    'is_discount': True,
+                    'discount_tax_ids': [(6, 0, list(taxes_ids))],
+                    'prix_unit_create': price_unit,
+                }
+                new_line = self.env['of.sale.price.management.wizard.line'].new(line_vals)
+                new_line.sim_total_price_tax_excl = sum(associated_lines.mapped('sim_total_price_tax_excl')) - sum(
+                    associated_lines.mapped('order_line_id.price_subtotal')
+                )
+                new_line.sim_total_price_tax_incl = sum(associated_lines.mapped('sim_total_price_tax_incl')) - sum(
+                    associated_lines.mapped('order_line_id.price_total')
                 )
 
-            line_vals = {
-                'wizard_id': self.id,
-                'is_discount': True,
-                'discount_tax_ids': [(6, 0, list(taxes_ids))],
-                'prix_unit_create': price_unit,
-            }
-            new_line = self.env['of.sale.price.management.wizard.line'].new(line_vals)
-            new_line.sim_total_price_tax_excl = sum(associated_lines.mapped('sim_total_price_tax_excl')) - sum(
-                associated_lines.mapped('order_line_id.price_subtotal')
-            )
-            new_line.sim_total_price_tax_incl = sum(associated_lines.mapped('sim_total_price_tax_incl')) - sum(
-                associated_lines.mapped('order_line_id.price_total')
-            )
-
-            values[idx] = new_line.get_values_order_line_create()
-            self.line_ids |= new_line
+                values[idx] = new_line.get_values_order_line_create()
+                self.line_ids |= new_line
 
         for product_line in self.line_ids.filtered(lambda line: not line.is_discount and line.state == 'included'):
             product_line.sim_total_price_tax_excl = product_line.total_price_tax_excl
