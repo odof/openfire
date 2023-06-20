@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-14 15:22+0000\n"
-"PO-Revision-Date: 2023-06-14 15:22+0000\n"
+"POT-Creation-Date: 2023-06-16 11:32+0000\n"
+"PO-Revision-Date: 2023-06-16 11:32+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -133,8 +133,8 @@ msgid ""
 "<span class=\"o_form_label\">(OF) Delivery notes management in Customer "
 "Invoice</span>"
 msgstr ""
-"<span class=\"o_form_label\">(OF) Gestion des bons de livraison dans la facture "
-"client</span>"
+"<span class=\"o_form_label\">(OF) Gestion des bons de livraison dans la "
+"facture client</span>"
 
 #. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
@@ -904,6 +904,25 @@ msgid "Of Nb Products"
 msgstr "Nombre de produits"
 
 #. module: of_sale
+#. odoo-python
+#: code:addons/of_sale/models/product_template.py:0
+#, python-format
+msgid "Only the administrator has the right to modify deposit items."
+msgstr "Seul l'administrateur a le droit de modifier les articles d'acompte."
+
+#. module: of_sale
+#. odoo-python
+#: code:addons/of_sale/models/product_template.py:0
+#: code:addons/of_sale/models/product_template.py:0
+#, python-format
+msgid ""
+"Only the administrator has the right to place items in the down payment "
+"category."
+msgstr ""
+"Seul l'administrateur a le droit de placer des articles dans la catégorie "
+"des acomptes.
+
+#. module: of_sale
 #: model:ir.model.fields,help:of_sale.field_of_connector_config_settings__of_sale_mail_subtype_subscribtion
 #: model:ir.model.fields,help:of_sale.field_res_config_settings__of_sale_mail_subtype_subscribtion
 msgid ""
@@ -1009,7 +1028,7 @@ msgstr "Paramètres d'impression"
 #. module: of_sale
 #: model:ir.model,name:of_sale.model_product_template
 msgid "Product"
-msgstr "Produit"
+msgstr "Modèle d'article"
 
 #. module: of_sale
 #: model:ir.ui.menu,name:of_sale.of_product_category_config_menu
