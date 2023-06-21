@@ -12,6 +12,8 @@ class StockReservation(models.Model):
     of_sale_order_id = fields.Many2one(comodel_name='sale.order', string=u"Commande", compute='_compute_order_fields')
     of_sale_partner_id = fields.Many2one(
         comodel_name='res.partner', string=u"partenaire", compute='_compute_order_fields')
+    of_internal_serial_number = fields.Char(
+        string=u"Numéro de série interne", readonly=True, related='reserved_quant_ids.of_internal_serial_number')
 
     @api.depends('of_sale_line_id')
     def _compute_order_fields(self):
