@@ -9,6 +9,7 @@
             <xpath expr="//field[@name='name']" position="after">
                 <field name="of_sale_order_id" attrs="{'invisible': [('of_sale_order_id', '=', False)]}"/>
                 <field name="of_sale_partner_id" attrs="{'invisible': [('of_sale_partner_id', '=', False)]}"/>
+                <field name="of_internal_serial_number" attrs="{'invisible': [('of_internal_serial_number', '=', False)]}"/>
             </xpath>
             <xpath expr="//group[@name='location']" position="replace">
                 <group name="location" string="Emplacements">
