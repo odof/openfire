@@ -48,7 +48,7 @@ class AccountJournal(models.Model):
             # Lors du changement de type d'un journal, le champ update_posted peut être à vrai
             #   et ne pas réussir à passer à faux car le champ est devenu readonly.
             # On s'assure donc de forcer cette valeur
-            if type in ('sale', 'bank', 'cash'):
+            if vals['type'] in ('sale', 'bank', 'cash'):
                 return "", {'update_posted': False}
         return "", {}
 
