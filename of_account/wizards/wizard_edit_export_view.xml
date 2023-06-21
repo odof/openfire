@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_of_wizard_export_account_move" model="ir.ui.view">
+        <field name="name">Test</field>
+        <field name="model">of.zz.wizard.export</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+                <span>Ceci va cocher la case 'Exporté'.</span>
+                <footer>
+                    <button name="of_action_mass_edit_export" string="Continuer" type="object" class="oe_highlight"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+         </field>
+    </record>
+
+    <act_window id="action_of_wizard_export_account_move"
+        key2="client_action_multi"
+        name="Marquer comme exporté"
+        res_model="of.zz.wizard.export"
+        src_model="account.move"
+        view_mode="form"
+        view_type="form"
+        multi="True"
+        view_id="view_of_wizard_export_account_move"
+        target="new" />
+
+</odoo>

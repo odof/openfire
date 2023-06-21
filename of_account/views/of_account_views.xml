@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Ajout rubriques -->
+    <record id="of_view_account_config_settings" model="ir.ui.view">
+        <field name="name">(OF) account settings</field>
+        <field name="model">account.config.settings</field>
+        <field name="inherit_id" ref="account.view_account_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <group name="rubrique_report" string="Factures PDF" invisible="1"/>
+            </xpath>
+            <!-- Le choix d'autoriser un plan comptable est déplacé dans le formulaire de la société -->
+            <xpath expr="//field[@name='expects_chart_of_accounts']/.." position="attributes">
+                 <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Vue société form -->
+    <!-- Company form view (tab 'Localisation') -->
+    <record id="of_account_view_company_form" model="ir.ui.view">
+        <field name="name">of.account.res.company.form</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='parent_id']" position="before">
+                <field name="chart_template_id" invisible="1"/>
+                <field name="expects_chart_of_accounts" groups="of_base.of_group_root_only"
+                       attrs="{'invisible': [('chart_template_id','!=',False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Vue avoir form-->
+    <record id="view_account_invoice_refund" model="ir.ui.view">
+        <field name="name">view.account.invoice.refund</field>
+        <field name="model">account.invoice.refund</field>
+        <field name="inherit_id" ref="account.view_account_invoice_refund"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='filter_refund']" position="after">
+                <label for="filter_refund" attrs="{'invisible':[('refund_only','!=',True)]}"/>
+                <div class="o_form_field_radio o_vertical o_form_field o_form_required" attrs="{'invisible':[('refund_only','!=',True)]}">
+                    <div class="o_radio_item">
+                        <input class="o_form_radio" type="radio" value="refund" checked="checked"/>
+                        <span class="o_form_label">Créer un avoir en brouillon</span>
+                    </div>
+                    <div class="o_radio_item">
+                        <input class="o_form_radio" disabled="disabled" type="radio" value="cancel"/>
+                        <span class="o_form_label">Annuler : créer l'avoir et lettrer</span>
+                    </div>
+                    <div class="o_radio_item">
+                        <input class="o_form_radio" disabled="disabled" type="radio" value="modify"/>
+                        <span class="o_form_label">Modifier : créer un avoir, le lettrer et créer une nouvelle facture en brouillon</span>
+                    </div>
+                </div>
+            </xpath>
+            <xpath expr="//group[1]/group[2]" position="inside">
+                 <div attrs="{'invisible':[('refund_only','!=',True)]}" class="oe_grey" colspan="4">
+                    Votre facture est partiellement lettrée,
+                     si vous souhaitez annuler ou modifier intégralement
+                     votre facture, vous devez annuler le lettrage
+                 </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Vue facture form -->
+    <record id="of_account_invoice_form" model="ir.ui.view">
+        <field name="name">of.account.invoice.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/label[1]" position="before">
+                <div class="oe_button_box" name="button_box">
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/tree" position="attributes">
+                <!-- Edition des lignes de facture par formulaire -->
+                <attribute name="editable"/>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='product_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='product_id']" position="after">
+                <field name="of_product_default_code"/>
+            </xpath>
+            <button name="action_invoice_sent" position="attributes">
+                <attribute name="attrs">{'invisible':[('state','in',('cancel','draft'))]}</attribute>
+            </button>
+            <!-- Ne pas permettre de valider une facture en cours de modification pour éviter de pouvoir sauvegarder et
+                 valider en même temps, ce qui duplique les écritures comptables -->
+            <xpath expr="//button[@name='action_invoice_open'][1]" position="attributes">
+                <attribute name="class">oe_highlight oe_read_only</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_invoice_open'][2]" position="attributes">
+                <attribute name="class">oe_read_only</attribute>
+            </xpath>
+            <field name="partner_id" position="after">
+                <label string="Coordonnées client"/>
+                <div>
+                    <field name="of_partner_phone" nolabel="1" style="margin-right:10px;" attrs="{'invisible': [('of_partner_phone', '=', False)]}"/>
+                    <field name="of_partner_mobile" nolabel="1"/><br/>
+                    <field name="of_partner_email" nolabel="1"/>
+                </div>
+            </field>
+            <field name="fiscal_position_id" position="replace"/>
+            <field name="date_invoice" position="after">
+                <field name="fiscal_position_id" options="{'no_open': True}"/>
+            </field>
+            <xpath expr="//field[@name='date_due']" position="after">
+                <field name="of_etiquette_partenaire_ids" widget="many2many_tags" readonly="1"/>
+            </xpath>
+            <!-- Afficher la date d'échéance dans la vue facture sans être en mode développeur -->
+            <xpath expr="//field[@name='date_due']" position="replace">
+                <field name="date_due"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- formulaire factures fournisseur -->
+    <record id="view_of_account_invoice_supplier_form" model="ir.ui.view">
+        <field name="name">of.account.invoice.supplier.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_supplier_form"/>
+        <field name="arch" type="xml">
+            <!-- Ne pas permettre de valider une facture en cours de modification pour éviter de pouvoir sauvegarder et
+                 valider en même temps, ce qui duplique les écritures comptables -->
+            <xpath expr="//button[@name='action_invoice_open']" position="attributes">
+                <attribute name="class">oe_highlight oe_read_only</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Vue facture tree -->
+    <record id="of_account_invoice_tree" model="ir.ui.view">
+        <field name="name">of.account.invoice.tree</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_tree"/>
+        <field name="arch" type="xml">
+            <field name="number" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="number" position="after">
+                <field name="move_name" string="Numéro"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Vue ligne de facture form -->
+    <record id="of_account_invoice_line_form" model="ir.ui.view">
+        <field name="name">of.account.invoice.line.form</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="account.view_invoice_line_form"/>
+        <field name="arch" type="xml">
+            <!-- ajout prix/U HT -->
+            <xpath expr="//field[@name='price_unit']" position="before">
+                <field name="of_price_unit_ht" string="Prix unitaire HT"
+                      attrs="{'invisible': [('of_price_unit_ht', '=', '_field_price_unit')]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Filtres recherche factures -->
+    <record id="of_account_view_invoice_search" model="ir.ui.view">
+        <field name="name">of.account.view.invoice.search</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="of_etiquette_partenaire_ids" string="Étiquettes client" widget="many2one"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Ajout du choix du mode de la date d'échéance -->
+    <record id="of_tiers_client_ref" model="ir.ui.view">
+        <field name="name">of.tiers.client.ref</field>
+        <field name="model">account.config.settings</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="account.view_account_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='group_warning_account']" position="after">
+                <field name="of_date_due" widget="radio"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- account.account -->
+    <record id="of_account_view_res_partner_form" model="ir.ui.view">
+        <field name="name">of.account.account</field>
+        <field name="model">account.account</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="account.view_account_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tax_ids']" position="after">
+                <field name="of_account_counterpart_id"/>
+            </xpath>
+            <xpath expr="//field[@name='deprecated']" position="after">
+                <field name="of_editable" groups="of_base.of_group_root_only"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- account move -->
+    <record id="of_account_view_account_move_tree" model="ir.ui.view">
+        <field name="name">of.account.move.tree</field>
+        <field name="model">account.move</field>
+        <field name="priority">20</field>
+        <field name="inherit_id" ref="account.view_move_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="of_export"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Pour préremplir compte de tiers en fonction du partenaire saisi et date de la dernière écriture du journal par défaut. -->
+    <record id="of_account_view_account_move_form" model="ir.ui.view">
+        <field name="name">of.account.move.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='ref']" position="after">
+                <field name="partner_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']" position="attributes">
+                <attribute name="context">{'line_ids': line_ids, 'journal_id': journal_id, 'default_partner_id': partner_id, 'default_name': ref}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']/tree/field[@name='credit']" position="after">
+                <field name="balance" sum="Balance totale"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_account_view_account_move_filter" model="ir.ui.view">
+        <field name="name">of.account.move.select</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_move_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date']" position="after">
+                <filter string="Mois en cours" name="this_month"
+                        domain="[('date', u'&gt;=', context_today().strftime('%Y-%m-01')),
+                                 ('date', u'&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Mois précédent" name="previous_month"
+                        domain="[('date', u'&gt;=', (context_today() - relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
+                                 ('date', u'&lt;', context_today().strftime('%Y-%m-01'))]"/>
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Rechercher écritures comptables sur le débit et crédit en même temps -->
+    <record id="of_account_view_account_move_line_filter" model="ir.ui.view">
+        <field name="name">of.account.view.account.move.line.filter</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="account.view_account_move_line_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tax_ids']" position="after">
+                <field name="debit" string="Montant" filter_domain="['|',('debit','=',self),('credit','=',self)]"/>
+                <separator/>
+                <filter string="Mois en cours" name="this_month"
+                        domain="[('date', u'&gt;=', context_today().strftime('%Y-%m-01')),
+                                 ('date', u'&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Mois précédent" name="previous_month"
+                        domain="[('date', u'&gt;=', (context_today() - relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
+                                 ('date', u'&lt;', context_today().strftime('%Y-%m-01'))]"/>
+                <separator/>
+                <filter string="Ventes" name="journal_sale" domain="[('of_journal_type', '=', 'sale')]"/>
+                <filter string="Achats" name="journal_purchase" domain="[('of_journal_type', '=', 'purchase')]"/>
+                <filter string="Divers" name="journal_general" domain="[('of_journal_type', '=', 'general')]"/>
+                <filter string="Banques" name="journal_bank" domain="[('of_journal_type', '=', 'bank')]"/>
+                <filter string="Liquidités" name="journal_cash" domain="[('of_journal_type', '=', 'cash')]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_view_payment_term_line_tree" model="ir.ui.view">
+        <field name="name">of.account.payment.term.line.tree</field>
+        <field name="model">account.payment.term.line</field>
+        <field name="inherit_id" ref="account.view_payment_term_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='value']" position="before">
+                <field name="name"/>
+            </xpath>
+            <xpath expr="//field[@name='value_amount']" position="after">
+                <field name="of_amount_round"/>
+            </xpath>
+            <xpath expr="//field[@name='days']" position="after">
+                <field name="of_weeks"/>
+                <field name="of_months"/>
+                <field name="of_payment_days"/>
+                <field name="of_option_date"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_view_payment_term_line_form" model="ir.ui.view">
+        <field name="name">of.account.payment.term.line.form</field>
+        <field name="inherit_id" ref="account.view_payment_term_line_form"/>
+        <field name="model">account.payment.term.line</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='value']" position="before">
+                <field name="name"/>
+            </xpath>
+            <xpath expr="//field[@name='sequence']" position="before">
+                <field name="of_amount_round" attrs="{'invisible':[('value','=','balance')]}"/>
+            </xpath>
+            <xpath expr="/form/group/group[2]"  position="replace">
+                <group string="Calcul date d'échéance">
+                    <field name="of_option_date" widget="radio"/>
+                    <field name="option" widget="radio" string="Mode de calcul"/>
+                    <field name="days" attrs="{'invisible': [('option', 'in', ['last_day_following_month', 'last_day_current_month'])]}"/>
+                    <field name="of_weeks" attrs="{'invisible': [('option', 'in', ['last_day_following_month', 'last_day_current_month'])]}"/>
+                    <field name="of_months" attrs="{'invisible': [('option', 'in', ['last_day_following_month', 'last_day_current_month'])]}"/>
+                    <field name="of_payment_days" attrs="{'invisible': [('option', 'in', ['last_day_following_month', 'last_day_current_month'])]}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Rendre visible le menu "Écritures comptables" sans le mode débogue. -->
+    <menuitem action="account.action_account_moves_all_a" id="account.menu_action_account_moves_all" parent="account.menu_finance_entries" sequence="1" groups="-base.group_no_one" />
+
+    <!-- Ajout du nom de la facture dans la liste des lignes de factures, permet de voir le numéro de la facture dans les lignes de la commande -->
+    <record id="of_account_view_invoice_line_tree" model="ir.ui.view">
+        <field name="name">of.account.view.invoice.line.tree</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="account.view_invoice_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="before">
+                <field name="invoice_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Account Payment Form View -->
+    <record id="of_account_payment_form_view" model="ir.ui.view">
+        <field name="name">of.account.payment.form.view</field>
+        <field name="model">account.payment</field>
+        <field name="priority">20</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <field name="payment_date" position="after">
+                <field name="of_expected_deposit_date"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="account_payment_view_form" model="ir.ui.view">
+        <field name="name">of.account.payment.view.form</field>
+        <field name="model">account.payment</field>
+        <field name="priority">20</field>
+        <field name="inherit_id" ref="payment.view_account_payment_form_inherit_payment"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payment_transaction_id']" position="after">
+                <field name="company_id" groups="base.group_no_one"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Account journal form view -->
+    <record id="of_account_journal_form_view" model="ir.ui.view">
+        <field name="name">account.journal.form</field>
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="account_cancel.view_account_journal_form_inherit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='update_posted']" position="before">
+                <field name="of_is_current_user_admin" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='update_posted']" position="attributes">
+                <attribute name="groups"></attribute>
+                <attribute name="attrs">{'invisible':[('of_is_current_user_admin','=',False),('type','in',('sale','cash','bank'))]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="account.menu_finance_reports" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('account.group_account_user')])]"/>
+    </record>
+    <record id="account.menu_finance_payables" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('account.group_account_user')])]"/>
+    </record>
+    <record id="account.menu_finance_configuration" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('account.group_account_manager')])]"/>
+    </record>
+    <record id="account.menu_action_account_payments_receivable" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('account.group_account_invoice')])]"/>
+    </record>
+
+    <record id="of_view_account_payment_tree_amount_total" model="ir.ui.view">
+        <field name="name">of.account.payment.tree.amount.total</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_tree"/>
+        <field name="arch" type="xml">
+            <field name="amount" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="amount" position="after">
+                <field name="of_amount_total" sum="Total"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>
