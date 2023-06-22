@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, SUPERUSER_ID
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class OfQuestionnaire(models.Model):
@@ -48,6 +48,7 @@ class OfQuestionnaireLine(models.Model):
         ('condition', u"Si condition vérifiée"),
         ('condition_answer', u"Si condition vérifiée, avec une réponse"),
         ('never', u"Jamais")], string=u"Impression avec condition", required=True, default='always')
+    required = fields.Boolean(string=u"Question obligatoire")
 
     @api.depends('answer_ids', 'answer_type')
     def _compute_answer(self):
@@ -174,6 +175,7 @@ class OfPlanningIntervention(models.Model):
             'condition_code': question.condition_code,
             'print_mode': question.print_mode,
             'condition_print_mode': question.condition_print_mode,
+            'required': question.required,
         }
 
     @api.onchange('questionnaire_id')
@@ -220,6 +222,16 @@ class OfPlanningIntervention(models.Model):
         for question in self.question_ids:
             question.copy({'intervention_id': interv_new.id})
         return interv_new
+
+    @api.multi
+    def _write(self, vals):
+        res = super(OfPlanningIntervention, self)._write(vals)
+        if vals.get('state', '') == 'done':
+            for intervention in self:
+                if intervention.question_ids and not all(
+                        [q.has_been_answered() for q in intervention.question_ids.filtered('required')]):
+                    raise ValidationError(u"Au moins une question obligatoire n'a pas de réponse.")
+        return res
 
     @api.multi
     def _filter_answers_category(self, questions):
@@ -295,6 +307,21 @@ class OfPlanningInterventionQuestion(models.Model):
             question_parc.mapped('parc_installe_id').write(vals)
         super(OfPlanningInterventionQuestion, other).write(vals)
         return True
+
+    @api.multi
+    def has_been_answered(self):
+        self.ensure_one()
+        type_field = self.get_answer_field_by_type()
+        return bool(self[type_field[self.answer_type]])
+
+    @api.model
+    def get_answer_field_by_type(self):
+        return {
+            'bool': 'definitive_answer',
+            'text': 'definitive_answer',
+            'one': 'definitive_answer',
+            'list': 'definitive_answer',
+        }
 
 
 class OfParcInstalle(models.Model):

@@ -107,6 +107,7 @@
                         <group>
                             <field name="sequence"/>
                             <field name="type" invisible="context.get('hide_type')"/>
+                            <field name="required"/>
                             <field name="category_id"/>
                             <field name="print_mode" attrs="{'invisible': [('condition', '=', True)]}"/>
                             <field name="condition_print_mode" string="Impression" attrs="{'invisible': [('condition', '=', False)]}"/>
@@ -335,6 +336,7 @@
                         <group>
                             <field name="sequence"/>
                             <field name="category_id"/>
+                            <field name="required"/>
                             <field name="print_mode" attrs="{'invisible': [('condition', '=', True)]}"/>
                             <field name="condition_print_mode" string="Impression" attrs="{'invisible': [('condition', '=', False)]}"/>
                         </group>
@@ -455,6 +457,7 @@
                             <field name="sequence" widget="handle"/>
                             <field name="category_id" invisible="1"/>
                             <field name="type" invisible="1"/>
+                            <field name="required" invisible="1"/>
                             <field name="condition_unmet" invisible="1"/>
                             <field name="name"/>
                             <field name="answer_type" invisible="1"/>
@@ -492,6 +495,7 @@
                         <group>
                             <field name="sequence"/>
                             <field name="category_id"/>
+                            <field name="required"/>
                             <field name="print_mode" attrs="{'invisible': [('condition', '=', True)]}"/>
                             <field name="condition_print_mode" string="Impression" attrs="{'invisible': [('condition', '=', False)]}"/>
                         </group>
