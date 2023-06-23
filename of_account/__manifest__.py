@@ -1,40 +1,36 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 {
     'name': "OpenFire / Comptabilité",
-    'version': "10.0.2.0.0",
+    'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
     'author': "OpenFire",
-    'license': '',
-    'website': "www.openfire.fr",
-    'category': "Generic Modules/Accounting",
-    'description': u"""
-Module de comptabilité OpenFire.
-================================
-
-- Ajout de la rubrique 'Rapports' dans les paramètres de configuration
-- Factures :
-
-  - Afficher le boutton "Envoyer par email" dans tous les cas sauf pour les factures annulées et brouillon
-  - Afficher la date d'échéance dans la vue facture sans être en mode développeur
-  - Permettre de modifier la date d'échéance manuellement (option dans les paramètres de configuration comptabilité : suivant les conditions de règlement/modification manuelle possible)
-  - Permettre d'afficher et de rechercher des étiquettes client
-
-- Ajout d'un champ 'Exporté' pour savoir quelles pièces comptables ont été exportées.
-- Modifie le libellé des écritures comptables (Factures : client + n° facture, Paiement : client + n° facture/n° commande)
-- Ajout d'options dans les conditions de règlement (inspiré du module OCA account_payment_term_extension).
-- Rendre visible le menu "Écritures comptables" sans le mode développeur.
-""",
+    'website': "https://www.openfire.fr",
+    'category': "OpenFire",
+    'summary': "Personnalisation de la comptabilité",
+    'description': "",
     'depends': [
         'account',
-        'account_cancel',
         'of_base',
     ],
-    'demo_xml': [],
     'data': [
-        'data/of_account_data.xml',
-        'security/of_account_security.xml',
-        'views/of_account_views.xml',
-        'views/partner_views.xml',
-        'wizards/wizard_edit_export_view.xml'
+        'data/ir_cron.xml',
+        'data/ir_config_parameter.xml',
+        'security/ir.model.access.csv',
+        'security/res_groups.xml',
+        'security/ir_rule.xml',
+        'views/account_account_views.xml',
+        'views/account_journal_views.xml',
+        'views/account_move_views.xml',
+        'views/account_move_line_views.xml',
+        'views/account_payment_term_views.xml',
+        'views/res_partner_views.xml',
+        'views/res_company_views.xml',
+        'views/res_config_settings_views.xml',
+        'wizard/of_mark_account_move_as_exported_view.xml',
     ],
     'installable': True,
+    'application': False,
+    'auto_install': False,
+    'post_init_hook': 'post_init_hook',
 }

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_mark_account_move_as_exported_form_view_wizard" model="ir.ui.view">
+        <field name="name">of.mark.account.move.as.exported.form.wizard</field>
+        <field name="model">of.mark.account.move.as.exported</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+                <span>This will check the 'Exported' box on all selected Entries</span>
+                <footer>
+                    <button name="action_button_validate" string="Validate" type="object" class="oe_highlight"/>
+                    <button string="Cancel" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="account_account_invoice_issued_act_window" model="ir.actions.act_window">
+        <field name="name">Mark Account Move as Exported</field>
+        <field name="res_model">of.mark.account.move.as.exported</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_view_types">list</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

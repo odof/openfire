@@ -4,12 +4,13 @@ from markupsafe import Markup
 
 from odoo.fields import Command
 from odoo.tests import Form, tagged
-from odoo.tests.common import TransactionCase
 from odoo.tools import float_compare
 
+from odoo.addons.of_account.tests.common import TestOFAccountCommon
 
-@tagged('post_install', '-at_install')
-class TestOFPriceManagementWizard(TransactionCase):
+
+@tagged('post_install', '-at_install', 'openfire_custom')
+class TestOFPriceManagementWizard(TestOFAccountCommon):
     def setUp(self):
         super().setUp()
 
@@ -26,61 +27,6 @@ class TestOFPriceManagementWizard(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.env = cls.env(
-            context=dict(
-                cls.env.context,
-                tracking_disable=True,
-            )
-        )
-        # Company and accounting data
-        coa = cls.env.ref('l10n_fr.l10n_fr_pcg_chart_template')
-        cls.company_fr = cls.create_company(
-            {
-                'name': "Openfire FR",
-                'currency_id': cls.env.ref('base.EUR').id,
-                'country_id': cls.env.ref('base.fr').id,
-            }
-        )
-        cls.env.user.company_ids |= cls.company_fr
-        cls.env.user.company_id = cls.company_fr.id
-        coa.try_loading(company=cls.env.user.company_id)
-
-        # Taxe data and fiscal position data
-        cls.tax_base, cls.tax_5_5 = cls.env['account.tax'].create(
-            [
-                {
-                    'name': 'Test base tax',
-                    'type_tax_use': 'sale',
-                    'price_include': False,
-                    'amount': 5.5,
-                    'company_id': cls.company_fr.id,
-                },
-                {
-                    'name': 'Test 5.5% tax',
-                    'type_tax_use': 'sale',
-                    'price_include': False,
-                    'amount': 5.5,
-                    'company_id': cls.company_fr.id,
-                },
-            ]
-        )
-
-        cls.fiscal_pos = cls.env['account.fiscal.position'].create(
-            {
-                'name': "Test Fiscal Position 5.5 %",
-                'auto_apply': True,
-                'country_id': cls.env.ref('base.fr').id,
-                'tax_ids': [Command.create({'tax_src_id': cls.tax_base.id, 'tax_dest_id': cls.tax_5_5.id})],
-            }
-        )
-
-        # Customer and supplier data
-        cls.customer_1 = (
-            cls.env['res.partner'].with_context(default_company_id=cls.company_fr.id).create({'name': "Customer 1"})
-        )
-        cls.supplier_1 = (
-            cls.env['res.partner'].with_context(default_company_id=cls.company_fr.id).create({'name': "Supplier 1"})
-        )
 
         # Product and sale data
         cls.category = (
@@ -111,7 +57,7 @@ class TestOFPriceManagementWizard(TransactionCase):
                 {
                     'name': 'Test brand',
                     'code': 'TB',
-                    'partner_id': cls.supplier_1.id,
+                    'partner_id': cls.supplier_a.id,
                 }
             )
         )
@@ -164,11 +110,11 @@ class TestOFPriceManagementWizard(TransactionCase):
 
     def _prepare_sale_order_values(self):
         return {
-            'partner_id': self.customer_1.id,
-            'partner_invoice_id': self.customer_1.id,
-            'partner_shipping_id': self.customer_1.id,
+            'partner_id': self.customer_a.id,
+            'partner_invoice_id': self.customer_a.id,
+            'partner_shipping_id': self.customer_a.id,
             'pricelist_id': self.default_pricelist.id,
-            'fiscal_position_id': self.fiscal_pos.id,
+            'fiscal_position_id': self.fiscal_pos_5_5.id,
             'order_line': [
                 Command.create(
                     {

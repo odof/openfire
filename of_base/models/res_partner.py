@@ -101,8 +101,6 @@ class ResPartner(models.Model):
         comodel_name='res.partner.category', string="Parent labels", compute='_compute_parent_category'
     )
     of_default_address = fields.Boolean(string="Default address")
-
-    of_last_order_date = fields.Date(string="Last quote date", compute='_compute_of_last_order_date', compute_sudo=True)
     of_potential_duplication = fields.Boolean(
         string="Potential duplicate ?",
         compute='_compute_of_potential_duplication',

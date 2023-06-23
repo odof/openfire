@@ -5,13 +5,14 @@ from odoo.exceptions import UserError
 
 FORBIDDEN_UNINSTALL = {
     'of_base',
-    'of_obligatoire',
-    'of_sale',
 }
 
 
-class IrModuleModule(models.Model):
+class IRModuleModule(models.Model):
     _inherit = 'ir.module.module'
+
+    def _get_forbidden_uninstall(self):
+        return FORBIDDEN_UNINSTALL
 
     def action_uninstall(self):
         modules = self.module_id
@@ -34,7 +35,7 @@ class IrModuleModule(models.Model):
 
     def _check_uninstall(self):
         """Checks that the modules to be uninstalled are not base modules"""
-        if illegal_uninstall := FORBIDDEN_UNINSTALL & set(self.mapped('name')):
+        if illegal_uninstall := self._get_forbidden_uninstall() & set(self.mapped('name')):
             raise UserError(
                 _("You are trying to delete one or more protected modules : %s") % ", ".join(illegal_uninstall)
             )

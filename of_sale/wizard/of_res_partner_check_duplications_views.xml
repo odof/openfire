@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_res_partner_check_duplications_form_view" model="ir.ui.view">
+        <field name="name">of.res.partner.check.duplications.form.view</field>
+        <field name="model">of.res.partner.check.duplications</field>
+        <field name="inherit_id" ref="of_base.of_res_partner_check_duplications_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='duplication_ids']/tree/field[@name='create_date']" position="after">
+                <field name="of_last_order_date"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

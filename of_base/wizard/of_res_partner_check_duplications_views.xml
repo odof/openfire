@@ -16,7 +16,6 @@
                         <field name="email"/>
                         <field name="company_id"/>
                         <field name="create_date"/>
-                        <field name="of_last_order_date"/>
                     </tree>
                 </field>
                 <field name="info_txt" readonly="1" nolabel="1"/>

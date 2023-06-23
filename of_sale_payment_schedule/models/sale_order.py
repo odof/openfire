@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import Command, _, api, fields, models
+from odoo import Command, api, fields, models
 from odoo.tools import float_compare
 
 
@@ -40,11 +40,6 @@ class SaleOrder(models.Model):
         if not self.payment_term_id or not self.currency_id:
             return False
 
-        # Aujourd'hui, dans les lignes de contitions de règlement, on n'a
-        #   ni la distinction entre date de facture et date de commande
-        #   ni le libellé (qui était ajouté dans of_account en v10)
-        # TODO: Améliorer le libellé et la date affichés
-
         date_ref = fields.Date.to_string(fields.Date.today())
         payment_terms = self.payment_term_id._compute_terms(
             date_ref=date_ref,
@@ -67,7 +62,7 @@ class SaleOrder(models.Model):
             pct = round(100 * amount / amount_total, 2) if amount_total else 0
 
             line_vals = {
-                'name': _("Payment #%s") % i,
+                'name': line['name'],
                 'percent': pct,
                 'amount': amount,
                 'date': line['date'],
@@ -86,35 +81,33 @@ class SaleOrder(models.Model):
     def _onchange_amount_total(self):
         self._compute_of_payment_schedule_ids()
 
-    # TODO: Uncomment me and continue the migration when `of_account` module is migrated
-    # TODO Calcul des dates de l'échéancier à décommenter et retravailler quand on saura comment on les gère
-    # def of_update_payment_schedule_dates(self):
-    #     for order in self:
-    #         if not order.payment_term_id:
-    #             continue
+    def of_update_payment_schedule_dates(self):
+        for order in self:
+            if not order.payment_term_id:
+                continue
 
-    #         invoice_date = order.invoice_status == 'invoiced' and order.invoice_ids and \
-    #             order.invoice_ids[0].invoice_date or False
-    #         dates = {
-    #             'order': order.date_order,
-    #             'invoice': invoice_date,
-    #             'default': False,
-    #         }
-    #         force_dates = [echeance.date for echeance in order.of_payment_schedule_ids]
-    #         milestones = order.payment_term_id.compute(order.amount_total, dates=dates, force_dates=force_dates)[0]
+            date_ref = fields.Date.to_string(fields.Date.today())
+            payment_terms = self.payment_term_id._compute_terms(
+                date_ref=date_ref,
+                currency=self.currency_id,
+                company=self.company_id,
+                tax_amount=self.amount_tax,
+                tax_amount_currency=self.amount_tax,
+                untaxed_amount=self.amount_untaxed,
+                untaxed_amount_currency=self.amount_untaxed,
+                sign=1,
+            )
+            if len(payment_terms) != len(order.of_payment_schedule_ids):
+                continue
 
-    #         if len(milestones) != len(order.of_payment_schedule_ids):
-    #             continue
+            for payment_schedule, payment_term in zip(order.of_payment_schedule_ids, payment_terms):
+                if payment_term['date'] and not payment_schedule.date or payment_term['date'] != payment_schedule.date:
+                    payment_schedule.date = payment_term['date']
 
-    #         for payment_schedule, milestone in zip(order.of_payment_schedule_ids, milestones):
-    #             if milestone[0] and not payment_schedule.date:
-    #                 payment_schedule.date = milestone[0]
-
-    # def action_confirm(self):
-    #     res = super().action_confirm()
-    #     self.of_update_payment_schedule_dates()
-    #     return res
-    # TODO: End of uncomment me
+    def action_confirm(self):
+        res = super().action_confirm()
+        self.of_update_payment_schedule_dates()
+        return res
 
     def of_recompute_last_payment_schedule(self):
         for order in self:
@@ -166,5 +159,5 @@ class SaleOrder(models.Model):
 
     def copy(self, default=None):
         res = super().copy(default=default)
-        res._onchange_payment_term_id()
+        res._compute_of_payment_schedule_ids()
         return res

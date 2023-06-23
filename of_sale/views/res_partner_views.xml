@@ -1,50 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <odoo>
 
-    <!-- TODO: Move me to `of_account` when is migrated -->
-        <record id="of_res_partner_warnings_form_view" model="ir.ui.view">
-        <field name="name">of.res.partner.warnings.form.view</field>
-        <field name="model">res.partner</field>
-        <field name="inherit_id" ref="base.view_partner_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//page[@name='internal_notes']" position="inside">
-                <group name="warnings" string="Warnings">
-                    <label for="of_is_warn" string="Object(s)" name="label_warn"/>
-                    <div name="of_is_warn">
-                        <div name="of_div_account_warn">
-                            <field name="of_is_account_warn" nolabel="1" class="oe_inline"/> invoices
-                        </div>
-                    </div>
-                    <field name="of_warn_block" attrs="{'invisible': [('of_is_warn', '=', False)]}"/>
-                    <label string="Message" for="invoice_warn_msg" colspan="2"
-                            attrs="{'invisible': [('of_is_warn', '=', False)]}"/>
-                    <field name="invoice_warn_msg" colspan="2" nolabel="1"
-                            attrs="{'required':[('invoice_warn','!=','no-message')],
-                                    'readonly':[('invoice_warn','=','no-message')],
-                                    'invisible': [('of_is_warn', '=', False)]}"/>
-                    <field name="of_is_warn" invisible="1"/>
-                    <field name="invoice_warn" invisible="1"/>
-                </group>
-            </xpath>
-        </field>
-    </record>
-
-    <record id="of_view_res_partner_account_warn_form" model="ir.ui.view">
-        <field name="name">of.view.res.partner.account.warn.form</field>
-        <field name="model">res.partner</field>
-        <field name="inherit_id" ref="account.partner_view_buttons"/>
-        <field name="priority" eval="11"/> <!-- parent view priority is set to 11 -->
-        <field name="arch" type="xml">
-            <!-- Hide the default warning features -->
-            <xpath expr="//field[@name='invoice_warn']/.." position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
-        </field>
-    </record>
-
-    <!-- /TODO: Move me to `of_account` when is migrated -->
-
-
     <record id="of_sale_view_partner_form" model="ir.ui.view">
         <field name="name">of.sale.view.partner.form</field>
         <field name="model">res.partner</field>
@@ -72,7 +28,7 @@
     <record id="of_view_res_partner_sale_warn_form" model="ir.ui.view">
         <field name="name">of.view.res.partner.sale.warn.form</field>
         <field name="model">res.partner</field>
-        <field name="inherit_id" ref="of_sale.of_res_partner_warnings_form_view"/>
+        <field name="inherit_id" ref="of_account.of_res_partner_warnings_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//page[@name='internal_notes']//div[@name='of_div_account_warn']" position="before">
                 <div name="of_div_sale_warn">

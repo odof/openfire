@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_account_move_line_form" model="ir.ui.view">
+        <field name="name">of.account.move.line.form</field>
+        <field name="model">account.move.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <field name="display_type" invisible="1"/>
+                    <field name="company_id" invisible="1"/>
+                    <field name="partner_id" invisible="1"/>
+                    <field name="move_type" invisible="1"/>
+                    <field name="of_unit_price_taxexcl_display" invisible="1"/>
+                    <group>
+                        <field name="product_id" widget="many2one_barcode" context="{'of_only_default_code': False}"/>
+                        <field name="quantity"/>
+                        <field name="product_uom_category_id" invisible="1"/>
+                        <field name="product_uom_id" groups="uom.group_uom"/>
+                        <field name="of_price_unit_taxexcl" readonly="1" attrs="{'invisible': [('of_unit_price_taxexcl_display', '=', True)]}"/>
+                        <field name="price_unit"/>
+                        <field name="discount" string="Disc.%"/>
+                    </group>
+                    <group>
+                        <field name="account_id" options="{'no_create': True}" domain="[('company_id', '=', company_id)]" context="{'partner_id': partner_id, 'move_type': move_type}"/>
+                        <field name="tax_ids" widget="many2many_tags"/>
+                        <field name="analytic_distribution" widget="analytic_distribution" groups="analytic.group_analytic_accounting"/>
+                    </group>
+                    <label for="name" string="Description" attrs="{'invisible': [('display_type', 'in', ('line_note', 'line_section'))]}"/>
+                    <label for="name" string="Section" attrs="{'invisible': [('display_type', '!=', 'line_section')]}"/>
+                    <label for="name" string="Note" attrs="{'invisible': [('display_type', '!=', 'line_note')]}"/>
+                    <field name="name" widget="text"/>
+                    <group>
+                        <field name="price_subtotal" string="Subtotal" groups="account.group_show_line_subtotals_tax_excluded"/>
+                        <field name="price_total" string="Total" groups="account.group_show_line_subtotals_tax_included"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_account_view_account_move_line_filter" model="ir.ui.view">
+        <field name="name">of.account.view.account.move.line.filter</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="account.view_account_move_line_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tax_ids']" position="after">
+                <field name="debit" string="Amount" filter_domain="['|',('debit','=',self), ('credit','=',self)]"/>
+            </xpath>
+            <xpath expr="//filter[@name='group_by_partner']" position="after">
+                <filter string="Partner tags" name="group_by_partner_tags" domain="[]" context="{'group_by':'of_gb_partner_tag_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

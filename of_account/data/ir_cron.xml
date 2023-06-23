@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+
+    <record id="account_journal_activate_restrict_mode_hash_table_on_journals" model="ir.cron">
+        <field name="name">Journal : Automatically activate restriction mode on selected journal types.</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="account.model_account_journal"/>
+        <field name="code">model.cron_activate_restrict_mode_hash_table_on_journals(journal_types=['sale',])</field>
+        <field name="state">code</field>
+        <field name="interval_type">days</field>
+        <field name="interval_number">1</field>
+        <field name="numbercall">-1</field>
+        <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d 02:00:00')"/>
+    </record>
+
+</odoo>

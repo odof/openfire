@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-# TODO: Migrate me when `of_account` module will be migrated
+# TODO: Migrate me when `of_account_invoice_report` module will be migrated
 # from odoo import models
 
 
@@ -37,4 +37,4 @@
 #             return lines.filtered(
 #                 lambda line: (line.product_id in self.product_ids or line.product_id.categ_id in self.categ_ids)
 #             )
-# End of TODO: Migrate me when `of_account` module will be migrated
+# End of TODO: Migrate me when `of_account_invoice_report` module will be migrated

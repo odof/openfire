@@ -11,6 +11,7 @@
     'description': "",
     'depends': [
         'of_sale_margin',
+        'of_product_brand',
     ],
     'data': [
         'security/ir.model.access.csv',

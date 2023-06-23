@@ -67,6 +67,8 @@ class SaleAdvancePaymentInv(models.TransientModel):
         values = super()._prepare_invoice_values(order, so_line)
         if line_name := self._context.get('of_account_line_name'):
             values['invoice_line_ids'][0][2]['name'] = line_name
+        if of_default_deposit_payment_term_id := order.company_id.of_default_deposit_payment_term_id:
+            values['invoice_payment_term_id'] = of_default_deposit_payment_term_id.id
         return values
 
     def _get_down_payment_amount(self, order):
@@ -77,6 +79,15 @@ class SaleAdvancePaymentInv(models.TransientModel):
         return super()._get_down_payment_amount(order)
 
     def _create_invoices(self, sale_orders):
+        if len(self.sale_order_ids) != 1:  # let the original method do its job when multiple SOs are selected
+            return super()._create_invoices(sale_orders)
+
+        # If we asked to create a regular invoice and we already have down payments for this SO, so thats a final
+        # invoice
+        if self.advance_payment_method == 'delivered' and self.has_down_payments:
+            return sale_orders.with_context(of_down_payment_final_invoice=True)._create_invoices(
+                final=self.deduct_down_payments
+            )
         if self.advance_payment_method in ['percentage', 'fixed']:
             # `advance_payment_method` is available only for one SO, default value is 'delivered'
             # we should have only one SO in here.

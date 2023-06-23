@@ -1,188 +1,124 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from dateutil.relativedelta import relativedelta
-from odoo import models, fields, api, exceptions, _
-from odoo.tools.float_utils import float_is_zero, float_round
-import odoo.addons.decimal_precision as dp
-import calendar
 
-
-class AccountPaymentTermLine(models.Model):
-    _inherit = 'account.payment.term.line'
-
-    option = fields.Selection(
-        [
-            ('day_after_invoice_date', u"À partir de la date de référence"),
-            ('fix_day_following_month', u"À partir de la fin du mois"),
-            ('last_day_following_month', "Last day of following month"),
-            ('last_day_current_month', "Last day of current month"),
-        ],
-        default='day_after_invoice_date', required=True, string="Mode de calcul")
-    name = fields.Char(string=u"Libellé", required=True, default=u"Échéance")
-    of_option_date = fields.Selection(
-        '_get_of_option_date', string="Date de référence", required=True, default='invoice')
-    of_amount_round = fields.Float(
-        string="Arrondi du montant",
-        digits=dp.get_precision('Account'),
-        help=u"Arrondit le montant à un multiple de cette valeur")
-    of_months = fields.Integer(string="Nombre de mois")
-    of_weeks = fields.Integer(string="Nombre de semaines")
-    of_payment_days = fields.Char(
-        string="Jours du mois",
-        help=u"Liste des jours du mois valides pour les paiements, séparés par des virgules (,), 'espaces blancs ( ) "
-             u"ou tirets pour des périodes (-).")
-
-    @api.model
-    def _get_of_option_date(self):
-        return [('invoice', "Date de facture"), ('previous', u"Échéance précédente")]
-
-    @api.model
-    def of_decode_payment_days(self, days_char):
-        # les jours sont séparés par des ' ' ou ','. Des '-' indiquent des périodes.
-        days_char = days_char.replace(',', ' ')
-        days = []
-        for day_char in days_char.split():
-            if '-' in day_char:
-                d = [int(d) for d in day_char.split('-')]
-                days += range(d[0], d[-1]+1)
-            else:
-                days.append(int(day_char))
-        days.sort()
-        return days
-
-    @api.multi
-    def of_apply_payment_days(self, date):
-        """Calculate the new date with days of payments"""
-        self.ensure_one()
-        if self.of_payment_days:
-            payment_days = self.of_decode_payment_days(self.of_payment_days)
-            if payment_days:
-                new_date = None
-                days_in_month = calendar.monthrange(date.year, date.month)[1]
-
-                months = 0
-                for day in payment_days:
-                    if date.day <= day:
-                        break
-                else:
-                    day = payment_days[0]
-                    months = 1
-                if day > days_in_month:
-                    day = days_in_month
-                new_date = date + relativedelta(day=day, months=months)
-                return new_date
-        return date
-
-    @api.multi
-    def of_compute_line_date(self, dates):
-        self.ensure_one()
-        next_date = dates[self.of_option_date]
-        if not next_date:
-            return False
-
-        if self.option == 'day_after_invoice_date':
-            next_date += relativedelta(
-                days=self.days,
-                weeks=self.of_weeks,
-                months=self.of_months)
-        elif self.option == 'fix_day_following_month':
-            # Getting 1st of next month
-            next_first_date = next_date + relativedelta(day=1, months=1)
-            next_date = next_first_date + relativedelta(
-                days=self.days - 1,
-                weeks=self.of_weeks,
-                months=self.of_months)
-        elif self.option == 'last_day_following_month':
-            # Getting last day of next month
-            next_date += relativedelta(day=31, months=1)
-        elif self.option == 'last_day_current_month':
-            # Getting last day of next month
-            next_date += relativedelta(day=31, months=0)
-        next_date = self.of_apply_payment_days(next_date)
-        return next_date
-
-    @api.multi
-    def of_compute_line_amount(self, total_amount, remaining_amount, precision_digits):
-        """Compute the amount for a payment term line.
-        In case of procent computation, use the payment
-        term line rounding if defined
-
-            :param total_amount: total balance to pay
-            :param remaining_amount: total amount minus sum of previous lines
-                computed amount
-            :returns: computed amount for this line
-        """
-        self.ensure_one()
-        amount = None
-        if self.value == 'fixed':
-            amount = self.value_amount * (total_amount < 0 and -1 or 1)
-        elif self.value == 'percent':
-            amount = total_amount * (self.value_amount / 100.0)
-            if self.of_amount_round:
-                amount = float_round(amount, precision_rounding=self.of_amount_round)
-        elif self.value == 'balance':
-            amount = remaining_amount
-        return amount and float_round(amount, precision_digits=precision_digits)
-
-    @api.one
-    @api.constrains('of_payment_days')
-    def _check_of_payment_days(self):
-        if not self.of_payment_days:
-            return
-        try:
-            payment_days = self.of_decode_payment_days(self.of_payment_days)
-            error = payment_days and (payment_days[0] <= 0 or payment_days[-1] > 31)
-        except Exception:
-            error = True
-        if error:
-            raise exceptions.Warning(_("Le format des jours de paiement n'est pas valide."))
+from odoo import _, api, fields, models
 
 
 class AccountPaymentTerm(models.Model):
     _inherit = 'account.payment.term'
 
-    @api.one
-    def compute(self, value, date_ref=False, dates={}, force_dates=False):
-        """
-        @param date_ref: Date de facturation. Champ conservé pour compatibilité Odoo.
-        @param dates: Dictionnaire des autres dates pouvant être utilisées.
-            Peut contenir une valeur 'default' pour les dates manquantes, sans quoi la date courante sera utilisée.
-        @param force_dates: Liste de valeurs (string de date ou False), dans l'ordre des lignes d'échéances.
-            Si renseigné, doit avoir une valeur par ligne d'échéance dont le montant est différent de 0.
-        """
-        default = dates.get('default', fields.Date.today())
-        dates = {
-            date_field: fields.Date.from_string(dates.get(date_field) or default)
-            for date_field in self.env['account.payment.term.line']._fields['of_option_date'].get_values(self.env)
+    of_balance_invoice_payment_term_id = fields.Many2one(
+        comodel_name='account.payment.term',
+        string="Payment terms for balance invoice",
+        help="Set a payment term to be used for balance invoice.",
+    )
+
+    @api.model
+    def _get_compute_terms_line_vals(self, line, date_ref):
+        """Returns a dictionary with the values for the payment term line. For inheritance purpose."""
+        return {
+            'name': line.of_name,
+            'date': line._get_due_date(date_ref),
+            'has_discount': line.discount_percentage,
+            'discount_date': None,
+            'discount_amount_currency': 0.0,
+            'discount_balance': 0.0,
+            'discount_percentage': line.discount_percentage,
         }
-        if date_ref:
-            dates['invoice'] = fields.Date.from_string(date_ref)
 
-        amount = value
+    def _compute_terms(
+        self,
+        date_ref,
+        currency,
+        company,
+        tax_amount,
+        tax_amount_currency,
+        sign,
+        untaxed_amount,
+        untaxed_amount_currency,
+    ):
+        """Get the distribution of this payment term.
+        :param date_ref: The move date to take into account
+        :param currency: the move's currency
+        :param company: the company issuing the move
+        :param tax_amount: the signed tax amount for the move
+        :param tax_amount_currency: the signed tax amount for the move in the move's currency
+        :param untaxed_amount: the signed untaxed amount for the move
+        :param untaxed_amount_currency: the signed untaxed amount for the move in the move's currency
+        :param sign: the sign of the move
+        :return (list<tuple<datetime.date,tuple<float,float>>>): the amount in the company's currency and
+            the document's currency, respectively for each required payment date
+        """
+        self.ensure_one()
+        company_currency = company.currency_id
+        tax_amount_left = tax_amount
+        tax_amount_currency_left = tax_amount_currency
+        untaxed_amount_left = untaxed_amount
+        untaxed_amount_currency_left = untaxed_amount_currency
+        total_amount = tax_amount + untaxed_amount
+        total_amount_currency = tax_amount_currency + untaxed_amount_currency
         result = []
-        if self.env.context.get('currency_id'):
-            currency = self.env['res.currency'].browse(self.env.context['currency_id'])
-        else:
-            currency = self.env.user.company_id.currency_id
-        prec = currency.decimal_places
 
-        i = 0
-        for line in self.line_ids:
-            amt = line.of_compute_line_amount(value, amount, prec)
-
-            if float_is_zero(amt, precision_rounding=prec):
-                dates['previous'] = line.of_compute_line_date(dates)
+        for line in self.line_ids.sorted(lambda line: line.value == 'balance'):
+            term_vals = self._get_compute_terms_line_vals(line, date_ref)
+            if line.value == 'fixed':
+                term_vals['company_amount'] = sign * company_currency.round(line.value_amount)
+                term_vals['foreign_amount'] = sign * currency.round(line.value_amount)
+                company_proportion = tax_amount / untaxed_amount if untaxed_amount else 1
+                foreign_proportion = tax_amount_currency / untaxed_amount_currency if untaxed_amount_currency else 1
+                line_tax_amount = company_currency.round(line.value_amount * company_proportion) * sign
+                line_tax_amount_currency = currency.round(line.value_amount * foreign_proportion) * sign
+                line_untaxed_amount = term_vals['company_amount'] - line_tax_amount
+                line_untaxed_amount_currency = term_vals['foreign_amount'] - line_tax_amount_currency
+            elif line.value == 'percent':
+                term_vals['company_amount'] = company_currency.round(total_amount * (line.value_amount / 100.0))
+                term_vals['foreign_amount'] = currency.round(total_amount_currency * (line.value_amount / 100.0))
+                line_tax_amount = company_currency.round(tax_amount * (line.value_amount / 100.0))
+                line_tax_amount_currency = currency.round(tax_amount_currency * (line.value_amount / 100.0))
+                line_untaxed_amount = term_vals['company_amount'] - line_tax_amount
+                line_untaxed_amount_currency = term_vals['foreign_amount'] - line_tax_amount_currency
             else:
-                if force_dates and len(force_dates) > i and force_dates[i]:
-                    dates['previous'] = fields.Date.from_string(force_dates[i])
+                line_tax_amount = line_tax_amount_currency = line_untaxed_amount = line_untaxed_amount_currency = 0.0
+
+            tax_amount_left -= line_tax_amount
+            tax_amount_currency_left -= line_tax_amount_currency
+            untaxed_amount_left -= line_untaxed_amount
+            untaxed_amount_currency_left -= line_untaxed_amount_currency
+
+            if line.value == 'balance':
+                term_vals['company_amount'] = tax_amount_left + untaxed_amount_left
+                term_vals['foreign_amount'] = tax_amount_currency_left + untaxed_amount_currency_left
+                line_tax_amount = tax_amount_left
+                line_tax_amount_currency = tax_amount_currency_left
+                line_untaxed_amount = untaxed_amount_left
+                line_untaxed_amount_currency = untaxed_amount_currency_left
+
+            if line.discount_percentage:
+                if company.early_pay_discount_computation in ('excluded', 'mixed'):
+                    term_vals['discount_balance'] = company_currency.round(
+                        term_vals['company_amount'] - line_untaxed_amount * line.discount_percentage / 100.0
+                    )
+                    term_vals['discount_amount_currency'] = currency.round(
+                        term_vals['foreign_amount'] - line_untaxed_amount_currency * line.discount_percentage / 100.0
+                    )
                 else:
-                    dates['previous'] = line.of_compute_line_date(dates)
-                i += 1
-                result.append((fields.Date.to_string(dates['previous']), amt))
-                amount -= amt
-        amount = reduce(lambda x, y: x + y[1], result, 0.0)
-        dist = round(value - amount, prec)
-        if dist:
-            last_date = result and result[-1][0] or fields.Date.today()
-            result.append((last_date, dist))
+                    term_vals['discount_balance'] = company_currency.round(
+                        term_vals['company_amount'] * (1 - (line.discount_percentage / 100.0))
+                    )
+                    term_vals['discount_amount_currency'] = currency.round(
+                        term_vals['foreign_amount'] * (1 - (line.discount_percentage / 100.0))
+                    )
+                term_vals['discount_date'] = date_ref + relativedelta(days=line.discount_days)
+
+            result.append(term_vals)
         return result
+
+
+class AccountPaymentTermLine(models.Model):
+    _inherit = 'account.payment.term.line'
+
+    def _default_of_name(self):
+        return _("Balance")
+
+    of_name = fields.Char(string="Description", required=False, default=lambda self: self._default_of_name())

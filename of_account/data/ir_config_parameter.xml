@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_account_suitable_default_type_domain" model="ir.config_parameter">
+        <field name="key">of.account.suitable_default_type_domain</field>
+        <field name="value">general,bank,cash,purchase</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_account_account_view_form" model="ir.ui.view">
+        <field name="name">of.account.account.view.form</field>
+        <field name="model">account.account</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="account.view_account_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tax_ids']" position="after">
+                <field name="of_account_counterpart_id"/>
+            </xpath>
+            <xpath expr="//field[@name='deprecated']" position="after">
+                <field name="of_editable" groups="of_base.of_group_root_only"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

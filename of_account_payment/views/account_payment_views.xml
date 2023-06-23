@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_account_payment_form_view" model="ir.ui.view">
+        <field name="name">of.account.payment.form.view</field>
+        <field name="model">account.payment</field>
+        <field name="priority">20</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <field name="date" position="after">
+                <field name="of_expected_deposit_date"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="of_account_payment_form_inherit_payment" model="ir.ui.view">
+        <field name="name">of.account.payment.form.inherit.payment</field>
+        <field name="model">account.payment</field>
+        <field name="priority">20</field>
+        <field name="inherit_id" ref="account_payment.view_account_payment_form_inherit_payment"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payment_transaction_id']" position="after">
+                <field name="company_id" groups="base.group_no_one"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

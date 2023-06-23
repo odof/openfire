@@ -1,21 +1,561 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-#	* of_account
+# 	* of_account
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 10.0\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-28 12:55+0000\n"
-"PO-Revision-Date: 2021-06-28 12:55+0000\n"
-"Last-Translator: <>\n"
+"POT-Creation-Date: 2023-07-06 08:54+0000\n"
+"PO-Revision-Date: 2023-07-06 08:54+0000\n"
+"Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
 
-#. module: account
-#: model:ir.ui.view,arch_db:account.partner_view_buttons
-msgid "<span class=\"o_stat_text\">Invoiced</span>"
-msgstr "<span class=\"o_stat_text\">Facturé HT</span>"
+#. module: of_account
+#: model:res.groups,name:of_account.of_account_can_modify_account_with_entry_lines
+msgid "(OF) Can modify account with entry lines"
+msgstr "(OF) Peut modifier les comptes avec des lignes d'écriture"
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_account_res_config_settings_view_form
+msgid ""
+"<span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-"
+"specific.\" aria-label=\"Values set here are company-specific.\" "
+"role=\"img\"/>"
+msgstr ""
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_mark_account_move_as_exported_form_view_wizard
+msgid ""
+"<span>This will check the 'Exported' box on all selected Entries</span>"
+msgstr ""
+"<span>Cette action coche la case 'Exporté' sur toutes les écritures "
+"sélectionnées</span>"
+
+#. module: of_account
+#: model:ir.model.fields,help:of_account.field_account_account__of_editable
+msgid "A non-editable account can only be modified by the admin."
+msgstr ""
+"Un compte non modifiable ne peut être modifié que par l'administrateur."
+
+#. module: of_account
+#: model:ir.model,name:of_account.model_account_account
+msgid "Account"
+msgstr "Compte"
+
+#. module: of_account
+#. odoo-python
+#: code:addons/of_account/models/account_move_line.py:0
+#, python-format
+msgid "Account Move Line"
+msgstr "Ligne d'écriture"
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_account_view_company_form
+msgid "Accounting"
+msgstr "Comptabilité"
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_account_view_account_move_line_filter
+msgid "Amount"
+msgstr "Montant"
+
+#. module: of_account
+#. odoo-python
+#: code:addons/of_account/models/account_payment_term.py:0
+#, python-format
+msgid "Balance"
+msgstr "Solde"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_res_partner__of_warn_block
+#: model:ir.model.fields,field_description:of_account.field_res_users__of_warn_block
+msgid "Blocking"
+msgstr "Bloquant"
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_mark_account_move_as_exported_form_view_wizard
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: of_account
+#. odoo-python
+#: code:addons/of_account/monkeypatch.py:0
+#, python-format
+msgid ""
+"Cannot find a chart of accounts for this company, You should configure it. \n"
+"Please go to Account Configuration."
+msgstr ""
+
+#. module: of_account
+#: model:ir.model,name:of_account.model_res_company
+msgid "Companies"
+msgstr "Sociétés"
+
+#. module: of_account
+#: model:ir.model,name:of_account.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
+
+#. module: of_account
+#: model:ir.model,name:of_account.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_account_account__of_account_counterpart_id
+msgid "Counterpart account"
+msgstr "Compte contrepartie"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_of_mark_account_move_as_exported__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_of_mark_account_move_as_exported__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_account_view_account_move_form
+msgid "Customer details"
+msgstr "Coordonnées du client"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_account_bank_statement_line__of_customer_category_ids
+#: model:ir.model.fields,field_description:of_account.field_account_move__of_customer_category_ids
+#: model:ir.model.fields,field_description:of_account.field_account_payment__of_customer_category_ids
+msgid "Customer tags"
+msgstr "Étiquettes client"
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_account_view_account_move_form
+msgid "Date"
+msgstr ""
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_of_connector_config_settings__of_default_deposit_payment_term_id
+#: model:ir.model.fields,field_description:of_account.field_res_company__of_default_deposit_payment_term_id
+#: model:ir.model.fields,field_description:of_account.field_res_config_settings__of_default_deposit_payment_term_id
+msgid "Default payment terms for deposit invoices"
+msgstr "Conditions de paiement par défaut pour les factures d'acompte"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_account_payment_term_line__of_name
+#: model_terms:ir.ui.view,arch_db:of_account.of_account_move_line_form
+msgid "Description"
+msgstr ""
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_account_move_line_form
+msgid "Disc.%"
+msgstr "Rem.%"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_of_mark_account_move_as_exported__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_account_move_line__of_unit_price_taxexcl_display
+msgid "Display unit price tax excl"
+msgstr "Afficher le prix unitaire HT"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_account_account__of_editable
+msgid "Editable"
+msgstr "Éditable"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_account_bank_statement_line__of_exported
+#: model:ir.model.fields,field_description:of_account.field_account_move__of_exported
+#: model:ir.model.fields,field_description:of_account.field_account_payment__of_exported
+msgid "Exported"
+msgstr "Exporté"
+
+#. module: of_account
+#. odoo-python
+#: code:addons/of_account/monkeypatch.py:0
+#, python-format
+msgid "Go to the configuration panel"
+msgstr ""
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_of_mark_account_move_as_exported__id
+msgid "ID"
+msgstr ""
+
+#. module: of_account
+#: model:ir.model.fields,help:of_account.field_account_journal__restrict_mode_hash_table
+msgid ""
+"If ticked, the accounting entry or invoice receives a hash as soon as it is "
+"posted and cannot be modified anymore."
+msgstr ""
+"Si elle est cochée, l'écriture comptable ou la facture reçoit un hash dès "
+"qu'elle est comptabilisée et ne peut plus être modifiée."
+
+#. module: of_account
+#. odoo-python
+#: code:addons/of_account/models/res_partner.py:0
+#, python-format
+msgid ""
+"If you save, you'll be editing an accounting account that contains entries. "
+"If you are sure you can continue, otherwise please do not save and cancel "
+"this modification (from: %s, to: %s)."
+msgstr ""
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_res_partner__invoice_warn
+#: model:ir.model.fields,field_description:of_account.field_res_users__invoice_warn
+msgid "Invoice"
+msgstr "Facture"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_account_move_line__of_date_invoice
+msgid "Invoice/Bill Date"
+msgstr "Date facture"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_res_partner__of_is_account_warn
+#: model:ir.model.fields,field_description:of_account.field_res_users__of_is_account_warn
+msgid "Invoices warning"
+msgstr "Avertissement factures"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_account_journal__of_is_current_user_admin
+msgid "Is the current user admin?"
+msgstr "L'utilisateur courant est-il administrateur ?"
+
+#. module: of_account
+#: model:ir.model,name:of_account.model_account_journal
+msgid "Journal"
+msgstr ""
+
+#. module: of_account
+#: model:ir.actions.server,name:of_account.account_journal_activate_restrict_mode_hash_table_on_journals_ir_actions_server
+#: model:ir.cron,cron_name:of_account.account_journal_activate_restrict_mode_hash_table_on_journals
+msgid ""
+"Journal : Automatically activate restriction mode on selected journal types."
+msgstr ""
+"Journal : Activer automatiquement le mode de restriction sur les journaux de "
+"types choisis."
+
+#. module: of_account
+#: model:ir.model,name:of_account.model_account_move
+msgid "Journal Entry"
+msgstr "Pièce comptable"
+
+#. module: of_account
+#: model:ir.model,name:of_account.model_account_move_line
+msgid "Journal Item"
+msgstr "Écriture comptable"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_of_mark_account_move_as_exported____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_of_mark_account_move_as_exported__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_of_mark_account_move_as_exported__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_account_journal__restrict_mode_hash_table
+msgid "Lock Posted Entries with Hash"
+msgstr "Verrouiller les écritures comptabilisées avec hash"
+
+#. module: of_account
+#: model:ir.actions.act_window,name:of_account.account_account_invoice_issued_act_window
+msgid "Mark Account Move as Exported"
+msgstr "Marquer comme exportée"
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_res_partner_warnings_form_view
+msgid "Message"
+msgstr ""
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_account_move_line__of_name
+msgid "Name"
+msgstr "Libellé"
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_account_move_line_form
+msgid "Note"
+msgstr ""
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_res_partner_warnings_form_view
+msgid "Object(s)"
+msgstr "Objets(s)"
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_account_view_account_move_form
+msgid "Open account move line"
+msgstr "Ouvrir l'écriture comptable"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_account_bank_statement_line__of_partner_email
+#: model:ir.model.fields,field_description:of_account.field_account_move__of_partner_email
+#: model:ir.model.fields,field_description:of_account.field_account_payment__of_partner_email
+msgid "Partner email"
+msgstr "Email du partenaire"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_account_move_line__of_gb_partner_tag_id
+msgid "Partner tag"
+msgstr "Étiquettes du partenaire"
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_account_view_account_move_line_filter
+msgid "Partner tags"
+msgstr "Étiquettes du partenaire"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_account_bank_statement_line__of_partner_mobile
+#: model:ir.model.fields,field_description:of_account.field_account_move__of_partner_mobile
+#: model:ir.model.fields,field_description:of_account.field_account_payment__of_partner_mobile
+msgid "Partner's mobile"
+msgstr "Mobile du partenaire"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_account_bank_statement_line__of_partner_phone
+#: model:ir.model.fields,field_description:of_account.field_account_move__of_partner_phone
+#: model:ir.model.fields,field_description:of_account.field_account_payment__of_partner_phone
+msgid "Partner's phone"
+msgstr "Téléphone du partenaire"
+
+#. module: of_account
+#: model:ir.model,name:of_account.model_account_payment_term
+msgid "Payment Terms"
+msgstr "Conditions de paiement"
+
+#. module: of_account
+#: model:ir.model,name:of_account.model_account_payment_term_line
+msgid "Payment Terms Line"
+msgstr "Détail des conditions de paiement"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_account_payment_term__of_balance_invoice_payment_term_id
+msgid "Payment terms for balance invoice"
+msgstr "Conditions de paiement pour la facture de solde"
+
+#. module: of_account
+#: model:ir.model,name:of_account.model_product_template
+msgid "Product"
+msgstr "Modèle d'article"
+
+#. module: of_account
+#: model:ir.model,name:of_account.model_product_product
+msgid "Product Variant"
+msgstr "Variante de produit"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_account_move_line__of_product_categ_id
+msgid "Product category"
+msgstr "Catégorie de produit"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_account_bank_statement_line__ref
+#: model:ir.model.fields,field_description:of_account.field_account_move__ref
+#: model:ir.model.fields,field_description:of_account.field_account_payment__ref
+msgid "Reference"
+msgstr "Référence"
+
+#. module: of_account
+#: model:ir.model,name:of_account.model_sale_advance_payment_inv
+msgid "Sales Advance Payment Invoice"
+msgstr "Facture de paiement d'avance"
+
+#. module: of_account
+#: model:ir.model,name:of_account.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_account_move_line_form
+msgid "Section"
+msgstr ""
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_account_res_config_settings_view_form
+msgid ""
+"Set a default payment term for deposits invoices (e.g. 50% on order, 50% on delivery).\n"
+"                            This payment terms will replace that of the order when the deposit invoice is created."
+msgstr ""
+"Définir une condition de paiement par défaut pour les factures d'acompte (par exemple 50% à la commande, 50% à la livraison).\n"
+"                            Cette condition de paiement remplacera celle de la commande lors de la création de la facture d'acompte."
+
+#. module: of_account
+#: model:ir.model.fields,help:of_account.field_of_connector_config_settings__of_default_deposit_payment_term_id
+#: model:ir.model.fields,help:of_account.field_res_company__of_default_deposit_payment_term_id
+#: model:ir.model.fields,help:of_account.field_res_config_settings__of_default_deposit_payment_term_id
+msgid ""
+"Set a default payment term for deposits invoices (e.g. 50% on order, 50% on "
+"delivery).This payment terms will replace that of the order when the deposit"
+" invoice is created."
+msgstr ""
+"Définir une condition de paiement par défaut pour les factures d'acompte "
+"(par exemple 50% à la commande, 50% à la livraison). Cette condition de "
+"paiement remplacera celle de la commande lors de la création de la facture "
+"d'acompte."
+
+#. module: of_account
+#: model:ir.model.fields,help:of_account.field_account_payment_term__of_balance_invoice_payment_term_id
+msgid "Set a payment term to be used for balance invoice."
+msgstr "Définir une condition de paiement pour la facture de solde."
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_account_move_line_form
+msgid "Subtotal"
+msgstr "Sous-total"
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_account_view_account_move_form
+msgid "Terms"
+msgstr ""
+
+#. module: of_account
+#. odoo-python
+#: code:addons/of_account/models/account_move.py:0
+#, python-format
+msgid "The journal's company must be the same as the move entry's company."
+msgstr ""
+"La société du journal doit être la même que celle de l'écriture comptable."
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_account_move_line_form
+msgid "Total"
+msgstr ""
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_account_view_account_move_form
+msgid "Total Balance"
+msgstr "Solde total"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_account_move_line__price_unit
+msgid "Unit Price"
+msgstr "Prix unitaire"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_account_move_line__of_price_unit_taxexcl
+msgid "Unit Price Tax excl"
+msgstr "Prix unitaire HT"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_account_move_line__of_price_unit_taxinc
+msgid "Unit Price Tax incl"
+msgstr "Prix unitaire TTC"
+
+#. module: of_account
+#: model:ir.model.fields,help:of_account.field_account_move_line__price_unit
+msgid ""
+"Unit price of the product. To enter without VAT or with VAT according to the"
+" invoice line."
+msgstr ""
+"Prix unitaire du produit. À saisir HT ou TTC selon la ligne de facture."
+
+#. module: of_account
+#: model:ir.model.fields,help:of_account.field_account_move_line__of_price_unit_taxinc
+msgid "Unit price with taxes"
+msgstr "Prix unitaire TTC"
+
+#. module: of_account
+#: model:ir.model.fields,help:of_account.field_account_move_line__of_price_unit_taxexcl
+msgid "Unit price without taxes"
+msgstr "Prix unitaire HT"
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_mark_account_move_as_exported_form_view_wizard
+msgid "Validate"
+msgstr "Valider"
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_account_view_account_move_form
+msgid "Vendor details"
+msgstr "Détails fournisseur"
+
+#. module: of_account
+#. odoo-python
+#: code:addons/of_account/models/res_partner.py:0
+#, python-format
+msgid "Warning"
+msgstr "Avertissement"
+
+#. module: of_account
+#. odoo-python
+#: code:addons/of_account/monkeypatch.py:0
+#, python-format
+msgid "Warning for %s"
+msgstr "Avertissement pour %s"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:of_account.field_res_partner__of_is_warn
+#: model:ir.model.fields,field_description:of_account.field_res_users__of_is_warn
+msgid "Warning on at least one object"
+msgstr "Avertissement sur au moins un objet"
+
+#. module: of_account
+#: model:ir.model.fields,help:of_account.field_res_partner__invoice_warn
+#: model:ir.model.fields,help:of_account.field_res_users__invoice_warn
+msgid "Warning type"
+msgstr "Type d'avertissement"
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_res_partner_warnings_form_view
+msgid "Warnings"
+msgstr "Avertissements"
+
+#. module: of_account
+#. odoo-python
+#: code:addons/of_account/models/account_journal.py:0
+#, python-format
+msgid ""
+"You cannot authorize the modification of accounting entries on a journal of "
+"this type"
+msgstr ""
+
+#. module: of_account
+#. odoo-python
+#: code:addons/of_account/models/account_account.py:0
+#, python-format
+msgid ""
+"You cannot change the code of an account that already has entries. : %s"
+msgstr ""
+"Vous ne pouvez pas modifier le code d'un compte qui a déjà des écritures. : "
+"%s"
+
+#. module: of_account
+#. odoo-python
+#: code:addons/of_account/models/account_move.py:0
+#, python-format
+msgid "You cannot validate an invoice or a refund with a negative total."
+msgstr ""
+"Vous ne pouvez pas valider une facture ou un avoir avec un total négatif."
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_res_partner_warnings_form_view
+msgid "invoices"
+msgstr "factures"
+
+#. module: of_account
+#: model:ir.model,name:of_account.model_of_account_move_hooks_installed
+msgid "of.account.move.hooks.installed"
+msgstr ""
+
+#. module: of_account
+#: model:ir.model,name:of_account.model_of_mark_account_move_as_exported
+msgid "of.mark.account.move.as.exported"
+msgstr ""

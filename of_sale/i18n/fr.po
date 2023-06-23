@@ -766,12 +766,6 @@ msgid "Invoiced qty(ies)"
 msgstr "Qté(s) facturée(s)"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_res_partner__of_is_account_warn
-#: model:ir.model.fields,field_description:of_sale.field_res_users__of_is_account_warn
-msgid "Invoices warning"
-msgstr "Avertissement factures"
-
-#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_res_partner__of_invoice_policy
 #: model:ir.model.fields,field_description:of_sale.field_res_users__of_invoice_policy
 #: model:ir.model.fields,field_description:of_sale.field_sale_order__of_invoice_policy
@@ -845,6 +839,11 @@ msgstr "Lignes à facturer"
 #: model:ir.model.fields,field_description:of_sale.field_account_payment__of_is_locked
 msgid "Locked"
 msgstr "Verrouillé"
+
+#. module: of_sale
+#: model:mail.message.subtype,name:of_sale.mt_of_sale_mail_subscribtion
+msgid "Mail"
+msgstr ""
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_product_category__of_main_product

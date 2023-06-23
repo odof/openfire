@@ -95,7 +95,7 @@ class ResConfigSettings(models.TransientModel):
         view and view.write({'active': self.of_fiscal_position_required})
 
     def _set_of_sale_mail_subtype_subscribtion(self):
-        subtype = self.env.ref('of_base.mt_of_sale_mail_subscribtion', raise_if_not_found=False)
+        subtype = self.env.ref('of_sale.mt_of_sale_mail_subscribtion', raise_if_not_found=False)
         subtype and subtype.write({'hidden': not self.of_sale_mail_subtype_subscribtion})
 
     def _set_of_sale_confirmation_date_mode(self):

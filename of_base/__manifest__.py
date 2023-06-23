@@ -13,15 +13,14 @@
         'base_iban',
         'base_vat',
         'crm',
-        'sale',
         'product',
         'mail',
-        'contacts'
+        'contacts',
+        'base_view_inheritance_extension'
     ],
     'data': [
         'data/ir_cron.xml',
         'data/ir_config_parameter.xml',
-        'data/mail_message_subtype.xml',
         'data/report_paperformat.xml',
         'security/of_base_security.xml',
         'security/ir.model.access.csv',

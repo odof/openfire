@@ -243,7 +243,7 @@ class SaleOrder(models.Model):
     def create(self, vals_list):
         records = super().create(vals_list)
         if self.env['ir.config_parameter'].sudo().get_param('of.sale.of_sale_mail_subtype_subscribtion'):
-            if mail_subtype := self.env.ref('of_base.mt_of_sale_mail_subscribtion', raise_if_not_found=False):
+            if mail_subtype := self.env.ref('of_sale.mt_of_sale_mail_subscribtion', raise_if_not_found=False):
                 # Subscribe the followers of the mail subtype to the new records
                 records.message_subscribe(partner_ids=records.mapped('partner_id')._ids, subtype_ids=[mail_subtype.id])
         return records
@@ -251,7 +251,7 @@ class SaleOrder(models.Model):
     def write(self, vals):
         subtype_icp = self.env['ir.config_parameter'].sudo().get_param('of.sale.of_sale_mail_subtype_subscribtion')
         if subtype_icp:
-            mail_subtype = self.env.ref('of_base.mt_of_sale_mail_subscribtion', raise_if_not_found=False)
+            mail_subtype = self.env.ref('of_sale.mt_of_sale_mail_subscribtion', raise_if_not_found=False)
             old_partner_ids = mail_subtype and vals.get('partner_id') and self.mapped('partner_id').ids or []
         res = super().write(vals)
         if subtype_icp and (mail_subtype and vals.get('partner_id')):
@@ -271,7 +271,7 @@ class SaleOrder(models.Model):
     def action_quotation_send(self):
         action = super().action_quotation_send()
         if self.env['ir.config_parameter'].sudo().get_param('of.sale.of_sale_mail_subtype_subscribtion'):
-            if mail_subtype := self.env.ref('of_base.mt_of_sale_mail_subscribtion', raise_if_not_found=False):
+            if mail_subtype := self.env.ref('of_sale.mt_of_sale_mail_subscribtion', raise_if_not_found=False):
                 action['context'].update({'default_subtype_id': mail_subtype.id})
         return action
 
@@ -342,8 +342,16 @@ class SaleOrder(models.Model):
         values = super()._prepare_invoice()  # <- self.ensure_one()
         if self.of_printing_apply_on_move:
             values['of_price_printing'] = self.of_price_printing
-        if self.env['ir.config_parameter'].sudo().get_param('of.sale.of_stop_payment_term_propagation'):
+        if self.env['ir.config_parameter'].sudo().get_param(
+            'of.sale.of_stop_payment_term_propagation'
+        ) and not self._context.get('of_down_payment_final_invoice'):
             values['invoice_payment_term_id'] = False
+        if self._context.get('of_down_payment_final_invoice'):
+            if (
+                balance_invoice_payment_term_id := self.payment_term_id
+                and self.payment_term_id.of_balance_invoice_payment_term_id
+            ):
+                values.update({'invoice_payment_term_id': balance_invoice_payment_term_id.id})
         return values
 
     def name_get(self):
@@ -390,7 +398,7 @@ class SaleOrder(models.Model):
     # Report methods
     # -------------------------------------------------------------------------
 
-    # TODO: Uncomment me and continue the migration when `of_account` module is migrated
+    # TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
     # def _of_get_total_lines_by_group(self):
     #     """
     #     Retourne les lignes de la commande, séparées en fonction du groupe dans lequel les afficher.
@@ -447,17 +455,17 @@ class SaleOrder(models.Model):
     #             if group.is_group_paiements():
     #                 result.append((group, lines))  # lines est vide
     #     return result
-    # End of TODO: Uncomment me and continue the migration when `of_account` module is migrated
+    # End of TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
 
-    # TODO: Uncomment me and continue the migration when `of_account` module is migrated
+    # TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
     # def _of_get_printable_lines(self):
     #     """[IMPRESSION]
     #     Renvoie les lignes à afficher
     #     """
     #     return self._of_get_total_lines_by_group()[0][1]
-    # End of TODO: Uncomment me and continue the migration when `of_account` module is migrated
+    # End of TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
 
-    # TODO: Uncomment me and continue the migration when `of_account` module is migrated
+    # TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
     # def _prepare_tax_line_vals(self, line, tax):  # FIXME: no longer exists in v16
     #     """Emulation de la fonction du même nom du modèle 'account.invoice'
     #     Permet de récupérer la clé de groupement dans _of_get_printable_totals
@@ -472,9 +480,9 @@ class SaleOrder(models.Model):
     #         'account_analytic_id': tax['analytic'] or False,
     #         'account_id': tax['account_id'] or tax['refund_account_id'] or False,
     #     }
-    # End of TODO: Uncomment me and continue the migration when `of_account` module is migrated
+    # End of TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
 
-    # TODO: Uncomment me and continue the migration when `of_account` module is migrated
+    # TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
     # def _of_get_printable_totals(self):
     #     """[IMPRESSION]
     #     Retourne un dictionnaire contenant les valeurs à afficher dans les totaux de la commande pdf.
@@ -565,9 +573,9 @@ class SaleOrder(models.Model):
     #     result['total'] = result_total
 
     #     return result
-    # End of TODO: Uncomment me and continue the migration when `of_account` module is migrated
+    # End of TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
 
-    # TODO: Uncomment me and continue the migration when `of_account` module is migrated
+    # TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
     # def _of_get_printable_payments(self, order_lines):
     #     """[IMPRESSION]
     #     Renvoie les lignes à afficher.
@@ -592,4 +600,4 @@ class SaleOrder(models.Model):
     #             name = move_obj._of_get_payment_display(move_line)
     #             result.append((name, payment['amount']))
     #     return result
-    # End of TODO: Uncomment me and continue the migration when `of_account` module is migrated
+    # End of TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated

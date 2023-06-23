@@ -3,7 +3,7 @@
 
     <record id="of_account_account_admin_editable_rule" model="ir.rule">
         <field name="name">OF Account editable admin</field>
-        <field name="model_id" ref="model_account_account"/>
+        <field name="model_id" ref="account.model_account_account"/>
         <field name="domain_force">[('of_editable', '=', True)]</field>
         <field name="perm_read" eval="False"/>
     </record>

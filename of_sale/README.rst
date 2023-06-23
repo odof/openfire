@@ -11,9 +11,7 @@ Fonctionnalités
 Clients
 -------
 
-* **Modification du système d'avertissement** et mise en place du socle technique et fonctionnel pour différents objets (commande, facture, etc.)
-    - adaptation du fonctionnement Odoo standard pour permettre d'activer un message d'avertissement sur un objet;
-    - une liste de choix apparait sur la fiche client pour permettre d'activer ou non l'avertissement pour les commandes ou les factures
+* Ajustement du système de **message d'avertissement** sur les fiches clients pour y ajouter l'option des commandes
 
 * Mise en place d'une **politique de facturation par défaut** pour les commandes sur la fiche client :
     - facturation sur les quantités commandées;

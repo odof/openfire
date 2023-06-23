@@ -1,10 +1,10 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-# import json  TODO: Uncomment me when `of_account` module is migrated
+# import json  TODO: Uncomment me when `of_account_invoice_report` module is migrated
 
 from odoo import Command, api, fields, models
 
-# from odoo.tools import float_compare  TODO: Uncomment me when `of_account` module is migrated
+# from odoo.tools import float_compare  TODO: Uncomment me when `of_account_invoice_report` module is migrated
 
 
 class AccountMove(models.Model):
@@ -19,13 +19,13 @@ class AccountMove(models.Model):
         comodel_name='stock.picking', compute='_compute_of_picking_ids', string="Deliveries"
     )
     of_picking_count = fields.Integer(compute='_compute_of_picking_ids', string="Nbr of deliveries")
-    # TODO: Uncomment me and continue the migration when `of_account` module is migrated
+    # TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
     # of_residual = fields.Monetary(
     #     string="Sum of the unpaid amount of the deposit invoices and the final invoice",
     #     compute='_compute_of_residual',
     # )
     # of_residual_equal = fields.Boolean(compute='_compute_of_residual', string="Residual equal")
-    # End of TODO: Migrate me when `of_account` module is migrated
+    # End of TODO: Migrate me when `of_account_invoice_report` module is migrated
     of_internal_followup = fields.Char(string="Internal follow-up")
     of_price_printing = fields.Selection(
         selection='_get_selection_of_price_printing',
@@ -77,7 +77,7 @@ class AccountMove(models.Model):
             move.of_picking_ids = of_picking_ids
             move.of_picking_count = of_picking_count
 
-    # TODO: Uncomment me and continue the migration when `of_account` module is migrated
+    # TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
     # @api.depends('invoice_line_ids')
     # def _compute_of_residual(self):
     #     group_paiements = self.env['of.invoice.report.total.group'].get_group_paiements()
@@ -102,24 +102,7 @@ class AccountMove(models.Model):
     #         moves = move | order_lines.mapped('invoice_lines').mapped('move_id')
     #         move.of_residual = sum(moves.mapped('residual'))
     #         move.of_residual_equal = move.state == 'draft' or float_compare(move.of_residual, move.residual, 2) == 0
-    # End of TODO: Migrate me and continue the migration when `of_account` module is migrated
-
-    # -------------------------------------------------------------------------
-    # Onchange methods
-    # -------------------------------------------------------------------------
-
-    @api.onchange('partner_id')
-    def _onchange_partner_id_warning(self):
-        partner = self.partner_id
-
-        # If partner has no warning, check its parents
-        # invoice_warn is shared between different objects
-        if not partner.of_is_account_warn and partner.parent_id:
-            partner = partner.parent_id
-
-        if partner.of_is_account_warn and partner.invoice_warn != 'no-message':
-            return super()._onchange_partner_id_warning()
-        return
+    # End of TODO: Migrate me and continue the migration when `of_account_invoice_report` module is migrated
 
     # -------------------------------------------------------------------------
     # Action methods
@@ -191,7 +174,7 @@ class AccountMove(models.Model):
             or "#000000"
         )
 
-    # TODO: Uncomment me and continue the migration when `of_account` module is migrated
+    # TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
     # def _report_of_get_linked_invoices(self):
     #     """[IMPRESSION]
     #     Retourne les factures liées à la facture courante.
@@ -258,9 +241,9 @@ class AccountMove(models.Model):
     #     # Tri dans l'ordre
     #     moves = move_obj.search([('id', 'in', moves.ids)])
     #     return moves
-    # End of TODO: Uncomment me and continue the migration when `of_account` module is migrated
+    # End of TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
 
-    # TODO: Uncomment me and continue the migration when `of_account` module is migrated
+    # TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
     # def _report_of_get_printable_payments(self):
     #     """[IMPRESSION]
     #     Renvoie les lignes à afficher.
@@ -281,9 +264,9 @@ class AccountMove(models.Model):
     #             name = self._of_get_payment_display(move_line)
     #             result_dict[sort_key] = (name, payment['amount'])
     #     return [result_dict[key] for key in sorted(result_dict)]
-    # End of TODO: Uncomment me and continue the migration when `of_account` module is migrated
+    # End of TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
 
-    # TODO: Uncomment me and continue the migration when `of_account` module is migrated
+    # TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
     # def _report_of_get_recap_taxes(self, moves):
     #     """[IMPRESSION]
     #     Retourne la liste des taxes à afficher dans le récapitulatif de la facture pdf.
@@ -309,9 +292,9 @@ class AccountMove(models.Model):
     #         vals[1] = round_curr(vals[1])
     #         vals[2] = round_curr(vals[2])
     #     return [vals for vals in tax_vals if vals[1]]
-    # End of TODO: Uncomment me and continue the migration when `of_account` module is migrated
+    # End of TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
 
-    # TODO: Uncomment me and continue the migration when `of_account` module is migrated
+    # TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
     # def _report_of_get_printable_data(self):
     #     result = super()._report_of_get_printable_data()
     #     lines_to_report = self._get_order_lines_to_report()
@@ -328,4 +311,4 @@ class AccountMove(models.Model):
     #             report_pages.append(page)
     #     result['lines_layouted'] = report_pages
     #     return result
-    # End of TODO: Uncomment me and continue the migration when `of_account` module is migrated
+    # End of TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated

@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_account_view_account_move_tree" model="ir.ui.view">
+        <field name="name">of.account.move.tree</field>
+        <field name="model">account.move</field>
+        <field name="priority">20</field>
+        <field name="inherit_id" ref="account.view_move_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='to_check']" position="after">
+                <field name="of_exported" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_account_view_account_move_form" model="ir.ui.view">
+        <field name="name">of.account.move.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <!-- Payment terms and date due : Keep them both displayed -->
+            <xpath expr="//group[@id='header_right_group']//label[@for='invoice_date_due']/.." position="replace"/>
+            <xpath expr="//group[@id='header_right_group']//field[@name='invoice_date_due']/.." position="replace"/>
+            <xpath expr="//group[@id='header_right_group']//field[@name='partner_bank_id']" position="after">
+                <field name="invoice_payment_term_id" force_save="1" placeholder="Terms"/>
+                <field name="invoice_date_due" force_save="1" placeholder="Date"/>
+            </xpath>
+            <!-- /Payment terms and date due -->
+
+            <!-- Partner related information -->
+            <xpath expr="//group[@id='header_left_group']//field[@name='partner_id']" position="after">
+                <label string="Customer details" for="of_partner_phone" attrs="{'invisible': [('move_type', 'not in', ('out_invoice', 'out_refund', 'out_receipt'))]}"/>
+                <label string="Vendor details" for="of_partner_phone" attrs="{'invisible': [('move_type', 'not in', ('in_invoice', 'in_refund', 'in_receipt'))]}"/>
+                <div name="partner_details" attrs="{'invisible': [('move_type', 'not in', ('in_invoice', 'in_refund', 'in_receipt'))]}">
+                    <field name="of_partner_phone" nolabel="1" style="margin-right:10px;" attrs="{'invisible': [('of_partner_phone', '=', False)]}"/>
+                    <field name="of_partner_mobile" nolabel="1"/><br/>
+                    <field name="of_partner_email" nolabel="1"/>
+                </div>
+            </xpath>
+            <!-- /Partner related information -->
+
+            <!-- Header right group -->
+            <xpath expr="//group[@id='header_right_group']//field[@name='invoice_date']" position="after">
+                <field name="fiscal_position_id" position="move"/>
+            </xpath>
+            <!-- /Header right group -->
+
+            <!-- Invoice line tab -->
+            <xpath expr="//page[@id='invoice_tab']//field[@name='invoice_line_ids']/tree//field[@name='product_id']" position="before">
+                <button name="action_button_open_account_move_line" style="max-width: 39px;" type="object" icon="fa-folder-open" title="Open account move line"
+                        attrs="{'invisible': ['|', ('id', '=', False), ('parent.state', '!=', 'draft')]}"/>
+            </xpath>
+            <xpath expr="//page[@id='invoice_tab']//field[@name='invoice_line_ids']/form" position="replace">
+            </xpath>
+            <xpath expr="//page[@id='invoice_tab']//field[@name='invoice_line_ids']" position="attributes">
+                <attribute name="context" operation="update">
+                    {
+                        "form_view_ref": "of_account.of_account_move_line_form",
+                        "of_only_default_code": True,
+                    }
+                </attribute>
+            </xpath>
+            <!-- /Invoice line tab -->
+
+            <!-- Move line tab -->
+            <xpath expr="//page[@id='aml_tab']//field[@name='line_ids']" position="attributes">
+                <attribute name="context" operation="update">
+                    {
+                        "default_partner_id": partner_id,
+                        "default_name": ref,
+                        "line_ids": line_ids,
+                    }
+                </attribute>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']/tree/field[@name='credit']" position="after">
+                <field name="balance" sum="Total Balance"/>
+            </xpath>
+            <xpath expr="//page[@id='aml_tab']//field[@name='line_ids']/tree/field[@name='name']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@id='aml_tab']//field[@name='line_ids']/tree/field[@name='name']" position="after">
+                <field name="of_name" />
+            </xpath>
+            <!-- /Move line tab -->
+
+            <!-- Other info tab -->
+            <xpath expr="//page[@id='other_tab']//field[@name='ref']" position="after">
+                <field name="of_customer_category_ids" widget="many2many_tags"  options="{'color_field': 'color'}"/>
+            </xpath>
+            <!-- /Other info tab -->
+        </field>
+    </record>
+
+    <record id="of_view_account_invoice_filter" model="ir.ui.view">
+        <field name="name">of.account.invoice.select</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='journal_id']" position="after">
+                <field name="of_customer_category_ids"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

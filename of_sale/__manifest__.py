@@ -1,7 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': u"OpenFire / Ventes",
+    'name': "OpenFire / Ventes",
     'version': '16.0.1.0.0',
     'license': 'AGPL-3',
     'author': "OpenFire",
@@ -11,6 +11,7 @@
     'description': "",
     'depends': [
         # "of_account_invoice_report",  # TODO: uncomment when of_account is migrated
+        'of_account',
         # "of_account_tax",  # TODO: uncomment when of_account is migrated
         'of_base_location',
         'of_custom_document',
@@ -28,6 +29,7 @@
     },
     'data': [
         'data/ir_config_parameter.xml',
+        'data/mail_message_subtype.xml',
         'security/ir.model.access.csv',
         'security/res_groups.xml',
         'views/res_config_settings_views.xml',
@@ -37,7 +39,6 @@
         'views/sale_order_line_views.xml',
         'views/product_category_views.xml',
         'views/res_partner_views.xml',
-        'views/payment_term_views.xml',
         'report/report_sale_order.xml',
         'report/report_account_move.xml',
         'wizard/of_sale_order_add_quote_views.xml',
@@ -46,6 +47,7 @@
         'wizard/sale_make_invoice_advance_views.xml',
         'wizard/of_sale_order_verification_views.xml',
         'wizard/of_sale_order_confirmation_views.xml',
+        'wizard/of_res_partner_check_duplications_views.xml',
     ],
     'installable': True,
     'application': False,
