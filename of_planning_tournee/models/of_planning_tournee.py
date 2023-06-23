@@ -38,7 +38,7 @@ WEEKDAYS_TR = {
 
 class OFPlanningTournee(models.Model):
     _name = 'of.planning.tournee'
-    _inherit = 'of.map.view.mixin'
+    _inherit = ['of.map.view.mixin', 'of.readgroup']
     _description = "Tour"
     _order = 'date DESC'
 
@@ -74,6 +74,7 @@ class OFPlanningTournee(models.Model):
     sector_ids = fields.Many2many(
         comodel_name='of.secteur', relation='tour_sector_rel', column1='tour_id', column2='sector_id',
         string="Sectors", domain="[('type', 'in', ['tech', 'tech_com'])]")
+    sector_kanban_names = fields.Text(string=u"Sector names", compute='_compute_sector_kanban_names')
     zip_id = fields.Many2one(comodel_name='res.better.zip', string=u"Ville")
     epi_lat = fields.Float(string=u'Épicentre Lat', digits=(12, 12))
     epi_lon = fields.Float(string=u'Épicentre Lon', digits=(12, 12))
@@ -114,6 +115,11 @@ class OFPlanningTournee(models.Model):
     additional_records = fields.Text(compute='_compute_additional_records', string="Additionnal records")
     map_tour_line_ids = fields.One2many(
         comodel_name='of.planning.tour.line', compute='_compute_map_tour_line_ids', string="Tour lines")
+
+    # Pour recherche
+    gb_sector_id = fields.Many2one(
+        comodel_name='of.secteur', compute=lambda *a, **k: {}, search='_search_gb_sector_id', string=u"Secteur",
+        of_custom_groupby=True)
 
     _sql_constraints = [
         ('date_employee_uniq', 'unique (date,employee_id)',
@@ -258,6 +264,14 @@ class OFPlanningTournee(models.Model):
         for tour in self:
             lines = tour.mapped('tour_line_ids.sequence')
             tour.max_line_sequence = lines and max(lines) or 0
+
+    @api.depends('sector_ids')
+    def _compute_sector_kanban_names(self):
+        for record in self:
+            record.sector_kanban_names = " - ".join([sector.name for sector in record.sector_ids])
+
+    def _search_gb_sector_id(self, operator, value):
+        return [('sector_ids', operator, value)]
 
     @api.onchange('zip_id')
     def _onchange_zip_id(self):
@@ -1198,3 +1212,24 @@ class OFPlanningTournee(models.Model):
                 'Done. Cron generate tour for new employees %s. Next call is still scheduled on %s' % (
                     new_employees, cron_generate_nextcall))
         return True
+
+    @api.model
+    def _read_group_process_groupby(self, gb, query):
+        # Ajout de la possibilité de regrouper par employé
+        if gb != 'gb_sector_id':
+            return super(OFPlanningTournee, self)._read_group_process_groupby(gb, query)
+
+        alias, _ = query.add_join(
+            (self._table, 'tour_sector_rel', 'id', 'tour_id', 'sector_ids'),
+            implicit=False, outer=True,
+        )
+
+        return {
+            'field': gb,
+            'groupby': gb,
+            'type': 'many2one',
+            'display_format': None,
+            'interval': None,
+            'tz_convert': False,
+            'qualified_field': '"%s".sector_id' % (alias,)
+        }
