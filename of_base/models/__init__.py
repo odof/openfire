@@ -12,3 +12,5 @@ from . import res_company
 from . import res_bank
 from . import ir_ui_menu
 from . import res_users
+from . import ir_attachment
+from . import models
