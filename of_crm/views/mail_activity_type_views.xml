@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_mail_activity_type_view_form" model="ir.ui.view">
+        <field name="name">of.crm.mail.activity.type.view.form</field>
+        <field name="model">mail.activity.type</field>
+        <field name="inherit_id" ref="mail.mail_activity_type_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//p[@role='alert']" position="after">
+                <group name="crm_activity_settings" string="CRM activites settings">
+                    <field name="of_object"/>
+                    <field name="of_load_attachment"/>
+                    <field name="of_team_id"/>
+                    <field name="of_compute_date_id"/>
+                    <field name="of_days"/>
+                    <field name="of_compute_date_res_field" invisible="1"/>
+                    <field name="of_automatic_recompute" attrs="{'invisible':[('of_compute_date_res_field', '=', 'today_date')]}"/>
+                </group>
+            </xpath>
+            <xpath expr="//div[hasclass('oe_title')]//h1" position="after">
+                <label for="of_short_name" class="oe_edit_only"/>
+                <h4><field name="of_short_name"/></h4>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_crm_crm_activity_view_search" model="ir.ui.view">
+        <field name="name">of.crm.mail.activity.type.search</field>
+        <field name="model">mail.activity.type</field>
+        <field name="inherit_id" ref="mail.mail_activity_type_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="of_short_name"/>
+                <field name="of_team_id"/>
+                <field name="of_compute_date_id"/>
+                <group string="Group By" name="groupby">
+                    <filter string="Object" name="object" context="{'group_by':'of_object'}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_crm_mail_activity_type_view_tree" model="ir.ui.view">
+        <field name="name">of.crm.mail.activity.type.view.tree</field>
+        <field name="model">mail.activity.type</field>
+        <field name="inherit_id" ref="mail.mail_activity_type_view_tree"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="of_short_name"/>
+                <field name="of_object"/>
+                <field name="of_compute_date_id"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

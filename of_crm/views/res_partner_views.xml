@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_crm_view_partner_form" model="ir.ui.view">
+        <field name="name">of.crm.res.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook//page[@name='sales_purchases']//group[@name='sale']//field[@name='user_id']" position="after">
+                <field name="of_canvasser_id"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page name="marketing" string="Marketing">
+                    <group>
+                        <group string="Source" name="utm">
+                            <field name="of_lead_campaign_id" attrs="{'invisible': [('opportunity_ids', '=', [])]}"/>
+                            <field name="of_lead_medium_id" attrs="{'invisible': [('opportunity_ids', '=', [])]}"/>
+                            <field name="of_lead_source_id" attrs="{'invisible': [('opportunity_ids', '=', [])]}"/>
+                            <field name="campaign_id" attrs="{'invisible': [('opportunity_ids', '!=', [])]}"/>
+                            <field name="medium_id" attrs="{'invisible': [('opportunity_ids', '!=', [])]}"/>
+                            <field name="source_id" attrs="{'invisible': [('opportunity_ids', '!=', [])]}"/>
+                            <!-- /!\ Readonly field to avoid on_change problems /!\ -->
+                            <!-- TODO : Still a pb now ? Remove me ? -->
+                            <field name="opportunity_ids" readonly="1" invisible="1"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_crm_view_res_partner_filter" model="ir.ui.view">
+        <field name="name">res.partner.select</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="of_canvasser_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="base.action_partner_form" model="ir.actions.act_window">
+        <field name="context">{'search_default_confirmed': 1, 'default_of_customer_state': 'customer', 'res_partner_search_mode': 'customer'}</field>
+    </record>
+
+    <record id="of_crm_action_prospect_act" model="ir.actions.act_window">
+        <field name="name">Prospects</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{'search_default_lead': 1, 'default_of_customer_state': 'lead', 'res_partner_search_mode': 'customer'}</field>
+        <field name="search_view_id" ref="of_crm_view_res_partner_filter"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a Contact in your address book
+            </p><p>
+                Odoo helps you track all activities related to your contacts.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="of_crm_menu_prospect"
+        action="of_crm_action_prospect_act"
+        parent="crm.crm_menu_sales"
+        name="Prospects"
+        sequence="4"/>
+
+</odoo>

@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_crm_funnel_conversion_user,access.of.crm.funnel.conversion.user,model_of_crm_funnel_conversion,base.group_user,1,0,0,0
+access_of_crm_funnel_conversion2_user,access.of.crm.funnel.conversion2.user,model_of_crm_funnel_conversion2,base.group_user,1,0,0,0
+access_of_invoiced_revenue_analysis_user,access.of.invoiced.revenue.analysis.user,model_of_invoiced_revenue_analysis,base.group_user,1,0,0,0

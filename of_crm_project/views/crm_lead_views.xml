@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_view_crm_case_leads_filter" model="ir.ui.view">
+        <field name="name">of.crm.lead.search - Leads</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="of_crm.view_crm_case_leads_filter"/>
+        <field name="arch" type="xml">
+            <field name="contact_name" position="after">
+                <field name="of_projet_line_ids" string="Projet"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="of_crm_lead_view_form" model="ir.ui.view">
+        <field name="name">of.crm.project.lead.form</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="of_crm.of_crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='opportunity_followup']//field[@name='date_deadline']" position="before">
+                <field name="of_date_project"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_crm_project_view_crm_case_opportunities_filter" model="ir.ui.view">
+        <field name="name">of.crm.product.crm.lead.search.opportunity</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.view_crm_case_opportunities_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='contact_name']" position="after">
+                <field name="of_projet_line_ids" string="Projet"/>
+            </xpath>
+        </field>
+    </record>
+
+
+</odoo>
